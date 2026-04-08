@@ -8,6 +8,11 @@ import { render } from '@testing-library/react';
  */
 import { createElement, Fragment, Component } from '../react';
 import createInterpolateElement from '../create-interpolate-element';
+import type {
+	ExtractTags,
+	InterpolationInput,
+	InterpolationString,
+} from '../types';
 
 describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is no conversion map', () => {
@@ -26,10 +31,11 @@ describe( 'createInterpolateElement', () => {
 	it( 'throws an error when there is an invalid conversion map', () => {
 		const testString = 'This is a <someValue/> string';
 		expect( () =>
-			createInterpolateElement( testString, [
-				'someValue',
-				{ value: 10 },
-			] )
+			createInterpolateElement(
+				testString,
+				// @ts-expect-error - Invalid argument type
+				[ 'someValue', { value: 10 } ]
+			)
 		).toThrow( TypeError );
 	} );
 	it(
@@ -39,7 +45,8 @@ describe( 'createInterpolateElement', () => {
 			const testString = 'This is a <item /> string and <somethingElse/>';
 			expect( () =>
 				createInterpolateElement( testString, {
-					someValue: <em />,
+					item: <em />,
+					// @ts-expect-error - Invalid type for somethingElse
 					somethingElse: 10,
 				} )
 			).toThrow( TypeError );
@@ -53,6 +60,7 @@ describe( 'createInterpolateElement', () => {
 			const expectedElement = <>{ testString }</>;
 			expect(
 				createInterpolateElement( testString, {
+					// @ts-expect-error - Unknown tag
 					someValue: <strong />,
 				} )
 			).toEqual( expectedElement );
@@ -162,8 +170,8 @@ describe( 'createInterpolateElement', () => {
 	} );
 	it( 'returns expected output for complex replacement', () => {
 		class TestComponent extends Component {
-			render( props ) {
-				return <div { ...props } />;
+			render() {
+				return <div { ...this.props } />;
 			}
 		}
 		const testString =
@@ -216,6 +224,37 @@ describe( 'createInterpolateElement', () => {
 
 		expect( container ).toContainHTML( '<strong>string!</strong>' );
 		expect( container ).not.toContainHTML( '<em>' );
+	} );
+	it( 'extracts all tag names from a template literal string', () => {
+		// Type-level test: verify ExtractTags extracts all tags correctly.
+		type Tags = ExtractTags< '<a>link</a> and <b>bold <c>nested</c></b>' >;
+		const tags: Tags[] = [ 'a', 'b', 'c' ];
+		expect( tags ).toHaveLength( 3 );
+	} );
+	it( 'extracts tags from a TransformedText input', () => {
+		// Type-level test: verify InterpolationString unwraps TransformedText.
+		type Text = InterpolationString<
+			string & {
+				readonly __transformedText: '<a>link</a> and <em>emphasis</em>';
+			}
+		>;
+		type Tags = ExtractTags< Text >;
+		const tags: Tags[] = [ 'a', 'em' ];
+		expect( tags ).toHaveLength( 2 );
+	} );
+	it( 'extracts tags from a sprintf (TransformedText) input', () => {
+		// Type-level test: sprintf returns TransformedText, so
+		// InterpolationString unwraps it for tag inference.
+		type SprintfResult = string & {
+			readonly __transformedText: '<Name>%1$s</Name> wrote <Link>%2$s</Link>';
+		};
+		const _check: InterpolationInput = '' as SprintfResult;
+		void _check;
+
+		type Text = InterpolationString< SprintfResult >;
+		type Tags = ExtractTags< Text >;
+		const tags: Tags[] = [ 'Name', 'Link' ];
+		expect( tags ).toHaveLength( 2 );
 	} );
 	it( 'handles parsing emojii correctly', () => {
 		const testString = '👳‍♀️<icon>🚨🤷‍♂️⛈️fully</icon> here';

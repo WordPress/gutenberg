@@ -39,13 +39,64 @@ jest.mock( '@wordpress/blocks', () => ( {
 			},
 		},
 		{
+			name: 'core/test-object-query',
+			attributes: {
+				metadata: {
+					type: 'object',
+					query: {
+						title: { type: 'rich-text' },
+						value: { type: 'string' },
+					},
+				},
+			},
+		},
+		{
 			name: 'core/table',
 			attributes: {
 				hasFixedLayout: { type: 'boolean' },
 				caption: { type: 'rich-text' },
-				head: { type: 'array' },
-				body: { type: 'array' },
-				foot: { type: 'array' },
+				head: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
+							},
+						},
+					},
+				},
+				body: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
+							},
+						},
+					},
+				},
+				foot: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
+								scope: { type: 'string' },
+								align: { type: 'string' },
+							},
+						},
+					},
+				},
 			},
 		},
 	],
@@ -1159,7 +1210,8 @@ describe( 'crdt-blocks', () => {
 
 			const block = yblocks2.get( 0 );
 			const attrs = block.get( 'attributes' ) as YBlockAttributes;
-			const body = attrs.get( 'body' ) as {
+			const bodyYArray = attrs.get( 'body' ) as Y.Array< unknown >;
+			const body = bodyYArray.toJSON() as {
 				cells: { content: string; tag: string }[];
 			}[];
 
@@ -1218,14 +1270,16 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks2.get( 0 );
 			const attrs = block.get( 'attributes' ) as YBlockAttributes;
 
-			const head = attrs.get( 'head' ) as {
+			const headYArray = attrs.get( 'head' ) as Y.Array< unknown >;
+			const head = headYArray.toJSON() as {
 				cells: { content: string }[];
 			}[];
 			expect( head[ 0 ].cells[ 0 ].content ).toBe(
 				'<strong>Header</strong>'
 			);
 
-			const body = attrs.get( 'body' ) as {
+			const bodyYArray = attrs.get( 'body' ) as Y.Array< unknown >;
+			const body = bodyYArray.toJSON() as {
 				cells: { content: string }[];
 			}[];
 			expect( body[ 0 ].cells[ 0 ].content ).toBe(
@@ -1233,6 +1287,731 @@ describe( 'crdt-blocks', () => {
 			);
 
 			doc2.destroy();
+		} );
+
+		it( 'stores table body as nested Y types (Y.Array of Y.Maps with Y.Text)', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						body: [
+							{
+								cells: [
+									{
+										content:
+											RichTextData.fromPlainText( 'A1' ),
+										tag: 'td',
+									},
+									{
+										content:
+											RichTextData.fromPlainText( 'B1' ),
+										tag: 'td',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' );
+
+			// body should be a Y.Array, not a plain array.
+			expect( body ).toBeInstanceOf( Y.Array );
+
+			// Each row should be a Y.Map.
+			const row = ( body as Y.Array< unknown > ).get( 0 );
+			expect( row ).toBeInstanceOf( Y.Map );
+
+			// Each row's cells should be a Y.Array.
+			const cells = ( row as Y.Map< unknown > ).get( 'cells' );
+			expect( cells ).toBeInstanceOf( Y.Array );
+
+			// Each cell should be a Y.Map with Y.Text content.
+			const cell = ( cells as Y.Array< unknown > ).get( 0 );
+			expect( cell ).toBeInstanceOf( Y.Map );
+
+			const content = ( cell as Y.Map< unknown > ).get(
+				'content'
+			) as Y.Text;
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content.toString() ).toBe( 'A1' );
+
+			// tag should be a plain string value.
+			expect( ( cell as Y.Map< unknown > ).get( 'tag' ) ).toBe( 'td' );
+		} );
+
+		it( 'merges table cell edits in-place without replacing sibling cells', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Grab the Y.Text for cell B2 before the update.
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row1 = body.get( 1 ) as Y.Map< unknown >;
+			const cells1 = row1.get( 'cells' ) as Y.Array< unknown >;
+			const cellB2 = cells1.get( 1 ) as Y.Map< unknown >;
+			const b2Text = cellB2.get( 'content' ) as Y.Text;
+
+			// Edit only cell A1.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-edited', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+							{
+								cells: [
+									{ content: 'A2', tag: 'td' },
+									{ content: 'B2', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			// The Y.Text for B2 should be the exact same object (identity).
+			const bodyAfter = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row1After = bodyAfter.get( 1 ) as Y.Map< unknown >;
+			const cells1After = row1After.get( 'cells' ) as Y.Array< unknown >;
+			const cellB2After = cells1After.get( 1 ) as Y.Map< unknown >;
+			const b2TextAfter = cellB2After.get( 'content' ) as Y.Text;
+
+			expect( b2TextAfter ).toBe( b2Text );
+			expect( b2TextAfter.toString() ).toBe( 'B2' );
+
+			// Cell A1 should be updated.
+			const row0After = bodyAfter.get( 0 ) as Y.Map< unknown >;
+			const cells0After = row0After.get( 'cells' ) as Y.Array< unknown >;
+			const cellA1After = cells0After.get( 0 ) as Y.Map< unknown >;
+			const a1Content = cellA1After.get( 'content' ) as Y.Text;
+			expect( a1Content.toString() ).toBe( 'A1-edited' );
+		} );
+
+		it( 'rebuilds Y.Array when row count changes (structural edit)', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			// Add a second row.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'A1', tag: 'td' } ],
+							},
+							{
+								cells: [ { content: 'A2', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+
+			expect( body.length ).toBe( 2 );
+
+			const row1 = body.get( 1 ) as Y.Map< unknown >;
+			const cells = ( row1.get( 'cells' ) as Y.Array< unknown > ).get(
+				0
+			) as Y.Map< unknown >;
+			const a2Content = cells.get( 'content' ) as Y.Text;
+			expect( a2Content.toString() ).toBe( 'A2' );
+		} );
+
+		it( 'concurrent cell edits on different cells are both preserved', () => {
+			// Simulate two users editing different cells in the same table.
+			const initialBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			// Set up doc1 (User A).
+			mergeCrdtBlocks( yblocks, initialBlocks, null );
+
+			// Set up doc2 (User B) by syncing initial state.
+			const doc2 = new Y.Doc();
+			const yblocks2 = doc2.getArray< YBlock >();
+			Y.applyUpdate( doc2, Y.encodeStateAsUpdate( doc ) );
+
+			// User A edits cell A1.
+			const userABlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1-userA', tag: 'td' },
+									{ content: 'B1', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks, userABlocks, null );
+
+			// User B edits cell B1 (concurrently, before syncing A's change).
+			const userBBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{ content: 'A1', tag: 'td' },
+									{ content: 'B1-userB', tag: 'td' },
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+			mergeCrdtBlocks( yblocks2, userBBlocks, null );
+
+			// Sync: apply each other's changes.
+			const updateA = Y.encodeStateAsUpdate( doc );
+			const updateB = Y.encodeStateAsUpdate( doc2 );
+			Y.applyUpdate( doc2, updateA );
+			Y.applyUpdate( doc, updateB );
+
+			// Both docs should have both edits preserved.
+			for ( const checkBlocks of [ yblocks, yblocks2 ] ) {
+				const attrs = checkBlocks
+					.get( 0 )
+					.get( 'attributes' ) as YBlockAttributes;
+				const body = (
+					attrs.get( 'body' ) as Y.Array< unknown >
+				 ).toJSON() as { cells: { content: string }[] }[];
+
+				expect( body[ 0 ].cells[ 0 ].content ).toBe( 'A1-userA' );
+				expect( body[ 0 ].cells[ 1 ].content ).toBe( 'B1-userB' );
+			}
+
+			doc2.destroy();
+		} );
+
+		it( 'migrates plain array to Y.Array on first update', () => {
+			// Manually set up a block with a plain array body (old format).
+			const block = new Y.Map() as unknown as YBlock;
+			block.set( 'name' as any, 'core/table' );
+			block.set( 'clientId' as any, 'table-migration' );
+			block.set( 'innerBlocks' as any, new Y.Array() );
+
+			const attrs = new Y.Map();
+			attrs.set( 'hasFixedLayout', true );
+			// Store body as a plain array (pre-migration format).
+			attrs.set( 'body', [
+				{ cells: [ { content: 'old', tag: 'td' } ] },
+			] );
+			block.set( 'attributes' as any, attrs );
+
+			doc.transact( () => {
+				yblocks.push( [ block ] );
+			} );
+
+			// The body is currently a plain array.
+			expect( attrs.get( 'body' ) ).not.toBeInstanceOf( Y.Array );
+
+			// Now merge blocks, which should trigger migration.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						hasFixedLayout: true,
+						body: [
+							{
+								cells: [ { content: 'migrated', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			// After migration, body should be a Y.Array.
+			const bodyAfter = attrs.get( 'body' );
+			expect( bodyAfter ).toBeInstanceOf( Y.Array );
+
+			const bodyJson = ( bodyAfter as Y.Array< unknown > ).toJSON() as {
+				cells: { content: string }[];
+			}[];
+			expect( bodyJson[ 0 ].cells[ 0 ].content ).toBe( 'migrated' );
+		} );
+
+		it( 'preserves non-rich-text cell properties alongside Y.Text content', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Header',
+										tag: 'th',
+										scope: 'col',
+										align: 'center',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row = body.get( 0 ) as Y.Map< unknown >;
+			const cells = row.get( 'cells' ) as Y.Array< unknown >;
+			const cell = cells.get( 0 ) as Y.Map< unknown >;
+
+			// Rich-text content should be Y.Text.
+			const content = cell.get( 'content' ) as Y.Text;
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content.toString() ).toBe( 'Header' );
+
+			// Plain string properties should be stored as-is.
+			expect( cell.get( 'tag' ) ).toBe( 'th' );
+			expect( cell.get( 'scope' ) ).toBe( 'col' );
+			expect( cell.get( 'align' ) ).toBe( 'center' );
+
+			// Update only the content, verify other properties remain.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Updated Header',
+										tag: 'th',
+										scope: 'col',
+										align: 'center',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const cellAfter = (
+				(
+					( attrs.get( 'body' ) as Y.Array< unknown > ).get(
+						0
+					) as Y.Map< unknown >
+				 ).get( 'cells' ) as Y.Array< unknown >
+			 ).get( 0 ) as Y.Map< unknown >;
+
+			expect( ( cellAfter.get( 'content' ) as Y.Text ).toString() ).toBe(
+				'Updated Header'
+			);
+			expect( cellAfter.get( 'tag' ) ).toBe( 'th' );
+			expect( cellAfter.get( 'scope' ) ).toBe( 'col' );
+			expect( cellAfter.get( 'align' ) ).toBe( 'center' );
+		} );
+
+		it( 'deletes removed properties from Y.Map cells', () => {
+			const tableBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Header',
+										tag: 'th',
+										scope: 'col',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, tableBlocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const body = attrs.get( 'body' ) as Y.Array< unknown >;
+			const row = body.get( 0 ) as Y.Map< unknown >;
+			const cells = row.get( 'cells' ) as Y.Array< unknown >;
+			const cell = cells.get( 0 ) as Y.Map< unknown >;
+
+			// Scope should exist initially.
+			expect( cell.get( 'scope' ) ).toBe( 'col' );
+
+			// Update without the scope property.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [
+									{
+										content: 'Header',
+										tag: 'th',
+									},
+								],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const cellAfter = (
+				(
+					( attrs.get( 'body' ) as Y.Array< unknown > ).get(
+						0
+					) as Y.Map< unknown >
+				 ).get( 'cells' ) as Y.Array< unknown >
+			 ).get( 0 ) as Y.Map< unknown >;
+
+			// Scope should be deleted.
+			expect( cellAfter.get( 'scope' ) ).toBeUndefined();
+			// Other properties should remain.
+			expect( cellAfter.get( 'tag' ) ).toBe( 'th' );
+			expect( ( cellAfter.get( 'content' ) as Y.Text ).toString() ).toBe(
+				'Header'
+			);
+		} );
+
+		it( 'rebuilds Y.Array when element is wrong type (partial migration)', () => {
+			// Manually set up a block with a Y.Array whose elements are
+			// plain values instead of Y.Maps (simulating a partial migration).
+			const block = new Y.Map() as unknown as YBlock;
+			block.set( 'name' as any, 'core/table' );
+			block.set( 'clientId' as any, 'table-partial' );
+			block.set( 'innerBlocks' as any, new Y.Array() );
+
+			const attrs = new Y.Map();
+			// Create a Y.Array with a plain object element (not a Y.Map).
+			const bodyArray = new Y.Array();
+			bodyArray.insert( 0, [
+				{ cells: [ { content: 'plain', tag: 'td' } ] },
+			] );
+			attrs.set( 'body', bodyArray );
+			block.set( 'attributes' as any, attrs );
+
+			doc.transact( () => {
+				yblocks.push( [ block ] );
+			} );
+
+			// The element should be a plain object, not a Y.Map.
+			expect( bodyArray.get( 0 ) ).not.toBeInstanceOf( Y.Map );
+
+			// Merge, which should detect the wrong type and rebuild.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/table',
+					attributes: {
+						body: [
+							{
+								cells: [ { content: 'rebuilt', tag: 'td' } ],
+							},
+						],
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const bodyAfter = attrs.get( 'body' ) as Y.Array< unknown >;
+			expect( bodyAfter ).toBeInstanceOf( Y.Array );
+
+			// After rebuild, elements should be proper Y.Maps.
+			const row = bodyAfter.get( 0 );
+			expect( row ).toBeInstanceOf( Y.Map );
+
+			const cells = ( row as Y.Map< unknown > ).get(
+				'cells'
+			) as Y.Array< unknown >;
+			const cell = cells.get( 0 ) as Y.Map< unknown >;
+			expect( cell ).toBeInstanceOf( Y.Map );
+			expect( ( cell.get( 'content' ) as Y.Text ).toString() ).toBe(
+				'rebuilt'
+			);
+		} );
+	} );
+
+	describe( 'object+query attributes', () => {
+		it( 'creates Y.Map for object+query attributes with Y.Text sub-values', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'Hello',
+							value: 'world',
+						},
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const metadata = attrs.get( 'metadata' );
+
+			// Should be a Y.Map, not a plain object.
+			expect( metadata ).toBeInstanceOf( Y.Map );
+
+			const metadataMap = metadata as Y.Map< unknown >;
+
+			// title is rich-text, so it should be Y.Text.
+			expect( metadataMap.get( 'title' ) ).toBeInstanceOf( Y.Text );
+			expect( ( metadataMap.get( 'title' ) as Y.Text ).toString() ).toBe(
+				'Hello'
+			);
+
+			// value is a plain string, so it should remain a string.
+			expect( metadataMap.get( 'value' ) ).toBe( 'world' );
+		} );
+
+		it( 'merges object+query attribute in-place preserving Y.Map identity', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'Original',
+							value: 'v1',
+						},
+					},
+					innerBlocks: [],
+					clientId: 'obj-query-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const metadataBefore = attrs.get( 'metadata' ) as Y.Map< unknown >;
+			const titleBefore = metadataBefore.get( 'title' ) as Y.Text;
+
+			// Update the metadata.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'Updated',
+							value: 'v2',
+						},
+					},
+					innerBlocks: [],
+					clientId: 'obj-query-1',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const metadataAfter = attrs.get( 'metadata' ) as Y.Map< unknown >;
+
+			// The Y.Map should be the same object (in-place merge).
+			expect( metadataAfter ).toBe( metadataBefore );
+
+			// The Y.Text for title should be the same object (merged in-place).
+			const titleAfter = metadataAfter.get( 'title' ) as Y.Text;
+			expect( titleAfter ).toBe( titleBefore );
+			expect( titleAfter.toString() ).toBe( 'Updated' );
+
+			// Plain value should be updated.
+			expect( metadataAfter.get( 'value' ) ).toBe( 'v2' );
+		} );
+
+		it( 'deletes removed properties from object+query Y.Map', () => {
+			const blocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'Keep',
+							value: 'remove-me',
+						},
+					},
+					innerBlocks: [],
+					clientId: 'obj-query-2',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, blocks, null );
+
+			const attrs = yblocks
+				.get( 0 )
+				.get( 'attributes' ) as YBlockAttributes;
+			const metadata = attrs.get( 'metadata' ) as Y.Map< unknown >;
+			expect( metadata.get( 'value' ) ).toBe( 'remove-me' );
+
+			// Update without the value property.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'Keep',
+						},
+					},
+					innerBlocks: [],
+					clientId: 'obj-query-2',
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			expect( metadata.get( 'value' ) ).toBeUndefined();
+			expect( ( metadata.get( 'title' ) as Y.Text ).toString() ).toBe(
+				'Keep'
+			);
+		} );
+
+		it( 'upgrades plain value to Y.Map when schema requires it', () => {
+			// Manually set up a block with a plain object attribute
+			// where the schema expects object+query (Y.Map).
+			const block = new Y.Map() as unknown as YBlock;
+			block.set( 'name' as any, 'core/test-object-query' );
+			block.set( 'clientId' as any, 'obj-upgrade' );
+			block.set( 'innerBlocks' as any, new Y.Array() );
+
+			const attrs = new Y.Map();
+			// Store metadata as a plain object (pre-migration).
+			attrs.set( 'metadata', { title: 'plain', value: 'old' } );
+			block.set( 'attributes' as any, attrs );
+
+			doc.transact( () => {
+				yblocks.push( [ block ] );
+			} );
+
+			// metadata should be a plain object currently.
+			expect( attrs.get( 'metadata' ) ).not.toBeInstanceOf( Y.Map );
+
+			// Merge, which should upgrade to Y.Map.
+			const updatedBlocks: Block[] = [
+				{
+					name: 'core/test-object-query',
+					attributes: {
+						metadata: {
+							title: 'upgraded',
+							value: 'new',
+						},
+					},
+					innerBlocks: [],
+				},
+			];
+
+			mergeCrdtBlocks( yblocks, updatedBlocks, null );
+
+			const metadataAfter = attrs.get( 'metadata' );
+			expect( metadataAfter ).toBeInstanceOf( Y.Map );
+
+			const metadataMap = metadataAfter as Y.Map< unknown >;
+			expect( metadataMap.get( 'title' ) ).toBeInstanceOf( Y.Text );
+			expect( ( metadataMap.get( 'title' ) as Y.Text ).toString() ).toBe(
+				'upgraded'
+			);
+			expect( metadataMap.get( 'value' ) ).toBe( 'new' );
 		} );
 	} );
 

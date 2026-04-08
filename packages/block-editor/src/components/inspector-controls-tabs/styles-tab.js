@@ -88,6 +88,7 @@ const StylesTab = ( {
 					<InspectorControls.Slot
 						group="background"
 						label={ __( 'Background image' ) }
+						className="background-block-support-panel__inner-wrapper"
 					/>
 					<InspectorControls.Slot group="filter" />
 					<InspectorControls.Slot

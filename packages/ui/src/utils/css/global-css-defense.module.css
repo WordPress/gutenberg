@@ -1,0 +1,117 @@
+/*
+ * Unlayered defense against wp-admin global CSS (common.css, forms.css).
+ *
+ * CSS cascade layers always lose to unlayered styles, so @wordpress/ui's
+ * layered component styles get overridden by wp-admin's broad bare-element
+ * selectors. This file provides unlayered, class-scoped defenses that
+ * restore control to the component.
+ *
+ * Mechanism (custom property bridge):
+ *   .input { font-size: var(--_gcd-input-font-size, inherit); }
+ *
+ * - The class selector beats admin bare-element selectors in specificity.
+ * - Each property reads a custom property. The fallback values are what
+ *   makes sense for @wordpress/ui, to minimize the number of overrides
+ *   in each individual component stylesheet.
+ * - Component CSS modules only need to define the custom properties for
+ *   the specific properties they want to override.
+ * - Custom property definitions aren't suppressed by cascade layers, so the
+ *   layered value propagates through to the unlayered declaration.
+ *
+ * Usage: apply the element-specific class directly to each element that
+ * needs defense (e.g. defenseStyles.input on an <input>).
+ */
+
+/*
+ * ==========================================================================
+ * forms.css defense - https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-admin/css/forms.css
+ * ==========================================================================
+ */
+
+.button {
+	box-sizing: var(--_gcd-button-box-sizing, border-box);
+	font-family: var(--_gcd-button-font-family, inherit);
+	font-size: var(--_gcd-button-font-size, inherit);
+	font-weight: var(--_gcd-button-font-weight, inherit);
+}
+
+.input {
+	box-sizing: var(--_gcd-input-box-sizing, border-box);
+	font-family: var(--_gcd-input-font-family, inherit);
+	font-size: var(--_gcd-input-font-size, inherit);
+	font-weight: var(--_gcd-input-font-weight, inherit);
+	margin: var(--_gcd-input-margin, 0);
+
+	/* Also targets textarea elements, which the `Input` primitive can render as. We combine these textarea defenses
+	   into the input defenses to minimize the number of tokens, but they should be split if it ever becomes necessary. */
+	&:is(textarea, [type="text"], [type="password"], [type="color"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
+		box-shadow: var(--_gcd-input-box-shadow, 0 0 0 transparent);
+		border-radius: var(--_gcd-input-border-radius, 0);
+		border: var(--_gcd-input-border, none);
+		background-color: var(--_gcd-input-background-color, transparent);
+		color: var(--_gcd-input-color, var(--wpds-color-fg-interactive-neutral));
+
+		&:focus {
+			border-color: var(--_gcd-input-border-color-focus, var(--wp-admin-theme-color));
+			box-shadow: var(--_gcd-input-box-shadow-focus, none);
+			outline: var(--_gcd-input-outline-focus, none);
+		}
+
+		&:disabled {
+			background: var(--_gcd-input-background-disabled, transparent);
+			border-color: var(--_gcd-input-border-color-disabled, transparent);
+			box-shadow: var(--_gcd-input-box-shadow-disabled, none);
+			color: var(--_gcd-input-color-disabled, var(--wpds-color-fg-interactive-neutral-disabled));
+		}
+
+		&::placeholder {
+			color: var(--_gcd-input-placeholder-color, var(--wpds-color-fg-interactive-neutral-disabled));
+		}
+	}
+
+	&:is(textarea, [type="text"], [type="password"], [type="date"], [type="datetime"], [type="datetime-local"], [type="email"], [type="month"], [type="number"], [type="search"], [type="tel"], [type="time"], [type="url"], [type="week"]) {
+		padding: var(--_gcd-input-padding, 0);
+		line-height: var(--_gcd-input-line-height, inherit);
+		min-height: var(--_gcd-input-min-height, auto);
+	}
+}
+
+.textarea {
+	box-sizing: var(--_gcd-textarea-box-sizing, border-box);
+	overflow: var(--_gcd-textarea-overflow, auto);
+	resize: var(--_gcd-textarea-resize, block);
+}
+
+/*
+ * ==========================================================================
+ * common.css defense - https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-admin/css/common.css
+ * ==========================================================================
+ */
+
+.div {
+	outline: var(--_gcd-div-outline, 0 solid transparent);
+}
+
+/* Narrowed down to p elements only, to support element multiplicity of Text component. */
+p.p {
+	font-size: var(--_gcd-p-font-size, 13px);
+	line-height: var(--_gcd-p-line-height, 1.5);
+	margin: var(--_gcd-p-margin, 0);
+}
+
+/* Narrowed down to h[1-6] elements only, to support element multiplicity of Text component. */
+:is(h1, h2, h3, h4, h5, h6).heading {
+	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
+	font-size: var(--_gcd-heading-font-size, inherit);
+	font-weight: var(--_gcd-heading-font-weight, var(--wpds-font-weight-medium));
+	margin: var(--_gcd-heading-margin, 0);
+}
+
+.a,
+.a:is(:hover, :focus, :active) {
+	outline: var(--_gcd-a-outline, 0 solid transparent);
+	color: var(--_gcd-a-color, inherit);
+	box-shadow: var(--_gcd-a-box-shadow, none);
+	border-radius: var(--_gcd-a-border-radius, 0);
+	transition: var(--_gcd-a-transition, none);
+}

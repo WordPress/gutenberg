@@ -28,6 +28,10 @@
 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
 
+		--_gcd-button-font-family: var(--wpds-font-family-body);
+		--_gcd-button-font-size: var(--wp-ui-button-font-size);
+		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
+
 		/* Styles */
 		position: relative;
 		display: inline-flex;

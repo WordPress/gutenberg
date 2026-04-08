@@ -575,7 +575,7 @@ export function getNextNonWhitespaceToken( tokens ) {
 function getHTMLTokens( html, logger = createLogger() ) {
 	try {
 		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
-	} catch ( e ) {
+	} catch {
 		logger.warning( 'Malformed HTML detected: %s', html );
 	}
 
