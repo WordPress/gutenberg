@@ -2,11 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- DataViews: Migrate action modals and DataForm panel modals from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog` and `AlertDialog`. The `modalSize` value `'fill'` is deprecated in favour of `'stretch'`. New values `'stretch'` and `'full'` are available. Custom CSS targeting `.components-modal__*` classes inside action modals will no longer work. The `dataforms-layouts-panel__modal` CSS class on the panel modal and the `dataforms-layouts-panel__modal-footer` CSS class have been removed. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 14.2.0 (2026-04-29)
-
-### Enhancements
-
-- DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)
 
 ## 14.1.0 (2026-04-15)
 
@@ -35,8 +35,6 @@
 
 - DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
 - DataForm: The card layout now uses `Card` and `CollapsibleCard` from `@wordpress/ui` instead of `Card`, `CardHeader`, and `CardBody` from `@wordpress/components`. This changes the card's visual appearance (spacing, typography, and removal of the header/content separator). Custom CSS targeting `.components-card__body` within DataViews has been removed. Consumers wrapping DataViews or DataForm in a card should migrate to the `Card` and `CollapsibleCard` components from `@wordpress/ui`. [#76282](https://github.com/WordPress/gutenberg/pull/76282)
-- DataViews: Migrate action modals and DataForm panel modals from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog` and `AlertDialog`. The `modalSize` value `'fill'` is deprecated in favour of `'stretch'`. New values `'stretch'` and `'full'` are available. Custom CSS targeting `.components-modal__*` classes inside action modals will no longer work. [#76837](https://github.com/WordPress/gutenberg/pull/76837)
-- DataForm: The panel modal footer CSS class `.dataforms-layouts-panel__modal-footer` has been removed; the modal now uses `Dialog.Footer` for default spacing. [#76837](https://github.com/WordPress/gutenberg/pull/76837)
 
 ### Enhancements
 
