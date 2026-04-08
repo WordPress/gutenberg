@@ -63,15 +63,18 @@ const GUIDELINE_ITEMS = [
 	},
 ];
 
-function getInitialNavigatorPath() {
-	let view = '';
+const KNOWN_VIEWS = [ 'revision-history' ];
 
+function getInitialNavigatorPath() {
 	if ( window?.location?.href ) {
 		const url = new URL( window.location.href );
-		view = url.searchParams.get( 'view' ) ?? '';
+		const view = url.searchParams.get( 'view' ) ?? '';
+		if ( KNOWN_VIEWS.includes( view ) ) {
+			return `/${ view }`;
+		}
 	}
 
-	return `/${ view }`;
+	return '/';
 }
 
 function ContentGuidelinesPage() {

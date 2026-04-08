@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -14,13 +14,7 @@ import {
 } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useCallback,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useCallback, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
@@ -53,8 +47,6 @@ export default function RevisionHistory() {
 	const [ revisions, setRevisions ] = useState< ContentGuidelinesRevision[] >(
 		[]
 	);
-	const [ totalItems, setTotalItems ] = useState( 0 );
-	const [ totalPages, setTotalPages ] = useState( 0 );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ revisionToRestore, setRevisionToRestore ] =
 		useState< ContentGuidelinesRevision | null >( null );
@@ -75,14 +67,15 @@ export default function RevisionHistory() {
 
 		setIsLoading( true );
 		try {
+			// Fetch all revisions at once so client-side filtering works
+			// across the full dataset. Server-side pagination + filtering
+			// will be done together in a follow-up.
 			const result = await fetchContentGuidelinesRevisions( {
 				guidelinesId: guidelinesId!,
-				page: view.page,
-				perPage: view.perPage,
+				page: 1,
+				perPage: 100,
 			} );
 			setRevisions( result.revisions );
-			setTotalItems( result.total );
-			setTotalPages( result.totalPages );
 		} catch {
 			createErrorNotice(
 				__( 'Could not load revision history. Please try again.' ),
@@ -91,7 +84,7 @@ export default function RevisionHistory() {
 		} finally {
 			setIsLoading( false );
 		}
-	}, [ guidelinesId, view.page, view.perPage, createErrorNotice ] );
+	}, [ guidelinesId, createErrorNotice ] );
 
 	useEffect( () => {
 		loadRevisions();
@@ -162,20 +155,13 @@ export default function RevisionHistory() {
 		[ setRevisionToRestore ]
 	);
 
-	const hasActiveFilters = view.filters && view.filters.length > 0;
-
-	const { data: filteredRevisions, paginationInfo: filteredPaginationInfo } =
+	// Client-side pagination and filtering on the full dataset.
+	// TODO: Move both pagination and filtering to the API side together.
+	const { data: displayedRevisions, paginationInfo: paginationToShow } =
 		useMemo(
 			() => filterSortAndPaginate( revisions, view, fields ),
 			[ revisions, view, fields ]
 		);
-
-	const displayedRevisions = hasActiveFilters ? filteredRevisions : revisions;
-
-	// Todo: move filtering to the api level
-	const paginationToShow = hasActiveFilters
-		? filteredPaginationInfo
-		: { totalItems, totalPages };
 
 	async function handleRestore() {
 		if ( ! guidelinesId || ! revisionToRestore ) {
