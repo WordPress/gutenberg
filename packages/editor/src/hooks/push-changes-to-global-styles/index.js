@@ -125,33 +125,48 @@ const SIBLING_STYLE_ATTRIBUTES = [
  * @return {{ scopeBlockTitle: string|null, siblingClientIds: string[] }} The nearest ancestor's title and the sibling clientIds.
  */
 function useSiblingScope( blockName, clientId ) {
-	return useSelect(
+	const { parentId, scopeBlockTitle } = useSelect(
 		( select ) => {
 			const { getBlockParents, getBlockName, getClientIdsOfDescendants } =
 				select( blockEditorStore );
 
-			for ( const parentId of getBlockParents( clientId, true ) ) {
-				const sameTypeSiblings = getClientIdsOfDescendants(
-					parentId
-				).filter(
+			for ( const pId of getBlockParents( clientId, true ) ) {
+				const hasSibling = getClientIdsOfDescendants( pId ).some(
 					( id ) =>
 						id !== clientId && getBlockName( id ) === blockName
 				);
 
-				if ( sameTypeSiblings.length > 0 ) {
+				if ( hasSibling ) {
 					return {
-						scopeBlockTitle: getBlockType(
-							getBlockName( parentId )
-						)?.title,
-						siblingClientIds: sameTypeSiblings,
+						parentId: pId,
+						scopeBlockTitle:
+							getBlockType( getBlockName( pId ) )?.title ?? null,
 					};
 				}
 			}
 
-			return { scopeBlockTitle: null, siblingClientIds: [] };
+			return { parentId: null, scopeBlockTitle: null };
 		},
 		[ blockName, clientId ]
 	);
+
+	const siblingClientIds = useSelect(
+		( select ) => {
+			if ( ! parentId ) {
+				return [];
+			}
+
+			const { getBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
+
+			return getClientIdsOfDescendants( parentId ).filter(
+				( id ) => id !== clientId && getBlockName( id ) === blockName
+			);
+		},
+		[ parentId, blockName, clientId ]
+	);
+
+	return { scopeBlockTitle, siblingClientIds };
 }
 
 const getValueFromObjectPath = ( object, path ) => {
