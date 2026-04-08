@@ -396,6 +396,9 @@ export default function Image( {
 		hasNonContentControls &&
 		! isWideAligned &&
 		isLargeViewport;
+	// An image is uploading if it has a temporary blob URL, or if it is
+	// being processed client-side (e.g. transcoded or generating sub-sizes).
+	const isUploading = !! temporaryURL || isSideloading;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -885,9 +888,7 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={
-										!! temporaryURL || isSideloading
-									}
+									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -1104,11 +1105,6 @@ export default function Image( {
 	} else {
 		img = <ImageWrapper href={ href }>{ img }</ImageWrapper>;
 	}
-
-	// Don't show resize handles while an image is uploading — the
-	// temporary preview dimensions may not reflect the final image,
-	// and resizing mid-upload is not useful.
-	const isUploading = !! temporaryURL || isSideloading;
 
 	let resizableBox;
 	if (
