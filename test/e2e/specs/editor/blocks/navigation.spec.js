@@ -449,7 +449,7 @@ test.describe( 'Navigation block', () => {
 
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
-				await page.keyboard.press( Navigation.END_KEY );
+				await pageUtils.pressKeys( 'ArrowDown' );
 				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
@@ -570,7 +570,7 @@ test.describe( 'Navigation block', () => {
 			 * Test: Deleting first item returns focus to the parent submenu item
 			 */
 			// Add a link back so we can delete the first submenu link.
-			await page.keyboard.press( Navigation.END_KEY );
+			await pageUtils.pressKeys( 'ArrowDown' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
@@ -2134,10 +2134,6 @@ test.describe( 'Navigation block', () => {
 } );
 
 class Navigation {
-	/** Platform-aware Home/End keys for caret movement in contenteditable. */
-	static END_KEY = process.platform === 'darwin' ? 'Meta+ArrowRight' : 'End';
-	static HOME_KEY = process.platform === 'darwin' ? 'Meta+ArrowLeft' : 'Home';
-
 	constructor( { page, pageUtils, editor } ) {
 		this.page = page;
 		this.pageUtils = pageUtils;
