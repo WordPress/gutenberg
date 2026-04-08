@@ -1,92 +1,12 @@
 const tokenListModule = require( '@wordpress/theme/design-tokens.js' );
 const tokenList = tokenListModule.default || tokenListModule;
 
-const DS_TOKEN_PREFIX = 'wpds-';
-
-/**
- * Single-pass extraction that finds all `--prefix-*` tokens in a CSS value
- * string and classifies each occurrence as `var()`-wrapped or bare.
- *
- * @param {string} value       - The CSS value string to search.
- * @param {string} [prefix=''] - Optional prefix to filter variables (e.g., 'wpds-').
- * @return {{ tokens: Set<string>, bare: Set<string> }}
- *   `tokens` — every unique matched token;
- *   `bare`   — the subset that appeared at least once without a `var()` wrapper.
- *
- * @example
- * classifyTokens(
- *   'var(--wpds-color-fg) --wpds-color-bg',
- *   'wpds-'
- * );
- * // → { tokens: Set {'--wpds-color-fg','--wpds-color-bg'},
- * //     bare:   Set {'--wpds-color-bg'} }
- */
-function classifyTokens( value, prefix = '' ) {
-	const regex = new RegExp(
-		`(?:^|[^\\w])(var\\(\\s*)?(--${ prefix }[\\w-]+)`,
-		'g'
-	);
-	const tokens = new Set();
-	const bare = new Set();
-
-	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		const token = match[ 2 ];
-		tokens.add( token );
-		if ( ! match[ 1 ] ) {
-			bare.add( token );
-		}
-	}
-
-	return { tokens, bare };
-}
-
-/**
- * @param {string} value
- * @param {string} [prefix='']
- */
-function collectStaticTokenOccurrences( value, prefix = '' ) {
-	const regex = new RegExp(
-		`(?:^|[^\\w])(var\\(\\s*)?(--${ prefix }[\\w-]+)`,
-		'g'
-	);
-	const occurrences = [];
-
-	let match;
-	while ( ( match = regex.exec( value ) ) !== null ) {
-		occurrences.push( {
-			token: match[ 2 ],
-			bare: ! match[ 1 ],
-			declaration: /^\s*:/.test( value.slice( regex.lastIndex ) ),
-		} );
-	}
-
-	return occurrences;
-}
-
-/**
- * @param {Array<{ token: string }>} occurrences
- */
-function getUniqueTokenNames( occurrences ) {
-	return [ ...new Set( occurrences.map( ( { token } ) => token ) ) ];
-}
-
-/**
- * @param {import('estree').Literal | import('estree').TemplateElement} node
- */
-function getStaticNodeValue( node ) {
-	if ( ! node.value ) {
-		return;
-	}
-
-	if ( typeof node.value === 'string' ) {
-		return node.value;
-	}
-
-	if ( typeof node.value === 'object' && 'raw' in node.value ) {
-		return node.value.cooked ?? node.value.raw;
-	}
-}
+const {
+	DS_TOKEN_PREFIX,
+	collectTokenOccurrences,
+	getUniqueTokenNames,
+	getStaticNodeValue,
+} = require( '../utils/ds-token-utils' );
 
 const knownTokens = new Set( tokenList );
 const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
@@ -140,25 +60,24 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 						hasDynamic = true;
 					}
 
-					const { tokens, bare } = classifyTokens(
+					let occurrences = collectTokenOccurrences(
 						value,
 						DS_TOKEN_PREFIX
 					);
 
-					// Remove the trailing incomplete token — it's the one
-					// being dynamically constructed by the next expression.
 					if ( isFollowedByExpression ) {
 						const endMatch = value.match( /(--([\w-]+))$/ );
 						if ( endMatch ) {
-							tokens.delete( endMatch[ 1 ] );
-							bare.delete( endMatch[ 1 ] );
+							occurrences = occurrences.filter(
+								( o ) => o.token !== endMatch[ 1 ]
+							);
 						}
 					}
 
-					for ( const token of tokens ) {
+					for ( const { token, bare } of occurrences ) {
 						if ( ! knownTokens.has( token ) ) {
 							unknownTokens.push( token );
-						} else if ( bare.has( token ) ) {
+						} else if ( bare ) {
 							bareTokens.push( token );
 						}
 					}
@@ -203,7 +122,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					return;
 				}
 
-				const occurrences = collectStaticTokenOccurrences(
+				const occurrences = collectTokenOccurrences(
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
