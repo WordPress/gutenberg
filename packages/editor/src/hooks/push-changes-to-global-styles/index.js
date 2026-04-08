@@ -18,7 +18,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useMemo, useCallback, useState } from '@wordpress/element';
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -324,7 +324,6 @@ function PushChangesToGlobalStylesControl( {
 	const { __unstableMarkNextChangeAsNotPersistent, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const registry = useRegistry();
 
 	const pushChanges = useCallback( () => {
 		if ( changes.length === 0 ) {
@@ -409,9 +408,7 @@ function PushChangesToGlobalStylesControl( {
 			] )
 		);
 
-		registry.batch( () => {
-			updateBlockAttributes( siblingClientIds, styleAttrs );
-		} );
+		updateBlockAttributes( siblingClientIds, styleAttrs );
 
 		createSuccessNotice(
 			sprintf(
@@ -425,7 +422,6 @@ function PushChangesToGlobalStylesControl( {
 	}, [
 		siblingClientIds,
 		attributes,
-		registry,
 		updateBlockAttributes,
 		createSuccessNotice,
 		name,
