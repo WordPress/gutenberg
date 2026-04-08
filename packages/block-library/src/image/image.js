@@ -1079,7 +1079,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ ( temporaryURL || isSideloading ) && <Spinner /> }
+				{ isUploading && <Spinner /> }
 			</>
 		);
 
