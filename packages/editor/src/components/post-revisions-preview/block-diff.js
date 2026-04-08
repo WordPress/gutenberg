@@ -60,10 +60,15 @@ function textSimilarity( text1, text2 ) {
 		return 0;
 	}
 
-	// Strip HTML tags so similarity is based on text content only.
-	const strip = ( html ) => html.replace( /<[^>]*>/g, ' ' );
-	const words1 = strip( text1 ).split( /\s+/ ).filter( Boolean );
-	const words2 = strip( text2 ).split( /\s+/ ).filter( Boolean );
+	const segmenter = new Intl.Segmenter( undefined, {
+		granularity: 'word',
+	} );
+	const getWords = ( text ) =>
+		[ ...segmenter.segment( text ) ]
+			.filter( ( s ) => s.isWordLike )
+			.map( ( s ) => s.segment );
+	const words1 = getWords( text1 );
+	const words2 = getWords( text2 );
 
 	if ( words1.length === 0 && words2.length === 0 ) {
 		return 1;

@@ -661,6 +661,61 @@ describe( 'diffRevisionContent', () => {
 			const previous = serialize( [
 				createBlock( 'core/group', {}, [
 					createBlock( 'core/paragraph', { content: 'A' } ),
+					createBlock( 'core/paragraph', { content: 'B' } ),
+					createBlock( 'core/paragraph', { content: 'C' } ),
+				] ),
+			] );
+			const current = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', { content: 'A' } ),
+					createBlock( 'core/paragraph', { content: 'D' } ),
+				] ),
+			] );
+			const blocks = diffRevisionContent( current, previous );
+
+			// Post-LCS pairing matches B with D (same block type, high HTML similarity).
+			// C remains removed since it has no matching added block.
+			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+				{
+					name: 'core/group',
+					attributes: {
+						__revisionDiffStatus: undefined,
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'A',
+								__revisionDiffStatus: undefined,
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'C',
+								__revisionDiffStatus: { status: 'removed' },
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								// B→D modification with inline diff
+								content:
+									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
+								__revisionDiffStatus: {
+									status: 'modified',
+								},
+							},
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'handles multiple inner block changes at once (similar content)', () => {
+			const previous = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', { content: 'A' } ),
 					createBlock( 'core/paragraph', {
 						content: 'The quick brown fox jumps over the lazy dog',
 					} ),
