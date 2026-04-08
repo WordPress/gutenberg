@@ -18,6 +18,10 @@
 	// Ensure label is aligned with checkbox along X axis
 	line-height: var(--checkbox-input-size);
 	cursor: pointer;
+
+	.components-checkbox-control:has(:disabled) & {
+		cursor: default;
+	}
 }
 
 .components-checkbox-control__input[type="checkbox"] {
@@ -55,9 +59,17 @@
 	&:checked::before {
 		content: none;
 	}
+
+	&:disabled {
+		cursor: default;
+	}
 }
 
 .components-checkbox-control__input-container {
+	&:has(:disabled) {
+		opacity: 0.3;
+	}
+
 	position: relative;
 	display: inline-block;
 	margin-right: var(--checkbox-input-margin);
