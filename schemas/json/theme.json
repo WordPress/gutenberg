@@ -48,6 +48,25 @@
 							"description": "Allow users to set a gradient background.",
 							"type": "boolean",
 							"default": false
+						},
+						"backgroundClip": {
+							"description": "Allow users to set background clip. Pass true for all methods, or an array of CSS values: [\"text\", \"padding-box\", \"border-box\", \"content-box\"].",
+							"oneOf": [
+								{ "type": "boolean", "default": false },
+								{
+									"type": "array",
+									"items": {
+										"type": "string",
+										"enum": [
+											"text",
+											"padding-box",
+											"border-box",
+											"content-box"
+										]
+									},
+									"uniqueItems": true
+								}
+							]
 						}
 					},
 					"additionalProperties": false

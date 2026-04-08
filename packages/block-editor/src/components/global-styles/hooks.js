@@ -189,6 +189,7 @@ export function useSettingsForBlockElement(
 			[ 'backgroundImage', 'backgroundImage' ],
 			[ 'backgroundSize', 'backgroundSize' ],
 			[ 'backgroundGradient', 'gradient' ],
+			[ 'backgroundClip', 'backgroundClip' ],
 		].forEach( ( [ styleKey, settingKey ] ) => {
 			if ( ! supportedStyles.includes( styleKey ) ) {
 				updatedSettings.background = {
