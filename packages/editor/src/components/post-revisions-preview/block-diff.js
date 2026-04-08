@@ -45,8 +45,19 @@ function stringifyValue( value ) {
 }
 
 /**
- * Calculate text similarity using word-set overlap (Jaccard index).
- * O(n) where n is the number of words, compared to O(n*m) for diffWords.
+ * Calculate text similarity using word-set overlap.
+ *
+ * Uses a variant of the Jaccard index (https://en.wikipedia.org/wiki/Jaccard_index)
+ * called the overlap coefficient (https://en.wikipedia.org/wiki/Overlap_coefficient)
+ * where we divide by the larger set size rather than the union. This ensures that
+ * a small edit to a long paragraph scores high — the few changed words don't
+ * dilute the score.
+ *
+ * This replaces the previous diffWords-based similarity which was O(n*m) per pair.
+ * The word-set approach is O(n) where n is the number of words.
+ *
+ * Words are extracted using Intl.Segmenter for proper multilingual support
+ * (CJK, Thai, etc.) rather than splitting on whitespace.
  *
  * @param {string} text1 First text to compare.
  * @param {string} text2 Second text to compare.
@@ -82,15 +93,23 @@ function textSimilarity( text1, text2 ) {
 		}
 	}
 
-	// Use the larger set as denominator (overlap coefficient variant)
-	// so that a small edit to a long paragraph scores high.
 	const total = Math.max( words1.length, words2.length );
 	return total > 0 ? intersection / total : 0;
 }
 
 /**
  * Post-process diff result to pair similar removed/added blocks as modifications.
- * This catches modifications that LCS missed due to content changes.
+ *
+ * After LCS diffing, a block whose content changed appears as a separate "removed"
+ * and "added" entry (since the full block signature differs). This function detects
+ * such pairs and merges them into a single "modified" block with inline diff.
+ *
+ * Two pairing strategies are used:
+ * 1. When exactly one block of a given type was removed and one was added,
+ *    they are paired directly — no ambiguity, no similarity check needed.
+ * 2. When multiple candidates exist, textSimilarity (overlap coefficient) is
+ *    used to find the best match. Blocks must share at least 50% of their
+ *    words to be paired, preventing unrelated paragraphs from being merged.
  *
  * @param {Array} blocks Raw blocks with diff status.
  * @return {Array} Blocks with similar pairs converted to modifications.
