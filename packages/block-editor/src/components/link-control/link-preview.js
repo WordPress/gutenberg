@@ -40,28 +40,11 @@ const { Badge } = unlock( componentsPrivateApis );
 
 import useRichUrlData from './use-rich-url-data';
 
-const getDisplayTitle = ( { value, richData, displayURL, isEntity } ) => {
-	let displayTitle = '';
-
-	// Prioritize the bound entity title
-	if ( isEntity ) {
-		displayTitle = value?.title;
-	}
-
-	// If we don't have a title from a bound entity (or the bound entity title is empty), prioritize the rich data title
-	if ( ! displayTitle ) {
-		displayTitle = richData?.title || value?.title || displayURL;
-	}
-
-	return stripHTML( displayTitle );
-};
-
 export default function LinkPreview( {
 	value,
 	onEditClick,
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
-	isEntity = false,
 	onRemove,
 } ) {
 	const showIconLabels = useSelect(
@@ -85,12 +68,11 @@ export default function LinkPreview( {
 	// url can be undefined if the href attribute is unset
 	const isEmptyURL = ! value?.url?.length;
 
-	const displayTitle = getDisplayTitle( {
-		value,
-		richData,
-		displayURL,
-		isEntity,
-	} );
+	const displayTitle =
+		! isEmptyURL &&
+		stripHTML(
+			value?.entityTitle || richData?.title || value?.title || displayURL
+		);
 
 	let icon;
 
