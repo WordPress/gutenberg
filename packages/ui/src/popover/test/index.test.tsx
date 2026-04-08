@@ -421,21 +421,30 @@ describe( 'Popover', () => {
 		} );
 	} );
 
-	describe( 'inline', () => {
-		it( 'should render without a portal when inline is true', async () => {
-			const user = userEvent.setup();
-
-			render(
+	describe( 'inline (via container)', () => {
+		function InlinePopover() {
+			const containerRef = createRef< HTMLSpanElement >();
+			return (
 				<div data-testid="inline-wrapper">
 					<Popover.Root>
 						<Popover.Trigger>Open</Popover.Trigger>
-						<Popover.Popup inline>
+						<span
+							ref={ containerRef }
+							style={ { display: 'contents' } }
+						/>
+						<Popover.Popup container={ containerRef }>
 							<Popover.Title>Title</Popover.Title>
 							Inline content
 						</Popover.Popup>
 					</Popover.Root>
 				</div>
 			);
+		}
+
+		it( 'should render inside the container when a local ref is used', async () => {
+			const user = userEvent.setup();
+
+			render( <InlinePopover /> );
 
 			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 

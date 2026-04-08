@@ -1,6 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
-import { forwardRef, useRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -22,8 +22,7 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
  * Renders the floating popup container for the popover content.
  *
  * Handles portal rendering, positioning relative to the anchor, collision
- * avoidance, focus management, and optional backdrop. Set `inline` to
- * render inside the DOM tree instead of a portal, or supply a `container`
+ * avoidance, focus management, and optional backdrop. Supply a `container`
  * element for cross-document scenarios such as iframes.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
@@ -42,7 +41,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		container,
 		finalFocus,
 		initialFocus,
-		inline: inlineProp = false,
 		side = 'bottom',
 		sideOffset = 8,
 		sticky,
@@ -52,7 +50,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	},
 	ref
 ) {
-	const inlineContainerRef = useRef< HTMLSpanElement >( null );
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ATTR,
@@ -97,21 +94,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			</ThemeProvider>
 		</_Popover.Positioner>
 	);
-
-	if ( inlineProp ) {
-		return (
-			<>
-				<span
-					ref={ inlineContainerRef }
-					style={ { display: 'contents' } }
-				/>
-				<_Popover.Portal container={ inlineContainerRef }>
-					{ backdropElement }
-					{ positioner }
-				</_Popover.Portal>
-			</>
-		);
-	}
 
 	return (
 		<_Popover.Portal container={ container }>

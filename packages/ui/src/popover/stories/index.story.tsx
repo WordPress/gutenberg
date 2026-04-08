@@ -442,36 +442,43 @@ export const OverlayPlacement: Story = {
 };
 
 /**
- * When `inline` is set to `true`, the popup renders in place within the DOM
- * hierarchy instead of being portaled to `document.body`. This can be
- * useful when you need the popup to participate in the surrounding layout
- * or inherit styles from a parent.
+ * To render the popup inline (without a portal), create a local ref to a
+ * `<span>` with `display: contents` and pass it as the `container` prop.
+ * The popup will render inside the span rather than being portaled to
+ * `document.body`, while retaining all positioning behavior.
  *
- * Positioning props (`side`, `align`, collision settings, etc.) still work
- * normally. However, `container` is ignored (the portal target is managed
- * internally) and `backdrop` will not cover the full viewport.
+ * **Note:** `backdrop` will not cover the full viewport in this mode.
  */
 export const Inline: Story = {
-	args: {
-		children: (
-			<>
-				<Popover.Trigger>Open Inline</Popover.Trigger>
-				<Popover.Popup inline>
-					<Popover.Arrow />
-					<Popover.Title
-						style={ {
-							marginBottom: 'var(--wpds-dimension-gap-xs)',
-						} }
-					>
-						Inline Popover
-					</Popover.Title>
-					<Popover.Description>
-						This popup is rendered in place — no portal is used.
-						Inspect the DOM to see it lives inside its parent.
-					</Popover.Description>
-				</Popover.Popup>
-			</>
-		),
+	parameters: { controls: { disable: true } },
+	render: function Render() {
+		const inlineContainerRef = useRef< HTMLSpanElement >( null );
+
+		return (
+			<div data-testid="inline-wrapper">
+				<Popover.Root>
+					<Popover.Trigger>Open Inline</Popover.Trigger>
+					<span
+						ref={ inlineContainerRef }
+						style={ { display: 'contents' } }
+					/>
+					<Popover.Popup container={ inlineContainerRef }>
+						<Popover.Arrow />
+						<Popover.Title
+							style={ {
+								marginBottom: 'var(--wpds-dimension-gap-xs)',
+							} }
+						>
+							Inline Popover
+						</Popover.Title>
+						<Popover.Description>
+							This popup is rendered in place — no portal is used.
+							Inspect the DOM to see it lives inside its parent.
+						</Popover.Description>
+					</Popover.Popup>
+				</Popover.Root>
+			</div>
+		);
 	},
 };
 
