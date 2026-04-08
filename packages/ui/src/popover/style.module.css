@@ -50,12 +50,7 @@
 		fill: var(--wpds-color-stroke-surface-neutral-weak);
 	}
 
-	.title {
-		margin: 0;
-	}
-
 	.description {
-		margin: 0;
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 

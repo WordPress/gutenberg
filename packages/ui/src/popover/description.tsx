@@ -12,11 +12,17 @@ import type { DescriptionProps } from './types';
  * Uses the `body-md` text variant by default.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
-	function PopoverDescription( { className, children, ...props }, ref ) {
+	function PopoverDescription(
+		{ className, children, render, ...props },
+		ref
+	) {
 		return (
 			<Text
+				ref={ ref }
 				variant="body-md"
-				render={ <_Popover.Description ref={ ref } { ...props } /> }
+				render={
+					<_Popover.Description render={ render } { ...props } />
+				}
 				className={ clsx( styles.description, className ) }
 			>
 				{ children }
