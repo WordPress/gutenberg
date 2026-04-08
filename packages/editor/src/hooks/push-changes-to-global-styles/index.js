@@ -17,7 +17,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -325,7 +325,7 @@ function PushChangesToGlobalStylesControl( {
 		useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const pushChanges = useCallback( () => {
+	const pushChanges = () => {
 		if ( changes.length === 0 ) {
 			return;
 		}
@@ -385,18 +385,9 @@ function PushChangesToGlobalStylesControl( {
 				}
 			);
 		}
-	}, [
-		__unstableMarkNextChangeAsNotPersistent,
-		attributes,
-		changes,
-		createSuccessNotice,
-		name,
-		setAttributes,
-		setUserConfig,
-		userConfig,
-	] );
+	};
 
-	const applyToSiblings = useCallback( () => {
+	const applyToSiblings = () => {
 		if ( siblingClientIds.length === 0 ) {
 			return;
 		}
@@ -419,14 +410,7 @@ function PushChangesToGlobalStylesControl( {
 			),
 			{ type: 'snackbar' }
 		);
-	}, [
-		siblingClientIds,
-		attributes,
-		updateBlockAttributes,
-		createSuccessNotice,
-		name,
-		scopeBlockTitle,
-	] );
+	};
 
 	const hasSiblingOption = siblingClientIds.length > 0;
 	const hasGlobalOption = isBlockBasedTheme;
@@ -438,13 +422,13 @@ function PushChangesToGlobalStylesControl( {
 		hasSiblingOption ? SCOPE_SIBLINGS : SCOPE_GLOBAL
 	);
 
-	const handleApply = useCallback( () => {
+	const handleApply = () => {
 		if ( scope === SCOPE_SIBLINGS ) {
 			applyToSiblings();
 		} else {
 			pushChanges();
 		}
-	}, [ scope, applyToSiblings, pushChanges ] );
+	};
 
 	const blockTitle = getBlockType( name ).title;
 
