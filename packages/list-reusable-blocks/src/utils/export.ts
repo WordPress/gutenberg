@@ -12,7 +12,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { downloadBlob } from '@wordpress/blob';
-import type { ExportedBlock, Post, PostType } from './types';
+import type { Post, PostType } from './types';
 
 /**
  * Export a reusable block as a JSON file.
@@ -38,7 +38,7 @@ async function exportReusableBlock( id: number ): Promise< void > {
 			title,
 			content,
 			syncStatus,
-		} as ExportedBlock,
+		},
 		null,
 		2
 	);

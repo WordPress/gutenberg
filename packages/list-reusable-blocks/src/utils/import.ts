@@ -25,7 +25,7 @@ async function importReusableBlock( file: File ): Promise< ReusableBlock > {
 	let parsedContent: ParsedContent;
 
 	try {
-		parsedContent = JSON.parse( fileContent ) as ParsedContent;
+		parsedContent = JSON.parse( fileContent );
 	} catch {
 		throw new Error( 'Invalid JSON file' );
 	}
@@ -56,7 +56,7 @@ async function importReusableBlock( file: File ): Promise< ReusableBlock > {
 				parsedContent.syncStatus === 'unsynced'
 					? { wp_pattern_sync_status: parsedContent.syncStatus }
 					: undefined,
-		} as ReusableBlockData,
+		} satisfies ReusableBlockData,
 		method: 'POST',
 	} );
 

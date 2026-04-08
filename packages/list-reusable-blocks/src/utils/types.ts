@@ -3,27 +3,27 @@
  */
 import type { Post as CorePost, Type } from '@wordpress/core-data';
 
-interface ImportDropdownProps {
+export interface ImportDropdownProps {
 	onUpload: ( data: ReusableBlock ) => void;
 }
 
-interface ImportFormProps {
+export interface ImportFormProps {
 	instanceId: string | number;
 	onUpload: ( reusableBlock: ReusableBlock ) => void;
 }
 
-type PostType = Type;
+export type PostType = Type;
 
-type Post = CorePost & { wp_pattern_sync_status?: string };
+export type Post = CorePost & { wp_pattern_sync_status?: string };
 
-interface ExportedBlock {
+export interface ExportedBlock {
 	__file: string;
 	title: string;
 	content: string;
 	syncStatus: string;
 }
 
-interface ParsedContent {
+export interface ParsedContent {
 	__file: string;
 	title: string;
 	content: string;
@@ -31,18 +31,18 @@ interface ParsedContent {
 	[ key: string ]: unknown;
 }
 
-interface ReusableBlockMeta {
+export interface ReusableBlockMeta {
 	wp_pattern_sync_status?: string;
 }
 
-interface ReusableBlockData {
+export interface ReusableBlockData {
 	title: string;
 	content: string;
 	status: string;
 	meta?: ReusableBlockMeta;
 }
 
-interface ReusableBlock {
+export interface ReusableBlock {
 	id: number;
 	title: {
 		raw: string;
@@ -55,15 +55,3 @@ interface ReusableBlock {
 	status: string;
 	[ key: string ]: unknown;
 }
-
-export type {
-	ExportedBlock,
-	ImportDropdownProps,
-	ImportFormProps,
-	ParsedContent,
-	Post,
-	PostType,
-	ReusableBlock,
-	ReusableBlockData,
-	ReusableBlockMeta,
-};
