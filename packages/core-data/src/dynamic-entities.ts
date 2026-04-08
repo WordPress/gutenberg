@@ -95,7 +95,9 @@ export type SaveActions = {
 					WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
 			  >,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => Promise<
+		WPEntityTypes[ Key extends `save${ infer E }` ? E : never ] | undefined
+	>;
 };
 
 export type DeleteActions = {
@@ -103,7 +105,11 @@ export type DeleteActions = {
 		id: number | string,
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
-	) => Promise< void >;
+	) => Promise<
+		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
+		| false
+		| undefined
+	>;
 };
 
 export let dynamicActions: SaveActions & DeleteActions;
