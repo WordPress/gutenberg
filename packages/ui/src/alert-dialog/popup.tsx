@@ -23,6 +23,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function AlertDialogPopup(
 		{
 			className,
+			container,
 			intent = 'default',
 			title,
 			description,
@@ -44,7 +45,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
 		return (
-			<_AlertDialog.Portal>
+			<_AlertDialog.Portal container={ container }>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup

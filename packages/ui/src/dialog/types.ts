@@ -35,6 +35,11 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
+	 * A parent element to render the portal into.
+	 */
+	container?: _Dialog.Portal.Props[ 'container' ];
+
+	/**
 	 * Renders the dialog at a preset width (excluding additional padding from
 	 * the viewport edges).
 	 *
