@@ -109,10 +109,7 @@ function ModalContent< Item >( {
 				}
 			} }
 		>
-			<Dialog.Popup
-				size="medium"
-				className="dataforms-layouts-panel__modal"
-			>
+			<Dialog.Popup size="medium">
 				<Dialog.Header>
 					<Dialog.Title>{ fieldLabel }</Dialog.Title>
 					<Dialog.CloseIcon />

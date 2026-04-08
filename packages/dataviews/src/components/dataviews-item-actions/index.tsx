@@ -170,6 +170,9 @@ export function ActionModal< Item >( {
 		contentRef
 	);
 
+	// AlertDialog.Root provides `role="alertdialog"` and blocks backdrop-click
+	// dismissal via the shared Base UI DialogStore. Dialog.Popup is used instead
+	// of AlertDialog.Popup because RenderModal provides its own buttons.
 	const DialogRoot = action.hideModalHeader ? AlertDialog.Root : Dialog.Root;
 
 	return (
@@ -189,9 +192,9 @@ export function ActionModal< Item >( {
 				initialFocus={ initialFocus }
 			>
 				{ action.hideModalHeader ? (
-					<VisuallyHidden>
-						<Dialog.Title>{ title }</Dialog.Title>
-					</VisuallyHidden>
+					<VisuallyHidden
+						render={ <Dialog.Title>{ title }</Dialog.Title> }
+					/>
 				) : (
 					<Dialog.Header>
 						<Dialog.Title>{ title }</Dialog.Title>
