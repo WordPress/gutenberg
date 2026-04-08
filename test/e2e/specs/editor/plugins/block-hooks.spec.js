@@ -346,7 +346,7 @@ test.describe( 'Block Hooks API', () => {
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
 				'wp-block-navigation-item wp-block-home-link',
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-page-list',
 			] );
 		} );
@@ -424,7 +424,7 @@ test.describe( 'Block Hooks API', () => {
 			await expect(
 				page.locator( '.wp-block-navigation__container > *' )
 			).toHaveClass( [
-				' wp-block-navigation-item wp-block-navigation-link',
+				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-navigation-item wp-block-home-link',
 				'wp-block-page-list',
 			] );

@@ -73,10 +73,21 @@ export interface ConnectionStatusConnecting {
 
 export interface ConnectionStatusDisconnected {
 	status: 'disconnected';
+
 	/** Optional error information. */
 	error?: ConnectionError;
-	/** Milliseconds until the next automatic retry attempt. */
-	retryInMs?: number;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
 }
 
 export type ConnectionStatus =
@@ -139,6 +150,10 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
 }
 
 export interface SyncManager {

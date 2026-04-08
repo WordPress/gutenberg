@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Input, InputLayout } from '../../../..';
+import { WithSuffixControl } from '../../input-layout/stories/index.story';
 
 const meta: Meta< typeof Input > = {
 	title: 'Design System/Components/Form/Primitives/Input',
@@ -31,6 +32,12 @@ export const WithPrefix: Story = {
 		prefix: <InputLayout.Slot>@</InputLayout.Slot>,
 	},
 };
+
+WithSuffixControl.args = {
+	...WithSuffixControl.args,
+	children: undefined,
+};
+export { WithSuffixControl };
 
 export const Disabled: Story = {
 	args: {

@@ -24,14 +24,34 @@ Install using NPM:
 npm install @wordpress/ui
 ```
 
-As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. This is managed on your behalf in a WordPress admin page context, but you will need to install and include the base theme stylesheet yourself if you're using the components in an application outside WordPress:
+## Setup
+
+As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
+
+### Within WordPress
+
+Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+
+### Outside WordPress
+
+While the components ship with basic fallbacks for every CSS custom property, it's recommended that you install and load the design tokens stylesheet to support the full range of theming capabilities:
 
 ```
 npm install @wordpress/theme
 ```
 
-```tsx
+```js
 import '@wordpress/theme/design-tokens.css';
+```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+Also, to ensure that portaled popovers appear correctly, add these isolation styles to your application's layout root element:
+
+```css
+.root {
+  isolation: isolate;
+}
 ```
 
 ## Usage

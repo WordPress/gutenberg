@@ -74,18 +74,20 @@ function findVideoEmbedProvider( url ) {
 }
 
 /**
- * Extracts iframe src from embed HTML.
+ * Modifies embed HTML to use background video parameters.
  *
- * @param {string} html The embed HTML.
- * @return {string|null} The iframe src URL or null if not found.
+ * @param {string} html The original embed HTML.
+ * @return {string|null} The modified embed HTML, or null if not possible.
  */
-export function getIframeSrc( html ) {
-	if ( ! html ) {
+export function getBackgroundEmbedHtml( html ) {
+	const srcMatch = html?.match( /src=["']([^"']+)["']/ );
+	if ( ! srcMatch ) {
 		return null;
 	}
 
-	const srcMatch = html.match( /src=["']([^"']+)["']/ );
-	return srcMatch ? srcMatch[ 1 ] : null;
+	const iframeSrc = srcMatch[ 1 ];
+	const backgroundSrc = getBackgroundVideoSrc( iframeSrc );
+	return html.replace( iframeSrc, backgroundSrc );
 }
 
 /**
@@ -189,7 +191,7 @@ export function getBackgroundVideoSrc( src ) {
 		}
 
 		return url.toString();
-	} catch ( error ) {
+	} catch {
 		// If URL parsing fails, return original src
 		return src;
 	}

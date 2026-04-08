@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -1126,10 +1121,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1186,10 +1178,7 @@ test.describe( 'Pattern Overrides', () => {
 		editor,
 	} ) => {
 		const imageName = 'Editable image';
-		const TEST_IMAGE_FILE_PATH = path.resolve(
-			__dirname,
-			'../../../assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		const TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 		const { id } = await requestUtils.createBlock( {
 			title: 'Pattern',
 			content: `<!-- wp:image {"metadata":{"name":"${ imageName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
@@ -1242,17 +1231,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 
@@ -1311,17 +1294,11 @@ test.describe( 'Pattern Overrides', () => {
 		// Upload two images, one for the original pattern, one for the override.
 		const { id: originalImageId, source_url: originalImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-				)
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
-				path.resolve(
-					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 		const overrideName = 'test';
 

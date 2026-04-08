@@ -110,7 +110,7 @@ export function fromDOM( domNodes ) {
 	for ( let i = 0; i < domNodes.length; i++ ) {
 		try {
 			result.push( node.fromDOM( domNodes[ i ] ) );
-		} catch ( error ) {
+		} catch {
 			// Simply ignore if DOM node could not be converted.
 		}
 	}

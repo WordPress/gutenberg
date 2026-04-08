@@ -229,6 +229,8 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				true
 			);
+			// Server should convert formats (e.g. HEIC to JPEG).
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 
 		it( 'should add only Upload for unsupported image types like SVG', async () => {
@@ -262,6 +264,7 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				true
 			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 
 		it( 'should add only Upload for unsupported image types like BMP', async () => {
@@ -295,6 +298,7 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				true
 			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 
 		it( 'should add only Upload for PDF files', async () => {
@@ -328,6 +332,7 @@ describe( 'actions', () => {
 			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
 				true
 			);
+			expect( updatedItem.additionalData.convert_format ).toBe( true );
 		} );
 	} );
 

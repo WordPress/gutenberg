@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useContext } from '@wordpress/element';
+import { useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -35,6 +35,11 @@ import type { SetSelection } from '../../../types/private';
 import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
+import { useGridColumns } from '../grid/preview-size-picker';
+import {
+	useIntersectionObserver,
+	usePlaceholdersNeeded,
+} from '../utils/use-infinite-scroll';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
@@ -73,7 +78,16 @@ function GridItem< Item >( {
 }: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
+	const elementRef = useRef< HTMLElement | null >( null );
+
 	const isSelected = selection.includes( id );
+
+	const setElementRef = ( element: HTMLElement | null ) => {
+		elementRef.current = element;
+	};
+
+	useIntersectionObserver( elementRef, posinset );
+
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
 			item={ item }
@@ -88,6 +102,7 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
+			ref={ setElementRef }
 			aria-label={
 				titleField
 					? titleField.getValue( { item } ) || __( '(no title)' )
@@ -105,6 +120,7 @@ function GridItem< Item >( {
 			} ) }
 			aria-selected={ isSelected }
 			onClick={ () => {
+				// Toggle in/out of selection array
 				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
@@ -318,11 +334,20 @@ function ViewPickerGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
 	const setSize = isInfiniteScroll ? paginationInfo?.totalItems : undefined;
+
+	// Calculate placeholders needed for infinite scroll
+	const gridColumns = useGridColumns();
+	const placeholdersNeeded = usePlaceholdersNeeded(
+		data,
+		isInfiniteScroll,
+		gridColumns
+	);
 
 	return (
 		<>
@@ -378,10 +403,12 @@ function ViewPickerGrid< Item >( {
 										}
 									>
 										{ groupItems.map( ( item ) => {
+											// Use position from item if available (infinite scroll), otherwise calculate.
 											const posInSet =
+												( item as any ).position ??
 												( currentPage - 1 ) * perPage +
-												data.indexOf( item ) +
-												1;
+													data.indexOf( item ) +
+													1;
 											return (
 												<GridItem
 													key={ getItemId( item ) }
@@ -451,17 +478,28 @@ function ViewPickerGrid< Item >( {
 						aria-multiselectable={ isMultiselect }
 						aria-label={ itemListLabel }
 					>
-						{ data.map( ( item, index ) => {
-							let posinset = isInfiniteScroll
-								? index + 1
-								: undefined;
-
-							if ( ! isInfiniteScroll ) {
-								// When infinite scroll isn't active, take pagination into account
-								// when calculating the posinset.
-								posinset =
-									( currentPage - 1 ) * perPage + index + 1;
-							}
+						{ /* Render placeholders for unloaded items in first row */ }
+						{ Array.from( { length: placeholdersNeeded } ).map(
+							( _, index ) => (
+								<Composite.Item
+									key={ `placeholder-${ index }` }
+									render={ ( { children, ...props } ) => (
+										<Stack
+											direction="column"
+											children={ children }
+											{ ...props }
+										/>
+									) }
+									role="option"
+									aria-hidden
+									tabIndex={ -1 }
+									className="dataviews-view-picker-grid__card dataviews-view-picker-grid__placeholder"
+								/>
+							)
+						) }
+						{ data.map( ( item ) => {
+							// Use position from item for accessibility in infinite scroll mode.
+							const posinset = ( item as any ).position;
 
 							return (
 								<GridItem

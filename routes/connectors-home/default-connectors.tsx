@@ -7,7 +7,7 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
-	type __experimentalApiKeySource as ApiKeySource,
+	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
 import { __ } from '@wordpress/i18n';
@@ -21,30 +21,21 @@ import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
+	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
-
-type ConnectorAuthentication =
-	| {
-			method: 'api_key';
-			settingName: string;
-			credentialsUrl: string | null;
-			keySource?: ApiKeySource;
-			isConnected?: boolean;
-	  }
-	| { method: 'none' };
 
 interface ConnectorData {
 	name: string;
 	description: string;
 	logoUrl?: string;
-	type: 'ai_provider';
+	type: string;
 	plugin?: {
-		slug: string;
+		file: string;
 		isInstalled: boolean;
 		isActivated: boolean;
 	};
-	authentication: ConnectorAuthentication;
+	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
 /**
@@ -67,6 +58,7 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
+	akismet: AkismetLogo,
 };
 
 function getConnectorLogo(
@@ -101,28 +93,22 @@ const ConnectedBadge = () => (
 
 const UnavailableActionBadge = () => <Badge>{ __( 'Not available' ) }</Badge>;
 
-interface ApiKeyConnectorConfig {
-	pluginSlug?: string;
-	settingName: string;
-	helpUrl?: string;
-	isInstalled?: boolean;
-	isActivated?: boolean;
-	keySource?: ApiKeySource;
-	initialIsConnected?: boolean;
-}
-
 function ApiKeyConnector( {
-	label,
+	name,
 	description,
-	pluginSlug,
-	settingName,
-	helpUrl,
-	icon,
-	isInstalled,
-	isActivated,
-	keySource: initialKeySource,
-	initialIsConnected,
-}: ConnectorRenderProps & ApiKeyConnectorConfig ) {
+	logo,
+	authentication,
+	plugin,
+}: ConnectorRenderProps ) {
+	const auth =
+		authentication?.method === 'api_key' ? authentication : undefined;
+	const settingName = auth?.settingName ?? '';
+	const helpUrl = auth?.credentialsUrl ?? undefined;
+	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
+	const pluginSlug = pluginFile?.includes( '/' )
+		? pluginFile.split( '/' )[ 0 ]
+		: pluginFile;
+
 	let helpLabel: string | undefined;
 	try {
 		if ( helpUrl ) {
@@ -147,13 +133,13 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug,
+		file: plugin?.file,
 		settingName,
-		connectorName: label,
-		isInstalled,
-		isActivated,
-		keySource: initialKeySource,
-		initialIsConnected,
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+		keySource: auth?.keySource,
+		initialIsConnected: auth?.isConnected,
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
@@ -185,8 +171,8 @@ function ApiKeyConnector( {
 			className={
 				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
 			}
-			icon={ icon }
-			name={ label }
+			logo={ logo }
+			name={ name }
 			description={ description }
 			actionArea={
 				<HStack spacing={ 3 } expanded={ false }>
@@ -200,11 +186,7 @@ function ApiKeyConnector( {
 									? 'tertiary'
 									: 'secondary'
 							}
-							size={
-								isExpanded || isConnected
-									? undefined
-									: 'compact'
-							}
+							size="compact"
 							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
@@ -254,37 +236,30 @@ function ApiKeyConnector( {
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
 
-	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-]/gi, '-' );
+	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
-		const { authentication } = data;
-
-		if (
-			data.type !== 'ai_provider' ||
-			authentication.method !== 'api_key'
-		) {
+		// Special case: Hide Akismet unless it is already installed.
+		// See https://core.trac.wordpress.org/ticket/65012
+		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
 			continue;
 		}
 
-		const connectorName = `${ sanitize( data.type ) }/${ sanitize(
-			connectorId
-		) }`;
-		registerConnector( connectorName, {
-			label: data.name,
+		const { authentication } = data;
+
+		const connectorName = sanitize( connectorId );
+		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
+			name: data.name,
 			description: data.description,
-			icon: getConnectorLogo( connectorId, data.logoUrl ),
-			render: ( props ) => (
-				<ApiKeyConnector
-					{ ...props }
-					pluginSlug={ data.plugin?.slug }
-					settingName={ authentication.settingName }
-					helpUrl={ authentication.credentialsUrl ?? undefined }
-					isInstalled={ data.plugin?.isInstalled }
-					isActivated={ data.plugin?.isActivated }
-					keySource={ authentication.keySource }
-					initialIsConnected={ authentication.isConnected }
-				/>
-			),
-		} );
+			type: data.type,
+			logo: getConnectorLogo( connectorId, data.logoUrl ),
+			authentication,
+			plugin: data.plugin,
+		};
+		if ( authentication.method === 'api_key' ) {
+			args.render = ApiKeyConnector;
+		}
+
+		registerConnector( connectorName, args );
 	}
 }

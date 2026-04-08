@@ -21,7 +21,7 @@ import type { View, Field, Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../store';
+import { store as coreContentGuidelinesStore } from '../store';
 import {
 	fetchContentGuidelinesRevisions,
 	restoreContentGuidelinesRevision,
@@ -57,12 +57,7 @@ export default function RevisionHistory() {
 		useDispatch( noticesStore );
 
 	const guidelinesId = useSelect(
-		( select ) =>
-			(
-				select( STORE_NAME ) as unknown as {
-					getId: () => number | null;
-				}
-			 ).getId(),
+		( select ) => select( coreContentGuidelinesStore ).getId(),
 		[]
 	);
 

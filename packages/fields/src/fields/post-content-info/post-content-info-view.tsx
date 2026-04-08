@@ -14,16 +14,22 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { BasePost } from '../../types';
+import type { BasePostWithEditedEntity } from '../../types';
 
 // Taken from packages/editor/src/components/time-to-read/index.js.
 const AVERAGE_READING_RATE = 189;
 
-export default function PostContentInfoView( { item }: { item: BasePost } ) {
-	const content =
-		typeof item.content === 'string'
-			? item.content
-			: item.content?.raw || '';
+export default function PostContentInfoView( {
+	item,
+}: {
+	item: BasePostWithEditedEntity;
+} ) {
+	let content = '';
+	if ( typeof item.content === 'string' ) {
+		content = item.content;
+	} else if ( typeof item.content === 'function' ) {
+		content = item.content( item );
+	}
 
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),

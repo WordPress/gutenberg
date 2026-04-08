@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 7.43.0 (2026-04-01)
+
+### Bug Fixes
+
+-   `useDialog`: Add `event.stopPropagation()` to the Escape key handler to prevent the event from bubbling to parent overlays ([#76861](https://github.com/WordPress/gutenberg/pull/76861)).
+
+## 7.42.0 (2026-03-18)
+
+### New Features
+
+-   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
+
 ## 7.41.0 (2026-03-04)
 
 ## 7.40.0 (2026-02-18)
