@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { camelCase } from 'change-case';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -205,6 +206,35 @@ export const getEntityRecord =
 						editRecord: ( edits, options = {} ) => {
 							if ( ! Object.keys( edits ).length ) {
 								return;
+							}
+
+							// Clear edits that match the persisted record
+							// so the entity is no longer dirty after undo.
+							const persistedRecord = select.getEntityRecord(
+								kind,
+								name,
+								key
+							);
+							if ( persistedRecord ) {
+								edits = Object.fromEntries(
+									Object.entries( edits ).map(
+										( [ editKey, editValue ] ) => {
+											const persisted =
+												persistedRecord[ editKey ]
+													?.raw ??
+												persistedRecord[ editKey ];
+											return [
+												editKey,
+												fastDeepEqual(
+													editValue,
+													persisted
+												)
+													? undefined
+													: editValue,
+											];
+										}
+									)
+								);
 							}
 
 							dispatch( {
