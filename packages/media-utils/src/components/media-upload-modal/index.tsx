@@ -23,7 +23,12 @@ import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import type {
+	View,
+	Field,
+	ActionButton,
+	SupportedLayouts,
+} from '@wordpress/dataviews';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -451,11 +456,15 @@ export function MediaUploadModal( {
 		[ totalItems, totalPages ]
 	);
 
-	const defaultLayouts = useMemo(
+	const defaultLayouts: SupportedLayouts = useMemo(
 		() => ( {
 			[ LAYOUT_PICKER_GRID ]: {
 				fields: [],
 				showTitle: false,
+				layout: {
+					previewSize: 170,
+					density: 'compact',
+				},
 			},
 			[ LAYOUT_PICKER_TABLE ]: {
 				fields: [
