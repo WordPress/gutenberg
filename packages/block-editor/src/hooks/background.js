@@ -14,7 +14,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
 	default as StylesBackgroundPanel,
@@ -130,16 +130,10 @@ function BackgroundInspectorControl( {
 	const resetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
-				return {
-					...attributes,
-					style: cleanEmptyObject( {
-						...attributes.style,
-						[ selectedState ]: {
-							...attributes.style?.[ selectedState ],
-							background: undefined,
-						},
-					} ),
-				};
+				return buildStateResetAllFilter( selectedState, ( style ) => ( {
+					...style,
+					background: undefined,
+				} ) )( attributes );
 			}
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
