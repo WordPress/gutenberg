@@ -35,6 +35,7 @@ test.describe( 'Contrast Checker', () => {
 			} );
 			const backgroundButton = editorSettings.getByRole( 'button', {
 				name: 'Background',
+				exact: true,
 			} );
 
 			await expect( textButton ).toBeVisible();
@@ -102,6 +103,7 @@ test.describe( 'Contrast Checker', () => {
 		} );
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
+			exact: true,
 		} );
 		await expect( textButton ).toBeVisible();
 		await textButton.click();
@@ -143,6 +145,7 @@ test.describe( 'Contrast Checker', () => {
 		} );
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
+			exact: true,
 		} );
 		await expect( textButton ).toBeVisible();
 		await textButton.click();
@@ -191,6 +194,7 @@ test.describe( 'Contrast Checker', () => {
 		// Set background to black first
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
+			exact: true,
 		} );
 		await backgroundButton.click();
 		await page.getByRole( 'option', { name: 'Black' } ).click();
@@ -246,6 +250,7 @@ test.describe( 'Contrast Checker', () => {
 		// Set background to black (poor contrast with black text)
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
+			exact: true,
 		} );
 		await backgroundButton.click();
 		await page.getByRole( 'option', { name: 'Black' } ).click();
@@ -286,6 +291,7 @@ test.describe( 'Contrast Checker', () => {
 		// Set background to white (good contrast with black text)
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
+			exact: true,
 		} );
 		await backgroundButton.click();
 		await page.getByRole( 'option', { name: 'White' } ).click();

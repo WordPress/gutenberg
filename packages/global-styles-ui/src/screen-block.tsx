@@ -187,6 +187,12 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		disableAspectRatio = true;
 	}
 
+	// In global styles, enable backgroundClip if the block declares support
+	// for it, even when the theme hasn't opted in via settings.
+	const enableBackgroundClip =
+		! settingsForBlockElement?.background?.backgroundClip &&
+		blockType?.supports?.background?.backgroundClip;
+
 	const settings = useMemo( () => {
 		const updatedSettings = structuredClone( settingsForBlockElement );
 		if ( disableBlockGap ) {
@@ -195,8 +201,19 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		if ( disableAspectRatio ) {
 			updatedSettings.dimensions.aspectRatio = false;
 		}
+		if ( enableBackgroundClip ) {
+			updatedSettings.background = {
+				...updatedSettings.background,
+				backgroundClip: true,
+			};
+		}
 		return updatedSettings;
-	}, [ settingsForBlockElement, disableBlockGap, disableAspectRatio ] );
+	}, [
+		settingsForBlockElement,
+		disableBlockGap,
+		disableAspectRatio,
+		enableBackgroundClip,
+	] );
 
 	const blockVariations = useBlockVariations( name );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
@@ -383,6 +400,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
+					defaultControls={ {
+						backgroundImage: true,
+					} }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
 				/>
 			) }
