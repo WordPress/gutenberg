@@ -482,6 +482,8 @@ export const getPreviousRevision = createRegistrySelector(
 			{
 				per_page: -1,
 				context: 'edit',
+				orderby: 'date',
+				order: 'asc',
 				_fields: [
 					...new Set( [
 						'id',
@@ -501,25 +503,14 @@ export const getPreviousRevision = createRegistrySelector(
 			return null;
 		}
 
-		// Template revisions use the template REST API format, which exposes
-		// 'modified' instead of 'date'. Regular post revisions use 'date'.
-		const revisionDateField = revisionKey === 'wp_id' ? 'modified' : 'date';
-
-		// Sort by date ascending (oldest first).
-		const sortedRevisions = [ ...revisions ].sort(
-			( a, b ) =>
-				new Date( a[ revisionDateField ] ) -
-				new Date( b[ revisionDateField ] )
-		);
-
 		// Find current revision index.
-		const currentIndex = sortedRevisions.findIndex(
+		const currentIndex = revisions.findIndex(
 			( r ) => r[ revisionKey ] === currentRevisionId
 		);
 
 		// Return the previous revision (older one) if it exists.
 		if ( currentIndex > 0 ) {
-			return sortedRevisions[ currentIndex - 1 ];
+			return revisions[ currentIndex - 1 ];
 		}
 
 		return null;
