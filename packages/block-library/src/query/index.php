@@ -150,3 +150,47 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 }
 
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );
+
+function block_core_query_use_same_term( $query, $block ) {
+
+	if (
+		empty( $block->context['query']['taxQuery']['__experimentalSameTerm'] )
+	) {
+		return $query;
+	}
+
+	if ( ! is_singular() ) {
+		return $query;
+	}
+
+	$post_id = get_the_ID();
+
+	$tax_query = [];
+
+	$taxonomies = get_object_taxonomies( get_post_type( $post_id ) );
+
+	foreach ( $taxonomies as $taxonomy ) {
+		$terms = wp_get_post_terms( $post_id, $taxonomy, [
+			'fields' => 'ids',
+		] );
+
+		if ( empty( $terms ) ) {
+			continue;
+		}
+
+		$tax_query[] = [
+			'taxonomy' => $taxonomy,
+			'field'    => 'term_id',
+			'terms'    => $terms,
+		];
+	}
+
+	if ( ! empty( $tax_query ) ) {
+		$query['tax_query'] = $tax_query;
+	}
+
+	return $query;
+
+}
+
+add_filter( 'query_loop_block_query_vars', 'block_core_query_use_same_term', 10, 2 );
