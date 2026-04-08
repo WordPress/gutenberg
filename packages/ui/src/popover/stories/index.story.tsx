@@ -114,11 +114,9 @@ export const Positioning: Story = {
 									align: 'none',
 								} }
 							>
-								<Popover.Title>
-									<VisuallyHidden>
-										{ side } / { align }
-									</VisuallyHidden>
-								</Popover.Title>
+								<VisuallyHidden render={ <Popover.Title /> }>
+									{ side } / { align }
+								</VisuallyHidden>
 								<Popover.Arrow />
 								<Popover.Description>
 									{ side } side / { align } align
@@ -835,9 +833,9 @@ export const Anchor: Story = {
 							anchor={ elementAnchor ?? undefined }
 							{ ...popupProps }
 						>
-							<Popover.Title>
-								<VisuallyHidden>Element anchor</VisuallyHidden>
-							</Popover.Title>
+							<VisuallyHidden render={ <Popover.Title /> }>
+								Element anchor
+							</VisuallyHidden>
 							<Popover.Arrow />
 							<Popover.Description>
 								Anchored to a DOM element
@@ -856,9 +854,9 @@ export const Anchor: Story = {
 							anchor={ virtualAnchor }
 							{ ...popupProps }
 						>
-							<Popover.Title>
-								<VisuallyHidden>Virtual anchor</VisuallyHidden>
-							</Popover.Title>
+							<VisuallyHidden render={ <Popover.Title /> }>
+								Virtual anchor
+							</VisuallyHidden>
 							<Popover.Arrow />
 							<Popover.Description>
 								Anchored to a virtual element
@@ -874,9 +872,9 @@ export const Anchor: Story = {
 					</div>
 					<Popover.Root open>
 						<Popover.Popup anchor={ refAnchor } { ...popupProps }>
-							<Popover.Title>
-								<VisuallyHidden>Ref anchor</VisuallyHidden>
-							</Popover.Title>
+							<VisuallyHidden render={ <Popover.Title /> }>
+								Ref anchor
+							</VisuallyHidden>
 							<Popover.Arrow />
 							<Popover.Description>
 								Anchored via useRef
@@ -895,9 +893,9 @@ export const Anchor: Story = {
 							anchor={ () => callbackTarget.current }
 							{ ...popupProps }
 						>
-							<Popover.Title>
-								<VisuallyHidden>Callback anchor</VisuallyHidden>
-							</Popover.Title>
+							<VisuallyHidden render={ <Popover.Title /> }>
+								Callback anchor
+							</VisuallyHidden>
 							<Popover.Arrow />
 							<Popover.Description>
 								Anchored via callback function
@@ -934,9 +932,9 @@ export const ToolbarVariant: Story = {
 						fontSize: 13,
 					} }
 				>
-					<Popover.Title>
-						<VisuallyHidden>Formatting</VisuallyHidden>
-					</Popover.Title>
+					<VisuallyHidden render={ <Popover.Title /> }>
+						Formatting
+					</VisuallyHidden>
 					<button type="button">B</button>
 					<button type="button">I</button>
 					<button type="button">U</button>
@@ -1294,9 +1292,9 @@ export const InfoTip: Story = {
 					</Popover.Trigger>
 					<Popover.Popup>
 						<Popover.Arrow />
-						<Popover.Title>
-							<VisuallyHidden>More information</VisuallyHidden>
-						</Popover.Title>
+						<VisuallyHidden render={ <Popover.Title /> }>
+							More information
+						</VisuallyHidden>
 						<Popover.Description>
 							This is additional context about the label. Unlike
 							tooltips, this content is accessible to touch and
