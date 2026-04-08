@@ -5,6 +5,11 @@
 ### New Features
 
 -   Add text shadow preset support ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Add a `background.backgroundClip` style rule that generates `background-clip`, along with the `-webkit-background-clip` and `-webkit-text-fill-color` declarations needed for the text clipping case ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
+
+### Bug Fixes
+
+-   Preserve vendor-prefixed CSS property names when compiling rules, instead of running them through kebab-case conversion ([#77141](https://github.com/WordPress/gutenberg/pull/77141)).
 
 ## 2.55.0 (2026-09-10)
 
