@@ -168,8 +168,18 @@ export default function PresetInputControl( {
 		unitConfig?.max ?? customValueSettings[ computedUnit ]?.max ?? 10;
 
 	const handleCustomValueChange = ( newValue ) => {
-		const isNumeric = ! isNaN( parseFloat( newValue ) );
-		const newCustomValue = isNumeric ? newValue : undefined;
+		const isExplicitlyEmpty = newValue === '';
+		const isNumeric =
+			newValue !== undefined && ! isNaN( parseFloat( newValue ) );
+
+		let newCustomValue;
+		if ( isExplicitlyEmpty ) {
+			newCustomValue = '';
+		} else if ( isNumeric ) {
+			newCustomValue = newValue;
+		} else {
+			newCustomValue = undefined;
+		}
 
 		if ( newCustomValue !== undefined ) {
 			onChange( newCustomValue );
