@@ -41,6 +41,53 @@ function classifyTokens( value, prefix = '' ) {
 	return { tokens, bare };
 }
 
+/**
+ * @param {string} value
+ * @param {string} [prefix='']
+ */
+function collectStaticTokenOccurrences( value, prefix = '' ) {
+	const regex = new RegExp(
+		`(?:^|[^\\w])(var\\(\\s*)?(--${ prefix }[\\w-]+)`,
+		'g'
+	);
+	const occurrences = [];
+
+	let match;
+	while ( ( match = regex.exec( value ) ) !== null ) {
+		occurrences.push( {
+			token: match[ 2 ],
+			bare: ! match[ 1 ],
+			declaration: /^\s*:/.test( value.slice( regex.lastIndex ) ),
+		} );
+	}
+
+	return occurrences;
+}
+
+/**
+ * @param {Array<{ token: string }>} occurrences
+ */
+function getUniqueTokenNames( occurrences ) {
+	return [ ...new Set( occurrences.map( ( { token } ) => token ) ) ];
+}
+
+/**
+ * @param {import('estree').Literal | import('estree').TemplateElement} node
+ */
+function getStaticNodeValue( node ) {
+	if ( ! node.value ) {
+		return;
+	}
+
+	if ( typeof node.value === 'string' ) {
+		return node.value;
+	}
+
+	if ( typeof node.value === 'object' && 'raw' in node.value ) {
+		return node.value.cooked ?? node.value.raw;
+	}
+}
+
 const knownTokens = new Set( tokenList );
 const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
@@ -150,31 +197,20 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			},
 			/** @param {import('estree').Literal | import('estree').TemplateElement} node */
 			[ staticTokensAST ]( node ) {
-				let computedValue;
-
-				if ( ! node.value ) {
-					return;
-				}
-
-				if ( typeof node.value === 'string' ) {
-					computedValue = node.value;
-				} else if (
-					typeof node.value === 'object' &&
-					'raw' in node.value
-				) {
-					computedValue = node.value.cooked ?? node.value.raw;
-				}
+				const computedValue = getStaticNodeValue( node );
 
 				if ( ! computedValue ) {
 					return;
 				}
 
-				const { tokens: usedTokens, bare } = classifyTokens(
+				const occurrences = collectStaticTokenOccurrences(
 					computedValue,
 					DS_TOKEN_PREFIX
 				);
-				const unknownTokens = [ ...usedTokens ].filter(
-					( token ) => ! knownTokens.has( token )
+				const unknownTokens = getUniqueTokenNames(
+					occurrences.filter(
+						( occurrence ) => ! knownTokens.has( occurrence.token )
+					)
 				);
 
 				if ( unknownTokens.length > 0 ) {
@@ -196,9 +232,13 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					node.parent.key === node;
 
 				if ( ! isPropertyKey ) {
-					const bareTokens = [ ...usedTokens ].filter(
-						( token ) =>
-							knownTokens.has( token ) && bare.has( token )
+					const bareTokens = getUniqueTokenNames(
+						occurrences.filter(
+							( occurrence ) =>
+								! occurrence.declaration &&
+								occurrence.bare &&
+								knownTokens.has( occurrence.token )
+						)
 					);
 
 					if ( bareTokens.length > 0 ) {

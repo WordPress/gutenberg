@@ -44,6 +44,12 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 		{
 			code: `const style = { '--wpds-color-fg-content-neutral': 'red' };`,
 		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red;';`,
+		},
+		{
+			code: 'const css = `--wpds-color-fg-content-neutral: red;`;',
+		},
 	],
 	invalid: [
 		{
@@ -148,6 +154,17 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			],
 		},
 		{
+			code: `const css = '--wpds-nonexistent-token: red;';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames: "'--wpds-nonexistent-token'",
+					},
+				},
+			],
+		},
+		{
 			code: `const token = '--wpds-color-fg-content-neutral';`,
 			errors: [
 				{
@@ -198,6 +215,29 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 					messageId: 'bareToken',
 					data: {
 						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-color-fg-content-neutral: red; color: --wpds-color-bg-surface-neutral;';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-bg-surface-neutral'",
+					},
+				},
+			],
+		},
+		{
+			code: `const css = '--wpds-other-nonexistent-token: red; color: var(--wpds-nonexistent-token);';`,
+			errors: [
+				{
+					messageId: 'onlyKnownTokens',
+					data: {
+						tokenNames:
+							"'--wpds-other-nonexistent-token', '--wpds-nonexistent-token'",
 					},
 				},
 			],
