@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
-:root {
+.dataviews-action-modal-portal {
 	--wp-ui-dialog-z-index: #{z-index(".dataviews-action-modal")};
 }
 
