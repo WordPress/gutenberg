@@ -7,6 +7,7 @@ import {
 	ToggleControl,
 	TextControl,
 	CheckboxControl,
+	RangeControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Spinner,
@@ -37,6 +38,7 @@ export default function BreadcrumbEdit( {
 		showCurrentItem,
 		prefersTaxonomy,
 		showOnHomePage,
+		characterLimit,
 	} = attributes;
 	const {
 		post,
@@ -213,6 +215,7 @@ export default function BreadcrumbEdit( {
 							separator: separatorDefaultValue,
 							showHomeItem: true,
 							showCurrentItem: true,
+							characterLimit: 10,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -278,6 +281,25 @@ export default function BreadcrumbEdit( {
 									} );
 								}
 							} }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => characterLimit !== 10 }
+						label={ __( 'Max characters' ) }
+						onDeselect={ () =>
+							setAttributes( { characterLimit: 10 } )
+						}
+						isShownByDefault
+					>
+						<RangeControl
+							__next40pxDefaultSize
+							label={ __( 'Max characters' ) }
+							value={ characterLimit }
+							onChange={ ( value ) => {
+								setAttributes( { characterLimit: value } );
+							} }
+							min="0"
+							max="200"
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>

@@ -26,6 +26,10 @@
 		"showOnHomePage": {
 			"type": "boolean",
 			"default": false
+		},
+		"characterLimit": {
+			"type": "number",
+			"default": 10
 		}
 	},
 	"usesContext": [ "postId", "postType", "templateSlug" ],

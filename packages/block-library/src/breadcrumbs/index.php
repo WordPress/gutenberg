@@ -23,6 +23,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$character_limit = isset( $attributes['characterLimit'] ) ? (int) $attributes['characterLimit'] : 10;
+
 	$is_home          = is_home();
 	$page_for_posts   = get_option( 'page_for_posts' );
 	$breadcrumb_items = array();
@@ -181,6 +183,11 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
+	}
+
+	// Apply character limit truncation if set.
+	if ( $character_limit > 0 ) {
+		$breadcrumb_items = block_core_breadcrumbs_truncate_items( $breadcrumb_items, $character_limit );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
@@ -593,6 +600,70 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 		);
 	}
 	return $breadcrumb_items;
+}
+
+/**
+ * Truncates breadcrumb items to fit within a character limit.
+ *
+ * If the total character count of breadcrumb labels exceeds the limit,
+ * truncates the last item's label and adds an ellipsis.
+ *
+ * @since 7.0.0
+ *
+ * @param array $breadcrumb_items Array of breadcrumb item data.
+ * @param int   $character_limit  The maximum number of characters allowed.
+ *
+ * @return array Modified array of breadcrumb item data.
+ */
+function block_core_breadcrumbs_truncate_items( $breadcrumb_items, $character_limit ) {
+	if ( empty( $breadcrumb_items ) || $character_limit <= 0 ) {
+		return $breadcrumb_items;
+	}
+
+	// Calculate total characters in all labels.
+	$total_chars = 0;
+	foreach ( $breadcrumb_items as $item ) {
+		$label = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
+		$total_chars += strlen( $label );
+	}
+
+	// If within limit, return as is.
+	if ( $total_chars <= $character_limit ) {
+		return $breadcrumb_items;
+	}
+
+	// Truncate the last item's label to fit within the limit.
+	$remaining_chars = $character_limit;
+	$truncated_items = array();
+
+	foreach ( $breadcrumb_items as $index => $item ) {
+		$label = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
+		$label_length = strlen( $label );
+
+		if ( $index === count( $breadcrumb_items ) - 1 ) {
+			// Last item: truncate if necessary.
+			if ( $remaining_chars < $label_length ) {
+				$truncated_label = substr( $label, 0, max( 0, $remaining_chars - 3 ) ) . '…';
+				$item['label'] = $truncated_label;
+			}
+		} else {
+			// Not the last item: use full label if it fits, otherwise skip remaining items.
+			if ( $remaining_chars < $label_length ) {
+				// If this item doesn't fit, we've reached the truncation point.
+				// Replace this item with ellipsis.
+				$item['label'] = '…';
+				$item['url'] = ''; // Remove URL for ellipsis item.
+				unset( $item['allow_html'] );
+				$truncated_items[] = $item;
+				break;
+			}
+		}
+
+		$remaining_chars -= $label_length;
+		$truncated_items[] = $item;
+	}
+
+	return $truncated_items;
 }
 
 /**
