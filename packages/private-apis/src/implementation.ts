@@ -78,7 +78,7 @@ export const __dangerousOptInToUnstableAPIsOnlyForCoreModules = (
 	consent: string,
 	moduleName: string
 ) => {
-	if ( ! CORE_MODULES_USING_PRIVATE_APIS.includes( moduleName ) ) {
+	if ( CORE_MODULES_USING_PRIVATE_APIS.indexOf( moduleName ) === -1 ) {
 		throw new Error(
 			`You tried to opt-in to unstable APIs as module "${ moduleName }". ` +
 				'This feature is only for JavaScript modules shipped with WordPress core. ' +
