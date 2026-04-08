@@ -23,8 +23,7 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	ExperimentalBlockEditorProvider,
-	__unstableBlockStyleVariationOverridesWithConfig:
-		BlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 } = unlock( blockEditorPrivateApis );
 
 function isObjectEmpty( object ) {
