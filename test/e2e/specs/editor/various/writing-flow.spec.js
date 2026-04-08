@@ -1199,8 +1199,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.setIsFixedToolbar( true );
-
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
@@ -1228,12 +1226,12 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await page.mouse.move( endX, endY, { steps: 10 } );
 		await page.mouse.up();
 
-		// The Bold button should be visible in the top toolbar.
+		// The Bold button should be visible in the inline block toolbar.
 		await expect(
-			page.getByRole( 'button', { name: 'Bold' } )
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
-
-		await editor.setIsFixedToolbar( false );
 	} );
 } );
 
