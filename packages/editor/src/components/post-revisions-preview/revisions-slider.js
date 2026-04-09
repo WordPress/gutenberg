@@ -150,7 +150,7 @@ function RevisionsSlider() {
 				<RevisionDiffChart
 					stats={ diffStats }
 					width={ chartWidth }
-					height={ 30 }
+					height={ 40 }
 				/>
 				<RangeControl
 					__next40pxDefaultSize

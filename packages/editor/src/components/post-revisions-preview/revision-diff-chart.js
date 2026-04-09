@@ -5,7 +5,9 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { diffWords } from 'diff/lib/diff/word';
 
 /**
- * Build a smooth closed area path from data points using Catmull-Rom splines.
+ * Build a smooth closed area path using monotone cubic interpolation.
+ * Unlike Catmull-Rom, monotone interpolation never overshoots data points,
+ * producing clean curves similar to Recharts' "monotone" curve type.
  *
  * @param {Array}  points   Array of { x, y }.
  * @param {number} baseline The Y coordinate of the center line.
@@ -16,25 +18,72 @@ function buildSmoothAreaPath( points, baseline ) {
 		return '';
 	}
 
-	const tension = 0.3;
-	let d = `M 0,${ baseline } L ${ points[ 0 ].x },${ points[ 0 ].y }`;
+	// Compute tangent slopes using Fritsch-Carlson monotone method.
+	const n = points.length;
+	const slopes = new Array( n );
+	const deltas = new Array( n - 1 );
 
-	for ( let i = 0; i < points.length - 1; i++ ) {
-		const p0 = points[ Math.max( 0, i - 1 ) ];
-		const p1 = points[ i ];
-		const p2 = points[ i + 1 ];
-		const p3 = points[ Math.min( points.length - 1, i + 2 ) ];
-
-		const cp1x = p1.x + ( p2.x - p0.x ) * tension;
-		const cp1y = p1.y + ( p2.y - p0.y ) * tension;
-		const cp2x = p2.x - ( p3.x - p1.x ) * tension;
-		const cp2y = p2.y - ( p3.y - p1.y ) * tension;
-
-		d += ` C ${ cp1x },${ cp1y } ${ cp2x },${ cp2y } ${ p2.x },${ p2.y }`;
+	for ( let i = 0; i < n - 1; i++ ) {
+		const dx = points[ i + 1 ].x - points[ i ].x;
+		deltas[ i ] = dx === 0 ? 0 : ( points[ i + 1 ].y - points[ i ].y ) / dx;
 	}
 
-	d += ` L ${ points[ points.length - 1 ].x },${ baseline } Z`;
+	slopes[ 0 ] = deltas[ 0 ];
+	slopes[ n - 1 ] = deltas[ n - 2 ];
+
+	for ( let i = 1; i < n - 1; i++ ) {
+		if ( deltas[ i - 1 ] * deltas[ i ] <= 0 ) {
+			slopes[ i ] = 0;
+		} else {
+			slopes[ i ] = ( deltas[ i - 1 ] + deltas[ i ] ) / 2;
+		}
+	}
+
+	// Enforce monotonicity.
+	for ( let i = 0; i < n - 1; i++ ) {
+		if ( deltas[ i ] === 0 ) {
+			slopes[ i ] = 0;
+			slopes[ i + 1 ] = 0;
+		} else {
+			const alpha = slopes[ i ] / deltas[ i ];
+			const beta = slopes[ i + 1 ] / deltas[ i ];
+			const s = alpha * alpha + beta * beta;
+			if ( s > 9 ) {
+				const t = 3 / Math.sqrt( s );
+				slopes[ i ] = t * alpha * deltas[ i ];
+				slopes[ i + 1 ] = t * beta * deltas[ i ];
+			}
+		}
+	}
+
+	// Build path.
+	let d = `M 0,${ baseline } L ${ points[ 0 ].x },${ points[ 0 ].y }`;
+
+	for ( let i = 0; i < n - 1; i++ ) {
+		const dx = points[ i + 1 ].x - points[ i ].x;
+		const cp1x = points[ i ].x + dx / 3;
+		const cp1y = points[ i ].y + ( slopes[ i ] * dx ) / 3;
+		const cp2x = points[ i + 1 ].x - dx / 3;
+		const cp2y = points[ i + 1 ].y - ( slopes[ i + 1 ] * dx ) / 3;
+		d += ` C ${ cp1x },${ cp1y } ${ cp2x },${ cp2y } ${
+			points[ i + 1 ].x
+		},${ points[ i + 1 ].y }`;
+	}
+
+	d += ` L ${ points[ n - 1 ].x },${ baseline } Z`;
 	return d;
+}
+
+const segmenter = new Intl.Segmenter( undefined, { granularity: 'word' } );
+
+function countWords( text ) {
+	let count = 0;
+	for ( const { isWordLike } of segmenter.segment( text ) ) {
+		if ( isWordLike ) {
+			count++;
+		}
+	}
+	return count;
 }
 
 function diffRevisionPair( prev, curr ) {
@@ -46,14 +95,10 @@ function diffRevisionPair( prev, curr ) {
 	let removed = 0;
 
 	for ( const change of changes ) {
-		const wordCount = change.value
-			.trim()
-			.split( /\s+/ )
-			.filter( Boolean ).length;
 		if ( change.added ) {
-			added += wordCount;
+			added += countWords( change.value );
 		} else if ( change.removed ) {
-			removed += wordCount;
+			removed += countWords( change.value );
 		}
 	}
 
@@ -85,17 +130,19 @@ export function useRevisionDiffStats( sortedRevisions ) {
 		} ) );
 		setStats( initial );
 
-		let index = 1;
+		// Process from the last revision backwards so the max scale
+		// is established early and the chart only grows, never shrinks.
+		let index = sortedRevisions.length - 1;
 
 		function processNext() {
 			if ( revisionsRef.current !== sortedRevisions ) {
 				return;
 			}
-			if ( index >= sortedRevisions.length ) {
+			if ( index < 1 ) {
 				return;
 			}
 
-			const i = index++;
+			const i = index--;
 			const result = diffRevisionPair(
 				sortedRevisions[ i - 1 ],
 				sortedRevisions[ i ]
@@ -126,6 +173,10 @@ export function useRevisionDiffStats( sortedRevisions ) {
  * @param {number} props.height Height of the SVG in pixels.
  * @return {React.JSX.Element|null} The SVG chart or null if insufficient data.
  */
+// Fixed reference for log scale — changes of this many words
+// or more fill the full chart height. Larger values clip.
+const LOG_SCALE_REF = Math.log10( 2000 );
+
 export default function RevisionDiffChart( { stats, width, height } ) {
 	if ( ! stats || stats.length < 2 || ! width || ! height ) {
 		return null;
@@ -134,25 +185,19 @@ export default function RevisionDiffChart( { stats, width, height } ) {
 	const gap = 2;
 	const midY = height / 2;
 	const halfHeight = midY - gap - 2;
-
-	// Use square root scale so small changes remain visible
-	// relative to large ones.
-	const maxValue = Math.max(
-		1,
-		...stats.map( ( s ) =>
-			Math.max( Math.sqrt( s.added ), Math.sqrt( s.removed ) )
-		)
-	);
-	const verticalScale = halfHeight / maxValue;
+	const verticalScale = halfHeight / LOG_SCALE_REF;
 
 	const addedPoints = stats.map( ( stat, index ) => ( {
 		x: ( index / ( stats.length - 1 ) ) * width,
-		y: midY - gap - Math.sqrt( stat.added ) * verticalScale,
+		y: midY - gap - Math.max( 0, Math.log10( stat.added ) ) * verticalScale,
 	} ) );
 
 	const removedPoints = stats.map( ( stat, index ) => ( {
 		x: ( index / ( stats.length - 1 ) ) * width,
-		y: midY + gap + Math.sqrt( stat.removed ) * verticalScale,
+		y:
+			midY +
+			gap +
+			Math.max( 0, Math.log10( stat.removed ) ) * verticalScale,
 	} ) );
 
 	/* eslint-disable react/forbid-elements */
