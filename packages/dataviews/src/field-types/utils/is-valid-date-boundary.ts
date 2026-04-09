@@ -39,7 +39,11 @@ function validateDateLikeBoundary< Item >(
 		? value[ boundary === 'min' ? 0 : value.length - 1 ]
 		: value;
 
-	if ( boundaryValue === null || boundaryValue === '' ) {
+	if (
+		boundaryValue === undefined ||
+		boundaryValue === null ||
+		boundaryValue === ''
+	) {
 		return true;
 	}
 
