@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.1.0-next.0 (2026-04-09)
+
 ### Enhancements
 
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)

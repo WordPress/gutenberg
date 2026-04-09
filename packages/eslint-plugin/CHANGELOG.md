@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 24.6.0-next.0 (2026-04-09)
+
 ### Enhancements
 
 -   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).

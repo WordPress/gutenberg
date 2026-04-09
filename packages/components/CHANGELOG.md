@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.5.1-next.0 (2026-04-09)
+
 ### Bug Fixes
 
 -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).

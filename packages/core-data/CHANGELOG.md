@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.43.1-next.0 (2026-04-09)
+
 ### Bug Fixes
 
 -   Fix `getEntityRecords` returning incomplete results for non-paginated entities by normalizing `per_page` in queries ([#76406](https://github.com/WordPress/gutenberg/pull/76406)).
