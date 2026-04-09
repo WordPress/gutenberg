@@ -64,7 +64,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							<Text
 								variant="heading-xl"
 								render={ <_AlertDialog.Title /> }
-								className={ dialogStyles.title }
 							>
 								{ title }
 							</Text>

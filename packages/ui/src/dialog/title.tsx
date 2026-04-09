@@ -1,7 +1,7 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
-import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
+import { Text } from '../text';
 import { useDialogValidationContext } from './context';
 import styles from './style.module.css';
 import type { TitleProps } from './types';
@@ -11,11 +11,12 @@ import type { TitleProps } from './types';
  * and serves as both the visible heading and the accessible label for
  * the dialog.
  *
- * Base UI's Dialog.Title renders an `<h2>` by default. Use the `render` prop
+ * Uses the `heading-xl` text variant, matching Popover. Base UI's
+ * Dialog.Title renders an `<h2>` by default. Use the `render` prop
  * to customize the element if needed.
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function DialogTitle( { className, render, ...props }, forwardedRef ) {
+	function DialogTitle( { children, ...props }, forwardedRef ) {
 		const validationContext = useDialogValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
@@ -26,12 +27,14 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 		}, [ validationContext ] );
 
 		return (
-			<_Dialog.Title
+			<Text
 				ref={ mergedRef }
-				className={ clsx( styles.title, className ) }
-				render={ render }
-				{ ...props }
-			/>
+				variant="heading-xl"
+				render={ <_Dialog.Title { ...props } /> }
+				className={ styles.title }
+			>
+				{ children }
+			</Text>
 		);
 	}
 );
