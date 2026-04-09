@@ -167,15 +167,6 @@ export default function BackgroundImagePanel( {
 	} else if ( Array.isArray( clipSetting ) ) {
 		allowedClipValues = clipSetting;
 	}
-	// When text gradient support is active (the color panel's text section
-	// handles setting backgroundClip to 'text'), exclude 'text' from the
-	// background panel's clip control. This avoids shared-state confusion
-	// between the two panels.
-	const hasTextGradientSupport =
-		allowedClipValues.includes( 'text' ) && hasBackgroundGradientControl;
-	if ( hasTextGradientSupport ) {
-		allowedClipValues = allowedClipValues.filter( ( v ) => v !== 'text' );
-	}
 	const showBackgroundClipControl = allowedClipValues.length > 0;
 
 	const resetBackgroundClip = () =>
@@ -186,16 +177,17 @@ export default function BackgroundImagePanel( {
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
 			const prevClip = previousValue?.background?.backgroundClip;
-			const isTextGrad = prevClip === 'text';
+			// When the background clip UI has not been explicitly opted into
+			// via theme.json settings, backgroundClip (and its companion
+			// gradient) is owned by the color panel's text gradient handling
+			// and must be preserved here.
+			const preserveTextGradient =
+				! showBackgroundClipControl && prevClip === 'text';
 
 			return {
 				...previousValue,
 				background: {
-					// When a text gradient is active, the color panel owns
-					// gradient and backgroundClip. Preserve them here so the
-					// background panel's "Reset all" only clears background-
-					// panel values (image, size, position, etc.).
-					...( isTextGrad
+					...( preserveTextGradient
 						? {
 								gradient: previousValue?.background?.gradient,
 								backgroundClip: prevClip,
@@ -210,7 +202,7 @@ export default function BackgroundImagePanel( {
 					: previousValue?.color,
 			};
 		},
-		[ hasBackgroundGradientControl ]
+		[ hasBackgroundGradientControl, showBackgroundClipControl ]
 	);
 
 	if (

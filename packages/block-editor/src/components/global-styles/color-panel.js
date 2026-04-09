@@ -23,6 +23,7 @@ import {
 } from '@wordpress/components';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { reset as resetIcon } from '@wordpress/icons';
 
@@ -331,6 +332,7 @@ export default function ColorPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 	label,
 	children,
+	blockName,
 } ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
@@ -482,7 +484,15 @@ export default function ColorPanel( {
 
 		onChange( changedObject );
 	};
-	// Text Gradient (background-clip: text)
+	// Text Gradient (background-clip: text).
+	// Two independent gates can enable this:
+	//   1. theme.json sets background.backgroundClip to true (or an array
+	//      including 'text'), opting into the full backgroundClip UI.
+	//   2. The block declares supports.background.backgroundClip in its
+	//      block.json. This is the path used by core/heading and
+	//      core/paragraph: text gradient is exposed for those blocks even
+	//      when the (unrefined) box-model clip control in the background
+	//      panel remains disabled by default.
 	const clipSetting = settings?.background?.backgroundClip;
 	let allowedClipValues = [];
 	if ( clipSetting === true ) {
@@ -490,8 +500,13 @@ export default function ColorPanel( {
 	} else if ( Array.isArray( clipSetting ) ) {
 		allowedClipValues = clipSetting;
 	}
+	const blockSupportsBackgroundClip = blockName
+		? !! getBlockSupport( blockName, [ 'background', 'backgroundClip' ] )
+		: false;
 	const showTextGradient =
-		allowedClipValues.includes( 'text' ) && hasBackgroundGradientSupport;
+		( allowedClipValues.includes( 'text' ) ||
+			blockSupportsBackgroundClip ) &&
+		hasBackgroundGradientSupport;
 	// Text gradient is stored at background.gradient, discriminated from a
 	// regular background gradient by backgroundClip === 'text'.
 	const textGradient = inheritedIsTextGradient

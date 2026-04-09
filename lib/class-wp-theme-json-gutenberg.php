@@ -786,7 +786,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
-		array( 'background', 'backgroundClip' ),
 		array( 'background', 'backgroundImage' ),
 		array( 'background', 'backgroundSize' ),
 		array( 'background', 'gradient' ),
