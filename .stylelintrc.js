@@ -55,7 +55,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.css' ],
+			files: [ '**/*.module.{css,scss}' ],
 			rules: {
 				'function-no-unknown': [
 					true,
