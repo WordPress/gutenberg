@@ -91,10 +91,14 @@
 	}
 
 	.header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		margin-bottom: var(--wpds-dimension-gap-lg);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
 	.title {
@@ -106,11 +110,15 @@
 	}
 
 	.footer {
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
 		gap: var(--wpds-dimension-gap-sm);
 		margin-top: var(--wpds-dimension-gap-lg);
 		padding-top: var(--wpds-dimension-padding-lg);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 }
