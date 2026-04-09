@@ -1265,6 +1265,30 @@ describe( 'useFormValidity', () => {
 			expect( validity?.createdAt ).toEqual( MIN_MESSAGE );
 			expect( isValid ).toBe( false );
 		} );
+
+		it( 'datetime is valid when min uses an offset-based ISO string', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-04-01T09:30:00.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						min: '2026-04-01T10:00:00+02:00',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
 	} );
 
 	describe( 'isValid.max (datetime)', () => {
@@ -1303,6 +1327,54 @@ describe( 'useFormValidity', () => {
 			const item = {
 				id: 1,
 				createdAt: '2026-05-01T00:00:00.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						max: '2026-04-30T23:59:59.000Z',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.createdAt ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'datetime is invalid when max uses an offset-based ISO string', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-04-01T09:30:00.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						max: '2026-04-01T10:00:00+02:00',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.createdAt ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'datetime is invalid when value cannot be parsed', () => {
+			const item = {
+				id: 1,
+				createdAt: 'not-a-date',
 			};
 			const fields: Field< {} >[] = [
 				{

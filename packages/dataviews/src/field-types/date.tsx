@@ -21,8 +21,7 @@ import {
 	OPERATOR_BETWEEN,
 } from '../constants';
 import isValidRequired from './utils/is-valid-required';
-import isValidMinDate from './utils/is-valid-min-date';
-import isValidMaxDate from './utils/is-valid-max-date';
+import { isValidMaxDate, isValidMinDate } from './utils/is-valid-date-boundary';
 import render from './utils/render-default';
 
 const format = {

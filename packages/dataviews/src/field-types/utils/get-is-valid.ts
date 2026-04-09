@@ -1,15 +1,22 @@
 /**
  * Internal dependencies
  */
-import type { Field, Rules, NormalizedRules } from '../../types';
+import type { Field, NormalizedRules } from '../../types';
 import type { FieldType } from '../../types/private';
+
+function supportsNumericRangeConstraint( type?: string ) {
+	return type === 'integer' || type === 'number';
+}
+
+function supportsDateRangeConstraint( type?: string ) {
+	return type === 'date' || type === 'datetime';
+}
 
 export default function getIsValid< Item >(
 	field: Field< Item >,
 	fieldType: FieldType< Item >
 ): NormalizedRules< Item > {
-	// Cast to Rules (widest type) since this function handles all field types.
-	const rules = field.isValid as Rules< Item > | undefined;
+	const rules = field.isValid;
 	let required;
 	if (
 		rules?.required === true &&
@@ -38,7 +45,10 @@ export default function getIsValid< Item >(
 	const minValue = rules?.min;
 	let min;
 	if (
-		( typeof minValue === 'number' || typeof minValue === 'string' ) &&
+		( ( typeof minValue === 'number' &&
+			supportsNumericRangeConstraint( fieldType.type ) ) ||
+			( typeof minValue === 'string' &&
+				supportsDateRangeConstraint( fieldType.type ) ) ) &&
 		fieldType.validate.min !== undefined
 	) {
 		min = {
@@ -50,7 +60,10 @@ export default function getIsValid< Item >(
 	const maxValue = rules?.max;
 	let max;
 	if (
-		( typeof maxValue === 'number' || typeof maxValue === 'string' ) &&
+		( ( typeof maxValue === 'number' &&
+			supportsNumericRangeConstraint( fieldType.type ) ) ||
+			( typeof maxValue === 'string' &&
+				supportsDateRangeConstraint( fieldType.type ) ) ) &&
 		fieldType.validate.max !== undefined
 	) {
 		max = {

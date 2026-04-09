@@ -90,16 +90,6 @@ type BaseRules< Item > = {
 		  ) => Promise< null | string > );
 };
 
-export type NumericRules< Item > = BaseRules< Item > & {
-	min?: number;
-	max?: number;
-};
-
-export type DateRules< Item > = BaseRules< Item > & {
-	min?: string;
-	max?: string;
-};
-
 export type Rules< Item > = BaseRules< Item > & {
 	min?: number | string;
 	max?: number | string;
@@ -197,10 +187,12 @@ export type EditConfig =
 	| EditConfigDatetime
 	| EditConfigGeneric;
 
-type NumericFieldType = 'integer' | 'number';
-type DateFieldType = 'date' | 'datetime';
-
 type FieldBase< Item > = {
+	/**
+	 * Type of the field.
+	 */
+	type?: FieldTypeName;
+
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -322,32 +314,22 @@ type FieldBase< Item > = {
 		item: Item;
 		field: NormalizedField< Item >;
 	} ) => string;
+
+	/**
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
+	 */
+	isValid?: Rules< Item >;
 };
 
 /**
  * A dataview field for a specific property of a data type.
- *
- * The `type` property determines which validation rules are available:
- * - `'integer' | 'number'`: `min`/`max` accept `number`
- * - `'date' | 'datetime'`: `min`/`max` accept `string` (ISO date)
- * - All other types: `min`/`max` are not available
  */
-export type Field< Item > =
-	| ( FieldBase< Item > & {
-			type: NumericFieldType;
-			isValid?: NumericRules< Item >;
-	  } )
-	| ( FieldBase< Item > & {
-			type: DateFieldType;
-			isValid?: DateRules< Item >;
-	  } )
-	| ( FieldBase< Item > & {
-			type?: Exclude<
-				FieldTypeName,
-				NumericFieldType | DateFieldType
-			>;
-			isValid?: BaseRules< Item >;
-	  } );
+export type Field< Item > = FieldBase< Item >;
 
 /**
  * Format for datetime fields:
