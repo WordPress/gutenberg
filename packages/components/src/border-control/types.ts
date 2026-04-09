@@ -73,7 +73,13 @@ export type BorderControlProps = ColorProps &
 		 */
 		placeholder?: HTMLInputElement[ 'placeholder' ];
 		/**
-		 * An internal prop used to control the visibility of the dropdown.
+		 * Props to pass to the popover that contains the border color and style
+		 * picker dropdown.
+		 */
+		popoverProps?: Omit< PopoverProps, 'children' >;
+		/**
+		 * @deprecated Use `popoverProps` instead.
+		 * @ignore
 		 */
 		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
 		/**
@@ -138,9 +144,10 @@ export type DropdownProps = ColorProps &
 		 */
 		isStyleSettable: boolean;
 		/**
-		 * An internal prop used to control the visibility of the dropdown.
+		 * Props to pass to the popover that contains the border color and style
+		 * picker dropdown.
 		 */
-		__unstablePopoverProps?: Omit< PopoverProps, 'children' >;
+		popoverProps?: Omit< PopoverProps, 'children' >;
 		/**
 		 * A callback invoked when the border color or style selections change.
 		 */

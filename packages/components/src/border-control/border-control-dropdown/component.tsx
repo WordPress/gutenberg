@@ -159,7 +159,7 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
 		size,
-		__unstablePopoverProps,
+		popoverProps,
 		...otherProps
 	} = useBorderControlDropdown( props );
 
@@ -244,7 +244,7 @@ const BorderControlDropdown = (
 			renderToggle={ renderToggle }
 			renderContent={ renderContent }
 			popoverProps={ {
-				...__unstablePopoverProps,
+				...popoverProps,
 			} }
 			{ ...otherProps }
 			ref={ forwardedRef }

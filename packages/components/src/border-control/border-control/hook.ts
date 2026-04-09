@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback, useMemo, useState } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -36,11 +37,23 @@ export function useBorderControl(
 		size = 'default',
 		value: border,
 		width,
+		popoverProps,
+		__unstablePopoverProps,
 		__experimentalIsRenderedInSidebar = false,
 		__next40pxDefaultSize,
 		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
+
+	if ( __unstablePopoverProps !== undefined ) {
+		deprecated(
+			'`__unstablePopoverProps` prop in wp.components.BorderControl',
+			{
+				since: '7.0',
+				alternative: '`popoverProps`',
+			}
+		);
+	}
 
 	maybeWarnDeprecated36pxSize( {
 		componentName: 'BorderControl',
@@ -163,6 +176,7 @@ export function useBorderControl(
 		onBorderChange,
 		onSliderChange,
 		onWidthChange,
+		popoverProps: popoverProps ?? __unstablePopoverProps,
 		previousStyleSelection: styleSelection,
 		sliderClassName,
 		value: border,

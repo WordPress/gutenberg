@@ -54,7 +54,7 @@ const UnconnectedBorderControl = (
 		onSliderChange,
 		onWidthChange,
 		placeholder,
-		__unstablePopoverProps,
+		popoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
 		size,
@@ -82,9 +82,7 @@ const UnconnectedBorderControl = (
 							<BorderControlDropdown
 								border={ border }
 								colors={ colors }
-								__unstablePopoverProps={
-									__unstablePopoverProps
-								}
+								popoverProps={ popoverProps }
 								disableCustomColors={ disableCustomColors }
 								enableAlpha={ enableAlpha }
 								enableStyle={ enableStyle }

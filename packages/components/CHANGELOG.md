@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Deprecations
+
+-   `BorderControl`: Stabilize `__unstablePopoverProps` as `popoverProps`. The old prop is deprecated and will be removed in a future version.
+
 ### Bug Fixes
 
 -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).

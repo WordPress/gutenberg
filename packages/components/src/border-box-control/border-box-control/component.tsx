@@ -74,19 +74,18 @@ const UnconnectedBorderBoxControl = (
 	);
 
 	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
-		useMemo(
-			() =>
-				popoverPlacement
-					? {
-							placement: popoverPlacement,
-							offset: popoverOffset,
-							anchor: popoverAnchor,
-							shift: true,
-					  }
-					: undefined,
-			[ popoverPlacement, popoverOffset, popoverAnchor ]
-		);
+	const popoverProps: BorderControlProps[ 'popoverProps' ] = useMemo(
+		() =>
+			popoverPlacement
+				? {
+						placement: popoverPlacement,
+						offset: popoverOffset,
+						anchor: popoverAnchor,
+						shift: true,
+				  }
+				: undefined,
+		[ popoverPlacement, popoverOffset, popoverAnchor ]
+	);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
 	return (
@@ -108,7 +107,7 @@ const UnconnectedBorderBoxControl = (
 						placeholder={
 							hasMixedBorders ? __( 'Mixed' ) : undefined
 						}
-						__unstablePopoverProps={ popoverProps }
+						popoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
 						withSlider

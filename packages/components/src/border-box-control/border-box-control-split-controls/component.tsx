@@ -45,19 +45,18 @@ const BorderBoxControlSplitControls = (
 	);
 
 	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps: BorderControlProps[ '__unstablePopoverProps' ] =
-		useMemo(
-			() =>
-				popoverPlacement
-					? {
-							placement: popoverPlacement,
-							offset: popoverOffset,
-							anchor: popoverAnchor,
-							shift: true,
-					  }
-					: undefined,
-			[ popoverPlacement, popoverOffset, popoverAnchor ]
-		);
+	const popoverProps: BorderControlProps[ 'popoverProps' ] = useMemo(
+		() =>
+			popoverPlacement
+				? {
+						placement: popoverPlacement,
+						offset: popoverOffset,
+						anchor: popoverAnchor,
+						shift: true,
+				  }
+				: undefined,
+		[ popoverPlacement, popoverOffset, popoverAnchor ]
+	);
 
 	const sharedBorderControlProps = {
 		colors,
@@ -83,7 +82,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision
 				label={ __( 'Top border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'top' ) }
-				__unstablePopoverProps={ popoverProps }
+				popoverProps={ popoverProps }
 				value={ value?.top }
 				{ ...sharedBorderControlProps }
 			/>
@@ -93,7 +92,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision
 				label={ __( 'Left border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'left' ) }
-				__unstablePopoverProps={ popoverProps }
+				popoverProps={ popoverProps }
 				value={ value?.left }
 				{ ...sharedBorderControlProps }
 			/>
@@ -104,7 +103,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision
 				label={ __( 'Right border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'right' ) }
-				__unstablePopoverProps={ popoverProps }
+				popoverProps={ popoverProps }
 				value={ value?.right }
 				{ ...sharedBorderControlProps }
 			/>
@@ -115,7 +114,7 @@ const BorderBoxControlSplitControls = (
 				hideLabelFromVision
 				label={ __( 'Bottom border' ) }
 				onChange={ ( newBorder ) => onChange( newBorder, 'bottom' ) }
-				__unstablePopoverProps={ popoverProps }
+				popoverProps={ popoverProps }
 				value={ value?.bottom }
 				{ ...sharedBorderControlProps }
 			/>
