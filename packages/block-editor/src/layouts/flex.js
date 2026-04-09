@@ -23,7 +23,7 @@ import {
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
+import { getGapValueWithFallback } from '../hooks/gap';
 import {
 	BlockControls,
 	JustifyContentControl,
@@ -145,25 +145,17 @@ export default {
 
 		// Determine the fallback gap value using global styles (theme.json),
 		// falling back to '0.5em' for backwards compatibility.
-		let fallbackGapValue = '0.5em';
-		if ( globalBlockGapValue ) {
-			// Process the global gap value to handle preset values
-			const processedGlobalGap = getGapCSSValue(
-				globalBlockGapValue,
-				'0.5em'
-			);
-			// Use the column gap value (second value if two values exist)
-			const gapParts = processedGlobalGap.split( ' ' );
-			fallbackGapValue =
-				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
-		}
+		const fallbackGapValue = globalBlockGapValue || '0.5em';
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
+				? getGapValueWithFallback(
+						style?.spacing?.blockGap,
+						fallbackGapValue
+				  )
 				: undefined;
 		const justifyContent = justifyContentMap[ layout.justifyContent ];
 		const flexWrap = flexWrapOptions.includes( layout.flexWrap )

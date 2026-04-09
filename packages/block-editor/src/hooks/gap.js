@@ -44,3 +44,78 @@ export function getGapCSSValue( blockGapValue, defaultValue = '0' ) {
 
 	return row === column ? row : `${ row } ${ column }`;
 }
+
+/**
+ * Split a CSS shorthand value by top-level whitespace only.
+ *
+ * @param {?string} value CSS shorthand value.
+ * @return {string[]}     Top-level parts.
+ */
+export function splitTopLevelGapValues( value ) {
+	if ( ! value ) {
+		return [];
+	}
+
+	const parts = [];
+	let current = '';
+	let depth = 0;
+
+	for ( const char of value ) {
+		if ( char === '(' ) {
+			depth++;
+			current += char;
+			continue;
+		}
+
+		if ( char === ')' ) {
+			depth = Math.max( 0, depth - 1 );
+			current += char;
+			continue;
+		}
+
+		if ( /\s/.test( char ) && depth === 0 ) {
+			if ( current ) {
+				parts.push( current );
+				current = '';
+			}
+			continue;
+		}
+
+		current += char;
+	}
+
+	if ( current ) {
+		parts.push( current );
+	}
+
+	return parts;
+}
+
+/**
+ * Returns a CSS value for the `gap` property with fallback support.
+ *
+ * @param {?string | ?Object} blockGapValue A block gap string or axial object value, e.g., '10px' or { top: '10px', left: '10px'}.
+ * @param {?string}           fallbackValue A fallback gap value, which may be a shorthand string.
+ * @return {string|null}                    The concatenated gap value (row and column).
+ */
+export function getGapValueWithFallback( blockGapValue, fallbackValue = '0' ) {
+	const blockGapBoxControlValue =
+		getGapBoxControlValueFromStyle( blockGapValue );
+
+	if ( ! blockGapBoxControlValue ) {
+		return null;
+	}
+
+	const fallbackParts = splitTopLevelGapValues( fallbackValue );
+
+	const fallbackTop = fallbackParts[ 0 ] || fallbackValue;
+	const fallbackLeft =
+		fallbackParts[ 1 ] || fallbackParts[ 0 ] || fallbackValue;
+
+	const row =
+		getSpacingPresetCssVar( blockGapBoxControlValue?.top ) || fallbackTop;
+	const column =
+		getSpacingPresetCssVar( blockGapBoxControlValue?.left ) || fallbackLeft;
+
+	return row === column ? row : `${ row } ${ column }`;
+}
