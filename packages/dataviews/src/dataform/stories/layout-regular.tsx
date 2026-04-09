@@ -312,8 +312,10 @@ const getLayoutFromStoryArgs = ( {
 
 const LayoutRegularComponent = ( {
 	labelPosition,
+	disabled = false,
 }: {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
@@ -331,6 +333,18 @@ const LayoutRegularComponent = ( {
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
 	} );
+
+	// Make fields disabled when control is set to disabled.
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
 
 	const form: Form = useMemo(
 		() => ( {
@@ -363,7 +377,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

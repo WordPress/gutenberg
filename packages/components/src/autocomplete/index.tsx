@@ -22,7 +22,7 @@ import { isAppleOS } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from './autocompleter-ui';
+import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
@@ -106,11 +106,6 @@ export function useAutocomplete( {
 	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
-
-	const AutocompleterUI = useMemo(
-		() => ( autocompleter ? getAutoCompleterUI( autocompleter ) : null ),
-		[ autocompleter ]
-	);
 
 	const backspacingRef = useRef( false );
 
@@ -271,7 +266,7 @@ export function useAutocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 	const hasSelection = record.start !== undefined;
-	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
+	const showPopover = !! textContent && hasSelection && !! autocompleter;
 
 	return {
 		listBoxId,
@@ -279,6 +274,8 @@ export function useAutocomplete( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
+				key={ autocompleter.name + autocompleter.triggerPrefix }
+				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
 				instanceId={ instanceId }
@@ -286,7 +283,6 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
-				value={ record }
 				contentRef={ contentRef }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
@@ -294,17 +290,41 @@ export function useAutocomplete( {
 	};
 }
 
-function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
-	const history = useRef< Set< typeof value > >( new Set() );
+/**
+ * Checks whether two records represent the same user-visible state
+ * (same text content and cursor position).
+ */
+function recordValuesMatch(
+	a: UseAutocompleteProps[ 'record' ],
+	b: UseAutocompleteProps[ 'record' ]
+) {
+	return a.text === b.text && a.start === b.start && a.end === b.end;
+}
 
-	history.current.add( value );
+/**
+ * Tracks the last record whose value differed from the current one.
+ * Used to determine whether the user has actually typed something
+ */
+export function useLastDifferentValue(
+	value: UseAutocompleteProps[ 'record' ]
+) {
+	const history = useRef< Array< typeof value > >( [] );
 
-	// Keep the history size to 2.
-	if ( history.current.size > 2 ) {
-		history.current.delete( Array.from( history.current )[ 0 ] );
+	const lastEntry = history.current[ history.current.length - 1 ];
+
+	// Only add to history if the value is meaningfully different from
+	// the most recent entry (analogous to Set.add being a no-op for
+	// duplicate references in the original implementation).
+	if ( ! lastEntry || ! recordValuesMatch( value, lastEntry ) ) {
+		history.current.push( value );
 	}
 
-	return Array.from( history.current )[ 0 ];
+	// Keep the history size to 2.
+	if ( history.current.length > 2 ) {
+		history.current.shift();
+	}
+
+	return history.current[ 0 ];
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {
