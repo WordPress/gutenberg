@@ -3,25 +3,35 @@
  */
 import { __ } from '@wordpress/i18n';
 import { applyFormat, removeFormat } from '@wordpress/rich-text';
+import type { RichTextValue } from '@wordpress/rich-text';
 
-const FORMAT_NAME = 'core/annotation';
-
-const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
 /**
  * Internal dependencies
  */
 import { STORE_NAME } from '../store/constants';
+import type { Annotation, AnnotationFormat } from '../types';
+
+const FORMAT_NAME = 'core/annotation';
+
+const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
 
 /**
  * Applies given annotations to the given record.
  *
- * @param {Object} record      The record to apply annotations to.
- * @param {Array}  annotations The annotation to apply.
- * @return {Object} A record with the annotations applied.
+ * @param record      The record to apply annotations to.
+ * @param annotations The annotation to apply.
+ * @return A record with the annotations applied.
  */
-export function applyAnnotations( record, annotations = [] ) {
+export function applyAnnotations(
+	record: RichTextValue,
+	annotations: Annotation[] = []
+): RichTextValue {
 	annotations.forEach( ( annotation ) => {
 		let { start, end } = annotation;
+
+		if ( typeof start !== 'number' || typeof end !== 'number' ) {
+			return;
+		}
 
 		if ( start > record.text.length ) {
 			start = record.text.length;
@@ -42,7 +52,7 @@ export function applyAnnotations( record, annotations = [] ) {
 					className,
 					id,
 				},
-			},
+			} as any,
 			start,
 			end
 		);
@@ -54,21 +64,23 @@ export function applyAnnotations( record, annotations = [] ) {
 /**
  * Removes annotations from the given record.
  *
- * @param {Object} record Record to remove annotations from.
- * @return {Object} The cleaned record.
+ * @param record Record to remove annotations from.
+ * @return The cleaned record.
  */
-export function removeAnnotations( record ) {
+export function removeAnnotations( record: RichTextValue ): RichTextValue {
 	return removeFormat( record, 'core/annotation', 0, record.text.length );
 }
 
 /**
  * Retrieves the positions of annotations inside an array of formats.
  *
- * @param {Array} formats Formats with annotations in there.
- * @return {Object} ID keyed positions of annotations.
+ * @param formats Formats with annotations in there.
+ * @return ID keyed positions of annotations.
  */
-function retrieveAnnotationPositions( formats ) {
-	const positions = {};
+function retrieveAnnotationPositions(
+	formats: any[][]
+): Record< string, { start: number; end?: number } > {
+	const positions: Record< string, { start: number; end?: number } > = {};
 
 	formats.forEach( ( characterFormats, i ) => {
 		characterFormats = characterFormats || [];
@@ -98,17 +110,27 @@ function retrieveAnnotationPositions( formats ) {
 /**
  * Updates annotations in the state based on positions retrieved from RichText.
  *
- * @param {Array}    annotations                   The annotations that are currently applied.
- * @param {Array}    positions                     The current positions of the given annotations.
- * @param {Object}   actions
- * @param {Function} actions.removeAnnotation      Function to remove an annotation from the state.
- * @param {Function} actions.updateAnnotationRange Function to update an annotation range in the state.
+ * @param annotations                   The annotations that are currently applied.
+ * @param positions                     The current positions of the given annotations.
+ * @param actions
+ * @param actions.removeAnnotation      Function to remove an annotation from the state.
+ * @param actions.updateAnnotationRange Function to update an annotation range in the state.
  */
 function updateAnnotationsWithPositions(
-	annotations,
-	positions,
-	{ removeAnnotation, updateAnnotationRange }
-) {
+	annotations: Annotation[],
+	positions: Record< string, { start: number; end?: number } >,
+	{
+		removeAnnotation,
+		updateAnnotationRange,
+	}: {
+		removeAnnotation: ( annotationId: string ) => void;
+		updateAnnotationRange: (
+			annotationId: string,
+			start: number,
+			end: number
+		) => void;
+	}
+): void {
 	annotations.forEach( ( currentAnnotation ) => {
 		const position = positions[ currentAnnotation.id ];
 		// If we cannot find an annotation, delete it.
@@ -120,17 +142,22 @@ function updateAnnotationsWithPositions(
 		}
 
 		const { start, end } = currentAnnotation;
-		if ( start !== position.start || end !== position.end ) {
+		if (
+			typeof start === 'number' &&
+			typeof end === 'number' &&
+			( start !== position.start ||
+				end !== ( position.end ?? position.start ) )
+		) {
 			updateAnnotationRange(
 				currentAnnotation.id,
 				position.start,
-				position.end
+				position.end ?? position.start
 			);
 		}
 	} );
 }
 
-export const annotation = {
+export const annotation: AnnotationFormat = {
 	name: FORMAT_NAME,
 	title: __( 'Annotation' ),
 	tagName: 'mark',
@@ -139,13 +166,15 @@ export const annotation = {
 		className: 'class',
 		id: 'id',
 	},
-	edit() {
+	interactive: false,
+	object: false,
+	edit: () => {
 		return null;
 	},
-	__experimentalGetPropsForEditableTreePreparation(
+	__experimentalGetPropsForEditableTreePreparation: (
 		select,
 		{ richTextIdentifier, blockClientId }
-	) {
+	) => {
 		return {
 			annotations: select(
 				STORE_NAME
@@ -155,18 +184,24 @@ export const annotation = {
 			),
 		};
 	},
-	__experimentalCreatePrepareEditableTree( { annotations } ) {
+	__experimentalCreatePrepareEditableTree: ( { annotations } ) => {
 		return ( formats, text ) => {
 			if ( annotations.length === 0 ) {
 				return formats;
 			}
 
-			let record = { formats, text };
+			let record: RichTextValue = {
+				formats,
+				text,
+				replacements: [],
+				start: 0,
+				end: 0,
+			};
 			record = applyAnnotations( record, annotations );
 			return record.formats;
 		};
 	},
-	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
+	__experimentalGetPropsForEditableTreeChangeHandler: ( dispatch ) => {
 		return {
 			removeAnnotation:
 				dispatch( STORE_NAME ).__experimentalRemoveAnnotation,
@@ -174,7 +209,7 @@ export const annotation = {
 				dispatch( STORE_NAME ).__experimentalUpdateAnnotationRange,
 		};
 	},
-	__experimentalCreateOnChangeEditableValue( props ) {
+	__experimentalCreateOnChangeEditableValue: ( props ) => {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
 			const { removeAnnotation, updateAnnotationRange, annotations } =

@@ -3,6 +3,7 @@
  */
 import fs from 'node:fs/promises';
 import babel from '@babel/core';
+import { ROOT_DIR } from './index.mjs';
 
 /**
  * Returns `meta.tags` from a Storybook file.
@@ -14,6 +15,9 @@ export async function getTagsFromStorybook( filePath ) {
 	const fileContent = await fs.readFile( filePath, 'utf8' );
 	const parsedFile = babel.parse( fileContent, {
 		filename: filePath,
+		sourceType: 'module',
+		cwd: ROOT_DIR,
+		rootMode: 'upward-optional',
 	} );
 
 	const meta = parsedFile.program.body.find(

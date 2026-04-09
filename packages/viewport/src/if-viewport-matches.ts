@@ -11,6 +11,7 @@ import {
  * Internal dependencies
  */
 import withViewportMatch from './with-viewport-match';
+import type { ViewportQuery } from './types';
 
 /**
  * Higher-order component creator, creating a new component which renders if
@@ -18,7 +19,7 @@ import withViewportMatch from './with-viewport-match';
  *
  * @see withViewportMatches
  *
- * @param {string} query Viewport query.
+ * @param query Viewport query.
  *
  * @example
  *
@@ -30,15 +31,17 @@ import withViewportMatch from './with-viewport-match';
  * MyMobileComponent = ifViewportMatches( '< small' )( MyMobileComponent );
  * ```
  *
- * @return {Function} Higher-order component.
+ * @return Higher-order component.
  */
-const ifViewportMatches = ( query ) =>
+const ifViewportMatches = ( query: ViewportQuery ) =>
 	createHigherOrderComponent(
-		compose( [
+		( compose as any )( [
 			withViewportMatch( {
 				isViewportMatch: query,
 			} ),
-			ifCondition( ( props ) => props.isViewportMatch ),
+			ifCondition(
+				( props: { isViewportMatch: boolean } ) => props.isViewportMatch
+			),
 		] ),
 		'ifViewportMatches'
 	);

@@ -4,37 +4,41 @@
 import { createSelector } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import type { AnnotationsState, Annotation } from '../types';
+
+/**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation, as in a connected or
  * other pure component which performs `shouldComponentUpdate` check on props.
  * This should be used as a last resort, since the normalized data should be
  * maintained by the reducer result in state.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Annotation[] = [];
 
 /**
  * Returns the annotations for a specific client ID.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId The ID of the block to get the annotations for.
- *
- * @return {Array} The annotations applicable to this block.
+ * @param state         Editor state.
+ * @param blockClientId The ID of the block to get the annotations for.
+ * @return The annotations applicable to this block.
  */
 export const __experimentalGetAnnotationsForBlock = createSelector(
-	( state, blockClientId ) => {
+	( state: AnnotationsState, blockClientId: string ): Annotation[] => {
 		return ( state?.[ blockClientId ] ?? [] ).filter( ( annotation ) => {
 			return annotation.selector === 'block';
 		} );
 	},
-	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
+	( state: AnnotationsState, blockClientId: string ) => [
+		state?.[ blockClientId ] ?? EMPTY_ARRAY,
+	]
 );
 
 export function __experimentalGetAllAnnotationsForBlock(
-	state,
-	blockClientId
-) {
+	state: AnnotationsState,
+	blockClientId: string
+): Annotation[] {
 	return state?.[ blockClientId ] ?? EMPTY_ARRAY;
 }
 
@@ -45,13 +49,17 @@ export function __experimentalGetAllAnnotationsForBlock(
  * a block might have multiple `RichText` components. This does mean that every
  * block needs to implement annotations itself.
  *
- * @param {Object} state              Editor state.
- * @param {string} blockClientId      The client ID for the block.
- * @param {string} richTextIdentifier Unique identifier that identifies the given RichText.
- * @return {Array} All the annotations relevant for the `RichText`.
+ * @param state              Editor state.
+ * @param blockClientId      The client ID for the block.
+ * @param richTextIdentifier Unique identifier that identifies the given RichText.
+ * @return All the annotations relevant for the `RichText`.
  */
 export const __experimentalGetAnnotationsForRichText = createSelector(
-	( state, blockClientId, richTextIdentifier ) => {
+	(
+		state: AnnotationsState,
+		blockClientId: string,
+		richTextIdentifier: string
+	): Annotation[] => {
 		return ( state?.[ blockClientId ] ?? [] )
 			.filter( ( annotation ) => {
 				return (
@@ -68,15 +76,21 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 				};
 			} );
 	},
-	( state, blockClientId ) => [ state?.[ blockClientId ] ?? EMPTY_ARRAY ]
+	( state: AnnotationsState, blockClientId: string ) => [
+		state?.[ blockClientId ] ?? EMPTY_ARRAY,
+	]
 );
 
 /**
  * Returns all annotations in the editor state.
  *
- * @param {Object} state Editor state.
- * @return {Array} All annotations currently applied.
+ * @param state Editor state.
+ * @return All annotations currently applied.
  */
-export function __experimentalGetAnnotations( state ) {
-	return Object.values( state ).flat();
+export function __experimentalGetAnnotations(
+	state: AnnotationsState
+): Annotation[] {
+	return Object.values( state )
+		.filter( ( arr ): arr is Annotation[] => Boolean( arr ) )
+		.flat();
 }

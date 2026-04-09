@@ -1,13 +1,26 @@
 /**
+ * Internal dependencies
+ */
+import type {
+	AnnotationAction,
+	AnnotationsState,
+	Annotation,
+	AnnotationRange,
+} from '../types';
+
+/**
  * Filters an array based on the predicate, but keeps the reference the same if
  * the array hasn't changed.
  *
- * @param {Array}    collection The collection to filter.
- * @param {Function} predicate  Function that determines if the item should stay
- *                              in the array.
- * @return {Array} Filtered array.
+ * @param collection The collection to filter.
+ * @param predicate  Function that determines if the item should stay
+ *                   in the array.
+ * @return Filtered array.
  */
-function filterWithReference( collection, predicate ) {
+function filterWithReference< T >(
+	collection: T[],
+	predicate: ( item: T ) => boolean
+): T[] {
 	const filteredCollection = collection.filter( predicate );
 
 	return collection.length === filteredCollection.length
@@ -19,46 +32,57 @@ function filterWithReference( collection, predicate ) {
  * Creates a new object with the same keys, but with `callback()` called as
  * a transformer function on each of the values.
  *
- * @param {Object}   obj      The object to transform.
- * @param {Function} callback The function to transform each object value.
- * @return {Array} Transformed object.
+ * @param obj      The object to transform.
+ * @param callback The function to transform each object value.
+ * @return Transformed object.
  */
-const mapValues = ( obj, callback ) =>
-	Object.entries( obj ).reduce(
-		( acc, [ key, value ] ) => ( {
+const mapValues = < T, U >(
+	obj: Partial< Record< string, T > >,
+	callback: ( value: T ) => U
+): Partial< Record< string, U > > =>
+	Object.entries( obj ).reduce( ( acc, [ key, value ] ) => {
+		if ( value === undefined ) {
+			return acc;
+		}
+		return {
 			...acc,
 			[ key ]: callback( value ),
-		} ),
-		{}
-	);
+		};
+	}, {} );
 
 /**
  * Verifies whether the given annotations is a valid annotation.
  *
- * @param {Object} annotation The annotation to verify.
- * @return {boolean} Whether the given annotation is valid.
+ * @param annotation       The annotation to verify.
+ * @param annotation.range The range property of the annotation.
+ * @return Whether the given annotation is valid.
  */
-function isValidAnnotationRange( annotation ) {
-	return (
-		typeof annotation.start === 'number' &&
-		typeof annotation.end === 'number' &&
-		annotation.start <= annotation.end
+function isValidAnnotationRange( annotation: {
+	range?: AnnotationRange | null;
+} ): boolean {
+	return Boolean(
+		annotation.range &&
+			typeof annotation.range.start === 'number' &&
+			typeof annotation.range.end === 'number' &&
+			annotation.range.start <= annotation.range.end
 	);
 }
 
 /**
  * Reducer managing annotations.
  *
- * @param {Object} state  The annotations currently shown in the editor.
- * @param {Object} action Dispatched action.
- *
- * @return {Array} Updated state.
+ * @param state  The annotations currently shown in the editor.
+ * @param action Dispatched action.
+ * @return Updated state.
  */
-export function annotations( state = {}, action ) {
+export function annotations(
+	state: AnnotationsState = {},
+	action: AnnotationAction
+): AnnotationsState {
 	switch ( action.type ) {
 		case 'ANNOTATION_ADD':
 			const blockClientId = action.blockClientId;
-			const newAnnotation = {
+			const newAnnotation: Annotation = {
 				id: action.id,
 				blockClientId,
 				richTextIdentifier: action.richTextIdentifier,
@@ -69,7 +93,7 @@ export function annotations( state = {}, action ) {
 
 			if (
 				newAnnotation.selector === 'range' &&
-				! isValidAnnotationRange( newAnnotation.range )
+				! isValidAnnotationRange( newAnnotation )
 			) {
 				return state;
 			}
@@ -85,21 +109,21 @@ export function annotations( state = {}, action ) {
 			};
 
 		case 'ANNOTATION_REMOVE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
 				return filterWithReference(
 					annotationsForBlock,
-					( annotation ) => {
+					( annotation: Annotation ) => {
 						return annotation.id !== action.annotationId;
 					}
 				);
 			} );
 
 		case 'ANNOTATION_UPDATE_RANGE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
 				let hasChangedRange = false;
 
 				const newAnnotations = annotationsForBlock.map(
-					( annotation ) => {
+					( annotation: Annotation ) => {
 						if ( annotation.id === action.annotationId ) {
 							hasChangedRange = true;
 							return {
@@ -119,10 +143,10 @@ export function annotations( state = {}, action ) {
 			} );
 
 		case 'ANNOTATION_REMOVE_SOURCE':
-			return mapValues( state, ( annotationsForBlock ) => {
+			return mapValues( state, ( annotationsForBlock: Annotation[] ) => {
 				return filterWithReference(
 					annotationsForBlock,
-					( annotation ) => {
+					( annotation: Annotation ) => {
 						return annotation.source !== action.source;
 					}
 				);

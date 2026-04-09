@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import { annotations } from '../reducer';
+import type { AnnotationAction, AnnotationsState } from '../../types';
 
 describe( 'annotations', () => {
-	const initialState = {};
+	const initialState: AnnotationsState = {};
 
 	it( 'returns all annotations and annotation IDs per block', () => {
-		const state = annotations( undefined, {} );
+		const state = annotations( undefined, {} as AnnotationAction );
 
 		expect( state ).toEqual( initialState );
 	} );
@@ -63,14 +64,14 @@ describe( 'annotations', () => {
 			blockClientId: 'blockClientId',
 			richTextIdentifier: 'identifier',
 			source: 'default',
-			selector: 'block',
+			selector: 'block' as const,
 		};
 		const annotation2 = {
 			id: 'annotationId2',
 			blockClientId: 'blockClientId2',
 			richTextIdentifier: 'identifier2',
 			source: 'other-source',
-			selector: 'block',
+			selector: 'block' as const,
 		};
 		const state = annotations(
 			{
@@ -129,7 +130,7 @@ describe( 'annotations', () => {
 						blockClientId: 'blockClientId',
 						richTextIdentifier: 'identifier',
 						source: 'default',
-						selector: 'range',
+						selector: 'range' as const,
 						range: {
 							start: 0,
 							end: 100,
@@ -165,6 +166,9 @@ describe( 'annotations', () => {
 	it( 'rejects invalid annotations', () => {
 		let state = annotations( undefined, {
 			type: 'ANNOTATION_ADD',
+			id: 'test1',
+			blockClientId: 'blockClientId',
+			richTextIdentifier: 'identifier',
 			source: 'default',
 			selector: 'range',
 			range: {
@@ -174,19 +178,27 @@ describe( 'annotations', () => {
 		} );
 		state = annotations( state, {
 			type: 'ANNOTATION_ADD',
+			id: 'test2',
+			blockClientId: 'blockClientId',
+			richTextIdentifier: 'identifier',
 			source: 'default',
 			selector: 'range',
 			range: {
+				// @ts-expect-error Testing invalid input
 				start: 'not a number',
 				end: 100,
 			},
 		} );
 		state = annotations( state, {
 			type: 'ANNOTATION_ADD',
+			id: 'test3',
+			blockClientId: 'blockClientId',
+			richTextIdentifier: 'identifier',
 			source: 'default',
 			selector: 'range',
 			range: {
 				start: 100,
+				// @ts-expect-error Testing invalid input
 				end: 'not a number',
 			},
 		} );

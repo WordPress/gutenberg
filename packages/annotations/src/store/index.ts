@@ -19,8 +19,6 @@ import { STORE_NAME } from './constants';
  * Store definition for the annotations namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
- *
- * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, {
 	reducer,
