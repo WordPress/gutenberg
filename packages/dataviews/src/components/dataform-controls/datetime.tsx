@@ -61,10 +61,10 @@ function CalendarDateTimeControl< Item >( {
 		useRef< ReturnType< typeof setTimeout > >( undefined );
 	const previousFocusRef = useRef< Element | null >( null );
 
-	const minConstraint = isValid?.min
+	const minConstraint = isValid.min
 		? String( isValid.min.constraint )
 		: undefined;
-	const maxConstraint = isValid?.max
+	const maxConstraint = isValid.max
 		? String( isValid.max.constraint )
 		: undefined;
 
