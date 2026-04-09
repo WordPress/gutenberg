@@ -1,12 +1,13 @@
-import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+import type { Popover as _Popover } from '@base-ui/react/popover';
 import { useMemo, useRef } from '@wordpress/element';
 import { tabbable } from 'tabbable';
 
 /**
- * Derived from Base UI's `Dialog.Popup.Props['initialFocus']`.
- * The same type is shared by all Base UI overlay popups (Dialog, Popover, etc.).
+ * The `initialFocus` type shared by Base UI overlay popups (Dialog, Popover,
+ * AlertDialog, etc.). We derive it from `Popover.Popup.Props` here, but it
+ * is identical across all overlay components.
  */
-type InitialFocus = _Dialog.Popup.Props[ 'initialFocus' ];
+type InitialFocus = _Popover.Popup.Props[ 'initialFocus' ];
 
 /**
  * Options matching Base UI's internal tabbable configuration.

@@ -3391,7 +3391,7 @@ describe( 'state', () => {
 
 	describe( 'blockListSettings', () => {
 		it( 'should add new settings', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3401,19 +3401,29 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should return same reference if updated as the same', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3427,7 +3437,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return same reference if updated settings not assigned and id not exists', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3438,14 +3448,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update the settings of a block', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3455,40 +3473,61 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/list' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/list' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove existing settings if updated settings not assigned', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 
 		it( 'should remove the settings of a block when it is replaced', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3496,22 +3535,35 @@ describe( 'state', () => {
 				blocks: [],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3524,29 +3576,42 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove the settings of a block when it is removed', () => {
-			const original = deepFreeze( {
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 	} );
 
