@@ -12,7 +12,7 @@ import Editor from '../editor';
 import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen-templates-browse';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import PageTemplates from '../page-templates';
-import PageTemplatesLegacy from '../page-templates/index-legacy';
+import PageTemplatesActivation from '../page-templates/index-activation';
 import { unlock } from '../../lock-unlock';
 import { isThemeDataLoaded } from './utils';
 
@@ -54,12 +54,12 @@ export const templatesRoute = {
 			if ( ! isBlockTheme ) {
 				return undefined;
 			}
-			// Use the new template activation system if experiment is enabled,
-			// otherwise use the legacy simple template list.
+			// Use the template activation system if experiment is enabled,
+			// otherwise use the default template list.
 			return window?.__experimentalTemplateActivate ? (
-				<PageTemplates />
+				<PageTemplatesActivation />
 			) : (
-				<PageTemplatesLegacy />
+				<PageTemplates />
 			);
 		},
 		async preview( { query, siteData } ) {
@@ -81,12 +81,12 @@ export const templatesRoute = {
 			const isTemplateActivateEnabled =
 				typeof window !== 'undefined' &&
 				window.__experimentalTemplateActivate;
-			// Use the new template activation system if experiment is enabled,
-			// otherwise use the legacy simple template list.
+			// Use the template activation system if experiment is enabled,
+			// otherwise use the default template list.
 			return isTemplateActivateEnabled ? (
-				<PageTemplates />
+				<PageTemplatesActivation />
 			) : (
-				<PageTemplatesLegacy />
+				<PageTemplates />
 			);
 		},
 	},
