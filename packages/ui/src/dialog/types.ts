@@ -12,6 +12,7 @@ export interface RootProps
 		_Dialog.Root.Props,
 		| 'open'
 		| 'onOpenChange'
+		| 'onOpenChangeComplete'
 		| 'defaultOpen'
 		| 'modal'
 		| 'disablePointerDismissal'
@@ -90,6 +91,13 @@ export interface TitleProps extends ComponentProps< 'h2' > {
 	 *
 	 * When `Dialog.Title` is passed as a render element (e.g. to
 	 * `VisuallyHidden`), children can be provided by the wrapper instead.
+	 */
+	children?: ReactNode;
+}
+
+export interface DescriptionProps extends ComponentProps< 'p' > {
+	/**
+	 * The description content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 }
