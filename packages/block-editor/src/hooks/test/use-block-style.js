@@ -35,9 +35,11 @@ describe( 'useBlockStyle', () => {
 		} );
 	} );
 
-	afterAll( () => {
+	afterAll( async () => {
 		unregisterBlockType( 'test/style-block' );
-		dispatch( blockEditorStore ).resetBlocks( [] );
+		await act( async () => {
+			await dispatch( blockEditorStore ).resetBlocks( [] );
+		} );
 	} );
 
 	let clientId;
@@ -48,12 +50,16 @@ describe( 'useBlockStyle', () => {
 				':hover': { color: { text: '#ff0000' } },
 			},
 		} );
-		await dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		await act( async () => {
+			await dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		} );
 		clientId = block.clientId;
 	} );
 
-	afterEach( () => {
-		dispatch( blockEditorStore ).resetBlocks( [] );
+	afterEach( async () => {
+		await act( async () => {
+			await dispatch( blockEditorStore ).resetBlocks( [] );
+		} );
 	} );
 
 	function makeWrapper( id ) {
