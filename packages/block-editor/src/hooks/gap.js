@@ -106,11 +106,18 @@ export function getGapValueWithFallback( blockGapValue, fallbackValue = '0' ) {
 		return null;
 	}
 
-	const fallbackParts = splitTopLevelGapValues( fallbackValue );
+	let fallbackTop;
+	let fallbackLeft;
 
-	const fallbackTop = fallbackParts[ 0 ] || fallbackValue;
-	const fallbackLeft =
-		fallbackParts[ 1 ] || fallbackParts[ 0 ] || fallbackValue;
+	if ( typeof fallbackValue === 'object' && fallbackValue !== null ) {
+		fallbackTop = fallbackValue?.top || fallbackValue?.left || '0';
+		fallbackLeft = fallbackValue?.left || fallbackValue?.top || '0';
+	} else {
+		const fallbackParts = splitTopLevelGapValues( fallbackValue );
+		fallbackTop = fallbackParts[ 0 ] || fallbackValue;
+		fallbackLeft =
+			fallbackParts[ 1 ] || fallbackParts[ 0 ] || fallbackValue;
+	}
 
 	const row =
 		getSpacingPresetCssVar( blockGapBoxControlValue?.top ) || fallbackTop;
