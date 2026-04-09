@@ -13,7 +13,11 @@ export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
 			render,
 			ref,
 			props: mergeProps< 'div' >(
-				{ className: styles[ 'visually-hidden' ] },
+				{
+					className: styles[ 'visually-hidden' ],
+					// @ts-expect-error - Data attribute that should stay hardcoded and not overridden by consumers.
+					'data-visually-hidden': '',
+				},
 				restProps
 			),
 		} );
