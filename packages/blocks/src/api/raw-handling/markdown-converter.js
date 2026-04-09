@@ -11,6 +11,7 @@ const converter = new showdown.Converter( {
 	omitExtraWLInCodeBlocks: true,
 	simpleLineBreaks: true,
 	strikethrough: true,
+	requireSpaceBeforeHeadingText: true,
 } );
 
 /**
