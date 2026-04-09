@@ -71,19 +71,22 @@ function ModalContent< Item >( {
 		[ field ]
 	);
 
-	const fieldsAsFieldType: Field< Item >[] = fields.map( ( f ) => ( {
-		...f,
-		Edit: f.Edit === null ? undefined : f.Edit,
-		isValid: {
-			required: f.isValid.required?.constraint,
-			elements: f.isValid.elements?.constraint,
-			min: f.isValid.min?.constraint,
-			max: f.isValid.max?.constraint,
-			pattern: f.isValid.pattern?.constraint,
-			minLength: f.isValid.minLength?.constraint,
-			maxLength: f.isValid.maxLength?.constraint,
-		},
-	} ) );
+	const fieldsAsFieldType = fields.map(
+		( f ) =>
+			( {
+				...f,
+				Edit: f.Edit === null ? undefined : f.Edit,
+				isValid: {
+					required: f.isValid.required?.constraint,
+					elements: f.isValid.elements?.constraint,
+					min: f.isValid.min?.constraint,
+					max: f.isValid.max?.constraint,
+					pattern: f.isValid.pattern?.constraint,
+					minLength: f.isValid.minLength?.constraint,
+					maxLength: f.isValid.maxLength?.constraint,
+				},
+			} ) as Field< Item >
+	);
 	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
 
 	const onApply = () => {

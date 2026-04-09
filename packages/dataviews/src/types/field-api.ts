@@ -76,20 +76,33 @@ export type FieldTypeName =
 	| 'url'
 	| 'array';
 
-export type Rules< Item > = {
+type BaseRules< Item > = {
 	required?: boolean;
 	elements?: boolean;
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: number | string;
-	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
 				item: Item,
 				field: NormalizedField< Item >
 		  ) => Promise< null | string > );
+};
+
+export type NumericRules< Item > = BaseRules< Item > & {
+	min?: number;
+	max?: number;
+};
+
+export type DateRules< Item > = BaseRules< Item > & {
+	min?: string;
+	max?: string;
+};
+
+export type Rules< Item > = BaseRules< Item > & {
+	min?: number | string;
+	max?: number | string;
 };
 
 export type Validator< Item > = (
@@ -184,15 +197,10 @@ export type EditConfig =
 	| EditConfigDatetime
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
-export type Field< Item > = {
-	/**
-	 * Type of the fields.
-	 */
-	type?: FieldTypeName;
+type NumericFieldType = 'integer' | 'number';
+type DateFieldType = 'date' | 'datetime';
 
+type FieldBase< Item > = {
 	/**
 	 * The unique identifier of the field.
 	 */
@@ -233,11 +241,6 @@ export type Field< Item > = {
 	 * Callback used to sort the field.
 	 */
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
-
-	/**
-	 * Callback used to validate the field.
-	 */
-	isValid?: Rules< Item >;
 
 	/**
 	 * Callback used to decide if a field should be displayed.
@@ -320,6 +323,31 @@ export type Field< Item > = {
 		field: NormalizedField< Item >;
 	} ) => string;
 };
+
+/**
+ * A dataview field for a specific property of a data type.
+ *
+ * The `type` property determines which validation rules are available:
+ * - `'integer' | 'number'`: `min`/`max` accept `number`
+ * - `'date' | 'datetime'`: `min`/`max` accept `string` (ISO date)
+ * - All other types: `min`/`max` are not available
+ */
+export type Field< Item > =
+	| ( FieldBase< Item > & {
+			type: NumericFieldType;
+			isValid?: NumericRules< Item >;
+	  } )
+	| ( FieldBase< Item > & {
+			type: DateFieldType;
+			isValid?: DateRules< Item >;
+	  } )
+	| ( FieldBase< Item > & {
+			type?: Exclude<
+				FieldTypeName,
+				NumericFieldType | DateFieldType
+			>;
+			isValid?: BaseRules< Item >;
+	  } );
 
 /**
  * Format for datetime fields:
