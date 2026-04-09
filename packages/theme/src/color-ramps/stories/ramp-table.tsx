@@ -28,9 +28,13 @@ const RAMP_TOKENS_ORDER: { tokenName: keyof Ramp; abbr: string }[] = [
 	{ tokenName: 'fgSurface1', abbr: 'FGS1' },
 	{ tokenName: 'fgSurface2', abbr: 'FGS2' },
 	{ tokenName: 'fgSurface3', abbr: 'FGS3' },
+	{ tokenName: 'fgSurface3Active', abbr: 'FGS3A' },
 	{ tokenName: 'fgSurface4', abbr: 'FGS4' },
+	{ tokenName: 'fgSurface4Active', abbr: 'FGS4A' },
 	{ tokenName: 'fgFill', abbr: 'FGF' },
+	{ tokenName: 'fgFillActive', abbr: 'FGFA' },
 	{ tokenName: 'fgFillInverted', abbr: 'FGFI' },
+	{ tokenName: 'fgFillInvertedActive', abbr: 'FGIA' },
 	{ tokenName: 'fgFillDark', abbr: 'FGFD' },
 ];
 

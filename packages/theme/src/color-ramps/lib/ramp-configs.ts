@@ -199,7 +199,21 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		lightness: lightnessConstraintForegroundMediumContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
+	fgSurface3Active: {
+		contrast: {
+			reference: 'fgSurface3',
+			followDirection: 'main',
+			target: 1.2,
+		},
+	},
 	fgSurface4: fgSurface4Config,
+	fgSurface4Active: {
+		contrast: {
+			reference: 'fgSurface4',
+			followDirection: 'main',
+			target: 1.2,
+		},
+	},
 	// fgFill
 	fgFill: {
 		contrast: {
@@ -211,6 +225,14 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
 	},
+	fgFillActive: {
+		contrast: {
+			reference: 'fgFill',
+			followDirection: 'best',
+			target: 1.2,
+			preferLighter: true,
+		},
+	},
 	fgFillInverted: {
 		contrast: {
 			reference: 'bgFillInverted1',
@@ -220,6 +242,14 @@ export const BG_RAMP_CONFIG: RampConfig = {
 		},
 		lightness: lightnessConstraintForegroundHighContrast,
 		taperChromaOptions: FG_TAPER_CHROMA,
+	},
+	fgFillInvertedActive: {
+		contrast: {
+			reference: 'fgFillInverted',
+			followDirection: 'best',
+			target: 1.2,
+			preferLighter: true,
+		},
 	},
 	fgFillDark: {
 		contrast: {
@@ -302,8 +332,20 @@ export const ACCENT_RAMP_CONFIG: RampConfig = {
 		taperChromaOptions: undefined,
 		sameAsIfPossible: 'bgFill1',
 	},
+	fgSurface3Active: {
+		...BG_RAMP_CONFIG.fgSurface3Active,
+	},
 	fgSurface4: {
 		...BG_RAMP_CONFIG.fgSurface4,
 		taperChromaOptions: undefined,
+	},
+	fgSurface4Active: {
+		...BG_RAMP_CONFIG.fgSurface4Active,
+	},
+	fgFillActive: {
+		...BG_RAMP_CONFIG.fgFillActive,
+	},
+	fgFillInvertedActive: {
+		...BG_RAMP_CONFIG.fgFillInvertedActive,
 	},
 };

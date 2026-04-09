@@ -5,16 +5,12 @@
 
 export default {
 	'primary-bgFill1': [ 'bg-interactive-brand-strong' ],
-	'primary-fgFill': [
-		'fg-interactive-brand-strong',
-		'fg-interactive-brand-strong-active',
-	],
+	'primary-fgFill': [ 'fg-interactive-brand-strong' ],
+	'primary-fgFillActive': [ 'fg-interactive-brand-strong-active' ],
 	'primary-bgFill2': [ 'bg-interactive-brand-strong-active' ],
 	'primary-surface4': [ 'bg-interactive-brand-weak-active' ],
-	'primary-fgSurface3': [
-		'fg-interactive-brand',
-		'fg-interactive-brand-active',
-	],
+	'primary-fgSurface3': [ 'fg-interactive-brand' ],
+	'primary-fgSurface3Active': [ 'fg-interactive-brand-active' ],
 	'primary-stroke3': [
 		'bg-thumb-brand',
 		'bg-thumb-brand-active',
@@ -44,10 +40,8 @@ export default {
 	'warning-stroke3': [ 'stroke-surface-warning-strong' ],
 	'warning-stroke1': [ 'stroke-surface-warning' ],
 	'error-bgFill1': [ 'bg-interactive-error-strong' ],
-	'error-fgFill': [
-		'fg-interactive-error-strong',
-		'fg-interactive-error-strong-active',
-	],
+	'error-fgFill': [ 'fg-interactive-error-strong' ],
+	'error-fgFillActive': [ 'fg-interactive-error-strong-active' ],
 	'error-bgFill2': [ 'bg-interactive-error-strong-active' ],
 	'error-surface2': [
 		'bg-interactive-error-active',
@@ -58,11 +52,8 @@ export default {
 		'bg-surface-error',
 	],
 	'error-fgSurface4': [ 'fg-content-error' ],
-	'error-fgSurface3': [
-		'fg-content-error-weak',
-		'fg-interactive-error',
-		'fg-interactive-error-active',
-	],
+	'error-fgSurface3': [ 'fg-content-error-weak', 'fg-interactive-error' ],
+	'error-fgSurface3Active': [ 'fg-interactive-error-active' ],
 	'error-stroke3': [
 		'stroke-interactive-error',
 		'stroke-interactive-error-strong',
@@ -74,11 +65,8 @@ export default {
 	'bg-surface5': [ 'bg-interactive-neutral-strong-disabled' ],
 	'bg-surface4': [ 'bg-interactive-neutral-weak-active' ],
 	'bg-surface3': [ 'bg-surface-neutral-strong' ],
-	'bg-fgSurface4': [
-		'fg-content-neutral',
-		'fg-interactive-neutral',
-		'fg-interactive-neutral-active',
-	],
+	'bg-fgSurface4': [ 'fg-content-neutral', 'fg-interactive-neutral' ],
+	'bg-fgSurface4Active': [ 'fg-interactive-neutral-active' ],
 	'bg-fgSurface3': [
 		'fg-content-neutral-weak',
 		'fg-interactive-neutral-weak',
@@ -107,10 +95,8 @@ export default {
 	'bg-stroke1': [ 'bg-track-neutral-weak', 'stroke-surface-neutral-weak' ],
 	'bg-bgFillInverted2': [ 'bg-interactive-neutral-strong-active' ],
 	'bg-bgFillInverted1': [ 'bg-interactive-neutral-strong' ],
-	'bg-fgFillInverted': [
-		'fg-interactive-neutral-strong',
-		'fg-interactive-neutral-strong-active',
-	],
+	'bg-fgFillInverted': [ 'fg-interactive-neutral-strong' ],
+	'bg-fgFillInvertedActive': [ 'fg-interactive-neutral-strong-active' ],
 	'bg-surface1': [ 'bg-surface-neutral-weak' ],
 	'caution-surface2': [ 'bg-surface-caution-weak' ],
 	'caution-surface4': [ 'bg-surface-caution' ],
