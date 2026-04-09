@@ -318,6 +318,30 @@ function CalendarDateControl< Item >( {
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
+	const minConstraint = isValid.min
+		? String( isValid.min.constraint )
+		: undefined;
+	const maxConstraint = isValid.max
+		? String( isValid.max.constraint )
+		: undefined;
+
+	const disabledMatchers = useMemo( () => {
+		const matchers: Array< { before: Date } | { after: Date } > = [];
+		if ( minConstraint ) {
+			const minDate = parseDate( minConstraint );
+			if ( minDate ) {
+				matchers.push( { before: minDate } );
+			}
+		}
+		if ( maxConstraint ) {
+			const maxDate = parseDate( maxConstraint );
+			if ( maxDate ) {
+				matchers.push( { after: maxDate } );
+			}
+		}
+		return matchers.length > 0 ? matchers : undefined;
+	}, [ minConstraint, maxConstraint ] );
+
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
 			onChange( setValue( { item: data, value: newValue } ) ),
@@ -440,6 +464,8 @@ function CalendarDateControl< Item >( {
 						onChange={ handleManualDateChange }
 						required={ !! field.isValid?.required }
 						disabled={ disabled }
+						min={ minConstraint }
+						max={ maxConstraint }
 					/>
 
 					{ /* Calendar widget */ }
@@ -453,7 +479,7 @@ function CalendarDateControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabled }
+						disabled={ disabledMatchers ?? disabled }
 						disableNavigation={ disabled }
 					/>
 				</Stack>
@@ -476,6 +502,7 @@ function CalendarDateRangeControl< Item >( {
 		description,
 		getValue,
 		setValue,
+		isValid,
 		format: fieldFormat,
 	} = field;
 	const disabled = field.isDisabled( { item: data, field } );
@@ -492,6 +519,30 @@ function CalendarDateRangeControl< Item >( {
 	const weekStartsOn =
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
+
+	const minConstraint = isValid.min
+		? String( isValid.min.constraint )
+		: undefined;
+	const maxConstraint = isValid.max
+		? String( isValid.max.constraint )
+		: undefined;
+
+	const disabledMatchers = useMemo( () => {
+		const matchers: Array< { before: Date } | { after: Date } > = [];
+		if ( minConstraint ) {
+			const minDate = parseDate( minConstraint );
+			if ( minDate ) {
+				matchers.push( { before: minDate } );
+			}
+		}
+		if ( maxConstraint ) {
+			const maxDate = parseDate( maxConstraint );
+			if ( maxDate ) {
+				matchers.push( { after: maxDate } );
+			}
+		}
+		return matchers.length > 0 ? matchers : undefined;
+	}, [ minConstraint, maxConstraint ] );
 
 	const onChangeCallback = useCallback(
 		( newValue: DateRange ) => {
@@ -674,6 +725,8 @@ function CalendarDateRangeControl< Item >( {
 							}
 							required={ !! field.isValid?.required }
 							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 						<InputControl
 							__next40pxDefaultSize
@@ -687,6 +740,8 @@ function CalendarDateRangeControl< Item >( {
 							}
 							required={ !! field.isValid?.required }
 							disabled={ disabled }
+							min={ minConstraint }
+							max={ maxConstraint }
 						/>
 					</Stack>
 
@@ -698,7 +753,7 @@ function CalendarDateRangeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabled }
+						disabled={ disabledMatchers ?? disabled }
 					/>
 				</Stack>
 			</BaseControl>
