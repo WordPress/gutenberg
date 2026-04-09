@@ -6,6 +6,7 @@ import {
 	useRef,
 	useState,
 	useEffect,
+	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
@@ -137,44 +138,13 @@ function SandBox( {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
-
-	function isFrameAccessible() {
-		try {
-			return !! ref.current?.contentDocument?.body;
-		} catch {
-			return false;
-		}
-	}
-
-	function trySandBox( forceRerender = false ) {
-		if ( ! isFrameAccessible() ) {
-			return;
-		}
-
-		const { contentDocument, ownerDocument } =
-			ref.current as HTMLIFrameElement & {
-				contentDocument: Document;
-			};
-
-		if (
-			! forceRerender &&
-			null !==
-				contentDocument?.body.getAttribute(
-					'data-resizable-iframe-connected'
-				)
-		) {
-			return;
-		}
-
-		// Put the html snippet into a html document, and then write it to the iframe's document
-		// we can use this in the future to inject custom styles or scripts.
-		// Scripts go into the body rather than the head, to support embedded content such as Instagram
-		// that expect the scripts to be part of the body.
+	// Build the full HTML document as a string for the srcdoc attribute.
+	// This replaces the previous approach of writing to contentDocument,
+	// which required allow-same-origin on the sandbox iframe.
+	const srcDoc = useMemo( () => {
+		const lang = document.documentElement.lang;
 		const htmlDoc = (
-			<html
-				lang={ ownerDocument.documentElement.lang }
-				className={ type }
-			>
+			<html lang={ lang } className={ type }>
 				<head>
 					<title>{ title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
@@ -203,25 +173,17 @@ function SandBox( {
 			</html>
 		);
 
-		// Writing the document like this makes it act in the same way as if it was
-		// loaded over the network, so DOM creation and mutation, script execution, etc.
-		// all work as expected.
-		contentDocument.open();
-		contentDocument.write( '<!DOCTYPE html>' + renderToString( htmlDoc ) );
-		contentDocument.close();
-	}
+		return '<!DOCTYPE html>' + renderToString( htmlDoc );
+	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {
-		trySandBox();
-
-		function tryNoForceSandBox() {
-			trySandBox( false );
-		}
-
 		function checkMessageForResize( event: MessageEvent ) {
 			const iframe = ref.current;
 
 			// Verify that the mounted element is the source of the message.
+			// iframe.contentWindow is accessible cross-origin as a
+			// WindowProxy reference, so this check still works without
+			// allow-same-origin.
 			if ( ! iframe || iframe.contentWindow !== event.source ) {
 				return;
 			}
@@ -245,38 +207,16 @@ function SandBox( {
 			setHeight( data.height );
 		}
 
-		const iframe = ref.current;
-		const defaultView = iframe?.ownerDocument?.defaultView;
-
-		// This used to be registered using <iframe onLoad={} />, but it made the iframe blank
-		// after reordering the containing block. See these two issues for more details:
-		// https://github.com/WordPress/gutenberg/issues/6146
-		// https://github.com/facebook/react/issues/18752
-		iframe?.addEventListener( 'load', tryNoForceSandBox, false );
+		const defaultView = ref.current?.ownerDocument?.defaultView;
 		defaultView?.addEventListener( 'message', checkMessageForResize );
 
 		return () => {
-			iframe?.removeEventListener( 'load', tryNoForceSandBox, false );
 			defaultView?.removeEventListener(
 				'message',
 				checkMessageForResize
 			);
 		};
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
 	}, [] );
-
-	useEffect( () => {
-		trySandBox();
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ title, styles, scripts ] );
-
-	useEffect( () => {
-		trySandBox( true );
-		// Passing `exhaustive-deps` will likely involve a more detailed refactor.
-		// See https://github.com/WordPress/gutenberg/pull/44378
-	}, [ html, type ] );
 
 	return (
 		<iframe
@@ -284,7 +224,8 @@ function SandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox="allow-scripts allow-same-origin allow-presentation"
+			sandbox="allow-scripts allow-presentation"
+			srcDoc={ srcDoc }
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
 			height={ Math.ceil( height ) }
