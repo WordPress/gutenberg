@@ -25,7 +25,9 @@ function normalizeRangeRule< Item >(
 			( typeof value === 'string' &&
 				supportsDateRangeConstraint( fieldType.type ) ) )
 	) {
-		return { constraint: value, validate: validator };
+		return { constraint: value, validate: validator } as NonNullable<
+			NormalizedRules< Item >[ typeof key ]
+		>;
 	}
 	return undefined;
 }
