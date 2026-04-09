@@ -21,7 +21,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { getRenderingMode, getCurrentPost } from './selectors';
+import {
+	getRenderingMode,
+	getCurrentPost,
+	getCurrentPostRevisionsCount,
+} from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
@@ -464,9 +468,8 @@ export function isNoteFocused( state ) {
 
 /**
  * Returns the previous revision (the one before the current revision).
- * Used for diffing between revisions. Uses the paginated revisions
- * from the current page. At page boundaries (first revision on a page),
- * returns null since the previous revision is on another page.
+ * Used for diffing between revisions. At page boundaries, fetches the
+ * adjacent page to find the previous revision.
  *
  * @param {Object} state Global application state.
  * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
@@ -489,6 +492,20 @@ export const getPreviousRevision = createRegistrySelector(
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
+		const fields = [
+			...new Set( [
+				'id',
+				'date',
+				'modified',
+				'author',
+				'meta',
+				'title.raw',
+				'excerpt.raw',
+				'content.raw',
+				revisionKey,
+			] ),
+		].join();
+
 		// Query matches the slider: desc order, page 1 = newest.
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
@@ -500,19 +517,7 @@ export const getPreviousRevision = createRegistrySelector(
 				context: 'edit',
 				orderby: 'date',
 				order: 'desc',
-				_fields: [
-					...new Set( [
-						'id',
-						'date',
-						'modified',
-						'author',
-						'meta',
-						'title.raw',
-						'excerpt.raw',
-						'content.raw',
-						revisionKey,
-					] ),
-				].join(),
+				_fields: fields,
 			}
 		);
 		if ( ! revisions ) {
@@ -527,6 +532,28 @@ export const getPreviousRevision = createRegistrySelector(
 		// The previous (older) revision is the next index in desc order.
 		if ( currentIndex >= 0 && currentIndex < revisions.length - 1 ) {
 			return revisions[ currentIndex + 1 ];
+		}
+
+		// At page boundary: fetch the first revision from the next page
+		// (older revisions). The next page in desc order is page + 1.
+		const totalRevisions = getCurrentPostRevisionsCount( state );
+		const totalPages = Math.ceil( totalRevisions / 100 ) || 1;
+		if ( currentIndex === revisions.length - 1 && page < totalPages ) {
+			const nextPageRevisions = select( coreStore ).getRevisions(
+				'postType',
+				postType,
+				postId,
+				{
+					per_page: 100,
+					page: page + 1,
+					context: 'edit',
+					orderby: 'date',
+					order: 'desc',
+					_fields: fields,
+				}
+			);
+			// Return the first (newest) revision from the next page.
+			return nextPageRevisions?.[ 0 ] ?? null;
 		}
 
 		return null;
