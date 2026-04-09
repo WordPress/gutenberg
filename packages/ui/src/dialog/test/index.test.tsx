@@ -203,10 +203,8 @@ describe( 'Dialog', () => {
 						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 						<Dialog.Popup>
 							<Dialog.Header>
-								{ /* @ts-expect-error this is just for test purposes */ }
-								<Dialog.Title>
-									{ /* Empty title */ }
-								</Dialog.Title>
+								{ /* Empty title */ }
+								<Dialog.Title />
 							</Dialog.Header>
 							<p>Content with empty title</p>
 							<Dialog.Footer>
