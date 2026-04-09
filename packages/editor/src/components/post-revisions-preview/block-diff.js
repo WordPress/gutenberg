@@ -74,10 +74,15 @@ function textSimilarity( text1, text2 ) {
 	const segmenter = new Intl.Segmenter( undefined, {
 		granularity: 'word',
 	} );
-	const getWords = ( text ) =>
-		Array.from( segmenter.segment( text ), ( s ) =>
-			s.isWordLike ? s.segment : null
-		).filter( Boolean );
+	const getWords = ( text ) => {
+		const words = [];
+		for ( const { segment, isWordLike } of segmenter.segment( text ) ) {
+			if ( isWordLike ) {
+				words.push( segment );
+			}
+		}
+		return words;
+	};
 	const words1 = getWords( text1 );
 	const words2 = getWords( text2 );
 
