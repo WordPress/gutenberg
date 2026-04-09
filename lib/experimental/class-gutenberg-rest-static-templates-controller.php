@@ -42,7 +42,7 @@ class Gutenberg_REST_Static_Templates_Controller extends Gutenberg_REST_Template
 			array(
 				'args'   => array(
 					'id' => array(
-						'description'       => __( 'The id of a template' ),
+						'description'       => __( 'The id of a template', 'gutenberg' ),
 						'type'              => 'string',
 						'sanitize_callback' => array( $this, '_sanitize_template_id' ),
 					),
@@ -63,14 +63,14 @@ class Gutenberg_REST_Static_Templates_Controller extends Gutenberg_REST_Template
 	public function get_item_schema() {
 		$schema                            = parent::get_item_schema();
 		$schema['properties']['is_custom'] = array(
-			'description' => __( 'Whether a template is a custom template.' ),
+			'description' => __( 'Whether a template is a custom template.', 'gutenberg' ),
 			'type'        => 'bool',
 			'context'     => array( 'embed', 'view', 'edit' ),
 			'readonly'    => true,
 		);
 		$schema['properties']['plugin']    = array(
 			'type'        => 'string',
-			'description' => __( 'Plugin that registered the template.' ),
+			'description' => __( 'Plugin that registered the template.', 'gutenberg' ),
 			'readonly'    => true,
 			'context'     => array( 'view', 'edit', 'embed' ),
 		);
@@ -99,7 +99,7 @@ class Gutenberg_REST_Static_Templates_Controller extends Gutenberg_REST_Template
 		$template = get_block_file_template( $request['id'], 'wp_template' );
 
 		if ( ! $template ) {
-			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.' ), array( 'status' => 404 ) );
+			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
 		$item = $this->prepare_item_for_response( $template, $request );
