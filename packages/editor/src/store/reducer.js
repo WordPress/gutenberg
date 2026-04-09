@@ -451,11 +451,10 @@ export function revisionId( state = null, action ) {
 
 /**
  * Reducer for the current revisions page number.
- * Resets to null when exiting revisions mode.
  *
- * @param {number|null} state  Current page number.
- * @param {Object}      action Dispatched action.
- * @return {number|null} Updated state.
+ * @param {number} state  Current page number.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
  */
 export function revisionPage( state = 1, action ) {
 	switch ( action.type ) {

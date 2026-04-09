@@ -34,8 +34,12 @@ function RevisionsSlider() {
 		revisionPage,
 		totalRevisions,
 	} = useSelect( ( select ) => {
-		const { getCurrentRevisionId, getRevisionPage, getPageRevisions } =
-			unlock( select( editorStore ) );
+		const {
+			getCurrentRevisionId,
+			getRevisionPage,
+			getPageRevisions,
+			getRevisionsPerPage,
+		} = unlock( select( editorStore ) );
 
 		const postType = select( editorStore ).getCurrentPostType();
 		if ( ! postType ) {
@@ -48,11 +52,10 @@ function RevisionsSlider() {
 		);
 		const _revisionKey = entityConfig?.revisionKey || 'id';
 		const _revisionPage = getRevisionPage();
-		const pageData = getPageRevisions( _revisionPage );
 
 		return {
-			revisions: pageData?.revisions,
-			perPage: pageData?.perPage,
+			revisions: getPageRevisions( _revisionPage ),
+			perPage: getRevisionsPerPage(),
 			currentRevisionId: getCurrentRevisionId(),
 			revisionKey: _revisionKey,
 			revisionPage: _revisionPage,
@@ -66,7 +69,7 @@ function RevisionsSlider() {
 	);
 
 	const isLoading = ! rawRevisions;
-	const totalPages = Math.ceil( totalRevisions / ( perPage || 1 ) ) || 1;
+	const totalPages = Math.ceil( totalRevisions / perPage ) || 1;
 
 	const revisions = useMemo(
 		() => rawRevisions && [ ...rawRevisions ].reverse(),
@@ -82,10 +85,6 @@ function RevisionsSlider() {
 		if ( revision ) {
 			setCurrentRevisionId( revision[ revisionKey ] );
 		}
-	};
-
-	const handlePageChange = ( newPage ) => {
-		setRevisionPage( newPage );
 	};
 
 	// Format date for tooltip.
@@ -163,7 +162,7 @@ function RevisionsSlider() {
 						? getPageRangeLabel( revisionPage + 1 )
 						: __( 'No older revisions' )
 				}
-				onClick={ () => handlePageChange( revisionPage + 1 ) }
+				onClick={ () => setRevisionPage( revisionPage + 1 ) }
 				disabled={ isLoading || revisionPage >= totalPages }
 				size="compact"
 				accessibleWhenDisabled
@@ -185,7 +184,7 @@ function RevisionsSlider() {
 						? getPageRangeLabel( revisionPage - 1 )
 						: __( 'No newer revisions' )
 				}
-				onClick={ () => handlePageChange( revisionPage - 1 ) }
+				onClick={ () => setRevisionPage( revisionPage - 1 ) }
 				disabled={ isLoading || revisionPage <= 1 }
 				size="compact"
 				accessibleWhenDisabled

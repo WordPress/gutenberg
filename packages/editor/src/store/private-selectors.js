@@ -354,7 +354,7 @@ export function getCanvasMinHeight( state ) {
  * Returns the current revisions page number.
  *
  * @param {Object} state Global application state.
- * @return {number|null} The page number, or null if not set.
+ * @return {number} The page number.
  */
 export function getRevisionPage( state ) {
 	return state.revisionPage;
@@ -369,7 +369,7 @@ export function getRevisionPage( state ) {
  */
 export function buildRevisionsPageQuery( revisionKey, page ) {
 	return {
-		per_page: 100,
+		per_page: REVISIONS_PER_PAGE,
 		page,
 		context: 'edit',
 		orderby: 'date',
@@ -390,12 +390,18 @@ export function buildRevisionsPageQuery( revisionKey, page ) {
 	};
 }
 
+const REVISIONS_PER_PAGE = 100;
+
+export function getRevisionsPerPage() {
+	return REVISIONS_PER_PAGE;
+}
+
 /**
- * Returns revisions and pagination info for the given page number.
+ * Returns revisions for the given page number.
  *
  * @param {Object} state Global application state.
  * @param {number} page  The 1-based page number (page 1 = newest).
- * @return {Object|null} Object with `revisions` and `perPage`, or null if not yet loaded.
+ * @return {Array|null} The revisions array, or null if not yet loaded.
  */
 export const getPageRevisions = createRegistrySelector(
 	( select ) => ( state, page ) => {
@@ -413,19 +419,13 @@ export const getPageRevisions = createRegistrySelector(
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
-		const query = buildRevisionsPageQuery( revisionKey, page );
-		const revisions = select( coreStore ).getRevisions(
+
+		return select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			query
+			buildRevisionsPageQuery( revisionKey, page )
 		);
-
-		if ( ! revisions ) {
-			return null;
-		}
-
-		return { revisions, perPage: query.per_page };
 	}
 );
 
