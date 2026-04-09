@@ -457,14 +457,13 @@ export function revisionId( state = null, action ) {
  * @param {Object}      action Dispatched action.
  * @return {number|null} Updated state.
  */
-export function revisionPage( state = null, action ) {
+export function revisionPage( state = 1, action ) {
 	switch ( action.type ) {
 		case 'SET_REVISION_PAGE':
 			return action.page;
 		case 'SET_CURRENT_REVISION_ID':
-			// Reset page when exiting revisions mode.
 			if ( ! action.revisionId ) {
-				return null;
+				return 1;
 			}
 			return state;
 	}

@@ -11,7 +11,7 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
@@ -65,19 +65,13 @@ function RevisionsSlider() {
 		useDispatch( editorStore )
 	);
 
-	const isLoading = !! revisionPage && ! rawRevisions;
+	const isLoading = ! rawRevisions;
 	const totalPages = Math.ceil( totalRevisions / ( perPage || 1 ) ) || 1;
 
 	const revisions = useMemo(
 		() => rawRevisions && [ ...rawRevisions ].reverse(),
 		[ rawRevisions ]
 	);
-
-	useEffect( () => {
-		if ( revisionPage === null && totalRevisions > 0 ) {
-			setRevisionPage( 1 );
-		}
-	}, [ revisionPage, totalRevisions, setRevisionPage ] );
 
 	const selectedIndex = revisions?.findIndex(
 		( r ) => r[ revisionKey ] === currentRevisionId
@@ -93,13 +87,6 @@ function RevisionsSlider() {
 	const handlePageChange = ( newPage ) => {
 		setRevisionPage( newPage );
 	};
-
-	useEffect( () => {
-		if ( revisions?.length && selectedIndex === -1 ) {
-			const lastRevision = revisions[ revisions.length - 1 ];
-			setCurrentRevisionId( lastRevision[ revisionKey ] );
-		}
-	}, [ revisions, selectedIndex, revisionKey, setCurrentRevisionId ] );
 
 	// Format date for tooltip.
 	const dateSettings = getDateSettings();
@@ -144,23 +131,24 @@ function RevisionsSlider() {
 		);
 	};
 
-	const sliderOrSpinner = isLoading ? (
-		<Spinner />
-	) : (
-		<RangeControl
-			__next40pxDefaultSize
-			className="editor-revisions-header__slider"
-			hideLabelFromVision
-			label={ __( 'Revision' ) }
-			max={ revisions?.length - 1 }
-			min={ 0 }
-			marks
-			onChange={ handleSliderChange }
-			renderTooltipContent={ renderTooltipContent }
-			value={ selectedIndex >= 0 ? selectedIndex : 0 }
-			withInputField={ false }
-		/>
-	);
+	const sliderOrSpinner =
+		isLoading || selectedIndex === -1 ? (
+			<Spinner />
+		) : (
+			<RangeControl
+				__next40pxDefaultSize
+				className="editor-revisions-header__slider"
+				hideLabelFromVision
+				label={ __( 'Revision' ) }
+				max={ revisions?.length - 1 }
+				min={ 0 }
+				marks
+				onChange={ handleSliderChange }
+				renderTooltipContent={ renderTooltipContent }
+				value={ selectedIndex }
+				withInputField={ false }
+			/>
+		);
 
 	if ( ! showPagination ) {
 		return sliderOrSpinner;

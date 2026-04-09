@@ -367,7 +367,7 @@ export function getRevisionPage( state ) {
  * @param {number} page        The 1-based page number (page 1 = newest).
  * @return {Object} Query object for getRevisions.
  */
-function buildRevisionsPageQuery( revisionKey, page ) {
+export function buildRevisionsPageQuery( revisionKey, page ) {
 	return {
 		per_page: 100,
 		page,
