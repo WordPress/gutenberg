@@ -763,6 +763,49 @@ describe( 'SyncManager', () => {
 			} );
 		} );
 
+		it( 'sanitizes remote changes to prevent XSS', async () => {
+			// Capture the Y.Doc from provider creator.
+			let capturedDoc: Y.Doc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			// Simulate a remote change with an XSS payload.
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'title', '<script>alert("xss")</script>Safe Title' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Safe Title',
+			} );
+		} );
+
 		it( 'does not edit the local record for local transactions', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;

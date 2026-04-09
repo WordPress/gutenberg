@@ -19,6 +19,7 @@ import {
 	yieldToEventLoop,
 } from './performance';
 import { getProviderCreators } from './providers';
+import { sanitizeRemoteChanges } from './sanitize';
 import type {
 	CollectionHandlers,
 	CRDTDoc,
@@ -631,10 +632,13 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
+		// Sanitize remote content to prevent XSS from malicious peers.
+		const sanitizedChanges = sanitizeRemoteChanges( changes );
+
 		log( 'updateEntityRecord', 'changes', entityId, {
 			changedKeys,
 		} );
-		handlers.editRecord( changes );
+		handlers.editRecord( sanitizedChanges );
 	}
 
 	/**
