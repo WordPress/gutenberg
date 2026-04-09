@@ -37,16 +37,18 @@ function filterWithReference< T >(
  * @return Transformed object.
  */
 const mapValues = < T, U >(
-	obj: Record< string, T >,
+	obj: Partial< Record< string, T > >,
 	callback: ( value: T ) => U
-): Record< string, U > =>
-	Object.entries( obj ).reduce(
-		( acc, [ key, value ] ) => ( {
+): Partial< Record< string, U > > =>
+	Object.entries( obj ).reduce( ( acc, [ key, value ] ) => {
+		if ( value === undefined ) {
+			return acc;
+		}
+		return {
 			...acc,
 			[ key ]: callback( value ),
-		} ),
-		{}
-	);
+		};
+	}, {} );
 
 /**
  * Verifies whether the given annotations is a valid annotation.

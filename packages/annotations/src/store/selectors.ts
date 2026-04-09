@@ -90,5 +90,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 export function __experimentalGetAnnotations(
 	state: AnnotationsState
 ): Annotation[] {
-	return Object.values( state ).flat();
+	return Object.values( state )
+		.filter( ( arr ): arr is Annotation[] => Boolean( arr ) )
+		.flat();
 }
