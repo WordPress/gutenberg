@@ -879,7 +879,7 @@ const ValidationComponent = ( {
 			{
 				id: 'datetime',
 				type: 'datetime',
-			label: 'Date time',
+				label: 'Date time',
 				description: minMax
 					? 'Must be between Apr 1 and Apr 20, 2026'
 					: undefined,
