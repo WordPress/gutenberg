@@ -218,25 +218,43 @@ function pairSimilarBlocks( blocks ) {
 		if ( bestMatch ) {
 			maxPairedAddedIndex = bestMatch.index;
 
-			// Place the modified block at whichever position comes
-			// first — the removed or the added. This ensures the
-			// modified content doesn't jump past unpaired blocks
-			// in either direction.
 			const modifiedBlock = {
 				...bestMatch.block,
 				__revisionDiffStatus: { status: 'modified' },
 				__previousRawBlock: rem.block,
 			};
-			if ( rem.index < bestMatch.index ) {
-				// Removed comes first — place modified there,
-				// filter out the added.
-				modifications.set( rem.index, modifiedBlock );
-				pairedAdded.add( bestMatch.index );
-			} else {
-				// Added comes first — place modified there,
-				// filter out the removed.
+
+			// Decide where to place the modified block by checking
+			// what's between the removed and added positions.
+			// If there are unpaired added blocks between them,
+			// placing at the removed position would put the modified
+			// block before content that comes before it in the
+			// current revision — so use the added position.
+			// Otherwise, use the removed position to keep the
+			// previous revision's order intact.
+			const lo = Math.min( rem.index, bestMatch.index );
+			const hi = Math.max( rem.index, bestMatch.index );
+			let hasAddedBetween = false;
+			for ( let i = lo + 1; i < hi; i++ ) {
+				if (
+					blocks[ i ].__revisionDiffStatus?.status === 'added' &&
+					! pairedAdded.has( i )
+				) {
+					hasAddedBetween = true;
+					break;
+				}
+			}
+
+			if ( hasAddedBetween ) {
+				// Use the added position — don't jump before
+				// current-revision content.
 				modifications.set( bestMatch.index, modifiedBlock );
 				pairedRemoved.add( rem.index );
+			} else {
+				// Use the removed position — keep the previous
+				// revision's reading order.
+				modifications.set( rem.index, modifiedBlock );
+				pairedAdded.add( bestMatch.index );
 			}
 		}
 	}

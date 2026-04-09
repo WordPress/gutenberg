@@ -206,22 +206,11 @@ describe( 'diffRevisionContent', () => {
 		const normalized = normalizeBlockTree( blocks );
 
 		// Post-LCS pairing detects similar blocks and marks them as modified.
-		// The modified block appears at whichever position comes first
-		// (the removed position), so the original content stays in place
-		// and the new blocks appear after it.
+		// Added blocks between the removed and added positions mean the
+		// modified block stays at the added position to preserve the
+		// current revision's layout.
 		expect( normalized ).toHaveLength( 3 );
 		expect( normalized ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					// Inline diff: "existing" → "modified"
-					content:
-						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
-					__revisionDiffStatus: {
-						status: 'modified',
-					},
-				},
-			},
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -234,6 +223,17 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					content: 'Second new block',
 					__revisionDiffStatus: { status: 'added' },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					// Inline diff: "existing" → "modified"
+					content:
+						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
+					__revisionDiffStatus: {
+						status: 'modified',
+					},
 				},
 			},
 		] );
