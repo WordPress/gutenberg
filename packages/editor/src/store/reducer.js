@@ -450,6 +450,28 @@ export function revisionId( state = null, action ) {
 }
 
 /**
+ * Reducer for the current revisions page number.
+ * Resets to null when exiting revisions mode.
+ *
+ * @param {number|null} state  Current page number.
+ * @param {Object}      action Dispatched action.
+ * @return {number|null} Updated state.
+ */
+export function revisionPage( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_REVISION_PAGE':
+			return action.page;
+		case 'SET_CURRENT_REVISION_ID':
+			// Reset page when exiting revisions mode.
+			if ( ! action.revisionId ) {
+				return null;
+			}
+			return state;
+	}
+	return state;
+}
+
+/**
  * Reducer for whether the revision diff is shown.
  * Resets to true when entering/exiting revisions mode.
  *
@@ -506,6 +528,7 @@ export default combineReducers( {
 	showStylebook,
 	canvasMinHeight,
 	revisionId,
+	revisionPage,
 	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,

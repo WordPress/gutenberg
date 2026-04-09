@@ -603,6 +603,19 @@ export function setCurrentRevisionId( revisionId ) {
 }
 
 /**
+ * Set the current revisions page number.
+ *
+ * @param {number} page The page number.
+ * @return {Object} Action object.
+ */
+export function setRevisionPage( page ) {
+	return {
+		type: 'SET_REVISION_PAGE',
+		page,
+	};
+}
+
+/**
  * Set whether the revision diff highlighting is shown.
  *
  * @param {boolean} showDiff Whether to show diff highlighting.
