@@ -90,12 +90,21 @@ type ActionOptions = {
 
 type DeleteRecordsHttpQuery = Record< string, any >;
 
+// The per-entity save/delete actions are thunks at runtime: the outer function
+// returned here corresponds to the entity wrapper in `index.js`, which returns
+// the `saveEntityRecord` / `deleteEntityRecord` thunk. Modeling them as thunks
+// (rather than as functions returning a Promise directly) is what allows
+// `@wordpress/data`'s `PromisifyActionCreator` to flatten the dispatched shape
+// to a single `Promise<…>` via its thunk branch, instead of producing a
+// `Promise<Promise<…>>`.
 export type SaveActions = {
 	[ Key in `save${ keyof WPEntityTypes }` ]: (
 		data: Partial<
 			WPEntityTypes[ Key extends `save${ infer E }` ? E : never ]
 		>,
 		options?: ActionOptions
+	) => (
+		thunkArgs: any
 	) => Promise<
 		WPEntityTypes[ Key extends `save${ infer E }` ? E : never ] | undefined
 	>;
@@ -106,6 +115,8 @@ export type DeleteActions = {
 		id: number | string,
 		query?: DeleteRecordsHttpQuery,
 		options?: ActionOptions
+	) => (
+		thunkArgs: any
 	) => Promise<
 		| WPEntityTypes[ Key extends `delete${ infer E }` ? E : never ]
 		| false
