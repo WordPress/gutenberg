@@ -18,6 +18,9 @@ jest.mock( 'fs', () => ( {
 		mkdir: jest.fn(),
 		writeFile: jest.fn(),
 	},
+	existsSync: jest.fn(),
+	mkdirSync: jest.fn(),
+	writeFileSync: jest.fn(),
 } ) );
 
 // This mocks a small response with a format matching the stable-check API.
@@ -38,6 +41,13 @@ jest.mock( 'got', () =>
 );
 
 jest.mock( '../detect-directory-type', () => jest.fn() );
+
+jest.mock( 'devcert', () => ( {
+	certificateFor: jest.fn().mockResolvedValue( {
+		key: 'mock-key',
+		cert: 'mock-cert',
+	} ),
+} ) );
 
 describe( 'Config Integration', () => {
 	beforeEach( () => {
@@ -65,6 +75,7 @@ describe( 'Config Integration', () => {
 		expect( config.env.tests.port ).toEqual( 8889 );
 		expect( config.env.development.mysqlPort ).toEqual( null );
 		expect( config.env.tests.mysqlPort ).toEqual( null );
+		expect( config.https ).toEqual( false );
 		expect( config ).toMatchSnapshot();
 	} );
 
@@ -74,6 +85,7 @@ describe( 'Config Integration', () => {
 				return JSON.stringify( {
 					core: 'WordPress/WordPress#trunk',
 					port: 123,
+					https: true,
 					lifecycleScripts: {
 						afterStart: 'test',
 						afterClean: null,
@@ -81,9 +93,11 @@ describe( 'Config Integration', () => {
 					},
 					env: {
 						development: {
+							httpsPort: 443,
 							mysqlPort: 13306,
 						},
 						tests: {
+							httpsPort: 8443,
 							mysqlPort: 23307,
 						},
 					},
@@ -99,6 +113,9 @@ describe( 'Config Integration', () => {
 		expect( config.env.tests.port ).toEqual( 8889 );
 		expect( config.env.development.mysqlPort ).toEqual( 13306 );
 		expect( config.env.tests.mysqlPort ).toEqual( 23307 );
+		expect( config.https ).toEqual( true );
+		expect( config.env.development.httpsPort ).toEqual( 443 );
+		expect( config.env.tests.httpsPort ).toEqual( 8443 );
 		expect( config ).toMatchSnapshot();
 	} );
 

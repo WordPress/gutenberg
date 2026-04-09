@@ -218,7 +218,12 @@ module.exports = function buildDockerComposeConfig( config ) {
 				dockerfile: 'WordPress.Dockerfile',
 				args: imageBuildArgs,
 			},
-			ports: [ developmentPorts ],
+			ports: config.https
+				? [
+						developmentPorts,
+						`${ config.env.development.httpsPort }:443`,
+				  ]
+				: [ developmentPorts ],
 			environment: {
 				APACHE_RUN_USER: '#' + hostUser.uid,
 				APACHE_RUN_GROUP: '#' + hostUser.gid,
@@ -296,7 +301,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 				dockerfile: 'Tests-WordPress.Dockerfile',
 				args: imageBuildArgs,
 			},
-			ports: [ testsPorts ],
+			ports: config.https
+				? [ testsPorts, `${ config.env.tests.httpsPort }:443` ]
+				: [ testsPorts ],
 			environment: {
 				APACHE_RUN_USER: '#' + hostUser.uid,
 				APACHE_RUN_GROUP: '#' + hostUser.gid,

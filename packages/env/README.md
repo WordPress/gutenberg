@@ -597,23 +597,28 @@ To enable editor autocomplete and validation, add a `$schema` key:
 
 `.wp-env.json` supports the following fields:
 
-| Field                | Type           | Default                                | Description                                                                                                                      |
-|----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
-| `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
-| `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
-| `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
-| `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
-| `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
-| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
-| `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
-| `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
-| `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
-| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
-| `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
-| `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
-| `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
-| `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
+| Field                 | Type           | Default                                | Description                                                                                                                          |
+|-----------------------|----------------|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `"core"`              | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.             |
+| `"phpVersion"`        | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress.     |
+| `"plugins"`           | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                        |
+| `"themes"`            | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                      |
+| `"port"`              | `integer`      | `8888`                                 | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.           |
+| `"testsEnvironment"`  | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
+| `"testsPort"`         | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                             |
+| `"autoPort"`          | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy.                                                   |
+| `"config"`            | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                          |
+| `"mappings"`          | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                       |
+| `"mysqlPort"`         | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                     |
+| `"phpmyadmin"`        | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                                |
+| `"phpmyadminPort"`    | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                                  |
+| `"multisite"`         | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                          |
+| `"lifecycleScripts"`  | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                      |
+| `"https"`             | `boolean`      | `false`                                | Whether to enable support for HTTPS. This will either create or use the defined SSL/TLS certificates.                                |
+| `"httpsPort"`         | `integer`      | `443`                                  | The HTTPS port number to be used in the development environment.                                                                     |
+| `"testsHttpsPort"`    | `integer`      | `8443`                                 | The HTTPS port for the tests environment.                                                                                            |
+| `"sslCertPath"`       | `string\|null` | `null`                                 | A path to the certificate file used for HTTPS. If not provided, one will be created.                                                 |
+| `"sslKeyPath"`        | `string\|null` | `null`                                 | The path to the private key for the SSL/TLS certificate file. Both must be provided to be used, otherwise a new one will be created. |
 
 _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
 
@@ -686,6 +691,14 @@ WP_HOME: 'http://localhost',
 These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
 
 The values referencing a URL include the specified port. So if you set `port: 2000`, `WP_HOME` (for example) will be `http://localhost:2000`.
+
+## HTTPS Support
+
+If you need to use HTTPS for any reason, you may use the root `https` property in the `.wp-env.json` file. Simply setting this option to `true` will create a local development certificate using `devcert` and will, in most cases, add that certificate to your browser's trusted store. For some browsers, this may need to be added to your trusted store manually (i.e., Firefox).
+
+You may also change the ports that are used for HTTPS using the root `httpsPort` and `testsHttpsPort` configuration options.
+
+If you wish to use your own certificates, you may do that as well by assigning a path to `sslCertPath` and `sslKeyPath`. Both are required to use the provided certificate. If only one is provided, it will revert to the automatically generated `devcert` certificate.
 
 ## Lifecycle Scripts
 

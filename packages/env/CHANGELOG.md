@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add support for HTTPS using devcert ([#66264](https://github.com/WordPress/gutenberg/pull/66264)).
+
 ## 11.3.0 (2026-04-01)
 
 ## 11.2.0 (2026-03-18)

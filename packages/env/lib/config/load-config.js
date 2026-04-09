@@ -119,6 +119,9 @@ module.exports = async function loadConfig(
 				customConfigPath
 			),
 		] ),
+		https: config.https,
+		sslCertPath: config.sslCertPath,
+		sslKeyPath: config.sslKeyPath,
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
 	};

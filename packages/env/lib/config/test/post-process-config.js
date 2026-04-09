@@ -5,7 +5,28 @@
 const { ValidationError } = require( '..' );
 const postProcessConfig = require( '../post-process-config' );
 
+/**
+ * External dependencies
+ */
+const fs = require( 'fs' );
+const os = require( 'os' );
+const path = require( 'path' );
+
+const testFolderPath = path.resolve( os.homedir + '/.wp-env/test-unit' );
+
 describe( 'postProcessConfig', () => {
+	beforeAll( () => {
+		if ( ! fs.existsSync( testFolderPath ) ) {
+			fs.mkdirSync( testFolderPath, { recursive: true } );
+		}
+	} );
+
+	afterAll( () => {
+		if ( fs.existsSync( testFolderPath ) ) {
+			fs.rmSync( testFolderPath, { recursive: true } );
+		}
+	} );
+
 	afterEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -384,6 +405,34 @@ describe( 'postProcessConfig', () => {
 
 			// Tests should not get root options merged.
 			expect( processed.env.tests ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'enableHttps', () => {
+		it( 'should create SSL and change WP_HOME and WP_SITEURL to HTTPS', async () => {
+			const processed = await postProcessConfig( {
+				coreSource: {
+					path: testFolderPath,
+				},
+				https: true,
+				config: {
+					WP_HOME: 'http://localhost',
+					WP_SITEURL: 'http://localhost',
+				},
+			} );
+
+			expect( processed ).toEqual( {
+				coreSource: {
+					path: testFolderPath,
+				},
+				https: true,
+				sslCertPath: expect.any( String ),
+				sslKeyPath: expect.any( String ),
+				config: {
+					WP_HOME: 'https://localhost',
+					WP_SITEURL: 'https://localhost',
+				},
+			} );
 		} );
 	} );
 } );

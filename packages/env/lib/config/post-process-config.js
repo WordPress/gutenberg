@@ -8,6 +8,12 @@ const { ValidationError } = require( './validate-config' );
 const { resolveConfigPorts } = require( '../resolve-available-ports' );
 
 /**
+ * External dependencies
+ */
+const fs = require( 'fs' );
+const devcert = require( 'devcert' );
+
+/**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
  * @typedef {import('./parse-config').WPEnvironmentConfig} WPEnvironmentConfig
  */
@@ -25,6 +31,9 @@ module.exports = async function postProcessConfig(
 	config,
 	{ portResolver } = {}
 ) {
+	config = await enableHttps( config );
+
+
 	// Make sure that we're operating on a config object that has
 	// complete environment configs for convenience.
 	config = mergeRootToEnvironments( config );
@@ -87,6 +96,34 @@ function mergeRootToEnvironments( config ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
 		delete config.lifecycleScripts;
 	}
+	if ( config.https !== undefined ) {
+		removedRootOptions.https = config.https;
+		delete config.https;
+	}
+	if ( config.sslCertPath !== undefined ) {
+		removedRootOptions.sslCertPath = config.sslCertPath;
+		delete config.sslCertPath;
+	}
+	if ( config.sslKeyPath !== undefined ) {
+		removedRootOptions.sslKeyPath = config.sslKeyPath;
+		delete config.sslKeyPath;
+	}
+	if (
+		config.httpsPort !== undefined &&
+		config.env.development.httpsPort === undefined
+	) {
+		removedRootOptions.httpsPort = config.httpsPort;
+		config.env.development.httpsPort = config.httpsPort;
+		delete config.httpsPort;
+	}
+	if (
+		config.testsHttpsPort !== undefined &&
+		config.env.tests.httpsPort === undefined
+	) {
+		removedRootOptions.testsHttpsPort = config.testsHttpsPort;
+		config.env.tests.httpsPort = config.testsHttpsPort;
+		delete config.testsHttpsPort;
+	}
 
 	// Merge the root config and the environment configs together so that
 	// we can ignore the root config and have full environment configs.
@@ -101,6 +138,29 @@ function mergeRootToEnvironments( config ) {
 			// should be specified at the root level.
 			testsDisabled ? {} : config.env[ env ]
 		);
+
+		// Ensure HTTPS-related properties are always present on each environment
+		if ( removedRootOptions.https !== undefined ) {
+			config.env[ env ].https = removedRootOptions.https;
+		}
+		if (
+			removedRootOptions.httpsPort !== undefined &&
+			env === 'development'
+		) {
+			config.env[ env ].httpsPort = removedRootOptions.httpsPort;
+		}
+		if (
+			removedRootOptions.testsHttpsPort !== undefined &&
+			env === 'tests'
+		) {
+			config.env[ env ].httpsPort = removedRootOptions.testsHttpsPort;
+		}
+		if ( removedRootOptions.sslCertPath !== undefined ) {
+			config.env[ env ].sslCertPath = removedRootOptions.sslCertPath;
+		}
+		if ( removedRootOptions.sslKeyPath !== undefined ) {
+			config.env[ env ].sslKeyPath = removedRootOptions.sslKeyPath;
+		}
 	}
 
 	// Set any root-level options we reset back.
@@ -147,11 +207,67 @@ function appendPortToWPConfigs( config ) {
 				continue;
 			}
 
-			config.env[ env ].config[ option ] = addOrReplacePort(
-				config.env[ env ].config[ option ],
-				config.env[ env ].port,
-				// Don't replace the port if one is already set on WP_HOME.
-				option !== 'WP_HOME'
+			const before = config.env[ env ].config[ option ];
+			// Use httpsPort only if https is enabled, otherwise use port
+			const portToUse = config.env[ env ].https
+				? config.env[ env ].httpsPort
+				: config.env[ env ].port;
+			const after = addOrReplacePort(
+				before,
+				portToUse,
+				true // Always replace the port for all options
+			);
+			config.env[ env ].config[ option ] = after;
+		}
+	}
+
+	return config;
+}
+
+async function enableHttps( config ) {
+	if ( config.https === true ) {
+		const workDirectoryPath = config.coreSource.path.replace(
+			/\/WordPress$/,
+			''
+		);
+		const httpsUrl = ( url ) => url.replace( /^http:\/\//i, 'https://' );
+		const domainName = new URL(config.config.WP_HOME).hostname;
+
+		// change the siteurl and home to https
+		config.config.WP_SITEURL = httpsUrl( config.config.WP_SITEURL );
+		config.config.WP_HOME = httpsUrl( config.config.WP_HOME );
+
+		// check if certificate and key are set, if not we will create them
+		if (
+			config.sslCertPath === undefined &&
+			config.sslKeyPath === undefined
+		) {
+			const certsDir = workDirectoryPath + '/certs';
+			const certFile = `${ certsDir }/${ domainName }.crt`;
+			const keyFile = `${ certsDir }/${ domainName }.key`;
+			await devcert
+				.certificateFor( domainName )
+				.then( ( { key, cert } ) => {
+					if ( ! fs.existsSync( certsDir ) ) {
+						fs.mkdirSync( certsDir );
+					}
+
+					if (
+						fs.existsSync( certFile ) &&
+						fs.existsSync( keyFile )
+					) {
+						return;
+					}
+
+					fs.writeFileSync( certFile, cert );
+					fs.writeFileSync( keyFile, key );
+				} );
+
+			config.sslCertPath = certFile;
+			config.sslKeyPath = keyFile;
+		} else {
+			throw new ValidationError(
+				'Invalid config: sslCertPath and sslKeyPath must both be set.'
 			);
 		}
 	}
