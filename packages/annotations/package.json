@@ -31,7 +31,6 @@
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
-	"types": "build-types/index.d.ts",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
@@ -42,6 +41,7 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"types": "build-types/index.d.ts",
 	"dependencies": {
 		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
