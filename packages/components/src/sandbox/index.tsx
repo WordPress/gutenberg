@@ -7,6 +7,7 @@ import {
 	useState,
 	useEffect,
 	useMemo,
+	useCallback,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
 
@@ -139,10 +140,12 @@ function SandBox( {
 	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
-	// Build the full HTML document as a string for the srcdoc attribute.
-	// This replaces the previous approach of writing to contentDocument,
-	// which required allow-same-origin on the sandbox iframe.
-	const srcDoc = useMemo( () => {
+
+	/**
+	 * Renders the HTML document string used for both the srcdoc attribute
+	 * and the contentDocument.write() approaches.
+	 */
+	const renderDocument = useCallback( () => {
 		const lang = document.documentElement.lang;
 		const htmlDoc = (
 			<html lang={ lang } className={ type }>
@@ -176,6 +179,44 @@ function SandBox( {
 
 		return '<!DOCTYPE html>' + renderToString( htmlDoc );
 	}, [ html, title, type, styles, scripts ] );
+
+	// For the isolated (non-same-origin) path, build the document as a
+	// string for the srcdoc attribute. This avoids needing same-origin
+	// access to write to contentDocument.
+	const srcDoc = useMemo( () => {
+		if ( allowSameOrigin ) {
+			return undefined;
+		}
+		return renderDocument();
+	}, [ allowSameOrigin, renderDocument ] );
+
+	// For the same-origin path, write to contentDocument directly.
+	// This preserves the parent page's URL as the iframe's document
+	// URL, which provides a valid Referer header for nested iframes
+	// (required by providers like YouTube).
+	useEffect( () => {
+		if ( ! allowSameOrigin ) {
+			return;
+		}
+
+		const iframe = ref.current;
+		if ( ! iframe ) {
+			return;
+		}
+
+		try {
+			const { contentDocument } = iframe;
+			if ( ! contentDocument ) {
+				return;
+			}
+
+			contentDocument.open();
+			contentDocument.write( renderDocument() );
+			contentDocument.close();
+		} catch {
+			// If the iframe is not accessible, do nothing.
+		}
+	}, [ allowSameOrigin, renderDocument ] );
 
 	useEffect( () => {
 		function checkMessageForResize( event: MessageEvent ) {
@@ -219,16 +260,17 @@ function SandBox( {
 		};
 	}, [] );
 
+	const sandboxAttr =
+		'allow-scripts allow-presentation' +
+		( allowSameOrigin ? ' allow-same-origin' : '' );
+
 	return (
 		<iframe
 			ref={ useMergeRefs( [ ref, useFocusableIframe() ] ) }
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox={
-				'allow-scripts allow-presentation' +
-				( allowSameOrigin ? ' allow-same-origin' : '' )
-			}
+			sandbox={ sandboxAttr }
 			srcDoc={ srcDoc }
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }

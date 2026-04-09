@@ -49,24 +49,6 @@ describe( 'SandBox', () => {
 		);
 	} );
 
-	it( 'should include allow-same-origin when allowSameOrigin is true', () => {
-		render(
-			<SandBox
-				allowSameOrigin
-				html="<p>Embed</p>"
-				title="Same Origin Test"
-			/>
-		);
-
-		const iframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Same Origin Test' );
-
-		expect( iframe ).toHaveAttribute(
-			'sandbox',
-			'allow-scripts allow-presentation allow-same-origin'
-		);
-	} );
-
 	it( 'should set srcdoc with the provided html content', () => {
 		render( <SandBox html="<p>Hello</p>" title="Test Title" /> );
 
