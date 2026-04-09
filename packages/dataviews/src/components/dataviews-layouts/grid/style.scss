@@ -71,7 +71,7 @@
 		}
 
 		.dataviews-view-grid__title-field {
-			min-height: calc(var(--wpds-dimension-base) * 6); // Preserve layout when there is no ellipsis button
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available. Preserve layout when there is no ellipsis button
 			overflow: hidden;
 			align-content: center;
 			text-align: start;
@@ -149,13 +149,13 @@
 		}
 
 		.dataviews-view-grid__field-value:not(:empty) {
-			min-height: calc(var(--wpds-dimension-base) * 6);
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
 			line-height: var(--wpds-font-line-height-sm);
 			padding-top: calc(var(--wpds-dimension-base) / 2);
 		}
 
 		.dataviews-view-grid__field {
-			min-height: calc(var(--wpds-dimension-base) * 6);
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
 			align-items: center;
 
 			.dataviews-view-grid__field-name {

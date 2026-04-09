@@ -132,7 +132,7 @@ div.dataviews-view-list {
 	}
 	.dataviews-view-list__title-field {
 		flex: 1;
-		min-height: calc(var(--wpds-dimension-base) * 6);
+		min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
 		line-height: var(--wpds-font-line-height-md);
 		overflow: hidden;
 		// The field should be in front of the main button in case it has a link/button.
@@ -196,7 +196,7 @@ div.dataviews-view-list {
 		}
 
 		.dataviews-view-list__field-value {
-			min-height: calc(var(--wpds-dimension-base) * 6);
+			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
 			line-height: var(--wpds-font-line-height-sm);
 			display: flex;
 			align-items: center;
@@ -215,17 +215,17 @@ div.dataviews-view-list {
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: calc(var(--wpds-dimension-base) * 4);
+				min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
 				line-height: var(--wpds-font-line-height-xs);
 			}
 
 			.dataviews-view-list__media-wrapper {
-				width: calc(var(--wpds-dimension-base) * 8);
-				height: calc(var(--wpds-dimension-base) * 8);
+				width: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
+				height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 			}
 
 			.dataviews-view-list__field-wrapper {
-				min-height: calc(var(--wpds-dimension-base) * 8);
+				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 			}
 
 			.dataviews-view-list__fields {
@@ -233,7 +233,7 @@ div.dataviews-view-list {
 				row-gap: var(--wpds-dimension-gap-lg);
 
 				.dataviews-view-list__field-value {
-					min-height: calc(var(--wpds-dimension-base) * 4);
+					min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
 					line-height: var(--wpds-font-line-height-xs);
 				}
 			}
@@ -247,7 +247,7 @@ div.dataviews-view-list {
 			}
 
 			.dataviews-view-list__title-field {
-				min-height: calc(var(--wpds-dimension-base) * 8);
+				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 				line-height: var(--wpds-font-line-height-xl);
 			}
 
@@ -265,7 +265,7 @@ div.dataviews-view-list {
 				row-gap: var(--wpds-dimension-gap-lg);
 
 				.dataviews-view-list__field-value {
-					min-height: calc(var(--wpds-dimension-base) * 8);
+					min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 					line-height: var(--wpds-font-line-height-md);
 				}
 			}
