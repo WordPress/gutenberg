@@ -8,7 +8,6 @@ import {
 import {
 	useCallback,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -22,6 +21,7 @@ import { Stack } from '@wordpress/ui';
 import type { DataFormControlProps, FormatDatetime } from '../../types';
 import { OPERATOR_IN_THE_PAST, OPERATOR_OVER } from '../../constants';
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import getCustomValidity from './utils/get-custom-validity';
 import parseDateTime from '../../field-types/utils/parse-date-time';
 import { unlock } from '../../lock-unlock';
@@ -68,22 +68,11 @@ function CalendarDateTimeControl< Item >( {
 		? String( isValid.max.constraint )
 		: undefined;
 
-	const disabledMatchers = useMemo( () => {
-		const matchers: Array< { before: Date } | { after: Date } > = [];
-		if ( minConstraint ) {
-			const minDate = parseDateTime( minConstraint );
-			if ( minDate ) {
-				matchers.push( { before: minDate } );
-			}
-		}
-		if ( maxConstraint ) {
-			const maxDate = parseDateTime( maxConstraint );
-			if ( maxDate ) {
-				matchers.push( { after: maxDate } );
-			}
-		}
-		return matchers.length > 0 ? matchers : undefined;
-	}, [ minConstraint, maxConstraint ] );
+	const disabledMatchers = useDisabledDateMatchers(
+		minConstraint,
+		maxConstraint,
+		parseDateTime
+	);
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>

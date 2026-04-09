@@ -38,6 +38,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import RelativeDateControl from './utils/relative-date-control';
+import useDisabledDateMatchers from './utils/use-disabled-date-matchers';
 import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
@@ -325,22 +326,11 @@ function CalendarDateControl< Item >( {
 		? String( isValid.max.constraint )
 		: undefined;
 
-	const disabledMatchers = useMemo( () => {
-		const matchers: Array< { before: Date } | { after: Date } > = [];
-		if ( minConstraint ) {
-			const minDate = parseDate( minConstraint );
-			if ( minDate ) {
-				matchers.push( { before: minDate } );
-			}
-		}
-		if ( maxConstraint ) {
-			const maxDate = parseDate( maxConstraint );
-			if ( maxDate ) {
-				matchers.push( { after: maxDate } );
-			}
-		}
-		return matchers.length > 0 ? matchers : undefined;
-	}, [ minConstraint, maxConstraint ] );
+	const disabledMatchers = useDisabledDateMatchers(
+		minConstraint,
+		maxConstraint,
+		parseDate
+	);
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -527,22 +517,11 @@ function CalendarDateRangeControl< Item >( {
 		? String( isValid.max.constraint )
 		: undefined;
 
-	const disabledMatchers = useMemo( () => {
-		const matchers: Array< { before: Date } | { after: Date } > = [];
-		if ( minConstraint ) {
-			const minDate = parseDate( minConstraint );
-			if ( minDate ) {
-				matchers.push( { before: minDate } );
-			}
-		}
-		if ( maxConstraint ) {
-			const maxDate = parseDate( maxConstraint );
-			if ( maxDate ) {
-				matchers.push( { after: maxDate } );
-			}
-		}
-		return matchers.length > 0 ? matchers : undefined;
-	}, [ minConstraint, maxConstraint ] );
+	const disabledMatchers = useDisabledDateMatchers(
+		minConstraint,
+		maxConstraint,
+		parseDate
+	);
 
 	const onChangeCallback = useCallback(
 		( newValue: DateRange ) => {
