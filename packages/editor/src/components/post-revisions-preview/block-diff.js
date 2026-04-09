@@ -133,8 +133,9 @@ function pairSimilarBlocks( blocks ) {
 		return blocks;
 	}
 
-	const pairedRemoved = new Set(); // Indices of removed blocks that were paired.
-	const modifications = new Map(); // Map from added block index to modified block.
+	const pairedRemoved = new Set(); // Indices of removed blocks filtered out.
+	const pairedAdded = new Set(); // Indices of added blocks filtered out.
+	const modifications = new Map(); // Index → modified block.
 	const SIMILARITY_THRESHOLD = 0.5;
 
 	// Group candidates by block name for efficient lookup.
@@ -156,11 +157,17 @@ function pairSimilarBlocks( blocks ) {
 	}
 
 	// For each removed block, find best matching added block.
+	// Track the highest added index paired so far — new pairings must
+	// not go backwards, or the removed/added text order would break.
+	let maxPairedAddedIndex = -1;
+
 	for ( const rem of removed ) {
 		const candidates = addedByName.get( rem.block.blockName ) || [];
 		const sameNameRemoved = removedByName.get( rem.block.blockName ) || [];
 		const unpaired = candidates.filter(
-			( add ) => ! modifications.has( add.index )
+			( add ) =>
+				! modifications.has( add.index ) &&
+				add.index > maxPairedAddedIndex
 		);
 
 		if ( unpaired.length === 0 ) {
@@ -209,25 +216,38 @@ function pairSimilarBlocks( blocks ) {
 		}
 
 		if ( bestMatch ) {
-			pairedRemoved.add( rem.index );
+			maxPairedAddedIndex = bestMatch.index;
 
-			// Create modified block with previous content stored.
-			modifications.set( bestMatch.index, {
+			// Place the modified block at whichever position comes
+			// first — the removed or the added. This ensures the
+			// modified content doesn't jump past unpaired blocks
+			// in either direction.
+			const modifiedBlock = {
 				...bestMatch.block,
 				__revisionDiffStatus: { status: 'modified' },
 				__previousRawBlock: rem.block,
-			} );
+			};
+			if ( rem.index < bestMatch.index ) {
+				// Removed comes first — place modified there,
+				// filter out the added.
+				modifications.set( rem.index, modifiedBlock );
+				pairedAdded.add( bestMatch.index );
+			} else {
+				// Added comes first — place modified there,
+				// filter out the removed.
+				modifications.set( bestMatch.index, modifiedBlock );
+				pairedRemoved.add( rem.index );
+			}
 		}
 	}
 
-	// Rebuild result: filter out paired removed, replace paired added with modified.
+	// Rebuild result: replace modification targets, filter out
+	// their paired counterparts.
 	return blocks
 		.map( ( block, index ) => {
-			// Skip paired removed blocks.
-			if ( pairedRemoved.has( index ) ) {
+			if ( pairedRemoved.has( index ) || pairedAdded.has( index ) ) {
 				return null;
 			}
-			// Replace paired added blocks with modified version.
 			if ( modifications.has( index ) ) {
 				return modifications.get( index );
 			}
