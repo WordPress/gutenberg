@@ -711,4 +711,60 @@ describe( 'Composite', () => {
 			} );
 		} );
 	} );
+
+	describe( 'context validation', () => {
+		it( 'should throw when Composite.Item is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.Item>Item</Composite.Item> )
+			).toThrow(
+				'Composite.Item can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should throw when Composite.Row is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.Row>Row</Composite.Row> )
+			).toThrow(
+				'Composite.Row can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should throw when Composite.Group is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.Group>Group</Composite.Group> )
+			).toThrow(
+				'Composite.Group can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should throw when Composite.GroupLabel is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.GroupLabel>Label</Composite.GroupLabel> )
+			).toThrow(
+				'Composite.GroupLabel can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should throw when Composite.Hover is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.Hover>Hover</Composite.Hover> )
+			).toThrow(
+				'Composite.Hover can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+
+		it( 'should throw when Composite.Typeahead is rendered outside of Composite', () => {
+			expect( () =>
+				render( <Composite.Typeahead>Typeahead</Composite.Typeahead> )
+			).toThrow(
+				'Composite.Typeahead can only be rendered inside a Composite component'
+			);
+			expect( console ).toHaveErrored();
+		} );
+	} );
 } );

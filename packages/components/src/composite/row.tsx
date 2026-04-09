@@ -24,7 +24,13 @@ export const CompositeRow = forwardRef<
 	// @ts-expect-error The store prop is undocumented and only used by the
 	// legacy compat layer. The `store` prop is documented, but its type is
 	// obfuscated to discourage its use outside of the component's internals.
-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
+
+	if ( ! store ) {
+		throw new Error(
+			'Composite.Row can only be rendered inside a Composite component'
+		);
+	}
 
 	return <Ariakit.CompositeRow store={ store } { ...props } ref={ ref } />;
 } );

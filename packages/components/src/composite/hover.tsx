@@ -24,7 +24,13 @@ export const CompositeHover = forwardRef<
 	// @ts-expect-error The store prop is undocumented and only used by the
 	// legacy compat layer. The `store` prop is documented, but its type is
 	// obfuscated to discourage its use outside of the component's internals.
-	const store = ( props.store ?? context.store ) as Ariakit.CompositeStore;
+	const store = ( props.store ?? context?.store ) as Ariakit.CompositeStore;
+
+	if ( ! store ) {
+		throw new Error(
+			'Composite.Hover can only be rendered inside a Composite component'
+		);
+	}
 
 	return <Ariakit.CompositeHover store={ store } { ...props } ref={ ref } />;
 } );
