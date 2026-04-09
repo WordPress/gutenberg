@@ -1267,7 +1267,7 @@ export const HoverTrigger: Story = {
  * popup itself, it's a popover. If the trigger's purpose is unrelated to
  * opening the popup, it's a tooltip.
  */
-export const InfoTip: Story = {
+export const Infotip: Story = {
 	parameters: { controls: { disable: true } },
 	render: function Render( args ) {
 		return (

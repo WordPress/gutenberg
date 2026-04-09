@@ -7,7 +7,7 @@ import * as UsageGuidelinesStories from './usage-guidelines.story';
 
 ## Usage guidelines
 
--   **Prefer using tooltips as visual labels only.** Tooltips should act as
+-   **Use tooltips as visual labels only.** Tooltips should act as
     supplementary visual labels for sighted mouse and keyboard users.
     Tooltip popups are not exposed to assistive technologies — the
     trigger's accessible name (e.g. `aria-label`) is what provides the
@@ -56,9 +56,9 @@ To know when to reach for a popover instead of a tooltip, consider the
 popup itself, it's a popover. If the trigger's purpose is unrelated to
 opening the popup, it's a tooltip.
 
-<Canvas of={ UsageGuidelinesStories.InfoTipWithPopover } />
+<Canvas of={ UsageGuidelinesStories.InfotipWithPopover } />
 
-See also the [Popover InfoTip story](?path=/story/design-system-components-popover--info-tip).
+See also the [Popover Infotip story](?path=/story/design-system-components-popover--infotip).
 
 Infotips opened on hover can be dismissed by pressing `Escape`.
 
@@ -87,5 +87,5 @@ content, such as a
 
 ## References
 
-- [WCAG 1.4.13: Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html) — tooltips must be dismissible (Escape), hoverable, and persistent.
-- [WAI-ARIA APG: Tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/) — note that this component intentionally diverges from the traditional `role="tooltip"` + `aria-describedby` pattern. The trigger's `aria-label` is the source of truth for assistive technologies, and the tooltip popup is a visual-only supplement.
+-   [WCAG 1.4.13: Content on Hover or Focus](https://www.w3.org/WAI/WCAG21/Understanding/content-on-hover-or-focus.html) — tooltips must be dismissible (Escape), hoverable, and persistent.
+-   [WAI-ARIA APG: Tooltip pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tooltip/) — note that this component intentionally diverges from the traditional `role="tooltip"` + `aria-describedby` pattern. The trigger's `aria-label` is the source of truth for assistive technologies, and the tooltip popup is a visual-only supplement.

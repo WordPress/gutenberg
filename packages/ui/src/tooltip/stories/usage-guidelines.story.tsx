@@ -56,7 +56,7 @@ export const RecommendedUsage: Story = {
  * `openOnHover` instead of a Tooltip. This ensures the content is accessible
  * to touch and screen reader users.
  */
-export const InfoTipWithPopover: Story = {
+export const InfotipWithPopover: Story = {
 	render: () => (
 		<div
 			style={ {
