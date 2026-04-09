@@ -57,9 +57,12 @@
 	&:disabled {
 		background: $components-color-gray-100;
 		border: 1px solid $components-color-gray-300;
+		opacity: 1; // Override style from wp-admin forms.css.
 
-		&::before {
+		&:checked::before {
 			border-color: $components-color-gray-300;
+			opacity: 1; // Override style from wp-admin forms.css.
+
 		}
 	}
 }
