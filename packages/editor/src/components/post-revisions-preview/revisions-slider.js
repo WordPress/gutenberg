@@ -20,20 +20,15 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const REVISIONS_PER_PAGE = 100;
-
 /**
  * Slider component for navigating revisions with pagination.
- *
- * Page 1 contains the newest revisions. The API returns them in
- * descending date order, and we reverse for display so the slider
- * reads oldest-left → newest-right.
  *
  * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
 	const {
 		revisions: rawRevisions,
+		perPage,
 		currentRevisionId,
 		revisionKey,
 		revisionPage,
@@ -53,9 +48,11 @@ function RevisionsSlider() {
 		);
 		const _revisionKey = entityConfig?.revisionKey || 'id';
 		const _revisionPage = getRevisionPage();
+		const pageData = getPageRevisions( _revisionPage );
 
 		return {
-			revisions: getPageRevisions( _revisionPage ),
+			revisions: pageData?.revisions,
+			perPage: pageData?.perPage,
 			currentRevisionId: getCurrentRevisionId(),
 			revisionKey: _revisionKey,
 			revisionPage: _revisionPage,
@@ -68,16 +65,14 @@ function RevisionsSlider() {
 		useDispatch( editorStore )
 	);
 
-	const totalPages = Math.ceil( totalRevisions / REVISIONS_PER_PAGE ) || 1;
 	const isLoading = !! revisionPage && ! rawRevisions;
+	const totalPages = Math.ceil( totalRevisions / ( perPage || 1 ) ) || 1;
 
-	// Reverse so the slider reads oldest (left) → newest (right).
 	const revisions = useMemo(
 		() => rawRevisions && [ ...rawRevisions ].reverse(),
 		[ rawRevisions ]
 	);
 
-	// Set initial page to 1 (newest revisions) when entering revisions mode.
 	useEffect( () => {
 		if ( revisionPage === null && totalRevisions > 0 ) {
 			setRevisionPage( 1 );
@@ -99,8 +94,6 @@ function RevisionsSlider() {
 		setRevisionPage( newPage );
 	};
 
-	// When revisions load and no revision is selected (after page change),
-	// select the last revision on the page (newest = last in reversed array).
 	useEffect( () => {
 		if ( revisions?.length && selectedIndex === -1 ) {
 			const lastRevision = revisions[ revisions.length - 1 ];
@@ -140,11 +133,9 @@ function RevisionsSlider() {
 		);
 	}
 
-	// Compute the 1-based revision range for a given page.
-	// Page 1 = newest, so page 1 of 1000 → "901–1000".
 	const getPageRangeLabel = ( page ) => {
-		const end = totalRevisions - ( page - 1 ) * REVISIONS_PER_PAGE;
-		const start = Math.max( 1, end - REVISIONS_PER_PAGE + 1 );
+		const end = totalRevisions - ( page - 1 ) * perPage;
+		const start = Math.max( 1, end - perPage + 1 );
 		return sprintf(
 			/* translators: 1: first revision number, 2: last revision number */
 			__( 'Revisions %1$s\u2013%2$s' ),
@@ -182,7 +173,7 @@ function RevisionsSlider() {
 				label={
 					revisionPage < totalPages
 						? getPageRangeLabel( revisionPage + 1 )
-						: __( 'Older revisions' )
+						: __( 'No older revisions' )
 				}
 				onClick={ () => handlePageChange( revisionPage + 1 ) }
 				disabled={ isLoading || revisionPage >= totalPages }
@@ -204,7 +195,7 @@ function RevisionsSlider() {
 				label={
 					revisionPage > 1
 						? getPageRangeLabel( revisionPage - 1 )
-						: __( 'Newer revisions' )
+						: __( 'No newer revisions' )
 				}
 				onClick={ () => handlePageChange( revisionPage - 1 ) }
 				disabled={ isLoading || revisionPage <= 1 }
@@ -215,5 +206,4 @@ function RevisionsSlider() {
 	);
 }
 
-export { REVISIONS_PER_PAGE };
 export default RevisionsSlider;
