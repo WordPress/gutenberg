@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 - DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
+- DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
 
 ### Code Quality
 
