@@ -35,7 +35,7 @@ describe( 'SandBox', () => {
 		);
 	};
 
-	it( 'should render with the correct sandbox attribute', () => {
+	it( 'should not include allow-same-origin by default', () => {
 		render( <SandBox html="<p>Hello</p>" title="Test" /> );
 
 		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Test' );
@@ -43,6 +43,27 @@ describe( 'SandBox', () => {
 		expect( iframe ).toHaveAttribute(
 			'sandbox',
 			'allow-scripts allow-presentation'
+		);
+		expect( iframe.getAttribute( 'sandbox' ) ).not.toContain(
+			'allow-same-origin'
+		);
+	} );
+
+	it( 'should include allow-same-origin when allowSameOrigin is true', () => {
+		render(
+			<SandBox
+				allowSameOrigin
+				html="<p>Embed</p>"
+				title="Same Origin Test"
+			/>
+		);
+
+		const iframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Same Origin Test' );
+
+		expect( iframe ).toHaveAttribute(
+			'sandbox',
+			'allow-scripts allow-presentation allow-same-origin'
 		);
 	} );
 

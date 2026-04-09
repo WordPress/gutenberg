@@ -127,6 +127,7 @@ const style = `
  * ```
  */
 function SandBox( {
+	allowSameOrigin = false,
 	html = '',
 	title = '',
 	type,
@@ -224,7 +225,10 @@ function SandBox( {
 			title={ title }
 			tabIndex={ tabIndex }
 			className="components-sandbox"
-			sandbox="allow-scripts allow-presentation"
+			sandbox={
+				'allow-scripts allow-presentation' +
+				( allowSameOrigin ? ' allow-same-origin' : '' )
+			}
 			srcDoc={ srcDoc }
 			onFocus={ onFocus }
 			width={ Math.ceil( width ) }
