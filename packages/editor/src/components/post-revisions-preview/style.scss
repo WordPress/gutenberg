@@ -1,6 +1,21 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
+.editor-revisions-slider__container {
+	position: relative;
+	width: 100%;
+}
+
+.editor-revisions-slider__chart {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	pointer-events: none;
+	z-index: 1;
+}
+
 .editor-revisions-header__slider {
 	width: 100%;
 
