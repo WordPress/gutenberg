@@ -10,7 +10,7 @@
 
 ### Enhancements
 
--   `Composite`: Add context validation to subcomponents to throw a helpful error when rendered outside of `Composite`.
+-   `Composite`: Add context validation to subcomponents to throw a helpful error when rendered outside of `Composite` ([#77183](https://github.com/WordPress/gutenberg/pull/77183)).
 
 ### Internal
 
