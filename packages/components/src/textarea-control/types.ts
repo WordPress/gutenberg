@@ -13,12 +13,6 @@ export type TextareaControlProps = Pick<
 	'__nextHasNoMarginBottom' | 'hideLabelFromVision' | 'help' | 'label'
 > & {
 	/**
-	 * Whether the textarea should be disabled.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
-	/**
 	 * A function that receives the new value of the textarea each time it
 	 * changes.
 	 */
