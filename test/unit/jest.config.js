@@ -9,6 +9,12 @@ const glob = require( 'glob' ).sync;
  */
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 
+// Read directly from root package.json — npm_package_config_* isn't reliable
+// in workspace context, and setupFiles run too late for module-level guards.
+const rootPackageJson = require( path.join( ROOT_DIR, 'package.json' ) );
+const IS_GUTENBERG_PLUGIN =
+	rootPackageJson?.config?.IS_GUTENBERG_PLUGIN === true;
+
 // Ensure Babel config resolution works from the repo root,
 // even when Jest runs from the workspace directory.
 process.chdir( ROOT_DIR );
@@ -26,6 +32,11 @@ process.env.TZ = 'UTC';
 
 module.exports = {
 	rootDir: '../../',
+	globals: {
+		// Set before any module loads so module-level guards evaluate correctly.
+		IS_GUTENBERG_PLUGIN,
+		IS_WORDPRESS_CORE: true,
+	},
 	moduleNameMapper: {
 		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.

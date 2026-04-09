@@ -70,7 +70,7 @@ jobs:
                   MAXWORKERS: ${{ steps.cpu-cores.outputs.count }}
                   SHARD: ${{ matrix.shard }}
               run: |
-                  npm run --workspace @wordpress/unit-tests test:unit -- \
+                  npm run test:unit -- \
                     --ci \
                     --maxWorkers="$MAXWORKERS" \
                     --shard="$SHARD" \
