@@ -233,7 +233,16 @@ function RevisionsSlider() {
 				size="compact"
 				accessibleWhenDisabled
 			/>
-			<div style={ { flex: 1, minWidth: 0 } }>{ sliderOrSpinner }</div>
+			<div
+				style={ {
+					flex: 1,
+					minWidth: 0,
+					display: 'flex',
+					justifyContent: 'center',
+				} }
+			>
+				{ sliderOrSpinner }
+			</div>
 			<Button
 				icon={ chevronRight }
 				label={
