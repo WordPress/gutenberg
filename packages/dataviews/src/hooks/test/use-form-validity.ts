@@ -1,3 +1,4 @@
+/// <reference types="@wordpress/jest-console" />
 /**
  * External dependencies
  */
