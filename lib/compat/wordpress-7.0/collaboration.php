@@ -247,7 +247,7 @@ add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_opt
  * row action to "Join", and re-enables controls that core normally hides
  * for locked posts (since collaborative editing is possible).
  *
- * @global string $pagenow The filename of the current screen. 
+ * @global string $pagenow The filename of the current screen.
  */
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
