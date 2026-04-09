@@ -71,6 +71,7 @@ function RevisionsSlider() {
 	const isLoading = ! rawRevisions;
 	const totalPages = Math.ceil( totalRevisions / perPage ) || 1;
 
+	// Reverse desc→asc so the slider reads oldest (left) → newest (right).
 	const revisions = useMemo(
 		() => rawRevisions && [ ...rawRevisions ].reverse(),
 		[ rawRevisions ]
@@ -124,7 +125,7 @@ function RevisionsSlider() {
 		const start = Math.max( 1, end - perPage + 1 );
 		return sprintf(
 			/* translators: 1: first revision number, 2: last revision number */
-			__( 'Revisions %1$s\u2013%2$s' ),
+			__( 'Revisions %1$s–%2$s' ),
 			start,
 			end
 		);
