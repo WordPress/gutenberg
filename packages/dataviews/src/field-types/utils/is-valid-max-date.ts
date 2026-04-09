@@ -21,10 +21,12 @@ export default function isValidMaxDate< Item >(
 
 	// For array values (e.g., date ranges [from, to]), check the last element.
 	if ( Array.isArray( value ) ) {
+		if ( value.length === 0 ) {
+			return true;
+		}
 		return (
-			value.length > 0 &&
 			String( value[ value.length - 1 ] ) <=
-				field.isValid.max.constraint
+			field.isValid.max.constraint
 		);
 	}
 

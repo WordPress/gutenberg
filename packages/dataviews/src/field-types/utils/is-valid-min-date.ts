@@ -21,10 +21,10 @@ export default function isValidMinDate< Item >(
 
 	// For array values (e.g., date ranges [from, to]), check the first element.
 	if ( Array.isArray( value ) ) {
-		return (
-			value.length > 0 &&
-			String( value[ 0 ] ) >= field.isValid.min.constraint
-		);
+		if ( value.length === 0 ) {
+			return true;
+		}
+		return String( value[ 0 ] ) >= field.isValid.min.constraint;
 	}
 
 	return String( value ) >= field.isValid.min.constraint;

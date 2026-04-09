@@ -35,59 +35,62 @@ export default function getIsValid< Item >(
 		};
 	}
 
+	const minValue = rules?.min;
 	let min;
 	if (
-		( typeof rules?.min === 'number' ||
-			typeof rules?.min === 'string' ) &&
+		( typeof minValue === 'number' || typeof minValue === 'string' ) &&
 		fieldType.validate.min !== undefined
 	) {
 		min = {
-			constraint: rules!.min,
+			constraint: minValue,
 			validate: fieldType.validate.min,
 		};
 	}
 
+	const maxValue = rules?.max;
 	let max;
 	if (
-		( typeof rules?.max === 'number' ||
-			typeof rules?.max === 'string' ) &&
+		( typeof maxValue === 'number' || typeof maxValue === 'string' ) &&
 		fieldType.validate.max !== undefined
 	) {
 		max = {
-			constraint: rules!.max,
+			constraint: maxValue,
 			validate: fieldType.validate.max,
 		};
 	}
 
+	const minLengthValue = rules?.minLength;
 	let minLength;
 	if (
-		typeof rules?.minLength === 'number' &&
+		typeof minLengthValue === 'number' &&
 		fieldType.validate.minLength !== undefined
 	) {
 		minLength = {
-			constraint: rules!.minLength,
+			constraint: minLengthValue,
 			validate: fieldType.validate.minLength,
 		};
 	}
 
+	const maxLengthValue = rules?.maxLength;
 	let maxLength;
 	if (
-		typeof rules?.maxLength === 'number' &&
+		typeof maxLengthValue === 'number' &&
 		fieldType.validate.maxLength !== undefined
 	) {
 		maxLength = {
-			constraint: rules!.maxLength,
+			constraint: maxLengthValue,
 			validate: fieldType.validate.maxLength,
 		};
 	}
 
+	const patternValue = rules?.pattern;
 	let pattern;
 	if (
-		rules?.pattern !== undefined &&
+		patternValue !== undefined &&
 		fieldType.validate.pattern !== undefined
 	) {
 		pattern = {
-			constraint: rules?.pattern,
+			constraint: patternValue,
 			validate: fieldType.validate.pattern,
 		};
 	}
