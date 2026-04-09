@@ -69,11 +69,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-revisions-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
-	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/collaboration.php';
-	require __DIR__ . '/experimental/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-wp-connector-registry.php';
@@ -89,6 +87,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
+
+	// Experimental REST controller for the template activation experiment.
+	require __DIR__ . '/experimental/class-gutenberg-rest-static-templates-controller.php';
 
 	// Experimental autosaves controller override for real-time collaboration.
 
@@ -121,6 +122,7 @@ require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 
 // Experimental features.
+require __DIR__ . '/experimental/template-activate.php';
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
