@@ -5,7 +5,13 @@ import {
 	BaseControl,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
 import { Stack } from '@wordpress/ui';
@@ -54,6 +60,30 @@ function CalendarDateTimeControl< Item >( {
 	const validationTimeoutRef =
 		useRef< ReturnType< typeof setTimeout > >( undefined );
 	const previousFocusRef = useRef< Element | null >( null );
+
+	const minConstraint = isValid?.min
+		? String( isValid.min.constraint )
+		: undefined;
+	const maxConstraint = isValid?.max
+		? String( isValid.max.constraint )
+		: undefined;
+
+	const disabledMatchers = useMemo( () => {
+		const matchers: Array< { before: Date } | { after: Date } > = [];
+		if ( minConstraint ) {
+			const minDate = parseDateTime( minConstraint );
+			if ( minDate ) {
+				matchers.push( { before: minDate } );
+			}
+		}
+		if ( maxConstraint ) {
+			const maxDate = parseDateTime( maxConstraint );
+			if ( maxDate ) {
+				matchers.push( { after: maxDate } );
+			}
+		}
+		return matchers.length > 0 ? matchers : undefined;
+	}, [ minConstraint, maxConstraint ] );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>
@@ -181,6 +211,16 @@ function CalendarDateTimeControl< Item >( {
 					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }
 					disabled={ disabled }
+					min={
+						minConstraint
+							? formatDateTime( minConstraint )
+							: undefined
+					}
+					max={
+						maxConstraint
+							? formatDateTime( maxConstraint )
+							: undefined
+					}
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
@@ -196,7 +236,7 @@ function CalendarDateTimeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabled }
+						disabled={ disabledMatchers ?? disabled }
 					/>
 				) }
 			</Stack>
