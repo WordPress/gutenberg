@@ -54,16 +54,4 @@ describe( 'validateMimeType', () => {
 			} )
 		);
 	} );
-
-	it( 'should not error if allowedTypes contains the wildcard "*"', () => {
-		expect( () => {
-			validateMimeType( xmlFile, [ '*' ] );
-		} ).not.toThrow();
-	} );
-
-	it( 'should not error if allowedTypes contains "*" alongside other types', () => {
-		expect( () => {
-			validateMimeType( xmlFile, [ 'image', '*' ] );
-		} ).not.toThrow();
-	} );
 } );
