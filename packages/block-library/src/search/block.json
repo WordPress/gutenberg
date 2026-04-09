@@ -47,14 +47,15 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "left", "center", "right" ],
-		"color": {
-			"gradients": true,
-			"__experimentalSkipSerialization": true,
-			"__experimentalDefaultControls": {
+			"color": {
+			  "gradients": true,
+			  "__experimentalSkipSerialization": true,
+			  "__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			}
-		},
+			  },
+			  "button": true
+			},
 		"interactivity": true,
 		"typography": {
 			"__experimentalSkipSerialization": true,

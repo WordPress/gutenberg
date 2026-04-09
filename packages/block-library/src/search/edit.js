@@ -120,6 +120,36 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+
+	const getPresetColorClass = ( value, type ) => {
+		if ( ! value || typeof value !== 'string' ) {
+			return undefined;
+		}
+
+		const parts = value.split( '|' );
+		const slug = parts[ parts.length - 1 ];
+
+		if ( type === 'gradient' ) {
+			return `has-${ slug }-gradient-background`;
+		}
+
+		if ( type === 'background' ) {
+			return `has-${ slug }-background-color`;
+		}
+
+		if ( type === 'text' ) {
+			return `has-${ slug }-color`;
+		}
+	};
+
+	const bg = attributes.style?.elements?.button?.color?.background;
+	const text = attributes.style?.elements?.button?.color?.text;
+	const gradientBg = attributes.style?.elements?.button?.color?.gradient;
+
+	const bgClass = getPresetColorClass( bg, 'background' );
+	const textClass = getPresetColorClass( text, 'text' );
+	const gradientBgClass = getPresetColorClass( gradientBg, 'gradient' );
+
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -205,7 +235,8 @@ export default function SearchEdit( {
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			isButtonPositionInside ? undefined : borderProps.className,
-			typographyProps.className
+			typographyProps.className,
+			colorProps.className
 		);
 		const textFieldStyles = {
 			...( isButtonPositionInside
@@ -222,6 +253,7 @@ export default function SearchEdit( {
 				  }
 				: borderProps.style ),
 			...typographyProps.style,
+			...colorProps.style,
 			textDecoration: undefined,
 		};
 
@@ -250,14 +282,15 @@ export default function SearchEdit( {
 		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
 		const buttonClasses = clsx(
 			'wp-block-search__button',
-			colorProps.className,
+			bgClass,
+			textClass,
+			gradientBgClass,
 			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
 			__experimentalGetElementClassName( 'button' )
 		);
 		const buttonStyles = {
-			...colorProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
 				? {

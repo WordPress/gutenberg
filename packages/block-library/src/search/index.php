@@ -19,27 +19,27 @@ function render_block_core_search( $attributes ) {
 	// attributes to `__( 'Search' )` meaning that many posts contain `<!--
 	// wp:search /-->`. Support these by defaulting an undefined label and
 	// buttonText to `__( 'Search' )`.
-	$attributes = wp_parse_args(
+	$attributes           = wp_parse_args(
 		$attributes,
 		array(
 			'label'      => __( 'Search' ),
 			'buttonText' => __( 'Search' ),
 		)
 	);
-
-	$input_id            = wp_unique_id( 'wp-block-search__input-' );
-	$classnames          = classnames_for_block_core_search( $attributes );
-	$show_label          = ! empty( $attributes['showLabel'] );
-	$use_icon_button     = ! empty( $attributes['buttonUseIcon'] );
-	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
-	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
-	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
-	$button              = '';
-	$query_params_markup = '';
-	$inline_styles       = styles_for_block_core_search( $attributes );
-	$color_classes       = get_color_classes_for_block_core_search( $attributes );
-	$typography_classes  = get_typography_classes_for_block_core_search( $attributes );
-	$is_button_inside    = ! empty( $attributes['buttonPosition'] ) &&
+	$input_id             = wp_unique_id( 'wp-block-search__input-' );
+	$classnames           = classnames_for_block_core_search( $attributes );
+	$show_label           = ! empty( $attributes['showLabel'] );
+	$use_icon_button      = ! empty( $attributes['buttonUseIcon'] );
+	$show_button          = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
+	$button_position      = $show_button ? $attributes['buttonPosition'] : null;
+	$query_params         = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
+	$button               = '';
+	$query_params_markup  = '';
+	$inline_styles        = styles_for_block_core_search( $attributes );
+	$color_classes        = get_color_classes_for_input_block_core_search( $attributes );
+	$button_color_classes = get_color_classes_for_button_block_core_search( $attributes );
+	$typography_classes   = get_typography_classes_for_block_core_search( $attributes );
+	$is_button_inside     = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
 	$border_color_classes = get_border_color_classes_for_block_core_search( $attributes );
@@ -68,6 +68,9 @@ function render_block_core_search( $attributes ) {
 	}
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
+	}
+	if ( ! empty( $color_classes ) ) {
+		$input_classes[] = $color_classes;
 	}
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
@@ -103,13 +106,12 @@ function render_block_core_search( $attributes ) {
 	if ( $show_button ) {
 		$button_classes         = array( 'wp-block-search__button' );
 		$button_internal_markup = '';
-		if ( ! empty( $color_classes ) ) {
-			$button_classes[] = $color_classes;
+		if ( ! empty( $button_color_classes ) ) {
+			$button_classes[] = $button_color_classes;
 		}
 		if ( ! empty( $typography_classes ) ) {
 			$button_classes[] = $typography_classes;
 		}
-
 		if ( ! $is_button_inside && ! empty( $border_color_classes ) ) {
 			$button_classes[] = $border_color_classes;
 		}
@@ -584,7 +586,7 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
  *
  * @return string The color classnames to be applied to the block elements.
  */
-function get_color_classes_for_block_core_search( $attributes ) {
+function get_color_classes_for_input_block_core_search( $attributes ) {
 	$classnames = array();
 
 	// Text color.
@@ -615,6 +617,76 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	}
 	if ( $has_named_gradient ) {
 		$classnames[] = sprintf( 'has-%s-gradient-background', $attributes['gradient'] );
+	}
+
+	return implode( ' ', $classnames );
+}
+/**
+ * Returns color classnames depending on whether there are named or custom text and background colors for input.
+ *
+ * @since 5.9.0
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The color classnames to be applied to the block elements.
+ */
+function get_color_classes_for_button_block_core_search( $attributes ) {
+	$classnames = array();
+
+	$color_text_name       = '';
+	$color_background_name = '';
+	$color_gradient_name   = '';
+
+	if (
+		isset( $attributes['style']['elements']['button']['color']['text'] ) &&
+		is_string( $attributes['style']['elements']['button']['color']['text'] )
+	) {
+		$full_value_text = $attributes['style']['elements']['button']['color']['text'];
+		if ( strpos( $full_value_text, '|' ) !== false ) {
+			$parts           = explode( '|', $full_value_text );
+			$color_text_name = end( $parts );
+		}
+	}
+
+	if (
+		isset( $attributes['style']['elements']['button']['color']['background'] ) &&
+		is_string( $attributes['style']['elements']['button']['color']['background'] )
+	) {
+		$full_value_background = $attributes['style']['elements']['button']['color']['background'];
+		if ( strpos( $full_value_background, '|' ) !== false ) {
+			$parts                 = explode( '|', $full_value_background );
+			$color_background_name = end( $parts );
+		}
+	}
+
+	if (
+		isset( $attributes['style']['elements']['button']['color']['gradient'] ) &&
+		is_string( $attributes['style']['elements']['button']['color']['gradient'] )
+	) {
+		$full_value_gradient = $attributes['style']['elements']['button']['color']['gradient'];
+		if ( strpos( $full_value_gradient, '|' ) !== false ) {
+			$parts               = explode( '|', $full_value_gradient );
+			$color_gradient_name = end( $parts );
+		}
+	}
+
+	// Add final classes.
+	if ( ! empty( $color_text_name ) ) {
+		$classnames[] = 'has-' . sanitize_title( $color_text_name ) . '-color';
+	} elseif ( ! empty( $full_value_text ) ) {
+		$classnames[] = 'has-text-color';
+	}
+
+	if ( ! empty( $color_background_name ) ) {
+		$classnames[] = 'has-' . sanitize_title( $color_background_name ) . '-background-color';
+	} elseif ( ! empty( $full_value_background ) ) {
+		$classnames[] = 'has-background';
+	}
+
+	if ( ! empty( $color_gradient_name ) ) {
+		$classnames[] = 'has-' . sanitize_title( $color_gradient_name ) . '-gradient-background';
+	} elseif ( ! empty( $full_value_gradient ) ) {
+		$classnames[] = 'has-gradient';
 	}
 
 	return implode( ' ', $classnames );
