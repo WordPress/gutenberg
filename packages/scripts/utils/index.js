@@ -34,6 +34,7 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 } = require( './block-json' );
+const { checkForDeprecatedUsage } = require( './deprecated-check' );
 
 module.exports = {
 	fromConfigRoot,
@@ -62,4 +63,5 @@ module.exports = {
 	hasPrettierConfig,
 	hasProjectFile,
 	spawnScript,
+	checkForDeprecatedUsage,
 };
