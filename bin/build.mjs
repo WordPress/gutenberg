@@ -114,7 +114,7 @@ async function build() {
 			// Step 4: Build TypeScript types
 			console.log( '\n📘 Building TypeScript types...\n' );
 			const tsStartTime = Date.now();
-			await exec( 'tsc', [ '--build' ] ).catch( () => {
+			await exec( 'tsgo', [ '--build' ] ).catch( () => {
 				console.error(
 					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
 				);
