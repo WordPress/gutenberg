@@ -85,6 +85,7 @@
 -   `Tabs`: Set explicit `font-family` on tab buttons to prevent inheriting unintended fonts ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
 -   `ExternalLink`: Add `wp-exclude-emoji` class to prevent Twemoji from replacing the arrow icon ([#75538](https://github.com/WordPress/gutenberg/pull/75538)).
 -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
+-   `TimePicker`: Prevent Invalid Date from propagating via `onChange` when date fields are cleared ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
@@ -93,6 +94,7 @@
 
 ### Enhancements
 
+-   `TimePicker`, `DateTimePicker`: Add `minYear` prop to control minimum selectable year. Defaults to 1, enabling support for historical dates. Post scheduling continues to restrict dates to the current year and future via the `minYear` prop ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
 -   `DateCalendar`, `DateRangeCalendar`: use lighter gray for disabled dates ([#75683](https://github.com/WordPress/gutenberg/pull/75683)).
 

@@ -89,3 +89,27 @@ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
 - Required: No
 - Default: 0
+
+### `minYear`: `number`
+
+The minimum year that can be selected in the year input field.
+
+- Required: No
+- Default: `1`
+
+**Usage examples:**
+
+```jsx
+// Default behavior - allows years from 1 onwards
+<DateTimePicker
+	currentDate={ date }
+	onChange={ setDate }
+/>
+
+// For post scheduling - restrict to current year and future only
+<DateTimePicker
+	currentDate={ date }
+	onChange={ setDate }
+	minYear={ new Date().getFullYear() }
+/>
+```

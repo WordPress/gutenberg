@@ -40,7 +40,7 @@ TIMEZONES.forEach( ( timezone ) => {
 			).toHaveText( 'Immediately' );
 		} );
 
-		test( 'should show the publishing date if the date is in the past', async ( {
+		test( 'should not allow scheduling to a past year', async ( {
 			page,
 		} ) => {
 			const datepicker = page.getByRole( 'button', {
@@ -48,18 +48,26 @@ TIMEZONES.forEach( ( timezone ) => {
 			} );
 			await datepicker.click();
 
-			// Change the publishing date to a year in the future.
-			await page
+			const yearInput = page
 				.getByRole( 'group', { name: 'Date' } )
-				.getByRole( 'spinbutton', { name: 'Year' } )
-				.click();
+				.getByRole( 'spinbutton', { name: 'Year' } );
+
+			// Get the current year value
+			const currentYear = await yearInput.inputValue();
+
+			// Try to decrease the year
+			await yearInput.click();
 			await page.keyboard.press( 'ArrowDown' );
+
+			// The year should remain at the current year (cannot go to past)
+			await expect( yearInput ).toHaveValue( currentYear );
+
 			await page.keyboard.press( 'Escape' );
 
-			// The expected date format will be "Sep 26, 2018 11:52 pm".
+			// Since the date hasn't changed from current, it should still show "Immediately"
 			await expect(
 				page.getByRole( 'button', { name: 'Change date' } )
-			).toContainText( /^[A-Za-z]+\s\d{1,2},\s\d{1,4}/ );
+			).toHaveText( 'Immediately' );
 		} );
 
 		test( 'should show the publishing date if the date is in the future', async ( {

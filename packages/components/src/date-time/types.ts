@@ -36,6 +36,13 @@ export type TimePickerProps = {
 	 * @default false
 	 */
 	hideLabelFromVision?: boolean;
+
+	/**
+	 * The minimum year that can be selected in the year input field.
+	 *
+	 * @default 1
+	 */
+	minYear?: number;
 };
 
 export type TimeInputValue = {

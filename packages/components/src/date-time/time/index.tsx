@@ -55,6 +55,7 @@ export function TimePicker( {
 	onChange,
 	dateOrder: dateOrderProp,
 	hideLabelFromVision = false,
+	minYear = 1,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -96,8 +97,23 @@ export function TimePicker( {
 		[ date ]
 	);
 
+	const updateDate = ( newDate: Date ) => {
+		// Guard against Invalid Date propagation.
+		if (
+			newDate instanceof Date &&
+			! Number.isFinite( newDate.getTime() )
+		) {
+			return;
+		}
+
+		setDate( newDate );
+		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+	};
+
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
+			// validateInputElementTarget checks event.target.validity.valid,
+			// which catches empty values via the 'required' attribute
 			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
@@ -110,8 +126,7 @@ export function TimePicker( {
 			const newDate = setInConfiguredTimezone( date, {
 				[ method ]: numberValue,
 			} );
-			setDate( newDate );
-			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+			updateDate( newDate );
 		};
 		return callback;
 	};
@@ -126,8 +141,7 @@ export function TimePicker( {
 			hours: newHours,
 			minutes: newMinutes,
 		} );
-		setDate( newDate );
-		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+		updateDate( newDate );
 	};
 
 	const dayField = (
@@ -165,8 +179,7 @@ export function TimePicker( {
 					const newDate = setInConfiguredTimezone( date, {
 						month: Number( value ) - 1,
 					} );
-					setDate( newDate );
-					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+					updateDate( newDate );
 				} }
 			/>
 		</MonthSelectWrapper>
@@ -181,7 +194,7 @@ export function TimePicker( {
 			__next40pxDefaultSize
 			value={ year }
 			step={ 1 }
-			min={ 1 }
+			min={ minYear }
 			max={ 9999 }
 			required
 			spinControls="none"
