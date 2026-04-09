@@ -937,7 +937,10 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text variant="muted">
+									<Text
+										variant="muted"
+										className="fields__media-edit-description"
+									>
 										{ field.description }
 									</Text>
 								) }

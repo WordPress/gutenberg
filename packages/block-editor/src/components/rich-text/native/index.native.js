@@ -15,7 +15,6 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { BlockFormatControls } from '@wordpress/block-editor';
 import { getPxFromCssUnit } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import {
@@ -42,6 +41,7 @@ import {
 	isCollapsed,
 	remove,
 } from '@wordpress/rich-text';
+import { BlockFormatControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -1342,22 +1342,23 @@ RichText.defaultProps = {
 	tagName: 'div',
 };
 
-const withFormatTypes = ( WrappedComponent ) => ( props ) => {
-	const {
-		clientId,
-		identifier,
-		withoutInteractiveFormatting,
-		allowedFormats,
-	} = props;
-	const { formatTypes } = useFormatTypes( {
-		clientId,
-		identifier,
-		withoutInteractiveFormatting,
-		allowedFormats,
-	} );
+const withFormatTypes = ( WrappedComponent ) =>
+	function WithFormatTypes( props ) {
+		const {
+			clientId,
+			identifier,
+			withoutInteractiveFormatting,
+			allowedFormats,
+		} = props;
+		const { formatTypes } = useFormatTypes( {
+			clientId,
+			identifier,
+			withoutInteractiveFormatting,
+			allowedFormats,
+		} );
 
-	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
-};
+		return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
+	};
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {

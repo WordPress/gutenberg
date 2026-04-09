@@ -61,6 +61,12 @@ export interface BasePost extends CommonPost {
 	author?: number;
 }
 
+export interface BasePostWithEditedEntity extends Omit< BasePost, 'content' > {
+	content:
+		| BasePost[ 'content' ]
+		| ( ( record: BasePostWithEditedEntity ) => string );
+}
+
 export interface BasePostWithEmbeddedAuthor extends BasePost {
 	_embedded: EmbeddedAuthor;
 }

@@ -4,15 +4,12 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	Card,
-	Modal,
+	__experimentalConfirmDialog as ConfirmDialog,
 	Notice,
 	useNavigator,
-	__experimentalText as Text,
-	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
+	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState } from '@wordpress/element';
@@ -20,21 +17,15 @@ import { useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import './guideline-actions-section.scss';
 import { importContentGuidelines, exportContentGuidelines } from '../api';
 import ActionItem from './action-item';
 
-function getErrorMessage( error: unknown ): string {
-	if ( error instanceof Error ) {
-		return error.message;
-	}
-
-	if ( typeof error === 'object' && error !== null && 'message' in error ) {
-		return String( ( error as { message: unknown } ).message );
-	}
-	return __( 'Unknown error.' );
+function getErrorMessage( err: any ) {
+	return err instanceof Error ? err.message : __( 'Unknown error' );
 }
 
-export default function ActionsSection() {
+export default function GuidelineActionsSection() {
 	const { goTo } = useNavigator();
 
 	const fileInputRef = useRef< HTMLInputElement >( null );
@@ -65,12 +56,12 @@ export default function ActionsSection() {
 		try {
 			await importContentGuidelines( file );
 			setError( null );
-		} catch ( importError ) {
+		} catch ( err ) {
 			setError(
 				sprintf(
 					/* translators: %s: Error message. */
-					__( 'We ran into a problem importing your guidelines. %s' ),
-					getErrorMessage( importError )
+					__( 'We ran into a problem importing your guidelines: %s' ),
+					getErrorMessage( err )
 				)
 			);
 		} finally {
@@ -82,12 +73,12 @@ export default function ActionsSection() {
 		try {
 			exportContentGuidelines();
 			setError( null );
-		} catch ( exportError ) {
+		} catch ( err ) {
 			setError(
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'We ran into a problem exporting your guidelines: %s' ),
-					getErrorMessage( exportError )
+					getErrorMessage( err )
 				)
 			);
 		}
@@ -151,49 +142,30 @@ export default function ActionsSection() {
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
 				<ul role="list" className="content-guidelines__actions-list">
 					{ ACTIONS.map( ( action ) => (
-						<ActionItem key={ action.slug } { ...action } />
+						<li
+							key={ action.slug }
+							className="content-guidelines__action-list-item"
+						>
+							<ActionItem { ...action } />
+						</li>
 					) ) }
 				</ul>
 				{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 			</Card>
-			{ pendingImport && (
-				<Modal
-					title={ __( 'Import guidelines' ) }
-					onRequestClose={ () => setPendingImport( null ) }
-					size="medium"
-				>
-					<VStack spacing={ 4 }>
-						<Text size={ 13 } weight={ 400 }>
-							{ __(
-								'Importing new guidelines will replace your current guidelines.'
-							) }
-						</Text>
-						<Text size={ 13 } weight={ 400 }>
-							{ __(
-								'This can be undone from revision history.'
-							) }
-						</Text>
-					</VStack>
-					<HStack
-						justify="flex-end"
-						className="content-guidelines__import-modal-actions"
-					>
-						<Button
-							variant="tertiary"
-							onClick={ () => setPendingImport( null ) }
-						>
-							{ __( 'Cancel' ) }
-						</Button>
-						<Button
-							variant="primary"
-							onClick={ handleModalContinue }
-							__next40pxDefaultSize
-						>
-							{ __( 'Continue' ) }
-						</Button>
-					</HStack>
-				</Modal>
-			) }
+
+			<ConfirmDialog
+				isOpen={ !! pendingImport }
+				__experimentalHideHeader={ false }
+				title={ __( 'Import guidelines' ) }
+				confirmButtonText={ __( 'Continue' ) }
+				onConfirm={ handleModalContinue }
+				onCancel={ () => setPendingImport( null ) }
+				size="small"
+			>
+				{ __(
+					'Importing new guidelines will replace your current guidelines. This can be undone from revision history.'
+				) }
+			</ConfirmDialog>
 		</VStack>
 	);
 }

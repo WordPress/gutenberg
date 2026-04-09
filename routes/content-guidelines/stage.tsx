@@ -21,7 +21,7 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
-import ActionsSection from './components/actions-section';
+import GuidelineActionsSection from './components/guideline-actions-section';
 import RevisionHistory from './components/revision-history';
 
 const GUIDELINE_ITEMS = [
@@ -167,7 +167,7 @@ function ContentGuidelinesPage() {
 									} ) }
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								<ActionsSection />
+								<GuidelineActionsSection />
 							</VStack>
 						</Navigator.Screen>
 						<Navigator.Screen path="/revision-history">

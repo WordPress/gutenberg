@@ -30,6 +30,6 @@ export function useDefaultStyle() {
 		if ( ! element ) {
 			return;
 		}
-		element.style.whiteSpace = whiteSpace;
+		element.style.whiteSpace = element.style.whiteSpace || whiteSpace;
 	}, [] );
 }

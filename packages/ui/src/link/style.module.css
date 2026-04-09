@@ -9,28 +9,38 @@
 	/* Brand tone */
 	.is-brand,
 	.is-brand:visited {
+		--_gcd-a-color: var(--wpds-color-fg-interactive-brand);
+
 		color: var(--wpds-color-fg-interactive-brand);
 	}
 
 	.is-brand:hover,
 	.is-brand:active {
+		--_gcd-a-color: var(--wpds-color-fg-interactive-brand-active);
+
 		color: var(--wpds-color-fg-interactive-brand-active);
 	}
 
 	/* Neutral tone */
 	.is-neutral,
 	.is-neutral:visited {
+		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral);
+
 		color: var(--wpds-color-fg-interactive-neutral);
 		text-decoration-color: var(--wpds-color-stroke-interactive-neutral);
 	}
 
 	.is-neutral:hover,
 	.is-neutral:active {
+		--_gcd-a-color: var(--wpds-color-fg-interactive-neutral-active);
+
 		color: var(--wpds-color-fg-interactive-neutral-active);
 	}
 
 	/* Unstyled variant */
 	.is-unstyled {
+		--_gcd-a-color: inherit;
+
 		color: inherit;
 		text-decoration: none;
 	}

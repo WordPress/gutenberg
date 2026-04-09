@@ -396,6 +396,9 @@ export default function Image( {
 		hasNonContentControls &&
 		! isWideAligned &&
 		isLargeViewport;
+	// An image is uploading if it has a temporary blob URL, or if it is
+	// being processed client-side (e.g. transcoded or generating sub-sizes).
+	const isUploading = !! temporaryURL || isSideloading;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -885,9 +888,7 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={
-										!! temporaryURL || isSideloading
-									}
+									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -1078,7 +1079,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ ( temporaryURL || isSideloading ) && <Spinner /> }
+				{ isUploading && <Spinner /> }
 			</>
 		);
 
@@ -1110,6 +1111,7 @@ export default function Image( {
 		isResizable &&
 		isSingleSelected &&
 		! isEditingImage &&
+		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );

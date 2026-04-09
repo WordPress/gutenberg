@@ -245,6 +245,18 @@ export type Field< Item > = {
 	isVisible?: ( item: Item ) => boolean;
 
 	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
+
+	/**
 	 * Whether the field is sortable.
 	 */
 	enableSorting?: boolean;
@@ -380,6 +392,10 @@ export type NormalizedField< Item > = Omit<
 	filterBy: Required< FilterByConfig > | false;
 	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
 	format:
 		| {}
 		| Required< FormatDate >
