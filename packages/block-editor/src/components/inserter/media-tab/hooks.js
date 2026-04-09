@@ -24,6 +24,7 @@ import { unlock } from '../../../lock-unlock';
 export function useMediaResults( category, query = {} ) {
 	const [ mediaList, setMediaList ] = useState();
 	const [ isLoading, setIsLoading ] = useState( false );
+	const [ hasMore, setHasMore ] = useState( false );
 	// We need to keep track of the last request made because
 	// multiple request can be fired without knowing the order
 	// of resolution, and we need to ensure we are showing
@@ -44,11 +45,12 @@ export function useMediaResults( category, query = {} ) {
 			const _media = await category.fetch?.( query );
 			if ( key === lastRequestRef.current ) {
 				setMediaList( _media );
+				setHasMore( _media?.length === query.per_page );
 				setIsLoading( false );
 			}
 		} )();
 	}, [ category.name, ...Object.values( query ) ] );
-	return { mediaList, isLoading };
+	return { mediaList, isLoading, hasMore };
 }
 
 export function useMediaCategories( rootClientId ) {

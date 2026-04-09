@@ -478,6 +478,11 @@ $block-inserter-tabs-height: 44px;
 			padding: $grid-unit-20 $grid-unit-30 $grid-unit-20;
 		}
 	}
+
+	.block-editor-inserter__media-pagination {
+		border-top: 1px solid $gray-800;
+		padding: $grid-unit-05;
+	}
 }
 
 .block-editor-inserter__media-list__list-item {

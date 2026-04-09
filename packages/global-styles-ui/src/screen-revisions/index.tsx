@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
+	__experimentalText as Text,
 	Spinner,
 	useNavigator,
 } from '@wordpress/components';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
+// @ts-expect-error: Not typed yet.
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -17,7 +20,9 @@ import { ScreenHeader } from '../screen-header';
 import { GlobalStylesContext } from '../context';
 import useGlobalStylesRevisions from './use-global-styles-revisions';
 import RevisionsButtons from './revisions-buttons';
-import Pagination from '../pagination';
+import { unlock } from '../lock-unlock';
+
+const { Pagination } = unlock( blockEditorPrivateApis );
 
 const PAGE_SIZE = 10;
 
@@ -123,12 +128,21 @@ function ScreenRevisions( { onClose }: ScreenRevisionsProps = {} ) {
 			/>
 			{ numPages > 1 && (
 				<div className="global-styles-ui-screen-revisions__footer">
+					<Text
+						variant="muted"
+						className="global-styles-ui-screen-revisions__total"
+					>
+						{ sprintf(
+							// translators: %d: Total number of revisions.
+							_n( '%d item', '%d items', revisionsCount ),
+							revisionsCount
+						) }
+					</Text>
 					<Pagination
 						className="global-styles-ui-screen-revisions__pagination"
 						currentPage={ currentPage }
 						numPages={ numPages }
 						changePage={ setCurrentPage }
-						totalItems={ revisionsCount }
 						disabled={ isLoading }
 						label={ __( 'Global Styles pagination' ) }
 					/>

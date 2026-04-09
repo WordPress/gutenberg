@@ -1920,6 +1920,7 @@ export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
  * @typedef {Object} InserterMediaRequest
  * @property {number} per_page How many items to fetch per page.
  * @property {string} search   The search term to use for filtering the results.
+ * @property {number} [page]   The page number for paginated results.
  */
 
 /**
