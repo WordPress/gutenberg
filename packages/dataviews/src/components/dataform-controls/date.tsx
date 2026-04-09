@@ -479,7 +479,7 @@ function CalendarDateControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabledMatchers ?? disabled }
+						disabled={ disabled || disabledMatchers }
 						disableNavigation={ disabled }
 					/>
 				</Stack>
@@ -753,7 +753,7 @@ function CalendarDateRangeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabledMatchers ?? disabled }
+						disabled={ disabled || disabledMatchers }
 					/>
 				</Stack>
 			</BaseControl>

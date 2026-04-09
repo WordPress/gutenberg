@@ -236,7 +236,7 @@ function CalendarDateTimeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
-						disabled={ disabledMatchers ?? disabled }
+						disabled={ disabled || disabledMatchers }
 					/>
 				) }
 			</Stack>
