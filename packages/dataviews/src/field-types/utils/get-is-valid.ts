@@ -35,7 +35,8 @@ export default function getIsValid< Item >(
 
 	let min;
 	if (
-		typeof field.isValid?.min === 'number' &&
+		( typeof field.isValid?.min === 'number' ||
+			typeof field.isValid?.min === 'string' ) &&
 		fieldType.validate.min !== undefined
 	) {
 		min = {
@@ -46,7 +47,8 @@ export default function getIsValid< Item >(
 
 	let max;
 	if (
-		typeof field.isValid?.max === 'number' &&
+		( typeof field.isValid?.max === 'number' ||
+			typeof field.isValid?.max === 'string' ) &&
 		fieldType.validate.max !== undefined
 	) {
 		max = {
