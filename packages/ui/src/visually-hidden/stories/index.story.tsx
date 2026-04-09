@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import { Popover } from '../..';
 import { VisuallyHidden } from '../';
 
 const meta: Meta< typeof VisuallyHidden > = {
@@ -45,40 +44,4 @@ export const WithCustomElement: Story = {
 			</>
 		);
 	},
-};
-
-/**
- * When composing `VisuallyHidden` with another component that has its own
- * semantic element, always make `VisuallyHidden` the **host** (outer
- * component) and pass the other component via `render`. This preserves
- * the other component's HTML element and semantics.
- *
- * ```jsx
- * // Correct — Popover.Title keeps its <h2> element.
- * <VisuallyHidden render={ <Popover.Title /> }>
- *   Title text
- * </VisuallyHidden>
- *
- * // Avoid — replaces Popover.Title's <h2> with a <div>.
- * <Popover.Title render={ <VisuallyHidden /> }>
- *   Title text
- * </Popover.Title>
- * ```
- */
-export const ComposedWithAnotherComponent: Story = {
-	render: () => (
-		<Popover.Root defaultOpen>
-			<Popover.Trigger>Open popover</Popover.Trigger>
-			<Popover.Popup>
-				<VisuallyHidden render={ <Popover.Title /> }>
-					Accessible popover heading
-				</VisuallyHidden>
-				<p>
-					This popover has a visually hidden title that is still
-					accessible to screen readers via{ ' ' }
-					<code>aria-labelledby</code>.
-				</p>
-			</Popover.Popup>
-		</Popover.Root>
-	),
 };
