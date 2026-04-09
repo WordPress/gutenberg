@@ -11,9 +11,18 @@ import type { TitleProps } from './types';
  * and serves as both the visible heading and the accessible label for
  * the dialog.
  *
- * Uses the `heading-xl` text variant, matching Popover. Base UI's
- * Dialog.Title renders an `<h2>` by default. Use the `render` prop
- * to customize the element if needed.
+ * **Required** — every dialog must include a `Dialog.Title`, even if
+ * visually hidden. The rendered element is linked to the popup via
+ * `aria-labelledby`. Renders an `<h2>` by default.
+ *
+ * To visually hide the title while keeping it accessible, wrap it with
+ * `VisuallyHidden` using the `render` prop:
+ *
+ * ```jsx
+ * <VisuallyHidden render={ <Dialog.Title /> }>
+ *   Accessible title text
+ * </VisuallyHidden>
+ * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 	function DialogTitle( { children, ...props }, forwardedRef ) {
