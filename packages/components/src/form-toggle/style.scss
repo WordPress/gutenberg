@@ -104,7 +104,40 @@ $transition-duration: 0.2s;
 	// Disabled state:
 	&.is-disabled,
 	.components-disabled & {
-		opacity: 0.3;
+		.components-form-toggle__track {
+			background-color: $components-color-gray-100;
+			border-color: $components-color-gray-300;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+			}
+		}
+
+		.components-form-toggle__thumb {
+			background-color: $components-color-gray-400;
+			box-shadow: none;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+			}
+		}
+
+		&.is-checked .components-form-toggle__track {
+			background-color: $components-color-gray-400;
+			border-color: $components-color-gray-400;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+
+				&::after {
+					border-top-color: GrayText;
+				}
+			}
+		}
+
+		&.is-checked .components-form-toggle__thumb {
+			background-color: $white;
+		}
 	}
 }
 
