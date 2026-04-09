@@ -1210,6 +1210,242 @@ describe( 'useFormValidity', () => {
 		} );
 	} );
 
+	describe( 'isValid.min (datetime)', () => {
+		const MIN_MESSAGE = {
+			min: {
+				type: 'invalid',
+				message: 'Value is below the minimum.',
+			},
+		};
+
+		it( 'datetime is valid when value is at min', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-04-01T10:00:00.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						min: '2026-04-01T10:00:00.000Z',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'datetime is invalid when value is before min', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-03-31T23:59:59.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						min: '2026-04-01T10:00:00.000Z',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.createdAt ).toEqual( MIN_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid.max (datetime)', () => {
+		const MAX_MESSAGE = {
+			max: {
+				type: 'invalid',
+				message: 'Value is above the maximum.',
+			},
+		};
+
+		it( 'datetime is valid when value is at max', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-04-30T23:59:59.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						max: '2026-04-30T23:59:59.000Z',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'datetime is invalid when value is after max', () => {
+			const item = {
+				id: 1,
+				createdAt: '2026-05-01T00:00:00.000Z',
+			};
+			const fields: Field< {} >[] = [
+				{
+					id: 'createdAt',
+					type: 'datetime',
+					isValid: {
+						max: '2026-04-30T23:59:59.000Z',
+					},
+				},
+			];
+			const form = { fields: [ 'createdAt' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.createdAt ).toEqual( MAX_MESSAGE );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid combined min and max (date)', () => {
+		it( 'date is valid when value is within range', () => {
+			const item = { id: 1, eventDate: '2026-04-10' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'eventDate',
+					type: 'date',
+					isValid: {
+						min: '2026-04-01',
+						max: '2026-04-30',
+					},
+				},
+			];
+			const form = { fields: [ 'eventDate' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'date is invalid when value is below min with both min and max', () => {
+			const item = { id: 1, eventDate: '2026-03-15' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'eventDate',
+					type: 'date',
+					isValid: {
+						min: '2026-04-01',
+						max: '2026-04-30',
+					},
+				},
+			];
+			const form = { fields: [ 'eventDate' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.eventDate ).toEqual( {
+				min: {
+					type: 'invalid',
+					message: 'Value is below the minimum.',
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+
+		it( 'date is invalid when value is above max with both min and max', () => {
+			const item = { id: 1, eventDate: '2026-05-15' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'eventDate',
+					type: 'date',
+					isValid: {
+						min: '2026-04-01',
+						max: '2026-04-30',
+					},
+				},
+			];
+			const form = { fields: [ 'eventDate' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity?.eventDate ).toEqual( {
+				max: {
+					type: 'invalid',
+					message: 'Value is above the maximum.',
+				},
+			} );
+			expect( isValid ).toBe( false );
+		} );
+	} );
+
+	describe( 'isValid empty array (date)', () => {
+		it( 'empty array is valid for min validation', () => {
+			const item = { id: 1, dateRange: [] as string[] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'dateRange',
+					type: 'date',
+					isValid: {
+						min: '2026-04-01',
+					},
+				},
+			];
+			const form = { fields: [ 'dateRange' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'empty array is valid for max validation', () => {
+			const item = { id: 1, dateRange: [] as string[] };
+			const fields: Field< {} >[] = [
+				{
+					id: 'dateRange',
+					type: 'date',
+					isValid: {
+						max: '2026-04-30',
+					},
+				},
+			];
+			const form = { fields: [ 'dateRange' ] };
+			const {
+				result: {
+					current: { validity, isValid },
+				},
+			} = renderHook( () => useFormValidity( item, fields, form ) );
+			expect( validity ).toEqual( undefined );
+			expect( isValid ).toBe( true );
+		} );
+	} );
+
 	describe( 'isValid.minLength', () => {
 		const MIN_LENGTH_MESSAGE = {
 			minLength: {
