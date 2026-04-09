@@ -6,6 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
 
@@ -155,6 +156,7 @@ export function useConnectorPlugin( {
 		( pluginStatusOverride === 'active' && !! currentApiKey );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const installPlugin = async () => {
 		if ( ! pluginSlug ) {
@@ -180,13 +182,16 @@ export function useConnectorPlugin( {
 				)
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to install plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-install-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -220,13 +225,16 @@ export function useConnectorPlugin( {
 				)
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to activate plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-activate-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
