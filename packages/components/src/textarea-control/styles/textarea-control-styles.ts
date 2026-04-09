@@ -62,6 +62,13 @@ export const StyledTextarea = styled.textarea`
 		${ inputStyleFocus }
 	}
 
+	&:disabled {
+		background: ${ COLORS.ui.backgroundDisabled };
+		border-color: ${ COLORS.ui.borderDisabled };
+		color: ${ COLORS.ui.textDisabled };
+		opacity: 1;
+	}
+
 	// Use opacity to work in various editor styles.
 	&::-webkit-input-placeholder {
 		color: ${ COLORS.ui.darkGrayPlaceholder };

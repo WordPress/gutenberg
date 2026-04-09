@@ -22,7 +22,7 @@ import { isAppleOS } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from './autocompleter-ui';
+import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
@@ -106,11 +106,6 @@ export function useAutocomplete( {
 	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
-
-	const AutocompleterUI = useMemo(
-		() => ( autocompleter ? getAutoCompleterUI( autocompleter ) : null ),
-		[ autocompleter ]
-	);
 
 	const backspacingRef = useRef( false );
 
@@ -271,7 +266,7 @@ export function useAutocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 	const hasSelection = record.start !== undefined;
-	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
+	const showPopover = !! textContent && hasSelection && !! autocompleter;
 
 	return {
 		listBoxId,
@@ -279,6 +274,8 @@ export function useAutocomplete( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
+				key={ autocompleter.name + autocompleter.triggerPrefix }
+				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
 				instanceId={ instanceId }
@@ -286,7 +283,6 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
-				value={ record }
 				contentRef={ contentRef }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
