@@ -775,8 +775,8 @@ describe( 'diffRevisionContent', () => {
 		} );
 
 		it( 'pairs paragraphs in order when section is condensed', () => {
-			// Real-world case from revision 11→12: four ISS paragraphs
-			// condensed into two. Uses exact content from the revisions.
+			// Four paragraphs condensed into two. The first paragraph
+			// should pair and appear first, not after the removed blocks.
 			const previous = serialize( [
 				createBlock( 'core/paragraph', {
 					content:
