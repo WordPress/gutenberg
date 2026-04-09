@@ -170,8 +170,10 @@ function generateStyles( {
 
 export function useThemeProviderStyles( {
 	color = {},
+	cursor,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
+	cursor?: ThemeProviderProps[ 'cursor' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
@@ -185,6 +187,7 @@ export function useThemeProviderStyles( {
 		DEFAULT_SEED_COLORS.primary;
 	const bg =
 		color.bg ?? inheritedSettings.color?.bg ?? DEFAULT_SEED_COLORS.bg;
+	const cursorControl = cursor?.control ?? inheritedSettings.cursor?.control;
 
 	const resolvedSettings = useMemo(
 		() => ( {
@@ -192,11 +195,12 @@ export function useThemeProviderStyles( {
 				primary,
 				bg,
 			},
+			cursor: cursorControl ? { control: cursorControl } : undefined,
 		} ),
-		[ primary, bg ]
+		[ primary, bg, cursorControl ]
 	);
 
-	const themeProviderStyles = useMemo( () => {
+	const colorStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
@@ -223,6 +227,16 @@ export function useThemeProviderStyles( {
 			computedColorRamps,
 		} );
 	}, [ primary, bg ] );
+
+	const themeProviderStyles = useMemo(
+		() => ( {
+			...colorStyles,
+			...( cursorControl && {
+				'--wpds-cursor-control': cursorControl,
+			} ),
+		} ),
+		[ colorStyles, cursorControl ]
+	);
 
 	return {
 		resolvedSettings,

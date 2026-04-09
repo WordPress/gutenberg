@@ -4,6 +4,8 @@ When using Design System tokens (CSS custom properties beginning with `--wpds-`)
 
 Additionally, token names must not be dynamically constructed (e.g. via template literal expressions), as they cannot be statically verified for correctness or processed automatically to inject fallbacks.
 
+Tokens must also be wrapped in `var()` syntax (e.g. `var(--wpds-color-fg-content-neutral)`). The build tooling relies on this pattern to inject fallback values so that components render correctly without a ThemeProvider. Bare token references like `'--wpds-color-fg-content-neutral'` will not receive fallbacks.
+
 This rule lints all string literals and template literals in JavaScript/TypeScript files. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
 
 ## Rule details
@@ -25,6 +27,11 @@ const token = 'var(--wpds-nonexistent-token)';
 ```js
 // Dynamically constructed token names are not allowed.
 const token = `var(--wpds-dimension-gap-${ size })`;
+```
+
+```js
+// Bare tokens without var() won't receive build-time fallbacks.
+const token = '--wpds-color-fg-content-neutral';
 ```
 
 Examples of **correct** code for this rule:

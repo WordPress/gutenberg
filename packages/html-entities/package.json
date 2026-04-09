@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/html-entities",
-	"version": "4.41.1-next.v.202603161435.0+ab4981c4f",
+	"version": "4.43.0",
 	"description": "HTML entity utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

@@ -390,6 +390,11 @@ export const getCurrentRevision = createRegistrySelector(
 		}
 
 		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
 		// - Use getRevisions (plural) instead of getRevision (singular) to
 		//   avoid a race condition where both API calls complete around the
 		//   same time and the single revision fetch overwrites the list in the
@@ -404,19 +409,27 @@ export const getCurrentRevision = createRegistrySelector(
 			{
 				per_page: -1,
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
 			}
 		);
 		if ( ! revisions ) {
 			return null;
 		}
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			postType
+		return (
+			revisions.find( ( r ) => r[ revisionKey ] === revisionId ) ?? null
 		);
-		const revKey = entityConfig?.revisionKey || 'id';
-		return revisions.find( ( r ) => r[ revKey ] === revisionId ) ?? null;
 	}
 );
 
@@ -457,6 +470,11 @@ export const getPreviousRevision = createRegistrySelector(
 		}
 
 		const { type: postType, id: postId } = getCurrentPost( state );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
@@ -464,32 +482,35 @@ export const getPreviousRevision = createRegistrySelector(
 			{
 				per_page: -1,
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				orderby: 'date',
+				order: 'asc',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
 			}
 		);
 		if ( ! revisions ) {
 			return null;
 		}
 
-		// Sort by date ascending (oldest first).
-		const sortedRevisions = [ ...revisions ].sort(
-			( a, b ) => new Date( a.date ) - new Date( b.date )
-		);
-
 		// Find current revision index.
-		const entityConfig = select( coreStore ).getEntityConfig(
-			'postType',
-			postType
-		);
-		const revKey = entityConfig?.revisionKey || 'id';
-		const currentIndex = sortedRevisions.findIndex(
-			( r ) => r[ revKey ] === currentRevisionId
+		const currentIndex = revisions.findIndex(
+			( r ) => r[ revisionKey ] === currentRevisionId
 		);
 
 		// Return the previous revision (older one) if it exists.
 		if ( currentIndex > 0 ) {
-			return sortedRevisions[ currentIndex - 1 ];
+			return revisions[ currentIndex - 1 ];
 		}
 
 		return null;

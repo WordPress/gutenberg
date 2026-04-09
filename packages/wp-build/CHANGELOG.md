@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-## 0.10.0-next.0 (2026-03-16)
+## 0.11.0 (2026-04-01)
+
+### Bug Fixes
+
+-   Derive `data-wp-hash` from the transformed CSS instead of the raw source to prevent style mismatches when multiple build pipelines process the same source file ([#76743](https://github.com/WordPress/gutenberg/pull/76743)).
+
+## 0.10.0 (2026-03-18)
 
 ### Breaking Changes
 

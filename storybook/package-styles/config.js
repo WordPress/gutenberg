@@ -17,6 +17,8 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+import adminUiLtr from '../package-styles/admin-ui-ltr.lazy.scss?inline';
+import adminUiRtl from '../package-styles/admin-ui-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
 
 /**
@@ -72,6 +74,11 @@ const CONFIG = [
 		componentIdMatcher: /^fields-/,
 		ltr: [ componentsLtr, dataviewsLtr, fieldsLtr, mediaFieldsLtr ],
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
+	},
+	{
+		componentIdMatcher: /^admin-ui-/,
+		ltr: [ designTokens, componentsLtr, adminUiLtr ],
+		rtl: [ designTokens, componentsRtl, adminUiRtl ],
 	},
 	{
 		componentIdMatcher: /^design-system-/,

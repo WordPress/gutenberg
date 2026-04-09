@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.26.1-next.v.202603161435.0+ab4981c4f",
+	"version": "0.28.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,7 +49,6 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",

@@ -1,7 +1,10 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
-	plugins: [ 'stylelint-plugin-logical-css' ],
+	plugins: [
+		'stylelint-plugin-logical-css',
+		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+	],
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -48,10 +51,11 @@ module.exports = {
 		'scss/at-else-empty-line-before': null,
 		'scss/at-if-closing-brace-space-after': null,
 		'no-invalid-position-at-import-rule': null,
+		'plugin-wpds/no-token-fallback-values': true,
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.css' ],
+			files: [ '**/*.module.{css,scss}' ],
 			rules: {
 				'function-no-unknown': [
 					true,

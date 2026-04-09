@@ -173,3 +173,21 @@ export const setCollaborationSupported =
 	( { dispatch } ) => {
 		dispatch( { type: 'SET_COLLABORATION_SUPPORTED', supported } );
 	};
+
+/**
+ * Returns an action object used to receive view config.
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} config View config object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveViewConfig( kind, name, config ) {
+	return {
+		type: 'RECEIVE_VIEW_CONFIG',
+		kind,
+		name,
+		config,
+	};
+}

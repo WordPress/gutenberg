@@ -41,7 +41,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'`SomeComponent` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -51,12 +50,10 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'`Foo` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
-					type: 'ImportSpecifier',
 				},
 				{
 					message:
 						'`Bar` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -67,7 +64,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
-					type: 'ImportSpecifier',
 				},
 			],
 		},
@@ -77,7 +73,6 @@ ruleTester.run( 'use-recommended-components', rule, {
 				{
 					message:
 						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
-					type: 'ImportSpecifier',
 				},
 			],
 		},

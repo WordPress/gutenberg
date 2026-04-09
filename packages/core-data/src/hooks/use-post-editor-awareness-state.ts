@@ -25,7 +25,7 @@ interface AwarenessState {
 }
 
 const defaultResolvedSelection: ResolvedSelection = {
-	textIndex: null,
+	richTextOffset: null,
 	localClientId: null,
 };
 

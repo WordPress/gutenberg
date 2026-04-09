@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "6.41.1-next.v.202603161435.0+ab4981c4f",
+	"version": "6.43.0",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

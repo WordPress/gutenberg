@@ -70,7 +70,9 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
+const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const scaleOptions = [
 	{
@@ -342,7 +344,13 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 
-	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
+	const {
+		canInsertCover,
+		imageEditing,
+		imageSizes,
+		maxWidth,
+		editMediaEntity,
+	} = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, canInsertBlockType, getSettings } =
 				select( blockEditorStore );
@@ -354,6 +362,7 @@ export default function Image( {
 				imageEditing: settings.imageEditing,
 				imageSizes: settings.imageSizes,
 				maxWidth: settings.maxWidth,
+				editMediaEntity: settings?.[ mediaEditKey ],
 				canInsertCover: canInsertBlockType(
 					'core/cover',
 					rootClientId
@@ -387,6 +396,9 @@ export default function Image( {
 		hasNonContentControls &&
 		! isWideAligned &&
 		isLargeViewport;
+	// An image is uploading if it has a temporary blob URL, or if it is
+	// being processed client-side (e.g. transcoded or generating sub-sizes).
+	const isUploading = !! temporaryURL || isSideloading;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -550,7 +562,12 @@ export default function Image( {
 		}
 	}, [ isSingleSelected ] );
 
-	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
+	const canEditImage =
+		id &&
+		naturalWidth &&
+		naturalHeight &&
+		imageEditing &&
+		!! editMediaEntity;
 	const allowCrop =
 		isSingleSelected &&
 		canEditImage &&
@@ -762,6 +779,7 @@ export default function Image( {
 		id &&
 		isSingleSelected &&
 		canUserEdit &&
+		!! editMediaEntity &&
 		! isExternalImage( id, url ) &&
 		! isEditingImage &&
 		onNavigateToEntityRecord && (
@@ -870,9 +888,7 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={
-										!! temporaryURL || isSideloading
-									}
+									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -1063,7 +1079,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ ( temporaryURL || isSideloading ) && <Spinner /> }
+				{ isUploading && <Spinner /> }
 			</>
 		);
 
@@ -1095,6 +1111,7 @@ export default function Image( {
 		isResizable &&
 		isSingleSelected &&
 		! isEditingImage &&
+		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );

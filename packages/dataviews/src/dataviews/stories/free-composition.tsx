@@ -7,14 +7,15 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
-	Card,
-	CardBody,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
+// TODO: enable in the ESlint rule once we complete
+// https://github.com/WordPress/gutenberg/issues/76135.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -52,8 +53,8 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 						</Stack>
 					</Stack>
 					<DataViews.FiltersToggled />
-					<Card variant="secondary">
-						<CardBody>
+					<Card.Root>
+						<Card.Content>
 							<Stack direction="column" gap="sm">
 								<Text size={ 18 } as="p">
 									{ createInterpolateElement(
@@ -87,10 +88,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 									) }
 								</Text>
 							</Stack>
-						</CardBody>
-					</Card>
-					<Card style={ { width: '100%' } }>
-						<CardBody>
+						</Card.Content>
+					</Card.Root>
+					<Card.Root style={ { width: '100%' } }>
+						<Card.Content>
 							<Stack
 								direction="row"
 								justify="space-between"
@@ -100,8 +101,8 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								<DataViews.BulkActionToolbar />
 								<DataViews.Pagination />
 							</Stack>
-						</CardBody>
-					</Card>
+						</Card.Content>
+					</Card.Root>
 				</Stack>
 			</div>
 			<DataViews.Layout className="free-composition-dataviews-layout" />

@@ -100,7 +100,7 @@ export function useMediaCategories( rootClientId ) {
 							results = await category.fetch( {
 								per_page: 1,
 							} );
-						} catch ( e ) {
+						} catch {
 							// If the request fails, we shallow the error and just don't show
 							// the category, in order to not break the media tab.
 						}

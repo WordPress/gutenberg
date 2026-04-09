@@ -4,12 +4,15 @@
 	.root {
 		--wp-ui-card-padding: var(--wpds-dimension-padding-2xl);
 		--wp-ui-card-header-content-gap: var(--wpds-dimension-gap-xl);
+		--wp-ui-card-header-content-margin: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
 
 		display: flex;
 		flex-direction: column;
 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		border-radius: var(--wpds-border-radius-lg);
+		overflow: clip;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	/* Padding is applied to the individual header/content elements to enable
@@ -28,7 +31,7 @@
 	/* Custom vertical gap between header and content */
 	.header + .content {
 		padding-block-start: 0;
-		margin-block-start: calc(var(--wp-ui-card-header-content-gap) - var(--wp-ui-card-padding));
+		margin-block-start: var(--wp-ui-card-header-content-margin);
 	}
 
 	.fullbleed {
@@ -38,10 +41,5 @@
 
 	.title {
 		margin: 0;
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-lg);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
-		color: var(--wpds-color-fg-content-neutral);
 	}
 }

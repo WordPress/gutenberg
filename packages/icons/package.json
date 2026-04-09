@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "12.0.1-next.v.202603161435.0+ab4981c4f",
+	"version": "12.1.0",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

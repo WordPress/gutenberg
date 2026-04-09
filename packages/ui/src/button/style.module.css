@@ -28,6 +28,10 @@
 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
 
+		--_gcd-button-font-family: var(--wpds-font-family-body);
+		--_gcd-button-font-size: var(--wp-ui-button-font-size);
+		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
+
 		/* Styles */
 		position: relative;
 		display: inline-flex;
@@ -50,6 +54,7 @@
 		line-height: var(--wpds-font-line-height-sm);
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
+		cursor: var(--wpds-cursor-control);
 
 		@media not ( prefers-reduced-motion ) {
 			transition: color 0.1s ease-out;
@@ -61,6 +66,7 @@
 
 		/* Use pointer cursor for buttons that are links */
 		&[href] {
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 			cursor: pointer;
 		}
 
