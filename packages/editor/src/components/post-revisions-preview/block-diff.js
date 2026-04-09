@@ -75,9 +75,9 @@ function textSimilarity( text1, text2 ) {
 		granularity: 'word',
 	} );
 	const getWords = ( text ) =>
-		[ ...segmenter.segment( text ) ]
-			.filter( ( s ) => s.isWordLike )
-			.map( ( s ) => s.segment );
+		Array.from( segmenter.segment( text ), ( s ) =>
+			s.isWordLike ? s.segment : null
+		).filter( Boolean );
 	const words1 = getWords( text1 );
 	const words2 = getWords( text2 );
 
