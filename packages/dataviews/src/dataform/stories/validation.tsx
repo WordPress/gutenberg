@@ -850,14 +850,14 @@ const ValidationComponent = ( {
 				type: 'date',
 				label: 'Date',
 				description: minMax
-					? 'Must be between Apr 1 and Apr 20, 2017'
+					? 'Must be between Apr 1 and Apr 20, 2026'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRule ),
-					min: minMax ? '2017-04-01' : undefined,
-					max: minMax ? '2017-04-20' : undefined,
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
@@ -866,14 +866,14 @@ const ValidationComponent = ( {
 				label: 'Date range',
 				Edit: DateRangeEdit,
 				description: minMax
-					? 'Must be between Apr 1 and Apr 20, 2017'
+					? 'Must be between Apr 1 and Apr 20, 2026'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRangeRule ),
-					min: minMax ? '2017-04-01' : undefined,
-					max: minMax ? '2017-04-20' : undefined,
+					min: minMax ? '2026-04-01' : undefined,
+					max: minMax ? '2026-04-20' : undefined,
 				},
 			},
 			{
@@ -881,14 +881,14 @@ const ValidationComponent = ( {
 				type: 'datetime',
 			label: 'Date time',
 				description: minMax
-					? 'Must be between Apr 1 and Apr 20, 2017'
+					? 'Must be between Apr 1 and Apr 20, 2026'
 					: undefined,
 				isValid: {
 					required,
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateTimeRule ),
-					min: minMax ? '2017-04-01T00:00:00.000Z' : undefined,
-					max: minMax ? '2017-04-20T23:59:59.000Z' : undefined,
+					min: minMax ? '2026-04-01T00:00:00.000Z' : undefined,
+					max: minMax ? '2026-04-20T23:59:59.000Z' : undefined,
 				},
 			},
 		];
