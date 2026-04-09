@@ -8,7 +8,7 @@ export type RadioControlProps = Pick<
 	'label' | 'help' | 'hideLabelFromVision'
 > & {
 	/**
-	 * Whether the radio inputs should be disabled.
+	 * Whether the radio group should be disabled.
 	 *
 	 * @default false
 	 */
