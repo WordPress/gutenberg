@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add `visual` prop to render an icon or image alongside the header title or breadcrumbs, outside the `h2` tag. [#76469](https://github.com/WordPress/gutenberg/pull/76469)
+
 ## 1.12.0 (2026-04-15)
 
 ### Enhancements
