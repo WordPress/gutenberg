@@ -89,9 +89,7 @@ export function RadioControl(
 		<fieldset
 			id={ id }
 			role="radiogroup"
-			className={ clsx( className, 'components-radio-control', {
-				'is-disabled': disabled,
-			} ) }
+			className={ clsx( className, 'components-radio-control' ) }
 			disabled={ disabled }
 			aria-describedby={ !! help ? generateHelpId( id ) : undefined }
 		>
