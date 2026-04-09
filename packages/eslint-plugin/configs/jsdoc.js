@@ -150,5 +150,6 @@ module.exports = {
 		'jsdoc/require-returns-description': 'error',
 		'jsdoc/require-returns-type': 'error',
 		'jsdoc/valid-types': 'error',
+		'@wordpress/require-valid-since': 'error',
 	},
 };
