@@ -50,7 +50,7 @@ export type CustomSelectButtonProps = {
 };
 
 // Props only exposed on the internal implementation
-export type _CustomSelectInternalProps = {
+export type CustomSelectInternalProps = {
 	/**
 	 * True if the consumer is emulating the legacy component behavior and look
 	 */

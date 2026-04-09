@@ -11,9 +11,9 @@
     -   `AlertDialog.Popup`: removed `loading` prop (async flows are now handled internally via `Promise`-returning `onConfirm`);
     -   `AlertDialog.Popup`: made `children` optional in favor of a new `description` prop, which describes the alert dialog semantically.
 
-### Internal
+### New Features
 
--   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
+-   Add `Popover` primitive ([#76438](https://github.com/WordPress/gutenberg/pull/76438)).
 
 ### Bug Fixes
 
@@ -22,6 +22,10 @@
 ### Enhancements
 
 -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
+
+### Internal
+
+-   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
 
 ## 0.10.0 (2026-04-01)
 
