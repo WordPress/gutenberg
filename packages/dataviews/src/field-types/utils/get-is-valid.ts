@@ -43,12 +43,19 @@ export default function getIsValid< Item >(
 	}
 
 	const minValue = rules?.min;
-	let min;
+	let min: NormalizedRules< Item >[ 'min' ];
 	if (
-		( ( typeof minValue === 'number' &&
-			supportsNumericRangeConstraint( fieldType.type ) ) ||
-			( typeof minValue === 'string' &&
-				supportsDateRangeConstraint( fieldType.type ) ) ) &&
+		typeof minValue === 'number' &&
+		supportsNumericRangeConstraint( fieldType.type ) &&
+		fieldType.validate.min !== undefined
+	) {
+		min = {
+			constraint: minValue,
+			validate: fieldType.validate.min,
+		};
+	} else if (
+		typeof minValue === 'string' &&
+		supportsDateRangeConstraint( fieldType.type ) &&
 		fieldType.validate.min !== undefined
 	) {
 		min = {
@@ -58,12 +65,19 @@ export default function getIsValid< Item >(
 	}
 
 	const maxValue = rules?.max;
-	let max;
+	let max: NormalizedRules< Item >[ 'max' ];
 	if (
-		( ( typeof maxValue === 'number' &&
-			supportsNumericRangeConstraint( fieldType.type ) ) ||
-			( typeof maxValue === 'string' &&
-				supportsDateRangeConstraint( fieldType.type ) ) ) &&
+		typeof maxValue === 'number' &&
+		supportsNumericRangeConstraint( fieldType.type ) &&
+		fieldType.validate.max !== undefined
+	) {
+		max = {
+			constraint: maxValue,
+			validate: fieldType.validate.max,
+		};
+	} else if (
+		typeof maxValue === 'string' &&
+		supportsDateRangeConstraint( fieldType.type ) &&
 		fieldType.validate.max !== undefined
 	) {
 		max = {

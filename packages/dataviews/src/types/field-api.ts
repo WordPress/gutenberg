@@ -128,8 +128,8 @@ export type NormalizedRules< Item > = {
 	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
-	min?: NormalizedRule< Item, number | string >;
-	max?: NormalizedRule< Item, number | string >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
 	custom?: CustomValidator< Item >;
 };
 

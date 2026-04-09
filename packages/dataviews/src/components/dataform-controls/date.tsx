@@ -319,12 +319,8 @@ function CalendarDateControl< Item >( {
 	const [ isTouched, setIsTouched ] = useState( false );
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 
-	const minConstraint = isValid.min
-		? String( isValid.min.constraint )
-		: undefined;
-	const maxConstraint = isValid.max
-		? String( isValid.max.constraint )
-		: undefined;
+	const minConstraint = isValid.min?.constraint as string | undefined;
+	const maxConstraint = isValid.max?.constraint as string | undefined;
 
 	const disabledMatchers = useDisabledDateMatchers(
 		minConstraint,
@@ -510,12 +506,8 @@ function CalendarDateRangeControl< Item >( {
 		( fieldFormat as FormatDate ).weekStartsOn ??
 		getSettings().l10n.startOfWeek;
 
-	const minConstraint = isValid.min
-		? String( isValid.min.constraint )
-		: undefined;
-	const maxConstraint = isValid.max
-		? String( isValid.max.constraint )
-		: undefined;
+	const minConstraint = isValid.min?.constraint as string | undefined;
+	const maxConstraint = isValid.max?.constraint as string | undefined;
 
 	const disabledMatchers = useDisabledDateMatchers(
 		minConstraint,

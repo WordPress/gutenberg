@@ -23,7 +23,7 @@ function parseDateLike( value?: string ) {
 	return isValidDate( parsed ) ? parsed : null;
 }
 
-export function validateDateLikeBoundary< Item >(
+function validateDateLikeBoundary< Item >(
 	item: Item,
 	field: NormalizedField< Item >,
 	boundary: Boundary
@@ -38,13 +38,13 @@ export function validateDateLikeBoundary< Item >(
 		return true;
 	}
 
-	const boundaryValue = Array.isArray( value )
-		? value[ boundary === 'min' ? 0 : value.length - 1 ]
-		: value;
-
 	if ( Array.isArray( value ) && value.length === 0 ) {
 		return true;
 	}
+
+	const boundaryValue = Array.isArray( value )
+		? value[ boundary === 'min' ? 0 : value.length - 1 ]
+		: value;
 
 	if ( isEmptyValue( boundaryValue ) ) {
 		return true;
