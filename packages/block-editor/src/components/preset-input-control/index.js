@@ -168,22 +168,18 @@ export default function PresetInputControl( {
 		unitConfig?.max ?? customValueSettings[ computedUnit ]?.max ?? 10;
 
 	const handleCustomValueChange = ( newValue ) => {
-		const isExplicitlyEmpty = newValue === '';
-		const isNumeric =
-			newValue !== undefined && ! isNaN( parseFloat( newValue ) );
-
-		let newCustomValue;
-		if ( isExplicitlyEmpty ) {
-			newCustomValue = '';
-		} else if ( isNumeric ) {
-			newCustomValue = newValue;
-		} else {
-			newCustomValue = undefined;
+		// Treat empty or undefined as an explicit clear and propagate undefined.
+		if ( newValue === undefined || newValue === '' ) {
+			onChange( undefined );
+			return;
 		}
 
-		if ( newCustomValue !== undefined ) {
-			onChange( newCustomValue );
+		// Ignore non-numeric intermediate input (e.g. just a unit).
+		if ( isNaN( parseFloat( newValue ) ) ) {
+			return;
 		}
+
+		onChange( newValue );
 	};
 	const handleCustomValueSliderChange = ( next ) => {
 		onChange( [ next, computedUnit ].join( '' ) );
