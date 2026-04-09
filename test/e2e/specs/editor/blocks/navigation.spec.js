@@ -449,7 +449,7 @@ test.describe( 'Navigation block', () => {
 
 			await test.step( 'focus returns to the submenu appender when exiting the submenu link creation without creating a link', async () => {
 				// Move focus to the submenu navigation appender
-				await page.keyboard.press( 'End' );
+				await pageUtils.pressKeys( 'ArrowDown' );
 				await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 
 				await pageUtils.pressKeys( 'ArrowDown' );
@@ -516,7 +516,6 @@ test.describe( 'Navigation block', () => {
 			// Move to the submenu item (only one ArrowUp needed - skips the
 			// submenu wrapper directly to Cat's content)
 			await page.keyboard.press( 'ArrowUp' );
-			await page.keyboard.press( 'Home' );
 
 			// Check we're on our submenu link
 			await navigation.checkLabelFocus( 'Cat' );
@@ -571,7 +570,7 @@ test.describe( 'Navigation block', () => {
 			 * Test: Deleting first item returns focus to the parent submenu item
 			 */
 			// Add a link back so we can delete the first submenu link.
-			await page.keyboard.press( 'End' );
+			await pageUtils.pressKeys( 'ArrowDown' );
 			await pageUtils.pressKeys( 'ArrowRight', { times: 2 } );
 			await navigation.useBlockInserter();
 			await navigation.addCustomURL( 'https://wordpress.org' );
@@ -2315,9 +2314,7 @@ class Navigation {
 	 * @param {string} label Nav label text
 	 */
 	async checkLabelFocus( label ) {
-		await this.page.keyboard.press( 'Home' );
-		// Select all the text
-		await this.pageUtils.pressKeys( 'Shift+End' );
+		await this.pageUtils.pressKeys( 'primary+a' );
 		await this.expectToHaveTextSelected( label );
 		// Move caret back to starting position
 		await this.pageUtils.pressKeys( 'ArrowLeft' );

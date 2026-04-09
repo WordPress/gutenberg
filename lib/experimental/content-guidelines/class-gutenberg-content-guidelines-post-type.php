@@ -19,7 +19,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 *
 	 * @var string
 	 */
-	const POST_TYPE = 'wp_content_guideline';
+	const POST_TYPE = 'wp_guideline';
 
 	/**
 	 * The standard guideline category meta keys.
