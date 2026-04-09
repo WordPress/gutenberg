@@ -79,10 +79,9 @@ export default function QuoteEdit( {
 
 	const { hasInnerBlocks } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const block = getBlock( clientId );
+			const { getBlockCount } = select( blockEditorStore );
 			return {
-				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
 			};
 		},
 		[ clientId ]
