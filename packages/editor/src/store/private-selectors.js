@@ -360,6 +360,75 @@ export function getRevisionPage( state ) {
 	return state.revisionPage;
 }
 
+const REVISIONS_PER_PAGE = 100;
+
+/**
+ * Builds the query object for fetching a page of revisions.
+ * Shared by getPageRevisions, getCurrentRevision, and getPreviousRevision
+ * so they all hit the same cache key.
+ *
+ * @param {string} revisionKey The entity's revision key.
+ * @param {number} page        The 1-based page number (page 1 = newest).
+ * @return {Object} Query object for getRevisions.
+ */
+function buildRevisionsPageQuery( revisionKey, page ) {
+	return {
+		per_page: REVISIONS_PER_PAGE,
+		page,
+		context: 'edit',
+		orderby: 'date',
+		order: 'desc',
+		_fields: [
+			...new Set( [
+				'id',
+				'date',
+				'modified',
+				'author',
+				'meta',
+				'title.raw',
+				'excerpt.raw',
+				'content.raw',
+				revisionKey,
+			] ),
+		].join(),
+	};
+}
+
+/**
+ * Returns revisions for the given page number. Centralises the
+ * paginated query so the slider, getCurrentRevision, and
+ * getPreviousRevision all share the same cache key.
+ *
+ * @param {Object} state Global application state.
+ * @param {number} page  The 1-based page number (page 1 = newest).
+ * @return {Array|null} The revisions array, or null if not yet loaded.
+ */
+export const getPageRevisions = createRegistrySelector(
+	( select ) => ( state, page ) => {
+		if ( ! page ) {
+			return null;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		if ( ! postType || ! postId ) {
+			return null;
+		}
+
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
+		return select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			buildRevisionsPageQuery( revisionKey, page )
+		);
+	}
+);
+
 /**
  * Returns whether the editor is in revisions preview mode.
  *
@@ -392,8 +461,7 @@ export function getCurrentRevisionId( state ) {
 
 /**
  * Returns the current revision object in revisions mode.
- * Uses getRevision (singular) to look up from the cache populated by
- * the paginated getRevisions call in the slider.
+ * Looks up from the cache populated by the paginated getPageRevisions call.
  *
  * @param {Object} state Global application state.
  * @return {Object|null|undefined} The revision object, null if loading, or undefined if not in revisions mode.
@@ -405,42 +473,30 @@ export const getCurrentRevision = createRegistrySelector(
 			return undefined;
 		}
 
+		const page = getRevisionPage( state );
+		if ( ! page ) {
+			return null;
+		}
+
 		const { type: postType, id: postId } = getCurrentPost( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
-		const fields = [
-			...new Set( [
-				'id',
-				'date',
-				'modified',
-				'author',
-				'meta',
-				'title.raw',
-				'excerpt.raw',
-				'content.raw',
-				revisionKey,
-			] ),
-		].join();
-
-		// Use getRevision (singular) which reads from the cache populated
-		// by the paginated getRevisions call. The plural resolver marks
-		// individual getRevision resolutions as done, so this won't
-		// trigger a new API call.
-		const revision = select( coreStore ).getRevision(
+		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			currentRevId,
-			{
-				context: 'edit',
-				_fields: fields,
-			}
+			buildRevisionsPageQuery( revisionKey, page )
 		);
+		if ( ! revisions ) {
+			return null;
+		}
 
-		return revision ?? null;
+		return (
+			revisions.find( ( r ) => r[ revisionKey ] === currentRevId ) ?? null
+		);
 	}
 );
 
@@ -492,33 +548,11 @@ export const getPreviousRevision = createRegistrySelector(
 			postType
 		);
 		const revisionKey = entityConfig?.revisionKey || 'id';
-		const fields = [
-			...new Set( [
-				'id',
-				'date',
-				'modified',
-				'author',
-				'meta',
-				'title.raw',
-				'excerpt.raw',
-				'content.raw',
-				revisionKey,
-			] ),
-		].join();
-
-		// Query matches the slider: desc order, page 1 = newest.
 		const revisions = select( coreStore ).getRevisions(
 			'postType',
 			postType,
 			postId,
-			{
-				per_page: 100,
-				page,
-				context: 'edit',
-				orderby: 'date',
-				order: 'desc',
-				_fields: fields,
-			}
+			buildRevisionsPageQuery( revisionKey, page )
 		);
 		if ( ! revisions ) {
 			return null;
@@ -534,25 +568,17 @@ export const getPreviousRevision = createRegistrySelector(
 			return revisions[ currentIndex + 1 ];
 		}
 
-		// At page boundary: fetch the first revision from the next page
-		// (older revisions). The next page in desc order is page + 1.
+		// At page boundary: fetch the first revision from the next page.
 		const totalRevisions = getCurrentPostRevisionsCount( state );
-		const totalPages = Math.ceil( totalRevisions / 100 ) || 1;
+		const totalPages =
+			Math.ceil( totalRevisions / REVISIONS_PER_PAGE ) || 1;
 		if ( currentIndex === revisions.length - 1 && page < totalPages ) {
 			const nextPageRevisions = select( coreStore ).getRevisions(
 				'postType',
 				postType,
 				postId,
-				{
-					per_page: 100,
-					page: page + 1,
-					context: 'edit',
-					orderby: 'date',
-					order: 'desc',
-					_fields: fields,
-				}
+				buildRevisionsPageQuery( revisionKey, page + 1 )
 			);
-			// Return the first (newest) revision from the next page.
 			return nextPageRevisions?.[ 0 ] ?? null;
 		}
 

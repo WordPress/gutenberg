@@ -34,77 +34,33 @@ const REVISIONS_PER_PAGE = 100;
 function RevisionsSlider() {
 	const {
 		revisions: rawRevisions,
-		isLoading,
 		currentRevisionId,
 		revisionKey,
 		revisionPage,
 		totalRevisions,
 	} = useSelect( ( select ) => {
-		const {
-			getCurrentPostId,
-			getCurrentPostType,
-			getCurrentPostRevisionsCount,
-		} = select( editorStore );
-		const { getRevisions, isResolving, getEntityConfig } =
-			select( coreStore );
-		const { getCurrentRevisionId, getRevisionPage } = unlock(
-			select( editorStore )
-		);
+		const { getCurrentRevisionId, getRevisionPage, getPageRevisions } =
+			unlock( select( editorStore ) );
 
-		const postId = getCurrentPostId();
-		const postType = getCurrentPostType();
-
-		if ( ! postId || ! postType ) {
+		const postType = select( editorStore ).getCurrentPostType();
+		if ( ! postType ) {
 			return {};
 		}
 
-		const entityConfig = getEntityConfig( 'postType', postType );
+		const entityConfig = select( coreStore ).getEntityConfig(
+			'postType',
+			postType
+		);
 		const _revisionKey = entityConfig?.revisionKey || 'id';
-		const _totalRevisions = getCurrentPostRevisionsCount();
 		const _revisionPage = getRevisionPage();
 
-		// Don't fetch until we have a page number.
-		if ( ! _revisionPage ) {
-			return {
-				isLoading: true,
-				totalRevisions: _totalRevisions,
-				revisionPage: _revisionPage,
-				revisionKey: _revisionKey,
-			};
-		}
-
-		const query = {
-			per_page: REVISIONS_PER_PAGE,
-			page: _revisionPage,
-			context: 'edit',
-			orderby: 'date',
-			order: 'desc',
-			_fields: [
-				...new Set( [
-					'id',
-					'date',
-					'modified',
-					'author',
-					'meta',
-					'title.raw',
-					'excerpt.raw',
-					'content.raw',
-					_revisionKey,
-				] ),
-			].join(),
-		};
 		return {
-			revisions: getRevisions( 'postType', postType, postId, query ),
-			isLoading: isResolving( 'getRevisions', [
-				'postType',
-				postType,
-				postId,
-				query,
-			] ),
+			revisions: getPageRevisions( _revisionPage ),
 			currentRevisionId: getCurrentRevisionId(),
 			revisionKey: _revisionKey,
 			revisionPage: _revisionPage,
-			totalRevisions: _totalRevisions,
+			totalRevisions:
+				select( editorStore ).getCurrentPostRevisionsCount(),
 		};
 	}, [] );
 
@@ -113,6 +69,7 @@ function RevisionsSlider() {
 	);
 
 	const totalPages = Math.ceil( totalRevisions / REVISIONS_PER_PAGE ) || 1;
+	const isLoading = !! revisionPage && ! rawRevisions;
 
 	// Reverse so the slider reads oldest (left) → newest (right).
 	const revisions = useMemo(
