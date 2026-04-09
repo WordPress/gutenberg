@@ -87,8 +87,8 @@
 	&.is-disabled {
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token.components-button {
-			background: $gray-100;
-			color: $gray-600;
+			background: $components-color-gray-100;
+			color: $components-color-gray-600;
 		}
 	}
 
