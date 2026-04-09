@@ -67,10 +67,18 @@ function Edit( {
 			// to be rendered in "creating" mode. We need to check isActive to see if
 			// we have an active link format.
 			const link = event.target.closest( '[contenteditable] a' );
-			if (
-				! link || // other formats (e.g. bold) may be nested within the link.
-				! isActive
-			) {
+			if ( ! link ) {
+				// other formats (e.g. bold) may be nested within the link.
+				return;
+			}
+
+			// Prevent the browser from following the link. Without this, anchor links
+			// (e.g. href="#section") cause the page to jump before the Link UI opens.
+			// This must happen before the isActive check because clicking the leftmost
+			// edge of a link can fire the click event while isActive is still false.
+			event.preventDefault();
+
+			if ( ! isActive ) {
 				return;
 			}
 
