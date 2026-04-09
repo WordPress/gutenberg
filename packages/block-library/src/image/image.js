@@ -313,7 +313,7 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const { image, canUserEdit } = useSelect(
+	const { image, canUserEdit, hasResolvedImage } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -324,6 +324,20 @@ export default function Image( {
 							{ context: 'view' }
 					  )
 					: null;
+
+			// Check if the attachment resolution has completed (not still loading).
+			const hasResolved =
+				id && isSingleSelected
+					? select( coreStore ).hasFinishedResolution(
+							'getEntityRecord',
+							[
+								'postType',
+								'attachment',
+								id,
+								{ context: 'view' },
+							]
+					  )
+					: false;
 
 			// Check edit permissions when the media editor experiment is enabled.
 			// Only check when imageRecord is available to avoid unnecessary API requests.
@@ -339,10 +353,25 @@ export default function Image( {
 			return {
 				image: imageRecord,
 				canUserEdit: canEdit,
+				hasResolvedImage: hasResolved,
 			};
 		},
 		[ id, isSingleSelected ]
 	);
+
+	// If the image has an id but the attachment doesn't exist on this site,
+	// clear the id so Gutenberg treats the image as external.
+	// This handles content copied between WordPress sites.
+	// See: https://github.com/WordPress/gutenberg/issues/74156
+	useEffect( () => {
+		if ( ! id || ! isSingleSelected || ! hasResolvedImage ) {
+			return;
+		}
+		// Resolution finished but no record found = attachment doesn't exist locally.
+		if ( ! image ) {
+			setAttributes( { id: undefined } );
+		}
+	}, [ id, isSingleSelected, hasResolvedImage, image, setAttributes ] );
 
 	const {
 		canInsertCover,
