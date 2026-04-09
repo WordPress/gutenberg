@@ -12,7 +12,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { DataViews } from '@wordpress/dataviews';
 import { dateI18n, getDate, humanTimeDiff, getSettings } from '@wordpress/date';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { authorField } from '@wordpress/fields';
 
@@ -26,10 +25,44 @@ import { unlock } from '../../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 const DAY_IN_MILLISECONDS = 86400000;
 const EMPTY_ARRAY = [];
-const POST_TYPES_USING_MODIFIED_DATE = [ 'wp_template', 'wp_template_part' ];
 const defaultLayouts = { activity: {} };
 const noop = () => {};
 const paginationInfo = {};
+const view = {
+	type: 'activity',
+	titleField: 'date',
+	fields: [ 'author' ],
+	layout: { density: 'compact' },
+};
+const fields = [
+	{
+		id: 'date',
+		label: __( 'Date' ),
+		render: ( { item, field } ) => {
+			const dateNowInMs = getDate( null ).getTime();
+			const _value = field.getValue( { item } );
+			const date = getDate( _value ?? null );
+			const displayDate =
+				dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
+					? dateI18n(
+							getSettings().formats.datetimeAbbreviated,
+							date
+					  )
+					: humanTimeDiff( date );
+			return (
+				<time
+					className="editor-post-revisions-panel__revision-date"
+					dateTime={ _value }
+				>
+					{ displayDate }
+				</time>
+			);
+		},
+		enableSorting: false,
+		enableHiding: false,
+	},
+	authorField,
+];
 
 function PostRevisionsPanelContent() {
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
@@ -39,7 +72,6 @@ function PostRevisionsPanelContent() {
 		revisionKey,
 		isLoading,
 		lastRevisionId,
-		dateField,
 	} = useSelect( ( select ) => {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const { getCurrentPostRevisionsCount, getCurrentPostLastRevisionId } =
@@ -49,14 +81,11 @@ function PostRevisionsPanelContent() {
 		const _postType = getCurrentPostType();
 		const entityConfig = getEntityConfig( 'postType', _postType );
 		const _revisionKey = entityConfig?.revisionKey || 'id';
-		const _dateField = POST_TYPES_USING_MODIFIED_DATE.includes( _postType )
-			? 'modified'
-			: 'date';
 		const revisionsQuery = {
 			per_page: 3,
 			orderby: 'date',
 			order: 'desc',
-			_fields: `${ _revisionKey },${ _dateField },author`,
+			_fields: `${ _revisionKey },date,author`,
 		};
 		const query = [
 			'postType',
@@ -70,51 +99,9 @@ function PostRevisionsPanelContent() {
 			lastRevisionId: getCurrentPostLastRevisionId(),
 			revisions: _revisions,
 			revisionKey: _revisionKey,
-			dateField: _dateField,
 			isLoading: isResolving( 'getRevisions', query ),
 		};
 	}, [] );
-	const view = useMemo(
-		() => ( {
-			type: 'activity',
-			titleField: dateField,
-			fields: [ 'author' ],
-			layout: { density: 'compact' },
-		} ),
-		[ dateField ]
-	);
-	const fields = useMemo(
-		() => [
-			{
-				id: dateField,
-				label: __( 'Date' ),
-				render: ( { item, field } ) => {
-					const dateNowInMs = getDate( null ).getTime();
-					const _value = field.getValue( { item } );
-					const date = getDate( _value ?? null );
-					const displayDate =
-						dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
-							? dateI18n(
-									getSettings().formats.datetimeAbbreviated,
-									date
-							  )
-							: humanTimeDiff( date );
-					return (
-						<time
-							className="editor-post-revisions-panel__revision-date"
-							dateTime={ _value }
-						>
-							{ displayDate }
-						</time>
-					);
-				},
-				enableSorting: false,
-				enableHiding: false,
-			},
-			authorField,
-		],
-		[ dateField ]
-	);
 	return (
 		<PanelBody
 			title={
