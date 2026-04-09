@@ -42,12 +42,27 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 				id: updatedLink.id,
 			};
 
-			// Only include title when there's no existing label
-			// This preserves user-customized labels when updating links
-			if ( ! attributes.label || attributes.label === '' ) {
+			const isSameEntityLink =
+				!! updatedLink.id &&
+				updatedLink.id === attributes.id &&
+				updatedLink.kind === attributes.kind &&
+				updatedLink.type === attributes.type;
+
+			const isSameCustomLink =
+				! updatedLink.id &&
+				! attributes.id &&
+				updatedLink.url === attributes.url &&
+				updatedLink.kind === attributes.kind &&
+				updatedLink.type === attributes.type;
+
+			if (
+				! attributes.label ||
+				attributes.label === '' ||
+				isSameEntityLink ||
+				isSameCustomLink
+			) {
 				attrs.title = updatedLink.title;
 			}
-
 			// Check if transitioning from entity to custom link
 			const willBeCustomLink = ! updatedLink.id && hasUrlBinding;
 
