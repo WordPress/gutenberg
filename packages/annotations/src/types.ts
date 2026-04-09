@@ -56,9 +56,7 @@ export interface AddAnnotationParameters {
 /**
  * Store state interface.
  */
-export interface AnnotationsState {
-	[ blockClientId: string ]: Annotation[];
-}
+export type AnnotationsState = Partial< Record< string, Annotation[] > >;
 
 /**
  * Action types.
