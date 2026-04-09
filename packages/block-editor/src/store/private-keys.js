@@ -4,4 +4,11 @@ export const selectBlockPatternsKey = Symbol( 'selectBlockPatternsKey' );
 export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
-export const essentialFormatKey = Symbol( 'essentialFormat' );
+export const getMediaSelectKey = Symbol( 'getMediaSelect' );
+export const isIsolatedEditorKey = Symbol( 'isIsolatedEditor' );
+export const deviceTypeKey = Symbol( 'deviceTypeKey' );
+export const isNavigationOverlayContextKey = Symbol(
+	'isNavigationOverlayContext'
+);
+export const isNavigationPostEditorKey = Symbol( 'isNavigationPostEditor' );
+export const mediaUploadOnSuccessKey = Symbol( 'mediaUploadOnSuccess' );

@@ -42,13 +42,10 @@
 		"query": {
 			"type": "object",
 			"default": {}
-		},
-		"isSearchFieldHidden": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "left", "center", "right" ],
 		"color": {
 			"gradients": true,

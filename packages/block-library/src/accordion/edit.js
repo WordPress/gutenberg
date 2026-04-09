@@ -48,7 +48,9 @@ export default function Edit( {
 } ) {
 	const registry = useRegistry();
 	const { getBlockOrder } = useSelect( blockEditorStore );
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		role: 'group',
+	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const { updateBlockAttributes, insertBlock } =
 		useDispatch( blockEditorStore );
@@ -56,7 +58,7 @@ export default function Edit( {
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		template: [ [ ACCORDION_BLOCK_NAME ], [ ACCORDION_BLOCK_NAME ] ],
+		template: [ [ ACCORDION_BLOCK_NAME ] ],
 		defaultBlock: ACCORDION_BLOCK,
 		directInsert: true,
 		templateInsertUpdatesSelection: true,
@@ -112,7 +114,7 @@ export default function Edit( {
 					</BlockControls>
 					<BlockControls group="other">
 						<ToolbarButton onClick={ addAccordionItemBlock }>
-							{ __( 'Add' ) }
+							{ __( 'Add item' ) }
 						</ToolbarButton>
 					</BlockControls>
 				</>
@@ -125,7 +127,6 @@ export default function Edit( {
 							autoclose: false,
 							showIcon: true,
 							iconPosition: 'right',
-							headingLevel: 3,
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -140,7 +141,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Auto-close' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -161,7 +161,6 @@ export default function Edit( {
 					>
 						<ToggleControl
 							isBlock
-							__nextHasNoMarginBottom
 							label={ __( 'Show icon' ) }
 							onChange={ ( value ) => {
 								setAttributes( {
@@ -187,7 +186,6 @@ export default function Edit( {
 							}
 						>
 							<ToggleGroupControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								isBlock
 								label={ __( 'Icon Position' ) }

@@ -14,18 +14,22 @@ export function sanitizeCommentString( str ) {
 }
 
 /**
- * These colors are picked from the WordPress.org design library.
- * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
+ * A no-operation function that does nothing.
+ */
+export function noop() {}
+
+/**
+ * Avatar border colors chosen to be visually distinct from each other and from
+ * the editor's semantic UI colors (Delta E > 10 between all pairs).
  */
 const AVATAR_BORDER_COLORS = [
-	'#3858E9', // Blueberry
-	'#9fB1FF', // Blueberry 2
-	'#1D35B4', // Dark Blueberry
-	'#1A1919', // Charcoal 0
-	'#E26F56', // Pomegranate
-	'#33F078', // Acid Green
-	'#FFF972', // Lemon
-	'#7A00DF', // Purple
+	'#C36EFF', // Purple
+	'#FF51A8', // Pink
+	'#E4780A', // Orange
+	'#FF35EE', // Magenta
+	'#879F11', // Olive
+	'#46A494', // Teal
+	'#00A2C3', // Cyan
 ];
 
 /**
@@ -85,4 +89,56 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 
 	const isTrimmed = trimmedExcerpt !== rawText;
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
+}
+
+/**
+ * Shift focus to the comment thread associated with a particular comment ID.
+ * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {string}       commentId          The ID of the comment thread to focus.
+ * @param {?HTMLElement} container          The container element to search within.
+ * @param {string}       additionalSelector The additional selector to focus on.
+ */
+export function focusCommentThread( commentId, container, additionalSelector ) {
+	if ( ! container ) {
+		return;
+	}
+
+	// A thread without a commentId is a new comment thread.
+	const threadSelector =
+		commentId && commentId !== 'new'
+			? `[role=treeitem][id="comment-thread-${ commentId }"]`
+			: '[role=treeitem]:not([id])';
+	const selector = additionalSelector
+		? `${ threadSelector } ${ additionalSelector }`
+		: threadSelector;
+
+	return new Promise( ( resolve ) => {
+		if ( container.querySelector( selector ) ) {
+			return resolve( container.querySelector( selector ) );
+		}
+
+		let timer = null;
+		// Wait for the element to be added to the DOM.
+		const observer = new window.MutationObserver( () => {
+			if ( container.querySelector( selector ) ) {
+				clearTimeout( timer );
+				observer.disconnect();
+				resolve( container.querySelector( selector ) );
+			}
+		} );
+
+		observer.observe( container, {
+			childList: true,
+			subtree: true,
+		} );
+
+		// Stop trying after 3 seconds.
+		timer = setTimeout( () => {
+			observer.disconnect();
+			resolve( null );
+		}, 3000 );
+	} ).then( ( element ) => element?.focus() );
 }

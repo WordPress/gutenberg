@@ -295,26 +295,116 @@ describe( 'postProcessConfig', () => {
 				},
 			} );
 		} );
+
+		it( 'should not append port to URLs when port is null', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				config: {
+					WP_TESTS_DOMAIN: 'localhost',
+					WP_SITEURL: 'http://localhost',
+					WP_HOME: 'http://localhost',
+				},
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			// Null ports should not be appended to URLs.
+			expect( processed.env.development.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+			expect( processed.env.tests.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+		} );
 	} );
 
 	describe( 'validatePortUniqueness', () => {
 		it( 'should fail when two environments have the same port', async () => {
-			const processed = postProcessConfig( {
-				env: {
-					development: {
-						port: 123,
+			await expect(
+				postProcessConfig( {
+					env: {
+						development: {
+							port: 123,
+						},
+						tests: {
+							port: 123,
+						},
 					},
-					tests: {
-						port: 123,
-					},
-				},
-			} );
-
-			await expect( processed ).rejects.toThrow(
+				} )
+			).rejects.toThrow(
 				new ValidationError(
 					'The "development" and "tests" environments may not have the same port.'
 				)
 			);
+		} );
+
+		it( 'should skip port validation for disabled tests environment', async () => {
+			await expect(
+				postProcessConfig( {
+					testsEnvironment: false,
+					port: 123,
+					env: {
+						development: {},
+						tests: {},
+					},
+				} )
+			).resolves.toBeDefined();
+		} );
+
+		it( 'should not fail when both environments have null ports', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			expect( processed.env.development.port ).toEqual( null );
+			expect( processed.env.tests.port ).toEqual( null );
+		} );
+	} );
+
+	describe( 'testsEnvironment', () => {
+		it( 'should ignore env overrides entirely when testsEnvironment is false', async () => {
+			const processed = await postProcessConfig( {
+				testsEnvironment: false,
+				port: 123,
+				testsPort: 456,
+				coreSource: {
+					type: 'test',
+				},
+				config: {
+					TESTS_ROOT: 'root',
+				},
+				pluginSources: [
+					{
+						type: 'root-plugin',
+					},
+				],
+				env: {
+					development: {
+						config: {
+							TEST_ENV: 'development',
+						},
+					},
+					tests: {},
+				},
+			} );
+
+			// Development should get root options but NOT env overrides.
+			expect( processed.env.development.port ).toEqual( 123 );
+			expect( processed.env.development.config.TESTS_ROOT ).toEqual(
+				'root'
+			);
+			expect( processed.env.development.config.TEST_ENV ).toBeUndefined();
+
+			// Tests should not get root options merged.
+			expect( processed.env.tests ).toEqual( {} );
 		} );
 	} );
 

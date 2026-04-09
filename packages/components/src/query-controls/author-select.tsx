@@ -30,7 +30,6 @@ export default function AuthorSelect( {
 					? String( selectedAuthorId )
 					: undefined
 			}
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize={ __next40pxDefaultSize }
 		/>
 	);

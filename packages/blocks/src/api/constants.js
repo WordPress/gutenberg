@@ -56,6 +56,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'backgroundPosition' ],
 		useEngine: true,
 	},
+	backgroundGradient: {
+		value: [ 'background', 'gradient' ],
+		support: [ 'background', 'gradient' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],
@@ -222,6 +227,16 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'minHeight' ],
 		useEngine: true,
 	},
+	height: {
+		value: [ 'dimensions', 'height' ],
+		support: [ 'dimensions', 'height' ],
+		useEngine: true,
+	},
+	width: {
+		value: [ 'dimensions', 'width' ],
+		support: [ 'dimensions', 'width' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -251,6 +266,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	letterSpacing: {
 		value: [ 'typography', 'letterSpacing' ],
 		support: [ 'typography', '__experimentalLetterSpacing' ],
+		useEngine: true,
+	},
+	textIndent: {
+		value: [ 'typography', 'textIndent' ],
+		support: [ 'typography', 'textIndent' ],
 		useEngine: true,
 	},
 	writingMode: {

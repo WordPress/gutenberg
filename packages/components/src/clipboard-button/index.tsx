@@ -32,7 +32,7 @@ export default function ClipboardButton( {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	const timeoutIdRef = useRef< NodeJS.Timeout >();
+	const timeoutIdRef = useRef< NodeJS.Timeout >( undefined );
 	const ref = useCopyToClipboard( text, () => {
 		onCopy();
 		if ( timeoutIdRef.current ) {
@@ -65,6 +65,8 @@ export default function ClipboardButton( {
 	};
 
 	return (
+		// Disable reasons: the parent component takes care of the __next40pxDefaultSize prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button
 			{ ...buttonProps }
 			className={ classes }

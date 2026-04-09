@@ -209,7 +209,7 @@ function useResourcePermissions< IdType = void >(
 
 export default useResourcePermissions;
 
-export function __experimentalUseResourcePermissions(
+export function useDeprecatedResourcePermissions(
 	resource: string,
 	id?: unknown
 ) {

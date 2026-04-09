@@ -6,10 +6,20 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Site editor url navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		// Document-Isolation-Policy places the editor in its own agent cluster.
+		// Template creation triggers URL/page navigation to pages without the
+		// DIP header, creating an agent cluster mismatch that breaks
+		// cross-window communication.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
@@ -34,17 +44,17 @@ test.describe( 'Site editor url navigation', () => {
 		await admin.visitSiteEditor();
 		await page.click( 'role=button[name="Templates"]' );
 		await page.click( 'role=button[name="Add Template"i]' );
-		await page
-			.getByRole( 'button', {
-				name: 'Single item: Post',
-			} )
-			.click();
+		const singleItemPost = page.getByRole( 'button', {
+			name: 'Single item: Post',
+		} );
+		await expect( singleItemPost ).toBeEnabled();
+		await singleItemPost.click();
 		await page
 			.getByRole( 'button', { name: 'For a specific item' } )
 			.click();
 		await page.getByRole( 'option', { name: 'Demo' } ).click();
 		await expect( page ).toHaveURL(
-			/wp-admin\/site-editor\.php\?p=%2Fwp_template%2F\d+&canvas=edit/
+			'/wp-admin/site-editor.php?p=%2Fwp_template%2Femptytheme%2F%2Fsingle-post-demo&canvas=edit'
 		);
 	} );
 
@@ -79,7 +89,7 @@ test.describe( 'Site editor url navigation', () => {
 		await navigation.getByRole( 'button', { name: 'General' } ).click();
 		await page
 			.getByRole( 'region', {
-				name: 'Patterns content',
+				name: 'General',
 			} )
 			.getByText( 'header', { exact: true } )
 			.click();

@@ -15,6 +15,16 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 		return $tags;
 	}
 
+	public function replace_backslash( $input ) {
+		return preg_replace_callback(
+			'/<!-- wp:([^ ]+) ({.*?}) -->/',
+			function ( $matches ) {
+				$json = str_replace( '\\u005c', '\\\\', $matches[2] );
+				return "<!-- wp:{$matches[1]} {$json} -->";
+			},
+			$input
+		);
+	}
 	/**
 	 * Tests that running the serialised block content through KSES doesn't cause the
 	 * HTML to change.
@@ -37,6 +47,11 @@ class Block_Fixture_Test extends WP_UnitTestCase {
 
 		// KSES adds a space at the end of self-closing tags, add it to the original to match.
 		$block = preg_replace( '|([^ ])/>|', '$1 />', $block );
+
+		// KSES replaces \u005c with \\ in block comment delimiters. For some
+		// reason this if only applied to $block, though it passes locally.
+		$block      = $this->replace_backslash( $block );
+		$kses_block = $this->replace_backslash( $kses_block );
 
 		// KSES removes the last semi-colon from style attributes, remove it from the original to match.
 		$block = preg_replace( '/style="([^"]*);"/', 'style="$1"', $block );

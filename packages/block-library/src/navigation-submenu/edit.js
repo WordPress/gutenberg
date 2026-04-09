@@ -13,10 +13,11 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	useInnerBlocksProps,
 	InspectorControls,
+	useInnerBlocksProps,
 	RichText,
 	useBlockProps,
+	useBlockEditingMode,
 	store as blockEditorStore,
 	getColorClassName,
 } from '@wordpress/block-editor';
@@ -31,9 +32,17 @@ import { useMergeRefs, usePrevious } from '@wordpress/compose';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
-import { LinkUI } from '../navigation-link/link-ui';
-import { Controls, updateAttributes } from '../navigation-link/shared';
-
+import {
+	Controls,
+	LinkUI,
+	updateAttributes,
+	useEntityBinding,
+	useIsInvalidLink,
+	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
+	useIsDraggingWithin,
+	selectLabelText,
+} from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
@@ -45,57 +54,6 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-submenu',
 	'core/page-list',
 ];
-
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
-
-	return isDraggingWithin;
-};
 
 /**
  * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
@@ -124,18 +82,30 @@ export default function NavigationSubmenuEdit( {
 	context,
 	clientId,
 } ) {
-	const { label, url, description } = attributes;
+	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel, openSubmenusOnClick } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
+	const blockEditingMode = useBlockEditingMode();
 
+	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
+	const openSubmenusOnClick =
+		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
+
+	// URL binding logic
 	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceBlock,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+		clearBinding,
+		createBinding,
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		entityRecord,
+	} = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	// Store what element opened the popover, so we know where to return focus to (toolbar button vs navigation link text)
-	const [ openedBy, setOpenedBy ] = useState( null );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -200,7 +170,17 @@ export default function NavigationSubmenuEdit( {
 		[ clientId ]
 	);
 
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
+
 	const prevHasChildren = usePrevious( hasChildren );
+
+	// Check if the submenu's parent link is invalid or draft
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		kind,
+		type,
+		id,
+		validateLinkStatus
+	);
 
 	// Show the LinkControl on mount if the URL is empty
 	// ( When adding a new menu item)
@@ -231,25 +211,10 @@ export default function NavigationSubmenuEdit( {
 				/^.+\.[a-z]+/.test( label )
 			) {
 				// Focus and select the label text.
-				selectLabelText();
+				selectLabelText( ref );
 			}
 		}
 	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	const {
 		textColor,
@@ -267,7 +232,6 @@ export default function NavigationSubmenuEdit( {
 			// If we don't stop propagation, this event bubbles up to the parent submenu item
 			event.stopPropagation();
 			setIsLinkOpen( true );
-			setOpenedBy( ref.current );
 		}
 	}
 
@@ -284,6 +248,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
+			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
@@ -354,9 +319,8 @@ export default function NavigationSubmenuEdit( {
 							icon={ linkIcon }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ ( event ) => {
+							onClick={ () => {
 								setIsLinkOpen( true );
-								setOpenedBy( event.currentTarget );
 							} }
 						/>
 					) }
@@ -371,53 +335,63 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
+					clientId={ clientId }
+					isLinkEditable={ ! openSubmenusOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<ParentElement className="wp-block-navigation-item__content">
-					{ /* eslint-enable */ }
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-item__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						withoutInteractiveFormatting
-						onClick={ () => {
-							if ( ! openSubmenusOnClick && ! url ) {
-								setIsLinkOpen( true );
-								setOpenedBy( ref.current );
-							}
-						} }
-					/>
-					{ description && (
-						<span className="wp-block-navigation-item__description">
-							{ description }
-						</span>
+					{ ! isInvalid && ! isDraft && (
+						<>
+							<RichText
+								ref={ ref }
+								identifier="label"
+								className="wp-block-navigation-item__label"
+								value={ label }
+								onChange={ ( labelValue ) =>
+									setAttributes( { label: labelValue } )
+								}
+								onMerge={ mergeBlocks }
+								onReplace={ onReplace }
+								aria-label={ __( 'Navigation link text' ) }
+								placeholder={ itemLabelPlaceholder }
+								withoutInteractiveFormatting
+								onClick={ () => {
+									if ( ! openSubmenusOnClick && ! url ) {
+										setIsLinkOpen( true );
+									}
+								} }
+							/>
+							{ description && (
+								<span className="wp-block-navigation-item__description">
+									{ description }
+								</span>
+							) }
+						</>
+					) }
+					{ ( isInvalid || isDraft ) && (
+						<InvalidDraftDisplay
+							label={ label }
+							isInvalid={ isInvalid }
+							isDraft={ isDraft }
+							className="wp-block-navigation-item__label"
+						/>
 					) }
 					{ ! openSubmenusOnClick && isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
-								if ( openedBy ) {
-									openedBy.focus();
-									setOpenedBy( null );
-								} else {
-									selectBlock( clientId );
-								}
 							} }
 							anchor={ popoverAnchor }
 							onRemove={ () => {
@@ -425,11 +399,24 @@ export default function NavigationSubmenuEdit( {
 								speak( __( 'Link removed.' ), 'assertive' );
 							} }
 							onChange={ ( updatedValue ) => {
-								updateAttributes(
+								// updateAttributes determines the final state and returns metadata
+								const {
+									isEntityLink,
+									attributes: updatedAttributes,
+								} = updateAttributes(
 									updatedValue,
 									setAttributes,
 									attributes
 								);
+
+								// Handle URL binding based on the final computed state
+								// Only create bindings for entity links (posts, pages, taxonomies)
+								// Never create bindings for custom links (manual URLs)
+								if ( isEntityLink ) {
+									createBinding( updatedAttributes );
+								} else {
+									clearBinding();
+								}
 							} }
 						/>
 					) }

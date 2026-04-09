@@ -109,8 +109,8 @@ You would have something like this as the conversionMap value:
 
 _Parameters_
 
--   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record< string, ReactElement >`: The map used to convert the string to a react element.
+-   _interpolatedString_ `Input`: The interpolation string to be parsed.
+-   _conversionMap_ `ConversionMap< InterpolationString< Input > >`: The map used to convert the string to a react element.
 
 _Returns_
 
@@ -126,7 +126,7 @@ _Related_
 
 _Parameters_
 
--   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 ### createRef
@@ -155,7 +155,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `import('react').ComponentType`: Component's instance.
+-   _component_ `React.ComponentType`: Component's instance.
 
 ### flushSync
 
@@ -294,7 +294,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Dangerously-rendering component.
+-   Dangerously-rendering component.
 
 ### render
 

@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { timeToRead, wordCount } from '@wordpress/icons';
 
 const variations = [
 	{
@@ -19,7 +15,7 @@ const variations = [
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'time',
-		icon,
+		icon: timeToRead,
 		isDefault: true,
 	},
 	{
@@ -32,7 +28,7 @@ const variations = [
 		scope: [ 'inserter', 'transform' ],
 		isActive: ( blockAttributes ) =>
 			blockAttributes?.displayMode === 'words',
-		icon,
+		icon: wordCount,
 	},
 ];
 

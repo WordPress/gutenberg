@@ -1,4 +1,16 @@
 /**
+ * Check if the current theme data has been loaded from the REST API.
+ *
+ * @param {Object} siteData - The site data provided by the site editor route area resolvers.
+ * @return {boolean} True if the theme data is available, false otherwise.
+ */
+export function isThemeDataLoaded( siteData ) {
+	return (
+		siteData.currentTheme !== undefined && siteData.currentTheme !== null
+	);
+}
+
+/**
  * Check if the classic theme supports the stylebook.
  *
  * @param {Object} siteData - The site data provided by the site editor route area resolvers.

@@ -4,11 +4,11 @@
 	"name": "core/accordion-item",
 	"title": "Accordion Item",
 	"category": "design",
-	"description": "Displays a section of content in an accordion, including a heading and expandable content.",
-	"__experimental": true,
+	"description": "Wraps the heading and panel in one unit.",
 	"parent": [ "core/accordion" ],
 	"allowedBlocks": [ "core/accordion-heading", "core/accordion-panel" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
@@ -31,7 +31,9 @@
 			}
 		},
 		"shadow": true,
-		"layout": true,
+		"layout": {
+			"allowEditing": false
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -44,13 +46,17 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
-		}
+		},
+		"contentRole": true
 	},
 	"attributes": {
 		"openByDefault": {
 			"type": "boolean",
 			"default": false
 		}
+	},
+	"providesContext": {
+		"core/accordion-open-by-default": "openByDefault"
 	},
 	"textdomain": "default",
 	"style": "wp-block-accordion-item"

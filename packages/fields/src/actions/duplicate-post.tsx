@@ -6,25 +6,32 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
-import { titleField } from '../fields';
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
-const fields = [ titleField ];
-const formDuplicateAction = {
-	fields: [ 'title' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+}
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
@@ -55,9 +62,7 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
-			const isTemplate =
-				item.type === 'wp_template' ||
-				item.type === 'wp_registered_template';
+			const isTemplate = item.type === 'wp_template';
 
 			const newItemObject = {
 				status: isTemplate ? 'publish' : 'draft',
@@ -101,9 +106,7 @@ const duplicatePost: Action< BasePost > = {
 			try {
 				const newItem = await saveEntityRecord(
 					'postType',
-					item.type === 'wp_registered_template'
-						? 'wp_template'
-						: item.type,
+					item.type,
 					newItemObject,
 					{ throwOnError: true }
 				);
@@ -142,14 +145,22 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
-					<DataForm
-						data={ item }
-						fields={ fields }
-						form={ formDuplicateAction }
-						onChange={ ( changes ) =>
+					{ typeof item.id === 'string' && (
+						<div>
+							{ __(
+								'You are about to duplicate a bundled template. Changes will not be live until you activate the new template.'
+							) }
+						</div>
+					) }
+					<InputControl
+						__next40pxDefaultSize
+						label={ __( 'Title' ) }
+						placeholder={ __( 'No title' ) }
+						value={ getItemTitle( item ) }
+						onChange={ ( value ) =>
 							setItem( ( prev ) => ( {
 								...prev,
-								...changes,
+								title: value || __( 'No title' ),
 							} ) )
 						}
 					/>

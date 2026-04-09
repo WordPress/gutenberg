@@ -74,7 +74,10 @@ export function getInlineStyles( styles = {} ) {
  * @return {Object} Filtered block settings.
  */
 function addAttribute( settings ) {
-	if ( ! hasStyleSupport( settings ) ) {
+	if (
+		! hasStyleSupport( settings ) &&
+		! hasBlockSupport( settings, 'customCSS', true )
+	) {
 		return settings;
 	}
 

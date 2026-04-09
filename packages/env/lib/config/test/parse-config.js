@@ -24,7 +24,9 @@ const DEFAULT_CONFIG = {
 	testsHttpsPort: 8443,
 	port: 8888,
 	testsPort: 8889,
+	autoPort: false,
 	mysqlPort: null,
+	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
 	phpVersion: null,
@@ -55,6 +57,8 @@ const DEFAULT_CONFIG = {
 	lifecycleScripts: {
 		afterStart: null,
 		afterClean: null,
+		afterReset: null,
+		afterCleanup: null,
 		afterDestroy: null,
 	},
 	env: {
@@ -190,6 +194,19 @@ describe( 'parseConfig', () => {
 			},
 		};
 		expect( parsed ).toEqual( expected );
+	} );
+
+	it( 'should accept autoPort as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: true,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.autoPort ).toEqual( true );
 	} );
 
 	it( 'should parse core, plugin, theme, and mapping sources', async () => {
@@ -377,6 +394,24 @@ describe( 'parseConfig', () => {
 		);
 	} );
 
+	it( 'throws for non-boolean autoPort', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					autoPort: 'true',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "autoPort" must be a boolean.`
+			)
+		);
+	} );
+
 	it( 'throws for root-only config options', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
@@ -406,7 +441,75 @@ describe( 'parseConfig', () => {
 		);
 	} );
 
+	it( 'throws when port is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					port: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "port" must be an integer.`
+			)
+		);
+	} );
+
+	it( 'throws when testsPort is null', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsPort: null,
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsPort" must be an integer.`
+			)
+		);
+	} );
+
 	it( 'should parse phpmyadmin configuration for a given environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					env: {
+						development: {
+							phpmyadmin: true,
+							phpmyadminPort: 9001,
+						},
+					},
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: {
+				...DEFAULT_CONFIG.env.development,
+				phpmyadmin: true,
+				phpmyadminPort: 9001,
+			},
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should infer phpmyadmin: true when phpmyadminPort is set', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
 				return {
@@ -429,6 +532,7 @@ describe( 'parseConfig', () => {
 		const expected = {
 			development: {
 				...DEFAULT_CONFIG.env.development,
+				phpmyadmin: true,
 				phpmyadminPort: 9001,
 			},
 			tests: DEFAULT_CONFIG.env.tests,
@@ -457,5 +561,36 @@ describe( 'parseConfig', () => {
 			tests: DEFAULT_CONFIG.env.tests,
 		};
 		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should accept testsEnvironment as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: false,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.testsEnvironment ).toEqual( false );
+	} );
+
+	it( 'throws for non-boolean testsEnvironment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: 'false',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsEnvironment" must be a boolean.`
+			)
+		);
 	} );
 } );

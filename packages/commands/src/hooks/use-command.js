@@ -23,6 +23,7 @@ import { store as commandsStore } from '../store';
  *     name: 'myplugin/my-command-name',
  *     label: __( 'Add new post' ),
  *	   icon: plus,
+ *     category: 'command',
  *     callback: ({ close }) => {
  *         document.location.href = 'post-new.php';
  *         close();
@@ -44,6 +45,7 @@ export function useCommand( command ) {
 		registerCommand( {
 			name: command.name,
 			context: command.context,
+			category: command.category,
 			label: command.label,
 			searchLabel: command.searchLabel,
 			icon: command.icon,
@@ -59,6 +61,7 @@ export function useCommand( command ) {
 		command.searchLabel,
 		command.icon,
 		command.context,
+		command.category,
 		command.keywords,
 		command.disabled,
 		registerCommand,
@@ -74,13 +77,14 @@ export function useCommand( command ) {
  * @example
  * ```js
  * import { useCommands } from '@wordpress/commands';
- * import { plus, edit } from '@wordpress/icons';
+ * import { plus, pencil } from '@wordpress/icons';
  *
  * useCommands( [
  *     {
  *         name: 'myplugin/add-post',
  *         label: __( 'Add new post' ),
  *         icon: plus,
+ *         category: 'command',
  *         callback: ({ close }) => {
  *             document.location.href = 'post-new.php';
  *             close();
@@ -89,7 +93,8 @@ export function useCommand( command ) {
  *     {
  *         name: 'myplugin/edit-posts',
  *         label: __( 'Edit posts' ),
- *         icon: edit,
+ *         icon: pencil,
+ *         category: 'view',
  *         callback: ({ close }) => {
  *             document.location.href = 'edit.php';
  *             close();
@@ -124,6 +129,7 @@ export function useCommands( commands ) {
 			registerCommand( {
 				name: command.name,
 				context: command.context,
+				category: command.category,
 				label: command.label,
 				searchLabel: command.searchLabel,
 				icon: command.icon,

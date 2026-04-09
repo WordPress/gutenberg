@@ -9,27 +9,21 @@ import { forwardRef, useId, useRef } from '@wordpress/element';
 import { ControlWithError } from '../control-with-error';
 import type { ValidatedControlProps } from './types';
 import { ToggleGroupControl } from '../../toggle-group-control';
-import type { ToggleGroupControlProps } from '../../toggle-group-control/types';
-
-type Value = ToggleGroupControlProps[ 'value' ];
 
 const UnforwardedValidatedToggleGroupControl = (
 	{
 		required,
-		onValidate,
 		customValidity,
-		onChange,
 		markWhenOptional,
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof ToggleGroupControl >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+		'__next40pxDefaultSize'
 	> &
-		ValidatedControlProps< Value >,
+		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
-	const valueRef = useRef< Value >( restProps.value );
 
 	const nameAttr = useId();
 
@@ -38,20 +32,12 @@ const UnforwardedValidatedToggleGroupControl = (
 			<ControlWithError
 				required={ required }
 				markWhenOptional={ markWhenOptional }
-				onValidate={ () => {
-					return onValidate?.( valueRef.current );
-				} }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
 			>
 				<ToggleGroupControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					ref={ forwardedRef }
-					onChange={ ( value ) => {
-						valueRef.current = value;
-						onChange?.( value );
-					} }
 					{ ...restProps }
 				/>
 			</ControlWithError>
@@ -80,3 +66,4 @@ const UnforwardedValidatedToggleGroupControl = (
 export const ValidatedToggleGroupControl = forwardRef(
 	UnforwardedValidatedToggleGroupControl
 );
+ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';

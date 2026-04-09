@@ -6,6 +6,13 @@ import { toTree } from './to-tree';
 import { createElement } from './create-element';
 import { isRangeEqual } from './is-range-equal';
 
+/**
+ * MathML namespace URI.
+ *
+ * @see https://www.w3.org/1998/Math/MathML/
+ */
+const MATHML_NAMESPACE = 'http://www.w3.org/1998/Math/MathML';
+
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
 /**
@@ -73,7 +80,30 @@ function append( element, child ) {
 				attributes[ 'data-rich-text-comment' ]
 			);
 		} else {
-			child = element.ownerDocument.createElement( type );
+			// Handle namespace-aware element creation
+			const parentNamespace = element.namespaceURI;
+
+			if ( type === 'math' ) {
+				// Root math element always uses MathML namespace
+				child = element.ownerDocument.createElementNS(
+					MATHML_NAMESPACE,
+					type
+				);
+			} else if ( parentNamespace === MATHML_NAMESPACE ) {
+				if ( element.tagName === 'MTEXT' ) {
+					// mtext switches back to HTML namespace for phrasing content
+					child = element.ownerDocument.createElement( type );
+				} else {
+					// All other elements in MathML context use MathML namespace
+					child = element.ownerDocument.createElementNS(
+						MATHML_NAMESPACE,
+						type
+					);
+				}
+			} else {
+				// Default HTML element creation
+				child = element.ownerDocument.createElement( type );
+			}
 
 			for ( const key in attributes ) {
 				child.setAttribute( key, attributes[ key ] );

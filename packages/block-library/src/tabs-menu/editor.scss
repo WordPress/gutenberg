@@ -1,0 +1,10 @@
+.wp-block-tabs-menu {
+	// Allow the inner block list to be displayed in the flex layout, so the tab buttons appear as direct flex children in the editor.
+	> .block-editor-block-list__layout {
+		display: contents;
+	}
+
+	.block-editor-block-list__block:has(> .wp-block-tabs-menu-item) {
+		display: contents;
+	}
+}

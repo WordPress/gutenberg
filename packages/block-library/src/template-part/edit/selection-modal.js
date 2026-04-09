@@ -75,7 +75,6 @@ export default function TemplatePartSelectionModal( {
 		<div className="block-library-template-part__selection-content">
 			<div className="block-library-template-part__selection-search">
 				<SearchControl
-					__nextHasNoMarginBottom
 					onChange={ setSearchValue }
 					value={ searchValue }
 					label={ __( 'Search' ) }

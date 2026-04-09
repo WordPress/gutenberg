@@ -78,7 +78,6 @@ If everything went well, you should see the following message in your terminal:
 
 ```bash
 WordPress development site started at http://localhost:8888/
-WordPress test site started at http://localhost:8889/
 MySQL is listening on port 51220
 
  ✔ Done! (in 261s 898ms)

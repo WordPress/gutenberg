@@ -13,18 +13,8 @@ export function createLogger() {
 	 * @return {Function} Augmented logger function.
 	 */
 	function createLogHandler( logger ) {
-		let log = ( message, ...args ) =>
+		return ( message, ...args ) =>
 			logger( 'Block validation: ' + message, ...args );
-
-		// In test environments, pre-process string substitutions to improve
-		// readability of error messages. We'd prefer to avoid pulling in this
-		// dependency in runtime environments, and it can be dropped by a combo
-		// of Webpack env substitution + UglifyJS dead code elimination.
-		if ( process.env.NODE_ENV === 'test' ) {
-			log = ( ...args ) => logger( require( 'util' ).format( ...args ) );
-		}
-
-		return log;
 	}
 
 	return {

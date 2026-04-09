@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;

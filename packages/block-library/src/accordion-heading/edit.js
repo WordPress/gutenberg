@@ -7,7 +7,11 @@ import {
 	useBlockProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	RichText,
+	getTypographyClassesAndStyles as useTypographyProps,
+	useSettings,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes, context } ) {
 	const { title } = attributes;
@@ -17,16 +21,37 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		'core/accordion-heading-level': headingLevel,
 	} = context;
 	const TagName = 'h' + headingLevel;
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Set icon attributes.
 	useEffect( () => {
 		if ( iconPosition !== undefined && showIcon !== undefined ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				iconPosition,
 				showIcon,
 			} );
 		}
-	}, [ iconPosition, showIcon, setAttributes ] );
+	}, [
+		iconPosition,
+		showIcon,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
+
+	const [ fluidTypographySettings, layout ] = useSettings(
+		'typography.fluid',
+		'layout'
+	);
+	const typographyProps = useTypographyProps( attributes, {
+		typography: {
+			fluid: fluidTypographySettings,
+		},
+		layout: {
+			wideSize: layout?.wideSize,
+		},
+	} );
 
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
@@ -36,6 +61,7 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			<button
 				className="wp-block-accordion-heading__toggle"
 				style={ spacingProps.style }
+				tabIndex="-1"
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
@@ -55,6 +81,10 @@ export default function Edit( { attributes, setAttributes, context } ) {
 					}
 					placeholder={ __( 'Accordion title' ) }
 					className="wp-block-accordion-heading__toggle-title"
+					style={ {
+						letterSpacing: typographyProps.style.letterSpacing,
+						textDecoration: typographyProps.style.textDecoration,
+					} }
 				/>
 				{ showIcon && iconPosition === 'right' && (
 					<span

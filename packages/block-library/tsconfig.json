@@ -27,10 +27,12 @@
 		{ "path": "../icons" },
 		{ "path": "../interactivity" },
 		{ "path": "../interactivity-router" },
+		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../rich-text" },
+		{ "path": "../upload-media" },
 		{ "path": "../url" },
 		{ "path": "../wordcount" }
 	],

@@ -4,10 +4,11 @@
 	"name": "core/accordion-panel",
 	"title": "Accordion Panel",
 	"category": "design",
-	"description": "Displays an accordion panel.",
-	"__experimental": true,
+	"description": "Contains the hidden or revealed content beneath the heading.",
 	"parent": [ "core/accordion-item" ],
+	"usesContext": [ "core/accordion-open-by-default" ],
 	"supports": {
+		"html": false,
 		"color": {
 			"background": true,
 			"gradients": true
@@ -47,24 +48,18 @@
 			}
 		},
 		"shadow": true,
-		"layout": true,
-		"blockVisibility": false
+		"layout": {
+			"allowEditing": false
+		},
+		"visibility": false,
+		"contentRole": true,
+		"allowedBlocks": true,
+		"lock": false
 	},
 	"attributes": {
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ],
-			"default": false
-		},
-		"openByDefault": {
-			"type": "boolean",
-			"default": false
-		},
-		"isSelected": {
-			"type": "boolean",
 			"default": false
 		}
 	},

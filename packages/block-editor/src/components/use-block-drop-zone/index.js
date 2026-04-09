@@ -415,11 +415,7 @@ export default function useBlockDropZone( {
 					// Filter out blocks that are hidden
 					.filter( ( block ) => {
 						return ! (
-							hasBlockSupport(
-								block.name,
-								'blockVisibility',
-								true
-							) &&
+							hasBlockSupport( block.name, 'visibility', true ) &&
 							block.attributes?.metadata?.blockVisibility ===
 								false
 						);

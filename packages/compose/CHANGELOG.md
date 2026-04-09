@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+## 7.43.0 (2026-04-01)
+
+### Bug Fixes
+
+-   `useDialog`: Add `event.stopPropagation()` to the Escape key handler to prevent the event from bubbling to parent overlays ([#76861](https://github.com/WordPress/gutenberg/pull/76861)).
+
+## 7.42.0 (2026-03-18)
+
+### New Features
+
+-   Hooks `useMediaQuery` and `useViewportMatch` accept a new optional `view` argument of type `Window`, which enables consumers to perform media queries in a window other than the global one (e.g. an iframe) ([#76446](https://github.com/WordPress/gutenberg/pull/76446)).
+
+## 7.41.0 (2026-03-04)
+
+## 7.40.0 (2026-02-18)
+
+## 7.39.0 (2026-01-29)
+
+## 7.38.0 (2026-01-16)
+
+## 7.36.0 (2025-11-26)
+
+### New Features
+
+-   `useFocusOnMount`: Now the hook supports `firstInputElement` option which when enabled focuses the first input element and not the first tabbable element (as happens on default mode) ([#72322](https://github.com/WordPress/gutenberg/pull/72322)).
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
 ## 7.32.0 (2025-10-01)
 
 ## 7.31.0 (2025-09-17)

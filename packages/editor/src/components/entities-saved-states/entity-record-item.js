@@ -55,7 +55,6 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 		<>
 			<PanelRow>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={
 						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
 					}

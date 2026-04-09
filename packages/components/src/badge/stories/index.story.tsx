@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -13,6 +13,13 @@ const meta: Meta< typeof Badge > = {
 	title: 'Components/Containers/Badge',
 	id: 'components-badge',
 	tags: [ 'status-private' ],
+	parameters: {
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Badge` in `@wordpress/ui`, but continue using for now.',
+		},
+	},
 };
 
 export default meta;
