@@ -3,7 +3,7 @@
  */
 import {
 	createBlock,
-	getBlockType,
+	getBlockVariations,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 
@@ -14,10 +14,9 @@ const transforms = {
 			regExp: /^-{3,}$/,
 			transform: () => {
 				// Check for default variation to preserve attributes.
-				const blockType = getBlockType( 'core/separator' );
-				const defaultVariation = blockType?.variations?.find(
-					( variation ) => variation.isDefault
-				);
+				const defaultVariation = getBlockVariations(
+					'core/separator'
+				)?.find( ( variation ) => variation.isDefault );
 
 				// Fall back to empty attributes if no default variation is found.
 				const attributes = defaultVariation
