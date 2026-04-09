@@ -74,8 +74,11 @@ export interface TitleProps extends ComponentProps< 'h2' > {
 	/**
 	 * The title content to be rendered. This serves as both the visible
 	 * heading and the accessible label for the dialog.
+	 *
+	 * When `Dialog.Title` is passed as a render element (e.g. to
+	 * `VisuallyHidden`), children can be provided by the wrapper instead.
 	 */
-	children: ReactNode;
+	children?: ReactNode;
 }
 
 export interface CloseIconProps
