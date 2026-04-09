@@ -161,11 +161,13 @@ function RevisionsSlider() {
 		return dateI18n( dateSettings.formats.datetime, revision.date );
 	};
 
-	if ( isLoading ) {
+	const showPagination = totalPages > 1;
+
+	if ( isLoading && ! showPagination ) {
 		return <Spinner />;
 	}
 
-	if ( ! revisions?.length ) {
+	if ( ! isLoading && ! revisions?.length ) {
 		return (
 			<span className="editor-revisions-header__no-revisions">
 				{ __( 'No revisions found.' ) }
@@ -181,8 +183,6 @@ function RevisionsSlider() {
 		);
 	}
 
-	const showPagination = totalPages > 1;
-
 	// Compute the 1-based revision range for a given page.
 	// Page 1 = newest, so page 1 of 1000 → "901–1000".
 	const getPageRangeLabel = ( page ) => {
@@ -196,7 +196,9 @@ function RevisionsSlider() {
 		);
 	};
 
-	const slider = (
+	const sliderOrSpinner = isLoading ? (
+		<Spinner />
+	) : (
 		<RangeControl
 			__next40pxDefaultSize
 			aria-valuetext={ renderTooltipContent( selectedIndex ) }
@@ -214,7 +216,7 @@ function RevisionsSlider() {
 	);
 
 	if ( ! showPagination ) {
-		return slider;
+		return sliderOrSpinner;
 	}
 
 	return (
@@ -227,11 +229,11 @@ function RevisionsSlider() {
 						: __( 'Older revisions' )
 				}
 				onClick={ () => handlePageChange( revisionPage + 1 ) }
-				disabled={ revisionPage >= totalPages }
+				disabled={ isLoading || revisionPage >= totalPages }
 				size="compact"
 				accessibleWhenDisabled
 			/>
-			<div style={ { flex: 1, minWidth: 0 } }>{ slider }</div>
+			<div style={ { flex: 1, minWidth: 0 } }>{ sliderOrSpinner }</div>
 			<Button
 				icon={ chevronRight }
 				label={
@@ -240,7 +242,7 @@ function RevisionsSlider() {
 						: __( 'Newer revisions' )
 				}
 				onClick={ () => handlePageChange( revisionPage - 1 ) }
-				disabled={ revisionPage <= 1 }
+				disabled={ isLoading || revisionPage <= 1 }
 				size="compact"
 				accessibleWhenDisabled
 			/>
