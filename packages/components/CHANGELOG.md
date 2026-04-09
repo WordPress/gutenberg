@@ -4,7 +4,7 @@
 
 ### Deprecations
 
--   `BorderControl`: Stabilize `__unstablePopoverProps` as `popoverProps`. The old prop is deprecated and will be removed in a future version.
+-   `BorderControl`: Stabilize `__unstablePopoverProps` as `popoverProps`. The old prop is deprecated and will be removed in a future version ([#77184](https://github.com/WordPress/gutenberg/pull/77184)).
 
 ### Bug Fixes
 
