@@ -29,7 +29,7 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 
 	// Re-render each tabs-menu-item with per-item context (index, id, label).
 	// Match by position so items align with their corresponding tabs.
-	$buttons_html      = '';
+	$buttons_html       = '';
 	$menu_item_position = 0;
 
 	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
