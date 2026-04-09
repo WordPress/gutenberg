@@ -86,8 +86,7 @@ describe( 'SandBox', () => {
 			/>
 		);
 
-		const iframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Styled Test' );
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Styled Test' );
 		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
 
 		expect( srcDoc ).toContain( '.custom { color: red; }' );
@@ -102,8 +101,7 @@ describe( 'SandBox', () => {
 			/>
 		);
 
-		const iframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Script Test' );
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Script Test' );
 		const srcDoc = iframe.getAttribute( 'srcdoc' ) ?? '';
 
 		expect( srcDoc ).toContain(
