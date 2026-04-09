@@ -234,6 +234,13 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 		color: $components-color-foreground-inverted;
 	}
 
+	&:has(
+	.components-calendar__day-button:disabled,
+	.components-calendar__day-button:hover:disabled
+) {
+		color: $components-color-gray-600;
+	}
+
 	.components-calendar__day-button {
 		&::before {
 			background-color: $components-color-foreground;
