@@ -1393,6 +1393,7 @@ describe( 'useFormValidity', () => {
 			} = renderHook( () => useFormValidity( item, fields, form ) );
 			expect( validity?.createdAt ).toEqual( MAX_MESSAGE );
 			expect( isValid ).toBe( false );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

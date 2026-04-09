@@ -12,6 +12,24 @@ function supportsDateRangeConstraint( type?: string ) {
 	return type === 'date' || type === 'datetime';
 }
 
+function normalizeRangeRule< Item >(
+	value: number | string | undefined,
+	fieldType: FieldType< Item >,
+	key: 'min' | 'max'
+): NormalizedRules< Item >[ 'min' ] {
+	const validator = fieldType.validate[ key ];
+	if (
+		validator &&
+		( ( typeof value === 'number' &&
+			supportsNumericRangeConstraint( fieldType.type ) ) ||
+			( typeof value === 'string' &&
+				supportsDateRangeConstraint( fieldType.type ) ) )
+	) {
+		return { constraint: value, validate: validator };
+	}
+	return undefined;
+}
+
 export default function getIsValid< Item >(
 	field: Field< Item >,
 	fieldType: FieldType< Item >
@@ -42,49 +60,8 @@ export default function getIsValid< Item >(
 		};
 	}
 
-	const minValue = rules?.min;
-	let min: NormalizedRules< Item >[ 'min' ];
-	if (
-		typeof minValue === 'number' &&
-		supportsNumericRangeConstraint( fieldType.type ) &&
-		fieldType.validate.min !== undefined
-	) {
-		min = {
-			constraint: minValue,
-			validate: fieldType.validate.min,
-		};
-	} else if (
-		typeof minValue === 'string' &&
-		supportsDateRangeConstraint( fieldType.type ) &&
-		fieldType.validate.min !== undefined
-	) {
-		min = {
-			constraint: minValue,
-			validate: fieldType.validate.min,
-		};
-	}
-
-	const maxValue = rules?.max;
-	let max: NormalizedRules< Item >[ 'max' ];
-	if (
-		typeof maxValue === 'number' &&
-		supportsNumericRangeConstraint( fieldType.type ) &&
-		fieldType.validate.max !== undefined
-	) {
-		max = {
-			constraint: maxValue,
-			validate: fieldType.validate.max,
-		};
-	} else if (
-		typeof maxValue === 'string' &&
-		supportsDateRangeConstraint( fieldType.type ) &&
-		fieldType.validate.max !== undefined
-	) {
-		max = {
-			constraint: maxValue,
-			validate: fieldType.validate.max,
-		};
-	}
+	const min = normalizeRangeRule( rules?.min, fieldType, 'min' );
+	const max = normalizeRangeRule( rules?.max, fieldType, 'max' );
 
 	const minLengthValue = rules?.minLength;
 	let minLength;

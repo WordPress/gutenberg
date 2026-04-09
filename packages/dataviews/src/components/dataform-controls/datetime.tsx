@@ -56,14 +56,8 @@ function CalendarDateTimeControl< Item >( {
 		useRef< ReturnType< typeof setTimeout > >( undefined );
 	const previousFocusRef = useRef< Element | null >( null );
 
-	const minConstraint = isValid.min?.constraint as string | undefined;
-	const maxConstraint = isValid.max?.constraint as string | undefined;
-
-	const disabledMatchers = useDisabledDateMatchers(
-		minConstraint,
-		maxConstraint,
-		parseDateTime
-	);
+	const { minConstraint, maxConstraint, disabledMatchers } =
+		useDisabledDateMatchers( isValid, parseDateTime );
 
 	const onChangeCallback = useCallback(
 		( newValue: string | undefined ) =>

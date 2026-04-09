@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { isValid as isValidDate, parseISO } from 'date-fns';
+import { isValid as isValidDate } from 'date-fns';
+
+/**
+ * WordPress dependencies
+ */
+import { getDate } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -10,17 +15,13 @@ import type { NormalizedField } from '../../types';
 
 type Boundary = 'min' | 'max';
 
-function isEmptyValue( value: unknown ) {
-	return value === undefined || value === null || value === '';
-}
-
 function parseDateLike( value?: string ) {
 	if ( ! value ) {
 		return null;
 	}
 
-	const parsed = parseISO( value );
-	return isValidDate( parsed ) ? parsed : null;
+	const parsed = getDate( value );
+	return parsed && isValidDate( parsed ) ? parsed : null;
 }
 
 function validateDateLikeBoundary< Item >(
@@ -34,32 +35,24 @@ function validateDateLikeBoundary< Item >(
 	}
 
 	const value = field.getValue( { item } );
-	if ( isEmptyValue( value ) ) {
-		return true;
-	}
-
-	if ( Array.isArray( value ) && value.length === 0 ) {
-		return true;
-	}
-
 	const boundaryValue = Array.isArray( value )
 		? value[ boundary === 'min' ? 0 : value.length - 1 ]
 		: value;
 
-	if ( isEmptyValue( boundaryValue ) ) {
+	if ( boundaryValue === null || boundaryValue === '' ) {
 		return true;
 	}
 
 	const parsedConstraint = parseDateLike( constraint );
 	const parsedValue = parseDateLike( String( boundaryValue ) );
 
-	if ( ! parsedConstraint || ! parsedValue ) {
-		return false;
-	}
-
-	return boundary === 'min'
-		? parsedValue.getTime() >= parsedConstraint.getTime()
-		: parsedValue.getTime() <= parsedConstraint.getTime();
+	return (
+		!! parsedConstraint &&
+		!! parsedValue &&
+		( boundary === 'min'
+			? parsedValue.getTime() >= parsedConstraint.getTime()
+			: parsedValue.getTime() <= parsedConstraint.getTime() )
+	);
 }
 
 export function isValidMinDate< Item >(
