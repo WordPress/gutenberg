@@ -100,11 +100,7 @@ function TableRow< Item >( {
 	const isSelected = selection.includes( id );
 
 	const [ isHovered, setIsHovered ] = useState( false );
-	const elementRef = useRef< HTMLElement | null >( null );
-
-	const setElementRef = ( element: HTMLElement | null ) => {
-		elementRef.current = element;
-	};
+	const elementRef = useRef< HTMLButtonElement >( null );
 
 	useIntersectionObserver( elementRef, posinset );
 	const {
@@ -129,7 +125,7 @@ function TableRow< Item >( {
 	return (
 		<Composite.Item
 			key={ id }
-			ref={ setElementRef }
+			ref={ elementRef }
 			render={ ( { children, ...props } ) => (
 				<tr
 					className={ clsx( 'dataviews-view-table__row', {
