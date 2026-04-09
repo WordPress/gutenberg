@@ -417,7 +417,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( incompleteTokenValue );
 		}
 
-		return true; // PreventDefault.
+		return true; // Always prevent default — comma is a separator, not input.
 	}
 
 	function moveInputToIndex( index: number ) {
@@ -462,8 +462,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
 		} else if ( inputHasValidValue() ) {
-			addNewToken( incompleteTokenValue );
-			preventDefault = true;
+			preventDefault = addNewToken( incompleteTokenValue );
 		}
 
 		return preventDefault;
@@ -476,6 +475,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					.map( saveTransform )
 					.filter( Boolean )
 					.filter( ( token ) => ! valueContainsToken( token ) )
+					.filter( ( token ) => __experimentalValidateInput( token ) )
 			),
 		];
 
@@ -486,10 +486,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addNewToken( token: string ) {
+	function addNewToken( token: string ): boolean {
 		if ( ! __experimentalValidateInput( token ) ) {
 			speak( messages.__experimentalInvalid, 'assertive' );
-			return;
+			return false;
 		}
 		addNewTokens( [ token ] );
 		speak( messages.added, 'assertive' );
@@ -502,6 +502,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		if ( isActive && ! tokenizeOnBlur ) {
 			focus();
 		}
+
+		return true;
 	}
 
 	function deleteToken( token: string | TokenItem ) {

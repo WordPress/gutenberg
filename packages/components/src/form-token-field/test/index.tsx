@@ -1929,6 +1929,61 @@ describe( 'FormTokenField', () => {
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
 		} );
+
+		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					tokenizeOnSpace
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello ' — lowercase, fails validation.
+			// The space should be typed into the input (not prevented).
+			await user.type( input, 'hello ' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello ' );
+
+			// Clear and type 'Hello ' — capital letter, passes validation.
+			// The space should be prevented, and a token should be created.
+			await user.clear( input );
+			await user.type( input, 'Hello ' );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Hello' ] );
+			expectTokensToBeInTheDocument( [ 'Hello' ] );
+		} );
+
+		it( 'should filter out invalid tokens when pasting with separators', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type values separated by comma — only valid ones should be added.
+			await user.type( input, 'Apple,banana,Cherry,' );
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expectTokensNotToBeInTheDocument( [ 'banana' ] );
+		} );
 	} );
 
 	describe( 'maxLength', () => {
