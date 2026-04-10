@@ -103,13 +103,13 @@
 
 		&.has-values {
 			color: var(--wpds-color-fg-interactive-brand);
-			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background: var(--wpds-color-bg-interactive-brand-weak);
 			border-color: var(--wpds-color-stroke-interactive-brand);
 
 			&:hover:not(&.is-not-clickable),
 			&[aria-expanded="true"] {
 				color: var(--wpds-color-fg-interactive-brand-active);
-				background: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				background: var(--wpds-color-bg-interactive-brand-weak-active);
 				border-color: var(--wpds-color-stroke-interactive-brand-active);
 			}
 		}

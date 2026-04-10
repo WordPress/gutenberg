@@ -37,16 +37,15 @@
 		cursor: var(--wpds-cursor-control);
 
 		&.is-selected {
-			// Ensure selected rows are visually distinct
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 		}
 
 		&.is-hovered {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 		}
 
 		&.is-selected.is-hovered {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.12);
+			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 		}
 	}
 }

@@ -60,11 +60,11 @@ div.dataviews-view-list {
 		}
 
 		&.is-selected.is-selected {
-			border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+			border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 
 			& + div[role="row"],
 			& + div[role="article"] {
-				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 			}
 		}
 
@@ -73,12 +73,12 @@ div.dataviews-view-list {
 			&.is-hovered,
 			&:focus-within {
 				color: var(--wpds-color-fg-interactive-brand);
-				background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
-				border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+				background-color: var(--wpds-color-bg-interactive-brand-weak);
+				border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 
 				& + div[role="row"],
 				& + div[role="article"] {
-					border-top: 1px solid rgba(var(--wp-admin-theme-color--rgb), 0.12);
+					border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 				}
 
 				.dataviews-title-field,
@@ -95,7 +95,7 @@ div.dataviews-view-list {
 	div[role="article"].is-selected,
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
-			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
+			background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 			color: var(--wpds-color-fg-interactive-neutral);
 
 			.dataviews-title-field,
