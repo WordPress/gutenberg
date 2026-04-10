@@ -606,6 +606,42 @@ describe( 'useHandleLinkChange', () => {
 			);
 		} );
 
+		it( 'should include title when editing text for the same existing entity link', () => {
+			const attributes = {
+				id: 123,
+				url: 'https://example.com/page',
+				label: 'Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			const updatedLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Updated Sample Page',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					title: 'Updated Sample Page',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+		} );
+
 		it( 'should update custom link to another custom link', () => {
 			updateAttributes.mockImplementation( ( attrs ) => ( {
 				isEntityLink: false,
