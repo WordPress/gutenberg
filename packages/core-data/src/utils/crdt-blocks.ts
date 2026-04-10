@@ -695,13 +695,18 @@ function mergeYArray(
 
 	if ( numOfInsertionsNeeded > 0 ) {
 		const insertAt = left + numOfUpdatesNeeded;
-
-		yArray.insert(
-			insertAt,
-			newValue
-				.slice( insertAt, insertAt + numOfInsertionsNeeded )
-				.map( ( item ) => createYMapFromQuery( query, item ) )
+		const itemsToInsert: Y.Map< unknown >[] = new Array(
+			numOfInsertionsNeeded
 		);
+
+		for ( let i = 0; i < numOfInsertionsNeeded; i++ ) {
+			itemsToInsert[ i ] = createYMapFromQuery(
+				query,
+				newValue[ insertAt + i ]
+			);
+		}
+
+		yArray.insert( insertAt, itemsToInsert );
 	}
 }
 
