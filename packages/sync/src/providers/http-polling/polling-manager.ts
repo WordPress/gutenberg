@@ -86,25 +86,24 @@ interface RoomState {
 }
 
 /**
+ * Minimal shape of a WordPress REST API error as it arrives on the client
+ * via apiFetch. WP_Error is serialized to JSON with a `data.status` field
+ * containing the HTTP status code; `code` and `message` are best-effort.
+ */
+interface WPRestError {
+	code?: string;
+	message?: string;
+	data: { status: number };
+}
+
+/**
  * Check if an error is a forbidden (403) response from the WordPress REST
  * API. These errors have a `data.status` property set by WP_Error.
  *
- * Only targets 403 (permission denied for a specific entity), not 401
- * (not logged in) which should still surface as a connection error.
- *
  * @param error The caught error to inspect.
  */
-function isForbiddenError( error: unknown ): boolean {
-	if ( ! error || typeof error !== 'object' || ! ( 'data' in error ) ) {
-		return false;
-	}
-
-	const data = ( error as Record< string, unknown > ).data;
-	if ( ! data || typeof data !== 'object' || ! ( 'status' in data ) ) {
-		return false;
-	}
-
-	return ( data as Record< string, unknown > ).status === 403;
+function isForbiddenError( error: unknown ): error is WPRestError {
+	return ( error as WPRestError | undefined )?.data?.status === 403;
 }
 
 /**
@@ -117,20 +116,14 @@ function isForbiddenError( error: unknown ): boolean {
  * Returns the room name if found, or null for generic auth failures
  * (e.g. "not logged in") where no specific room is identified.
  *
- * @param error The caught error to inspect.
+ * @param error The forbidden error, narrowed via isForbiddenError.
  * @param rooms The room names from the request payload.
  */
 function identifyForbiddenRoom(
-	error: unknown,
+	error: WPRestError,
 	rooms: string[]
 ): string | null {
-	const message =
-		error &&
-		typeof error === 'object' &&
-		'message' in error &&
-		typeof ( error as Record< string, unknown > ).message === 'string'
-			? ( ( error as Record< string, unknown > ).message as string )
-			: '';
+	const message = typeof error.message === 'string' ? error.message : '';
 
 	// Sort rooms by length descending so the longest match wins. Room names
 	// embed numeric IDs (e.g. "postType/post:1", "postType/post:10"), and a
@@ -588,7 +581,7 @@ function poll(): void {
 		} catch ( error ) {
 			// A 403 response means the user does not have permission to
 			// sync a specific entity. Silently unregister the affected
-			// room(s) — treat it as if sync was never supported.
+			// room(s).
 			if ( isForbiddenError( error ) ) {
 				const forbiddenRoom = identifyForbiddenRoom(
 					error,
