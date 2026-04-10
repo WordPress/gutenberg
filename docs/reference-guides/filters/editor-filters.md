@@ -185,6 +185,33 @@ addFilter(
 );
 ```
 
+### `editor.preSavePost`
+
+This async filter can modify the post edits. The filter can also abort the save, e.g., when some custom validation fails, by throwing an error or returning a rejected promise. It receives two arguments:
+- `edits` is an object that contains the id of the saved post and the modified attributes. This is the modified object that will be sent to the server as the payload of the save POST request. 
+- `options` is a read-only second argument that contains an `isAutosave` (boolean) field that lets the filter distinguish between regular saves and autosaves, and also an `isPreview` field that indicated whether the saved post is a draft intended to be previewed.
+
+```js
+addFilter( 'editor.preSavePost', 'handler', async ( edits, options ) => {
+	if ( ! await customValidation( edits ) ) {
+		throw new Error( 'validation failed' );
+	}
+	return edits;
+} );
+```
+
+### `editor.savePost`
+
+This async action is run after the post is saved and lets you perform additional work after the save. For example, the Gutenberg post editor itself uses this action to save legacy metaboxes for the post. This action receives one argument, the `options` object, the same one as the `editor.preSavePost` action also receives.
+
+```js
+addAction( 'editor.savePost', 'handler', async ( options ) => {
+	if ( options.isPreview ) {
+		// Do something for previews only.
+	}
+} );
+```
+
 ### `media.crossOrigin`
 
 This filter is used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e., `<audio>`, `<img>`, `<link>`, `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information on the `crossOrigin` attribute, its values, and how it applies to each element.
