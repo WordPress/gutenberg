@@ -2,9 +2,34 @@
 
 `@wordpress/eslint-plugin` has been upgraded to support ESLint v10 with flat config. This guide covers how to migrate your project.
 
-## What changed
+## Upstream ESLint migration resources
 
--   **Flat config is the default.** The plugin now exports flat config arrays instead of eslintrc objects. ESLint v10 only supports `eslint.config.*` files.
+If you are also upgrading ESLint itself (e.g., coming from ESLint v8), the ESLint project publishes per-version migration guides that complement this document:
+
+-   [Migrate to v9.x](https://eslint.org/docs/latest/use/migrate-to-9.0.0) — flat config as default, removal of legacy formatters, Node.js version requirements, and more.
+-   [Migrate to v10.x](https://eslint.org/docs/latest/use/migrate-to-10.0.0) — complete removal of eslintrc, removal of `/* eslint-env */` comments, and other breaking changes.
+
+If you are jumping straight from ESLint v8 to v10, you need to follow **both** upstream guides in order (v8 → v9 → v10), since v10 assumes you have already addressed the v9 breaking changes.
+
+## TL;DR — Breaking changes by ESLint version
+
+### v8 → v9
+
+-   Flat config (`eslint.config.*`) becomes the default, but `.eslintrc.*` is still supported as a fallback.
+-   Node.js `^18.18.0 || ^20.9.0 || >=21.1.0` is required.
+-   Several formatters moved out of core into separate packages.
+-   Some rules were removed or had their defaults changed (see the upstream [v9 migration guide](https://eslint.org/docs/latest/use/migrate-to-9.0.0)).
+
+### v9 → v10
+
+-   **`.eslintrc.*` is no longer supported at all** — flat config is mandatory.
+-   `/* eslint-env */` comments are no longer supported — configure globals via `languageOptions.globals`.
+-   The `--ignore-path` CLI flag was removed — use `ignores` in your flat config.
+-   Various rule default changes (see the upstream [v10 migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0)).
+
+### `@wordpress/eslint-plugin` specific changes
+
+-   **Flat config is the default.** The plugin now exports flat config arrays instead of eslintrc objects.
 -   **Minimum ESLint version** is `^9.0.0 || ^10.0.0`.
 -   **Rule prefix change:** `eslint-comments/*` → `@eslint-community/eslint-comments/*`.
 -   **TypeScript ESLint** upgraded from `@typescript-eslint/*` v6 to v8 via the unified `typescript-eslint` package.

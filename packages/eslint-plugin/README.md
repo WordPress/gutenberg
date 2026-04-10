@@ -16,6 +16,8 @@ npm install @wordpress/eslint-plugin --save-dev
 
 **Minimum ESLint version:** `^9.0.0 || ^10.0.0`
 
+> **Upgrading from an older version?** See the [ESLint v10 migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/docs/how-to-guides/eslint-v10-migration.md) for a comprehensive walkthrough of the breaking changes, migration steps, and troubleshooting.
+
 ### Flat config (ESLint v9+, recommended)
 
 Create an `eslint.config.mjs` file in your project root:
@@ -162,7 +164,7 @@ If you are upgrading from a previous version that used `.eslintrc.*` files:
     ```
 7. Remove any `/* eslint-env */` comments — they are no longer supported in ESLint v10. Use `languageOptions.globals` in your config instead.
 
-See the [ESLint migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for full details.
+For a comprehensive walkthrough with examples and troubleshooting, see the [Gutenberg ESLint v10 migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/docs/how-to-guides/eslint-v10-migration.md). See also the [ESLint migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for general flat config details.
 
 ## Contributing to this package
 
