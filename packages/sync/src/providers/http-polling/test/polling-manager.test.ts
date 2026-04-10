@@ -1120,6 +1120,81 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
 
+		it( 'unregisters the correct room when room names share a prefix', async () => {
+			// Register the shorter-named room first so that, without the
+			// length-descending sort in identifyForbiddenRoom, the iteration
+			// order would match "postType/post:1" as a substring of
+			// "postType/post:10" and unregister the wrong room.
+			const twoRoomResponse = {
+				rooms: [
+					{
+						room: 'postType/post:1',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'postType/post:10',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			};
+			mockPostSyncUpdate.mockResolvedValueOnce( twoRoomResponse );
+
+			pollingManager.registerRoom( {
+				room: 'postType/post:1',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'postType/post:10',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Next poll: 403 referencing the longer-named room.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync this entity: postType/post:10.',
+				data: { status: 403 },
+			} );
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'postType/post:1',
+						end_cursor: 2,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// The next poll's payload should still include the shorter
+			// room and exclude the (correctly identified) longer one.
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+			const lastPayload = mockPostSyncUpdate.mock.calls[ 2 ][ 0 ] as {
+				rooms: { room: string }[];
+			};
+			const remainingRoomNames = lastPayload.rooms.map( ( r ) => r.room );
+			expect( remainingRoomNames ).toContain( 'postType/post:1' );
+			expect( remainingRoomNames ).not.toContain( 'postType/post:10' );
+		} );
+
 		it( 'resumes polling for a newly-registered room after a 403 unregistered all rooms', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 

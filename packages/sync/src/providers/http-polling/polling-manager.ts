@@ -132,7 +132,14 @@ function identifyForbiddenRoom(
 			? ( ( error as Record< string, unknown > ).message as string )
 			: '';
 
-	for ( const room of rooms ) {
+	// Sort rooms by length descending so the longest match wins. Room names
+	// embed numeric IDs (e.g. "postType/post:1", "postType/post:10"), and a
+	// shorter name can be a substring of a longer one. Without sorting, the
+	// iteration order is the room registration order, so a 403 referencing
+	// "postType/post:10" could incorrectly match "postType/post:1" first.
+	const sortedRooms = [ ...rooms ].sort( ( a, b ) => b.length - a.length );
+
+	for ( const room of sortedRooms ) {
 		if ( message.includes( room ) ) {
 			return room;
 		}
