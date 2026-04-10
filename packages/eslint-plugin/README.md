@@ -14,7 +14,9 @@ npm install @wordpress/eslint-plugin --save-dev
 
 ## Usage
 
-### Flat config (ESLint v10+, recommended)
+**Minimum ESLint version:** `^9.0.0 || ^10.0.0`
+
+### Flat config (ESLint v9+, recommended)
 
 Create an `eslint.config.mjs` file in your project root:
 
@@ -41,7 +43,7 @@ export default [
 
 Refer to the [ESLint flat config documentation](https://eslint.org/docs/latest/use/configure/configuration-files) for more information.
 
-### Legacy eslintrc (ESLint v9, deprecated)
+### Legacy eslintrc (ESLint v9 only, deprecated)
 
 If you are still using ESLint v9 with the legacy `.eslintrc.*` format, a compatibility wrapper is available:
 
@@ -52,7 +54,9 @@ const wordpress = require( '@wordpress/eslint-plugin/eslintrc' );
 module.exports = wordpress.configs.recommended;
 ```
 
-> **Note:** The eslintrc wrapper is deprecated and will be removed in a future major version. Please migrate to flat config.
+All config presets are available through the wrapper (e.g., `wordpress.configs.esnext`, `wordpress.configs[ 'recommended-with-formatting' ]`).
+
+> **Note:** The eslintrc wrapper is deprecated and will be removed in the next major version. ESLint v10 does not support `.eslintrc.*` files at all. Please migrate to flat config.
 
 ### About the recommended preset
 
@@ -151,6 +155,12 @@ If you are upgrading from a previous version that used `.eslintrc.*` files:
 3. Convert `overrides` to separate config objects with `files` patterns.
 4. Replace `env` with `languageOptions.globals` using the [`globals`](https://www.npmjs.com/package/globals) package.
 5. Delete your `.eslintignore` file and move patterns into an `ignores` config object.
+6. Update rule prefixes in inline comments: `eslint-comments/*` has been renamed to `@eslint-community/eslint-comments/*`. For example:
+    ```diff
+    - /* eslint-disable eslint-comments/no-unlimited-disable */
+    + /* eslint-disable @eslint-community/eslint-comments/no-unlimited-disable */
+    ```
+7. Remove any `/* eslint-env */` comments — they are no longer supported in ESLint v10. Use `languageOptions.globals` in your config instead.
 
 See the [ESLint migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for full details.
 
