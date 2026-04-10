@@ -1119,5 +1119,57 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 2000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 		} );
+
+		it( 'resumes polling for a newly-registered room after a 403 unregistered all rooms', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Next poll: 403 referencing the only registered room.
+			// All rooms get unregistered and the poll loop stops.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync this entity: test-room.',
+				data: { status: 403 },
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Register a brand-new room. This should kick off a fresh poll
+			// cycle — but only if isPolling was reset when the previous
+			// cycle stopped.
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'new-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			pollingManager.registerRoom( {
+				room: 'new-room',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
 	} );
 } );

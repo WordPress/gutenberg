@@ -633,8 +633,10 @@ function poll(): void {
 					}
 				}
 
-				// If all rooms are gone, stop polling.
+				// If all rooms are gone, stop polling. Reset isPolling so
+				// that a future registerRoom() call can start a new poll cycle.
 				if ( roomStates.size === 0 ) {
+					isPolling = false;
 					return;
 				}
 			} else {
