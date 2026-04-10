@@ -117,9 +117,12 @@ In all other cases, let `render` flow through `...props`. Destructuring `render`
 
 ### Overriding the Default Element
 
-When a component needs to render a different element than its inner component's default (e.g., a `<div>` instead of `<span>`), hoist the default to a **module-level constant** and assign it as a destructuring default:
+When a component needs to render a different element than its inner component's default (e.g., a `<div>` instead of `<span>`), hoist the default to a **module-level constant** and assign it as a destructuring default.
+
+The default can be a **JSX element** or a **render function**, depending on what the component needs:
 
 ```tsx
+// JSX element — suitable when you only need to swap the tag.
 const DEFAULT_TAG = <div />;
 
 export const Title = forwardRef( function MyTitle(
@@ -134,7 +137,24 @@ export const Title = forwardRef( function MyTitle(
 } );
 ```
 
-React elements are immutable descriptors — `useRender` calls `cloneElement` on them (creating a new element), never mutating the original. A hoisted constant avoids allocating a fresh object every render and gives React/Base UI a stable reference for equality checks.
+```tsx
+// Render function — useful when the default needs to compose
+// other components or add additional props.
+const defaultRender = ( props: React.ComponentProps< typeof Stack > ) => (
+    <Stack { ...props } direction="column" gap="sm" />
+);
+
+export const Root = forwardRef( function MyRoot(
+    { className, render = defaultRender, ...restProps },
+    ref
+) {
+    return (
+        <_Field.Root ref={ ref } className={ className } render={ render } { ...restProps } />
+    );
+} );
+```
+
+When using a JSX element, React elements are immutable descriptors — `useRender` calls `cloneElement` on them (creating a new element), never mutating the original. In both cases, a hoisted constant avoids allocating a fresh object every render and gives React/Base UI a stable reference for equality checks.
 
 ### Anti-patterns
 
@@ -160,13 +180,6 @@ function MyComponent( props, ref ) {
     return <Inner ref={ ref } { ...props } />;
 }
 ```
-
-### Decision Tree
-
-1. **Am I wrapping Base UI or another `@wordpress/ui` component?** → Use Pattern B (pass `ref`, spread `...props`). Let `render` flow implicitly.
-2. **Am I building a custom component with no inner primitive?** → Use Pattern A (`useRender` + `mergeProps`). Destructure `render` (required by the hook).
-3. **Do I need a different default element?** → Hoist a constant (`const DEFAULT_TAG = <div />;`), assign it as a destructuring default.
-4. **Do I need to prevent `render` customization?** → Destructure `render` to discard it, and `Omit` it from the component's type.
 
 ## CSS Architecture
 
