@@ -1,0 +1,73 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+// Override the parent container when the DataViews panel is present.
+// - Remove padding: DataViews manages its own internal spacing.
+// - Set height: 100% so the container fills the tabpanel instead of
+//   growing to fit content (which would cause the tabpanel to scroll
+//   as a whole instead of just the DataViews grid).
+.block-editor-inserter__media-tabs-container:has(.inserter-media-panel) {
+	padding: 0;
+	height: 100%;
+	overflow: hidden;
+}
+
+.inserter-media-panel {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0; // Allow flex child to shrink for proper overflow.
+}
+
+.inserter-media-panel__source-switcher {
+	display: flex;
+	gap: $grid-unit-10;
+	padding: $grid-unit-20;
+	border-bottom: $border-width solid $gray-200;
+	flex-shrink: 0;
+}
+
+.inserter-media-panel__source-button {
+	flex: 1;
+	padding: $grid-unit-10 $grid-unit-15;
+	border: $border-width solid $gray-300;
+	border-radius: $radius-small;
+	background: $white;
+	cursor: pointer;
+	font-size: $default-font-size;
+	color: $gray-700;
+	transition: background-color 0.1s ease, border-color 0.1s ease;
+
+	&:hover {
+		background: $gray-100;
+	}
+
+	&--active {
+		background: var(--wp-admin-theme-color, #3858e9);
+		color: $white;
+		border-color: var(--wp-admin-theme-color, #3858e9);
+
+		&:hover {
+			background: var(--wp-admin-theme-color-darker-10, #2145e6);
+		}
+	}
+}
+
+// Let the DataViews wrapper scroll so that the sticky footer works.
+.inserter-media-panel .dataviews-wrapper {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+}
+
+// Give the "Open Media Library" button the same padding as the source switcher.
+.inserter-media-panel + .block-editor-inserter__media-library-button-container {
+	padding: 0 $grid-unit-20 $grid-unit-20;
+	flex-shrink: 0;
+
+	// Remove the button's default margin-top since the container padding handles spacing.
+	.block-editor-inserter__media-library-button.components-button {
+		margin-top: 0;
+	}
+}
