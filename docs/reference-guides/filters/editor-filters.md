@@ -202,10 +202,10 @@ addFilter( 'editor.preSavePost', 'handler', async ( edits, options ) => {
 
 ### `editor.savePost`
 
-This async action is run after the post is saved and lets you perform additional work after the save. For example, the Gutenberg post editor itself uses this action to save legacy metaboxes for the post. This action receives one argument, the `options` object, the same one as the `editor.preSavePost` action also receives.
+This async action is run after the post is saved and lets you perform additional work after the save. For example, the Gutenberg post editor itself uses this action to save legacy metaboxes for the post. This action receives one additional argument, the `options` object, the same one as the `editor.preSavePost` action also receives.
 
 ```js
-addAction( 'editor.savePost', 'handler', async ( options ) => {
+addAction( 'editor.savePost', 'handler', async ( post, options ) => {
 	if ( options.isPreview ) {
 		// Do something for previews only.
 	}
