@@ -41,12 +41,12 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 }
 
 .emotion-6 {
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 499;
   line-height: 1.4;
-  text-transform: uppercase;
   display: block;
   margin-bottom: calc(4px * 2);
+  color: var(--wp-components-color-foreground, #1e1e1e);
   padding: 0;
 }
 

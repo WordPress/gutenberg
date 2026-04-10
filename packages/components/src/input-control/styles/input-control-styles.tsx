@@ -314,6 +314,7 @@ const BaseLabel = styled( Text )< { labelPosition?: LabelPosition } >`
 		padding-bottom: 0;
 		max-width: 100%;
 		z-index: 1;
+		color: ${ COLORS.theme.foreground };
 	}
 `;
 

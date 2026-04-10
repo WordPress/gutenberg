@@ -28,6 +28,7 @@ const labelStyles = css`
 
 	display: block;
 	margin-bottom: ${ space( 2 ) };
+	color: ${ COLORS.theme.foreground };
 	/**
 	 * Removes Chrome/Safari/Firefox user agent stylesheet padding from
 	 * StyledLabel when it is rendered as a legend.

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: Standardize panel label styles from capitalize to sentence case, matching updated BaseControl labels ([#77202](https://github.com/WordPress/gutenberg/pull/77202)).
+
 ### Breaking Changes
 
 - DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)

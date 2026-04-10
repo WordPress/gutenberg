@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BaseControl`, `InputControl`: Standardize label styles from uppercase to sentence case, using design system type tokens ([#77202](https://github.com/WordPress/gutenberg/pull/77202)).
+
 ### Bug Fixes
 
 -   `RadioControl`: Add `role="radiogroup"` to the wrapping `fieldset` element ([#76745](https://github.com/WordPress/gutenberg/pull/76745)).
