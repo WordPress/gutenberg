@@ -43,7 +43,7 @@
 	"devDependencies": {
 		"atob": "^2.1.2",
 		"css-loader": "^6.2.0",
-		"lodash": "^4.17.21",
+		"lodash": "4.18.1",
 		"mini-css-extract-plugin": "^2.9.2",
 		"mkdirp": "^3.0.1"
 	},
