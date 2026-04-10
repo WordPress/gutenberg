@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useRef, useEffect } from '@wordpress/element';
 import { seen, unseen } from '@wordpress/icons';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -15,12 +14,20 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
-	const hasBlockVisibilityButtonShownRef = useRef( false );
-	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
+	const {
+		canToggleBlockVisibility,
+		areBlocksHiddenAnywhere,
+		isViewportModalOpenForSelection,
+	} = useSelect(
 		( select ) => {
-			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
-				unlock( select( blockEditorStore ) );
+			const {
+				getBlocksByClientId,
+				getBlockName,
+				isBlockHiddenAnywhere,
+				getViewportModalClientIds,
+			} = unlock( select( blockEditorStore ) );
 			const _blocks = getBlocksByClientId( clientIds );
+			const viewportModalClientIds = getViewportModalClientIds();
 			return {
 				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
 					hasBlockSupport(
@@ -32,6 +39,13 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
 					isBlockHiddenAnywhere( clientId )
 				),
+				isViewportModalOpenForSelection:
+					Array.isArray( viewportModalClientIds ) &&
+					Array.isArray( clientIds ) &&
+					viewportModalClientIds.length === clientIds.length &&
+					viewportModalClientIds.every( ( modalClientId ) =>
+						clientIds.includes( modalClientId )
+					),
 			};
 		},
 
@@ -39,23 +53,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	);
 	const blockEditorDispatch = useDispatch( blockEditorStore );
 
-	/*
-	 * If the block visibility button has been shown, we don't want to
-	 * remove it from the toolbar until the toolbar is rendered again
-	 * without it. Removing it beforehand can cause focus loss issues.
-	 * It needs to return focus from whence it came, and to do that,
-	 * we need to leave the button in the toolbar.
-	 */
-	useEffect( () => {
-		if ( areBlocksHiddenAnywhere ) {
-			hasBlockVisibilityButtonShownRef.current = true;
-		}
-	}, [ areBlocksHiddenAnywhere ] );
-
-	if (
-		! areBlocksHiddenAnywhere &&
-		! hasBlockVisibilityButtonShownRef.current
-	) {
+	if ( ! areBlocksHiddenAnywhere && ! isViewportModalOpenForSelection ) {
 		return null;
 	}
 
