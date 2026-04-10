@@ -234,6 +234,43 @@ describe( 'useTabMenuSync', () => {
 			expect( removeBlock ).not.toHaveBeenCalled();
 			expect( insertBlock ).not.toHaveBeenCalled();
 		} );
+
+		it( 'does nothing when both sides grow by different amounts', () => {
+			const tabs = [
+				makeTab( 't1', 'tab-1', 'Tab 1' ),
+				makeTab( 't2', 'tab-2', 'Tab 2' ),
+			];
+			const menuItems = [
+				makeMenuItem( 'm1', 'tab-1-button' ),
+				makeMenuItem( 'm2', 'tab-2-button' ),
+			];
+
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			// Tabs grew by 2, menu items grew by 1.
+			// Bail out.
+			rerender( {
+				tabs: [
+					...tabs,
+					makeTab( 't3', 'tab-3', 'Tab 3' ),
+					makeTab( 't4', 'tab-4', 'Tab 4' ),
+				],
+				menuItems: [
+					...menuItems,
+					makeMenuItem( 'm3', 'tab-3-button' ),
+				],
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( removeBlock ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'tab inserted', () => {

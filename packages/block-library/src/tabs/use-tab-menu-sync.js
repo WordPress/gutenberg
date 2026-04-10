@@ -50,16 +50,17 @@ export default function useTabMenuSync( {
 		const { tabs: prevTabs, menuItems: prevMenuItems } =
 			prevSyncStateRef.current;
 
-		const tabsRemoved = currentTabs.length < prevTabs.length;
-		const menuItemsRemoved = menuItems.length < prevMenuItems.length;
-		const tabsInserted = currentTabs.length > prevTabs.length;
-		const menuItemsInserted = menuItems.length > prevMenuItems.length;
+		const tabCountChange = currentTabs.length - prevTabs.length;
+		const menuItemCountChange = menuItems.length - prevMenuItems.length;
 
-		// Lists are already in sync.
-		if (
-			( tabsRemoved && menuItemsRemoved ) ||
-			( tabsInserted && menuItemsInserted )
-		) {
+		const tabsRemoved = tabCountChange < 0;
+		const menuItemsRemoved = menuItemCountChange < 0;
+		const tabsInserted = tabCountChange > 0;
+		const menuItemsInserted = menuItemCountChange > 0;
+
+		// Both sides changed by the same amount.
+		// Covers: no-op re-renders, "Add Tab" toolbar, and toolbar-remove.
+		if ( tabCountChange === menuItemCountChange ) {
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
 				menuItems: [ ...menuItems ],
@@ -67,12 +68,11 @@ export default function useTabMenuSync( {
 			return;
 		}
 
-		// Nothing changed.
+		// Both sides changed in the same direction but by different amounts.
+		// Bail without making a partial fix.
 		if (
-			! tabsRemoved &&
-			! menuItemsRemoved &&
-			! tabsInserted &&
-			! menuItemsInserted
+			( tabCountChange > 0 && menuItemCountChange > 0 ) ||
+			( tabCountChange < 0 && menuItemCountChange < 0 )
 		) {
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
@@ -82,7 +82,7 @@ export default function useTabMenuSync( {
 		}
 
 		// If the required container block isn't available yet, bail without
-		// updating the snapshot so the next render re-evaluates the same delta.
+		// updating the snapshot so the next render re-evaluates the same count change.
 		if ( tabsInserted && ! tabsMenuClientId ) {
 			return;
 		}
