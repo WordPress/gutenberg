@@ -15,7 +15,7 @@ const MyTimePicker = () => {
   const [ time, setTime ] = useState( new Date() );
   return (
     <TimePicker
-      currentTime={ date }
+      currentTime={ time }
       onChange={ ( newTime ) => setTime( newTime ) }
       is12Hour
     />
