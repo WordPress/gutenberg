@@ -40,7 +40,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Registers the routes for content guidelines.
+	 * Registers the routes for guidelines.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
 	 * collection route with a singleton GET endpoint.
@@ -120,7 +120,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Gets the singleton content guidelines.
+	 * Gets the singleton guidelines.
 	 *
 	 * Supports query parameters:
 	 * - ?status=publish|draft - Filter by status
@@ -149,7 +149,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Creates content guidelines.
+	 * Creates guidelines.
 	 *
 	 * Enforces singleton pattern — only one guidelines post per site.
 	 *
@@ -197,7 +197,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Updates content guidelines.
+	 * Updates guidelines.
 	 *
 	 * Saves guideline categories to meta before updating the post so that
 	 * the revision captures the updated meta values.

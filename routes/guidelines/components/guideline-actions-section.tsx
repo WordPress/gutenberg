@@ -16,7 +16,7 @@ import { useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import './guideline-actions-section.scss';
-import { importContentGuidelines, exportContentGuidelines } from '../api';
+import { importGuidelines, exportGuidelines } from '../api';
 import ActionItem from './action-item';
 
 function getErrorMessage( err: any ) {
@@ -52,7 +52,7 @@ export default function GuidelineActionsSection() {
 		setPendingImport( null );
 		setIsImporting( true );
 		try {
-			await importContentGuidelines( file );
+			await importGuidelines( file );
 			setError( null );
 		} catch ( err ) {
 			setError(
@@ -69,7 +69,7 @@ export default function GuidelineActionsSection() {
 
 	async function handleExportClick() {
 		try {
-			exportContentGuidelines();
+			exportGuidelines();
 			setError( null );
 		} catch ( err ) {
 			setError(

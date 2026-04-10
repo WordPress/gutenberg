@@ -46,7 +46,7 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 	}
 
 	/**
-	 * Registers the routes for content guideline revisions.
+	 * Registers the routes for guideline revisions.
 	 *
 	 * Calls parent to register standard list + single revision routes,
 	 * then adds a custom restore endpoint.

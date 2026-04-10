@@ -12,7 +12,7 @@ export interface Categories {
 	blocks: Record< string, string >;
 }
 
-export interface ContentGuidelinesState {
+export interface GuidelinesState {
 	id: number | null;
 	status: string | null;
 	categories: Categories;
@@ -47,7 +47,7 @@ export interface GuidelineAccordionProps {
 	descriptionId?: string;
 }
 
-export interface ContentGuidelinesRevision {
+export interface GuidelinesRevision {
 	id: number;
 	date: string;
 	author: number;

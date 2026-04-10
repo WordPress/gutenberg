@@ -17,7 +17,7 @@ import {
 import './style.scss';
 import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
-import { fetchContentGuidelines } from './api';
+import { fetchGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
 import GuidelineActionsSection from './components/guideline-actions-section';
 import RevisionHistory from './components/revision-history';
@@ -75,13 +75,13 @@ function getInitialNavigatorPath() {
 	return '/';
 }
 
-function ContentGuidelinesPage() {
+function GuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState< string | null >( null );
 
 	useEffect( () => {
-		// Populate the store with the content guidelines.
-		fetchContentGuidelines()
+		// Populate the store with the guidelines.
+		fetchGuidelines()
 			.then( () => setError( null ) )
 			.catch( ( e: Error ) => setError( e.message ) )
 			.finally( () => setLoading( false ) );
@@ -188,4 +188,4 @@ function ContentGuidelinesPage() {
 	);
 }
 
-export const stage = ContentGuidelinesPage;
+export const stage = GuidelinesPage;
