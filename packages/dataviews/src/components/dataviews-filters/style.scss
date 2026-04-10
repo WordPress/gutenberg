@@ -118,7 +118,7 @@
 			outline: none;
 			box-shadow:
 				0 0 0 var(--wpds-border-width-focus)
-				var(--wp-admin-theme-color);
+				var(--wpds-color-stroke-focus-brand);
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
@@ -167,7 +167,7 @@
 			outline: none;
 			box-shadow:
 				0 0 0 var(--wpds-border-width-focus)
-				var(--wp-admin-theme-color);
+				var(--wpds-color-stroke-focus-brand);
 		}
 	}
 }
@@ -211,18 +211,18 @@
 		background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
-			border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
 			background: var(--wpds-color-bg-surface-neutral-strong);
 			&.is-selected {
-				border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
-				background: var(--wp-admin-theme-color-darker-20, #183ad6);
+				border-color: var(--wpds-color-stroke-interactive-brand-active);
+				background: var(--wpds-color-bg-interactive-brand-strong-active);
 			}
 		}
 
 		.dataviews-filters__search-widget-listitem-multi-selection {
 			&.is-selected {
-				border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
-				background: var(--wp-admin-theme-color-darker-20, #183ad6);
+				border-color: var(--wpds-color-stroke-interactive-brand-active);
+				background: var(--wpds-color-bg-interactive-brand-strong-active);
 			}
 		}
 	}
@@ -249,8 +249,8 @@
 		padding: 0;
 
 		&.is-selected {
-			background: var(--wp-admin-theme-color, #3858e9);
-			border-color: var(--wp-admin-theme-color, #3858e9);
+			background: var(--wpds-color-bg-interactive-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
 
 			&::before {
 				content: "";
@@ -298,8 +298,8 @@
 		}
 
 		&.is-selected {
-			background: var(--wp-admin-theme-color, #3858e9);
-			border-color: var(--wp-admin-theme-color, #3858e9);
+			background: var(--wpds-color-bg-interactive-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
 
 			svg {
 				--checkmark-size: var(--checkbox-size);
@@ -345,7 +345,7 @@
 			background: var(--wpds-color-bg-surface-neutral-strong);
 			box-shadow:
 				inset 0 0 0 var(--wpds-border-width-focus)
-				var(--wp-admin-theme-color);
+				var(--wpds-color-stroke-focus-brand);
 		}
 
 		&::placeholder {
@@ -386,7 +386,7 @@
 	top: 0;
 	right: 0;
 	transform: translate(50%, -50%);
-	background: var(--wp-admin-theme-color, #3858e9);
+	background: var(--wpds-color-bg-interactive-brand-strong);
 	height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
 	min-width: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
 	line-height: var(--wpds-font-line-height-xs);

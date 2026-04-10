@@ -27,14 +27,14 @@
 	}
 
 	&:not(.is-disabled):hover {
-		color: var(--wp-admin-theme-color);
+		color: var(--wpds-color-fg-interactive-brand);
 
 		.dataforms-layouts-panel__field-trigger-icon {
 			opacity: 1;
 		}
 
 		.dataforms-layouts-panel__field-label {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 		}
 	}
 
@@ -55,13 +55,13 @@
 
 	&:hover,
 	&:focus-visible {
-		fill: var(--wp-admin-theme-color);
+		fill: var(--wpds-color-fg-interactive-brand);
 	}
 }
 
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
-	color: var(--wp-admin-theme-color);
+	color: var(--wpds-color-fg-interactive-brand);
 	flex: 0 0 auto;
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);
@@ -70,7 +70,7 @@
 		opacity: 1;
 		outline:
 			var(--wpds-border-width-focus) solid
-			var(--wp-admin-theme-color);
+			var(--wpds-color-stroke-focus-brand);
 	}
 }
 

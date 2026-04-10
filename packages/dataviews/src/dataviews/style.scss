@@ -95,7 +95,7 @@
 		color: var(--wpds-color-fg-interactive-neutral);
 
 		&:hover {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 		}
 		@include link-reset();
 	}
@@ -110,7 +110,7 @@
 		width: 100%;
 		color: var(--wpds-color-fg-interactive-neutral-active);
 		&:hover {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 		}
 	}
 }
@@ -119,7 +119,7 @@
 	cursor: var(--wpds-cursor-control);
 	color: var(--wpds-color-fg-interactive-neutral);
 	&:hover {
-		color: var(--wp-admin-theme-color);
+		color: var(--wpds-color-fg-interactive-brand);
 	}
 	@include link-reset();
 }
