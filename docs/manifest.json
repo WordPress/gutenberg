@@ -858,8 +858,8 @@
 		"parent": "components"
 	},
 	{
-		"title": "Date",
-		"slug": "date",
+		"title": "DatePicker",
+		"slug": "date-picker",
 		"markdown_source": "../packages/components/src/date-time/date/README.md",
 		"parent": "components"
 	},
@@ -870,8 +870,8 @@
 		"parent": "components"
 	},
 	{
-		"title": "Time",
-		"slug": "time",
+		"title": "TimePicker",
+		"slug": "time-picker",
 		"markdown_source": "../packages/components/src/date-time/time/README.md",
 		"parent": "components"
 	},
