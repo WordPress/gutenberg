@@ -42,15 +42,13 @@ export default function PostContentInformation() {
 				postType
 			);
 
+		if ( postType === 'post' || postType === 'page' ) {
+			return showPostContentInfo && getEditedPostAttribute( 'content' );
+		}
 		const type = postType ? getPostType( postType ) : null;
 		const supportsTimeToRead = type?.supports?.[ 'time-to-read' ];
 
-		const isSupported =
-			postType === 'post' ||
-			postType === 'page' ||
-			supportsTimeToRead === true;
-
-		return showPostContentInfo && isSupported
+		return showPostContentInfo && supportsTimeToRead
 			? getEditedPostAttribute( 'content' )
 			: null;
 	}, [] );
