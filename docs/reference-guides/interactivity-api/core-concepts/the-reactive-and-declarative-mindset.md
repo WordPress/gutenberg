@@ -255,7 +255,7 @@ const { state } = store( 'myArrayPlugin', {
 			// Preferred — direct mutation:
 			state.list.push( 'new item' );
 
-			// Unnecessary — this works, but direct mutation is simpler:
+			// Unnecessary — this works, but it's more complex and can cause unnecessary rerenders.
 			state.list = [ ...state.list, 'new item' ];
 		},
 	},
