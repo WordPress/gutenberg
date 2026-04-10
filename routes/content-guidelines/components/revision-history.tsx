@@ -219,7 +219,7 @@ export default function RevisionHistory() {
 				actions={ actions }
 				isLoading={ isLoading }
 				paginationInfo={ paginationToShow }
-				defaultLayouts={ { table: {} } }
+				defaultLayouts={ { table: true } }
 				getItemId={ ( item ) => String( item.id ) }
 				empty={
 					isLoading && displayedRevisions.length === 0 ? (

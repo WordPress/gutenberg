@@ -29,8 +29,8 @@ export const DEFAULT_LAYOUTS = {
 			},
 		},
 	},
-	grid: {},
-	list: {},
+	grid: true,
+	list: true,
 };
 
 export const DEFAULT_VIEWS: {

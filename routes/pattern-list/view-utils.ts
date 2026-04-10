@@ -42,7 +42,7 @@ export const DEFAULT_VIEWS: {
 ];
 
 export const DEFAULT_LAYOUTS = {
-	[ LAYOUT_TABLE ]: {},
+	[ LAYOUT_TABLE ]: true,
 	[ LAYOUT_GRID ]: {
 		layout: {
 			badgeFields: [ 'sync-status' ],
