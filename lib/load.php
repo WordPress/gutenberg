@@ -121,6 +121,9 @@ require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 
+// WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/script-modules.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';

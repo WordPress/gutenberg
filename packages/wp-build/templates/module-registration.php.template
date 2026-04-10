@@ -55,6 +55,15 @@ function {{PREFIX}}_register_script_modules() {
 				'in_footer'     => true,
 			)
 		);
+
+		// Set up translations if the module uses wp-i18n.
+		if (
+			function_exists( 'wp_set_script_module_translations' ) &&
+			isset( $asset['dependencies'] ) &&
+			in_array( 'wp-i18n', $asset['dependencies'], true )
+		) {
+			wp_set_script_module_translations( $module['id'], 'default' );
+		}
 	}
 }
 
