@@ -87,11 +87,16 @@ test.describe( 'Collaboration with meta boxes', () => {
 			} );
 			await expect( modal ).toBeVisible( { timeout: 15000 } );
 
-			// Assert the explanation about meta box incompatibility.
+			// Assert the explanation about plugin incompatibility.
 			await expect(
 				modal.getByText(
-					'Because this post uses plugins that aren\u2019t compatible with real-time collaboration, only one person can edit at a time.'
+					/aren't compatible with real-time collaboration/
 				)
+			).toBeVisible();
+
+			// Assert the specific plugin name is listed.
+			await expect(
+				modal.getByText( 'Gutenberg Test Plugin, Meta Box' )
 			).toBeVisible();
 
 			// Assert the "Take over" option is available.

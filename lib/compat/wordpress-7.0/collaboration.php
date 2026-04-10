@@ -423,3 +423,133 @@ function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
 
 	return $actions;
 }
+
+/**
+ * Resolves a callback to its source plugin data.
+ *
+ * WordPress core's _get_plugin_from_callback() matches by directory prefix,
+ * which is ambiguous when multiple single-file plugins share the same parent
+ * directory (e.g. test plugins). This wrapper tries an exact file match first,
+ * then falls back to core's directory-based matching.
+ *
+ * @param callable $callback The callback to resolve.
+ * @return array|null Plugin data array on success, null on failure.
+ */
+function gutenberg_get_plugin_from_callback( $callback ) {
+	try {
+		if ( is_array( $callback ) ) {
+			$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+		} elseif ( is_string( $callback ) && str_contains( $callback, '::' ) ) {
+			$reflection = new ReflectionMethod( $callback );
+		} else {
+			$reflection = new ReflectionFunction( $callback );
+		}
+	} catch ( ReflectionException $exception ) {
+		return null;
+	}
+
+	if ( $reflection->isInternal() ) {
+		return null;
+	}
+
+	$filename   = wp_normalize_path( $reflection->getFileName() );
+	$plugin_dir = wp_normalize_path( WP_PLUGIN_DIR );
+
+	if ( ! str_starts_with( $filename, $plugin_dir ) ) {
+		return null;
+	}
+
+	// Get the path relative to the plugins directory.
+	$relative_path = ltrim( str_replace( $plugin_dir, '', $filename ), '/' );
+
+	$plugins = get_plugins();
+
+	// Try exact file match first. This correctly identifies single-file
+	// plugins that share a parent directory with other plugins.
+	if ( isset( $plugins[ $relative_path ] ) ) {
+		return $plugins[ $relative_path ];
+	}
+
+	// Fall back to core's directory-based matching for callbacks
+	// defined in plugin subdirectories.
+	if ( function_exists( '_get_plugin_from_callback' ) ) {
+		return _get_plugin_from_callback( $callback );
+	}
+
+	return null;
+}
+
+/**
+ * Detects which plugins registered meta boxes and exposes the plugin names
+ * to the editor via an inline script global. This allows the editor UI to
+ * show which specific plugins are incompatible with real-time collaboration.
+ */
+function gutenberg_inject_meta_box_plugin_names() {
+	global $wp_meta_boxes;
+
+	$screen = get_current_screen();
+
+	if ( ! $screen || ! $screen->is_block_editor ) {
+		return;
+	}
+
+	if ( ! get_option( 'wp_collaboration_enabled' ) ) {
+		return;
+	}
+
+	if ( ! function_exists( '_get_plugin_from_callback' ) ) {
+		return;
+	}
+
+	if ( ! isset( $wp_meta_boxes[ $screen->id ] ) ) {
+		return;
+	}
+
+	$plugin_names                  = array();
+	$unknown_meta_box_plugin_count = 0;
+
+	foreach ( $wp_meta_boxes[ $screen->id ] as $location_boxes ) {
+		foreach ( $location_boxes as $priority_boxes ) {
+			foreach ( $priority_boxes as $meta_box ) {
+				if ( false === $meta_box || ! $meta_box['title'] ) {
+					continue;
+				}
+
+				// Skip back-compat meta boxes. These are core meta boxes
+				// (categories, tags, etc.) that are reimplemented as block
+				// editor panels and don't actually render in the editor.
+				if ( isset( $meta_box['args']['__back_compat_meta_box'] ) && $meta_box['args']['__back_compat_meta_box'] ) {
+					continue;
+				}
+
+				$plugin = gutenberg_get_plugin_from_callback( $meta_box['callback'] );
+
+				if ( $plugin && ! empty( $plugin['Name'] ) ) {
+					$plugin_names[] = $plugin['Name'];
+				} else {
+					$unknown_meta_box_plugin_count += 1;
+				}
+			}
+		}
+	}
+
+	// Deduplicate plugin names if a plugin has multiple boxes
+	$plugin_names = array_values( array_unique( $plugin_names ) );
+
+	// Only output when there are meta boxes to report.
+	if ( empty( $plugin_names ) && 0 === $unknown_meta_box_plugin_count ) {
+		return;
+	}
+
+	$data = array(
+		'pluginNames'                => $plugin_names,
+		'unknownMetaBoxPluginsCount' => $unknown_meta_box_plugin_count,
+	);
+
+	wp_add_inline_script(
+		'wp-edit-post',
+		'window._wpMetaBoxPluginNames = ' . wp_json_encode( $data, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ';',
+		'before'
+	);
+}
+add_action( 'admin_footer', 'gutenberg_inject_meta_box_plugin_names' );

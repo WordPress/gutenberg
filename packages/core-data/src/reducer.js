@@ -692,28 +692,27 @@ export function syncConnectionStatuses( state = {}, action ) {
 }
 
 /**
- * Reducer managing whether collaboration is supported.
+ * Reducer managing collaboration support errors.
  *
- * Default to true, as collaboration is supported by default
- * unless explicitly disabled due to unsupported conditions
- * such as metaboxes.
+ * An empty object means collaboration is supported. Each key represents
+ * a reason collaboration is unsupported (e.g., 'metaBox', 'documentSizeLimitExceeded').
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {Object} Updated state.
  */
-export function collaborationSupported( state = true, action ) {
+export function collaborationSupportErrors( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_COLLABORATION_SUPPORTED':
-			return action.supported;
+		case 'SET_COLLABORATION_SUPPORT_ERRORS':
+			return { ...state, ...action.errors };
 
 		case 'SET_SYNC_CONNECTION_STATUS':
 			if (
 				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
 				action.status?.error?.code
 			) {
-				return false;
+				return { ...state, documentSizeLimitExceeded: true };
 			}
 
 			return state;
@@ -763,6 +762,6 @@ export default combineReducers( {
 	editorSettings,
 	editorAssets,
 	syncConnectionStatuses,
-	collaborationSupported,
+	collaborationSupportErrors,
 	viewConfigs,
 } );

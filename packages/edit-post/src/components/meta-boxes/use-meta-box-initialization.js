@@ -27,7 +27,9 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		} ),
 		[ enabled ]
 	);
-	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
+	const { setCollaborationSupportErrors } = unlock(
+		useDispatch( coreStore )
+	);
 
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
@@ -36,15 +38,23 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		if ( isEnabledAndEditorReady ) {
 			initializeMetaBoxes();
 
-			// Disable real-time collaboration when legacy meta boxes are detected.
+			// Disable real-time collaboration with errors when legacy meta
+			// boxes are detected.
 			if ( isCollaborationEnabled ) {
-				setCollaborationSupported( false );
+				const metaBoxPluginData = window._wpMetaBoxPluginNames || {
+					pluginNames: [],
+					unknownMetaBoxPluginsCount: 0,
+				};
+
+				setCollaborationSupportErrors( {
+					metaBox: metaBoxPluginData,
+				} );
 			}
 		}
 	}, [
 		isEnabledAndEditorReady,
 		initializeMetaBoxes,
 		isCollaborationEnabled,
-		setCollaborationSupported,
+		setCollaborationSupportErrors,
 	] );
 };
