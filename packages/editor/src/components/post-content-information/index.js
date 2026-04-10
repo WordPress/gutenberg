@@ -26,7 +26,7 @@ export default function PostContentInformation() {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
 		const { canUser } = select( coreStore );
-		const { getEntityRecord } = select( coreStore );
+		const { getEntityRecord, getPostType } = select( coreStore );
 		const siteSettings = canUser( 'read', {
 			kind: 'root',
 			name: 'site',
@@ -41,8 +41,24 @@ export default function PostContentInformation() {
 			! [ TEMPLATE_POST_TYPE, TEMPLATE_PART_POST_TYPE ].includes(
 				postType
 			);
-		return showPostContentInfo && getEditedPostAttribute( 'content' );
+
+		const type = postType ? getPostType( postType ) : null;
+		const supportsTimeToRead = type?.supports?.[ 'time-to-read' ];
+
+		const isSupported =
+			postType === 'post' ||
+			postType === 'page' ||
+			supportsTimeToRead === true;
+
+		return showPostContentInfo && isSupported
+			? getEditedPostAttribute( 'content' )
+			: null;
 	}, [] );
+
+	if ( ! postContent ) {
+		return null;
+	}
+
 	return <PostContentInformationUI postContent={ postContent } />;
 }
 
