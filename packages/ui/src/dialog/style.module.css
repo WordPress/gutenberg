@@ -98,7 +98,12 @@
 	}
 
 	.title {
-		margin-inline-end: auto;
+		/* Workaround the higher specificity of the global CSS defense styles */
+		--_gcd-heading-margin: 0 auto 0 0;
+
+		&:dir(rtl) {
+			--_gcd-heading-margin: 0 0 0 auto;
+		}
 	}
 
 	.footer {
