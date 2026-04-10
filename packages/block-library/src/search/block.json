@@ -42,10 +42,6 @@
 		"query": {
 			"type": "object",
 			"default": {}
-		},
-		"isSearchFieldHidden": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {
