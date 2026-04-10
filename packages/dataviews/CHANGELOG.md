@@ -28,6 +28,7 @@
 ### Code Quality
 
 - DataViewsPicker: Remove unnecessary ref callbacks in grid and table layouts. [#77179](https://github.com/WordPress/gutenberg/pull/77179)
+- Adopt `@wordpress/theme` design tokens for colors, spacing, typography, and borders. [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 
 ## 14.0.0 (2026-04-01)
 
