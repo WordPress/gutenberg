@@ -973,4 +973,151 @@ describe( 'polling-manager', () => {
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
+
+	describe( 'forbidden error handling', () => {
+		it( 'silently unregisters only the forbidden room on a 403', async () => {
+			// Respond with two rooms on the first poll.
+			const twoRoomResponse = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+					{
+						room: 'other-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+					},
+				],
+			};
+			mockPostSyncUpdate.mockResolvedValueOnce( twoRoomResponse );
+
+			const onStatusChangeA = jest.fn();
+			const onStatusChangeB = jest.fn();
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: onStatusChangeA,
+				onSync: jest.fn(),
+			} );
+			pollingManager.registerRoom( {
+				room: 'other-room',
+				doc: createMockDoc( 2 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: onStatusChangeB,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Second poll: 403 referencing only test-room.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync this entity: test-room.',
+				data: { status: 403 },
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// No error should be emitted — the room is silently removed.
+			expect( onStatusChangeA ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					error: expect.anything(),
+				} )
+			);
+
+			// The other room should be unaffected.
+			expect( onStatusChangeB ).not.toHaveBeenCalledWith(
+				expect.objectContaining( {
+					error: expect.anything(),
+				} )
+			);
+
+			// Polling should continue for the remaining room.
+			mockPostSyncUpdate.mockResolvedValueOnce( {
+				rooms: [
+					{
+						room: 'other-room',
+						end_cursor: 2,
+						awareness: {},
+						updates: [],
+					},
+				],
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'retries normally on a 401 (not treated as forbidden)', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			const onStatusChange = jest.fn();
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// Fail with a 401 — should go through normal retry path.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_not_logged_in',
+				message: 'You are not currently logged in.',
+				data: { status: 401 },
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			// Should emit a disconnected status (normal error handling).
+			expect( onStatusChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					status: 'disconnected',
+					canManuallyRetry: true,
+				} )
+			);
+
+			// Should retry after backoff (2000ms for solo first failure).
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+			await jest.advanceTimersByTimeAsync( 2000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'still retries on non-forbidden errors', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			// Fail with a generic network error (no data.status).
+			mockPostSyncUpdate.mockRejectedValueOnce(
+				new Error( 'Network error' )
+			);
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// Should retry after backoff (2000ms for solo first failure).
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+			await jest.advanceTimersByTimeAsync( 2000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
 } );
