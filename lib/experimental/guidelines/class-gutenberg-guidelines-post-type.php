@@ -151,11 +151,14 @@ class Gutenberg_Guidelines_Post_Type {
 			)
 		);
 
-		// Seed default terms.
-		foreach ( self::VALID_TYPES as $type ) {
-			if ( ! term_exists( $type, self::TAXONOMY ) ) {
-				wp_insert_term( $type, self::TAXONOMY, array( 'slug' => $type ) );
+		// Seed default terms once to avoid per-request SELECT queries from term_exists().
+		if ( ! get_option( 'wp_guideline_type_terms_seeded' ) ) {
+			foreach ( self::VALID_TYPES as $type ) {
+				if ( ! term_exists( $type, self::TAXONOMY ) ) {
+					wp_insert_term( $type, self::TAXONOMY, array( 'slug' => $type ) );
+				}
 			}
+			update_option( 'wp_guideline_type_terms_seeded', true );
 		}
 	}
 
