@@ -14,7 +14,7 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	/**
 	 * Gets the raw source URL for a registered script module.
 	 *
-	 * Uses WP_Script_Modules::get_registered_src() if available (WP 7.1+),
+	 * Uses WP_Script_Modules::get_registered_src() if available (WP 7.0+),
 	 * otherwise falls back to reflection to access the private registered array.
 	 *
 	 * @since X.X.X
