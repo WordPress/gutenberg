@@ -190,6 +190,7 @@ function PostFeaturedImage( {
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
+						multiple={ false }
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								{ isMissingMedia ? (
