@@ -5,6 +5,7 @@
 ### Enhancements
 
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
 
 ### Bug Fixes
 
