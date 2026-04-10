@@ -1195,6 +1195,36 @@ describe( 'polling-manager', () => {
 			expect( remainingRoomNames ).not.toContain( 'postType/post:10' );
 		} );
 
+		it( 'does not send a disconnect signal when unregistering a forbidden room', async () => {
+			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			// Next poll: 403 referencing the only registered room.
+			mockPostSyncUpdate.mockRejectedValueOnce( {
+				code: 'rest_cannot_edit',
+				message:
+					'You do not have permission to sync this entity: test-room.',
+				data: { status: 403 },
+			} );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// The server already denied the sync request, so our awareness
+			// was never stored. No disconnect signal should be sent.
+			expect( mockPostSyncUpdateNonBlocking ).not.toHaveBeenCalled();
+		} );
+
 		it( 'resumes polling for a newly-registered room after a 403 unregistered all rooms', async () => {
 			mockPostSyncUpdate.mockResolvedValueOnce( syncResponse );
 

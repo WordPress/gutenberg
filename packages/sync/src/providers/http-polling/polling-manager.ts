@@ -588,6 +588,10 @@ function poll(): void {
 					payload.rooms.map( ( r ) => r.room )
 				);
 
+				// Skip the disconnect signal in both branches: the server
+				// rejected our sync request before any awareness was written,
+				// so there is nothing on the server to clean up and the
+				// signal would just generate another 403.
 				if ( forbiddenRoom ) {
 					// A specific room was denied — unregister only that room.
 					const state = roomStates.get( forbiddenRoom );
@@ -598,7 +602,9 @@ function poll(): void {
 							'error',
 							true // force
 						);
-						unregisterRoom( forbiddenRoom );
+						unregisterRoom( forbiddenRoom, {
+							sendDisconnectSignal: false,
+						} );
 					}
 
 					// Restore updates for remaining rooms so they can
@@ -628,7 +634,9 @@ function poll(): void {
 								'error',
 								true // force
 							);
-							unregisterRoom( room );
+							unregisterRoom( room, {
+								sendDisconnectSignal: false,
+							} );
 						}
 					}
 				}
@@ -843,22 +851,28 @@ function registerRoom( {
 	}
 }
 
-function unregisterRoom( room: string ): void {
+function unregisterRoom(
+	room: string,
+	{ sendDisconnectSignal = true }: { sendDisconnectSignal?: boolean } = {}
+): void {
 	const state = roomStates.get( room );
 	if ( state ) {
-		// Send a disconnect signal so the server removes this client's
-		// awareness entry immediately instead of waiting for the timeout.
-		const rooms = [
-			{
-				after: 0,
-				awareness: null,
-				client_id: state.clientId,
-				room,
-				updates: [],
-			},
-		];
+		if ( sendDisconnectSignal ) {
+			// Send a disconnect signal so the server removes this client's
+			// awareness entry immediately instead of waiting for the timeout.
+			const rooms = [
+				{
+					after: 0,
+					awareness: null,
+					client_id: state.clientId,
+					room,
+					updates: [],
+				},
+			];
 
-		postSyncUpdateNonBlocking( { rooms } );
+			postSyncUpdateNonBlocking( { rooms } );
+		}
+
 		state.unregister();
 		roomStates.delete( room );
 	}
