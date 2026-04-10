@@ -57,7 +57,7 @@ type DataViewsProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
 	onClickItem?: ( item: Item ) => void;
@@ -82,6 +82,7 @@ type DataViewsProps< Item > = {
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const defaultIsItemClickable = () => true;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_LAYOUTS: SupportedLayouts = { table: {}, grid: {}, list: {} };
 
 const dataViewsLayouts = VIEW_LAYOUTS.filter(
 	( viewLayout ) => ! viewLayout.isPicker
@@ -144,7 +145,7 @@ function DataViews< Item >( {
 	getItemLevel,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
 	selection: selectionProperty,
 	onChangeSelection,
 	onClickItem,

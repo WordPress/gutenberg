@@ -70,15 +70,22 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = persistedView ?? defaultView ?? {};
+	const baseView: View = useMemo(
+		() => persistedView ?? defaultView ?? {},
+		[ persistedView, defaultView ]
+	);
 	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
 
 	const combinedOverrides = useMemo( () => {
-		const layoutTypeDefaults =
+		const rawLayoutDefaults =
 			config.defaultLayouts?.[
 				baseView.type as keyof typeof config.defaultLayouts
-			] ?? {};
+			];
+		const layoutTypeDefaults =
+			rawLayoutDefaults === true || rawLayoutDefaults === null
+				? {}
+				: rawLayoutDefaults;
 		return { ...layoutTypeDefaults, ...activeViewOverrides };
 	}, [ config.defaultLayouts, baseView.type, activeViewOverrides ] );
 

@@ -527,10 +527,10 @@ export type ViewPickerProps< Item > =
 	| ViewPickerTableProps< Item >;
 
 export interface SupportedLayouts {
-	list?: Omit< ViewList, 'type' >;
-	grid?: Omit< ViewGrid, 'type' >;
-	table?: Omit< ViewTable, 'type' >;
-	activity?: Omit< ViewActivity, 'type' >;
-	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
-	pickerTable?: Omit< ViewPickerTable, 'type' >;
+	list?: Omit< ViewList, 'type' > | true;
+	grid?: Omit< ViewGrid, 'type' > | true;
+	table?: Omit< ViewTable, 'type' > | true;
+	activity?: Omit< ViewActivity, 'type' > | true;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
+	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
 }

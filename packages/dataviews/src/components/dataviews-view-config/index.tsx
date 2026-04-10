@@ -90,10 +90,14 @@ export function ViewTypeMenu() {
 										if ( 'layout' in viewWithoutLayout ) {
 											delete viewWithoutLayout.layout;
 										}
+										const layoutDefaults =
+											defaultLayouts[ e.target.value ];
 										return onChangeView( {
 											...viewWithoutLayout,
 											type: e.target.value,
-											...defaultLayouts[ e.target.value ],
+											...( layoutDefaults === true
+												? {}
+												: layoutDefaults ),
 										} as View );
 								}
 								warning( 'Invalid dataview' );

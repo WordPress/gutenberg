@@ -62,7 +62,7 @@ type DataViewsPickerProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
@@ -77,6 +77,10 @@ type DataViewsPickerProps< Item > = {
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_PICKER_LAYOUTS: SupportedLayouts = {
+	pickerGrid: {},
+	pickerTable: {},
+};
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
@@ -132,7 +136,7 @@ function DataViewsPicker< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_PICKER_LAYOUTS,
 	selection,
 	onChangeSelection,
 	children,
