@@ -255,6 +255,46 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.sources`
+
+Additional package sources to discover and compile. By default the tool only discovers packages under `./packages/`. The `sources` field accepts an array that can contain two types of entries:
+
+**Directory paths** — relative paths pointing to a directory containing packages:
+
+```json
+{
+	"wpPlugin": {
+		"sources": [ "../js-packages" ]
+	}
+}
+```
+
+With this configuration the tool scans both `./packages/*` and `../js-packages/*`. Local packages always take priority: if a sources-discovered package has the same directory name as a local one, the local one wins.
+
+**Package names** — npm package names resolved via Node's module resolution:
+
+```json
+{
+	"wpPlugin": {
+		"sources": [ "@automattic/charts", "@automattic/number-formatters" ]
+	}
+}
+```
+
+Named sources are resolved using `require.resolve()`, so they work with any package manager's workspace protocol (pnpm `workspace:*`, yarn `workspace:*`, npm workspaces). The package must be declared as a dependency and installed.
+
+Named sources **preserve their npm identity** as the script-module ID. For example, `@automattic/charts` is registered as `@automattic/charts` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. The source's scoped namespace (e.g., `@automattic`) is automatically added to the externals configuration so that imports resolve correctly.
+
+Both types can be mixed in a single array:
+
+```json
+{
+	"wpPlugin": {
+		"sources": [ "../shared-packages", "@automattic/charts" ]
+	}
+}
+```
+
 ### `wpPlugin.pages` (Experimental)
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
