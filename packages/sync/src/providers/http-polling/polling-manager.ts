@@ -141,6 +141,68 @@ function identifyForbiddenRoom(
 	return null;
 }
 
+/**
+ * Handle a 403 from the sync endpoint. Silently unregisters the affected
+ * rooms, and restores pending updates for the remaining rooms so they retry on
+ * the next poll cycle.
+ *
+ * @param error          The forbidden error, narrowed via isForbiddenError.
+ * @param requestedRooms The rooms that were in the failing request.
+ */
+function handleForbiddenError(
+	error: WPRestError,
+	requestedRooms: SyncPayload[ 'rooms' ]
+): void {
+	const forbiddenRoom = identifyForbiddenRoom(
+		error,
+		requestedRooms.map( ( r ) => r.room )
+	);
+
+	if ( forbiddenRoom ) {
+		// A specific room was denied — unregister only that room.
+		const state = roomStates.get( forbiddenRoom );
+		if ( state ) {
+			state.log(
+				'Permission denied, unregistering room',
+				{ error },
+				'error',
+				true // force
+			);
+			unregisterRoom( forbiddenRoom, { sendDisconnectSignal: false } );
+		}
+
+		// Restore updates for remaining rooms so they can be retried on
+		// the next poll cycle.
+		for ( const room of requestedRooms ) {
+			if (
+				room.room === forbiddenRoom ||
+				! roomStates.has( room.room )
+			) {
+				continue;
+			}
+			const remainingState = roomStates.get( room.room )!;
+			if ( room.updates.length > 0 ) {
+				remainingState.updateQueue.restore( room.updates );
+			}
+		}
+	} else {
+		// Generic auth failure (e.g. not logged in) — unregister all rooms.
+		const rooms = [ ...roomStates.keys() ];
+		for ( const room of rooms ) {
+			const state = roomStates.get( room );
+			if ( state ) {
+				state.log(
+					'Permission denied, unregistering room',
+					{ error },
+					'error',
+					true // force
+				);
+				unregisterRoom( room, { sendDisconnectSignal: false } );
+			}
+		}
+	}
+}
+
 const roomStates: Map< string, RoomState > = new Map();
 
 /**
@@ -581,68 +643,13 @@ function poll(): void {
 		} catch ( error ) {
 			// A 403 response means the user does not have permission to
 			// sync a specific entity. Silently unregister the affected
-			// room(s).
+			// room(s) and let polling continue for the rest.
 			if ( isForbiddenError( error ) ) {
-				const forbiddenRoom = identifyForbiddenRoom(
-					error,
-					payload.rooms.map( ( r ) => r.room )
-				);
+				handleForbiddenError( error, payload.rooms );
 
-				// Skip the disconnect signal in both branches: the server
-				// rejected our sync request before any awareness was written,
-				// so there is nothing on the server to clean up and the
-				// signal would just generate another 403.
-				if ( forbiddenRoom ) {
-					// A specific room was denied — unregister only that room.
-					const state = roomStates.get( forbiddenRoom );
-					if ( state ) {
-						state.log(
-							'Permission denied, unregistering room',
-							{ error },
-							'error',
-							true // force
-						);
-						unregisterRoom( forbiddenRoom, {
-							sendDisconnectSignal: false,
-						} );
-					}
-
-					// Restore updates for remaining rooms so they can
-					// be retried on the next poll cycle.
-					for ( const room of payload.rooms ) {
-						if (
-							room.room === forbiddenRoom ||
-							! roomStates.has( room.room )
-						) {
-							continue;
-						}
-						const remainingState = roomStates.get( room.room )!;
-						if ( room.updates.length > 0 ) {
-							remainingState.updateQueue.restore( room.updates );
-						}
-					}
-				} else {
-					// Generic auth failure (e.g. not logged in) —
-					// unregister all rooms.
-					const rooms = [ ...roomStates.keys() ];
-					for ( const room of rooms ) {
-						const state = roomStates.get( room );
-						if ( state ) {
-							state.log(
-								'Permission denied, unregistering room',
-								{ error },
-								'error',
-								true // force
-							);
-							unregisterRoom( room, {
-								sendDisconnectSignal: false,
-							} );
-						}
-					}
-				}
-
-				// If all rooms are gone, stop polling. Reset isPolling so
-				// that a future registerRoom() call can start a new poll cycle.
+				// If every room was unregistered, stop the poll loop
+				// instead of scheduling another tick. Reset isPolling
+				// so a future registerRoom() call can restart it.
 				if ( roomStates.size === 0 ) {
 					isPolling = false;
 					return;
