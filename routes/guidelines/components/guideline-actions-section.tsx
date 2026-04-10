@@ -122,7 +122,7 @@ export default function GuidelineActionsSection() {
 	];
 
 	return (
-		<VStack spacing={ 4 } className="content-guidelines__actions">
+		<VStack spacing={ 4 } className="guidelines__actions">
 			<Heading level={ 3 } size={ 15 } weight={ 500 }>
 				{ __( 'Actions' ) }
 			</Heading>
@@ -142,17 +142,17 @@ export default function GuidelineActionsSection() {
 					{ error }
 				</Notice>
 			) }
-			<Card className="content-guidelines__actions-card">
+			<Card className="guidelines__actions-card">
 				{ /*
 				 * Disable reason: The `list` ARIA role is redundant but
 				 * Safari+VoiceOver won't announce the list otherwise.
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */ }
-				<ul role="list" className="content-guidelines__actions-list">
+				<ul role="list" className="guidelines__actions-list">
 					{ ACTIONS.map( ( action ) => (
 						<li
 							key={ action.slug }
-							className="content-guidelines__action-list-item"
+							className="guidelines__action-list-item"
 						>
 							<ActionItem { ...action } />
 						</li>

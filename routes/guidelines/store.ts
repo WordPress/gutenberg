@@ -13,7 +13,7 @@ import type {
 } from './types';
 
 export type { Categories };
-export const STORE_NAME = 'core/content-guidelines';
+export const STORE_NAME = 'core/guidelines';
 
 const DEFAULT_STATE: ContentGuidelinesState = {
 	id: null,

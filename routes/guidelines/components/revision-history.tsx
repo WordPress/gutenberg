@@ -196,10 +196,10 @@ export default function RevisionHistory() {
 	};
 
 	return (
-		<div className="content-guidelines__revision-history">
+		<div className="guidelines__revision-history">
 			<Navigator.BackButton
 				icon={ isRTL() ? chevronRight : chevronLeft }
-				className="content-guidelines__revision-history-back"
+				className="guidelines__revision-history-back"
 				onClick={ navigateToGuidelines }
 			>
 				{ __( 'Revision history' ) }
@@ -255,7 +255,7 @@ export default function RevisionHistory() {
 					</VStack>
 					<HStack
 						justify="flex-end"
-						className="content-guidelines__restore-modal-actions"
+						className="guidelines__restore-modal-actions"
 					>
 						<Button
 							variant="tertiary"

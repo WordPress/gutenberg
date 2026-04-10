@@ -132,7 +132,7 @@ export default function GuidelineAccordionForm( {
 			aria-labelledby={ headingId }
 			aria-describedby={ descriptionId }
 			onSubmit={ handleSave }
-			className="content-guidelines__accordion-form"
+			className="guidelines__accordion-form"
 		>
 			<VStack spacing={ 4 }>
 				<DataForm

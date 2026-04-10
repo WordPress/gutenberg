@@ -1,6 +1,6 @@
 <?php
 /**
- * Content Guidelines Post Type registration.
+ * Guidelines Post Type registration.
  *
  * @package gutenberg
  */
@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles registration of the Content Guidelines custom post type.
+ * Handles registration of the Guidelines custom post type.
  */
-class Gutenberg_Content_Guidelines_Post_Type {
+class Gutenberg_Guidelines_Post_Type {
 
 	/**
 	 * The post type name.
@@ -63,7 +63,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 *
 	 * @var string
 	 */
-	const BLOCK_META_PREFIX = '_content_guideline_block_';
+	const BLOCK_META_PREFIX = '_guideline_block_';
 
 	/**
 	 * Register the custom post type.
@@ -79,9 +79,9 @@ class Gutenberg_Content_Guidelines_Post_Type {
 			'show_ui'                         => false,
 			'show_in_menu'                    => false,
 			'show_in_rest'                    => true,
-			'rest_base'                       => 'content-guidelines',
-			'rest_controller_class'           => 'Gutenberg_Content_Guidelines_REST_Controller',
-			'revisions_rest_controller_class' => 'Gutenberg_Content_Guidelines_Revisions_Controller',
+			'rest_base'                       => 'guidelines',
+			'rest_controller_class'           => 'Gutenberg_Guidelines_REST_Controller',
+			'revisions_rest_controller_class' => 'Gutenberg_Guidelines_Revisions_Controller',
 			'capability_type'                 => 'post',
 			'capabilities'                    => array(
 				'read'                   => 'edit_posts',
@@ -123,7 +123,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 
 		// Register standard category meta.
 		foreach ( self::CATEGORY_META_KEYS as $category ) {
-			register_post_meta( self::POST_TYPE, '_content_guideline_' . $category, $meta_args );
+			register_post_meta( self::POST_TYPE, '_guideline_' . $category, $meta_args );
 		}
 
 		// Register meta for content blocks.
@@ -174,7 +174,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 * Convert a block name to a meta key.
 	 *
 	 * @param string $block_name The block name (e.g., 'core/paragraph').
-	 * @return string The meta key (e.g., '_content_guideline_block_core_paragraph').
+	 * @return string The meta key (e.g., '_guideline_block_core_paragraph').
 	 */
 	public static function block_name_to_meta_key( $block_name ) {
 		// Replace '/' with '_' to create a valid meta key.
@@ -185,7 +185,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	/**
 	 * Convert a meta key back to a block name.
 	 *
-	 * @param string $meta_key The meta key (e.g., '_content_guideline_block_core_paragraph').
+	 * @param string $meta_key The meta key (e.g., '_guideline_block_core_paragraph').
 	 * @return string The block name (e.g., 'core/paragraph').
 	 */
 	public static function meta_key_to_block_name( $meta_key ) {
@@ -225,7 +225,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 
 		// Get standard categories.
 		foreach ( self::CATEGORY_META_KEYS as $category ) {
-			$meta_key = '_content_guideline_' . $category;
+			$meta_key = '_guideline_' . $category;
 			$value    = get_post_meta( $post_id, $meta_key, true );
 
 			$guideline_categories[ $category ] = array(

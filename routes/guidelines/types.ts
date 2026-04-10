@@ -1,5 +1,5 @@
 /**
- * Types for the Content Guidelines feature.
+ * Types for the Guidelines feature.
  */
 
 import type { ReactNode } from 'react';

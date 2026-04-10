@@ -95,7 +95,7 @@ function ContentGuidelinesPage() {
 			) }
 		>
 			{ error && (
-				<div className="content-guidelines__content">
+				<div className="guidelines__content">
 					<Notice status="error" isDismissible={ false }>
 						<strong>
 							{ sprintf(
@@ -104,7 +104,7 @@ function ContentGuidelinesPage() {
 								error
 							) }
 						</strong>
-						<p className="content-guidelines__error-description">
+						<p className="guidelines__error-description">
 							{ __(
 								'Please try again. If the problem persists, contact support.'
 							) }
@@ -113,34 +113,31 @@ function ContentGuidelinesPage() {
 				</div>
 			) }
 			{ loading ? (
-				<div className="content-guidelines__loading">
+				<div className="guidelines__loading">
 					<Spinner />
 				</div>
 			) : (
 				! error && (
 					<Navigator initialPath={ getInitialNavigatorPath() }>
 						<Navigator.Screen path="/">
-							<VStack className="content-guidelines__content">
+							<VStack className="guidelines__content">
 								{ /*
 								 * Disable reason: The `list` ARIA role is redundant but
 								 * Safari+VoiceOver won't announce the list otherwise.
 								 */
 								/* eslint-disable jsx-a11y/no-redundant-roles */ }
-								<ul
-									role="list"
-									className="content-guidelines__list"
-								>
+								<ul role="list" className="guidelines__list">
 									{ GUIDELINE_ITEMS.map( ( item ) => {
-										const contentId = `content-guidelines-${ item.slug }`;
-										const headingId = `content-guidelines-${ item.slug }-heading`;
-										const descriptionId = `content-guidelines-${ item.slug }-description`;
+										const contentId = `guidelines-${ item.slug }`;
+										const headingId = `guidelines-${ item.slug }-heading`;
+										const descriptionId = `guidelines-${ item.slug }-description`;
 
 										return (
 											<li
 												key={ item.slug }
-												className="content-guidelines__list-item"
+												className="guidelines__list-item"
 											>
-												<div className="content-guidelines__accordion-item">
+												<div className="guidelines__accordion-item">
 													<GuidelineAccordion
 														title={ item.title }
 														description={

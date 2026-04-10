@@ -1,7 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.content-guidelines__accordion {
+.guidelines__accordion {
 	padding: $grid-unit-20 $grid-unit-30;
 
 	&-trigger {
@@ -35,16 +35,16 @@
 	}
 }
 
-.content-guidelines__accordion-header {
+.guidelines__accordion-header {
 	color: $gray-900;
 	padding-top: $grid-unit-05;
 }
 
-.content-guidelines__accordion-description {
+.guidelines__accordion-description {
 	color: $gray-700;
 	padding-bottom: $grid-unit-05;
 }
 
-.content-guidelines__accordion-form {
+.guidelines__accordion-form {
 	margin-top: $grid-unit-30;
 }
