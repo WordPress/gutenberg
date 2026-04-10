@@ -42,7 +42,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 
 .emotion-6 {
   font-size: 13px;
-  font-weight: 499;
+  font-weight: normal;
   line-height: 1.4;
   display: block;
   margin-bottom: calc(4px * 2);
