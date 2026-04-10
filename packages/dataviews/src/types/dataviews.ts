@@ -534,3 +534,12 @@ export interface SupportedLayouts {
 	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
 	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
 }
+
+export interface NormalizedSupportedLayouts {
+	list?: Omit< ViewList, 'type' >;
+	grid?: Omit< ViewGrid, 'type' >;
+	table?: Omit< ViewTable, 'type' >;
+	activity?: Omit< ViewActivity, 'type' >;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' >;
+	pickerTable?: Omit< ViewPickerTable, 'type' >;
+}

@@ -78,14 +78,12 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	const search = queryParams?.search ?? baseView.search ?? '';
 
 	const combinedOverrides = useMemo( () => {
-		const rawLayoutDefaults =
+		const rawDefaults =
 			config.defaultLayouts?.[
 				baseView.type as keyof typeof config.defaultLayouts
 			];
 		const layoutTypeDefaults =
-			rawLayoutDefaults === true || rawLayoutDefaults === null
-				? {}
-				: rawLayoutDefaults;
+			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
 		return { ...layoutTypeDefaults, ...activeViewOverrides };
 	}, [ config.defaultLayouts, baseView.type, activeViewOverrides ] );
 

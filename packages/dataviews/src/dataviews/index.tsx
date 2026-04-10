@@ -242,17 +242,20 @@ function DataViews< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Filter out DataViewsPicker layouts.
+	// Filter out DataViewsPicker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);

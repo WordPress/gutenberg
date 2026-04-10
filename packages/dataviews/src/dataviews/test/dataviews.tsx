@@ -19,7 +19,7 @@ import {
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 } from '../../constants';
-import type { Action, View } from '../../types';
+import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -38,7 +38,7 @@ const DEFAULT_VIEW = {
 	filters: [],
 };
 
-const defaultLayouts = {
+const defaultLayouts: SupportedLayouts = {
 	[ LAYOUT_TABLE ]: true,
 	[ LAYOUT_GRID ]: true,
 	[ LAYOUT_LIST ]: true,

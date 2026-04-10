@@ -14,7 +14,12 @@ import { useMemo, useState } from '@wordpress/element';
  */
 import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
-import type { ActionButton, View, ViewPickerGrid } from '../../types';
+import type {
+	ActionButton,
+	SupportedLayouts,
+	View,
+	ViewPickerGrid,
+} from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -107,7 +112,7 @@ function Picker( {
 		paginationInfo,
 		data: shownData,
 		view,
-		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: true },
+		defaultLayouts: { [ LAYOUT_PICKER_GRID ]: true } as SupportedLayouts,
 		fields: [],
 		onChangeView: setView,
 		multiselect,
