@@ -51,11 +51,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	}
 
 	return (
-		<Text
-			variant="body-lg"
-			render={ <nav /> }
-			aria-label={ __( 'Breadcrumbs' ) }
-		>
+		<nav aria-label={ __( 'Breadcrumbs' ) }>
 			<Stack
 				render={ <ul /> }
 				direction="row"
@@ -64,22 +60,32 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 			>
 				{ precedingItems.map( ( item, index ) => (
 					<li key={ index }>
-						<Link
-							render={ <RouterLink to={ item.to } /> }
-							tone="neutral"
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ item.to } /> }
+								/>
+							}
 						>
 							{ item.label }
-						</Link>
+						</Text>
 					</li>
 				) ) }
 				<li>
 					{ lastItem.to ? (
-						<Link
-							render={ <RouterLink to={ lastItem.to } /> }
-							tone="neutral"
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ lastItem.to } /> }
+								/>
+							}
 						>
 							{ lastItem.label }
-						</Link>
+						</Text>
 					) : (
 						<Text
 							variant="heading-lg"
@@ -91,7 +97,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 					) }
 				</li>
 			</Stack>
-		</Text>
+		</nav>
 	);
 };
 
