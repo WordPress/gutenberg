@@ -50,7 +50,15 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
 
 ```css
 .root {
-  isolation: isolate;
+	isolation: isolate;
+}
+```
+
+Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
 }
 ```
 
