@@ -679,6 +679,10 @@ button.wp-block-navigation-item__content {
 				left: auto;
 			}
 		}
+
+		.wp-block-navigation__overlay-backdrop {
+			display: block;
+		}
 	}
 
 	// Custom overlay container visibility.
@@ -741,6 +745,12 @@ button.wp-block-navigation-item__content {
 			}
 		}
 	}
+
+	.wp-block-navigation__overlay-backdrop {
+		position: fixed;
+		inset: 0;
+		background-color: rgba(0, 0, 0, 0.1);
+	}
 }
 
 // Default menu background and font color.
@@ -755,6 +765,9 @@ button.wp-block-navigation-item__content {
 	color: #000;
 }
 
+.wp-block-navigation__overlay-backdrop {
+	display: none;
+}
 
 // Overlay menu toggle button label
 .wp-block-navigation__toggle_button_label {

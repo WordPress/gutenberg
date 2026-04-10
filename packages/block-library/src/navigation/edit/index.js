@@ -923,6 +923,7 @@ function Navigation( {
 						overlayMenu={ overlayMenu }
 						overlay={ overlay }
 						setAttributes={ setAttributes }
+						attributes={ attributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 						overlayMenuPreview={ overlayMenuPreview }
 						setOverlayMenuPreview={ setOverlayMenuPreview }

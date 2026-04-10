@@ -59,6 +59,14 @@
 		"overlay": {
 			"type": "string"
 		},
+		"overlayBackdrop": {
+			"type": "boolean",
+			"default": true
+		},
+		"overlayBackdropBlur": {
+			"type": "number",
+			"default": 0
+		},
 		"icon": {
 			"type": "string",
 			"default": "handle"
