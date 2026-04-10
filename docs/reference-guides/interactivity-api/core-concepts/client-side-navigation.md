@@ -9,6 +9,10 @@ The Interactivity API supports two navigation modes:
 -   **Region-based client-side navigation** — The recommended approach for implementing client-side navigation in WordPress.
 -   **Full-page client-side navigation** _(experimental)_ — Treats the entire `<body>` element as a single region, effectively updating the whole page content without a traditional reload. Covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
+<div class="callout callout-info">
+To learn how to ensure your blocks and interactive elements are compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility</a> guide.
+</div>
+
 ## How client-side navigation works
 
 When a user triggers a navigation, for example, by clicking a link that has a `data-wp-on--click` directive that calls `actions.navigate()`, the Interactivity Router:
@@ -29,7 +33,13 @@ This approach offers several benefits:
 
 ## Getting started with the Interactivity Router
 
-The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool, which creates a block with the Interactivity API already configured:
+The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool. It offers a dedicated `client-side-navigation` variant that scaffolds a fully working block with client-side navigation already wired up — including router regions, prev/next navigation, a loading indicator, and a stopwatch that persists across navigations to demonstrate state persistence:
+
+```bash
+npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template --variant client-side-navigation
+```
+
+You can also scaffold the default variant and add client-side navigation yourself:
 
 ```bash
 npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template
@@ -101,13 +111,17 @@ For **blocks**, this attribute is added automatically when the block declares in
 
 If your block's `block.json` already includes one of these, no additional setup is needed — WordPress handles the rest.
 
-For **classic themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
+For **classic PHP themes** and other script modules registered outside of `block.json`, the attribute is not added automatically. You must register your script module for client-side navigation explicitly using `add_client_navigation_support_to_script_module()`:
 
 ```php
 wp_interactivity()->add_client_navigation_support_to_script_module(
     'my-theme/navigation'
 );
 ```
+
+<div class="callout callout-info">
+To understand what makes a block (or interactive elements in a classic PHP theme) compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility</a> guide.
+</div>
 
 Without this, the router will not load your script module when navigating to a page that needs it.
 

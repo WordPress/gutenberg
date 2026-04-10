@@ -39,7 +39,7 @@ import type {
 import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
-import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
+import { useScrollState } from './use-scroll-state';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -267,7 +267,6 @@ function TableRow< Item >( {
 				// itself (to toggle row selection) without erroneously
 				// intercepting click events from ItemActions.
 
-				/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 				<td
 					className={ clsx( 'dataviews-view-table__actions-column', {
 						'dataviews-view-table__actions-column--sticky': true,
@@ -278,7 +277,6 @@ function TableRow< Item >( {
 				>
 					<ItemActions item={ item } actions={ actions } />
 				</td>
-				/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			) }
 		</tr>
 	);
@@ -323,9 +321,9 @@ function ViewTable< Item >( {
 
 	const tableNoticeId = useId();
 
-	const isHorizontalScrollEnd = useIsHorizontalScrollEnd( {
+	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
-		enabled: !! actions?.length,
+		enabledHorizontal: !! actions?.length,
 	} );
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
@@ -464,7 +462,13 @@ function ViewTable< Item >( {
 						<PropertiesSection showLabel={ false } />
 					</Popover>
 				) }
-				<thead onContextMenu={ handleHeaderContextMenu }>
+				<thead
+					className={ clsx( {
+						'dataviews-view-table__thead--stuck':
+							isVerticallyScrolled,
+					} ) }
+					onContextMenu={ handleHeaderContextMenu }
+				>
 					<tr className="dataviews-view-table__row">
 						{ hasBulkActions && (
 							<th

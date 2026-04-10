@@ -42,11 +42,15 @@ function ConnectorsPage() {
 		[]
 	);
 
-	const isEmpty = connectors.length === 0;
+	const renderableConnectors = connectors.filter(
+		( connector: ConnectorConfig ) => connector.render
+	);
+	const isEmpty = renderableConnectors.length === 0;
 
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
+			headingLevel={ 1 }
 			subTitle={ __(
 				'All of your API keys and credentials are stored here and shared across plugins. Configure once and use everywhere.'
 			) }
@@ -85,8 +89,14 @@ function ConnectorsPage() {
 									<connector.render
 										key={ connector.slug }
 										slug={ connector.slug }
-										label={ connector.label }
+										name={ connector.name }
 										description={ connector.description }
+										type={ connector.type }
+										logo={ connector.logo }
+										authentication={
+											connector.authentication
+										}
+										plugin={ connector.plugin }
 									/>
 								);
 							}
@@ -98,12 +108,12 @@ function ConnectorsPage() {
 					<p>
 						{ createInterpolateElement(
 							__(
-								'Find more connectors in <a>the plugin directory</a>'
+								'If the connector you need is not listed, <a>search the plugin directory</a> to see if a connector is available.'
 							),
 							{
 								a: (
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="plugin-install.php" />
+									<a href="plugin-install.php?s=connector&tab=search&type=tag" />
 								),
 							}
 						) }

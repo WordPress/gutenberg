@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -6,24 +6,18 @@
 import {
 	Button,
 	Icon,
-	Modal,
+	Notice,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
 import {
 	DataViews,
 	filterSortAndPaginate,
 	type View,
 } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { store as blocksStore } from '@wordpress/blocks';
@@ -34,7 +28,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import BlockGuidelineModal from './block-guideline-modal';
 import { saveContentGuidelines } from '../api';
-import { STORE_NAME } from '../store';
+import { store as coreContentGuidelinesStore } from '../store';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
@@ -91,8 +85,7 @@ export default function BlockGuidelines() {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const blockGuidelines = useSelect(
-		// @ts-ignore
-		( select ) => select( STORE_NAME ).getBlockGuidelines(),
+		( select ) => select( coreContentGuidelinesStore ).getBlockGuidelines(),
 		[]
 	);
 
@@ -115,7 +108,7 @@ export default function BlockGuidelines() {
 		[ blockGuidelines, blockTypes ]
 	);
 
-	const { setBlockGuideline } = useDispatch( STORE_NAME );
+	const { setBlockGuideline } = useDispatch( coreContentGuidelinesStore );
 
 	const handleRowClick = ( id: string ) => {
 		setSelectedItem( id );
@@ -205,15 +198,13 @@ export default function BlockGuidelines() {
 	return (
 		<VStack spacing={ 4 } className="block-guidelines">
 			{ error && (
-				<Notice.Root intent="error">
-					<Notice.Title>
-						{ sprintf(
-							/* translators: %s: Error message. */
-							__( 'Error: %s' ),
-							error
-						) }
-					</Notice.Title>
-				</Notice.Root>
+				<Notice status="error" onRemove={ () => setError( null ) }>
+					{ sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error: %s' ),
+						error
+					) }
+				</Notice>
 			) }
 			{ rows.length > 0 && (
 				<DataViews
@@ -243,7 +234,7 @@ export default function BlockGuidelines() {
 			) }
 			<HStack>
 				<Button variant="primary" onClick={ openModal }>
-					{ __( 'Add block guidelines' ) }
+					{ __( 'Add guidelines' ) }
 				</Button>
 			</HStack>
 
@@ -253,54 +244,24 @@ export default function BlockGuidelines() {
 					initialBlock={ selectedItem }
 				/>
 			) }
-			{ itemToDelete && (
-				<Modal
-					className="block-guidelines__remove-modal"
-					title={ __( 'Remove block guidelines' ) }
-					onRequestClose={ () => setItemToDelete( null ) }
-					size="small"
-				>
-					<VStack spacing={ 6 }>
-						<VStack spacing={ 4 }>
-							<Text size={ 13 } weight={ 400 }>
-								{ sprintf(
-									/* translators: %s: Block name. */
-									__(
-										'You are about to remove the block guidelines for the %s block.'
-									),
-									itemToDelete.label
-								) }
-							</Text>
-							<Text size={ 13 } weight={ 400 }>
-								{ __(
-									'This can be undone from revision history.'
-								) }
-							</Text>
-						</VStack>
-						<HStack justify="flex-end">
-							<Button
-								variant="tertiary"
-								onClick={ () => setItemToDelete( null ) }
-								disabled={ busy }
-								accessibleWhenDisabled
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								disabled={ busy }
-								accessibleWhenDisabled
-								isBusy={ busy }
-								variant="primary"
-								onClick={ handleDelete }
-								isDestructive
-								__next40pxDefaultSize
-							>
-								{ __( 'Remove' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				</Modal>
-			) }
+			<ConfirmDialog
+				isOpen={ !! itemToDelete }
+				title={ __( 'Remove block guidelines' ) }
+				__experimentalHideHeader={ false }
+				onConfirm={ handleDelete }
+				onCancel={ () => setItemToDelete( null ) }
+				confirmButtonText={ __( 'Remove' ) }
+				isBusy={ busy }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Block name. */
+					__(
+						'You are about to remove the block guidelines for the %s block. This can be undone from revision history.'
+					),
+					itemToDelete?.label ?? ''
+				) }
+			</ConfirmDialog>
 		</VStack>
 	);
 }

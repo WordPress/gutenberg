@@ -126,11 +126,11 @@ const fields: Field< SamplePost >[] = [
 		id: 'can_comment',
 		label: 'Allow people to leave a comment',
 		type: 'boolean',
-		Edit: 'checkbox',
+		Edit: 'toggle',
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -177,7 +177,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -186,7 +186,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -196,7 +196,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -230,7 +230,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -312,8 +312,10 @@ const getLayoutFromStoryArgs = ( {
 
 const LayoutRegularComponent = ( {
 	labelPosition,
+	disabled = false,
 }: {
 	labelPosition: 'default' | 'top' | 'side' | 'none';
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState( {
 		title: 'Hello, World!',
@@ -332,6 +334,18 @@ const LayoutRegularComponent = ( {
 		description: 'This is a sample description.',
 	} );
 
+	// Make fields disabled when control is set to disabled.
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
+
 	const form: Form = useMemo(
 		() => ( {
 			layout: getLayoutFromStoryArgs( {
@@ -342,6 +356,7 @@ const LayoutRegularComponent = ( {
 				'title',
 				'order',
 				'sticky',
+				'can_comment',
 				'author',
 				'status',
 				'reviewer',
@@ -349,7 +364,6 @@ const LayoutRegularComponent = ( {
 				'password',
 				'date',
 				'birthdate',
-				'can_comment',
 				'filesize',
 				'dimensions',
 				'tags',
@@ -363,7 +377,7 @@ const LayoutRegularComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

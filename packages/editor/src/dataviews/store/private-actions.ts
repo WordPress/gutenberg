@@ -19,6 +19,7 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
+	excerptField,
 	featuredImageField,
 	dateField,
 	parentField,
@@ -38,6 +39,7 @@ import {
 	scheduledDateField,
 	formatField,
 	postContentInfoField,
+	stickyField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -267,6 +269,9 @@ export const registerPostTypeSchema =
 				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
 					scheduledDateField,
 				slugField,
+				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
+					postTypeConfig.supports?.excerpt &&
+					excerptField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
@@ -281,6 +286,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.editor &&
 					postContentInfoField,
 				passwordField,
+				postTypeConfig.slug === 'post' && stickyField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,

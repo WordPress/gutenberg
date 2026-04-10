@@ -42,7 +42,10 @@
 	}
 
 	.is-none-intent {
-		background-color: var(--wpds-color-bg-surface-neutral);
-		color: var(--wpds-color-fg-content-neutral-weak);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		color: var(--wpds-color-fg-content-neutral);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+		padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
 	}
 }

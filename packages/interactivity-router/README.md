@@ -7,7 +7,7 @@ The package defines an Interactivity API store with the `core/router` namespace,
 The `@wordpress/interactivity-router` package was [introduced in WordPress Core in v6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/). This means this package is already bundled in Core in any version of WordPress higher than v6.5.
 
 <div class="callout callout-info">
-    For a comprehensive guide on how client-side navigation works, including getting started, block compatibility, and advanced use cases, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/">Client-Side Navigation guide</a>.
+    For a comprehensive guide on how client-side navigation works, including getting started, block compatibility, and advanced use cases, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/">Client-Side Navigation guide</a>. To learn how to ensure your blocks are compatible with client-side navigation, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation-compatibility/">Client-Side Navigation Compatibility guide</a>.
 </div>
 
 <div class="callout callout-info">

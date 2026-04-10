@@ -86,7 +86,7 @@ import {
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
 
-const { isIsolatedEditorKey } = unlock( blockEditorPrivateApis );
+const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -330,15 +330,17 @@ function Navigation( {
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
+
 		return {
 			isPreviewMode: settings.isPreviewMode,
 			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
 			// Needed to construct the template part ID for the overlay preview.
 			currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-			// In preview mode or isolated editor, always show navigation expanded (no hamburger)
-			// so users can see and interact with all menu items.
+			// When editing a navigation post directly in an isolated editor,
+			// always show navigation expanded (no hamburger) so users can see
+			// and interact with all menu items.
 			editorDisabledResponsive:
-				settings.isPreviewMode || !! settings?.[ isIsolatedEditorKey ],
+				!! settings?.[ isNavigationPostEditorKey ],
 		};
 	}, [] );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
@@ -964,16 +966,7 @@ function Navigation( {
 
 	if ( hasUnsavedBlocks && ! isCreatingNavigationMenu ) {
 		return (
-			<TagName
-				{ ...blockProps }
-				aria-describedby={
-					! isPlaceholder ? accessibleDescriptionId : undefined
-				}
-			>
-				<AccessibleDescription id={ accessibleDescriptionId }>
-					{ __( 'Unsaved Navigation Menu.' ) }
-				</AccessibleDescription>
-
+			<>
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
@@ -990,26 +983,36 @@ function Navigation( {
 					blockEditingMode={ blockEditingMode }
 				/>
 				{ blockEditingMode === 'default' && stylingInspectorControls }
-				<ResponsiveWrapper
-					id={ clientId }
-					onToggle={ setResponsiveMenuVisibility }
-					isOpen={ isResponsiveMenuOpen }
-					hasIcon={ hasIcon }
-					icon={ icon }
-					isResponsive={ isResponsive }
-					isHiddenByDefault={ isHiddenByDefault }
-					overlayBackgroundColor={ overlayBackgroundColor }
-					overlayTextColor={ overlayTextColor }
-					overlay={ overlay }
-					onNavigateToEntityRecord={ onNavigateToEntityRecord }
+				<TagName
+					{ ...blockProps }
+					aria-describedby={
+						! isPlaceholder ? accessibleDescriptionId : undefined
+					}
 				>
-					<UnsavedInnerBlocks
-						createNavigationMenu={ createNavigationMenu }
-						blocks={ uncontrolledInnerBlocks }
-						hasSelection={ isSelected || isInnerBlockSelected }
-					/>
-				</ResponsiveWrapper>
-			</TagName>
+					<AccessibleDescription id={ accessibleDescriptionId }>
+						{ __( 'Unsaved Navigation Menu.' ) }
+					</AccessibleDescription>
+					<ResponsiveWrapper
+						id={ clientId }
+						onToggle={ setResponsiveMenuVisibility }
+						isOpen={ isResponsiveMenuOpen }
+						hasIcon={ hasIcon }
+						icon={ icon }
+						isResponsive={ isResponsive }
+						isHiddenByDefault={ isHiddenByDefault }
+						overlayBackgroundColor={ overlayBackgroundColor }
+						overlayTextColor={ overlayTextColor }
+						overlay={ overlay }
+						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+					>
+						<UnsavedInnerBlocks
+							createNavigationMenu={ createNavigationMenu }
+							blocks={ uncontrolledInnerBlocks }
+							hasSelection={ isSelected || isInnerBlockSelected }
+						/>
+					</ResponsiveWrapper>
+				</TagName>
+			</>
 		);
 	}
 
@@ -1017,7 +1020,7 @@ function Navigation( {
 	// TODO - the user should be able to select a new one?
 	if ( ref && isNavigationMenuMissing ) {
 		return (
-			<TagName { ...blockProps }>
+			<>
 				<MenuInspectorControls
 					clientId={ clientId }
 					createNavigationMenuIsSuccess={
@@ -1033,10 +1036,12 @@ function Navigation( {
 					isLoading={ isLoading }
 					blockEditingMode={ blockEditingMode }
 				/>
-				<DeletedNavigationWarning
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-				/>
-			</TagName>
+				<TagName { ...blockProps }>
+					<DeletedNavigationWarning
+						onCreateNew={ createUntitledEmptyNavigationMenu }
+					/>
+				</TagName>
+			</>
 		);
 	}
 
@@ -1086,105 +1091,106 @@ function Navigation( {
 	}
 
 	return (
-		<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
-			<RecursionProvider uniqueId={ recursionId }>
-				<MenuInspectorControls
-					clientId={ clientId }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
-					currentMenuId={ ref }
-					isNavigationMenuMissing={ isNavigationMenuMissing }
-					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
-					onCreateNew={ createUntitledEmptyNavigationMenu }
-					onSelectClassicMenu={ onSelectClassicMenu }
-					onSelectNavigationMenu={ onSelectNavigationMenu }
-					isLoading={ isLoading }
-					blockEditingMode={ blockEditingMode }
-				/>
-				{ blockEditingMode === 'default' && stylingInspectorControls }
-				{ blockEditingMode === 'contentOnly' && isEntityAvailable && (
-					<NavigationAddPageButton clientId={ clientId } />
-				) }
-				{ blockEditingMode === 'default' && isEntityAvailable && (
-					<InspectorControls group="advanced">
-						{ hasResolvedCanUserUpdateNavigationMenu &&
-							canUserUpdateNavigationMenu && (
-								<NavigationMenuNameControl />
-							) }
-						{ hasResolvedCanUserDeleteNavigationMenu &&
-							canUserDeleteNavigationMenu && (
-								<NavigationMenuDeleteControl
-									onDelete={ () => {
-										replaceInnerBlocks( clientId, [] );
-										showNavigationMenuStatusNotice(
-											__(
-												'Navigation Menu successfully deleted.'
-											)
-										);
-									} }
-								/>
-							) }
-						<ManageMenusButton
-							disabled={ isManageMenusButtonDisabled }
-							className="wp-block-navigation-manage-menus-button"
-						/>
-					</InspectorControls>
-				) }
-
-				<TagName
-					{ ...blockProps }
-					aria-describedby={
-						! isPlaceholder && ! isLoading
-							? accessibleDescriptionId
-							: undefined
-					}
-				>
-					{ isLoading && ! isHiddenByDefault && (
-						<div className="wp-block-navigation__loading-indicator-container">
-							<Spinner className="wp-block-navigation__loading-indicator" />
-						</div>
-					) }
-
-					{ ( ! isLoading || isHiddenByDefault ) && (
-						<>
-							<AccessibleMenuDescription
-								id={ accessibleDescriptionId }
-							/>
-							<ResponsiveWrapper
-								id={ clientId }
-								onToggle={ setResponsiveMenuVisibility }
-								hasIcon={ hasIcon }
-								icon={ icon }
-								isOpen={ isResponsiveMenuOpen }
-								isResponsive={ isResponsive }
-								isHiddenByDefault={ isHiddenByDefault }
-								overlayBackgroundColor={
-									overlayBackgroundColor
-								}
-								overlayTextColor={ overlayTextColor }
-								overlay={ overlay }
-								onNavigateToEntityRecord={
-									onNavigateToEntityRecord
-								}
-							>
-								{ isEntityAvailable && (
-									<NavigationInnerBlocks
-										clientId={ clientId }
-										hasCustomPlaceholder={
-											!! CustomPlaceholder
-										}
-										templateLock={ templateLock }
-										orientation={ orientation }
+		<>
+			<MenuInspectorControls
+				clientId={ clientId }
+				createNavigationMenuIsSuccess={ createNavigationMenuIsSuccess }
+				createNavigationMenuIsError={ createNavigationMenuIsError }
+				currentMenuId={ ref }
+				isNavigationMenuMissing={ isNavigationMenuMissing }
+				isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+				onCreateNew={ createUntitledEmptyNavigationMenu }
+				onSelectClassicMenu={ onSelectClassicMenu }
+				onSelectNavigationMenu={ onSelectNavigationMenu }
+				isLoading={ isLoading }
+				blockEditingMode={ blockEditingMode }
+			/>
+			{ blockEditingMode === 'default' && stylingInspectorControls }
+			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
+				<RecursionProvider uniqueId={ recursionId }>
+					{ blockEditingMode === 'contentOnly' &&
+						isEntityAvailable && (
+							<NavigationAddPageButton clientId={ clientId } />
+						) }
+					{ blockEditingMode === 'default' && isEntityAvailable && (
+						<InspectorControls group="advanced">
+							{ hasResolvedCanUserUpdateNavigationMenu &&
+								canUserUpdateNavigationMenu && (
+									<NavigationMenuNameControl />
+								) }
+							{ hasResolvedCanUserDeleteNavigationMenu &&
+								canUserDeleteNavigationMenu && (
+									<NavigationMenuDeleteControl
+										onDelete={ () => {
+											replaceInnerBlocks( clientId, [] );
+											showNavigationMenuStatusNotice(
+												__(
+													'Navigation Menu successfully deleted.'
+												)
+											);
+										} }
 									/>
 								) }
-							</ResponsiveWrapper>
-						</>
+							<ManageMenusButton
+								disabled={ isManageMenusButtonDisabled }
+								className="wp-block-navigation-manage-menus-button"
+							/>
+						</InspectorControls>
 					) }
-				</TagName>
-			</RecursionProvider>
-		</EntityProvider>
+
+					<TagName
+						{ ...blockProps }
+						aria-describedby={
+							! isPlaceholder && ! isLoading
+								? accessibleDescriptionId
+								: undefined
+						}
+					>
+						{ isLoading && ! isHiddenByDefault && (
+							<div className="wp-block-navigation__loading-indicator-container">
+								<Spinner className="wp-block-navigation__loading-indicator" />
+							</div>
+						) }
+
+						{ ( ! isLoading || isHiddenByDefault ) && (
+							<>
+								<AccessibleMenuDescription
+									id={ accessibleDescriptionId }
+								/>
+								<ResponsiveWrapper
+									id={ clientId }
+									onToggle={ setResponsiveMenuVisibility }
+									hasIcon={ hasIcon }
+									icon={ icon }
+									isOpen={ isResponsiveMenuOpen }
+									isResponsive={ isResponsive }
+									isHiddenByDefault={ isHiddenByDefault }
+									overlayBackgroundColor={
+										overlayBackgroundColor
+									}
+									overlayTextColor={ overlayTextColor }
+									overlay={ overlay }
+									onNavigateToEntityRecord={
+										onNavigateToEntityRecord
+									}
+								>
+									{ isEntityAvailable && (
+										<NavigationInnerBlocks
+											clientId={ clientId }
+											hasCustomPlaceholder={
+												!! CustomPlaceholder
+											}
+											templateLock={ templateLock }
+											orientation={ orientation }
+										/>
+									) }
+								</ResponsiveWrapper>
+							</>
+						) }
+					</TagName>
+				</RecursionProvider>
+			</EntityProvider>
+		</>
 	);
 }
 

@@ -9,6 +9,7 @@
 		]
 	},
 	"dependencies": {
+		"@wordpress/a11y": "file:../../packages/a11y",
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
 		"@wordpress/components": "file:../../packages/components",
@@ -18,6 +19,7 @@
 		"@wordpress/element": "file:../../packages/element",
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
-		"@wordpress/ui": "file:../../packages/ui"
+		"@wordpress/ui": "file:../../packages/ui",
+		"@wordpress/url": "file:../../packages/url"
 	}
 }

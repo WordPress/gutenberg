@@ -152,7 +152,7 @@ describe( 'cross-origin-isolation', () => {
 		expect( observeSpy ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should add crossorigin="anonymous" to images', async () => {
+	it( 'should not add crossorigin="anonymous" to images', async () => {
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: true,
 			writable: true,
@@ -172,8 +172,12 @@ describe( 'cross-origin-isolation', () => {
 		// Wait for MutationObserver callback to fire (async microtask).
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
-		// The image should get the crossorigin attribute
-		expect( img ).toHaveAttribute( 'crossorigin', 'anonymous' );
+		// Images should NOT get the crossorigin attribute.
+		// Under Document-Isolation-Policy: isolate-and-credentialless,
+		// the credentialless mode handles image loading without CORS headers.
+		// Adding crossorigin="anonymous" would override this and break
+		// external images that don't serve CORS headers.
+		expect( img ).not.toHaveAttribute( 'crossorigin' );
 
 		document.body.removeChild( img );
 	} );

@@ -3,6 +3,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .edit-site-patterns__delete-modal {
+	// TODO: Replace with a --wpds-dimension-surface-width-* token.
 	width: $modal-width-small;
 }
 

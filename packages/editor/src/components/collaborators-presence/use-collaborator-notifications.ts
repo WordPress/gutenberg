@@ -10,6 +10,7 @@ import {
 	type PostEditorAwarenessState,
 	type PostSaveEvent,
 } from '@wordpress/core-data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -29,16 +30,6 @@ const NOTIFICATION_TYPE = {
 	COLLAB_USER_ENTERED: 'collab-user-entered',
 	COLLAB_USER_EXITED: 'collab-user-exited',
 } as const;
-
-/**
- * Development kill-switches for each notification type. Flip to `false`
- * to suppress a category during local testing without removing code.
- */
-const NOTIFICATIONS_CONFIG = {
-	userEntered: true,
-	userExited: true,
-	postUpdated: true,
-};
 
 const PUBLISHED_STATUSES = [ 'publish', 'private', 'future' ];
 
@@ -77,23 +68,32 @@ export function useCollaboratorNotifications(
 	postId: number | null,
 	postType: string | null
 ): void {
-	const { postStatus, isCollaborationEnabled } = useSelect( ( select ) => {
-		const editorSel = select( editorStore );
-		return {
-			postStatus: editorSel.getCurrentPostAttribute( 'status' ) as
-				| string
-				| undefined,
-			isCollaborationEnabled:
-				editorSel.isCollaborationEnabledForCurrentPost(),
-		};
-	}, [] );
+	const { postStatus, isCollaborationEnabled, showNotifications } = useSelect(
+		( select ) => {
+			const editorSel = select( editorStore );
+			return {
+				postStatus: editorSel.getCurrentPostAttribute( 'status' ) as
+					| string
+					| undefined,
+				isCollaborationEnabled:
+					editorSel.isCollaborationEnabledForCurrentPost(),
+				showNotifications:
+					select( preferencesStore ).get(
+						'core',
+						'showCollaborationNotifications'
+					) ?? true,
+			};
+		},
+		[]
+	);
 
 	const { createNotice } = useDispatch( noticesStore );
 
-	// Pass null when collaboration is disabled to prevent the hooks
-	// from subscribing to awareness state.
-	const effectivePostId = isCollaborationEnabled ? postId : null;
-	const effectivePostType = isCollaborationEnabled ? postType : null;
+	// Pass null when collaboration is disabled or notifications are
+	// turned off to prevent the hooks from subscribing to awareness state.
+	const shouldSubscribe = isCollaborationEnabled && showNotifications;
+	const effectivePostId = shouldSubscribe ? postId : null;
+	const effectivePostType = shouldSubscribe ? postType : null;
 
 	useOnCollaboratorJoin(
 		effectivePostId,
@@ -103,10 +103,6 @@ export function useCollaboratorNotifications(
 				collaborator: PostEditorAwarenessState,
 				me?: PostEditorAwarenessState
 			) => {
-				if ( ! NOTIFICATIONS_CONFIG.userEntered ) {
-					return;
-				}
-
 				/*
 				 * Skip collaborators who were present before the current user
 				 * joined. Their enteredAt is earlier than ours, meaning we're
@@ -143,10 +139,6 @@ export function useCollaboratorNotifications(
 		effectivePostType,
 		useCallback(
 			( collaborator: PostEditorAwarenessState ) => {
-				if ( ! NOTIFICATIONS_CONFIG.userExited ) {
-					return;
-				}
-
 				void createNotice(
 					'info',
 					sprintf(
@@ -174,7 +166,7 @@ export function useCollaboratorNotifications(
 				saver: PostEditorAwarenessState,
 				prevEvent: PostSaveEvent | null
 			) => {
-				if ( ! NOTIFICATIONS_CONFIG.postUpdated || ! postStatus ) {
+				if ( ! postStatus ) {
 					return;
 				}
 

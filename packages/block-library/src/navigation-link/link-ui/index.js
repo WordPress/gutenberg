@@ -124,13 +124,24 @@ function UnforwardedLinkUI( props, ref ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
+			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
 			kind,
 			type,
 			id,
 			image,
 			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id, image, badges ]
+		[
+			label,
+			opensInNewTab,
+			url,
+			kind,
+			type,
+			id,
+			image,
+			badges,
+			entityRecord,
+		]
 	);
 
 	const handlePageCreated = ( pageLink ) => {

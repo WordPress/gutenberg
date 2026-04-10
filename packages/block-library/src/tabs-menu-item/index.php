@@ -8,18 +8,19 @@
 /**
  * Render callback for core/tabs-menu-item.
  *
- * Applies IAPI directives and tab-specific attributes to the saved content.
+ * Injects the tab label and IAPI directives into the saved button HTML.
+ * Per-item context (index, id, label) is provided by the parent tabs-menu
+ * render callback before this is called.
  *
  * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content.
+ * @param string    $content    Block content (styled button from save.js).
  * @param \WP_Block $block      WP_Block instance.
  *
  * @return string Updated HTML.
  */
 function block_core_tabs_menu_item_render_callback( array $attributes, string $content, \WP_Block $block ): string {
-	// Get tab-specific context
 	$tab_index = $block->context['core/tabs-menu-item-index'] ?? 0;
 	$tab_id    = $block->context['core/tabs-menu-item-id'] ?? '';
 	$tab_label = $block->context['core/tabs-menu-item-label'] ?? '';
@@ -28,42 +29,29 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		$tab_id = 'tab-' . $tab_index;
 	}
 
-	// Process the content to add IAPI directives
+	// Add Interactivity API directives and tab-specific attributes to the button.
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	if ( $tag_processor->next_tag() ) {
-		// Remove hidden attribute and template class (from save.js)
-		$tag_processor->remove_attribute( 'hidden' );
-
-		// Set tab-specific attributes
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );
-
-		// Add IAPI directives
 		$tag_processor->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );
 		$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
 		$tag_processor->set_attribute( 'data-wp-bind--aria-selected', 'state.isActiveTab' );
 		$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
-
-		// Add context for this specific tab item
 		$tag_processor->set_attribute(
 			'data-wp-context',
 			wp_json_encode( array( 'tabIndex' => $tab_index ) )
 		);
 	}
 
-	// Get updated HTML and inject the label
-	$output = $tag_processor->get_updated_html();
-
-	// The save.js outputs <button><span class="screen-reader-text">...</span></button>
-	// Replace the button content with the actual tab label
-	$output = preg_replace(
-		'/(<button[^>]*>).*?(<\/button>)/s',
-		'$1' . '<span>' . wp_kses_post( $tab_label ) . '</span>' . '$2',
-		$output
+	// Inject the tab label into the button.
+	return preg_replace(
+		'/(<button\b[^>]*>).*?(<\/button>)/s',
+		'$1<span>' . wp_kses_post( $tab_label ) . '</span>$2',
+		$tag_processor->get_updated_html(),
+		1
 	);
-
-	return $output;
 }
 
 /**

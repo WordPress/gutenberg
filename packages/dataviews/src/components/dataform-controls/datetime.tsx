@@ -37,8 +37,11 @@ function CalendarDateTimeControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
+	const { compact } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -177,19 +180,25 @@ function CalendarDateTimeControl< Item >( {
 					hideLabelFromVision
 					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }
+					disabled={ disabled }
 				/>
 				{ /* Calendar widget */ }
-				<DateCalendar
-					style={ { width: '100%' } }
-					selected={
-						value ? parseDateTime( value ) || undefined : undefined
-					}
-					onSelect={ onSelectDate }
-					month={ calendarMonth }
-					onMonthChange={ setCalendarMonth }
-					timeZone={ timezoneString || undefined }
-					weekStartsOn={ weekStartsOn }
-				/>
+				{ ! compact && (
+					<DateCalendar
+						style={ { width: '100%' } }
+						selected={
+							value
+								? parseDateTime( value ) || undefined
+								: undefined
+						}
+						onSelect={ onSelectDate }
+						month={ calendarMonth }
+						onMonthChange={ setCalendarMonth }
+						timeZone={ timezoneString || undefined }
+						weekStartsOn={ weekStartsOn }
+						disabled={ disabled }
+					/>
+				) }
 			</Stack>
 		</BaseControl>
 	);
@@ -203,6 +212,7 @@ export default function DateTime< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -225,6 +235,7 @@ export default function DateTime< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			markWhenOptional={ markWhenOptional }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

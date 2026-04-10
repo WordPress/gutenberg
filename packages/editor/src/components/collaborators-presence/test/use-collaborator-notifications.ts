@@ -19,9 +19,13 @@ const mockCreateNotice = jest.fn();
 let mockOnJoinCallback: Function | null = null;
 let mockOnLeaveCallback: Function | null = null;
 let mockOnPostSaveCallback: Function | null = null;
+let lastJoinPostId: unknown;
+let lastLeavePostId: unknown;
+let lastSavePostId: unknown;
 let mockEditorState = {
 	postStatus: 'draft',
 	isCollaborationEnabled: true,
+	showCollaborationNotifications: true,
 };
 
 jest.mock( '@wordpress/data', () => ( {
@@ -31,6 +35,10 @@ jest.mock( '@wordpress/data', () => ( {
 
 jest.mock( '@wordpress/notices', () => ( {
 	store: 'core/notices',
+} ) );
+
+jest.mock( '@wordpress/preferences', () => ( {
+	store: 'core/preferences',
 } ) );
 
 // Mock the editor store to prevent deep import chain (blocks, rich-text, etc.)
@@ -46,17 +54,20 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '../../../lock-unlock', () => ( {
 	unlock: jest.fn( () => ( {
 		useOnCollaboratorJoin: jest.fn(
-			( _postId: unknown, _postType: unknown, callback: Function ) => {
+			( postId: unknown, _postType: unknown, callback: Function ) => {
+				lastJoinPostId = postId;
 				mockOnJoinCallback = callback;
 			}
 		),
 		useOnCollaboratorLeave: jest.fn(
-			( _postId: unknown, _postType: unknown, callback: Function ) => {
+			( postId: unknown, _postType: unknown, callback: Function ) => {
+				lastLeavePostId = postId;
 				mockOnLeaveCallback = callback;
 			}
 		),
 		useOnPostSave: jest.fn(
-			( _postId: unknown, _postType: unknown, callback: Function ) => {
+			( postId: unknown, _postType: unknown, callback: Function ) => {
+				lastSavePostId = postId;
 				mockOnPostSaveCallback = callback;
 			}
 		),
@@ -103,21 +114,40 @@ function makeMe( overrides: Record< string, unknown > = {} ) {
 // --- Setup ---
 
 function buildMockSelect() {
-	return () => ( {
-		getCurrentPostAttribute: ( attr: string ) =>
-			attr === 'status' ? mockEditorState.postStatus : undefined,
-		isCollaborationEnabledForCurrentPost: () =>
-			mockEditorState.isCollaborationEnabled,
-	} );
+	return ( storeKey: string ) => {
+		if ( storeKey === 'core/preferences' ) {
+			return {
+				get: ( scope: string, name: string ) => {
+					if (
+						scope === 'core' &&
+						name === 'showCollaborationNotifications'
+					) {
+						return mockEditorState.showCollaborationNotifications;
+					}
+					return undefined;
+				},
+			};
+		}
+		return {
+			getCurrentPostAttribute: ( attr: string ) =>
+				attr === 'status' ? mockEditorState.postStatus : undefined,
+			isCollaborationEnabledForCurrentPost: () =>
+				mockEditorState.isCollaborationEnabled,
+		};
+	};
 }
 
 beforeEach( () => {
 	mockOnJoinCallback = null;
 	mockOnLeaveCallback = null;
 	mockOnPostSaveCallback = null;
+	lastJoinPostId = undefined;
+	lastLeavePostId = undefined;
+	lastSavePostId = undefined;
 	mockEditorState = {
 		postStatus: 'draft',
 		isCollaborationEnabled: true,
+		showCollaborationNotifications: true,
 	};
 	mockCreateNotice.mockClear();
 	( useSelect as jest.Mock ).mockImplementation( ( selector: Function ) =>
@@ -335,6 +365,32 @@ describe( 'useCollaboratorNotifications', () => {
 			);
 
 			expect( mockCreateNotice ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'when notifications are disabled', () => {
+		it( 'passes null postId to hooks when showCollaborationNotifications preference is false', () => {
+			mockEditorState = {
+				...mockEditorState,
+				showCollaborationNotifications: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBeNull();
+			expect( lastLeavePostId ).toBeNull();
+			expect( lastSavePostId ).toBeNull();
+		} );
+
+		it( 'passes null postId to hooks when collaboration is disabled', () => {
+			mockEditorState = {
+				...mockEditorState,
+				isCollaborationEnabled: false,
+			};
+			renderHook( () => useCollaboratorNotifications( 123, 'post' ) );
+
+			expect( lastJoinPostId ).toBeNull();
+			expect( lastLeavePostId ).toBeNull();
+			expect( lastSavePostId ).toBeNull();
 		} );
 	} );
 } );

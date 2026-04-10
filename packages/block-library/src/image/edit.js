@@ -159,12 +159,19 @@ export function ImageEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
 			blob: undefined,
 		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
 	}
 
 	function onSelectImagesList( images ) {
@@ -479,6 +486,7 @@ export function ImageEdit( {
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
 					placeholder={ placeholder }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }

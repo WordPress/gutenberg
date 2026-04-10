@@ -24,7 +24,7 @@ import {
 	setBackgroundStyleDefaults,
 	useLayoutClasses,
 	useLayoutStyles,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	useZoomOut,
 } from './hooks';
 import DimensionsTool from './components/dimensions-tool';
@@ -48,6 +48,7 @@ import {
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
@@ -120,7 +121,7 @@ lock( privateApis, {
 	PrivatePublishDateTimePicker,
 	useSpacingSizes,
 	useBlockDisplayTitle,
-	__unstableBlockStyleVariationOverridesWithConfig,
+	BlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
 	CommentIconSlotFill,
@@ -130,6 +131,7 @@ lock( privateApis, {
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	isNavigationOverlayContextKey,
+	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
 	useBlockElement,
 	useBlockElementRef,
