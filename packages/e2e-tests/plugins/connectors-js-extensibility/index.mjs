@@ -34,12 +34,8 @@ registerConnector( 'test_custom_service', {
 		),
 } );
 
-// Regression test: register a custom render for an api_key-authenticated
-// connector. The page's `registerDefaultConnectors()` would otherwise
-// overwrite this render with the generic ApiKeyConnector form because the
-// store reducer spreads new config over existing entries. The fix in
-// `routes/connectors-home/default-connectors.tsx` skips setting
-// `args.render = ApiKeyConnector` when an existing render is present.
+// Registers a custom render for an api_key connector to verify that a
+// subsequent default registration for the same slug does not replace it.
 registerConnector( 'test_api_key_with_custom_render', {
 	render: ( props ) =>
 		h(

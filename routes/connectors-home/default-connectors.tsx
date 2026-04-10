@@ -262,15 +262,12 @@ export function registerDefaultConnectors() {
 			plugin: data.plugin,
 		};
 
-		// If a third-party plugin's script module already registered a
-		// custom render for this slug (which can happen when the plugin's
-		// connector bundle executes before this module's dynamic import
-		// chain settles), don't overwrite it. The reducer spreads the
-		// existing entry first, so leaving `render` out of `args` here
-		// preserves the plugin's render while still merging the
-		// server-side metadata (logo, plugin install state, etc.).
-		const existing =
-			unlock( select( connectorsStore ) ).getConnector( connectorName );
+		// Preserve a render that was already registered for this slug by
+		// another caller. Omitting `render` from `args` leaves the existing
+		// render in place while the server-side metadata still merges on top.
+		const existing = unlock( select( connectorsStore ) ).getConnector(
+			connectorName
+		);
 		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
 		}

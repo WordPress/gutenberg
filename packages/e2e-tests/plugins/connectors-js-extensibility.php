@@ -11,10 +11,9 @@
  *    providing the render function, the other metadata).
  * 2. test_server_only_service — server-only, with no client-side render function,
  *    so it should not display a card in the UI.
- * 3. test_api_key_with_custom_render — an api_key connector whose JS render is
- *    registered *before* the page's `registerDefaultConnectors()` call runs.
- *    Regression test for the bug where the default ApiKeyConnector overwrote
- *    third-party custom renders for any api_key-authenticated connector.
+ * 3. test_api_key_with_custom_render — an api_key connector whose JS render
+ *    is registered before the default registrations run, used to verify that
+ *    a subsequent default registration does not replace an existing render.
  *
  * @package gutenberg-test-connectors-js-extensibility
  */

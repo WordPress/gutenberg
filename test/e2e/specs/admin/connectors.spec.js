@@ -596,16 +596,17 @@ test.describe( 'Connectors', () => {
 			);
 			await expect( card ).toBeVisible();
 
-			// The custom render content must be visible — proving the
-			// JS-supplied render survived registerDefaultConnectors().
+			// The JS-registered custom render must be visible inside the card.
 			await expect(
 				card.getByText(
 					'Custom render survived registerDefaultConnectors().'
 				)
 			).toBeVisible();
 
-			// And the default API key form must NOT be present in this card.
-			await expect( card.getByLabel( 'API Key' ) ).toHaveCount( 0 );
+			// The default API key input must not appear inside the card.
+			await expect(
+				card.getByRole( 'textbox', { name: 'API Key' } )
+			).toHaveCount( 0 );
 		} );
 	} );
 } );
