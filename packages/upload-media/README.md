@@ -107,6 +107,20 @@ _Returns_
 
 -   `Settings`: Settings
 
+#### getUploadProgressSummary
+
+Returns a summary of the current upload queue, or `null` when the queue is empty. Intended for a single high-level progress indicator rather than a per-item list.
+
+The overall `progress` prefers the average of per-item `progress` values when every item has one; otherwise it falls back to `completed / total` so the bar still advances meaningfully before per-item progress is wired through the upload pipeline.
+
+_Parameters_
+
+-   _state_ `State`: Upload state.
+
+_Returns_
+
+-   `UploadProgressSummary | null`: Summary of the current upload queue, or null when idle.
+
 #### isUploading
 
 Determines whether any upload is currently in progress.

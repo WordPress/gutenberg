@@ -3,6 +3,7 @@
  */
 import {
 	getItems,
+	getUploadProgressSummary,
 	isUploading,
 	isUploadingById,
 	isUploadingByUrl,
@@ -421,6 +422,115 @@ describe( 'selectors', () => {
 			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'getUploadProgressSummary', () => {
+		const makeItem = ( overrides: Partial< QueueItem > ): QueueItem =>
+			( {
+				id: 'id',
+				status: ItemStatus.Processing,
+				file: new File( [ '' ], 'file.jpg' ),
+				...overrides,
+			} ) as QueueItem;
+
+		const makeState = ( queue: QueueItem[] ): State => ( {
+			queue,
+			queueStatus: 'active',
+			blobUrls: {},
+			settings: {
+				mediaUpload: jest.fn(),
+			},
+		} );
+
+		it( 'returns null when the queue is empty', () => {
+			expect( getUploadProgressSummary( makeState( [] ) ) ).toBeNull();
+		} );
+
+		it( 'returns counts and the current filename for a single item', () => {
+			const state = makeState( [
+				makeItem( {
+					id: '1',
+					status: ItemStatus.Processing,
+					currentOperation: OperationType.Upload,
+					file: new File( [ '' ], 'kitten.jpg' ),
+				} ),
+			] );
+
+			expect( getUploadProgressSummary( state ) ).toEqual( {
+				total: 1,
+				completed: 0,
+				progress: 0,
+				currentFilename: 'kitten.jpg',
+			} );
+		} );
+
+		it( 'derives progress from completed / total when per-item progress is missing', () => {
+			const queue: QueueItem[] = [];
+			for ( let i = 0; i < 10; i++ ) {
+				queue.push(
+					makeItem( {
+						id: String( i ),
+						status:
+							i < 3 ? ItemStatus.Uploaded : ItemStatus.Processing,
+						currentOperation:
+							i === 3 ? OperationType.Upload : undefined,
+						file: new File( [ '' ], `img-${ i }.jpg` ),
+					} )
+				);
+			}
+
+			const summary = getUploadProgressSummary( makeState( queue ) );
+			expect( summary ).toEqual( {
+				total: 10,
+				completed: 3,
+				progress: 30,
+				currentFilename: 'img-3.jpg',
+			} );
+		} );
+
+		it( 'averages per-item progress when every item reports it', () => {
+			const state = makeState( [
+				makeItem( {
+					id: '1',
+					status: ItemStatus.Processing,
+					progress: 80,
+					file: new File( [ '' ], 'a.jpg' ),
+				} ),
+				makeItem( {
+					id: '2',
+					status: ItemStatus.Processing,
+					progress: 20,
+					currentOperation: OperationType.Upload,
+					file: new File( [ '' ], 'b.jpg' ),
+				} ),
+			] );
+
+			const summary = getUploadProgressSummary( state );
+			expect( summary ).toMatchObject( {
+				total: 2,
+				completed: 0,
+				progress: 50,
+				currentFilename: 'b.jpg',
+			} );
+		} );
+
+		it( 'skips errored items when picking the current filename', () => {
+			const state = makeState( [
+				makeItem( {
+					id: '1',
+					status: ItemStatus.Error,
+					file: new File( [ '' ], 'broken.jpg' ),
+				} ),
+				makeItem( {
+					id: '2',
+					status: ItemStatus.Processing,
+					file: new File( [ '' ], 'good.jpg' ),
+				} ),
+			] );
+
+			const summary = getUploadProgressSummary( state );
+			expect( summary?.currentFilename ).toBe( 'good.jpg' );
 		} );
 	} );
 } );
