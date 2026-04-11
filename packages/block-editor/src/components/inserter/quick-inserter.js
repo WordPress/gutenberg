@@ -65,7 +65,7 @@ export default function QuickInserter( {
 
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
-			// setInserterIsOpened( false );
+			setInserterIsOpened( false );
 		}
 	}, [ setInserterIsOpened ] );
 
