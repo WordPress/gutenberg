@@ -11,7 +11,9 @@
  * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content.
+* @param array     $attributes Block attributes.
+* @param string    $content    Block content.
+* @param \WP_Block $block      Block instance.
  *
  * @return string Updated HTML.
  */
