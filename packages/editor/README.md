@@ -1478,6 +1478,16 @@ _Returns_
 
 -   `React.ReactNode`: The component to be rendered.
 
+### PostUploadIndicator
+
+Renders a compact upload progress indicator inside the post summary sidebar while one or more client-side media uploads are in progress.
+
+Mirrors the Media Library's "Uploading" pattern: a progress bar, a completed / total count, and the filename of the item currently being processed. Returns `null` when the upload queue is empty so it adds no DOM clutter in the common case.
+
+_Returns_
+
+-   `JSX.Element|null`: The rendered indicator, or null when idle.
+
 ### PostURL
 
 Renders the `PostURL` component.
