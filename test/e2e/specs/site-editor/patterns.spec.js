@@ -155,7 +155,10 @@ test.describe( 'Patterns', () => {
 		await searchBox.fill( 'footer' );
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced footer', 'Synced footer' ] )
 		);
@@ -180,7 +183,10 @@ test.describe( 'Patterns', () => {
 		await page.getByRole( 'option', { name: /^Not synced/ } ).click();
 		await expect( patterns.item ).toHaveCount( 2 );
 		expect(
-			await patterns.item.getByRole( 'button' ).allInnerTexts()
+			await patterns.item
+				.getByRole( 'button' )
+				// eslint-disable-next-line playwright/prefer-web-first-assertions -- toHaveText doesn't support expect.arrayContaining
+				.allInnerTexts()
 		).toEqual(
 			expect.arrayContaining( [ 'Unsynced header', 'Unsynced footer' ] )
 		);
@@ -227,7 +233,7 @@ test.describe( 'Patterns', () => {
 		// Close the view options.
 		await page.keyboard.press( 'Escape' );
 
-		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+		await expect( patterns.itemTitle ).toHaveText( [
 			'Starter',
 			'Berry',
 			'Animal',
@@ -240,7 +246,7 @@ test.describe( 'Patterns', () => {
 		// Close the view options.
 		await page.keyboard.press( 'Escape' );
 
-		expect( await patterns.itemTitle.allInnerTexts() ).toEqual( [
+		await expect( patterns.itemTitle ).toHaveText( [
 			'Animal',
 			'Berry',
 			'Starter',

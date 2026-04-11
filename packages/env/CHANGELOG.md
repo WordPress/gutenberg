@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix WP-Cron, REST API loopback, and Site Health loopback failures when wp-env runs on a non-default port. Apache inside the WordPress container now also listens on the host-mapped port, so PHP loopback requests to `WP_HOME` succeed instead of being refused. ([#20569](https://github.com/WordPress/gutenberg/issues/20569))
+
 ## 11.3.0 (2026-04-01)
 
 ## 11.2.0 (2026-03-18)

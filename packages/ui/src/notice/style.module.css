@@ -3,7 +3,7 @@
 @layer wp-ui-components {
 	.notice {
 		--icon-height: 24px;
-		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-font-line-height-sm)) / 2);
+		--text-vertical-padding: calc((var(--icon-height) - var(--wpds-typography-line-height-sm)) / 2);
 
 		--wp-ui-notice-background-color: var(--wpds-color-bg-surface-neutral-weak);
 		--wp-ui-notice-border-color: var(--wpds-color-stroke-surface-neutral);
@@ -64,10 +64,10 @@
 
 	.action-link {
 		flex-shrink: 0;
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
-		font-weight: var(--wpds-font-weight-regular);
-		line-height: var(--wpds-font-line-height-sm);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		font-weight: var(--wpds-typography-font-weight-regular);
+		line-height: var(--wpds-typography-line-height-sm);
 		margin-block: auto;
 
 		/* Add more horizontal space when following another action link/button */

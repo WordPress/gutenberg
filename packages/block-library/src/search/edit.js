@@ -204,10 +204,12 @@ export default function SearchEdit( {
 		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
+			hasNoButton ? colorProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
+			...( hasNoButton ? colorProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,

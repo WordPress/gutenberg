@@ -458,6 +458,7 @@ export function mergeCrdtBlocks(
 	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
 		const block = blocksToSync[ left ];
 		const yblock = yblocks.get( left );
+
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
@@ -582,12 +583,32 @@ export function mergeCrdtBlocks(
 }
 
 /**
+ * Compare a plain array element against a Y.Map element for equality.
+ * Used by the left-right sweep diff in mergeYArray.
+ *
+ * @param newElement The plain object from the incoming array.
+ * @param yElement   The Y.Map element from the existing Y.Array.
+ * @return True if the elements are deeply equal.
+ */
+function areArrayElementsEqual(
+	newElement: unknown,
+	yElement: unknown
+): boolean {
+	if ( yElement instanceof Y.Map && isRecord( newElement ) ) {
+		return fastDeepEqual( newElement, yElement.toJSON() );
+	}
+
+	return fastDeepEqual( newElement, yElement );
+}
+
+/**
  * Merge an incoming plain array into an existing Y.Array in-place.
  *
- * When the array length is unchanged (stable structure), each element is
- * merged individually via `mergeYMapValues`, preserving concurrent edits to
- * different elements. When the length changes (structural edit such as row
- * insertion/deletion), the Y.Array is rebuilt from scratch.
+ * Uses the same left-right sweep diff approach as mergeCrdtBlocks:
+ * equal elements are skipped from both ends, then the middle section
+ * is updated, deleted, or inserted as needed. This preserves existing
+ * Y.Map/Y.Text objects for unchanged elements, so concurrent edits
+ * to those elements are not lost.
  *
  * @param yArray         The existing Y.Array to update.
  * @param newValue       The new plain array to merge into the Y.Array.
@@ -605,40 +626,87 @@ function mergeYArray(
 	}
 
 	const query = schema.query;
+	const numOfCommonEntries = Math.min( newValue.length, yArray.length );
 
-	if ( yArray.length === newValue.length ) {
-		// Same length: update each element in-place.
-		for ( let i = 0; i < newValue.length; i++ ) {
-			const currentElement = yArray.get( i );
-			const newElement = newValue[ i ];
+	let left = 0;
+	let right = 0;
 
-			if ( currentElement instanceof Y.Map && isRecord( newElement ) ) {
-				mergeYMapValues(
-					currentElement,
-					newElement,
-					query,
-					cursorPosition
-				);
-			} else {
-				// Element is the wrong type (e.g. partial migration) or the
-				// incoming value is not an object. Rebuild the entire array.
-				yArray.delete( 0, yArray.length );
-				yArray.insert(
-					0,
-					newValue.map( ( item ) =>
-						createYMapFromQuery( query, item )
-					)
-				);
-				return;
-			}
-		}
-	} else {
-		// Structure changed: rebuild the Y.Array.
-		yArray.delete( 0, yArray.length );
-		yArray.insert(
-			0,
-			newValue.map( ( item ) => createYMapFromQuery( query, item ) )
+	// Skip equal elements from left.
+	for (
+		;
+		left < numOfCommonEntries &&
+		areArrayElementsEqual( newValue[ left ], yArray.get( left ) );
+		left++
+	) {
+		/* nop */
+	}
+
+	// Skip equal elements from right.
+	for (
+		;
+		right < numOfCommonEntries - left &&
+		areArrayElementsEqual(
+			newValue[ newValue.length - right - 1 ],
+			yArray.get( yArray.length - right - 1 )
 		);
+		right++
+	) {
+		/* nop */
+	}
+
+	// Updates: merge changed elements in-place.
+	const numOfUpdatesNeeded = numOfCommonEntries - left - right;
+
+	for ( let i = 0; i < numOfUpdatesNeeded; i++ ) {
+		const currentElement = yArray.get( left + i );
+		const newElement = newValue[ left + i ];
+
+		if ( currentElement instanceof Y.Map && isRecord( newElement ) ) {
+			mergeYMapValues(
+				currentElement,
+				newElement,
+				query,
+				cursorPosition
+			);
+		} else {
+			// Element is the wrong type (e.g. partial migration) or the
+			// incoming value is not an object. Rebuild the entire array.
+			yArray.delete( 0, yArray.length );
+			yArray.insert(
+				0,
+				newValue.map( ( item ) => createYMapFromQuery( query, item ) )
+			);
+			return;
+		}
+	}
+
+	// Deletes.
+	const numOfDeletionsNeeded = Math.max( 0, yArray.length - newValue.length );
+
+	if ( numOfDeletionsNeeded > 0 ) {
+		yArray.delete( left + numOfUpdatesNeeded, numOfDeletionsNeeded );
+	}
+
+	// Inserts.
+	const numOfInsertionsNeeded = Math.max(
+		0,
+		newValue.length - yArray.length
+	);
+
+	if ( numOfInsertionsNeeded > 0 ) {
+		const insertAt = left + numOfUpdatesNeeded;
+		const itemsToInsert: Y.Map< unknown >[] = new Array(
+			numOfInsertionsNeeded
+		);
+
+		for ( let i = 0; i < numOfInsertionsNeeded; i++ ) {
+			itemsToInsert[ i ] = createYMapFromQuery(
+				query,
+				newValue[ insertAt + i ]
+			);
+		}
+
+		yArray.insert( insertAt, itemsToInsert );
 	}
 }
 
