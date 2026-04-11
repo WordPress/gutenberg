@@ -20,9 +20,9 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	 * @since X.X.X
 	 *
 	 * @param string $id The script module identifier.
-	 * @return string|false The script module source URL, or false if not registered.
+	 * @return string|null The script module source URL, or null if not registered.
 	 */
-	function gutenberg_get_script_module_src( string $id ) {
+	function gutenberg_get_script_module_src( string $id ): ?string {
 		$script_modules = wp_script_modules();
 
 		if ( method_exists( $script_modules, 'get_registered_src' ) ) {
@@ -35,11 +35,7 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 		$prop->setAccessible( true );
 		$registered = $prop->getValue( $script_modules );
 
-		if ( ! isset( $registered[ $id ] ) ) {
-			return false;
-		}
-
-		return $registered[ $id ]['src'];
+		return $registered[ $id ]['src'] ?? null;
 	}
 
 	/**
@@ -67,7 +63,7 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 		global $gutenberg_script_module_translations;
 
 		$src = gutenberg_get_script_module_src( $id );
-		if ( false === $src ) {
+		if ( null === $src ) {
 			return false;
 		}
 
@@ -142,7 +138,7 @@ if ( ! function_exists( 'load_script_module_textdomain' ) ) {
 
 		$src = gutenberg_get_script_module_src( $id );
 
-		if ( false === $src ) {
+		if ( null === $src ) {
 			return false;
 		}
 
