@@ -212,22 +212,26 @@ function applyResizeAndCrop<
 	smartCrop: boolean,
 	createThumbnail: ( width: number, options: ThumbnailOptions ) => T
 ): T {
+	// Clone so we don't mutate the caller's config.
 	// If resize.height is zero, calculate from aspect ratio.
-	resize.height =
-		resize.height || ( originalHeight / originalWidth ) * resize.width;
+	const target: ImageSizeCrop = {
+		...resize,
+		height:
+			resize.height || ( originalHeight / originalWidth ) * resize.width,
+	};
 
 	const thumbnailOptions: ThumbnailOptions = {
 		size: 'down',
-		height: resize.height,
+		height: target.height,
 	};
 
-	let resizeWidth = resize.width;
+	let resizeWidth = target.width;
 
-	if ( ! resize.crop ) {
+	if ( ! target.crop ) {
 		return createThumbnail( resizeWidth, thumbnailOptions );
 	}
 
-	if ( true === resize.crop ) {
+	if ( true === target.crop ) {
 		thumbnailOptions.crop = smartCrop ? 'attention' : 'centre';
 		return createThumbnail( resizeWidth, thumbnailOptions );
 	}
@@ -235,49 +239,49 @@ function applyResizeAndCrop<
 	// Positional crop: first resize, then crop to exact dimensions.
 	if ( originalWidth < originalHeight ) {
 		resizeWidth =
-			resize.width >= resize.height
-				? resize.width
-				: ( originalWidth / originalHeight ) * resize.height;
+			target.width >= target.height
+				? target.width
+				: ( originalWidth / originalHeight ) * target.height;
 		thumbnailOptions.height =
-			resize.width >= resize.height
+			target.width >= target.height
 				? ( originalHeight / originalWidth ) * resizeWidth
-				: resize.height;
+				: target.height;
 	} else {
 		resizeWidth =
-			resize.width >= resize.height
-				? ( originalWidth / originalHeight ) * resize.height
-				: resize.width;
+			target.width >= target.height
+				? ( originalWidth / originalHeight ) * target.height
+				: target.width;
 		thumbnailOptions.height =
-			resize.width >= resize.height
-				? resize.height
+			target.width >= target.height
+				? target.height
 				: ( originalHeight / originalWidth ) * resizeWidth;
 	}
 
 	const image = createThumbnail( resizeWidth, thumbnailOptions );
 
 	let left = 0;
-	if ( 'center' === resize.crop[ 0 ] ) {
-		left = ( image.width - resize.width ) / 2;
-	} else if ( 'right' === resize.crop[ 0 ] ) {
-		left = image.width - resize.width;
+	if ( 'center' === target.crop[ 0 ] ) {
+		left = ( image.width - target.width ) / 2;
+	} else if ( 'right' === target.crop[ 0 ] ) {
+		left = image.width - target.width;
 	}
 
 	let top = 0;
-	if ( 'center' === resize.crop[ 1 ] ) {
-		top = ( image.height - resize.height ) / 2;
-	} else if ( 'bottom' === resize.crop[ 1 ] ) {
-		top = image.height - resize.height;
+	if ( 'center' === target.crop[ 1 ] ) {
+		top = ( image.height - target.height ) / 2;
+	} else if ( 'bottom' === target.crop[ 1 ] ) {
+		top = image.height - target.height;
 	}
 
 	// Address rounding errors where `left` or `top` become negative integers
-	// and `resize.width` / `resize.height` are bigger than the actual dimensions.
+	// and `target.width` / `target.height` are bigger than the actual dimensions.
 	// Downside: one side could be 1px smaller than the requested size.
 	left = Math.max( 0, left );
 	top = Math.max( 0, top );
-	resize.width = Math.min( image.width, resize.width );
-	resize.height = Math.min( image.height, resize.height );
+	const cropWidth = Math.min( image.width, target.width );
+	const cropHeight = Math.min( image.height, target.height );
 
-	return image.crop( left, top, resize.width, resize.height );
+	return image.crop( left, top, cropWidth, cropHeight );
 }
 
 /**
@@ -452,17 +456,11 @@ export async function batchResizeImage(
 	try {
 		const vips = await getVips();
 
-		const strOptions = '';
-		const loadOptions: LoadOptions< typeof inputType > = {};
-
 		// Do not load animation frames for batch resize — copyMemory()
 		// would materialize all frames and use excessive memory.
+		const loadOptions: LoadOptions< typeof inputType > = {};
 
-		const sourceImage = vips.Image.newFromBuffer(
-			buffer,
-			strOptions,
-			loadOptions
-		);
+		const sourceImage = vips.Image.newFromBuffer( buffer, '', loadOptions );
 
 		sourceImage.onProgress = () => {
 			if ( ! inProgressOperations.has( id ) ) {
