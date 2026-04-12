@@ -83,13 +83,20 @@ export default function UploadProgressSnackbar() {
 		const current = total - remaining + 1;
 		const filename = originals[ 0 ]?.sourceFile?.name || __( 'Uploading' );
 
-		const content = sprintf(
-			/* translators: 1: current upload number, 2: total uploads, 3: filename. */
-			__( 'Uploading %1$d of %2$d — %3$s' ),
-			current,
-			total,
-			filename
-		);
+		const content =
+			total === 1
+				? sprintf(
+						/* translators: %s: filename. */
+						__( 'Uploading — %s' ),
+						filename
+				  )
+				: sprintf(
+						/* translators: 1: current upload number, 2: total uploads, 3: filename. */
+						__( 'Uploading %1$d of %2$d — %3$s' ),
+						current,
+						total,
+						filename
+				  );
 
 		createNotice( 'info', content, {
 			id: NOTICE_ID,

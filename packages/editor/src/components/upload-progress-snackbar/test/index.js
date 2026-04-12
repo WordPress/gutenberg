@@ -89,8 +89,11 @@ describe( 'UploadProgressSnackbar', () => {
 				type: 'snackbar',
 			} )
 		);
-		// "Uploading 1 of 1"
-		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /1 of 1/ );
+		// Single upload uses the simpler "Uploading — filename" format.
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
+			'Uploading — photo.jpg'
+		);
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).not.toMatch( /of/ );
 	} );
 
 	it( 'creates a notice with count when a batch is uploading', () => {
@@ -111,8 +114,9 @@ describe( 'UploadProgressSnackbar', () => {
 			makeItem( '1-medium', 'photo-300x300.jpg', { parentId: '1' } ),
 		] );
 		render( <UploadProgressSnackbar /> );
-		// Only 1 original, so "Uploading 1 of 1"
-		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /1 of 1/ );
-		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /photo\.jpg/ );
+		// Only 1 original, so the simpler "Uploading — photo.jpg" format.
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toBe(
+			'Uploading — photo.jpg'
+		);
 	} );
 } );
