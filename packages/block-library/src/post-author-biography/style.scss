@@ -1,14 +1,5 @@
 .wp-block-post-author-biography {
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
-}
-
-// Override browser's default margin for paragraph at block boundaries.
-.wp-block-post-author-biography p {
-	&:first-child {
-		margin-block-start: 0;
-	}
-	&:last-child {
-		margin-block-end: 0;
-	}
+	white-space: pre-wrap;
 }

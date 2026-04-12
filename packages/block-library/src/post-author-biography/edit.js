@@ -5,7 +5,6 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { autop } from '@wordpress/autop';
 
 /**
  * Internal dependencies
@@ -35,9 +34,8 @@ function PostAuthorBiographyEdit( props ) {
 
 	const blockProps = useBlockProps();
 
-	const displayAuthorBiography = authorDetails?.description
-		? autop( authorDetails.description )
-		: __( 'Author Biography' );
+	const displayAuthorBiography =
+		authorDetails?.description || __( 'Author Biography' );
 
 	return (
 		<>
