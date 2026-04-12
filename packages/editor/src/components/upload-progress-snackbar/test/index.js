@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -18,6 +18,19 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	return mock;
 } );
 
+const mockCreateNotice = jest.fn();
+const mockRemoveNotice = jest.fn();
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => {
+	return {
+		useDispatch: jest.fn( () => ( {
+			createNotice: mockCreateNotice,
+			removeNotice: mockRemoveNotice,
+		} ) ),
+		useDispatchWithMap: jest.fn(),
+	};
+} );
+
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
 } ) );
@@ -31,52 +44,75 @@ function mockQueue( items ) {
 	);
 }
 
+function makeItem( id, name, { parentId } = {} ) {
+	return {
+		id,
+		sourceFile: { name },
+		status: 'PROCESSING',
+		parentId,
+	};
+}
+
 describe( 'UploadProgressSnackbar', () => {
 	const originalFlag = window.__clientSideMediaProcessing;
 
 	beforeEach( () => {
 		window.__clientSideMediaProcessing = true;
+		jest.clearAllMocks();
 	} );
 
 	afterEach( () => {
 		window.__clientSideMediaProcessing = originalFlag;
-		jest.clearAllMocks();
 	} );
 
-	it( 'renders nothing when the client-side media processing flag is off', () => {
+	it( 'does not create a notice when the feature flag is off', () => {
 		window.__clientSideMediaProcessing = false;
 		mockQueue( [] );
-		const { container } = render( <UploadProgressSnackbar /> );
-		expect( container ).toBeEmptyDOMElement();
+		render( <UploadProgressSnackbar /> );
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
 	} );
 
-	it( 'renders nothing when the upload queue is empty', () => {
+	it( 'does not create a notice when the upload queue is empty', () => {
 		mockQueue( [] );
-		const { container } = render( <UploadProgressSnackbar /> );
-		expect( container ).toBeEmptyDOMElement();
+		render( <UploadProgressSnackbar /> );
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
 	} );
 
-	it( 'shows the source filename when a single file is uploading', () => {
-		mockQueue( [
-			{
-				id: '1',
-				sourceFile: { name: 'photo.jpg' },
-				status: 'PROCESSING',
-			},
-		] );
+	it( 'creates a notice with the filename when a single file is uploading', () => {
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
 		render( <UploadProgressSnackbar /> );
-		expect( screen.getByText( /photo\.jpg/ ) ).toBeInTheDocument();
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0 / 1' );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'info',
+			expect.stringContaining( 'photo.jpg' ),
+			expect.objectContaining( {
+				id: 'upload-progress',
+				type: 'snackbar',
+			} )
+		);
+		// "Uploading 1 of 1"
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /1 of 1/ );
 	} );
 
-	it( 'shows an "Uploading N files" label when a batch is uploading', () => {
+	it( 'creates a notice with count when a batch is uploading', () => {
 		mockQueue( [
-			{ id: '1', sourceFile: { name: 'a.jpg' }, status: 'PROCESSING' },
-			{ id: '2', sourceFile: { name: 'b.jpg' }, status: 'QUEUED' },
-			{ id: '3', sourceFile: { name: 'c.jpg' }, status: 'QUEUED' },
+			makeItem( '1', 'a.jpg' ),
+			makeItem( '2', 'b.jpg' ),
+			makeItem( '3', 'c.jpg' ),
 		] );
 		render( <UploadProgressSnackbar /> );
-		expect( screen.getByText( /Uploading 3 files/ ) ).toBeInTheDocument();
-		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0 / 3' );
+		// "Uploading 1 of 3 — a.jpg"
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /1 of 3/ );
+	} );
+
+	it( 'excludes subsizes from the count', () => {
+		mockQueue( [
+			makeItem( '1', 'photo.jpg' ),
+			makeItem( '1-thumb', 'photo-150x150.jpg', { parentId: '1' } ),
+			makeItem( '1-medium', 'photo-300x300.jpg', { parentId: '1' } ),
+		] );
+		render( <UploadProgressSnackbar /> );
+		// Only 1 original, so "Uploading 1 of 1"
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /1 of 1/ );
+		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /photo\.jpg/ );
 	} );
 } );

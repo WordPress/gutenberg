@@ -1,23 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { ProgressBar, Snackbar } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
+import { store as noticesStore } from '@wordpress/notices';
+
+const NOTICE_ID = 'upload-progress';
 
 /**
- * Renders a persistent snackbar in the editor chrome while media uploads are
- * in progress. The snackbar shows a progress bar, a `completed / total` count,
- * and either the active filename (single upload) or an "Uploading N files"
- * label (batch). It is gated by the `window.__clientSideMediaProcessing`
- * runtime flag and bypasses the notices store so that live-updating React
- * children (the progress bar) can be rendered without re-creating a notice
- * on every progress tick.
+ * Manages a snackbar notice that shows media upload progress while uploads are
+ * in progress. It creates/updates a notice via the notices store so that it
+ * positions and stacks with every other snackbar in the editor.
  *
- * @return {JSX.Element|null} The snackbar, or `null` when idle or the flag is off.
+ * Only counts original user-uploaded files (items without a `parentId`),
+ * ignoring generated subsizes/thumbnails.
+ *
+ * Gated by the `window.__clientSideMediaProcessing` runtime flag.
+ *
+ * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
 	const isClientSideMediaProcessingEnabled =
@@ -33,108 +36,78 @@ export default function UploadProgressSnackbar() {
 		[ isClientSideMediaProcessingEnabled ]
 	);
 
-	const active = items.length;
+	// Only count original user uploads, not generated subsizes/thumbnails.
+	const originals = items.filter( ( item ) => ! item.parentId );
+	const remaining = originals.length;
 
-	// Track peak queue length during a session. Items are removed from the
+	// Track peak original count during a session. Items are removed from the
 	// queue on completion, so `total` has to be tracked separately.
 	const peakRef = useRef( 0 );
-	if ( active > peakRef.current ) {
-		peakRef.current = active;
+	if ( remaining > peakRef.current ) {
+		peakRef.current = remaining;
 	}
 
-	// Reset the peak one tick after the queue drains. Using an effect avoids
-	// a race where a second batch starts on the same render the first empties.
-	useEffect( () => {
-		if ( active === 0 ) {
-			peakRef.current = 0;
-		}
-	}, [ active ] );
+	const { createNotice, removeNotice } = useDispatch( noticesStore );
 
-	// Announce start and completion transitions once, not on every tick.
+	// Track whether the user has dismissed the notice. If so, don't re-create
+	// it until the current batch finishes and a new one starts.
+	const dismissedRef = useRef( false );
+
+	// Announce start and completion transitions, and manage the notice.
 	const wasUploadingRef = useRef( false );
 	useEffect( () => {
 		if ( ! isClientSideMediaProcessingEnabled ) {
 			return;
 		}
-		const isUploading = active > 0;
+
+		const isUploading = remaining > 0;
+
 		if ( isUploading && ! wasUploadingRef.current ) {
+			// New batch started — reset state.
+			dismissedRef.current = false;
 			speak( __( 'Media upload started' ), 'polite' );
 		} else if ( ! isUploading && wasUploadingRef.current ) {
+			// Batch finished.
 			speak( __( 'Media upload complete' ), 'polite' );
+			removeNotice( NOTICE_ID );
+			peakRef.current = 0;
 		}
+
 		wasUploadingRef.current = isUploading;
-	}, [ active, isClientSideMediaProcessingEnabled ] );
 
-	if ( ! isClientSideMediaProcessingEnabled || active === 0 ) {
-		return null;
-	}
+		if ( ! isUploading || dismissedRef.current ) {
+			return;
+		}
 
-	const total = peakRef.current;
-	const completed = Math.max( 0, total - active );
+		const total = peakRef.current;
+		const current = total - remaining + 1;
+		const filename = originals[ 0 ]?.sourceFile?.name || __( 'Uploading' );
 
-	// Prefer averaged per-item progress when every in-flight item reports one;
-	// otherwise fall back to `completed / total` so the bar still advances
-	// before per-item progress is wired through the upload pipeline.
-	const reportedProgressValues = items
-		.map( ( item ) => item.progress )
-		.filter( ( value ) => typeof value === 'number' );
-	const hasFullPerItemProgress =
-		reportedProgressValues.length === items.length && items.length > 0;
-	let progress = 0;
-	if ( hasFullPerItemProgress ) {
-		progress =
-			reportedProgressValues.reduce( ( sum, value ) => sum + value, 0 ) /
-			reportedProgressValues.length;
-	} else if ( total > 0 ) {
-		progress = ( completed / total ) * 100;
-	}
+		const content = sprintf(
+			/* translators: 1: current upload number, 2: total uploads, 3: filename. */
+			__( 'Uploading %1$d of %2$d — %3$s' ),
+			current,
+			total,
+			filename
+		);
 
-	const label =
-		active > 1
-			? sprintf(
-					/* translators: %d: number of files currently uploading. */
-					_n( 'Uploading %d file', 'Uploading %d files', active ),
-					active
-			  )
-			: items[ 0 ]?.sourceFile?.name || __( 'Uploading' );
+		createNotice( 'info', content, {
+			id: NOTICE_ID,
+			type: 'snackbar',
+			isDismissible: false,
+			explicitDismiss: true,
+			speak: false,
+			onDismiss: () => {
+				dismissedRef.current = true;
+			},
+		} );
+	}, [
+		remaining,
+		isClientSideMediaProcessingEnabled,
+		originals,
+		createNotice,
+		removeNotice,
+	] );
 
-	const countLabel = sprintf(
-		/* translators: 1: number of completed uploads, 2: total uploads. */
-		__( '%1$d / %2$d' ),
-		completed,
-		total
-	);
-
-	return (
-		<div className="editor-upload-progress-snackbar components-snackbar-list">
-			<Snackbar
-				className="editor-upload-progress-snackbar__snackbar"
-				explicitDismiss
-				spokenMessage=""
-				politeness="polite"
-			>
-				<div className="editor-upload-progress-snackbar__body">
-					<div className="editor-upload-progress-snackbar__heading">
-						{ __( 'Uploading' ) }
-					</div>
-					<ProgressBar
-						value={ progress }
-						aria-label={ __( 'Media upload progress' ) }
-					/>
-					<div
-						className="editor-upload-progress-snackbar__status"
-						role="status"
-						aria-live="polite"
-					>
-						{ sprintf(
-							/* translators: 1: progress count (e.g. "3 / 10"), 2: filename or batch label. */
-							__( '%1$s — %2$s' ),
-							countLabel,
-							label
-						) }
-					</div>
-				</div>
-			</Snackbar>
-		</div>
-	);
+	return null;
 }

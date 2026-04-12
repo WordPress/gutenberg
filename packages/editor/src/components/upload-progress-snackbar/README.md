@@ -1,25 +1,21 @@
 # UploadProgressSnackbar
 
-`UploadProgressSnackbar` renders a persistent snackbar in the editor chrome while media uploads are in progress. It shows a progress bar, a `completed / total` count, and either the active filename (single upload) or an "Uploading N files" label (batch). The snackbar disappears automatically when the upload queue drains.
+`UploadProgressSnackbar` manages a snackbar notice that shows media upload progress. It creates and updates a notice via the notices store, so the snackbar positions and stacks with every other snackbar in the editor.
 
-The component subscribes directly to `@wordpress/upload-media`'s public selectors and bypasses the notices store so that it can render a live-updating `ProgressBar` as a child of `Snackbar`.
+Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes and thumbnails.
 
-It is gated by the `window.__clientSideMediaProcessing` runtime flag. When the flag is off or the queue is empty, the component returns `null`.
+The component renders nothing itself — it is a controller that manages a notice. It is gated by the `window.__clientSideMediaProcessing` runtime flag.
 
 ## Usage
 
 ```jsx
 import { UploadProgressSnackbar } from '@wordpress/editor';
 
-// Mount as a sibling to the other snackbar notice list in the editor layout.
-<>
-	<SnackbarNotices className="edit-post-layout__snackbar" />
-	<UploadProgressSnackbar />
-</>
+// Mount anywhere in the editor — it doesn't render DOM, just manages a notice.
+<UploadProgressSnackbar />
 ```
 
 ## Accessibility
 
 -   The component calls `wp.a11y.speak()` once when uploads start and once when they complete, avoiding per-tick chatter.
--   The progress readout is wrapped in a `role="status" aria-live="polite"` live region.
--   The `ProgressBar` has a descriptive `aria-label`.
+-   The snackbar is created with `speak: false` to prevent the notices store from re-announcing on every text update.

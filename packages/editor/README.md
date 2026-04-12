@@ -1705,11 +1705,15 @@ _Returns_
 
 ### UploadProgressSnackbar
 
-Renders a persistent snackbar in the editor chrome while media uploads are in progress. The snackbar shows a progress bar, a `completed / total` count, and either the active filename (single upload) or an "Uploading N files" label (batch). It is gated by the `window.__clientSideMediaProcessing` runtime flag and bypasses the notices store so that live-updating React children (the progress bar) can be rendered without re-creating a notice on every progress tick.
+Manages a snackbar notice that shows media upload progress while uploads are in progress. It creates/updates a notice via the notices store so that it positions and stacks with every other snackbar in the editor.
+
+Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes/thumbnails.
+
+Gated by the `window.__clientSideMediaProcessing` runtime flag.
 
 _Returns_
 
--   `JSX.Element|null`: The snackbar, or `null` when idle or the flag is off.
+-   `null`: This component renders nothing — it only manages a notice.
 
 ### URLInput
 
