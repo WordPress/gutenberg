@@ -23,6 +23,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
+	UploadProgressSnackbar,
 	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
@@ -157,6 +158,7 @@ function Layout() {
 					) }
 
 					<SnackbarNotices className="edit-site-layout__snackbar" />
+					<UploadProgressSnackbar />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
