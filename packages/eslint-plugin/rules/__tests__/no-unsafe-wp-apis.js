@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../no-unsafe-wp-apis';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},

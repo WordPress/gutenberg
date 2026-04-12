@@ -462,7 +462,8 @@ export function showRevisionDiff( state = true, action ) {
 		case 'SET_SHOW_REVISION_DIFF':
 			return action.showDiff;
 		case 'SET_CURRENT_REVISION_ID':
-			return true; // reset on enter/exit revisions
+			// Reset during the exit.
+			return ! action.revisionId ? true : state;
 	}
 	return state;
 }

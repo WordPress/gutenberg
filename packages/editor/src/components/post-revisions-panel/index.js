@@ -25,30 +25,23 @@ import { unlock } from '../../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 const DAY_IN_MILLISECONDS = 86400000;
 const EMPTY_ARRAY = [];
-
-const REVISIONS_QUERY = {
-	per_page: 3,
-	orderby: 'date',
-	order: 'desc',
-	context: 'embed',
-	_fields: 'id,date,author',
-};
 const defaultLayouts = { activity: {} };
+const noop = () => {};
+const paginationInfo = {};
 const view = {
 	type: 'activity',
 	titleField: 'date',
 	fields: [ 'author' ],
-	layout: {
-		density: 'compact',
-	},
+	layout: { density: 'compact' },
 };
 const fields = [
 	{
 		id: 'date',
 		label: __( 'Date' ),
-		render: ( { item } ) => {
+		render: ( { item, field } ) => {
 			const dateNowInMs = getDate( null ).getTime();
-			const date = getDate( item.date ?? null );
+			const _value = field.getValue( { item } );
+			const date = getDate( _value ?? null );
 			const displayDate =
 				dateNowInMs - date.getTime() > DAY_IN_MILLISECONDS
 					? dateI18n(
@@ -59,7 +52,7 @@ const fields = [
 			return (
 				<time
 					className="editor-post-revisions-panel__revision-date"
-					dateTime={ item.date }
+					dateTime={ _value }
 				>
 					{ displayDate }
 				</time>
@@ -70,36 +63,45 @@ const fields = [
 	},
 	authorField,
 ];
-const noop = () => {};
-const paginationInfo = {};
 
 function PostRevisionsPanelContent() {
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
-	const { revisionsCount, revisions, isLoading, lastRevisionId } = useSelect(
-		( select ) => {
-			const { getCurrentPostId, getCurrentPostType } =
-				select( editorStore );
-			const {
-				getCurrentPostRevisionsCount,
-				getCurrentPostLastRevisionId,
-			} = select( editorStore );
-			const { getRevisions, isResolving } = select( coreStore );
-			const query = [
-				'postType',
-				getCurrentPostType(),
-				getCurrentPostId(),
-				REVISIONS_QUERY,
-			];
-			const _revisions = getRevisions( ...query );
-			return {
-				revisionsCount: getCurrentPostRevisionsCount(),
-				lastRevisionId: getCurrentPostLastRevisionId(),
-				revisions: _revisions,
-				isLoading: isResolving( 'getRevisions', query ),
-			};
-		},
-		[]
-	);
+	const {
+		revisionsCount,
+		revisions,
+		revisionKey,
+		isLoading,
+		lastRevisionId,
+	} = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const { getCurrentPostRevisionsCount, getCurrentPostLastRevisionId } =
+			select( editorStore );
+		const { getRevisions, getEntityConfig, isResolving } =
+			select( coreStore );
+		const _postType = getCurrentPostType();
+		const entityConfig = getEntityConfig( 'postType', _postType );
+		const _revisionKey = entityConfig?.revisionKey || 'id';
+		const revisionsQuery = {
+			per_page: 3,
+			orderby: 'date',
+			order: 'desc',
+			_fields: `${ _revisionKey },date,author`,
+		};
+		const query = [
+			'postType',
+			_postType,
+			getCurrentPostId(),
+			revisionsQuery,
+		];
+		const _revisions = getRevisions( ...query );
+		return {
+			revisionsCount: getCurrentPostRevisionsCount(),
+			lastRevisionId: getCurrentPostLastRevisionId(),
+			revisions: _revisions,
+			revisionKey: _revisionKey,
+			isLoading: isResolving( 'getRevisions', query ),
+		};
+	}, [] );
 	return (
 		<PanelBody
 			title={
@@ -121,10 +123,10 @@ function PostRevisionsPanelContent() {
 					isLoading={ isLoading }
 					paginationInfo={ paginationInfo }
 					defaultLayouts={ defaultLayouts }
-					getItemId={ ( item ) => item.id }
+					getItemId={ ( item ) => item[ revisionKey ] }
 					isItemClickable={ () => true }
 					onClickItem={ ( item ) => {
-						setCurrentRevisionId( item.id );
+						setCurrentRevisionId( item[ revisionKey ] );
 					} }
 				>
 					<DataViews.Layout />

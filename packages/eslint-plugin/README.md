@@ -14,15 +14,47 @@ npm install @wordpress/eslint-plugin --save-dev
 
 ## Usage
 
-To opt-in to the default configuration, extend your own project's `.eslintrc` file:
+### Flat config (ESLint v10+, recommended)
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/recommended" ]
-}
+Create an `eslint.config.mjs` file in your project root:
+
+```js
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [ ...wordpress.configs.recommended ];
 ```
 
-Refer to the [ESLint documentation on Shareable Configs](https://eslint.org/docs/latest/extend/shareable-configs) for more information.
+You can add your own overrides after the spread:
+
+```js
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [
+	...wordpress.configs.recommended,
+	{
+		rules: {
+			// your custom rule overrides
+		},
+	},
+];
+```
+
+Refer to the [ESLint flat config documentation](https://eslint.org/docs/latest/use/configure/configuration-files) for more information.
+
+### Legacy eslintrc (ESLint v9, deprecated)
+
+If you are still using ESLint v9 with the legacy `.eslintrc.*` format, a compatibility wrapper is available:
+
+```js
+// .eslintrc.js
+const wordpress = require( '@wordpress/eslint-plugin/eslintrc' );
+
+module.exports = wordpress.configs.recommended;
+```
+
+> **Note:** The eslintrc wrapper is deprecated and will be removed in a future major version. Please migrate to flat config.
+
+### About the recommended preset
 
 The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsdoc`](https://github.com/gajus/eslint-plugin-jsdoc), [`eslint-plugin-jsx-a11y`](https://github.com/jsx-eslint/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and other similar plugins.
 
@@ -55,15 +87,16 @@ Alternatively, you can opt-in to only the more granular rulesets offered by the 
 -   `test-unit`– rules for unit tests written in Jest.
 -   `test-playwright` – rules for end-to-end tests written in Playwright.
 
-For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
+For example, if your project does not use React, you could use only the ESNext rules:
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/esnext" ]
-}
+```js
+// eslint.config.mjs
+import wordpress from '@wordpress/eslint-plugin';
+
+export default [ ...wordpress.configs.esnext ];
 ```
 
-These rules can be used additively, so you could extend both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
+These rules can be used additively, so you could spread both `esnext` and `custom` rulesets, but omit the `react` and `jsx-a11y` configurations.
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
 
@@ -99,15 +132,27 @@ The granular rulesets will not define any environment globals. As such, if they 
 | [valid-sprintf](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage.                                                                    | ✓           |
 | [wp-global-usage](https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/docs/rules/wp-global-usage.md)                                             | Enforce correct usage of WordPress globals like `globalThis.SCRIPT_DEBUG`.                      |             |
 
-### Legacy
+### Migrating from eslintrc to flat config
 
-If you are using WordPress' `.jshintrc` JSHint configuration and you would like to take the first step to migrate to an ESLint equivalent it is also possible to define your own project's `.eslintrc` file as:
+If you are upgrading from a previous version that used `.eslintrc.*` files:
 
-```json
-{
-	"extends": [ "plugin:@wordpress/eslint-plugin/jshint" ]
-}
-```
+1. Replace your `.eslintrc.*` file with an `eslint.config.mjs` file.
+2. Change `extends` arrays to import + spread:
+    ```js
+    // Old (.eslintrc.js)
+    module.exports = {
+    	extends: [ 'plugin:@wordpress/eslint-plugin/recommended' ],
+    };
+
+    // New (eslint.config.mjs)
+    import wordpress from '@wordpress/eslint-plugin';
+    export default [ ...wordpress.configs.recommended ];
+    ```
+3. Convert `overrides` to separate config objects with `files` patterns.
+4. Replace `env` with `languageOptions.globals` using the [`globals`](https://www.npmjs.com/package/globals) package.
+5. Delete your `.eslintignore` file and move patterns into an `ignores` config object.
+
+See the [ESLint migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for full details.
 
 ## Contributing to this package
 

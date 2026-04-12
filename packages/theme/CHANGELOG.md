@@ -2,9 +2,21 @@
 
 ## Unreleased
 
+### Breaking changes
+
+-   Renamed typography tokens from `--wpds-font-*` to `--wpds-typography-*`. Sub-groups that correspond to CSS `font-*` properties retain the `font-` prefix; `line-height` does not. To migrate:
+    -   `--wpds-font-family-*`: use `--wpds-typography-font-family-*` instead.
+    -   `--wpds-font-size-*`: use `--wpds-typography-font-size-*` instead.
+    -   `--wpds-font-weight-*`: use `--wpds-typography-font-weight-*` instead.
+    -   `--wpds-font-line-height-*`: use `--wpds-typography-line-height-*` instead.
+
+### Enhancements
+
+-   The design token fallback build plugins (PostCSS, esbuild, Vite) now throw an error when encountering an unknown `--wpds-*` token, instead of silently skipping it.
+
 ## 0.10.0 (2026-04-01)
 
-### Enhancement
+### Enhancements
 
 -   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
 

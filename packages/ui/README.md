@@ -50,7 +50,15 @@ Also, to ensure that portaled popovers appear correctly, add these isolation sty
 
 ```css
 .root {
-  isolation: isolate;
+	isolation: isolate;
+}
+```
+
+Finally, in order to support overlay elements such as backdrops to correctly cover the whole browser viewport even when scrolled, add the following style to your global styles:
+
+```css
+body {
+	position: relative;
 }
 ```
 
@@ -124,10 +132,10 @@ Interactive components that manage internal state (such as open/closed, selected
 
 For a given state `x`, the convention is:
 
-| Prop | Purpose |
-| --- | --- |
-| `defaultX` | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally. |
-| `x` | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes. |
+| Prop        | Purpose                                                                                                                                 |
+| ----------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `defaultX`  | Sets the initial value in **uncontrolled** mode. The component manages subsequent state changes internally.                             |
+| `x`         | Sets the current value in **controlled** mode. The consumer is responsible for updating the value in response to changes.               |
 | `onXChange` | Callback invoked when the state changes. Receives the new value as its first argument. Works in both controlled and uncontrolled modes. |
 
 For example, a component with an open/closed state would expose:

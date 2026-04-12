@@ -21,7 +21,7 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
-import ActionsSection from './components/actions-section';
+import GuidelineActionsSection from './components/guideline-actions-section';
 import RevisionHistory from './components/revision-history';
 
 const GUIDELINE_ITEMS = [
@@ -58,11 +58,24 @@ const GUIDELINE_ITEMS = [
 	},
 	{
 		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines for your team.' ),
-
+		description: __( 'Add additional guidelines.' ),
 		slug: 'additional',
 	},
 ];
+
+const KNOWN_VIEWS = [ 'revision-history' ];
+
+function getInitialNavigatorPath() {
+	if ( window?.location?.href ) {
+		const url = new URL( window.location.href );
+		const view = url.searchParams.get( 'view' ) ?? '';
+		if ( KNOWN_VIEWS.includes( view ) ) {
+			return `/${ view }`;
+		}
+	}
+
+	return '/';
+}
 
 function ContentGuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
@@ -107,7 +120,7 @@ function ContentGuidelinesPage() {
 				</div>
 			) : (
 				! error && (
-					<Navigator initialPath="/">
+					<Navigator initialPath={ getInitialNavigatorPath() }>
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content">
 								{ /*
@@ -167,7 +180,7 @@ function ContentGuidelinesPage() {
 									} ) }
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								<ActionsSection />
+								<GuidelineActionsSection />
 							</VStack>
 						</Navigator.Screen>
 						<Navigator.Screen path="/revision-history">

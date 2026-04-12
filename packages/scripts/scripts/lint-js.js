@@ -12,7 +12,6 @@ const {
 	getArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
-	hasPackageProp,
 	hasProjectFile,
 } = require( '../utils' );
 
@@ -20,46 +19,49 @@ const args = getArgsFromCLI();
 
 const defaultFilesArgs = hasFileArgInCLI() ? [] : [ '.' ];
 
-// See: https://eslint.org/docs/user-guide/configuring#using-configuration-files-1.
+// ESLint v10 flat config detection.
+// See: https://eslint.org/docs/latest/use/configure/configuration-files
 const hasLintConfig =
 	hasArgInCLI( '-c' ) ||
 	hasArgInCLI( '--config' ) ||
-	hasProjectFile( '.eslintrc.js' ) ||
-	hasProjectFile( '.eslintrc.json' ) ||
-	hasProjectFile( '.eslintrc.yaml' ) ||
-	hasProjectFile( '.eslintrc.yml' ) ||
-	hasProjectFile( 'eslintrc.config.js' ) ||
-	hasProjectFile( '.eslintrc' ) ||
-	hasPackageProp( 'eslintConfig' );
+	hasProjectFile( 'eslint.config.js' ) ||
+	hasProjectFile( 'eslint.config.mjs' ) ||
+	hasProjectFile( 'eslint.config.cjs' ) ||
+	hasProjectFile( 'eslint.config.ts' ) ||
+	hasProjectFile( 'eslint.config.mts' ) ||
+	hasProjectFile( 'eslint.config.cts' );
 
-// When a configuration is not provided by the project, use from the default
-// provided with the scripts module. Instruct ESLint to avoid discovering via
-// the `--no-eslintrc` flag, as otherwise it will still merge with inherited.
+// Warn if the project still has a legacy eslintrc config file.
+if ( ! hasLintConfig ) {
+	const legacyConfigFiles = [
+		'.eslintrc',
+		'.eslintrc.js',
+		'.eslintrc.cjs',
+		'.eslintrc.json',
+		'.eslintrc.yml',
+		'.eslintrc.yaml',
+	];
+	const hasLegacyConfig = legacyConfigFiles.some( hasProjectFile );
+	if ( hasLegacyConfig ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Warning: Legacy eslintrc configuration detected. ' +
+				'ESLint v10 no longer supports eslintrc files. ' +
+				'Please migrate to eslint.config.js (flat config). ' +
+				'See https://eslint.org/docs/latest/use/configure/migration-guide for details.'
+		);
+	}
+}
+
+// When a configuration is not provided by the project, use the default
+// provided with the scripts module.
 const defaultConfigArgs = ! hasLintConfig
-	? [ '--no-eslintrc', '--config', fromConfigRoot( '.eslintrc.js' ) ]
+	? [ '--config', fromConfigRoot( 'eslint.config.cjs' ) ]
 	: [];
-
-// See: https://eslint.org/docs/user-guide/configuring#ignoring-files-and-directories.
-const hasIgnoredFiles =
-	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.eslintignore' );
-
-const defaultIgnoreArgs = ! hasIgnoredFiles
-	? [ '--ignore-path', fromConfigRoot( '.eslintignore' ) ]
-	: [];
-
-const defaultExtArgs = hasArgInCLI( '--ext' )
-	? []
-	: [ '--ext', 'js,cjs,mjs,jsx,ts,cts,mts,tsx' ];
 
 const result = spawn(
 	resolveBin( 'eslint' ),
-	[
-		...defaultConfigArgs,
-		...defaultIgnoreArgs,
-		...defaultExtArgs,
-		...args,
-		...defaultFilesArgs,
-	],
+	[ ...defaultConfigArgs, ...args, ...defaultFilesArgs ],
 	{ stdio: 'inherit' }
 );
 
