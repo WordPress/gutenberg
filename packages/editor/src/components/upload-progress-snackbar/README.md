@@ -2,9 +2,12 @@
 
 `UploadProgressSnackbar` manages a snackbar notice that shows media upload progress. It creates and updates a notice via the notices store, so the snackbar positions and stacks with every other snackbar in the editor.
 
-Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes and thumbnails.
+The component reads from two sources so it works for both upload paths:
 
-The component renders nothing itself — it is a controller that manages a notice. It is gated by the `window.__clientSideMediaProcessing` runtime flag.
+-   **`@wordpress/upload-media`** — the client-side media processing (CSM) path. Only counts original user-uploaded files, ignoring generated subsizes and thumbnails (items with a `parentId`).
+-   **Editor-local tracker** — populated by the editor's `mediaUpload` wrapper for the traditional (non-CSM) upload path (e.g. Safari, or when a filter disables CSM).
+
+The component renders nothing itself — it is a controller that manages a notice.
 
 ## Usage
 

@@ -14,6 +14,10 @@ import { uploadMedia } from '@wordpress/media-utils';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	addFiles as trackStart,
+	advance as trackAdvance,
+} from '../../components/upload-progress-snackbar/tracker';
 
 const noop = () => {};
 
@@ -80,6 +84,16 @@ export default function mediaUpload( {
 		imageIsUploading = false;
 	};
 
+	// Track this batch for the upload progress snackbar. Only applies to the
+	// non-CSM path — when CSM is enabled, the block-editor provider intercepts
+	// mediaUpload and dispatches to the upload-media store, so this wrapper is
+	// not called.
+	const trackingFiles = Array.from( filesList ).map( ( f ) => f?.name || '' );
+	if ( ! window.__clientSideMediaProcessing ) {
+		trackStart( trackingFiles );
+	}
+	let lastCompletedCount = 0;
+
 	uploadMedia( {
 		allowedTypes,
 		filesList,
@@ -91,6 +105,15 @@ export default function mediaUpload( {
 					setSaveLock();
 				} else {
 					clearSaveLock();
+				}
+
+				// Advance the snackbar tracker for newly-completed files.
+				const completedCount = file.filter(
+					( _file ) => _file?.id
+				).length;
+				if ( completedCount > lastCompletedCount ) {
+					trackAdvance( completedCount - lastCompletedCount );
+					lastCompletedCount = completedCount;
 				}
 			}
 			onFileChange?.( file );
@@ -119,6 +142,8 @@ export default function mediaUpload( {
 		onError: ( { message } ) => {
 			if ( ! window.__clientSideMediaProcessing ) {
 				clearSaveLock();
+				// Failed files still count as "done" for the snackbar.
+				trackAdvance( 1 );
 			}
 			onError( message );
 		},

@@ -1707,9 +1707,12 @@ _Returns_
 
 Manages a snackbar notice that shows media upload progress while uploads are in progress. It creates/updates a notice via the notices store so that it positions and stacks with every other snackbar in the editor.
 
-Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes/thumbnails.
+Reads from two sources to cover both upload paths:
 
-Gated by the `window.__clientSideMediaProcessing` runtime flag.
+-   `@wordpress/upload-media` store (client-side media processing path).
+-   An editor-local tracker populated by the traditional `mediaUpload` wrapper (non-CSM path — e.g. Safari, or when a filter disables CSM).
+
+Only counts original user-uploaded files (items without a `parentId`), ignoring generated subsizes/thumbnails.
 
 _Returns_
 

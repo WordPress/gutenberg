@@ -8,6 +8,11 @@ import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 
+/**
+ * Internal dependencies
+ */
+import { useTracker } from './tracker';
+
 const NOTICE_ID = 'upload-progress';
 
 /**
@@ -15,36 +20,39 @@ const NOTICE_ID = 'upload-progress';
  * in progress. It creates/updates a notice via the notices store so that it
  * positions and stacks with every other snackbar in the editor.
  *
+ * Reads from two sources to cover both upload paths:
+ *  - `@wordpress/upload-media` store (client-side media processing path).
+ *  - An editor-local tracker populated by the traditional `mediaUpload`
+ *    wrapper (non-CSM path — e.g. Safari, or when a filter disables CSM).
+ *
  * Only counts original user-uploaded files (items without a `parentId`),
  * ignoring generated subsizes/thumbnails.
- *
- * Gated by the `window.__clientSideMediaProcessing` runtime flag.
  *
  * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
-	const isClientSideMediaProcessingEnabled =
-		window.__clientSideMediaProcessing;
-
 	const items = useSelect(
-		( select ) => {
-			if ( ! isClientSideMediaProcessingEnabled ) {
-				return [];
-			}
-			return select( uploadStore ).getItems();
-		},
-		[ isClientSideMediaProcessingEnabled ]
+		( select ) => select( uploadStore ).getItems(),
+		[]
 	);
+	const tracker = useTracker();
 
-	// Only count original user uploads, not generated subsizes/thumbnails.
-	const originals = items.filter( ( item ) => ! item.parentId );
-	const remaining = originals.length;
+	// CSM path: originals in the upload-media queue (subsizes excluded).
+	const csmOriginals = items.filter( ( item ) => ! item.parentId );
+	const csmRemaining = csmOriginals.length;
 
-	// Track peak original count during a session. Items are removed from the
-	// queue on completion, so `total` has to be tracked separately.
+	// Non-CSM path: files tracked by the editor's mediaUpload wrapper.
+	const trackedRemaining = tracker ? tracker.total - tracker.completed : 0;
+
+	const remaining = csmRemaining + trackedRemaining;
+
+	// Track peak total across sources during a session. The CSM queue removes
+	// items on completion, and the tracker tops out at its recorded total, so
+	// `total` has to be tracked as the high-water mark.
 	const peakRef = useRef( 0 );
-	if ( remaining > peakRef.current ) {
-		peakRef.current = remaining;
+	const sessionTotal = csmRemaining + ( tracker ? tracker.total : 0 );
+	if ( sessionTotal > peakRef.current ) {
+		peakRef.current = sessionTotal;
 	}
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
@@ -53,21 +61,14 @@ export default function UploadProgressSnackbar() {
 	// it until the current batch finishes and a new one starts.
 	const dismissedRef = useRef( false );
 
-	// Announce start and completion transitions, and manage the notice.
 	const wasUploadingRef = useRef( false );
 	useEffect( () => {
-		if ( ! isClientSideMediaProcessingEnabled ) {
-			return;
-		}
-
 		const isUploading = remaining > 0;
 
 		if ( isUploading && ! wasUploadingRef.current ) {
-			// New batch started — reset state.
 			dismissedRef.current = false;
 			speak( __( 'Media upload started' ), 'polite' );
 		} else if ( ! isUploading && wasUploadingRef.current ) {
-			// Batch finished.
 			speak( __( 'Media upload complete' ), 'polite' );
 			removeNotice( NOTICE_ID );
 			peakRef.current = 0;
@@ -81,7 +82,13 @@ export default function UploadProgressSnackbar() {
 
 		const total = peakRef.current;
 		const current = total - remaining + 1;
-		const filename = originals[ 0 ]?.sourceFile?.name || __( 'Uploading' );
+
+		// Prefer the CSM queue's first original filename, then fall back to
+		// the tracker's first pending filename.
+		const filename =
+			csmOriginals[ 0 ]?.sourceFile?.name ||
+			tracker?.pending[ 0 ] ||
+			__( 'Uploading' );
 
 		const content =
 			total === 1
@@ -108,13 +115,7 @@ export default function UploadProgressSnackbar() {
 				dismissedRef.current = true;
 			},
 		} );
-	}, [
-		remaining,
-		isClientSideMediaProcessingEnabled,
-		originals,
-		createNotice,
-		removeNotice,
-	] );
+	}, [ remaining, csmOriginals, tracker, createNotice, removeNotice ] );
 
 	return null;
 }
