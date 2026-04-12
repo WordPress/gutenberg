@@ -185,7 +185,7 @@ export default function DataviewsPatterns() {
 				actions={
 					<PatternsActions
 						categoryId={ categoryId }
-						postType={ postType }
+						type={ postType }
 					/>
 				}
 			>
