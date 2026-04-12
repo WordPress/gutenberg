@@ -1,0 +1,25 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-upload-progress-snackbar {
+	// Hide the default Snackbar dismiss button: the component is driven by
+	// upload state, not user interaction.
+	.components-snackbar__dismiss-button {
+		display: none;
+	}
+
+	.editor-upload-progress-snackbar__body {
+		display: flex;
+		flex-direction: column;
+		gap: $grid-unit-10;
+		min-width: 240px;
+	}
+
+	.editor-upload-progress-snackbar__heading {
+		font-weight: 600;
+	}
+
+	.editor-upload-progress-snackbar__status {
+		font-size: 12px;
+		opacity: 0.85;
+	}
+}

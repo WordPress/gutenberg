@@ -1703,6 +1703,14 @@ _Returns_
 
 -   `React.ReactNode`: The component.
 
+### UploadProgressSnackbar
+
+Renders a persistent snackbar in the editor chrome while media uploads are in progress. The snackbar shows a progress bar, a `completed / total` count, and either the active filename (single upload) or an "Uploading N files" label (batch). It is gated by the `window.__clientSideMediaProcessing` runtime flag and bypasses the notices store so that live-updating React children (the progress bar) can be rendered without re-creating a notice on every progress tick.
+
+_Returns_
+
+-   `JSX.Element|null`: The snackbar, or `null` when idle or the flag is off.
+
 ### URLInput
 
 > **Deprecated** since 5.3, use `wp.blockEditor.URLInput` instead.
