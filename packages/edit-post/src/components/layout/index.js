@@ -11,6 +11,7 @@ import {
 	AutosaveMonitor,
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
+	UploadProgressSnackbar,
 	EditorKeyboardShortcutsRegister,
 	ErrorBoundary,
 	PostLockedModal,
@@ -620,6 +621,7 @@ function Layout( {
 						<PostEditorMoreMenu />
 						{ backButton }
 						<SnackbarNotices className="edit-post-layout__snackbar" />
+						<UploadProgressSnackbar />
 					</Editor>
 				</div>
 			</ErrorBoundary>
