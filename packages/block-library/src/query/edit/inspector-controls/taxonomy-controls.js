@@ -64,12 +64,20 @@ export function TaxonomyControls( { onChange, query, context } ) {
 		[ postType, postId ]
 	);
 
+	const postTypeObject = useSelect(
+		( select ) => select( coreStore ).getPostType( postType ),
+		[ postType ]
+	);
+
 	const CurrentPostTerms = useMemo(
-		() => ( {
-			category: currentPost?.categories || [],
-			post_tag: currentPost?.tags || [],
-		} ),
-		[ currentPost?.categories, currentPost?.tags ]
+		() =>
+			( taxonomies || [] ).reduce( ( termsByTaxonomy, taxonomy ) => {
+				const restBase = taxonomy.rest_base || taxonomy.slug;
+				termsByTaxonomy[ taxonomy.slug ] =
+					currentPost?.[ restBase ] || [];
+				return termsByTaxonomy;
+			}, {} ),
+		[ currentPost, taxonomies ]
 	);
 
 	useEffect( () => {
@@ -86,7 +94,7 @@ export function TaxonomyControls( { onChange, query, context } ) {
 		const nextQueryUpdates = {};
 
 		for ( const taxonomy of taxonomies ) {
-			const termIds = CurrentPostTerms?.[ taxonomy.slug ];
+			const termIds = CurrentPostTerms?.[ taxonomy.slug ] || [];
 
 			const existingIds = taxQuery?.include?.[ taxonomy.slug ] || [];
 
@@ -98,15 +106,19 @@ export function TaxonomyControls( { onChange, query, context } ) {
 				continue;
 			}
 
-			nextInclude[ taxonomy.slug ] = termIds;
+			if ( termIds?.length ) {
+				nextInclude[ taxonomy.slug ] = termIds;
+			} else {
+				delete nextInclude[ taxonomy.slug ];
+			}
 			hasChanged = true;
 
-			if ( taxonomy.slug === 'category' ) {
-				nextQueryUpdates.categories = termIds;
-			}
+			const restBase = taxonomy.rest_base || taxonomy.slug;
 
-			if ( taxonomy.slug === 'post_tag' ) {
-				nextQueryUpdates.tags = termIds;
+			if ( termIds.length ) {
+				nextQueryUpdates[ restBase ] = termIds;
+			} else {
+				nextQueryUpdates[ restBase ] = [];
 			}
 		}
 
@@ -114,24 +126,33 @@ export function TaxonomyControls( { onChange, query, context } ) {
 			return;
 		}
 
+		const nextExclude = query.exclude?.includes( postId )
+			? query.exclude
+			: [ ...( query.exclude || [] ), postId ];
+
 		onChange( {
 			...nextQueryUpdates,
+			exclude: nextExclude,
 			taxQuery: {
 				...taxQuery,
 				include: nextInclude,
 				__experimentalSameTerm: true,
 			},
 		} );
-	}, [ CurrentPostTerms, onChange, taxQuery, taxonomies ] );
+	}, [ CurrentPostTerms, onChange, postId, query, taxQuery, taxonomies ] );
 
 	if ( ! taxonomies?.length ) {
 		return null;
 	}
-
+	const label = sprintf(
+		/* translators: %s: Post type plural name */
+		__( 'Show related %s' ),
+		postTypeObject.labels.name.toLowerCase()
+	);
 	return (
 		<VStack spacing={ 4 }>
 			<ToggleControl
-				label="Show related posts"
+				label={ label }
 				checked={ !! taxQuery?.__experimentalSameTerm }
 				onChange={ ( value ) => {
 					onChange(
@@ -144,8 +165,18 @@ export function TaxonomyControls( { onChange, query, context } ) {
 							  }
 							: {
 									taxQuery: undefined,
-									categories: [],
-									tags: [],
+									exclude: ( query.exclude || [] ).filter(
+										( id ) => id !== postId
+									),
+									...Object.fromEntries(
+										( taxonomies || [] ).map(
+											( taxonomy ) => [
+												taxonomy.rest_base ||
+													taxonomy.slug,
+												[],
+											]
+										)
+									),
 							  }
 					);
 				} }
