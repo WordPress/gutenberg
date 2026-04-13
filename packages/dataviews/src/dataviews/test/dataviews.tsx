@@ -737,4 +737,71 @@ describe( 'DataViews component', () => {
 			).toEqual( 3 );
 		} );
 	} );
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal wrapper that intentionally omits the `defaultLayouts` prop so
+		 * DataViews falls back to its internal DEFAULT_LAYOUTS constant
+		 * ({ table: true, grid: true, list: true }).
+		 */
+		function DataViewWrapperWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				...DEFAULT_VIEW,
+				fields: [ 'title', 'order', 'author' ],
+			} );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, fields );
+			}, [ view ] );
+
+			return (
+				<DataViews
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ fields }
+					onChangeView={ setView }
+					// No `defaultLayouts` prop — falls back to DEFAULT_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders Table, Grid, and List layout options when defaultLayouts is not provided', async () => {
+			render( <DataViewWrapperWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// All three default layouts are available, so the Layout switcher
+			// button (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Table, Grid, and List options must all appear.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).toBeInTheDocument();
+
+			// Table is the default active layout.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).not.toBeChecked();
+		} );
+	} );
 } );
