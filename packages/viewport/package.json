@@ -33,6 +33,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -40,6 +41,7 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"types": "build-types",
 	"dependencies": {
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",

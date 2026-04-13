@@ -11,16 +11,15 @@ This feature is still experimental. “Experimental” means this is an early im
 ```jsx
 import {
 	__experimentalDivider as Divider,
-	__experimentalText as Text,
 } from `@wordpress/components`;
 import { Stack } from '@wordpress/ui';
 
 function Example() {
 	return (
 		<Stack direction="column" gap="lg">
-			<Text>Some text here</Text>
+			<span>Some text here</span>
 			<Divider />
-			<Text>Some more text here</Text>
+			<span>Some more text here</span>
 		</Stack>
 	);
 }

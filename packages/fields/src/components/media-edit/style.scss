@@ -30,6 +30,11 @@ fieldset.fields__media-edit {
 		color: $gray-900;
 	}
 
+	.fields__media-edit-description {
+		font-size: $helptext-font-size;
+		line-height: 1.5;
+	}
+
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container-type: inline-size;
 

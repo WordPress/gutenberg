@@ -5,14 +5,36 @@
 ### Breaking Changes
 
 -   `Text`: Apply `margin: 0`, removing user-agent margins when the component renders as block-level elements (for example `p` or `h1`–`h6` via `render` prop) ([#76970](https://github.com/WordPress/gutenberg/pull/76970)).
+-   `AlertDialog`: Revise component API ([#76937](https://github.com/WordPress/gutenberg/pull/76937)):
+    -   `AlertDialog.Root`: moved `intent` prop to `AlertDialog.Popup`;
+    -   `AlertDialog.Popup`: moved `onConfirm` prop to `AlertDialog.Root` (now optional; supports async handlers, `{ close: false }` to keep the dialog open, and `{ error: '...' }` to display a built-in error message);
+    -   `AlertDialog.Popup`: removed `loading` prop (async flows are now handled internally via `Promise`-returning `onConfirm`);
+    -   `AlertDialog.Popup`: made `children` optional in favor of a new `description` prop, which describes the alert dialog semantically.
+
+### New Features
+
+-   Add `Popover` primitive ([#76438](https://github.com/WordPress/gutenberg/pull/76438)).
 
 ### Bug Fixes
 
+-   `Card.Title`, `EmptyState.Title`, `EmptyState.Description`: Fix ref and props being lost when a custom `render` element is provided ([#77160](https://github.com/WordPress/gutenberg/pull/77160)).
+-   `Tabs.List`: Fix `render` prop being silently discarded ([#77160](https://github.com/WordPress/gutenberg/pull/77160)).
 -   `Card`: Set default foreground color on `Card.Root` so content and `currentColor` icons (for example the `CollapsibleCard` chevron) are themeable by default ([#77013](https://github.com/WordPress/gutenberg/pull/77013)).
 
 ### Enhancements
 
+-   `Dialog`: Update `Header` layout to support multiple trailing elements alongside the title ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+-   `Dialog`: Use `Text` internally for `Dialog.Title`, adopting the `heading-xl` variant for consistent typography ([#77161](https://github.com/WordPress/gutenberg/pull/77161)).
+-   `Dialog`, `AlertDialog`, `Tooltip`, `Select`: Add `container` prop to `Popup` for custom portal targets ([#77163](https://github.com/WordPress/gutenberg/pull/77163)).
 -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
+-   `VisuallyHidden`: Improve Storybook stories and documentation for the `render` prop composition pattern.
+
+### Internal
+
+-   `Card`: Remove redundant `margin: 0` from `Card.Title` now that `Text` applies it by default ([#77187](https://github.com/WordPress/gutenberg/pull/77187)).
+-   Normalize `render` prop handling across components and document conventions in `CONTRIBUTING.md` ([#77160](https://github.com/WordPress/gutenberg/pull/77160)).
+-   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
+-   `Field.Label`, `Fieldset.Legend`, `Field.Details`: Refactor `VisuallyHidden` composition to preserve semantic HTML elements when visually hiding content.
 
 ## 0.10.0 (2026-04-01)
 

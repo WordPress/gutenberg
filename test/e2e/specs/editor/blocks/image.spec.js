@@ -298,8 +298,8 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
+		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		expect( initialImageSrc ).not.toEqual( updatedImageSrc );
 
 		await expect
 			.poll( () => image.boundingBox() )
@@ -360,8 +360,8 @@ test.describe( 'Image', () => {
 		).toBeHidden();
 
 		// Assert that the image is edited.
+		await expect( image ).not.toHaveAttribute( 'src', initialImageSrc );
 		const updatedImageSrc = await image.getAttribute( 'src' );
-		expect( updatedImageSrc ).not.toEqual( initialImageSrc );
 
 		await expect
 			.poll( () => image.boundingBox() )

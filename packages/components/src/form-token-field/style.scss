@@ -11,8 +11,10 @@
 	cursor: text;
 
 	&.is-disabled {
-		background: $gray-300;
-		border-color: $gray-300;
+		background: $components-color-gray-100;
+		border-color: $components-color-gray-400;
+		cursor: default;
+		opacity: 1;
 	}
 
 	&.is-active {
@@ -79,6 +81,14 @@
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
 			color: $gray-700;
+		}
+	}
+
+	&.is-disabled {
+		.components-form-token-field__token-text,
+		.components-form-token-field__remove-token.components-button {
+			background: $components-color-gray-100;
+			color: $components-color-gray-600;
 		}
 	}
 
@@ -198,6 +208,6 @@
 	}
 
 	&:not(.is-empty) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "22.9.0-rc.1",
+	"version": "22.9.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -15,7 +15,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=20.10.0",
+		"node": ">=20.19.0",
 		"npm": ">=10.2.3"
 	},
 	"wpPlugin": {
@@ -48,6 +48,10 @@
 		"@emotion/native": "11.11.0",
 		"@emotion/react": "11.14.0",
 		"@emotion/styled": "11.14.1",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
+		"@eslint/compat": "^2.0.0",
+		"@eslint/eslintrc": "^3.0.0",
+		"@eslint/js": "^10.0.0",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
 		"@testing-library/jest-dom": "6.9.1",
@@ -69,24 +73,25 @@
 		"chalk": "4.1.1",
 		"change-case": "4.1.2",
 		"commander": "9.2.0",
-		"comment-parser": "^1.1.1",
 		"concurrently": "3.5.0",
 		"cross-env": "7.0.3",
 		"cross-spawn": "^7.0.6",
 		"css-loader": "^6.2.0",
 		"esbuild": "^0.27.2",
+		"eslint": "^10.0.0",
+		"eslint-formatter-compact": "9.0.1",
 		"eslint-import-resolver-typescript": "4.4.4",
-		"eslint-plugin-eslint-comments": "3.1.2",
-		"eslint-plugin-import": "2.25.2",
-		"eslint-plugin-jest": "27.4.3",
-		"eslint-plugin-jest-dom": "5.0.2",
-		"eslint-plugin-prettier": "5.0.0",
-		"eslint-plugin-react-compiler": "19.0.0-beta-0dec889-20241115",
-		"eslint-plugin-storybook": "10.2.17",
-		"eslint-plugin-testing-library": "6.0.2",
+		"eslint-plugin-import": "2.31.0",
+		"eslint-plugin-jest": "28.11.0",
+		"eslint-plugin-jest-dom": "5.5.0",
+		"eslint-plugin-prettier": "5.5.5",
+		"eslint-plugin-react-compiler": "^19.1.0-rc.2",
+		"eslint-plugin-storybook": "10.2.19",
+		"eslint-plugin-testing-library": "7.16.0",
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
 		"glob": "7.1.2",
+		"globals": "14.0.0",
 		"husky": "7.0.0",
 		"jest": "29.6.2",
 		"jest-environment-jsdom": "^30.2.0",
@@ -94,7 +99,6 @@
 		"jest-junit": "13.0.0",
 		"jest-message-util": "^29.6.2",
 		"jest-watch-typeahead": "2.2.2",
-		"json2md": "2.0.1",
 		"jsonc-parser": "3.3.1",
 		"lerna": "8.1.9",
 		"lint-staged": "10.0.2",
@@ -121,6 +125,7 @@
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
+		"typescript-eslint": "8.57.1",
 		"uuid": "9.0.1",
 		"wait-on": "8.0.1"
 	},
@@ -136,12 +141,13 @@
 		"component-usage-stats": "node ./node_modules/react-scanner/bin/react-scanner -c ./react-scanner.config.js",
 		"dev": "node ./bin/dev.mjs",
 		"distclean": "git clean --force -d -X",
-		"docs:api-ref": "node ./bin/api-docs/update-api-docs.js",
-		"docs:blocks": "node ./bin/api-docs/gen-block-lib-list.js",
+		"docs:api-ref": "npm run --workspace @wordpress/api-docs-generator docs:api-ref",
+		"docs:blocks": "npm run --workspace @wordpress/api-docs-generator docs:blocks",
 		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:api-ref docs:theme-ref",
-		"docs:components": "node ./bin/api-docs/gen-components-docs/index.mjs",
+		"docs:check-api-docs-unstaged": "node ./tools/api-docs/are-api-docs-unstaged.js",
+		"docs:components": "npm run --workspace @wordpress/api-docs-generator docs:components",
 		"docs:gen": "node ./docs/tool/index.js",
-		"docs:theme-ref": "node ./bin/api-docs/gen-theme-reference.mjs",
+		"docs:theme-ref": "npm run --workspace tools/api-docs docs:theme-ref",
 		"env": "wp-env",
 		"fixtures:clean": "rimraf --glob \"test/integration/fixtures/blocks/*.{json,serialized.html}\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test:unit test/integration/full-content/ && npm run format test/integration/fixtures/blocks/*.json",
@@ -220,7 +226,7 @@
 		],
 		"**/*.{js,ts,tsx,jsx}": [
 			"npm run prelint:js",
-			"wp-scripts lint-js --config .eslintrc.strict.js"
+			"wp-scripts lint-js --config eslint.config.strict.mjs"
 		],
 		"*.scss": [
 			"wp-scripts lint-style"
@@ -238,7 +244,7 @@
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./bin/api-docs/are-api-docs-unstaged.js"
+			"node ./tools/api-docs/are-api-docs-unstaged.js"
 		],
 		"packages/icons/src/library/*": [
 			"npm run -w packages/icons build"
@@ -253,6 +259,7 @@
 		"storybook",
 		"test/e2e",
 		"test/performance",
-		"test/storybook-playwright"
+		"test/storybook-playwright",
+		"tools/api-docs"
 	]
 }

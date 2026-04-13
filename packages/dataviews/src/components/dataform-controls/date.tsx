@@ -454,6 +454,7 @@ function CalendarDateControl< Item >( {
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
 						disabled={ disabled }
+						disableNavigation={ disabled }
 					/>
 				</Stack>
 			</BaseControl>

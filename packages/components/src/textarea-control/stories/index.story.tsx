@@ -21,6 +21,9 @@ const meta: Meta< typeof TextareaControl > = {
 		onChange: { action: 'onChange' },
 		label: { control: { type: 'text' } },
 		help: { control: { type: 'text' } },
+		disabled: {
+			control: { type: 'boolean' },
+		},
 		value: { control: false },
 	},
 	parameters: {

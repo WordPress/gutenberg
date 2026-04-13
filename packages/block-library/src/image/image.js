@@ -396,6 +396,9 @@ export default function Image( {
 		hasNonContentControls &&
 		! isWideAligned &&
 		isLargeViewport;
+	// An image is uploading if it has a temporary blob URL, or if it is
+	// being processed client-side (e.g. transcoded or generating sub-sizes).
+	const isUploading = !! temporaryURL || isSideloading;
 	const imageSizeOptions = imageSizes
 		.filter(
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
@@ -532,6 +535,7 @@ export default function Image( {
 		if ( ! mediaUpload ) {
 			return;
 		}
+		let notified = false;
 		mediaUpload( {
 			filesList: [ externalBlob ],
 			onFileChange( [ img ] ) {
@@ -541,10 +545,15 @@ export default function Image( {
 					return;
 				}
 
-				setExternalBlob();
-				createSuccessNotice( __( 'Image uploaded.' ), {
-					type: 'snackbar',
-				} );
+				// With client-side media processing, onFileChange fires
+				// for each generated sub-size. Only show the notice once.
+				if ( ! notified ) {
+					notified = true;
+					setExternalBlob();
+					createSuccessNotice( __( 'Image uploaded.' ), {
+						type: 'snackbar',
+					} );
+				}
 			},
 			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {
@@ -885,9 +894,7 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={
-										!! temporaryURL || isSideloading
-									}
+									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -1078,7 +1085,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ ( temporaryURL || isSideloading ) && <Spinner /> }
+				{ isUploading && <Spinner /> }
 			</>
 		);
 
@@ -1110,6 +1117,7 @@ export default function Image( {
 		isResizable &&
 		isSingleSelected &&
 		! isEditingImage &&
+		! isUploading &&
 		! SIZED_LAYOUTS.includes( parentLayoutType )
 	) {
 		const numericRatio = aspectRatio && evalAspectRatio( aspectRatio );

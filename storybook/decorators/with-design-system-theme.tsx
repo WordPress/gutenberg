@@ -66,7 +66,7 @@ export function WithDesignSystemTheme(
 							display: 'block',
 							opacity: 0.5,
 							marginTop: 'var(--wpds-dimension-gap-md)',
-							fontSize: 'var(--wpds-font-size-xs)',
+							fontSize: 'var(--wpds-typography-font-size-xs)',
 							color: 'var(--wpds-color-fg-content-neutral-weak)',
 							textTransform: 'uppercase',
 							textAlign: 'end',

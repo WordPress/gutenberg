@@ -232,10 +232,9 @@ test.describe( 'Registered sources', () => {
 			);
 
 			// Alt textarea should have the custom field value.
-			const altValue = await page
-				.getByRole( 'textbox', { name: 'Alternative text' } )
-				.inputValue();
-			expect( altValue ).toBe( 'Text Field Value' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'Alternative text' } )
+			).toHaveValue( 'Text Field Value' );
 
 			// Title input should have the original value.
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -249,11 +248,11 @@ test.describe( 'Registered sources', () => {
 			if ( isAdvancedPanelOpen === 'false' ) {
 				await advancedButton.click();
 			}
-			const titleValue = await page
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByLabel( 'Title attribute' )
-				.inputValue();
-			expect( titleValue ).toBe( 'default title value' );
+			await expect(
+				page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+			).toHaveValue( 'default title value' );
 
 			// Check the frontend uses the values of the custom fields.
 			const previewPage = await editor.openPreviewPage();
@@ -529,8 +528,7 @@ test.describe( 'Registered sources', () => {
 					name: 'Alternative text',
 				} );
 				await expect( altInput ).toHaveAttribute( 'readonly' );
-				const altValue = await altInput.inputValue();
-				expect( altValue ).toBe( 'Text Field Value' );
+				await expect( altInput ).toHaveValue( 'Text Field Value' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -543,11 +541,11 @@ test.describe( 'Registered sources', () => {
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toHaveAttribute( 'readonly' );
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'Text Field Value' );
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toHaveValue( 'Text Field Value' );
 			} );
 		} );
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.

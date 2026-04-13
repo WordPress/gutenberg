@@ -19,6 +19,7 @@ import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
 	vipsResizeImage,
+	vipsBatchResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
@@ -1167,6 +1168,35 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
+			// Determine the actual output type for thumbnails.
+			// If transcoding is configured, use that format; otherwise
+			// use the source format.
+			const thumbnailOutputType = thumbnailTranscodeOperation
+				? `image/${ thumbnailTranscodeOperation[ 1 ].outputFormat }`
+				: sourceType;
+
+			const quality = thumbnailTranscodeOperation
+				? thumbnailTranscodeOperation[ 1 ].outputQuality ??
+				  DEFAULT_OUTPUT_QUALITY
+				: DEFAULT_OUTPUT_QUALITY;
+
+			// Collect all resize configs for batch processing.
+			const batchConfigs: Array< {
+				name: string;
+				resize: {
+					width: number;
+					height: number;
+					crop?:
+						| boolean
+						| [
+								'left' | 'center' | 'right',
+								'top' | 'center' | 'bottom',
+						  ];
+				};
+				quality: number;
+				scaledSuffix?: boolean;
+			} > = [];
+
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1177,65 +1207,122 @@ export function generateThumbnails( id: QueueItemId ) {
 					continue;
 				}
 
-				// Build operations list for this thumbnail.
-				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
-				];
-
-				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
-				if ( thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( thumbnailTranscodeOperation );
-				}
-
-				thumbnailOperations.push( OperationType.Upload );
-
-				dispatch.addSideloadItem( {
-					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
-					batchId,
-					parentId: item.id,
-					additionalData: {
-						// Sideloading does not use the parent post ID but the
-						// attachment ID as the image sizes need to be added to it.
-						post: attachment.id,
-						image_size: name,
-						convert_format: false,
-					},
-					operations: thumbnailOperations,
+				batchConfigs.push( {
+					name,
+					resize: imageSize,
+					quality,
 				} );
 			}
 
-			// Create and sideload the scaled version.
+			// Check if a scaled version is needed.
 			const { bigImageSizeThreshold } = settings;
+			let needsScaling = false;
 			if ( bigImageSizeThreshold && attachment.id ) {
-				// Check if the image actually exceeds the threshold.
-				// Only create a scaled version for images larger than the threshold,
-				// matching WordPress core's wp_create_image_subsizes() behavior.
 				const bitmap = await createImageBitmap( item.sourceFile );
-				const needsScaling =
+				needsScaling =
 					bitmap.width > bigImageSizeThreshold ||
 					bitmap.height > bigImageSizeThreshold;
 				bitmap.close();
 
 				if ( needsScaling ) {
-					// Rename sourceFile to match the server attachment filename.
-					const sourceForScaled = attachment.filename
-						? renameFile( item.sourceFile, attachment.filename )
-						: item.sourceFile;
+					batchConfigs.push( {
+						name: 'scaled',
+						resize: {
+							width: bigImageSizeThreshold,
+							height: bigImageSizeThreshold,
+						},
+						quality,
+						scaledSuffix: true,
+					} );
+				}
+			}
 
-					// Add scaling to queue.
+			// Batch resize: decode source once via copyMemory(),
+			// generate all sub-sizes with thumbnailImage(), and
+			// write each directly to the output format.
+			// Falls back to per-thumbnail processing on failure.
+			let batchResults: Awaited<
+				ReturnType< typeof vipsBatchResizeImage >
+			> | null = null;
+
+			if ( batchConfigs.length > 0 ) {
+				try {
+					batchResults = await vipsBatchResizeImage(
+						item.id,
+						file,
+						thumbnailOutputType,
+						batchConfigs,
+						false
+					);
+				} catch {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'Batch resize failed, falling back to per-thumbnail processing'
+					);
+				}
+			}
+
+			if ( batchResults ) {
+				// Batch succeeded — enqueue upload-only sideloads.
+				for ( const result of batchResults ) {
+					dispatch.addSideloadItem( {
+						file: result.file,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: result.name,
+							convert_format: false,
+						},
+						operations: [ OperationType.Upload ],
+					} );
+				}
+			} else {
+				// Fallback: per-thumbnail processing (original approach
+				// without batch resize).
+				for ( const name of sizesToGenerate ) {
+					const imageSize = allImageSizes[ name ];
+					if ( ! imageSize ) {
+						continue;
+					}
+
+					const thumbnailOperations: Operation[] = [
+						[ OperationType.ResizeCrop, { resize: imageSize } ],
+					];
+
+					if ( thumbnailTranscodeOperation ) {
+						thumbnailOperations.push( thumbnailTranscodeOperation );
+					}
+
+					thumbnailOperations.push( OperationType.Upload );
+
+					dispatch.addSideloadItem( {
+						file,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: name,
+							convert_format: false,
+						},
+						operations: thumbnailOperations,
+					} );
+				}
+
+				// Fallback scaled version.
+				if ( needsScaling && bigImageSizeThreshold && attachment.id ) {
 					const scaledOperations: Operation[] = [
 						[
 							OperationType.ResizeCrop,
@@ -1249,7 +1336,6 @@ export function generateThumbnails( id: QueueItemId ) {
 						],
 					];
 
-					// Add transcoding if format conversion is configured.
 					if ( thumbnailTranscodeOperation ) {
 						scaledOperations.push( thumbnailTranscodeOperation );
 					}
@@ -1257,7 +1343,7 @@ export function generateThumbnails( id: QueueItemId ) {
 					scaledOperations.push( OperationType.Upload );
 
 					dispatch.addSideloadItem( {
-						file: sourceForScaled,
+						file,
 						onChange: ( [ updatedAttachment ] ) => {
 							if ( isBlobURL( updatedAttachment.url ) ) {
 								return;
