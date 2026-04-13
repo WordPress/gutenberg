@@ -54,6 +54,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 		$query_params['namespace'] = array(
 			'description' => __( 'Limit results to icons belonging to the given collection slug.', 'gutenberg' ),
 			'type'        => 'string',
+			'pattern'     => '^[a-z][a-z-]*$',
 		);
 		return $query_params;
 	}
