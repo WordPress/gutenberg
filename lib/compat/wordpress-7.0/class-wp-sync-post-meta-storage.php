@@ -395,9 +395,9 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		/**
 		 * Records a user as a contributor who has submitted updates to a room.
 		 *
-		 * Each call inserts an independent meta row so concurrent requests
-		 * never conflict through read-modify-write races. Duplicate user IDs
-		 * across rows are expected and deduplicated in get_contributors().
+		 * Skips the insert when the user is already tracked. A rare race
+		 * between concurrent requests can produce at most one extra row
+		 * per user, which get_contributors() handles via array_unique.
 		 *
 		 * @since 7.0.0
 		 *
@@ -408,6 +408,11 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		public function track_contributor( string $room, int $user_id ): void {
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
+				return;
+			}
+
+			$contributors = get_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, false );
+			if ( is_array( $contributors ) && in_array( (string) $user_id, $contributors, true ) ) {
 				return;
 			}
 
