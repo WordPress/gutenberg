@@ -637,14 +637,14 @@ function block_core_breadcrumbs_truncate_items( $breadcrumb_items, $character_li
 	$truncated_items = array();
 
 	foreach ( $breadcrumb_items as $index => $item ) {
-		$label = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
+		$label        = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
 		$label_length = strlen( $label );
 
-		if ( $index === count( $breadcrumb_items ) - 1 ) {
+		if ( count( $breadcrumb_items ) - 1 === $index ) {
 			// Last item: truncate if necessary.
 			if ( $remaining_chars < $label_length ) {
 				$truncated_label = substr( $label, 0, max( 0, $remaining_chars - 3 ) ) . '…';
-				$item['label'] = $truncated_label;
+				$item['label']   = $truncated_label;
 			}
 		} else {
 			// Not the last item: use full label if it fits, otherwise skip remaining items.
@@ -652,14 +652,14 @@ function block_core_breadcrumbs_truncate_items( $breadcrumb_items, $character_li
 				// If this item doesn't fit, we've reached the truncation point.
 				// Replace this item with ellipsis.
 				$item['label'] = '…';
-				$item['url'] = ''; // Remove URL for ellipsis item.
+				$item['url']   = ''; // Remove URL for ellipsis item.
 				unset( $item['allow_html'] );
 				$truncated_items[] = $item;
 				break;
 			}
 		}
 
-		$remaining_chars -= $label_length;
+		$remaining_chars  -= $label_length;
 		$truncated_items[] = $item;
 	}
 
