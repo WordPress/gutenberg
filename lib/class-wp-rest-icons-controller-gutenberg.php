@@ -97,39 +97,24 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	/**
 	 * Prepare a raw icon before it gets output in a REST API response.
 	 *
-	 * Splits the internally namespaced icon name into a `collection` field
-	 * and a collection-local `name` field.
+	 * Adds a `collection` field to the base response while keeping the
+	 * namespaced icon name (e.g. `core/arrow-left`) as the `name` field.
 	 *
 	 * @param array           $item    Raw icon as registered.
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $item, $request ) {
-		$fields = $this->get_fields_for_response( $request );
-		$data   = array();
-
-		$local_name = $item['name'];
-		if ( false !== strpos( $item['name'], '/' ) ) {
-			list( , $local_name ) = explode( '/', $item['name'], 2 );
-		}
+		$response = parent::prepare_item_for_response( $item, $request );
+		$fields   = $this->get_fields_for_response( $request );
 
 		if ( rest_is_field_included( 'collection', $fields ) && isset( $item['collection'] ) ) {
+			$data               = $response->get_data();
 			$data['collection'] = $item['collection'];
-		}
-		if ( rest_is_field_included( 'name', $fields ) ) {
-			$data['name'] = $local_name;
-		}
-		if ( rest_is_field_included( 'label', $fields ) && isset( $item['label'] ) ) {
-			$data['label'] = $item['label'];
-		}
-		if ( rest_is_field_included( 'content', $fields ) && isset( $item['content'] ) ) {
-			$data['content'] = $item['content'];
+			$response->set_data( $data );
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
-		return rest_ensure_response( $data );
+		return $response;
 	}
 
 	/**
