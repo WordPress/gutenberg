@@ -99,6 +99,8 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 		/**
 		 * Unregisters an icon collection.
 		 *
+		 * Any icons registered under the given collection are also unregistered.
+		 *
 		 * @param string $collection_slug Icon collection slug.
 		 * @return bool True if the collection was unregistered with success and false otherwise.
 		 */
@@ -114,6 +116,13 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 					'21.4.0'
 				);
 				return false;
+			}
+
+			$icons_registry = WP_Icons_Registry::get_instance();
+			foreach ( $icons_registry->get_registered_icons() as $icon ) {
+				if ( isset( $icon['collection'] ) && $icon['collection'] === $collection_slug ) {
+					$icons_registry->unregister( $icon['name'] );
+				}
 			}
 
 			unset( $this->registered_collections[ $collection_slug ] );

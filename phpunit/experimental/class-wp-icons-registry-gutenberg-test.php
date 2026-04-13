@@ -216,4 +216,52 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 		$collections->unregister( 'other-collection' );
 	}
+
+	/**
+	 * Unregistering a collection should cascade and remove all icons
+	 * belonging to it, while leaving icons from other collections intact.
+	 */
+	public function test_unregister_collection_cascades_to_icons() {
+		$collections = WP_Icon_Collections_Registry::get_instance();
+		$collections->register( 'other-collection', array( 'label' => 'Other' ) );
+
+		// Icons in the collection being removed.
+		$this->register(
+			'alpha',
+			array(
+				'label'      => 'Alpha',
+				'content'    => '<svg></svg>',
+				'collection' => 'test-collection',
+			)
+		);
+		$this->register(
+			'beta',
+			array(
+				'label'      => 'Beta',
+				'content'    => '<svg></svg>',
+				'collection' => 'test-collection',
+			)
+		);
+
+		// Icon in an unrelated collection that must survive.
+		$this->register(
+			'gamma',
+			array(
+				'label'      => 'Gamma',
+				'content'    => '<svg></svg>',
+				'collection' => 'other-collection',
+			)
+		);
+
+		$this->assertTrue( $this->registry->is_registered( 'test-collection/alpha' ) );
+		$this->assertTrue( $this->registry->is_registered( 'test-collection/beta' ) );
+
+		$this->assertTrue( $collections->unregister( 'test-collection' ) );
+
+		$this->assertFalse( $this->registry->is_registered( 'test-collection/alpha' ) );
+		$this->assertFalse( $this->registry->is_registered( 'test-collection/beta' ) );
+		$this->assertTrue( $this->registry->is_registered( 'other-collection/gamma' ) );
+
+		$collections->unregister( 'other-collection' );
+	}
 }
