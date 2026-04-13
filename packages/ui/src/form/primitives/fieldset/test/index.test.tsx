@@ -43,6 +43,28 @@ describe( 'Fieldset', () => {
 		).toBeVisible();
 	} );
 
+	it( 'preserves the legend element type when hideFromVision is enabled', () => {
+		const { rerender } = render(
+			<Fieldset.Root>
+				<Fieldset.Legend>Choose your options</Fieldset.Legend>
+			</Fieldset.Root>
+		);
+
+		const tagWithout = screen.getByText( 'Choose your options' ).tagName;
+
+		rerender(
+			<Fieldset.Root>
+				<Fieldset.Legend hideFromVision>
+					Choose your options
+				</Fieldset.Legend>
+			</Fieldset.Root>
+		);
+
+		expect( screen.getByText( 'Choose your options' ).tagName ).toBe(
+			tagWithout
+		);
+	} );
+
 	it( 'accessibly associates description when Fieldset.Description is present', () => {
 		render(
 			<Fieldset.Root>

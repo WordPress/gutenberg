@@ -18,18 +18,33 @@ import { unlock } from '../../lock-unlock';
  * @param { boolean } enabled
  */
 export const useMetaBoxInitialization = ( enabled ) => {
-	const { isEnabledAndEditorReady, isCollaborationEnabled } = useSelect(
+	const {
+		isEnabledAndEditorReady,
+		isCollaborationEnabled,
+		hasMetaBoxes,
+		allMetaBoxes,
+		rtcCompatibleIds,
+	} = useSelect(
 		( select ) => ( {
 			isEnabledAndEditorReady:
 				enabled && select( editorStore ).__unstableIsEditorReady(),
 			isCollaborationEnabled:
 				select( editorStore ).isCollaborationEnabledForCurrentPost(),
+			hasMetaBoxes: enabled
+				? select( editPostStore ).hasMetaBoxes()
+				: false,
+			allMetaBoxes: enabled
+				? select( editPostStore ).getAllMetaBoxes()
+				: [],
+			rtcCompatibleIds:
+				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
 		} ),
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
 
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
+
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
 	// will noop until then.
 	useEffect( () => {
@@ -37,8 +52,16 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			initializeMetaBoxes();
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
+			// Meta boxes marked with __rtc_compatible_meta_box on the server
+			// have their IDs stored via setRtcCompatibleMetaBoxIds().
 			if ( isCollaborationEnabled ) {
-				setCollaborationSupported( false );
+				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
+					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
+				);
+
+				if ( hasIncompatibleMetaBoxes ) {
+					setCollaborationSupported( false );
+				}
 			}
 		}
 	}, [
@@ -46,5 +69,8 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		setCollaborationSupported,
+		hasMetaBoxes,
+		allMetaBoxes,
+		rtcCompatibleIds,
 	] );
 };

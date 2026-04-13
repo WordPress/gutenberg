@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
+import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
@@ -66,34 +67,6 @@ export const _Default: Story = {
 					</p>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
-	},
-};
-
-/**
- * A confirmation dialog that intentionally omits the close icon. The user
- * must explicitly choose "Cancel" or "Confirm" to make their intent clear,
- * since it is not obvious what would happen when clicking a close icon.
- */
-export const ConfirmDialog: Story = {
-	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Header>
-						<Dialog.Title>Confirm Action</Dialog.Title>
-					</Dialog.Header>
-					<p>
-						Are you sure you want to proceed? This action cannot be
-						undone.
-					</p>
-					<Dialog.Footer>
-						<Dialog.Action variant="outline">Cancel</Dialog.Action>
-						<Dialog.Action>Confirm</Dialog.Action>
 					</Dialog.Footer>
 				</Dialog.Popup>
 			</>
@@ -188,4 +161,36 @@ export const AllSizes: Story = {
 export const WithCustomZIndex: Story = {
 	..._Default,
 	name: 'With Custom z-index',
+};
+
+/**
+ * A dialog with a visually hidden title. The title is still present in the
+ * DOM for `aria-labelledby`, but is not visible to sighted users.
+ *
+ * Use `<VisuallyHidden render={ <Dialog.Title /> }>` so that `Dialog.Title`
+ * keeps its `<h2>` element while being visually hidden.
+ */
+export const WithVisuallyHiddenTitle: Story = {
+	args: {
+		children: (
+			<>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Header>
+						<VisuallyHidden render={ <Dialog.Title /> }>
+							Accessible dialog heading
+						</VisuallyHidden>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+					<p>
+						This dialog has a visually hidden title. Inspect the DOM
+						or use a screen reader to verify the heading is present.
+					</p>
+					<Dialog.Footer>
+						<Dialog.Action>Got it</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</>
+		),
+	},
 };

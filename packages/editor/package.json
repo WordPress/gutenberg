@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.42.0",
+	"version": "14.43.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -101,6 +101,7 @@
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",

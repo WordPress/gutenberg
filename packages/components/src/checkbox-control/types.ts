@@ -13,6 +13,10 @@ export type CheckboxControlProps = Pick<
 	'__nextHasNoMarginBottom' | 'help'
 > & {
 	/**
+	 * Whether the checkbox should be disabled.
+	 */
+	disabled?: boolean;
+	/**
 	 * A function that receives the checked state (boolean) as input.
 	 */
 	onChange: ( value: boolean ) => void;

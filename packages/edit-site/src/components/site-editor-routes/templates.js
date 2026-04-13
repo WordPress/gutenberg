@@ -14,6 +14,7 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import PageTemplates from '../page-templates';
 import PageTemplatesLegacy from '../page-templates/index-legacy';
 import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
 
 async function isTemplateListView( query ) {
 	const { activeView = 'active' } = query;
@@ -39,8 +40,10 @@ export const templatesRoute = {
 	path: '/template',
 	areas: {
 		sidebar( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreenTemplatesBrowse backPath="/" />
 			) : (
 				<SidebarNavigationScreenUnsupported />
@@ -68,8 +71,10 @@ export const templatesRoute = {
 			return isListView ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			if ( ! isBlockTheme ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			if ( ! siteData.currentTheme.is_block_theme ) {
 				return <SidebarNavigationScreenUnsupported />;
 			}
 			// Check if the template activation experiment is enabled.

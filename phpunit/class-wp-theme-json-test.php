@@ -316,6 +316,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'background' => array(
 				'backgroundImage' => true,
 				'backgroundSize'  => true,
+				'gradient'        => true,
 			),
 			'border'     => array(
 				'width'  => true,
@@ -358,6 +359,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'background' => array(
 						'backgroundImage' => true,
 						'backgroundSize'  => true,
+						'gradient'        => true,
 					),
 					'border'     => array(
 						'width'  => true,
@@ -3012,6 +3014,66 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
 	 */
+	public function test_remove_insecure_properties_allows_combined_background_gradient_and_image() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.com/image.jpg',
+						),
+						'gradient'        => 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
+					),
+				),
+			),
+			true
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'gradient'        => 'linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_allows_background_gradient_only() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'gradient' => 'linear-gradient(135deg, #fff 0%, #000 100%)',
+					),
+				),
+			),
+			true
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'background' => array(
+					'gradient' => 'linear-gradient(135deg, #fff 0%, #000 100%)',
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
 	public function test_remove_insecure_properties_should_allow_indirect_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
@@ -5650,6 +5712,89 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$expected = "html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}:root :where(.wp-block-group){background-image: url('http://example.org/group.png');background-size: cover;}:root :where(.wp-block-post-content){background-image: url('http://example.org/top.png');background-position: 10% 20%;background-repeat: repeat;background-size: contain;background-attachment: scroll;}";
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
+	 * Tests that background gradient styles are output correctly in theme.json.
+	 */
+	public function test_get_background_gradient_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+			)
+		);
+
+		$body_node = array(
+			'path'     => array( 'styles' ),
+			'selector' => 'body',
+		);
+
+		$expected_styles = 'html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);}';
+		$this->assertSameCSS( $expected_styles, $theme_json->get_styles_for_block( $body_node ), 'Styles returned from "::get_styles_for_block()" with top-level background gradient do not match expectations' );
+	}
+
+	/**
+	 * Tests that background gradient preset slug styles are resolved correctly in theme.json.
+	 */
+	public function test_get_background_gradient_preset_slug_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'background' => array(
+						'gradient' => 'var:preset|gradient|vivid-cyan-blue',
+					),
+				),
+			)
+		);
+
+		$body_node = array(
+			'path'     => array( 'styles' ),
+			'selector' => 'body',
+		);
+
+		$expected_styles = 'html{min-height: calc(100% - var(--wp-admin--admin-bar--height, 0px));}body{background-image: var(--wp--preset--gradient--vivid-cyan-blue);}';
+		$this->assertSameCSS( $expected_styles, $theme_json->get_styles_for_block( $body_node ), 'Styles returned from "::get_styles_for_block()" with background gradient preset slug do not match expectations' );
+	}
+
+	/**
+	 * Tests that background gradient and image are combined correctly in theme.json.
+	 */
+	public function test_get_background_gradient_and_image_combined_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'background' => array(
+								'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+								'backgroundImage' => array(
+									'url' => 'http://example.org/image.png',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$group_node = array(
+			'name'      => 'core/group',
+			'path'      => array( 'styles', 'blocks', 'core/group' ),
+			'selector'  => '.wp-block-group',
+			'selectors' => array(
+				'root' => '.wp-block-group',
+			),
+		);
+
+		$expected_styles = ":root :where(.wp-block-group){background-image: linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url('http://example.org/image.png');}";
+		$this->assertSameCSS( $expected_styles, $theme_json->get_styles_for_block( $group_node ), 'Styles returned from "::get_styles_for_block()" with combined background gradient and image do not match expectations' );
 	}
 
 	/**
