@@ -387,9 +387,19 @@ function _gutenberg_register_default_connector_settings(): void {
 			continue;
 		}
 
-		// For AI providers, skip if the provider is not in the AI Client registry.
-		if ( 'ai_provider' === $connector_data['type'] && ! $ai_registry->hasProvider( $connector_id ) ) {
-			continue;
+		if ( 'ai_provider' === $connector_data['type'] ) {
+			// For AI providers, skip if the provider is not in the AI Client registry.
+			if ( ! $ai_registry->hasProvider( $connector_id ) ) {
+				continue;
+			}
+		} else {
+			if ( ! isset( $connector_data['plugin']['is_active'] ) || ! is_callable( $connector_data['plugin']['is_active'] ) ) {
+				continue;
+			}
+
+			if ( ! call_user_func( $connector_data['plugin']['is_active'] ) ) {
+				continue;
+			}
 		}
 
 		register_setting(
