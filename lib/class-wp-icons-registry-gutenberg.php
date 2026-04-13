@@ -11,7 +11,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Registers an icon.
 	 *
-	 * @param string $icon_name       Icon name including namespace.
+	 * @param string $icon_name       Icon name.
 	 * @param array  $icon_properties {
 	 *     List of properties for the icon.
 	 *
@@ -156,24 +156,27 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Unregisters an icon.
 	 *
-	 * @param string $icon_name Icon name including namespace.
+	 * @param string $icon_name  Unqualified icon name (e.g. "arrow-left").
+	 * @param string $collection Slug of the collection the icon belongs to.
 	 * @return bool True if the icon was unregistered successfully, else false.
 	 */
-	public function unregister( $icon_name ) {
-		if ( ! $this->is_registered( $icon_name ) ) {
+	public function unregister( $icon_name, $collection ) {
+		$qualified_name = $collection . '/' . $icon_name;
+
+		if ( ! $this->is_registered( $qualified_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
 				sprintf(
 					/* translators: %s: Icon name. */
 					__( 'Icon "%s" is not registered.', 'gutenberg' ),
-					$icon_name
+					$qualified_name
 				),
 				'7.1.0'
 			);
 			return false;
 		}
 
-		unset( $this->registered_icons[ $icon_name ] );
+		unset( $this->registered_icons[ $qualified_name ] );
 		return true;
 	}
 
