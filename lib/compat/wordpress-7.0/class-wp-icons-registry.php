@@ -59,7 +59,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				) {
 					_doing_it_wrong(
 						__METHOD__,
-						__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
+						__( 'Core icon collection manifest must provide a valid "filePath" for each icon.', 'gutenberg' ),
 						'7.0.0'
 					);
 					return;
