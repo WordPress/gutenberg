@@ -81,6 +81,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 
 	// WordPress 7.1 compat.
 	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-view-config-controller-7-1.php';
+	require __DIR__ . '/compat/wordpress-7.1/class-wp-icon-collections-registry.php';
+	require __DIR__ . '/compat/wordpress-7.1/icons.php';
 	require __DIR__ . '/compat/wordpress-7.1/rest-api.php';
 
 	// Plugin specific code.
