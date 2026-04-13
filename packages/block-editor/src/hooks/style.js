@@ -42,6 +42,7 @@ import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
 import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { getValueFromObjectPath } from '../utils/object';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -340,18 +341,20 @@ function BlockStyleControls( {
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
-	const [ selectedState, setSelectedState ] = useState( 'default' );
+	const [ selectedState, setSelectedState ] = useState( [] );
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+
+	const isStateSelected = selectedState.length > 0;
 
 	// Inject state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
 	// other blocks of the same type are not affected. Must be called before
 	// any early returns because it is a hook.
 	const canvasStateCSS = useMemo( () => {
-		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+		if ( ! showStateOnCanvas || ! isStateSelected ) {
 			return undefined;
 		}
-		const stateValue = style?.[ selectedState ];
+		const stateValue = getValueFromObjectPath( style, selectedState );
 		if ( ! stateValue ) {
 			return undefined;
 		}
@@ -360,7 +363,14 @@ function BlockStyleControls( {
 		// Use !important to override utility classes (e.g. has-accent-3-color)
 		// that the block's default color support generates with !important.
 		return css ? css.replace( /;/g, ' !important;' ) : undefined;
-	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
+	}, [
+		showStateOnCanvas,
+		isStateSelected,
+		selectedState,
+		style,
+		clientId,
+		name,
+	] );
 	useStyleOverride( { css: canvasStateCSS } );
 
 	if ( blockEditingMode !== 'default' ) {
@@ -392,7 +402,7 @@ function BlockStyleControls( {
 				value={ selectedState }
 				onChange={ setSelectedState }
 			/>
-			{ selectedState !== 'default' && (
+			{ isStateSelected && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						<ToggleControl
@@ -510,29 +520,32 @@ function useBlockProps( { name, style } ) {
 			} );
 		}
 
-		// Generate per-instance state CSS (e.g., :hover, :focus).
+		// Generate per-instance state CSS for pseudo-selector states (e.g., :hover, :focus).
+		// Custom class-based states (e.g., @current) require server-side context to
+		// determine which items are "current", so they are skipped here.
 		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
 		if ( validStates ) {
-			validStates.forEach( ( state ) => {
-				const stateStyles = style?.[ state ];
-				if ( stateStyles ) {
-					const selector = buildStateSelector(
-						baseElementSelector,
-						name,
-						state
-					);
-					// State styles use !important to override utility classes
-					// like .has-accent-3-background-color which the block's
-					// default color support generates with !important.
-					const css = compileCSS( stateStyles, { selector } ).replace(
-						/;/g,
-						' !important;'
-					);
-					if ( css ) {
-						elementCSSRules.push( css );
+			validStates
+				.filter( ( state ) => state.startsWith( ':' ) )
+				.forEach( ( state ) => {
+					const stateStyles = style?.[ state ];
+					if ( stateStyles ) {
+						const selector = buildStateSelector(
+							baseElementSelector,
+							name,
+							state
+						);
+						// State styles use !important to override utility classes
+						// like .has-accent-3-background-color which the block's
+						// default color support generates with !important.
+						const css = compileCSS( stateStyles, {
+							selector,
+						} ).replace( /;/g, ' !important;' );
+						if ( css ) {
+							elementCSSRules.push( css );
+						}
 					}
-				}
-			} );
+				} );
 		}
 
 		return elementCSSRules.length > 0

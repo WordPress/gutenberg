@@ -242,9 +242,9 @@ function attributesToStyle( attributes ) {
 function ColorInspectorControl( {
 	children,
 	resetAllFilter,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
@@ -281,7 +281,7 @@ export function ColorEdit( {
 	asWrapper,
 	label,
 	defaultControls,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
 	const isEnabled = useHasColorPanel( settings );
 
@@ -306,7 +306,7 @@ export function ColorEdit( {
 	);
 
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

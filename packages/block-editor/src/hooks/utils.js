@@ -56,20 +56,30 @@ export const cleanEmptyObject = ( object ) => {
  * resetting the whole block style object, it scopes the reset to the
  * sub-key that stores styles for that state, leaving default styles intact.
  *
- * @param {string}   selectedState    The active state key, e.g. ':hover'.
- * @param {Function} innerResetFilter The panel's own resetAllFilter callback.
+ * Supports compound states as an array (e.g. `[ '@current', ':hover' ]`),
+ * which are stored as nested objects in the `style` attribute.
+ *
+ * @param {string|string[]} selectedState    The active state key or array of keys.
+ * @param {Function}        innerResetFilter The panel's own resetAllFilter callback.
  * @return {Function} A filter that takes block `attributes` and returns updated attributes.
  */
 export function buildStateResetAllFilter( selectedState, innerResetFilter ) {
 	return ( attributes ) => {
-		const existingStateStyle = attributes.style?.[ selectedState ] || {};
+		const statePath = Array.isArray( selectedState )
+			? selectedState
+			: [ selectedState ];
+		const existingStateStyle =
+			getValueFromObjectPath( attributes.style, statePath ) || {};
 		const updatedStateStyle = innerResetFilter( existingStateStyle );
 		return {
 			...attributes,
-			style: cleanEmptyObject( {
-				...attributes.style,
-				[ selectedState ]: updatedStateStyle,
-			} ),
+			style: cleanEmptyObject(
+				setImmutably(
+					attributes.style ?? {},
+					statePath,
+					updatedStateStyle
+				)
+			),
 		};
 	};
 }

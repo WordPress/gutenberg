@@ -34,8 +34,10 @@ import { cleanEmptyObject } from './utils';
  * distinguish state keys from style property names, regardless of the
  * state format convention used.
  *
- * @param {string|string[]|null} path  Dot-separated path into the `style` object, or `null` for the root.
- * @param {string}               state Optional state key, e.g. `':hover'` or `'@current'`. Omit or pass `'default'` for base styles.
+ * @param {string|string[]|null}      path  Dot-separated path into the `style` object, or `null` for the root.
+ * @param {string|string[]|undefined} state Optional state key or array of keys for compound states,
+ *                                          e.g. `':hover'`, `'@current'`, or `[ '@current', ':hover' ]`.
+ *                                          Omit or pass an empty array for base styles.
  * @return {[*, Function]} Tuple of `[currentValue, setValue]`.
  */
 export function useBlockStyle( path, state ) {
@@ -57,9 +59,17 @@ export function useBlockStyle( path, state ) {
 		} else {
 			stylePath = path.split( '.' );
 		}
-		return state && state !== 'default'
-			? [ state, ...stylePath ]
-			: stylePath;
+		// state can be a string, a string[], or undefined/empty.
+		// Normalize to an array of segments to prepend.
+		let stateSegments;
+		if ( Array.isArray( state ) ) {
+			stateSegments = state;
+		} else if ( state && state !== 'default' ) {
+			stateSegments = [ state ];
+		} else {
+			stateSegments = [];
+		}
+		return [ ...stateSegments, ...stylePath ];
 	}, [ path, state ] );
 
 	const value = useMemo(
