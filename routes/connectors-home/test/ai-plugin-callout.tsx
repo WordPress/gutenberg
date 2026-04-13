@@ -19,9 +19,8 @@ jest.mock( '@wordpress/a11y', () => ( {
 } ) );
 
 jest.mock( '@wordpress/components', () => {
-	const { createElement, forwardRef } = jest.requireActual(
-		'@wordpress/element'
-	);
+	const { createElement, forwardRef } =
+		jest.requireActual( '@wordpress/element' );
 
 	return {
 		Button: forwardRef(
