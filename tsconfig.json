@@ -50,6 +50,7 @@
 		{ "path": "packages/latex-to-mathml" },
 		{ "path": "packages/lazy-editor" },
 		{ "path": "packages/lazy-import" },
+		{ "path": "packages/list-reusable-blocks" },
 		{ "path": "packages/media-editor" },
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },

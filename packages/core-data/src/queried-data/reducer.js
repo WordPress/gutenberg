@@ -51,6 +51,7 @@ export function getMergedItemIds(
 	}
 
 	const nextItemIdsStartIndex = offset ?? ( page - 1 ) * perPage;
+	const nextItemIdsRange = Math.max( perPage, nextItemIds.length );
 
 	// If later page has already been received, default to the larger known
 	// size of the existing array, else calculate as extending the existing.
@@ -67,7 +68,8 @@ export function getMergedItemIds(
 		// We need to check against the possible maximum upper boundary because
 		// a page could receive fewer than what was previously stored.
 		const isInNextItemsRange =
-			i >= nextItemIdsStartIndex && i < nextItemIdsStartIndex + perPage;
+			i >= nextItemIdsStartIndex &&
+			i < nextItemIdsStartIndex + nextItemIdsRange;
 		if ( isInNextItemsRange ) {
 			mergedItemIds[ i ] = nextItemIds[ i - nextItemIdsStartIndex ];
 		} else {

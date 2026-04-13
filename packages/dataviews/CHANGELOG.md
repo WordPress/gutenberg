@@ -5,9 +5,11 @@
 ### Enhancements
 
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
 
 ### Bug Fixes
 
+- DataForm: Fix disabled state for date(time) control. [#77138](https://github.com/WordPress/gutenberg/pull/77138)
 - DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
 - DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
 

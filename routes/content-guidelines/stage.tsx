@@ -58,11 +58,24 @@ const GUIDELINE_ITEMS = [
 	},
 	{
 		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines for your team.' ),
-
+		description: __( 'Add additional guidelines.' ),
 		slug: 'additional',
 	},
 ];
+
+const KNOWN_VIEWS = [ 'revision-history' ];
+
+function getInitialNavigatorPath() {
+	if ( window?.location?.href ) {
+		const url = new URL( window.location.href );
+		const view = url.searchParams.get( 'view' ) ?? '';
+		if ( KNOWN_VIEWS.includes( view ) ) {
+			return `/${ view }`;
+		}
+	}
+
+	return '/';
+}
 
 function ContentGuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
@@ -107,7 +120,7 @@ function ContentGuidelinesPage() {
 				</div>
 			) : (
 				! error && (
-					<Navigator initialPath="/">
+					<Navigator initialPath={ getInitialNavigatorPath() }>
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content">
 								{ /*

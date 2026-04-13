@@ -7,18 +7,23 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import exportReusableBlock from './utils/export';
 import ImportDropdown from './components/import-dropdown';
+import exportReusableBlock from './utils/export';
 
 // Setup Export Links.
-document.body.addEventListener( 'click', ( event ) => {
-	if (
-		! event.target.classList.contains( 'wp-list-reusable-blocks__export' )
-	) {
+document.body.addEventListener( 'click', ( event: MouseEvent ) => {
+	const target = event.target as HTMLElement;
+
+	if ( ! target.classList.contains( 'wp-list-reusable-blocks__export' ) ) {
 		return;
 	}
+
 	event.preventDefault();
-	exportReusableBlock( event.target.dataset.id );
+
+	const blockId = target.dataset.id;
+	if ( blockId ) {
+		exportReusableBlock( Number( blockId ) );
+	}
 } );
 
 // Setup Import Form.
@@ -34,7 +39,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		notice.innerHTML = `<p>${ __( 'Pattern imported successfully!' ) }</p>`;
 
 		const headerEnd = document.querySelector( '.wp-header-end' );
-		if ( ! headerEnd ) {
+		if ( ! headerEnd || ! headerEnd.parentNode ) {
 			return;
 		}
 		headerEnd.parentNode.insertBefore( notice, headerEnd );
@@ -42,6 +47,11 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	const container = document.createElement( 'div' );
 	container.className = 'list-reusable-blocks__container';
+
+	if ( ! button.parentNode ) {
+		return;
+	}
+
 	button.parentNode.insertBefore( container, button );
 	createRoot( container ).render(
 		<StrictMode>

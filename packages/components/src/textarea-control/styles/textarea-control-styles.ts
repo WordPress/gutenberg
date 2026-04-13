@@ -66,7 +66,6 @@ export const StyledTextarea = styled.textarea`
 		background: ${ COLORS.ui.backgroundDisabled };
 		border-color: ${ COLORS.ui.borderDisabled };
 		color: ${ COLORS.ui.textDisabled };
-		opacity: 1;
 	}
 
 	// Use opacity to work in various editor styles.

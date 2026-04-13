@@ -7,21 +7,29 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { readTextFile } from './file';
+import type {
+	ParsedContent,
+	PostType,
+	ReusableBlock,
+	ReusableBlockData,
+} from './types';
 
 /**
  * Import a reusable block from a JSON file.
  *
- * @param {File} file File.
- * @return {Promise} Promise returning the imported reusable block.
+ * @param file - File to import
+ * @return Promise returning the imported reusable block
  */
-async function importReusableBlock( file ) {
+async function importReusableBlock( file: File ): Promise< ReusableBlock > {
 	const fileContent = await readTextFile( file );
-	let parsedContent;
+	let parsedContent: ParsedContent;
+
 	try {
 		parsedContent = JSON.parse( fileContent );
 	} catch {
 		throw new Error( 'Invalid JSON file' );
 	}
+
 	if (
 		parsedContent.__file !== 'wp_block' ||
 		! parsedContent.title ||
@@ -33,8 +41,12 @@ async function importReusableBlock( file ) {
 	) {
 		throw new Error( 'Invalid pattern JSON file' );
 	}
-	const postType = await apiFetch( { path: `/wp/v2/types/wp_block` } );
-	const reusableBlock = await apiFetch( {
+
+	const postType = await apiFetch< PostType >( {
+		path: `/wp/v2/types/wp_block`,
+	} );
+
+	const reusableBlock = await apiFetch< ReusableBlock >( {
 		path: `/wp/v2/${ postType.rest_base }`,
 		data: {
 			title: parsedContent.title,
@@ -44,7 +56,7 @@ async function importReusableBlock( file ) {
 				parsedContent.syncStatus === 'unsynced'
 					? { wp_pattern_sync_status: parsedContent.syncStatus }
 					: undefined,
-		},
+		} satisfies ReusableBlockData,
 		method: 'POST',
 	} );
 

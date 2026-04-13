@@ -1,50 +1,51 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import { withInstanceId } from '@wordpress/compose';
-import { __, _x } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/compose';
+import { useRef, useState } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import importReusableBlock from '../../utils/import';
+import type { ImportFormProps, ReusableBlock } from '../../utils/types';
 
-function ImportForm( { instanceId, onUpload } ) {
+function ImportForm( { instanceId, onUpload }: ImportFormProps ) {
 	const inputId = 'list-reusable-blocks-import-form-' + instanceId;
 
-	const formRef = useRef();
+	const formRef = useRef< HTMLFormElement >( null );
 	const [ isLoading, setIsLoading ] = useState( false );
-	const [ error, setError ] = useState( null );
-	const [ file, setFile ] = useState( null );
+	const [ error, setError ] = useState< string | null >( null );
+	const [ file, setFile ] = useState< File | null >( null );
 
-	const onChangeFile = ( event ) => {
-		setFile( event.target.files[ 0 ] );
+	const onChangeFile = ( event: React.ChangeEvent< HTMLInputElement > ) => {
+		setFile( event.target.files?.[ 0 ] || null );
 		setError( null );
 	};
 
-	const onSubmit = ( event ) => {
+	const onSubmit = ( event: React.FormEvent< HTMLFormElement > ) => {
 		event.preventDefault();
 		if ( ! file ) {
 			return;
 		}
 		setIsLoading( true );
 		importReusableBlock( file )
-			.then( ( reusableBlock ) => {
-				if ( ! formRef ) {
+			.then( ( reusableBlock: ReusableBlock ) => {
+				if ( ! formRef.current ) {
 					return;
 				}
 
 				setIsLoading( false );
 				onUpload( reusableBlock );
 			} )
-			.catch( ( errors ) => {
-				if ( ! formRef ) {
+			.catch( ( errors: Error ) => {
+				if ( ! formRef.current ) {
 					return;
 				}
 
-				let uiMessage;
+				let uiMessage: string;
 				switch ( errors.message ) {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );

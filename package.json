@@ -244,7 +244,7 @@
 			"npm run docs:api-ref",
 			"npm run docs:blocks",
 			"npm run docs:theme-ref",
-			"node ./bin/api-docs/are-api-docs-unstaged.js"
+			"node ./tools/api-docs/are-api-docs-unstaged.js"
 		],
 		"packages/icons/src/library/*": [
 			"npm run -w packages/icons build"

@@ -25,7 +25,7 @@ import { unlock } from '../../lock-unlock';
 const { Badge } = unlock( componentsPrivateApis );
 const DAY_IN_MILLISECONDS = 86400000;
 const EMPTY_ARRAY = [];
-const defaultLayouts = { activity: {} };
+const defaultLayouts = { activity: true };
 const noop = () => {};
 const paginationInfo = {};
 const view = {

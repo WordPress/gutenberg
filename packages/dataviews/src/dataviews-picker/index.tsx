@@ -62,7 +62,7 @@ type DataViewsPickerProps< Item > = {
 		totalItems: number;
 		totalPages: number;
 	};
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts?: SupportedLayouts;
 	selection: string[];
 	onChangeSelection: ( items: string[] ) => void;
 	children?: ReactNode;
@@ -77,6 +77,10 @@ type DataViewsPickerProps< Item > = {
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
 const EMPTY_ARRAY: any[] = [];
+const DEFAULT_PICKER_LAYOUTS: SupportedLayouts = {
+	pickerGrid: true,
+	pickerTable: true,
+};
 
 type DefaultUIProps = Pick<
 	DataViewsPickerProps< any >,
@@ -132,7 +136,7 @@ function DataViewsPicker< Item >( {
 	getItemId = defaultGetItemId,
 	isLoading = false,
 	paginationInfo,
-	defaultLayouts: defaultLayoutsProperty,
+	defaultLayouts: defaultLayoutsProperty = DEFAULT_PICKER_LAYOUTS,
 	selection,
 	onChangeSelection,
 	children,
@@ -198,17 +202,20 @@ function DataViewsPicker< Item >( {
 		}
 	}, [ hasPrimaryOrLockedFilters, isShowingFilter ] );
 
-	// Filter out DataViewsPicker layouts.
+	// Filter out non-picker layouts and normalize `true` to `{}`.
 	const defaultLayouts = useMemo(
 		() =>
 			Object.fromEntries(
-				Object.entries( defaultLayoutsProperty ).filter(
-					( [ layoutType ] ) => {
+				Object.entries( defaultLayoutsProperty )
+					.filter( ( [ layoutType ] ) => {
 						return dataViewsPickerLayouts.some(
 							( viewLayout ) => viewLayout.type === layoutType
 						);
-					}
-				)
+					} )
+					.map( ( [ key, value ] ) => [
+						key,
+						value === true ? {} : value,
+					] )
 			),
 		[ defaultLayoutsProperty ]
 	);
