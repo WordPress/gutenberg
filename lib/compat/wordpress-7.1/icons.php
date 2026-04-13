@@ -37,6 +37,40 @@ if ( ! function_exists( 'wp_unregister_icon_collection' ) ) {
 	}
 }
 
+if ( ! function_exists( 'wp_register_icon' ) ) {
+	/**
+	 * Registers a new icon.
+	 *
+	 * @param string $icon_name Icon name including namespace.
+	 * @param array  $args {
+	 *     List of properties for the icon.
+	 *
+	 *     @type string $label      Required. A human-readable label for the icon.
+	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
+	 *     @type string $content    Optional. SVG markup for the icon.
+	 *                              If not provided, the content will be retrieved from the `filePath` if set.
+	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
+	 *     @type string $filePath   Optional. The full path to the file containing the icon content.
+	 * }
+	 * @return bool True if the icon was registered successfully, else false.
+	 */
+	function wp_register_icon( $icon_name, $args ) {
+		return WP_Icons_Registry::get_instance()->register( $icon_name, $args );
+	}
+}
+
+if ( ! function_exists( 'wp_unregister_icon' ) ) {
+	/**
+	 * Unregisters an icon.
+	 *
+	 * @param string $icon_name Icon name including namespace.
+	 * @return bool True if the icon was unregistered successfully, else false.
+	 */
+	function wp_unregister_icon( $icon_name ) {
+		return WP_Icons_Registry::get_instance()->unregister( $icon_name );
+	}
+}
+
 /**
  * Registers the default icon collections for Gutenberg.
  */
@@ -81,18 +115,6 @@ function gutenberg_register_icons() {
 		return;
 	}
 
-	$registry        = WP_Icons_Registry_Gutenberg::get_instance();
-	$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
-	/*
-	 * ReflectionMethod::setAccessible is:
-	 * - redundant as of 8.1.0, which made all properties accessible
-	 * - deprecated as of 8.5.0
-	 * - needed until 8.1.0, as method `register` is protected
-	 */
-	if ( PHP_VERSION_ID < 80100 ) {
-		$register_method->setAccessible( true );
-	}
-
 	foreach ( $collection as $icon_name => $icon_data ) {
 		if (
 			empty( $icon_data['filePath'] )
@@ -106,8 +128,7 @@ function gutenberg_register_icons() {
 			return;
 		}
 
-		$register_method->invoke(
-			$registry,
+		wp_register_icon(
 			'core/' . $icon_name,
 			array(
 				'label'      => $icon_data['label'],
@@ -121,4 +142,4 @@ function gutenberg_register_icons() {
 if ( has_action( 'init', '_wp_register_default_icons' ) ) {
 	remove_action( 'init', '_wp_register_default_icons' );
 }
-add_action( 'init', 'gutenberg_register_icons', 0 );
+add_action( 'init', 'gutenberg_register_icons' );

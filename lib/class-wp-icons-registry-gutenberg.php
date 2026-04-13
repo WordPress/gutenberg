@@ -16,15 +16,15 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *     List of properties for the icon.
 	 *
 	 *     @type string $label      Required. A human-readable label for the icon.
+	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
 	 *     @type string $content    Optional. SVG markup for the icon.
 	 *                              If not provided, the content will be retrieved from the `filePath` if set.
 	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
 	 *     @type string $filePath   Optional. The full path to the file containing the icon content.
-	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
 	 * }
 	 * @return bool True if the icon was registered with success and false otherwise.
 	 */
-	protected function register( $icon_name, $icon_properties ) {
+	public function register( $icon_name, $icon_properties ) {
 		if ( ! isset( $icon_name ) || ! is_string( $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
@@ -153,6 +153,30 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	}
 
 	/**
+	 * Unregisters an icon.
+	 *
+	 * @param string $icon_name Icon name including namespace.
+	 * @return bool True if the icon was unregistered successfully, else false.
+	 */
+	public function unregister( $icon_name ) {
+		if ( ! $this->is_registered( $icon_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				sprintf(
+					/* translators: %s: Icon name. */
+					__( 'Icon "%s" is not registered.', 'gutenberg' ),
+					$icon_name
+				),
+				'7.1.0'
+			);
+			return false;
+		}
+
+		unset( $this->registered_icons[ $icon_name ] );
+		return true;
+	}
+
+	/**
 	 * Modified to also search in icon labels
 	 */
 	public function get_registered_icons( $search = '' ) {
@@ -213,16 +237,6 @@ function gutenberg_override_wp_icons_registry() {
 	// If the original registry was already instantiated, replay any icons outside
 	// the `core/` namespace onto the Gutenberg registry so they are not lost.
 	if ( null !== $original_registry ) {
-		$register_method = new ReflectionMethod( WP_Icons_Registry_Gutenberg::class, 'register' );
-		/*
-		 * ReflectionMethod::setAccessible is:
-		 * - redundant as of 8.1.0, which made all properties accessible
-		 * - deprecated as of 8.5.0
-		 * - needed until 8.1.0, as property `instance` is private
-		 */
-		if ( PHP_VERSION_ID < 80100 ) {
-			$register_method->setAccessible( true );
-		}
 		foreach ( $original_registry->get_registered_icons() as $icon ) {
 			if ( strpos( $icon['name'], 'core/' ) === 0 ) {
 				continue;
@@ -235,7 +249,10 @@ function gutenberg_override_wp_icons_registry() {
 			} else {
 				continue;
 			}
-			$register_method->invoke( $gutenberg_registry, $icon['name'], $icon_properties );
+			if ( ! empty( $icon['collection'] ) ) {
+				$icon_properties['collection'] = $icon['collection'];
+			}
+			$gutenberg_registry->register( $icon['name'], $icon_properties );
 		}
 	}
 	$property->setValue( null, $gutenberg_registry );
