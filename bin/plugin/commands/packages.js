@@ -357,12 +357,6 @@ async function publishPackagesToNpm( {
 		cwd: gitWorkingDirectoryPath,
 	} );
 
-	log( '>> Current npm user:' );
-	await command( 'npm whoami', {
-		cwd: gitWorkingDirectoryPath,
-		stdio: 'inherit',
-	} );
-
 	const beforeCommitHash = await SimpleGit(
 		gitWorkingDirectoryPath
 	).revparse( [ '--short', 'HEAD' ] );
@@ -374,7 +368,7 @@ async function publishPackagesToNpm( {
 		.replace( /[-:T]/g, '' );
 
 	const yesFlag = interactive ? '' : '--yes';
-	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
+
 	if ( releaseType === 'next' ) {
 		log(
 			'>> Bumping version of public packages changed since the last release.'
@@ -390,7 +384,7 @@ async function publishPackagesToNpm( {
 
 		log( '>> Publishing modified packages to npm.' );
 		await command(
-			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+			`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -400,7 +394,7 @@ async function publishPackagesToNpm( {
 		log( '>> Publishing modified packages to npm.' );
 		try {
 			await command(
-				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag } ${ noVerifyAccessFlag }`,
+				`npx lerna publish ${ minimumVersionBump } --dist-tag ${ distTag } --no-private ${ yesFlag }`,
 				{
 					cwd: gitWorkingDirectoryPath,
 					stdio: 'inherit',
@@ -412,7 +406,7 @@ async function publishPackagesToNpm( {
 			);
 			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
 			await command(
-				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag } ${ noVerifyAccessFlag }`,
+				`npx lerna publish from-package --dist-tag ${ distTag } ${ yesFlag }`,
 				{
 					cwd: gitWorkingDirectoryPath,
 					stdio: 'inherit',
@@ -433,25 +427,19 @@ async function publishPackagesToNpm( {
 
 		log( '>> Publishing modified packages to npm.' );
 		try {
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
+			await command( `npx lerna publish from-package ${ yesFlag }`, {
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			} );
 		} catch {
 			log(
 				'>> Trying to finish failed publishing of modified npm packages.'
 			);
 			await SimpleGit( gitWorkingDirectoryPath ).reset( 'hard' );
-			await command(
-				`npx lerna publish from-package ${ yesFlag } ${ noVerifyAccessFlag }`,
-				{
-					cwd: gitWorkingDirectoryPath,
-					stdio: 'inherit',
-				}
-			);
+			await command( `npx lerna publish from-package ${ yesFlag }`, {
+				cwd: gitWorkingDirectoryPath,
+				stdio: 'inherit',
+			} );
 		}
 	}
 
