@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
@@ -30,10 +30,10 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
+import { isBlobURL, getBlobTypeByURL, createBlobURL } from '@wordpress/blob';
 import { pullLeft, pullRight } from '@wordpress/icons';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-
+import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
@@ -479,9 +479,56 @@ function MediaTextEdit( {
 		</ToolsPanel>
 	);
 
+	const { mediaUpload } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			mediaUpload: getSettings().mediaUpload,
+		};
+	}, [] );
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const onPaste = ( event ) => {
+		const files = event.clipboardData?.files;
+		if ( files && files.length > 0 ) {
+			const mediaFiles = Array.from( files ).filter(
+				( f ) =>
+					f.type.startsWith( 'image/' ) ||
+					f.type.startsWith( 'video/' )
+			);
+			if ( mediaFiles.length > 0 ) {
+				event.preventDefault();
+
+				if ( ! mediaUpload ) {
+					createErrorNotice(
+						__(
+							'To edit this block, you need permission to upload media.'
+						),
+						{ type: 'snackbar' }
+					);
+					return;
+				}
+
+				const file = mediaFiles[ 0 ];
+				onSelectMedia( { url: createBlobURL( file ) } );
+				mediaUpload( {
+					allowedTypes: [ 'image', 'video' ],
+					filesList: [ file ],
+					onFileChange: ( [ media ] ) => {
+						if ( media ) {
+							onSelectMedia( media );
+						}
+					},
+					onError: ( message ) =>
+						createErrorNotice( message, { type: 'snackbar' } ),
+				} );
+			}
+		}
+	};
+
 	const blockProps = useBlockProps( {
 		className: classNames,
 		style,
+		onPaste,
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
