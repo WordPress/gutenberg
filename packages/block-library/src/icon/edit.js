@@ -78,7 +78,7 @@ export function Edit( { attributes, setAttributes } ) {
 					? getEntityRecord( 'root', 'icon', icon )
 					: null,
 				allIcons: isInserterOpen
-					? getEntityRecords( 'root', 'icon' )
+					? getEntityRecords( 'root', 'icon', { per_page: -1 } )
 					: undefined,
 			};
 		},
