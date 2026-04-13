@@ -816,12 +816,11 @@ export function prepareItem( id: QueueItemId ) {
 		if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
-			// sub-sizes, format conversion). Keep the original HEIC in
-			// sourceFile so it can be sideloaded as the "original" after
-			// upload, preserving the user's original file.
+			// sub-sizes, format conversion).
 			const vipsAvailable = isClientSideMediaSupported();
 			updates = {
 				file: heicJpeg,
+				sourceFile: heicJpeg,
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: ! vipsAvailable,
@@ -1140,30 +1139,10 @@ export function generateThumbnails( id: QueueItemId ) {
 		const attachment = item.attachment;
 		const settings = select.getSettings();
 
-		// HEIC/HEIF: the uploaded file is a JPEG conversion, but
-		// sourceFile still holds the original HEIC. Sideload it as
-		// "original" so WordPress preserves it in metadata.
-		const isHeicSource = HEIC_MIME_TYPES.includes( item.sourceFile.type );
-		if ( isHeicSource && attachment.id ) {
-			dispatch.addSideloadItem( {
-				file: item.sourceFile,
-				batchId: uuidv4(),
-				parentId: item.id,
-				additionalData: {
-					post: attachment.id,
-					image_size: 'original',
-					convert_format: false,
-				},
-				operations: [ OperationType.Upload ],
-			} );
-		}
-
 		// Check if image needs rotation.
 		// If exif_orientation is not 1, the image needs rotation.
 		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
-		// HEIC rotation is handled by the browser's native decoder during
-		// canvas conversion, so skip vips rotation for HEIC sources.
-		if ( ! isHeicSource ) {
+		{
 			const needsRotation =
 				attachment.exif_orientation &&
 				attachment.exif_orientation !== 1 &&
@@ -1214,9 +1193,7 @@ export function generateThumbnails( id: QueueItemId ) {
 			const sizesToGenerate: string[] =
 				attachment.missing_image_sizes as string[];
 
-			// For HEIC, sourceFile is the original HEIC which vips cannot
-			// process. Use the uploaded JPEG (item.file) instead.
-			const thumbnailSource = isHeicSource ? item.file : item.sourceFile;
+			const thumbnailSource = item.sourceFile;
 			const file = attachment.filename
 				? renameFile( thumbnailSource, attachment.filename )
 				: thumbnailSource;
