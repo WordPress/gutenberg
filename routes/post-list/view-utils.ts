@@ -5,7 +5,7 @@ import { loadView } from '@wordpress/views';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { Type } from '@wordpress/core-data';
-import type { View, Filter } from '@wordpress/dataviews';
+import type { View, Filter, SupportedLayouts } from '@wordpress/dataviews';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -19,12 +19,12 @@ const DEFAULT_VIEW: View = {
 	descriptionField: 'excerpt',
 };
 
-export const DEFAULT_LAYOUTS = {
+export const DEFAULT_LAYOUTS: SupportedLayouts = {
 	table: {
 		layout: {
 			styles: {
 				author: {
-					align: 'start' as const,
+					align: 'start',
 				},
 			},
 		},

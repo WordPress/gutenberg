@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import type { View } from '@wordpress/dataviews';
+import type { SupportedLayouts, View } from '@wordpress/dataviews';
 
 const LAYOUT_GRID = 'grid';
 const LAYOUT_TABLE = 'table';
@@ -41,7 +41,7 @@ export const DEFAULT_VIEWS: {
 	},
 ];
 
-export const DEFAULT_LAYOUTS = {
+export const DEFAULT_LAYOUTS: SupportedLayouts = {
 	[ LAYOUT_TABLE ]: true,
 	[ LAYOUT_GRID ]: {
 		layout: {
