@@ -623,7 +623,7 @@ function block_core_breadcrumbs_truncate_items( $breadcrumb_items, $character_li
 	// Calculate total characters in all labels.
 	$total_chars = 0;
 	foreach ( $breadcrumb_items as $item ) {
-		$label = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
+		$label       = isset( $item['allow_html'] ) && $item['allow_html'] ? wp_strip_all_tags( $item['label'] ) : $item['label'];
 		$total_chars += strlen( $label );
 	}
 
