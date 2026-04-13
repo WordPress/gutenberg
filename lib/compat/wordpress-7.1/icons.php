@@ -15,8 +15,6 @@ if ( ! function_exists( 'wp_register_icon_collection' ) ) {
 	 *
 	 *     @type string $label       Required. A human-readable label for the icon collection.
 	 *     @type string $description Optional. A human-readable description for the icon collection.
-	 *     @type array  $categories  Optional. An array of categories. Each category is an array
-	 *                               with `name` and `slug` keys.
 	 * }
 	 * @return bool True if the icon collection was registered successfully, else false.
 	 */

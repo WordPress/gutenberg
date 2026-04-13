@@ -25,8 +25,6 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 		 *
 		 *     @type string $label       Required. A human-readable label for the icon collection.
 		 *     @type string $description Optional. A human-readable description for the icon collection.
-		 *     @type array  $categories  Optional. An array of categories. Each category is an array
-		 *                               with `name` and `slug` keys.
 		 * }
 		 * @return bool True if the collection was registered with success and false otherwise.
 		 */
@@ -58,7 +56,7 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 				return false;
 			}
 
-			$allowed_keys = array_fill_keys( array( 'label', 'description', 'categories' ), 1 );
+			$allowed_keys = array_fill_keys( array( 'label', 'description' ), 1 );
 			foreach ( array_keys( $collection_properties ) as $key ) {
 				if ( ! array_key_exists( $key, $allowed_keys ) ) {
 					_doing_it_wrong(
@@ -83,36 +81,8 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 				return false;
 			}
 
-			if ( isset( $collection_properties['categories'] ) ) {
-				if ( ! is_array( $collection_properties['categories'] ) ) {
-					_doing_it_wrong(
-						__METHOD__,
-						__( 'Icon collection categories must be an array.', 'gutenberg' ),
-						'7.1.0'
-					);
-					return false;
-				}
-
-				foreach ( $collection_properties['categories'] as $category ) {
-					if (
-						! is_array( $category )
-						|| ! isset( $category['name'], $category['slug'] )
-						|| ! is_string( $category['name'] )
-						|| ! is_string( $category['slug'] )
-					) {
-						_doing_it_wrong(
-							__METHOD__,
-							__( 'Each icon collection category must be an array with "name" and "slug" string keys.', 'gutenberg' ),
-							'7.1.0'
-						);
-						return false;
-					}
-				}
-			}
-
 			$defaults = array(
 				'description' => '',
-				'categories'  => array(),
 			);
 
 			$collection = array_merge(
