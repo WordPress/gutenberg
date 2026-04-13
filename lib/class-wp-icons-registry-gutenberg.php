@@ -4,7 +4,7 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	/**
 	 * Overridden to skip the parent's core icon registration, which uses the
 	 * core manifest path. Core icons are registered via
-	 * `gutenberg_register_icons()` using the Gutenberg manifest instead.
+	 * `gutenberg_register_default_icons()` using the Gutenberg manifest instead.
 	 */
 	protected function __construct() {}
 

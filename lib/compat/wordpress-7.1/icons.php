@@ -90,7 +90,7 @@ add_action( 'init', 'gutenberg_register_icon_collections', 0 );
 /**
  * Registers the default core icons from the Gutenberg manifest.
  */
-function gutenberg_register_icons() {
+function gutenberg_register_default_icons() {
 	$icons_directory = gutenberg_dir_path() . 'packages/icons/src';
 	$icons_directory = trailingslashit( $icons_directory );
 	$manifest_path   = $icons_directory . 'manifest.php';
@@ -140,4 +140,4 @@ function gutenberg_register_icons() {
 if ( has_action( 'init', '_wp_register_default_icons' ) ) {
 	remove_action( 'init', '_wp_register_default_icons' );
 }
-add_action( 'init', 'gutenberg_register_icons' );
+add_action( 'init', 'gutenberg_register_default_icons' );
