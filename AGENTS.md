@@ -67,6 +67,25 @@ vendor/bin/phpcbf <path_to_php_file.php>
 
 For full architecture details, see `docs/explanations/architecture/`.
 
+## Design system package guide
+
+The WordPress Design System spans several packages. When building or modifying UI, use the most specific package available:
+
+| Package | Role | Use for |
+|---|---|---|
+| `@wordpress/theme` | Design tokens | Colors, spacing, typography, radii, shadows, elevation via `--wpds-*` CSS custom properties. Source of truth for every visual value. |
+| `@wordpress/ui` | UI primitives | The preferred component library (e.g., AlertDialog, Badge, Button, Card, Dialog, EmptyState, Form, Icon, IconButton, Link, Notice, Popover, Stack, Tabs, Text, Tooltip). |
+| `@wordpress/icons` | Iconography | SVG icons consumed via `<Icon icon={iconName} />`. |
+| `@wordpress/admin-ui` | Page chrome | High-level layout (e.g., Page, Breadcrumbs, NavigableRegion). |
+| `@wordpress/dataviews` | Data UI | DataViews (tables, grids, lists with filtering, sorting, bulk actions) and DataForm (structured form rendering from field definitions). |
+| `@wordpress/components` | Legacy components | Only use when the component you need is not yet in `@wordpress/ui` (e.g., CheckboxControl, RadioControl, ToggleControl, ColorPicker, DatePicker). Prefer `@wordpress/ui` when both packages offer the same component. |
+
+Key rules:
+
+-   **Never hardcode colors, spacing, or typography values.** Always reference `--wpds-*` tokens from `@wordpress/theme`. If a token doesn't exist for your use case, that's a gap worth reporting — not a reason to use a raw value.
+-   **Prefer `@wordpress/ui` over `@wordpress/components`.** The `/ui` package is the design system implementation; `/components` is a legacy collection being incrementally replaced. When both packages export a component with the same purpose, use the `/ui` version.
+-   **`@wordpress/components` uses a different styling system.** It consumes Sass variables from `@wordpress/base-styles`, not `--wpds-*` tokens. Mixing `/ui` and `/components` on the same page may produce minor visual inconsistencies.
+
 ## Common pitfalls
 
 -   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
