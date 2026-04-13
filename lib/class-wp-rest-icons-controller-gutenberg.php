@@ -50,7 +50,7 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 	 * @return array Collection parameters.
 	 */
 	public function get_collection_params() {
-		$query_params = parent::get_collection_params();
+		$query_params              = parent::get_collection_params();
 		$query_params['namespace'] = array(
 			'description' => __( 'Limit results to icons belonging to the given collection slug.', 'gutenberg' ),
 			'type'        => 'string',

@@ -16,7 +16,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		$this->registry = WP_Icons_Registry_Gutenberg::get_instance();
-		$collections = WP_Icon_Collections_Registry::get_instance();
+		$collections    = WP_Icon_Collections_Registry::get_instance();
 		if ( ! $collections->is_registered( 'test-collection' ) ) {
 			$collections->register( 'test-collection', array( 'label' => 'Test Plugin' ) );
 		}
