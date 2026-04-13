@@ -113,7 +113,7 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 						__( 'Icon collection "%s" not found.', 'gutenberg' ),
 						$collection_slug
 					),
-					'21.4.0'
+					'7.1.0'
 				);
 				return false;
 			}
