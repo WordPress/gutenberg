@@ -29,6 +29,7 @@
 ### Code Quality
 
 -   `Textarea`: remove unnecessary style [#77221](https://github.com/WordPress/gutenberg/pull/77221).
+-   `FormTokenField`: remove unnecessary style [#77263](https://github.com/WordPress/gutenberg/pull/77263).
 
 ## 32.5.0 (2026-04-01)
 
