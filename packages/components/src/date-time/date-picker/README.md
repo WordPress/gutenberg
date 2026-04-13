@@ -11,14 +11,14 @@ import { useState } from 'react';
 import { DatePicker } from '@wordpress/components';
 
 const MyDatePicker = () => {
-  const [ date, setDate ] = useState( new Date() );
+	const [ date, setDate ] = useState( new Date() );
 
-  return (
-    <DatePicker
-      currentDate={ date }
-      onChange={ ( newDate ) => setDate( newDate ) }
-    />
-  );
+	return (
+		<DatePicker
+			currentDate={ date }
+			onChange={ ( newDate ) => setDate( newDate ) }
+		/>
+	);
 };
 ```
 

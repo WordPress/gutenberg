@@ -13,15 +13,15 @@ import { useState } from 'react';
 import { TimePicker } from '@wordpress/components';
 
 const MyTimePicker = () => {
-  const [ time, setTime ] = useState( new Date() );
+	const [ time, setTime ] = useState( new Date() );
 
-  return (
-    <TimePicker
-      currentTime={ time }
-      onChange={ ( newTime ) => setTime( newTime ) }
-      is12Hour
-    />
-  );
+	return (
+		<TimePicker
+			currentTime={ time }
+			onChange={ ( newTime ) => setTime( newTime ) }
+			is12Hour
+		/>
+	);
 };
 ```
 
