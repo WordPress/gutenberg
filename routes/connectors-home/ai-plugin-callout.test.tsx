@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
@@ -89,6 +90,8 @@ type StoreState = {
 	siteSettings?: Record< string, string >;
 };
 
+const mockSaveEntityRecord = jest.fn();
+
 describe( 'AiPluginCallout', () => {
 	let storeState: StoreState;
 	let selectorStore: {
@@ -140,8 +143,10 @@ describe( 'AiPluginCallout', () => {
 			) => mapSelect( () => selectorStore )
 		);
 
+		mockSaveEntityRecord.mockReset();
+		mockSaveEntityRecord.mockResolvedValue( undefined );
 		( useDispatch as jest.Mock ).mockReturnValue( {
-			saveEntityRecord: jest.fn(),
+			saveEntityRecord: mockSaveEntityRecord,
 		} );
 	} );
 
@@ -153,5 +158,26 @@ describe( 'AiPluginCallout', () => {
 				name: 'Control features in the AI plugin',
 			} )
 		).toHaveAttribute( 'href', 'options-general.php?page=ai-wp-admin' );
+	} );
+
+	it( 'installs the AI plugin using the plugin slug', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
+				'root',
+				'plugin',
+				{ slug: 'ai', status: 'active' },
+				{ throwOnError: true }
+			);
+		} );
 	} );
 } );
