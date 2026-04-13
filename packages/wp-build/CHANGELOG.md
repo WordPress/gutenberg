@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `wpPlugin.sources` configuration for discovering packages from additional roots or by npm name. Directory paths scan for packages; named sources (e.g. `@automattic/charts`) are resolved via `require.resolve()` and preserve their npm identity as the script-module ID.
+-   Add `wpPlugin.packageSources` configuration for discovering packages from additional directories or by npm name. Named sources (e.g. `@acme/shared-ui`) preserve their npm identity as the script-module ID.
 
 ## 0.12.0 (2026-04-15)
 

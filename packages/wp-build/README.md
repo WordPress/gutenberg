@@ -255,16 +255,16 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
-### `wpPlugin.sources`
+### `wpPlugin.packageSources`
 
-Additional package sources to discover and compile. By default the tool only discovers packages under `./packages/`. The `sources` field accepts an array that can contain two types of entries:
+Additional package sources to discover and compile. By default the tool only discovers packages under `./packages/`. The `packageSources` field accepts an array that can contain two types of entries:
 
 **Directory paths** — relative paths pointing to a directory containing packages:
 
 ```json
 {
 	"wpPlugin": {
-		"sources": [ "../js-packages" ]
+		"packageSources": [ "../js-packages" ]
 	}
 }
 ```
@@ -276,21 +276,21 @@ With this configuration the tool scans both `./packages/*` and `../js-packages/*
 ```json
 {
 	"wpPlugin": {
-		"sources": [ "@automattic/charts", "@automattic/number-formatters" ]
+		"packageSources": [ "@acme/shared-ui", "@acme/formatters" ]
 	}
 }
 ```
 
-Named sources are resolved using `require.resolve()`, so they work with any package manager's workspace protocol (pnpm `workspace:*`, yarn `workspace:*`, npm workspaces). The package must be declared as a dependency and installed.
+Named package sources are resolved from `node_modules`, so they work with any package manager's workspace protocol (pnpm `workspace:*`, yarn `workspace:*`, npm workspaces). The package must be declared as a dependency and installed.
 
-Named sources **preserve their npm identity** as the script-module ID. For example, `@automattic/charts` is registered as `@automattic/charts` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. The source's scoped namespace (e.g., `@automattic`) is automatically added to the externals configuration so that imports resolve correctly.
+Named sources **preserve their npm identity** as the script-module ID. For example, `@acme/shared-ui` is registered as `@acme/shared-ui` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. The source's scoped namespace (e.g., `@acme`) is automatically added to the externals configuration so that imports resolve correctly.
 
 Both types can be mixed in a single array:
 
 ```json
 {
 	"wpPlugin": {
-		"sources": [ "../shared-packages", "@automattic/charts" ]
+		"packageSources": [ "../shared-packages", "@acme/shared-ui" ]
 	}
 }
 ```

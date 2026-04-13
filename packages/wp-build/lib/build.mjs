@@ -119,7 +119,7 @@ const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
  *
  * Directory paths start with `.`, `/`, or a drive letter on Windows (`C:\`).
  *
- * @param {string} source A single entry from `wpPlugin.sources`.
+ * @param {string} source A single entry from `wpPlugin.packageSources`.
  * @return {boolean} True when the entry looks like a package name.
  */
 function isPackageName( source ) {
@@ -139,7 +139,7 @@ function isPackageName( source ) {
  * Uses Node's module resolution from the project root context so that
  * workspace symlinks (pnpm, yarn, npm) are followed automatically.
  *
- * @param {string} npmName Full package name (e.g. `@automattic/charts`).
+ * @param {string} npmName Full package name (e.g. `@acme/shared-ui`).
  * @return {{ dir: string, packageJson: import('./package-utils.mjs').PackageJson }|null}
  *   Resolved entry or null when the package is not resolvable.
  */
@@ -170,19 +170,20 @@ function resolveNamedSource( npmName ) {
 
 /**
  * Directories to scan for packages. Always starts with `./packages/`.
- * Additional directory-type entries from `wpPlugin.sources` are appended.
- * Package-name entries are handled separately in `getAllPackages()`.
+ * Additional directory-type entries from `wpPlugin.packageSources` are
+ * appended.  Package-name entries are handled separately in
+ * `getAllPackages()`.
  *
  * @type {string[]}
  */
-const SOURCES = WP_PLUGIN_CONFIG.sources || [];
+const PACKAGE_SOURCES = WP_PLUGIN_CONFIG.packageSources || [];
 const PACKAGE_DIRS = [
 	PACKAGES_DIR,
-	...SOURCES.filter( ( s ) => ! isPackageName( s ) ).map( ( s ) =>
+	...PACKAGE_SOURCES.filter( ( s ) => ! isPackageName( s ) ).map( ( s ) =>
 		path.resolve( ROOT_DIR, s )
 	),
 ];
-const NAMED_SOURCES = SOURCES.filter( isPackageName );
+const NAMED_SOURCES = PACKAGE_SOURCES.filter( isPackageName );
 
 /**
  * Get all packages by scanning every directory in PACKAGE_DIRS and
@@ -190,8 +191,8 @@ const NAMED_SOURCES = SOURCES.filter( isPackageName );
  *
  * Local packages (`./packages/`) are scanned first, so they take priority.
  * Named sources are resolved last — they preserve their npm identity
- * (e.g. `@automattic/charts` stays `@automattic/charts` in script-module
- * IDs instead of being rewritten to `@<packageNamespace>/charts`).
+ * (e.g. `@acme/shared-ui` stays `@acme/shared-ui` in script-module
+ * IDs instead of being rewritten to `@<packageNamespace>/shared-ui`).
  *
  * @return {Map<string, PackageEntry>} Map of package names to their entry data.
  */
@@ -245,8 +246,8 @@ const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 // Merge user-defined external namespaces with namespaces inferred from
-// named sources.  For example, a source `@automattic/charts` implies that
-// `@automattic/*` imports should be treated as externals so that the
+// named sources.  For example, a source `@acme/shared-ui` implies that
+// `@acme/*` imports should be treated as externals so that the
 // externals plugin can detect their `wpScriptModuleExports` field.
 const EXTERNAL_NAMESPACES = {
 	...( WP_PLUGIN_CONFIG.externalNamespaces || {} ),
@@ -802,7 +803,7 @@ async function bundlePackage( packageName, options = {} ) {
 			}
 
 			// External sources preserve their npm identity as the
-			// script-module ID (e.g. `@automattic/charts`).  Local
+			// script-module ID (e.g. `@acme/shared-ui`).  Local
 			// packages are scoped under the plugin's namespace.
 			const scriptModuleId = isExternalSource
 				? ( exportName === '.'
