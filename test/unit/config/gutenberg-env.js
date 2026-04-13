@@ -7,7 +7,7 @@
 // eslint-disable-next-line @wordpress/wp-global-usage
 globalThis.IS_WORDPRESS_CORE = true;
 
-// Inject IS_GUTENBERG_PLUGIN — read from root package.json directly since
+// Inject the `IS_GUTENBERG_PLUGIN` global, used for feature flagging.
 // eslint-disable-next-line @wordpress/wp-global-usage
 globalThis.IS_GUTENBERG_PLUGIN =
 	String( process.env.npm_package_config_IS_GUTENBERG_PLUGIN ) === 'true';
