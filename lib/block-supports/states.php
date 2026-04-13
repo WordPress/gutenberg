@@ -40,10 +40,10 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		}
 
 		$compiled = wp_style_engine_get_styles( $style[ $state ] );
-		if ( ! empty( $compiled['css'] ) ) {
+		if ( ! empty( $compiled['declarations'] ) ) {
 			$css_rules[] = array(
-				'state' => $state,
-				'css'   => $compiled['css'],
+				'state'        => $state,
+				'declarations' => $compiled['declarations'],
 			);
 		}
 	}
@@ -53,14 +53,37 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
-	$css          = '';
 
+	/*
+	 * Register each state's CSS rules with the block-supports style engine store.
+	 * The store deduplicates rules by selector — two block instances with identical
+	 * state styles share the same hash class and therefore the same selector, so
+	 * only one CSS rule is emitted. The store is flushed to the page by
+	 * gutenberg_enqueue_stored_styles() rather than injected inline here.
+	 */
+	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
 		// Use !important to override utility classes like
 		// .has-accent-3-background-color which are generated with !important.
-		$declarations = str_replace( ';', ' !important;', $rule['css'] );
-		$css         .= ".$unique_class$rule[state] { $declarations }\n";
+		$declarations_with_important = array_map(
+			static function ( $value ) {
+				return rtrim( $value ) . ' !important';
+			},
+			$rule['declarations']
+		);
+		$style_rules[]               = array(
+			'selector'     => ".$unique_class{$rule['state']}",
+			'declarations' => $declarations_with_important,
+		);
 	}
+
+	gutenberg_style_engine_get_stylesheet_from_css_rules(
+		$style_rules,
+		array(
+			'context'  => 'block-supports',
+			'prettify' => false,
+		)
+	);
 
 	// Add the unique class to the interactive element so that state selectors
 	// like `.$unique_class:hover` match directly without needing a descendant.
@@ -84,8 +107,6 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	} elseif ( $processor->next_tag() ) {
 		$processor->add_class( $unique_class );
 	}
-	$block_content = $processor->get_updated_html();
-
-	return '<style>' . $css . '</style>' . $block_content;
+	return $processor->get_updated_html();
 }
 add_filter( 'render_block', 'gutenberg_render_block_states_support', 10, 2 );

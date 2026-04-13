@@ -52,34 +52,26 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 	/**
 	 * Mirrors the CSS-building logic in gutenberg_render_block_states_support()
-	 * to produce the expected `<style>` tag and unique scoped class name for a
-	 * given map of state => style arrays.
+	 * to produce the unique scoped class name for a given map of state => style arrays.
+	 * CSS is now registered with the style engine store rather than injected inline.
 	 *
 	 * @param array $state_styles Map of state to style array (e.g. `[':hover' => ['color' => [...]]]`).
-	 * @return array { style_tag: string, unique_class: string }
+	 * @return array { unique_class: string }
 	 */
 	private function build_expected_state_output( $state_styles ) {
 		$css_rules = array();
 		foreach ( $state_styles as $state => $style ) {
 			$compiled = wp_style_engine_get_styles( $style );
-			if ( ! empty( $compiled['css'] ) ) {
+			if ( ! empty( $compiled['declarations'] ) ) {
 				$css_rules[] = array(
-					'state' => $state,
-					'css'   => $compiled['css'],
+					'state'        => $state,
+					'declarations' => $compiled['declarations'],
 				);
 			}
 		}
 
-		$unique_class = 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 );
-		$css          = '';
-		foreach ( $css_rules as $rule ) {
-			$declarations = str_replace( ';', ' !important;', $rule['css'] );
-			$css         .= ".$unique_class$rule[state] { $declarations }\n";
-		}
-
 		return array(
-			'style_tag'    => '<style>' . $css . '</style>',
-			'unique_class' => $unique_class,
+			'unique_class' => 'wp-states-' . substr( md5( wp_json_encode( $css_rules ) ), 0, 8 ),
 		);
 	}
 
@@ -202,7 +194,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that hover text color generates a scoped style tag with !important.
+	 * Tests that hover text color generates scoped CSS with !important.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
@@ -217,14 +209,14 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Tests that hover background color generates a scoped style tag.
+	 * Tests that hover background color generates scoped CSS.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
@@ -239,7 +231,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -268,7 +260,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -295,14 +287,14 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Tests that hover font size generates a scoped style tag.
+	 * Tests that hover font size generates scoped CSS.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
@@ -321,7 +313,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -350,14 +342,14 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Tests that hover border radius generates a scoped style tag.
+	 * Tests that hover border radius generates scoped CSS.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 */
@@ -376,7 +368,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -401,7 +393,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -424,7 +416,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
+		$expected = '<div class="wp-block-test ' . $parts['unique_class'] . '">Hello</div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -451,7 +443,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-button"><a class="wp-block-button__link ' . $parts['unique_class'] . '">Click me</a></div>';
+		$expected = '<div class="wp-block-button"><a class="wp-block-button__link ' . $parts['unique_class'] . '">Click me</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -490,7 +482,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-accent-4-background-color has-text-color has-background has-link-color wp-element-button ' . $parts['unique_class'] . '" style="color:#bdfffb">Button 2 outline</a></div>';
+		$expected = '<div class="wp-block-button is-style-outline"><a class="wp-block-button__link has-accent-4-background-color has-text-color has-background has-link-color wp-element-button ' . $parts['unique_class'] . '" style="color:#bdfffb">Button 2 outline</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
@@ -524,7 +516,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		);
 
 		$parts    = $this->build_expected_state_output( $state_styles );
-		$expected = $parts['style_tag'] . '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button ' . $parts['unique_class'] . '">Click</a></div>';
+		$expected = '<div class="wp-block-button"><a class="wp-block-button__link wp-element-button ' . $parts['unique_class'] . '">Click</a></div>';
 		$actual   = gutenberg_render_block_states_support( $block_content, $block );
 
 		$this->assertSame( $expected, $actual );
