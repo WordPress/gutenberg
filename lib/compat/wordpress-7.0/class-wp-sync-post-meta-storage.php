@@ -395,23 +395,40 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		/**
 		 * Records a user as a contributor who has submitted updates to a room.
 		 *
-		 * Each call inserts an independent meta row so concurrent requests
-		 * never conflict through read-modify-write races. Duplicate user IDs
-		 * across rows are expected and deduplicated in get_contributors().
+		 * Checks for an existing row with the same key and value before
+		 * inserting to avoid unbounded row growth from repeated polls.
+		 * A rare race between concurrent requests can produce at most one
+		 * duplicate per user, which get_contributors() handles via
+		 * array_unique.
 		 *
 		 * @since 7.0.0
+		 *
+		 * @global wpdb $wpdb WordPress database abstraction object.
 		 *
 		 * @param string $room    Room identifier.
 		 * @param int    $user_id WordPress user ID.
 		 * @return void
 		 */
 		public function track_contributor( string $room, int $user_id ): void {
+			global $wpdb;
+
 			$post_id = $this->get_storage_post_id( $room );
 			if ( null === $post_id ) {
 				return;
 			}
 
-			add_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, $user_id );
+			$exists = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_value = %s LIMIT 1",
+					$post_id,
+					self::CONTRIBUTORS_META_KEY,
+					(string) $user_id
+				)
+			);
+
+			if ( null === $exists ) {
+				add_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, $user_id );
+			}
 		}
 
 		/**
