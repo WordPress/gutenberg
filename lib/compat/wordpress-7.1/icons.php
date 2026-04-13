@@ -52,5 +52,5 @@ if ( ! function_exists( '_wp_register_default_icon_collections' ) ) {
 			)
 		);
 	}
-	add_action( 'init', '_wp_register_default_icon_collections' );
+	add_action( 'init', '_wp_register_default_icon_collections', 0 );
 }
