@@ -127,7 +127,7 @@ function gutenberg_register_icons() {
 		}
 
 		wp_register_icon(
-			'core/' . $icon_name,
+			$icon_name,
 			array(
 				'label'      => $icon_data['label'],
 				'filePath'   => $icons_directory . $icon_data['filePath'],

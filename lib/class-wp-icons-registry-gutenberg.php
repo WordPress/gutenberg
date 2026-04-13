@@ -43,20 +43,10 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			return false;
 		}
 
-		$name_matcher = '/^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/';
-		if ( ! preg_match( $name_matcher, $icon_name ) ) {
+		if ( ! preg_match( '/^[a-z][a-z0-9-]*$/', $icon_name ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon names must contain a namespace prefix. Example: my-plugin/my-custom-icon', 'gutenberg' ),
-				'7.1.0'
-			);
-			return false;
-		}
-
-		if ( $this->is_registered( $icon_name ) ) {
-			_doing_it_wrong(
-				__METHOD__,
-				__( 'Icon is already registered.', 'gutenberg' ),
+				__( 'Icon names must start with a lowercase letter and contain only lowercase letters, digits, and hyphens.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;
@@ -142,12 +132,23 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			}
 		}
 
+		$qualified_name = $icon_properties['collection'] . '/' . $icon_name;
+
+		if ( $this->is_registered( $qualified_name ) ) {
+			_doing_it_wrong(
+				__METHOD__,
+				__( 'Icon is already registered.', 'gutenberg' ),
+				'7.1.0'
+			);
+			return false;
+		}
+
 		$icon = array_merge(
 			$icon_properties,
-			array( 'name' => $icon_name )
+			array( 'name' => $qualified_name )
 		);
 
-		$this->registered_icons[ $icon_name ] = $icon;
+		$this->registered_icons[ $qualified_name ] = $icon;
 
 		return true;
 	}

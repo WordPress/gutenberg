@@ -93,4 +93,66 @@ class WP_REST_Icons_Controller_Gutenberg extends WP_REST_Icons_Controller {
 
 		return rest_ensure_response( $response );
 	}
+
+	/**
+	 * Prepare a raw icon before it gets output in a REST API response.
+	 *
+	 * Splits the internally namespaced icon name into a `collection` field
+	 * and a collection-local `name` field.
+	 *
+	 * @param array           $item    Raw icon as registered.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response Response object.
+	 */
+	public function prepare_item_for_response( $item, $request ) {
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
+
+		$local_name = $item['name'];
+		if ( false !== strpos( $item['name'], '/' ) ) {
+			list( , $local_name ) = explode( '/', $item['name'], 2 );
+		}
+
+		if ( rest_is_field_included( 'collection', $fields ) && isset( $item['collection'] ) ) {
+			$data['collection'] = $item['collection'];
+		}
+		if ( rest_is_field_included( 'name', $fields ) ) {
+			$data['name'] = $local_name;
+		}
+		if ( rest_is_field_included( 'label', $fields ) && isset( $item['label'] ) ) {
+			$data['label'] = $item['label'];
+		}
+		if ( rest_is_field_included( 'content', $fields ) && isset( $item['content'] ) ) {
+			$data['content'] = $item['content'];
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+		return rest_ensure_response( $data );
+	}
+
+	/**
+	 * Retrieves the icon schema, conforming to JSON Schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['collection'] = array(
+			'description' => __( 'The slug of the collection this icon belongs to.', 'gutenberg' ),
+			'type'        => 'string',
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
+
+		$this->schema = $schema;
+
+		return $this->add_additional_fields_schema( $this->schema );
+	}
 }
