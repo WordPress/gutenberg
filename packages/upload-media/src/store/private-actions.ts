@@ -1143,11 +1143,12 @@ export function generateThumbnails( id: QueueItemId ) {
 		const attachment = item.attachment;
 		const settings = select.getSettings();
 
-		// HEIC/HEIF: preserve the original file by sideloading it as the
-		// attachment's "original". The uploaded file is a JPEG conversion;
-		// the HEIC was kept on item.originalHeicFile for this purpose.
-		// parentId guarantees processItem routes this to the sideload
-		// endpoint, never the main create endpoint.
+		// HEIC/HEIF: preserve the original file under a dedicated metadata
+		// key so it never collides with `original_image`, which the scaled
+		// sideload flow owns. The HEIC was kept on item.originalHeicFile;
+		// the uploaded file is a JPEG conversion. parentId guarantees
+		// processItem routes this to the sideload endpoint, never the main
+		// create endpoint.
 		if ( item.originalHeicFile && attachment.id ) {
 			dispatch.addSideloadItem( {
 				file: item.originalHeicFile,
@@ -1155,7 +1156,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				parentId: item.id,
 				additionalData: {
 					post: attachment.id,
-					image_size: 'original',
+					image_size: 'original-heic',
 					convert_format: false,
 				},
 				operations: [ OperationType.Upload ],
