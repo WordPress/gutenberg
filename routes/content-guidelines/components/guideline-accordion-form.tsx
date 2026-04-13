@@ -1,4 +1,4 @@
-/* @jsx createElement */
+/* @jsxRuntime automatic */
 
 /**
  * WordPress dependencies
@@ -7,23 +7,20 @@ import {
 	Button,
 	Notice,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createElement,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../store';
+import { store as coreContentGuidelinesStore } from '../store';
 import { saveContentGuidelines } from '../api';
 import type { GuidelineAccordionFormProps } from '../types';
 
@@ -33,16 +30,16 @@ export default function GuidelineAccordionForm( {
 	headingId,
 	descriptionId,
 }: GuidelineAccordionFormProps ) {
-	// @ts-ignore
-	const { setGuideline } = useDispatch( STORE_NAME );
+	const { setGuideline } = useDispatch( coreContentGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
+	const [ showClearConfirmation, setShowClearConfirmation ] =
+		useState( false );
 
 	const { value } = useSelect(
 		( select ) => ( {
-			// @ts-ignore
-			value: select( STORE_NAME ).getGuideline( slug ) as string,
+			value: select( coreContentGuidelinesStore ).getGuideline( slug ),
 		} ),
 		[ slug ]
 	);
@@ -87,8 +84,48 @@ export default function GuidelineAccordionForm( {
 					type: 'snackbar',
 				} );
 			} )
-			.catch( ( e: Error ) => setError( e.message ) )
+			.catch( ( e: Error ) =>
+				setError(
+					sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error saving guidelines: %s' ),
+						e.message
+					)
+				)
+			)
 			.finally( () => setLoading( false ) );
+	};
+
+	const handleClearClick = () => setShowClearConfirmation( true );
+
+	const handleClearConfirm = () => {
+		const oldValue = draft;
+
+		// We need to pass an empty string to remove the guideline.
+		// This is because the API will only remove the guideline if the value is an empty string.
+		setGuideline( slug, '' );
+		setLoading( true );
+		saveContentGuidelines()
+			.then( () => {
+				setError( null );
+				createSuccessNotice( __( 'Guidelines cleared.' ), {
+					type: 'snackbar',
+				} );
+			} )
+			.catch( ( e: Error ) => {
+				setError(
+					sprintf(
+						/* translators: %s: Error message. */
+						__( 'Error clearing guidelines: %s' ),
+						e.message
+					)
+				);
+				setGuideline( slug, oldValue );
+			} )
+			.finally( () => {
+				setLoading( false );
+				setShowClearConfirmation( false );
+			} );
 	};
 
 	return (
@@ -110,24 +147,53 @@ export default function GuidelineAccordionForm( {
 				/>
 				{ error && (
 					<Notice status="error" onRemove={ () => setError( null ) }>
-						{ sprintf(
-							/* translators: %s: Error message. */
-							__( 'Error saving guidelines: %s' ),
-							error
-						) }
+						{ error }
 					</Notice>
 				) }
-				<Button
-					variant="primary"
-					type="submit"
-					className="save-button"
-					disabled={ loading }
-					accessibleWhenDisabled
-					isBusy={ loading }
-				>
-					{ __( 'Save guidelines' ) }
-				</Button>
+				<HStack spacing={ 4 } alignment="left">
+					<Button
+						variant="primary"
+						type="submit"
+						disabled={ loading || ! draft }
+						accessibleWhenDisabled
+						isBusy={ loading }
+					>
+						{ __( 'Save guidelines' ) }
+					</Button>
+					<Button
+						variant="tertiary"
+						type="button"
+						disabled={ loading || ! value }
+						accessibleWhenDisabled
+						isBusy={ loading }
+						onClick={ handleClearClick }
+					>
+						{ __( 'Clear guidelines' ) }
+					</Button>
+				</HStack>
 			</VStack>
+			<ConfirmDialog
+				isOpen={ showClearConfirmation }
+				title={ sprintf(
+					/* translators: %s: Guideline category. */
+					__( 'Clear %s guidelines' ),
+					slug
+				) }
+				__experimentalHideHeader={ false }
+				onConfirm={ handleClearConfirm }
+				onCancel={ () => setShowClearConfirmation( false ) }
+				confirmButtonText={ __( 'Clear guidelines' ) }
+				isBusy={ loading }
+				size="small"
+			>
+				{ sprintf(
+					/* translators: %s: Guideline category slug. */
+					__(
+						'You are about to clear the %s guidelines. This can be undone from revision history.'
+					),
+					slug
+				) }
+			</ConfirmDialog>
 		</form>
 	);
 }

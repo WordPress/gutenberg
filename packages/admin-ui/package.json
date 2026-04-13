@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "1.10.0",
+	"version": "1.11.0",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -43,7 +43,10 @@
 	},
 	"react-native": "src/index",
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",

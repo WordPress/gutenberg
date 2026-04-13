@@ -84,7 +84,7 @@ $color-palette-circle-spacing: 12px;
 		transition: 100ms box-shadow ease;
 	}
 
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	&:hover {
 		// Override default button hover style.

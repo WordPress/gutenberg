@@ -96,7 +96,7 @@ export function deserializeCrdtDoc(
 		ydoc.clientID = pseudoRandomID();
 
 		return ydoc;
-	} catch ( e ) {
+	} catch {
 		return null;
 	}
 }

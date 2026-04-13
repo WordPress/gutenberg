@@ -10,12 +10,12 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from './store';
+import { store as coreContentGuidelinesStore } from './store';
 import type {
-	Categories,
 	RestGuidelinesResponse,
 	GuidelinesImportData,
 	ContentGuidelinesRevision,
+	Categories,
 } from './types';
 
 const FLAT_CATEGORIES = [ 'site', 'copy', 'images', 'additional' ] as const;
@@ -34,9 +34,7 @@ function isValidGuidelinesImport(
 }
 
 export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( STORE_NAME ) as {
-		setFromResponse: ( response: RestGuidelinesResponse ) => void;
-	};
+	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 
 	const response = ( await apiFetch( {
 		path: '/wp/v2/content-guidelines?context=edit',
@@ -48,22 +46,30 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 }
 
 export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
-	// @ts-ignore
-	const { setFromResponse } = dispatch( STORE_NAME );
+	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getId: () => number | null;
-		getStatus: () => string | null;
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-		getGuideline: ( category: string ) => string | Record< string, string >;
-	};
+	const guidelinesStore = select( coreContentGuidelinesStore );
 
 	const id = guidelinesStore.getId();
 	const status = guidelinesStore.getStatus() || 'draft';
 	const categories = guidelinesStore.getAllGuidelines();
-	const blockGuidelines = guidelinesStore.getBlockGuidelines();
 
+	const response = await saveGuidelinesBypassingStore(
+		id,
+		status,
+		categories
+	);
+
+	setFromResponse( response );
+
+	return response;
+}
+
+async function saveGuidelinesBypassingStore(
+	id: number | null,
+	status: string,
+	categories: Categories
+): Promise< RestGuidelinesResponse > {
 	const data = {
 		id,
 		status,
@@ -81,7 +87,7 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 				guidelines: categories.additional,
 			},
 			blocks: Object.fromEntries(
-				Object.entries( blockGuidelines ).map(
+				Object.entries( categories.blocks ).map(
 					( [ blockName, guidelines ] ) => [
 						blockName,
 						{ guidelines },
@@ -102,8 +108,6 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
 		data,
 	} ) ) as RestGuidelinesResponse;
 
-	setFromResponse( response );
-
 	return response;
 }
 
@@ -112,8 +116,8 @@ export async function saveContentGuidelines(): Promise< RestGuidelinesResponse >
  * @param file Content Guidelines JSON file
  */
 export async function importContentGuidelines( file: File ): Promise< void > {
-	// @ts-ignore
-	const { setGuideline, setBlockGuideline } = dispatch( STORE_NAME );
+	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
+	const guidelinesStore = select( coreContentGuidelinesStore );
 	const { createSuccessNotice } = dispatch( noticesStore );
 
 	const parsed: unknown = JSON.parse( await file.text() );
@@ -126,52 +130,50 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 		);
 	}
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-	};
-	const previousCategories = guidelinesStore.getAllGuidelines();
-	const previousBlocks = { ...guidelinesStore.getBlockGuidelines() };
+	const existingGuidelines = guidelinesStore.getAllGuidelines();
 
-	const { guideline_categories: contentGuidelinesCategories } = parsed;
+	const newGuidelines = {
+		/**
+		 * Set empty string to all the simple guidelines so that if the category is not present
+		 * in the parsed data, the category gets removed.
+		 */
+		...Object.fromEntries(
+			FLAT_CATEGORIES.map( ( category ) => [ category, '' ] )
+		),
+		/**
+		 * Set empty string to all the existing block guidelines so that if the block is not present
+		 * in the parsed data, the block gets removed.
+		 */
+		blocks: Object.fromEntries(
+			Object.keys( existingGuidelines.blocks ).map( ( block ) => [
+				block,
+				'',
+			] )
+		),
+	} as Categories;
 
-	FLAT_CATEGORIES.forEach( ( guidelineCategory ) => {
-		const guidelines =
-			contentGuidelinesCategories[ guidelineCategory ]?.guidelines;
-		if ( typeof guidelines === 'string' ) {
-			setGuideline( guidelineCategory, guidelines );
-		}
+	// Now let's populate the simple guidelines with the parsed data.
+	for ( const cat of FLAT_CATEGORIES ) {
+		const guidelines = parsed.guideline_categories[ cat ]?.guidelines || '';
+		newGuidelines[ cat ] = guidelines;
+	}
+
+	// Now let's populate the block guidelines with the parsed data.
+	const parsedBlocks = parsed.guideline_categories?.blocks ?? {};
+	for ( const [ key, value ] of Object.entries( parsedBlocks ) ) {
+		newGuidelines.blocks[ key ] = value?.guidelines || '';
+	}
+
+	const response = await saveGuidelinesBypassingStore(
+		guidelinesStore.getId(),
+		guidelinesStore.getStatus() || 'draft',
+		newGuidelines
+	);
+
+	setFromResponse( response );
+	createSuccessNotice( __( 'Guidelines imported.' ), {
+		type: 'snackbar',
 	} );
-
-	const blocksData = contentGuidelinesCategories.blocks;
-	if ( blocksData && typeof blocksData === 'object' ) {
-		Object.entries( blocksData ).forEach( ( [ blockName, blockData ] ) => {
-			if ( blockData && typeof blockData.guidelines === 'string' ) {
-				setBlockGuideline( blockName, blockData.guidelines );
-			}
-		} );
-	}
-
-	try {
-		await saveContentGuidelines();
-		createSuccessNotice( __( 'Guidelines imported.' ), {
-			type: 'snackbar',
-		} );
-	} catch ( error ) {
-		FLAT_CATEGORIES.forEach( ( cat ) => {
-			setGuideline( cat, previousCategories[ cat ] ?? '' );
-		} );
-
-		const currentBlocks = guidelinesStore.getBlockGuidelines();
-		Object.keys( currentBlocks ).forEach( ( blockName ) =>
-			setBlockGuideline( blockName, '' )
-		);
-		Object.entries( previousBlocks ).forEach( ( [ blockName, value ] ) =>
-			setBlockGuideline( blockName, value )
-		);
-
-		throw error;
-	}
 }
 
 /**
@@ -180,10 +182,7 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 export function exportContentGuidelines(): void {
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const guidelinesStore = select( STORE_NAME ) as unknown as {
-		getAllGuidelines: () => Categories;
-		getBlockGuidelines: () => Record< string, string >;
-	};
+	const guidelinesStore = select( coreContentGuidelinesStore );
 	const contentGuidelinesCategories = guidelinesStore.getAllGuidelines();
 	const blockGuidelines = guidelinesStore.getBlockGuidelines();
 
@@ -210,8 +209,14 @@ export function exportContentGuidelines(): void {
 		},
 	};
 
+	const now = new Date();
+	const exportDate = [
+		now.getFullYear(),
+		String( now.getMonth() + 1 ).padStart( 2, '0' ),
+		String( now.getDate() ).padStart( 2, '0' ),
+	].join( '-' );
 	downloadBlob(
-		'guidelines.json',
+		`guidelines-${ exportDate }.json`,
 		JSON.stringify( data, null, 2 ),
 		'application/json'
 	);

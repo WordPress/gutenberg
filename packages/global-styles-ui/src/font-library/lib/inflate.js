@@ -28,7 +28,7 @@
  * SOFTWARE.
  */
 
-/* eslint eslint-comments/no-unlimited-disable: 0 */
+/* eslint @eslint-community/eslint-comments/no-unlimited-disable: 0 */
 /* eslint-disable */
 /* pako 1.0.10 nodeca/pako */
 export default ( function () {

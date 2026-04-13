@@ -27,7 +27,12 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = _Select.Popup.Props;
+export type SelectPopupProps = _Select.Popup.Props & {
+	/**
+	 * A parent element to render the portal into.
+	 */
+	container?: _Select.Portal.Props[ 'container' ];
+};
 
 export type SelectItemProps = Omit<
 	_Select.Item.Props,
