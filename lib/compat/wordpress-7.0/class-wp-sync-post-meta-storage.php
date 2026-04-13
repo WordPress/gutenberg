@@ -395,9 +395,11 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		/**
 		 * Records a user as a contributor who has submitted updates to a room.
 		 *
-		 * @since 7.0.0
+		 * Each call inserts an independent meta row so concurrent requests
+		 * never conflict through read-modify-write races. Duplicate user IDs
+		 * across rows are expected and deduplicated in get_contributors().
 		 *
-		 * @global wpdb $wpdb WordPress database abstraction object.
+		 * @since 7.0.0
 		 *
 		 * @param string $room    Room identifier.
 		 * @param int    $user_id WordPress user ID.
@@ -409,13 +411,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				return;
 			}
 
-			$contributors = $this->get_contributors_from_post( $post_id );
-			if ( in_array( $user_id, $contributors, true ) ) {
-				return;
-			}
-
-			$contributors[] = $user_id;
-			update_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, wp_json_encode( $contributors ) );
+			add_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, $user_id );
 		}
 
 		/**
@@ -424,7 +420,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @since 7.0.0
 		 *
 		 * @param string $room Room identifier.
-		 * @return int[] Array of WordPress user IDs.
+		 * @return int[] Array of unique WordPress user IDs.
 		 */
 		public function get_contributors( string $room ): array {
 			$post_id = $this->get_storage_post_id( $room );
@@ -432,7 +428,12 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				return array();
 			}
 
-			return $this->get_contributors_from_post( $post_id );
+			$values = get_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, false );
+			if ( ! is_array( $values ) || 0 === count( $values ) ) {
+				return array();
+			}
+
+			return array_values( array_unique( array_map( 'intval', $values ) ) );
 		}
 
 		/**
@@ -450,28 +451,6 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			}
 
 			delete_post_meta( $post_id, self::CONTRIBUTORS_META_KEY );
-		}
-
-		/**
-		 * Reads the contributor list from post meta for a given storage post.
-		 *
-		 * @since 7.0.0
-		 *
-		 * @param int $post_id Storage post ID.
-		 * @return int[] Array of WordPress user IDs.
-		 */
-		private function get_contributors_from_post( int $post_id ): array {
-			$raw = get_post_meta( $post_id, self::CONTRIBUTORS_META_KEY, true );
-			if ( ! $raw ) {
-				return array();
-			}
-
-			$decoded = json_decode( $raw, true );
-			if ( ! is_array( $decoded ) ) {
-				return array();
-			}
-
-			return array_values( array_map( 'intval', $decoded ) );
 		}
 	}
 }
