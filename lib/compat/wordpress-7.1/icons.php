@@ -78,7 +78,7 @@ function gutenberg_register_default_icon_collections() {
 	wp_register_icon_collection(
 		'core',
 		array(
-			'label'       => _x( 'WordPress', 'gutenberg' ),
+			'label'       => __( 'WordPress', 'gutenberg' ),
 			'description' => __( 'Default icon collection.', 'gutenberg' ),
 		)
 	);
