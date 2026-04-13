@@ -216,7 +216,7 @@ if ( ! function_exists( 'load_script_module_textdomain' ) ) {
 		}
 
 		/** This filter is documented in wp-includes/l10n.php */
-		$relative = apply_filters( 'load_script_textdomain_relative_path', $relative, $src );
+		$relative = apply_filters( 'load_script_textdomain_relative_path', $relative, $src, true );
 
 		if ( false === $relative ) {
 			return load_script_translations( false, $id, $domain );
