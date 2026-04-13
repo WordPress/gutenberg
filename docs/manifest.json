@@ -858,9 +858,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Date",
-		"slug": "date",
-		"markdown_source": "../packages/components/src/date-time/date/README.md",
+		"title": "DatePicker",
+		"slug": "date-picker",
+		"markdown_source": "../packages/components/src/date-time/date-picker/README.md",
 		"parent": "components"
 	},
 	{
@@ -870,9 +870,9 @@
 		"parent": "components"
 	},
 	{
-		"title": "Time",
-		"slug": "time",
-		"markdown_source": "../packages/components/src/date-time/time/README.md",
+		"title": "TimePicker",
+		"slug": "time-picker",
+		"markdown_source": "../packages/components/src/date-time/time-picker/README.md",
 		"parent": "components"
 	},
 	{
