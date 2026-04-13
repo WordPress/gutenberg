@@ -1,0 +1,35 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as BreadcrumbStories from './index.story';
+
+<Meta of={ BreadcrumbStories } />
+
+# Breadcrumb usage guidelines
+
+## Implementation notes
+
+-   Use `Breadcrumb` as a pure UI primitive. It is intentionally agnostic to routing and renders standard HTML semantics by default.
+-   The default structure is a `nav` landmark containing an ordered list, which communicates hierarchy to assistive technologies.
+-   Mark the current page with `aria-current="page"`. When using the `items` API, this is applied automatically to the last item.
+-   Use the `items` prop for straightforward breadcrumb trails, or the compound API when you need custom rendering.
+-   Links render as `<a href>` by default. For routers or custom navigation layers, pass a `render` prop to `Breadcrumb.Item`.
+
+<Canvas of={ BreadcrumbStories.FromItems } />
+
+## Compound composition
+
+Use `Breadcrumb.List`, `Breadcrumb.Item`, and `Breadcrumb.Current` when you need to compose breadcrumbs manually or integrate with a router-specific link component.
+
+<Canvas of={ BreadcrumbStories.Compound } />
+
+## Truncation
+
+This implementation provides a conservative baseline for truncation by applying single-line ellipsis behavior to breadcrumb content, especially the trailing item in constrained layouts.
+
+It does not introduce overflow disclosure UI such as an ellipsis menu or popover. That behavior was intentionally left out until there is clearer product and design direction for how hidden breadcrumb items should be revealed.
+
+## Accessibility
+
+-   Keep breadcrumb labels concise and descriptive.
+-   Preserve keyboard access for all navigable items.
+-   Avoid replacing the current page item with a non-semantic container unless the replacement still exposes `aria-current="page"`.
+-   If you customize rendering, preserve the accessible name and link behavior of each breadcrumb item.

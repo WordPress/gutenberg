@@ -1,17 +1,37 @@
 /**
  * WordPress dependencies
  */
-import { Link } from '@wordpress/route';
+import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Link } from '@wordpress/route';
+import { __experimentalHeading as Heading } from '@wordpress/components';
+import { Breadcrumb } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import type { BreadcrumbsProps } from './types';
+
+function createRouteLinkRender( to: string ) {
+	return function RouteLinkRender( props: React.ComponentProps< 'a' > ) {
+		const { href: _href, ...anchorProps } = props;
+
+		return <Link to={ to } { ...( anchorProps as Record< string, unknown > ) } />;
+	};
+}
+
+function renderCurrentHeading( props: React.ComponentProps< 'span' > ) {
+	const { className, ...headingProps } = props;
+
+	return (
+		<Heading
+			level={ 1 }
+			truncate
+			className={ clsx( 'admin-ui-breadcrumbs__current', className ) }
+			{ ...( headingProps as Record< string, unknown > ) }
+		/>
+	);
+}
 
 /**
  * Renders a breadcrumb navigation trail.
@@ -53,30 +73,32 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 	}
 
 	return (
-		<nav aria-label={ __( 'Breadcrumbs' ) }>
-			<HStack
-				as="ul"
-				className="admin-ui-breadcrumbs__list"
-				spacing={ 0 }
-				justify="flex-start"
-				alignment="center"
-			>
+		<Breadcrumb aria-label={ __( 'Breadcrumbs' ) }>
+			<Breadcrumb.List className="admin-ui-breadcrumbs__list">
 				{ precedingItems.map( ( item, index ) => (
-					<li key={ index }>
-						<Link to={ item.to }>{ item.label }</Link>
-					</li>
+					<Breadcrumb.Item
+						key={ index }
+						href={ item.to }
+						render={ createRouteLinkRender( item.to! ) }
+					>
+						{ item.label }
+					</Breadcrumb.Item>
 				) ) }
-				<li>
-					{ lastItem.to ? (
-						<Link to={ lastItem.to }>{ lastItem.label }</Link>
-					) : (
-						<Heading level={ 1 } truncate>
-							{ lastItem.label }
-						</Heading>
-					) }
-				</li>
-			</HStack>
-		</nav>
+				{ lastItem.to ? (
+					<Breadcrumb.Item
+						href={ lastItem.to }
+						render={ createRouteLinkRender( lastItem.to ) }
+						aria-current="page"
+					>
+						{ lastItem.label }
+					</Breadcrumb.Item>
+				) : (
+					<Breadcrumb.Current render={ renderCurrentHeading }>
+						{ lastItem.label }
+					</Breadcrumb.Current>
+				) }
+			</Breadcrumb.List>
+		</Breadcrumb>
 	);
 };
 
