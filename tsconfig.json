@@ -86,8 +86,7 @@
 		{ "path": "storybook" },
 		{ "path": "test/e2e" },
 		{ "path": "test/storybook-playwright" },
-		{ "path": "test/performance" },
-		{ "path": "test/unit" }
+		{ "path": "test/performance" }
 	],
 	"files": []
 }
