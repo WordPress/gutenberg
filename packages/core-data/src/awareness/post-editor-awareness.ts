@@ -224,7 +224,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * Resolve a selection state to a text index and block client ID.
 	 *
 	 * For text-based selections, navigates up from the resolved Y.Text via
-	 * AbstractType.parent to find the containing block, then resolves the
+	 * parent chain to find the containing block, then resolves the
 	 * local clientId via the block's tree path.
 	 * For WholeBlock selections, resolves the block's relative position and
 	 * then finds the local clientId via tree path.
@@ -234,14 +234,19 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
-	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
+	 * @return The rich-text offset, block client ID, and attribute key path.
 	 */
 	public convertSelectionStateToAbsolute( selection: SelectionState ): {
 		richTextOffset: number | null;
 		localClientId: string | null;
+		attributeKey: string | null;
 	} {
 		if ( selection.type === SelectionType.None ) {
-			return { richTextOffset: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -264,7 +269,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				}
 			}
 
-			return { richTextOffset: null, localClientId };
+			return { richTextOffset: null, localClientId, attributeKey: null };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -279,13 +284,57 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { richTextOffset: null, localClientId: null };
+			return {
+				richTextOffset: null,
+				localClientId: null,
+				attributeKey: null,
+			};
 		}
 
-		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
-		const yType = absolutePosition.type.parent?.parent;
-		const path =
-			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
+		// Navigate up from Y.Text to find the block and its attribute path.
+		let current: Y.AbstractType< any > | null = absolutePosition.type;
+		let blockMap: Y.Map< unknown > | null = null;
+		const pathParts: string[] = [];
+		let pendingIndex: number | null = null;
+
+		while ( current && current.parent ) {
+			const parent = current.parent;
+			if ( parent instanceof Y.Map ) {
+				let foundKey: string | null = null;
+				for ( const key of parent.keys() ) {
+					if ( parent.get( key ) === current ) {
+						foundKey = key;
+						break;
+					}
+				}
+
+				if ( foundKey ) {
+					if (
+						foundKey === 'attributes' &&
+						parent.has( 'clientId' )
+					) {
+						blockMap = parent;
+						break;
+					}
+					let part = foundKey;
+					if ( pendingIndex !== null ) {
+						part += `[${ pendingIndex }]`;
+						pendingIndex = null;
+					}
+					pathParts.unshift( part );
+				}
+			} else if ( parent instanceof Y.Array ) {
+				for ( let i = 0; i < parent.length; i++ ) {
+					if ( parent.get( i ) === current ) {
+						pendingIndex = i;
+						break;
+					}
+				}
+			}
+			current = parent;
+		}
+
+		const path = blockMap ? getBlockPathInYdoc( blockMap ) : null;
 		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
 		return {
@@ -294,6 +343,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				absolutePosition.index
 			),
 			localClientId,
+			attributeKey: pathParts.join( '.' ) || null,
 		};
 	}
 

@@ -20,13 +20,15 @@ const MAX_NODE_OFFSET_COUNT = 500;
  * @param blockElement          - The block element (or null if deleted)
  * @param editorDocument        - The editor document
  * @param overlayRect           - Pre-computed bounding rect of the overlay element
+ * @param attributeKey          - Optional attribute key to find a specific RichText area
  * @return The position of the cursor
  */
 export const getCursorPosition = (
 	absolutePositionIndex: number | null,
 	blockElement: HTMLElement | null,
 	editorDocument: Document,
-	overlayRect: DOMRect
+	overlayRect: DOMRect,
+	attributeKey: string | null = null
 ): CursorCoords | null => {
 	if ( absolutePositionIndex === null || ! blockElement ) {
 		return null;
@@ -37,7 +39,8 @@ export const getCursorPosition = (
 			blockElement,
 			absolutePositionIndex,
 			editorDocument,
-			overlayRect
+			overlayRect,
+			attributeKey
 		) ?? null
 	);
 };
@@ -49,18 +52,21 @@ export const getCursorPosition = (
  * @param charOffset     - The character offset
  * @param editorDocument - The editor document
  * @param overlayRect    - Pre-computed bounding rect of the overlay element
+ * @param attributeKey   - Optional attribute key to find a specific RichText area
  * @return The position of the cursor
  */
 const getOffsetPositionInBlock = (
 	blockElement: HTMLElement,
 	charOffset: number,
 	editorDocument: Document,
-	overlayRect: DOMRect
+	overlayRect: DOMRect,
+	attributeKey: string | null = null
 ) => {
 	const { node, offset } = findInnerBlockOffset(
 		blockElement,
 		charOffset,
-		editorDocument
+		editorDocument,
+		attributeKey
 	);
 
 	const cursorRange = editorDocument.createRange();
@@ -117,6 +123,7 @@ const getOffsetPositionInBlock = (
  * @param endOffset      - End character offset within the block
  * @param editorDocument - The editor document
  * @param overlayRect    - Pre-computed bounding rect of the overlay element
+ * @param attributeKey   - Optional attribute key to find a specific RichText area
  * @return Array of selection rectangles relative to the overlay, or null on failure
  */
 export const getSelectionRects = (
@@ -124,7 +131,8 @@ export const getSelectionRects = (
 	startOffset: number,
 	endOffset: number,
 	editorDocument: Document,
-	overlayRect: DOMRect
+	overlayRect: DOMRect,
+	attributeKey: string | null = null
 ): SelectionRect[] | null => {
 	// Normalize direction.
 	let normalizedStart = startOffset;
@@ -136,12 +144,14 @@ export const getSelectionRects = (
 	const startPos = findInnerBlockOffset(
 		blockElement,
 		normalizedStart,
-		editorDocument
+		editorDocument,
+		attributeKey
 	);
 	const endPos = findInnerBlockOffset(
 		blockElement,
 		normalizedEnd,
-		editorDocument
+		editorDocument,
+		attributeKey
 	);
 
 	const range = editorDocument.createRange();
@@ -284,15 +294,28 @@ export const getBlocksBetween = (
  * @param blockElement   - The block element
  * @param offset         - The character offset
  * @param editorDocument - The editor document
+ * @param attributeKey   - Optional attribute key to find a specific RichText area
  * @return The node and offset of the character at the offset
  */
 export const findInnerBlockOffset = (
 	blockElement: HTMLElement,
 	offset: number,
-	editorDocument: Document
+	editorDocument: Document,
+	attributeKey: string | null = null
 ) => {
+	let root: HTMLElement = blockElement;
+
+	if ( attributeKey ) {
+		const richTextElement = blockElement.querySelector< HTMLElement >(
+			`[data-wp-block-attribute-key="${ attributeKey }"]`
+		);
+		if ( richTextElement ) {
+			root = richTextElement;
+		}
+	}
+
 	const treeWalker = editorDocument.createTreeWalker(
-		blockElement,
+		root,
 		NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT // eslint-disable-line no-bitwise
 	);
 
@@ -310,7 +333,7 @@ export const findInnerBlockOffset = (
 			if ( lastTextNode ) {
 				return { node: lastTextNode, offset: 0 };
 			}
-			return { node: blockElement, offset: 0 };
+			return { node: root, offset: 0 };
 		}
 
 		const nodeLength = node.nodeValue?.length ?? 0;
@@ -333,7 +356,7 @@ export const findInnerBlockOffset = (
 						};
 					}
 					// Just in case, if there's no last text node, return the beginning of the block.
-					return { node: blockElement, offset: 0 };
+					return { node: root, offset: 0 };
 				}
 
 				// The <br> is before the target offset. Count it as a single character.
@@ -368,7 +391,7 @@ export const findInnerBlockOffset = (
 	}
 
 	// We didn't find any text nodes. Return the beginning of the block.
-	return { node: blockElement, offset: 0 };
+	return { node: root, offset: 0 };
 };
 
 /**

@@ -148,6 +148,52 @@ export function getSelectionState(
 }
 
 /**
+ * Navigate a Yjs type hierarchy by a string path, supporting both Map keys
+ * and Array indices.
+ *
+ * Example: "body[0].cells[0].content"
+ *
+ * @param root - The starting Yjs type.
+ * @param path - The string path to navigate.
+ * @return The Yjs type at the path, or undefined if not found.
+ */
+function getYjsValueByPath(
+	root: Y.AbstractType< any >,
+	path: string
+): Y.AbstractType< any > | undefined {
+	const parts = path.split( '.' );
+	let current: any = root;
+
+	for ( const part of parts ) {
+		// Handle array access like "body[0]"
+		const arrayMatch = part.match( /^(.+)\[(\d+)\]$/ );
+		if ( arrayMatch ) {
+			const [ , key, index ] = arrayMatch;
+			if ( ! ( current instanceof Y.Map ) ) {
+				return undefined;
+			}
+			current = current.get( key );
+			if ( ! ( current instanceof Y.Array ) ) {
+				return undefined;
+			}
+			current = current.get( parseInt( index, 10 ) );
+		} else {
+			// Handle simple Map key
+			if ( ! ( current instanceof Y.Map ) ) {
+				return undefined;
+			}
+			current = current.get( part );
+		}
+
+		if ( ! current ) {
+			return undefined;
+		}
+	}
+
+	return current instanceof Y.AbstractType ? current : undefined;
+}
+
+/**
  * Get the cursor position from a selection.
  *
  * @param selection - The selection.
@@ -169,7 +215,14 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	if ( ! attributes ) {
+		return null;
+	}
+
+	const currentYText = getYjsValueByPath(
+		attributes,
+		selection.attributeKey
+	);
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {

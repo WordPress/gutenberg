@@ -92,7 +92,8 @@ function computeCursorOnly(
 			start.richTextOffset,
 			blockElement,
 			overlayContext.editorDocument,
-			overlayContext.overlayRect
+			overlayContext.overlayRect,
+			start.attributeKey
 		),
 	};
 }
@@ -150,7 +151,8 @@ function computeTextSelection(
 				activeEnd.richTextOffset,
 				activeEndBlock,
 				overlayContext.editorDocument,
-				overlayContext.overlayRect
+				overlayContext.overlayRect,
+				activeEnd.attributeKey
 			),
 			selectionRects: allRects,
 		};
@@ -167,7 +169,8 @@ function computeTextSelection(
 			start.richTextOffset,
 			startBlock,
 			overlayContext.editorDocument,
-			overlayContext.overlayRect
+			overlayContext.overlayRect,
+			start.attributeKey
 		),
 	};
 }
@@ -203,7 +206,8 @@ function computeSingleBlockRects(
 				start.richTextOffset,
 				end.richTextOffset,
 				overlayContext.editorDocument,
-				overlayContext.overlayRect
+				overlayContext.overlayRect,
+				start.attributeKey
 			) ?? [],
 		blockElement,
 	};
@@ -265,7 +269,8 @@ function computeMultiBlockRects(
 		docFirst.richTextOffset,
 		Number.MAX_SAFE_INTEGER,
 		overlayContext.editorDocument,
-		overlayContext.overlayRect
+		overlayContext.overlayRect,
+		docFirst.attributeKey
 	);
 	if ( startRects ) {
 		allRects.push( ...startRects );
@@ -292,7 +297,8 @@ function computeMultiBlockRects(
 		0,
 		docLast.richTextOffset,
 		overlayContext.editorDocument,
-		overlayContext.overlayRect
+		overlayContext.overlayRect,
+		docLast.attributeKey
 	);
 	if ( endRects ) {
 		allRects.push( ...endRects );

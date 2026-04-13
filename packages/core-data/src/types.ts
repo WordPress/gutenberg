@@ -135,4 +135,5 @@ export type SelectionState =
 export interface ResolvedSelection {
 	richTextOffset: number | null;
 	localClientId: string | null;
+	attributeKey: string | null;
 }
