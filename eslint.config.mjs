@@ -65,6 +65,7 @@ function dedupePlugins( configs ) {
 const developmentFiles = [
 	'**/benchmark/**/*.js',
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
+	'**/*.@(test|spec).[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
 	'packages/theme/bin/**/*.[tj]s?(x)',

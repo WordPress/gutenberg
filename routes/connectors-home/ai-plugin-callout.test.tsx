@@ -136,11 +136,8 @@ describe( 'AiPluginCallout', () => {
 		};
 
 		( useSelect as jest.Mock ).mockImplementation(
-			(
-				mapSelect: (
-					select: () => typeof selectorStore
-				) => unknown
-			) => mapSelect( () => selectorStore )
+			( mapSelect: ( select: () => typeof selectorStore ) => unknown ) =>
+				mapSelect( () => selectorStore )
 		);
 
 		mockSaveEntityRecord.mockReset();
