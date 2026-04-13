@@ -85,6 +85,7 @@ Key rules:
 -   **Never hardcode colors, spacing, or typography values.** Always reference `--wpds-*` tokens from `@wordpress/theme`. If a token doesn't exist for your use case, that's a gap worth reporting — not a reason to use a raw value.
 -   **Prefer `@wordpress/ui` over `@wordpress/components`.** The `/ui` package is the design system implementation; `/components` is a legacy collection being incrementally replaced. When both packages export a component with the same purpose, use the `/ui` version.
 -   **`@wordpress/components` uses a different styling system.** It consumes Sass variables from `@wordpress/base-styles`, not `--wpds-*` tokens. Mixing `/ui` and `/components` on the same page may produce minor visual inconsistencies.
+-   **Two CSS custom property namespaces coexist in Gutenberg.** `--wp--preset--*` properties (from `theme.json`) are for block rendering and front-end styles. `--wpds-*` properties (from `@wordpress/theme`) are for admin UI and design system components. Use `--wp--preset--*` when working on blocks and the editor canvas; use `--wpds-*` when working on admin chrome, settings pages, and design system components.
 
 ## Common pitfalls
 
@@ -92,6 +93,8 @@ Key rules:
 -   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
 -   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
 -   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+-   Importing `@wordpress/dataviews` registers a `@wordpress/data` store at import time. Removing a `<DataViews>` usage without removing the `import` still ships the store registry. Be intentional about adding and removing DataViews imports.
+-   `@wordpress/ui` uses CSS Modules with `--wpds-*` tokens. `@wordpress/components` uses Emotion (CSS-in-JS) with Sass variables from `@wordpress/base-styles`. When modifying components, use the styling approach of the package you're working in — don't introduce Emotion into `/ui` or CSS Modules into `/components`.
 
 ## PR instructions
 
