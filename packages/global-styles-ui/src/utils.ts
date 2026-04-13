@@ -49,6 +49,12 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
 		{ value: ':active', label: __( 'Active' ) },
 	],
+	'core/navigation-link': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':active', label: __( 'Active' ) },
+		{ value: '@current', label: __( 'Current' ) },
+	],
 };
 
 /**

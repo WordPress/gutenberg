@@ -36,21 +36,25 @@ extend( [ a11yPlugin ] );
  * @param blockName          The name of the block, if applicable.
  * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
  * @param shouldDecodeEncode Whether to decode and encode the style value.
- * @param state              Optional pseudo-selector state (e.g. `:hover`, `:focus`). When provided,
- *                           reads from and writes to the state sub-object automatically.
+ * @param state              Optional state key or array of keys for compound states
+ *                           (e.g. `:hover`, `@current`, or `[ '@current', ':hover' ]`).
+ *                           When provided, reads from and writes to the nested state
+ *                           sub-object automatically. Pass an empty array or omit for
+ *                           base (default) styles.
  * @return An array containing the style value and a function to set the style
  * value.
  *
  * @example
  * const [ color, setColor ] = useStyle<string>( 'color.text', 'core/button', 'merged' );
  * const [ hoverColor, setHoverColor ] = useStyle<string>( 'color.text', 'core/button', 'user', true, ':hover' );
+ * const [ compoundColor, setCompoundColor ] = useStyle<string>( 'color.text', 'core/navigation-link', 'user', true, [ '@current', ':hover' ] );
  */
 export function useStyle< T = any >(
 	path: string,
 	blockName?: string,
 	readFrom: 'base' | 'user' | 'merged' = 'merged',
 	shouldDecodeEncode: boolean = true,
-	state?: string
+	state?: string | string[]
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
 
@@ -68,26 +72,51 @@ export function useStyle< T = any >(
 			blockName,
 			shouldDecodeEncode
 		);
-		if ( state ) {
-			return ( rawValue as any )?.[ state ] ?? {};
+		if ( ! state || ( Array.isArray( state ) && state.length === 0 ) ) {
+			return rawValue;
 		}
-		return rawValue;
+		const segments = Array.isArray( state ) ? state : [ state ];
+		let value: any = rawValue;
+		for ( const segment of segments ) {
+			value = value?.[ segment ] ?? {};
+		}
+		return value;
 	}, [ sourceValue, path, blockName, shouldDecodeEncode, state ] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
 			let valueToSet: any = newValue;
-			if ( state ) {
-				const fullCurrentValue = getStyle(
+			let segments: string[];
+			if ( Array.isArray( state ) ) {
+				segments = state;
+			} else if ( state ) {
+				segments = [ state ];
+			} else {
+				segments = [];
+			}
+			if ( segments.length > 0 ) {
+				const fullCurrentValue: any = getStyle(
 					user,
 					path,
 					blockName,
 					false
 				);
-				valueToSet = {
-					...( fullCurrentValue as object ),
-					[ state ]: newValue,
-				};
+				if ( segments.length === 1 ) {
+					valueToSet = {
+						...( fullCurrentValue ?? {} ),
+						[ segments[ 0 ] ]: newValue,
+					};
+				} else {
+					// Build nested update for compound states (e.g. ['@current', ':hover']).
+					valueToSet = { ...( fullCurrentValue ?? {} ) };
+					let cursor: any = valueToSet;
+					for ( let i = 0; i < segments.length - 1; i++ ) {
+						const key = segments[ i ];
+						cursor[ key ] = { ...( cursor[ key ] ?? {} ) };
+						cursor = cursor[ key ];
+					}
+					cursor[ segments[ segments.length - 1 ] ] = newValue;
+				}
 			}
 			const newGlobalStyles = setStyle< any >(
 				user,

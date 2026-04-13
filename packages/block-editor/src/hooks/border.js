@@ -122,9 +122,9 @@ function BordersInspectorControl( {
 	label,
 	children,
 	resetAllFilter,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
@@ -159,7 +159,7 @@ export function BorderPanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
 	const isEnabled = useHasBorderPanel( settings );
 	const { borderColor } = useSelect(
@@ -176,7 +176,7 @@ export function BorderPanel( {
 	);
 
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

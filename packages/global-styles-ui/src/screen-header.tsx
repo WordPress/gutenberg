@@ -28,8 +28,8 @@ interface ScreenHeaderProps {
 	description?: string | React.ReactElement;
 	onBack?: () => void;
 	states?: StateDefinition[];
-	selectedState?: string;
-	onChangeState?: ( value: string ) => void;
+	selectedState?: string[];
+	onChangeState?: ( value: string[] ) => void;
 }
 
 export function ScreenHeader( {
@@ -37,7 +37,7 @@ export function ScreenHeader( {
 	description,
 	onBack,
 	states,
-	selectedState = 'default',
+	selectedState = [],
 	onChangeState,
 }: ScreenHeaderProps ) {
 	return (

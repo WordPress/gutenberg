@@ -549,8 +549,8 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 -	**Category:** design
 -	**Parent:** core/navigation
 -	**Allowed Blocks:** core/navigation-link, core/navigation-submenu, core/page-list
--	**Supports:** anchor, interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
--	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, title, type, url
+-	**Supports:** anchor, interactivity (clientNavigation), states (:active, :focus, :hover, @current), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~, ~~reusable~~
+-	**Attributes:** description, id, isTopLevelLink, kind, label, opensInNewTab, rel, style, title, type, url
 
 ## Navigation Overlay Close
 

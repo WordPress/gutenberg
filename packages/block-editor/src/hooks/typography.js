@@ -97,9 +97,9 @@ function attributesToStyle( attributes ) {
 function TypographyInspectorControl( {
 	children,
 	resetAllFilter,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
@@ -133,7 +133,7 @@ export function TypographyPanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
 	const isEnabled = useHasTypographyPanel( settings );
 
@@ -158,7 +158,7 @@ export function TypographyPanel( {
 	);
 
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {

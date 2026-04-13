@@ -124,9 +124,9 @@ export function getBackgroundImageClasses( style ) {
 function BackgroundInspectorControl( {
 	children,
 	backgroundGradientSupported = false,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const resetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
@@ -172,7 +172,7 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
 	const { className, inheritedValue } = useSelect(
 		( select ) => {
@@ -197,7 +197,7 @@ export function BackgroundImagePanel( {
 	);
 
 	const [ style, setStyle ] = useBlockStyle( null, selectedState );
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,

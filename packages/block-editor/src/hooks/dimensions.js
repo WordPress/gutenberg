@@ -55,9 +55,9 @@ function useVisualizer() {
 function DimensionsInspectorControl( {
 	children,
 	resetAllFilter,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
 			if ( isStateSelected ) {
@@ -90,10 +90,10 @@ export function DimensionsPanel( {
 	clientId,
 	name,
 	settings,
-	selectedState = 'default',
+	selectedState = [],
 } ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const isStateSelected = selectedState !== 'default';
+	const isStateSelected = selectedState.length > 0;
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const [ value, onChange ] = useBlockStyle( null, selectedState );
 

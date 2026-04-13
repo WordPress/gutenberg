@@ -17,14 +17,14 @@ import { getVariationClassName } from './utils';
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
-	selectedState?: string;
+	selectedState?: string[];
 	stateStyles?: any;
 }
 
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
-	selectedState = 'default',
+	selectedState = [],
 	stateStyles,
 }: BlockPreviewPanelProps ) => {
 	const blockExample = getBlockType( name )?.example;
@@ -49,7 +49,7 @@ const BlockPreviewPanel = ( {
 
 	// Generate CSS for the selected state.
 	const stateCSS = useMemo( () => {
-		if ( selectedState === 'default' || ! stateStyles ) {
+		if ( ! selectedState?.length || ! stateStyles ) {
 			return '';
 		}
 

@@ -110,24 +110,23 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	// State selector state
-	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
+	// State selector state — empty array means "default" (no state selected).
+	const [ selectedState, setSelectedState ] = useState< string[] >( [] );
 	const validStates = useMemo( () => getValidStates( name ), [ name ] );
 
-	const stateParam = selectedState !== 'default' ? selectedState : undefined;
 	const [ style, setStyle ] = useStyle(
 		prefix,
 		name,
 		'user',
 		false,
-		stateParam
+		selectedState
 	);
 	const [ inheritedStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
 		false,
-		stateParam
+		selectedState
 	);
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
@@ -334,7 +333,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				name={ name }
 				variation={ variation }
 				selectedState={ selectedState }
-				stateStyles={ selectedState !== 'default' ? style : undefined }
+				stateStyles={ selectedState.length > 0 ? style : undefined }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

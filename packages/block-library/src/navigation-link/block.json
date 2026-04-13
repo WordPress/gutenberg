@@ -45,6 +45,9 @@
 		},
 		"isTopLevelLink": {
 			"type": "boolean"
+		},
+		"style": {
+			"type": "object"
 		}
 	},
 	"usesContext": [
@@ -83,7 +86,8 @@
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"states": [ ":hover", ":focus", ":active", "@current" ]
 	},
 	"selectors": {
 		"states": {
