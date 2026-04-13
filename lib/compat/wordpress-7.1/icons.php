@@ -72,7 +72,7 @@ if ( ! function_exists( 'wp_unregister_icon' ) ) {
 /**
  * Registers the default icon collections for Gutenberg.
  */
-function gutenberg_register_icon_collections() {
+function gutenberg_register_default_icon_collections() {
 	wp_register_icon_collection(
 		'core',
 		array(
@@ -85,7 +85,7 @@ function gutenberg_register_icon_collections() {
 if ( has_action( 'init', '_wp_register_default_icon_collections' ) ) {
 	remove_action( 'init', '_wp_register_default_icon_collections' );
 }
-add_action( 'init', 'gutenberg_register_icon_collections', 0 );
+add_action( 'init', 'gutenberg_register_default_icon_collections', 0 );
 
 /**
  * Registers the default core icons from the Gutenberg manifest.
