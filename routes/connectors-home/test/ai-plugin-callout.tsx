@@ -64,6 +64,22 @@ jest.mock( '@wordpress/core-data', () => ( {
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
 	useSelect: jest.fn(),
+	createSelector: jest.fn( ( fn ) => fn ),
+	createRegistrySelector: jest.fn( ( fn ) => fn ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+		const newState: Record< string, unknown > = {};
+
+		Object.keys( reducers ).forEach( ( key ) => {
+			newState[ key ] = reducers[ key ](
+				( state as Record< string, unknown > )[ key ],
+				action
+			);
+		} );
+
+		return newState;
+	} ),
+	register: jest.fn(),
 } ) );
 
 jest.mock( '../default-connectors', () => ( {
