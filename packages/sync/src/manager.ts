@@ -57,6 +57,7 @@ interface EntityState {
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
+	trustworthy: boolean;
 	unload: () => void;
 	ydoc: CRDTDoc;
 }
@@ -263,6 +264,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			objectId,
 			objectType,
 			syncConfig,
+			trustworthy: true,
 			unload,
 			ydoc,
 		};
@@ -282,6 +284,11 @@ export function createSyncManager( debug = false ): SyncManager {
 
 				// Attach status listener after provider creation.
 				provider.on( 'status', handlers.onStatusChange );
+
+				// Listen for trustworthiness signals from the provider.
+				provider.on( 'trustworthy', ( isTrustworthy ) => {
+					entityState.trustworthy = isTrustworthy;
+				} );
 
 				return provider;
 			} )
@@ -617,7 +624,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
-		const { handlers, syncConfig, ydoc } = entityState;
+		const { handlers, syncConfig, trustworthy, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current edited entity record.
@@ -632,13 +639,16 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
-		// Sanitize remote content to prevent XSS from malicious peers.
-		const sanitizedChanges = sanitizeRemoteChanges( changes );
+		// Sanitize remote content when any contributor lacks unfiltered_html.
+		const effectiveChanges = trustworthy
+			? changes
+			: sanitizeRemoteChanges( changes );
 
 		log( 'updateEntityRecord', 'changes', entityId, {
 			changedKeys,
+			trustworthy,
 		} );
-		handlers.editRecord( sanitizedChanges );
+		handlers.editRecord( effectiveChanges );
 	}
 
 	/**

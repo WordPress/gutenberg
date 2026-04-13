@@ -35,6 +35,7 @@ interface SyncEnvelopeFromServer {
 	end_cursor: number; // use as `after` in next request
 	should_compact?: boolean;
 	room: string;
+	trustworthy?: boolean;
 	updates: SyncUpdate[];
 }
 

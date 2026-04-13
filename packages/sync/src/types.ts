@@ -43,6 +43,7 @@ export type ObjectData = Record< string, unknown >;
  */
 export interface ProviderEventMap {
 	status: ConnectionStatus;
+	trustworthy: boolean;
 }
 
 /**

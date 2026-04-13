@@ -307,11 +307,17 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				}
 
 				// Process each update according to its type.
+				$has_updates = count( $room_request['updates'] ) > 0;
 				foreach ( $room_request['updates'] as $update ) {
 					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
+				}
+
+				// Track this user as a contributor if they submitted updates.
+				if ( $has_updates ) {
+					$this->storage->track_contributor( $room, get_current_user_id() );
 				}
 
 				// Get updates for this client.
@@ -569,9 +575,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @param bool   $is_compactor True if this client is nominated to perform compaction.
 		 * @return array{
 		 *   end_cursor: int,
-		 *   should_compact: bool,
 		 *   room: string,
+		 *   should_compact: bool,
 		 *   total_updates: int,
+		 *   trustworthy: bool,
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
@@ -594,11 +601,22 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
 
+			// Determine whether all contributors have the unfiltered_html capability.
+			$trustworthy  = true;
+			$contributors = $this->storage->get_contributors( $room );
+			foreach ( $contributors as $contributor_id ) {
+				if ( ! user_can( $contributor_id, 'unfiltered_html' ) ) {
+					$trustworthy = false;
+					break;
+				}
+			}
+
 			return array(
 				'end_cursor'     => $this->storage->get_cursor( $room ),
 				'room'           => $room,
 				'should_compact' => $should_compact,
 				'total_updates'  => $total_updates,
+				'trustworthy'    => $trustworthy,
 				'updates'        => $typed_updates,
 			);
 		}

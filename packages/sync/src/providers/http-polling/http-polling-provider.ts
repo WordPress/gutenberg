@@ -28,6 +28,7 @@ export interface ProviderOptions {
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
+	trustworthy: ( trustworthy: boolean ) => void;
 };
 
 /**
@@ -60,6 +61,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			log: this.log,
 			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
+			onTrustChange: this.emitTrustworthy,
 		} );
 	}
 
@@ -133,6 +135,15 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			room: this.options.room,
 			...debug,
 		} );
+	};
+
+	/**
+	 * Emit trustworthiness changes from the server.
+	 *
+	 * @param trustworthy Whether all contributors have unfiltered_html.
+	 */
+	protected emitTrustworthy = ( trustworthy: boolean ): void => {
+		this.emit( 'trustworthy', [ trustworthy ] );
 	};
 
 	/**

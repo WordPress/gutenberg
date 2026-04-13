@@ -61,6 +61,7 @@ interface PollingManager {
 		log: () => void;
 		onStatusChange: () => void;
 		onSync: () => void;
+		onTrustChange: ( trustworthy: boolean ) => void;
 	} ) => void;
 	unregisterRoom: ( room: string ) => void;
 }
@@ -96,6 +97,24 @@ function createMockAwareness() {
 		on: jest.fn(),
 		off: jest.fn(),
 		emit: jest.fn(),
+	};
+}
+
+function createRoomOptions(
+	overrides: Partial<
+		Parameters< PollingManager[ 'registerRoom' ] >[ 0 ]
+	> = {}
+) {
+	return {
+		room: 'test-room',
+		doc: createMockDoc( 1 ),
+		awareness: createMockAwareness(),
+		log: jest.fn(),
+		onStatusChange: jest.fn(),
+		onSync: jest.fn(),
+				onTrustChange: jest.fn(),
+		onTrustChange: jest.fn(),
+		...overrides,
 	};
 }
 
@@ -165,6 +184,8 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// Simulate a doc update that exceeds the mocked MAX_UPDATE_SIZE_IN_BYTES (10).
@@ -191,6 +212,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			const onDocUpdate = getOnDocUpdate( doc );
@@ -228,6 +250,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// Flush the initial poll so 'connected' status is emitted first.
@@ -279,6 +302,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -319,6 +343,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -352,6 +377,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -391,6 +417,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 1000 );
@@ -431,6 +458,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// First poll passes.
@@ -494,6 +522,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -537,6 +566,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -549,6 +579,58 @@ describe( 'polling-manager', () => {
 					} ),
 				} )
 			);
+		} );
+	} );
+
+	describe( 'trustworthy signal', () => {
+		it( 'calls onTrustChange with trustworthy value from server response', async () => {
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+						trustworthy: false,
+					},
+				],
+			} );
+
+			const onTrustChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onTrustChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onTrustChange ).toHaveBeenCalledWith( false );
+		} );
+
+		it( 'defaults to trustworthy when field is absent from response', async () => {
+			mockPostSyncUpdate.mockResolvedValue( syncResponse );
+
+			const onTrustChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onTrustChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onTrustChange ).toHaveBeenCalledWith( true );
 		} );
 	} );
 
@@ -583,6 +665,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -592,6 +675,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// First poll: detects collaborators on primary room, resumes all queues.
@@ -655,6 +739,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -664,6 +749,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// First poll: no collaborators.
@@ -707,6 +793,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			pollingManager.registerRoom( {
@@ -716,6 +803,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// First poll: no collaborators, queues stay paused.
@@ -828,6 +916,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// Flush the initial poll (queue is paused, so no updates sent).
@@ -886,6 +975,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -935,6 +1025,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// registerRoom → poll() → start() → postSyncUpdate (pending).
@@ -958,6 +1049,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			// Flush so the first poll completes and schedules a timeout.

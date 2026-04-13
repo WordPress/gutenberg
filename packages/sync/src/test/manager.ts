@@ -763,7 +763,71 @@ describe( 'SyncManager', () => {
 			} );
 		} );
 
-		it( 'sanitizes remote changes to prevent XSS', async () => {
+		it( 'sanitizes remote changes when marked untrusted', async () => {
+			// Capture the Y.Doc and the trustworthy callback from the provider.
+			let capturedDoc: Y.Doc | null = null;
+			let trustworthyCallback: ( ( v: boolean ) => void ) | null =
+				null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return {
+					destroy: jest.fn(),
+					on: jest.fn(
+						(
+							event: string,
+							cb: ( ...args: any[] ) => void
+						) => {
+							if ( event === 'trustworthy' ) {
+								trustworthyCallback = cb;
+							}
+						}
+					),
+				};
+			} );
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			// Signal that the session is untrusted.
+			expect( trustworthyCallback ).not.toBeNull();
+			trustworthyCallback!( false );
+
+			// Clear calls of editRecord, which is called during load.
+			mockHandlers.editRecord.mockClear();
+
+			expect( capturedDoc ).not.toBeNull();
+
+			// Simulate a remote change with an XSS payload.
+			const remoteDoc = new Y.Doc();
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set(
+					'title',
+					'<script>alert("xss")</script>Safe Title'
+				);
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			// Wait a tick.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
+				title: 'Safe Title',
+			} );
+		} );
+
+		it( 'does not sanitize remote changes when marked trusted', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
@@ -781,16 +845,18 @@ describe( 'SyncManager', () => {
 				mockHandlers
 			);
 
-			// Clear calls of editRecord, which is called during load.
+			// Default is trusted, so no need to signal.
 			mockHandlers.editRecord.mockClear();
 
 			expect( capturedDoc ).not.toBeNull();
 
-			// Simulate a remote change with an XSS payload.
+			// Simulate a remote change with HTML content that would be
+			// modified by DOMPurify (e.g. an img with onerror).
 			const remoteDoc = new Y.Doc();
+			const htmlContent = '<img src="x" onerror="alert(1)">';
 			remoteDoc
 				.getMap( CRDT_RECORD_MAP_KEY )
-				.set( 'title', '<script>alert("xss")</script>Safe Title' );
+				.set( 'title', htmlContent );
 			Y.applyUpdateV2(
 				capturedDoc as unknown as Y.Doc,
 				Y.encodeStateAsUpdateV2( remoteDoc )
@@ -801,8 +867,9 @@ describe( 'SyncManager', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
+			// Content passes through unsanitized because trustworthy is true.
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-				title: 'Safe Title',
+				title: htmlContent,
 			} );
 		} );
 

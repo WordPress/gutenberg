@@ -85,5 +85,36 @@ if ( ! interface_exists( 'WP_Sync_Storage' ) ) {
 		 * @return bool True on success, false on failure.
 		 */
 		public function set_awareness_state( string $room, array $awareness ): bool;
+
+		/**
+		 * Records a user as a contributor who has submitted updates to a room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room    Room identifier.
+		 * @param int    $user_id WordPress user ID.
+		 * @return void
+		 */
+		public function track_contributor( string $room, int $user_id ): void;
+
+		/**
+		 * Gets all contributor user IDs for a room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return int[] Array of WordPress user IDs.
+		 */
+		public function get_contributors( string $room ): array;
+
+		/**
+		 * Clears the contributor list for a room, typically called on save.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return void
+		 */
+		public function clear_contributors( string $room ): void;
 	}
 }

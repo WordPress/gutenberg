@@ -239,6 +239,33 @@ function gutenberg_set_collaboration_option_on_activation() {
 }
 add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
+if ( ! function_exists( 'gutenberg_clear_sync_contributors_on_save' ) ) {
+	/**
+	 * Clears the sync contributor tracking list when a post is saved.
+	 *
+	 * After a save, the content in the database is authoritative. The contributor
+	 * list is reset so that the trustworthiness check starts fresh for subsequent
+	 * collaborative edits.
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param WP_Post $post    Post object.
+	 */
+	function gutenberg_clear_sync_contributors_on_save( $post_id, $post ) {
+		if ( WP_Sync_Post_Meta_Storage::POST_TYPE === $post->post_type ) {
+			return;
+		}
+
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+
+		$room    = 'postType/' . $post->post_type . ':' . $post_id;
+		$storage = new WP_Sync_Post_Meta_Storage();
+		$storage->clear_contributors( $room );
+	}
+	add_action( 'save_post', 'gutenberg_clear_sync_contributors_on_save', 10, 2 );
+}
+
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
  *

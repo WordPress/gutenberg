@@ -68,6 +68,7 @@ interface RegisterRoomOptions {
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	onSync: () => void;
+	onTrustChange: ( trustworthy: boolean ) => void;
 }
 
 interface RoomState {
@@ -78,6 +79,7 @@ interface RoomState {
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
+	onTrustChange: ( trustworthy: boolean ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	room: string;
@@ -455,6 +457,10 @@ function poll(): void {
 					return;
 				}
 
+				// Signal trustworthiness before processing document updates
+				// so the sync manager can decide whether to sanitize.
+				roomState.onTrustChange( room.trustworthy ?? true );
+
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
@@ -605,6 +611,7 @@ function registerRoom( {
 	log,
 	onSync,
 	onStatusChange,
+	onTrustChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
@@ -700,6 +707,7 @@ function registerRoom( {
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
+		onTrustChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
