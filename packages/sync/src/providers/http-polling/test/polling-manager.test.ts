@@ -62,7 +62,10 @@ interface PollingManager {
 		onStatusChange: () => void;
 		onSync: () => void;
 	} ) => void;
-	unregisterRoom: ( room: string ) => void;
+	unregisterRoom: (
+		room: string,
+		options?: { sendDisconnectSignal?: boolean }
+	) => void;
 }
 
 function createDeferred< T >() {
