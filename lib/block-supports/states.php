@@ -60,20 +60,24 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	 * state styles share the same hash class and therefore the same selector, so
 	 * only one CSS rule is emitted. The store is flushed to the page by
 	 * gutenberg_enqueue_stored_styles() rather than injected inline here.
+	 *
+	 * Preset utility classes (e.g. .has-accent-3-background-color) are generated
+	 * with !important, so state styles targeting the same properties must also use
+	 * !important to win. Properties without preset utility classes don't need it.
 	 */
+	$preset_class_properties = array( 'color', 'background-color', 'border-color', 'background', 'font-size', 'font-family' );
+
 	$style_rules = array();
 	foreach ( $css_rules as $rule ) {
-		// Use !important to override utility classes like
-		// .has-accent-3-background-color which are generated with !important.
-		$declarations_with_important = array_map(
-			static function ( $value ) {
-				return rtrim( $value ) . ' !important';
-			},
-			$rule['declarations']
-		);
-		$style_rules[]               = array(
+		$declarations = array();
+		foreach ( $rule['declarations'] as $property => $value ) {
+			$declarations[ $property ] = in_array( $property, $preset_class_properties, true )
+				? $value . ' !important'
+				: $value;
+		}
+		$style_rules[] = array(
 			'selector'     => ".$unique_class{$rule['state']}",
-			'declarations' => $declarations_with_important,
+			'declarations' => $declarations,
 		);
 	}
 
