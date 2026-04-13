@@ -12,7 +12,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { AiPluginCallout } from './ai-plugin-callout';
+import { AiPluginCallout } from '../ai-plugin-callout';
 
 jest.mock( '@wordpress/a11y', () => ( {
 	speak: jest.fn(),
@@ -66,7 +66,7 @@ jest.mock( '@wordpress/data', () => ( {
 	useSelect: jest.fn(),
 } ) );
 
-jest.mock( './default-connectors', () => ( {
+jest.mock( '../default-connectors', () => ( {
 	getConnectorData: jest.fn( () => ( {
 		openai: {
 			type: 'ai_provider',
@@ -79,7 +79,7 @@ jest.mock( './default-connectors', () => ( {
 	} ) ),
 } ) );
 
-jest.mock( './wp-logo-decoration', () => ( {
+jest.mock( '../wp-logo-decoration', () => ( {
 	WpLogoDecoration: () => null,
 } ) );
 
