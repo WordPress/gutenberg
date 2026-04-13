@@ -6,7 +6,13 @@
 		"forceConsistentCasingInFileNames": true,
 		"module": "CommonJS",
 		"noEmit": true,
-		"rootDir": ".",
+		// the following 5 lines are needed else the missing file errors shows up on build. If there is a better solution, update this config.
+		"composite": false,
+		"declaration": false,
+		"declarationMap": false,
+		"declarationDir": null,
+		"emitDeclarationOnly": false,
+		"rootDir": "../..",
 		"types": [ "node" ]
 	},
 	"include": [ "." ],
