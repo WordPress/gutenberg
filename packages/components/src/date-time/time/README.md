@@ -52,8 +52,9 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 ### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
 
 The order of day, month, and year.
+
 -   Required: No
--   Default: `'mdy'`
+-   Default: `'dmy'` (or `'mdy'` when `is12Hour` is `true`)
 
 ### `hideLabelFromVision`: `boolean`
 
