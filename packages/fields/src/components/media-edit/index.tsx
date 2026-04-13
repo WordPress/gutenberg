@@ -567,7 +567,7 @@ function CompactMediaEditAttachments( {
  * @param {Item}                 props.data                  - The item being edited.
  * @param {Object}               props.field                 - The field configuration with getValue and setValue methods.
  * @param {Function}             props.onChange              - Callback function when the media selection changes.
- * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Default `['image']`.
+ * @param {string[]}             [props.allowedTypes]        - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
  * @param {boolean}              [props.multiple]            - Whether to allow multiple media selections. Default `false`.
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.

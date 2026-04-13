@@ -1943,7 +1943,7 @@ export function generateGlobalStyles(
 		},
 		{
 			assets: svgs,
-			__unstableType: 'svg',
+			__unstableType: 'svgs',
 			isGlobalStyles: true,
 		},
 	];

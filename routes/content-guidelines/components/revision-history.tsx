@@ -1,3 +1,5 @@
+/* @jsxRuntime automatic */
+
 /**
  * WordPress dependencies
  */
@@ -5,13 +7,14 @@ import {
 	Button,
 	Modal,
 	Navigator,
+	Spinner,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useCallback, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { dateI18n, getDate, getSettings } from '@wordpress/date';
@@ -36,9 +39,6 @@ const DEFAULT_VIEW: View = {
 	perPage: 10,
 	layout: {
 		enableMoving: false,
-		styles: {
-			author: { align: 'end' },
-		},
 	},
 };
 
@@ -51,7 +51,6 @@ export default function RevisionHistory() {
 	const [ revisionToRestore, setRevisionToRestore ] =
 		useState< ContentGuidelinesRevision | null >( null );
 	const [ isRestoring, setIsRestoring ] = useState( false );
-	const [ refetchKey, setRefetchKey ] = useState( 0 );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
@@ -61,31 +60,35 @@ export default function RevisionHistory() {
 		[]
 	);
 
-	useEffect( () => {
+	const loadRevisions = useCallback( async () => {
 		if ( ! guidelinesId ) {
 			return;
 		}
 
-		async function loadRevisions() {
-			setIsLoading( true );
-			try {
-				const result = await fetchContentGuidelinesRevisions( {
-					guidelinesId: guidelinesId!,
-					perPage: 100,
-				} );
-				setRevisions( result.revisions );
-			} catch {
-				createErrorNotice(
-					__( 'Could not load revision history. Please try again.' ),
-					{ type: 'snackbar' }
-				);
-			} finally {
-				setIsLoading( false );
-			}
+		setIsLoading( true );
+		try {
+			// Fetch all revisions at once so client-side filtering works
+			// across the full dataset. Server-side pagination + filtering
+			// will be done together in a follow-up.
+			const result = await fetchContentGuidelinesRevisions( {
+				guidelinesId: guidelinesId!,
+				page: 1,
+				perPage: 100,
+			} );
+			setRevisions( result.revisions );
+		} catch {
+			createErrorNotice(
+				__( 'Could not load revision history. Please try again.' ),
+				{ type: 'snackbar' }
+			);
+		} finally {
+			setIsLoading( false );
 		}
+	}, [ guidelinesId, createErrorNotice ] );
 
+	useEffect( () => {
 		loadRevisions();
-	}, [ guidelinesId, refetchKey, createErrorNotice ] );
+	}, [ loadRevisions ] );
 
 	const authorElements = useMemo( () => {
 		return [
@@ -141,11 +144,6 @@ export default function RevisionHistory() {
 		[ authorElements ]
 	);
 
-	const { data: displayedRevisions, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( revisions, view, fields ),
-		[ revisions, view, fields ]
-	);
-
 	const actions = useMemo< Action< ContentGuidelinesRevision >[] >(
 		() => [
 			{
@@ -156,6 +154,14 @@ export default function RevisionHistory() {
 		],
 		[ setRevisionToRestore ]
 	);
+
+	// Client-side pagination and filtering on the full dataset.
+	// TODO: Move both pagination and filtering to the API side together.
+	const { data: displayedRevisions, paginationInfo: paginationToShow } =
+		useMemo(
+			() => filterSortAndPaginate( revisions, view, fields ),
+			[ revisions, view, fields ]
+		);
 
 	async function handleRestore() {
 		if ( ! guidelinesId || ! revisionToRestore ) {
@@ -169,7 +175,7 @@ export default function RevisionHistory() {
 			);
 			await fetchContentGuidelines();
 			setRevisionToRestore( null );
-			setRefetchKey( ( k ) => k + 1 );
+			await loadRevisions();
 			createSuccessNotice( __( 'Revision restored.' ), {
 				type: 'snackbar',
 			} );
@@ -183,21 +189,25 @@ export default function RevisionHistory() {
 		}
 	}
 
+	const navigateToGuidelines = () => {
+		if ( window?.location?.href ) {
+			const url = new URL( window.location.href );
+			url.searchParams.delete( 'view' );
+			window.history.replaceState( {}, '', url.toString() );
+		}
+	};
+
 	return (
 		<div className="content-guidelines__revision-history">
 			<Navigator.BackButton
 				icon={ isRTL() ? chevronRight : chevronLeft }
 				className="content-guidelines__revision-history-back"
+				onClick={ navigateToGuidelines }
 			>
 				{ __( 'Revision history' ) }
 			</Navigator.BackButton>
 
-			<Text
-				size={ 13 }
-				weight={ 400 }
-				variant="muted"
-				className="content-guidelines__revision-description"
-			>
+			<Text size={ 13 } weight={ 400 } variant="muted">
 				{ __( 'Use a previous version of your guidelines.' ) }
 			</Text>
 
@@ -208,9 +218,16 @@ export default function RevisionHistory() {
 				onChangeView={ setView }
 				actions={ actions }
 				isLoading={ isLoading }
-				paginationInfo={ paginationInfo }
+				paginationInfo={ paginationToShow }
 				defaultLayouts={ { table: {} } }
 				getItemId={ ( item ) => String( item.id ) }
+				empty={
+					isLoading && displayedRevisions.length === 0 ? (
+						<Spinner />
+					) : (
+						__( 'No revisions found.' )
+					)
+				}
 			/>
 
 			{ revisionToRestore && (

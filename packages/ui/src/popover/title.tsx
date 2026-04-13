@@ -22,10 +22,7 @@ import type { TitleProps } from './types';
  * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function PopoverTitle(
-		{ className, children, render, ...props },
-		forwardedRef
-	) {
+	function PopoverTitle( { className, children, ...props }, forwardedRef ) {
 		const validationContext = usePopoverValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
@@ -38,7 +35,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 			<Text
 				ref={ mergedRef }
 				variant="heading-xl"
-				render={ <_Popover.Title render={ render } { ...props } /> }
+				render={ <_Popover.Title { ...props } /> }
 				className={ className }
 			>
 				{ children }

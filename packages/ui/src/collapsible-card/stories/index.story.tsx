@@ -12,10 +12,10 @@ function Text( { children }: { children: React.ReactNode } ) {
 		<p
 			style={ {
 				margin: 0,
-				fontFamily: 'var(--wpds-font-family-body)',
-				fontSize: 'var(--wpds-font-size-md)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-sm)',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				fontSize: 'var(--wpds-typography-font-size-md)',
+				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
 				color: 'var(--wpds-color-fg-content-neutral-weak)',
 			} }
@@ -183,7 +183,7 @@ export const WithHeaderDescription: Story = {
 					<CollapsibleCard.HeaderDescription>
 						<span
 							style={ {
-								fontSize: 'var(--wpds-font-size-sm)',
+								fontSize: 'var(--wpds-typography-font-size-sm)',
 								color: 'var(--wpds-color-fg-content-neutral-weak)',
 							} }
 						>
