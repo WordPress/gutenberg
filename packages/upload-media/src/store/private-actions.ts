@@ -816,11 +816,15 @@ export function prepareItem( id: QueueItemId ) {
 		if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
-			// sub-sizes, format conversion).
+			// sub-sizes, format conversion). Keep the original HEIC in
+			// a separate field so it can be sideloaded as the "original"
+			// after upload, preserving the user's file without leaking it
+			// into paths that expect an editor-supported image.
 			const vipsAvailable = isClientSideMediaSupported();
 			updates = {
 				file: heicJpeg,
 				sourceFile: heicJpeg,
+				originalHeicFile: item.file,
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: ! vipsAvailable,
@@ -1138,6 +1142,25 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 		const attachment = item.attachment;
 		const settings = select.getSettings();
+
+		// HEIC/HEIF: preserve the original file by sideloading it as the
+		// attachment's "original". The uploaded file is a JPEG conversion;
+		// the HEIC was kept on item.originalHeicFile for this purpose.
+		// parentId guarantees processItem routes this to the sideload
+		// endpoint, never the main create endpoint.
+		if ( item.originalHeicFile && attachment.id ) {
+			dispatch.addSideloadItem( {
+				file: item.originalHeicFile,
+				batchId: uuidv4(),
+				parentId: item.id,
+				additionalData: {
+					post: attachment.id,
+					image_size: 'original',
+					convert_format: false,
+				},
+				operations: [ OperationType.Upload ],
+			} );
+		}
 
 		// Check if image needs rotation.
 		// If exif_orientation is not 1, the image needs rotation.

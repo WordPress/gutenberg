@@ -8,6 +8,10 @@ export interface QueueItem {
 	id: QueueItemId;
 	sourceFile: File;
 	file: File;
+	// Original HEIC/HEIF file, kept separately so it can be sideloaded
+	// as the attachment's "original_image" after the converted JPEG is
+	// uploaded. Not set for non-HEIC items.
+	originalHeicFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
