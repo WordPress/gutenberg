@@ -18,10 +18,10 @@ Use the following links to locate the topic you're interested in. If you have ne
 
 -   **[Requirements](#requirements-of-the-interactivity-api):** Check this section before you start creating your interactive blocks with the Interactivity API.
 -   **[Quick Start Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/):** Get a custom block using the Interactivity API up and running in less than one minute.
--   **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/)** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
--   **[Core Concepts](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/)** Gain a better understanding of concepts and mental models related to Interactivity API development from this section.
+-   **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/):** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
+-   **[Core Concepts](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/):** Gain a better understanding of concepts and mental models related to Interactivity API development from this section.
 -   **[Directives and Store](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
--   **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
+-   **[Docs and Examples](#docs--examples):** Additional resources to learn/read more about the Interactivity API.
 
 To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
 
@@ -60,8 +60,9 @@ import { store } from '@wordpress/interactivity';
 
 To indicate that the block [supports](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) the Interactivity API features, add `"interactivity": true` to the `supports` attribute of the block's `block.json` file.
 
+In `block.json`:
+
 ```json
-// block.json
 "supports": {
     "interactivity": true
 },
@@ -73,24 +74,27 @@ Refer to the [`interactivity` support property docs](https://developer.wordpress
 
 The Interactivity API provides the `@wordpress/interactivity` Script Module. JavaScript using the Interactivity API should be implemented as Script Modules so they can depend on `@wordpress/interactivity`. [Script Modules have been available since WordPress 6.5](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/). Blocks can use [`viewScriptModule` block metadata](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#view-script-module) to enqueue their Script Modules easily:
 
+In `block.json`:
+
 ```json
-// block.json
 {
-   ...
-   "viewScriptModule": "file:./view.js"
+	"viewScriptModule": "file:./view.js"
 }
 ```
 
 The use of `viewScriptModule` also requires the `--experimental-modules` flag for both the [`build`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#build) and [`start`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-scripts/#start) scripts of `wp-scripts` to ensure a proper build of the Script Modules.
 
+> **Note:** If you scaffolded your block using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template), this flag is already included in your `package.json` scripts and no manual configuration is needed.
+
+If you need to add it manually, update your `package.json`:
+
 ```json
-// package.json
 {
-    "scripts": {
-        ...
+	"scripts": {
 		"build": "wp-scripts build --experimental-modules",
 		"start": "wp-scripts start --experimental-modules"
 	}
+}
 ```
 
 #### Add `wp-interactive` directive to a DOM element

@@ -103,7 +103,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	 * Registers the real-time collaboration setting.
 	 */
 	function gutenberg_register_real_time_collaboration_setting() {
-		$option_name = 'wp_enable_real_time_collaboration';
+		$option_name = 'wp_collaboration_enabled';
 
 		register_setting(
 			'writing',
@@ -112,7 +112,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				'type'              => 'boolean',
 				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => false,
+				'default'           => true,
 				'show_in_rest'      => true,
 			)
 		);
@@ -123,12 +123,24 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			function () use ( $option_name ) {
 				$option_value = get_option( $option_name );
 
-				?>
-				<label for="wp_enable_real_time_collaboration">
-					<input name="wp_enable_real_time_collaboration" type="checkbox" id="wp_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
-					<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
-				</label>
-				<?php
+				if ( wp_is_collaboration_allowed() ) :
+					?>
+					<label for="wp_collaboration_enabled">
+						<input name="wp_collaboration_enabled" type="checkbox" id="wp_collaboration_enabled" value="1" <?php checked( '1', $option_value ); ?>/>
+						<?php _e( "Enable early access to real-time collaboration. Real-time collaboration may affect your website's performance.", 'gutenberg' ); ?>
+					</label>
+				<?php else : ?>
+					<div class="notice notice-warning inline">
+						<?php
+						printf(
+								/* translators: %s: Prefix "Note:". */
+							'<p>' . __( '%s Real-time collaboration has been disabled.', 'gutenberg' ) . '</p>',
+							'<strong>' . __( 'Note:', 'gutenberg' ) . '</strong>'
+						);
+						?>
+					</div>
+					<?php
+				endif;
 			},
 			'writing'
 		);
@@ -136,13 +148,65 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
 }
 
+if ( ! function_exists( 'wp_is_collaboration_enabled' ) ) {
+	/**
+	 * Determines whether real-time collaboration is enabled.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is always disabled regardless of the database option.
+	 * Otherwise, falls back to the 'wp_collaboration_enabled' option.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is enabled.
+	 */
+	function wp_is_collaboration_enabled() {
+		return ( wp_is_collaboration_allowed() && (bool) get_option( 'wp_collaboration_enabled' ) );
+	}
+}
+
+if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
+	/**
+	 * Determines whether real-time collaboration is allowed.
+	 *
+	 * If the WP_ALLOW_COLLABORATION constant is false,
+	 * collaboration is not allowed and cannot be enabled.
+	 * The constant defaults to true, unless the WP_ALLOW_COLLABORATION
+	 * environment variable is set to string "false".
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return bool Whether real-time collaboration is allowed.
+	 */
+	function wp_is_collaboration_allowed() {
+		if ( ! defined( 'WP_ALLOW_COLLABORATION' ) ) {
+			$env_value = getenv( 'WP_ALLOW_COLLABORATION' );
+			if ( false === $env_value ) {
+				// Environment variable is not defined, default to allowing collaboration.
+				define( 'WP_ALLOW_COLLABORATION', true );
+			} else {
+				/*
+				* Environment variable is defined, let's confirm it is actually set to
+				* "true" as it may still have a string value "false" – the preceeding
+				* `if` branch only tests for the boolean `false`.
+				*/
+				define( 'WP_ALLOW_COLLABORATION', 'true' === $env_value );
+			}
+		}
+
+		return WP_ALLOW_COLLABORATION;
+	}
+}
+
 /**
  * Injects the real-time collaboration setting into a global variable.
+ *
+ * @global string $pagenow The filename of the current screen.
  */
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+	if ( ! wp_is_collaboration_enabled() ) {
 		return;
 	}
 
@@ -157,12 +221,23 @@ function gutenberg_inject_real_time_collaboration_setting() {
 
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . ( $enabled ? 'true' : 'false' ) . ';',
+		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';',
 		'after'
 	);
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
-add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
+
+/**
+ * Core adds an option with the default value, so we need to set the option to
+ * our intended default when the Gutenberg plugin is activated, provided
+ * collaboration is allowed.
+ */
+function gutenberg_set_collaboration_option_on_activation() {
+	if ( wp_is_collaboration_allowed() ) {
+		update_option( 'wp_collaboration_enabled', '1' );
+	}
+}
+add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
 /**
  * Modifies the post list UI and heartbeat responses for real-time collaboration.
@@ -171,11 +246,13 @@ add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' 
  * user-specific lock text with "Currently being edited", changes the "Edit"
  * row action to "Join", and re-enables controls that core normally hides
  * for locked posts (since collaborative editing is possible).
+ *
+ * @global string $pagenow The filename of the current screen.
  */
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
 
-	if ( ! get_option( 'wp_enable_real_time_collaboration' ) ) {
+	if ( ! wp_is_collaboration_enabled() ) {
 		return;
 	}
 
@@ -225,7 +302,8 @@ function gutenberg_filter_locked_posts_heartbeat_for_rtc( $response ) {
  *
  * Also re-enables checkboxes and row actions that WordPress core hides for
  * locked posts, since collaborative editing means the post is not exclusively
- * locked.
+ * locked. Toggles "Edit" / "Join" action link text via the
+ * `.wp-collaborative-editing` class that the heartbeat already manages.
  */
 function gutenberg_post_list_collaboration_styles() {
 	?>
@@ -245,13 +323,30 @@ function gutenberg_post_list_collaboration_styles() {
 		/*
 		 * Re-enable controls that core hides for locked posts,
 		 * since RTC allows collaborative editing.
+		 * Must use `tr.wp-locked` to match core's specificity in
+		 * list-tables.css and actually override its `display: none`.
 		 */
-		.wp-locked .check-column label,
-		.wp-locked .check-column input[type="checkbox"] {
+		tr.wp-locked .check-column label,
+		tr.wp-locked .check-column input[type="checkbox"] {
 			display: revert;
 		}
-		.wp-locked .row-actions .inline {
+		tr.wp-locked .row-actions .inline {
 			display: revert;
+		}
+		/*
+		 * Toggle "Edit" / "Join" action link text based on lock state.
+		 * The heartbeat adds/removes .wp-locked on locked rows. This
+		 * CSS only runs when RTC is enabled, so .wp-locked here always
+		 * means collaborative editing, not exclusive locking.
+		 */
+		.join-action-text {
+			display: none;
+		}
+		.wp-locked .edit-action-text {
+			display: none;
+		}
+		.wp-locked .join-action-text {
+			display: inline;
 		}
 	</style>
 	<?php
@@ -280,30 +375,51 @@ function gutenberg_filter_locked_post_text_for_rtc( $translation, $text, $domain
 }
 
 /**
- * Filters post row actions to change "Edit" to "Join" for locked posts
+ * Filters post row actions to render both "Edit" and "Join" link text
  * when real-time collaboration is enabled.
+ *
+ * Both labels are always present in the markup; CSS toggles visibility
+ * based on the `.wp-collaborative-editing` class the heartbeat manages.
+ * This ensures the link text updates when the lock state changes without
+ * requiring a page reload.
  *
  * @param string[] $actions An array of row action links.
  * @param WP_Post  $post    The post object.
  * @return string[] Modified row action links.
  */
 function gutenberg_post_list_collaboration_row_actions( $actions, $post ) {
-	if ( ! function_exists( 'wp_check_post_lock' ) ) {
-		require_once ABSPATH . 'wp-admin/includes/post.php';
-	}
-
-	$lock_holder = wp_check_post_lock( $post->ID );
-	if ( ! $lock_holder ) {
+	if ( ! isset( $actions['edit'] ) ) {
 		return $actions;
 	}
 
-	if ( isset( $actions['edit'] ) ) {
-		$actions['edit'] = preg_replace(
-			'/>Edit</',
-			'>' . esc_html__( 'Join', 'gutenberg' ) . '<',
-			$actions['edit']
-		);
-	}
+	$title = _draft_or_post_title( $post->ID );
+
+	/*
+	 * Both "Edit" and "Join" labels are rendered. The visible label is
+	 * toggled by CSS based on the row's `wp-collaborative-editing` class,
+	 * which is added or removed by inline-edit-post.js in response to
+	 * heartbeat ticks.
+	 */
+	$actions['edit'] = sprintf(
+		'<a href="%1$s">'
+		. '<span class="edit-action-text">'
+		. '<span aria-hidden="true">%2$s</span>'
+		. '<span class="screen-reader-text">%3$s</span>'
+		. '</span>'
+		. '<span class="join-action-text">'
+		. '<span aria-hidden="true">%4$s</span>'
+		. '<span class="screen-reader-text">%5$s</span>'
+		. '</span>'
+		. '</a>',
+		get_edit_post_link( $post->ID ),
+		__( 'Edit' ),
+		/* translators: %s: Post title. */
+		sprintf( __( 'Edit &#8220;%s&#8221;' ), $title ),
+		/* translators: Action link text for a singular post in the post list. Can be any type of post. */
+		_x( 'Join', 'post list', 'gutenberg' ),
+		/* translators: %s: Post title. */
+		sprintf( __( 'Join editing &#8220;%s&#8221;', 'gutenberg' ), $title )
+	);
 
 	return $actions;
 }

@@ -1,8 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -14,15 +10,12 @@ test.describe( 'Registered sources', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
 		await requestUtils.deleteAllMedia();
 		const placeholderMedia = await requestUtils.uploadMedia(
-			path.join( './test/e2e/assets', '10x10_e2e_test_image_z9T8jK.png' )
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 		imagePlaceholderSrc = placeholderMedia.source_url;
 
 		const testingImgMedia = await requestUtils.uploadMedia(
-			path.join(
-				'./test/e2e/assets',
-				'1024x768_e2e_test_image_size.jpeg'
-			)
+			'./assets/1024x768_e2e_test_image_size.jpeg'
 		);
 		testingImgSrc = testingImgMedia.source_url;
 	} );
@@ -239,10 +232,9 @@ test.describe( 'Registered sources', () => {
 			);
 
 			// Alt textarea should have the custom field value.
-			const altValue = await page
-				.getByRole( 'textbox', { name: 'Alternative text' } )
-				.inputValue();
-			expect( altValue ).toBe( 'Text Field Value' );
+			await expect(
+				page.getByRole( 'textbox', { name: 'Alternative text' } )
+			).toHaveValue( 'Text Field Value' );
 
 			// Title input should have the original value.
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -256,11 +248,11 @@ test.describe( 'Registered sources', () => {
 			if ( isAdvancedPanelOpen === 'false' ) {
 				await advancedButton.click();
 			}
-			const titleValue = await page
-				.getByRole( 'tabpanel', { name: 'Settings' } )
-				.getByLabel( 'Title attribute' )
-				.inputValue();
-			expect( titleValue ).toBe( 'default title value' );
+			await expect(
+				page
+					.getByRole( 'tabpanel', { name: 'Settings' } )
+					.getByLabel( 'Title attribute' )
+			).toHaveValue( 'default title value' );
 
 			// Check the frontend uses the values of the custom fields.
 			const previewPage = await editor.openPreviewPage();
@@ -536,8 +528,7 @@ test.describe( 'Registered sources', () => {
 					name: 'Alternative text',
 				} );
 				await expect( altInput ).toHaveAttribute( 'readonly' );
-				const altValue = await altInput.inputValue();
-				expect( altValue ).toBe( 'Text Field Value' );
+				await expect( altInput ).toHaveValue( 'Text Field Value' );
 
 				// Title input is enabled and with the original value.
 				await page.getByRole( 'tab', { name: 'Settings' } ).click();
@@ -550,11 +541,11 @@ test.describe( 'Registered sources', () => {
 						.getByRole( 'tabpanel', { name: 'Settings' } )
 						.getByLabel( 'Title attribute' )
 				).toHaveAttribute( 'readonly' );
-				const titleValue = await page
-					.getByRole( 'tabpanel', { name: 'Settings' } )
-					.getByLabel( 'Title attribute' )
-					.inputValue();
-				expect( titleValue ).toBe( 'Text Field Value' );
+				await expect(
+					page
+						.getByRole( 'tabpanel', { name: 'Settings' } )
+						.getByLabel( 'Title attribute' )
+				).toHaveValue( 'Text Field Value' );
 			} );
 		} );
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
@@ -717,10 +708,7 @@ test.describe( 'Registered sources', () => {
 			requestUtils,
 		} ) => {
 			const customFieldMedia = await requestUtils.uploadMedia(
-				path.join(
-					'./test/e2e/assets',
-					'1024x768_e2e_test_image_size.jpeg'
-				)
+				'./assets/1024x768_e2e_test_image_size.jpeg'
 			);
 			testingImgSrc = customFieldMedia.source_url;
 

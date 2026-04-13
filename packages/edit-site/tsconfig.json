@@ -40,6 +40,7 @@
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
 		{ "path": "../views" },
 		{ "path": "../wordcount" }
 	],

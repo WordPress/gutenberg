@@ -1,18 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
 
 export type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
 
 interface UseConnectorPluginOptions {
-	pluginSlug?: string;
+	file?: string;
 	settingName: string;
 	connectorName: string;
 	isInstalled?: boolean;
@@ -38,7 +38,7 @@ interface UseConnectorPluginReturn {
 }
 
 export function useConnectorPlugin( {
-	pluginSlug,
+	file: pluginFileFromServer,
 	settingName,
 	connectorName,
 	isInstalled,
@@ -53,6 +53,11 @@ export function useConnectorPlugin( {
 	// Local override for immediate UI feedback after install/activate.
 	const [ pluginStatusOverride, setPluginStatusOverride ] =
 		useState< PluginStatus | null >( null );
+
+	const pluginBasename = pluginFileFromServer?.replace( /\.php$/, '' );
+	const pluginSlug = pluginBasename?.includes( '/' )
+		? pluginBasename.split( '/' )[ 0 ]
+		: pluginBasename;
 
 	const {
 		derivedPluginStatus,
@@ -72,7 +77,7 @@ export function useConnectorPlugin( {
 				name: 'plugin',
 			} );
 
-			if ( ! pluginSlug ) {
+			if ( ! pluginFileFromServer ) {
 				const hasLoaded = store.hasFinishedResolution(
 					'getEntityRecord',
 					[ 'root', 'site' ]
@@ -87,59 +92,55 @@ export function useConnectorPlugin( {
 				};
 			}
 
-			const plugins = store.getEntityRecords(
+			const plugin = store.getEntityRecord(
 				'root',
-				'plugin'
-			) as Array< { plugin: string; status: string } > | null;
+				'plugin',
+				pluginBasename
+			) as { plugin: string; status: string } | undefined;
 
-			// plugins is null before resolution completes and when
-			// the resolver fails (e.g. 403 — no permissions).
-			if ( plugins === null ) {
-				const hasFinished = store.hasFinishedResolution(
-					'getEntityRecords',
-					[ 'root', 'plugin' ]
-				);
+			const hasFinished = store.hasFinishedResolution(
+				'getEntityRecord',
+				[ 'root', 'plugin', pluginBasename ]
+			);
 
-				if ( ! hasFinished ) {
-					return {
-						derivedPluginStatus: 'checking' as PluginStatus,
-						canManagePlugins: undefined as boolean | undefined,
-						currentApiKey: apiKey,
-						canInstallPlugins: canCreate,
-					};
-				}
-
-				// Resolution finished but returned null — fallback to server-provided status.
-				let status: PluginStatus = 'not-installed';
-				if ( isActivated ) {
-					status = 'active';
-				} else if ( isInstalled ) {
-					status = 'inactive';
-				}
+			if ( ! hasFinished ) {
 				return {
-					derivedPluginStatus: status,
-					canManagePlugins: false,
+					derivedPluginStatus: 'checking' as PluginStatus,
+					canManagePlugins: undefined as boolean | undefined,
 					currentApiKey: apiKey,
 					canInstallPlugins: canCreate,
 				};
 			}
 
-			const plugin = plugins.find(
-				( p ) => p.plugin === `${ pluginSlug }/plugin`
-			);
-			let status: PluginStatus = 'not-installed';
+			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
-				status = plugin.status === 'active' ? 'active' : 'inactive';
+				return {
+					derivedPluginStatus: ( plugin.status === 'active'
+						? 'active'
+						: 'inactive' ) as PluginStatus,
+					canManagePlugins: true,
+					currentApiKey: apiKey,
+					canInstallPlugins: canCreate,
+				};
 			}
 
+			// Resolution finished but plugin is undefined — either not
+			// installed or a 403 (no permissions). Fall back to the
+			// server-provided status.
+			let status: PluginStatus = 'not-installed';
+			if ( isActivated ) {
+				status = 'active';
+			} else if ( isInstalled ) {
+				status = 'inactive';
+			}
 			return {
 				derivedPluginStatus: status,
-				canManagePlugins: true,
+				canManagePlugins: false,
 				currentApiKey: apiKey,
 				canInstallPlugins: canCreate,
 			};
 		},
-		[ pluginSlug, settingName, isInstalled, isActivated ]
+		[ pluginBasename, settingName, isInstalled, isActivated ]
 	);
 
 	const pluginStatus = pluginStatusOverride ?? derivedPluginStatus;
@@ -154,6 +155,8 @@ export function useConnectorPlugin( {
 		( pluginStatusOverride === 'active' && !! currentApiKey );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const installPlugin = async () => {
 		if ( ! pluginSlug ) {
@@ -171,21 +174,28 @@ export function useConnectorPlugin( {
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s installed and activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-install-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to install plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-install-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -193,7 +203,7 @@ export function useConnectorPlugin( {
 	};
 
 	const activatePlugin = async () => {
-		if ( ! pluginSlug ) {
+		if ( ! pluginFileFromServer ) {
 			return;
 		}
 		setIsBusy( true );
@@ -201,28 +211,38 @@ export function useConnectorPlugin( {
 			await saveEntityRecord(
 				'root',
 				'plugin',
-				{ plugin: `${ pluginSlug }/plugin`, status: 'active' },
+				{
+					plugin: pluginBasename,
+					status: 'active',
+				},
 				{ throwOnError: true }
 			);
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the activated plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-activate-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to activate plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-activate-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -297,12 +317,16 @@ export function useConnectorPlugin( {
 			}
 
 			setConnectedState( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( '%s connected successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-connect-success',
+					type: 'snackbar',
+				}
 			);
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
@@ -323,23 +347,30 @@ export function useConnectorPlugin( {
 			);
 			// Store auto-updates; currentApiKey reactively becomes ''.
 			setConnectedState( false );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( '%s disconnected.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-disconnect-success',
+					type: 'snackbar',
+				}
 			);
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to disconnect %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-disconnect-error',
+					type: 'snackbar',
+				}
 			);
 			throw error;
 		}

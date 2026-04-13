@@ -210,7 +210,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					} )
 				);
 			}
-		} catch ( error ) {
+		} catch {
 			// If any of the fonts fail to download,
 			// show an error notice and stop the request from being sent.
 			setNotice( {
@@ -508,6 +508,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									),
 									{
 										div: <div aria-hidden />,
+										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
 											<SelectControl
 												aria-label={ __(

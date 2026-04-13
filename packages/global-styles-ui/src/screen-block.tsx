@@ -114,42 +114,21 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
 	const validStates = useMemo( () => getValidStates( name ), [ name ] );
 
-	const [ rawStyle ] = useStyle( prefix, name, 'user', false );
-	const [ rawInheritedStyle, rawSetStyle ] = useStyle(
+	const stateParam = selectedState !== 'default' ? selectedState : undefined;
+	const [ style, setStyle ] = useStyle(
+		prefix,
+		name,
+		'user',
+		false,
+		stateParam
+	);
+	const [ inheritedStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
-		false
+		false,
+		stateParam
 	);
-
-	// Extract style for the selected state
-	const style = useMemo( () => {
-		if ( selectedState === 'default' ) {
-			return rawStyle || {};
-		}
-		return rawStyle?.[ selectedState ] || {};
-	}, [ rawStyle, selectedState ] );
-
-	const inheritedStyle = useMemo( () => {
-		if ( selectedState === 'default' ) {
-			return rawInheritedStyle || {};
-		}
-		return rawInheritedStyle?.[ selectedState ] || {};
-	}, [ rawInheritedStyle, selectedState ] );
-
-	// Wrapper for setStyle that handles states
-	const setStyle = ( newStyle: any ) => {
-		if ( selectedState === 'default' ) {
-			rawSetStyle( newStyle );
-		} else {
-			// Merge the new style into the state
-			const updatedStyle = {
-				...rawStyle,
-				[ selectedState ]: newStyle,
-			};
-			rawSetStyle( updatedStyle );
-		}
-	};
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -355,11 +334,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				name={ name }
 				variation={ variation }
 				selectedState={ selectedState }
-				stateStyles={
-					selectedState !== 'default'
-						? rawStyle?.[ selectedState ]
-						: undefined
-				}
+				stateStyles={ selectedState !== 'default' ? style : undefined }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

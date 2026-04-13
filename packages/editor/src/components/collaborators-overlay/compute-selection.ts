@@ -89,7 +89,7 @@ function computeCursorOnly(
 		);
 	return {
 		coords: getCursorPosition(
-			start.textIndex,
+			start.richTextOffset,
 			blockElement,
 			overlayContext.editorDocument,
 			overlayContext.overlayRect
@@ -116,8 +116,8 @@ function computeTextSelection(
 	if (
 		! start.localClientId ||
 		! end.localClientId ||
-		start.textIndex === null ||
-		end.textIndex === null
+		start.richTextOffset === null ||
+		end.richTextOffset === null
 	) {
 		return {};
 	}
@@ -147,7 +147,7 @@ function computeTextSelection(
 	if ( allRects.length > 0 ) {
 		return {
 			coords: getCursorPosition(
-				activeEnd.textIndex,
+				activeEnd.richTextOffset,
 				activeEndBlock,
 				overlayContext.editorDocument,
 				overlayContext.overlayRect
@@ -164,7 +164,7 @@ function computeTextSelection(
 
 	return {
 		coords: getCursorPosition(
-			start.textIndex,
+			start.richTextOffset,
 			startBlock,
 			overlayContext.editorDocument,
 			overlayContext.overlayRect
@@ -191,8 +191,8 @@ function computeSingleBlockRects(
 		);
 	if (
 		! blockElement ||
-		start.textIndex === null ||
-		end.textIndex === null
+		start.richTextOffset === null ||
+		end.richTextOffset === null
 	) {
 		return { rects: [], blockElement: null };
 	}
@@ -200,8 +200,8 @@ function computeSingleBlockRects(
 		rects:
 			getSelectionRects(
 				blockElement,
-				start.textIndex,
-				end.textIndex,
+				start.richTextOffset,
+				end.richTextOffset,
 				overlayContext.editorDocument,
 				overlayContext.overlayRect
 			) ?? [],
@@ -244,8 +244,8 @@ function computeMultiBlockRects(
 	if (
 		! firstBlock ||
 		! lastBlock ||
-		docFirst.textIndex === null ||
-		docLast.textIndex === null ||
+		docFirst.richTextOffset === null ||
+		docLast.richTextOffset === null ||
 		! docFirst.localClientId ||
 		! docLast.localClientId
 	) {
@@ -262,7 +262,7 @@ function computeMultiBlockRects(
 	// First block: from start offset to end of block.
 	const startRects = getSelectionRects(
 		firstBlock,
-		docFirst.textIndex,
+		docFirst.richTextOffset,
 		Number.MAX_SAFE_INTEGER,
 		overlayContext.editorDocument,
 		overlayContext.overlayRect
@@ -290,7 +290,7 @@ function computeMultiBlockRects(
 	const endRects = getSelectionRects(
 		lastBlock,
 		0,
-		docLast.textIndex,
+		docLast.richTextOffset,
 		overlayContext.editorDocument,
 		overlayContext.overlayRect
 	);

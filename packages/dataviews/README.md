@@ -14,18 +14,29 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
-## Stylesheet Dependencies
+## Setup
 
-DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
+This package requires CSS from this package and from multiple dependency packages.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
 
 ```bash
-npm install @wordpress/components @wordpress/theme
+npm install @wordpress/dataviews @wordpress/theme @wordpress/components
 ```
 
-```tsx
-import '@wordpress/components/build-style/style.css';
+```js
 import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/build-style/style.css';
+import '@wordpress/dataviews/build-style/style.css';
 ```
+
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
 
 ## `DataViews`
 
@@ -216,6 +227,7 @@ Properties:
     -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
+-   `startPosition`: the first item to load when infinite scroll is enabled. Used instead of `page`.
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
@@ -389,7 +401,6 @@ const actions = [
 
 -   `totalItems`: the total number of items in the datasets.
 -   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
--   `infiniteScrollHandler`: a function that handles infinite scrolling. This function should be called when the user scrolls to the bottom of the page. See [example in storybook](https://wordpress.github.io/gutenberg/?path=/story/dataviews-dataviews--infinite-scroll).
 
 #### `search`: `boolean`
 
@@ -690,7 +701,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 
 #### `paginationInfo`: `Object`
 
-Same as `DataViews`. Contains `totalItems` and `totalPages` properties, and optionally `infiniteScrollHandler`.
+Same as `DataViews`. Contains `totalItems` and `totalPages` properties.
 
 #### `search`: `boolean`
 
@@ -1578,6 +1589,20 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+-   `datetime` configuration:
+
+```js
+{
+	id: 'date',
+	type: 'datetime',
+	label: 'Date',
+	Edit: {
+		control: 'datetime',
+		compact: true
+	}
+}
+```
+
 Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
 
 -   `data`: the item to be processed
@@ -1591,6 +1616,7 @@ Finally, the field author can always provide its own custom `Edit` control. It r
     -   `prefix`: a React component to be rendered as a prefix
     -   `suffix`: a React component to be rendered as a suffix
     -   `rows`: the number of rows to display (e.g., in the text area component)
+    -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 
 ```js
 {

@@ -1,14 +1,17 @@
 @use "@wordpress/base-styles/variables";
 
 .admin-ui-breadcrumbs__list {
+	// @TODO: use Text component from UI when available.
+	font-family: var(--wpds-typography-font-family-heading);
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	line-height: var(--wpds-typography-line-height-lg);
 	list-style: none;
 	padding: 0;
 	margin: 0;
 	// gap prop don't seem to be working properly.
 	gap: 0;
-	font-size: 15px;
 	min-height: 32px;
-	font-weight: 500;
 
 	li:not(:last-child)::after {
 		content: "/";

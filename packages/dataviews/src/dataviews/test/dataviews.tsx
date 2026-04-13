@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -19,7 +19,7 @@ import {
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 } from '../../constants';
-import type { Action, View } from '../../types';
+import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 type Data = {
@@ -38,11 +38,11 @@ const DEFAULT_VIEW = {
 	filters: [],
 };
 
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {},
-	[ LAYOUT_GRID ]: {},
-	[ LAYOUT_LIST ]: {},
-	[ LAYOUT_ACTIVITY ]: {},
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_TABLE ]: true,
+	[ LAYOUT_GRID ]: true,
+	[ LAYOUT_LIST ]: true,
+	[ LAYOUT_ACTIVITY ]: true,
 };
 
 const fields = [
@@ -240,8 +240,17 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'TEST TITLE' ) ).toBeInTheDocument();
 	} );
 
-	it( 'should trigger infinite scroll when the layout container scrolls', () => {
-		const infiniteScrollHandler = jest.fn();
+	it( 'should trigger infinite scroll when the layout container scrolls', async () => {
+		const onChangeView = jest.fn();
+
+		if ( typeof global.IntersectionObserver === 'undefined' ) {
+			( global as any ).IntersectionObserver = jest.fn( () => ( {
+				observe: jest.fn(),
+				unobserve: jest.fn(),
+				disconnect: jest.fn(),
+			} ) );
+		}
+
 		const { container } = render(
 			<DataViewWrapper
 				view={ {
@@ -249,11 +258,7 @@ describe( 'DataViews component', () => {
 					infiniteScrollEnabled: true,
 					perPage: 1,
 				} }
-				paginationInfo={ {
-					totalItems: data.length,
-					totalPages: data.length,
-					infiniteScrollHandler,
-				} }
+				onChangeView={ onChangeView }
 			/>
 		);
 		// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
@@ -278,7 +283,14 @@ describe( 'DataViews component', () => {
 
 		fireEvent.scroll( layoutContainer );
 
-		expect( infiniteScrollHandler ).toHaveBeenCalledTimes( 1 );
+		await waitFor( () => {
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					infiniteScrollEnabled: true,
+					startPosition: 2,
+				} )
+			);
+		} );
 	} );
 
 	describe( 'in table view', () => {
@@ -723,6 +735,73 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );
+		} );
+	} );
+	describe( 'Default layouts', () => {
+		/**
+		 * A minimal wrapper that intentionally omits the `defaultLayouts` prop so
+		 * DataViews falls back to its internal DEFAULT_LAYOUTS constant
+		 * ({ table: true, grid: true, list: true }).
+		 */
+		function DataViewWrapperWithoutDefaultLayouts() {
+			const [ view, setView ] = useState< View >( {
+				...DEFAULT_VIEW,
+				fields: [ 'title', 'order', 'author' ],
+			} );
+
+			const { data: shownData, paginationInfo } = useMemo( () => {
+				return filterSortAndPaginate( data, view, fields );
+			}, [ view ] );
+
+			return (
+				<DataViews
+					getItemId={ ( item: Data ) => item.id.toString() }
+					paginationInfo={ paginationInfo }
+					data={ shownData }
+					view={ view }
+					fields={ fields }
+					onChangeView={ setView }
+					// No `defaultLayouts` prop — falls back to DEFAULT_LAYOUTS
+				/>
+			);
+		}
+
+		it( 'renders Table, Grid, and List layout options when defaultLayouts is not provided', async () => {
+			render( <DataViewWrapperWithoutDefaultLayouts /> );
+
+			const user = userEvent.setup();
+
+			// All three default layouts are available, so the Layout switcher
+			// button (rendered by ViewTypeMenu) must be present.
+			const layoutButton = screen.getByRole( 'button', {
+				name: 'Layout',
+			} );
+			expect( layoutButton ).toBeInTheDocument();
+
+			// Open the layout menu.
+			await user.click( layoutButton );
+
+			// Table, Grid, and List options must all appear.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).toBeInTheDocument();
+
+			// Table is the default active layout.
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Table' } )
+			).toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'Grid' } )
+			).not.toBeChecked();
+			expect(
+				screen.getByRole( 'menuitemradio', { name: 'List' } )
+			).not.toBeChecked();
 		} );
 	} );
 } );

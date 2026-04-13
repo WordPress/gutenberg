@@ -30,7 +30,8 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
 	const id = getItemId( item );
-	const checked = ! disabled && selection.includes( id );
+	const isInSelectionArray = selection.includes( id );
+	const checked = ! disabled && isInSelectionArray;
 
 	// Fallback label to ensure accessibility
 	const selectionLabel =
@@ -47,8 +48,9 @@ export default function DataViewsSelectionCheckbox< Item >( {
 					return;
 				}
 
+				// Toggle in/out of selection array
 				onChangeSelection(
-					selection.includes( id )
+					isInSelectionArray
 						? selection.filter( ( itemId ) => id !== itemId )
 						: [ ...selection, id ]
 				);

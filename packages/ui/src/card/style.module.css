@@ -10,7 +10,9 @@
 		flex-direction: column;
 		border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		border-radius: var(--wpds-border-radius-lg);
+		overflow: clip;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		color: var(--wpds-color-fg-content-neutral);
 	}
 
 	/* Padding is applied to the individual header/content elements to enable
@@ -35,14 +37,5 @@
 	.fullbleed {
 		margin-inline: calc(-1 * var(--wp-ui-card-padding));
 		width: calc(100% + 2 * var(--wp-ui-card-padding));
-	}
-
-	.title {
-		margin: 0;
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-lg);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
-		color: var(--wpds-color-fg-content-neutral);
 	}
 }

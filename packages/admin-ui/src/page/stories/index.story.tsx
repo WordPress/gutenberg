@@ -2,7 +2,8 @@
  * External dependencies
  */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { __experimentalText as Text } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
+import { Badge, Button, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -35,9 +36,8 @@ export const Default: Story = {
 	args: {
 		title: 'Page title',
 		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -46,9 +46,8 @@ export const WithSubtitle: Story = {
 		title: 'Page title',
 		subTitle: 'All of the subtitle text you need goes here.',
 		showSidebarToggle: false,
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -63,9 +62,8 @@ export const WithBreadcrumbs: Story = {
 				] }
 			/>
 		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
-		),
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };
 
@@ -81,8 +79,89 @@ export const WithBreadcrumbsAndSubtitle: Story = {
 				] }
 			/>
 		),
-		children: (
-			<Text style={ { padding: '24px 24px' } }>Page content here</Text>
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithoutHeader: Story = {
+	args: {
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithTitleAndBadges: Story = {
+	args: {
+		title: 'Page title',
+		badges: <Badge intent="informational">Status</Badge>,
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithBreadcrumbsAndBadges: Story = {
+	args: {
+		showSidebarToggle: false,
+		breadcrumbs: (
+			<Breadcrumbs
+				items={ [
+					{ label: 'Root breadcrumb', to: '/connectors' },
+					{ label: 'Level 1 breadcrumb' },
+				] }
+			/>
 		),
+		badges: <Badge intent="none">Published</Badge>,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const WithActions: Story = {
+	args: {
+		title: 'Page title',
+		actions: (
+			<>
+				<Button size="compact" variant="outline">
+					Cancel
+				</Button>
+				<Button size="compact" variant="solid">
+					Save
+				</Button>
+			</>
+		),
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
+	},
+};
+
+export const FullHeader: Story = {
+	args: {
+		subTitle: 'All of the subtitle text you need goes here.',
+		breadcrumbs: (
+			<Breadcrumbs
+				items={ [
+					{ label: 'Root breadcrumb', to: '/connectors' },
+					{ label: 'Level 1 breadcrumb' },
+				] }
+			/>
+		),
+		badges: <Badge intent="informational">Status</Badge>,
+		actions: (
+			<>
+				<Button size="compact" variant="outline">
+					Cancel
+				</Button>
+				<Button size="compact" variant="solid">
+					Save
+				</Button>
+			</>
+		),
+		showSidebarToggle: false,
+		hasPadding: true,
+		children: <Text>Page content here</Text>,
 	},
 };

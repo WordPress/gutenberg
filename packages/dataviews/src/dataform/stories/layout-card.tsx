@@ -44,7 +44,7 @@ const LayoutCardComponent = ( {
 	const customerFields: Field< Customer >[] = [
 		{
 			id: 'name',
-			label: 'Customer Name',
+			label: 'Customer name',
 			type: 'text',
 		},
 		{
@@ -70,17 +70,17 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'shippingAddress',
-			label: 'Shipping Address',
+			label: 'Shipping address',
 			type: 'text',
 		},
 		{
 			id: 'billingAddress',
-			label: 'Billing Address',
+			label: 'Billing address',
 			type: 'text',
 		},
 		{
 			id: 'displayPayments',
-			label: 'Display Payments?',
+			label: 'Display payments?',
 			type: 'boolean',
 		},
 		{
@@ -112,7 +112,7 @@ const LayoutCardComponent = ( {
 		},
 		{
 			id: 'dueDate',
-			label: 'Due Date',
+			label: 'Due date',
 			type: 'text',
 			render: ( { item } ) => {
 				return <Badge>Due on: { item.dueDate }</Badge>;

@@ -11,6 +11,8 @@ import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	type CRDTDoc,
 	type ObjectData,
+	type ObjectID,
+	type ObjectType,
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
@@ -20,6 +22,7 @@ import {
  */
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
@@ -382,6 +385,15 @@ export function getPostChangesFromCRDTDoc(
 		} )
 	);
 
+	// Blocks extracted from the CRDT document have rich-text attributes as
+	// plain strings (from Y.Text.toJSON()). Convert them back to RichTextData
+	// so block edit components receive the same types as locally-created blocks.
+	if ( changes.blocks ) {
+		changes.blocks = deserializeBlockAttributes(
+			changes.blocks as Block[]
+		);
+	}
+
 	// Meta changes must be merged with the edited record since not all meta
 	// properties are synced.
 	if ( 'object' === typeof changes.meta ) {
@@ -416,6 +428,19 @@ export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+};
+
+/**
+ * This default collection sync config can be used to sync entity collections
+ * (e.g., block comments) where we are not interested in merging changes at the
+ * individual record level, but instead want to replace the entire collection
+ * when changes are detected.
+ */
+export const defaultCollectionSyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: () => {},
+	getChangesFromCRDTDoc: () => ( {} ),
+	shouldSync: ( _: ObjectType, objectId: ObjectID | null ) =>
+		null === objectId,
 };
 
 /**

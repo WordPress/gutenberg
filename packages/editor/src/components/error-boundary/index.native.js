@@ -34,7 +34,7 @@ function getContent() {
 		// content serialization throughout the lifetime of a non-erroring
 		// application.
 		return select( editorStore ).getEditedPostContent();
-	} catch ( error ) {}
+	} catch {}
 }
 
 function CopyButton( {
