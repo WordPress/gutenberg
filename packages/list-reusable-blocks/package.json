@@ -33,8 +33,10 @@
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
+	"types": "build-types",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},

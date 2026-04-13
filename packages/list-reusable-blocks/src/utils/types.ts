@@ -16,13 +16,6 @@ export type PostType = Type;
 
 export type Post = CorePost & { wp_pattern_sync_status?: string };
 
-export interface ExportedBlock {
-	__file: string;
-	title: string;
-	content: string;
-	syncStatus: string;
-}
-
 export interface ParsedContent {
 	__file: string;
 	title: string;
