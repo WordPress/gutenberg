@@ -297,6 +297,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
 
+				// Track every authenticated access to this room, not just
+				// requests that carry document updates. Awareness-only polls
+				// still represent an active participant whose capabilities
+				// must be considered for the trustworthiness check.
+				$this->storage->track_contributor( $room, get_current_user_id() );
+
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
 
@@ -307,17 +313,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				}
 
 				// Process each update according to its type.
-				$has_updates = count( $room_request['updates'] ) > 0;
 				foreach ( $room_request['updates'] as $update ) {
 					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
-				}
-
-				// Track this user as a contributor if they submitted updates.
-				if ( $has_updates ) {
-					$this->storage->track_contributor( $room, get_current_user_id() );
 				}
 
 				// Get updates for this client.
