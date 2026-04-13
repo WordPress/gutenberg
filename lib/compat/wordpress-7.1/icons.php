@@ -74,7 +74,7 @@ if ( ! function_exists( 'wp_unregister_icon' ) ) {
  */
 function gutenberg_register_icon_collections() {
 	wp_register_icon_collection(
-		'wordpress',
+		'core',
 		array(
 			'label'       => _x( 'WordPress', 'gutenberg' ),
 			'description' => __( 'Default icon collection.', 'gutenberg' ),
@@ -131,7 +131,7 @@ function gutenberg_register_icons() {
 			array(
 				'label'      => $icon_data['label'],
 				'filePath'   => $icons_directory . $icon_data['filePath'],
-				'collection' => 'wordpress',
+				'collection' => 'core',
 			)
 		);
 	}
