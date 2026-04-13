@@ -218,50 +218,29 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Unregistering a collection should cascade and remove all icons
-	 * belonging to it, while leaving icons from other collections intact.
+	 * Should unregister a previously registered icon.
 	 */
-	public function test_unregister_collection_cascades_to_icons() {
-		$collections = WP_Icon_Collections_Registry::get_instance();
-		$collections->register( 'other-collection', array( 'label' => 'Other' ) );
-
-		// Icons in the collection being removed.
+	public function test_unregister_icon() {
 		$this->register(
-			'alpha',
+			'my-icon',
 			array(
-				'label'      => 'Alpha',
-				'content'    => '<svg></svg>',
-				'collection' => 'test-collection',
-			)
-		);
-		$this->register(
-			'beta',
-			array(
-				'label'      => 'Beta',
+				'label'      => 'Icon',
 				'content'    => '<svg></svg>',
 				'collection' => 'test-collection',
 			)
 		);
 
-		// Icon in an unrelated collection that must survive.
-		$this->register(
-			'gamma',
-			array(
-				'label'      => 'Gamma',
-				'content'    => '<svg></svg>',
-				'collection' => 'other-collection',
-			)
-		);
+		$this->assertTrue( $this->registry->is_registered( 'test-collection/my-icon' ) );
+		$this->assertTrue( $this->registry->unregister( 'my-icon', 'test-collection' ) );
+		$this->assertFalse( $this->registry->is_registered( 'test-collection/my-icon' ) );
+	}
 
-		$this->assertTrue( $this->registry->is_registered( 'test-collection/alpha' ) );
-		$this->assertTrue( $this->registry->is_registered( 'test-collection/beta' ) );
-
-		$this->assertTrue( $collections->unregister( 'test-collection' ) );
-
-		$this->assertFalse( $this->registry->is_registered( 'test-collection/alpha' ) );
-		$this->assertFalse( $this->registry->is_registered( 'test-collection/beta' ) );
-		$this->assertTrue( $this->registry->is_registered( 'other-collection/gamma' ) );
-
-		$collections->unregister( 'other-collection' );
+	/**
+	 * Should fail to unregister an icon that was never registered.
+	 *
+	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::unregister
+	 */
+	public function test_unregister_unknown_icon() {
+		$this->assertFalse( $this->registry->unregister( 'ghost', 'test-collection' ) );
 	}
 }
