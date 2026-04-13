@@ -242,17 +242,16 @@ add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
  * Deletes the HEIC companion file when its attachment is deleted.
  *
  * The HEIC is sideloaded alongside a JPEG derivative and recorded in
- * $metadata['original_image_heic']. WordPress core's
- * wp_delete_attachment_files() only knows about 'original_image', so
- * without this hook the HEIC would linger on disk after the attachment
- * is deleted.
+ * $metadata['original']. WordPress core's wp_delete_attachment_files()
+ * only knows about 'original_image', so without this hook the HEIC
+ * would linger on disk after the attachment is deleted.
  *
  * @param int $post_id Attachment ID being deleted.
  */
 function gutenberg_delete_heic_companion_file( int $post_id ): void {
 	$metadata = wp_get_attachment_metadata( $post_id, true );
 
-	if ( empty( $metadata['original_image_heic'] ) ) {
+	if ( empty( $metadata['original'] ) ) {
 		return;
 	}
 
@@ -262,7 +261,7 @@ function gutenberg_delete_heic_companion_file( int $post_id ): void {
 		return;
 	}
 
-	$heic_path = path_join( dirname( $attached_file ), $metadata['original_image_heic'] );
+	$heic_path = path_join( dirname( $attached_file ), $metadata['original'] );
 
 	if ( file_exists( $heic_path ) ) {
 		wp_delete_file( $heic_path );

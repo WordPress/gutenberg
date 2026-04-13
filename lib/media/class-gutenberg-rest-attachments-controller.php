@@ -498,9 +498,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		} elseif ( 'original-heic' === $image_size ) {
 			// HEIC companion original: stored under its own meta key so the
 			// scaled-sideload flow (which writes 'original_image') cannot
-			// clobber it. Cleanup on attachment delete is handled by a
-			// delete_attachment hook that reads this key.
-			$metadata['original_image_heic'] = wp_basename( $path );
+			// clobber it. 'original_image' must keep pointing at the
+			// web-viewable JPEG derivative so existing consumers still work.
+			// Cleanup on attachment delete is handled by a delete_attachment
+			// hook that reads this key.
+			$metadata['original'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
 			// The current attached file is the original; record it as original_image.
 			$current_file               = get_attached_file( $attachment_id, true );
