@@ -109,7 +109,7 @@
 
 		.dataviews-view-picker-grid__field-value:not(:empty) {
 			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
-			line-height: var(--wpds-font-line-height-sm);
+			line-height: var(--wpds-typography-line-height-sm);
 			padding-top: calc(var(--wpds-dimension-base) / 2);
 		}
 
@@ -173,8 +173,8 @@
 }
 
 .dataviews-view-picker-grid-group__header {
-	font-size: var(--wpds-font-size-lg);
-	font-weight: var(--wpds-font-weight-medium);
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
 	color: var(--wpds-color-fg-content-neutral);
 	margin: 0 0 var(--wpds-dimension-gap-sm) 0;
 	padding: 0 calc(var(--wpds-dimension-base) * 12);

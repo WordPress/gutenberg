@@ -133,7 +133,7 @@ div.dataviews-view-list {
 	.dataviews-view-list__title-field {
 		flex: 1;
 		min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
-		line-height: var(--wpds-font-line-height-md);
+		line-height: var(--wpds-typography-line-height-md);
 		overflow: hidden;
 		// The field should be in front of the main button in case it has a link/button.
 		&:has(a, button) {
@@ -197,7 +197,7 @@ div.dataviews-view-list {
 
 		.dataviews-view-list__field-value {
 			min-height: calc(var(--wpds-dimension-base) * 6); // TODO: use size token when available
-			line-height: var(--wpds-font-line-height-sm);
+			line-height: var(--wpds-typography-line-height-sm);
 			display: flex;
 			align-items: center;
 		}
@@ -216,7 +216,7 @@ div.dataviews-view-list {
 
 			.dataviews-view-list__title-field {
 				min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
-				line-height: var(--wpds-font-line-height-xs);
+				line-height: var(--wpds-typography-line-height-xs);
 			}
 
 			.dataviews-view-list__media-wrapper {
@@ -234,7 +234,7 @@ div.dataviews-view-list {
 
 				.dataviews-view-list__field-value {
 					min-height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
-					line-height: var(--wpds-font-line-height-xs);
+					line-height: var(--wpds-typography-line-height-xs);
 				}
 			}
 		}
@@ -248,7 +248,7 @@ div.dataviews-view-list {
 
 			.dataviews-view-list__title-field {
 				min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
-				line-height: var(--wpds-font-line-height-xl);
+				line-height: var(--wpds-typography-line-height-xl);
 			}
 
 			.dataviews-view-list__media-wrapper {
@@ -266,7 +266,7 @@ div.dataviews-view-list {
 
 				.dataviews-view-list__field-value {
 					min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
-					line-height: var(--wpds-font-line-height-md);
+					line-height: var(--wpds-typography-line-height-md);
 				}
 			}
 		}
@@ -278,8 +278,8 @@ div.dataviews-view-list {
 }
 
 .dataviews-view-list__group-header {
-	font-size: var(--wpds-font-size-lg);
-	font-weight: var(--wpds-font-weight-medium);
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
 	color: var(--wpds-color-fg-content-neutral);
 	margin: 0 0 var(--wpds-dimension-gap-lg) 0;
 	padding: 0 var(--wpds-dimension-padding-2xl);

@@ -23,8 +23,8 @@
 }
 
 .dataviews-filters__summary-popover {
-	font-size: var(--wpds-font-size-md);
-	line-height: var(--wpds-font-line-height-sm);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-sm);
 
 	.components-popover__content {
 		width: 100%;
@@ -122,7 +122,7 @@
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: var(--wpds-font-weight-medium);
+			font-weight: var(--wpds-typography-font-weight-medium);
 		}
 	}
 
@@ -238,7 +238,7 @@
 		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font-size: var(--wpds-font-size-sm);
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 16px;
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
@@ -338,7 +338,7 @@
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
 		font-size: vars.$mobile-text-min-font-size;
 		@include break-small {
-			font-size: var(--wpds-font-size-md);
+			font-size: var(--wpds-typography-font-size-md);
 		}
 
 		&:focus {
@@ -389,7 +389,7 @@
 	background: var(--wpds-color-bg-interactive-brand-strong);
 	height: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
 	min-width: calc(var(--wpds-dimension-base) * 4); // TODO: use size token when available
-	line-height: var(--wpds-font-line-height-xs);
+	line-height: var(--wpds-typography-line-height-xs);
 	padding: 0 var(--wpds-dimension-padding-xs);
 	text-align: center;
 	border-radius: var(--wpds-border-radius-lg);

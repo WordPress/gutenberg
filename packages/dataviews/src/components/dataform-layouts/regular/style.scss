@@ -17,7 +17,7 @@
 	min-height: calc(var(--wpds-dimension-base) * 8); // TODO: use size token when available
 	display: flex;
 	align-items: center;
-	line-height: var(--wpds-font-line-height-sm);
+	line-height: var(--wpds-typography-line-height-sm);
 	hyphens: auto;
 
 	&--label-position-side {
