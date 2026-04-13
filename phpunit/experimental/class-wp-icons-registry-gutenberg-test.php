@@ -121,18 +121,18 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_invalid_icon_names
 	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 *
+	 * @param mixed $name Invalid icon name candidate.
 	 */
-	public function test_register_invalid_name() {
-		foreach ( $this->data_invalid_icon_names() as $name ) {
-			$settings = array(
-				'label'      => 'Icon',
-				'content'    => '<svg></svg>',
-				'collection' => 'test-collection',
-			);
+	public function test_register_invalid_name( $name ) {
+		$settings = array(
+			'label'      => 'Icon',
+			'content'    => '<svg></svg>',
+			'collection' => 'test-collection',
+		);
 
-			$result = $this->register( $name, $settings );
-			$this->assertFalse( $result );
-		}
+		$result = $this->register( $name, $settings );
+		$this->assertFalse( $result );
 	}
 
 	/**
