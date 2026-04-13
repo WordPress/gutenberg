@@ -165,7 +165,8 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 			support?.aspectRatio ||
 			!! support?.height ||
 			!! support?.minHeight ||
-			!! support?.width
+			!! support?.width ||
+			!! support?.minWidth
 		);
 	}
 
