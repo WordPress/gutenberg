@@ -56,6 +56,15 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 				return false;
 			}
 
+			if ( ! is_array( $collection_properties ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon collection properties must be an array.', 'gutenberg' ),
+					'7.1.0'
+				);
+				return false;
+			}
+
 			$allowed_keys = array_fill_keys( array( 'label', 'description' ), 1 );
 			foreach ( array_keys( $collection_properties ) as $key ) {
 				if ( ! array_key_exists( $key, $allowed_keys ) ) {
