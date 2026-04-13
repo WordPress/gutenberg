@@ -85,6 +85,29 @@ export default function useMerge( clientId, onMerge ) {
 		return getBlockOrder( order[ 0 ] )[ 0 ];
 	}
 
+	/**
+	 * Given a list item client ID, walk up through ancestor list items
+	 * and return the client ID of the first block found after any
+	 * ancestor list. This is used for forward merging when there are no
+	 * more list items at any nesting level.
+	 *
+	 * @param {string} id A list item client ID.
+	 */
+	function getNextOuterBlockClientId( id ) {
+		let parentListItemId = getParentListItemId( id );
+
+		while ( parentListItemId ) {
+			const parentListId = getBlockRootClientId( parentListItemId );
+			const nextOuterBlockClientId = getNextBlockClientId( parentListId );
+
+			if ( nextOuterBlockClientId ) {
+				return nextOuterBlockClientId;
+			}
+
+			parentListItemId = getParentListItemId( parentListItemId );
+		}
+	}
+
 	return ( forward ) => {
 		function mergeWithNested( clientIdA, clientIdB ) {
 			registry.batch( () => {
@@ -122,6 +145,17 @@ export default function useMerge( clientId, onMerge ) {
 			const nextBlockClientId = getNextId( clientId );
 
 			if ( ! nextBlockClientId ) {
+				const nextOuterBlockClientId =
+					getNextOuterBlockClientId( clientId );
+
+				if ( nextOuterBlockClientId ) {
+					mergeBlocks(
+						getBlockRootClientId( clientId ),
+						nextOuterBlockClientId
+					);
+					return;
+				}
+
 				onMerge( forward );
 				return;
 			}
