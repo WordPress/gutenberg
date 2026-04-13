@@ -494,20 +494,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		if ( 'original' === $image_size ) {
-			// If an original_image is already recorded (e.g. the un-scaled
-			// JPEG saved by the scaled-sideload flow), delete that file
-			// before overwriting the reference. Otherwise it becomes an
-			// orphan on disk that is never cleaned up on attachment
-			// deletion, since wp_delete_attachment_files() only consults
-			// the current value of original_image.
-			if ( ! empty( $metadata['original_image'] ) && wp_basename( $path ) !== $metadata['original_image'] ) {
-				$attached_file   = get_attached_file( $attachment_id, true );
-				$previous_origin = path_join( dirname( $attached_file ), $metadata['original_image'] );
-				if ( file_exists( $previous_origin ) ) {
-					wp_delete_file( $previous_origin );
-				}
-			}
-
 			$metadata['original_image'] = wp_basename( $path );
 		} elseif ( 'original-heic' === $image_size ) {
 			// HEIC companion original: stored under its own meta key so the
