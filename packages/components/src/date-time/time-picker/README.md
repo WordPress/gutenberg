@@ -62,3 +62,58 @@ Whether to visually hide field labels while keeping them accessible to screen re
 
 -   Required: No
 -   Default: false
+
+## TimePicker.TimeInput
+
+A standalone time input component. Values are passed as an object in 24-hour format (`{ hours: number, minutes: number }`).
+
+### Usage
+
+​```jsx
+import { useState } from 'react';
+import { TimePicker } from '@wordpress/components';
+
+const MyTimeInput = () => {
+	const [ time, setTime ] = useState( { hours: 13, minutes: 30 } );
+
+	return (
+		<TimePicker.TimeInput
+			value={ time }
+			onChange={ setTime }
+			label="Time"
+		/>
+	);
+};
+​```
+
+### Props
+
+#### `value`: `{ hours: number, minutes: number }`
+
+The time input value in 24-hour format.
+
+-   Required: No
+
+#### `defaultValue`: `{ hours: number, minutes: number }`
+
+An optional default value for the control when used in uncontrolled mode. If left `undefined`, the current time will be used.
+
+-   Required: No
+
+#### `onChange`: `( time: { hours: number, minutes: number } ) => void`
+
+Called when the time changes. Receives the new value as an object with `hours` and `minutes`.
+
+-   Required: No
+
+#### `is12Hour`: `boolean`
+
+Whether to use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed.
+
+-   Required: No
+
+#### `label`: `string`
+
+The label for the time input.
+
+-   Required: No
