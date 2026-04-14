@@ -38,51 +38,49 @@ export default function BreadcrumbEdit( {
 		prefersTaxonomy,
 		showOnHomePage,
 	} = attributes;
-	const {
-		post,
-		postTypeHasTaxonomies,
-		hasTermsAssigned,
-		isLoading,
-	} = useSelect(
-		( select ) => {
-			if ( ! postType ) {
-				return {};
-			}
-			const _post = select( coreStore ).getEntityRecord(
-				'postType',
-				postType,
-				postId
-			);
-			const postTypeObject = select( coreStore ).getPostType( postType );
-			const _postTypeHasTaxonomies =
-				postTypeObject && postTypeObject.taxonomies.length;
-			let taxonomies;
-			if ( _postTypeHasTaxonomies ) {
-				taxonomies = select( coreStore ).getTaxonomies( {
-					type: postType,
-					per_page: -1,
-				} );
-			}
-			return {
-				post: _post,
-				postTypeHasTaxonomies: _postTypeHasTaxonomies,
-				hasTermsAssigned:
-					_post &&
-					( taxonomies || [] )
-						.filter(
-							( { visibility } ) => visibility?.publicly_queryable
-						)
-						.some( ( taxonomy ) => {
-							return !! _post[ taxonomy.rest_base ]?.length;
-						} ),
-				isLoading:
-					( postId && ! _post ) ||
-					! postTypeObject ||
-					( _postTypeHasTaxonomies && ! taxonomies ),
-			};
-		},
-		[ postType, postId ]
-	);
+	const { post, postTypeHasTaxonomies, hasTermsAssigned, isLoading } =
+		useSelect(
+			( select ) => {
+				if ( ! postType ) {
+					return {};
+				}
+				const _post = select( coreStore ).getEntityRecord(
+					'postType',
+					postType,
+					postId
+				);
+				const postTypeObject =
+					select( coreStore ).getPostType( postType );
+				const _postTypeHasTaxonomies =
+					postTypeObject && postTypeObject.taxonomies.length;
+				let taxonomies;
+				if ( _postTypeHasTaxonomies ) {
+					taxonomies = select( coreStore ).getTaxonomies( {
+						type: postType,
+						per_page: -1,
+					} );
+				}
+				return {
+					post: _post,
+					postTypeHasTaxonomies: _postTypeHasTaxonomies,
+					hasTermsAssigned:
+						_post &&
+						( taxonomies || [] )
+							.filter(
+								( { visibility } ) =>
+									visibility?.publicly_queryable
+							)
+							.some( ( taxonomy ) => {
+								return !! _post[ taxonomy.rest_base ]?.length;
+							} ),
+					isLoading:
+						( postId && ! _post ) ||
+						! postTypeObject ||
+						( _postTypeHasTaxonomies && ! taxonomies ),
+				};
+			},
+			[ postType, postId ]
+		);
 
 	/**
 	 * Counter used to cache-bust `useServerSideRender`.
