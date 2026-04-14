@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/vips",
-	"version": "1.0.0-prerelease",
-	"private": true,
+	"version": "1.3.0",
 	"description": "Utils for working with libvips.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,12 +22,41 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
-	"wpScript": true,
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"type": "module",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs"
+		},
+		"./worker": {
+			"types": "./build-types/vips-worker.d.ts",
+			"import": "./build-module/vips-worker.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"vips-es6.js": "vips.js"
+			}
+		}
+	},
+	"wpScriptModuleExports": {
+		"./worker": "./build-module/vips-worker.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
 	"types": "build-types",
 	"dependencies": {
-		"wasm-vips": "^0.0.10"
+		"@wordpress/worker-threads": "file:../worker-threads",
+		"wasm-vips": "^0.0.16"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,12 +1,8 @@
 [
 	{
-		"name": "core/missing",
+		"name": "core/term-template",
 		"isValid": true,
-		"attributes": {
-			"originalName": "core/term-template",
-			"originalUndelimitedContent": "",
-			"originalContent": "<!-- wp:term-template /-->"
-		},
+		"attributes": {},
 		"innerBlocks": []
 	}
 ]

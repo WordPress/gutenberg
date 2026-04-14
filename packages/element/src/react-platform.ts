@@ -5,9 +5,11 @@ import {
 	createPortal,
 	findDOMNode,
 	flushSync,
+	/* eslint-disable react/no-deprecated */
 	render,
 	hydrate,
 	unmountComponentAtNode,
+	/* eslint-enable react/no-deprecated */
 } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
@@ -16,16 +18,16 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
  *
  * @see https://github.com/facebook/react/issues/10309#issuecomment-318433235
  *
- * @param {import('react').ReactElement} child     Any renderable child, such as an element,
- *                                                 string, or fragment.
- * @param {HTMLElement}                  container DOM node into which element should be rendered.
+ * @param {React.ReactElement} child     Any renderable child, such as an element,
+ *                                       string, or fragment.
+ * @param {HTMLElement}        container DOM node into which element should be rendered.
  */
 export { createPortal };
 
 /**
  * Finds the dom node of a React component.
  *
- * @param {import('react').ComponentType} component Component's instance.
+ * @param {React.ComponentType} component Component's instance.
  */
 export { findDOMNode };
 

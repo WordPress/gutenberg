@@ -268,4 +268,13 @@ test.describe( 'data-wp-bind', () => {
 			} );
 		}
 	} );
+
+	test( 'should ignore unique ids', async ( { page } ) => {
+		let element = page.getByTestId( 'without-unique-id' );
+		await expect( element ).toHaveAttribute( 'data-test' );
+
+		element = page.getByTestId( 'with-unique-id' );
+		await expect( element ).not.toHaveAttribute( 'data-test' );
+		await expect( element ).not.toHaveAttribute( 'data-test---unique-id' );
+	} );
 } );

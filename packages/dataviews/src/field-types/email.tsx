@@ -6,13 +6,8 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	SortDirection,
-	NormalizedField,
-	FieldTypeDefinition,
-} from '../types';
-import { renderFromElements } from '../utils';
+import type { NormalizedField } from '../types';
+import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS,
 	OPERATOR_IS_ALL,
@@ -24,61 +19,61 @@ import {
 	OPERATOR_NOT_CONTAINS,
 	OPERATOR_STARTS_WITH,
 } from '../constants';
-
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	return direction === 'asc'
-		? valueA.localeCompare( valueB )
-		: valueB.localeCompare( valueA );
-}
+import render from './utils/render-default';
+import sort from './utils/sort-text';
+import isValidRequired from './utils/is-valid-required';
+import isValidMinLength from './utils/is-valid-min-length';
+import isValidMaxLength from './utils/is-valid-max-length';
+import isValidPattern from './utils/is-valid-pattern';
+import isValidElements from './utils/is-valid-elements';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 // Email validation regex based on HTML5 spec
 // https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address
 const emailRegex =
 	/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
 
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! emailRegex.test( value )
+	) {
+		return __( 'Value must be a valid email address.' );
+	}
+
+	return null;
+}
+
 export default {
-	sort,
-	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! emailRegex.test( value )
-			) {
-				return __( 'Value must be a valid email address.' );
-			}
-
-			if ( field.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
-	},
+	type: 'email',
+	render,
 	Edit: 'email',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
-	},
+	sort,
 	enableSorting: true,
-	filterBy: {
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [
-			OPERATOR_IS,
-			OPERATOR_IS_NOT,
-			OPERATOR_CONTAINS,
-			OPERATOR_NOT_CONTAINS,
-			OPERATOR_STARTS_WITH,
-			// Multiple selection
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		],
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		OPERATOR_IS,
+		OPERATOR_IS_NOT,
+		OPERATOR_CONTAINS,
+		OPERATOR_NOT_CONTAINS,
+		OPERATOR_STARTS_WITH,
+		// Multiple selection
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_ALL,
+		OPERATOR_IS_NOT_ALL,
+	],
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		pattern: isValidPattern,
+		minLength: isValidMinLength,
+		maxLength: isValidMaxLength,
+		elements: isValidElements,
+		custom: isValidCustom,
 	},
-} satisfies FieldTypeDefinition< any >;
+} satisfies FieldType< any >;

@@ -1,6 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 /* Root of the component. */
 // Internal variables
-$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus) solid $components-color-accent;
+$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus)
+	solid $components-color-accent;
 $wp-components-calendar-button-height: $grid-unit-40;
 $wp-components-calendar-button-width: $grid-unit-40;
 $wp-components-calendar-nav-height: $grid-unit-40;
@@ -35,7 +40,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	// date follows the same color as the button's text, since the button
 	// inherits its text color.
 	&:has(.components-calendar__day-button:disabled) {
-		color: $components-color-disabled;
+		// Use a lighter shade of gray for less visual prominence.
+		color: $components-color-gray-400;
 	}
 	&:has(.components-calendar__day-button:hover:not(:disabled)),
 	&:has(.components-calendar__day-button:focus-visible) {
@@ -47,7 +53,7 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	background: none;
 	padding: 0;
 	margin: 0;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	justify-content: center;
 	align-items: center;
 	display: flex;
@@ -121,14 +127,12 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	background: none;
 	padding: 0;
 	margin: 0;
-	cursor: pointer;
-	-moz-appearance: none;
-	-webkit-appearance: none;
+	cursor: var(--wpds-cursor-control);
+	appearance: none;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	position: relative;
-	appearance: none;
 
 	width: $wp-components-calendar-button-width;
 	height: $wp-components-calendar-button-height;
@@ -240,13 +244,18 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 		}
 
 		&:disabled::before {
-			background-color: $components-color-disabled;
+			background-color: $components-color-gray-400;
 		}
 
 		&:hover:not(:disabled)::before {
 			background-color: $components-color-gray-800;
 		}
 	}
+}
+
+// Outside month days (visible when showOutsideDays is true): use a lighter text color.
+.components-calendar__day--outside {
+	color: $components-color-gray-600;
 }
 
 // Hidden button (ie. outside current month but still rendered)

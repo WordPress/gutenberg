@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
-	__unstableUseRichText as useRichText,
+	privateApis as richTextPrivateApis,
 	create,
 	insert,
 } from '@wordpress/rich-text';
@@ -28,15 +28,26 @@ import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
-const PostTitle = forwardRef( ( _, forwardedRef ) => {
-	const { placeholder } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder } = getSettings();
+import { unlock } from '../../lock-unlock';
 
-		return {
-			placeholder: titlePlaceholder,
-		};
-	}, [] );
+const { useRichText } = unlock( richTextPrivateApis );
+
+const PostTitle = forwardRef( ( _, forwardedRef ) => {
+	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
+		( select ) => {
+			const { getSettings, getEditedContentOnlySection } = unlock(
+				select( blockEditorStore )
+			);
+			const { titlePlaceholder, isPreviewMode } = getSettings();
+
+			return {
+				placeholder: titlePlaceholder,
+				isEditingContentOnlySection: !! getEditedContentOnlySection(),
+				isPreview: isPreviewMode,
+			};
+		},
+		[]
+	);
 
 	const [ isSelected, setIsSelected ] = useState( false );
 
@@ -113,16 +124,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		} catch ( error ) {
+		} catch {
 			// Some browsers like UC Browser paste plain text by default and
 			// don't support clipboardData at all, so allow default
 			// behaviour.
 			return;
 		}
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
 
 		const content = pasteHandler( {
 			HTML: html,
@@ -169,11 +176,15 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		'is-selected': isSelected,
 	} );
 
+	// Because the title is within the editor iframe, we can't use scss styles.
+	// Instead use an inline style to dim the block when it's disabled.
+	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
+
 	return (
-		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
-			contentEditable
+			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
 			className={ className }
 			aria-label={ decodedPlaceholder }
 			role="textbox"
@@ -182,8 +193,9 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			onBlur={ onUnselect }
 			onKeyDown={ onKeyDown }
 			onPaste={ onPaste }
+			style={ style }
 		/>
-		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
 } );
 

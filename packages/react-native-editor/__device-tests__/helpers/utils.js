@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
-const childProcess = require( 'child_process' );
-// eslint-disable-next-line import/no-extraneous-dependencies, import/named
 import { remote, Key } from 'webdriverio';
+import { getAndroidEmulatorID } from './get-android-emulator-id';
 
+const childProcess = require( 'child_process' );
 const crypto = require( 'crypto' );
 const path = require( 'path' );
-/**
- * Internal dependencies
- */
 const serverConfigs = require( './serverConfigs' );
 const {
 	iosServer,
@@ -19,7 +13,6 @@ const {
 	prefixKeysWithAppium,
 } = require( './caps' );
 const AppiumLocal = require( './appium-local' );
-import { getAndroidEmulatorID } from './get-android-emulator-id';
 
 // Platform setup.
 const defaultPlatform = 'android';
@@ -118,7 +111,7 @@ const setupDriver = async () => {
 					'Detected Android device running Android %s',
 					androidVersion
 				);
-			} catch ( error ) {
+			} catch {
 				// Ignore error.
 			}
 		} else {
@@ -699,7 +692,7 @@ const clickIfClickable = async (
 
 	try {
 		return await element.click();
-	} catch ( error ) {
+	} catch {
 		if ( iteration >= maxIteration ) {
 			// eslint-disable-next-line no-console
 			console.error(

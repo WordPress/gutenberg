@@ -93,6 +93,15 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	}, [ getSettings ] );
 }
 
+export function useDefaultAvatar() {
+	const avatarURL = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		const { __experimentalDiscussionSettings } = getSettings();
+		return __experimentalDiscussionSettings?.avatarURL ?? '';
+	}, [] );
+	return avatarURL;
+}
+
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile

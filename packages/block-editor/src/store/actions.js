@@ -34,6 +34,7 @@ import {
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
+	editContentOnlySection,
 } from './private-actions';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
@@ -104,7 +105,6 @@ export const validateBlocksToTemplate =
  * @property {WPBlockSelection} end   The selection end.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -120,7 +120,6 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -194,7 +193,6 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -202,13 +200,12 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
@@ -251,6 +248,13 @@ export const selectPreviousBlock =
 			const firstParentClientId = select.getBlockRootClientId( clientId );
 			if ( firstParentClientId ) {
 				dispatch.selectBlock( firstParentClientId, -1 );
+			} else {
+				// Fallback to next block when no previous block and no parent
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientId );
+				if ( nextBlockClientId ) {
+					dispatch.selectBlock( nextBlockClientId, 0 );
+				}
 			}
 		}
 	};
@@ -355,7 +359,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
@@ -370,7 +373,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
 	( { select, dispatch, registry } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
@@ -515,11 +517,12 @@ export function moveBlockToPosition(
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
  * a templateLock is active on the block list.
  *
- * @param {Object}   block           Block object to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta            Optional Meta values to be passed to the action object.
+ * @param {Object}    block           Block object to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -528,6 +531,7 @@ export function insertBlock(
 	index,
 	rootClientId,
 	updateSelection,
+	initialPosition,
 	meta
 ) {
 	return insertBlocks(
@@ -535,12 +539,11 @@ export function insertBlock(
 		index,
 		rootClientId,
 		updateSelection,
-		0,
+		initialPosition,
 		meta
 	);
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -566,7 +569,6 @@ export const insertBlocks =
 		meta
 	) =>
 	( { select, dispatch } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -930,7 +932,7 @@ export const __unstableSplitSelection =
 			// If an unmodified default block is selected, replace it. We don't
 			// want to be converting into a default block.
 			if ( blocks.length ) {
-				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+				if ( isUnmodifiedDefaultBlock( blockA, 'content' ) ) {
 					dispatch.replaceBlocks(
 						[ selectionA.clientId ],
 						blocks,
@@ -1400,7 +1402,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -1417,7 +1418,6 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,
@@ -1616,16 +1616,17 @@ export function updateSettings( settings ) {
  * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
- * @param {string} id        Reusable block's id.
- * @param {string} updatedId Updated block's id.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function __unstableSaveReusableBlock( id, updatedId ) {
+export function __unstableSaveReusableBlock() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSaveReusableBlock',
+		{
+			since: '7.1',
+		}
+	);
 	return {
-		type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-		id,
-		updatedId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1663,19 +1664,6 @@ export const __unstableMarkAutomaticChange =
 		requestIdleCallback( () => {
 			dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
 		} );
-	};
-
-/**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
 	};
 
 /**
@@ -1780,10 +1768,6 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const directInsertBlock = rootClientId
@@ -1823,10 +1807,6 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const directInsertBlock = rootClientId
@@ -1876,12 +1856,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 
@@ -1921,18 +1902,16 @@ export function setBlockVisibility( updates ) {
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
- * @param {?string} focusModeToRevert          The focus mode to revert after temporarily edit as blocks finishes.
+ * @param {?string} clientId The clientId of the block being temporarily edited.
  */
-export function __unstableSetTemporarilyEditingAsBlocks(
-	temporarilyEditingAsBlocks,
-	focusModeToRevert
-) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-		focusModeToRevert,
-	};
+export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
+	return editContentOnlySection( clientId );
 }
 
 /**
@@ -2156,5 +2135,60 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Sets which List View panel should be opened.
+ *
+ * @param {string|null} clientId The client ID of the panel to open, or null to close all.
+ * @return {Object} Action object.
+ */
+export function __unstableSetOpenListViewPanel( clientId ) {
+	return {
+		type: 'SET_OPEN_LIST_VIEW_PANEL',
+		clientId,
+	};
+}
+
+/**
+ * Sets all List View panels to be opened.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetAllListViewPanelsOpen() {
+	return {
+		type: 'SET_ALL_LIST_VIEW_PANELS_OPEN',
+	};
+}
+
+/**
+ * Toggles a List View panel open/closed state.
+ *
+ * @param {string}  clientId The client ID of the panel to toggle.
+ * @param {boolean} isOpen   Whether the panel should be open.
+ * @return {Object} Action object.
+ */
+export function __unstableToggleListViewPanel( clientId, isOpen ) {
+	return {
+		type: 'TOGGLE_LIST_VIEW_PANEL',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableIncrementListViewExpandRevision() {
+	return {
+		type: 'INCREMENT_LIST_VIEW_EXPAND_REVISION',
 	};
 }

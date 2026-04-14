@@ -27,7 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -156,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: prependHTTP( urlInput ),
+					href: prependHTTPS( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );
@@ -228,14 +228,12 @@ const ImageURLInputUI = ( {
 	const advancedOptions = (
 		<VStack spacing="3">
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Open in new tab' ) }
 				onChange={ onSetNewTab }
 				checked={ linkTarget === '_blank' }
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link relation' ) }
 				value={ rel ?? '' }
 				onChange={ onSetLinkRel }
@@ -252,7 +250,6 @@ const ImageURLInputUI = ( {
 			/>
 			<TextControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				label={ __( 'Link CSS class' ) }
 				value={ linkClass || '' }
 				onChange={ onSetLinkClass }

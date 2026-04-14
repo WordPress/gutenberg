@@ -15,21 +15,25 @@ import {
 } from './assets/script-modules';
 
 const {
-	directivePrefix,
 	getRegionRootFragment,
-	initialVdom,
+	initialVdomPromise,
 	toVdom,
 	render,
 	parseServerData,
 	populateServerData,
 	batch,
+	routerRegions,
+	h: createElement,
+	navigationSignal,
+	sessionId,
+	warn,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
 
-const regionAttr = `data-${ directivePrefix }-router-region`;
-const interactiveAttr = `data-${ directivePrefix }-interactive`;
-const regionsSelector = `[${ interactiveAttr }][${ regionAttr }]:not([${ interactiveAttr }] [${ interactiveAttr }])`;
+const regionAttr = `data-wp-router-region`;
+const interactiveAttr = `data-wp-interactive`;
+const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
 export interface NavigateOptions {
 	force?: boolean;
@@ -46,7 +50,7 @@ export interface PrefetchOptions {
 }
 
 interface VdomParams {
-	vdom?: typeof initialVdom;
+	vdom?: WeakMap< Element, any >;
 }
 
 interface Page {
@@ -86,10 +90,63 @@ const parseRegionAttribute = ( region: Element ) => {
 	try {
 		const { id, attachTo } = JSON.parse( value );
 		return { id, attachTo };
-	} catch ( e ) {
+	} catch {
 		return { id: value };
 	}
 };
+
+/**
+ * Clones the content of the router region vDOM passed as argument.
+ *
+ * The function creates a new VNode instance removing all priority levels up to
+ * the one containing the router-region directive, which should have evaluated
+ * in advance.
+ *
+ * @param vdom A router region's VNode.
+ * @return The VNode for the passed router region's content.
+ */
+const cloneRouterRegionContent = ( vdom: any ) => {
+	if ( ! vdom ) {
+		return vdom;
+	}
+	const allPriorityLevels: string[][] = vdom.props.priorityLevels;
+	const routerRegionLevel = allPriorityLevels.findIndex( ( level ) =>
+		level.includes( 'router-region' )
+	);
+	const priorityLevels =
+		routerRegionLevel !== -1
+			? allPriorityLevels.slice( routerRegionLevel + 1 )
+			: allPriorityLevels;
+
+	return priorityLevels.length > 0
+		? createElement( vdom.type, {
+				...vdom.props,
+				priorityLevels,
+		  } )
+		: vdom.props.element;
+};
+
+/**
+ * IDs of router regions with an `attachTo` property pointing to the same parent
+ * element.
+ */
+const regionsToAttachByParent = new WeakMap< Element, string[] >();
+
+/**
+ * Map of root fragments by parent element, used to render router regions with
+ * the `attachTo` property. Those elements with the same parent are rendered
+ * together in the corresponding root fragment.
+ */
+const rootFragmentsByParent = new WeakMap< Element, any >();
+
+/**
+ * Set of router regions using the `attachTo` property that are present in the
+ * initial page.
+ *
+ * These regions should be treated as regular regions without the `attachTo`
+ * attribute as they don't need to be appended; they are already in the HTML.
+ */
+const initialRegionsToAttach = new Set< string >();
 
 /**
  * Fetches and prepares a page from a given URL.
@@ -112,7 +169,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
 		}
 		const dom = new window.DOMParser().parseFromString( html, 'text/html' );
 		return await preparePage( url, dom );
-	} catch ( e ) {
+	} catch {
 		return false;
 	}
 };
@@ -146,10 +203,16 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 	const regionsToAttach = {};
 	dom.querySelectorAll( regionsSelector ).forEach( ( region ) => {
 		const { id, attachTo } = parseRegionAttribute( region );
-		regions[ id ] = vdom?.has( region )
-			? vdom.get( region )
-			: toVdom( region );
-		if ( attachTo ) {
+
+		if ( region.parentElement.closest( `[${ regionAttr }]` ) ) {
+			regions[ id ] = undefined;
+		} else {
+			regions[ id ] = vdom?.has( region )
+				? vdom.get( region )
+				: toVdom( region );
+		}
+
+		if ( attachTo && ! initialRegionsToAttach.has( id ) ) {
 			regionsToAttach[ id ] = attachTo;
 		}
 	} );
@@ -159,7 +222,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 	// Wait for styles and modules to be ready.
 	const [ styles, scriptModules ] = await Promise.all( [
-		Promise.all( preloadStyles( dom, url ) ),
+		Promise.all( preloadStyles( dom ) ),
 		Promise.all( preloadScriptModules( dom ) ),
 	] );
 
@@ -187,32 +250,66 @@ const renderPage = ( page: Page ) => {
 	const regionsToAttach = { ...page.regionsToAttach };
 
 	batch( () => {
+		// Updates the server data.
 		populateServerData( page.initialData );
-		document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
-			const { id } = parseRegionAttribute( region );
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
-			// If this is an attached region, remove it from the list.
-			delete regionsToAttach[ id ];
+
+		// Triggers navigation invalidations (`getServerState` and
+		// `getServerContext`).
+		navigationSignal.value += 1;
+
+		// Resets all router regions before setting the actual values.
+		( routerRegions as Map< string, any > ).forEach( ( signal ) => {
+			signal.value = null;
 		} );
 
-		// Render unattached regions.
+		// Inits regions with attachTo that don't exist yet.
+		const parentsToUpdate = new Set< Element >();
 		for ( const id in regionsToAttach ) {
 			const parent = document.querySelector( regionsToAttach[ id ] );
-
-			// Get the type from the vnode. If wrapped with Directives, get the
-			// original type from `props.type`.
-			const { props, type } = page.regions[ id ];
-			const elementType = typeof type === 'function' ? props.type : type;
-
-			// Create an element with the obtained type where the region will be
-			// rendered. The type should match the one of the root vnode.
-			const region = document.createElement( elementType );
-			parent.appendChild( region );
-
-			const fragment = getRegionRootFragment( region );
-			render( page.regions[ id ], fragment );
+			if ( ! regionsToAttachByParent.has( parent ) ) {
+				regionsToAttachByParent.set( parent, [] );
+			}
+			const regions = regionsToAttachByParent.get( parent );
+			if ( ! regions.includes( id ) ) {
+				regions.push( id );
+				parentsToUpdate.add( parent );
+			}
 		}
+
+		// Updates all existing regions.
+		for ( const id in page.regions ) {
+			if ( routerRegions.has( id ) ) {
+				routerRegions.get( id ).value = cloneRouterRegionContent(
+					page.regions[ id ]
+				);
+			}
+		}
+
+		// Renders regions attached to the same parent in the same fragment.
+		parentsToUpdate.forEach( ( parent ) => {
+			const ids = regionsToAttachByParent.get( parent );
+			const vdoms = ids.map( ( id ) => page.regions[ id ] );
+
+			if ( ! rootFragmentsByParent.has( parent ) ) {
+				const regions = vdoms.map( ( { props, type } ) => {
+					const elementType =
+						typeof type === 'function' ? props.type : type;
+
+					// Creates an element with the obtained type where the
+					// region will be rendered. The type should match the one of
+					// the root vnode.
+					const region = document.createElement( elementType );
+					parent.appendChild( region );
+					return region;
+				} );
+				rootFragmentsByParent.set(
+					parent,
+					getRegionRootFragment( regions )
+				);
+			}
+			const fragment = rootFragmentsByParent.get( parent );
+			render( vdoms, fragment );
+		} );
 	} );
 
 	if ( page.title ) {
@@ -241,11 +338,22 @@ window.addEventListener( 'popstate', async () => {
 	const pagePath = getPagePath( window.location.href ); // Remove hash.
 	const page = pages.has( pagePath ) && ( await pages.get( pagePath ) );
 	if ( page ) {
-		renderPage( page );
-		// Update the URL in the state.
-		state.url = window.location.href;
+		batch( () => {
+			state.url = window.location.href;
+			renderPage( page );
+		} );
 	} else {
 		window.location.reload();
+	}
+} );
+
+// Detect router regions with `attachTo` in the initial page. This step should
+// be done before the initial page is processed with `preparePage()` so this
+// function treats them as regular router regions.
+document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+	const { id, attachTo } = parseRegionAttribute( region );
+	if ( attachTo ) {
+		initialRegionsToAttach.add( id );
 	}
 } );
 
@@ -253,14 +361,19 @@ window.addEventListener( 'popstate', async () => {
 window.document
 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
-pages.set(
-	getPagePath( window.location.href ),
-	Promise.resolve(
-		preparePage( getPagePath( window.location.href ), document, {
-			vdom: initialVdom,
-		} )
-	)
-);
+
+// Await hydration completion before setting the initial page to ensure initialVdom is populated.
+( async () => {
+	const initialVdomMap = await initialVdomPromise;
+	pages.set(
+		getPagePath( window.location.href ),
+		Promise.resolve(
+			preparePage( getPagePath( window.location.href ), document, {
+				vdom: initialVdomMap,
+			} )
+		)
+	);
+} )();
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -288,12 +401,28 @@ interface Store {
 	};
 }
 
+const { state: privateState } = store(
+	'core/router/private',
+	{
+		state: {
+			navigation: {
+				hasStarted: false,
+				hasFinished: false,
+			},
+		},
+	},
+	{ lock: true }
+);
+
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
-		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
+		get navigation() {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The usage of state.navigation.{hasStarted|hasFinished} from core/router is deprecated and will stop working in WordPress 7.1.`
+				);
+			}
+			return privateState.navigation;
 		},
 	},
 	actions: {
@@ -322,7 +451,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 			}
 
 			const pagePath = getPagePath( href );
-			const { navigation } = state;
+			const { navigation } = privateState;
 			const {
 				loadingAnimation = true,
 				screenReaderAnnouncement = true,
@@ -332,13 +461,13 @@ export const { state, actions } = store< Store >( 'core/router', {
 			navigatingTo = href;
 			actions.prefetch( pagePath, options );
 
-			// Create a promise that resolves when the specified timeout ends.
+			// Creates a promise that resolves when the specified timeout ends.
 			// The timeout value is 10 seconds by default.
 			const timeoutPromise = new Promise< void >( ( resolve ) =>
 				setTimeout( resolve, timeout )
 			);
 
-			// Don't update the navigation status immediately, wait 400 ms.
+			// Doesn't update the navigation status immediately, wait 400 ms.
 			const loadingTimeout = setTimeout( () => {
 				if ( navigatingTo !== href ) {
 					return;
@@ -358,7 +487,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 				timeoutPromise,
 			] );
 
-			// Dismiss loading message if it hasn't been added yet.
+			// Dismisses loading message if it hasn't been added yet.
 			clearTimeout( loadingTimeout );
 
 			// Once the page is fetched, the destination URL could have changed
@@ -374,20 +503,25 @@ export const { state, actions } = store< Store >( 'core/router', {
 					?.clientNavigationDisabled
 			) {
 				yield importScriptModules( page.scriptModules );
-				renderPage( page );
+
+				batch( () => {
+					// Updates the URL in the state.
+					state.url = href;
+
+					// Updates the navigation status once the the new page rendering
+					// has been completed.
+					if ( loadingAnimation ) {
+						navigation.hasStarted = false;
+						navigation.hasFinished = true;
+					}
+
+					// Renders the new page.
+					renderPage( page );
+				} );
+
 				window.history[
 					options.replace ? 'replaceState' : 'pushState'
-				]( {}, '', href );
-
-				// Update the URL in the state.
-				state.url = href;
-
-				// Update the navigation status once the the new page rendering
-				// has been completed.
-				if ( loadingAnimation ) {
-					navigation.hasStarted = false;
-					navigation.hasFinished = true;
-				}
+				]( { wpInteractivityId: sessionId }, '', href );
 
 				if ( screenReaderAnnouncement ) {
 					a11ySpeak( 'loaded' );
@@ -434,6 +568,9 @@ export const { state, actions } = store< Store >( 'core/router', {
 		},
 	},
 } );
+
+// Initialize the URL in the state if it hasn't been set yet in the server.
+state.url = state.url || window.location.href;
 
 /**
  * Announces a message to screen readers.

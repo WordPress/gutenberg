@@ -19,9 +19,6 @@ test.describe( 'Style Book', () => {
 	} );
 
 	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
-		await page.addInitScript( () => {
-			window.__experimentalEditorWriteMode = true;
-		} );
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
 		await styleBook.open();
@@ -33,9 +30,6 @@ test.describe( 'Style Book', () => {
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {
 		await expect(
 			page.locator( 'role=button[name="Block Inserter"i]' )
-		).toBeDisabled();
-		await expect(
-			page.locator( 'role=button[name="Tools"i]' )
 		).toBeDisabled();
 		await expect(
 			page.locator( 'role=button[name="Document Overview"i]' )

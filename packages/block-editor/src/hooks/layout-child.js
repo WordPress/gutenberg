@@ -16,6 +16,9 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
+import useBlockVisibility from '../components/block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
@@ -199,12 +202,21 @@ function GridTools( {
 	isManualPlacement,
 	parentLayout,
 } ) {
-	const { rootClientId, isVisible } = useSelect(
+	const {
+		rootClientId,
+		isVisible,
+		parentBlockVisibility,
+		blockBlockVisibility,
+		deviceType,
+		isChildBlockAGrid,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getTemplateLock,
+				getBlockAttributes,
+				getSettings,
 			} = select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( clientId );
@@ -219,20 +231,49 @@ function GridTools( {
 				};
 			}
 
+			const parentAttributes = getBlockAttributes( _rootClientId );
+			const blockAttributes = getBlockAttributes( clientId );
+			const settings = getSettings();
+
 			return {
 				rootClientId: _rootClientId,
 				isVisible: true,
+				parentBlockVisibility:
+					parentAttributes?.metadata?.blockVisibility,
+				blockBlockVisibility:
+					blockAttributes?.metadata?.blockVisibility,
+				deviceType:
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+				// Check if the selected child block is itself a grid.
+				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 			};
 		},
 		[ clientId ]
 	);
 
+	const { isBlockCurrentlyHidden: isParentBlockCurrentlyHidden } =
+		useBlockVisibility( {
+			blockVisibility: parentBlockVisibility,
+			deviceType,
+		} );
+
+	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
+		useBlockVisibility( {
+			blockVisibility: blockBlockVisibility,
+			deviceType,
+		} );
+
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
 
-	if ( ! isVisible ) {
+	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
+
+	if ( ! isVisible || isParentBlockCurrentlyHidden ) {
 		return null;
 	}
+
+	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -252,8 +293,9 @@ function GridTools( {
 				clientId={ rootClientId }
 				contentRef={ setResizerBounds }
 				parentLayout={ parentLayout }
+				childGridClientId={ childGridClientId }
 			/>
-			{ allowSizingOnChildren && (
+			{ showResizer && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.

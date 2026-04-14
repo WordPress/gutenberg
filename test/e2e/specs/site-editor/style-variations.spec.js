@@ -36,7 +36,7 @@ test.describe( 'Global styles variations', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 
@@ -45,9 +45,7 @@ test.describe( 'Global styles variations', () => {
 		// TODO: instead of locating these elements by class,
 		//  we could update the source code to group them in a <section> or other container,
 		//  then add `aria-labelledby` and `aria-describedby` etc to provide accessible information,
-		const variations = page.locator(
-			'.edit-site-global-styles-variations_item'
-		);
+		const variations = page.locator( '.global-styles-ui-variations_item' );
 
 		await expect( variations ).toHaveCount( 3 );
 
@@ -72,7 +70,7 @@ test.describe( 'Global styles variations', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
@@ -108,7 +106,7 @@ test.describe( 'Global styles variations', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
@@ -144,7 +142,7 @@ test.describe( 'Global styles variations', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();
@@ -174,7 +172,7 @@ test.describe( 'Global styles variations', () => {
 	} ) => {
 		await admin.visitSiteEditor( {
 			postId: 'gutenberg-test-themes/style-variations//index',
-			postType: 'wp_registered_template',
+			postType: 'wp_template',
 			canvas: 'edit',
 		} );
 		await siteEditorStyleVariations.browseStyles();

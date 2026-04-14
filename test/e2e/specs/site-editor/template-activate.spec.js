@@ -8,11 +8,15 @@ test.describe( 'Template Activate', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+		// Enable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Disable the template activation experiment.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
@@ -50,7 +54,7 @@ test.describe( 'Template Activate', () => {
 			'.dataviews-view-grid__card:has-text("Index (Copy)")'
 		);
 
-		expect( await indexCopy.textContent() ).toContain( 'Inactive' );
+		await expect( indexCopy ).toContainText( 'Inactive' );
 
 		actionsButton = indexCopy.getByRole( 'button', {
 			name: 'Actions',
@@ -63,7 +67,7 @@ test.describe( 'Template Activate', () => {
 		await activateButton.click();
 
 		await page.waitForSelector(
-			'.dataviews-view-grid__field-value .is-success'
+			'.dataviews-view-grid__field-value .is-success:has-text("Active")'
 		);
 
 		await page
@@ -124,6 +128,36 @@ test.describe( 'Template Activate', () => {
 
 		await expect( previewPage.locator( 'body' ) ).not.toContainText(
 			'Copied from Index.'
+		);
+	} );
+
+	test( 'should deactivate after theme change', async ( {
+		admin,
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		await admin.visitSiteEditor( { postType: 'wp_template' } );
+		await page.getByRole( 'button', { name: 'Add Template' } ).click();
+		await page.getByRole( 'button', { name: 'Blog Home' } ).click();
+		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'My home template test.' },
+		} );
+		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Activate' } ).click();
+		await expect( page.locator( '.components-notice' ) ).toContainText(
+			'Template activated.'
+		);
+		await page.goto( '/' );
+		await expect( page.locator( 'body' ) ).toContainText(
+			'My home template test.'
+		);
+		await requestUtils.activateTheme( 'twentytwentyfive' );
+		await page.reload();
+		await expect( page.locator( 'body' ) ).not.toContainText(
+			'My home template test.'
 		);
 	} );
 } );

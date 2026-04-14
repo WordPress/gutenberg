@@ -528,18 +528,18 @@ describe( 'Popover', () => {
 		} );
 		describe( 'initial translation', () => {
 			it.each( [
-				[ 'top', 'translateY', '2em' ],
-				[ 'top-start', 'translateY', '2em' ],
-				[ 'top-end', 'translateY', '2em' ],
-				[ 'right', 'translateX', '-2em' ],
-				[ 'right-start', 'translateX', '-2em' ],
-				[ 'right-end', 'translateX', '-2em' ],
-				[ 'bottom', 'translateY', '-2em' ],
-				[ 'bottom-start', 'translateY', '-2em' ],
-				[ 'bottom-end', 'translateY', '-2em' ],
-				[ 'left', 'translateX', '2em' ],
-				[ 'left-start', 'translateX', '2em' ],
-				[ 'left-end', 'translateX', '2em' ],
+				[ 'top', 'translateY', '4px' ],
+				[ 'top-start', 'translateY', '4px' ],
+				[ 'top-end', 'translateY', '4px' ],
+				[ 'right', 'translateX', '-4px' ],
+				[ 'right-start', 'translateX', '-4px' ],
+				[ 'right-end', 'translateX', '-4px' ],
+				[ 'bottom', 'translateY', '-4px' ],
+				[ 'bottom-start', 'translateY', '-4px' ],
+				[ 'bottom-end', 'translateY', '-4px' ],
+				[ 'left', 'translateX', '4px' ],
+				[ 'left-start', 'translateX', '4px' ],
+				[ 'left-end', 'translateX', '4px' ],
 			] as PlacementToInitialTranslationTuple[] )(
 				'for the `%s` placement computes an initial `%s` of `%s',
 				(
@@ -577,5 +577,90 @@ describe( 'Popover', () => {
 				);
 			}
 		);
+	} );
+
+	describe( 'closing all nested popovers', () => {
+		// Test component that simulates the nested popover scenario:
+		// A parent popover (like ColorGradient dropdown) containing a trigger
+		// that opens a nested popover (like custom color picker dropdown)
+		function NestedPopoverTestComponent( {
+			onParentFocusOutside,
+			onNestedFocusOutside,
+		}: {
+			onParentFocusOutside: jest.Mock;
+			onNestedFocusOutside: jest.Mock;
+		} ) {
+			const [ isNestedOpen, setIsNestedOpen ] = useState( false );
+
+			return (
+				<>
+					<button data-testid="external-button">
+						External Button
+					</button>
+					<Popover
+						data-testid="parent-popover"
+						onFocusOutside={ onParentFocusOutside }
+						focusOnMount={ false }
+					>
+						<button
+							data-testid="parent-button"
+							onClick={ () => setIsNestedOpen( ! isNestedOpen ) }
+						>
+							Open Nested
+						</button>
+						{ isNestedOpen && (
+							<Popover
+								data-testid="nested-popover"
+								onFocusOutside={ onNestedFocusOutside }
+								focusOnMount={ false }
+							>
+								<button data-testid="nested-dummy-button">
+									Nested Dummy Button
+								</button>
+							</Popover>
+						) }
+					</Popover>
+				</>
+			);
+		}
+
+		it( 'should call parent onFocusOutside when focus moves from nested popover to external element', async () => {
+			const user = userEvent.setup();
+			const onParentFocusOutside = jest.fn();
+			const onNestedFocusOutside = jest.fn();
+
+			render(
+				<NestedPopoverTestComponent
+					onParentFocusOutside={ onParentFocusOutside }
+					onNestedFocusOutside={ onNestedFocusOutside }
+				/>
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByTestId( 'parent-popover' )
+				).toBeInTheDocument();
+			} );
+
+			await user.click( screen.getByTestId( 'parent-button' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByTestId( 'nested-popover' )
+				).toBeInTheDocument();
+			} );
+
+			await user.click( screen.getByTestId( 'nested-dummy-button' ) );
+
+			await user.click( screen.getByTestId( 'external-button' ) );
+
+			await waitFor( () => {
+				expect( onNestedFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			await waitFor( () => {
+				expect( onParentFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+		} );
 	} );
 } );
