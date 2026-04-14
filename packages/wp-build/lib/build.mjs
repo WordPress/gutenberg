@@ -229,6 +229,13 @@ function getAllPackages() {
 
 		const entry = resolveNamedSource( npmName );
 		if ( entry ) {
+			if ( ! entry.packageJson.wpScriptModuleExports ) {
+				console.warn(
+					`⚠️  Source "${ npmName }" does not declare wpScriptModuleExports. ` +
+						'Imports will be bundled inline instead of externalized.'
+				);
+			}
+
 			registry.set( npmName, {
 				...entry,
 				externalSource: true,
