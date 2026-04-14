@@ -18,6 +18,7 @@
 		{ "path": "../media-fields" },
 		{ "path": "../notices" },
 		{ "path": "../private-apis" },
-		{ "path": "../ui" }
+		{ "path": "../ui" },
+		{ "path": "../views" }
 	]
 }
