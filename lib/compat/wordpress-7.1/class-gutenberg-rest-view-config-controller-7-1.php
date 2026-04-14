@@ -905,7 +905,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 				'slug'  => 'trash',
 				'view'  => array(
 					'type'    => 'table',
-					'layout'  => $default_layouts['table']['layout'],
+					'layout'  => $default_layouts['table']['layout'] ?? array(),
 					'filters' => array(
 						array(
 							'field'    => 'status',
@@ -946,7 +946,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'mediaField' => 'preview',
 			'fields'     => array( 'sync-status' ),
 			'filters'    => array(),
-			'layout'     => $default_layouts['grid']['layout'],
+			'layout'     => $default_layouts['grid']['layout'] ?? array(),
 		);
 	}
 
@@ -961,7 +961,9 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					),
 				),
 			),
-			'grid'  => array(),
+			'grid'  => array(
+				'layout' => array(),
+			),
 		);
 	}
 
@@ -973,7 +975,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'mediaField' => 'preview',
 			'fields'     => array( 'author' ),
 			'filters'    => array(),
-			'layout'     => $default_layouts['grid']['layout'],
+			'layout'     => $default_layouts['grid']['layout'] ?? array(),
 		);
 	}
 
