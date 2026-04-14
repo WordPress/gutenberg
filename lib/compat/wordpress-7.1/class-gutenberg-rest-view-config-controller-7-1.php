@@ -134,6 +134,17 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			$view_list       = $this->get_view_list_for_wp_template();
 		}
 
+		/**
+		 * Filters the list of supported action identifiers for a given entity type.
+		 *
+		 * @since 7.1.0
+		 *
+		 * @param string[] $actions Array of action identifiers.
+		 * @param string   $kind    Entity kind.
+		 * @param string   $name    Entity name.
+		 */
+		$actions = apply_filters( 'gutenberg_view_config_actions', $this->get_actions( $kind, $name ), $kind, $name );
+
 		$response = array(
 			'kind'            => $kind,
 			'name'            => $name,
@@ -141,6 +152,7 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 			'default_layouts' => $default_layouts,
 			'view_list'       => $view_list,
 			'form'            => $form,
+			'actions'         => $actions,
 		);
 
 		return rest_ensure_response( $response );
@@ -280,6 +292,14 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 					'type'        => 'object',
 					'readonly'    => true,
 					'properties'  => $this->get_form_schema(),
+				),
+				'actions'         => array(
+					'description' => __( 'Supported action identifiers.', 'gutenberg' ),
+					'type'        => 'array',
+					'readonly'    => true,
+					'items'       => array(
+						'type' => 'string',
+					),
 				),
 			),
 		);
@@ -1268,5 +1288,62 @@ class Gutenberg_REST_View_Config_Controller_7_1 extends WP_REST_Controller {
 		$view_list = array_merge( $view_list, $registered_authors, $user_authors );
 
 		return $view_list;
+	}
+
+	/**
+	 * Returns the list of supported action identifiers for a given entity type.
+	 *
+	 * @param string $kind Entity kind.
+	 * @param string $name Entity name.
+	 * @return string[] Array of action identifiers.
+	 */
+	private function get_actions( $kind, $name ) {
+		// Actions available for all entity types.
+		$actions = array( 'restore', 'reset-post', 'delete-post', 'move-to-trash', 'permanently-delete' );
+
+		if ( 'postType' !== $kind ) {
+			return $actions;
+		}
+
+		$post_type_object = get_post_type_object( $name );
+		if ( ! $post_type_object ) {
+			return $actions;
+		}
+
+		if ( $post_type_object->viewable ) {
+			$actions[] = 'view-post';
+		}
+
+		if ( post_type_supports( $name, 'revisions' ) ) {
+			$actions[] = 'view-post-revisions';
+		}
+
+		if ( post_type_supports( $name, 'title' ) ) {
+			$actions[] = 'rename-post';
+		}
+
+		if ( post_type_supports( $name, 'page-attributes' ) ) {
+			$actions[] = 'order-pages';
+		}
+
+		$can_create = current_user_can( $post_type_object->cap->create_posts );
+
+		if ( $can_create && ! in_array( $name, array( 'wp_block', 'wp_template_part' ), true ) ) {
+			$actions[] = 'duplicate-post';
+		}
+
+		if ( $can_create && 'wp_template_part' === $name && wp_is_block_theme() ) {
+			$actions[] = 'duplicate-template-part';
+		}
+
+		if ( $can_create && 'wp_block' === $name ) {
+			$actions[] = 'duplicate-pattern';
+		}
+
+		if ( 'wp_block' === $name ) {
+			$actions[] = 'export-pattern';
+		}
+
+		return $actions;
 	}
 }

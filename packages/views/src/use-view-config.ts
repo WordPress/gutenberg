@@ -30,6 +30,7 @@ export function useViewConfig( {
 	default_layouts: SupportedLayouts;
 	view_list: Array< any >;
 	form: Form | undefined;
+	actions: string[] | undefined;
 } {
 	return useSelect(
 		( select ) => {

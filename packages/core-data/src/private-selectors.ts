@@ -344,6 +344,7 @@ export function getViewConfig(
 			default_layouts: undefined,
 			view_list: undefined,
 			form: undefined,
+			actions: undefined,
 		}
 	);
 }
