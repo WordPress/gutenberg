@@ -112,7 +112,6 @@ function createRoomOptions(
 		log: jest.fn(),
 		onStatusChange: jest.fn(),
 		onSync: jest.fn(),
-				onTrustChange: jest.fn(),
 		onTrustChange: jest.fn(),
 		...overrides,
 	};
@@ -184,7 +183,6 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
-				onTrustChange: jest.fn(),
 				onTrustChange: jest.fn(),
 			} );
 
