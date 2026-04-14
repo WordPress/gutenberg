@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/theme/src/prebuilt/css/design-tokens.css";
 @use "./components/block-ratings/style.scss" as *;
 @use "./components/compact-list/style.scss" as *;
 @use "./components/downloadable-block-icon/style.scss" as *;
