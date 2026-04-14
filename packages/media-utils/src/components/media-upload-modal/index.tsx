@@ -24,11 +24,11 @@ import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
-	View,
 	Field,
 	ActionButton,
 	SupportedLayouts,
 } from '@wordpress/dataviews';
+import { useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
 import {
 	altTextField,
@@ -193,22 +193,51 @@ export function MediaUploadModal( {
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
 
-	// DataViews configuration - allow view updates
-	const [ view, setView ] = useState< View >( () => ( {
-		type: LAYOUT_PICKER_GRID,
-		fields: [],
-		showTitle: false,
-		titleField: 'title',
-		mediaField: 'media_thumbnail',
-		search: '',
-		page: 1,
-		perPage: 50,
-		filters: [],
-		layout: {
-			previewSize: 170,
-			density: 'compact',
+	const defaultLayouts: SupportedLayouts = useMemo(
+		() => ( {
+			[ LAYOUT_PICKER_GRID ]: {
+				fields: [],
+				showTitle: false,
+				layout: {
+					previewSize: 170,
+					density: 'compact',
+				},
+			},
+			[ LAYOUT_PICKER_TABLE ]: {
+				fields: [
+					'filename',
+					'filesize',
+					'media_dimensions',
+					'author',
+					'date',
+				],
+				showTitle: true,
+			},
+		} ),
+		[]
+	);
+
+	// Persist view configuration across sessions via the preferences store.
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: 'attachment',
+		slug: 'media-modal',
+		defaultView: {
+			type: LAYOUT_PICKER_GRID,
+			fields: [],
+			showTitle: false,
+			titleField: 'title',
+			mediaField: 'media_thumbnail',
+			search: '',
+			page: 1,
+			perPage: 50,
+			filters: [],
+			layout: {
+				previewSize: 170,
+				density: 'compact',
+			},
 		},
-	} ) );
+	} );
 
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
@@ -456,30 +485,6 @@ export function MediaUploadModal( {
 		[ totalItems, totalPages ]
 	);
 
-	const defaultLayouts: SupportedLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-				layout: {
-					previewSize: 170,
-					density: 'compact',
-				},
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [
-					'filename',
-					'filesize',
-					'media_dimensions',
-					'author',
-					'date',
-				],
-				showTitle: true,
-			},
-		} ),
-		[]
-	);
-
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
 		if ( allowedTypes?.includes( '*' ) ) {
@@ -553,7 +558,7 @@ export function MediaUploadModal( {
 				data={ mediaRecords || [] }
 				fields={ fields }
 				view={ view }
-				onChangeView={ setView }
+				onChangeView={ updateView }
 				actions={ actions }
 				selection={ selection }
 				onChangeSelection={ setSelection }
@@ -562,6 +567,7 @@ export function MediaUploadModal( {
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item: RestAttachment ) => String( item.id ) }
 				itemListLabel={ __( 'Media items' ) }
+				onReset={ isModified ? resetToDefault : false }
 			>
 				<Stack
 					direction="row"
