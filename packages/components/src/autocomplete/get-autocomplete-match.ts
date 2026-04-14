@@ -121,14 +121,12 @@ export function getAutocompleteMatch(
 	// (e.g. @username), the trigger remains in the text and would
 	// re-activate the autocompleter. Suppress the match when the
 	// filter value still corresponds to the recently completed text.
-	if ( lastCompletion && lastCompletion.name === completer.name ) {
-		const trimmed = textWithoutTrigger.trimEnd();
-		if (
-			trimmed === lastCompletion.value ||
-			trimmed.startsWith( lastCompletion.value )
-		) {
-			return null;
-		}
+	if (
+		lastCompletion &&
+		lastCompletion.name === completer.name &&
+		textWithoutTrigger.trimEnd() === lastCompletion.value
+	) {
+		return null;
 	}
 
 	return {

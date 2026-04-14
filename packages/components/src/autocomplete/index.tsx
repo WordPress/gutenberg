@@ -134,6 +134,8 @@ export function useAutocomplete( {
 
 		const { getOptionCompletion } = autocompleter;
 		if ( ! getOptionCompletion ) {
+			dispatch( { type: 'RESET' } );
+			contentRef.current?.focus();
 			return;
 		}
 

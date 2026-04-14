@@ -260,6 +260,57 @@ describe( 'getAutocompleteMatch', () => {
 		expect( result?.filterValue ).toBe( 'hello world' );
 	} );
 
+	describe( 'lastCompletion suppression', () => {
+		it( 'should suppress match when text equals last completion value', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			expect(
+				getAutocompleteMatch( '@user', completers, {
+					...defaultOptions,
+					lastCompletion: {
+						name: completers[ 0 ].name,
+						value: 'user',
+					},
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should suppress match ignoring trailing whitespace', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			expect(
+				getAutocompleteMatch( '@user ', completers, {
+					...defaultOptions,
+					lastCompletion: {
+						name: completers[ 0 ].name,
+						value: 'user',
+					},
+				} )
+			).toBeNull();
+		} );
+
+		it( 'should NOT suppress match when completer name differs', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			const result = getAutocompleteMatch( '@user', completers, {
+				...defaultOptions,
+				lastCompletion: { name: 'other', value: 'user' },
+			} );
+			expect( result ).not.toBeNull();
+			expect( result?.filterValue ).toBe( 'user' );
+		} );
+
+		it( 'should NOT suppress match when text diverges from last completion', () => {
+			const completers = [ createCompleter( { triggerPrefix: '@' } ) ];
+			const result = getAutocompleteMatch( '@user2', completers, {
+				...defaultOptions,
+				lastCompletion: {
+					name: completers[ 0 ].name,
+					value: 'user',
+				},
+			} );
+			expect( result ).not.toBeNull();
+			expect( result?.filterValue ).toBe( 'user2' );
+		} );
+	} );
+
 	it.each( [
 		{
 			text: 'café @user',
