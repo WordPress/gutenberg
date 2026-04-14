@@ -51,7 +51,10 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			return;
 		}
 
-		insertBlock( createBlock( 'core/tab' ), undefined, tabPanelClientId );
+		const newTabBlock = createBlock( 'core/tab', {
+			label: __( 'Tab' ),
+		} );
+		insertBlock( newTabBlock, undefined, tabPanelClientId );
 
 		// Insert a corresponding menu item into the tabs-menu.
 		if ( tabsMenuClientId ) {
