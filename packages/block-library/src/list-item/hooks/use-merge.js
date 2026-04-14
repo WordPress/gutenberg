@@ -92,6 +92,7 @@ export default function useMerge( clientId, onMerge ) {
 	 * more list items at any nesting level.
 	 *
 	 * @param {string} id A list item client ID.
+	 * @return {string|undefined} The client ID of the next outer block, if any.
 	 */
 	function getNextOuterBlockClientId( id ) {
 		let parentListItemId = getParentListItemId( id );
@@ -106,6 +107,8 @@ export default function useMerge( clientId, onMerge ) {
 
 			parentListItemId = getParentListItemId( parentListItemId );
 		}
+
+		return undefined;
 	}
 
 	return ( forward ) => {
