@@ -13,18 +13,16 @@ const transforms = {
 			type: 'input',
 			regExp: /^-{3,}$/,
 			transform: () => {
-				// Check for default variation to preserve attributes.
+				// Check for default variation to apply default variation attributes.
 				const defaultVariation = getBlockVariations(
 					'core/separator'
 				)?.find( ( variation ) => variation.isDefault );
 
-				// Fall back to empty attributes if no default variation is found.
-				const attributes = defaultVariation
-					? defaultVariation.attributes
-					: {};
-
 				return [
-					createBlock( 'core/separator', attributes ),
+					createBlock(
+						'core/separator',
+						defaultVariation?.attributes ?? {}
+					),
 					createBlock( getDefaultBlockName() ),
 				];
 			},
