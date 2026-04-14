@@ -33,6 +33,7 @@ import {
 } from '../components/global-styles/color-panel';
 import BlockColorContrastChecker from './contrast-checker';
 import { store as blockEditorStore } from '../store';
+import { useBlockStyle } from './use-block-style';
 
 export const COLOR_SUPPORT_KEY = 'color';
 
@@ -271,20 +272,18 @@ export function ColorEdit( {
 } ) {
 	const isEnabled = useHasColorPanel( settings );
 
-	const { style, textColor, backgroundColor, gradient } = useSelect(
+	const { textColor, backgroundColor, gradient } = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
 			const {
-				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
 			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
 			return {
-				style: _style,
 				textColor: _textColor,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
@@ -292,6 +291,7 @@ export function ColorEdit( {
 		},
 		[ clientId, isEnabled ]
 	);
+	const [ style ] = useBlockStyle( null );
 	const value = useMemo( () => {
 		return attributesToStyle( {
 			style,
