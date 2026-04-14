@@ -61,6 +61,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'background', 'gradient' ],
 		useEngine: true,
 	},
+	backgroundClip: {
+		value: [ 'background', 'backgroundClip' ],
+		support: [ 'background', 'backgroundClip' ],
+		useEngine: true,
+	},
 	borderColor: {
 		value: [ 'border', 'color' ],
 		support: [ '__experimentalBorder', 'color' ],

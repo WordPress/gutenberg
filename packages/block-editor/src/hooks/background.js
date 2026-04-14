@@ -52,7 +52,8 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 			!! support?.backgroundImage ||
 			!! support?.backgroundSize ||
 			!! support?.backgroundRepeat ||
-			!! support?.gradient
+			!! support?.gradient ||
+			!! support?.backgroundClip
 		);
 	}
 
@@ -114,6 +115,12 @@ function useBlockProps( { name, style } ) {
  * @return {string} CSS class name.
  */
 export function getBackgroundImageClasses( style ) {
+	const isTextGradient =
+		style?.background?.backgroundClip === 'text' &&
+		hasBackgroundGradientValue( style );
+	if ( isTextGradient ) {
+		return '';
+	}
 	return hasBackgroundImageValue( style ) ||
 		hasBackgroundGradientValue( style )
 		? 'has-background'
@@ -126,6 +133,8 @@ function BackgroundInspectorControl( {
 } ) {
 	const resetAllFilter = useCallback(
 		( attributes ) => {
+			const prevClip = attributes.style?.background?.backgroundClip;
+			const isTextGradient = prevClip === 'text';
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
 			)
@@ -139,7 +148,13 @@ function BackgroundInspectorControl( {
 				className: updatedClassName,
 				style: cleanEmptyObject( {
 					...attributes.style,
-					background: undefined,
+					background: isTextGradient
+						? {
+								gradient:
+									attributes.style?.background?.gradient,
+								backgroundClip: prevClip,
+						  }
+						: undefined,
 					color: backgroundGradientSupported
 						? {
 								...attributes.style?.color,
@@ -236,7 +251,12 @@ export function BackgroundImagePanel( {
 		// gradient value is being set — not when it is being cleared/reset.
 		// Conversely, if the gradient is cleared and has-background was added
 		// during a previous migration, remove it so it does not linger.
-		if ( isMigrating && !! newStyle?.background?.gradient ) {
+		const isTextGrad = newStyle?.background?.backgroundClip === 'text';
+		if (
+			isMigrating &&
+			!! newStyle?.background?.gradient &&
+			! isTextGrad
+		) {
 			newAttributes.className = clsx( className, 'has-background' );
 		} else if (
 			! newStyle?.background?.gradient &&
@@ -275,6 +295,9 @@ export function BackgroundImagePanel( {
 			backgroundSize:
 				settings?.background?.backgroundSize &&
 				hasBackgroundSupport( name, 'backgroundSize' ),
+			backgroundClip:
+				settings?.background?.backgroundClip &&
+				hasBackgroundSupport( name, 'backgroundClip' ),
 		},
 	};
 

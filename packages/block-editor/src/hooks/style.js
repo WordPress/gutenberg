@@ -60,7 +60,16 @@ export function getInlineStyles( styles = {} ) {
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
 	getCSSRules( styles ).forEach( ( rule ) => {
-		output[ rule.key ] = rule.value;
+		// Vendor-prefixed CSS properties start with a dash (e.g. `-webkit-background-clip`).
+		// React style objects require camelCase keys without the leading dash
+		// (e.g. `WebkitBackgroundClip`), so convert them here.
+		const key = rule.key.startsWith( '-' )
+			? rule.key
+					.slice( 1 )
+					.replace( /-([a-z])/g, ( _, c ) => c.toUpperCase() )
+					.replace( /^[a-z]/, ( c ) => c.toUpperCase() )
+			: rule.key;
+		output[ key ] = rule.value;
 	} );
 
 	return output;

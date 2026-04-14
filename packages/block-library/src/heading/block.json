@@ -36,6 +36,11 @@
 			"style": true,
 			"width": true
 		},
+		"background": {
+			"backgroundClip": true,
+			"backgroundImage": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,

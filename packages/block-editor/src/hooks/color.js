@@ -341,6 +341,7 @@ export function ColorEdit( {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			label={ label }
+			blockName={ name }
 			enableContrastChecker={
 				false !==
 				getBlockSupport( name, [
