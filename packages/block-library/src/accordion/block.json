@@ -86,5 +86,6 @@
 	},
 	"allowedBlocks": [ "core/accordion-item" ],
 	"textdomain": "default",
+	"editorStyle": "wp-block-accordion-editor",
 	"viewScriptModule": "@wordpress/block-library/accordion/view"
 }
