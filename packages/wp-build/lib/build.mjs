@@ -63,6 +63,11 @@ import {
 	generateContentEntryPoint,
 } from './route-utils.mjs';
 import {
+	discoverWidgets,
+	findWidgetEntry,
+	getAllWidgets,
+} from './widget-utils.mjs';
+import {
 	generateWorkerPlaceholder,
 	buildWorkers,
 	generateWorkerCode,
@@ -1718,6 +1723,208 @@ async function buildAllRoutes() {
 }
 
 /**
+ * Build a single widget's files.
+ *
+ * @param {{name: string, dirName: string, dir: string, metadata: Object}} widget Widget descriptor.
+ * @return {Promise<number>} Build time in milliseconds.
+ */
+async function buildWidget( widget ) {
+	const startTime = Date.now();
+	const outputDir = path.join( BUILD_DIR, 'widgets', widget.dirName );
+
+	await mkdir( outputDir, { recursive: true } );
+
+	const target = browserslistToEsbuild();
+	const builds = [];
+
+	// Build render.min.js (UI component — with CSS)
+	const renderEntry = findWidgetEntry( widget.dir, 'render' );
+	if ( renderEntry ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: [ renderEntry ],
+				outfile: path.join( outputDir, 'render.min.js' ),
+				bundle: true,
+				format: 'esm',
+				target,
+				minify: true,
+				sourcemap: true,
+				jsx: 'automatic',
+				jsxImportSource: 'react',
+				loader: { '.js': 'jsx' },
+				define: getDefine( false ),
+				plugins: [
+					wordpressExternalsPlugin(
+						'render.min',
+						'esm',
+						[],
+						true
+					),
+					...createStyleBundlingPlugins( widget.dir ),
+				],
+			} ),
+			esbuild.build( {
+				entryPoints: [ renderEntry ],
+				outfile: path.join( outputDir, 'render.js' ),
+				bundle: true,
+				format: 'esm',
+				target,
+				minify: false,
+				sourcemap: true,
+				jsx: 'automatic',
+				jsxImportSource: 'react',
+				loader: { '.js': 'jsx' },
+				define: getDefine( true ),
+				plugins: [
+					wordpressExternalsPlugin(
+						'render.min',
+						'esm',
+						[],
+						false
+					),
+					...createStyleBundlingPlugins( widget.dir ),
+				],
+			} )
+		);
+	}
+
+	// Build widget.min.js (metadata — no CSS)
+	const widgetEntry = findWidgetEntry( widget.dir, 'widget' );
+	if ( widgetEntry ) {
+		builds.push(
+			esbuild.build( {
+				entryPoints: [ widgetEntry ],
+				outfile: path.join( outputDir, 'widget.min.js' ),
+				bundle: true,
+				format: 'esm',
+				target,
+				minify: true,
+				sourcemap: true,
+				define: getDefine( false ),
+				plugins: [
+					wordpressExternalsPlugin(
+						'widget.min',
+						'esm',
+						[],
+						true
+					),
+				],
+			} ),
+			esbuild.build( {
+				entryPoints: [ widgetEntry ],
+				outfile: path.join( outputDir, 'widget.js' ),
+				bundle: true,
+				format: 'esm',
+				target,
+				minify: false,
+				sourcemap: true,
+				define: getDefine( true ),
+				plugins: [
+					wordpressExternalsPlugin(
+						'widget.min',
+						'esm',
+						[],
+						false
+					),
+				],
+			} )
+		);
+	}
+
+	if ( builds.length === 0 ) {
+		console.log(
+			`   ⚠ Widget ${ widget.name }: no render or widget entry found, skipping.`
+		);
+		return 0;
+	}
+
+	await Promise.all( builds );
+	return Date.now() - startTime;
+}
+
+/**
+ * Build all discovered widgets.
+ *
+ * @return {Promise<Array>} Array of built widget descriptors.
+ */
+async function buildAllWidgets() {
+	console.log( '\n🧩 Phase 4: Building widgets...\n' );
+
+	const widgets = discoverWidgets( ROOT_DIR );
+
+	if ( widgets.length === 0 ) {
+		console.log( '   No widgets found, skipping.\n' );
+		return [];
+	}
+
+	await Promise.all(
+		widgets.map( async ( widget ) => {
+			const buildTime = await buildWidget( widget );
+			console.log(
+				`   ✔ Built widget ${ widget.name } (${ buildTime }ms)`
+			);
+		} )
+	);
+
+	return widgets;
+}
+
+/**
+ * Generate global widget registry file.
+ *
+ * @param {Array}                  widgets      Array of widget descriptors.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generateWidgetRegistry( widgets, replacements ) {
+	if ( widgets.length === 0 ) {
+		return;
+	}
+
+	const widgetEntries = widgets
+		.map( ( w ) => {
+			const hasRender = findWidgetEntry( w.dir, 'render' ) !== null;
+			const hasWidget = findWidgetEntry( w.dir, 'widget' ) !== null;
+			return `\tarray(
+		'name'       => '${ w.name }',
+		'dir_name'   => '${ w.dirName }',
+		'has_render' => ${ hasRender ? 'true' : 'false' },
+		'has_widget' => ${ hasWidget ? 'true' : 'false' },
+	)`;
+		} )
+		.join( ',\n' );
+
+	await generatePhpFromTemplate(
+		'widget-registry.php.template',
+		path.join( BUILD_DIR, 'widgets', 'registry.php' ),
+		{ ...replacements, '{{WIDGETS}}': widgetEntries }
+	);
+}
+
+/**
+ * Generate widgets.php file with widget registration logic.
+ *
+ * @param {Array}                  widgets      Array of widget descriptors.
+ * @param {Record<string, string>} replacements PHP template replacements.
+ */
+async function generateWidgetsPhp( widgets, replacements ) {
+	if ( widgets.length === 0 ) {
+		return;
+	}
+
+	const prefixUnderscore = replacements[ '{{PREFIX}}' ].replace( /-/g, '_' );
+
+	await generatePhpFromTemplate(
+		'widget-registration.php.template',
+		path.join( BUILD_DIR, 'widgets.php' ),
+		{
+			...replacements,
+			'{{HANDLE_PREFIX}}': HANDLE_PREFIX,
+			'{{PREFIX_UNDERSCORE}}': prefixUnderscore,
+		}
+	);
+}
+
+/**
  * Main build function.
  *
  * @param {string?} baseUrlExpression
@@ -1785,6 +1992,9 @@ async function buildAll( baseUrlExpression ) {
 
 	// Build routes
 	await buildAllRoutes();
+
+	// Build widgets
+	const widgets = await buildAllWidgets();
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -1858,6 +2068,8 @@ async function buildAll( baseUrlExpression ) {
 		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( activeRoutes, phpReplacements ),
 		generateRoutesPhp( activeRoutes, phpReplacements ),
+		generateWidgetRegistry( widgets, phpReplacements ),
+		generateWidgetsPhp( widgets, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
 	console.log( '   ✔ Generated build/build.php' );
@@ -1869,6 +2081,10 @@ async function buildAll( baseUrlExpression ) {
 	console.log( '   ✔ Generated build/styles/registry.php' );
 	console.log( '   ✔ Generated build/constants.php' );
 	console.log( '   ✔ Generated build/routes.php' );
+	if ( widgets.length > 0 ) {
+		console.log( '   ✔ Generated build/widgets.php' );
+		console.log( '   ✔ Generated build/widgets/registry.php' );
+	}
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
 		for ( const page of pageData ) {
@@ -1907,8 +2123,37 @@ async function watchMode() {
 		fullToPackageJson.set( packageJson.name, packageJson );
 	}
 
-	// Get all routes for dependency tracking
+	// Get all routes and widgets for dependency tracking
 	const allRoutes = getAllRoutes( ROOT_DIR );
+	const allWidgetDirs = getAllWidgets( ROOT_DIR );
+
+	/**
+	 * Rebuild a single widget.
+	 *
+	 * @param {string} widgetDirName Widget directory name.
+	 */
+	async function rebuildWidget( widgetDirName ) {
+		try {
+			const startTime = Date.now();
+			const widgets = discoverWidgets( ROOT_DIR );
+			const widget = widgets.find( ( w ) => w.dirName === widgetDirName );
+			if ( ! widget ) {
+				console.log(
+					`❌ widgets/${ widgetDirName } - Widget not found`
+				);
+				return;
+			}
+			await buildWidget( widget );
+			const buildTime = Date.now() - startTime;
+			console.log(
+				`✅ widgets/${ widgetDirName } (${ buildTime }ms)`
+			);
+		} catch ( error ) {
+			console.log(
+				`❌ widgets/${ widgetDirName } - Error: ${ error.message }`
+			);
+		}
+	}
 
 	/**
 	 * Rebuild a package and any affected scripts/modules.
@@ -2007,6 +2252,9 @@ async function watchMode() {
 			if ( item.startsWith( 'route:' ) ) {
 				const routeName = item.slice( 6 ); // Remove 'route:' prefix
 				await rebuildRoute( routeName );
+			} else if ( item.startsWith( 'widget:' ) ) {
+				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
+				await rebuildWidget( widgetDirName );
 			} else {
 				await rebuildPackage( item );
 			}
@@ -2130,6 +2378,62 @@ async function watchMode() {
 		routeWatcher.on( 'change', handleRouteFileChange );
 		routeWatcher.on( 'add', handleRouteFileChange );
 		routeWatcher.on( 'unlink', handleRouteFileChange );
+	}
+
+	// Watch widget files if widgets exist
+	if ( allWidgetDirs.length > 0 ) {
+		const widgetWatchPaths = allWidgetDirs.map( ( widgetDirName ) =>
+			path.join( ROOT_DIR, 'widgets', widgetDirName )
+		);
+
+		const widgetWatcher = chokidar.watch( widgetWatchPaths, {
+			persistent: true,
+			ignoreInitial: true,
+			ignored: ( filepath ) => {
+				if ( filepath.includes( 'node_modules' ) ) {
+					return true;
+				}
+				return false;
+			},
+			useFsEvents: true,
+			depth: 10,
+			awaitWriteFinish: {
+				stabilityThreshold: 100,
+				pollInterval: 50,
+			},
+		} );
+
+		widgetWatcher.on( 'error', ( error ) => {
+			console.error( '❌ Widget watcher error:', error );
+		} );
+
+		const handleWidgetFileChange = async ( filename ) => {
+			// Extract widget dir name from path: widgets/{widgetDirName}/...
+			const widgetMatch = filename.match(
+				/widgets[/\\]([^/\\]+)[/\\]/
+			);
+			if ( ! widgetMatch ) {
+				return;
+			}
+
+			const widgetDirName = widgetMatch[ 1 ];
+			if ( ! allWidgetDirs.includes( widgetDirName ) ) {
+				return;
+			}
+
+			if ( isRebuilding ) {
+				needsRebuild.add( `widget:${ widgetDirName }` );
+				return;
+			}
+
+			isRebuilding = true;
+			await rebuildWidget( widgetDirName );
+			await processNextRebuild();
+		};
+
+		widgetWatcher.on( 'change', handleWidgetFileChange );
+		widgetWatcher.on( 'add', handleWidgetFileChange );
+		widgetWatcher.on( 'unlink', handleWidgetFileChange );
 	}
 }
 
