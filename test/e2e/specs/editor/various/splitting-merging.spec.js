@@ -135,9 +135,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		await page.keyboard.type( 'Still Second' );
 
 		// Check the content.
-
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
+		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:paragraph -->
 <p>First</p>
 <!-- /wp:paragraph -->
