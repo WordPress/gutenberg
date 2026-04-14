@@ -19,17 +19,17 @@ test.describe( 'Block template registration', () => {
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await requestUtils.deleteAllPosts();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-block-template-registration'
 		);
 		// Disable the template activation experiment.
 		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'templates can be registered and edited', async ( {

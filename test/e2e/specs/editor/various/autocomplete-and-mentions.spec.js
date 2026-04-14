@@ -62,14 +62,14 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllUsers();
 		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
 	} );
 
 	[

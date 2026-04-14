@@ -21,13 +21,6 @@ test.describe( 'Block Style Variations', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllPages(),
-		] );
-	} );
-
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
@@ -41,6 +34,13 @@ test.describe( 'Block Style Variations', () => {
 				.dispatch( 'core/editor' )
 				.setRenderingMode( 'post-only' );
 		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test( 'apply block styles variations to nested blocks', async ( {

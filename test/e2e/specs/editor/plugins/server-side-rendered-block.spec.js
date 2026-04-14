@@ -113,14 +113,14 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-server-side-rendered-block'
 		);
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
 	} );
 
 	test( 'should register blocks with autoRegister flag', async ( {

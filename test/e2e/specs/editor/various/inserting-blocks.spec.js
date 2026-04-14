@@ -10,13 +10,13 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );

@@ -18,12 +18,12 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test( 'should be inserted', async ( { editor, page } ) => {

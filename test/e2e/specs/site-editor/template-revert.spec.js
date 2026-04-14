@@ -23,6 +23,11 @@ test.describe( 'Template Revert', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin, requestUtils } ) => {
+		await requestUtils.deleteAllTemplates( 'wp_template' );
+		await admin.visitSiteEditor( { canvas: 'edit' } );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -30,11 +35,6 @@ test.describe( 'Template Revert', () => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
-	} );
-
-	test.beforeEach( async ( { admin, requestUtils } ) => {
-		await requestUtils.deleteAllTemplates( 'wp_template' );
-		await admin.visitSiteEditor( { canvas: 'edit' } );
 	} );
 
 	test( 'should delete the template after saving the reverted template', async ( {

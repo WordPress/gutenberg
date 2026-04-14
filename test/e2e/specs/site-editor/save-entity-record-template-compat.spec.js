@@ -10,12 +10,6 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 		await requestUtils.setGutenbergExperiments( [ 'active_templates' ] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		// Disable the template activation feature.
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
 	test.beforeEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -24,6 +18,12 @@ test.describe( 'calling saveEntityRecord with a theme template ID', () => {
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		// Disable the template activation feature.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'should work as expected', async ( { admin, page } ) => {

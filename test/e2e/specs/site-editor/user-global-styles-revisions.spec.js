@@ -26,12 +26,12 @@ test.describe( 'Style Revisions', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should display revisions UI when there is 1 revision', async ( {
