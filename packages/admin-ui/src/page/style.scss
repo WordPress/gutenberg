@@ -1,11 +1,7 @@
 .admin-ui-page {
 	display: flex;
 	height: 100%;
-	// @TODO: Revisit page background color. Consider using
-	// --wpds-color-bg-surface-neutral once existing pages (e.g. Styles)
-	// are updated to handle the contrast change.
-	// See https://github.com/WordPress/gutenberg/pull/76548
-	background-color: var(--wpds-color-bg-surface-neutral-strong);
+	background-color: var(--wpds-color-bg-surface-neutral);
 	color: var(--wpds-color-fg-content-neutral);
 	position: relative;
 	z-index: 1;
@@ -14,7 +10,7 @@
 }
 
 .admin-ui-page__header {
-	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-2xl);
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	background: var(--wpds-color-bg-surface-neutral-strong);
 	position: sticky;
@@ -24,10 +20,10 @@
 
 .admin-ui-page__header-title {
 	// @TODO: use Text component from UI when available.
-	font-family: var(--wpds-font-family-heading);
-	font-size: var(--wpds-font-size-lg);
-	font-weight: var(--wpds-font-weight-medium);
-	line-height: var(--wpds-font-line-height-lg);
+	font-family: var(--wpds-typography-font-family-heading);
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	line-height: var(--wpds-typography-line-height-lg);
 	margin: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -41,8 +37,8 @@
 .admin-ui-page__header-subtitle {
 	padding-block-end: var(--wpds-dimension-padding-xs);
 	color: var(--wpds-color-fg-content-neutral-weak);
-	font-size: var(--wpds-font-size-md);
-	line-height: var(--wpds-font-line-height-md);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: var(--wpds-typography-line-height-md);
 	margin: 0;
 }
 
@@ -71,7 +67,7 @@
 			// ... and display labels.
 			&::after {
 				content: attr(aria-label);
-				font-size: var(--wpds-font-size-sm);
+				font-size: var(--wpds-typography-font-size-sm);
 			}
 		}
 	}

@@ -71,6 +71,7 @@ export function clearSelection( trigger: Element ): void {
 function useUpdatedRef< T >( value: T ): MutableRefObject< T > {
 	const ref = useRef< T >( value );
 	useLayoutEffect( () => {
+		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		ref.current = value;
 	}, [ value ] );
 	return ref;

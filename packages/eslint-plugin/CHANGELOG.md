@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Upgraded to ESLint v10 with flat config format. The plugin now exports flat config arrays instead of eslintrc objects. Consumers must migrate from `.eslintrc.*` files to `eslint.config.mjs`. See the [migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for details.
+-   The minimum required ESLint version is now `^9.0.0 || ^10.0.0`.
+-   Upgraded `eslint-plugin-import` to v2.31+ (wrapped with `fixupPluginRules` for flat config compatibility).
+-   Upgraded `@typescript-eslint/*` from v6 to v8 (via the unified `typescript-eslint` package).
+-   Replaced `eslint-plugin-eslint-comments` with `@eslint-community/eslint-plugin-eslint-comments`. Rule prefixes changed from `eslint-comments/*` to `@eslint-community/eslint-comments/*`.
+
+### New Features
+
+-   Added `@wordpress/eslint-plugin/eslintrc` entry point — a compatibility wrapper for ESLint v9 consumers still using `.eslintrc.*` files. This is deprecated and will be removed in a future major version.
+-   Configs are now exported as flat config arrays (e.g., `wordpress.configs.recommended` returns an array of config objects suitable for spreading into `eslint.config.mjs`).
+
+### Enhancements
+
+-   Disabled the `jsx-a11y/heading-has-content` rule in the recommended configuration, which reports many false positives when heading elements are passed via a `render` prop ([#77073](https://github.com/WordPress/gutenberg/pull/77073)).
+
 ## 24.5.0 (2026-04-01)
 
 ## 24.4.0 (2026-03-18)

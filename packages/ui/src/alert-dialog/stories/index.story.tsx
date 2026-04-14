@@ -1,10 +1,10 @@
 import { Menu } from '@base-ui/react/menu';
-import { useState } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
 
-import { AlertDialog } from '../..';
+import { AlertDialog, Text } from '../..';
 
 const meta: Meta< typeof AlertDialog.Root > = {
 	title: 'Design System/Components/AlertDialog',
@@ -14,6 +14,7 @@ const meta: Meta< typeof AlertDialog.Root > = {
 		'AlertDialog.Popup': AlertDialog.Popup,
 	},
 	argTypes: {
+		onConfirm: { action: fn() },
 		onOpenChange: { action: fn() },
 	},
 };
@@ -33,10 +34,8 @@ export const Default: Story = {
 				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
 				<AlertDialog.Popup
 					title="Move to trash?"
-					onConfirm={ action( 'onConfirm' ) }
-				>
-					This post will be moved to trash. You can restore it later.
-				</AlertDialog.Popup>
+					description="This post will be moved to trash. You can restore it later."
+				/>
 			</>
 		),
 	},
@@ -48,38 +47,64 @@ export const Default: Story = {
  */
 export const Irreversible: Story = {
 	args: {
-		intent: 'irreversible',
 		children: (
 			<>
 				<AlertDialog.Trigger>Delete permanently</AlertDialog.Trigger>
 				<AlertDialog.Popup
+					intent="irreversible"
 					title="Delete permanently?"
-					onConfirm={ action( 'onConfirm' ) }
+					description="This action cannot be undone. All data will be lost."
 					confirmButtonText="Delete permanently"
-				>
-					This action cannot be undone. All data will be lost.
-				</AlertDialog.Popup>
+				/>
 			</>
 		),
 	},
 };
 
 /**
- * Example with custom button text for both confirm and cancel buttons.
+ * Example with custom button labels for both confirm and cancel buttons.
  */
-export const CustomButtonText: Story = {
+export const CustomLabels: Story = {
 	args: {
 		children: (
 			<>
 				<AlertDialog.Trigger>Send feedback</AlertDialog.Trigger>
 				<AlertDialog.Popup
 					title="Send feedback?"
-					onConfirm={ action( 'onConfirm' ) }
+					description="Your feedback helps us improve. Would you like to send it now?"
 					confirmButtonText="Send feedback"
 					cancelButtonText="Not now"
+				/>
+			</>
+		),
+	},
+};
+
+/**
+ * Use `children` to render custom content between the description and the
+ * action buttons. The `description` should be self-contained for
+ * accessibility (`aria-describedby`); `children` adds supplementary detail.
+ */
+export const WithCustomContent: Story = {
+	args: {
+		children: (
+			<>
+				<AlertDialog.Trigger>Remove pages</AlertDialog.Trigger>
+				<AlertDialog.Popup
+					title="Remove 3 pages?"
+					description="These pages will be moved to trash."
+					confirmButtonText="Delete pages"
 				>
-					Your feedback helps us improve. Would you like to send it
-					now?
+					<ul
+						style={ {
+							margin: 0,
+							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
+						} }
+					>
+						<Text render={ <li /> }>About us</Text>
+						<Text render={ <li /> }>Contact</Text>
+						<Text render={ <li /> }>Privacy policy</Text>
+					</ul>
 				</AlertDialog.Popup>
 			</>
 		),
@@ -117,10 +142,7 @@ const menuItemStyles: React.CSSProperties = {
  * component (not ready yet).
  */
 export const MenuTrigger: Story = {
-	args: {
-		intent: 'irreversible',
-	},
-	render: ( args ) => {
+	render: () => {
 		const [ menuOpen, setMenuOpen ] = useState( false );
 		return (
 			<>
@@ -132,7 +154,12 @@ export const MenuTrigger: Story = {
 								<Menu.Item style={ menuItemStyles }>
 									Edit
 								</Menu.Item>
-								<AlertDialog.Root { ...args }>
+								<AlertDialog.Root
+									onConfirm={ () => {
+										setMenuOpen( false );
+										action( 'onConfirm' )();
+									} }
+								>
 									<Menu.Item
 										render={
 											<AlertDialog.Trigger
@@ -147,16 +174,11 @@ export const MenuTrigger: Story = {
 									>
 										Delete...
 										<AlertDialog.Popup
+											intent="irreversible"
 											title="Delete permanently?"
-											onConfirm={ () => {
-												setMenuOpen( false );
-												action( 'onConfirm' )();
-											} }
+											description="This action cannot be undone. All data will be lost."
 											confirmButtonText="Delete permanently"
-										>
-											This action cannot be undone. All
-											data will be lost.
-										</AlertDialog.Popup>
+										/>
 									</Menu.Item>
 								</AlertDialog.Root>
 							</Menu.Popup>
@@ -168,55 +190,87 @@ export const MenuTrigger: Story = {
 	},
 };
 
+function sleep( ms: number ) {
+	return new Promise< void >( ( resolve ) => setTimeout( resolve, ms ) );
+}
+
 /**
- * Consumer-driven async confirm flow. The consumer uses controlled mode to
- * keep the dialog open while the async operation is in progress, and passes
- * `loading` to show a spinner on the confirm button and disable the cancel
- * button.
+ * Async confirm flow. The consumer returns a promise from `onConfirm`.
+ * The dialog automatically manages the pending state: buttons are disabled
+ * and a spinner appears on the confirm button. Toggle between success and
+ * failure to test both outcomes.
+ *
+ * On failure, the consumer catches the error and returns
+ * `{ close: false, error: '...' }`. The component displays the message
+ * below the action buttons and announces it to screen readers. The error
+ * is automatically cleared on the next confirm attempt or when the dialog
+ * reopens.
  */
 export const AsyncConfirm: Story = {
 	render: function AsyncConfirm( args ) {
-		const [ isOpen, setIsOpen ] = useState( false );
-		const [ isLoading, setIsLoading ] = useState( false );
+		const [ shouldFail, setShouldFail ] = useState( false );
+		const successId = useId();
+		const failureId = useId();
 
 		return (
 			<>
-				<button onClick={ () => setIsOpen( true ) }>
-					Delete permanently
-				</button>
+				<fieldset>
+					<legend>Async task outcome</legend>
+					<label htmlFor={ successId }>
+						<input
+							id={ successId }
+							type="radio"
+							name="async-outcome"
+							checked={ ! shouldFail }
+							onChange={ () => setShouldFail( false ) }
+						/>
+						Success (closes dialog)
+					</label>
+					<label
+						htmlFor={ failureId }
+						style={ { marginInlineStart: 12 } }
+					>
+						<input
+							id={ failureId }
+							type="radio"
+							name="async-outcome"
+							checked={ shouldFail }
+							onChange={ () => setShouldFail( true ) }
+						/>
+						Failure (dialog stays open, shows error)
+					</label>
+				</fieldset>
+				<br />
 				<AlertDialog.Root
 					{ ...args }
-					open={ isOpen }
-					onOpenChange={ ( open, eventDetails ) => {
-						if ( ! isLoading ) {
-							setIsOpen( open );
+					onConfirm={ async () => {
+						action( 'onConfirm' )();
+						try {
+							await sleep( 2000 );
+							if ( shouldFail ) {
+								throw new Error( 'Task failed' );
+							}
+						} catch {
+							return {
+								close: false,
+								error: 'Something went wrong. Please try again.',
+							};
 						}
-						args.onOpenChange?.( open, eventDetails );
+						return undefined;
 					} }
 				>
+					<AlertDialog.Trigger>
+						Delete permanently
+					</AlertDialog.Trigger>
 					<AlertDialog.Popup
+						intent="irreversible"
 						title="Delete permanently?"
-						loading={ isLoading }
-						onConfirm={ () => {
-							action( 'onConfirm' )();
-							setIsLoading( true );
-							new Promise< void >( ( resolve ) =>
-								setTimeout( resolve, 2000 )
-							).then( () => {
-								setIsLoading( false );
-								setIsOpen( false );
-							} );
-						} }
+						description="This action cannot be undone. All data will be lost."
 						confirmButtonText="Delete permanently"
-					>
-						This action cannot be undone. All data will be lost.
-					</AlertDialog.Popup>
+					/>
 				</AlertDialog.Root>
 			</>
 		);
-	},
-	args: {
-		intent: 'irreversible',
 	},
 };
 
@@ -242,11 +296,8 @@ export const Controlled: Story = {
 				>
 					<AlertDialog.Popup
 						title="Move to trash?"
-						onConfirm={ action( 'onConfirm' ) }
-					>
-						This post will be moved to trash. You can restore it
-						later.
-					</AlertDialog.Popup>
+						description="This post will be moved to trash. You can restore it later."
+					/>
 				</AlertDialog.Root>
 			</>
 		);

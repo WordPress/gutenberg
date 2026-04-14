@@ -122,8 +122,8 @@
 		cursor: var(--wpds-cursor-control);
 
 		/* Typography */
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
 		white-space: nowrap;
 
 		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */
