@@ -1,6 +1,6 @@
 # TimePicker
 
-TimePicker is a React component that renders a clock for time selection. It can be used independently or as part of the `DateTimePicker` component.
+TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
 
 **Note:** `TimePicker` also exposes a compound sub-component, `TimePicker.TimeInput`, which can be used independently to render a time input field without the full picker UI.
 
@@ -51,7 +51,7 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 
 ### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
 
-The order of day, month, and year.
+The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
 
 -   Required: No
 -   Default: `'dmy'` (or `'mdy'` when `is12Hour` is `true`)
