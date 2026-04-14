@@ -139,6 +139,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		const pageListBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Page List',
 		} );
+
 		await test.step( 'Test setup', async () => {
 			// Create parent and child pages for testing
 			const parentPage = await requestUtils.createPage( {
@@ -206,6 +207,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 
 			await expect( submenuVisibilityGroup ).toBeVisible();
 		} );
+
 		await test.step( 'Set submenu visibility to always', async () => {
 			const settingsPanel = page
 				.getByRole( 'region', { name: 'Editor settings' } )

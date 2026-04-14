@@ -142,7 +142,7 @@ test.describe( 'Classic', () => {
 		await expect( classicBlock ).toBeVisible();
 		await classicBlock.click();
 
-		expect( errors.length ).toBe( 0 );
+		expect( errors ).toHaveLength( 0 );
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
 } );

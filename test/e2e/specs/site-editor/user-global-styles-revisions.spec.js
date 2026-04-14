@@ -16,6 +16,7 @@ test.use( {
 
 test.describe( 'Style Revisions', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),

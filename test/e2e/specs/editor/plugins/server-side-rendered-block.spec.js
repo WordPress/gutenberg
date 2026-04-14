@@ -23,6 +23,7 @@ test.describe( 'Server-side rendered block', () => {
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'test/server-side-rendered-block' } );

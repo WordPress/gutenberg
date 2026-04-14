@@ -103,7 +103,7 @@ test.describe( 'Site editor command palette', () => {
 
 		// Results heading should appear, Suggestions should not.
 		await expect( list.getByText( 'Results' ) ).toBeVisible();
-		await expect( list.getByText( 'Suggestions' ) ).not.toBeVisible();
+		await expect( list.getByText( 'Suggestions' ) ).toBeHidden();
 	} );
 
 	test( 'Recent commands show after using a command', async ( {

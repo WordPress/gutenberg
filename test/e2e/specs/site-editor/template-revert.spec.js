@@ -22,6 +22,7 @@ test.describe( 'Template Revert', () => {
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
@@ -30,6 +31,7 @@ test.describe( 'Template Revert', () => {
 			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
+
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await admin.visitSiteEditor( { canvas: 'edit' } );

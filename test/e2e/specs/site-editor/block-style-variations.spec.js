@@ -11,6 +11,7 @@ test.use( {
 
 test.describe( 'Block Style Variations', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme(

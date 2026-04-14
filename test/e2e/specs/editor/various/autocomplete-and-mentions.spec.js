@@ -47,6 +47,7 @@ const userList = [
 		password: 'sm1lingsmyfavorite',
 	},
 ];
+
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all(
@@ -76,6 +77,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,

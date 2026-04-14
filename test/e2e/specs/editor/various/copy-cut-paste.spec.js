@@ -182,7 +182,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -236,7 +236,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 

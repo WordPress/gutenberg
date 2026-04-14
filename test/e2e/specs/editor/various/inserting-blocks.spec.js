@@ -761,12 +761,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 test.describe( 'insert media from inserter', () => {
 	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
 			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllMedia(),
