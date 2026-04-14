@@ -20,6 +20,12 @@ function parseDateLike( value?: string ) {
 		return null;
 	}
 
+	// Pre-check to avoid passing unparseable strings to getDate,
+	// which uses moment.js and emits deprecation warnings.
+	if ( ! isValidDate( new Date( value ) ) ) {
+		return null;
+	}
+
 	const parsed = getDate( value );
 	return parsed && isValidDate( parsed ) ? parsed : null;
 }
