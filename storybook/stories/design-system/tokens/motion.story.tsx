@@ -7,25 +7,25 @@ import styles from './motion.story.module.css';
 
 const EASING_TOKENS = [
 	{
-		name: 'gentle',
-		variable: 'var(--wpds-motion-easing-gentle)',
+		name: 'subtle',
+		variable: 'var(--wpds-motion-easing-subtle)',
 		description: 'Hover, color, and background transitions.',
 	},
 	{
-		name: 'standard',
-		variable: 'var(--wpds-motion-easing-standard)',
+		name: 'balanced',
+		variable: 'var(--wpds-motion-easing-balanced)',
 		description:
 			'On-screen movement like resizing, morphing, and layout shifts.',
 	},
 	{
-		name: 'decelerate',
-		variable: 'var(--wpds-motion-easing-decelerate)',
+		name: 'expressive',
+		variable: 'var(--wpds-motion-easing-expressive)',
 		description:
 			'Elements entering or exiting the screen, such as menus and popovers.',
 	},
 	{
-		name: 'decelerate-emphasized',
-		variable: 'var(--wpds-motion-easing-decelerate-emphasized)',
+		name: 'dramatic',
+		variable: 'var(--wpds-motion-easing-dramatic)',
 		description:
 			'Prominent elements entering or exiting, like dialogs and drawers.',
 	},
@@ -186,7 +186,7 @@ function MotionDemo() {
 							label={ token.name }
 							description={ token.description }
 							duration={ token.variable }
-							easing="var(--wpds-motion-easing-standard)"
+							easing="var(--wpds-motion-easing-balanced)"
 							animKey={ animKey }
 						/>
 					) ) }

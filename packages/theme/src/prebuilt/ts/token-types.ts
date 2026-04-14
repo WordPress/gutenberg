@@ -26,11 +26,7 @@ export type DurationSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 /**
  * Easing curve variants.
  */
-export type Easing =
-	| 'gentle'
-	| 'standard'
-	| 'decelerate'
-	| 'decelerate-emphasized';
+export type Easing = 'subtle' | 'balanced' | 'expressive' | 'dramatic';
 
 /**
  * Size scale for border radius tokens.

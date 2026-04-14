@@ -135,10 +135,30 @@
 	--wpds-motion-duration-sm: 100ms; /* Micro-interactions like focus rings and state changes */
 	--wpds-motion-duration-xl: 400ms; /* Extended animations like complex or multi-step transitions */
 	--wpds-motion-duration-xs: 50ms; /* Micro-delays and transition offsets */
-	--wpds-motion-easing-decelerate: cubic-bezier(0, 0, 0, 1); /* Decelerating easing for elements entering or exiting the screen, such as menus and popovers */
-	--wpds-motion-easing-decelerate-emphasized: cubic-bezier(0.29, 0, 0, 1); /* Expressive easing for prominent elements entering or exiting, like dialogs and drawers */
-	--wpds-motion-easing-gentle: cubic-bezier(0.25, 0.1, 0.25, 1); /* Subtle easing for hover, color, and background transitions */
-	--wpds-motion-easing-standard: cubic-bezier(0.4, 0, 0.2, 1); /* Balanced easing for on-screen movement like resizing, morphing, and layout shifts */
+	--wpds-motion-easing-balanced: cubic-bezier(
+		0.4,
+		0,
+		0.2,
+		1
+	); /* General-purpose easing for on-screen movement like resizing, morphing, and layout shifts */
+	--wpds-motion-easing-dramatic: cubic-bezier(
+		0.29,
+		0,
+		0,
+		1
+	); /* High-impact easing for the most prominent, attention-grabbing transitions like dialogs and drawers */
+	--wpds-motion-easing-expressive: cubic-bezier(
+		0,
+		0,
+		0,
+		1
+	); /* Noticeable easing that communicates spatial change, such as menus and popovers entering or exiting */
+	--wpds-motion-easing-subtle: cubic-bezier(
+		0.25,
+		0.1,
+		0.25,
+		1
+	); /* Nearly imperceptible easing for hover, color, and background transitions */
 	--wpds-typography-font-family-body: -apple-system, system-ui, 'Segoe UI',
 		'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue',
 		sans-serif; /* Body font family */

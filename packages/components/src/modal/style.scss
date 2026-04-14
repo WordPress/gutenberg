@@ -16,13 +16,13 @@
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// This animates the appearance of the backdrop.
-	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-gentle));
+	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-subtle));
 
 	&.is-animating-out {
 		// Note: it's important that the fade-out animation doesn't end after the
 		// modal frame's disappear animation, because the component will be removed
 		// from the DOM when that animation ends.
-		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-gentle));
+		@include animation__fade-out($speed: var(--wpds-motion-duration-sm), $delay: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-subtle));
 	}
 }
 
@@ -47,7 +47,7 @@
 	// Animate the modal frame/contents appearing on the page.
 	animation-name: components-modal__appear-animation;
 	animation-fill-mode: forwards;
-	animation-timing-function: var(--wpds-motion-easing-decelerate-emphasized);
+	animation-timing-function: var(--wpds-motion-easing-dramatic);
 
 	// Ensure all headings use the proper editor text color, overriding wp-admin common.css
 	h1,
@@ -62,7 +62,7 @@
 
 	.components-modal__screen-overlay.is-animating-out & {
 		animation-name: components-modal__disappear-animation;
-		animation-timing-function: var(--wpds-motion-easing-decelerate-emphasized);
+		animation-timing-function: var(--wpds-motion-easing-dramatic);
 	}
 
 	// Show a centered modal on bigger screens.

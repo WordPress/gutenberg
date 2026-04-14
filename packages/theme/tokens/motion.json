@@ -25,21 +25,21 @@
 		},
 		"easing": {
 			"$type": "cubicBezier",
-			"gentle": {
+			"subtle": {
 				"$value": [ 0.25, 0.1, 0.25, 1 ],
-				"$description": "Subtle easing for hover, color, and background transitions"
+				"$description": "Nearly imperceptible easing for hover, color, and background transitions"
 			},
-			"standard": {
+			"balanced": {
 				"$value": [ 0.4, 0, 0.2, 1 ],
-				"$description": "Balanced easing for on-screen movement like resizing, morphing, and layout shifts"
+				"$description": "General-purpose easing for on-screen movement like resizing, morphing, and layout shifts"
 			},
-			"decelerate": {
+			"expressive": {
 				"$value": [ 0, 0, 0, 1 ],
-				"$description": "Decelerating easing for elements entering or exiting the screen, such as menus and popovers"
+				"$description": "Noticeable easing that communicates spatial change, such as menus and popovers entering or exiting"
 			},
-			"decelerate-emphasized": {
+			"dramatic": {
 				"$value": [ 0.29, 0, 0, 1 ],
-				"$description": "Expressive easing for prominent elements entering or exiting, like dialogs and drawers"
+				"$description": "High-impact easing for the most prominent, attention-grabbing transitions like dialogs and drawers"
 			}
 		}
 	}
