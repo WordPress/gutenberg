@@ -133,6 +133,7 @@ export {
 	getBlockVariations,
 	isReusableBlock,
 	isTemplatePart,
+	isNavigationBlock,
 	getChildBlockNames,
 	hasChildBlocks,
 	hasChildBlocksWithInserterSupport,

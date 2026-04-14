@@ -6,6 +6,7 @@ import {
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
+	isNavigationBlock,
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -107,7 +108,9 @@ export default function useBlockDisplayInformation( clientId ) {
 
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
-				isReusableBlock( blockType ) || isTemplatePart( blockType );
+				isReusableBlock( blockType ) ||
+				isTemplatePart( blockType ) ||
+				isNavigationBlock( blockType );
 			const syncedTitle = isSynced
 				? getBlockLabel( blockType, attributes )
 				: undefined;

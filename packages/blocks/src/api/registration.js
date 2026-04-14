@@ -594,6 +594,18 @@ export function isTemplatePart( blockOrType ) {
 }
 
 /**
+ * Determines whether or not the given block is a navigation block. This is a
+ * special block type that is used to represent a navigation menu.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a navigation block.
+ */
+export function isNavigationBlock( blockOrType ) {
+	return blockOrType?.name === 'core/navigation';
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {string} blockName Name of block (example: “latest-posts”).
