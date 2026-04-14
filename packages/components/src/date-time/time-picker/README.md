@@ -69,7 +69,7 @@ A standalone time input component. Values are passed as an object in 24-hour for
 
 ### Usage
 
-​```jsx
+```jsx
 import { useState } from 'react';
 import { TimePicker } from '@wordpress/components';
 
@@ -84,7 +84,6 @@ const MyTimeInput = () => {
 		/>
 	);
 };
-​```
 
 ### Props
 
