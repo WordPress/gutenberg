@@ -1,5 +1,3 @@
-/* @jsxRuntime automatic */
-
 /**
  * WordPress dependencies
  */
@@ -220,7 +218,7 @@ export default function BlockGuidelines() {
 						handleRowClick( id );
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 				>
 					<VStack spacing={ 4 }>

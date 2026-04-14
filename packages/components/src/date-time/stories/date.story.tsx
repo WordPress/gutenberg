@@ -11,7 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import DatePicker from '../date';
+import DatePicker from '../date-picker';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DatePicker > = {

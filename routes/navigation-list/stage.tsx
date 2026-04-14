@@ -155,7 +155,7 @@ function NavigationList() {
 						totalPages,
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 					getItemId={ getItemId }
 					selection={ selection }
