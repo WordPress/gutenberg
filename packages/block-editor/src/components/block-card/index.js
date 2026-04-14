@@ -9,11 +9,9 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	__experimentalText as WCText,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Text, Stack } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -32,7 +30,7 @@ import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
-const { Badge: WCBadge } = unlock( componentsPrivateApis );
+const { Badge } = unlock( componentsPrivateApis );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
@@ -150,8 +148,8 @@ function BlockCard( {
 				className
 			) }
 		>
-			<VStack>
-				<HStack justify="flex-start" spacing={ 0 }>
+			<Stack direction="column">
+				<Stack direction="row" justify="flex-start" spacing={ 0 }>
 					{ parentBlockClientId && (
 						<Button
 							onClick={ () => selectBlock( parentBlockClientId ) }
@@ -189,7 +187,7 @@ function BlockCard( {
 						}
 					>
 						<BlockIcon icon={ icon } showColors />
-						<VStack spacing={ 1 }>
+						<Stack direction="column" spacing={ 1 }>
 							<TitleElement className="block-editor-block-card__title">
 								<span className="block-editor-block-card__name">
 									{ !! name?.length ? name : title }
@@ -197,19 +195,22 @@ function BlockCard( {
 								{ ! parentClientId &&
 									! isChild &&
 									!! name?.length && (
-										<WCBadge>{ title }</WCBadge>
+										<Badge>{ title }</Badge>
 									) }
 							</TitleElement>
 							{ children }
-						</VStack>
+						</Stack>
 					</OptionalParentSelectButton>
-				</HStack>
+				</Stack>
 				{ ! parentClientId && ! isChild && description && (
-					<WCText className="block-editor-block-card__description">
+					<Text
+						variant="body-md"
+						className="block-editor-block-card__description"
+					>
 						{ description }
-					</WCText>
+					</Text>
 				) }
-			</VStack>
+			</Stack>
 		</div>
 	);
 }
