@@ -25,6 +25,7 @@
 	},
 	"files": [
 		"configs",
+		"eslintrc",
 		"rules",
 		"utils",
 		"index.js"
@@ -34,36 +35,40 @@
 		".": {
 			"default": "./index.js"
 		},
+		"./eslintrc": {
+			"default": "./eslintrc/index.js"
+		},
 		"./package.json": "./package.json"
 	},
 	"dependencies": {
-		"@babel/eslint-parser": "7.25.7",
-		"@typescript-eslint/eslint-plugin": "^6.4.1",
-		"@typescript-eslint/parser": "^6.4.1",
+		"@babel/eslint-parser": "^7.28.6",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
+		"@eslint/compat": "^2.0.0",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"@wordpress/theme": "file:../theme",
 		"cosmiconfig": "^7.0.0",
-		"eslint-config-prettier": "^8.3.0",
+		"eslint-config-prettier": "^10.0.0",
 		"eslint-import-resolver-typescript": "^4.4.4",
-		"eslint-plugin-import": "^2.25.2",
-		"eslint-plugin-jest": "^27.4.3",
-		"eslint-plugin-jsdoc": "^46.4.6",
-		"eslint-plugin-jsx-a11y": "^6.5.1",
-		"eslint-plugin-playwright": "^0.15.3",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-jest": "^28.0.0",
+		"eslint-plugin-jsdoc": "^50.0.0",
+		"eslint-plugin-jsx-a11y": "^6.10.0",
+		"eslint-plugin-playwright": "^2.1.0",
 		"eslint-plugin-prettier": "^5.0.0",
-		"eslint-plugin-react": "^7.27.0",
-		"eslint-plugin-react-hooks": "^4.3.0",
-		"globals": "^13.12.0",
-		"requireindex": "^1.2.0"
+		"eslint-plugin-react": "^7.37.0",
+		"eslint-plugin-react-hooks": "^5.0.0",
+		"globals": "^16.0.0",
+		"requireindex": "^1.2.0",
+		"typescript-eslint": "^8.0.0"
 	},
 	"devDependencies": {
-		"@types/eslint": "^8",
+		"@types/eslint": "^9",
 		"@types/estree": "1.0.5"
 	},
 	"peerDependencies": {
 		"@babel/core": ">=7",
-		"eslint": ">=8",
+		"eslint": "^9.0.0 || ^10.0.0",
 		"prettier": ">=3",
 		"typescript": ">=5"
 	},

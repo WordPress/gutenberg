@@ -1,5 +1,3 @@
-/* @jsxRuntime automatic */
-
 /**
  * WordPress dependencies
  */
@@ -154,7 +152,6 @@ export default function GuidelineAccordionForm( {
 					<Button
 						variant="primary"
 						type="submit"
-						className="save-button"
 						disabled={ loading || ! draft }
 						accessibleWhenDisabled
 						isBusy={ loading }

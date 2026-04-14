@@ -34,6 +34,7 @@
 		{ "path": "../rich-text" },
 		{ "path": "../upload-media" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
 		{ "path": "../wordcount" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]

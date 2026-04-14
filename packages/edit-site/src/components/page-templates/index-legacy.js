@@ -153,7 +153,7 @@ export default function PageTemplates() {
 					history.navigate( `/wp_template/${ id }?canvas=edit` );
 				} }
 				selection={ selection }
-				defaultLayouts={ defaultLayouts ?? {} }
+				defaultLayouts={ defaultLayouts }
 				onReset={
 					isModified
 						? () => {

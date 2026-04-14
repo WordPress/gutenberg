@@ -100,7 +100,7 @@ export const LayoutTableComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_LIST ]: {},
+					[ LAYOUT_LIST ]: true,
 				} }
 				config={ { perPageSizes } }
 			/>

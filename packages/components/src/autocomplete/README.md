@@ -78,7 +78,7 @@ In addition, a completer may optionally declare:
 
 #### name
 
-The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks.
+The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks. Each completer should have a unique name.
 
 -   Type: `String`
 -   Required: Yes

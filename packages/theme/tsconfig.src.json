@@ -3,8 +3,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "style-imports" ]
+		"types": [ "jest", "style-imports" ]
 	},
+	"exclude": [],
 	"files": [ "global.d.ts" ],
 	"references": [ { "path": "../element" }, { "path": "../private-apis" } ]
 }

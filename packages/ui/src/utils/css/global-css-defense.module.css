@@ -103,7 +103,7 @@ p.p {
 :is(h1, h2, h3, h4, h5, h6).heading {
 	color: var(--_gcd-heading-color, var(--wpds-color-fg-content-neutral));
 	font-size: var(--_gcd-heading-font-size, inherit);
-	font-weight: var(--_gcd-heading-font-weight, var(--wpds-font-weight-medium));
+	font-weight: var(--_gcd-heading-font-weight, var(--wpds-typography-font-weight-medium));
 	margin: var(--_gcd-heading-margin, 0);
 }
 

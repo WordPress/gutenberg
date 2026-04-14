@@ -14,7 +14,7 @@ import {
 
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
-export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
 
 export const DEFAULT_VALUES = {
 	top: undefined,

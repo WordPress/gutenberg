@@ -43,6 +43,7 @@ export default function ValidatedText< Item >( {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -69,6 +70,7 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
+			disabled={ disabled }
 			pattern={ isValid.pattern ? isValid.pattern.constraint : undefined }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined

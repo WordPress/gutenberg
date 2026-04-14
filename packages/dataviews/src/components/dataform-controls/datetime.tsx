@@ -41,6 +41,7 @@ function CalendarDateTimeControl< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { compact } = config || {};
 	const { id, label, description, setValue, getValue, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -179,6 +180,7 @@ function CalendarDateTimeControl< Item >( {
 					hideLabelFromVision
 					value={ formatDateTime( value ) }
 					onChange={ handleManualDateTimeChange }
+					disabled={ disabled }
 				/>
 				{ /* Calendar widget */ }
 				{ ! compact && (
@@ -194,6 +196,7 @@ function CalendarDateTimeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled }
 					/>
 				) }
 			</Stack>
