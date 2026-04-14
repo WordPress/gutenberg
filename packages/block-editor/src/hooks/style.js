@@ -471,11 +471,7 @@ function useBlockProps( { name, style } ) {
 
 	const styles = useMemo(
 		() =>
-			getElementCSSRules(
-				blockElementStyles,
-				name,
-				baseElementSelector
-			),
+			getElementCSSRules( blockElementStyles, name, baseElementSelector ),
 		[ baseElementSelector, blockElementStyles, name ]
 	);
 
