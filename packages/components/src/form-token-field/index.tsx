@@ -322,7 +322,31 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		const tokenValue = items[ items.length - 1 ] || '';
 
 		if ( items.length > 1 ) {
-			addNewTokens( items.slice( 0, -1 ) );
+			const tokensToProcess = items.slice( 0, -1 );
+			addNewTokens( tokensToProcess );
+
+			// Keep tokens that failed validation in the input
+			// instead of silently discarding them.
+			const failedTokens = tokensToProcess.filter( ( token ) => {
+				const transformed = saveTransform( token );
+				if ( ! transformed ) {
+					return false;
+				}
+				return (
+					valueContainsToken( transformed ) ||
+					! __experimentalValidateInput( transformed )
+				);
+			} );
+
+			if ( failedTokens.length > 0 ) {
+				const separatorChar = tokenizeOnSpace ? ' ' : ',';
+				const remaining = [ ...failedTokens, tokenValue ].join(
+					separatorChar
+				);
+				setIncompleteTokenValue( remaining );
+				onInputChange( remaining );
+				return;
+			}
 		}
 		setIncompleteTokenValue( tokenValue );
 		onInputChange( tokenValue );

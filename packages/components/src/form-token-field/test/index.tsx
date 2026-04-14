@@ -2007,8 +2007,12 @@ describe( 'FormTokenField', () => {
 
 			const input = screen.getByRole( 'combobox' );
 
-			// Type values separated by comma — only valid ones should be added.
-			await user.type( input, 'Apple,banana,Cherry,' );
+			// Paste values separated by comma — only valid ones should be added.
+			// Uses paste (not type) because comma keystrokes go through
+			// handleCommaKey, while pasted text goes through
+			// onInputChangeHandler which splits by separator.
+			await user.click( input );
+			await user.paste( 'Apple,banana,Cherry,' );
 			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
 			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
 			expectTokensNotToBeInTheDocument( [ 'banana' ] );
