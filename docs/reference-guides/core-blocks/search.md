@@ -22,7 +22,6 @@
 | `buttonPosition` | `string` | `"button-outside"` | — |
 | `buttonUseIcon` | `boolean` | `false` | — |
 | `query` | `object` | `{}` | — |
-| `isSearchFieldHidden` | `boolean` | `false` | — |
 
 ## Supports
 
@@ -38,6 +37,11 @@
   - margin: `true`
 - **html**: `false`
 
+## CSS Selectors
+
+- **color**: `.wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input`
+- **border**: `.wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper`
+
 ## Block Markup
 
 This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.
@@ -45,7 +49,7 @@ This is a **dynamic block**. It is rendered on the server and does not save HTML
 In post content, it is stored as a block comment:
 
 ```html
-<!-- wp:search {"showLabel":true,"placeholder":"","buttonPosition":"button-outside","buttonUseIcon":false,"query":{},"isSearchFieldHidden":false} /-->
+<!-- wp:search {"showLabel":true,"placeholder":"","buttonPosition":"button-outside","buttonUseIcon":false,"query":{}} /-->
 ```
 
 ## Source

@@ -41,6 +41,7 @@
 
 - `core/tabs-activeTabIndex`
 - `core/tabs-editorActiveTabIndex`
+- `core/tabs-id`
 
 **Provides context:**
 

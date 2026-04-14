@@ -14,9 +14,7 @@
 
 ## Attributes
 
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `anchor` | `string` | `""` | — |
+_This block has no custom attributes._
 
 ## Supports
 
@@ -50,7 +48,7 @@
 This is a **hybrid block**. It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tabs-menu-item {"anchor":""} -->
+<!-- wp:tabs-menu-item -->
 <!-- Content... -->
 <!-- /wp:tabs-menu-item -->
 ```

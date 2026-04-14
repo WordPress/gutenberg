@@ -25,6 +25,7 @@
 - **background**:
   - backgroundImage: `true`
   - backgroundSize: `true`
+  - gradient: `true`
 - **color**:
   - gradients: `true`
   - heading: `true`
