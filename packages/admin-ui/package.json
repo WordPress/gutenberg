@@ -23,7 +23,6 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
-		"src",
 		"build",
 		"build-module",
 		"build-style",
@@ -44,8 +43,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
-		"build-style/**",
-		"src/**/*.scss"
+		"build-style/**"
 	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
