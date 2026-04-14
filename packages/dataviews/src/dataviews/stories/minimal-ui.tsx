@@ -54,7 +54,7 @@ const MinimalUIComponent = ( {
 			view={ view }
 			fields={ _fields }
 			onChangeView={ setView }
-			defaultLayouts={ { [ layout ]: {} } }
+			defaultLayouts={ { [ layout ]: true } }
 		>
 			<DataViews.Layout />
 			<DataViews.Footer />

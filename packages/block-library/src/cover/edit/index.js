@@ -7,8 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { Placeholder, Spinner } from '@wordpress/components';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
+import { Placeholder, SandBox, Spinner } from '@wordpress/components';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import {
 	withColors,
@@ -49,7 +54,7 @@ import {
 	DEFAULT_OVERLAY_COLOR,
 } from './color-utils';
 import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
-import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
+import { getBackgroundEmbedHtml } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
@@ -121,6 +126,14 @@ function CoverEdit( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+
+	// Ref to access latest values after async operations (e.g. getMediaColor),
+	// avoiding stale values that could overwrite concurrent remote changes.
+	const propsRef = useRef( { attributes, overlayColor } );
+	useLayoutEffect( () => {
+		propsRef.current = { attributes, overlayColor };
+	} );
+
 	const { media } = useSelect(
 		( select ) => {
 			return {
@@ -155,22 +168,26 @@ function CoverEdit( {
 
 			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
-			let newOverlayColor = overlayColor.color;
-			if ( ! isUserOverlayColor ) {
+			// Read latest values after await to avoid stale closures.
+			const { attributes: currentAttrs, overlayColor: currentOverlay } =
+				propsRef.current;
+
+			let newOverlayColor = currentOverlay.color;
+			if ( ! currentAttrs.isUserOverlayColor ) {
 				newOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
 				setOverlayColor( newOverlayColor );
 			}
 
 			const newIsDark = compositeIsDark(
-				dimRatio,
+				currentAttrs.dimRatio,
 				newOverlayColor,
 				averageBackgroundColor
 			);
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				isDark: newIsDark,
-				isUserOverlayColor: isUserOverlayColor || false,
+				isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 			} );
 		} )();
 		// Update the block only when the featured image changes.
@@ -201,8 +218,12 @@ function CoverEdit( {
 			isImage ? newMedia?.url : undefined
 		);
 
-		let newOverlayColor = overlayColor.color;
-		if ( ! isUserOverlayColor ) {
+		// Read latest values to avoid stale closures.
+		const { attributes: currentAttrs, overlayColor: currentOverlay } =
+			propsRef.current;
+
+		let newOverlayColor = currentOverlay.color;
+		if ( ! currentAttrs.isUserOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
 
@@ -214,7 +235,9 @@ function CoverEdit( {
 		// to avoid resetting to 50 if it has been explicitly set to 100.
 		// See issue #52835 for context.
 		const newDimRatio =
-			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+			currentAttrs.url === undefined && currentAttrs.dimRatio === 100
+				? 50
+				: currentAttrs.dimRatio;
 
 		const newIsDark = compositeIsDark(
 			newDimRatio,
@@ -256,7 +279,7 @@ function CoverEdit( {
 			useFeaturedImage: undefined,
 			dimRatio: newDimRatio,
 			isDark: newIsDark,
-			isUserOverlayColor: isUserOverlayColor || false,
+			isUserOverlayColor: currentAttrs.isUserOverlayColor || false,
 		} );
 	};
 
@@ -290,8 +313,12 @@ function CoverEdit( {
 
 	const onSetOverlayColor = async ( newOverlayColor ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+
+		// Read latest dimRatio after await to avoid stale closure.
+		const { attributes: currentAttrs } = propsRef.current;
+
 		const newIsDark = compositeIsDark(
-			dimRatio,
+			currentAttrs.dimRatio,
 			newOverlayColor,
 			averageBackgroundColor
 		);
@@ -309,9 +336,13 @@ function CoverEdit( {
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
 		const averageBackgroundColor = await getMediaColor( url );
+
+		// Read latest overlayColor after await to avoid stale closure.
+		const { overlayColor: currentOverlay } = propsRef.current;
+
 		const newIsDark = compositeIsDark(
 			newDimRatio,
-			overlayColor.color,
+			currentOverlay.color,
 			averageBackgroundColor
 		);
 
@@ -365,23 +396,15 @@ function CoverEdit( {
 		[ url, backgroundType ]
 	);
 
-	// Compute embedSrc on-the-fly from embed preview for editor display
-	const embedSrc = useMemo( () => {
+	// Compute embed HTML for editor display via SandBox
+	const embedHtml = useMemo( () => {
 		if (
 			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
 			! embedPreview?.html
 		) {
 			return null;
 		}
-
-		// Extract iframe src from embed HTML
-		const iframeSrc = getIframeSrc( embedPreview.html );
-		if ( ! iframeSrc ) {
-			return null;
-		}
-
-		// Modify the src to add background video parameters (provider auto-detected)
-		return getBackgroundVideoSrc( iframeSrc );
+		return getBackgroundEmbedHtml( embedPreview.html );
 	}, [ embedPreview, backgroundType ] );
 
 	const isUploadingMedia = isTemporaryMedia( id, url );
@@ -477,11 +500,15 @@ function CoverEdit( {
 			? await getMediaColor( mediaUrl )
 			: DEFAULT_BACKGROUND_COLOR;
 
-		const newOverlayColor = ! isUserOverlayColor
-			? averageBackgroundColor
-			: overlayColor.color;
+		// Read latest values after await to avoid stale closures.
+		const { attributes: currentAttrs, overlayColor: currentOverlay } =
+			propsRef.current;
 
-		if ( ! isUserOverlayColor ) {
+		const newOverlayColor = ! currentAttrs.isUserOverlayColor
+			? averageBackgroundColor
+			: currentOverlay.color;
+
+		if ( ! currentAttrs.isUserOverlayColor ) {
 			if ( newUseFeaturedImage ) {
 				setOverlayColor( newOverlayColor );
 			} else {
@@ -492,7 +519,8 @@ function CoverEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 
-		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newDimRatio =
+			currentAttrs.dimRatio === 100 ? 50 : currentAttrs.dimRatio;
 		const newIsDark = compositeIsDark(
 			newDimRatio,
 			newOverlayColor,
@@ -668,21 +696,22 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isEmbedVideoBackground && embedSrc && (
+				{ isEmbedVideoBackground && embedHtml && (
 					<div
 						ref={ mediaElement }
 						className="wp-block-cover__video-background wp-block-cover__embed-background"
 						style={ mediaStyle }
 					>
-						<iframe
-							src={ embedSrc }
+						<SandBox
+							html={ embedHtml }
 							title="Background video"
-							frameBorder="0"
-							allow="autoplay; fullscreen"
+							styles={ [
+								'iframe{position:fixed;top:0;left:0;width:100%;height:100%;}',
+							] }
 						/>
 					</div>
 				) }
-				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
 					<Spinner />
 				) }
 

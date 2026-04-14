@@ -398,7 +398,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 -	**Name:** core/group
 -	**Category:** [design](./core-blocks/category-design.md)
--	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## [Heading](./core-blocks/heading.md)
@@ -912,7 +912,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 -	**Name:** core/search
 -	**Category:** [widgets](./core-blocks/category-widgets.md)
 -	**Supports:** align (center, left, right), anchor, color (background, gradients, text), interactivity, spacing (margin), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** buttonPosition, buttonText, buttonUseIcon, isSearchFieldHidden, label, placeholder, query, showLabel, width, widthUnit
+-	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, width, widthUnit
 
 ## [Separator](./core-blocks/separator.md)
 
@@ -1060,7 +1060,6 @@ A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gut
 -	**Category:** [design](./core-blocks/category-design.md)
 -	**Parent:** core/tabs-menu
 -	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
--	**Attributes:** anchor
 
 ## [Tag Cloud](./core-blocks/tag-cloud.md)
 

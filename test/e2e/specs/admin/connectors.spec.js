@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const CONNECTORS_PAGE_QUERY = 'page=options-connectors-wp-admin';
 
-const AI_CONNECTORS = [
+const CONNECTORS = [
 	{
 		slug: 'ai-provider-for-openai',
 		name: 'OpenAI',
@@ -21,15 +21,6 @@ const AI_CONNECTORS = [
 		slug: 'ai-provider-for-google',
 		name: 'Google',
 		description: 'Text and image generation with Gemini and Imagen.',
-	},
-];
-
-const CONNECTORS = [
-	...AI_CONNECTORS,
-	{
-		slug: 'akismet',
-		name: 'Akismet Anti-Spam',
-		description: 'Protect your site from spam.',
 	},
 ];
 
@@ -88,8 +79,8 @@ test.describe( 'Connectors', () => {
 			// Connector should be wrapped in a group with the heading as label.
 			const group = card.getByRole( 'group' );
 			await expect( group ).toBeVisible();
+			await expect( heading ).toHaveAttribute( 'id', /\S/ );
 			const headingId = await heading.getAttribute( 'id' );
-			expect( headingId ).toBeTruthy();
 			await expect( group ).toHaveAttribute(
 				'aria-labelledby',
 				headingId
@@ -385,28 +376,6 @@ test.describe( 'Connectors', () => {
 		} );
 	} );
 
-	test( 'should display Akismet connector with install button', async ( {
-		page,
-		admin,
-	} ) => {
-		await admin.visitAdminPage( SETTINGS_PAGE_PATH, CONNECTORS_PAGE_QUERY );
-
-		const card = page.locator( '.connector-item--akismet' );
-		await expect( card ).toBeVisible();
-
-		const heading = card.getByRole( 'heading', {
-			name: 'Akismet Anti-Spam',
-			level: 2,
-		} );
-		await expect( heading ).toBeVisible();
-		await expect(
-			card.getByText( 'Protect your site from spam.' )
-		).toBeVisible();
-
-		const button = card.getByRole( 'button', { name: 'Install' } );
-		await expect( button ).toBeVisible();
-	} );
-
 	test( 'should display the AI plugin callout banner with install button', async ( {
 		page,
 		admin,
@@ -611,6 +580,33 @@ test.describe( 'Connectors', () => {
 			await expect(
 				card.getByText( 'A custom service for E2E testing.' )
 			).toBeVisible();
+		} );
+
+		test( 'should preserve a custom render for an api_key connector registered before registerDefaultConnectors', async ( {
+			page,
+			admin,
+		} ) => {
+			await admin.visitAdminPage(
+				SETTINGS_PAGE_PATH,
+				CONNECTORS_PAGE_QUERY
+			);
+
+			const card = page.locator(
+				'.connector-item--test_api_key_with_custom_render'
+			);
+			await expect( card ).toBeVisible();
+
+			// The JS-registered custom render must be visible inside the card.
+			await expect(
+				card.getByText(
+					'Custom render survived registerDefaultConnectors().'
+				)
+			).toBeVisible();
+
+			// The default API key input must not appear inside the card.
+			await expect(
+				card.getByRole( 'textbox', { name: 'API Key' } )
+			).toHaveCount( 0 );
 		} );
 	} );
 } );

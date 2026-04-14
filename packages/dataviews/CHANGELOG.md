@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
+- DataForm: Show tooltip in edit button in `panel` layout. [#77024](https://github.com/WordPress/gutenberg/pull/77024)
+
+### Bug Fixes
+
+- DataForm: Fix disabled state for date(time) control. [#77138](https://github.com/WordPress/gutenberg/pull/77138)
+- DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
+- DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
+
+### Code Quality
+
+- DataViewsPicker: Remove unnecessary ref callbacks in grid and table layouts. [#77179](https://github.com/WordPress/gutenberg/pull/77179)
+
+## 14.0.0 (2026-04-01)
+
 ### Breaking Changes
 
 - DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
@@ -11,6 +29,7 @@
 
 - DataForm: Add `compact` configuration option to the `datetime` control. [#76905](https://github.com/WordPress/gutenberg/pull/76905)
 - DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
+- DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
 
 ## 13.1.0 (2026-03-18)
 

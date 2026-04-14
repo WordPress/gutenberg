@@ -15,6 +15,8 @@ import { useMemo, useEffect, useRef } from '@wordpress/element';
  */
 import Controls from './controls';
 
+const EMPTY_ARRAY = [];
+
 const TABS_TEMPLATE = [
 	[
 		'core/tabs-menu',
@@ -24,8 +26,8 @@ const TABS_TEMPLATE = [
 			},
 		},
 		[
-			[ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ],
-			[ 'core/tabs-menu-item', { anchor: 'tab-2-button' } ],
+			[ 'core/tabs-menu-item', {} ],
+			[ 'core/tabs-menu-item', {} ],
 		],
 	],
 	[
@@ -39,7 +41,6 @@ const TABS_TEMPLATE = [
 			[
 				'core/tab',
 				{
-					anchor: 'tab-1',
 					label: 'Tab 1',
 				},
 				[ [ 'core/paragraph' ] ],
@@ -47,7 +48,6 @@ const TABS_TEMPLATE = [
 			[
 				'core/tab',
 				{
-					anchor: 'tab-2',
 					label: 'Tab 2',
 				},
 				[ [ 'core/paragraph' ] ],
@@ -74,41 +74,24 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { removeBlock } = useDispatch( blockEditorStore );
+	const { removeBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
 
-	/**
-	 * Construct a list of core/tab blocks, used to create tabs-list context.
-	 * Also select menu items with their anchors for anchor-based deletion sync.
-	 */
-	const { tabs, menuItems } = useSelect(
+	const { tabs, tabPanelClientId, menuItems } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panel block and extract tab data.
 			const tabPanel = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panel'
 			);
-
-			// Find tabs-menu block and get its children with their anchors.
 			const tabsMenu = innerBlocks.find(
 				( block ) => block.name === 'core/tabs-menu'
 			);
 
 			return {
-				tabs: tabPanel
-					? tabPanel.innerBlocks.filter(
-							( block ) => block.name === 'core/tab'
-					  )
-					: [],
-				menuItems: tabsMenu
-					? getBlocks( tabsMenu.clientId )
-							.filter( ( b ) => b.name === 'core/tabs-menu-item' )
-							.map( ( b ) => ( {
-								clientId: b.clientId,
-								anchor: b.attributes.anchor ?? '',
-							} ) )
-					: [],
+				tabs: tabPanel?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanelClientId: tabPanel?.clientId ?? null,
+				menuItems: tabsMenu?.innerBlocks ?? EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]
@@ -130,7 +113,6 @@ function Edit( {
 	useEffect( () => {
 		const currentTabs = tabs.map( ( tab ) => ( {
 			clientId: tab.clientId,
-			anchor: tab.attributes.anchor ?? '',
 		} ) );
 
 		if ( prevSyncStateRef.current === null ) {
@@ -146,6 +128,13 @@ function Edit( {
 
 		const tabsRemoved = currentTabs.length < prevTabs.length;
 		const menuItemsRemoved = menuItems.length < prevMenuItems.length;
+		const menuItemsReordered =
+			! tabsRemoved &&
+			! menuItemsRemoved &&
+			menuItems.length === prevMenuItems.length &&
+			menuItems.some(
+				( m, i ) => m.clientId !== prevMenuItems[ i ]?.clientId
+			);
 
 		// Update snapshot to the current state.
 		// Snapshot is updated eagerly; post-removal mutations keep it consistent
@@ -154,6 +143,23 @@ function Edit( {
 			tabs: currentTabs,
 			menuItems: [ ...menuItems ],
 		};
+
+		// When menu items are reordered, move the corresponding tab content
+		// blocks to match the new order.
+		if ( menuItemsReordered && tabPanelClientId ) {
+			const reorderedTabs = menuItems
+				.map( ( menuItem ) => {
+					const oldIndex = prevMenuItems.findIndex(
+						( pm ) => pm.clientId === menuItem.clientId
+					);
+					return oldIndex !== -1 ? tabs[ oldIndex ] : null;
+				} )
+				.filter( Boolean );
+			if ( reorderedTabs.length === tabs.length ) {
+				replaceInnerBlocks( tabPanelClientId, reorderedTabs, false );
+			}
+			return;
+		}
 
 		// Lists are in sync, nothing changed, or toolbar already removed both.
 		if (
@@ -169,45 +175,31 @@ function Edit( {
 		);
 
 		if ( tabsRemoved ) {
-			prevTabs.forEach( ( prevTab ) => {
-				if ( currentTabIds.has( prevTab.clientId ) ) {
-					return;
-				}
-				const expectedMenuAnchor = prevTab.anchor
-					? `${ prevTab.anchor }-button`
-					: null;
-				const menuItemToRemove = expectedMenuAnchor
-					? menuItems.find( ( m ) => m.anchor === expectedMenuAnchor )
-					: null;
-				if ( menuItemToRemove ) {
-					removeBlock( menuItemToRemove.clientId, false );
-					prevSyncStateRef.current.menuItems =
-						prevSyncStateRef.current.menuItems.filter(
-							( m ) => m.clientId !== menuItemToRemove.clientId
-						);
-				}
-			} );
+			// Remove the menu item at the same position.
+			const removedIndex = prevTabs.findIndex(
+				( t ) => ! currentTabIds.has( t.clientId )
+			);
+			if ( removedIndex >= 0 && menuItems[ removedIndex ] ) {
+				removeBlock( menuItems[ removedIndex ].clientId, false );
+				prevSyncStateRef.current.menuItems =
+					prevSyncStateRef.current.menuItems.filter(
+						( _, i ) => i !== removedIndex
+					);
+			}
 		} else {
-			prevMenuItems.forEach( ( prevItem ) => {
-				if ( currentMenuItemIds.has( prevItem.clientId ) ) {
-					return;
-				}
-				const expectedTabAnchor =
-					prevItem.anchor?.replace( /-button$/, '' ) ?? '';
-				const tabToRemove = tabs.find(
-					( tab ) =>
-						( tab.attributes.anchor ?? '' ) === expectedTabAnchor
-				);
-				if ( tabToRemove ) {
-					removeBlock( tabToRemove.clientId, false );
-					prevSyncStateRef.current.tabs =
-						prevSyncStateRef.current.tabs.filter(
-							( t ) => t.clientId !== tabToRemove.clientId
-						);
-				}
-			} );
+			// Remove the tab at the same position.
+			const removedIndex = prevMenuItems.findIndex(
+				( m ) => ! currentMenuItemIds.has( m.clientId )
+			);
+			if ( removedIndex >= 0 && tabs[ removedIndex ] ) {
+				removeBlock( tabs[ removedIndex ].clientId, false );
+				prevSyncStateRef.current.tabs =
+					prevSyncStateRef.current.tabs.filter(
+						( _, i ) => i !== removedIndex
+					);
+			}
 		}
-	}, [ tabs, menuItems, removeBlock ] );
+	}, [ tabs, tabPanelClientId, menuItems, removeBlock, replaceInnerBlocks ] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.

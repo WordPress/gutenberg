@@ -24,6 +24,7 @@ export default function ArrayControl< Item >( {
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, getValue, setValue, isValid } = field;
 	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
@@ -73,6 +74,7 @@ export default function ArrayControl< Item >( {
 			onChange={ onChangeControl }
 			placeholder={ placeholder }
 			suggestions={ elements?.map( ( element ) => element.value ) }
+			disabled={ disabled }
 			__experimentalValidateInput={ ( token: string ) => {
 				// If elements validation is required, check if token is valid
 				if ( field.isValid?.elements && elements ) {

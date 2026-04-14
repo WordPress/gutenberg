@@ -141,7 +141,7 @@ function SandBox( {
 	function isFrameAccessible() {
 		try {
 			return !! ref.current?.contentDocument?.body;
-		} catch ( e ) {
+		} catch {
 			return false;
 		}
 	}
@@ -232,7 +232,7 @@ function SandBox( {
 			if ( 'string' === typeof data ) {
 				try {
 					data = JSON.parse( data );
-				} catch ( e ) {}
+				} catch {}
 			}
 
 			// Update the state only if the message is formatted as we expect,

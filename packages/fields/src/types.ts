@@ -54,10 +54,17 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;
 	modified?: string;
 	author?: number;
+}
+
+export interface BasePostWithEditedEntity extends Omit< BasePost, 'content' > {
+	content:
+		| BasePost[ 'content' ]
+		| ( ( record: BasePostWithEditedEntity ) => string );
 }
 
 export interface BasePostWithEmbeddedAuthor extends BasePost {
@@ -148,6 +155,7 @@ export interface MediaEditProps< Item >
 	> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
+	 * Use ['*'] to allow all file types.
 	 *
 	 * @default ['image']
 	 */

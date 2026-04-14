@@ -1,5 +1,3 @@
-/* @jsxRuntime automatic */
-
 /**
  * WordPress dependencies
  */

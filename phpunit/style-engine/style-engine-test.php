@@ -503,6 +503,57 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_background_gradient_only'              => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);',
+					'declarations' => array(
+						'background-image' => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
+			'inline_background_gradient_with_preset_slug'  => array(
+				'block_styles'    => array(
+					'background' => array(
+						'gradient' => 'var:preset|gradient|vivid-cyan-blue',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => 'background-image:var(--wp--preset--gradient--vivid-cyan-blue);',
+					'declarations' => array(
+						'background-image' => 'var(--wp--preset--gradient--vivid-cyan-blue)',
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
+			'inline_background_gradient_and_image_combined' => array(
+				'block_styles'    => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'url' => 'https://example.com/image.jpg',
+						),
+						'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+				'options'         => array(),
+				'expected_output' => array(
+					'css'          => "background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url('https://example.com/image.jpg');",
+					'declarations' => array(
+						'background-image' => "linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%), url('https://example.com/image.jpg')",
+					),
+					'classnames'   => 'has-background',
+				),
+			),
+
 			'inline_background_image_url_with_background_size' => array(
 				'block_styles'    => array(
 					'background' => array(

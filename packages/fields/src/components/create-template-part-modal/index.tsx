@@ -25,7 +25,6 @@ import {
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error serialize is not typed
 import { serialize } from '@wordpress/blocks';
 
 /**

@@ -271,12 +271,12 @@ test.describe( 'Buttons', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 		} );
 
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.activateTheme( 'twentytwentyone' );
-		} );
-
 		test.beforeEach( async ( { admin } ) => {
 			await admin.createNewPost();
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
 		} );
 
 		test( 'can resize width', async ( { editor, page } ) => {

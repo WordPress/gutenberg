@@ -4,51 +4,62 @@
 const { cosmiconfigSync } = require( 'cosmiconfig' );
 
 /**
- * WordPress dependencies
- */
-
-/**
  * Internal dependencies
  */
 const { isPackageInstalled } = require( '../utils' );
+const recommendedWithFormattingConfig = require( './recommended-with-formatting' );
 
-const config = {
-	extends: [ require.resolve( './recommended-with-formatting.js' ) ],
-};
+const config = [ ...recommendedWithFormattingConfig ];
 
 if ( isPackageInstalled( 'prettier' ) ) {
-	config.extends.push( 'plugin:prettier/recommended' );
+	const eslintPluginPrettier = require( 'eslint-plugin-prettier' );
+	const eslintConfigPrettier = require( 'eslint-config-prettier' );
 
 	const { config: localPrettierConfig } =
 		cosmiconfigSync( 'prettier' ).search() || {};
 	const defaultPrettierConfig = require( '@wordpress/prettier-config' );
 	const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
-	config.rules = {
-		'prettier/prettier': [ 'error', prettierConfig ],
-		// Prettier _disables_ this rule, but we want it!
-		// See https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#curly
-		// > This rule requires certain options.
-		// > …
-		// > If you like this rule, it can be used just fine with Prettier as long as you don’t use the "multi-line" or "multi-or-nest" option.
-		curly: [ 'error', 'all' ],
-	};
+
+	config.push( eslintConfigPrettier, {
+		plugins: {
+			prettier: eslintPluginPrettier,
+		},
+		rules: {
+			...eslintConfigPrettier.rules,
+			'prettier/prettier': [ 'error', prettierConfig ],
+			// Prettier _disables_ this rule, but we want it!
+			// See https://github.com/prettier/eslint-config-prettier?tab=readme-ov-file#curly
+			// > This rule requires certain options.
+			// > …
+			// > If you like this rule, it can be used just fine with Prettier as long as you don't use the "multi-line" or "multi-or-nest" option.
+			curly: [ 'error', 'all' ],
+		},
+	} );
 }
 
 if ( isPackageInstalled( 'typescript' ) ) {
-	config.settings = {
-		'import/resolver': {
-			typescript: {
-				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+	const tseslint = require( 'typescript-eslint' );
+
+	config.push(
+		tseslint.configs.eslintRecommended,
+		{
+			settings: {
+				'import/resolver': {
+					typescript: {
+						extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+					},
+				},
 			},
+			ignores: [ '**/*.d.ts' ],
 		},
-	};
-	config.extends.push( 'plugin:@typescript-eslint/eslint-recommended' );
-	config.ignorePatterns = [ '**/*.d.ts' ];
-	config.plugins = [ '@typescript-eslint' ];
-	config.overrides = [
 		{
 			files: [ '**/*.ts', '**/*.tsx' ],
-			parser: '@typescript-eslint/parser',
+			languageOptions: {
+				parser: tseslint.parser,
+			},
+			plugins: {
+				'@typescript-eslint': tseslint.plugin,
+			},
 			rules: {
 				'no-duplicate-imports': 'off',
 				'import/no-duplicates': 'error',
@@ -75,8 +86,8 @@ if ( isPackageInstalled( 'typescript' ) ) {
 				'import/default': 'off',
 				'import/named': 'off',
 			},
-		},
-	];
+		}
+	);
 }
 
 module.exports = config;

@@ -23,8 +23,10 @@ const VENDOR_SCRIPTS = [
 		handle: 'react-dom',
 		dependencies: [ 'react' ],
 		contents: [
-			'export * from "react-dom";',
-			'export { createRoot, hydrateRoot } from "react-dom/client";',
+			'module.exports = {',
+			'  ...require("react-dom"),',
+			'  ...require("react-dom/client"),',
+			'};',
 		].join( '\n' ),
 	},
 	{
