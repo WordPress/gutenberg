@@ -17,7 +17,8 @@
 	"parent": [ "core/tab-panel" ],
 	"usesContext": [
 		"core/tabs-activeTabIndex",
-		"core/tabs-editorActiveTabIndex"
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-id"
 	],
 	"supports": {
 		"anchor": true,

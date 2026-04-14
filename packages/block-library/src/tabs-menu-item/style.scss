@@ -7,6 +7,7 @@
 	cursor: pointer;
 	flex-basis: inherit !important;
 	flex-grow: inherit !important;
+	position: relative;
 
 	// Button reset
 	border: none;
@@ -26,13 +27,14 @@
 	text-transform: inherit;
 	text-align: inherit;
 
-	&:focus-visible {
-		outline-offset: 2px;
-	}
-
-	&[aria-selected="true"],
-	&.is-active {
-		background-color: #000;
-		color: #fff;
+	&[aria-selected="true"]::before,
+	&.is-active::before {
+		content: "";
+		position: absolute;
+		border-bottom: 2px solid currentColor;
+		pointer-events: none;
+		left: 0;
+		width: 100%;
+		bottom: 0;
 	}
 }

@@ -1060,7 +1060,6 @@ A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gut
 -	**Category:** design
 -	**Parent:** core/tabs-menu
 -	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
--	**Attributes:** anchor
 
 ## Tag Cloud
 
