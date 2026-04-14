@@ -175,6 +175,8 @@ function buildSandBoxDocument( {
  * Because `srcdoc` is a declarative attribute, the browser automatically
  * re-renders the content when the iframe is moved in the DOM (e.g.,
  * block reordering), so no `load` event listener is needed.
+ * The `message` listener is re-synced on every `load` so
+ * it follows the iframe if it's reparented into a different document.
  */
 function IsolatedSandBox( {
 	html = '',
@@ -195,9 +197,12 @@ function IsolatedSandBox( {
 	);
 
 	useEffect( () => {
-		function checkMessageForResize( event: MessageEvent ) {
-			const iframe = ref.current;
+		const iframe = ref.current;
+		if ( ! iframe ) {
+			return;
+		}
 
+		function checkMessageForResize( event: MessageEvent ) {
 			// Verify that the mounted element is the source of the message.
 			// iframe.contentWindow is accessible cross-origin as a
 			// WindowProxy reference, so this check still works without
@@ -225,11 +230,28 @@ function IsolatedSandBox( {
 			setHeight( data.height );
 		}
 
-		const defaultView = ref.current?.ownerDocument?.defaultView;
-		defaultView?.addEventListener( 'message', checkMessageForResize );
+		let currentView: Window | null = null;
+		function syncListener() {
+			const view = iframe?.ownerDocument?.defaultView ?? null;
+			if ( view === currentView ) {
+				return;
+			}
+
+			currentView?.removeEventListener(
+				'message',
+				checkMessageForResize
+			);
+
+			currentView = view;
+			currentView?.addEventListener( 'message', checkMessageForResize );
+		}
+
+		syncListener();
+		iframe.addEventListener( 'load', syncListener );
 
 		return () => {
-			defaultView?.removeEventListener(
+			iframe.removeEventListener( 'load', syncListener );
+			currentView?.removeEventListener(
 				'message',
 				checkMessageForResize
 			);
