@@ -29,7 +29,8 @@ export default function useTabMenuSync( {
 	tabPanelClientId,
 	tabsMenuClientId,
 } ) {
-	const { removeBlock, insertBlock } = useDispatch( blockEditorStore );
+	const { removeBlock, insertBlock, replaceInnerBlocks } =
+		useDispatch( blockEditorStore );
 
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
@@ -60,7 +61,33 @@ export default function useTabMenuSync( {
 
 		// Both sides changed by the same amount.
 		// Covers: no-op re-renders, "Add Tab" toolbar, and toolbar-remove.
+		// Also handles drag-and-drop reordering of menu items.
 		if ( tabCountChange === menuItemCountChange ) {
+			// When lengths are equal but order changed, the user reordered menu
+			// items via drag-and-drop. Reorder the tab content blocks to match.
+			if (
+				tabCountChange === 0 &&
+				tabPanelClientId &&
+				currentMenuItems.some(
+					( m, i ) => m.clientId !== prevMenuItems[ i ]?.clientId
+				)
+			) {
+				const reorderedTabs = currentMenuItems
+					.map( ( menuItem ) => {
+						const oldIndex = prevMenuItems.findIndex(
+							( pm ) => pm.clientId === menuItem.clientId
+						);
+						return oldIndex !== -1 ? tabs[ oldIndex ] : null;
+					} )
+					.filter( Boolean );
+				if ( reorderedTabs.length === tabs.length ) {
+					replaceInnerBlocks(
+						tabPanelClientId,
+						reorderedTabs,
+						false
+					);
+				}
+			}
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
 				menuItems: currentMenuItems,
@@ -178,6 +205,7 @@ export default function useTabMenuSync( {
 		menuItems,
 		removeBlock,
 		insertBlock,
+		replaceInnerBlocks,
 		tabsMenuClientId,
 		tabPanelClientId,
 	] );

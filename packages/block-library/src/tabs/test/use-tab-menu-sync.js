@@ -69,14 +69,17 @@ function renderSync( initialProps ) {
 
 let removeBlock;
 let insertBlock;
+let replaceInnerBlocks;
 
 beforeEach( () => {
 	removeBlock = jest.fn();
 	insertBlock = jest.fn();
+	replaceInnerBlocks = jest.fn();
 
 	useDispatch.mockReturnValue( {
 		removeBlock,
 		insertBlock,
+		replaceInnerBlocks,
 	} );
 
 	createBlock.mockImplementation( ( name, attributes ) => ( {
@@ -228,6 +231,85 @@ describe( 'useTabMenuSync', () => {
 
 			expect( insertBlock ).not.toHaveBeenCalled();
 			expect( removeBlock ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'reordering', () => {
+		it( 'reorders tabs to match when menu items are dragged to a new position', () => {
+			const t1 = makeTab( 't1', 'Tab 1' );
+			const t2 = makeTab( 't2', 'Tab 2' );
+			const t3 = makeTab( 't3', 'Tab 3' );
+			const tabs = [ t1, t2, t3 ];
+			const menuItems = [
+				makeMenuItem( 'm1' ),
+				makeMenuItem( 'm2' ),
+				makeMenuItem( 'm3' ),
+			];
+
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			// User drags m1 to the end: new order is m2, m3, m1.
+			rerender( {
+				tabs,
+				menuItems: [
+					makeMenuItem( 'm2' ),
+					makeMenuItem( 'm3' ),
+					makeMenuItem( 'm1' ),
+				],
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( replaceInnerBlocks ).toHaveBeenCalledWith(
+				PANEL,
+				[ t2, t3, t1 ], // tabs reordered to match menu items
+				false
+			);
+			expect( removeBlock ).not.toHaveBeenCalled();
+			expect( insertBlock ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does nothing when menu items are in the same order', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const props = {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			};
+
+			const { rerender } = renderSync( props );
+			rerender( props );
+
+			expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does nothing when tab-panel clientId is missing during reorder', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: null,
+				tabsMenuClientId: MENU,
+			} );
+
+			rerender( {
+				tabs,
+				menuItems: [ makeMenuItem( 'm2' ), makeMenuItem( 'm1' ) ],
+				tabPanelClientId: null,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 		} );
 	} );
 
