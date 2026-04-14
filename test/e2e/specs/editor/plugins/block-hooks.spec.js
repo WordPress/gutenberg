@@ -268,6 +268,17 @@ test.describe( 'Block Hooks API', () => {
 						] );
 				} );
 
+				await test.step( "Hooked block isn't duplicated in the editor after a reload", async () => {
+					await page.reload();
+					await expect
+						.poll( editor.getBlocks )
+						.not.toMatchObject( [
+							{ name: 'core/freeform' },
+							expectedHookedBlockLastChild,
+							expectedHookedBlockLastChild,
+						] );
+				} );
+
 				await test.step( 'Moving the last hooked block is persisted upon save', async () => {
 					const hookedBlock = editor.canvas.getByText(
 						getHookedBlockContent( 'last_child', blockType )
