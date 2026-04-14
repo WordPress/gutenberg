@@ -1,4 +1,5 @@
 import type { Select as _Select } from '@base-ui/react/select';
+import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
 // The second type parameter is the `multiple` flag (currently disabled).
@@ -7,14 +8,7 @@ export type SelectRootProps = Omit<
 	'multiple'
 >;
 
-export type SelectTriggerProps = Omit<
-	_Select.Trigger.Props,
-	'children' | 'style'
-> & {
-	/**
-	 * CSS style applied to the trigger element.
-	 */
-	style?: React.CSSProperties;
+export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	/**
 	 * The size of the trigger.
 	 *
@@ -34,11 +28,11 @@ export type SelectTriggerProps = Omit<
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = Omit< _Select.Popup.Props, 'style' > & {
+export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
-	 * CSS style applied to the positioner element.
+	 * The content to be rendered inside the popup.
 	 */
-	style?: React.CSSProperties;
+	children?: React.ReactNode;
 	/**
 	 * A parent element to render the portal into.
 	 */
@@ -46,13 +40,9 @@ export type SelectPopupProps = Omit< _Select.Popup.Props, 'style' > & {
 };
 
 export type SelectItemProps = Omit<
-	_Select.Item.Props,
-	'children' | 'value' | 'style'
+	ComponentProps< typeof _Select.Item >,
+	'value'
 > & {
-	/**
-	 * CSS style applied to the item element.
-	 */
-	style?: React.CSSProperties;
 	/**
 	 * A unique value that identifies this select item.
 	 */

@@ -17,12 +17,12 @@ export type ComponentProps< E extends ElementType > = Omit<
 	'className' | 'children' | 'render' | 'style'
 > & {
 	/**
-	 * CSS class name to apply to the component.
+	 * CSS class name to apply to the element.
 	 */
 	className?: string;
 
 	/**
-	 * CSS style to apply to the component.
+	 * CSS style to apply to the element.
 	 */
 	style?: React.CSSProperties;
 
