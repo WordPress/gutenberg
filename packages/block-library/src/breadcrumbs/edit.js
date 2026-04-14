@@ -40,7 +40,6 @@ export default function BreadcrumbEdit( {
 	} = attributes;
 	const {
 		post,
-		isPostTypeHierarchical,
 		postTypeHasTaxonomies,
 		hasTermsAssigned,
 		isLoading,
@@ -66,7 +65,6 @@ export default function BreadcrumbEdit( {
 			}
 			return {
 				post: _post,
-				isPostTypeHierarchical: postTypeObject?.hierarchical,
 				postTypeHasTaxonomies: _postTypeHasTaxonomies,
 				hasTermsAssigned:
 					_post &&
@@ -140,16 +138,12 @@ export default function BreadcrumbEdit( {
 	}
 
 	// Try to determine breadcrumb type for more accurate previews.
+	// Whether to show taxonomy terms is always controlled by the attribute.
+	// Post types without any taxonomies can only use a hierarchical ancestor trail.
 	let _showTerms;
-	// Some non-hierarchical post types (e.g., attachments) can have parents.
-	// Use hierarchical breadcrumbs if a parent exists, otherwise use taxonomy breadcrumbs.
-	if ( ! isPostTypeHierarchical && ! post?.parent ) {
-		_showTerms = true;
-	} else if ( ! postTypeHasTaxonomies ) {
-		// Hierarchical post type without taxonomies can only use ancestors.
+	if ( ! postTypeHasTaxonomies ) {
 		_showTerms = false;
 	} else {
-		// For hierarchical post types with taxonomies, use the attribute.
 		_showTerms = prefersTaxonomy;
 	}
 	let placeholder = null;
@@ -162,7 +156,6 @@ export default function BreadcrumbEdit( {
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.
 		( templateSlug && ! postType ) ||
-		( ! _showTerms && ! isPostTypeHierarchical ) ||
 		( _showTerms && ! hasTermsAssigned );
 	if ( showPlaceholder ) {
 		const placeholderItems = [];
@@ -294,13 +287,13 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 				<CheckboxControl
-					label={ __( 'Prefer taxonomy terms' ) }
+					label={ __( 'Show taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>
 						setAttributes( { prefersTaxonomy: value } )
 					}
 					help={ __(
-						'The exact type of breadcrumbs shown will vary automatically depending on the page in which this block is displayed. In the specific case of a hierarchical post type with taxonomies, the breadcrumbs can either reflect its post hierarchy (default) or the hierarchy of its assigned taxonomy terms.'
+						'When enabled, taxonomy terms (e.g. categories) are included in the breadcrumb trail. For hierarchical post types, this replaces the default post ancestor hierarchy with the taxonomy term hierarchy.'
 					) }
 				/>
 			</InspectorControls>
