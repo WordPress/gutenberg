@@ -3,8 +3,6 @@ import { Button, SelectControl, TextControl } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 
-import styles from './motion.story.module.css';
-
 const EASING_TOKENS = [
 	{
 		name: 'subtle',
@@ -63,6 +61,44 @@ const DURATION_OPTIONS = [
 	{ label: 'Custom', value: 'custom' },
 ];
 
+const labelStyle = {
+	fontFamily: 'var(--wpds-typography-font-family-mono)',
+	fontSize: 'var(--wpds-typography-font-size-sm)',
+	color: 'var(--wpds-color-fg-content-neutral)',
+} as const;
+
+const descriptionStyle = {
+	fontFamily: 'var(--wpds-typography-font-family-body)',
+	fontSize: 'var(--wpds-typography-font-size-xs)',
+	color: 'var(--wpds-color-fg-content-neutral-weak)',
+} as const;
+
+const trackStyle = {
+	position: 'relative',
+	height: '40px',
+	borderRadius: 'var(--wpds-border-radius-sm)',
+	backgroundColor: 'var(--wpds-color-bg-surface-neutral-weak)',
+	overflow: 'hidden',
+	flex: 1,
+} as const;
+
+const dotKeyframes = `@keyframes slideRight {
+	from { inset-inline-start: 4px; }
+	to { inset-inline-start: calc(100% - 36px); }
+}`;
+
+const dotBaseStyle = {
+	position: 'absolute',
+	top: '4px',
+	insetInlineStart: '4px',
+	width: '32px',
+	height: '32px',
+	borderRadius: 'var(--wpds-border-radius-sm)',
+	backgroundColor: 'var(--wpds-color-bg-interactive-brand-strong)',
+	animationName: 'slideRight',
+	animationFillMode: 'forwards',
+} as const;
+
 function AnimationRow( {
 	label,
 	description,
@@ -83,18 +119,16 @@ function AnimationRow( {
 				gap="xs"
 				style={ { width: '320px', flexShrink: 0 } }
 			>
-				<span className={ styles.label }>{ label }</span>
+				<span style={ labelStyle }>{ label }</span>
 				{ description && (
-					<span className={ styles.description }>
-						{ description }
-					</span>
+					<span style={ descriptionStyle }>{ description }</span>
 				) }
 			</Stack>
-			<div className={ styles.track }>
+			<div style={ trackStyle }>
 				<div
 					key={ animKey }
-					className={ styles.dot }
 					style={ {
+						...dotBaseStyle,
 						animationDuration: duration,
 						animationTimingFunction: easing,
 					} }
@@ -119,6 +153,8 @@ function MotionDemo() {
 
 	return (
 		<Stack direction="column" gap="xl">
+			{ /* eslint-disable-next-line react/no-danger */ }
+			<style dangerouslySetInnerHTML={ { __html: dotKeyframes } } />
 			<div>
 				<Button variant="secondary" onClick={ replay }>
 					Replay animations
