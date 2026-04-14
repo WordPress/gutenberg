@@ -12,6 +12,7 @@ import { useSettings } from '../use-settings';
 export const defaultLayout = { type: 'default' };
 
 const Layout = createContext( defaultLayout );
+Layout.displayName = 'BlockLayoutContext';
 
 /**
  * Allows to define the layout.

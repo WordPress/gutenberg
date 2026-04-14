@@ -1,0 +1,14 @@
+.wp-block-tabs-menu-item {
+	&.is-selected {
+		outline-offset: 2px;
+	}
+}
+
+.block-editor-block-preview__live-content:has(.wp-block-tabs-menu-item) {
+	flex-basis: inherit !important;
+	flex-grow: inherit !important;
+
+	.wp-block-tabs-menu-item {
+		flex-basis: 100% !important;
+	}
+}

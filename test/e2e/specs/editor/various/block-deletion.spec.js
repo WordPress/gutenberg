@@ -387,4 +387,50 @@ test.describe( 'Block deletion', () => {
 		// TODO: There should be expectations around where focus is placed in
 		// this scenario. Currently, a focus loss occurs, which is unacceptable.
 	} );
+
+	test( 'empty heading block below image block should be deleted on backspace', async ( {
+		editor,
+		page,
+	} ) => {
+		// Add an image block first
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				url: 'https://cldup.com/cXyG__fTLN.jpg',
+			},
+		} );
+
+		// Add an empty heading block
+		await editor.insertBlock( {
+			name: 'core/heading',
+		} );
+
+		// Verify initial state - should have both blocks
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/heading' },
+			] );
+
+		// Focus on the heading block (it should be empty by default)
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading',
+		} );
+		await headingBlock.click();
+
+		// Press backspace to trigger merge - this should remove the empty heading
+		await page.keyboard.press( 'Backspace' );
+
+		// After the fix: heading block should be removed, only image block should remain
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [ { name: 'core/image' } ] );
+
+		// Image block should now be focused
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect( imageBlock ).toBeFocused();
+	} );
 } );

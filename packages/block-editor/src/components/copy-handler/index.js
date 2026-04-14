@@ -17,6 +17,7 @@ export const __unstableUseClipboardHandler = () => {
 		since: '6.4',
 		version: '6.7',
 	} );
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	return useClipboardHandler();
 };
 

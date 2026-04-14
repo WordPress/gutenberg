@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .edit-widgets-customizer-edit-widgets-initializer__content {
 	position: relative;
 	.edit-widgets-header {

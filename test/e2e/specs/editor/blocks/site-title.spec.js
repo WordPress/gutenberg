@@ -14,10 +14,7 @@ test.describe( 'Site Title block', () => {
 		await requestUtils.updateSiteSettings( { title: originalSiteTitle } );
 	} );
 
-	// Reinstate once the patch that fixes the REST API endpoints is committed to core.
-	// https://core.trac.wordpress.org/ticket/41604.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'Can edit the site title as admin', async ( {
+	test( 'Can edit the site title as admin', async ( {
 		admin,
 		editor,
 		page,

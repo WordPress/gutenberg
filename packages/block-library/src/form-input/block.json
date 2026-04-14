@@ -9,7 +9,6 @@
 	"description": "Provides the basic building block for forms.",
 	"keywords": [ "input", "form" ],
 	"textdomain": "default",
-	"icon": "forms",
 	"attributes": {
 		"type": {
 			"type": "string",

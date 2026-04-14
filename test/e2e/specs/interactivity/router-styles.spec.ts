@@ -53,6 +53,7 @@ test.describe( 'Router styles', () => {
 
 	test.beforeEach( async ( { page, interactivityUtils: utils } ) => {
 		await page.goto( utils.getLink( 'none' ) );
+		await expect( page.getByTestId( 'hydrated' ) ).toBeVisible();
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -299,13 +300,25 @@ test.describe( 'Router styles', () => {
 		await expect( red ).toHaveCSS( 'color', COLOR_WRAPPER );
 		await expect( redBlock ).toBeHidden();
 
-		// Setup a route handler to make requests to the red stylesheet fail.
-		// The route handler is removed after navigation to simulate a
-		// temporary error.
+		/*
+		 * Set up a route handler to make requests to the red stylesheet fail.
+		 * The route handler only aborts the request the first time to simulate
+		 * a temporary error. It is later removed at the end of the test.
+		 *
+		 * This approach uses a variable to determine whether to abort or continue
+		 * the request. Other approaches, like removing the route handler during
+		 * execution or using the `times` option, proved unreliable and made the
+		 * test flaky.
+		 */
+		let intercepted = false;
 		const linkPattern = '**/router-styles-red/style-from-link.css*';
 		await page.route( linkPattern, async ( route ) => {
-			await page.unroute( linkPattern );
-			return route.abort( 'failed' );
+			if ( ! intercepted ) {
+				intercepted = true;
+				await route.abort( 'failed' );
+			} else {
+				await route.continue();
+			}
 		} );
 
 		// Navigate to the page with the Red block
@@ -314,6 +327,8 @@ test.describe( 'Router styles', () => {
 		await expect( csn ).toBeHidden();
 		await expect( red ).toHaveCSS( 'color', COLOR_RED );
 		await expect( redBlock ).toBeVisible();
+
+		await page.unroute( linkPattern );
 	} );
 
 	test( 'should not apply preloaded styles in current page', async ( {
@@ -410,5 +425,102 @@ test.describe( 'Router styles', () => {
 		await expect( green ).toHaveCSS( 'color', COLOR_GREEN );
 		await expect( blue ).toHaveCSS( 'color', COLOR_WRAPPER );
 		await expect( all ).toHaveCSS( 'color', COLOR_GREEN );
+	} );
+
+	test( 'should respect the original media attribute on initial style sheets', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const hideOnPrint = page.getByTestId( 'hide-on-print' );
+
+		await expect( hideOnPrint ).toBeVisible();
+
+		await page.getByTestId( 'link red' ).click();
+
+		// This element disappears when a navigation starts.
+		// It should be visible again after a successful navigation.
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// The "hide-on-print" element should remain visible.
+		await expect( hideOnPrint ).toBeVisible();
+	} );
+
+	test( 'should update styles when navigating to a cached page with force', async ( {
+		page,
+		request,
+		interactivityUtils: utils,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const red = page.getByTestId( 'red' );
+		const green = page.getByTestId( 'green' );
+
+		// Navigate to "red" to cache the page and populate the
+		// internal style cache for the red page URL.
+		await page.getByTestId( 'link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		// Navigate to "green" so red styles are removed.
+		await page.getByTestId( 'link green' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Intercept the next fetch to the red page URL and respond
+		// with the "all" page HTML instead.
+		const redLink = utils.getLink( 'red' );
+		const allLink = utils.getLink( 'all' );
+		await page.route( redLink, async ( route ) => {
+			// Fetch the "all" page HTML to simulate server-side content
+			// changes (e.g., new blocks appearing on the page).
+			const allPage = await request.fetch( allLink );
+			const body = await allPage.body();
+			return route.fulfill( { body, contentType: 'text/html' } );
+		} );
+
+		// Force-navigate to "red". The response now contains all
+		// three color blocks with their styles.
+		await page.getByTestId( 'force link red' ).click();
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// Red and green styles should be present.
+		await expect( red ).toHaveCSS( 'color', COLOR_RED );
+		await expect( green ).toHaveCSS( 'color', COLOR_GREEN );
+
+		// Unroute previous route handler for "red".
+		await page.unroute( redLink );
+	} );
+
+	test( 'should ignore styles inside noscript elements during navigation', async ( {
+		page,
+	} ) => {
+		const csn = page.getByTestId( 'client-side navigation' );
+		const noscriptStyleTest = page.getByTestId( 'noscript-style-test' );
+
+		// Initially the element should not have styling from noscript.
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link red' ).click();
+
+		// This element disappears when a navigation starts.
+		// It should be visible again after a successful navigation.
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// After navigation, the element should still have the default color
+		// and not be affected by styles in noscript elements
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
+
+		await page.getByTestId( 'link all' ).click();
+
+		await expect( csn ).toBeHidden();
+		await expect( csn ).toBeVisible();
+
+		// After navigating to the page with all blocks, the element should
+		// still maintain its original styling and not be affected by noscript styles
+		await expect( noscriptStyleTest ).toHaveCSS( 'color', COLOR_WRAPPER );
 	} );
 } );

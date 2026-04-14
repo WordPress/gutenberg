@@ -1,25 +1,21 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentControl,
-	BlockControls,
-	useBlockProps,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
-function PostAuthorBiographyEdit( {
-	context: { postType, postId },
-	attributes: { textAlign },
-	setAttributes,
-} ) {
+/**
+ * Internal dependencies
+ */
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+function PostAuthorBiographyEdit( props ) {
+	useDeprecatedTextAlign( props );
+	const {
+		context: { postType, postId },
+	} = props;
 	const { authorDetails } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getUser } = select( coreStore );
@@ -36,25 +32,13 @@ function PostAuthorBiographyEdit( {
 		[ postType, postId ]
 	);
 
-	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-		} ),
-	} );
+	const blockProps = useBlockProps();
 
 	const displayAuthorBiography =
 		authorDetails?.description || __( 'Author Biography' );
 
 	return (
 		<>
-			<BlockControls group="block">
-				<AlignmentControl
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
 			<div
 				{ ...blockProps }
 				dangerouslySetInnerHTML={ { __html: displayAuthorBiography } }

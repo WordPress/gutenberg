@@ -1,4 +1,8 @@
-# (Experimental) Interface
+# Interface
+
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
 
 The Interface Package contains the basis to start a new WordPress screen as Edit Post or Edit Site. The package offers a data store and a set of components. The store is useful to contain common data required by a screen (e.g., active areas). The information is persisted across screen reloads. The components allow one to implement functionality like a sidebar or menu items. Third-party plugins can extend them by default.
 

@@ -34,6 +34,9 @@ test.describe( 'Buttons', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/buttons' );
+		await expect(
+			page.getByRole( 'option', { name: 'Buttons' } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
 
@@ -60,7 +63,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -91,7 +94,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -111,7 +114,7 @@ test.describe( 'Buttons', () => {
 		).toBeVisible();
 	} );
 
-	test( 'appends http protocol to links added which are missing a protocol', async ( {
+	test( 'appends https protocol to links added which are missing a protocol', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -123,7 +126,9 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
+		const urlInput = page.locator(
+			'role=combobox[name="Search or type URL"i]'
+		);
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );
@@ -133,8 +138,8 @@ test.describe( 'Buttons', () => {
 		await pageUtils.pressKeys( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
-		// Check the value of the URL input has had http:// prepended.
-		await expect( urlInput ).toHaveValue( 'http://example.com' );
+		// Check the value of the URL input has had https:// prepended.
+		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
 	test( 'can jump to the link editor using the keyboard shortcut', async ( {
@@ -145,7 +150,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
@@ -172,7 +179,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 
 		// Edit link.
@@ -201,7 +210,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// The link should have been inserted.
@@ -235,7 +244,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// Check the content again.
@@ -257,28 +266,77 @@ test.describe( 'Buttons', () => {
 		] );
 	} );
 
-	test( 'can resize width', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/buttons' } );
-		await page.keyboard.type( 'Content' );
-		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'tab', { name: 'Settings' } )
-			.click();
-		await page
-			.getByRole( 'radiogroup', { name: 'Width' } )
-			.getByRole( 'radio', { name: '25%' } )
-			.click();
+	test.describe( 'Width support', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'emptytheme' );
+		} );
 
-		// Check the content.
-		const content = await editor.getEditedPostContent();
-		expect( content ).toBe(
-			`<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button {"width":25} -->
-<div class="wp-block-button has-custom-width wp-block-button__width-25"><a class="wp-block-button__link wp-element-button">Content</a></div>
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		} );
+
+		test.beforeEach( async ( { admin } ) => {
+			await admin.createNewPost();
+		} );
+
+		test( 'can resize width', async ( { editor, page } ) => {
+			// Mock spacing units to include % for the width control
+			await page.waitForFunction( () => window?.wp?.data );
+			await page.evaluate( () => {
+				const settings = window.wp.data
+					.select( 'core/block-editor' )
+					.getSettings();
+				window.wp.data.dispatch( 'core/block-editor' ).updateSettings( {
+					...settings,
+					spacing: { units: [ 'px', '%', 'em', 'rem', 'vh', 'vw' ] },
+				} );
+			} );
+
+			await editor.insertBlock( { name: 'core/buttons' } );
+			await page.keyboard.type( 'Content' );
+
+			// Select the inner Button block (not the outer Buttons container)
+			const buttonBlock = editor.canvas
+				.getByRole( 'document', {
+					name: 'Block: Button',
+					exact: true,
+				} )
+				.filter( { hasText: 'Content' } );
+			await editor.selectBlocks( buttonBlock );
+
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsPanel = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Switch from preset slider to custom value input
+			await settingsPanel
+				.getByRole( 'group', { name: 'Width' } )
+				.getByLabel( 'Set custom value' )
+				.click();
+
+			// Change the unit from px to % using the combobox
+			await settingsPanel
+				.getByRole( 'combobox', { name: 'Select unit' } )
+				.first()
+				.selectOption( '%' );
+
+			// Set the width value
+			await settingsPanel
+				.getByRole( 'spinbutton', { name: 'Width', exact: true } )
+				.fill( '25' );
+
+			// Check the content.
+			const content = await editor.getEditedPostContent();
+			expect( content ).toBe(
+				`<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
-		);
+			);
+		} );
 	} );
 
 	test( 'can apply named colors', async ( { editor, page } ) => {
@@ -286,10 +344,6 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
@@ -315,10 +369,6 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
@@ -350,10 +400,6 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
@@ -379,10 +425,6 @@ test.describe( 'Buttons', () => {
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
 
-		// Switch to the Styles tab.
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
-		);
 		await page.click(
 			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);

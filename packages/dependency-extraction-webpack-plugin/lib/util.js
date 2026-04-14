@@ -1,17 +1,14 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-
-// !!
-// This list must be kept in sync with the same list in tools/webpack/packages.js
-// !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/sync',
 	'@wordpress/undo-manager',
-	'@wordpress/upload-media',
 	'@wordpress/fields',
+	'@wordpress/views',
+	'@wordpress/ui',
 ];
 
 /**

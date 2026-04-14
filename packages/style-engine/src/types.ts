@@ -28,6 +28,7 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		gradient?: CSSProperties[ 'backgroundImage' ];
 	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
@@ -48,7 +49,9 @@ export interface Style {
 	};
 	dimensions?: {
 		aspectRatio?: CSSProperties[ 'aspectRatio' ];
+		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
+		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;

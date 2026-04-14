@@ -18,20 +18,25 @@ function gutenberg_test_block_bindings_registration() {
 	$upload_dir  = wp_upload_dir();
 	$testing_url = $upload_dir['url'] . '/1024x768_e2e_test_image_size.jpeg';
 	$fields_list = array(
-		'text_field'  => array(
+		'text_field'          => array(
 			'label' => 'Text Field Label',
 			'value' => 'Text Field Value',
 			'type'  => 'string',
 		),
-		'url_field'   => array(
+		'url_field'           => array(
 			'label' => 'URL Field Label',
 			'value' => $testing_url,
 			'type'  => 'string',
 		),
-		'empty_field' => array(
+		'empty_field'         => array(
 			'label' => 'Empty Field Label',
 			'value' => '',
 			'type'  => 'string',
+		),
+		'number_custom_field' => array(
+			'label' => 'Number Custom Field Label',
+			'value' => 10.5,
+			'type'  => 'number',
 		),
 	);
 
@@ -41,11 +46,6 @@ function gutenberg_test_block_bindings_registration() {
 		plugins_url( 'block-bindings/index.js', __FILE__ ),
 		array(
 			'wp-blocks',
-			'wp-block-editor',
-			'wp-components',
-			'wp-compose',
-			'wp-element',
-			'wp-hooks',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'block-bindings/index.js' ),
 		true
@@ -69,7 +69,9 @@ function gutenberg_test_block_bindings_registration() {
 				if ( ! isset( $source_args['key'] ) || ! isset( $fields_list[ $source_args['key'] ] ) ) {
 					return null;
 				}
-				return $fields_list[ $source_args['key'] ]['value']; },
+				return $fields_list[ $source_args['key'] ]['value'];
+			},
+			'uses_context'       => array( 'postType', 'postId' ),
 		)
 	);
 	register_block_bindings_source(
@@ -164,13 +166,13 @@ function gutenberg_test_block_bindings_registration() {
 	);
 	register_meta(
 		'post',
-		'number',
+		'number_custom_field',
 		array(
 			'label'        => 'Number custom field',
 			'type'         => 'number',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5.5,
+			'default'      => 0.5,
 		)
 	);
 	register_meta(
@@ -181,7 +183,7 @@ function gutenberg_test_block_bindings_registration() {
 			'type'         => 'integer',
 			'show_in_rest' => true,
 			'single'       => true,
-			'default'      => 5,
+			'default'      => 3,
 		)
 	);
 	register_meta(

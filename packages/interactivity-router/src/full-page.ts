@@ -21,20 +21,14 @@ const isValidEvent = ( event: MouseEvent ) =>
 	! event.defaultPrevented;
 
 // Navigate on click.
-document.addEventListener(
-	'click',
-	async ( event ) => {
-		const ref = ( event.target as Element ).closest( 'a' );
-		if ( isValidLink( ref ) && isValidEvent( event ) ) {
-			event.preventDefault();
-			const { actions } = await import(
-				'@wordpress/interactivity-router'
-			);
-			actions.navigate( ref.href );
-		}
-	},
-	true
-);
+document.addEventListener( 'click', async ( event ) => {
+	const ref = ( event.target as Element ).closest( 'a' );
+	if ( isValidLink( ref ) && isValidEvent( event ) ) {
+		event.preventDefault();
+		const { actions } = await import( '@wordpress/interactivity-router' );
+		actions.navigate( ref.href );
+	}
+} );
 // Prefetch on hover.
 document.addEventListener(
 	'mouseenter',

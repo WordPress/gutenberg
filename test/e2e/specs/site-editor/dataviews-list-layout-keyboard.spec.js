@@ -136,7 +136,7 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
-				.getByLabel( 'Edit' )
+				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowRight' );
@@ -150,11 +150,39 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
-				.getByLabel( 'Edit' )
+				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+	} );
+
+	test( 'Search input retains focus while typing', async ( { page } ) => {
+		const searchBox = page.getByRole( 'searchbox', { name: 'Search' } );
+		const grid = page.getByRole( 'grid' );
+
+		// Wait for Ariakit to auto-activate the first composite item.
+		await expect( grid.locator( '[data-active-item]' ) ).toBeVisible();
+
+		// Determine which item is active so we can search for the other one,
+		// forcing the active item to be filtered out of the list.
+		const activeRow = grid.locator(
+			'[role="row"]:has([data-active-item])'
+		);
+		const activeRowText = await activeRow.textContent();
+		const searchTerm = activeRowText.includes( 'Privacy' )
+			? 'Sample'
+			: 'Privacy';
+
+		// Type a query that filters out the auto-activated item.
+		await searchBox.click();
+		await searchBox.fill( searchTerm );
+
+		// Wait for the debounced search to filter the list.
+		await expect( grid.getByRole( 'row' ) ).toHaveCount( 1 );
+
+		// Focus should still be on the search input, not stolen by the list.
+		await expect( searchBox ).toBeFocused();
 	} );
 
 	test( 'Navigates the list via UP/DOWN arrow keys from action buttons', async ( {
@@ -178,14 +206,14 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', { name: 'Sample Page Edit Actions' } )
-				.getByLabel( 'Edit' )
+				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			page
 				.getByRole( 'row', { name: 'Privacy Policy Edit Actions' } )
-				.getByLabel( 'Edit' )
+				.getByRole( 'button', { name: 'Edit' } )
 		).toBeFocused();
 
 		// Use arrow up/down to move through the list from the all actions button.
