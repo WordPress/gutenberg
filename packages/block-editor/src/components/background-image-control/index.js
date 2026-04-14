@@ -12,6 +12,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 	DropZone,
 	FlexBlock,
 	FocalPointPicker,
@@ -265,6 +266,58 @@ function LoadingSpinner() {
 		</Placeholder>
 	);
 }
+function BackgroundImageURLInput( { url, onApply, onClose } ) {
+	const [ inputValue, setInputValue ] = useState( url ?? '' );
+
+	const handleApply = () => {
+		onApply( inputValue );
+		onClose();
+	};
+
+	const handleKeyDown = ( event ) => {
+		if ( event.key === 'Enter' ) {
+			handleApply();
+		}
+		if ( event.key === 'Escape' ) {
+			onClose();
+		}
+	};
+
+	return (
+		<VStack
+			spacing={ 3 }
+			className="block-editor-global-styles-background-panel__url-input-container"
+		>
+			<InputControl
+				label={ __( 'Image URL' ) }
+				value={ inputValue }
+				placeholder={ __( 'Paste or type URL' ) }
+				onChange={ ( val ) => setInputValue( val ?? '' ) }
+				onKeyDown={ handleKeyDown }
+				type="url"
+				size="__unstable-large"
+			/>
+			<HStack justify="flex-start" spacing={ 2 }>
+				<Button
+					variant="primary"
+					onClick={ handleApply }
+					disabled={ ! inputValue }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
+				>
+					{ __( 'Apply' ) }
+				</Button>
+				<Button
+					variant="tertiary"
+					onClick={ onClose }
+					__next40pxDefaultSize
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+			</HStack>
+		</VStack>
+	);
+}
 
 function BackgroundImageControls( {
 	onChange,
@@ -277,6 +330,10 @@ function BackgroundImageControls( {
 	containerRef,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
+
+	// Controls visibility of the inline URL input, replacing MediaReplaceFlow.
+	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
+
 	const { getSettings } = useSelect( blockEditorStore );
 
 	const { id, title, url } = style?.background?.backgroundImage || {
@@ -353,6 +410,31 @@ function BackgroundImageControls( {
 		focusToggleButton( containerRef );
 	};
 
+	/**
+	 * Handles applying a URL-sourced background image.
+	 * Stored as `{ url, source: 'url' }` with no `id`, distinguishing it
+	 * from a media-library image (`{ id, url, source: 'file' }`).
+	 *
+	 * @param {string} newURL The URL entered by the user.
+	 */
+	const onSelectURL = ( newURL ) => {
+		if ( ! newURL ) {
+			resetBackgroundImage();
+			return;
+		}
+		onChange(
+			setImmutably( style, [ 'background' ], {
+				...style?.background,
+				backgroundImage: {
+					url: newURL,
+					source: 'url',
+				},
+			} )
+		);
+		// Focus the toggle button after applying, same as onSelectMedia.
+		focusToggleButton( containerRef );
+	};
+
 	// Drag and drop callback, restricting image to one.
 	const onFilesDrop = ( filesList ) => {
 		getSettings().mediaUpload( {
@@ -375,51 +457,77 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+
+	// Resolve current URL regardless of storage format.
+	const currentURL =
+		typeof style?.background?.backgroundImage === 'string'
+			? style.background.backgroundImage
+			: style?.background?.backgroundImage?.url;
+
 	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
 			{ isUploading && <LoadingSpinner /> }
-			<MediaReplaceFlow
-				mediaId={ id }
-				mediaURL={ url }
-				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
-				accept="image/*"
-				onSelect={ onSelectMedia }
-				popoverProps={ {
-					className: clsx( {
-						'block-editor-global-styles-background-panel__media-replace-popover':
-							displayInPanel,
-					} ),
-				} }
-				name={
-					<InspectorImagePreviewItem
-						imgUrl={ url }
-						filename={ title }
-						label={ imgLabel }
-					/>
-				}
-				renderToggle={ ( props ) => (
-					<Button { ...props } __next40pxDefaultSize />
-				) }
-				onError={ onUploadError }
-				onReset={ () => {
-					focusToggleButton( containerRef );
-					onResetImage();
-				} }
-			>
-				{ canRemove && (
-					<MenuItem
-						onClick={ () => {
-							focusToggleButton( containerRef );
-							onRemove();
-							onRemoveImage();
-						} }
-					>
-						{ __( 'Remove' ) }
+			{ isURLInputVisible ? (
+				/*
+				 * Replace the MediaReplaceFlow button with the inline URL
+				 * input when the user clicks "Use image URL".
+				 */
+				<BackgroundImageURLInput
+					url={ currentURL }
+					onApply={ onSelectURL }
+					onClose={ () => setIsURLInputVisible( false ) }
+				/>
+			) : (
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
+					accept="image/*"
+					onSelect={ onSelectMedia }
+					popoverProps={ {
+						className: clsx( {
+							'block-editor-global-styles-background-panel__media-replace-popover':
+								displayInPanel,
+						} ),
+					} }
+					name={
+						<InspectorImagePreviewItem
+							imgUrl={ url }
+							filename={ title }
+							label={ imgLabel }
+						/>
+					}
+					renderToggle={ ( props ) => (
+						<Button { ...props } __next40pxDefaultSize />
+					) }
+					onError={ onUploadError }
+					onReset={ () => {
+						focusToggleButton( containerRef );
+						onResetImage();
+					} }
+				>
+					{ /*
+					 * "Use image URL" appears in the MediaReplaceFlow popover
+					 * alongside Upload / Media Library options.
+					 */ }
+					<MenuItem onClick={ () => setIsURLInputVisible( true ) }>
+						{ __( 'Use image URL' ) }
 					</MenuItem>
-				) }
-			</MediaReplaceFlow>
+					{ canRemove && (
+						<MenuItem
+							onClick={ () => {
+								focusToggleButton( containerRef );
+								onRemove();
+								onRemoveImage();
+							} }
+						>
+							{ __( 'Remove' ) }
+						</MenuItem>
+					) }
+				</MediaReplaceFlow>
+			) }
 			<DropZone
 				onFilesDrop={ onFilesDrop }
 				label={ __( 'Drop to upload' ) }
