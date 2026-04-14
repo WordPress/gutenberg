@@ -12,11 +12,11 @@ export const ActionLink = forwardRef< HTMLAnchorElement, ActionLinkProps >(
 	function NoticeActionLink( { className, ...props }, ref ) {
 		return (
 			<Text
-				variant="body-md"
-				render={ <Link tone="neutral" variant="default" /> }
 				ref={ ref }
 				className={ clsx( styles[ 'action-link' ], className ) }
 				{ ...props }
+				variant="body-md"
+				render={ <Link tone="neutral" variant="default" /> }
 			/>
 		);
 	}
