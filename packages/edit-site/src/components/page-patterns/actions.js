@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 
@@ -24,7 +28,7 @@ export default function PatternsActions( { categoryId, type } ) {
 	}
 
 	return (
-		<>
+		<HStack className="edit-site-page-patterns-dataviews__header-actions">
 			<AddNewPattern />
 			{ !! patternCategory?.id && (
 				<DropdownMenu
@@ -49,6 +53,6 @@ export default function PatternsActions( { categoryId, type } ) {
 					) }
 				</DropdownMenu>
 			) }
-		</>
+		</HStack>
 	);
 }
