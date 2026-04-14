@@ -2,23 +2,23 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
 import {
 	useRef,
+	useState,
 	useCallback,
+	useMemo,
 	forwardRef,
 	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import {
-	__unstableUseRichText as useRichText,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -33,14 +33,15 @@ import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
-import { useFormatTypes } from './use-format-types';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
-import { canBindBlock } from '../../utils/block-bindings';
 import BlockContext from '../block-context';
+import { unlock } from '../../lock-unlock';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -123,6 +124,7 @@ export function RichTextWrapper(
 
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
+	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
@@ -135,12 +137,8 @@ export function RichTextWrapper(
 			return { isSelected: false };
 		}
 
-		const {
-			getSelectionStart,
-			getSelectionEnd,
-			getBlockEditingMode,
-			isNavigationMode,
-		} = select( blockEditorStore );
+		const { getSelectionStart, getSelectionEnd } =
+			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
 
@@ -161,26 +159,29 @@ export function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			isContentOnlyWriteMode:
-				isNavigationMode() &&
-				getBlockEditingMode( clientId ) === 'contentOnly',
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected, isContentOnlyWriteMode } =
-		useSelect( selector, [
-			clientId,
-			identifier,
-			instanceId,
-			originalIsSelected,
-			isBlockSelected,
-		] );
+	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+		clientId,
+		identifier,
+		instanceId,
+		originalIsSelected,
+		isBlockSelected,
+	] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			if (
-				! blockBindings?.[ identifier ] ||
-				! canBindBlock( blockName )
-			) {
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
+
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
+			if ( ! bindableAttributes ) {
 				return {};
 			}
 
@@ -214,13 +215,19 @@ export function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			const fieldsList = blockBindingsSource?.getFieldsList?.( {
-				select,
-				context: blockBindingsContext,
-			} );
+			let clientSideFieldLabel = null;
+			if ( blockBindingsSource?.getFieldsList ) {
+				const fieldsItems = blockBindingsSource.getFieldsList( {
+					select,
+					context: blockBindingsContext,
+				} );
+				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
+				)?.label;
+			}
+
 			const bindingKey =
-				fieldsList?.[ relatedBinding?.args?.key ]?.label ??
-				blockBindingsSource?.label;
+				clientSideFieldLabel ?? blockBindingsSource?.label;
 
 			const _bindingsPlaceholder = _disableBoundBlock
 				? bindingKey
@@ -253,8 +260,15 @@ export function RichTextWrapper(
 			blockContext,
 		]
 	);
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
 
-	const shouldDisableEditing = readOnly || disableBoundBlock;
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
+
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || shouldDisableForPattern;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -326,62 +340,14 @@ export function RichTextWrapper(
 	);
 
 	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier,
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: isContentOnlyWriteMode,
-	} );
-
-	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	function removeEditorOnlyFormats( value ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat(
-					value,
-					formatType.name,
-					0,
-					value.text.length
-				);
-			}
-		} );
-
-		return value.formats;
-	}
-
-	function addInvisibleFormats( value ) {
-		return prepareHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	const {
 		value,
 		getValue,
 		onChange,
 		ref: richTextRef,
+		formatTypes,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange( html, { __unstableFormats, __unstableText } ) {
-			adjustedOnChange( html );
-			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-				changeHandler( __unstableFormats, __unstableText );
-			} );
-		},
+		onChange: adjustedOnChange,
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -389,10 +355,16 @@ export function RichTextWrapper(
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
-		__unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -434,7 +406,7 @@ export function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					editableContentElement={ anchorRef.current }
+					editableContentElement={ anchorElement }
 				/>
 			) }
 			<TagName
@@ -477,7 +449,6 @@ export function RichTextWrapper(
 						pastePlainText,
 						onMerge,
 						onRemove,
-						removeEditorOnlyFormats,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
@@ -485,6 +456,7 @@ export function RichTextWrapper(
 						inputEvents,
 					} ),
 					anchorRef,
+					setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
@@ -563,9 +535,10 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		} = removeNativeProps( props );
 		return (
 			<Tag
+				ref={ ref }
 				{ ...contentProps }
 				dangerouslySetInnerHTML={ {
-					__html: valueToHTMLString( value, multiline ),
+					__html: valueToHTMLString( value, multiline ) || '<br>',
 				} }
 			/>
 		);
@@ -582,4 +555,4 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 export default PublicForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';

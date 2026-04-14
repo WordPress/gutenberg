@@ -103,7 +103,7 @@ test.describe( 'Post title', () => {
 			);
 		} );
 
-		test( `should show raw HTML in the post title field when in Code view mode `, async ( {
+		test( `should show raw HTML in the post title field when in Code view mode`, async ( {
 			page,
 			admin,
 			requestUtils,

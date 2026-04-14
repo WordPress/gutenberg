@@ -15,6 +15,7 @@ import {
 	Button,
 	Spinner,
 	TextControl,
+	ExternalLink,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -30,7 +31,12 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useMemo, useEffect, useState } from '@wordpress/element';
+import {
+	useMemo,
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -272,7 +278,6 @@ export default function PostFeaturedImageEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={
 									postType?.labels.singular_name
 										? sprintf(
@@ -301,7 +306,6 @@ export default function PostFeaturedImageEdit( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open in new tab' ) }
 									onChange={ ( value ) =>
 										setAttributes( {
@@ -316,7 +320,7 @@ export default function PostFeaturedImageEdit( {
 						) }
 						{ isLink && (
 							<ToolsPanelItem
-								label={ __( 'Link rel' ) }
+								label={ __( 'Link relation' ) }
 								isShownByDefault
 								hasValue={ () => !! rel }
 								onDeselect={ () =>
@@ -327,8 +331,17 @@ export default function PostFeaturedImageEdit( {
 							>
 								<TextControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Link rel' ) }
+									label={ __( 'Link relation' ) }
+									help={ createInterpolateElement(
+										__(
+											'The <a>Link Relation</a> attribute defines the relationship between a linked resource and the current document.'
+										),
+										{
+											a: (
+												<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
+											),
+										}
+									) }
 									value={ rel }
 									onChange={ ( newRel ) =>
 										setAttributes( { rel: newRel } )

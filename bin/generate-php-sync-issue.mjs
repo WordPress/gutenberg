@@ -430,7 +430,6 @@ async function fetchCommit( sha ) {
 	} );
 }
 
-// eslint-disable-next-line no-unused-vars
 async function getPullRequestDataForCommit( commitSha ) {
 	const pullRequests = await octokitRequest(
 		'GET /repos/{owner}/{repo}/commits/{commit_sha}/pulls',

@@ -12,7 +12,11 @@ const EditableText = forwardRef( ( props, ref ) => {
 	return <RichText ref={ ref } { ...props } __unstableDisableFormats />;
 } );
 
-EditableText.Content = ( { value = '', tagName: Tag = 'div', ...props } ) => {
+EditableText.Content = function Content( {
+	value = '',
+	tagName: Tag = 'div',
+	...props
+} ) {
 	return <Tag { ...props }>{ value }</Tag>;
 };
 

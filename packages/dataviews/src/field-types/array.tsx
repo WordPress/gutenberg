@@ -8,21 +8,57 @@ import { __ } from '@wordpress/i18n';
  */
 import type {
 	DataViewRenderFieldProps,
-	SortDirection,
-	FieldTypeDefinition,
 	NormalizedField,
+	SortDirection,
 } from '../types';
+import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS_ALL,
 	OPERATOR_IS_ANY,
 	OPERATOR_IS_NONE,
 	OPERATOR_IS_NOT_ALL,
 } from '../constants';
+import isValidRequiredForArray from './utils/is-valid-required-for-array';
+import isValidElements from './utils/is-valid-elements';
 
-// Sort arrays by length, then alphabetically by joined string
-function sort( valueA: any, valueB: any, direction: SortDirection ) {
-	const arrA = Array.isArray( valueA ) ? valueA : [];
-	const arrB = Array.isArray( valueB ) ? valueB : [];
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	const value = field.getValue( { item } );
+	const arr = Array.isArray( value ) ? value : [];
+	return arr.join( ', ' );
+}
+
+function render( { item, field }: DataViewRenderFieldProps< any > ) {
+	return getValueFormatted( { item, field } );
+}
+
+function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
+	const value = field.getValue( { item } );
+
+	if (
+		! [ undefined, '', null ].includes( value ) &&
+		! Array.isArray( value )
+	) {
+		return __( 'Value must be an array.' );
+	}
+
+	// Only allow strings for now. Can be extended to other types in the future.
+	if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
+		return __( 'Every value must be a string.' );
+	}
+
+	return null;
+}
+
+const sort = ( a: any, b: any, direction: SortDirection ) => {
+	// Sort arrays by length, then alphabetically by joined string
+	const arrA = Array.isArray( a ) ? a : [];
+	const arrB = Array.isArray( b ) ? b : [];
 	if ( arrA.length !== arrB.length ) {
 		return direction === 'asc'
 			? arrA.length - arrB.length
@@ -34,54 +70,27 @@ function sort( valueA: any, valueB: any, direction: SortDirection ) {
 	return direction === 'asc'
 		? joinedA.localeCompare( joinedB )
 		: joinedB.localeCompare( joinedA );
-}
-
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	const value = field.getValue( { item } ) || [];
-	return value.join( ', ' );
-}
-
-const arrayFieldType: FieldTypeDefinition< any > = {
-	sort,
-	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-
-			if (
-				! [ undefined, '', null ].includes( value ) &&
-				! Array.isArray( value )
-			) {
-				return __( 'Value must be an array.' );
-			}
-
-			// Only allow strings for now. Can be extended to other types in the future.
-			if ( ! value.every( ( v: any ) => typeof v === 'string' ) ) {
-				return __( 'Every value must be a string.' );
-			}
-
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if (
-					! value.every( ( v: any ) => validValues.includes( v ) )
-				) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-			return null;
-		},
-	},
-	Edit: 'array', // Use array control
-	render,
-	enableSorting: true,
-	filterBy: {
-		defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
-		validOperators: [
-			OPERATOR_IS_ANY,
-			OPERATOR_IS_NONE,
-			OPERATOR_IS_ALL,
-			OPERATOR_IS_NOT_ALL,
-		],
-	},
 };
 
-export default arrayFieldType;
+export default {
+	type: 'array',
+	render,
+	Edit: 'array',
+	sort,
+	enableSorting: true,
+	enableGlobalSearch: false,
+	defaultOperators: [ OPERATOR_IS_ANY, OPERATOR_IS_NONE ],
+	validOperators: [
+		OPERATOR_IS_ANY,
+		OPERATOR_IS_NONE,
+		OPERATOR_IS_ALL,
+		OPERATOR_IS_NOT_ALL,
+	],
+	format: {},
+	getValueFormatted,
+	validate: {
+		required: isValidRequiredForArray,
+		elements: isValidElements,
+		custom: isValidCustom,
+	},
+} satisfies FieldType< any >;

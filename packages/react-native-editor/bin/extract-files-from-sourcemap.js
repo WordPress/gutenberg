@@ -40,14 +40,14 @@ if ( require.main === module ) {
 	}
 	try {
 		fs.accessSync( mapFile );
-	} catch ( err ) {
+	} catch {
 		// eslint-disable-next-line no-console
 		console.error( `Map file "${ mapFile } doesn't exist.` );
 		process.exit( 1 );
 	}
 	try {
 		fs.accessSync( targetDir );
-	} catch ( err ) {
+	} catch {
 		// eslint-disable-next-line no-console
 		console.error( `Target directory "${ targetDir }"" doesn't exist.` );
 		process.exit( 1 );
@@ -74,7 +74,7 @@ if ( require.main === module ) {
 		try {
 			fs.accessSync( file );
 			return true;
-		} catch ( error ) {
+		} catch {
 			return false;
 		}
 	} );
@@ -87,7 +87,7 @@ if ( require.main === module ) {
 				.replace( '.ts', '.js' );
 			try {
 				fs.accessSync( compiledFile );
-			} catch ( error ) {
+			} catch {
 				// eslint-disable-next-line no-console
 				console.warn(
 					`Couldn't find matching build file for Typescript file "${ compiledFile }".`

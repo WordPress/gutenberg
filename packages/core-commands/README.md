@@ -20,6 +20,10 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Initializes the Command Palette.
 
+_Parameters_
+
+-   _settings_ `Object`: Command palette settings.
+
 ### privateApis
 
 Undocumented declaration.

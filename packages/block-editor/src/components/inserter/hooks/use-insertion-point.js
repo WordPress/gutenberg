@@ -151,7 +151,7 @@ function useInsertionPoint( {
 			if (
 				! isAppender &&
 				selectedBlock &&
-				isUnmodifiedDefaultBlock( selectedBlock )
+				isUnmodifiedDefaultBlock( selectedBlock, 'content' )
 			) {
 				replaceBlocks(
 					selectedBlock.clientId,
@@ -201,6 +201,8 @@ function useInsertionPoint( {
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
+			setLastFocus,
+			registry,
 		]
 	);
 
@@ -234,6 +236,7 @@ function useInsertionPoint( {
 			hideInsertionPoint,
 			destinationRootClientId,
 			destinationIndex,
+			registry,
 		]
 	);
 

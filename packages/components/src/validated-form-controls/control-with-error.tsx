@@ -1,19 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { usePrevious } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	cloneElement,
 	forwardRef,
 	useEffect,
+	useId,
 	useState,
 } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type { ValidatedControlProps } from './components/types';
 import { ValidityIndicator } from './validity-indicator';
 
@@ -22,22 +21,30 @@ function appendRequiredIndicator(
 	required: boolean | undefined,
 	markWhenOptional: boolean | undefined
 ) {
+	let suffix;
 	if ( required && ! markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Required' ) })` }
-			</>
-		);
+		suffix = `(${ __( 'Required' ) })`;
+	} else if ( ! required && markWhenOptional ) {
+		suffix = `(${ __( 'Optional' ) })`;
 	}
-	if ( ! required && markWhenOptional ) {
-		return (
-			<>
-				{ label } { `(${ __( 'Optional' ) })` }
-			</>
-		);
+
+	if ( ! suffix ) {
+		return label;
 	}
-	return label;
+
+	if ( typeof label === 'string' ) {
+		return `${ label } ${ suffix }`;
+	}
+
+	return (
+		<>
+			{ label } { suffix }
+		</>
+	);
 }
+
+const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
+const className = 'components-validated-control';
 
 /**
  * HTML elements that support the Constraint Validation API.
@@ -57,7 +64,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	{
 		required,
 		markWhenOptional,
-		onValidate,
 		customValidity,
 		getValidityTarget,
 		children,
@@ -70,17 +76,18 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * Label the control as "optional" when _not_ `required`, instead of the inverse.
 		 */
 		markWhenOptional?: boolean;
-		/**
-		 * The callback to run when the input should be validated.
-		 */
-		onValidate?: () => void;
-		customValidity?: ValidatedControlProps< unknown >[ 'customValidity' ];
+		customValidity?: ValidatedControlProps[ 'customValidity' ];
 		/**
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
 		getValidityTarget: () => ValidityTarget | null | undefined;
 		/**
 		 * The control component to apply validation to.
+		 *
+		 * As `children` will be cloned with additional props,
+		 * the component at the root of `children` should accept
+		 * `label`, `onChange`, and `required` props, and process them
+		 * appropriately.
 		 */
 		children: C;
 	},
@@ -94,31 +101,71 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		  }
 		| undefined
 	>();
+	const [ showMessage, setShowMessage ] = useState( false );
 	const [ isTouched, setIsTouched ] = useState( false );
-	const previousCustomValidityType = usePrevious( customValidity?.type );
 
-	// Ensure that error messages are visible after user attemps to submit a form
-	// with multiple invalid fields.
+	// Ensure that error messages are visible when an `invalid` event is triggered,
+	// e.g. when a form is submitted or reportValidity() is called.
 	useEffect( () => {
 		const validityTarget = getValidityTarget();
-		const showValidationMessage = () =>
-			setErrorMessage( validityTarget?.validationMessage );
+		const handler = () => {
+			setShowMessage( true );
+			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
+		};
 
-		validityTarget?.addEventListener( 'invalid', showValidationMessage );
+		validityTarget?.addEventListener( 'invalid', handler );
+		return () => validityTarget?.removeEventListener( 'invalid', handler );
+	}, [ getValidityTarget ] );
+
+	// Suppress the native error popover, while keeping the focus behavior intact.
+	useEffect( () => {
+		const validityTarget = getValidityTarget();
+
+		const suppressNativePopover = ( event: Event ) => {
+			event.preventDefault();
+
+			const target = event.target as ValidityTarget;
+			const firstErrorInForm = Array.from(
+				target.form?.elements ?? []
+			).find( ( el ) => ! ( el as ValidityTarget ).validity.valid );
+
+			if ( ! target.form || firstErrorInForm === target ) {
+				target.focus();
+			}
+		};
+
+		// Radio inputs need special handling because all radio inputs with the
+		// same `name` will be marked as invalid. Without this handling, the last radio option
+		// will be focused with an unsuppressed native popover.
+		const radioSibilings =
+			validityTarget?.type === 'radio' && validityTarget?.name
+				? Array.from(
+						validityTarget
+							?.closest( `.${ className }` )
+							?.querySelectorAll< HTMLInputElement >(
+								`input[type="radio"][name="${ validityTarget?.name }"]`
+							) ?? []
+				  ).filter( ( sibling ) => sibling !== validityTarget )
+				: [];
+
+		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
+		radioSibilings.forEach( ( sibling ) =>
+			sibling.addEventListener( 'invalid', suppressNativePopover )
+		);
 
 		return () => {
 			validityTarget?.removeEventListener(
 				'invalid',
-				showValidationMessage
+				suppressNativePopover
+			);
+			radioSibilings.forEach( ( sibling ) =>
+				sibling.removeEventListener( 'invalid', suppressNativePopover )
 			);
 		};
-	} );
+	}, [ getValidityTarget ] );
 
-	useEffect( (): ReturnType< React.EffectCallback > => {
-		if ( ! isTouched ) {
-			return;
-		}
-
+	// Handle validity messages.
+	useEffect( () => {
 		const validityTarget = getValidityTarget();
 
 		if ( ! customValidity?.type ) {
@@ -130,26 +177,16 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 		switch ( customValidity.type ) {
 			case 'validating': {
-				// Wait before showing a validating state.
-				const timer = setTimeout( () => {
-					validityTarget?.setCustomValidity( '' );
-					setErrorMessage( undefined );
+				validityTarget?.setCustomValidity( '' );
+				setErrorMessage( undefined );
 
-					setStatusMessage( {
-						type: 'validating',
-						message: customValidity.message,
-					} );
-				}, 1000 );
-
-				return () => clearTimeout( timer );
+				setStatusMessage( {
+					type: 'validating',
+					message: customValidity.message,
+				} );
+				break;
 			}
 			case 'valid': {
-				// Ensures that we wait for any async responses before showing
-				// a synchronously valid state.
-				if ( previousCustomValidityType === 'valid' ) {
-					break;
-				}
-
 				validityTarget?.setCustomValidity( '' );
 				setErrorMessage( validityTarget?.validationMessage );
 
@@ -169,14 +206,28 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				break;
 			}
 		}
-	}, [
-		isTouched,
-		customValidity?.type,
-		customValidity?.message,
-		getValidityTarget,
-		previousCustomValidityType,
-	] );
+	}, [ customValidity, getValidityTarget ] );
 
+	// Show messages if field has been touched (i.e. has blurred at least once),
+	// or validation has been triggered by the consumer/user.
+	useEffect( (): ReturnType< React.EffectCallback > => {
+		if ( ! isTouched || showMessage ) {
+			return;
+		}
+
+		if ( customValidity?.type === 'validating' ) {
+			// Don't show validating indicators for quick calls that take less than 1 sec.
+			const timer = setTimeout( () => {
+				setShowMessage( true );
+			}, 1000 );
+
+			return () => clearTimeout( timer );
+		}
+
+		setShowMessage( true );
+	}, [ isTouched, customValidity?.type, showMessage ] );
+
+	// Mark blurred fields as touched.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
 			return;
@@ -189,62 +240,80 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
-			onValidate?.();
+			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
 	};
 
-	const onChange = ( ...args: unknown[] ) => {
-		children.props.onChange?.( ...args );
+	const messageId = useId();
 
-		// Only validate incrementally if the field has blurred at least once,
-		// or currently has an error message.
-		if ( isTouched || errorMessage ) {
-			onValidate?.();
+	const message = ( () => {
+		if ( errorMessage ) {
+			return (
+				<ValidityIndicator
+					id={ messageId }
+					type="invalid"
+					message={ errorMessage }
+				/>
+			);
 		}
-	};
+		if ( statusMessage?.type ) {
+			return (
+				<ValidityIndicator
+					id={ messageId }
+					type={ statusMessage.type }
+					message={ statusMessage.message }
+				/>
+			);
+		}
+		return null;
+	} )();
 
-	const onKeyDown = ( event: React.KeyboardEvent< HTMLDivElement > ) => {
-		// Ensures that custom validators are triggered when the user submits by pressing Enter,
-		// without ever blurring the control.
-		if ( event.key === 'Enter' ) {
-			onValidate?.();
+	const visibleMessage = showMessage ? message : null;
+
+	// Imperatively manage `aria-describedby` on the validity target so we
+	// merge with any value the child control sets internally (e.g. from a
+	// `help` prop), rather than competing with it at the props level.
+	useEffect( () => {
+		const target = getValidityTarget();
+		if ( ! target ) {
+			return;
 		}
-	};
+
+		function setDescribedBy( el: Element, shouldAdd: boolean ) {
+			const ids = ( el.getAttribute( 'aria-describedby' ) ?? '' )
+				.split( ' ' )
+				.filter( ( id ) => id && id !== messageId );
+
+			if ( shouldAdd ) {
+				ids.push( messageId );
+			}
+
+			if ( ids.length ) {
+				el.setAttribute( 'aria-describedby', ids.join( ' ' ) );
+			} else {
+				el.removeAttribute( 'aria-describedby' );
+			}
+		}
+
+		setDescribedBy( target, !! visibleMessage );
+
+		return () => setDescribedBy( target, false );
+	}, [ visibleMessage, messageId, getValidityTarget ] );
 
 	return (
-		// Disable reason: Just listening to a bubbled event, not for interaction.
-		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div
-			className="components-validated-control"
-			ref={ forwardedRef }
-			onBlur={ onBlur }
-			onKeyDown={ withIgnoreIMEEvents( onKeyDown ) }
-		>
+		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
 			{ cloneElement( children, {
 				label: appendRequiredIndicator(
 					children.props.label,
 					required,
 					markWhenOptional
 				),
-				onChange,
 				required,
 			} ) }
-			<div aria-live="polite">
-				{ errorMessage && (
-					<ValidityIndicator
-						type="invalid"
-						message={ errorMessage }
-					/>
-				) }
-				{ ! errorMessage && statusMessage && (
-					<ValidityIndicator
-						type={ statusMessage.type }
-						message={ statusMessage.message }
-					/>
-				) }
-			</div>
+			<div aria-live="polite">{ visibleMessage }</div>
 		</div>
 	);
 }
 
 export const ControlWithError = forwardRef( UnforwardedControlWithError );
+ControlWithError.displayName = 'ControlWithError';

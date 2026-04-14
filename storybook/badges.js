@@ -5,11 +5,13 @@
  * the `tags` array in the story's metadata. For example, to apply the "private"
  * badge, add "status-private" to the `tags` array.
  *
- * @see https://github.com/geometricpanda/storybook-addon-badges
- * @see './webpack/copy-tags-to-badges.js' - Webpack loader that processes the tags
+ * @see https://github.com/Sidnioulz/storybook-addon-tag-badges
  */
 
-export default {
+/**
+ * Badge definitions used by sidebar.js for rendering icons.
+ */
+const badges = {
 	private: {
 		icon: '🔒',
 		title: '🔒 Private',
@@ -42,3 +44,5 @@ export default {
 		},
 	},
 };
+
+export default badges;

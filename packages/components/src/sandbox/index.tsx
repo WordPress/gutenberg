@@ -134,14 +134,14 @@ function SandBox( {
 	onFocus,
 	tabIndex,
 }: SandBoxProps ) {
-	const ref = useRef< HTMLIFrameElement >();
+	const ref = useRef< HTMLIFrameElement >( null );
 	const [ width, setWidth ] = useState( 0 );
 	const [ height, setHeight ] = useState( 0 );
 
 	function isFrameAccessible() {
 		try {
 			return !! ref.current?.contentDocument?.body;
-		} catch ( e ) {
+		} catch {
 			return false;
 		}
 	}
@@ -232,7 +232,7 @@ function SandBox( {
 			if ( 'string' === typeof data ) {
 				try {
 					data = JSON.parse( data );
-				} catch ( e ) {}
+				} catch {}
 			}
 
 			// Update the state only if the message is formatted as we expect,

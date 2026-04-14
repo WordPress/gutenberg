@@ -83,6 +83,7 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 				{ ...otherProps }
 				ref={ forwardedRef }
 				role="group"
+				id={ baseId }
 			>
 				{ children }
 			</View>
@@ -93,3 +94,4 @@ function UnforwardedToggleGroupControlAsButtonGroup(
 export const ToggleGroupControlAsButtonGroup = forwardRef(
 	UnforwardedToggleGroupControlAsButtonGroup
 );
+ToggleGroupControlAsButtonGroup.displayName = 'ToggleGroupControlAsButtonGroup';

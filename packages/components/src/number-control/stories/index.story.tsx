@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,11 @@ const meta: Meta< typeof NumberControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `InputControl` with `type="number"` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 
@@ -44,6 +49,7 @@ const Template: StoryFn< typeof NumberControl > = ( {
 	return (
 		<>
 			<NumberControl
+				__next40pxDefaultSize
 				{ ...props }
 				value={ value }
 				onChange={ ( v, extra ) => {

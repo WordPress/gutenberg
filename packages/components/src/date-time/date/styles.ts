@@ -68,6 +68,7 @@ export const DayButton = styled( Button, {
 	grid-column: ${ ( props ) => props.column };
 	position: relative;
 	justify-content: center;
+	padding: 0;
 
 	${ ( props ) =>
 		props.disabled &&
@@ -79,6 +80,7 @@ export const DayButton = styled( Button, {
 		border-radius: ${ CONFIG.radiusRound };
 		height: ${ space( 7 ) };
 		width: ${ space( 7 ) };
+		font-weight: 400;
 
 		${ ( props ) =>
 			props.isSelected &&

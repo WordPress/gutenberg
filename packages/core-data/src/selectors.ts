@@ -3,7 +3,9 @@
  */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
+import type { ConnectionStatus } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -15,15 +17,14 @@ import {
 	getQueriedTotalPages,
 } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getUndoManager } from './private-selectors';
 import {
 	getNormalizedCommaSeparable,
-	isRawAttribute,
 	setNestedValue,
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
-import type { UndoManager } from '@wordpress/undo-manager';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -36,7 +37,7 @@ export interface State {
 	blockPatternCategories: Array< unknown >;
 	currentGlobalStylesId: string;
 	currentTheme: string;
-	currentUser: ET.User< 'edit' >;
+	currentUser: ET.User< 'view' >;
 	embedPreviews: Record< string, { html: string } >;
 	entities: EntitiesState;
 	themeBaseGlobalStyles: Record< string, Object >;
@@ -49,6 +50,11 @@ export interface State {
 	userPatternCategories: Array< UserPatternCategory >;
 	defaultTemplates: Record< string, string >;
 	registeredPostMeta: Record< string, Object >;
+	editorSettings: Record< string, any > | null;
+	editorAssets: Record< string, any > | null;
+	syncConnectionStatuses?: Record< string, ConnectionStatus >;
+	collaborationSupported: boolean;
+	viewConfigs: Record< string, Record< string, any > >;
 }
 
 type EntityRecordKey = string | number;
@@ -185,7 +191,7 @@ export function getAuthors(
  *
  * @return Current user object.
  */
-export function getCurrentUser( state: State ): ET.User< 'edit' > {
+export function getCurrentUser( state: State ): ET.User< 'view' > {
 	return state.currentUser;
 }
 
@@ -357,7 +363,6 @@ export const getEntityRecord = createSelector(
 		query?: GetRecordsHttpQuery
 	): EntityRecord | undefined => {
 		logEntityDeprecation( kind, name, 'getEntityRecord' );
-
 		const queriedState =
 			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		if ( ! queriedState ) {
@@ -365,7 +370,7 @@ export const getEntityRecord = createSelector(
 		}
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if ( ! query || ! query._fields ) {
 			// If expecting a complete item, validate that completeness.
 			if ( ! queriedState.itemIsComplete[ context ]?.[ key ] ) {
 				return undefined;
@@ -375,30 +380,29 @@ export const getEntityRecord = createSelector(
 		}
 
 		const item = queriedState.items[ context ]?.[ key ];
-		if ( item && query._fields ) {
-			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-			for ( let f = 0; f < fields.length; f++ ) {
-				const field = fields[ f ].split( '.' );
-				let value = item;
-				field.forEach( ( fieldName ) => {
-					value = value?.[ fieldName ];
-				} );
-				setNestedValue( filteredItem, field, value );
-			}
-			return filteredItem as EntityRecord;
+		if ( ! item ) {
+			return item;
 		}
 
-		return item;
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			let value = item;
+			field.forEach( ( fieldName ) => {
+				value = value?.[ fieldName ];
+			} );
+			setNestedValue( filteredItem, field, value );
+		}
+		return filteredItem as EntityRecord;
 	} ) as GetEntityRecord,
 	( state: State, kind, name, recordId, query ) => {
 		const context = query?.context ?? 'default';
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.queriedData;
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData?.items[
-				context
-			]?.[ recordId ],
-			state.entities.records?.[ kind ]?.[ name ]?.queriedData
-				?.itemIsComplete[ context ]?.[ recordId ],
+			queriedState?.items[ context ]?.[ recordId ],
+			queriedState?.itemIsComplete[ context ]?.[ recordId ],
 		];
 	}
 ) as GetEntityRecord;
@@ -420,6 +424,62 @@ getEntityRecord.__unstableNormalizeArgs = (
 
 	return newArgs;
 };
+
+/**
+ * Returns true if a record has been received for the given set of parameters, or false otherwise.
+ *
+ * Note: This action does not trigger a request for the entity record from the API
+ * if it's not available in the local state.
+ *
+ * @param state State tree
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key.
+ * @param query Optional query.
+ *
+ * @return Whether an entity record has been received.
+ */
+export function hasEntityRecord(
+	state: State,
+	kind: string,
+	name: string,
+	key?: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.queriedData;
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	// If expecting a complete item, validate that completeness.
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ key ];
+	}
+
+	const item = queriedState.items[ context ]?.[ key ];
+	if ( ! item ) {
+		return false;
+	}
+
+	// When `query._fields` is provided, check that each requested field exists,
+	// including any nested paths, on the item; return false if any part is missing.
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
 
 /**
  * Returns the Entity's record object by key. Doesn't trigger a resolver nor requests the entity records from the API if the entity record isn't available in the local state.
@@ -463,25 +523,26 @@ export const getRawEntityRecord = createSelector(
 			name,
 			key
 		);
-		return (
-			record &&
-			Object.keys( record ).reduce( ( accumulator, _key ) => {
-				if (
-					isRawAttribute( getEntityConfig( state, kind, name ), _key )
-				) {
-					// Because edits are the "raw" attribute values,
-					// we return those from record selectors to make rendering,
-					// comparisons, and joins with edits easier.
-					accumulator[ _key ] =
-						record[ _key ]?.raw !== undefined
-							? record[ _key ]?.raw
-							: record[ _key ];
-				} else {
-					accumulator[ _key ] = record[ _key ];
+		const config = getEntityConfig( state, kind, name );
+		if ( ! record || ! config?.rawAttributes?.length ) {
+			return record;
+		}
+
+		// Because edits are the "raw" attribute values,
+		// we return those from record selectors to make rendering,
+		// comparisons, and joins with edits easier.
+		return Object.fromEntries(
+			Object.keys( record ).map( ( _key ) => {
+				if ( config.rawAttributes.includes( _key ) ) {
+					const rawValue = record[ _key ]?.raw;
+					return [
+						_key,
+						rawValue !== undefined ? rawValue : record[ _key ],
+					];
 				}
-				return accumulator;
-			}, {} as any )
-		);
+				return [ _key, record[ _key ] ];
+			} )
+		) as EntityRecord;
 	},
 	(
 		state: State,
@@ -552,6 +613,16 @@ export interface GetEntityRecords {
 		name: string,
 		query?: GetRecordsHttpQuery
 	) => EntityRecord[] | null;
+
+	PromiseCurriedSignature: <
+		EntityRecord extends
+			| ET.EntityRecord< any >
+			| Partial< ET.EntityRecord< any > >,
+	>(
+		kind: string,
+		name: string,
+		query?: GetRecordsHttpQuery
+	) => Promise< EntityRecord[] | null >;
 }
 
 /**
@@ -584,7 +655,10 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
-	return getQueriedItems( queriedState, query );
+	return getQueriedItems( queriedState, query, {
+		supportsPagination: !! getEntityConfig( state, kind, name )
+			?.supportsPagination,
+	} );
 } ) as GetEntityRecords;
 
 /**
@@ -642,7 +716,10 @@ export const getEntityRecordsTotalPages = (
 	if ( ! queriedState ) {
 		return null;
 	}
-	if ( query?.per_page === -1 ) {
+	if (
+		! getEntityConfig( state, kind, name )?.supportsPagination ||
+		query?.per_page === -1
+	) {
 		return 1;
 	}
 	const totalItems = getQueriedTotalItems( queriedState, query );
@@ -1071,7 +1148,7 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	return state.undoManager.hasUndo();
+	return getUndoManager( state ).hasUndo();
 }
 
 /**
@@ -1083,7 +1160,7 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	return state.undoManager.hasRedo();
+	return getUndoManager( state ).hasRedo();
 }
 
 /**
@@ -1455,6 +1532,62 @@ export const getRevisions = (
 };
 
 /**
+ * Returns true if a revision has been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * Note: This does not trigger a request for the revision from the API
+ * if it's not available in the local state.
+ *
+ * @param state       State tree
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revision you want to check.
+ * @param revisionKey The revision's key.
+ * @param query       Optional query.
+ *
+ * @return Whether a revision has been received.
+ */
+export function hasRevision(
+	state: State,
+	kind: string,
+	name: string,
+	recordKey: EntityRecordKey,
+	revisionKey: EntityRecordKey,
+	query?: GetRecordsHttpQuery
+): boolean {
+	const queriedState =
+		state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ];
+	if ( ! queriedState ) {
+		return false;
+	}
+	const context = query?.context ?? 'default';
+
+	if ( ! query || ! query._fields ) {
+		return !! queriedState.itemIsComplete[ context ]?.[ revisionKey ];
+	}
+
+	const item = queriedState.items[ context ]?.[ revisionKey ];
+	if ( ! item ) {
+		return false;
+	}
+
+	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	for ( let i = 0; i < fields.length; i++ ) {
+		const path = fields[ i ].split( '.' );
+		let value = item;
+		for ( let p = 0; p < path.length; p++ ) {
+			const part = path[ p ];
+			if ( ! value || ! Object.hasOwn( value, part ) ) {
+				return false;
+			}
+			value = value[ part ];
+		}
+	}
+
+	return true;
+}
+
+/**
  * Returns a single, specific revision of a parent entity.
  *
  * @param state       State tree
@@ -1488,7 +1621,7 @@ export const getRevision = createSelector(
 
 		const context = query?.context ?? 'default';
 
-		if ( query === undefined ) {
+		if ( ! query || ! query._fields ) {
 			// If expecting a complete item, validate that completeness.
 			if ( ! queriedState.itemIsComplete[ context ]?.[ revisionKey ] ) {
 				return undefined;
@@ -1498,31 +1631,65 @@ export const getRevision = createSelector(
 		}
 
 		const item = queriedState.items[ context ]?.[ revisionKey ];
-		if ( item && query._fields ) {
-			const filteredItem = {};
-			const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
-
-			for ( let f = 0; f < fields.length; f++ ) {
-				const field = fields[ f ].split( '.' );
-				let value = item;
-				field.forEach( ( fieldName ) => {
-					value = value?.[ fieldName ];
-				} );
-				setNestedValue( filteredItem, field, value );
-			}
-
-			return filteredItem;
+		if ( ! item ) {
+			return item;
 		}
 
-		return item;
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			let value = item;
+			field.forEach( ( fieldName ) => {
+				value = value?.[ fieldName ];
+			} );
+			setNestedValue( filteredItem, field, value );
+		}
+
+		return filteredItem;
 	},
 	( state: State, kind, name, recordKey, revisionKey, query ) => {
 		const context = query?.context ?? 'default';
+		const queriedState =
+			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[
+				recordKey
+			];
 		return [
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
-				?.items?.[ context ]?.[ revisionKey ],
-			state.entities.records?.[ kind ]?.[ name ]?.revisions?.[ recordKey ]
-				?.itemIsComplete?.[ context ]?.[ revisionKey ],
+			queriedState?.items?.[ context ]?.[ revisionKey ],
+			queriedState?.itemIsComplete?.[ context ]?.[ revisionKey ],
 		];
 	}
 );
+
+/**
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
+ *
+ * @param state Data state.
+ *
+ * @return The current sync connection state, prioritized by importance.
+ */
+export function getSyncConnectionStatus(
+	state: State
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
+		return undefined;
+	}
+
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
+
+	let coalesced: ConnectionStatus | undefined;
+
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
+		if (
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
+		) {
+			coalesced = status;
+		}
+	}
+
+	return coalesced;
+}

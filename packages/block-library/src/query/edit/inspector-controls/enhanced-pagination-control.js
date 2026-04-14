@@ -14,7 +14,7 @@ export default function EnhancedPaginationControl( {
 	setAttributes,
 	clientId,
 } ) {
-	const { hasUnsupportedBlocks } = useUnsupportedBlocks( clientId );
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
 
 	let help = __(
 		'Reload the full page—instead of just the posts list—when visitors navigate between pages.'
@@ -28,7 +28,6 @@ export default function EnhancedPaginationControl( {
 	return (
 		<>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Reload full page' ) }
 				help={ help }
 				checked={ ! enhancedPagination }
