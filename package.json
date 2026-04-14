@@ -238,7 +238,7 @@
 		"packages/*/package.json": [
 			"wp-scripts lint-pkg-json"
 		],
-		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
+		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
 		"packages/**/*.{js,ts,tsx,json}": [

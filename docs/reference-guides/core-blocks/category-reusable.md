@@ -1,3 +1,3 @@
 # Reusable Blocks
 
-- [Pattern](./block.md) — `core/block`: Reuse this design across your site.
+- [Pattern](../../../packages/block-library/src/block/README.md) — `core/block`: Reuse this design across your site.

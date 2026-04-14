@@ -1,27 +1,27 @@
 # Design Blocks
 
-- [Accordion](./accordion.md) — `core/accordion`: Displays a foldable layout that groups content in collapsible sections.
-- [Accordion Heading](./accordion-heading.md) — `core/accordion-heading`: Displays a heading that toggles the accordion panel.
-- [Accordion Item](./accordion-item.md) — `core/accordion-item`: Wraps the heading and panel in one unit.
-- [Accordion Panel](./accordion-panel.md) — `core/accordion-panel`: Contains the hidden or revealed content beneath the heading.
-- [Button](./button.md) — `core/button`: Prompt visitors to take action with a button-style link.
-- [Buttons](./buttons.md) — `core/buttons`: Prompt visitors to take action with a group of button-style links.
-- [Column](./column.md) — `core/column`: A single column within a columns block.
-- [Columns](./columns.md) — `core/columns`: Display content in multiple columns, with blocks added to each column.
-- [Comment Template](./comment-template.md) — `core/comment-template`: Contains the block elements used to display a comment, like the title, date, author, avatar and more.
-- [Group](./group.md) — `core/group`: Gather blocks in a layout container.
-- [Home Link](./home-link.md) — `core/home-link`: Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
-- [More](./more.md) — `core/more`: Content before this block will be shown in the excerpt on your archives page.
-- [Custom Link](./navigation-link.md) — `core/navigation-link`: Add a page, link, or another item to your navigation.
-- [Navigation Overlay Close](./navigation-overlay-close.md) — `core/navigation-overlay-close`: A customizable button to close overlays.
-- [Submenu](./navigation-submenu.md) — `core/navigation-submenu`: Add a submenu to your navigation.
-- [Page Break](./nextpage.md) — `core/nextpage`: Separate your content into a multi-page experience.
-- [Separator](./separator.md) — `core/separator`: Create a break between ideas or sections with a horizontal separator.
-- [Spacer](./spacer.md) — `core/spacer`: Add white space between blocks and customize its height.
-- [Tab](./tab.md) — `core/tab`: Content for a tab in a tabbed interface.
-- [Tab Panel](./tab-panel.md) — `core/tab-panel`: Container for tab panel content in a tabbed interface.
-- [Table of Contents](./table-of-contents.md) — `core/table-of-contents`: Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
-- [Tabs](./tabs.md) — `core/tabs`: Display content in a tabbed interface to help users navigate detailed content with ease.
-- [Tabs Menu](./tabs-menu.md) — `core/tabs-menu`: Display the tab buttons for a tabbed interface.
-- [Tab Menu Item](./tabs-menu-item.md) — `core/tabs-menu-item`: A single tab button in the tabs menu.
-- [Text Columns (deprecated)](./text-columns.md) — `core/text-columns`: This block is deprecated. Please use the Columns block instead.
+- [Accordion](../../../packages/block-library/src/accordion/README.md) — `core/accordion`: Displays a foldable layout that groups content in collapsible sections.
+- [Accordion Heading](../../../packages/block-library/src/accordion-heading/README.md) — `core/accordion-heading`: Displays a heading that toggles the accordion panel.
+- [Accordion Item](../../../packages/block-library/src/accordion-item/README.md) — `core/accordion-item`: Wraps the heading and panel in one unit.
+- [Accordion Panel](../../../packages/block-library/src/accordion-panel/README.md) — `core/accordion-panel`: Contains the hidden or revealed content beneath the heading.
+- [Button](../../../packages/block-library/src/button/README.md) — `core/button`: Prompt visitors to take action with a button-style link.
+- [Buttons](../../../packages/block-library/src/buttons/README.md) — `core/buttons`: Prompt visitors to take action with a group of button-style links.
+- [Column](../../../packages/block-library/src/column/README.md) — `core/column`: A single column within a columns block.
+- [Columns](../../../packages/block-library/src/columns/README.md) — `core/columns`: Display content in multiple columns, with blocks added to each column.
+- [Comment Template](../../../packages/block-library/src/comment-template/README.md) — `core/comment-template`: Contains the block elements used to display a comment, like the title, date, author, avatar and more.
+- [Group](../../../packages/block-library/src/group/README.md) — `core/group`: Gather blocks in a layout container.
+- [Home Link](../../../packages/block-library/src/home-link/README.md) — `core/home-link`: Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
+- [More](../../../packages/block-library/src/more/README.md) — `core/more`: Content before this block will be shown in the excerpt on your archives page.
+- [Custom Link](../../../packages/block-library/src/navigation-link/README.md) — `core/navigation-link`: Add a page, link, or another item to your navigation.
+- [Navigation Overlay Close](../../../packages/block-library/src/navigation-overlay-close/README.md) — `core/navigation-overlay-close`: A customizable button to close overlays.
+- [Submenu](../../../packages/block-library/src/navigation-submenu/README.md) — `core/navigation-submenu`: Add a submenu to your navigation.
+- [Page Break](../../../packages/block-library/src/nextpage/README.md) — `core/nextpage`: Separate your content into a multi-page experience.
+- [Separator](../../../packages/block-library/src/separator/README.md) — `core/separator`: Create a break between ideas or sections with a horizontal separator.
+- [Spacer](../../../packages/block-library/src/spacer/README.md) — `core/spacer`: Add white space between blocks and customize its height.
+- [Tab](../../../packages/block-library/src/tab/README.md) — `core/tab`: Content for a tab in a tabbed interface.
+- [Tab Panel](../../../packages/block-library/src/tab-panel/README.md) — `core/tab-panel`: Container for tab panel content in a tabbed interface.
+- [Table of Contents](../../../packages/block-library/src/table-of-contents/README.md) — `core/table-of-contents`: Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
+- [Tabs](../../../packages/block-library/src/tabs/README.md) — `core/tabs`: Display content in a tabbed interface to help users navigate detailed content with ease.
+- [Tabs Menu](../../../packages/block-library/src/tabs-menu/README.md) — `core/tabs-menu`: Display the tab buttons for a tabbed interface.
+- [Tab Menu Item](../../../packages/block-library/src/tabs-menu-item/README.md) — `core/tabs-menu-item`: A single tab button in the tabs menu.
+- [Text Columns (deprecated)](../../../packages/block-library/src/text-columns/README.md) — `core/text-columns`: This block is deprecated. Please use the Columns block instead.
