@@ -55,12 +55,16 @@ export function TaxonomyControls( { onChange, query, context } ) {
 	const taxonomies = useTaxonomies( postType );
 
 	const currentPost = useSelect(
-		( select ) =>
+		( select ) => {
+			if ( ! postId ) {
+				return null;
+			}
 			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
-			),
+			);
+		},
 		[ postType, postId ]
 	);
 
@@ -81,7 +85,11 @@ export function TaxonomyControls( { onChange, query, context } ) {
 	);
 
 	useEffect( () => {
-		if ( ! taxQuery?.__experimentalSameTerm || ! taxonomies?.length ) {
+		if (
+			! postId ||
+			! taxQuery?.__experimentalSameTerm ||
+			! taxonomies?.length
+		) {
 			return;
 		}
 
@@ -139,7 +147,7 @@ export function TaxonomyControls( { onChange, query, context } ) {
 				__experimentalSameTerm: true,
 			},
 		} );
-	}, [ CurrentPostTerms, onChange, postId, query, taxQuery, taxonomies ] );
+	}, [ CurrentPostTerms, onChange, postId, taxQuery, taxonomies ] );
 
 	if ( ! taxonomies?.length ) {
 		return null;
