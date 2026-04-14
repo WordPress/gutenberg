@@ -621,6 +621,89 @@ test.describe( 'List (@firefox)', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( startingContent );
 	} );
 
+	test( 'should merge a following paragraph into a nested list item when Delete is pressed', async ( {
+		editor,
+		page,
+	} ) => {
+		const startingContent = [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'after' },
+			},
+		];
+
+		for ( const block of startingContent ) {
+			await editor.insertBlock( block );
+		}
+
+		const inner = editor.canvas
+			.getByRole( 'textbox', { name: 'List text' } )
+			.filter( { hasText: /^inner$/ } );
+
+		// Avoid click here: the floating block toolbar can intercept pointer events.
+		await inner.evaluate( ( element ) => {
+			element.focus();
+
+			const range = element.ownerDocument.createRange();
+			range.selectNodeContents( element );
+			range.collapse( false );
+
+			const selection = element.ownerDocument.getSelection();
+			selection.removeAllRanges();
+			selection.addRange( range );
+		} );
+
+		await expect( inner ).toBeFocused();
+		await page.keyboard.press( 'Delete' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'outer' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: { content: 'inner' },
+									},
+									{
+										name: 'core/list-item',
+										attributes: { content: 'after' },
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'should split into two ordered lists with paragraph', async ( {
 		editor,
 		page,
