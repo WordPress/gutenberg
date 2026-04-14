@@ -39,7 +39,10 @@
 			"blockGap": true
 		},
 		"shadow": true,
-		"layout": true,
+		"layout": {
+			"allowSwitching": true,
+			"allowSizingOnChildren": true
+		},
 		"ariaLabel": true,
 		"interactivity": true,
 		"typography": {
