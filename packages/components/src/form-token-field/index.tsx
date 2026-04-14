@@ -253,7 +253,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				break;
 			case 'Space':
 				if ( tokenizeOnSpace ) {
-					preventDefault = addCurrentToken();
+					preventDefault = addCurrentToken( {
+						preventDefaultOnFailedValidation: false,
+					} );
 				}
 				break;
 			case 'Escape':
@@ -454,7 +456,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		}
 	}
 
-	function addCurrentToken() {
+	function addCurrentToken( {
+		preventDefaultOnFailedValidation = true,
+	} = {} ): boolean {
 		let preventDefault = false;
 		const selectedSuggestion = getSelectedSuggestion();
 
@@ -462,7 +466,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			addNewToken( selectedSuggestion );
 			preventDefault = true;
 		} else if ( inputHasValidValue() ) {
-			preventDefault = addNewToken( incompleteTokenValue );
+			const wasAdded = addNewToken( incompleteTokenValue );
+			preventDefault = wasAdded || preventDefaultOnFailedValidation;
 		}
 
 		return preventDefault;

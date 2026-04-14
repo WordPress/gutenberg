@@ -1930,6 +1930,35 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'cherry', 'Cranberry' ] );
 		} );
 
+		it( 'should still preventDefault on Enter when validation rejects the value', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const onSubmitSpy = jest.fn( ( e: React.FormEvent ) =>
+				e.preventDefault()
+			);
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<form onSubmit={ onSubmitSpy }>
+					<FormTokenFieldWithState
+						onChange={ onChangeSpy }
+						__experimentalValidateInput={ startsWithCapitalLetter }
+					/>
+				</form>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			// Type 'hello' — lowercase, fails validation.
+			// Press Enter — should NOT submit the parent form.
+			await user.type( input, 'hello[Enter]' );
+			expect( onChangeSpy ).not.toHaveBeenCalled();
+			expect( onSubmitSpy ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 'hello' );
+		} );
+
 		it( 'should not preventDefault on space when validation fails and `tokenizeOnSpace` is true', async () => {
 			const user = userEvent.setup();
 
