@@ -13,7 +13,7 @@ const style = 'color: var(--wpds-color-fg-content-neutral)';
 ```
 
 ```js
-const style = `border: 1px solid var(--wpds-border-color)`;
+const style = `border: 1px solid var(--wpds-color-stroke-surface-neutral)`;
 ```
 
 ```jsx

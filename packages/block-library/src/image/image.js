@@ -535,6 +535,7 @@ export default function Image( {
 		if ( ! mediaUpload ) {
 			return;
 		}
+		let notified = false;
 		mediaUpload( {
 			filesList: [ externalBlob ],
 			onFileChange( [ img ] ) {
@@ -544,10 +545,15 @@ export default function Image( {
 					return;
 				}
 
-				setExternalBlob();
-				createSuccessNotice( __( 'Image uploaded.' ), {
-					type: 'snackbar',
-				} );
+				// With client-side media processing, onFileChange fires
+				// for each generated sub-size. Only show the notice once.
+				if ( ! notified ) {
+					notified = true;
+					setExternalBlob();
+					createSuccessNotice( __( 'Image uploaded.' ), {
+						type: 'snackbar',
+					} );
+				}
 			},
 			allowedTypes: ALLOWED_MEDIA_TYPES,
 			onError( message ) {

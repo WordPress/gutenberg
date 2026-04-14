@@ -24,7 +24,7 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
 		{ value: ':visited', label: __( 'Visited' ) },
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
 		{ value: ':active', label: __( 'Active' ) },
 	],
 	button: [
@@ -33,7 +33,7 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
 		{ value: ':visited', label: __( 'Visited' ) },
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
 		{ value: ':active', label: __( 'Active' ) },
 	],
 };
@@ -46,7 +46,7 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 	'core/button': [
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
 		{ value: ':active', label: __( 'Active' ) },
 	],
 };

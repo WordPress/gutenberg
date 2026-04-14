@@ -244,7 +244,7 @@ By default, files located in `build`, `node_modules`, and `vendor` folders are i
 
 #### Advanced information
 
-It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [ESLint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. It detects flat config files (`eslint.config.*`) first, falling back to legacy `.eslintrc.*` files if present. You can override default rules with your own as described in the [ESLint configuration docs](https://eslint.org/docs/latest/use/configure/). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `lint-pkg-json`
 

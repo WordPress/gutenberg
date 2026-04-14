@@ -10,6 +10,22 @@ import { MediaEdit } from '@wordpress/fields';
 
 const fields = [
 	{
+		id: 'title',
+		type: 'text',
+		label: __( 'Site Title' ),
+		description: __(
+			"Displays in your site's layout via the Site Title block."
+		),
+	},
+	{
+		id: 'description',
+		type: 'text',
+		label: __( 'Site Tagline' ),
+		description: __(
+			"In a few words, explain what this site is about. Displays in your site's layout via the Site Tagline block."
+		),
+	},
+	{
 		id: 'site_logo',
 		type: 'media',
 		label: __( 'Site Logo' ),
@@ -42,7 +58,7 @@ const form = {
 		type: 'regular',
 		labelPosition: 'top',
 	},
-	fields: [ 'site_logo', 'site_icon' ],
+	fields: [ 'title', 'description', 'site_logo', 'site_icon' ],
 };
 
 export default function SidebarIdentity() {

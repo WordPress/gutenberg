@@ -27,6 +27,25 @@ jest.mock( '../utils', () => ( {
 			} )
 		)
 	),
+	vipsBatchResizeImage: jest.fn( ( _id, file, outputType, configs ) =>
+		Promise.resolve(
+			configs.map(
+				( c: {
+					name: string;
+					resize: { width: number; height: number };
+				} ) => ( {
+					name: c.name,
+					file: new File(
+						[ 'batch-resized' ],
+						`example-${ c.resize.width }x${ c.resize.height }.${
+							outputType.split( '/' )[ 1 ]
+						}`,
+						{ type: outputType }
+					),
+				} )
+			)
+		)
+	),
 	vipsRotateImage: jest.fn(),
 	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
 	vipsConvertImageFormat: jest.fn(),
