@@ -245,23 +245,12 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
-// Merge user-defined external namespaces with namespaces inferred from
-// named sources.  For example, a source `@acme/shared-ui` implies that
-// `@acme/*` imports should be treated as externals so that the
-// externals plugin can detect their `wpScriptModuleExports` field.
-const EXTERNAL_NAMESPACES = {
-	...( WP_PLUGIN_CONFIG.externalNamespaces || {} ),
-};
-for ( const npmName of NAMED_SOURCES ) {
-	if ( npmName.startsWith( '@' ) ) {
-		const ns = npmName.split( '/' )[ 0 ].slice( 1 ); // '@scope/name' → 'scope'
-		if ( ! EXTERNAL_NAMESPACES[ ns ] ) {
-			EXTERNAL_NAMESPACES[ ns ] = {
-				handlePrefix: ns,
-			};
-		}
-	}
-}
+const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
+
+// Individual packages from named sources to externalize.  Unlike
+// EXTERNAL_NAMESPACES (which externalizes an entire `@scope/*`), this
+// targets only the exact packages listed in `packageSources`.
+const EXTERNAL_PACKAGES = new Set( NAMED_SOURCES );
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -303,7 +292,8 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX
+	HANDLE_PREFIX,
+	EXTERNAL_PACKAGES
 );
 
 /**
@@ -1895,6 +1885,13 @@ async function buildAll( baseUrlExpression ) {
 		await Promise.all(
 			level.map( async ( fullName ) => {
 				const packageName = fullToShort.get( fullName );
+				const entry = PACKAGES.get( packageName );
+
+				// External sources are pre-built — only bundle, skip transpilation.
+				if ( entry.externalSource ) {
+					return;
+				}
+
 				const buildTime = await transpilePackage( packageName );
 				console.log(
 					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
@@ -2062,8 +2059,13 @@ async function watchMode() {
 	async function rebuildPackage( packageName ) {
 		try {
 			const startTime = Date.now();
+			const entry = PACKAGES.get( packageName );
 
-			await transpilePackage( packageName );
+			// External sources are pre-built — only rebundle.
+			if ( ! entry.externalSource ) {
+				await transpilePackage( packageName );
+			}
+
 			await bundlePackage( packageName );
 
 			const buildTime = Date.now() - startTime;

@@ -283,7 +283,7 @@ With this configuration the tool scans both `./packages/*` and `../js-packages/*
 
 Named package sources are resolved from `node_modules`, so they work with any package manager's workspace protocol (pnpm `workspace:*`, yarn `workspace:*`, npm workspaces). The package must be declared as a dependency and installed.
 
-Named sources **preserve their npm identity** as the script-module ID. For example, `@acme/shared-ui` is registered as `@acme/shared-ui` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. The source's scoped namespace (e.g., `@acme`) is automatically added to the externals configuration so that imports resolve correctly.
+Named sources **preserve their npm identity** as the script-module ID. For example, `@acme/shared-ui` is registered as `@acme/shared-ui` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. Each named source is externalized individually (by exact package name, not the entire `@scope/*`), so only the packages explicitly listed in `packageSources` are treated as externals. The source package must have a `wpScriptModuleExports` field in its `package.json` for the externals plugin to detect it as a script module.
 
 Both types can be mixed in a single array:
 
