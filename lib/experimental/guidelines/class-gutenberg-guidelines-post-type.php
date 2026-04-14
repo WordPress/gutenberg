@@ -29,18 +29,6 @@ class Gutenberg_Guidelines_Post_Type {
 	const TAXONOMY = 'wp_guideline_type';
 
 	/**
-	 * Valid guideline type taxonomy terms.
-	 *
-	 * @var array
-	 */
-	const VALID_TYPES = array(
-		'content',
-		'skill',
-		'memory',
-		'plan',
-	);
-
-	/**
 	 * The standard guideline category meta keys.
 	 *
 	 * @var array
@@ -130,36 +118,22 @@ class Gutenberg_Guidelines_Post_Type {
 			array(
 				'public'             => false,
 				'publicly_queryable' => false,
-				'show_ui'            => false,
-				'show_in_menu'       => false,
-				'show_in_rest'       => true,
-				'rest_base'          => 'wp-guideline-type',
 				'hierarchical'       => false,
-				'rewrite'            => false,
-				'query_var'          => false,
-				'show_admin_column'  => false,
-				'capabilities'       => array(
-					'manage_terms' => 'manage_options',
-					'edit_terms'   => 'manage_options',
-					'delete_terms' => 'manage_options',
-					'assign_terms' => 'manage_options',
-				),
 				'labels'             => array(
 					'name'          => __( 'Guideline Types', 'gutenberg' ),
 					'singular_name' => __( 'Guideline Type', 'gutenberg' ),
 				),
+				'query_var'          => false,
+				'rewrite'            => false,
+				'show_ui'            => false,
+				'show_in_nav_menus'  => false,
+				'show_in_rest'       => true,
+				'default_term'       => array(
+					'name' => 'content',
+					'slug' => 'content',
+				),
 			)
 		);
-
-		// Seed default terms once to avoid per-request SELECT queries from term_exists().
-		if ( ! get_option( 'wp_guideline_type_terms_seeded' ) ) {
-			foreach ( self::VALID_TYPES as $type ) {
-				if ( ! term_exists( $type, self::TAXONOMY ) ) {
-					wp_insert_term( $type, self::TAXONOMY, array( 'slug' => $type ) );
-				}
-			}
-			update_option( 'wp_guideline_type_terms_seeded', true );
-		}
 	}
 
 	/**
