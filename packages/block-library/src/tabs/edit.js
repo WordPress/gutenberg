@@ -16,6 +16,8 @@ import { useMemo, useEffect } from '@wordpress/element';
 import Controls from './controls';
 import useTabMenuSync from './use-tab-menu-sync';
 
+const EMPTY_ARRAY = [];
+
 const TABS_TEMPLATE = [
 	[
 		'core/tabs-menu',
@@ -25,8 +27,8 @@ const TABS_TEMPLATE = [
 			},
 		},
 		[
-			[ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ],
-			[ 'core/tabs-menu-item', { anchor: 'tab-2-button' } ],
+			[ 'core/tabs-menu-item', {} ],
+			[ 'core/tabs-menu-item', {} ],
 		],
 	],
 	[
@@ -40,7 +42,6 @@ const TABS_TEMPLATE = [
 			[
 				'core/tab',
 				{
-					anchor: 'tab-1',
 					label: 'Tab 1',
 				},
 				[ [ 'core/paragraph' ] ],
@@ -48,7 +49,6 @@ const TABS_TEMPLATE = [
 			[
 				'core/tab',
 				{
-					anchor: 'tab-2',
 					label: 'Tab 2',
 				},
 				[ [ 'core/paragraph' ] ],
@@ -75,21 +75,20 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
+	const { removeBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
+
 	/**
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
 	 * Also select menu items with their anchors for anchor-based deletion sync.
 	 */
-	const { tabs, menuItems, tabPanelClientId, tabsMenuClientId } = useSelect(
+	const { tabs, tabPanelClientId, menuItems, tabsMenuClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panel block and extract tab data.
 			const tabPanel = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panel'
 			);
-
-			// Find tabs-menu block and get its children with their anchors.
 			const tabsMenu = innerBlocks.find(
 				( block ) => block.name === 'core/tabs-menu'
 			);
@@ -99,7 +98,8 @@ function Edit( {
 					? tabPanel.innerBlocks.filter(
 							( block ) => block.name === 'core/tab'
 					  )
-					: [],
+					: EMPTY_ARRAY,
+				tabPanelClientId: tabPanel?.clientId ?? null,
 				menuItems: tabsMenu
 					? getBlocks( tabsMenu.clientId )
 							.filter( ( b ) => b.name === 'core/tabs-menu-item' )
@@ -107,9 +107,7 @@ function Edit( {
 								clientId: b.clientId,
 								anchor: b.attributes.anchor ?? '',
 							} ) )
-					: [],
-				tabPanelClientId: tabPanel?.clientId ?? null,
-				tabsMenuClientId: tabsMenu?.clientId ?? null,
+					: EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]

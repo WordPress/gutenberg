@@ -603,6 +603,19 @@ export function setCurrentRevisionId( revisionId ) {
 }
 
 /**
+ * Set whether the revision diff highlighting is shown.
+ *
+ * @param {boolean} showDiff Whether to show diff highlighting.
+ * @return {Object} Action object.
+ */
+export function setShowRevisionDiff( showDiff ) {
+	return {
+		type: 'SET_SHOW_REVISION_DIFF',
+		showDiff,
+	};
+}
+
+/**
  * Restore a revision by replacing the current content with the revision's content
  * and auto-saving.
  *
@@ -614,6 +627,11 @@ export const restoreRevision =
 		const postType = select.getCurrentPostType();
 		const postId = select.getCurrentPostId();
 
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
 		// Use resolveSelect to ensure the revision is fetched if not yet
 		// in the store. The _fields parameter matches the query used by
 		// getRevisions so the result is served from cache without an
@@ -622,8 +640,19 @@ export const restoreRevision =
 			.resolveSelect( coreStore )
 			.getRevision( 'postType', postType, postId, revisionId, {
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
 			} );
 
 		if ( ! revision ) {

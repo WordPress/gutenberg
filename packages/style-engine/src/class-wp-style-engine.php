@@ -73,6 +73,18 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'background', 'backgroundAttachment' ),
 				),
+				'gradient'             => array(
+					'property_keys' => array(
+						'default' => 'background-image',
+					),
+					'css_vars'      => array(
+						'gradient' => '--wp--preset--gradient--$slug',
+					),
+					'path'          => array( 'background', 'gradient' ),
+					'classnames'    => array(
+						'has-background' => true,
+					),
+				),
 			),
 			'color'      => array(
 				'text'       => array(
@@ -455,6 +467,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					$css_declarations = static::get_css_declarations( $style_value, $style_definition, $options );
 					if ( ! empty( $css_declarations ) ) {
+						/*
+						 * Combine background gradient and background image into a single
+						 * comma-separated background-image value, matching the JS style engine.
+						 */
+						if ( isset( $css_declarations['background-image'] ) && isset( $parsed_styles['declarations']['background-image'] ) ) {
+							$css_declarations['background-image'] = $css_declarations['background-image'] . ', ' . $parsed_styles['declarations']['background-image'];
+						}
 						$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], $css_declarations );
 					}
 				}

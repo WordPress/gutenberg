@@ -22,6 +22,7 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
+	intValueOrDefault,
 	postSyncUpdate,
 	uint8ArrayToBase64,
 } from '../utils';
@@ -629,6 +630,34 @@ describe( 'http-polling utils', () => {
 			await expect( postSyncUpdate( { rooms: [] } ) ).rejects.toThrow(
 				'Network error'
 			);
+		} );
+	} );
+
+	describe( 'intValueOrDefault', () => {
+		it( 'returns the integer value when parsing succeeds', () => {
+			expect( intValueOrDefault( '42', 0 ) ).toBe( 42 );
+			expect( intValueOrDefault( '-10', 0 ) ).toBe( -10 );
+			expect( intValueOrDefault( '0', 1 ) ).toBe( 0 );
+		} );
+
+		it( 'returns the default value when parsing fails', () => {
+			expect( intValueOrDefault( 'abc', 100 ) ).toBe( 100 );
+			expect( intValueOrDefault( '', 50 ) ).toBe( 50 );
+			expect( intValueOrDefault( {}, 10 ) ).toBe( 10 );
+			expect( intValueOrDefault( [], 20 ) ).toBe( 20 );
+			expect( intValueOrDefault( null, 25 ) ).toBe( 25 );
+			expect( intValueOrDefault( undefined, 75 ) ).toBe( 75 );
+		} );
+
+		it( 'handles non-string inputs gracefully', () => {
+			expect( intValueOrDefault( 123, 0 ) ).toBe( 123 );
+			expect( intValueOrDefault( 45.67, 0 ) ).toBe( 45 ); // parseInt truncates
+			expect( intValueOrDefault( 0x10, 0 ) ).toBe( 16 ); // hex
+		} );
+
+		it( 'handles edge cases', () => {
+			expect( intValueOrDefault( '   15   ', 0 ) ).toBe( 15 ); // whitespace
+			expect( intValueOrDefault( '08', 0 ) ).toBe( 8 ); // leading zero
 		} );
 	} );
 } );

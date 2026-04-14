@@ -47,6 +47,7 @@ const userList = [
 		password: 'sm1lingsmyfavorite',
 	},
 ];
+
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all(
@@ -61,14 +62,14 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllUsers();
 		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
 		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
 	} );
 
 	[
@@ -76,6 +77,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,

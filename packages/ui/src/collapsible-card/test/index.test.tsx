@@ -53,9 +53,7 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Hidden content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Hidden content' ) ).not.toBeVisible();
 		} );
 
 		it( 'shows content when defaultOpen is true', () => {
@@ -87,13 +85,12 @@ describe( 'CollapsibleCard', () => {
 				</CollapsibleCard.Root>
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			);
 
@@ -101,38 +98,12 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: true,
 				} )
 			);
 
-			expect(
-				screen.queryByText( 'Toggle content' )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'toggles content when clicking the header area', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<CollapsibleCard.Root>
-					<CollapsibleCard.Header>
-						<Card.Title>Header click test</Card.Title>
-					</CollapsibleCard.Header>
-					<CollapsibleCard.Content>
-						<p>Header toggled content</p>
-					</CollapsibleCard.Content>
-				</CollapsibleCard.Root>
-			);
-
-			expect(
-				screen.queryByText( 'Header toggled content' )
-			).not.toBeInTheDocument();
-
-			await user.click( screen.getByText( 'Header click test' ) );
-
-			expect(
-				screen.getByText( 'Header toggled content' )
-			).toBeVisible();
+			expect( screen.getByText( 'Toggle content' ) ).not.toBeVisible();
 		} );
 
 		it( 'calls onOpenChange when toggled', async () => {
@@ -152,7 +123,8 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			);
 
@@ -179,7 +151,8 @@ describe( 'CollapsibleCard', () => {
 
 			await user.click(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: true,
 				} )
 			);
 
@@ -188,7 +161,7 @@ describe( 'CollapsibleCard', () => {
 	} );
 
 	describe( 'trigger', () => {
-		it( 'renders a toggle button', () => {
+		it( 'renders the header as a toggle button', () => {
 			render(
 				<CollapsibleCard.Root>
 					<CollapsibleCard.Header>
@@ -199,9 +172,103 @@ describe( 'CollapsibleCard', () => {
 
 			expect(
 				screen.getByRole( 'button', {
-					name: 'Expand or collapse card',
+					name: 'Title',
+					expanded: false,
 				} )
 			).toBeVisible();
+		} );
+	} );
+
+	describe( 'HeaderDescription', () => {
+		it( 'sets aria-describedby on the trigger pointing to the description', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Settings</Card.Title>
+						<CollapsibleCard.HeaderDescription data-testid="desc">
+							3 errors
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+					<CollapsibleCard.Content>
+						<p>Content</p>
+					</CollapsibleCard.Content>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', {
+				name: 'Settings',
+			} );
+			const descriptionElement = screen.getByTestId( 'desc' );
+
+			expect( descriptionElement ).toHaveAttribute( 'id' );
+			expect( trigger ).toHaveAttribute(
+				'aria-describedby',
+				descriptionElement.id
+			);
+		} );
+
+		it( 'marks the description content as aria-hidden', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Settings</Card.Title>
+						<CollapsibleCard.HeaderDescription data-testid="desc">
+							<span>Status: OK</span>
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const descriptionWrapper = screen.getByTestId( 'desc' );
+			expect( descriptionWrapper ).toHaveAttribute(
+				'aria-hidden',
+				'true'
+			);
+		} );
+
+		it( 'does not set aria-describedby when HeaderDescription is absent', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			const trigger = screen.getByRole( 'button', { name: 'Title' } );
+			expect( trigger ).not.toHaveAttribute( 'aria-describedby' );
+		} );
+
+		it( 'forwards ref on HeaderDescription', () => {
+			const descRef = createRef< HTMLDivElement >();
+
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+						<CollapsibleCard.HeaderDescription ref={ descRef }>
+							Description
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			expect( descRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+
+		it( 'renders description content visually', () => {
+			render(
+				<CollapsibleCard.Root>
+					<CollapsibleCard.Header>
+						<Card.Title>Title</Card.Title>
+						<CollapsibleCard.HeaderDescription>
+							Badge content
+						</CollapsibleCard.HeaderDescription>
+					</CollapsibleCard.Header>
+				</CollapsibleCard.Root>
+			);
+
+			expect( screen.getByText( 'Badge content' ) ).toBeVisible();
 		} );
 	} );
 } );

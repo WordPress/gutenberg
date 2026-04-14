@@ -1,17 +1,15 @@
-/* @jsx createElement */
-
 /**
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
 import { __, sprintf } from '@wordpress/i18n';
-import { createElement, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Spinner,
 	Navigator,
+	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { Notice } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -21,7 +19,7 @@ import GuidelineAccordion from './components/guideline-accordion';
 import GuidelineAccordionForm from './components/guideline-accordion-form';
 import { fetchContentGuidelines } from './api';
 import BlockGuidelines from './components/block-guidelines';
-import ActionsSection from './components/actions-section';
+import GuidelineActionsSection from './components/guideline-actions-section';
 import RevisionHistory from './components/revision-history';
 
 const GUIDELINE_ITEMS = [
@@ -58,11 +56,24 @@ const GUIDELINE_ITEMS = [
 	},
 	{
 		title: __( 'Additional' ),
-		description: __( 'Add additional guidelines for your team.' ),
-
+		description: __( 'Add additional guidelines.' ),
 		slug: 'additional',
 	},
 ];
+
+const KNOWN_VIEWS = [ 'revision-history' ];
+
+function getInitialNavigatorPath() {
+	if ( window?.location?.href ) {
+		const url = new URL( window.location.href );
+		const view = url.searchParams.get( 'view' ) ?? '';
+		if ( KNOWN_VIEWS.includes( view ) ) {
+			return `/${ view }`;
+		}
+	}
+
+	return '/';
+}
 
 function ContentGuidelinesPage() {
 	const [ loading, setLoading ] = useState( true );
@@ -85,20 +96,20 @@ function ContentGuidelinesPage() {
 		>
 			{ error && (
 				<div className="content-guidelines__content">
-					<Notice.Root intent="error">
-						<Notice.Title>
+					<Notice status="error" isDismissible={ false }>
+						<strong>
 							{ sprintf(
 								/* translators: %s: Error message. */
 								__( 'Error loading guidelines: %s' ),
 								error
 							) }
-						</Notice.Title>
-						<Notice.Description>
+						</strong>
+						<p className="content-guidelines__error-description">
 							{ __(
 								'Please try again. If the problem persists, contact support.'
 							) }
-						</Notice.Description>
-					</Notice.Root>
+						</p>
+					</Notice>
 				</div>
 			) }
 			{ loading ? (
@@ -107,7 +118,7 @@ function ContentGuidelinesPage() {
 				</div>
 			) : (
 				! error && (
-					<Navigator initialPath="/">
+					<Navigator initialPath={ getInitialNavigatorPath() }>
 						<Navigator.Screen path="/">
 							<VStack className="content-guidelines__content">
 								{ /*
@@ -167,7 +178,7 @@ function ContentGuidelinesPage() {
 									} ) }
 								</ul>
 								{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
-								<ActionsSection />
+								<GuidelineActionsSection />
 							</VStack>
 						</Navigator.Screen>
 						<Navigator.Screen path="/revision-history">

@@ -808,6 +808,53 @@ describe( 'global styles renderer', () => {
 				':root :where(p){color:red;}'
 			);
 		} );
+
+		it( 'should output duotone SVG filters with __unstableType of svgs', () => {
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+
+			const config = {
+				version: 3,
+				settings: {
+					color: {
+						duotone: {
+							theme: [
+								{
+									slug: 'midnight',
+									name: 'Midnight',
+									colors: [ '#263135', '#69a8a7' ],
+								},
+							],
+						},
+					},
+				},
+				styles: {},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/image',
+					selectors: {
+						root: '.wp-block-image',
+						filter: { duotone: '.wp-block-image img' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+
+			const svgStyle = styles.find(
+				( s: any ) => s.__unstableType === 'svgs'
+			);
+
+			expect( svgStyle ).toBeDefined();
+			expect( svgStyle.__unstableType ).toBe( 'svgs' );
+			expect( svgStyle.assets.join( '' ) ).toContain(
+				'wp-duotone-midnight'
+			);
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {

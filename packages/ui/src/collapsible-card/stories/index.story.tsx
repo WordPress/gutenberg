@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Card from '../../card';
 import * as CollapsibleCard from '../index';
+import { Stack } from '../../stack';
 
 /**
  * Temporary text component for story examples. This will be replaced by an
@@ -11,10 +12,10 @@ function Text( { children }: { children: React.ReactNode } ) {
 		<p
 			style={ {
 				margin: 0,
-				fontFamily: [ 'var(--wp', 'ds-font-family-body)' ].join( '' ),
-				fontSize: 'var(--wpds-font-size-md)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-sm)',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				fontSize: 'var(--wpds-typography-font-size-md)',
+				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
 				color: 'var(--wpds-color-fg-content-neutral-weak)',
 			} }
@@ -29,6 +30,7 @@ const meta: Meta< typeof CollapsibleCard.Root > = {
 	component: CollapsibleCard.Root,
 	subcomponents: {
 		'CollapsibleCard.Header': CollapsibleCard.Header,
+		'CollapsibleCard.HeaderDescription': CollapsibleCard.HeaderDescription,
 		'CollapsibleCard.Content': CollapsibleCard.Content,
 	},
 };
@@ -103,6 +105,102 @@ export const Disabled: Story = {
 			</>
 		),
 	},
+};
+
+/**
+ * Multiple collapsible cards stacked vertically, simulating a typical
+ * settings-panel or FAQ-style layout.
+ */
+export const Stacked: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<div
+			style={ {
+				display: 'flex',
+				flexDirection: 'column',
+				gap: 'var(--wpds-dimension-gap-lg)',
+			} }
+		>
+			{ [
+				'General',
+				'Advanced',
+				'Accessibility',
+				'Performance',
+				'Privacy',
+				'Notifications',
+			].map( ( title ) => (
+				<CollapsibleCard.Root key={ title }>
+					<CollapsibleCard.Header>
+						<Card.Title>{ title }</Card.Title>
+					</CollapsibleCard.Header>
+					<CollapsibleCard.Content>
+						<Text>
+							Configure all { title.toLowerCase() } settings for
+							your site. Changes here affect how your site behaves
+							across all pages and posts.
+						</Text>
+						<Text>
+							Review each option carefully before saving. Some
+							changes may require a page reload to take effect.
+							Hover over individual options for more details about
+							what they control.
+						</Text>
+						<Text>
+							If you&apos;re unsure about a setting, you can
+							always reset to defaults using the button at the
+							bottom of this section. Your previous configuration
+							will be saved as a backup.
+						</Text>
+					</CollapsibleCard.Content>
+				</CollapsibleCard.Root>
+			) ) }
+		</div>
+	),
+};
+
+/**
+ * A collapsible card with a `HeaderDescription` that provides supplementary
+ * information (e.g. status, summary) as an `aria-describedby` relationship.
+ */
+export const WithHeaderDescription: Story = {
+	// `defaultOpen` (uncontrolled) and `open` (controlled) should not be
+	// used together — disable the `open` control to avoid confusion.
+	argTypes: { open: { control: false } },
+	args: {
+		defaultOpen: true,
+	},
+	render: ( { open, defaultOpen, onOpenChange, disabled, ...restArgs } ) => (
+		<CollapsibleCard.Root
+			open={ open }
+			defaultOpen={ defaultOpen }
+			onOpenChange={ onOpenChange }
+			disabled={ disabled }
+			{ ...restArgs }
+		>
+			<CollapsibleCard.Header>
+				<Stack justify="space-between">
+					<Card.Title>Settings</Card.Title>
+					<CollapsibleCard.HeaderDescription>
+						<span
+							style={ {
+								fontSize: 'var(--wpds-typography-font-size-sm)',
+								color: 'var(--wpds-color-fg-content-neutral-weak)',
+							} }
+						>
+							3 items configured
+						</span>
+					</CollapsibleCard.HeaderDescription>
+				</Stack>
+			</CollapsibleCard.Header>
+			<CollapsibleCard.Content>
+				<Text>
+					The header description provides supplementary context to the
+					trigger button. Assistive technologies will announce the
+					description alongside the button label.
+				</Text>
+			</CollapsibleCard.Content>
+		</CollapsibleCard.Root>
+	),
 };
 
 /**

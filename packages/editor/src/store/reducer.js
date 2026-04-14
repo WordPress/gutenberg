@@ -450,6 +450,25 @@ export function revisionId( state = null, action ) {
 }
 
 /**
+ * Reducer for whether the revision diff is shown.
+ * Resets to true when entering/exiting revisions mode.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function showRevisionDiff( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_SHOW_REVISION_DIFF':
+			return action.showDiff;
+		case 'SET_CURRENT_REVISION_ID':
+			// Reset during the exit.
+			return ! action.revisionId ? true : state;
+	}
+	return state;
+}
+
+/**
  * Reducer returning the currently selected note and its options.
  *
  * @param {Object} state  Current state.
@@ -487,6 +506,7 @@ export default combineReducers( {
 	showStylebook,
 	canvasMinHeight,
 	revisionId,
+	showRevisionDiff,
 	selectedNote,
 	dataviews: dataviewsReducer,
 } );

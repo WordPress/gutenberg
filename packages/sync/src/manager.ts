@@ -170,6 +170,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		if ( false === syncConfig.shouldSync?.( objectType, objectId ) ) {
+			log( 'loadEntity', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
+		}
+
 		log( 'loadEntity', 'loading', entityId );
 
 		handlers = {
@@ -177,9 +182,9 @@ export function createSyncManager( debug = false ): SyncManager {
 			editRecord: debugWrap( handlers.editRecord ),
 			getEditedRecord: debugWrap( handlers.getEditedRecord ),
 			onStatusChange: debugWrap( handlers.onStatusChange ),
+			persistCRDTDoc: debugWrap( handlers.persistCRDTDoc ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
-			saveRecord: debugWrap( handlers.saveRecord ),
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
@@ -315,6 +320,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		if ( collectionStates.has( objectType ) ) {
 			log( 'loadCollection', 'already loaded', entityId );
 			return; // Already loaded.
+		}
+
+		if ( false === syncConfig.shouldSync?.( objectType, null ) ) {
+			log( 'loadCollection', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
 		}
 
 		log( 'loadCollection', 'loading', entityId );
@@ -467,12 +477,12 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( ! tempDoc ) {
 			log( 'applyPersistedCrdtDoc', 'no persisted doc', entityId );
-			// Apply the current record as changes and trigger a save, which will
-			// persist the CRDT document. (The entity should call `createPersistedCRDTDoc`
-			// via its pre-persist hook.)
+			// Apply the current record as changes and request that the CRDT doc be
+			// persisted with the entity. The persisted CRDT doc can be created by
+			// calling `syncManager.createPersistedCRDTDoc`.
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord();
+				handlers.persistCRDTDoc();
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
@@ -524,12 +534,12 @@ export function createSyncManager( debug = false ): SyncManager {
 			{}
 		);
 
-		// Apply the changes and trigger a save, which will persist the CRDT
-		// document. (The entity should call `createPersistedCRDTDoc` via its
-		// pre-persist hook.)
+		// Apply the changes and request that the updated CRDT doc be persisted with
+		// the entity. The persisted CRDT doc can be created by calling
+		// `syncManager.createPersistedCRDTDoc`.
 		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
-			handlers.saveRecord();
+			handlers.persistCRDTDoc();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
 	}
 

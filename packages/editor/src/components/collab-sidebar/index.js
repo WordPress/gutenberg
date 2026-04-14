@@ -56,6 +56,7 @@ function NotesSidebarContent( {
 				// Sometimes previous sidebar unmounts after the new one mounts.
 				// This ensures we always have the latest reference.
 				if ( node ) {
+					// eslint-disable-next-line react-compiler/react-compiler
 					commentSidebarRef.current = node;
 				}
 			} }

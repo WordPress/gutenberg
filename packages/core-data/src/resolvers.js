@@ -230,18 +230,26 @@ export const getEntityRecord =
 								query
 							);
 						},
-						// Save the current entity record, whether or not it has unsaved
-						// edits. This is used to trigger a persisted CRDT document.
-						saveRecord: () => {
+						// Persist the CRDT document.
+						//
+						// TODO: Currently, persisted CRDT documents are stored in post meta.
+						// This effectively means that only post entities support CRDT
+						// persistence. As we add support for syncing additional entity,
+						// we'll need to revisit where persisted CRDT documents are stored.
+						persistCRDTDoc: () => {
 							resolveSelect
 								.getEditedEntityRecord( kind, name, key )
 								.then( ( editedRecord ) => {
-									// Don't trigger a save if the record is still an auto-draft.
-									const { status } = editedRecord;
-									if ( 'auto-draft' === status ) {
+									// Don't persist the CRDT document if the record is still an
+									// auto-draft or if the entity does not support meta.
+									const { meta, status } = editedRecord;
+									if ( 'auto-draft' === status || ! meta ) {
 										return;
 									}
 
+									// Trigger a save to persist the CRDT document. The entity's
+									// pre-persist hooks will create the persisted CRDT document
+									// and apply it to the record's meta.
 									dispatch.saveEntityRecord(
 										kind,
 										name,
@@ -570,7 +578,7 @@ export const getEntityRecords =
 
 				dispatch.__unstableReleaseStoreLock( lock );
 			} );
-		} catch ( e ) {
+		} catch {
 			dispatch.__unstableReleaseStoreLock( lock );
 		}
 	};
@@ -627,7 +635,7 @@ export const getEmbedPreview =
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
 			} );
 			dispatch.receiveEmbedPreview( url, embedProxyResponse );
-		} catch ( error ) {
+		} catch {
 			// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 			dispatch.receiveEmbedPreview( url, false );
 		}
@@ -698,7 +706,7 @@ export const canUser =
 				method: 'OPTIONS',
 				parse: false,
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if our OPTIONS request comes back with an API error (4xx or
 			// 5xx). The previously determined isAllowed value will remain in the store.
 			return;
@@ -983,11 +991,12 @@ export const getDefaultTemplateId =
 		const id = window?.__experimentalTemplateActivate
 			? template?.wp_id || template?.id
 			: template?.id;
-		// Endpoint may return an empty object if no template is found.
-		if ( id ) {
-			template.id = id;
-			registry.batch( () => {
-				dispatch.receiveDefaultTemplateId( query, id );
+
+		registry.batch( () => {
+			dispatch.receiveDefaultTemplateId( query, id || '' );
+			// Endpoint may return an empty object if no template is found.
+			if ( id ) {
+				template.id = id;
 				dispatch.receiveEntityRecords(
 					'postType',
 					template.type,
@@ -999,8 +1008,8 @@ export const getDefaultTemplateId =
 					template.type,
 					id,
 				] );
-			} );
-		}
+			}
+		} );
 	};
 
 getDefaultTemplateId.shouldInvalidate = ( action ) => {
@@ -1068,7 +1077,7 @@ export const getRevisions =
 				entityConfig.supportsPagination && query.per_page !== -1;
 			try {
 				response = await apiFetch( { path, parse: ! isPaginated } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1211,7 +1220,7 @@ export const getRevision =
 			let record;
 			try {
 				record = await apiFetch( { path } );
-			} catch ( error ) {
+			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
@@ -1248,7 +1257,7 @@ export const getRegisteredPostMeta =
 				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
-		} catch ( error ) {
+		} catch {
 			// Do nothing if the request comes back with an API error.
 			return;
 		}
@@ -1311,4 +1320,19 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests view config for a given entity type from the REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getViewConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/view-config', { kind, name } ),
+		} );
+		dispatch.receiveViewConfig( kind, name, config );
 	};

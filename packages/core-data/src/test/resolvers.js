@@ -172,16 +172,69 @@ describe( 'getEntityRecord', () => {
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
+				persistCRDTDoc: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
-				saveRecord: expect.any( Function ),
 			}
 		);
 	} );
 
-	it( 'saveRecord fetches edited record and saves full entity record', async () => {
-		const POST_RECORD = { id: 1, title: 'Test Post' };
-		const EDITED_RECORD = { id: 1, title: 'Edited Post' };
+	it( 'persistCRDTDoc fetches edited record and does not save full entity record when the entity does not support meta', async () => {
+		const ENTITY_RECORD = { id: 1, title: 'Test Record' };
+		const EDITED_RECORD = { id: 1, title: 'Edited Record' };
+		const ENTITY_RESPONSE = {
+			json: () => Promise.resolve( ENTITY_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'bar',
+				kind: 'foo',
+				baseURL: '/wp/v2/foo',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+			},
+		];
+
+		dispatch.saveEntityRecord = jest.fn();
+
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+
+		triggerFetch.mockImplementation( () => ENTITY_RESPONSE );
+
+		await getEntityRecord(
+			'foo',
+			'bar',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		// Extract the handlers passed to syncManager.load.
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
+		await resolveSelectWithSync.getEditedEntityRecord();
+
+		// Should have fetched the full edited entity record.
+		expect(
+			resolveSelectWithSync.getEditedEntityRecord
+		).toHaveBeenCalledWith( 'foo', 'bar', 1 );
+
+		// Should not have called saveEntityRecord.
+		expect( dispatch.saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'persistCRDTDoc fetches edited record and saves full entity record', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
+		const EDITED_RECORD = { id: 1, title: 'Edited Post', meta: {} };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
 		};
@@ -219,8 +272,8 @@ describe( 'getEntityRecord', () => {
 		// Extract the handlers passed to syncManager.load.
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
-		// Call saveRecord and wait for the internal promise chain.
-		handlers.saveRecord();
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
 		await resolveSelectWithSync.getEditedEntityRecord();
 
 		// Should have fetched the full edited entity record.
@@ -236,8 +289,8 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'saveRecord saves even when there are no unsaved edits', async () => {
-		const POST_RECORD = { id: 1, title: 'Test Post' };
+	it( 'persistCRDTDoc saves even when there are no unsaved edits', async () => {
+		const POST_RECORD = { id: 1, title: 'Test Post', meta: {} };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
 		};
@@ -275,8 +328,8 @@ describe( 'getEntityRecord', () => {
 
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
-		// Call saveRecord and wait for the internal promise chain.
-		handlers.saveRecord();
+		// Call persistCRDTDoc and wait for the internal promise chain.
+		handlers.persistCRDTDoc();
 		await resolveSelectWithSync.getEditedEntityRecord();
 
 		// Should save the record even with no edits (the whole point of the fix).
@@ -336,9 +389,9 @@ describe( 'getEntityRecord', () => {
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
 				onStatusChange: expect.any( Function ),
+				persistCRDTDoc: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				restoreUndoMeta: expect.any( Function ),
-				saveRecord: expect.any( Function ),
 			}
 		);
 	} );

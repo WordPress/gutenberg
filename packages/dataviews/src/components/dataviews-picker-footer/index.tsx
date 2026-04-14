@@ -32,14 +32,31 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	disableSelectAll = false,
 }: {
 	selection: string[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	disableSelectAll?: boolean;
 } ) {
+	const hasSelection = selection.length > 0;
 	const areAllSelected = selectedItems.length === data.length;
+
+	if ( disableSelectAll ) {
+		return (
+			<CheckboxControl
+				className="dataviews-view-table-selection-checkbox"
+				checked={ hasSelection }
+				disabled={ ! hasSelection }
+				onChange={ () => {
+					onChangeSelection( [] );
+				} }
+				aria-label={ __( 'Deselect all' ) }
+			/>
+		);
+	}
 
 	return (
 		<CheckboxControl
@@ -136,6 +153,7 @@ export function DataViewsPickerFooter() {
 		getItemId,
 		actions = EMPTY_ARRAY,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
@@ -143,7 +161,8 @@ export function DataViewsPickerFooter() {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		!! view.infiniteScrollEnabled
 	);
 
 	const selectedItems = useMemo(
@@ -173,6 +192,7 @@ export function DataViewsPickerFooter() {
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
+						disableSelectAll={ !! view.infiniteScrollEnabled }
 					/>
 				) }
 				<span className="dataviews-bulk-actions-footer__item-count">

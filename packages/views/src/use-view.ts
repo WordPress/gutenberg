@@ -70,9 +70,22 @@ export function useView( config: ViewConfig ): UseViewReturn {
 	);
 	const { set } = useDispatch( preferencesStore );
 
-	const baseView: View = persistedView ?? defaultView;
+	const baseView: View = useMemo(
+		() => persistedView ?? defaultView ?? {},
+		[ persistedView, defaultView ]
+	);
 	const page = Number( queryParams?.page ?? baseView.page ?? 1 );
 	const search = queryParams?.search ?? baseView.search ?? '';
+
+	const combinedOverrides = useMemo( () => {
+		const rawDefaults =
+			config.defaultLayouts?.[
+				baseView.type as keyof typeof config.defaultLayouts
+			];
+		const layoutTypeDefaults =
+			! rawDefaults || rawDefaults === true ? {} : rawDefaults;
+		return { ...layoutTypeDefaults, ...activeViewOverrides };
+	}, [ config.defaultLayouts, baseView.type, activeViewOverrides ] );
 
 	// Merge URL query parameters (page, search) and activeViewOverrides into the view
 	const view: View = useMemo( () => {
@@ -82,10 +95,10 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				page,
 				search,
 			},
-			activeViewOverrides,
+			combinedOverrides,
 			defaultView
 		);
-	}, [ baseView, page, search, activeViewOverrides, defaultView ] );
+	}, [ baseView, page, search, combinedOverrides, defaultView ] );
 
 	const isModified = !! persistedView;
 
@@ -100,7 +113,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
 			const preferenceView = stripActiveViewOverrides(
 				omit( newView, [ 'page', 'search' ] ) as View,
-				activeViewOverrides,
+				combinedOverrides,
 				defaultView
 			);
 
@@ -115,12 +128,12 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			// Compare with baseView and defaultView after stripping activeViewOverrides
 			const comparableBaseView = stripActiveViewOverrides(
 				baseView,
-				activeViewOverrides,
+				combinedOverrides,
 				defaultView
 			);
 			const comparableDefaultView = stripActiveViewOverrides(
 				defaultView,
-				activeViewOverrides,
+				combinedOverrides,
 				defaultView
 			);
 
@@ -139,7 +152,7 @@ export function useView( config: ViewConfig ): UseViewReturn {
 			search,
 			baseView,
 			defaultView,
-			activeViewOverrides,
+			combinedOverrides,
 			set,
 			preferenceKey,
 		]

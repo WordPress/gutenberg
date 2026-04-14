@@ -8,7 +8,6 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -20,6 +19,7 @@ import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
 	vipsResizeImage,
+	vipsBatchResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
@@ -74,6 +74,7 @@ type ActionCreators = {
 	rotateItem: typeof rotateItem;
 	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
+	finalizeItem: typeof finalizeItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
 	< T = Record< string, unknown > >( args: T ): void;
@@ -380,6 +381,15 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
+				// If parent has pending operations (like Finalize), trigger them.
+				if (
+					parentItem.operations &&
+					parentItem.operations.length > 0
+				) {
+					dispatch.processItem( parentId );
+					return;
+				}
+
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
 				}
@@ -400,6 +410,14 @@ export function processItem( id: QueueItemId ) {
 			 Do nothing and let the removal happen once the last side-loaded item finishes.
 			 */
 
+			return;
+		}
+
+		// For Finalize, wait until all child sideloads are complete.
+		if (
+			operation === OperationType.Finalize &&
+			select.hasPendingItemsByParentId( id )
+		) {
 			return;
 		}
 
@@ -445,6 +463,10 @@ export function processItem( id: QueueItemId ) {
 
 			case OperationType.ThumbnailGeneration:
 				dispatch.generateThumbnails( id );
+				break;
+
+			case OperationType.Finalize:
+				dispatch.finalizeItem( id );
 				break;
 		}
 	};
@@ -735,7 +757,8 @@ export function prepareItem( id: QueueItemId ) {
 
 			operations.push(
 				OperationType.Upload,
-				OperationType.ThumbnailGeneration
+				OperationType.ThumbnailGeneration,
+				OperationType.Finalize
 			);
 		} else {
 			operations.push( OperationType.Upload );
@@ -755,6 +778,7 @@ export function prepareItem( id: QueueItemId ) {
 						additionalData: {
 							...item.additionalData,
 							generate_sub_sizes: true,
+							convert_format: true,
 						},
 				  }
 				: {};
@@ -780,7 +804,7 @@ export function uploadItem( id: QueueItemId ) {
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
-				if ( ! isBlobURL( attachment.url ) ) {
+				if ( attachment && ! isBlobURL( attachment.url ) ) {
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
@@ -1108,6 +1132,11 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+			const sizesToGenerate: string[] =
+				attachment.missing_image_sizes as string[];
+
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
@@ -1116,8 +1145,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const settings = select.getSettings();
-			const allImageSizes = settings.allImageSizes || {};
 			const { imageOutputFormats } = settings;
 
 			// Check if thumbnails should be transcoded to a different format.
@@ -1141,7 +1168,36 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
-			for ( const name of attachment.missing_image_sizes ) {
+			// Determine the actual output type for thumbnails.
+			// If transcoding is configured, use that format; otherwise
+			// use the source format.
+			const thumbnailOutputType = thumbnailTranscodeOperation
+				? `image/${ thumbnailTranscodeOperation[ 1 ].outputFormat }`
+				: sourceType;
+
+			const quality = thumbnailTranscodeOperation
+				? thumbnailTranscodeOperation[ 1 ].outputQuality ??
+				  DEFAULT_OUTPUT_QUALITY
+				: DEFAULT_OUTPUT_QUALITY;
+
+			// Collect all resize configs for batch processing.
+			const batchConfigs: Array< {
+				name: string;
+				resize: {
+					width: number;
+					height: number;
+					crop?:
+						| boolean
+						| [
+								'left' | 'center' | 'right',
+								'top' | 'center' | 'bottom',
+						  ];
+				};
+				quality: number;
+				scaledSuffix?: boolean;
+			} > = [];
+
+			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
 					// eslint-disable-next-line no-console
@@ -1151,65 +1207,122 @@ export function generateThumbnails( id: QueueItemId ) {
 					continue;
 				}
 
-				// Build operations list for this thumbnail.
-				const thumbnailOperations: Operation[] = [
-					[ OperationType.ResizeCrop, { resize: imageSize } ],
-				];
-
-				// Add transcoding if format conversion is configured and
-				// the transparency check passed.
-				if ( thumbnailTranscodeOperation ) {
-					thumbnailOperations.push( thumbnailTranscodeOperation );
-				}
-
-				thumbnailOperations.push( OperationType.Upload );
-
-				dispatch.addSideloadItem( {
-					file,
-					onChange: ( [ updatedAttachment ] ) => {
-						// If the sub-size is still being generated, there is no need
-						// to invoke the callback below. It would just override
-						// the main image in the editor with the sub-size.
-						if ( isBlobURL( updatedAttachment.url ) ) {
-							return;
-						}
-
-						// This might be confusing, but the idea is to update the original
-						// image item in the editor with the new one with the added sub-size.
-						item.onChange?.( [ updatedAttachment ] );
-					},
-					batchId,
-					parentId: item.id,
-					additionalData: {
-						// Sideloading does not use the parent post ID but the
-						// attachment ID as the image sizes need to be added to it.
-						post: attachment.id,
-						image_size: name,
-						convert_format: false,
-					},
-					operations: thumbnailOperations,
+				batchConfigs.push( {
+					name,
+					resize: imageSize,
+					quality,
 				} );
 			}
 
-			// Create and sideload the scaled version.
+			// Check if a scaled version is needed.
 			const { bigImageSizeThreshold } = settings;
+			let needsScaling = false;
 			if ( bigImageSizeThreshold && attachment.id ) {
-				// Check if the image actually exceeds the threshold.
-				// Only create a scaled version for images larger than the threshold,
-				// matching WordPress core's wp_create_image_subsizes() behavior.
 				const bitmap = await createImageBitmap( item.sourceFile );
-				const needsScaling =
+				needsScaling =
 					bitmap.width > bigImageSizeThreshold ||
 					bitmap.height > bigImageSizeThreshold;
 				bitmap.close();
 
 				if ( needsScaling ) {
-					// Rename sourceFile to match the server attachment filename.
-					const sourceForScaled = attachment.filename
-						? renameFile( item.sourceFile, attachment.filename )
-						: item.sourceFile;
+					batchConfigs.push( {
+						name: 'scaled',
+						resize: {
+							width: bigImageSizeThreshold,
+							height: bigImageSizeThreshold,
+						},
+						quality,
+						scaledSuffix: true,
+					} );
+				}
+			}
 
-					// Add scaling to queue.
+			// Batch resize: decode source once via copyMemory(),
+			// generate all sub-sizes with thumbnailImage(), and
+			// write each directly to the output format.
+			// Falls back to per-thumbnail processing on failure.
+			let batchResults: Awaited<
+				ReturnType< typeof vipsBatchResizeImage >
+			> | null = null;
+
+			if ( batchConfigs.length > 0 ) {
+				try {
+					batchResults = await vipsBatchResizeImage(
+						item.id,
+						file,
+						thumbnailOutputType,
+						batchConfigs,
+						false
+					);
+				} catch {
+					// eslint-disable-next-line no-console
+					console.warn(
+						'Batch resize failed, falling back to per-thumbnail processing'
+					);
+				}
+			}
+
+			if ( batchResults ) {
+				// Batch succeeded — enqueue upload-only sideloads.
+				for ( const result of batchResults ) {
+					dispatch.addSideloadItem( {
+						file: result.file,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: result.name,
+							convert_format: false,
+						},
+						operations: [ OperationType.Upload ],
+					} );
+				}
+			} else {
+				// Fallback: per-thumbnail processing (original approach
+				// without batch resize).
+				for ( const name of sizesToGenerate ) {
+					const imageSize = allImageSizes[ name ];
+					if ( ! imageSize ) {
+						continue;
+					}
+
+					const thumbnailOperations: Operation[] = [
+						[ OperationType.ResizeCrop, { resize: imageSize } ],
+					];
+
+					if ( thumbnailTranscodeOperation ) {
+						thumbnailOperations.push( thumbnailTranscodeOperation );
+					}
+
+					thumbnailOperations.push( OperationType.Upload );
+
+					dispatch.addSideloadItem( {
+						file,
+						onChange: ( [ updatedAttachment ] ) => {
+							if ( isBlobURL( updatedAttachment.url ) ) {
+								return;
+							}
+							item.onChange?.( [ updatedAttachment ] );
+						},
+						batchId,
+						parentId: item.id,
+						additionalData: {
+							post: attachment.id,
+							image_size: name,
+							convert_format: false,
+						},
+						operations: thumbnailOperations,
+					} );
+				}
+
+				// Fallback scaled version.
+				if ( needsScaling && bigImageSizeThreshold && attachment.id ) {
 					const scaledOperations: Operation[] = [
 						[
 							OperationType.ResizeCrop,
@@ -1223,7 +1336,6 @@ export function generateThumbnails( id: QueueItemId ) {
 						],
 					];
 
-					// Add transcoding if format conversion is configured.
 					if ( thumbnailTranscodeOperation ) {
 						scaledOperations.push( thumbnailTranscodeOperation );
 					}
@@ -1231,7 +1343,7 @@ export function generateThumbnails( id: QueueItemId ) {
 					scaledOperations.push( OperationType.Upload );
 
 					dispatch.addSideloadItem( {
-						file: sourceForScaled,
+						file,
 						onChange: ( [ updatedAttachment ] ) => {
 							if ( isBlobURL( updatedAttachment.url ) ) {
 								return;
@@ -1248,6 +1360,40 @@ export function generateThumbnails( id: QueueItemId ) {
 						operations: scaledOperations,
 					} );
 				}
+			}
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Finalizes an uploaded item by calling the server's finalize endpoint.
+ *
+ * This triggers the wp_generate_attachment_metadata filter so that PHP
+ * plugins can process the attachment after all client-side operations
+ * (including thumbnail sideloads) are complete.
+ *
+ * @param id Item ID.
+ */
+export function finalizeItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const attachment = item.attachment;
+		const { mediaFinalize } = select.getSettings();
+
+		// Only finalize if we have an attachment ID and a mediaFinalize callback.
+		if ( attachment?.id && mediaFinalize ) {
+			try {
+				await mediaFinalize( attachment.id );
+			} catch ( error ) {
+				// Log but don't fail the upload if finalization fails.
+				// eslint-disable-next-line no-console
+				console.warn( 'Media finalization failed:', error );
 			}
 		}
 

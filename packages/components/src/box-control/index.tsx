@@ -21,17 +21,12 @@ import {
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	getInitialSide,
 	isValueMixed,
 	isValuesDefined,
 	getAllowedSides,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
-import type {
-	BoxControlIconProps,
-	BoxControlProps,
-	BoxControlValue,
-} from './types';
+import type { BoxControlProps, BoxControlValue } from './types';
 import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const defaultInputProps = {
@@ -101,10 +96,6 @@ function BoxControl( {
 		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
 	);
 
-	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
-		getInitialSide( isLinked, splitOnAxis )
-	);
-
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
@@ -120,14 +111,6 @@ function BoxControl( {
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
-	};
-
-	const handleOnFocus = (
-		_event: React.FocusEvent< HTMLInputElement >,
-		{ side: nextSide }: { side: typeof side }
-	) => {
-		setSide( nextSide );
 	};
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
@@ -148,7 +131,6 @@ function BoxControl( {
 		onMouseOut,
 		...inputProps,
 		onChange: handleOnChange,
-		onFocus: handleOnFocus,
 		isLinked,
 		units,
 		selectedUnits,

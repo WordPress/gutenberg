@@ -28,29 +28,18 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 	}
 
 	// Re-render each tabs-menu-item with per-item context (index, id, label).
-	// Match by anchor so the correct tab is found even when the two lists
-	// are in different orders.
-	$buttons_html = '';
+	// Match by position so items align with their corresponding tabs.
+	$buttons_html       = '';
+	$menu_item_position = 0;
 
 	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
 		if ( 'core/tabs-menu-item' !== ( $parsed_menu_item['blockName'] ?? '' ) ) {
 			continue;
 		}
 
-		// Find the tab anchor from the menu item anchor (e.g. "tab-1-button" → "tab-1").
-		$menu_item_anchor = $parsed_menu_item['attrs']['anchor'] ?? '';
-		$tab_anchor       = preg_replace( '/-button$/', '', $menu_item_anchor );
-
-		// Find the matching tab in $tabs_list by id.
-		$tab       = null;
-		$tab_index = 0;
-		foreach ( $tabs_list as $index => $candidate ) {
-			if ( ( $candidate['id'] ?? '' ) === $tab_anchor ) {
-				$tab       = $candidate;
-				$tab_index = $index;
-				break;
-			}
-		}
+		$tab       = $tabs_list[ $menu_item_position ] ?? null;
+		$tab_index = $menu_item_position;
+		++$menu_item_position;
 
 		// Skip menu items with no matching tab.
 		if ( null === $tab ) {

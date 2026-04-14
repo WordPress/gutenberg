@@ -133,7 +133,8 @@ interface ViewBase {
 	page?: number;
 
 	/**
-	 * The number of items per page
+	 * The number of items per page.
+	 * Also used as the batch size when infinite scroll is enabled.
 	 */
 	perPage?: number;
 
@@ -203,6 +204,12 @@ interface ViewBase {
 	 * Whether infinite scroll is enabled.
 	 */
 	infiniteScrollEnabled?: boolean;
+
+	/**
+	 * The start position for infinite scroll (1-indexed).
+	 * Used when infiniteScrollEnabled is true.
+	 */
+	startPosition?: number;
 }
 
 export interface ColumnStyle {
@@ -520,6 +527,15 @@ export type ViewPickerProps< Item > =
 	| ViewPickerTableProps< Item >;
 
 export interface SupportedLayouts {
+	list?: Omit< ViewList, 'type' > | true;
+	grid?: Omit< ViewGrid, 'type' > | true;
+	table?: Omit< ViewTable, 'type' > | true;
+	activity?: Omit< ViewActivity, 'type' > | true;
+	pickerGrid?: Omit< ViewPickerGrid, 'type' > | true;
+	pickerTable?: Omit< ViewPickerTable, 'type' > | true;
+}
+
+export interface NormalizedSupportedLayouts {
 	list?: Omit< ViewList, 'type' >;
 	grid?: Omit< ViewGrid, 'type' >;
 	table?: Omit< ViewTable, 'type' >;

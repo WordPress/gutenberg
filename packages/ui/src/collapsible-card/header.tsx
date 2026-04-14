@@ -1,12 +1,12 @@
-import { Collapsible } from '@base-ui/react/collapsible';
 import clsx from 'clsx';
-import type { MouseEvent } from 'react';
-import { forwardRef, useCallback, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { chevronDown, chevronUp } from '@wordpress/icons';
+import { forwardRef, useMemo, useState } from '@wordpress/element';
+import { chevronDown } from '@wordpress/icons';
 import * as Card from '../card';
-import { IconButton } from '../icon-button';
+import * as Collapsible from '../collapsible';
+import { Icon } from '../icon';
 import styles from './style.module.css';
+import focusStyles from '../utils/css/focus.module.css';
+import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
 
 /**
@@ -20,52 +20,57 @@ import type { HeaderProps } from './types';
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
-		{ children, className, onClick, ...restProps },
+		{ children, className, render, ...restProps },
 		ref
 	) {
-		const triggerRef = useRef< HTMLButtonElement >( null );
+		const [ descriptionId, setDescriptionId ] = useState< string >();
 
-		const handleHeaderClick = useCallback(
-			( event: MouseEvent< HTMLDivElement > ) => {
-				const trigger = triggerRef.current;
-				if (
-					trigger &&
-					event.target instanceof Node &&
-					! trigger.contains( event.target )
-				) {
-					trigger.click();
-				}
-
-				onClick?.( event );
-			},
-			[ onClick ]
+		const contextValue = useMemo(
+			() => ( { setDescriptionId } ),
+			[ setDescriptionId ]
 		);
 
 		return (
-			<Card.Header
-				ref={ ref }
-				className={ clsx( styles.header, className ) }
-				onClick={ handleHeaderClick }
-				{ ...restProps }
-			>
-				<div className={ styles[ 'header-content' ] }>{ children }</div>
-				<div className={ styles[ 'header-trigger-wrapper' ] }>
-					<Collapsible.Trigger
-						ref={ triggerRef }
-						render={ ( props, state ) => (
-							<IconButton
-								{ ...props }
-								label={ __( 'Expand or collapse card' ) }
-								icon={ state.open ? chevronUp : chevronDown }
-								variant="minimal"
-								tone="neutral"
-								size="compact"
-							/>
+			<HeaderDescriptionIdContext.Provider value={ contextValue }>
+				<Collapsible.Trigger
+					className={ clsx( styles.header, className ) }
+					render={
+						<Card.Header
+							ref={ ref }
+							render={ render }
+							{ ...restProps }
+						/>
+					}
+					nativeButton={ false }
+					aria-describedby={ descriptionId }
+				>
+					<div className={ styles[ 'header-content' ] }>
+						{ children }
+					</div>
+					<div
+						className={ clsx(
+							styles[ 'header-trigger-positioner' ]
 						) }
-						className={ styles[ 'header-trigger' ] }
-					/>
-				</div>
-			</Card.Header>
+					>
+						<div
+							className={ clsx(
+								styles[ 'header-trigger-wrapper' ],
+								// While the interactive trigger element is the whole header,
+								// the focus ring will be displayed only on the icon to visually
+								// emulate it being the button.
+								focusStyles[
+									'outset-ring--focus-parent-visible'
+								]
+							) }
+						>
+							<Icon
+								icon={ chevronDown }
+								className={ styles[ 'header-trigger' ] }
+							/>
+						</div>
+					</div>
+				</Collapsible.Trigger>
+			</HeaderDescriptionIdContext.Provider>
 		);
 	}
 );

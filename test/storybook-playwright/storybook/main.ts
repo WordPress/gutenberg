@@ -1,5 +1,5 @@
 import type { StorybookConfig } from '@storybook/react-vite';
-import baseConfig from '../../../storybook/main.ts';
+import baseConfig from '@wordpress/storybook/main';
 
 export default {
 	...baseConfig,

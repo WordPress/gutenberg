@@ -7,7 +7,11 @@ import type { ComponentProps } from '../utils/types';
 export interface RootProps
 	extends Pick<
 		_Dialog.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+		| 'open'
+		| 'onOpenChange'
+		| 'defaultOpen'
+		| 'modal'
+		| 'disablePointerDismissal'
 	> {
 	/**
 	 * The content to be rendered inside the component.
@@ -22,19 +26,26 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
-export interface PopupProps extends ComponentProps< 'div' > {
+export interface PopupProps
+	extends ComponentProps< 'div' >,
+		Pick< _Dialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 
 	/**
+	 * A parent element to render the portal into.
+	 */
+	container?: _Dialog.Portal.Props[ 'container' ];
+
+	/**
 	 * Renders the dialog at a preset width (excluding additional padding from
 	 * the viewport edges).
 	 *
-	 * - `'small'` — max-width of 384px.
-	 * - `'medium'` — max-width of 512px.
-	 * - `'large'` — max-width of 840px.
+	 * - `'small'` — narrow max-width.
+	 * - `'medium'` — moderate max-width.
+	 * - `'large'` — wide max-width.
 	 * - `'stretch'` — no max-width, stretches to fill available space.
 	 * - `'full'` — stretches to fill available width and height.
 	 *
@@ -68,8 +79,11 @@ export interface TitleProps extends ComponentProps< 'h2' > {
 	/**
 	 * The title content to be rendered. This serves as both the visible
 	 * heading and the accessible label for the dialog.
+	 *
+	 * When `Dialog.Title` is passed as a render element (e.g. to
+	 * `VisuallyHidden`), children can be provided by the wrapper instead.
 	 */
-	children: ReactNode;
+	children?: ReactNode;
 }
 
 export interface CloseIconProps

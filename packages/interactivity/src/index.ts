@@ -125,8 +125,16 @@ window.history.replaceState(
 // server can render the correct content. Without this, the URL would change but
 // the page content would remain stale because the interactivity router — which
 // handles client-side navigations — might not be loaded yet.
+//
+// Some `popstate` events (e.g., anchor/fragment navigations like
+// clicking `<a href="#section">`) have `null` state. These are
+// same-document navigations and must NOT trigger a reload — the browser
+// should just scroll to the target element as normal.
 window.addEventListener( 'popstate', ( event ) => {
-	if ( event.state?.wpInteractivityId !== sessionId ) {
+	if (
+		event.state !== null &&
+		event.state?.wpInteractivityId !== sessionId
+	) {
 		window.location.reload();
 	}
 } );

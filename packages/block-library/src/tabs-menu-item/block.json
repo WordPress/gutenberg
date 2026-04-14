@@ -17,10 +17,8 @@
 		"core/tabs-menu-item-id",
 		"core/tabs-menu-item-label"
 	],
-	"attributes": {},
 	"supports": {
 		"html": false,
-		"anchor": true,
 		"reusable": false,
 		"lock": false,
 		"color": {

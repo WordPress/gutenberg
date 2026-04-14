@@ -63,6 +63,7 @@ export const LayoutTableComponent = ( {
 		<div
 			style={
 				{
+					height: '100%',
 					'--wp-dataviews-color-background': backgroundColor,
 				} as React.CSSProperties
 			}
@@ -96,7 +97,7 @@ export const LayoutTableComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_GRID ]: {},
+					[ LAYOUT_GRID ]: true,
 				} }
 				config={ { perPageSizes } }
 			/>
