@@ -14,13 +14,13 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
 	return (
 		<Text
 			ref={ ref }
-			variant="body-sm"
 			className={ clsx(
 				styles.badge,
 				styles[ `is-${ intent }-intent` ],
 				className
 			) }
 			{ ...props }
+			variant="body-sm"
 		/>
 	);
 } );

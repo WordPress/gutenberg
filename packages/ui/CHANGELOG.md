@@ -28,7 +28,6 @@
 -   `Dialog`, `AlertDialog`, `Tooltip`, `Select`: Add `container` prop to `Popup` for custom portal targets ([#77163](https://github.com/WordPress/gutenberg/pull/77163)).
 -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
 -   `VisuallyHidden`: Improve Storybook stories and documentation for the `render` prop composition pattern.
--   `Badge`: Use `Text` component for typography ([#77295](https://github.com/WordPress/gutenberg/pull/77295)).
 
 ### Internal
 
@@ -36,6 +35,7 @@
 -   Normalize `render` prop handling across components and document conventions in `CONTRIBUTING.md` ([#77160](https://github.com/WordPress/gutenberg/pull/77160)).
 -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
 -   `Field.Label`, `Fieldset.Legend`, `Field.Details`: Refactor `VisuallyHidden` composition to preserve semantic HTML elements when visually hiding content.
+-   `Badge`: Use `Text` component for typography ([#77295](https://github.com/WordPress/gutenberg/pull/77295)).
 
 ## 0.10.0 (2026-04-01)
 
