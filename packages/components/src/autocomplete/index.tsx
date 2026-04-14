@@ -279,9 +279,11 @@ export function useAutocomplete( {
 
 		const { completer, filterValue: query } = match;
 
-		// Don't activate autocomplete on cursor-only movement.
-		// textContent (text before cursor) changes when the cursor moves,
-		// but that shouldn't re-activate a dismissed autocompleter.
+		// Don't re-activate a dismissed autocompleter on cursor-only
+		// movement. `textContent` (text before cursor) changes with the
+		// caret, so the effect re-runs, but `record.text` does not.
+		// Complements the render-time `didUserInput` gate in
+		// `useAutocompleteProps` for callers using this hook directly.
 		if ( ! autocompleter && ! isTextChange ) {
 			return;
 		}
