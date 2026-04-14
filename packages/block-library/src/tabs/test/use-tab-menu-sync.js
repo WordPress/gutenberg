@@ -15,8 +15,7 @@ jest.mock( '@wordpress/blocks', () => ( {
 	createBlock: jest.fn( ( name, attributes ) => ( {
 		name,
 		attributes,
-		// Deterministic clientId so tests can assert on it.
-		clientId: `generated:${ name }:${ attributes.anchor ?? '' }`,
+		clientId: `generated:${ name }`,
 		innerBlocks: [],
 	} ) ),
 } ) );
@@ -40,12 +39,12 @@ import useTabMenuSync from '../use-tab-menu-sync';
 // Helpers
 // ---------------------------------------------------------------------------
 
-function makeTab( clientId, anchor, label = '' ) {
-	return { clientId, attributes: { anchor, label } };
+function makeTab( clientId, label = '' ) {
+	return { clientId, attributes: { label } };
 }
 
-function makeMenuItem( clientId, anchor ) {
-	return { clientId, anchor };
+function makeMenuItem( clientId ) {
+	return { clientId };
 }
 
 const PANEL = 'panel-client-id';
@@ -70,23 +69,20 @@ function renderSync( initialProps ) {
 
 let removeBlock;
 let insertBlock;
-let updateBlockAttributes;
 
 beforeEach( () => {
 	removeBlock = jest.fn();
 	insertBlock = jest.fn();
-	updateBlockAttributes = jest.fn();
 
 	useDispatch.mockReturnValue( {
 		removeBlock,
 		insertBlock,
-		updateBlockAttributes,
 	} );
 
 	createBlock.mockImplementation( ( name, attributes ) => ( {
 		name,
 		attributes,
-		clientId: `generated:${ name }:${ attributes.anchor ?? '' }`,
+		clientId: `generated:${ name }`,
 		innerBlocks: [],
 	} ) );
 } );
@@ -102,14 +98,8 @@ afterEach( () => {
 describe( 'useTabMenuSync', () => {
 	describe( 'initial mount', () => {
 		it( 'does nothing on first render', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			renderSync( {
 				tabs,
@@ -120,18 +110,11 @@ describe( 'useTabMenuSync', () => {
 
 			expect( removeBlock ).not.toHaveBeenCalled();
 			expect( insertBlock ).not.toHaveBeenCalled();
-			expect( updateBlockAttributes ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when re-rendered with the same data', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 			const props = {
 				tabs,
 				menuItems,
@@ -148,15 +131,9 @@ describe( 'useTabMenuSync', () => {
 	} );
 
 	describe( 'deletion', () => {
-		it( 'removes the menu item when a tab is deleted', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+		it( 'removes the menu item at the same position when a tab is deleted', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -165,8 +142,9 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
+			// Tab at index 1 ('t2') is deleted.
 			rerender( {
-				tabs: [ makeTab( 't1', 'tab-1', 'Tab 1' ) ],
+				tabs: [ makeTab( 't1', 'Tab 1' ) ],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -177,15 +155,9 @@ describe( 'useTabMenuSync', () => {
 			expect( insertBlock ).not.toHaveBeenCalled();
 		} );
 
-		it( 'removes the tab when a menu item is deleted', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+		it( 'removes the tab at the same position when a menu item is deleted', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -194,9 +166,10 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
+			// Menu item at index 1 ('m2') is deleted.
 			rerender( {
 				tabs,
-				menuItems: [ makeMenuItem( 'm1', 'tab-1-button' ) ],
+				menuItems: [ makeMenuItem( 'm1' ) ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -207,14 +180,8 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides shrink simultaneously (toolbar removal)', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -225,8 +192,8 @@ describe( 'useTabMenuSync', () => {
 
 			// Both lists shrink together — already in sync.
 			rerender( {
-				tabs: [ makeTab( 't1', 'tab-1', 'Tab 1' ) ],
-				menuItems: [ makeMenuItem( 'm1', 'tab-1-button' ) ],
+				tabs: [ makeTab( 't1', 'Tab 1' ) ],
+				menuItems: [ makeMenuItem( 'm1' ) ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -236,14 +203,8 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides grow by different amounts', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -257,13 +218,10 @@ describe( 'useTabMenuSync', () => {
 			rerender( {
 				tabs: [
 					...tabs,
-					makeTab( 't3', 'tab-3', 'Tab 3' ),
-					makeTab( 't4', 'tab-4', 'Tab 4' ),
+					makeTab( 't3', 'Tab 3' ),
+					makeTab( 't4', 'Tab 4' ),
 				],
-				menuItems: [
-					...menuItems,
-					makeMenuItem( 'm3', 'tab-3-button' ),
-				],
+				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -274,15 +232,9 @@ describe( 'useTabMenuSync', () => {
 	} );
 
 	describe( 'tab inserted', () => {
-		it( 'inserts a menu item when a tab with a fresh anchor is pasted', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+		it( 'inserts a menu item when a tab is pasted or duplicated', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -291,19 +243,19 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			// New tab 't3' has anchor 'tab-3' — no conflict.
+			// New tab 't3' inserted at the end.
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't3', 'tab-3', 'Tab 3' ) ],
+				tabs: [ ...tabs, makeTab( 't3', 'Tab 3' ) ],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( updateBlockAttributes ).not.toHaveBeenCalled();
 			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 			expect( insertBlock ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					attributes: { anchor: 'tab-3-button' },
+					name: 'core/tabs-menu-item',
+					attributes: {},
 				} ),
 				2, // index of the new tab
 				MENU,
@@ -311,55 +263,8 @@ describe( 'useTabMenuSync', () => {
 			);
 		} );
 
-		it( 'generates a fresh anchor and updates the tab when a duplicate tab conflicts', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
-
-			const { rerender } = renderSync( {
-				tabs,
-				menuItems,
-				tabPanelClientId: PANEL,
-				tabsMenuClientId: MENU,
-			} );
-
-			// 't1-dup' is a duplicate of t1, keeping its anchor 'tab-1'.
-			const dupTab = makeTab( 't1-dup', 'tab-1', 'Tab 1' );
-			rerender( {
-				tabs: [
-					makeTab( 't1', 'tab-1', 'Tab 1' ),
-					dupTab,
-					makeTab( 't2', 'tab-2', 'Tab 2' ),
-				],
-				menuItems,
-				tabPanelClientId: PANEL,
-				tabsMenuClientId: MENU,
-			} );
-
-			// Anchor on the duplicate tab must be updated to avoid conflict.
-			expect( updateBlockAttributes ).toHaveBeenCalledWith( 't1-dup', {
-				anchor: 'tab-4', // currentTabs.length(3) + 1 = 4
-			} );
-
-			// A menu item with the new anchor should be inserted at index 1.
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					attributes: { anchor: 'tab-4-button' },
-				} ),
-				1,
-				MENU,
-				false
-			);
-		} );
-
 		it( 'does nothing when tabs-menu clientId is missing', () => {
-			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
+			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
 			const menuItems = [];
 
 			const { rerender } = renderSync( {
@@ -370,7 +275,7 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't2', 'tab-2', 'Tab 2' ) ],
+				tabs: [ ...tabs, makeTab( 't2', 'Tab 2' ) ],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: null,
@@ -380,9 +285,9 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'syncs once (no duplicates) when tabs-menu clientId becomes available after a one-sided insertion', () => {
-			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1', 'tab-1-button' ) ];
-			const tabsWithNew = [ ...tabs, makeTab( 't2', 'tab-2', 'Tab 2' ) ];
+			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ) ];
+			const tabsWithNew = [ ...tabs, makeTab( 't2', 'Tab 2' ) ];
 
 			// Render 1 — initial snapshot.
 			const { rerender } = renderSync( {
@@ -413,7 +318,8 @@ describe( 'useTabMenuSync', () => {
 			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 			expect( insertBlock ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					attributes: { anchor: 'tab-2-button' },
+					name: 'core/tabs-menu-item',
+					attributes: {},
 				} ),
 				1,
 				MENU,
@@ -432,14 +338,8 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides grow simultaneously (Add Tab toolbar)', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -450,11 +350,8 @@ describe( 'useTabMenuSync', () => {
 
 			// Both grow together — "Add Tab" already created both.
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't3', 'tab-3', 'Tab 3' ) ],
-				menuItems: [
-					...menuItems,
-					makeMenuItem( 'm3', 'tab-3-button' ),
-				],
+				tabs: [ ...tabs, makeTab( 't3', 'Tab 3' ) ],
+				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -462,61 +359,12 @@ describe( 'useTabMenuSync', () => {
 			expect( insertBlock ).not.toHaveBeenCalled();
 			expect( removeBlock ).not.toHaveBeenCalled();
 		} );
-
-		it( 'generates distinct anchors when two tabs are duplicated at once', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
-
-			const { rerender } = renderSync( {
-				tabs,
-				menuItems,
-				tabPanelClientId: PANEL,
-				tabsMenuClientId: MENU,
-			} );
-
-			// Two duplicates inserted — both keep conflicting anchor 'tab-1'.
-			const dup1 = makeTab( 'dup-a', 'tab-1', 'Tab 1' );
-			const dup2 = makeTab( 'dup-b', 'tab-1', 'Tab 1' );
-			rerender( {
-				tabs: [
-					makeTab( 't1', 'tab-1', 'Tab 1' ),
-					dup1,
-					dup2,
-					makeTab( 't2', 'tab-2', 'Tab 2' ),
-				],
-				menuItems,
-				tabPanelClientId: PANEL,
-				tabsMenuClientId: MENU,
-			} );
-
-			const assignedAnchors = updateBlockAttributes.mock.calls.map(
-				( [ , attrs ] ) => attrs.anchor
-			);
-			expect( assignedAnchors ).toHaveLength( 2 );
-			// Each duplicate must receive a distinct anchor.
-			expect( new Set( assignedAnchors ).size ).toBe( 2 );
-			// Both must be distinct from the originals.
-			expect( assignedAnchors ).not.toContain( 'tab-1' );
-			expect( assignedAnchors ).not.toContain( 'tab-2' );
-		} );
 	} );
 
 	describe( 'menu item inserted', () => {
-		it( 'inserts a tab when a menu item with a fresh anchor is pasted', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+		it( 'inserts a tab when a menu item is pasted or duplicated', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -525,22 +373,19 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			// New menu item 'm3' has anchor 'tab-3-button' — no conflict.
+			// New menu item 'm3' appended at the end.
 			rerender( {
 				tabs,
-				menuItems: [
-					...menuItems,
-					makeMenuItem( 'm3', 'tab-3-button' ),
-				],
+				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( updateBlockAttributes ).not.toHaveBeenCalled();
 			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 			expect( insertBlock ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					attributes: { anchor: 'tab-3', label: '' },
+					name: 'core/tab',
+					attributes: { label: 'Tab 2' }, // label copied from adjacent tab at index 1
 				} ),
 				2, // index of the new menu item
 				PANEL,
@@ -548,15 +393,9 @@ describe( 'useTabMenuSync', () => {
 			);
 		} );
 
-		it( 'generates a fresh anchor and copies the label when a menu item is duplicated', () => {
-			const tabs = [
-				makeTab( 't1', 'tab-1', 'Tab 1' ),
-				makeTab( 't2', 'tab-2', 'Tab 2' ),
-			];
-			const menuItems = [
-				makeMenuItem( 'm1', 'tab-1-button' ),
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+		it( 'copies the label from the adjacent tab when a menu item is duplicated in the middle', () => {
+			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -565,39 +404,34 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			// 'm1-dup' is a duplicate of m1, keeping its anchor 'tab-1-button'.
-			const dupItem = makeMenuItem( 'm1-dup', 'tab-1-button' );
+			// 'm1-dup' is a duplicate of m1, inserted at index 1.
 			rerender( {
 				tabs,
 				menuItems: [
-					makeMenuItem( 'm1', 'tab-1-button' ),
-					dupItem,
-					makeMenuItem( 'm2', 'tab-2-button' ),
+					makeMenuItem( 'm1' ),
+					makeMenuItem( 'm1-dup' ),
+					makeMenuItem( 'm2' ),
 				],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
 
-			// Anchor on the duplicate menu item must be updated.
-			expect( updateBlockAttributes ).toHaveBeenCalledWith( 'm1-dup', {
-				anchor: 'tab-4-button', // menuItems.length(3) + 1 = 4
-			} );
-
-			// A tab with the new base anchor and the original label should be inserted.
+			// Tab inserted at index 1 should copy label from t1 (index 0).
 			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 			expect( insertBlock ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					attributes: { anchor: 'tab-4', label: 'Tab 1' },
+					name: 'core/tab',
+					attributes: { label: 'Tab 1' },
 				} ),
-				1, // index of the duplicate in the menu items list
+				1,
 				PANEL,
 				false
 			);
 		} );
 
 		it( 'does nothing when tab-panel clientId is missing', () => {
-			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1', 'tab-1-button' ) ];
+			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ) ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -608,10 +442,7 @@ describe( 'useTabMenuSync', () => {
 
 			rerender( {
 				tabs,
-				menuItems: [
-					...menuItems,
-					makeMenuItem( 'm2', 'tab-2-button' ),
-				],
+				menuItems: [ ...menuItems, makeMenuItem( 'm2' ) ],
 				tabPanelClientId: null,
 				tabsMenuClientId: MENU,
 			} );
@@ -620,12 +451,9 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'syncs once (no duplicates) when tab-panel clientId becomes available after a one-sided insertion', () => {
-			const tabs = [ makeTab( 't1', 'tab-1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1', 'tab-1-button' ) ];
-			const menuItemsWithNew = [
-				...menuItems,
-				makeMenuItem( 'm2', 'tab-2-button' ),
-			];
+			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
+			const menuItems = [ makeMenuItem( 'm1' ) ];
+			const menuItemsWithNew = [ ...menuItems, makeMenuItem( 'm2' ) ];
 
 			// Render 1 — initial snapshot.
 			const { rerender } = renderSync( {
@@ -656,7 +484,8 @@ describe( 'useTabMenuSync', () => {
 			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
 			expect( insertBlock ).toHaveBeenCalledWith(
 				expect.objectContaining( {
-					attributes: { anchor: 'tab-2', label: '' },
+					name: 'core/tab',
+					attributes: { label: 'Tab 1' },
 				} ),
 				1,
 				PANEL,

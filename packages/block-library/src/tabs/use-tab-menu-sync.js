@@ -10,7 +10,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Keep tabs and menu items in sync when the lists change due to direct
  * user actions (deletion, paste, duplicate, drag-and-drop).
  *
- * Deletion: when one side shrinks, remove the orphaned counterpart.
+ * Deletion: when one side shrinks, remove the counterpart at the same index.
  * Insertion: when one side grows without the other, insert the missing
  * counterpart at the matching index.
  *
@@ -19,7 +19,7 @@ import { useEffect, useRef } from '@wordpress/element';
  *
  * @param {Object}      props
  * @param {Array}       props.tabs             Raw core/tab block objects.
- * @param {Array}       props.menuItems        Menu item descriptors { clientId, anchor }.
+ * @param {Array}       props.menuItems        Raw core/tabs-menu-item block objects.
  * @param {string|null} props.tabPanelClientId Client ID of the core/tab-panel block.
  * @param {string|null} props.tabsMenuClientId Client ID of the core/tabs-menu block.
  */
@@ -29,20 +29,21 @@ export default function useTabMenuSync( {
 	tabPanelClientId,
 	tabsMenuClientId,
 } ) {
-	const { removeBlock, insertBlock, updateBlockAttributes } =
-		useDispatch( blockEditorStore );
+	const { removeBlock, insertBlock } = useDispatch( blockEditorStore );
 
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
 		const currentTabs = tabs.map( ( tab ) => ( {
 			clientId: tab.clientId,
-			anchor: tab.attributes.anchor ?? '',
+		} ) );
+		const currentMenuItems = menuItems.map( ( m ) => ( {
+			clientId: m.clientId,
 		} ) );
 
 		if ( prevSyncStateRef.current === null ) {
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
-				menuItems: [ ...menuItems ],
+				menuItems: currentMenuItems,
 			};
 			return;
 		}
@@ -51,10 +52,9 @@ export default function useTabMenuSync( {
 			prevSyncStateRef.current;
 
 		const tabCountChange = currentTabs.length - prevTabs.length;
-		const menuItemCountChange = menuItems.length - prevMenuItems.length;
+		const menuItemCountChange =
+			currentMenuItems.length - prevMenuItems.length;
 
-		const tabsRemoved = tabCountChange < 0;
-		const menuItemsRemoved = menuItemCountChange < 0;
 		const tabsInserted = tabCountChange > 0;
 		const menuItemsInserted = menuItemCountChange > 0;
 
@@ -63,7 +63,7 @@ export default function useTabMenuSync( {
 		if ( tabCountChange === menuItemCountChange ) {
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
-				menuItems: [ ...menuItems ],
+				menuItems: currentMenuItems,
 			};
 			return;
 		}
@@ -76,7 +76,7 @@ export default function useTabMenuSync( {
 		) {
 			prevSyncStateRef.current = {
 				tabs: currentTabs,
-				menuItems: [ ...menuItems ],
+				menuItems: currentMenuItems,
 			};
 			return;
 		}
@@ -93,183 +93,84 @@ export default function useTabMenuSync( {
 		// Update snapshot to the current state.
 		prevSyncStateRef.current = {
 			tabs: currentTabs,
-			menuItems: [ ...menuItems ],
+			menuItems: currentMenuItems,
 		};
 
 		const currentTabIds = new Set( currentTabs.map( ( t ) => t.clientId ) );
 		const currentMenuItemIds = new Set(
-			menuItems.map( ( m ) => m.clientId )
+			currentMenuItems.map( ( m ) => m.clientId )
 		);
 
-		if ( tabsRemoved ) {
-			// A tab was deleted — remove its corresponding menu item.
-			prevTabs.forEach( ( prevTab ) => {
-				if ( currentTabIds.has( prevTab.clientId ) ) {
-					return;
-				}
-				const expectedMenuAnchor = prevTab.anchor
-					? `${ prevTab.anchor }-button`
-					: null;
-				const menuItemToRemove = expectedMenuAnchor
-					? menuItems.find( ( m ) => m.anchor === expectedMenuAnchor )
-					: null;
-				if ( menuItemToRemove ) {
-					removeBlock( menuItemToRemove.clientId, false );
-					prevSyncStateRef.current.menuItems =
-						prevSyncStateRef.current.menuItems.filter(
-							( m ) => m.clientId !== menuItemToRemove.clientId
-						);
-				}
-			} );
-		} else if ( menuItemsRemoved ) {
-			// A menu item was deleted — remove its corresponding tab.
-			prevMenuItems.forEach( ( prevItem ) => {
-				if ( currentMenuItemIds.has( prevItem.clientId ) ) {
-					return;
-				}
-				const expectedTabAnchor =
-					prevItem.anchor?.replace( /-button$/, '' ) ?? '';
-				const tabToRemove = tabs.find(
-					( tab ) =>
-						( tab.attributes.anchor ?? '' ) === expectedTabAnchor
-				);
-				if ( tabToRemove ) {
-					removeBlock( tabToRemove.clientId, false );
-					prevSyncStateRef.current.tabs =
-						prevSyncStateRef.current.tabs.filter(
-							( t ) => t.clientId !== tabToRemove.clientId
-						);
-				}
-			} );
+		if ( tabCountChange < 0 ) {
+			// Remove the menu item at the same position as the deleted tab.
+			const removedIndex = prevTabs.findIndex(
+				( t ) => ! currentTabIds.has( t.clientId )
+			);
+			if ( removedIndex >= 0 && menuItems[ removedIndex ] ) {
+				removeBlock( menuItems[ removedIndex ].clientId, false );
+				prevSyncStateRef.current.menuItems =
+					prevSyncStateRef.current.menuItems.filter(
+						( _, i ) => i !== removedIndex
+					);
+			}
+		} else if ( menuItemCountChange < 0 ) {
+			// Remove the tab at the same position as the deleted menu item.
+			const removedIndex = prevMenuItems.findIndex(
+				( m ) => ! currentMenuItemIds.has( m.clientId )
+			);
+			if ( removedIndex >= 0 && tabs[ removedIndex ] ) {
+				removeBlock( tabs[ removedIndex ].clientId, false );
+				prevSyncStateRef.current.tabs =
+					prevSyncStateRef.current.tabs.filter(
+						( _, i ) => i !== removedIndex
+					);
+			}
 		} else if ( tabsInserted ) {
-			// A tab was pasted or duplicated — insert a matching menu item.
-			// If the tab's anchor conflicts with an existing menu item, generate
-			// a fresh unique anchor.
+			// A tab was pasted or duplicated — insert a matching menu item at
+			// the same position.
 			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
-			// Track anchors in use across both tabs and menu items to generate
-			// collision-free anchors when multiple tabs are inserted at once.
-			const usedTabAnchors = new Set(
-				currentTabs.map( ( t ) => t.anchor ).filter( Boolean )
-			);
-			const existingMenuAnchors = new Set(
-				menuItems.map( ( m ) => m.anchor )
-			);
 			currentTabs.forEach( ( newTab, tabIndex ) => {
 				if ( prevTabIds.has( newTab.clientId ) ) {
 					return;
 				}
-				let tabAnchor = newTab.anchor;
-				const menuAnchorConflicts =
-					tabAnchor &&
-					existingMenuAnchors.has( `${ tabAnchor }-button` );
-
-				if ( ! tabAnchor || menuAnchorConflicts ) {
-					// Find the next free tab-N slot.
-					let tabNumber = currentTabs.length + 1;
-					while ( usedTabAnchors.has( `tab-${ tabNumber }` ) ) {
-						tabNumber++;
-					}
-					tabAnchor = `tab-${ tabNumber }`;
-					// Reserve this anchor so subsequent new tabs don't collide.
-					usedTabAnchors.add( tabAnchor );
-					updateBlockAttributes( newTab.clientId, {
-						anchor: tabAnchor,
-					} );
-					// Keep the snapshot in sync with the new anchor value.
-					prevSyncStateRef.current.tabs[ tabIndex ] = {
-						...prevSyncStateRef.current.tabs[ tabIndex ],
-						anchor: tabAnchor,
-					};
-				}
-
-				const menuAnchor = `${ tabAnchor }-button`;
-				const newMenuItemBlock = createBlock( 'core/tabs-menu-item', {
-					anchor: menuAnchor,
-				} );
+				const newMenuItemBlock = createBlock(
+					'core/tabs-menu-item',
+					{}
+				);
 				insertBlock(
 					newMenuItemBlock,
 					tabIndex,
 					tabsMenuClientId,
 					false
 				);
-				// Add a placeholder so the next render does not re-trigger insertion.
 				prevSyncStateRef.current.menuItems.splice( tabIndex, 0, {
 					clientId: newMenuItemBlock.clientId,
-					anchor: menuAnchor,
 				} );
-				existingMenuAnchors.add( menuAnchor );
 			} );
 		} else if ( menuItemsInserted ) {
-			// A menu item was pasted or duplicated — insert a matching tab.
-			// If the menu item's anchor conflicts with an existing tab, generate
-			// a fresh unique anchor.
+			// A menu item was pasted or duplicated — insert a matching tab at
+			// the same position, copying the label from the adjacent tab.
 			const prevMenuItemIds = new Set(
 				prevMenuItems.map( ( m ) => m.clientId )
 			);
-			// Track base anchors (the tab-N part) already in use across both
-			// tabs and menu items to generate collision-free anchors when
-			// multiple menu items are inserted at once.
-			const usedBaseAnchors = new Set( [
-				...currentTabs.map( ( t ) => t.anchor ).filter( Boolean ),
-				...menuItems
-					.map( ( m ) => m.anchor.replace( /-button$/, '' ) )
-					.filter( Boolean ),
-			] );
-			const existingTabAnchors = new Set(
-				currentTabs.map( ( t ) => t.anchor )
-			);
-			menuItems.forEach( ( newMenuItem, menuItemIndex ) => {
+			currentMenuItems.forEach( ( newMenuItem, menuItemIndex ) => {
 				if ( prevMenuItemIds.has( newMenuItem.clientId ) ) {
 					return;
 				}
-				let baseAnchor = newMenuItem.anchor
-					? newMenuItem.anchor.replace( /-button$/, '' )
-					: '';
-				const tabAnchorConflicts =
-					baseAnchor && existingTabAnchors.has( baseAnchor );
-
-				// Grab the original tab's label before potentially reassigning
-				// baseAnchor, so we can copy it to the new tab.
-				const originalTab = tabs.find(
-					( t ) => ( t.attributes.anchor ?? '' ) === baseAnchor
-				);
-				const label = originalTab?.attributes?.label ?? '';
-
-				if ( ! baseAnchor || tabAnchorConflicts ) {
-					// Find the next free tab-N slot.
-					let tabNumber = menuItems.length + 1;
-					while ( usedBaseAnchors.has( `tab-${ tabNumber }` ) ) {
-						tabNumber++;
-					}
-					baseAnchor = `tab-${ tabNumber }`;
-					// Reserve this anchor so subsequent new items don't collide.
-					usedBaseAnchors.add( baseAnchor );
-					updateBlockAttributes( newMenuItem.clientId, {
-						anchor: `${ baseAnchor }-button`,
-					} );
-					// Keep the snapshot in sync with the new anchor value.
-					prevSyncStateRef.current.menuItems[ menuItemIndex ] = {
-						...prevSyncStateRef.current.menuItems[ menuItemIndex ],
-						anchor: `${ baseAnchor }-button`,
-					};
-				}
-
-				const newTabBlock = createBlock( 'core/tab', {
-					anchor: baseAnchor,
-					label,
-				} );
+				const label =
+					tabs[ menuItemIndex - 1 ]?.attributes?.label ??
+					tabs[ menuItemIndex ]?.attributes?.label ??
+					'';
+				const newTabBlock = createBlock( 'core/tab', { label } );
 				insertBlock(
 					newTabBlock,
 					menuItemIndex,
 					tabPanelClientId,
 					false
 				);
-				// Add a placeholder so the next render does not re-trigger insertion.
 				prevSyncStateRef.current.tabs.splice( menuItemIndex, 0, {
 					clientId: newTabBlock.clientId,
-					anchor: baseAnchor,
 				} );
-				existingTabAnchors.add( baseAnchor );
 			} );
 		}
 	}, [
@@ -277,7 +178,6 @@ export default function useTabMenuSync( {
 		menuItems,
 		removeBlock,
 		insertBlock,
-		updateBlockAttributes,
 		tabsMenuClientId,
 		tabPanelClientId,
 	] );

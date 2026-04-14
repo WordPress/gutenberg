@@ -75,12 +75,6 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { removeBlock, replaceInnerBlocks } = useDispatch( blockEditorStore );
-
-	/**
-	 * Construct a list of core/tab blocks, used to create tabs-list context.
-	 * Also select menu items with their anchors for anchor-based deletion sync.
-	 */
 	const { tabs, tabPanelClientId, menuItems, tabsMenuClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
@@ -94,20 +88,10 @@ function Edit( {
 			);
 
 			return {
-				tabs: tabPanel
-					? tabPanel.innerBlocks.filter(
-							( block ) => block.name === 'core/tab'
-					  )
-					: EMPTY_ARRAY,
+				tabs: tabPanel?.innerBlocks ?? EMPTY_ARRAY,
 				tabPanelClientId: tabPanel?.clientId ?? null,
-				menuItems: tabsMenu
-					? getBlocks( tabsMenu.clientId )
-							.filter( ( b ) => b.name === 'core/tabs-menu-item' )
-							.map( ( b ) => ( {
-								clientId: b.clientId,
-								anchor: b.attributes.anchor ?? '',
-							} ) )
-					: EMPTY_ARRAY,
+				menuItems: tabsMenu?.innerBlocks ?? EMPTY_ARRAY,
+				tabsMenuClientId: tabsMenu?.clientId ?? null,
 			};
 		},
 		[ clientId ]
