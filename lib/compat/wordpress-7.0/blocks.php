@@ -182,3 +182,22 @@ function gutenberg_update_tax_query_of_query_loop_block( $query, $block ) {
 }
 
 add_filter( 'query_loop_block_query_vars', 'gutenberg_update_tax_query_of_query_loop_block', 10, 2 );
+
+/**
+ * Add the `_wp_ignored_hooked_blocks` post meta to the REST API response for content-like post types.
+ *
+ * @param WP_REST_Response $response The REST API response.
+ * @param WP_Post          $post The post object.
+ * @return WP_REST_Response The modified REST API response.
+ */
+function gutenberg_set_wp_ignored_hooked_blocks_post_meta_in_rest_response( $response, $post ) {
+	$updated_post = update_ignored_hooked_blocks_postmeta( (object) $post );
+	if ( ! empty( $updated_post->meta_input['_wp_ignored_hooked_blocks'] ) ) {
+		$response->data['meta']['_wp_ignored_hooked_blocks'] = $updated_post->meta_input['_wp_ignored_hooked_blocks'];
+	}
+	return $response;
+}
+add_filter( 'rest_prepare_page', 'gutenberg_set_wp_ignored_hooked_blocks_post_meta_in_rest_response', 11, 2 );
+add_filter( 'rest_prepare_post', 'gutenberg_set_wp_ignored_hooked_blocks_post_meta_in_rest_response', 11, 2 );
+add_filter( 'rest_prepare_wp_block', 'gutenberg_set_wp_ignored_hooked_blocks_post_meta_in_rest_response', 11, 2 );
+add_filter( 'rest_prepare_wp_navigation', 'gutenberg_set_wp_ignored_hooked_blocks_post_meta_in_rest_response', 11, 2 );
