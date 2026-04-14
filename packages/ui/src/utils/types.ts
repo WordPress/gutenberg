@@ -14,12 +14,17 @@ type ComponentRenderFn< Props > = (
 
 export type ComponentProps< E extends ElementType > = Omit<
 	ComponentPropsWithoutRef< E >,
-	'className' | 'children' | 'render'
+	'className' | 'children' | 'render' | 'style'
 > & {
 	/**
 	 * CSS class name to apply to the component.
 	 */
 	className?: string;
+
+	/**
+	 * CSS style to apply to the component.
+	 */
+	style?: React.CSSProperties;
 
 	/**
 	 * Replaces the component's default HTML element using a given React

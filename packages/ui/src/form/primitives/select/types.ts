@@ -27,7 +27,11 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = _Select.Popup.Props & {
+export type SelectPopupProps = Omit< _Select.Popup.Props, 'style' > & {
+	/**
+	 * CSS style applied to the positioner element.
+	 */
+	style?: React.CSSProperties;
 	/**
 	 * A parent element to render the portal into.
 	 */
