@@ -34,6 +34,7 @@
 		{ "path": "../token-list" },
 		{ "path": "../ui" },
 		{ "path": "../url" },
+		{ "path": "../ui" },
 		{ "path": "../upload-media" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
