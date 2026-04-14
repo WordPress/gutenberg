@@ -13,6 +13,7 @@
 		{ "path": "packages/block-editor" },
 		{ "path": "packages/block-library" },
 		{ "path": "packages/block-serialization-default-parser" },
+		{ "path": "packages/blocks" },
 		{ "path": "packages/boot" },
 		{ "path": "packages/components" },
 		{ "path": "packages/connectors" },

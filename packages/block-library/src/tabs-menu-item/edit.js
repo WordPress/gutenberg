@@ -23,7 +23,6 @@ import Controls from './controls';
 const EMPTY_ARRAY = [];
 
 function Edit( {
-	attributes,
 	context,
 	clientId,
 	__unstableLayoutClassNames: layoutClassNames,
@@ -75,14 +74,7 @@ function Edit( {
 		[ clientId, tabsList ]
 	);
 
-	// Find the corresponding tab's anchor from this menu item's anchor
-	// attribute (e.g., "tab-1-button" → "tab-1"), then look it up in tabsList.
-	// Falls back to positional lookup when no anchor is set.
-	const tabAnchor = attributes.anchor?.replace( /-button$/, '' ) ?? '';
-	const tab =
-		( tabAnchor && tabsList.find( ( t ) => t.id === tabAnchor ) ) ||
-		tabsList[ menuItemIndex ] ||
-		{};
+	const tab = tabsList[ menuItemIndex ] || {};
 
 	// tabListIndex is the tab's position in tabsList, used for active-state
 	// checks and click handling.
