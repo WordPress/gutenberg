@@ -157,17 +157,16 @@ Do not edit directly.
 
 ### Motion
 
-| Variable name                     | Description                                                                                        |
-| --------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                |
-| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                              |
-| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                       |
-| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                      |
-| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                         |
-| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                           |
-| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts           |
-| `--wpds-motion-easing-expressive` | Noticeable easing that communicates spatial change, such as menus and popovers entering or exiting |
-| `--wpds-motion-easing-dramatic`   | High-impact easing for the most prominent, attention-grabbing transitions like dialogs and drawers |
+| Variable name                     | Description                                                                                         |
+| --------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `--wpds-motion-duration-xs`       | Micro-delays and transition offsets                                                                 |
+| `--wpds-motion-duration-sm`       | Micro-interactions like focus rings and state changes                                               |
+| `--wpds-motion-duration-md`       | Standard transitions like menus and popovers                                                        |
+| `--wpds-motion-duration-lg`       | Deliberate animations like slides and reveals                                                       |
+| `--wpds-motion-duration-xl`       | Extended animations like complex or multi-step transitions                                          |
+| `--wpds-motion-easing-subtle`     | Nearly imperceptible easing for hover, color, and background transitions                            |
+| `--wpds-motion-easing-balanced`   | General-purpose easing for on-screen movement like resizing, morphing, and layout shifts            |
+| `--wpds-motion-easing-expressive` | Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers |
 
 ### Typography
 

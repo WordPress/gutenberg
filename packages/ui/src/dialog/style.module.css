@@ -60,13 +60,13 @@
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-dramatic),
-				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-dramatic);
+				opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
+				transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
 
 			&[data-open] {
 				transition:
-					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-dramatic),
-					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-dramatic);
+					opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive),
+					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-expressive);
 			}
 		}
 

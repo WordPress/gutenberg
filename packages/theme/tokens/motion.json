@@ -26,7 +26,7 @@
 		"easing": {
 			"$type": "cubicBezier",
 			"subtle": {
-				"$value": [ 0.25, 0.1, 0.25, 1 ],
+				"$value": [ 0.15, 0, 0.15, 1 ],
 				"$description": "Nearly imperceptible easing for hover, color, and background transitions"
 			},
 			"balanced": {
@@ -34,12 +34,8 @@
 				"$description": "General-purpose easing for on-screen movement like resizing, morphing, and layout shifts"
 			},
 			"expressive": {
-				"$value": [ 0, 0, 0, 1 ],
-				"$description": "Noticeable easing that communicates spatial change, such as menus and popovers entering or exiting"
-			},
-			"dramatic": {
-				"$value": [ 0.29, 0, 0, 1 ],
-				"$description": "High-impact easing for the most prominent, attention-grabbing transitions like dialogs and drawers"
+				"$value": [ 0.25, 0, 0, 1 ],
+				"$description": "Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers"
 			}
 		}
 	}

@@ -21,13 +21,7 @@ const EASING_TOKENS = [
 		name: 'expressive',
 		variable: 'var(--wpds-motion-easing-expressive)',
 		description:
-			'Elements entering or exiting the screen, such as menus and popovers.',
-	},
-	{
-		name: 'dramatic',
-		variable: 'var(--wpds-motion-easing-dramatic)',
-		description:
-			'Prominent elements entering or exiting, like dialogs and drawers.',
+			'Enter/exit and spatial transitions like menus, popovers, dialogs, and drawers.',
 	},
 ];
 

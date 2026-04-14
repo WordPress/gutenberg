@@ -135,7 +135,6 @@ export default [
 	'--wpds-motion-easing-subtle',
 	'--wpds-motion-easing-balanced',
 	'--wpds-motion-easing-expressive',
-	'--wpds-motion-easing-dramatic',
 	'--wpds-typography-font-family-heading',
 	'--wpds-typography-font-family-body',
 	'--wpds-typography-font-family-mono',
