@@ -74,6 +74,7 @@ function MediaPreviewContent( {
 					<p className="media-editor-preview__mime-type">
 						{ mimeType }
 					</p>
+					{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
 					<a
 						href={ mediaUrl }
 						target="_blank"

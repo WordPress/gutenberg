@@ -82,6 +82,7 @@ export const MoreExamplesStory: StoryFn< typeof Navigation > = ( {
 						title="WordPress.org"
 					/>
 					<NavigationItem item="item-5">
+						{ /* eslint-disable-next-line react/jsx-no-target-blank */ }
 						<a
 							className="navigation-story__wordpress-icon"
 							href="https://wordpress.org/"
