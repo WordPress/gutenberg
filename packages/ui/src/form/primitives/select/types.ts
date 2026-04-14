@@ -7,7 +7,14 @@ export type SelectRootProps = Omit<
 	'multiple'
 >;
 
-export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
+export type SelectTriggerProps = Omit<
+	_Select.Trigger.Props,
+	'children' | 'style'
+> & {
+	/**
+	 * CSS style applied to the trigger element.
+	 */
+	style?: React.CSSProperties;
 	/**
 	 * The size of the trigger.
 	 *
@@ -40,8 +47,12 @@ export type SelectPopupProps = Omit< _Select.Popup.Props, 'style' > & {
 
 export type SelectItemProps = Omit<
 	_Select.Item.Props,
-	'children' | 'value'
+	'children' | 'value' | 'style'
 > & {
+	/**
+	 * CSS style applied to the item element.
+	 */
+	style?: React.CSSProperties;
 	/**
 	 * A unique value that identifies this select item.
 	 */
