@@ -118,55 +118,60 @@ test.describe( 'Block Hooks API', () => {
 					},
 				};
 
-				await admin.editPost( postObject.id );
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						{ name: 'core/heading' },
-						expectedHookedBlockAfterHeading,
-						{ name: 'core/paragraph' },
-						expectedHookedBlockLastChild,
+				await test.step( 'Editor contains the hooked blocks in the expected positions', async () => {
+					await admin.editPost( postObject.id );
+					await expect
+						.poll( editor.getBlocks )
+						.toMatchObject( [
+							{ name: 'core/heading' },
+							expectedHookedBlockAfterHeading,
+							{ name: 'core/paragraph' },
+							expectedHookedBlockLastChild,
+						] );
+				} );
+
+				await test.step( 'Moving the last hooked block is persisted upon save', async () => {
+					const hookedBlock = editor.canvas.getByText(
+						getHookedBlockContent( 'last_child', blockType )
+					);
+					await editor.selectBlocks( hookedBlock );
+					await editor.clickBlockToolbarButton( 'Move up' );
+
+					// Save updated post.
+					const saveButton = page
+						.getByRole( 'region', { name: 'Editor top bar' } )
+						.getByRole( 'button', { name: 'Save', exact: true } );
+					await saveButton.click();
+					await page
+						.getByRole( 'button', { name: 'Dismiss this notice' } )
+						.filter( { hasText: 'updated' } )
+						.waitFor();
+
+					// Reload and verify that the new position of the hooked block has been persisted.
+					await page.reload();
+					await expect
+						.poll( editor.getBlocks )
+						.toMatchObject( [
+							{ name: 'core/heading' },
+							expectedHookedBlockAfterHeading,
+							expectedHookedBlockLastChild,
+							{ name: 'core/paragraph' },
+						] );
+				} );
+
+				await test.step( 'Frontend reflects the changes made in the editor', async () => {
+					await page.goto( `/?p=${ containerPost.id }` );
+					await expect(
+						page.locator( '.entry-content > *' )
+					).toHaveClass( [
+						'wp-block-heading',
+						getHookedBlockClassName( 'after', 'core/heading' ) +
+							' wp-block-paragraph',
+						getHookedBlockClassName( 'last_child', blockType ) +
+							' wp-block-paragraph',
+						'dummy-paragraph wp-block-paragraph',
 					] );
-
-				const hookedBlock = editor.canvas.getByText(
-					getHookedBlockContent( 'last_child', blockType )
-				);
-				await editor.selectBlocks( hookedBlock );
-				await editor.clickBlockToolbarButton( 'Move up' );
-
-				// Save updated post.
-				const saveButton = page
-					.getByRole( 'region', { name: 'Editor top bar' } )
-					.getByRole( 'button', { name: 'Save', exact: true } );
-				await saveButton.click();
-				await page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'updated' } )
-					.waitFor();
-
-				// Reload and verify that the new position of the hooked block has been persisted.
-				await page.reload();
-				await expect
-					.poll( editor.getBlocks )
-					.toMatchObject( [
-						{ name: 'core/heading' },
-						expectedHookedBlockAfterHeading,
-						expectedHookedBlockLastChild,
-						{ name: 'core/paragraph' },
-					] );
-
-				// Verify that the frontend reflects the changes made in the editor.
-				await page.goto( `/?p=${ containerPost.id }` );
-				await expect(
-					page.locator( '.entry-content > *' )
-				).toHaveClass( [
-					'wp-block-heading',
-					getHookedBlockClassName( 'after', 'core/heading' ) +
-						' wp-block-paragraph',
-					getHookedBlockClassName( 'last_child', blockType ) +
-						' wp-block-paragraph',
-					'dummy-paragraph wp-block-paragraph',
-				] );
+				} );
 			} );
 		} );
 
