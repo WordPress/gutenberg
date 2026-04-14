@@ -9,11 +9,11 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
@@ -205,7 +205,10 @@ function BlockCard( {
 					</OptionalParentSelectButton>
 				</HStack>
 				{ ! parentClientId && ! isChild && description && (
-					<Text className="block-editor-block-card__description">
+					<Text
+						variant="body-md"
+						className="block-editor-block-card__description"
+					>
 						{ description }
 					</Text>
 				) }
