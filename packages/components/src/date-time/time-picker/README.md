@@ -84,6 +84,7 @@ const MyTimeInput = () => {
 		/>
 	);
 };
+```
 
 ### Props
 
