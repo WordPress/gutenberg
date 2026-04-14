@@ -526,6 +526,87 @@ The build system generates:
 
 The boot package in Gutenberg will automatically use these routes and make them available.
 
+## Widgets (Experimental)
+
+Widgets provide a file-based discovery system for building self-contained UI components that are registered as WordPress script modules. Each widget lives in its own directory under `widgets/` at the repository root.
+
+### Structure
+
+```
+widgets/
+  hello-world/
+    widget.json     # Widget metadata (required)
+    render.tsx      # UI component entry point
+    widget.ts       # Widget metadata entry point
+    render.scss     # Optional styles (bundled inline)
+```
+
+### Widget Configuration
+
+In `widgets/{widget-name}/widget.json`:
+
+```json
+{
+	"name": "my-plugin/hello-world",
+	"title": "Hello World",
+	"description": "A simple example widget.",
+	"category": "demo"
+}
+```
+
+**Fields:**
+- **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
+- **`title`** (optional): Human-readable title
+- **`description`** (optional): Short description
+- **`category`** (optional): Grouping category
+
+### Entry Points
+
+**render.tsx** — UI component (bundled with CSS support):
+
+```tsx
+export default function HelloWorld() {
+	return <div>Hello World</div>;
+}
+```
+
+**widget.ts** — Widget metadata:
+
+```ts
+export default {
+	title: 'Hello World',
+	category: 'demo',
+};
+```
+
+Both entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`.
+
+### Build Output
+
+The build system generates:
+
+- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
+- `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
+- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
+- `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
+- `build/widgets/registry.php` — Widget registry data
+- `build/widgets.php` — Script module registration logic
+
+### PHP Registration
+
+The generated `widgets.php` registers each widget's entries as script modules via `wp_register_script_module()`. Module handles follow the pattern:
+
+```
+{handlePrefix}/widgets/{widget-dir-name}/render
+{handlePrefix}/widgets/{widget-dir-name}/widget
+```
+
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+
+### Watch Mode
+
+In development (`wp-build --watch`), widget source files are watched for changes. When a file inside `widgets/{name}/` changes, only that widget is rebuilt.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose.
