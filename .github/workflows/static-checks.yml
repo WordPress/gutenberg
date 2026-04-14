@@ -35,10 +35,11 @@ jobs:
                 os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
 
                 include:
-                    # Only generate annotations once.
+                    # Only generate lint-js once.
                     - node: '24'
                       os: 'ubuntu-24.04'
-                      annotations: true
+                      lint-js: true
+                      lint-css: true
                 exclude:
                     # On PRs: Only test Node 20 on Ubuntu and Windows
                     - event: 'pull_request'
@@ -51,6 +52,27 @@ jobs:
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
+
+            # This date is used to ensure that caches are cleared at least once every other.
+            # http://man7.org/linux/man-pages/man1/date.1.html
+            - name: Get the date from 2 days ago
+              id: get-date
+              if: ${{ matrix.lint-js || matrix.lint-css }}
+              run: echo "date=$(/bin/date -u --date='2 days ago' "+%F")" >> "$GITHUB_OUTPUT"
+
+            - name: Configure caching for ESLint
+              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+              if: ${{ matrix.lint-js }}
+              with:
+                  path: .cache/eslint/.eslintcache
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-eslint-cache-${{ hashFiles('**/package.json', '**/.eslintignore', '**/.eslintrc.js', '**/.eslint.strict.js') }}
+
+            - name: Configure caching for Stylelint
+              uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+              if: ${{ matrix.lint-css }}
+              with:
+                  path: .cache/.stylelintcache/
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-stylelint-cache-${{ hashFiles('**/package.json', '**/.stylelintignore', '**/.stylelintrc.json') }}
 
             - name: Use desired version of Node.js
               uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
@@ -80,11 +102,11 @@ jobs:
               run: npm run lint:tsconfig
 
             - name: Lint JavaScript
-              if: ${{ matrix.annotations }}
+              if: ${{ matrix.lint-js }}
               run: npm run lint:js -- --format compact
 
             - name: Lint Styles
-              if: ${{ matrix.annotations }}
+              if: ${{ matrix.lint-css }}
               run: npm run lint:css -- --formatter compact
 
             - name: Type checking
