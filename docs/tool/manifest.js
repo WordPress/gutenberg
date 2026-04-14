@@ -3,12 +3,16 @@
 /**
  * External dependencies
  */
-const { pascalCase } = require( 'change-case' );
 const fs = require( 'fs' );
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
+const { pascalCase } = require( 'change-case' );
+const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
+const blockJsonPaths = glob( 'packages/block-library/src/*/block.json' );
+const blockCategoryPaths = glob(
+	'docs/reference-guides/core-blocks/category-*.md'
+);
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
@@ -88,6 +92,63 @@ function getComponentManifest( paths ) {
 	} );
 }
 
+/**
+ * Generates the block manifest with a 3-level hierarchy:
+ *   core-blocks → category pages → individual block pages.
+ *
+ * Reads block metadata directly from block.json (the single source of truth)
+ * and points markdown_source to each block's README.md in its source directory.
+ *
+ * @param {Array} jsonPaths Paths to block.json files.
+ * @param {Array} catPaths  Paths to category index markdown files.
+ *
+ * @return {Array}          Manifest
+ */
+function getBlockManifest( jsonPaths, catPaths ) {
+	const manifest = [];
+
+	// Add category pages (parent: core-blocks).
+	catPaths.forEach( ( filePath ) => {
+		const fileName = filePath.split( '/' ).pop().replace( '.md', '' );
+		const category = fileName.replace( 'category-', '' );
+		const content = fs.readFileSync( filePath, 'utf8' );
+		const titleMatch = content.match( /^#\s(.+)$/m );
+		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( category );
+		manifest.push( {
+			title,
+			slug: `core-blocks-${ category }`,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
+			parent: 'core-blocks',
+		} );
+	} );
+
+	// Add block pages (parent: core-blocks-{category}).
+	// Block slugs use "core-block-" (singular) to avoid collisions
+	// with category slugs which use "core-blocks-" (plural).
+	jsonPaths.forEach( ( jsonPath ) => {
+		const blockDir = jsonPath.split( '/' )[ 3 ]; // packages/block-library/src/{blockDir}/block.json
+		const readmePath = `packages/block-library/src/${ blockDir }/README.md`;
+
+		// Only include blocks that have a README.
+		if ( ! fs.existsSync( readmePath ) ) {
+			return;
+		}
+
+		const blockJson = require( join( __dirname, '..', '..', jsonPath ) );
+		const title = blockJson.title || pascalCase( blockDir );
+		const category = blockJson.category || 'uncategorized';
+
+		manifest.push( {
+			title,
+			slug: `core-block-${ blockDir }`,
+			markdown_source: `${ baseRepoUrl }/${ readmePath }`,
+			parent: `core-blocks-${ category }`,
+		} );
+	} );
+
+	return manifest;
+}
+
 function getRootManifest( tocFileName ) {
 	return generateRootManifestFromTOCItems( require( tocFileName ) );
 }
@@ -131,6 +192,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		} else if ( children === '{{components}}' ) {
 			pageItems = pageItems.concat(
 				getComponentManifest( componentPaths )
+			);
+		} else if ( children === '{{blocks}}' ) {
+			pageItems = pageItems.concat(
+				getBlockManifest( blockJsonPaths, blockCategoryPaths )
 			);
 		} else if ( children === '{{packages}}' ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
