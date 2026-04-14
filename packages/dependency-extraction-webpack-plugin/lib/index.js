@@ -152,7 +152,7 @@ class DependencyExtractionWebpackPlugin {
 		 * Offload externalization work to the ExternalsPlugin.
 		 * @type {webpack.ExternalsPlugin}
 		 */
-		this.externalsPlugin = new webpack.ExternalsPlugin(
+		this.externalsPlugin = new compiler.webpack.ExternalsPlugin(
 			this.useModules ? 'import' : 'window',
 			this.externalizeWpDeps.bind( this )
 		);
