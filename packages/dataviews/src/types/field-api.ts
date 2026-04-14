@@ -76,23 +76,20 @@ export type FieldTypeName =
 	| 'url'
 	| 'array';
 
-type BaseRules< Item > = {
+export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
+	min?: number | string;
+	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
 				item: Item,
 				field: NormalizedField< Item >
 		  ) => Promise< null | string > );
-};
-
-export type Rules< Item > = BaseRules< Item > & {
-	min?: number | string;
-	max?: number | string;
 };
 
 export type Validator< Item > = (
@@ -187,7 +184,7 @@ export type EditConfig =
 	| EditConfigDatetime
 	| EditConfigGeneric;
 
-type FieldBase< Item > = {
+export type Field< Item > = {
 	/**
 	 * Type of the field.
 	 */
@@ -233,6 +230,16 @@ type FieldBase< Item > = {
 	 * Callback used to sort the field.
 	 */
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
+
+	/**
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
+	 */
+	isValid?: Rules< Item >;
 
 	/**
 	 * Callback used to decide if a field should be displayed.
@@ -314,22 +321,7 @@ type FieldBase< Item > = {
 		item: Item;
 		field: NormalizedField< Item >;
 	} ) => string;
-
-	/**
-	 * Validation config for the field.
-	 *
-	 * Range rules are normalized according to `type`:
-	 * - `'integer' | 'number'`: `min`/`max` accept `number`
-	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
-	 * - all other field types ignore `min`/`max`
-	 */
-	isValid?: Rules< Item >;
 };
-
-/**
- * A dataview field for a specific property of a data type.
- */
-export type Field< Item > = FieldBase< Item >;
 
 /**
  * Format for datetime fields:
