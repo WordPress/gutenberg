@@ -287,3 +287,74 @@ export function useLinkPreview( {
 		badges,
 	};
 }
+
+/**
+ * Render-prop component that fetches entity data and computes a link preview.
+ *
+ * Designed to be passed as `Preview` in the block-fields Link control's
+ * Edit config. Accepts a link field value (from `getValue()`) and a render
+ * function as `children` that receives the computed preview object.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Object}   props.value    The link field value from getValue().
+ * @param {Function} props.children Render prop receiving the preview object.
+ * @return {Object} Rendered children with preview data.
+ */
+export function FieldLinkPreview( { value, children } ) {
+	const { url, id, kind, type, binding } = value ?? {};
+
+	const isEntityLink = !! id && kind !== 'custom';
+	const hasBinding = !! binding;
+
+	// Fetch the entity record if this is an entity link.
+	const { entityRecord, isBoundEntityAvailable } = useSelect(
+		( select ) => {
+			if ( ! isEntityLink || ! id ) {
+				return {
+					entityRecord: null,
+					isBoundEntityAvailable: false,
+				};
+			}
+
+			const isPostType = kind === 'post-type';
+			const isTaxonomy = kind === 'taxonomy';
+
+			if ( ! isPostType && ! isTaxonomy ) {
+				return {
+					entityRecord: null,
+					isBoundEntityAvailable: false,
+				};
+			}
+
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreDataStore );
+			const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+			// Convert 'tag' back to 'post_tag' for the API call.
+			const typeForAPI = type === 'tag' ? 'post_tag' : type;
+			const record = getEntityRecord( entityType, typeForAPI, id );
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				entityType,
+				typeForAPI,
+				id,
+			] );
+
+			const isAvailable = hasResolved ? record !== undefined : true;
+
+			return {
+				entityRecord: record || null,
+				isBoundEntityAvailable: isAvailable,
+			};
+		},
+		[ isEntityLink, id, kind, type ]
+	);
+
+	const preview = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
+
+	return children( preview );
+}

@@ -392,13 +392,15 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls group="content">
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
-			</InspectorControls>
+			{ ! window?.__experimentalContentOnlyInspectorFields && (
+				<InspectorControls group="content">
+					<Controls
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>

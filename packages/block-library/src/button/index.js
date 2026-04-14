@@ -66,21 +66,31 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'url',
-			Edit: 'link', // TODO: replace with custom component
+			Edit: 'link',
 			getValue: ( { item } ) => ( {
 				url: item.url,
-				rel: item.rel,
-				linkTarget: item.linkTarget,
 			} ),
 			setValue: ( { value } ) => ( {
 				url: value.url,
-				rel: value.rel,
-				linkTarget: value.linkTarget,
 			} ),
+		},
+		{
+			id: 'linkTarget',
+			label: __( 'Open in new tab' ),
+			type: 'boolean',
+			getValue: ( { item } ) => item.linkTarget === '_blank',
+			setValue: ( { value } ) => ( {
+				linkTarget: value ? '_blank' : undefined,
+			} ),
+		},
+		{
+			id: 'rel',
+			label: __( 'Rel attribute' ),
+			type: 'text',
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'text', 'link' ],
+		fields: [ 'text', 'link', 'linkTarget', 'rel' ],
 	};
 }
 

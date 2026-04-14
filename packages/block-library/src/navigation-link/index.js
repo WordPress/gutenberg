@@ -11,6 +11,7 @@ import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
+import { FieldLinkPreview } from './shared/use-link-preview';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
@@ -121,19 +122,47 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'url',
-			Edit: 'link',
+			Edit: { control: 'link', Preview: FieldLinkPreview },
 			getValue: ( { item } ) => ( {
 				url: item.url,
-				rel: item.rel,
+				id: item.id,
+				kind: item.kind,
+				type: item.type,
+				binding: item.metadata?.bindings?.url,
 			} ),
-			setValue: ( { value } ) => ( {
-				url: value.url,
-				rel: value.rel,
-			} ),
+			setValue: ( { item, value } ) => {
+				const { url: _urlBinding, ...remainingBindings } =
+					item.metadata?.bindings ?? {};
+				const newBindings = value.binding
+					? { ...remainingBindings, url: value.binding }
+					: remainingBindings;
+				return {
+					url: value.url,
+					id: value.id,
+					kind: value.kind,
+					type: value.type,
+					metadata: {
+						...item.metadata,
+						bindings: Object.keys( newBindings ).length
+							? newBindings
+							: undefined,
+					},
+				};
+			},
+		},
+		{
+			id: 'opensInNewTab',
+			label: __( 'Open in new tab' ),
+			type: 'boolean',
+		},
+		{
+			id: 'rel',
+			label: __( 'Rel attribute' ),
+			type: 'text',
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'label', 'link' ],
+		fields: [ 'label', 'link', 'opensInNewTab', 'rel' ],
 	};
 }
 

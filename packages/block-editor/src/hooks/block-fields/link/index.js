@@ -1,162 +1,107 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	Icon,
-	__experimentalGrid as Grid,
-	Popover,
-} from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { link } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import LinkControl from '../../../components/link-control';
-import { useInspectorPopoverPlacement } from '../use-inspector-popover-placement';
-
-export const NEW_TAB_REL = 'noreferrer noopener';
-export const NEW_TAB_TARGET = '_blank';
-export const NOFOLLOW_REL = 'nofollow';
+import { LinkPicker } from '../../../components/link-picker';
 
 /**
- * Updates the link attributes.
+ * Returns the binding configuration for a given entity kind,
+ * or undefined if the kind does not support bindings.
  *
- * @param {Object}  attributes               The current block attributes.
- * @param {string}  attributes.rel           The current link rel attribute.
- * @param {string}  attributes.url           The current link url.
- * @param {boolean} attributes.opensInNewTab Whether the link should open in a new window.
- * @param {boolean} attributes.nofollow      Whether the link should be marked as nofollow.
+ * @param {string} kind The entity kind ('post-type' or 'taxonomy').
+ * @return {Object|undefined} The binding config, or undefined.
  */
-export function getUpdatedLinkAttributes( {
-	rel = '',
-	url = '',
-	opensInNewTab,
-	nofollow,
-} ) {
-	let newLinkTarget;
-	// Since `rel` is editable attribute, we need to check for existing values and proceed accordingly.
-	let updatedRel = rel;
-
-	if ( opensInNewTab ) {
-		newLinkTarget = NEW_TAB_TARGET;
-		updatedRel = updatedRel?.includes( NEW_TAB_REL )
-			? updatedRel
-			: updatedRel + ` ${ NEW_TAB_REL }`;
-	} else {
-		const relRegex = new RegExp( `\\b${ NEW_TAB_REL }\\s*`, 'g' );
-		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+function getBinding( kind ) {
+	if ( kind === 'post-type' ) {
+		return { source: 'core/post-data', args: { field: 'link' } };
 	}
-
-	if ( nofollow ) {
-		updatedRel = updatedRel?.includes( NOFOLLOW_REL )
-			? updatedRel
-			: ( updatedRel + ` ${ NOFOLLOW_REL }` ).trim();
-	} else {
-		const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
-		updatedRel = updatedRel?.replace( relRegex, '' ).trim();
+	if ( kind === 'taxonomy' ) {
+		return { source: 'core/term-data', args: { field: 'link' } };
 	}
-
-	return {
-		url: prependHTTP( url ),
-		linkTarget: newLinkTarget,
-		rel: updatedRel || undefined,
-	};
+	return undefined;
 }
 
-export default function Link( { data, field, onChange } ) {
-	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
-	const { popoverProps } = useInspectorPopoverPlacement( {
-		isControl: true,
-	} );
-	const value = field.getValue( { item: data } );
+/**
+ * Normalizes the type value from a LinkPicker suggestion.
+ * Ensures consistency with how types are stored in block attributes.
+ *
+ * @param {string} type The raw type string from the suggestion.
+ * @return {string} The normalized type string.
+ */
+function normalizeType( type ) {
+	if ( ! type ) {
+		return type;
+	}
+	// Use "tag" in favor of "post_tag".
+	// See https://github.com/WordPress/gutenberg/pull/24670
+	if ( type === 'post_tag' ) {
+		return 'tag';
+	}
+	return type.replace( '-', '_' );
+}
+
+/**
+ * Default preview component used when no Preview is provided via config.
+ * Returns a basic preview with just the URL as the title.
+ *
+ * @param {Object}   props          Component props.
+ * @param {Object}   props.value    The link field value.
+ * @param {Function} props.children Render prop receiving the preview object.
+ * @return {Object} Rendered children with preview data.
+ */
+function DefaultFieldLinkPreview( { value, children } ) {
 	const url = value?.url;
-	const rel = value?.rel || '';
-	const target = value?.linkTarget;
+	return children( {
+		title: url || __( 'Add link' ),
+		url: url || '',
+	} );
+}
 
-	const opensInNewTab = target === NEW_TAB_TARGET;
-	const nofollow = rel === NOFOLLOW_REL;
-
-	// Memoize link value to avoid overriding the LinkControl's internal state.
-	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
-	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
-	);
+export default function Link( { data, field, onChange, config } ) {
+	const value = field.getValue( { item: data } );
+	const PreviewProvider = config?.Preview || DefaultFieldLinkPreview;
 
 	return (
-		<>
-			<Button
-				__next40pxDefaultSize
-				className="block-editor-content-only-controls__link"
-				onClick={ () => {
-					setIsLinkControlOpen( true );
-				} }
-			>
-				<Grid
-					rowGap={ 0 }
-					columnGap={ 8 }
-					templateColumns="24px 1fr"
-					className="block-editor-content-only-controls__link-row"
-				>
-					{ url && (
-						<>
-							<Icon icon={ link } size={ 24 } />
-							<span className="block-editor-content-only-controls__link-title">
-								{ url }
-							</span>
-						</>
-					) }
-					{ ! url && (
-						<>
-							<Icon
-								icon={ link }
-								size={ 24 }
-								style={ { opacity: 0.3 } }
-							/>
-							<span className="block-editor-content-only-controls__link-title">
-								{ __( 'Link' ) }
-							</span>
-						</>
-					) }
-				</Grid>
-			</Button>
-			{ isLinkControlOpen && (
-				<Popover
-					onClose={ () => {
-						setIsLinkControlOpen( false );
-					} }
-					{ ...( popoverProps ?? {} ) }
-				>
-					<LinkControl
-						value={ linkValue }
-						onChange={ ( newValues ) => {
-							const updatedAttrs = getUpdatedLinkAttributes( {
-								rel,
-								...newValues,
-							} );
+		<PreviewProvider value={ value }>
+			{ ( preview ) => (
+				<LinkPicker
+					preview={ preview }
+					onSelect={ ( suggestion ) => {
+						if ( ! suggestion ) {
+							return;
+						}
 
-							onChange(
-								field.setValue( {
-									item: data,
-									value: updatedAttrs,
-								} )
-							);
-						} }
-						onRemove={ () => {
-							onChange(
-								field.setValue( {
-									item: data,
-									value: {},
-								} )
-							);
-						} }
-					/>
-				</Popover>
+						const isEntityLink =
+							!! suggestion.id && suggestion.kind !== 'custom';
+
+						onChange(
+							field.setValue( {
+								item: data,
+								value: {
+									url: suggestion.url,
+									id: isEntityLink
+										? suggestion.id
+										: undefined,
+									kind: isEntityLink
+										? suggestion.kind
+										: 'custom',
+									type: isEntityLink
+										? normalizeType( suggestion.type )
+										: 'custom',
+									binding: isEntityLink
+										? getBinding( suggestion.kind )
+										: undefined,
+								},
+							} )
+						);
+					} }
+					label={ field.label }
+				/>
 			) }
-		</>
+		</PreviewProvider>
 	);
 }
