@@ -36,6 +36,7 @@
 	"scripts": {
 		"docs:api-ref": "node ./update-api-docs.js",
 		"docs:blocks": "node ./gen-block-lib-list.js",
+		"docs:blocks-detail": "node ./generate-block-docs.mjs",
 		"docs:components": "node ./gen-components-docs/index.mjs",
 		"docs:theme-ref": "node ./gen-theme-reference.mjs"
 	}

@@ -162,14 +162,18 @@ function readBlockJSON( filename ) {
 		__experimental,
 		allowedBlocks,
 	} = blockjson;
+	const blockdir = path.basename( path.dirname( filename ) );
 	const sourcefile = getSourceFromFile( filename );
-	const blockInfoList = [ `-	**Name:** ${ name }` ];
+	const blockDetailUrl = `/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockdir }/`;
+	const blockInfoList = [ `-	**Name:** [${ name }](${ blockDetailUrl })` ];
 
 	if ( __experimental ) {
 		blockInfoList.push( `-	**Experimental:** ${ __experimental }` );
 	}
 	if ( category?.length > 0 ) {
-		blockInfoList.push( `-	**Category:** ${ category }` );
+		blockInfoList.push(
+			`-	**Category:** [${ category }](/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
+		);
 	}
 	if ( parent?.length > 0 ) {
 		blockInfoList.push( `-	**Parent:** ${ parent.join( ', ' ) }` );
