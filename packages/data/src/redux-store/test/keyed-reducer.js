@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { onSubKey } from '../on-sub-key';
+import { keyedReducer } from '../keyed-reducer';
 
-describe( 'onSubKey', () => {
+describe( 'keyedReducer', () => {
 	function createEnhancedReducer( actionProperty ) {
-		const enhanceReducer = onSubKey( actionProperty );
+		const enhanceReducer = keyedReducer( actionProperty );
 		return enhanceReducer(
 			( state, action ) => 'Called by ' + action.caller
 		);

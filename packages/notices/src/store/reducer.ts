@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { onSubKey } from '@wordpress/data';
+import { keyedReducer } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,7 +17,7 @@ import type { Notice, ReducerAction } from './types';
  *
  * @return Updated state.
  */
-const notices = onSubKey< Array< Notice >, ReducerAction >( 'context' )( (
+const notices = keyedReducer< Array< Notice >, ReducerAction >( 'context' )( (
 	state = [],
 	action
 ) => {

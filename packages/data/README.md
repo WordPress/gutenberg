@@ -506,16 +506,16 @@ _Returns_
 
 -   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
-### onSubKey
+### keyedReducer
 
 Higher-order reducer creator which creates a combined reducer object, keyed by a property on the action object.
 
 _Usage_
 
 ```js
-import { onSubKey } from '@wordpress/data';
+import { keyedReducer } from '@wordpress/data';
 
-const itemsByContext = onSubKey( 'context' )( ( state = [], action ) => {
+const itemsByContext = keyedReducer( 'context' )( ( state = [], action ) => {
 	switch ( action.type ) {
 		case 'ADD_ITEM':
 			return [ ...state, action.item ];

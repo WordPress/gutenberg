@@ -32,7 +32,7 @@ export { createRegistrySelector, createRegistryControl } from './factory';
 export { createSelector } from './create-selector';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
-export { onSubKey } from './redux-store/on-sub-key';
+export { keyedReducer } from './redux-store/keyed-reducer';
 export { dispatch } from './dispatch';
 export { select } from './select';
 

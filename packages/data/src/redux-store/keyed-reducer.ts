@@ -12,9 +12,9 @@ import type { AnyAction, Reducer } from 'redux';
  *
  * @example
  * ```js
- * import { onSubKey } from '@wordpress/data';
+ * import { keyedReducer } from '@wordpress/data';
  *
- * const itemsByContext = onSubKey( 'context' )( ( state = [], action ) => {
+ * const itemsByContext = keyedReducer( 'context' )( ( state = [], action ) => {
  *   switch ( action.type ) {
  *     case 'ADD_ITEM':
  *       return [ ...state, action.item ];
@@ -23,7 +23,7 @@ import type { AnyAction, Reducer } from 'redux';
  * } );
  * ```
  */
-export const onSubKey =
+export const keyedReducer =
 	< TState extends unknown, TAction extends AnyAction >(
 		actionProperty: string
 	) =>
