@@ -168,7 +168,8 @@ function formatAttributesTable( attributes ) {
  * @param {string} property Top-level or dotted property name.
  * @return {string} Absolute handbook path with anchor.
  */
-const SUPPORTS_BASE = '/block-editor/reference-guides/block-api/block-supports/';
+const SUPPORTS_BASE =
+	'/block-editor/reference-guides/block-api/block-supports/';
 const SUPPORTS_SUB_ANCHORS = new Set( [
 	'color.background',
 	'color.button',
@@ -234,10 +235,7 @@ function formatSupports( supports ) {
 				const subLabel = SUPPORTS_SUB_ANCHORS.has( subProp )
 					? `[\`${ subKey }\`](${ supportsLink( subProp ) })`
 					: `\`${ subKey }\``;
-				if (
-					typeof subValue === 'object' &&
-					subValue !== null
-				) {
+				if ( typeof subValue === 'object' && subValue !== null ) {
 					lines.push(
 						`  - ${ subLabel }: \`${ JSON.stringify( subValue ) }\``
 					);
@@ -246,9 +244,7 @@ function formatSupports( supports ) {
 				}
 			}
 		} else {
-			lines.push(
-				`- ${ keyLink }: \`${ JSON.stringify( value ) }\``
-			);
+			lines.push( `- ${ keyLink }: \`${ JSON.stringify( value ) }\`` );
 		}
 	}
 
@@ -324,9 +320,7 @@ function formatRelationships( blockJson ) {
 
 	if ( blockJson.parent && blockJson.parent.length > 0 ) {
 		parts.push(
-			`**[Parent](${
-				METADATA_BASE
-			}#parent) blocks (direct):**`
+			`**[Parent](${ METADATA_BASE }#parent) blocks (direct):**`
 		);
 		for ( const p of blockJson.parent ) {
 			parts.push( `- ${ blockLink( p ) }` );
@@ -337,11 +331,7 @@ function formatRelationships( blockJson ) {
 		if ( parts.length > 0 ) {
 			parts.push( '' );
 		}
-		parts.push(
-			`**[Ancestor](${
-				METADATA_BASE
-			}#ancestor) blocks:**`
-		);
+		parts.push( `**[Ancestor](${ METADATA_BASE }#ancestor) blocks:**` );
 		for ( const a of blockJson.ancestor ) {
 			parts.push( `- ${ blockLink( a ) }` );
 		}
@@ -352,9 +342,7 @@ function formatRelationships( blockJson ) {
 			parts.push( '' );
 		}
 		parts.push(
-			`**[Allowed](${
-				METADATA_BASE
-			}#allowed-blocks) inner blocks:**`
+			`**[Allowed](${ METADATA_BASE }#allowed-blocks) inner blocks:**`
 		);
 		for ( const b of blockJson.allowedBlocks ) {
 			parts.push( `- ${ blockLink( b ) }` );
@@ -480,7 +468,6 @@ function generateBlockApiSection( blockDir ) {
 
 	const {
 		name,
-		title,
 		category,
 		description,
 		keywords,
@@ -620,9 +607,7 @@ function generateBlockApiSection( blockDir ) {
 	}
 	lines.push( '' );
 	lines.push( '```html' );
-	lines.push(
-		generateBlockCommentExample( slug, attributes, blockType )
-	);
+	lines.push( generateBlockCommentExample( slug, attributes, blockType ) );
 	lines.push( '```' );
 	lines.push( '' );
 
@@ -633,14 +618,10 @@ function generateBlockApiSection( blockDir ) {
 		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](/block-editor/reference-guides/block-api/block-metadata/))`
 	);
 	if ( files.hasEditJs ) {
-		lines.push(
-			`- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)`
-		);
+		lines.push( `- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)` );
 	}
 	if ( files.hasSaveJs ) {
-		lines.push(
-			`- [save.js](${ SOURCE_URL_BASE }${ blockDir }/save.js)`
-		);
+		lines.push( `- [save.js](${ SOURCE_URL_BASE }${ blockDir }/save.js)` );
 	}
 	if ( files.hasIndexPhp ) {
 		lines.push(
@@ -675,7 +656,7 @@ function generateBlockApiSection( blockDir ) {
 function writeBlockReadme( blockDir, apiSection ) {
 	const readmePath = path.join( BLOCK_LIBRARY_DIR, blockDir, 'README.md' );
 	const blockJson = readBlockJson( blockDir );
-	const { title, description } = blockJson;
+	const { title } = blockJson;
 
 	if ( ! fs.existsSync( readmePath ) ) {
 		// Case 1: No README — create full file.
@@ -716,7 +697,7 @@ function writeBlockReadme( blockDir, apiSection ) {
  * Escape a string for use in a RegExp.
  *
  * @param {string} str
- * @return {string}
+ * @return {string} Escaped string safe for RegExp use.
  */
 function escapeRegExp( str ) {
 	return str.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
