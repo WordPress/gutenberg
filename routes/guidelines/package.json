@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/content-guidelines-route",
+	"name": "@wordpress/guidelines-route",
 	"version": "1.0.0",
 	"private": true,
 	"route": {

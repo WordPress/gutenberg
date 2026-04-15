@@ -157,7 +157,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( `role=option[name="${ testData.optionText }"i]` )
+				page.getByRole( 'option', {
+					name: testData.optionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
@@ -195,16 +198,18 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
-				page.locator(
-					`role=option[name="${ testData.firstOptionText }"i]`
-				)
+				page.getByRole( 'option', {
+					name: testData.firstOptionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( testData.secondTriggerString );
 			await expect(
-				page.locator(
-					`role=option[name="${ testData.secondOptionText }"i]`
-				)
+				page.getByRole( 'option', {
+					name: testData.secondOptionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -236,11 +241,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
-			await expect(
-				page.locator( `role=option[name="${ testData.optionText }"i]` )
-			).toBeVisible();
 			await page
-				.locator( `role=option[name="${ testData.optionText }"i]` )
+				.getByRole( 'option', {
+					name: testData.optionText,
+				} )
 				.click();
 
 			await expect

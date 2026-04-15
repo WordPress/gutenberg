@@ -1,6 +1,6 @@
 <?php
 /**
- * Content Guidelines REST API Controller.
+ * Guidelines REST API Controller.
  *
  * Extends WP_REST_Posts_Controller to inherit standard WordPress CRUD behavior,
  * permission checks, and response formatting. Follows the pattern used by
@@ -14,9 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Content Guidelines.
+ * REST API controller for Guidelines.
  */
-class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
+class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Maximum length for guideline text strings.
@@ -36,11 +36,11 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Constructor.
 	 */
 	public function __construct() {
-		parent::__construct( Gutenberg_Content_Guidelines_Post_Type::POST_TYPE );
+		parent::__construct( Gutenberg_Guidelines_Post_Type::POST_TYPE );
 	}
 
 	/**
-	 * Registers the routes for content guidelines.
+	 * Registers the routes for guidelines.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
 	 * collection route with a singleton GET endpoint.
@@ -61,7 +61,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'category' => array(
 							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => Gutenberg_Content_Guidelines_Post_Type::VALID_CATEGORIES,
+							'enum'              => Gutenberg_Guidelines_Post_Type::VALID_CATEGORIES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'block'    => array(
@@ -72,7 +72,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'status'   => array(
 							'description'       => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => Gutenberg_Content_Guidelines_Post_Type::VALID_STATUSES,
+							'enum'              => Gutenberg_Guidelines_Post_Type::VALID_STATUSES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 					),
@@ -120,7 +120,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Gets the singleton content guidelines.
+	 * Gets the singleton guidelines.
 	 *
 	 * Supports query parameters:
 	 * - ?status=publish|draft - Filter by status
@@ -149,7 +149,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Creates content guidelines.
+	 * Creates guidelines.
 	 *
 	 * Enforces singleton pattern — only one guidelines post per site.
 	 *
@@ -197,7 +197,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Updates content guidelines.
+	 * Updates guidelines.
 	 *
 	 * Saves guideline categories to meta before updating the post so that
 	 * the revision captures the updated meta values.
@@ -280,7 +280,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
-			$guideline_categories = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
+			$guideline_categories = Gutenberg_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
 
 			// Handle ?block filter.
 			$block_filter = $request->get_param( 'block' );
@@ -388,9 +388,9 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 */
 	protected function save_guideline_categories_to_meta( $post_id, $categories ) {
 		// Save standard categories.
-		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
+		foreach ( Gutenberg_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
-				$meta_key = '_content_guideline_' . $category;
+				$meta_key = '_guideline_' . $category;
 				$value    = $categories[ $category ]['guidelines'] ?? '';
 				update_post_meta( $post_id, $meta_key, $value );
 			}
@@ -399,7 +399,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		// Handle block-specific guidelines as individual meta keys.
 		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
 			foreach ( $categories['blocks'] as $block_name => $block_data ) {
-				$meta_key = Gutenberg_Content_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
+				$meta_key = Gutenberg_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
 				$value    = $block_data['guidelines'] ?? '';
 
 				if ( ! empty( $value ) ) {
@@ -422,7 +422,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			return array();
 		}
 
-		$valid_categories = Gutenberg_Content_Guidelines_Post_Type::VALID_CATEGORIES;
+		$valid_categories = Gutenberg_Guidelines_Post_Type::VALID_CATEGORIES;
 		$sanitized        = array_intersect_key( $categories, array_flip( $valid_categories ) );
 
 		foreach ( $sanitized as $key => &$category ) {
@@ -538,7 +538,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'content-guidelines',
+			'title'      => 'guidelines',
 			'type'       => 'object',
 			'properties' => array(
 				'id'                   => array(
@@ -550,7 +550,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 				'status'               => array(
 					'description' => __( 'The status of the guidelines (draft or publish).', 'gutenberg' ),
 					'type'        => 'string',
-					'enum'        => Gutenberg_Content_Guidelines_Post_Type::VALID_STATUSES,
+					'enum'        => Gutenberg_Guidelines_Post_Type::VALID_STATUSES,
 					'context'     => array( 'view', 'edit' ),
 				),
 				'guideline_categories' => array(

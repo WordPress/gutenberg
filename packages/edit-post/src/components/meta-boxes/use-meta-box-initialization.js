@@ -35,14 +35,13 @@ export const useMetaBoxInitialization = ( enabled ) => {
 				: false,
 			allMetaBoxes: enabled
 				? select( editPostStore ).getAllMetaBoxes()
-				: [],
+				: undefined,
 			rtcCompatibleIds:
 				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
 		} ),
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
-
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
 
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
@@ -55,7 +54,7 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			// Meta boxes marked with __rtc_compatible_meta_box on the server
 			// have their IDs stored via setRtcCompatibleMetaBoxIds().
 			if ( isCollaborationEnabled ) {
-				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
+				const hasIncompatibleMetaBoxes = allMetaBoxes?.some(
 					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
 				);
 

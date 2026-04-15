@@ -30,19 +30,16 @@ export default function ActionItem( {
 	disabled,
 	isBusy,
 }: ActionProps ) {
-	const descriptionId = `content-guidelines-action-${ slug }-description`;
+	const descriptionId = `guidelines-action-${ slug }-description`;
 
 	return (
-		<HStack
-			justify="space-between"
-			className="content-guidelines__action-row"
-		>
+		<HStack justify="space-between" className="guidelines__action-row">
 			<VStack spacing={ 1 }>
 				<Heading
 					level={ 3 }
 					size={ 13 }
 					weight={ 400 }
-					className="content-guidelines__action-title"
+					className="guidelines__action-title"
 				>
 					{ title }
 				</Heading>
@@ -51,7 +48,7 @@ export default function ActionItem( {
 					size={ 13 }
 					weight={ 400 }
 					variant="muted"
-					className="content-guidelines__action-description"
+					className="guidelines__action-description"
 				>
 					{ description }
 				</Text>
@@ -59,7 +56,7 @@ export default function ActionItem( {
 			<Button
 				size="compact"
 				variant="secondary"
-				className="content-guidelines__action-button"
+				className="guidelines__action-button"
 				aria-label={ ariaLabel }
 				aria-describedby={ descriptionId }
 				onClick={ onClick }

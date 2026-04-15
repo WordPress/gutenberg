@@ -31,9 +31,9 @@ export default function GuidelineAccordion( {
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	return (
-		<Card className="content-guidelines__accordion">
+		<Card className="guidelines__accordion">
 			<Button
-				className="content-guidelines__accordion-trigger"
+				className="guidelines__accordion-trigger"
 				onClick={ () => setIsOpen( ! isOpen ) }
 				aria-expanded={ isOpen }
 				aria-controls={ contentId }
@@ -56,7 +56,7 @@ export default function GuidelineAccordion( {
 					<VStack spacing={ 1 }>
 						<Heading
 							id={ headingId }
-							className="content-guidelines__accordion-header"
+							className="guidelines__accordion-header"
 							level={ 2 }
 							size={ 15 }
 							weight={ 400 }
@@ -65,7 +65,7 @@ export default function GuidelineAccordion( {
 						</Heading>
 						<Text
 							id={ descriptionId }
-							className="content-guidelines__accordion-description"
+							className="guidelines__accordion-description"
 							size={ 13 }
 							weight={ 400 }
 							variant="muted"
@@ -77,8 +77,8 @@ export default function GuidelineAccordion( {
 						icon={ chevronDown }
 						className={
 							isOpen
-								? 'content-guidelines__accordion-chevron-up'
-								: 'content-guidelines__accordion-chevron-down'
+								? 'guidelines__accordion-chevron-up'
+								: 'guidelines__accordion-chevron-down'
 						}
 					/>
 				</HStack>

@@ -1,6 +1,6 @@
 <?php
 /**
- * Content Guidelines Revisions REST API Controller.
+ * Guidelines Revisions REST API Controller.
  *
  * Extends WP_REST_Revisions_Controller to inherit standard WordPress revision
  * list/get behavior and adds guideline_categories to responses + a restore endpoint.
@@ -13,9 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Content Guidelines revisions.
+ * REST API controller for Guidelines revisions.
  */
-class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revisions_Controller {
+class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Controller {
 
 	/**
 	 * The base of the parent controller's route.
@@ -46,7 +46,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	}
 
 	/**
-	 * Registers the routes for content guideline revisions.
+	 * Registers the routes for guideline revisions.
 	 *
 	 * Calls parent to register standard list + single revision routes,
 	 * then adds a custom restore endpoint.
@@ -98,7 +98,7 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
 			$data                         = $response->get_data();
-			$guideline_categories         = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $item->ID );
+			$guideline_categories         = Gutenberg_Guidelines_Post_Type::get_guideline_categories_from_meta( $item->ID );
 			$data['guideline_categories'] = ! empty( $guideline_categories ) ? $guideline_categories : new stdClass();
 			$response->set_data( $data );
 		}

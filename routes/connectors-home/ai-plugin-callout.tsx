@@ -23,6 +23,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
+const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
@@ -278,7 +279,7 @@ export function AiPluginCallout() {
 						variant="secondary"
 						size="compact"
 						href={ addQueryArgs( 'options-general.php', {
-							page: AI_PLUGIN_SLUG,
+							page: AI_PLUGIN_PAGE_SLUG,
 						} ) }
 					>
 						{ __( 'Control features in the AI plugin' ) }

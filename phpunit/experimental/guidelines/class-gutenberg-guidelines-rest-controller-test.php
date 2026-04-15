@@ -1,10 +1,10 @@
 <?php
 /**
- * Tests for the Content Guidelines REST API Controller.
+ * Tests for the Guidelines REST API Controller.
  *
  * @package gutenberg
  */
-class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
+class Gutenberg_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
 
 	/**
 	 * @var int Administrator user ID.
@@ -21,7 +21,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	 *
 	 * @var string
 	 */
-	const REST_BASE = '/wp/v2/content-guidelines';
+	const REST_BASE = '/wp/v2/guidelines';
 
 	/**
 	 * Set up class fixtures.
@@ -51,7 +51,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	public function tear_down() {
 		$posts = get_posts(
 			array(
-				'post_type'      => Gutenberg_Content_Guidelines_Post_Type::POST_TYPE,
+				'post_type'      => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status'    => array( 'publish', 'draft' ),
 				'posts_per_page' => -1,
 			)
@@ -92,7 +92,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
-	 * Test that content-guidelines routes are registered.
+	 * Test that guidelines routes are registered.
 	 *
 	 * @covers ::register_routes
 	 */
@@ -606,7 +606,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restoring a revision works and returns parent post response.
 	 *
-	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
+	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision() {
 		wp_set_current_user( self::$admin_id );
@@ -650,7 +650,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restore response includes _links (via prepare_item_for_response).
 	 *
-	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
+	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision_response_includes_links() {
 		wp_set_current_user( self::$admin_id );
@@ -681,7 +681,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restoring requires admin permissions.
 	 *
-	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision_permissions_check
+	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision_permissions_check
 	 */
 	public function test_restore_revision_no_permission() {
 		wp_set_current_user( self::$admin_id );
@@ -721,7 +721,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 		$data     = $response->get_data();
 		$schema   = $data['schema'];
 
-		$this->assertSame( 'content-guidelines', $schema['title'] );
+		$this->assertSame( 'guidelines', $schema['title'] );
 		$this->assertArrayHasKey( 'id', $schema['properties'] );
 		$this->assertArrayHasKey( 'status', $schema['properties'] );
 		$this->assertArrayHasKey( 'guideline_categories', $schema['properties'] );

@@ -30,7 +30,7 @@ import { TimeInput } from './time-input';
 const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
 /**
- * TimePicker is a React component that renders a clock for time selection.
+ * TimePicker is a React component that renders form inputs for time and date selection. It can be used independently or as part of the `DateTimePicker` component.
  *
  * ```jsx
  * import { TimePicker } from '@wordpress/components';
