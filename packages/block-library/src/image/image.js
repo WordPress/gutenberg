@@ -365,6 +365,10 @@ export default function Image( {
 	// If the image has an id but the attachment doesn't exist on this site,
 	// clear the id so Gutenberg treats the image as external.
 	// This handles content copied between WordPress sites.
+	//
+	// Known limitation: if a different attachment with the same id happens to
+	// exist on the destination site, the lookup will succeed and the wrong
+	// local image will be used. URL matching could address this in a follow-up.
 	// See: https://github.com/WordPress/gutenberg/issues/74156
 	useEffect( () => {
 		if ( ! id || ! isSingleSelected ) {
