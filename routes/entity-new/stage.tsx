@@ -93,8 +93,7 @@ function EntityNew() {
 		from: '/new/$entityType',
 	} );
 	const navigate = useNavigate();
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ config, setConfig ] =
@@ -202,17 +201,25 @@ function EntityNew() {
 						  } ),
 				},
 			} );
+			sessionStorage.setItem(
+				'gutenberg_entity_saved',
+				__( 'Entity created successfully.' )
+			);
+
 			if ( config.show_in_menu || config.show_ui ) {
-				sessionStorage.setItem( 'gutenberg_entity_saved', '1' );
-				window.location.reload();
+				// Navigate to the edit screen via full reload so the admin menu updates.
+				const url = new URL( window.location.href );
+				url.searchParams.set(
+					'p',
+					`/edit/${ entityType }/${ config.slug }`
+				);
+				window.location.href = url.toString();
 				return;
 			}
 
-			createSuccessNotice( __( 'Entity created successfully.' ), {
-				type: 'snackbar',
-				id: 'entity-save-success',
+			navigate( {
+				to: `/edit/${ entityType }/${ config.slug }`,
 			} );
-			navigate( { to: '/', search: { tab: entityType } } );
 		} catch ( error: any ) {
 			createErrorNotice(
 				error?.message || __( 'Failed to create entity.' ),
@@ -221,14 +228,7 @@ function EntityNew() {
 		}
 
 		setIsSaving( false );
-	}, [
-		config,
-		entityType,
-		isPostType,
-		navigate,
-		createSuccessNotice,
-		createErrorNotice,
-	] );
+	}, [ config, entityType, isPostType, navigate, createErrorNotice ] );
 
 	const pageTitle = isPostType ? __( 'New Post Type' ) : __( 'New Taxonomy' );
 

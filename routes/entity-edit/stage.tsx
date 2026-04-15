@@ -74,9 +74,10 @@ function EntityEdit() {
 
 	// Show a success notice if we just reloaded after a menu-affecting save.
 	useEffect( () => {
-		if ( sessionStorage.getItem( 'gutenberg_entity_saved' ) ) {
+		const message = sessionStorage.getItem( 'gutenberg_entity_saved' );
+		if ( message ) {
 			sessionStorage.removeItem( 'gutenberg_entity_saved' );
-			createSuccessNotice( __( 'Entity updated successfully.' ), {
+			createSuccessNotice( message, {
 				type: 'snackbar',
 				id: 'entity-save-success',
 			} );
@@ -221,7 +222,10 @@ function EntityEdit() {
 					JSON.stringify( config.object_type );
 
 			if ( menuChanged ) {
-				sessionStorage.setItem( 'gutenberg_entity_saved', '1' );
+				sessionStorage.setItem(
+					'gutenberg_entity_saved',
+					__( 'Entity updated successfully.' )
+				);
 				window.location.reload();
 				return;
 			}

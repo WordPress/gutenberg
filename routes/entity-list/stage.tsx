@@ -132,9 +132,10 @@ function EntityList() {
 		useDispatch( noticesStore );
 	// Show a success notice if we just reloaded after a save.
 	useEffect( () => {
-		if ( sessionStorage.getItem( 'gutenberg_entity_saved' ) ) {
+		const message = sessionStorage.getItem( 'gutenberg_entity_saved' );
+		if ( message ) {
 			sessionStorage.removeItem( 'gutenberg_entity_saved' );
-			createSuccessNotice( __( 'Entity saved successfully.' ), {
+			createSuccessNotice( message, {
 				type: 'snackbar',
 				id: 'entity-save-success',
 			} );
