@@ -3,8 +3,13 @@
 
 const { spawnSync } = require( 'node:child_process' );
 
-const STALE_SUPPRESSIONS_MESSAGE =
-	'There are suppressions left that do not occur anymore.';
+const STALE_SUPPRESSIONS_PATTERN = new RegExp(
+	[
+		'There are suppressions left that do not occur anymore\\.',
+		'To resolve this, re-run the command with `--prune-suppressions` to remove unused suppressions\\.',
+		'To ignore unused suppressions, use `--pass-on-unpruned-suppressions`\\.',
+	].join( '\\s+' )
+);
 
 const PRUNE_HELP_MESSAGE =
 	'Stale ESLint suppressions detected. Run `npm run lint:js:prune-suppressions` and commit the updated `eslint-suppressions.json`.';
@@ -24,15 +29,18 @@ if ( result.error ) {
 	throw result.error;
 }
 
-if ( result.stdout ) {
-	process.stdout.write( result.stdout );
+const stdout = stripStaleSuppressionsMessage( result.stdout );
+const stderr = stripStaleSuppressionsMessage( result.stderr );
+
+if ( stdout ) {
+	process.stdout.write( stdout );
 }
 
-if ( result.stderr ) {
-	process.stderr.write( result.stderr );
+if ( stderr ) {
+	process.stderr.write( stderr );
 }
 
-if ( shouldShowPruneHelp( result, args ) ) {
+if ( hasStaleSuppressions( result, args ) ) {
 	process.stderr.write( `\n${ PRUNE_HELP_MESSAGE }\n` );
 }
 
@@ -42,14 +50,23 @@ process.exit( result.status ?? 1 );
  * @param {import( 'node:child_process' ).SpawnSyncReturns<string>} lintResult Spawn result.
  * @param {string[]}                                                cliArgs    Passed CLI arguments.
  *
- * @return {boolean} Whether the custom prune guidance should be shown.
+ * @return {boolean} Whether stale suppressions were detected.
  */
-function shouldShowPruneHelp( lintResult, cliArgs ) {
+function hasStaleSuppressions( lintResult, cliArgs ) {
 	const output = `${ lintResult.stdout ?? '' }\n${ lintResult.stderr ?? '' }`;
 
 	return (
 		! cliArgs.includes( '--pass-on-unpruned-suppressions' ) &&
 		! cliArgs.includes( '--prune-suppressions' ) &&
-		output.includes( STALE_SUPPRESSIONS_MESSAGE )
+		STALE_SUPPRESSIONS_PATTERN.test( output )
 	);
+}
+
+/**
+ * @param {string|undefined} output Process output.
+ *
+ * @return {string} Output without ESLint's generic stale suppressions message.
+ */
+function stripStaleSuppressionsMessage( output ) {
+	return ( output ?? '' ).replace( STALE_SUPPRESSIONS_PATTERN, '' );
 }
