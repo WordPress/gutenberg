@@ -484,15 +484,22 @@ function generateBlockApiSection( blockDir ) {
 
 	// Metadata.
 	lines.push( `**Name:** \`${ name }\`` );
-	lines.push( `**Category:** ${ category }` );
+	const catSlug = `core-blocks-${ category }`;
+	lines.push(
+		`**Category:** [${ category }](/block-editor/reference-guides/core-blocks/${ catSlug }/)`
+	);
 	if ( apiVersion ) {
-		lines.push( `**API Version:** ${ apiVersion }` );
+		lines.push(
+			`**API Version:** [${ apiVersion }](/block-editor/reference-guides/block-api/block-api-versions/)`
+		);
 	}
 
+	const RENDERING_GUIDE =
+		'/block-editor/getting-started/fundamentals/static-dynamic-rendering/';
 	const typeLabel = {
-		static: 'Static (saved in post content)',
-		dynamic: 'Dynamic (server-rendered)',
-		hybrid: 'Hybrid (static save + server enhancements)',
+		static: `[Static](${ RENDERING_GUIDE }) (saved in post content)`,
+		dynamic: `[Dynamic](${ RENDERING_GUIDE }) (server-rendered)`,
+		hybrid: `[Hybrid](${ RENDERING_GUIDE }) (static save + server enhancements)`,
 	};
 	lines.push( `**Block Type:** ${ typeLabel[ blockType ] || 'Unknown' }` );
 	lines.push( '' );
@@ -523,11 +530,19 @@ function generateBlockApiSection( blockDir ) {
 	// Attributes.
 	lines.push( '## Attributes' );
 	lines.push( '' );
+	lines.push(
+		'_Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._'
+	);
+	lines.push( '' );
 	lines.push( formatAttributesTable( attributes ) );
 	lines.push( '' );
 
 	// Supports.
 	lines.push( '## Supports' );
+	lines.push( '' );
+	lines.push(
+		'_Defined via the [`supports`](/block-editor/reference-guides/block-api/block-supports/) property in block.json._'
+	);
 	lines.push( '' );
 	lines.push( formatSupports( supports ) );
 	lines.push( '' );
@@ -536,6 +551,10 @@ function generateBlockApiSection( blockDir ) {
 	const contextSection = formatContext( usesContext, providesContext );
 	if ( contextSection ) {
 		lines.push( '## Context' );
+		lines.push( '' );
+		lines.push(
+			'_Defined via the [`usesContext` and `providesContext`](/block-editor/reference-guides/block-api/block-context/) properties in block.json._'
+		);
 		lines.push( '' );
 		lines.push( contextSection );
 		lines.push( '' );
@@ -546,6 +565,10 @@ function generateBlockApiSection( blockDir ) {
 	if ( stylesSection ) {
 		lines.push( '## Block Styles' );
 		lines.push( '' );
+		lines.push(
+			'_Defined via the [`styles`](/block-editor/reference-guides/block-api/block-styles/) property in block.json._'
+		);
+		lines.push( '' );
 		lines.push( stylesSection );
 		lines.push( '' );
 	}
@@ -554,6 +577,10 @@ function generateBlockApiSection( blockDir ) {
 	const selectorsSection = formatSelectors( selectors );
 	if ( selectorsSection ) {
 		lines.push( '## CSS Selectors' );
+		lines.push( '' );
+		lines.push(
+			'_Defined via the [`selectors`](/block-editor/reference-guides/block-api/block-selectors/) property in block.json._'
+		);
 		lines.push( '' );
 		lines.push( selectorsSection );
 		lines.push( '' );
@@ -564,17 +591,17 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '' );
 	if ( blockType === 'dynamic' ) {
 		lines.push(
-			'This is a **dynamic block**. It is rendered on the server and does not save HTML in post content.'
+			'This is a [**dynamic block**](/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.'
 		);
 		lines.push( '' );
 		lines.push( 'In post content, it is stored as a block comment:' );
 	} else if ( blockType === 'hybrid' ) {
 		lines.push(
-			'This is a **hybrid block**. It saves static markup that the server may enhance during rendering.'
+			'This is a [**hybrid block**](/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.'
 		);
 	} else {
 		lines.push(
-			'This is a **static block**. The markup is saved directly in the post content.'
+			'This is a [**static block**](/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.'
 		);
 	}
 	lines.push( '' );
@@ -589,7 +616,7 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '## Source' );
 	lines.push( '' );
 	lines.push(
-		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json)`
+		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](/block-editor/reference-guides/block-api/block-metadata/))`
 	);
 	if ( files.hasEditJs ) {
 		lines.push(
