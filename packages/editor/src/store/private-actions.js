@@ -688,12 +688,7 @@ export const restoreRevision =
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n(
-					getDateSettings().formats.datetime,
-					// Template revisions use the template REST API format, which
-					// exposes 'modified' instead of 'date'.
-					revisionKey === 'wp_id' ? revision.modified : revision.date
-				)
+				dateI18n( getDateSettings().formats.datetime, revision.date )
 			),
 			{
 				type: 'snackbar',

@@ -282,11 +282,11 @@ const SiteLogo = ( {
 		),
 		{
 			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
 				<a
 					href={ siteIconSettingsUrl }
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener"
 				/>
 			),
 		}

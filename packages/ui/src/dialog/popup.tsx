@@ -24,6 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
 		className,
+		container,
 		size = 'medium',
 		initialFocus,
 		finalFocus,
@@ -39,7 +40,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 
 	return (
-		<_Dialog.Portal>
+		<_Dialog.Portal container={ container }>
 			<_Dialog.Backdrop className={ styles.backdrop } />
 			<ThemeProvider>
 				<_Dialog.Popup

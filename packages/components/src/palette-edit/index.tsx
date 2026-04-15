@@ -299,6 +299,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
 	const elementsReferenceRef = useRef< T[] >( undefined );
 	useEffect( () => {
+		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 

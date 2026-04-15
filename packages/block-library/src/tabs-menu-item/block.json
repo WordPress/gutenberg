@@ -17,12 +17,6 @@
 		"core/tabs-menu-item-id",
 		"core/tabs-menu-item-label"
 	],
-	"attributes": {
-		"anchor": {
-			"type": "string",
-			"default": ""
-		}
-	},
 	"supports": {
 		"html": false,
 		"reusable": false,
