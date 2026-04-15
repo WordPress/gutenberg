@@ -220,3 +220,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/guidelines/load.php';
 	require __DIR__ . '/experimental/guidelines/index.php';
 }
+
+// Entities (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-entities' ) ) {
+	require __DIR__ . '/experimental/entities/load.php';
+}
