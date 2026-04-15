@@ -1,3 +1,10 @@
+// Reset the browser's default `padding-inline-start: 40px` on `<ol>`.
+// Using `:where` keeps specificity at 0 so global styles, theme.json,
+// and inspector controls can override it without difficulty.
+:where(.wp-block-latest-comments) {
+	padding: 0;
+}
+
 // Lower specificity - target list element.
 ol.wp-block-latest-comments {
 	// Removes left spacing in Customizer Widgets screen.
