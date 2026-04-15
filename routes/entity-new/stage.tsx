@@ -258,7 +258,7 @@ function EntityNew() {
 				</HStack>
 			}
 		>
-			<div style={ { maxWidth: 800, padding: 16 } }>
+			<div style={ { padding: 16 } }>
 				<VStack spacing={ 4 }>
 					<Panel>
 						<PanelBody title={ __( 'General' ) } initialOpen>
