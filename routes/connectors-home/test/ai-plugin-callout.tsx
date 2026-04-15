@@ -106,6 +106,8 @@ type StoreState = {
 };
 
 const mockSaveEntityRecord = jest.fn();
+const mockCreateSuccessNotice = jest.fn();
+const mockCreateErrorNotice = jest.fn();
 
 describe( 'AiPluginCallout', () => {
 	let storeState: StoreState;
@@ -157,8 +159,12 @@ describe( 'AiPluginCallout', () => {
 
 		mockSaveEntityRecord.mockReset();
 		mockSaveEntityRecord.mockResolvedValue( undefined );
+		mockCreateSuccessNotice.mockReset();
+		mockCreateErrorNotice.mockReset();
 		( useDispatch as jest.Mock ).mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
+			createSuccessNotice: mockCreateSuccessNotice,
+			createErrorNotice: mockCreateErrorNotice,
 		} );
 	} );
 
