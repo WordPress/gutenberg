@@ -29,8 +29,12 @@ export default function useTabMenuSync( {
 	tabPanelClientId,
 	tabsMenuClientId,
 } ) {
-	const { removeBlock, insertBlock, replaceInnerBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		removeBlock,
+		insertBlock,
+		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
@@ -81,6 +85,7 @@ export default function useTabMenuSync( {
 					} )
 					.filter( Boolean );
 				if ( reorderedTabs.length === tabs.length ) {
+					__unstableMarkNextChangeAsNotPersistent();
 					replaceInnerBlocks(
 						tabPanelClientId,
 						reorderedTabs,
@@ -129,29 +134,41 @@ export default function useTabMenuSync( {
 		);
 
 		if ( tabCountChange < 0 ) {
-			// Remove the menu item at the same position as the deleted tab.
-			const removedIndex = prevTabs.findIndex(
-				( t ) => ! currentTabIds.has( t.clientId )
-			);
-			if ( removedIndex >= 0 && menuItems[ removedIndex ] ) {
-				removeBlock( menuItems[ removedIndex ].clientId, false );
-				prevSyncStateRef.current.menuItems =
-					prevSyncStateRef.current.menuItems.filter(
-						( _, i ) => i !== removedIndex
-					);
-			}
+			// Remove the menu item at the same position as each deleted tab.
+			const removedIndices = prevTabs
+				.map( ( t, i ) =>
+					! currentTabIds.has( t.clientId ) ? i : -1
+				)
+				.filter( ( i ) => i !== -1 );
+			const removedSet = new Set( removedIndices );
+			removedIndices.forEach( ( removedIndex ) => {
+				if ( menuItems[ removedIndex ] ) {
+					__unstableMarkNextChangeAsNotPersistent();
+					removeBlock( menuItems[ removedIndex ].clientId, false );
+				}
+			} );
+			prevSyncStateRef.current.menuItems =
+				prevSyncStateRef.current.menuItems.filter(
+					( _, i ) => ! removedSet.has( i )
+				);
 		} else if ( menuItemCountChange < 0 ) {
-			// Remove the tab at the same position as the deleted menu item.
-			const removedIndex = prevMenuItems.findIndex(
-				( m ) => ! currentMenuItemIds.has( m.clientId )
-			);
-			if ( removedIndex >= 0 && tabs[ removedIndex ] ) {
-				removeBlock( tabs[ removedIndex ].clientId, false );
-				prevSyncStateRef.current.tabs =
-					prevSyncStateRef.current.tabs.filter(
-						( _, i ) => i !== removedIndex
-					);
-			}
+			// Remove the tab at the same position as each deleted menu item.
+			const removedIndices = prevMenuItems
+				.map( ( m, i ) =>
+					! currentMenuItemIds.has( m.clientId ) ? i : -1
+				)
+				.filter( ( i ) => i !== -1 );
+			const removedSet = new Set( removedIndices );
+			removedIndices.forEach( ( removedIndex ) => {
+				if ( tabs[ removedIndex ] ) {
+					__unstableMarkNextChangeAsNotPersistent();
+					removeBlock( tabs[ removedIndex ].clientId, false );
+				}
+			} );
+			prevSyncStateRef.current.tabs =
+				prevSyncStateRef.current.tabs.filter(
+					( _, i ) => ! removedSet.has( i )
+				);
 		} else if ( tabsInserted ) {
 			// A tab was pasted or duplicated — insert a matching menu item at
 			// the same position.
@@ -164,6 +181,7 @@ export default function useTabMenuSync( {
 					'core/tabs-menu-item',
 					{}
 				);
+				__unstableMarkNextChangeAsNotPersistent();
 				insertBlock(
 					newMenuItemBlock,
 					tabIndex,
@@ -189,6 +207,7 @@ export default function useTabMenuSync( {
 					tabs[ menuItemIndex ]?.attributes?.label ??
 					'';
 				const newTabBlock = createBlock( 'core/tab', { label } );
+				__unstableMarkNextChangeAsNotPersistent();
 				insertBlock(
 					newTabBlock,
 					menuItemIndex,
@@ -206,6 +225,7 @@ export default function useTabMenuSync( {
 		removeBlock,
 		insertBlock,
 		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 		tabsMenuClientId,
 		tabPanelClientId,
 	] );

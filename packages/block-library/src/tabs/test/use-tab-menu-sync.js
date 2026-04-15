@@ -70,16 +70,19 @@ function renderSync( initialProps ) {
 let removeBlock;
 let insertBlock;
 let replaceInnerBlocks;
+let __unstableMarkNextChangeAsNotPersistent;
 
 beforeEach( () => {
 	removeBlock = jest.fn();
 	insertBlock = jest.fn();
 	replaceInnerBlocks = jest.fn();
+	__unstableMarkNextChangeAsNotPersistent = jest.fn();
 
 	useDispatch.mockReturnValue( {
 		removeBlock,
 		insertBlock,
 		replaceInnerBlocks,
+		__unstableMarkNextChangeAsNotPersistent,
 	} );
 
 	createBlock.mockImplementation( ( name, attributes ) => ( {
@@ -178,6 +181,72 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			expect( removeBlock ).toHaveBeenCalledTimes( 1 );
+			expect( removeBlock ).toHaveBeenCalledWith( 't2', false );
+			expect( insertBlock ).not.toHaveBeenCalled();
+		} );
+
+		it( 'removes all orphaned menu items when multiple tabs are deleted at once', () => {
+			const tabs = [
+				makeTab( 't1', 'Tab 1' ),
+				makeTab( 't2', 'Tab 2' ),
+				makeTab( 't3', 'Tab 3' ),
+			];
+			const menuItems = [
+				makeMenuItem( 'm1' ),
+				makeMenuItem( 'm2' ),
+				makeMenuItem( 'm3' ),
+			];
+
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			// Tabs at index 0 and 1 ('t1', 't2') are deleted simultaneously.
+			rerender( {
+				tabs: [ makeTab( 't3', 'Tab 3' ) ],
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( removeBlock ).toHaveBeenCalledTimes( 2 );
+			expect( removeBlock ).toHaveBeenCalledWith( 'm1', false );
+			expect( removeBlock ).toHaveBeenCalledWith( 'm2', false );
+			expect( insertBlock ).not.toHaveBeenCalled();
+		} );
+
+		it( 'removes all orphaned tabs when multiple menu items are deleted at once', () => {
+			const tabs = [
+				makeTab( 't1', 'Tab 1' ),
+				makeTab( 't2', 'Tab 2' ),
+				makeTab( 't3', 'Tab 3' ),
+			];
+			const menuItems = [
+				makeMenuItem( 'm1' ),
+				makeMenuItem( 'm2' ),
+				makeMenuItem( 'm3' ),
+			];
+
+			const { rerender } = renderSync( {
+				tabs,
+				menuItems,
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			// Menu items at index 0 and 1 ('m1', 'm2') are deleted simultaneously.
+			rerender( {
+				tabs,
+				menuItems: [ makeMenuItem( 'm3' ) ],
+				tabPanelClientId: PANEL,
+				tabsMenuClientId: MENU,
+			} );
+
+			expect( removeBlock ).toHaveBeenCalledTimes( 2 );
+			expect( removeBlock ).toHaveBeenCalledWith( 't1', false );
 			expect( removeBlock ).toHaveBeenCalledWith( 't2', false );
 			expect( insertBlock ).not.toHaveBeenCalled();
 		} );
