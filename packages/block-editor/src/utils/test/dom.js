@@ -8,6 +8,19 @@ import {
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
 } from '../dom';
 
+function mockVisibleBoundingClientRect( element ) {
+	element.getBoundingClientRect = jest.fn().mockReturnValue( {
+		left: 0,
+		top: 0,
+		right: 100,
+		bottom: 20,
+		width: 100,
+		height: 20,
+		x: 0,
+		y: 0,
+	} );
+}
+
 describe( 'dom', () => {
 	describe( 'isElementVisible', () => {
 		it( 'returns false for @wordpress/components VisuallyHidden', () => {
@@ -17,6 +30,7 @@ describe( 'dom', () => {
 				</WCVisuallyHidden>
 			);
 			const element = screen.getByTestId( 'components-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
 			expect( isElementVisible( element ) ).toBe( false );
 		} );
 
@@ -27,6 +41,7 @@ describe( 'dom', () => {
 				</VisuallyHidden>
 			);
 			const element = screen.getByTestId( 'ui-visually-hidden' );
+			mockVisibleBoundingClientRect( element );
 			expect( isElementVisible( element ) ).toBe( false );
 		} );
 	} );
