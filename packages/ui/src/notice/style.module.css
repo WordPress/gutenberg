@@ -64,7 +64,6 @@
 
 	.action-link {
 		flex-shrink: 0;
-		margin-block: auto;
 
 		/* Add more horizontal space when following another action link/button */
 		&:not(:first-child) {
@@ -121,6 +120,11 @@
 }
 
 @layer wp-ui-compositions {
+	/* Override `Text` margin */
+	.action-link {
+		margin-block: auto;
+	}
+
 	/* Add partial transparency to CloseIcon and outline/minimal ActionButton
 	 * for a better look over tinted backgrounds */
 	.close-icon,
