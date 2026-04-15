@@ -71,6 +71,13 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 						>
 							{ item.label }
 						</Text>
+						<Text
+							variant="body-lg"
+							aria-hidden="true"
+							className="admin-ui-breadcrumbs__separator"
+						>
+							/
+						</Text>
 					</li>
 				) ) }
 				<li>

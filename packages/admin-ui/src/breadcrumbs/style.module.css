@@ -11,10 +11,8 @@
 		white-space: nowrap;
 	}
 
-	li:not(:last-child)::after {
-		content: "/";
-		margin: 0 var(--wpds-dimension-gap-sm);
+	.admin-ui-breadcrumbs__separator {
 		color: var(--wpds-color-stroke-surface-neutral);
-		font-weight: var(--wpds-typography-font-weight-regular);
+		margin: 0 var(--wpds-dimension-gap-sm);
 	}
 }
