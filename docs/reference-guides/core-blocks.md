@@ -10,7 +10,7 @@ This page lists the blocks included in the block-library package.
 
 ## Accordion
 
-Displays a foldable layout that groups content in collapsible sections. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion))
+Displays a foldable layout that groups content in collapsible sections.
 
 -	**Name:** [core/accordion](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -20,7 +20,7 @@ Displays a foldable layout that groups content in collapsible sections. ([Source
 
 ## Accordion Heading
 
-Displays a heading that toggles the accordion panel. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-heading))
+Displays a heading that toggles the accordion panel.
 
 -	**Name:** [core/accordion-heading](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-heading/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -30,7 +30,7 @@ Displays a heading that toggles the accordion panel. ([Source](https://github.co
 
 ## Accordion Item
 
-Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-item))
+Wraps the heading and panel in one unit.
 
 -	**Name:** [core/accordion-item](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-item/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -41,7 +41,7 @@ Wraps the heading and panel in one unit. ([Source](https://github.com/WordPress/
 
 ## Accordion Panel
 
-Contains the hidden or revealed content beneath the heading. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/accordion-panel))
+Contains the hidden or revealed content beneath the heading.
 
 -	**Name:** [core/accordion-panel](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-panel/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -51,7 +51,7 @@ Contains the hidden or revealed content beneath the heading. ([Source](https://g
 
 ## Archives
 
-Display a date archive of your posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/archives))
+Display a date archive of your posts.
 
 -	**Name:** [core/archives](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-archives/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -60,7 +60,7 @@ Display a date archive of your posts. ([Source](https://github.com/WordPress/gut
 
 ## Audio
 
-Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/audio))
+Embed a simple audio player.
 
 -	**Name:** [core/audio](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-audio/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -69,7 +69,7 @@ Embed a simple audio player. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Avatar
 
-Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/avatar))
+Add a user’s avatar.
 
 -	**Name:** [core/avatar](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -78,7 +78,7 @@ Add a user’s avatar. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 ## Pattern
 
-Reuse this design across your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/block))
+Reuse this design across your site.
 
 -	**Name:** [core/block](/block-editor/reference-guides/core-blocks/core-blocks-reusable/core-block-block/)
 -	**Category:** [reusable](/block-editor/reference-guides/core-blocks/core-blocks-reusable/)
@@ -87,7 +87,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 ## Breadcrumbs
 
-Display a breadcrumb trail showing the path to the current page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs))
+Display a breadcrumb trail showing the path to the current page.
 
 -	**Name:** [core/breadcrumbs](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-breadcrumbs/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -96,7 +96,7 @@ Display a breadcrumb trail showing the path to the current page. ([Source](https
 
 ## Button
 
-Prompt visitors to take action with a button-style link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/button))
+Prompt visitors to take action with a button-style link.
 
 -	**Name:** [core/button](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -106,7 +106,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 
 ## Buttons
 
-Prompt visitors to take action with a group of button-style links. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/buttons))
+Prompt visitors to take action with a group of button-style links.
 
 -	**Name:** [core/buttons](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -115,7 +115,7 @@ Prompt visitors to take action with a group of button-style links. ([Source](htt
 
 ## Calendar
 
-A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/calendar))
+A calendar of your site’s posts.
 
 -	**Name:** [core/calendar](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-calendar/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -124,7 +124,7 @@ A calendar of your site’s posts. ([Source](https://github.com/WordPress/gutenb
 
 ## Terms List
 
-Display a list of all terms of a given taxonomy. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/categories))
+Display a list of all terms of a given taxonomy.
 
 -	**Name:** [core/categories](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-categories/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -133,7 +133,7 @@ Display a list of all terms of a given taxonomy. ([Source](https://github.com/Wo
 
 ## Code
 
-Display code snippets that respect your spacing and tabs. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/code))
+Display code snippets that respect your spacing and tabs.
 
 -	**Name:** [core/code](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-code/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -142,7 +142,7 @@ Display code snippets that respect your spacing and tabs. ([Source](https://gith
 
 ## Column
 
-A single column within a columns block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/column))
+A single column within a columns block.
 
 -	**Name:** [core/column](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-column/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -152,7 +152,7 @@ A single column within a columns block. ([Source](https://github.com/WordPress/g
 
 ## Columns
 
-Display content in multiple columns, with blocks added to each column. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/columns))
+Display content in multiple columns, with blocks added to each column.
 
 -	**Name:** [core/columns](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -162,7 +162,7 @@ Display content in multiple columns, with blocks added to each column. ([Source]
 
 ## Comment Author Avatar (deprecated)
 
-This block is deprecated. Please use the Avatar block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-avatar))
+This block is deprecated. Please use the Avatar block instead.
 
 -	**Name:** [core/comment-author-avatar](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-avatar/)
 -	**Experimental:** fse
@@ -173,7 +173,7 @@ This block is deprecated. Please use the Avatar block instead. ([Source](https:/
 
 ## Comment Author Name
 
-Displays the name of the author of the comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-author-name))
+Displays the name of the author of the comment.
 
 -	**Name:** [core/comment-author-name](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-name/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -183,7 +183,7 @@ Displays the name of the author of the comment. ([Source](https://github.com/Wor
 
 ## Comment Content
 
-Displays the contents of a comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-content))
+Displays the contents of a comment.
 
 -	**Name:** [core/comment-content](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-content/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -192,7 +192,7 @@ Displays the contents of a comment. ([Source](https://github.com/WordPress/guten
 
 ## Comment Date
 
-Displays the date on which the comment was posted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-date))
+Displays the date on which the comment was posted.
 
 -	**Name:** [core/comment-date](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-date/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -202,7 +202,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 
 ## Comment Edit Link
 
-Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-edit-link))
+Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.
 
 -	**Name:** [core/comment-edit-link](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-edit-link/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -212,7 +212,7 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 
 ## Comment Reply Link
 
-Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-reply-link))
+Displays a link to reply to a comment.
 
 -	**Name:** [core/comment-reply-link](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-reply-link/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -221,7 +221,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 
 ## Comment Template
 
-Contains the block elements used to display a comment, like the title, date, author, avatar and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comment-template))
+Contains the block elements used to display a comment, like the title, date, author, avatar and more.
 
 -	**Name:** [core/comment-template](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-comment-template/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -230,7 +230,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 
 ## Comments
 
-An advanced block that allows displaying post comments using different visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments))
+An advanced block that allows displaying post comments using different visual configurations.
 
 -	**Name:** [core/comments](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -239,7 +239,7 @@ An advanced block that allows displaying post comments using different visual co
 
 ## Comments Pagination
 
-Displays a paginated navigation to next/previous set of comments, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination))
+Displays a paginated navigation to next/previous set of comments, when applicable.
 
 -	**Name:** [core/comments-pagination](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -250,7 +250,7 @@ Displays a paginated navigation to next/previous set of comments, when applicabl
 
 ## Comments Next Page
 
-Displays the next comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-next))
+Displays the next comment's page link.
 
 -	**Name:** [core/comments-pagination-next](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-next/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -260,7 +260,7 @@ Displays the next comment's page link. ([Source](https://github.com/WordPress/gu
 
 ## Comments Page Numbers
 
-Displays a list of page numbers for comments pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-numbers))
+Displays a list of page numbers for comments pagination.
 
 -	**Name:** [core/comments-pagination-numbers](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-numbers/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -269,7 +269,7 @@ Displays a list of page numbers for comments pagination. ([Source](https://githu
 
 ## Comments Previous Page
 
-Displays the previous comment's page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-pagination-previous))
+Displays the previous comment's page link.
 
 -	**Name:** [core/comments-pagination-previous](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination-previous/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -279,7 +279,7 @@ Displays the previous comment's page link. ([Source](https://github.com/WordPres
 
 ## Comments Title
 
-Displays a title with the number of comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/comments-title))
+Displays a title with the number of comments.
 
 -	**Name:** [core/comments-title](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-title/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -289,7 +289,7 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 
 ## Cover
 
-Add an image or video with a text overlay. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/cover))
+Add an image or video with a text overlay.
 
 -	**Name:** [core/cover](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -298,7 +298,7 @@ Add an image or video with a text overlay. ([Source](https://github.com/WordPres
 
 ## Details
 
-Hide and show additional content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/details))
+Hide and show additional content.
 
 -	**Name:** [core/details](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-details/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -307,7 +307,7 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 
 ## Embed
 
-Add a block that displays content pulled from other sites, like Twitter or YouTube. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/embed))
+Add a block that displays content pulled from other sites, like Twitter or YouTube.
 
 -	**Name:** [core/embed](/block-editor/reference-guides/core-blocks/core-blocks-embed/core-block-embed/)
 -	**Category:** [embed](/block-editor/reference-guides/core-blocks/core-blocks-embed/)
@@ -316,7 +316,7 @@ Add a block that displays content pulled from other sites, like Twitter or YouTu
 
 ## File
 
-Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/file))
+Add a link to a downloadable file.
 
 -	**Name:** [core/file](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-file/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -325,7 +325,7 @@ Add a link to a downloadable file. ([Source](https://github.com/WordPress/gutenb
 
 ## Footnotes
 
-Display footnotes added to the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/footnotes))
+Display footnotes added to the page.
 
 -	**Name:** [core/footnotes](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-footnotes/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -333,7 +333,7 @@ Display footnotes added to the page. ([Source](https://github.com/WordPress/gute
 
 ## Form
 
-A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form))
+A form.
 
 -	**Name:** [core/form](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form/)
 -	**Experimental:** true
@@ -344,7 +344,7 @@ A form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/blo
 
 ## Input Field
 
-The basic building block for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input))
+The basic building block for forms.
 
 -	**Name:** [core/form-input](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-input/)
 -	**Experimental:** true
@@ -355,7 +355,7 @@ The basic building block for forms. ([Source](https://github.com/WordPress/guten
 
 ## Form Submission Notification
 
-Provide a notification message after the form has been submitted. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submission-notification))
+Provide a notification message after the form has been submitted.
 
 -	**Name:** [core/form-submission-notification](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submission-notification/)
 -	**Experimental:** true
@@ -365,7 +365,7 @@ Provide a notification message after the form has been submitted. ([Source](http
 
 ## Form Submit Button
 
-A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-submit-button))
+A submission button for forms.
 
 -	**Name:** [core/form-submit-button](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submit-button/)
 -	**Experimental:** true
@@ -375,7 +375,7 @@ A submission button for forms. ([Source](https://github.com/WordPress/gutenberg/
 
 ## Classic
 
-Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/freeform))
+Use the classic WordPress editor.
 
 -	**Name:** [core/freeform](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-freeform/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -384,7 +384,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 ## Gallery
 
-Display multiple images in a rich gallery. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/gallery))
+Display multiple images in a rich gallery.
 
 -	**Name:** [core/gallery](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-gallery/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -394,7 +394,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 
 ## Group
 
-Gather blocks in a layout container. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/group))
+Gather blocks in a layout container.
 
 -	**Name:** [core/group](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -403,7 +403,7 @@ Gather blocks in a layout container. ([Source](https://github.com/WordPress/gute
 
 ## Heading
 
-Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/heading))
+Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.
 
 -	**Name:** [core/heading](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -412,7 +412,7 @@ Introduce new sections and organize content to help visitors (and search engines
 
 ## Home Link
 
-Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/home-link))
+Create a link that always points to the homepage of the site. Usually not necessary if there is already a site title link present in the header.
 
 -	**Name:** [core/home-link](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-home-link/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -422,7 +422,7 @@ Create a link that always points to the homepage of the site. Usually not necess
 
 ## Custom HTML
 
-Add custom HTML code and preview it as you edit. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/html))
+Add custom HTML code and preview it as you edit.
 
 -	**Name:** [core/html](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-html/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -431,7 +431,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 
 ## Icon
 
-Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/icon))
+Insert an SVG icon.
 
 -	**Name:** [core/icon](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -440,7 +440,7 @@ Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 
 ## Image
 
-Insert an image to make a visual statement. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/image))
+Insert an image to make a visual statement.
 
 -	**Name:** [core/image](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -449,7 +449,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 
 ## Latest Comments
 
-Display a list of your most recent comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-comments))
+Display a list of your most recent comments.
 
 -	**Name:** [core/latest-comments](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-comments/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -458,7 +458,7 @@ Display a list of your most recent comments. ([Source](https://github.com/WordPr
 
 ## Latest Posts
 
-Display a list of your most recent posts. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-posts))
+Display a list of your most recent posts.
 
 -	**Name:** [core/latest-posts](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -467,7 +467,7 @@ Display a list of your most recent posts. ([Source](https://github.com/WordPress
 
 ## List
 
-An organized collection of items displayed in a specific order. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list))
+An organized collection of items displayed in a specific order.
 
 -	**Name:** [core/list](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -477,7 +477,7 @@ An organized collection of items displayed in a specific order. ([Source](https:
 
 ## List Item
 
-An individual item within a list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/list-item))
+An individual item within a list.
 
 -	**Name:** [core/list-item](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list-item/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -488,7 +488,7 @@ An individual item within a list. ([Source](https://github.com/WordPress/gutenbe
 
 ## Login/out
 
-Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/loginout))
+Show login & logout links.
 
 -	**Name:** [core/loginout](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -497,7 +497,7 @@ Show login & logout links. ([Source](https://github.com/WordPress/gutenberg/tree
 
 ## Math
 
-Display mathematical notation using LaTeX. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/math))
+Display mathematical notation using LaTeX.
 
 -	**Name:** [core/math](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-math/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -506,7 +506,7 @@ Display mathematical notation using LaTeX. ([Source](https://github.com/WordPres
 
 ## Media & Text
 
-Set media and words side-by-side for a richer layout. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/media-text))
+Set media and words side-by-side for a richer layout.
 
 -	**Name:** [core/media-text](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-media-text/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
@@ -515,7 +515,7 @@ Set media and words side-by-side for a richer layout. ([Source](https://github.c
 
 ## Unsupported
 
-Your site doesn’t include support for this block. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/missing))
+Your site doesn’t include support for this block.
 
 -	**Name:** [core/missing](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-missing/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -524,7 +524,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 ## More
 
-Content before this block will be shown in the excerpt on your archives page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/more))
+Content before this block will be shown in the excerpt on your archives page.
 
 -	**Name:** [core/more](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-more/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -533,7 +533,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
 
 ## Navigation
 
-A collection of blocks that allow visitors to get around your site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation))
+A collection of blocks that allow visitors to get around your site.
 
 -	**Name:** [core/navigation](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -543,7 +543,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 
 ## Custom Link
 
-Add a page, link, or another item to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-link))
+Add a page, link, or another item to your navigation.
 
 -	**Name:** [core/navigation-link](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -554,7 +554,7 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 
 ## Navigation Overlay Close
 
-A customizable button to close overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-overlay-close))
+A customizable button to close overlays.
 
 -	**Name:** [core/navigation-overlay-close](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-overlay-close/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -563,7 +563,7 @@ A customizable button to close overlays. ([Source](https://github.com/WordPress/
 
 ## Submenu
 
-Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-submenu))
+Add a submenu to your navigation.
 
 -	**Name:** [core/navigation-submenu](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -573,7 +573,7 @@ Add a submenu to your navigation. ([Source](https://github.com/WordPress/gutenbe
 
 ## Page Break
 
-Separate your content into a multi-page experience. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/nextpage))
+Separate your content into a multi-page experience.
 
 -	**Name:** [core/nextpage](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-nextpage/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -582,7 +582,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 
 ## Page List
 
-Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list))
+Display a list of all pages.
 
 -	**Name:** [core/page-list](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -592,7 +592,7 @@ Display a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tr
 
 ## Page List Item
 
-Displays a page inside a list of all pages. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/page-list-item))
+Displays a page inside a list of all pages.
 
 -	**Name:** [core/page-list-item](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -602,7 +602,7 @@ Displays a page inside a list of all pages. ([Source](https://github.com/WordPre
 
 ## Paragraph
 
-Start with the basic building block of all narrative. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/paragraph))
+Start with the basic building block of all narrative.
 
 -	**Name:** [core/paragraph](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -611,7 +611,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 ## Pattern Placeholder
 
-Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern))
+Show a block pattern.
 
 -	**Name:** [core/pattern](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-pattern/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -620,7 +620,7 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 ## Playlist
 
-Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist))
+Embed a simple playlist.
 
 -	**Name:** [core/playlist](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
 -	**Experimental:** true
@@ -631,7 +631,7 @@ Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/t
 
 ## Playlist track
 
-Playlist track. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist-track))
+Playlist track.
 
 -	**Name:** [core/playlist-track](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist-track/)
 -	**Experimental:** true
@@ -642,7 +642,7 @@ Playlist track. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pack
 
 ## Author (deprecated)
 
-This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
+This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead.
 
 -	**Name:** [core/post-author](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -651,7 +651,7 @@ This block is deprecated. Please use the Avatar block, the Author Name block, an
 
 ## Author Biography
 
-The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-biography))
+The author biography.
 
 -	**Name:** [core/post-author-biography](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-biography/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -659,7 +659,7 @@ The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 ## Author Name
 
-The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author-name))
+The author name.
 
 -	**Name:** [core/post-author-name](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-name/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -668,7 +668,7 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 ## Comment (deprecated)
 
-This block is deprecated. Please use the Comments block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment))
+This block is deprecated. Please use the Comments block instead.
 
 -	**Name:** [core/post-comment](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comment/)
 -	**Experimental:** fse
@@ -679,7 +679,7 @@ This block is deprecated. Please use the Comments block instead. ([Source](https
 
 ## Comments Count
 
-Display a post's comments count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-count))
+Display a post's comments count.
 
 -	**Name:** [core/post-comments-count](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-count/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -687,7 +687,7 @@ Display a post's comments count. ([Source](https://github.com/WordPress/gutenber
 
 ## Comments Form
 
-Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-form))
+Display a post's comments form.
 
 -	**Name:** [core/post-comments-form](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-form/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -695,7 +695,7 @@ Display a post's comments form. ([Source](https://github.com/WordPress/gutenberg
 
 ## Comments Link
 
-Displays the link to the current post comments. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comments-link))
+Displays the link to the current post comments.
 
 -	**Name:** [core/post-comments-link](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-link/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -703,7 +703,7 @@ Displays the link to the current post comments. ([Source](https://github.com/Wor
 
 ## Content
 
-Displays the contents of a post or page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-content))
+Displays the contents of a post or page.
 
 -	**Name:** [core/post-content](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-content/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -712,7 +712,7 @@ Displays the contents of a post or page. ([Source](https://github.com/WordPress/
 
 ## Date
 
-Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-date))
+Display a custom date.
 
 -	**Name:** [core/post-date](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-date/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -721,7 +721,7 @@ Display a custom date. ([Source](https://github.com/WordPress/gutenberg/tree/tru
 
 ## Excerpt
 
-Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt))
+Display the excerpt.
 
 -	**Name:** [core/post-excerpt](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-excerpt/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -730,7 +730,7 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 ## Featured Image
 
-Display a post's featured image. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-featured-image))
+Display a post's featured image.
 
 -	**Name:** [core/post-featured-image](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-featured-image/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -739,7 +739,7 @@ Display a post's featured image. ([Source](https://github.com/WordPress/gutenber
 
 ## Post Navigation Link
 
-Displays the next or previous post link that is adjacent to the current post. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-navigation-link))
+Displays the next or previous post link that is adjacent to the current post.
 
 -	**Name:** [core/post-navigation-link](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-navigation-link/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -748,7 +748,7 @@ Displays the next or previous post link that is adjacent to the current post. ([
 
 ## Post Template
 
-Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-template))
+Contains the block elements used to render a post, like the title, date, featured image, content or excerpt, and more.
 
 -	**Name:** [core/post-template](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-template/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -757,7 +757,7 @@ Contains the block elements used to render a post, like the title, date, feature
 
 ## Post Terms
 
-Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-terms))
+Post terms.
 
 -	**Name:** [core/post-terms](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-terms/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -766,7 +766,7 @@ Post terms. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages
 
 ## Time to Read
 
-Show minutes required to finish reading the post. Can also show a word count. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-time-to-read))
+Show minutes required to finish reading the post. Can also show a word count.
 
 -	**Name:** [core/post-time-to-read](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-time-to-read/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -775,7 +775,7 @@ Show minutes required to finish reading the post. Can also show a word count. ([
 
 ## Title
 
-Displays the title of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-title))
+Displays the title of a post, page, or any other content-type.
 
 -	**Name:** [core/post-title](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-title/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -784,7 +784,7 @@ Displays the title of a post, page, or any other content-type. ([Source](https:/
 
 ## Preformatted
 
-Add text that respects your spacing and tabs, and also allows styling. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/preformatted))
+Add text that respects your spacing and tabs, and also allows styling.
 
 -	**Name:** [core/preformatted](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-preformatted/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -793,7 +793,7 @@ Add text that respects your spacing and tabs, and also allows styling. ([Source]
 
 ## Pullquote
 
-Give special visual emphasis to a quote from your text. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
+Give special visual emphasis to a quote from your text.
 
 -	**Name:** [core/pullquote](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -802,7 +802,7 @@ Give special visual emphasis to a quote from your text. ([Source](https://github
 
 ## Query Loop
 
-An advanced block that allows displaying post types based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query))
+An advanced block that allows displaying post types based on different query parameters and visual configurations.
 
 -	**Name:** [core/query](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -811,7 +811,7 @@ An advanced block that allows displaying post types based on different query par
 
 ## No Results
 
-Contains the block elements used to render content when no query results are found. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-no-results))
+Contains the block elements used to render content when no query results are found.
 
 -	**Name:** [core/query-no-results](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-no-results/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -820,7 +820,7 @@ Contains the block elements used to render content when no query results are fou
 
 ## Pagination
 
-Displays a paginated navigation to next/previous set of posts, when applicable. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination))
+Displays a paginated navigation to next/previous set of posts, when applicable.
 
 -	**Name:** [core/query-pagination](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -831,7 +831,7 @@ Displays a paginated navigation to next/previous set of posts, when applicable. 
 
 ## Next Page
 
-Displays the next posts page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-next))
+Displays the next posts page link.
 
 -	**Name:** [core/query-pagination-next](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-next/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -841,7 +841,7 @@ Displays the next posts page link. ([Source](https://github.com/WordPress/gutenb
 
 ## Page Numbers
 
-Displays a list of page numbers for pagination. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers))
+Displays a list of page numbers for pagination.
 
 -	**Name:** [core/query-pagination-numbers](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-numbers/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -851,7 +851,7 @@ Displays a list of page numbers for pagination. ([Source](https://github.com/Wor
 
 ## Previous Page
 
-Displays the previous posts page link. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-previous))
+Displays the previous posts page link.
 
 -	**Name:** [core/query-pagination-previous](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-previous/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -861,7 +861,7 @@ Displays the previous posts page link. ([Source](https://github.com/WordPress/gu
 
 ## Query Title
 
-Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title))
+Display the query title.
 
 -	**Name:** [core/query-title](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-title/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -870,7 +870,7 @@ Display the query title. ([Source](https://github.com/WordPress/gutenberg/tree/t
 
 ## Query Total
 
-Display the total number of results in a query. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-total))
+Display the total number of results in a query.
 
 -	**Name:** [core/query-total](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-total/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -880,7 +880,7 @@ Display the total number of results in a query. ([Source](https://github.com/Wor
 
 ## Quote
 
-Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/quote))
+Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
 
 -	**Name:** [core/quote](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -889,7 +889,7 @@ Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Ju
 
 ## Read More
 
-Displays the link of a post, page, or any other content-type. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/read-more))
+Displays the link of a post, page, or any other content-type.
 
 -	**Name:** [core/read-more](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-read-more/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -898,7 +898,7 @@ Displays the link of a post, page, or any other content-type. ([Source](https://
 
 ## RSS
 
-Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/rss))
+Display entries from any RSS or Atom feed.
 
 -	**Name:** [core/rss](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-rss/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -907,7 +907,7 @@ Display entries from any RSS or Atom feed. ([Source](https://github.com/WordPres
 
 ## Search
 
-Help visitors find your content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/search))
+Help visitors find your content.
 
 -	**Name:** [core/search](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -916,7 +916,7 @@ Help visitors find your content. ([Source](https://github.com/WordPress/gutenber
 
 ## Separator
 
-Create a break between ideas or sections with a horizontal separator. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/separator))
+Create a break between ideas or sections with a horizontal separator.
 
 -	**Name:** [core/separator](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-separator/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -925,7 +925,7 @@ Create a break between ideas or sections with a horizontal separator. ([Source](
 
 ## Shortcode
 
-Insert additional custom elements with a WordPress shortcode. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/shortcode))
+Insert additional custom elements with a WordPress shortcode.
 
 -	**Name:** [core/shortcode](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-shortcode/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -934,7 +934,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 ## Site Logo
 
-Display an image to represent this site. Update this block and the changes apply everywhere. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-logo))
+Display an image to represent this site. Update this block and the changes apply everywhere.
 
 -	**Name:** [core/site-logo](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-logo/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -943,7 +943,7 @@ Display an image to represent this site. Update this block and the changes apply
 
 ## Site Tagline
 
-Describe in a few words what this site is about. This is important for search results, sharing on social media, and gives overall clarity to visitors. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-tagline))
+Describe in a few words what this site is about. This is important for search results, sharing on social media, and gives overall clarity to visitors.
 
 -	**Name:** [core/site-tagline](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-tagline/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -952,7 +952,7 @@ Describe in a few words what this site is about. This is important for search re
 
 ## Site Title
 
-Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/site-title))
+Displays the name of this site. Update the block, and the changes apply everywhere it’s used. This will also appear in the browser title bar and in search results.
 
 -	**Name:** [core/site-title](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-title/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -961,7 +961,7 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 
 ## Social Icon
 
-Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))
+Display an icon linking to a social profile or site.
 
 -	**Name:** [core/social-link](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-link/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -971,7 +971,7 @@ Display an icon linking to a social profile or site. ([Source](https://github.co
 
 ## Social Icons
 
-Display icons linking to your social profiles or sites. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-links))
+Display icons linking to your social profiles or sites.
 
 -	**Name:** [core/social-links](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -981,7 +981,7 @@ Display icons linking to your social profiles or sites. ([Source](https://github
 
 ## Spacer
 
-Add white space between blocks and customize its height. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/spacer))
+Add white space between blocks and customize its height.
 
 -	**Name:** [core/spacer](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -990,7 +990,7 @@ Add white space between blocks and customize its height. ([Source](https://githu
 
 ## Tab
 
-Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
+Content for a tab in a tabbed interface.
 
 -	**Name:** [core/tab](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/)
 -	**Experimental:** true
@@ -1001,7 +1001,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 
 ## Tab Panel
 
-Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel))
+Container for tab panel content in a tabbed interface.
 
 -	**Name:** [core/tab-panel](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
 -	**Experimental:** true
@@ -1012,7 +1012,7 @@ Container for tab panel content in a tabbed interface. ([Source](https://github.
 
 ## Table
 
-Create structured content in rows and columns to display information. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table))
+Create structured content in rows and columns to display information.
 
 -	**Name:** [core/table](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-table/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -1021,7 +1021,7 @@ Create structured content in rows and columns to display information. ([Source](
 
 ## Table of Contents
 
-Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/table-of-contents))
+Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
 
 -	**Name:** [core/table-of-contents](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/)
 -	**Experimental:** true
@@ -1031,7 +1031,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 
 ## Tabs
 
-Display content in a tabbed interface to help users navigate detailed content with ease. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs))
+Display content in a tabbed interface to help users navigate detailed content with ease.
 
 -	**Name:** [core/tabs](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 -	**Experimental:** true
@@ -1042,7 +1042,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 
 ## Tabs Menu
 
-Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu))
+Display the tab buttons for a tabbed interface.
 
 -	**Name:** [core/tabs-menu](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/)
 -	**Experimental:** true
@@ -1053,7 +1053,7 @@ Display the tab buttons for a tabbed interface. ([Source](https://github.com/Wor
 
 ## Tab Menu Item
 
-A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
+A single tab button in the tabs menu.
 
 -	**Name:** [core/tabs-menu-item](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu-item/)
 -	**Experimental:** true
@@ -1063,7 +1063,7 @@ A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gut
 
 ## Tag Cloud
 
-A cloud of popular keywords, each sized by how often it appears. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tag-cloud))
+A cloud of popular keywords, each sized by how often it appears.
 
 -	**Name:** [core/tag-cloud](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-tag-cloud/)
 -	**Category:** [widgets](/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
@@ -1072,7 +1072,7 @@ A cloud of popular keywords, each sized by how often it appears. ([Source](https
 
 ## Template Part
 
-Edit the different global regions of your site, like the header, footer, sidebar, or create your own. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/template-part))
+Edit the different global regions of your site, like the header, footer, sidebar, or create your own.
 
 -	**Name:** [core/template-part](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-template-part/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1081,7 +1081,7 @@ Edit the different global regions of your site, like the header, footer, sidebar
 
 ## Term Count
 
-Displays the post count of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-count))
+Displays the post count of a taxonomy term.
 
 -	**Name:** [core/term-count](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-count/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1090,7 +1090,7 @@ Displays the post count of a taxonomy term. ([Source](https://github.com/WordPre
 
 ## Term Description
 
-Display the description of categories, tags and custom taxonomies when viewing an archive. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-description))
+Display the description of categories, tags and custom taxonomies when viewing an archive.
 
 -	**Name:** [core/term-description](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-description/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1098,7 +1098,7 @@ Display the description of categories, tags and custom taxonomies when viewing a
 
 ## Term Name
 
-Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-name))
+Displays the name of a taxonomy term.
 
 -	**Name:** [core/term-name](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-name/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1107,7 +1107,7 @@ Displays the name of a taxonomy term. ([Source](https://github.com/WordPress/gut
 
 ## Term Template
 
-Contains the block elements used to render a taxonomy term, like the name, description, and more. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/term-template))
+Contains the block elements used to render a taxonomy term, like the name, description, and more.
 
 -	**Name:** [core/term-template](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-term-template/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1116,7 +1116,7 @@ Contains the block elements used to render a taxonomy term, like the name, descr
 
 ## Terms Query
 
-An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/terms-query))
+An advanced block that allows displaying taxonomy terms based on different query parameters and visual configurations.
 
 -	**Name:** [core/terms-query](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-terms-query/)
 -	**Category:** [theme](/block-editor/reference-guides/core-blocks/core-blocks-theme/)
@@ -1125,7 +1125,7 @@ An advanced block that allows displaying taxonomy terms based on different query
 
 ## Text Columns (deprecated)
 
-This block is deprecated. Please use the Columns block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/text-columns))
+This block is deprecated. Please use the Columns block instead.
 
 -	**Name:** [core/text-columns](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-text-columns/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
@@ -1134,7 +1134,7 @@ This block is deprecated. Please use the Columns block instead. ([Source](https:
 
 ## Poetry
 
-Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/verse))
+Insert poetry. Use special spacing formats. Or quote song lyrics.
 
 -	**Name:** [core/verse](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-verse/)
 -	**Category:** [text](/block-editor/reference-guides/core-blocks/core-blocks-text/)
@@ -1143,7 +1143,7 @@ Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](http
 
 ## Video
 
-Embed a video from your media library or upload a new one. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/video))
+Embed a video from your media library or upload a new one.
 
 -	**Name:** [core/video](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-video/)
 -	**Category:** [media](/block-editor/reference-guides/core-blocks/core-blocks-media/)
