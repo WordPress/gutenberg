@@ -13,12 +13,12 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/avatar`
-- `core/comment-author-name`
-- `core/comment-content`
-- `core/comment-date`
-- `core/comment-edit-link`
-- `core/comment-reply-link`
+- [`core/avatar`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
+- [`core/comment-author-name`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-name/)
+- [`core/comment-content`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-content/)
+- [`core/comment-date`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-date/)
+- [`core/comment-edit-link`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-edit-link/)
+- [`core/comment-reply-link`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-reply-link/)
 
 ## Attributes
 

@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/list-item`
+- [`core/list-item`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list-item/)
 
 ## Attributes
 

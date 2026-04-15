@@ -13,12 +13,12 @@
 ## Block Relationships
 
 **Ancestor blocks:**
-- `core/query`
+- [`core/query`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 
 **Allowed inner blocks:**
-- `core/query-pagination-previous`
-- `core/query-pagination-numbers`
-- `core/query-pagination-next`
+- [`core/query-pagination-previous`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-previous/)
+- [`core/query-pagination-numbers`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-numbers/)
+- [`core/query-pagination-next`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-next/)
 
 ## Attributes
 

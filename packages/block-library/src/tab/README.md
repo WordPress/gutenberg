@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/tab-panel`
+- [`core/tab-panel`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
 
 ## Attributes
 

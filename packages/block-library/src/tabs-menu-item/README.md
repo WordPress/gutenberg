@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/tabs-menu`
+- [`core/tabs-menu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/)
 
 ## Attributes
 

@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Ancestor blocks:**
-- `core/comment-template`
+- [`core/comment-template`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-comment-template/)
 
 ## Attributes
 

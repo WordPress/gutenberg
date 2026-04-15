@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/query-pagination`
+- [`core/query-pagination`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination/)
 
 ## Attributes
 

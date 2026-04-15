@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/image`
+- [`core/image`](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-image/)
 
 ## Attributes
 

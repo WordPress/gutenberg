@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/navigation`
+- [`core/navigation`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
 
 ## Attributes
 

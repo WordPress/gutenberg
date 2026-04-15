@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/column`
+- [`core/column`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-column/)
 
 ## Attributes
 

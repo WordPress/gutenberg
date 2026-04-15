@@ -15,13 +15,13 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/paragraph`
-- `core/heading`
-- `core/form-input`
-- `core/form-submit-button`
-- `core/form-submission-notification`
-- `core/group`
-- `core/columns`
+- [`core/paragraph`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
+- [`core/heading`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
+- [`core/form-input`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-input/)
+- [`core/form-submit-button`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submit-button/)
+- [`core/form-submission-notification`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submission-notification/)
+- [`core/group`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
+- [`core/columns`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 
 ## Attributes
 

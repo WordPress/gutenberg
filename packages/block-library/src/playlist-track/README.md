@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/playlist`
+- [`core/playlist`](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist/)
 
 ## Attributes
 

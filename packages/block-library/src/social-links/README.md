@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/social-link`
+- [`core/social-link`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-link/)
 
 ## Attributes
 

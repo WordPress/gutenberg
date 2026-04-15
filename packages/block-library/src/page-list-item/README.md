@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/page-list`
+- [`core/page-list`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 
 ## Attributes
 
