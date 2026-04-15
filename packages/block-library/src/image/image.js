@@ -313,7 +313,7 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const { image, canUserEdit, hasResolvedImage } = useSelect(
+	const { image, canUserEdit, attachmentResolutionError } = useSelect(
 		( select ) => {
 			const imageRecord =
 				id && isSingleSelected
@@ -325,10 +325,13 @@ export default function Image( {
 					  )
 					: null;
 
-			// Check if the attachment resolution has completed (not still loading).
-			const hasResolved =
+			// Check if the attachment resolution failed with a specific error.
+			// We use getResolutionError instead of hasFinishedResolution so we
+			// can distinguish 404 (attachment doesn't exist) from transient
+			// errors (500, 403, network) that shouldn't clear the id.
+			const resolutionError =
 				id && isSingleSelected
-					? select( coreStore ).hasFinishedResolution(
+					? select( coreStore ).getResolutionError(
 							'getEntityRecord',
 							[
 								'postType',
@@ -337,7 +340,7 @@ export default function Image( {
 								{ context: 'view' },
 							]
 					  )
-					: false;
+					: null;
 
 			// Check edit permissions when the media editor experiment is enabled.
 			// Only check when imageRecord is available to avoid unnecessary API requests.
@@ -353,7 +356,7 @@ export default function Image( {
 			return {
 				image: imageRecord,
 				canUserEdit: canEdit,
-				hasResolvedImage: hasResolved,
+				attachmentResolutionError: resolutionError,
 			};
 		},
 		[ id, isSingleSelected ]
@@ -364,14 +367,17 @@ export default function Image( {
 	// This handles content copied between WordPress sites.
 	// See: https://github.com/WordPress/gutenberg/issues/74156
 	useEffect( () => {
-		if ( ! id || ! isSingleSelected || ! hasResolvedImage ) {
+		if ( ! id || ! isSingleSelected ) {
 			return;
 		}
-		// Resolution finished but no record found = attachment doesn't exist locally.
-		if ( ! image ) {
+		// Only clear for confirmed 404s. apiFetch throws the Response object
+		// for HTTP errors, so checking .status === 404 avoids incorrectly
+		// clearing the id on 403, 500, or network failures, which would
+		// cause data loss for valid local attachments.
+		if ( attachmentResolutionError?.status === 404 ) {
 			setAttributes( { id: undefined } );
 		}
-	}, [ id, isSingleSelected, hasResolvedImage, image, setAttributes ] );
+	}, [ id, isSingleSelected, attachmentResolutionError, setAttributes ] );
 
 	const {
 		canInsertCover,
