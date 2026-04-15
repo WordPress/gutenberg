@@ -31,6 +31,16 @@ function usePopoverScroll( contentRef ) {
 				// Scrolls “through” the popover only if another contained scrollable area isn’t
 				// in front of it. This is to avoid scrolling both containers simultaneously.
 				if ( ! node.contains( eventScrollContainer ) ) {
+					// Dispatching the event won’t cause scrolling but it does make the event
+					// available to edit-post’s meta box pane’s height adjustment effect.
+					// TODO: something more tailored/explicit seems appealing - like a custom event.
+					scrollContainer.dispatchEvent(
+						new window.WheelEvent( 'wheel', {
+							deltaX,
+							deltaY,
+							bubbles: true,
+						} )
+					);
 					scrollContainer.scrollBy( deltaX, deltaY );
 				}
 			}

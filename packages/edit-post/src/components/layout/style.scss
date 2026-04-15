@@ -22,6 +22,10 @@
 	position: relative;
 	z-index: 1;
 	height: $button-size-compact;
+	// There’s no scrolling but in order to align horizontally with the meta box contents - a
+	// scrollable area - the gutter is forced.
+	scrollbar-gutter: stable;
+	overflow: auto;
 	// Enlarge the toggle/resizable hit area on touch devices.
 	@media (pointer: coarse) {
 		height: $button-size;
@@ -39,6 +43,7 @@
 	}
 
 	> button[aria-expanded] {
+		position: relative;
 		cursor: pointer;
 		width: 100%;
 		display: flex;
@@ -84,7 +89,7 @@
 			}
 		}
 
-		&:is(:hover, :focus)::before {
+		&:is(.is-auto-resizing, :hover, :focus)::before {
 			background-color: var(--wp-admin-theme-color);
 			width: $grid-unit-80 + $grid-unit-20;
 		}
@@ -94,7 +99,8 @@
 .edit-post-meta-boxes-main__liner {
 	// Enable scrolling only for the split view.
 	.edit-post-meta-boxes-main & {
-		overflow: auto;
+		overflow-y: scroll;
+		flex: 1; // Makes the scrollbar gutter (when visible) extend to full parent height when the pane is oversized.
 	}
 	// Keep the contents behind the resize handle.
 	isolation: isolate;
@@ -105,7 +111,7 @@
 	}
 }
 
-// In case the canvas is not iframe’d.
+// In case the canvas is not iframe’d, the main meta boxes need to clear any floating content.
 .edit-post-layout__metaboxes {
 	clear: both;
 }
