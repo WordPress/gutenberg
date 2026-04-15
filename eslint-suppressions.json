@@ -111,12 +111,12 @@
 	},
 	"packages/block-editor/src/components/global-styles/color-panel.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/global-styles/filters-panel.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.js": {
@@ -886,7 +886,7 @@
 	},
 	"packages/global-styles-ui/src/palette.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 3
 		}
 	},
 	"packages/global-styles-ui/src/preview-colors.tsx": {
