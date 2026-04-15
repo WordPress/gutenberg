@@ -5,6 +5,7 @@ import { useParams, useNavigate } from '@wordpress/route';
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
+	Notice,
 	TextControl,
 	TextareaControl,
 	ToggleControl,
@@ -339,6 +340,13 @@ function EntityEdit() {
 			>
 				<div style={ { maxWidth: 800, padding: 16 } }>
 					<VStack spacing={ 4 }>
+						{ ! config._user_created && (
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Warning: you are editing a built-in entity, which might have unexpected consequences.'
+								) }
+							</Notice>
+						) }
 						<Panel>
 							<PanelBody title={ __( 'General' ) } initialOpen>
 								<PanelRow>
