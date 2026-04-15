@@ -177,7 +177,7 @@
 	& > .dataviews-view-activity__item:last-child {
 		.dataviews-view-activity__item-type {
 			&::after {
-				background: linear-gradient(to bottom, var(--wpds-color-stroke-surface-neutral) 0%, rgba(221, 221, 221, 0.2) 60%, rgba(221, 221, 221, 0) 100%);
+				background: linear-gradient(to bottom, var(--wpds-color-stroke-surface-neutral) 0%, color-mix(in srgb, var(--wpds-color-stroke-surface-neutral) 20%, transparent) 60%, transparent 100%);
 			}
 		}
 	}
