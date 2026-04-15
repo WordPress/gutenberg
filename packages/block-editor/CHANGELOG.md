@@ -6,6 +6,8 @@
 
 -   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
 
+## 15.17.0 (2026-04-15)
+
 ## 15.16.0 (2026-04-01)
 
 ## 15.15.0 (2026-03-18)

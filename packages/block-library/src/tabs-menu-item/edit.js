@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	store as blockEditorStore,
@@ -138,11 +138,7 @@ function Edit( {
 				<RichText
 					tagName="span"
 					withoutInteractiveFormatting
-					placeholder={ sprintf(
-						/* translators: %d is the tab index + 1 */
-						__( 'Tab title %d' ),
-						menuItemIndex + 1
-					) }
+					placeholder={ __( 'Tab title' ) }
 					value={ label }
 					onChange={ handleLabelChange }
 				/>
