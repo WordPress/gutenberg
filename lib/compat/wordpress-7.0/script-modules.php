@@ -14,7 +14,7 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	/**
 	 * Gets the raw source URL for a registered script module.
 	 *
-	 * Uses WP_Script_Modules::get_registered_src() if available (WP 7.0+),
+	 * Uses WP_Script_Modules::get_registered() if available (WP 7.0+),
 	 * otherwise falls back to reflection to access the private registered array.
 	 *
 	 * @since X.X.X
@@ -25,11 +25,12 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	function gutenberg_get_script_module_src( string $id ): ?string {
 		$script_modules = wp_script_modules();
 
-		if ( method_exists( $script_modules, 'get_registered_src' ) ) {
-			return $script_modules->get_registered_src( $id );
+		if ( method_exists( $script_modules, 'get_registered' ) ) {
+			$module = $script_modules->get_registered( $id );
+			return null === $module ? null : ( $module['src'] ?? null );
 		}
 
-		// Fallback for WP versions without get_registered_src().
+		// Fallback for WP versions without get_registered().
 		$reflection = new ReflectionClass( $script_modules );
 		$prop       = $reflection->getProperty( 'registered' );
 		$prop->setAccessible( true );
@@ -99,14 +100,21 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 			}
 
 			$domain = $data['domain'];
-			$output = <<<JS
-( function( domain, translations ) {
-	var localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
-	localeData[""].domain = domain;
-	wp.i18n.setLocaleData( localeData, domain );
-} )( "{$domain}", {$json_translations} );
-JS;
 
+			$set_locale_data_js_function = <<<JS
+			( domain, translations ) => {
+				const localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+				localeData[""].domain = domain;
+				wp.i18n.setLocaleData( localeData, domain );
+			}
+			JS;
+
+			$output     = sprintf(
+				'( %s )( %s, %s );',
+				$set_locale_data_js_function,
+				wp_json_encode( $domain ),
+				$json_translations
+			);
 			$source_url = rawurlencode( "{$id}-js-module-translations" );
 			$output    .= "\n//# sourceURL={$source_url}";
 			wp_print_inline_script_tag( $output, array( 'id' => "{$id}-js-module-translations" ) );
