@@ -4,6 +4,7 @@ $blocks-block__margin: 0.5em;
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;

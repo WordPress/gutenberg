@@ -9,6 +9,7 @@
 	background: none;
 	border: 0;
 	box-sizing: border-box;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
 	cursor: pointer;
 	display: inline-flex;
 	font-size: inherit;
