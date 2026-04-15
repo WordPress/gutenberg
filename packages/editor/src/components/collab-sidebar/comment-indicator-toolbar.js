@@ -3,7 +3,7 @@
  */
 import {
 	ToolbarButton,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -98,7 +98,7 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 						/>
 					) ) }
 					{ overflowCount > 0 && (
-						<Text weight={ 500 }>{ overflowText }</Text>
+						<WCText weight={ 500 }>{ overflowText }</WCText>
 					) }
 				</HStack>
 			</ToolbarButton>

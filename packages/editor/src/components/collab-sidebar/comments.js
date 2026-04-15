@@ -15,7 +15,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
@@ -625,9 +625,9 @@ function Thread( {
 				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
-				<Text as="p" weight={ 500 } variant="muted">
+				<WCText as="p" weight={ 500 } variant="muted">
 					{ __( 'Original block deleted.' ) }
-				</Text>
+				</WCText>
 			) }
 			<CommentBoard
 				thread={ thread }
