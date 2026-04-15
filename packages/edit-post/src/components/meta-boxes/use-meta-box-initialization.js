@@ -23,7 +23,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		isCollaborationEnabled,
 		hasMetaBoxes,
 		allMetaBoxes,
-		rtcCompatibleIds,
 	} = useSelect(
 		( select ) => ( {
 			isEnabledAndEditorReady:
@@ -36,8 +35,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 			allMetaBoxes: enabled
 				? select( editPostStore ).getAllMetaBoxes()
 				: undefined,
-			rtcCompatibleIds:
-				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
 		} ),
 		[ enabled ]
 	);
@@ -52,10 +49,10 @@ export const useMetaBoxInitialization = ( enabled ) => {
 
 			// Disable real-time collaboration when legacy meta boxes are detected.
 			// Meta boxes marked with __rtc_compatible_meta_box on the server
-			// have their IDs stored via setRtcCompatibleMetaBoxIds().
+			// carry an `__rtc_compatible` flag on their store entry.
 			if ( isCollaborationEnabled ) {
 				const hasIncompatibleMetaBoxes = allMetaBoxes?.some(
-					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
+					( metaBox ) => ! metaBox.__rtc_compatible
 				);
 
 				if ( hasIncompatibleMetaBoxes ) {
@@ -70,6 +67,5 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		setCollaborationSupported,
 		hasMetaBoxes,
 		allMetaBoxes,
-		rtcCompatibleIds,
 	] );
 };
