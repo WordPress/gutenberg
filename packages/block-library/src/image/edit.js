@@ -10,6 +10,7 @@ import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -263,6 +264,14 @@ export function ImageEdit( {
 				'<br>'
 			);
 		}
+
+		// Allow third-parties to filter the caption on media selection,
+		// similar to the classic editor's `image_add_caption_text` filter.
+		mediaAttributes.caption = applyFilters(
+			'editor.mediaUpload.imageCaption',
+			mediaAttributes.caption,
+			media
+		);
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
