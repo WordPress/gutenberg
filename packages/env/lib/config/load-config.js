@@ -75,7 +75,7 @@ module.exports = async function loadConfig(
 	);
 
 	// Descriptive cache directory name
-	const directory = path.dirname( configFilePath ).replace( /^.*[\\/]/, '' );
+	const directory = path.basename( path.dirname( configFilePath ) );
 	const descriptiveCacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
 		'wp-env-' + directory + '-' + md5( configFilePath )
