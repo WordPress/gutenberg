@@ -87,7 +87,7 @@ export function isElementVisible( element ) {
 	}
 
 	// Check for <VisuallyHidden> components.
-	if ( element.getAttribute( 'data-visually-hidden' ) ) {
+	if ( element.hasAttribute( 'data-visually-hidden' ) ) {
 		return false;
 	}
 
