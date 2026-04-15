@@ -32,7 +32,7 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 						className
 					) }
 				>
-					<ThemeProvider>
+					<ThemeProvider hasLayoutBox>
 						<_Select.Popup
 							ref={ ref }
 							className={ itemPopupStyles.popup }

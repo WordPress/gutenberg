@@ -49,6 +49,7 @@ export const ThemeProvider = ( {
 	children,
 	color = {},
 	cursor,
+	hasLayoutBox = false,
 	isRoot = false,
 	density,
 }: ThemeProviderProps ) => {
@@ -80,7 +81,11 @@ export const ThemeProvider = ( {
 				data-wpds-theme-provider-id={ instanceId }
 				data-wpds-root-provider={ isRoot }
 				data-wpds-density={ density }
-				className={ styles.root }
+				className={
+					hasLayoutBox
+						? `${ styles.root } ${ styles[ 'has-layout-box' ] }`
+						: styles.root
+				}
 			>
 				<ThemeContext.Provider value={ contextValue }>
 					{ children }

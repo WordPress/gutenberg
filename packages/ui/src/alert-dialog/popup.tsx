@@ -47,7 +47,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		return (
 			<_AlertDialog.Portal container={ container }>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
-				<ThemeProvider>
+				<ThemeProvider hasLayoutBox>
 					<_AlertDialog.Popup
 						ref={ ref }
 						className={ clsx(

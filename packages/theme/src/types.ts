@@ -55,6 +55,17 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	children?: ReactNode;
 
 	/**
+	 * Whether the ThemeProvider wrapper should generate a layout box instead of
+	 * using `display: contents`.
+	 *
+	 * This is useful for cases where descendants rely on visibility or layout
+	 * APIs that require an ancestor box to exist.
+	 *
+	 * @default false
+	 */
+	hasLayoutBox?: boolean;
+
+	/**
 	 * When a ThemeProvider is the root provider, it will apply its theming
 	 * settings also to the root document element (e.g. the html element).
 	 * This is useful, for example, to make sure that the `html` element can
