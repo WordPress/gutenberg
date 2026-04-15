@@ -764,17 +764,19 @@ describe( 'SyncManager', () => {
 		} );
 
 		it( 'sanitizes remote changes when marked untrusted', async () => {
-			// Capture the Y.Doc and the trustworthy callback from the provider.
+			// Capture the Y.Doc and the permissions callback from the provider.
 			let capturedDoc: Y.Doc | null = null;
-			let trustworthyCallback: ( ( v: boolean ) => void ) | null = null;
+			let permissionsCallback:
+				| ( ( v: { unfilteredHtml: boolean } ) => void )
+				| null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
 				capturedDoc = ydoc;
 				return {
 					destroy: jest.fn(),
 					on: jest.fn(
 						( event: string, cb: ( ...args: any[] ) => void ) => {
-							if ( event === 'trustworthy' ) {
-								trustworthyCallback = cb;
+							if ( event === 'permissions' ) {
+								permissionsCallback = cb;
 							}
 						}
 					),
@@ -792,8 +794,8 @@ describe( 'SyncManager', () => {
 			);
 
 			// Signal that the session is untrusted.
-			expect( trustworthyCallback ).not.toBeNull();
-			trustworthyCallback!( false );
+			expect( permissionsCallback ).not.toBeNull();
+			permissionsCallback!( { unfilteredHtml: false } );
 
 			// Clear calls of editRecord, which is called during load.
 			mockHandlers.editRecord.mockClear();
@@ -858,7 +860,7 @@ describe( 'SyncManager', () => {
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-			// Content passes through unsanitized because trustworthy is true.
+			// Content passes through unsanitized because permissions.unfilteredHtml is true.
 			expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
 				title: htmlContent,
 			} );

@@ -28,7 +28,7 @@ import {
 	MANUAL_RETRY_INTERVAL_MS,
 } from './config';
 import { ConnectionError, ConnectionErrorCode } from '../../errors';
-import type { ConnectionStatus } from '../../types';
+import type { ConnectionStatus, Permissions } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -71,7 +71,7 @@ interface RegisterRoomOptions {
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	onSync: () => void;
-	onTrustChange: ( trustworthy: boolean ) => void;
+	onPermissionsChange: ( permissions: Permissions ) => void;
 }
 
 interface RoomState {
@@ -82,7 +82,7 @@ interface RoomState {
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
-	onTrustChange: ( trustworthy: boolean ) => void;
+	onPermissionsChange: ( permissions: Permissions ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	room: string;
@@ -578,9 +578,12 @@ function poll(): void {
 					return;
 				}
 
-				// Signal trustworthiness before processing document updates
-				// so the sync manager can decide whether to sanitize.
-				roomState.onTrustChange( room.trustworthy ?? true );
+				// Signal current shared-contributor permissions before processing
+				// document updates, so the sync manager can decide whether to
+				// sanitize remote changes.
+				roomState.onPermissionsChange( {
+					unfilteredHtml: room.permissions?.unfiltered_html ?? true,
+				} );
 
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
@@ -747,7 +750,7 @@ function registerRoom( {
 	log,
 	onSync,
 	onStatusChange,
-	onTrustChange,
+	onPermissionsChange,
 }: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
@@ -843,7 +846,7 @@ function registerRoom( {
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
-		onTrustChange,
+		onPermissionsChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>

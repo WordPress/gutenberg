@@ -10,6 +10,7 @@ import { Awareness } from 'y-protocols/awareness';
  */
 import type {
 	ConnectionStatus,
+	Permissions,
 	ProviderCreator,
 	ProviderCreatorResult,
 	ProviderEventMap,
@@ -60,7 +61,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			log: this.log,
 			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
-			onTrustChange: this.emitTrustworthy,
+			onPermissionsChange: this.emitPermissions,
 		} );
 	}
 
@@ -137,12 +138,12 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	};
 
 	/**
-	 * Emit trustworthiness changes from the server.
+	 * Emit the current set of shared contributor permissions.
 	 *
-	 * @param trustworthy Whether all contributors have unfiltered_html.
+	 * @param permissions Per-ability flags shared by all contributors.
 	 */
-	protected emitTrustworthy = ( trustworthy: boolean ): void => {
-		this.emit( 'trustworthy', [ trustworthy ] );
+	protected emitPermissions = ( permissions: Permissions ): void => {
+		this.emit( 'permissions', [ permissions ] );
 	};
 
 	/**

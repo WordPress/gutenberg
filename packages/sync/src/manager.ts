@@ -27,6 +27,7 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
+	Permissions,
 	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
@@ -56,8 +57,8 @@ interface EntityState {
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
+	permissions: Permissions;
 	syncConfig: SyncConfig;
-	trustworthy: boolean;
 	unload: () => void;
 	ydoc: CRDTDoc;
 }
@@ -263,8 +264,8 @@ export function createSyncManager( debug = false ): SyncManager {
 			handlers,
 			objectId,
 			objectType,
+			permissions: { unfilteredHtml: true },
 			syncConfig,
-			trustworthy: true,
 			unload,
 			ydoc,
 		};
@@ -285,9 +286,9 @@ export function createSyncManager( debug = false ): SyncManager {
 				// Attach status listener after provider creation.
 				provider.on( 'status', handlers.onStatusChange );
 
-				// Listen for trustworthiness signals from the provider.
-				provider.on( 'trustworthy', ( isTrustworthy ) => {
-					entityState.trustworthy = isTrustworthy;
+				// Listen for shared-contributor permission changes.
+				provider.on( 'permissions', ( permissions ) => {
+					entityState.permissions = permissions;
 				} );
 
 				return provider;
@@ -624,7 +625,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
-		const { handlers, syncConfig, trustworthy, ydoc } = entityState;
+		const { handlers, permissions, syncConfig, ydoc } = entityState;
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current edited entity record.
@@ -639,14 +640,14 @@ export function createSyncManager( debug = false ): SyncManager {
 			return;
 		}
 
-		// Sanitize remote content when any contributor lacks unfiltered_html.
-		const effectiveChanges = trustworthy
+		// Sanitize remote content when any contributor can not sync unfiltered HTML.
+		const effectiveChanges = permissions.unfilteredHtml
 			? changes
 			: sanitizeRemoteChanges( changes );
 
 		log( 'updateEntityRecord', 'changes', entityId, {
 			changedKeys,
-			trustworthy,
+			permissions,
 		} );
 		handlers.editRecord( effectiveChanges );
 	}

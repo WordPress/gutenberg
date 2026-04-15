@@ -38,12 +38,21 @@ export type Origin = any;
 export type ObjectData = Record< string, unknown >;
 
 /**
+ * Per-capability flags that are `true` if ALL contributors in the current
+ * sync room share the given ability.
+ */
+export interface Permissions {
+	/** Whether all contributors have the ability to send unfiltered HTML. */
+	unfilteredHtml: boolean;
+}
+
+/**
  * Event map for provider events.
  * Add new event types here as needed.
  */
 export interface ProviderEventMap {
 	status: ConnectionStatus;
-	trustworthy: boolean;
+	permissions: Permissions;
 }
 
 /**

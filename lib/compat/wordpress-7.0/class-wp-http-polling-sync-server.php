@@ -300,7 +300,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				// Track every authenticated access to this room, not just
 				// requests that carry document updates. Awareness-only polls
 				// still represent an active participant whose capabilities
-				// must be considered for the trustworthiness check.
+				// must be considered when computing shared room permissions.
 				$this->storage->track_contributor( $room, get_current_user_id() );
 
 				// Merge awareness state.
@@ -578,7 +578,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *   room: string,
 		 *   should_compact: bool,
 		 *   total_updates: int,
-		 *   trustworthy: bool,
+		 *   permissions: array{unfiltered_html: bool},
 		 *   updates: array<int, array{data: string, type: string}>,
 		 * } Response data for this room.
 		 */
@@ -601,22 +601,28 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
 
-			// Determine whether all contributors have the unfiltered_html capability.
-			$trustworthy  = true;
+			// Collect permissions flags that describe whether ALL contributors
+			// in the room share a given RTC-related ability. The client uses
+			// these to decide things like whether to sanitize remote CRDT
+			// changes before writing them to the local entity store.
+			$permissions  = array(
+				'unfiltered_html' => true,
+			);
+			
 			$contributors = $this->storage->get_contributors( $room );
 			foreach ( $contributors as $contributor_id ) {
 				if ( ! user_can( $contributor_id, 'unfiltered_html' ) ) {
-					$trustworthy = false;
+					$permissions['unfiltered_html'] = false;
 					break;
 				}
 			}
 
 			return array(
 				'end_cursor'     => $this->storage->get_cursor( $room ),
+				'permissions'    => $permissions,
 				'room'           => $room,
 				'should_compact' => $should_compact,
 				'total_updates'  => $total_updates,
-				'trustworthy'    => $trustworthy,
 				'updates'        => $typed_updates,
 			);
 		}

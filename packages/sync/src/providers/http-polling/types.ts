@@ -33,9 +33,11 @@ interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
 	compaction_request?: SyncUpdate[]; // deprecated
 	end_cursor: number; // use as `after` in next request
+	permissions?: {
+		unfiltered_html?: boolean;
+	};
 	should_compact?: boolean;
 	room: string;
-	trustworthy?: boolean;
 	updates: SyncUpdate[];
 }
 

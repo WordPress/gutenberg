@@ -244,8 +244,8 @@ if ( ! function_exists( 'gutenberg_clear_sync_contributors_on_save' ) ) {
 	 * Clears the sync contributor tracking list when a post is saved.
 	 *
 	 * After a save, the content in the database is authoritative. The contributor
-	 * list is reset so that the trustworthiness check starts fresh for subsequent
-	 * collaborative edits.
+	 * list is reset so that the shared-permissions check starts fresh for
+	 * subsequent collaborative edits.
 	 *
 	 * @param int     $post_id Post ID.
 	 * @param WP_Post $post    Post object.
