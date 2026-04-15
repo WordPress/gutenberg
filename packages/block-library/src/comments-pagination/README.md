@@ -28,21 +28,21 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
   - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
-- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+- [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
   - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
   - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
   - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context

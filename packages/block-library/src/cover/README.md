@@ -39,31 +39,31 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**shadow**](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
   - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [heading](/block-editor/reference-guides/block-api/block-supports/#colorheading): `true`
   - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
   - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `false`
   - [enableContrastChecker](/block-editor/reference-guides/block-api/block-supports/#colorenablecontrastchecker): `false`
-- [**dimensions**](/block-editor/reference-guides/block-api/block-supports/#dimensions):
+- [dimensions](/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - [aspectRatio](/block-editor/reference-guides/block-api/block-supports/#dimensionsaspectratio): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+- [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
   - [allowJustification](/block-editor/reference-guides/block-api/block-supports/#layoutallowjustification): `false`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
-- [**filter**](/block-editor/reference-guides/block-api/block-supports/#filter):
+- [filter](/block-editor/reference-guides/block-api/block-supports/#filter):
   - [duotone](/block-editor/reference-guides/block-api/block-supports/#filterduotone): `true`
-- [**allowedBlocks**](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
+- [allowedBlocks](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Context
 

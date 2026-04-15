@@ -191,7 +191,7 @@ function formatSupports( supports ) {
 		if ( key.startsWith( '__' ) ) {
 			continue; // Skip experimental/unstable top-level keys in detail view.
 		}
-		const keyLink = `[**${ key }**](${ supportsLink( key ) })`;
+		const keyLink = `[${ key }](${ supportsLink( key ) })`;
 		if ( typeof value === 'boolean' ) {
 			lines.push( `- ${ keyLink }: \`${ value }\`` );
 		} else if ( Array.isArray( value ) ) {

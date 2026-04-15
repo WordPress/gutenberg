@@ -21,22 +21,22 @@ _This block has no custom attributes._
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
   - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
   - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
   - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `{"__experimentalDefault":"1.25em"}`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
