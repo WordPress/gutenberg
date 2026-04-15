@@ -135,6 +135,7 @@ function EntityList() {
 			sessionStorage.removeItem( 'gutenberg_entity_saved' );
 			createSuccessNotice( __( 'Entity saved successfully.' ), {
 				type: 'snackbar',
+				id: 'entity-save-success',
 			} );
 		}
 	}, [ createSuccessNotice ] );

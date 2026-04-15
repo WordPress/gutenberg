@@ -78,6 +78,7 @@ function EntityEdit() {
 			sessionStorage.removeItem( 'gutenberg_entity_saved' );
 			createSuccessNotice( __( 'Entity updated successfully.' ), {
 				type: 'snackbar',
+				id: 'entity-save-success',
 			} );
 		}
 	}, [ createSuccessNotice ] );
@@ -228,6 +229,7 @@ function EntityEdit() {
 			originalConfigRef.current = config;
 			createSuccessNotice( __( 'Entity updated successfully.' ), {
 				type: 'snackbar',
+				id: 'entity-save-success',
 			} );
 		} catch {
 			createErrorNotice( __( 'Failed to update entity.' ), {

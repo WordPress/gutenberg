@@ -208,6 +208,7 @@ function EntityNew() {
 
 			createSuccessNotice( __( 'Entity created successfully.' ), {
 				type: 'snackbar',
+				id: 'entity-save-success',
 			} );
 			navigate( { to: '/' } );
 		} catch ( error: any ) {
