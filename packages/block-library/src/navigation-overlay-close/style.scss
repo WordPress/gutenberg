@@ -6,7 +6,7 @@
 	padding: 0;
 	border: none;
 	background: transparent;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	text-decoration: none;
 
 	&:focus {

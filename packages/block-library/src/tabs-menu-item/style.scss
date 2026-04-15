@@ -4,7 +4,7 @@
 	display: block;
 	width: max-content;
 	text-decoration: none;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	flex-basis: inherit !important;
 	flex-grow: inherit !important;
 	position: relative;

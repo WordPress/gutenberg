@@ -363,7 +363,7 @@ button.wp-block-navigation-item__content {
 }
 
 .wp-block-navigation-submenu__toggle {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	// Rotate submenu icon when open.
 	&[aria-expanded="true"] {
@@ -766,7 +766,7 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open,
 .wp-block-navigation__responsive-container-close {
 	vertical-align: middle;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	color: currentColor;
 	background: transparent;
 	border: none;

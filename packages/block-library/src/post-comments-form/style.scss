@@ -42,7 +42,7 @@
 	// Styles copied from button block styles.
 	:where(input[type="submit"]) {
 		box-shadow: none;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: inline-block;
 		text-align: center;
 		overflow-wrap: break-word;

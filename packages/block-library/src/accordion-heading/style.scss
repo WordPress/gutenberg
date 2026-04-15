@@ -12,7 +12,7 @@
 	border: none;
 	color: inherit;
 	padding: var(--wp--preset--spacing--20, 1em) 0;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	overflow: hidden;
 	display: flex;
 	align-items: center;

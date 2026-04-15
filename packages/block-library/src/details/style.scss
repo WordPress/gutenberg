@@ -3,5 +3,5 @@
 }
 
 .wp-block-details summary {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }

@@ -2,5 +2,5 @@
  * Element styles.
  */
 .wp-element-button {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
