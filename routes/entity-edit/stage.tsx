@@ -349,7 +349,7 @@ function EntityEdit() {
 						) }
 						<Panel>
 							<PanelBody title={ __( 'General' ) } initialOpen>
-								<PanelRow>
+								<VStack spacing={ 4 }>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Name (Plural)' ) }
@@ -358,8 +358,6 @@ function EntityEdit() {
 											updateLabel( 'name', value )
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Singular Name' ) }
@@ -373,8 +371,6 @@ function EntityEdit() {
 											)
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Slug' ) }
@@ -382,8 +378,6 @@ function EntityEdit() {
 										disabled
 										readOnly
 									/>
-								</PanelRow>
-								<PanelRow>
 									<TextareaControl
 										__nextHasNoMarginBottom
 										label={ __( 'Description' ) }
@@ -392,7 +386,7 @@ function EntityEdit() {
 											updateField( 'description', value )
 										}
 									/>
-								</PanelRow>
+								</VStack>
 							</PanelBody>
 						</Panel>
 
@@ -461,17 +455,20 @@ function EntityEdit() {
 								title={ __( 'REST API' ) }
 								initialOpen={ false }
 							>
-								<PanelRow>
-									<ToggleControl
-										__nextHasNoMarginBottom
-										label={ __( 'Show in REST' ) }
-										checked={ config.show_in_rest }
-										onChange={ ( value: boolean ) =>
-											updateField( 'show_in_rest', value )
-										}
-									/>
-								</PanelRow>
-								<PanelRow>
+								<VStack spacing={ 4 }>
+									<PanelRow>
+										<ToggleControl
+											__nextHasNoMarginBottom
+											label={ __( 'Show in REST' ) }
+											checked={ config.show_in_rest }
+											onChange={ ( value: boolean ) =>
+												updateField(
+													'show_in_rest',
+													value
+												)
+											}
+										/>
+									</PanelRow>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'REST Base' ) }
@@ -480,7 +477,7 @@ function EntityEdit() {
 											updateField( 'rest_base', value )
 										}
 									/>
-								</PanelRow>
+								</VStack>
 							</PanelBody>
 						</Panel>
 
@@ -530,7 +527,7 @@ function EntityEdit() {
 									title={ __( 'Menu' ) }
 									initialOpen={ false }
 								>
-									<PanelRow>
+									<VStack spacing={ 4 }>
 										<TextControl
 											__nextHasNoMarginBottom
 											label={ __( 'Menu Icon' ) }
@@ -545,8 +542,6 @@ function EntityEdit() {
 												)
 											}
 										/>
-									</PanelRow>
-									<PanelRow>
 										<TextControl
 											__nextHasNoMarginBottom
 											label={ __( 'Menu Position' ) }
@@ -567,7 +562,7 @@ function EntityEdit() {
 												)
 											}
 										/>
-									</PanelRow>
+									</VStack>
 								</PanelBody>
 							</Panel>
 						) }
@@ -606,21 +601,22 @@ function EntityEdit() {
 								title={ __( 'Labels' ) }
 								initialOpen={ false }
 							>
-								{ [
-									'add_new',
-									'add_new_item',
-									'edit_item',
-									'new_item',
-									'view_item',
-									'view_items',
-									'search_items',
-									'not_found',
-									'not_found_in_trash',
-									'all_items',
-									'menu_name',
-								].map( ( labelKey ) => (
-									<PanelRow key={ labelKey }>
+								<VStack spacing={ 4 }>
+									{ [
+										'add_new',
+										'add_new_item',
+										'edit_item',
+										'new_item',
+										'view_item',
+										'view_items',
+										'search_items',
+										'not_found',
+										'not_found_in_trash',
+										'all_items',
+										'menu_name',
+									].map( ( labelKey ) => (
 										<TextControl
+											key={ labelKey }
 											__nextHasNoMarginBottom
 											label={ labelKey }
 											value={
@@ -631,8 +627,8 @@ function EntityEdit() {
 												updateLabel( labelKey, value )
 											}
 										/>
-									</PanelRow>
-								) ) }
+									) ) }
+								</VStack>
 							</PanelBody>
 						</Panel>
 					</VStack>

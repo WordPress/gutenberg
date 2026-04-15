@@ -262,7 +262,7 @@ function EntityNew() {
 				<VStack spacing={ 4 }>
 					<Panel>
 						<PanelBody title={ __( 'General' ) } initialOpen>
-							<PanelRow>
+							<VStack spacing={ 4 }>
 								<TextControl
 									__nextHasNoMarginBottom
 									label={ __( 'Slug' ) }
@@ -279,8 +279,6 @@ function EntityNew() {
 										)
 									}
 								/>
-							</PanelRow>
-							<PanelRow>
 								<TextControl
 									__nextHasNoMarginBottom
 									label={ __( 'Name (Plural)' ) }
@@ -289,8 +287,6 @@ function EntityNew() {
 										updateLabel( 'name', value )
 									}
 								/>
-							</PanelRow>
-							<PanelRow>
 								<TextControl
 									__nextHasNoMarginBottom
 									label={ __( 'Singular Name' ) }
@@ -299,8 +295,6 @@ function EntityNew() {
 										updateLabel( 'singular_name', value )
 									}
 								/>
-							</PanelRow>
-							<PanelRow>
 								<TextareaControl
 									__nextHasNoMarginBottom
 									label={ __( 'Description' ) }
@@ -309,7 +303,7 @@ function EntityNew() {
 										updateField( 'description', value )
 									}
 								/>
-							</PanelRow>
+							</VStack>
 						</PanelBody>
 					</Panel>
 
@@ -375,17 +369,17 @@ function EntityNew() {
 							title={ __( 'REST API' ) }
 							initialOpen={ false }
 						>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show in REST' ) }
-									checked={ config.show_in_rest }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_in_rest', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
+							<VStack spacing={ 4 }>
+								<PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Show in REST' ) }
+										checked={ config.show_in_rest }
+										onChange={ ( value: boolean ) =>
+											updateField( 'show_in_rest', value )
+										}
+									/>
+								</PanelRow>
 								<TextControl
 									__nextHasNoMarginBottom
 									label={ __( 'REST Base' ) }
@@ -394,7 +388,7 @@ function EntityNew() {
 										updateField( 'rest_base', value )
 									}
 								/>
-							</PanelRow>
+							</VStack>
 						</PanelBody>
 					</Panel>
 
@@ -435,7 +429,7 @@ function EntityNew() {
 								title={ __( 'Menu' ) }
 								initialOpen={ false }
 							>
-								<PanelRow>
+								<VStack spacing={ 4 }>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Menu Icon' ) }
@@ -447,8 +441,6 @@ function EntityNew() {
 											updateField( 'menu_icon', value )
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<TextControl
 										__nextHasNoMarginBottom
 										label={ __( 'Menu Position' ) }
@@ -465,7 +457,7 @@ function EntityNew() {
 											)
 										}
 									/>
-								</PanelRow>
+								</VStack>
 							</PanelBody>
 						</Panel>
 					) }
