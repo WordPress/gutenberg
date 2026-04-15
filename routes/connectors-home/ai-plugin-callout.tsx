@@ -22,7 +22,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 
 import type { PluginStatus } from './use-connector-plugin';
 
-const AI_PLUGIN_INSTALL_SLUG = 'ai';
+const AI_PLUGIN_SLUG = 'ai';
 const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
@@ -133,7 +133,7 @@ export function AiPluginCallout() {
 			await saveEntityRecord(
 				'root',
 				'plugin',
-				{ slug: AI_PLUGIN_INSTALL_SLUG, status: 'active' },
+				{ slug: AI_PLUGIN_SLUG, status: 'active' },
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
