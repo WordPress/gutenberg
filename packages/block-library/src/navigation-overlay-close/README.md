@@ -24,7 +24,7 @@
 - [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `padding`: `true`
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`

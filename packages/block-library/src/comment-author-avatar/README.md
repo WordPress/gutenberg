@@ -30,10 +30,10 @@
   - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `margin`: `true`
+  - `padding`: `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

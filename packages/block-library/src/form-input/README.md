@@ -35,7 +35,7 @@
 - [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
+  - `margin`: `["top","bottom"]`
 
 ## Block Markup
 

@@ -30,7 +30,7 @@ _This block has no custom attributes._
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
   - [`textAlign`](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `["horizontal","vertical"]`
+  - `padding`: `["horizontal","vertical"]`
 - [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 
 ## Context

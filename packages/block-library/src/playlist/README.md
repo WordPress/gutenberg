@@ -39,8 +39,8 @@
   - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `margin`: `true`
+  - `padding`: `true`
 
 ## Context
 

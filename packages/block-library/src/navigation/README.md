@@ -76,8 +76,8 @@ The structural CSS for the navigation block targets generic classnames across me
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
-  - [`units`](/block-editor/reference-guides/block-api/block-supports/#spacing-units): `["px","em","rem","vh","vw"]`
+  - `blockGap`: `true`
+  - `units`: `["px","em","rem","vh","vw"]`
 - [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowSwitching`](/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
   - [`allowInheriting`](/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`

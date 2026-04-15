@@ -30,12 +30,12 @@
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `padding`: `true`
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

@@ -26,7 +26,7 @@
 - [`inserter`](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`customCSS`](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
 
 ## Context

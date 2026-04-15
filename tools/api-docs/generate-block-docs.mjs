@@ -162,13 +162,37 @@ function formatAttributesTable( attributes ) {
 /**
  * Build a link to the Block Supports reference for a given property.
  *
- * Anchors use the property name lowercased with dots replaced by hyphens
- * (e.g. `color.background` → `#colorbackground`).
+ * Only sub-properties that have their own heading on the supports page
+ * get a dedicated anchor. All others fall back to the parent property anchor.
  *
  * @param {string} property Top-level or dotted property name.
  * @return {string} Absolute handbook path with anchor.
  */
 const SUPPORTS_BASE = '/block-editor/reference-guides/block-api/block-supports/';
+const SUPPORTS_SUB_ANCHORS = new Set( [
+	'color.background',
+	'color.button',
+	'color.enableContrastChecker',
+	'color.__experimentalDuotone',
+	'color.gradients',
+	'color.heading',
+	'color.link',
+	'color.text',
+	'filter.duotone',
+	'layout.default',
+	'layout.allowSwitching',
+	'layout.allowEditing',
+	'layout.allowInheriting',
+	'layout.allowSizingOnChildren',
+	'layout.allowVerticalAlignment',
+	'layout.allowJustification',
+	'layout.allowOrientation',
+	'layout.allowWrap',
+	'layout.allowCustomContentAndWideSize',
+	'typography.fontSize',
+	'typography.lineHeight',
+	'typography.textAlign',
+] );
 function supportsLink( property ) {
 	const anchor = property.toLowerCase().replace( /\./g, '-' );
 	return `${ SUPPORTS_BASE }#${ anchor }`;
@@ -206,18 +230,19 @@ function formatSupports( supports ) {
 				if ( subKey.startsWith( '__' ) ) {
 					continue;
 				}
-				const subLink = `[\`${ subKey }\`](${ supportsLink(
-					`${ key }.${ subKey }`
-				) })`;
+				const subProp = `${ key }.${ subKey }`;
+				const subLabel = SUPPORTS_SUB_ANCHORS.has( subProp )
+					? `[\`${ subKey }\`](${ supportsLink( subProp ) })`
+					: `\`${ subKey }\``;
 				if (
 					typeof subValue === 'object' &&
 					subValue !== null
 				) {
 					lines.push(
-						`  - ${ subLink }: \`${ JSON.stringify( subValue ) }\``
+						`  - ${ subLabel }: \`${ JSON.stringify( subValue ) }\``
 					);
 				} else {
-					lines.push( `  - ${ subLink }: \`${ subValue }\`` );
+					lines.push( `  - ${ subLabel }: \`${ subValue }\`` );
 				}
 			}
 		} else {

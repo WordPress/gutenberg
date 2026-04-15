@@ -27,9 +27,9 @@
 - [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - `margin`: `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Block Markup
 

@@ -33,11 +33,11 @@ _This block has no custom attributes._
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `{"__experimentalDefault":"1.25em"}`
+  - `margin`: `true`
+  - `padding`: `true`
+  - `blockGap`: `{"__experimentalDefault":"1.25em"}`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

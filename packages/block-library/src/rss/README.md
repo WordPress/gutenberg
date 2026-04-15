@@ -33,10 +33,10 @@
 - [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `margin`: `true`
+  - `padding`: `true`
 - [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`

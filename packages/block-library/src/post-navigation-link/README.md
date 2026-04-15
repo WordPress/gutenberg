@@ -33,7 +33,7 @@
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
   - [`textAlign`](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

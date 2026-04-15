@@ -24,14 +24,14 @@
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `margin`: `["top","bottom"]`
+  - `padding`: `true`
 - [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
   - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Block Markup
 

@@ -35,7 +35,7 @@
 - [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 - [`inserter`](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

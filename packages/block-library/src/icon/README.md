@@ -28,12 +28,12 @@
   - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - `padding`: `true`
+  - `margin`: `true`
 - [`dimensions`](/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - [`width`](/block-editor/reference-guides/block-api/block-supports/#dimensions-width): `true`
+  - `width`: `true`
 
 ## CSS Selectors
 
