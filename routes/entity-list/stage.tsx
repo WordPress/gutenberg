@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useNavigate, Link } from '@wordpress/route';
+import { useNavigate, useSearch, Link } from '@wordpress/route';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Page } from '@wordpress/admin-ui';
 import type {
@@ -127,6 +127,7 @@ function getItemId( item: EntityConfig ) {
 
 function EntityList() {
 	const navigate = useNavigate();
+	const searchParams = useSearch( { from: '/' } );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 	// Show a success notice if we just reloaded after a save.
@@ -142,7 +143,9 @@ function EntityList() {
 
 	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const [ activeTab, setActiveTab ] = useState< string >( 'post_type' );
+	const initialTab =
+		searchParams.tab === 'taxonomy' ? 'taxonomy' : 'post_type';
+	const [ activeTab, setActiveTab ] = useState< string >( initialTab );
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 
 	// Fetch entity configs from REST API.
@@ -172,10 +175,14 @@ function EntityList() {
 		return filterSortAndPaginate( filteredConfigs, view, fields );
 	}, [ filteredConfigs, view ] );
 
-	const handleTabChange = useCallback( ( tab: string ) => {
-		setActiveTab( tab );
-		setView( DEFAULT_VIEW );
-	}, [] );
+	const handleTabChange = useCallback(
+		( tab: string ) => {
+			setActiveTab( tab );
+			setView( DEFAULT_VIEW );
+			navigate( { search: { tab } } );
+		},
+		[ navigate ]
+	);
 
 	const deleteAction: Action< EntityConfig > = useMemo(
 		() => ( {

@@ -210,7 +210,7 @@ function EntityNew() {
 				type: 'snackbar',
 				id: 'entity-save-success',
 			} );
-			navigate( { to: '/' } );
+			navigate( { to: '/', search: { tab: entityType } } );
 		} catch ( error: any ) {
 			createErrorNotice(
 				error?.message || __( 'Failed to create entity.' ),
@@ -237,7 +237,9 @@ function EntityNew() {
 				<HStack spacing={ 3 }>
 					<Button
 						variant="tertiary"
-						onClick={ () => navigate( { to: '/' } ) }
+						onClick={ () =>
+							navigate( { to: '/', search: { tab: entityType } } )
+						}
 						size="compact"
 					>
 						{ __( 'Cancel' ) }

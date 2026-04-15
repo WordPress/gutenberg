@@ -268,7 +268,12 @@ function EntityEdit() {
 				<HStack spacing={ 3 }>
 					<Button
 						variant="tertiary"
-						onClick={ () => navigate( { to: '/' } ) }
+						onClick={ () =>
+							navigate( {
+								to: '/',
+								search: { tab: entityType },
+							} )
+						}
 						size="compact"
 					>
 						{ __( 'Back' ) }
