@@ -12,7 +12,7 @@
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/page-list`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 
 ## Attributes

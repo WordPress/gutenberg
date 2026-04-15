@@ -12,7 +12,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/paragraph`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 - [`core/heading`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
 - [`core/form-input`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-input/)

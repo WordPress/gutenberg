@@ -10,10 +10,10 @@
 
 ## Block Relationships
 
-**Ancestor blocks:**
+**[Ancestor](/block-editor/reference-guides/block-api/block-metadata/#ancestor) blocks:**
 - [`core/query`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query/)
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/query-pagination-previous`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-previous/)
 - [`core/query-pagination-numbers`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-numbers/)
 - [`core/query-pagination-next`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-next/)

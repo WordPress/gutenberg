@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/comments-pagination`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-pagination/)
 
 ## Attributes

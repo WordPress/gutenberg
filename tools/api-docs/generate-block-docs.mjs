@@ -318,10 +318,16 @@ function blockLink( blockName ) {
  * @return {string|null} Markdown or null if no relationships.
  */
 function formatRelationships( blockJson ) {
+	const METADATA_BASE =
+		'/block-editor/reference-guides/block-api/block-metadata/';
 	const parts = [];
 
 	if ( blockJson.parent && blockJson.parent.length > 0 ) {
-		parts.push( '**Parent blocks (direct):**' );
+		parts.push(
+			`**[Parent](${
+				METADATA_BASE
+			}#parent) blocks (direct):**`
+		);
 		for ( const p of blockJson.parent ) {
 			parts.push( `- ${ blockLink( p ) }` );
 		}
@@ -331,7 +337,11 @@ function formatRelationships( blockJson ) {
 		if ( parts.length > 0 ) {
 			parts.push( '' );
 		}
-		parts.push( '**Ancestor blocks:**' );
+		parts.push(
+			`**[Ancestor](${
+				METADATA_BASE
+			}#ancestor) blocks:**`
+		);
 		for ( const a of blockJson.ancestor ) {
 			parts.push( `- ${ blockLink( a ) }` );
 		}
@@ -341,7 +351,11 @@ function formatRelationships( blockJson ) {
 		if ( parts.length > 0 ) {
 			parts.push( '' );
 		}
-		parts.push( '**Allowed inner blocks:**' );
+		parts.push(
+			`**[Allowed](${
+				METADATA_BASE
+			}#allowed-blocks) inner blocks:**`
+		);
 		for ( const b of blockJson.allowedBlocks ) {
 			parts.push( `- ${ blockLink( b ) }` );
 		}
