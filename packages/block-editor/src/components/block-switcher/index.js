@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { __, _n, sprintf, _x } from '@wordpress/i18n';
+import { Text } from '@wordpress/ui';
 import {
 	DropdownMenu,
 	ToolbarGroup,
 	ToolbarItem,
-	__experimentalText as Text,
 	MenuGroup,
 } from '@wordpress/components';
 import {
