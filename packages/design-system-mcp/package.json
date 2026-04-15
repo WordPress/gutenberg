@@ -24,6 +24,7 @@
 		"npm": ">=10.2.3"
 	},
 	"files": [
+		"bin",
 		"build-module",
 		"build-types"
 	],
@@ -37,7 +38,7 @@
 		"./package.json": "./package.json"
 	},
 	"bin": {
-		"design-system-mcp": "./build-module/index.mjs"
+		"design-system-mcp": "./bin/design-system-mcp.mjs"
 	},
 	"dependencies": {
 		"@cfworker/json-schema": "4.1.1",
