@@ -9,6 +9,19 @@ import type { AnyAction, Reducer } from 'redux';
  *
  * @param actionProperty Action property by which to key object.
  * @return Higher-order reducer.
+ *
+ * @example
+ * ```js
+ * import { onSubKey } from '@wordpress/data';
+ *
+ * const itemsByContext = onSubKey( 'context' )( ( state = [], action ) => {
+ *   switch ( action.type ) {
+ *     case 'ADD_ITEM':
+ *       return [ ...state, action.item ];
+ *   }
+ *   return state;
+ * } );
+ * ```
  */
 export const onSubKey =
 	< TState extends unknown, TAction extends AnyAction >(

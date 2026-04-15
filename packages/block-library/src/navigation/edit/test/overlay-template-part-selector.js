@@ -43,6 +43,7 @@ jest.mock( '@wordpress/data', () => ( {
 		return newState;
 	} ),
 	register: jest.fn(),
+	onSubKey: jest.fn( () => ( reducer ) => reducer ),
 } ) );
 
 const mockSetAttributes = jest.fn();
