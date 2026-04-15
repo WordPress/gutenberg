@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 25.0.0 (2026-04-15)
+
 ### Breaking Changes
 
 -   Upgraded to ESLint v10 with flat config format. The plugin now exports flat config arrays instead of eslintrc objects. Consumers must migrate from `.eslintrc.*` files to `eslint.config.mjs`. See the [migration guide](https://eslint.org/docs/latest/use/configure/migration-guide) for details.

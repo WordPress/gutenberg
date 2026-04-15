@@ -9,6 +9,7 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -41,14 +42,14 @@ const TABS_TEMPLATE = [
 			[
 				'core/tab',
 				{
-					label: 'Tab 1',
+					label: __( 'Tab' ),
 				},
 				[ [ 'core/paragraph' ] ],
 			],
 			[
 				'core/tab',
 				{
-					label: 'Tab 2',
+					label: __( 'Tab' ),
 				},
 				[ [ 'core/paragraph' ] ],
 			],

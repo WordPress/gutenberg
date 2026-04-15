@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.12.0 (2026-04-15)
+
 ### Enhancements
 
 -   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
