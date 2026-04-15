@@ -7,14 +7,14 @@ An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for t
 ### Claude Code
 
 ```bash
-claude mcp add wordpress-design-system -- npx -y @wordpress/design-system-mcp
+claude mcp add wordpress-design-system -- npx -y @wordpress/design-system-mcp@latest
 ```
 
 ### Cursor
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IEB3b3JkcHJlc3MvZGVzaWduLXN5c3RlbS1tY3AifQ%3D%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IEB3b3JkcHJlc3MvZGVzaWduLXN5c3RlbS1tY3BAbGF0ZXN0In0%3D)
 
-Install link: cursor://anysphere.cursor-deeplink/mcp/install?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IEB3b3JkcHJlc3MvZGVzaWduLXN5c3RlbS1tY3AifQ%3D%3D
+Install link: [cursor://anysphere.cursor-deeplink/mcp/install?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IEB3b3JkcHJlc3MvZGVzaWduLXN5c3RlbS1tY3BAbGF0ZXN0In0%3D](cursor://anysphere.cursor-deeplink/mcp/install?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IEB3b3JkcHJlc3MvZGVzaWduLXN5c3RlbS1tY3BAbGF0ZXN0In0%3D)
 
 ### Other (Claude Desktop, VS Code)
 
@@ -25,7 +25,7 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 	"mcpServers": {
 		"wordpress-design-system": {
 			"command": "npx",
-			"args": [ "-y", "@wordpress/design-system-mcp" ]
+			"args": [ "-y", "@wordpress/design-system-mcp@latest" ]
 		}
 	}
 }
