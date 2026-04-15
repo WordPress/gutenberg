@@ -22,6 +22,13 @@ class Gutenberg_Guidelines_Post_Type {
 	const POST_TYPE = 'wp_guideline';
 
 	/**
+	 * The taxonomy name for guideline types.
+	 *
+	 * @var string
+	 */
+	const TAXONOMY = 'wp_guideline_type';
+
+	/**
 	 * The standard guideline category meta keys.
 	 *
 	 * @var array
@@ -104,6 +111,29 @@ class Gutenberg_Guidelines_Post_Type {
 		);
 
 		register_post_type( self::POST_TYPE, $args );
+
+		register_taxonomy(
+			self::TAXONOMY,
+			self::POST_TYPE,
+			array(
+				'public'             => false,
+				'publicly_queryable' => false,
+				'hierarchical'       => false,
+				'labels'             => array(
+					'name'          => __( 'Guideline Types', 'gutenberg' ),
+					'singular_name' => __( 'Guideline Type', 'gutenberg' ),
+				),
+				'query_var'          => false,
+				'rewrite'            => false,
+				'show_ui'            => false,
+				'show_in_nav_menus'  => false,
+				'show_in_rest'       => true,
+				'default_term'       => array(
+					'name' => 'content',
+					'slug' => 'content',
+				),
+			)
+		);
 	}
 
 	/**
