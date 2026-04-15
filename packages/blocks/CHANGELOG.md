@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- `registerBlockType`: Introduced a slightly modified version of the generics from `@types/wordpress__blocks`
+- `registerBlockVariation`, `unregisterBlockVariation` updated the types to match the dispatch call
+
 ## 15.17.0 (2026-04-15)
 
 ## 15.16.0 (2026-04-01)
