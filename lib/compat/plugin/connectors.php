@@ -42,8 +42,8 @@ function _gutenberg_connectors_add_settings_menu_item(): void {
  *
  * @access private
  *
- * @param array $preload_paths Paths already queued for preloading.
- * @return array Paths with the Connectors-specific requests appended.
+ * @param string[] $preload_paths Paths already queued for preloading.
+ * @return string[] Paths with the Connectors-specific requests appended.
  */
 function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
 	// getEntityRecord( 'root', 'site' ) in stage.tsx / use-connector-plugin.ts.
