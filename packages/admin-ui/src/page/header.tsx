@@ -51,15 +51,15 @@ export default function Header( {
 							{ visual }
 						</div>
 					) }
-				{ title && (
-					<Text
-						className={ styles[ 'header-title' ] }
-						render={ <HeadingTag /> }
-						variant="heading-lg"
-					>
-						{ title }
-					</Text>
-				) }
+					{ title && (
+						<Text
+							className={ styles[ 'header-title' ] }
+							render={ <HeadingTag /> }
+							variant="body-lg"
+						>
+							{ title }
+						</Text>
+					) }
 					{ breadcrumbs }
 					{ badges }
 				</Stack>
@@ -73,15 +73,15 @@ export default function Header( {
 					{ actions }
 				</Stack>
 			</Stack>
-		{ subTitle && (
-			<Text
-				render={ <p /> }
-				variant="body-md"
-				className={ styles[ 'header-subtitle' ] }
-			>
-				{ subTitle }
-			</Text>
-		) }
+			{ subTitle && (
+				<Text
+					render={ <p /> }
+					variant="body-md"
+					className={ styles[ 'header-subtitle' ] }
+				>
+					{ subTitle }
+				</Text>
+			) }
 		</Stack>
 	);
 }
