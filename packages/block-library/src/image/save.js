@@ -60,6 +60,25 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
+	// If both dimensions are px, derive aspect-ratio and drop the fixed
+	// height — otherwise it overrides height:auto and breaks on mobile.
+	let savedAspectRatio = aspectRatio;
+	let savedHeight = height;
+	if ( ! aspectRatio && width && height ) {
+		const widthPx =
+			typeof width === 'string' && width.endsWith( 'px' )
+				? parseFloat( width )
+				: 0;
+		const heightPx =
+			typeof height === 'string' && height.endsWith( 'px' )
+				? parseFloat( height )
+				: 0;
+		if ( widthPx && heightPx ) {
+			savedAspectRatio = `${ widthPx }/${ heightPx }`;
+			savedHeight = undefined;
+		}
+	}
+
 	const image = (
 		<img
 			src={ url }
@@ -68,14 +87,14 @@ export default function save( { attributes } ) {
 			style={ {
 				...borderProps.style,
 				...shadowProps.style,
-				aspectRatio,
+				aspectRatio: savedAspectRatio,
 				objectFit: scale,
 				objectPosition:
 					focalPoint && scale
 						? mediaPosition( focalPoint )
 						: undefined,
 				width,
-				height,
+				height: savedHeight,
 			} }
 			title={ title }
 		/>

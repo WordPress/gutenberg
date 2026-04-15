@@ -8,7 +8,7 @@
 			"alt": "",
 			"caption": "",
 			"width": "100px",
-			"height": "100px"
+			"aspectRatio": "100/100"
 		},
 		"innerBlocks": []
 	}

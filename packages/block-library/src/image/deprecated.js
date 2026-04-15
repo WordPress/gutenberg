@@ -653,10 +653,27 @@ const v6 = {
 	},
 	migrate( attributes ) {
 		const { height, width } = attributes;
+		const newWidth = typeof width === 'number' ? `${ width }px` : width;
+		const newHeight = typeof height === 'number' ? `${ height }px` : height;
+		// Derive aspect-ratio so we don't end up with a hard px height
+		// that kills responsive scaling (see #53555).
+		if (
+			typeof width === 'number' &&
+			typeof height === 'number' &&
+			width &&
+			height
+		) {
+			return {
+				...attributes,
+				width: newWidth,
+				height: undefined,
+				aspectRatio: `${ width }/${ height }`,
+			};
+		}
 		return {
 			...attributes,
-			width: typeof width === 'number' ? `${ width }px` : width,
-			height: typeof height === 'number' ? `${ height }px` : height,
+			width: newWidth,
+			height: newHeight,
 		};
 	},
 	save( { attributes } ) {
@@ -855,6 +872,14 @@ const v7 = {
 		},
 	},
 	migrate( { width, height, ...attributes } ) {
+		// Prefer aspect-ratio over a hard height — see #53555.
+		if ( width && height ) {
+			return {
+				...attributes,
+				width: `${ width }px`,
+				aspectRatio: `${ width }/${ height }`,
+			};
+		}
 		return {
 			...attributes,
 			width: `${ width }px`,
@@ -1166,4 +1191,229 @@ const v8 = {
 	},
 };
 
-export default [ v8, v7, v6, v5, v4, v3, v2, v1 ];
+/**
+ * Deprecation for replacing a hard px height with aspect-ratio so images
+ * don't break on narrow viewports.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/53555
+ */
+const v9 = {
+	attributes: {
+		align: {
+			type: 'string',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'src',
+			role: 'content',
+		},
+		alt: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'alt',
+			default: '',
+			role: 'content',
+		},
+		caption: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'figcaption',
+			role: 'content',
+		},
+		lightbox: {
+			type: 'object',
+			enabled: {
+				type: 'boolean',
+			},
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'img',
+			attribute: 'title',
+			role: 'content',
+		},
+		href: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'href',
+			role: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'rel',
+		},
+		linkClass: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'class',
+		},
+		id: {
+			type: 'number',
+			role: 'content',
+		},
+		width: {
+			type: 'string',
+		},
+		height: {
+			type: 'string',
+		},
+		aspectRatio: {
+			type: 'string',
+		},
+		scale: {
+			type: 'string',
+		},
+		sizeSlug: {
+			type: 'string',
+		},
+		linkDestination: {
+			type: 'string',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'figure > a',
+			attribute: 'target',
+		},
+	},
+	supports: {
+		interactivity: true,
+		align: [ 'left', 'center', 'right', 'wide', 'full' ],
+		anchor: true,
+		color: {
+			text: false,
+			background: false,
+		},
+		filter: {
+			duotone: true,
+		},
+		spacing: {
+			margin: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				width: true,
+			},
+		},
+	},
+	isEligible( { width, height, aspectRatio } ) {
+		return (
+			! aspectRatio &&
+			typeof width === 'string' &&
+			width.endsWith( 'px' ) &&
+			typeof height === 'string' &&
+			height.endsWith( 'px' )
+		);
+	},
+	migrate( { width, height, ...attributes } ) {
+		const w = parseFloat( width );
+		const h = parseFloat( height );
+		return {
+			...attributes,
+			width,
+			aspectRatio: `${ w }/${ h }`,
+		};
+	},
+	save( { attributes } ) {
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			aspectRatio,
+			scale,
+			id,
+			linkTarget,
+			sizeSlug,
+			title,
+		} = attributes;
+
+		const newRel = ! rel ? undefined : rel;
+		const borderProps = getBorderClassesAndStyles( attributes );
+
+		const classes = clsx( {
+			// All other align classes are handled by block supports.
+			// `{ align: 'none' }` is unique to transforms for the image block.
+			alignnone: 'none' === align,
+			[ `size-${ sizeSlug }` ]: sizeSlug,
+			'is-resized': width || height,
+			'has-custom-border':
+				!! borderProps.className ||
+				( borderProps.style &&
+					Object.keys( borderProps.style ).length > 0 ),
+		} );
+
+		const imageClasses = clsx( borderProps.className, {
+			[ `wp-image-${ id }` ]: !! id,
+		} );
+
+		const image = (
+			<img
+				src={ url }
+				alt={ alt }
+				className={ imageClasses || undefined }
+				style={ {
+					...borderProps.style,
+					aspectRatio,
+					objectFit: scale,
+					width,
+					height,
+				} }
+				title={ title }
+			/>
+		);
+
+		const figure = (
+			<>
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ newRel }
+					>
+						{ image }
+					</a>
+				) : (
+					image
+				) }
+				{ ! RichText.isEmpty( caption ) && (
+					<RichText.Content
+						className={ __experimentalGetElementClassName(
+							'caption'
+						) }
+						tagName="figcaption"
+						value={ caption }
+					/>
+				) }
+			</>
+		);
+
+		return (
+			<figure { ...useBlockProps.save( { className: classes } ) }>
+				{ figure }
+			</figure>
+		);
+	},
+};
+
+export default [ v9, v8, v7, v6, v5, v4, v3, v2, v1 ];

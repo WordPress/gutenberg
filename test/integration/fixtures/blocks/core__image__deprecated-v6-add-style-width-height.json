@@ -8,7 +8,7 @@
 			"alt": "",
 			"caption": "",
 			"width": "164px",
-			"height": "164px",
+			"aspectRatio": "164/164",
 			"sizeSlug": "large",
 			"className": "is-style-rounded",
 			"style": {
