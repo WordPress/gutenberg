@@ -101,7 +101,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 	 * them here so the responses are embedded in the initial HTML rather
 	 * than fetched over the network after hydration.
 	 *
-	 * @param array $preload_paths Paths to preload.
+	 * @param string[] $preload_paths Paths to preload.
 	 */
 	$preload_paths = apply_filters( '{{PAGE_SLUG}}-wp-admin_preload_paths', $preload_paths );
 
