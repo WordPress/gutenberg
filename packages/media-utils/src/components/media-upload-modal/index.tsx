@@ -27,6 +27,7 @@ import type {
 	Field,
 	ActionButton,
 	SupportedLayouts,
+	View,
 } from '@wordpress/dataviews';
 import { useView } from '@wordpress/views';
 import { Stack } from '@wordpress/ui';
@@ -68,6 +69,22 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+const defaultView: View = {
+	type: LAYOUT_PICKER_GRID,
+	fields: [],
+	showTitle: false,
+	titleField: 'title',
+	mediaField: 'media_thumbnail',
+	search: '',
+	page: 1,
+	perPage: 50,
+	filters: [],
+	layout: {
+		previewSize: 170,
+		density: 'compact',
+	},
+};
 
 const defaultLayouts: SupportedLayouts = {
 	[ LAYOUT_PICKER_GRID ]: {
@@ -219,21 +236,7 @@ export function MediaUploadModal( {
 		kind: 'postType',
 		name: 'attachment',
 		slug: 'media-modal',
-		defaultView: {
-			type: LAYOUT_PICKER_GRID,
-			fields: [],
-			showTitle: false,
-			titleField: 'title',
-			mediaField: 'media_thumbnail',
-			search: '',
-			page: 1,
-			perPage: 50,
-			filters: [],
-			layout: {
-				previewSize: 170,
-				density: 'compact',
-			},
-		},
+		defaultView,
 	} );
 
 	// Build query args based on view properties, similar to PostList
