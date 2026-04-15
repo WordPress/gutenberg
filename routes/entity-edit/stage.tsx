@@ -18,7 +18,13 @@ import {
 	// @ts-ignore
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
@@ -70,6 +76,7 @@ function EntityEdit() {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ config, setConfig ] = useState< EntityConfig | null >( null );
 	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
+	const originalConfigRef = useRef< EntityConfig | null >( null );
 
 	// Fetch the entity config and all configs (for taxonomy/post type lists).
 	useEffect( () => {
@@ -84,6 +91,7 @@ function EntityEdit() {
 		] )
 			.then( ( [ entityResponse, allResponse ] ) => {
 				setConfig( entityResponse );
+				originalConfigRef.current = entityResponse;
 				setAllConfigs( allResponse );
 				setIsLoading( false );
 			} )
@@ -189,6 +197,24 @@ function EntityEdit() {
 						  } ),
 				},
 			} );
+
+			const prev = originalConfigRef.current;
+			const menuChanged =
+				prev?.labels?.name !== config.labels?.name ||
+				prev?.labels?.menu_name !== config.labels?.menu_name ||
+				prev?.show_ui !== config.show_ui ||
+				prev?.show_in_menu !== config.show_in_menu ||
+				prev?.menu_icon !== config.menu_icon ||
+				prev?.menu_position !== config.menu_position ||
+				JSON.stringify( prev?.object_type ) !==
+					JSON.stringify( config.object_type );
+
+			if ( menuChanged ) {
+				window.location.reload();
+				return;
+			}
+
+			originalConfigRef.current = config;
 			createSuccessNotice( __( 'Entity updated successfully.' ), {
 				type: 'snackbar',
 			} );

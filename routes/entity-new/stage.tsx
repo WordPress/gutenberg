@@ -200,6 +200,11 @@ function EntityNew() {
 						  } ),
 				},
 			} );
+			if ( config.show_in_menu || config.show_ui ) {
+				window.location.reload();
+				return;
+			}
+
 			createSuccessNotice( __( 'Entity created successfully.' ), {
 				type: 'snackbar',
 			} );
