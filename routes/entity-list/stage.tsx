@@ -210,12 +210,13 @@ function EntityList() {
 						);
 						createSuccessNotice(
 							__( 'Entity deleted successfully.' ),
-							{ type: 'snackbar' }
+							{ type: 'snackbar', id: 'entity-delete-success' }
 						);
 					} )
 					.catch( () => {
 						createErrorNotice( __( 'Failed to delete entity.' ), {
 							type: 'snackbar',
+							id: 'entity-delete-error',
 						} );
 					} );
 			},

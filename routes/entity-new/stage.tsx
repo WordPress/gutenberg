@@ -160,6 +160,7 @@ function EntityNew() {
 		if ( ! config.slug ) {
 			createErrorNotice( __( 'Slug is required.' ), {
 				type: 'snackbar',
+				id: 'entity-validation-error',
 			} );
 			return;
 		}
@@ -167,6 +168,7 @@ function EntityNew() {
 		if ( ! config.labels.name ) {
 			createErrorNotice( __( 'Name is required.' ), {
 				type: 'snackbar',
+				id: 'entity-validation-error',
 			} );
 			return;
 		}
@@ -214,7 +216,7 @@ function EntityNew() {
 		} catch ( error: any ) {
 			createErrorNotice(
 				error?.message || __( 'Failed to create entity.' ),
-				{ type: 'snackbar' }
+				{ type: 'snackbar', id: 'entity-save-error' }
 			);
 		}
 

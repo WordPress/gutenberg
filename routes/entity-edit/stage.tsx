@@ -234,6 +234,7 @@ function EntityEdit() {
 		} catch {
 			createErrorNotice( __( 'Failed to update entity.' ), {
 				type: 'snackbar',
+				id: 'entity-save-error',
 			} );
 		}
 
