@@ -27,19 +27,19 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `false`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-- [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [visibility](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
-- [lock](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `false`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+- [`shadow`](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+- [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 
 ## Context
 

@@ -19,19 +19,19 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-  - [heading](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [`heading`](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
+  - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 
 ## Context
 

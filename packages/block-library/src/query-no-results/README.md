@@ -21,18 +21,18 @@ _This block has no custom attributes._
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

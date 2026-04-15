@@ -23,20 +23,20 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
-- [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `false`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-- [renaming](/block-editor/reference-guides/block-api/block-supports/#renaming): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+- [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `false`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+- [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `true`
 
 ## Context
 

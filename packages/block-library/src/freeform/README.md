@@ -18,13 +18,13 @@
 
 ## Supports
 
-- [className](/block-editor/reference-guides/block-api/block-supports/#classname): `false`
-- [customClassName](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
-- [lock](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [renaming](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
-- [visibility](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
-- [customCSS](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- [`className`](/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+- [`customClassName`](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
+- [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+- [`customCSS`](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
 
 ## Block Markup
 

@@ -27,28 +27,28 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [background](/block-editor/reference-guides/block-api/block-supports/#background):
-  - [backgroundImage](/block-editor/reference-guides/block-api/block-supports/#background-backgroundimage): `true`
-  - [backgroundSize](/block-editor/reference-guides/block-api/block-supports/#background-backgroundsize): `true`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
-- [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
-- [ariaLabel](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
-- [contentRole](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
-- [listView](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [`background`](/block-editor/reference-guides/block-api/block-supports/#background):
+  - [`backgroundImage`](/block-editor/reference-guides/block-api/block-supports/#background-backgroundimage): `true`
+  - [`backgroundSize`](/block-editor/reference-guides/block-api/block-supports/#background-backgroundsize): `true`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
+  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+- [`shadow`](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`ariaLabel`](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`contentRole`](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [`listView`](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 
 ## Context
 

@@ -21,20 +21,20 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [alignWide](/block-editor/reference-guides/block-api/block-supports/#alignwide): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
-- [filter](/block-editor/reference-guides/block-api/block-supports/#filter):
-  - [duotone](/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [`alignWide`](/block-editor/reference-guides/block-api/block-supports/#alignwide): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`filter`](/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [`duotone`](/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 
 ## Block Styles
 

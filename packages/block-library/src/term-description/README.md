@@ -16,20 +16,20 @@ _This block has no custom attributes._
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
-  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+  - [`textAlign`](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

@@ -21,11 +21,11 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 
 ## Context
 

@@ -21,19 +21,19 @@ _This block has no custom attributes._
 
 ## Supports
 
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [lock](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-- [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`textAlign`](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+- [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [`allowEditing`](/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
 
 ## Context
 
