@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.6.0 (2026-04-15)
+
 ### Documentation
 
 -   Add README.md files for `DatePicker` and `TimePicker` components ([#70365](https://github.com/WordPress/gutenberg/pull/70365)).

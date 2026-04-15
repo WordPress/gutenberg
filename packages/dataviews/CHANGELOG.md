@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.1.0 (2026-04-15)
+
 ### Enhancements
 
 - DataForm: Add `min`/`max` date range validation support for `date` and `datetime` fields. [#77201](https://github.com/WordPress/gutenberg/pull/77201)
