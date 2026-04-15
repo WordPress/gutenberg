@@ -52,8 +52,8 @@ if ( ! function_exists( 'gutenberg_inject_rtc_compatible_meta_boxes' ) ) {
 					}
 
 					$meta_boxes_per_location[ $location ][] = array(
-						'id'                => $meta_box['id'],
-						'title'             => $meta_box['title'],
+						'id'               => $meta_box['id'],
+						'title'            => $meta_box['title'],
 						'__rtc_compatible' => true,
 					);
 				}
