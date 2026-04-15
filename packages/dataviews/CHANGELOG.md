@@ -5,7 +5,7 @@
 ### Enhancements
 
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
--   `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling ([#77259](https://github.com/WordPress/gutenberg/pull/77259)).
+- `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling. [#77259](https://github.com/WordPress/gutenberg/pull/77259)
 
 ### Bug Fixes
 
