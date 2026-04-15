@@ -93,6 +93,18 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_preload_data() {
 		array( '/wp/v2/settings', 'OPTIONS' ),
 	);
 
+	/**
+	 * Filters the REST API paths preloaded for this page.
+	 *
+	 * Each entry is either a string path (GET) or a `[ path, method ]` tuple.
+	 * Pages that know which requests their JS will issue on mount can add
+	 * them here so the responses are embedded in the initial HTML rather
+	 * than fetched over the network after hydration.
+	 *
+	 * @param array $preload_paths Paths to preload.
+	 */
+	$preload_paths = apply_filters( '{{PAGE_SLUG}}-wp-admin_preload_paths', $preload_paths );
+
 	// Use rest_preload_api_request to gather the preloaded data
 	$preload_data = array_reduce(
 		$preload_paths,
