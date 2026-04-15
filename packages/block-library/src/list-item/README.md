@@ -13,10 +13,10 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/list`
+- [`core/list`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 
 **Allowed inner blocks:**
-- `core/list`
+- [`core/list`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list/)
 
 ## Attributes
 

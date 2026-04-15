@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/columns`
+- [`core/columns`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 
 ## Attributes
 

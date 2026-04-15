@@ -13,12 +13,12 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/navigation`
+- [`core/navigation`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
 
 **Allowed inner blocks:**
-- `core/navigation-link`
-- `core/navigation-submenu`
-- `core/page-list`
+- [`core/navigation-link`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
+- [`core/navigation-submenu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
+- [`core/page-list`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 
 ## Attributes
 

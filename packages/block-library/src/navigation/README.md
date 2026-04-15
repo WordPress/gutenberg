@@ -26,18 +26,18 @@ The structural CSS for the navigation block targets generic classnames across me
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/navigation-link`
-- `core/search`
-- `core/social-links`
-- `core/page-list`
-- `core/spacer`
-- `core/home-link`
-- `core/icon`
-- `core/site-title`
-- `core/site-logo`
-- `core/navigation-submenu`
-- `core/loginout`
-- `core/buttons`
+- [`core/navigation-link`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
+- [`core/search`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
+- [`core/social-links`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
+- [`core/page-list`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
+- [`core/spacer`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/)
+- [`core/home-link`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-home-link/)
+- [`core/icon`](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/)
+- [`core/site-title`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-title/)
+- [`core/site-logo`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-site-logo/)
+- [`core/navigation-submenu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
+- [`core/loginout`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/)
+- [`core/buttons`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 
 ## Attributes
 

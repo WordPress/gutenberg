@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/button`
+- [`core/button`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 
 ## Attributes
 

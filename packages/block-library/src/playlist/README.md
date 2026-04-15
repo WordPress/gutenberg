@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/playlist-track`
+- [`core/playlist-track`](/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-playlist-track/)
 
 ## Attributes
 

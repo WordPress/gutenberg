@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Ancestor blocks:**
-- `core/terms-query`
+- [`core/terms-query`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-terms-query/)
 
 ## Attributes
 

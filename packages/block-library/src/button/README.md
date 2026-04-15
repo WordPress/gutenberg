@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/buttons`
+- [`core/buttons`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 
 ## Attributes
 

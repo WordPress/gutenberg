@@ -246,6 +246,28 @@ function formatContext( usesContext, providesContext ) {
 }
 
 /**
+ * Build a handbook link for a block name (e.g. `core/button`).
+ *
+ * Returns a markdown link if the block exists locally, otherwise plain code.
+ *
+ * @param {string} blockName Full block name like `core/button`.
+ * @return {string} Markdown link or code span.
+ */
+function blockLink( blockName ) {
+	const slug = blockName.replace( 'core/', '' );
+	const blockJsonPath = path.join( BLOCK_LIBRARY_DIR, slug, 'block.json' );
+
+	if ( ! fs.existsSync( blockJsonPath ) ) {
+		return `\`${ blockName }\``;
+	}
+
+	const json = JSON.parse( fs.readFileSync( blockJsonPath, 'utf-8' ) );
+	const category = json.category || 'uncategorized';
+	const url = `/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ slug }/`;
+	return `[\`${ blockName }\`](${ url })`;
+}
+
+/**
  * Format block relationships (parent, ancestor, allowedBlocks).
  *
  * @param {Object} blockJson
@@ -257,7 +279,7 @@ function formatRelationships( blockJson ) {
 	if ( blockJson.parent && blockJson.parent.length > 0 ) {
 		parts.push( '**Parent blocks (direct):**' );
 		for ( const p of blockJson.parent ) {
-			parts.push( `- \`${ p }\`` );
+			parts.push( `- ${ blockLink( p ) }` );
 		}
 	}
 
@@ -267,7 +289,7 @@ function formatRelationships( blockJson ) {
 		}
 		parts.push( '**Ancestor blocks:**' );
 		for ( const a of blockJson.ancestor ) {
-			parts.push( `- \`${ a }\`` );
+			parts.push( `- ${ blockLink( a ) }` );
 		}
 	}
 
@@ -277,7 +299,7 @@ function formatRelationships( blockJson ) {
 		}
 		parts.push( '**Allowed inner blocks:**' );
 		for ( const b of blockJson.allowedBlocks ) {
-			parts.push( `- \`${ b }\`` );
+			parts.push( `- ${ blockLink( b ) }` );
 		}
 	}
 

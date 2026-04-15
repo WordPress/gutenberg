@@ -13,8 +13,8 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/tabs-menu`
-- `core/tab-panel`
+- [`core/tabs-menu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/)
+- [`core/tab-panel`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
 
 ## Attributes
 

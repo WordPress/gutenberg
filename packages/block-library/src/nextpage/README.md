@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/post-content`
+- [`core/post-content`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-content/)
 
 ## Attributes
 

@@ -15,11 +15,11 @@
 ## Block Relationships
 
 **Ancestor blocks:**
-- `core/form`
+- [`core/form`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form/)
 
 **Allowed inner blocks:**
-- `core/buttons`
-- `core/button`
+- [`core/buttons`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
+- [`core/button`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 
 ## Attributes
 

@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/page-list-item`
+- [`core/page-list-item`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
 
 ## Attributes
 

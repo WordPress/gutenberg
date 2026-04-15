@@ -13,7 +13,7 @@
 ## Block Relationships
 
 **Allowed inner blocks:**
-- `core/accordion-item`
+- [`core/accordion-item`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-item/)
 
 ## Attributes
 

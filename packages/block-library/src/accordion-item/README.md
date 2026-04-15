@@ -13,11 +13,11 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/accordion`
+- [`core/accordion`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion/)
 
 **Allowed inner blocks:**
-- `core/accordion-heading`
-- `core/accordion-panel`
+- [`core/accordion-heading`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-heading/)
+- [`core/accordion-panel`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-panel/)
 
 ## Attributes
 

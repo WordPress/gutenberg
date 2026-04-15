@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **Ancestor blocks:**
-- `core/form`
+- [`core/form`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form/)
 
 ## Attributes
 

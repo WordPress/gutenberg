@@ -13,10 +13,10 @@
 ## Block Relationships
 
 **Parent blocks (direct):**
-- `core/tabs`
+- [`core/tabs`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 
 **Allowed inner blocks:**
-- `core/tab`
+- [`core/tab`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/)
 
 ## Attributes
 
