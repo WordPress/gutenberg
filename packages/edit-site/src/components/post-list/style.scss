@@ -44,7 +44,7 @@
 	padding: 0;
 	background-color: unset;
 	box-sizing: border-box;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	overflow: hidden;
 	height: 100%;
 	width: 100%;
