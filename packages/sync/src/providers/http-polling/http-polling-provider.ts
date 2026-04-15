@@ -12,6 +12,7 @@ import type {
 	ConnectionStatus,
 	ProviderCreator,
 	ProviderCreatorResult,
+	ProviderEventMap,
 } from '../../types';
 import { pollingManager } from './polling-manager';
 
@@ -23,12 +24,10 @@ export interface ProviderOptions {
 }
 
 /**
- * Event types for HttpPollingProvider.
- * ObservableV2 expects event handlers as functions.
+ * Event types for HttpPollingProvider, Derived from ProviderEventMap.
  */
 type HttpPollingEvents = {
-	status: ( status: ConnectionStatus ) => void;
-	trustworthy: ( trustworthy: boolean ) => void;
+	[ K in keyof ProviderEventMap ]: ( data: ProviderEventMap[ K ] ) => void;
 };
 
 /**
@@ -181,7 +180,10 @@ export function createHttpPollingProvider(): ProviderCreator {
 			// Adapter: ObservableV2.on is compatible with ProviderOn
 			// The callback receives data as the first parameter
 			on: ( event, callback ) => {
-				provider.on( event, callback );
+				provider.on(
+					event,
+					callback as HttpPollingEvents[ typeof event ]
+				);
 			},
 		};
 	};
