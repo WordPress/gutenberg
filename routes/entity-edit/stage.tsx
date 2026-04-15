@@ -14,6 +14,8 @@ import {
 	PanelRow,
 	Spinner,
 	// @ts-ignore
+	__experimentalConfirmDialog as ConfirmDialog,
+	// @ts-ignore
 	__experimentalVStack as VStack,
 	// @ts-ignore
 	__experimentalHStack as HStack,
@@ -25,10 +27,11 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
+import { trash } from '@wordpress/icons';
 
 interface EntityConfig {
 	slug: string;
@@ -86,6 +89,8 @@ function EntityEdit() {
 
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isDeleting, setIsDeleting ] = useState( false );
+	const [ showDeleteConfirm, setShowDeleteConfirm ] = useState( false );
 	const [ config, setConfig ] = useState< EntityConfig | null >( null );
 	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
 	const originalConfigRef = useRef< EntityConfig | null >( null );
@@ -245,6 +250,32 @@ function EntityEdit() {
 		setIsSaving( false );
 	}, [ config, entityType, slug, createSuccessNotice, createErrorNotice ] );
 
+	const handleDelete = useCallback( async () => {
+		setIsDeleting( true );
+		try {
+			await apiFetch( {
+				path: `/gutenberg/v1/entity-configs/${ entityType }/${ slug }`,
+				method: 'DELETE',
+			} );
+			sessionStorage.setItem(
+				'gutenberg_entity_saved',
+				__( 'Entity deleted successfully.' )
+			);
+			// Always reload — a deleted entity affects the admin menu.
+			const url = new URL( window.location.href );
+			url.searchParams.set( 'p', '/' );
+			url.searchParams.set( 'tab', entityType );
+			window.location.href = url.toString();
+		} catch {
+			createErrorNotice( __( 'Failed to delete entity.' ), {
+				type: 'snackbar',
+				id: 'entity-delete-error',
+			} );
+			setIsDeleting( false );
+			setShowDeleteConfirm( false );
+		}
+	}, [ entityType, slug, createErrorNotice ] );
+
 	if ( isLoading ) {
 		return (
 			<Page title={ __( 'Edit Entity' ) }>
@@ -267,302 +298,354 @@ function EntityEdit() {
 	}`;
 
 	return (
-		<Page
-			title={ pageTitle }
-			actions={
-				<HStack spacing={ 3 }>
-					<Button
-						variant="tertiary"
-						onClick={ () =>
-							navigate( {
-								to: '/',
-								search: { tab: entityType },
-							} )
-						}
-						size="compact"
-					>
-						{ __( 'Back' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ handleSave }
-						isBusy={ isSaving }
-						disabled={ isSaving }
-						size="compact"
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			}
-		>
-			<div style={ { maxWidth: 800, padding: '0 16px' } }>
-				<VStack spacing={ 4 }>
-					<Panel>
-						<PanelBody title={ __( 'General' ) } initialOpen>
-							<PanelRow>
-								<TextControl
-									__nextHasNoMarginBottom
-									label={ __( 'Name (Plural)' ) }
-									value={ config.labels?.name || '' }
-									onChange={ ( value: string ) =>
-										updateLabel( 'name', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<TextControl
-									__nextHasNoMarginBottom
-									label={ __( 'Singular Name' ) }
-									value={ config.labels?.singular_name || '' }
-									onChange={ ( value: string ) =>
-										updateLabel( 'singular_name', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<TextControl
-									__nextHasNoMarginBottom
-									label={ __( 'Slug' ) }
-									value={ config.slug }
-									disabled
-									readOnly
-								/>
-							</PanelRow>
-							<PanelRow>
-								<TextareaControl
-									__nextHasNoMarginBottom
-									label={ __( 'Description' ) }
-									value={ config.description || '' }
-									onChange={ ( value: string ) =>
-										updateField( 'description', value )
-									}
-								/>
-							</PanelRow>
-						</PanelBody>
-					</Panel>
-
-					<Panel>
-						<PanelBody title={ __( 'Visibility' ) } initialOpen>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Public' ) }
-									checked={ config.public }
-									onChange={ ( value: boolean ) =>
-										updateField( 'public', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Hierarchical' ) }
-									checked={ config.hierarchical }
-									onChange={ ( value: boolean ) =>
-										updateField( 'hierarchical', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show UI' ) }
-									checked={ config.show_ui }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_ui', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show in Menu' ) }
-									checked={ !! config.show_in_menu }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_in_menu', value )
-									}
-								/>
-							</PanelRow>
-							{ isPostType && (
+		<>
+			<Page
+				title={ pageTitle }
+				actions={
+					<HStack spacing={ 3 }>
+						<Button
+							variant="tertiary"
+							onClick={ () =>
+								navigate( {
+									to: '/',
+									search: { tab: entityType },
+								} )
+							}
+							size="compact"
+						>
+							{ __( 'Back' ) }
+						</Button>
+						{ config._user_created && (
+							<Button
+								icon={ trash }
+								label={ __( 'Delete' ) }
+								isDestructive
+								onClick={ () => setShowDeleteConfirm( true ) }
+								disabled={ isDeleting }
+								size="compact"
+							/>
+						) }
+						<Button
+							variant="primary"
+							onClick={ handleSave }
+							isBusy={ isSaving }
+							disabled={ isSaving }
+							size="compact"
+						>
+							{ __( 'Save' ) }
+						</Button>
+					</HStack>
+				}
+			>
+				<div style={ { maxWidth: 800, padding: '0 16px' } }>
+					<VStack spacing={ 4 }>
+						<Panel>
+							<PanelBody title={ __( 'General' ) } initialOpen>
 								<PanelRow>
-									<ToggleControl
+									<TextControl
 										__nextHasNoMarginBottom
-										label={ __( 'Has Archive' ) }
-										checked={ !! config.has_archive }
-										onChange={ ( value: boolean ) =>
-											updateField( 'has_archive', value )
+										label={ __( 'Name (Plural)' ) }
+										value={ config.labels?.name || '' }
+										onChange={ ( value: string ) =>
+											updateLabel( 'name', value )
 										}
 									/>
 								</PanelRow>
-							) }
-						</PanelBody>
-					</Panel>
+								<PanelRow>
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Singular Name' ) }
+										value={
+											config.labels?.singular_name || ''
+										}
+										onChange={ ( value: string ) =>
+											updateLabel(
+												'singular_name',
+												value
+											)
+										}
+									/>
+								</PanelRow>
+								<PanelRow>
+									<TextControl
+										__nextHasNoMarginBottom
+										label={ __( 'Slug' ) }
+										value={ config.slug }
+										disabled
+										readOnly
+									/>
+								</PanelRow>
+								<PanelRow>
+									<TextareaControl
+										__nextHasNoMarginBottom
+										label={ __( 'Description' ) }
+										value={ config.description || '' }
+										onChange={ ( value: string ) =>
+											updateField( 'description', value )
+										}
+									/>
+								</PanelRow>
+							</PanelBody>
+						</Panel>
 
-					<Panel>
-						<PanelBody
-							title={ __( 'REST API' ) }
-							initialOpen={ false }
-						>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show in REST' ) }
-									checked={ config.show_in_rest }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_in_rest', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<TextControl
-									__nextHasNoMarginBottom
-									label={ __( 'REST Base' ) }
-									value={ config.rest_base || '' }
-									onChange={ ( value: string ) =>
-										updateField( 'rest_base', value )
-									}
-								/>
-							</PanelRow>
-						</PanelBody>
-					</Panel>
-
-					{ ! isPostType && (
 						<Panel>
-							<PanelBody title={ __( 'Post Types' ) } initialOpen>
-								{ availablePostTypes.map( ( pt ) => (
-									<PanelRow key={ pt.slug }>
-										<CheckboxControl
+							<PanelBody title={ __( 'Visibility' ) } initialOpen>
+								<PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Public' ) }
+										checked={ config.public }
+										onChange={ ( value: boolean ) =>
+											updateField( 'public', value )
+										}
+									/>
+								</PanelRow>
+								<PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Hierarchical' ) }
+										checked={ config.hierarchical }
+										onChange={ ( value: boolean ) =>
+											updateField( 'hierarchical', value )
+										}
+									/>
+								</PanelRow>
+								<PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Show UI' ) }
+										checked={ config.show_ui }
+										onChange={ ( value: boolean ) =>
+											updateField( 'show_ui', value )
+										}
+									/>
+								</PanelRow>
+								<PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Show in Menu' ) }
+										checked={ !! config.show_in_menu }
+										onChange={ ( value: boolean ) =>
+											updateField( 'show_in_menu', value )
+										}
+									/>
+								</PanelRow>
+								{ isPostType && (
+									<PanelRow>
+										<ToggleControl
 											__nextHasNoMarginBottom
-											label={ pt.labels?.name || pt.slug }
-											checked={
-												config.object_type?.includes(
-													pt.slug
-												) ?? false
-											}
+											label={ __( 'Has Archive' ) }
+											checked={ !! config.has_archive }
 											onChange={ ( value: boolean ) =>
-												toggleObjectType(
-													pt.slug,
+												updateField(
+													'has_archive',
 													value
 												)
 											}
 										/>
 									</PanelRow>
-								) ) }
-								{ availablePostTypes.length === 0 && (
-									<PanelRow>
-										<p>
-											{ __( 'No post types available.' ) }
-										</p>
-									</PanelRow>
 								) }
 							</PanelBody>
 						</Panel>
-					) }
 
-					{ isPostType && (
 						<Panel>
 							<PanelBody
-								title={ __( 'Menu' ) }
+								title={ __( 'REST API' ) }
 								initialOpen={ false }
 							>
 								<PanelRow>
-									<TextControl
+									<ToggleControl
 										__nextHasNoMarginBottom
-										label={ __( 'Menu Icon' ) }
-										help={ __(
-											'A dashicon class name or URL to an icon image.'
-										) }
-										value={ config.menu_icon || '' }
-										onChange={ ( value: string ) =>
-											updateField(
-												'menu_icon',
-												value || null
-											)
+										label={ __( 'Show in REST' ) }
+										checked={ config.show_in_rest }
+										onChange={ ( value: boolean ) =>
+											updateField( 'show_in_rest', value )
 										}
 									/>
 								</PanelRow>
 								<PanelRow>
 									<TextControl
 										__nextHasNoMarginBottom
-										label={ __( 'Menu Position' ) }
-										type="number"
-										value={
-											config.menu_position !== null
-												? String( config.menu_position )
-												: ''
-										}
+										label={ __( 'REST Base' ) }
+										value={ config.rest_base || '' }
 										onChange={ ( value: string ) =>
-											updateField(
-												'menu_position',
-												value ? Number( value ) : null
-											)
+											updateField( 'rest_base', value )
 										}
 									/>
 								</PanelRow>
 							</PanelBody>
 						</Panel>
-					) }
 
-					{ isPostType && (
+						{ ! isPostType && (
+							<Panel>
+								<PanelBody
+									title={ __( 'Post Types' ) }
+									initialOpen
+								>
+									{ availablePostTypes.map( ( pt ) => (
+										<PanelRow key={ pt.slug }>
+											<CheckboxControl
+												__nextHasNoMarginBottom
+												label={
+													pt.labels?.name || pt.slug
+												}
+												checked={
+													config.object_type?.includes(
+														pt.slug
+													) ?? false
+												}
+												onChange={ ( value: boolean ) =>
+													toggleObjectType(
+														pt.slug,
+														value
+													)
+												}
+											/>
+										</PanelRow>
+									) ) }
+									{ availablePostTypes.length === 0 && (
+										<PanelRow>
+											<p>
+												{ __(
+													'No post types available.'
+												) }
+											</p>
+										</PanelRow>
+									) }
+								</PanelBody>
+							</Panel>
+						) }
+
+						{ isPostType && (
+							<Panel>
+								<PanelBody
+									title={ __( 'Menu' ) }
+									initialOpen={ false }
+								>
+									<PanelRow>
+										<TextControl
+											__nextHasNoMarginBottom
+											label={ __( 'Menu Icon' ) }
+											help={ __(
+												'A dashicon class name or URL to an icon image.'
+											) }
+											value={ config.menu_icon || '' }
+											onChange={ ( value: string ) =>
+												updateField(
+													'menu_icon',
+													value || null
+												)
+											}
+										/>
+									</PanelRow>
+									<PanelRow>
+										<TextControl
+											__nextHasNoMarginBottom
+											label={ __( 'Menu Position' ) }
+											type="number"
+											value={
+												config.menu_position !== null
+													? String(
+															config.menu_position
+													  )
+													: ''
+											}
+											onChange={ ( value: string ) =>
+												updateField(
+													'menu_position',
+													value
+														? Number( value )
+														: null
+												)
+											}
+										/>
+									</PanelRow>
+								</PanelBody>
+							</Panel>
+						) }
+
+						{ isPostType && (
+							<Panel>
+								<PanelBody
+									title={ __( 'Supports' ) }
+									initialOpen={ false }
+								>
+									{ POST_TYPE_SUPPORTS.map( ( feature ) => (
+										<PanelRow key={ feature }>
+											<CheckboxControl
+												__nextHasNoMarginBottom
+												label={ feature }
+												checked={
+													!! config.supports?.[
+														feature
+													]
+												}
+												onChange={ ( value: boolean ) =>
+													updateSupport(
+														feature,
+														value
+													)
+												}
+											/>
+										</PanelRow>
+									) ) }
+								</PanelBody>
+							</Panel>
+						) }
+
 						<Panel>
 							<PanelBody
-								title={ __( 'Supports' ) }
+								title={ __( 'Labels' ) }
 								initialOpen={ false }
 							>
-								{ POST_TYPE_SUPPORTS.map( ( feature ) => (
-									<PanelRow key={ feature }>
-										<CheckboxControl
+								{ [
+									'add_new',
+									'add_new_item',
+									'edit_item',
+									'new_item',
+									'view_item',
+									'view_items',
+									'search_items',
+									'not_found',
+									'not_found_in_trash',
+									'all_items',
+									'menu_name',
+								].map( ( labelKey ) => (
+									<PanelRow key={ labelKey }>
+										<TextControl
 											__nextHasNoMarginBottom
-											label={ feature }
-											checked={
-												!! config.supports?.[ feature ]
+											label={ labelKey }
+											value={
+												config.labels?.[ labelKey ] ||
+												''
 											}
-											onChange={ ( value: boolean ) =>
-												updateSupport( feature, value )
+											onChange={ ( value: string ) =>
+												updateLabel( labelKey, value )
 											}
 										/>
 									</PanelRow>
 								) ) }
 							</PanelBody>
 						</Panel>
+					</VStack>
+				</div>
+			</Page>
+			{ showDeleteConfirm && (
+				<ConfirmDialog
+					isOpen
+					onConfirm={ handleDelete }
+					onCancel={ () => setShowDeleteConfirm( false ) }
+					confirmButtonText={ __( 'Delete' ) }
+					isBusy={ isDeleting }
+				>
+					{ sprintf(
+						/* translators: %s: entity name */
+						__( 'Are you sure you want to delete "%s"?' ),
+						config.labels?.name || config.slug
 					) }
-
-					<Panel>
-						<PanelBody
-							title={ __( 'Labels' ) }
-							initialOpen={ false }
-						>
-							{ [
-								'add_new',
-								'add_new_item',
-								'edit_item',
-								'new_item',
-								'view_item',
-								'view_items',
-								'search_items',
-								'not_found',
-								'not_found_in_trash',
-								'all_items',
-								'menu_name',
-							].map( ( labelKey ) => (
-								<PanelRow key={ labelKey }>
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ labelKey }
-										value={
-											config.labels?.[ labelKey ] || ''
-										}
-										onChange={ ( value: string ) =>
-											updateLabel( labelKey, value )
-										}
-									/>
-								</PanelRow>
-							) ) }
-						</PanelBody>
-					</Panel>
-				</VStack>
-			</div>
-		</Page>
+				</ConfirmDialog>
+			) }
+		</>
 	);
 }
 
