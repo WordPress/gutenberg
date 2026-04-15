@@ -14,6 +14,10 @@
 
 -   Convert styles to CSS modules with logical properties, removing previously exposed class names. [#77088](https://github.com/WordPress/gutenberg/pull/77088).
 
+### Enhancements
+
+-   Admin UI: use UI Text component in header.
+
 ## 1.12.0 (2026-04-15)
 
 ### Enhancements

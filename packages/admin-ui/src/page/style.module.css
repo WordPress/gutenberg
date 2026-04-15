@@ -19,11 +19,6 @@
 }
 
 .header-title {
-	/* @TODO: use Text component from UI when available. */
-	font-family: var(--wpds-typography-font-family-heading);
-	font-size: var(--wpds-typography-font-size-lg);
-	font-weight: var(--wpds-typography-font-weight-medium);
-	line-height: var(--wpds-typography-line-height-lg);
 	margin: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -54,8 +49,6 @@
 .header-subtitle {
 	padding-block-end: var(--wpds-dimension-padding-xs);
 	color: var(--wpds-color-fg-content-neutral-weak);
-	font-size: var(--wpds-typography-font-size-md);
-	line-height: var(--wpds-typography-line-height-md);
 	margin: 0;
 }
 
