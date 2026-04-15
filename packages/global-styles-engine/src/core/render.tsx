@@ -7,8 +7,8 @@ import {
 	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
-	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
 
@@ -34,12 +34,7 @@ import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getSetting } from '../settings/get-setting';
-import type {
-	BlockStyleVariation,
-	BlockType,
-	GlobalStylesConfig,
-	GlobalStylesStyles,
-} from '../types';
+import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -142,6 +137,8 @@ export type BlockSelectors = Record<
 		styleVariationSelectors?: Record< string, string >;
 	}
 >;
+
+type ElementName = keyof typeof ELEMENTS;
 
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
@@ -956,12 +953,15 @@ export const getNodesWithStyles = (
 						Object.entries(
 							typedVariation?.elements ?? {}
 						).forEach( ( [ element, elementStyles ] ) => {
-							if ( elementStyles && ELEMENTS[ element ] ) {
+							if (
+								elementStyles &&
+								ELEMENTS[ element as ElementName ]
+							) {
 								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
-										ELEMENTS[ element ]
+										ELEMENTS[ element as ElementName ]
 									),
 								} );
 							}
@@ -1040,14 +1040,16 @@ export const getNodesWithStyles = (
 									] ) => {
 										if (
 											variationBlockElementStyles &&
-											ELEMENTS[ variationBlockElement ]
+											ELEMENTS[
+												variationBlockElement as ElementName
+											]
 										) {
 											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
 													ELEMENTS[
-														variationBlockElement
+														variationBlockElement as ElementName
 													]
 												),
 											} );
@@ -1088,7 +1090,7 @@ export const getNodesWithStyles = (
 						typeof blockSelectors !== 'string' &&
 						value &&
 						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName ]
+						ELEMENTS[ elementName as ElementName ]
 					) {
 						nodes.push( {
 							styles: value,
@@ -1096,7 +1098,9 @@ export const getNodesWithStyles = (
 								.split( ',' )
 								.map( ( sel: string ) => {
 									const elementSelectors =
-										ELEMENTS[ elementName ].split( ',' );
+										ELEMENTS[
+											elementName as ElementName
+										].split( ',' );
 									return elementSelectors.map(
 										( elementSelector: string ) =>
 											sel + ' ' + elementSelector
@@ -1726,10 +1730,9 @@ export const getBlockSelectors = (
 				'color.__experimentalDuotone',
 				false
 			);
-			duotoneSelector =
-				duotoneSupport &&
-				rootSelector &&
-				scopeSelector( rootSelector, duotoneSupport );
+			if ( typeof duotoneSupport === 'string' && rootSelector ) {
+				duotoneSelector = scopeSelector( rootSelector, duotoneSupport );
+			}
 		}
 
 		const hasLayoutSupport =
@@ -1741,7 +1744,7 @@ export const getBlockSelectors = (
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors: Record< string, string > = {};
-		blockStyleVariations?.forEach( ( variation: BlockStyleVariation ) => {
+		blockStyleVariations?.forEach( ( variation ) => {
 			const variationSuffix = variationInstanceId
 				? `-${ variationInstanceId }`
 				: '';

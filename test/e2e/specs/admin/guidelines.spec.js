@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const GUIDELINES_PAGE_QUERY = 'page=guidelines-wp-admin';
-const GUIDELINES_REST_BASE = '/wp/v2/content-guidelines';
+const GUIDELINES_REST_BASE = '/wp/v2/guidelines';
 
 // Remove any existing singleton guideline post so each test starts from a
 // clean slate. Uses REST for speed — this is test scaffolding, not the
@@ -30,14 +30,14 @@ async function deleteAllGuidelines( requestUtils ) {
 // others.
 function getCategoryCard( page, title ) {
 	return page
-		.locator( '.content-guidelines__accordion' )
+		.locator( '.guidelines__accordion' )
 		.filter( {
 			has: page.getByRole( 'button', {
 				name: `Expand ${ title } guidelines`,
 			} ),
 		} )
 		.or(
-			page.locator( '.content-guidelines__accordion' ).filter( {
+			page.locator( '.guidelines__accordion' ).filter( {
 				has: page.getByRole( 'button', {
 					name: `Collapse ${ title } guidelines`,
 				} ),
@@ -81,7 +81,7 @@ async function saveCategoryGuidelines( page, title, text ) {
 test.describe( 'Guidelines', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-content-guidelines',
+			'gutenberg-guidelines',
 		] );
 		await deleteAllGuidelines( requestUtils );
 	} );

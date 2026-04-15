@@ -1,4 +1,5 @@
 import type { Select as _Select } from '@base-ui/react/select';
+import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
 // The second type parameter is the `multiple` flag (currently disabled).
@@ -7,7 +8,7 @@ export type SelectRootProps = Omit<
 	'multiple'
 >;
 
-export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
+export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	/**
 	 * The size of the trigger.
 	 *
@@ -27,7 +28,11 @@ export type SelectTriggerProps = Omit< _Select.Trigger.Props, 'children' > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
-export type SelectPopupProps = _Select.Popup.Props & {
+export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
+	/**
+	 * The content to be rendered inside the popup.
+	 */
+	children?: React.ReactNode;
 	/**
 	 * A parent element to render the portal into.
 	 */
@@ -35,8 +40,8 @@ export type SelectPopupProps = _Select.Popup.Props & {
 };
 
 export type SelectItemProps = Omit<
-	_Select.Item.Props,
-	'children' | 'value'
+	ComponentProps< typeof _Select.Item >,
+	'value'
 > & {
 	/**
 	 * A unique value that identifies this select item.

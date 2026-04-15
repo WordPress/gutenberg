@@ -35,6 +35,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -42,12 +43,14 @@
 		"./build-style/": "./build-style/"
 	},
 	"wpScript": true,
+	"types": "build-types",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"change-case": "^4.1.2"
