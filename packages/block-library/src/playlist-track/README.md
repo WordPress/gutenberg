@@ -34,10 +34,10 @@
 
 ## Supports
 
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
-- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 
 ## Context
 

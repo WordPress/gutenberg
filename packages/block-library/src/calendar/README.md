@@ -21,15 +21,15 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Markup

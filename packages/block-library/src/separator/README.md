@@ -21,16 +21,16 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"center"`, `"wide"`, `"full"`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"center"`, `"wide"`, `"full"`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [enableContrastChecker](/block-editor/reference-guides/block-api/block-supports/#colorenablecontrastchecker): `false`
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
   - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
   - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Styles

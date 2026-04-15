@@ -26,23 +26,23 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
   - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
   - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
-- [**contentRole**](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [contentRole](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 
 ## Context
 

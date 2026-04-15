@@ -18,16 +18,16 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Markup

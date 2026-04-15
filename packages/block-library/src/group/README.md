@@ -21,36 +21,36 @@
 
 ## Supports
 
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**ariaLabel**](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [**background**](/block-editor/reference-guides/block-api/block-supports/#background):
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [ariaLabel](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [background](/block-editor/reference-guides/block-api/block-supports/#background):
   - [backgroundImage](/block-editor/reference-guides/block-api/block-supports/#backgroundbackgroundimage): `true`
   - [backgroundSize](/block-editor/reference-guides/block-api/block-supports/#backgroundbackgroundsize): `true`
   - [gradient](/block-editor/reference-guides/block-api/block-supports/#backgroundgradient): `true`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
   - [heading](/block-editor/reference-guides/block-api/block-supports/#colorheading): `true`
   - [button](/block-editor/reference-guides/block-api/block-supports/#colorbutton): `true`
   - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
-- [**shadow**](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
   - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
   - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
-- [**dimensions**](/block-editor/reference-guides/block-api/block-supports/#dimensions):
+- [dimensions](/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - [minHeight](/block-editor/reference-guides/block-api/block-supports/#dimensionsminheight): `true`
-- [**position**](/block-editor/reference-guides/block-api/block-supports/#position):
+- [position](/block-editor/reference-guides/block-api/block-supports/#position):
   - [sticky](/block-editor/reference-guides/block-api/block-supports/#positionsticky): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+- [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
   - [allowSizingOnChildren](/block-editor/reference-guides/block-api/block-supports/#layoutallowsizingonchildren): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
-- [**allowedBlocks**](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
+- [allowedBlocks](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Block Markup
 

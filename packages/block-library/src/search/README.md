@@ -28,17 +28,17 @@
 
 ## Supports
 
-- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
-- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
+- [color](/block-editor/reference-guides/block-api/block-supports/#color):
   - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
-- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
   - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
   - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
-- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 
 ## CSS Selectors
 
