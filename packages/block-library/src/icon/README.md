@@ -20,20 +20,20 @@
 
 ## Supports
 
-- **anchor**: `true`
-- **ariaLabel**:
-- **align**: `"left"`, `"center"`, `"right"`
-- **html**: `false`
-- **color**:
-  - background: `true`
-  - text: `true`
-- **interactivity**:
-  - clientNavigation: `true`
-- **spacing**:
-  - padding: `true`
-  - margin: `true`
-- **dimensions**:
-  - width: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**ariaLabel**](/block-editor/reference-guides/block-api/block-supports/#arialabel):
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+- [**dimensions**](/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - [width](/block-editor/reference-guides/block-api/block-supports/#dimensionswidth): `true`
 
 ## CSS Selectors
 

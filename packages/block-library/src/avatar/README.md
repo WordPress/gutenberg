@@ -21,20 +21,20 @@
 
 ## Supports
 
-- **anchor**: `true`
-- **html**: `false`
-- **align**: `true`
-- **alignWide**: `false`
-- **spacing**:
-  - margin: `true`
-  - padding: `true`
-- **color**:
-  - text: `false`
-  - background: `false`
-- **filter**:
-  - duotone: `true`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [**alignWide**](/block-editor/reference-guides/block-api/block-supports/#alignwide): `false`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `false`
+- [**filter**](/block-editor/reference-guides/block-api/block-supports/#filter):
+  - [duotone](/block-editor/reference-guides/block-api/block-supports/#filterduotone): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

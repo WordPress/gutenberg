@@ -160,6 +160,21 @@ function formatAttributesTable( attributes ) {
 }
 
 /**
+ * Build a link to the Block Supports reference for a given property.
+ *
+ * Anchors use the property name lowercased with dots replaced by hyphens
+ * (e.g. `color.background` → `#colorbackground`).
+ *
+ * @param {string} property Top-level or dotted property name.
+ * @return {string} Absolute handbook path with anchor.
+ */
+const SUPPORTS_BASE = '/block-editor/reference-guides/block-api/block-supports/';
+function supportsLink( property ) {
+	const anchor = property.toLowerCase().replace( /\./g, '' );
+	return `${ SUPPORTS_BASE }#${ anchor }`;
+}
+
+/**
  * Format supports as a readable list.
  *
  * @param {Object} supports
@@ -176,34 +191,38 @@ function formatSupports( supports ) {
 		if ( key.startsWith( '__' ) ) {
 			continue; // Skip experimental/unstable top-level keys in detail view.
 		}
+		const keyLink = `[**${ key }**](${ supportsLink( key ) })`;
 		if ( typeof value === 'boolean' ) {
-			lines.push( `- **${ key }**: \`${ value }\`` );
+			lines.push( `- ${ keyLink }: \`${ value }\`` );
 		} else if ( Array.isArray( value ) ) {
 			lines.push(
-				`- **${ key }**: ${ value
+				`- ${ keyLink }: ${ value
 					.map( ( v ) => `\`${ JSON.stringify( v ) }\`` )
 					.join( ', ' ) }`
 			);
 		} else if ( typeof value === 'object' && value !== null ) {
-			lines.push( `- **${ key }**:` );
+			lines.push( `- ${ keyLink }:` );
 			for ( const [ subKey, subValue ] of Object.entries( value ) ) {
 				if ( subKey.startsWith( '__' ) ) {
 					continue;
 				}
+				const subLink = `[${ subKey }](${ supportsLink(
+					`${ key }.${ subKey }`
+				) })`;
 				if (
 					typeof subValue === 'object' &&
 					subValue !== null
 				) {
 					lines.push(
-						`  - ${ subKey }: \`${ JSON.stringify( subValue ) }\``
+						`  - ${ subLink }: \`${ JSON.stringify( subValue ) }\``
 					);
 				} else {
-					lines.push( `  - ${ subKey }: \`${ subValue }\`` );
+					lines.push( `  - ${ subLink }: \`${ subValue }\`` );
 				}
 			}
 		} else {
 			lines.push(
-				`- **${ key }**: \`${ JSON.stringify( value ) }\``
+				`- ${ keyLink }: \`${ JSON.stringify( value ) }\``
 			);
 		}
 	}

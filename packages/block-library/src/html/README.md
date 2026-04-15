@@ -20,13 +20,13 @@
 
 ## Supports
 
-- **customClassName**: `false`
-- **className**: `false`
-- **html**: `false`
-- **interactivity**:
-  - clientNavigation: `true`
-- **customCSS**: `false`
-- **visibility**: `false`
+- [**customClassName**](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
+- [**className**](/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+- [**customCSS**](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- [**visibility**](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Block Markup
 

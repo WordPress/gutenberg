@@ -23,24 +23,24 @@
 
 ## Supports
 
-- **html**: `false`
-- **color**:
-  - background: `true`
-  - gradients: `true`
-- **interactivity**: `true`
-- **spacing**:
-  - padding: `true`
-  - blockGap: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **shadow**: `true`
-- **layout**:
-  - allowEditing: `false`
-- **visibility**: `false`
-- **contentRole**: `true`
-- **allowedBlocks**: `true`
-- **lock**: `false`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**shadow**](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layoutallowediting): `false`
+- [**visibility**](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+- [**contentRole**](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [**allowedBlocks**](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
+- [**lock**](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 
 ## Context
 

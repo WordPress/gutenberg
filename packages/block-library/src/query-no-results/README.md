@@ -21,18 +21,18 @@ _This block has no custom attributes._
 
 ## Supports
 
-- **anchor**: `true`
-- **align**: `true`
-- **reusable**: `false`
-- **html**: `false`
-- **color**:
-  - gradients: `true`
-  - link: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

@@ -33,28 +33,28 @@
 
 ## Supports
 
-- **align**: `"left"`, `"center"`, `"right"`
-- **anchor**: `true`
-- **html**: `false`
-- **layout**:
-  - allowSwitching: `false`
-  - allowInheriting: `false`
-  - allowVerticalAlignment: `false`
-  - default: `{"type":"flex"}`
-- **color**:
-  - enableContrastChecker: `false`
-  - background: `true`
-  - gradients: `true`
-  - text: `false`
-- **spacing**:
-  - blockGap: `["horizontal","vertical"]`
-  - margin: `true`
-  - padding: `true`
-  - units: `["px","em","rem","vh","vw"]`
-- **interactivity**:
-  - clientNavigation: `true`
-- **contentRole**: `true`
-- **listView**: `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
+  - [allowVerticalAlignment](/block-editor/reference-guides/block-api/block-supports/#layoutallowverticalalignment): `false`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [enableContrastChecker](/block-editor/reference-guides/block-api/block-supports/#colorenablecontrastchecker): `false`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `["horizontal","vertical"]`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [units](/block-editor/reference-guides/block-api/block-supports/#spacingunits): `["px","em","rem","vh","vw"]`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+- [**contentRole**](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [**listView**](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 
 ## Context
 

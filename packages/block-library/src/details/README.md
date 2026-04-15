@@ -23,24 +23,24 @@
 
 ## Supports
 
-- **align**: `"wide"`, `"full"`
-- **anchor**: `true`
-- **color**:
-  - gradients: `true`
-  - link: `true`
-- **html**: `false`
-- **spacing**:
-  - margin: `true`
-  - padding: `true`
-  - blockGap: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **layout**:
-  - allowEditing: `false`
-- **interactivity**:
-  - clientNavigation: `true`
-- **allowedBlocks**: `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layoutallowediting): `false`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+- [**allowedBlocks**](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Block Markup
 

@@ -28,10 +28,10 @@
 
 ## Supports
 
-- **html**: `false`
-- **inserter**: `false`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**inserter**](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

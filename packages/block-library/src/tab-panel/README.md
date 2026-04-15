@@ -24,33 +24,33 @@ _This block has no custom attributes._
 
 ## Supports
 
-- **anchor**: `false`
-- **html**: `false`
-- **reusable**: `false`
-- **lock**: `false`
-- **dimensions**:
-  - aspectRatio: `false`
-  - height: `false`
-  - minHeight: `false`
-  - width: `false`
-- **color**:
-  - background: `true`
-  - text: `true`
-  - heading: `true`
-  - link: `true`
-- **spacing**:
-  - blockGap: `false`
-  - padding: `true`
-  - margin: `true`
-- **typography**:
-  - fontSize: `true`
-- **layout**:
-  - default: `{"type":"flex","flexWrap":"nowrap","justifyContent":"stretch","orientation":"vertical"}`
-  - allowSwitching: `false`
-  - allowVerticalAlignment: `false`
-  - allowOrientation: `false`
-  - allowJustification: `true`
-  - allowSizingOnChildren: `false`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `false`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [**lock**](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [**dimensions**](/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - [aspectRatio](/block-editor/reference-guides/block-api/block-supports/#dimensionsaspectratio): `false`
+  - [height](/block-editor/reference-guides/block-api/block-supports/#dimensionsheight): `false`
+  - [minHeight](/block-editor/reference-guides/block-api/block-supports/#dimensionsminheight): `false`
+  - [width](/block-editor/reference-guides/block-api/block-supports/#dimensionswidth): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
+  - [heading](/block-editor/reference-guides/block-api/block-supports/#colorheading): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `false`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex","flexWrap":"nowrap","justifyContent":"stretch","orientation":"vertical"}`
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
+  - [allowVerticalAlignment](/block-editor/reference-guides/block-api/block-supports/#layoutallowverticalalignment): `false`
+  - [allowOrientation](/block-editor/reference-guides/block-api/block-supports/#layoutalloworientation): `false`
+  - [allowJustification](/block-editor/reference-guides/block-api/block-supports/#layoutallowjustification): `true`
+  - [allowSizingOnChildren](/block-editor/reference-guides/block-api/block-supports/#layoutallowsizingonchildren): `false`
 
 ## Block Markup
 
