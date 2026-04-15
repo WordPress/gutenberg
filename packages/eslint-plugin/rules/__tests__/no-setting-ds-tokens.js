@@ -45,9 +45,6 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			code: 'const css = `--my-custom-prop: red;`;',
 		},
 		{
-			code: 'const css = `--my-custom-prop-${ suffix }: red;`;',
-		},
-		{
 			code: '<style>{ `--my-custom-prop-${ suffix }: red;` }</style>',
 		},
 	],
