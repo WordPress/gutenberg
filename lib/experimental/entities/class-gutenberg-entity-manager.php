@@ -245,6 +245,7 @@ class Gutenberg_Entity_Manager {
 				}
 			}
 		}
+
 	}
 
 	/**
@@ -323,6 +324,27 @@ class Gutenberg_Entity_Manager {
 
 		if ( isset( $config['show_in_rest'] ) ) {
 			$taxonomy_object->show_in_rest = (bool) $config['show_in_rest'];
+		}
+
+		if ( isset( $config['object_type'] ) ) {
+			$current_object_types = (array) $taxonomy_object->object_type;
+			$desired_object_types = (array) $config['object_type'];
+
+			// Unregister from post types that are no longer assigned.
+			foreach ( $current_object_types as $post_type ) {
+				if ( ! in_array( $post_type, $desired_object_types, true ) ) {
+					unregister_taxonomy_for_object_type( $slug, $post_type );
+				}
+			}
+
+			// Register for newly assigned post types.
+			foreach ( $desired_object_types as $post_type ) {
+				if ( ! in_array( $post_type, $current_object_types, true ) ) {
+					register_taxonomy_for_object_type( $slug, $post_type );
+				}
+			}
+
+			$taxonomy_object->object_type = $desired_object_types;
 		}
 	}
 

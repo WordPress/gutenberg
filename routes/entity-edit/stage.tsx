@@ -18,7 +18,7 @@ import {
 	// @ts-ignore
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
@@ -41,7 +41,6 @@ interface EntityConfig {
 	menu_position?: number | null;
 	show_ui: boolean;
 	show_in_menu: boolean | string;
-	taxonomies?: string[];
 	object_type?: string[];
 }
 
@@ -70,21 +69,34 @@ function EntityEdit() {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ config, setConfig ] = useState< EntityConfig | null >( null );
+	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
 
-	// Fetch the entity config.
+	// Fetch the entity config and all configs (for taxonomy/post type lists).
 	useEffect( () => {
 		setIsLoading( true );
-		apiFetch< EntityConfig >( {
-			path: `/gutenberg/v1/entity-configs/${ entityType }/${ slug }`,
-		} )
-			.then( ( response ) => {
-				setConfig( response );
+		Promise.all( [
+			apiFetch< EntityConfig >( {
+				path: `/gutenberg/v1/entity-configs/${ entityType }/${ slug }`,
+			} ),
+			apiFetch< EntityConfig[] >( {
+				path: '/gutenberg/v1/entity-configs',
+			} ),
+		] )
+			.then( ( [ entityResponse, allResponse ] ) => {
+				setConfig( entityResponse );
+				setAllConfigs( allResponse );
 				setIsLoading( false );
 			} )
 			.catch( () => {
 				setIsLoading( false );
 			} );
 	}, [ entityType, slug ] );
+
+	// Available post types for taxonomy assignment panel.
+	const availablePostTypes = useMemo(
+		() => allConfigs.filter( ( c ) => c.entity_type === 'post_type' ),
+		[ allConfigs ]
+	);
 
 	const updateField = useCallback(
 		< K extends keyof EntityConfig >(
@@ -131,6 +143,19 @@ function EntityEdit() {
 		[]
 	);
 
+	const toggleObjectType = useCallback(
+		( postTypeSlug: string, assigned: boolean ) => {
+			setConfig( ( prev ) => {
+				const current = prev!.object_type ?? [];
+				const updated = assigned
+					? [ ...current, postTypeSlug ]
+					: current.filter( ( t ) => t !== postTypeSlug );
+				return { ...prev!, object_type: updated } as EntityConfig;
+			} );
+		},
+		[]
+	);
+
 	const handleSave = useCallback( async () => {
 		if ( ! config ) {
 			return;
@@ -158,7 +183,6 @@ function EntityEdit() {
 								has_archive: config.has_archive,
 								menu_icon: config.menu_icon,
 								menu_position: config.menu_position,
-								taxonomies: config.taxonomies,
 						  }
 						: {
 								object_type: config.object_type,
@@ -352,6 +376,39 @@ function EntityEdit() {
 							</PanelRow>
 						</PanelBody>
 					</Panel>
+
+					{ ! isPostType && (
+						<Panel>
+							<PanelBody title={ __( 'Post Types' ) } initialOpen>
+								{ availablePostTypes.map( ( pt ) => (
+									<PanelRow key={ pt.slug }>
+										<CheckboxControl
+											__nextHasNoMarginBottom
+											label={ pt.labels?.name || pt.slug }
+											checked={
+												config.object_type?.includes(
+													pt.slug
+												) ?? false
+											}
+											onChange={ ( value: boolean ) =>
+												toggleObjectType(
+													pt.slug,
+													value
+												)
+											}
+										/>
+									</PanelRow>
+								) ) }
+								{ availablePostTypes.length === 0 && (
+									<PanelRow>
+										<p>
+											{ __( 'No post types available.' ) }
+										</p>
+									</PanelRow>
+								) }
+							</PanelBody>
+						</Panel>
+					) }
 
 					{ isPostType && (
 						<Panel>

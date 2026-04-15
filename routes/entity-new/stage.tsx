@@ -17,11 +17,18 @@ import {
 	// @ts-ignore
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
+
+interface EntityConfig {
+	slug: string;
+	entity_type: 'post_type' | 'taxonomy';
+	_user_created: boolean;
+	labels?: Record< string, string >;
+}
 
 const POST_TYPE_SUPPORTS = [
 	'title',
@@ -92,8 +99,23 @@ function EntityNew() {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ config, setConfig ] =
 		useState< NewEntityConfig >( getDefaultConfig );
+	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
 
 	const isPostType = entityType === 'post_type';
+
+	// Fetch all configs for taxonomy/post type assignment lists.
+	useEffect( () => {
+		apiFetch< EntityConfig[] >( {
+			path: '/gutenberg/v1/entity-configs',
+		} ).then( ( response ) => {
+			setAllConfigs( response );
+		} );
+	}, [] );
+
+	const availablePostTypes = useMemo(
+		() => allConfigs.filter( ( c ) => c.entity_type === 'post_type' ),
+		[ allConfigs ]
+	);
 
 	const updateField = useCallback(
 		< K extends keyof NewEntityConfig >(
@@ -118,6 +140,18 @@ function EntityNew() {
 				...prev,
 				supports: { ...prev.supports, [ feature ]: enabled },
 			} ) );
+		},
+		[]
+	);
+
+	const toggleObjectType = useCallback(
+		( postTypeSlug: string, assigned: boolean ) => {
+			setConfig( ( prev ) => {
+				const updated = assigned
+					? [ ...prev.object_type, postTypeSlug ]
+					: prev.object_type.filter( ( t ) => t !== postTypeSlug );
+				return { ...prev, object_type: updated };
+			} );
 		},
 		[]
 	);
@@ -353,6 +387,37 @@ function EntityNew() {
 						</PanelBody>
 					</Panel>
 
+					{ ! isPostType && (
+						<Panel>
+							<PanelBody title={ __( 'Post Types' ) } initialOpen>
+								{ availablePostTypes.map( ( pt ) => (
+									<PanelRow key={ pt.slug }>
+										<CheckboxControl
+											__nextHasNoMarginBottom
+											label={ pt.labels?.name || pt.slug }
+											checked={ config.object_type.includes(
+												pt.slug
+											) }
+											onChange={ ( value: boolean ) =>
+												toggleObjectType(
+													pt.slug,
+													value
+												)
+											}
+										/>
+									</PanelRow>
+								) ) }
+								{ availablePostTypes.length === 0 && (
+									<PanelRow>
+										<p>
+											{ __( 'No post types available.' ) }
+										</p>
+									</PanelRow>
+								) }
+							</PanelBody>
+						</Panel>
+					) }
+
 					{ isPostType && (
 						<Panel>
 							<PanelBody
@@ -414,38 +479,6 @@ function EntityNew() {
 										/>
 									</PanelRow>
 								) ) }
-							</PanelBody>
-						</Panel>
-					) }
-
-					{ ! isPostType && (
-						<Panel>
-							<PanelBody
-								title={ __( 'Associated Post Types' ) }
-								initialOpen={ false }
-							>
-								<PanelRow>
-									<TextControl
-										__nextHasNoMarginBottom
-										label={ __( 'Object Types' ) }
-										help={ __(
-											'Comma-separated list of post type slugs.'
-										) }
-										value={
-											config.object_type?.join( ', ' ) ||
-											''
-										}
-										onChange={ ( value: string ) =>
-											updateField(
-												'object_type',
-												value
-													.split( ',' )
-													.map( ( s ) => s.trim() )
-													.filter( Boolean )
-											)
-										}
-									/>
-								</PanelRow>
 							</PanelBody>
 						</Panel>
 					) }
