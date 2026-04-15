@@ -35,18 +35,6 @@ import { createBlock } from '@wordpress/blocks';
  */
 import useTabMenuSync from '../use-tab-menu-sync';
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function makeTab( clientId, label = '' ) {
-	return { clientId, attributes: { label } };
-}
-
-function makeMenuItem( clientId ) {
-	return { clientId };
-}
-
 const PANEL = 'panel-client-id';
 const MENU = 'menu-client-id';
 
@@ -104,8 +92,11 @@ afterEach( () => {
 describe( 'useTabMenuSync', () => {
 	describe( 'initial mount', () => {
 		it( 'does nothing on first render', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			renderSync( {
 				tabs,
@@ -119,8 +110,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when re-rendered with the same data', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 			const props = {
 				tabs,
 				menuItems,
@@ -138,8 +132,11 @@ describe( 'useTabMenuSync', () => {
 
 	describe( 'deletion', () => {
 		it( 'removes the menu item at the same position when a tab is deleted', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -150,7 +147,7 @@ describe( 'useTabMenuSync', () => {
 
 			// Tab at index 1 ('t2') is deleted.
 			rerender( {
-				tabs: [ makeTab( 't1', 'Tab 1' ) ],
+				tabs: [ { clientId: 't1', attributes: { label: 'Tab 1' } } ],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -162,8 +159,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'removes the tab at the same position when a menu item is deleted', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -175,7 +175,7 @@ describe( 'useTabMenuSync', () => {
 			// Menu item at index 1 ('m2') is deleted.
 			rerender( {
 				tabs,
-				menuItems: [ makeMenuItem( 'm1' ) ],
+				menuItems: [ { clientId: 'm1' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -187,14 +187,14 @@ describe( 'useTabMenuSync', () => {
 
 		it( 'removes all orphaned menu items when multiple tabs are deleted at once', () => {
 			const tabs = [
-				makeTab( 't1', 'Tab 1' ),
-				makeTab( 't2', 'Tab 2' ),
-				makeTab( 't3', 'Tab 3' ),
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+				{ clientId: 't3', attributes: { label: 'Tab 3' } },
 			];
 			const menuItems = [
-				makeMenuItem( 'm1' ),
-				makeMenuItem( 'm2' ),
-				makeMenuItem( 'm3' ),
+				{ clientId: 'm1' },
+				{ clientId: 'm2' },
+				{ clientId: 'm3' },
 			];
 
 			const { rerender } = renderSync( {
@@ -206,7 +206,7 @@ describe( 'useTabMenuSync', () => {
 
 			// Tabs at index 0 and 1 ('t1', 't2') are deleted simultaneously.
 			rerender( {
-				tabs: [ makeTab( 't3', 'Tab 3' ) ],
+				tabs: [ { clientId: 't3', attributes: { label: 'Tab 3' } } ],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -220,14 +220,14 @@ describe( 'useTabMenuSync', () => {
 
 		it( 'removes all orphaned tabs when multiple menu items are deleted at once', () => {
 			const tabs = [
-				makeTab( 't1', 'Tab 1' ),
-				makeTab( 't2', 'Tab 2' ),
-				makeTab( 't3', 'Tab 3' ),
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+				{ clientId: 't3', attributes: { label: 'Tab 3' } },
 			];
 			const menuItems = [
-				makeMenuItem( 'm1' ),
-				makeMenuItem( 'm2' ),
-				makeMenuItem( 'm3' ),
+				{ clientId: 'm1' },
+				{ clientId: 'm2' },
+				{ clientId: 'm3' },
 			];
 
 			const { rerender } = renderSync( {
@@ -240,7 +240,7 @@ describe( 'useTabMenuSync', () => {
 			// Menu items at index 0 and 1 ('m1', 'm2') are deleted simultaneously.
 			rerender( {
 				tabs,
-				menuItems: [ makeMenuItem( 'm3' ) ],
+				menuItems: [ { clientId: 'm3' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -252,8 +252,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides shrink simultaneously (toolbar removal)', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -264,8 +267,8 @@ describe( 'useTabMenuSync', () => {
 
 			// Both lists shrink together — already in sync.
 			rerender( {
-				tabs: [ makeTab( 't1', 'Tab 1' ) ],
-				menuItems: [ makeMenuItem( 'm1' ) ],
+				tabs: [ { clientId: 't1', attributes: { label: 'Tab 1' } } ],
+				menuItems: [ { clientId: 'm1' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -275,8 +278,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides grow by different amounts', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -290,10 +296,10 @@ describe( 'useTabMenuSync', () => {
 			rerender( {
 				tabs: [
 					...tabs,
-					makeTab( 't3', 'Tab 3' ),
-					makeTab( 't4', 'Tab 4' ),
+					{ clientId: 't3', attributes: { label: 'Tab 3' } },
+					{ clientId: 't4', attributes: { label: 'Tab 4' } },
 				],
-				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
+				menuItems: [ ...menuItems, { clientId: 'm3' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -305,14 +311,14 @@ describe( 'useTabMenuSync', () => {
 
 	describe( 'reordering', () => {
 		it( 'reorders tabs to match when menu items are dragged to a new position', () => {
-			const t1 = makeTab( 't1', 'Tab 1' );
-			const t2 = makeTab( 't2', 'Tab 2' );
-			const t3 = makeTab( 't3', 'Tab 3' );
+			const t1 = { clientId: 't1', attributes: { label: 'Tab 1' } };
+			const t2 = { clientId: 't2', attributes: { label: 'Tab 2' } };
+			const t3 = { clientId: 't3', attributes: { label: 'Tab 3' } };
 			const tabs = [ t1, t2, t3 ];
 			const menuItems = [
-				makeMenuItem( 'm1' ),
-				makeMenuItem( 'm2' ),
-				makeMenuItem( 'm3' ),
+				{ clientId: 'm1' },
+				{ clientId: 'm2' },
+				{ clientId: 'm3' },
 			];
 
 			const { rerender } = renderSync( {
@@ -326,9 +332,9 @@ describe( 'useTabMenuSync', () => {
 			rerender( {
 				tabs,
 				menuItems: [
-					makeMenuItem( 'm2' ),
-					makeMenuItem( 'm3' ),
-					makeMenuItem( 'm1' ),
+					{ clientId: 'm2' },
+					{ clientId: 'm3' },
+					{ clientId: 'm1' },
 				],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -345,8 +351,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when menu items are in the same order', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 			const props = {
 				tabs,
 				menuItems,
@@ -361,8 +370,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when tab-panel clientId is missing during reorder', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -373,7 +385,7 @@ describe( 'useTabMenuSync', () => {
 
 			rerender( {
 				tabs,
-				menuItems: [ makeMenuItem( 'm2' ), makeMenuItem( 'm1' ) ],
+				menuItems: [ { clientId: 'm2' }, { clientId: 'm1' } ],
 				tabPanelClientId: null,
 				tabsMenuClientId: MENU,
 			} );
@@ -384,8 +396,11 @@ describe( 'useTabMenuSync', () => {
 
 	describe( 'tab inserted', () => {
 		it( 'inserts a menu item when a tab is pasted or duplicated', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -396,7 +411,10 @@ describe( 'useTabMenuSync', () => {
 
 			// New tab 't3' inserted at the end.
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't3', 'Tab 3' ) ],
+				tabs: [
+					...tabs,
+					{ clientId: 't3', attributes: { label: 'Tab 3' } },
+				],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -417,7 +435,7 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when tabs-menu clientId is missing', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
+			const tabs = [ { clientId: 't1', attributes: { label: 'Tab 1' } } ];
 			const menuItems = [];
 
 			const { rerender } = renderSync( {
@@ -428,7 +446,10 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't2', 'Tab 2' ) ],
+				tabs: [
+					...tabs,
+					{ clientId: 't2', attributes: { label: 'Tab 2' } },
+				],
 				menuItems,
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: null,
@@ -438,9 +459,12 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'syncs once (no duplicates) when tabs-menu clientId becomes available after a one-sided insertion', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ) ];
-			const tabsWithNew = [ ...tabs, makeTab( 't2', 'Tab 2' ) ];
+			const tabs = [ { clientId: 't1', attributes: { label: 'Tab 1' } } ];
+			const menuItems = [ { clientId: 'm1' } ];
+			const tabsWithNew = [
+				...tabs,
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
 
 			// Render 1 — initial snapshot.
 			const { rerender } = renderSync( {
@@ -493,8 +517,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when both sides grow simultaneously (Add Tab toolbar)', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -505,8 +532,11 @@ describe( 'useTabMenuSync', () => {
 
 			// Both grow together — "Add Tab" already created both.
 			rerender( {
-				tabs: [ ...tabs, makeTab( 't3', 'Tab 3' ) ],
-				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
+				tabs: [
+					...tabs,
+					{ clientId: 't3', attributes: { label: 'Tab 3' } },
+				],
+				menuItems: [ ...menuItems, { clientId: 'm3' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -518,8 +548,11 @@ describe( 'useTabMenuSync', () => {
 
 	describe( 'menu item inserted', () => {
 		it( 'inserts a tab when a menu item is pasted or duplicated', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -531,7 +564,7 @@ describe( 'useTabMenuSync', () => {
 			// New menu item 'm3' appended at the end.
 			rerender( {
 				tabs,
-				menuItems: [ ...menuItems, makeMenuItem( 'm3' ) ],
+				menuItems: [ ...menuItems, { clientId: 'm3' } ],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
 			} );
@@ -551,8 +584,11 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'copies the label from the adjacent tab when a menu item is duplicated in the middle', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ), makeTab( 't2', 'Tab 2' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ), makeMenuItem( 'm2' ) ];
+			const tabs = [
+				{ clientId: 't1', attributes: { label: 'Tab 1' } },
+				{ clientId: 't2', attributes: { label: 'Tab 2' } },
+			];
+			const menuItems = [ { clientId: 'm1' }, { clientId: 'm2' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -565,9 +601,9 @@ describe( 'useTabMenuSync', () => {
 			rerender( {
 				tabs,
 				menuItems: [
-					makeMenuItem( 'm1' ),
-					makeMenuItem( 'm1-dup' ),
-					makeMenuItem( 'm2' ),
+					{ clientId: 'm1' },
+					{ clientId: 'm1-dup' },
+					{ clientId: 'm2' },
 				],
 				tabPanelClientId: PANEL,
 				tabsMenuClientId: MENU,
@@ -589,8 +625,8 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'does nothing when tab-panel clientId is missing', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ) ];
+			const tabs = [ { clientId: 't1', attributes: { label: 'Tab 1' } } ];
+			const menuItems = [ { clientId: 'm1' } ];
 
 			const { rerender } = renderSync( {
 				tabs,
@@ -601,7 +637,7 @@ describe( 'useTabMenuSync', () => {
 
 			rerender( {
 				tabs,
-				menuItems: [ ...menuItems, makeMenuItem( 'm2' ) ],
+				menuItems: [ ...menuItems, { clientId: 'm2' } ],
 				tabPanelClientId: null,
 				tabsMenuClientId: MENU,
 			} );
@@ -610,9 +646,9 @@ describe( 'useTabMenuSync', () => {
 		} );
 
 		it( 'syncs once (no duplicates) when tab-panel clientId becomes available after a one-sided insertion', () => {
-			const tabs = [ makeTab( 't1', 'Tab 1' ) ];
-			const menuItems = [ makeMenuItem( 'm1' ) ];
-			const menuItemsWithNew = [ ...menuItems, makeMenuItem( 'm2' ) ];
+			const tabs = [ { clientId: 't1', attributes: { label: 'Tab 1' } } ];
+			const menuItems = [ { clientId: 'm1' } ];
+			const menuItemsWithNew = [ ...menuItems, { clientId: 'm2' } ];
 
 			// Render 1 — initial snapshot.
 			const { rerender } = renderSync( {
