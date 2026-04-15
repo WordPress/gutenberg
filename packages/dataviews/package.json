@@ -75,6 +75,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
+		"@wordpress/jest-console": "file:../jest-console",
 		"@storybook/addon-docs": "^10.2.8",
 		"@storybook/react-vite": "^10.2.8",
 		"@testing-library/jest-dom": "^6.9.1",
