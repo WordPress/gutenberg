@@ -72,6 +72,16 @@ function EntityEdit() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	// Show a success notice if we just reloaded after a menu-affecting save.
+	useEffect( () => {
+		if ( sessionStorage.getItem( 'gutenberg_entity_saved' ) ) {
+			sessionStorage.removeItem( 'gutenberg_entity_saved' );
+			createSuccessNotice( __( 'Entity updated successfully.' ), {
+				type: 'snackbar',
+			} );
+		}
+	}, [ createSuccessNotice ] );
+
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ config, setConfig ] = useState< EntityConfig | null >( null );
@@ -210,6 +220,7 @@ function EntityEdit() {
 					JSON.stringify( config.object_type );
 
 			if ( menuChanged ) {
+				sessionStorage.setItem( 'gutenberg_entity_saved', '1' );
 				window.location.reload();
 				return;
 			}

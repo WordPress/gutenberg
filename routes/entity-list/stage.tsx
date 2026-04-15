@@ -129,6 +129,16 @@ function EntityList() {
 	const navigate = useNavigate();
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
+	// Show a success notice if we just reloaded after a save.
+	useEffect( () => {
+		if ( sessionStorage.getItem( 'gutenberg_entity_saved' ) ) {
+			sessionStorage.removeItem( 'gutenberg_entity_saved' );
+			createSuccessNotice( __( 'Entity saved successfully.' ), {
+				type: 'snackbar',
+			} );
+		}
+	}, [ createSuccessNotice ] );
+
 	const [ allConfigs, setAllConfigs ] = useState< EntityConfig[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ activeTab, setActiveTab ] = useState< string >( 'post_type' );

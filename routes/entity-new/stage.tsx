@@ -201,6 +201,7 @@ function EntityNew() {
 				},
 			} );
 			if ( config.show_in_menu || config.show_ui ) {
+				sessionStorage.setItem( 'gutenberg_entity_saved', '1' );
 				window.location.reload();
 				return;
 			}
