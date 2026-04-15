@@ -68,19 +68,19 @@ function renderSync( initialProps ) {
 // ---------------------------------------------------------------------------
 
 let removeBlock;
-let insertBlock;
+let insertBlocks;
 let replaceInnerBlocks;
 let __unstableMarkNextChangeAsNotPersistent;
 
 beforeEach( () => {
 	removeBlock = jest.fn();
-	insertBlock = jest.fn();
+	insertBlocks = jest.fn();
 	replaceInnerBlocks = jest.fn();
 	__unstableMarkNextChangeAsNotPersistent = jest.fn();
 
 	useDispatch.mockReturnValue( {
 		removeBlock,
-		insertBlock,
+		insertBlocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} );
@@ -115,7 +115,7 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			expect( removeBlock ).not.toHaveBeenCalled();
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when re-rendered with the same data', () => {
@@ -132,7 +132,7 @@ describe( 'useTabMenuSync', () => {
 			rerender( props );
 
 			expect( removeBlock ).not.toHaveBeenCalled();
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 	} );
 
@@ -158,7 +158,7 @@ describe( 'useTabMenuSync', () => {
 
 			expect( removeBlock ).toHaveBeenCalledTimes( 1 );
 			expect( removeBlock ).toHaveBeenCalledWith( 'm2', false );
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'removes the tab at the same position when a menu item is deleted', () => {
@@ -182,7 +182,7 @@ describe( 'useTabMenuSync', () => {
 
 			expect( removeBlock ).toHaveBeenCalledTimes( 1 );
 			expect( removeBlock ).toHaveBeenCalledWith( 't2', false );
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'removes all orphaned menu items when multiple tabs are deleted at once', () => {
@@ -215,7 +215,7 @@ describe( 'useTabMenuSync', () => {
 			expect( removeBlock ).toHaveBeenCalledTimes( 2 );
 			expect( removeBlock ).toHaveBeenCalledWith( 'm1', false );
 			expect( removeBlock ).toHaveBeenCalledWith( 'm2', false );
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'removes all orphaned tabs when multiple menu items are deleted at once', () => {
@@ -248,7 +248,7 @@ describe( 'useTabMenuSync', () => {
 			expect( removeBlock ).toHaveBeenCalledTimes( 2 );
 			expect( removeBlock ).toHaveBeenCalledWith( 't1', false );
 			expect( removeBlock ).toHaveBeenCalledWith( 't2', false );
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when both sides shrink simultaneously (toolbar removal)', () => {
@@ -271,7 +271,7 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			expect( removeBlock ).not.toHaveBeenCalled();
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when both sides grow by different amounts', () => {
@@ -298,7 +298,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 			expect( removeBlock ).not.toHaveBeenCalled();
 		} );
 	} );
@@ -341,7 +341,7 @@ describe( 'useTabMenuSync', () => {
 				false
 			);
 			expect( removeBlock ).not.toHaveBeenCalled();
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'does nothing when menu items are in the same order', () => {
@@ -402,12 +402,14 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					name: 'core/tabs-menu-item',
-					attributes: {},
-				} ),
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						name: 'core/tabs-menu-item',
+						attributes: {},
+					} ),
+				],
 				2, // index of the new tab
 				MENU,
 				false
@@ -432,7 +434,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: null,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'syncs once (no duplicates) when tabs-menu clientId becomes available after a one-sided insertion', () => {
@@ -456,7 +458,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: null,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 
 			// Render 3 — container now available; hook should sync exactly once.
 			rerender( {
@@ -466,12 +468,14 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					name: 'core/tabs-menu-item',
-					attributes: {},
-				} ),
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						name: 'core/tabs-menu-item',
+						attributes: {},
+					} ),
+				],
 				1,
 				MENU,
 				false
@@ -485,7 +489,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( 'does nothing when both sides grow simultaneously (Add Tab toolbar)', () => {
@@ -507,7 +511,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 			expect( removeBlock ).not.toHaveBeenCalled();
 		} );
 	} );
@@ -532,12 +536,14 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					name: 'core/tab',
-					attributes: { label: 'Tab 2' }, // label copied from adjacent tab at index 1
-				} ),
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						name: 'core/tab',
+						attributes: { label: 'Tab 2' }, // label copied from adjacent tab at index 1
+					} ),
+				],
 				2, // index of the new menu item
 				PANEL,
 				false
@@ -568,12 +574,14 @@ describe( 'useTabMenuSync', () => {
 			} );
 
 			// Tab inserted at index 1 should copy label from t1 (index 0).
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					name: 'core/tab',
-					attributes: { label: 'Tab 1' },
-				} ),
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						name: 'core/tab',
+						attributes: { label: 'Tab 1' },
+					} ),
+				],
 				1,
 				PANEL,
 				false
@@ -598,7 +606,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'syncs once (no duplicates) when tab-panel clientId becomes available after a one-sided insertion', () => {
@@ -622,7 +630,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).not.toHaveBeenCalled();
+			expect( insertBlocks ).not.toHaveBeenCalled();
 
 			// Render 3 — container now available; hook should sync exactly once.
 			rerender( {
@@ -632,12 +640,14 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
-			expect( insertBlock ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					name: 'core/tab',
-					attributes: { label: 'Tab 1' },
-				} ),
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledWith(
+				[
+					expect.objectContaining( {
+						name: 'core/tab',
+						attributes: { label: 'Tab 1' },
+					} ),
+				],
 				1,
 				PANEL,
 				false
@@ -651,7 +661,7 @@ describe( 'useTabMenuSync', () => {
 				tabsMenuClientId: MENU,
 			} );
 
-			expect( insertBlock ).toHaveBeenCalledTimes( 1 );
+			expect( insertBlocks ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

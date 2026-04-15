@@ -31,7 +31,7 @@ export default function useTabMenuSync( {
 } ) {
 	const {
 		removeBlock,
-		insertBlock,
+		insertBlocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
@@ -170,60 +170,75 @@ export default function useTabMenuSync( {
 					( _, i ) => ! removedSet.has( i )
 				);
 		} else if ( tabsInserted ) {
-			// A tab was pasted or duplicated — insert a matching menu item at
-			// the same position.
+			// A tab was pasted or duplicated — insert matching menu items.
 			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
-			currentTabs.forEach( ( newTab, tabIndex ) => {
-				if ( prevTabIds.has( newTab.clientId ) ) {
-					return;
-				}
-				const newMenuItemBlock = createBlock(
-					'core/tabs-menu-item',
-					{}
-				);
+			const newMenuItems = currentTabs
+				.map( ( tab, tabIndex ) =>
+					! prevTabIds.has( tab.clientId )
+						? {
+								tabIndex,
+								block: createBlock( 'core/tabs-menu-item', {} ),
+						  }
+						: null
+				)
+				.filter( Boolean );
+
+			if ( newMenuItems.length > 0 ) {
 				__unstableMarkNextChangeAsNotPersistent();
-				insertBlock(
-					newMenuItemBlock,
-					tabIndex,
+				insertBlocks(
+					newMenuItems.map( ( { block } ) => block ),
+					newMenuItems[ 0 ].tabIndex,
 					tabsMenuClientId,
 					false
 				);
-				prevSyncStateRef.current.menuItems.splice( tabIndex, 0, {
-					clientId: newMenuItemBlock.clientId,
+				newMenuItems.forEach( ( { tabIndex, block } ) => {
+					prevSyncStateRef.current.menuItems.splice( tabIndex, 0, {
+						clientId: block.clientId,
+					} );
 				} );
-			} );
+			}
 		} else if ( menuItemsInserted ) {
-			// A menu item was pasted or duplicated — insert a matching tab at
-			// the same position, copying the label from the adjacent tab.
+			// A menu item was pasted or duplicated — insert matching tabs,
+			// copying the label from the adjacent tab.
 			const prevMenuItemIds = new Set(
 				prevMenuItems.map( ( m ) => m.clientId )
 			);
-			currentMenuItems.forEach( ( newMenuItem, menuItemIndex ) => {
-				if ( prevMenuItemIds.has( newMenuItem.clientId ) ) {
-					return;
-				}
-				const label =
-					tabs[ menuItemIndex - 1 ]?.attributes?.label ??
-					tabs[ menuItemIndex ]?.attributes?.label ??
-					'';
-				const newTabBlock = createBlock( 'core/tab', { label } );
+			const newTabs = currentMenuItems
+				.map( ( menuItem, menuItemIndex ) => {
+					if ( prevMenuItemIds.has( menuItem.clientId ) ) {
+						return null;
+					}
+					const label =
+						tabs[ menuItemIndex - 1 ]?.attributes?.label ??
+						tabs[ menuItemIndex ]?.attributes?.label ??
+						'';
+					return {
+						menuItemIndex,
+						block: createBlock( 'core/tab', { label } ),
+					};
+				} )
+				.filter( Boolean );
+
+			if ( newTabs.length > 0 ) {
 				__unstableMarkNextChangeAsNotPersistent();
-				insertBlock(
-					newTabBlock,
-					menuItemIndex,
+				insertBlocks(
+					newTabs.map( ( { block } ) => block ),
+					newTabs[ 0 ].menuItemIndex,
 					tabPanelClientId,
 					false
 				);
-				prevSyncStateRef.current.tabs.splice( menuItemIndex, 0, {
-					clientId: newTabBlock.clientId,
+				newTabs.forEach( ( { menuItemIndex, block } ) => {
+					prevSyncStateRef.current.tabs.splice( menuItemIndex, 0, {
+						clientId: block.clientId,
+					} );
 				} );
-			} );
+			}
 		}
 	}, [
 		tabs,
 		menuItems,
 		removeBlock,
-		insertBlock,
+		insertBlocks,
 		replaceInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
 		tabsMenuClientId,
