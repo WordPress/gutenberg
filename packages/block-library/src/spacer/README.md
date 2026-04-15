@@ -19,11 +19,11 @@
 
 ## Supports
 
-- **anchor**: `true`
-- **spacing**:
-  - margin: `["top","bottom"]`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

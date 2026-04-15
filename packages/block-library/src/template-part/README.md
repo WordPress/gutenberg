@@ -21,12 +21,12 @@
 
 ## Supports
 
-- **align**: `true`
-- **html**: `false`
-- **reusable**: `false`
-- **renaming**: `false`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [**renaming**](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Markup
 

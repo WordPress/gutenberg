@@ -23,22 +23,22 @@
 
 ## Supports
 
-- **anchor**: `true`
-- **ariaLabel**: `true`
-- **html**: `false`
-- **color**:
-  - text: `true`
-  - background: `true`
-  - gradients: `true`
-  - link: `true`
-- **spacing**:
-  - margin: `true`
-  - padding: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**ariaLabel**](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Markup
 

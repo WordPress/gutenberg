@@ -21,13 +21,13 @@
 
 ## Supports
 
-- **color**:
-  - gradients: `false`
-- **spacing**:
-  - padding: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `false`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
 
 ## Block Markup
 

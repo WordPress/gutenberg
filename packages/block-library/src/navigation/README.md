@@ -66,26 +66,26 @@ The structural CSS for the navigation block targets generic classnames across me
 
 ## Supports
 
-- **anchor**: `true`
-- **align**: `"wide"`, `"full"`
-- **ariaLabel**: `true`
-- **contentRole**: `true`
-- **html**: `false`
-- **inserter**: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **spacing**:
-  - blockGap: `true`
-  - units: `["px","em","rem","vh","vw"]`
-- **layout**:
-  - allowSwitching: `false`
-  - allowInheriting: `false`
-  - allowVerticalAlignment: `false`
-  - allowSizingOnChildren: `true`
-  - default: `{"type":"flex"}`
-- **interactivity**: `true`
-- **renaming**: `false`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [**ariaLabel**](/block-editor/reference-guides/block-api/block-supports/#arialabel): `true`
+- [**contentRole**](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**inserter**](/block-editor/reference-guides/block-api/block-supports/#inserter): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
+  - [units](/block-editor/reference-guides/block-api/block-supports/#spacingunits): `["px","em","rem","vh","vw"]`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
+  - [allowVerticalAlignment](/block-editor/reference-guides/block-api/block-supports/#layoutallowverticalalignment): `false`
+  - [allowSizingOnChildren](/block-editor/reference-guides/block-api/block-supports/#layoutallowsizingonchildren): `true`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
+- [**renaming**](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 
 ## Context
 

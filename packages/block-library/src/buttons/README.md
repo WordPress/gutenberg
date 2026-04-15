@@ -23,27 +23,27 @@ _This block has no custom attributes._
 
 ## Supports
 
-- **anchor**: `true`
-- **align**: `"wide"`, `"full"`
-- **html**: `false`
-- **color**:
-  - gradients: `true`
-  - text: `false`
-- **spacing**:
-  - blockGap: `["horizontal","vertical"]`
-  - padding: `true`
-  - margin: `["top","bottom"]`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **layout**:
-  - allowSwitching: `false`
-  - allowInheriting: `false`
-  - default: `{"type":"flex"}`
-- **interactivity**:
-  - clientNavigation: `true`
-- **listView**: `true`
-- **contentRole**: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `["horizontal","vertical"]`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+- [**listView**](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
+- [**contentRole**](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 
 ## Block Markup
 

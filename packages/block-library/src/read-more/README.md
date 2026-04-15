@@ -19,19 +19,19 @@
 
 ## Supports
 
-- **anchor**: `true`
-- **html**: `false`
-- **color**:
-  - gradients: `true`
-  - text: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-- **spacing**:
-  - margin: `["top","bottom"]`
-  - padding: `true`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

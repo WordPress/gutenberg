@@ -18,12 +18,12 @@
 
 ## Supports
 
-- **html**: `false`
-- **inserter**: `false`
-- **renaming**: `false`
-- **visibility**: `false`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**inserter**](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [**renaming**](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [**visibility**](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Block Markup
 

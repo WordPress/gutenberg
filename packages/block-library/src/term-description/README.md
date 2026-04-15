@@ -16,20 +16,20 @@ _This block has no custom attributes._
 
 ## Supports
 
-- **anchor**: `true`
-- **align**: `"wide"`, `"full"`
-- **html**: `false`
-- **color**:
-  - link: `true`
-- **spacing**:
-  - padding: `true`
-  - margin: `true`
-- **typography**:
-  - fontSize: `true`
-  - lineHeight: `true`
-  - textAlign: `true`
-- **interactivity**:
-  - clientNavigation: `true`
+- [**anchor**](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [**align**](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typographytextalign): `true`
+- [**interactivity**](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
 
 ## Context
 

@@ -21,19 +21,19 @@ _This block has no custom attributes._
 
 ## Supports
 
-- **html**: `false`
-- **reusable**: `false`
-- **lock**: `false`
-- **color**:
-  - background: `true`
-  - text: `true`
-- **typography**:
-  - fontSize: `true`
-  - textAlign: `true`
-- **spacing**:
-  - padding: `true`
-- **layout**:
-  - allowEditing: `false`
+- [**html**](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [**reusable**](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [**lock**](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [**color**](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `true`
+- [**typography**](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
+  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typographytextalign): `true`
+- [**spacing**](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+- [**layout**](/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layoutallowediting): `false`
 
 ## Context
 
