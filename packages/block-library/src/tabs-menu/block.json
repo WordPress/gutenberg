@@ -15,6 +15,7 @@
 	"supports": {
 		"html": false,
 		"reusable": false,
+		"visibility": false,
 		"lock": false,
 		"dimensions": {
 			"aspectRatio": false,

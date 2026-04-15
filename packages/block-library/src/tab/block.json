@@ -46,7 +46,8 @@
 				"__experimentalFontFamily": true
 			}
 		},
-		"renaming": true
+		"renaming": true,
+		"visibility": false
 	},
 	"providesContext": {
 		"core/tab-label": "label"

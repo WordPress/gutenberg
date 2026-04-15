@@ -239,7 +239,7 @@ function Edit( {
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
-		templateLock: false,
+		templateLock: 'all',
 		renderAppender: false,
 	} );
 

@@ -20,6 +20,7 @@
 	"supports": {
 		"html": false,
 		"reusable": false,
+		"visibility": false,
 		"lock": false,
 		"color": {
 			"background": true,
