@@ -23,7 +23,7 @@
 - [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 - [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Block Markup
 

@@ -28,13 +28,13 @@ _This block has no custom attributes._
 - [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`inserter`](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `margin`: `true`
+  - `padding`: `true`
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 
 ## Context
 

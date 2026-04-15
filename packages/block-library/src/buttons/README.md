@@ -30,9 +30,9 @@ _This block has no custom attributes._
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `["horizontal","vertical"]`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
+  - `blockGap`: `["horizontal","vertical"]`
+  - `padding`: `true`
+  - `margin`: `["top","bottom"]`
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -41,7 +41,7 @@ _This block has no custom attributes._
   - [`allowInheriting`](/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
   - [`default`](/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`listView`](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 - [`contentRole`](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 

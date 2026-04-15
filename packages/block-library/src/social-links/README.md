@@ -47,12 +47,12 @@
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `["horizontal","vertical"]`
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [`units`](/block-editor/reference-guides/block-api/block-supports/#spacing-units): `["px","em","rem","vh","vw"]`
+  - `blockGap`: `["horizontal","vertical"]`
+  - `margin`: `true`
+  - `padding`: `true`
+  - `units`: `["px","em","rem","vh","vw"]`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`contentRole`](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 - [`listView`](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 

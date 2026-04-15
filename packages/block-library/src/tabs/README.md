@@ -40,9 +40,9 @@
 - [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `blockGap`: `true`
+  - `margin`: `true`
+  - `padding`: `true`
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 - [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `true`

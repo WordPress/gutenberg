@@ -31,7 +31,7 @@ _This block has no custom attributes._
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`textAlign`](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - `padding`: `true`
 - [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout):
   - [`allowEditing`](/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
 

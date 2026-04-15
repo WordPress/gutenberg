@@ -37,7 +37,7 @@
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - `margin`: `true`
 - [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 
 ## CSS Selectors

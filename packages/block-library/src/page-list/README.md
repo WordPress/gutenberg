@@ -33,15 +33,15 @@
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+  - `clientNavigation`: `true`
 - [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
   - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
   - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
   - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
 - [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - `padding`: `true`
+  - `margin`: `true`
 - [`contentRole`](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 
 ## Context
