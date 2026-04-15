@@ -19,7 +19,6 @@
 }
 
 .header-title {
-	margin: 0;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -49,7 +48,6 @@
 .header-subtitle {
 	padding-block-end: var(--wpds-dimension-padding-xs);
 	color: var(--wpds-color-fg-content-neutral-weak);
-	margin: 0;
 }
 
 .content {
