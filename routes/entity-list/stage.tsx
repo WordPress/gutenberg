@@ -229,7 +229,7 @@ function EntityList() {
 
 	return (
 		<Page title={ __( 'Entities' ) }>
-			<div style={ { padding: '0 16px' } }>
+			<div style={ { padding: '16px' } }>
 				<Tabs selectedTabId={ activeTab } onSelect={ handleTabChange }>
 					<Tabs.TabList>
 						{ TABS.map( ( tab ) => (

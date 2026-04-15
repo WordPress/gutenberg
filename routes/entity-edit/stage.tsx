@@ -337,7 +337,7 @@ function EntityEdit() {
 					</HStack>
 				}
 			>
-				<div style={ { maxWidth: 800, padding: '0 16px' } }>
+				<div style={ { maxWidth: 800, padding: 16 } }>
 					<VStack spacing={ 4 }>
 						<Panel>
 							<PanelBody title={ __( 'General' ) } initialOpen>
