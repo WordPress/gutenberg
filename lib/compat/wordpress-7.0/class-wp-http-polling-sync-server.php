@@ -605,10 +605,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// in the room share a given RTC-related ability. The client uses
 			// these to decide things like whether to sanitize remote CRDT
 			// changes before writing them to the local entity store.
-			$permissions  = array(
+			$permissions = array(
 				'unfiltered_html' => true,
 			);
-			
+
 			$contributors = $this->storage->get_contributors( $room );
 			foreach ( $contributors as $contributor_id ) {
 				if ( ! user_can( $contributor_id, 'unfiltered_html' ) ) {
