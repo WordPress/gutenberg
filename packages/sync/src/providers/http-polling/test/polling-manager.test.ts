@@ -103,23 +103,6 @@ function createMockAwareness() {
 	};
 }
 
-function createRoomOptions(
-	overrides: Partial<
-		Parameters< PollingManager[ 'registerRoom' ] >[ 0 ]
-	> = {}
-) {
-	return {
-		room: 'test-room',
-		doc: createMockDoc( 1 ),
-		awareness: createMockAwareness(),
-		log: jest.fn(),
-		onStatusChange: jest.fn(),
-		onSync: jest.fn(),
-		onTrustChange: jest.fn(),
-		...overrides,
-	};
-}
-
 function simulateVisibilityChange( state: string ) {
 	Object.defineProperty( document, 'visibilityState', {
 		configurable: true,
@@ -1097,6 +1080,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: onStatusChangeA,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'other-room',
@@ -1105,6 +1089,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: onStatusChangeB,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1160,6 +1145,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange,
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1196,6 +1182,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1243,6 +1230,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 			pollingManager.registerRoom( {
 				room: 'postType/post:10',
@@ -1251,6 +1239,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1298,6 +1287,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1328,6 +1318,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
@@ -1364,6 +1355,7 @@ describe( 'polling-manager', () => {
 				log: jest.fn(),
 				onStatusChange: jest.fn(),
 				onSync: jest.fn(),
+				onTrustChange: jest.fn(),
 			} );
 
 			await jest.advanceTimersByTimeAsync( 0 );
