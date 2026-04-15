@@ -18,11 +18,11 @@
 
 ## Supports
 
-- [className](/block-editor/reference-guides/block-api/block-supports/#classname): `false`
-- [customClassName](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [customCSS](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
-- [visibility](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+- [`className`](/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+- [`customClassName`](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`customCSS`](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Block Markup
 

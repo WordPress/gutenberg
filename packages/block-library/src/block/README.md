@@ -21,13 +21,13 @@
 
 ## Supports
 
-- [customClassName](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [inserter](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
-- [renaming](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
-- [customCSS](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- [`customClassName`](/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`inserter`](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`customCSS`](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
 
 ## Context
 

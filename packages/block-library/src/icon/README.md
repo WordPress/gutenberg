@@ -20,20 +20,20 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [ariaLabel](/block-editor/reference-guides/block-api/block-supports/#arialabel):
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
-- [dimensions](/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - [width](/block-editor/reference-guides/block-api/block-supports/#dimensions-width): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`ariaLabel`](/block-editor/reference-guides/block-api/block-supports/#arialabel):
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+- [`dimensions`](/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - [`width`](/block-editor/reference-guides/block-api/block-supports/#dimensions-width): `true`
 
 ## CSS Selectors
 

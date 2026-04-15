@@ -29,13 +29,13 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [lock](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [inserter](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
+- [`inserter`](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

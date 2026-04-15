@@ -25,25 +25,25 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-  - [heading](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
-  - [button](/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
-- [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
-- [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
-- [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
-- [allowedBlocks](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [`heading`](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
+  - [`button`](/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
+  - [`link`](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`shadow`](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`blockGap`](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+  - [`padding`](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+- [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
+  - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [`lineHeight`](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+- [`layout`](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`allowedBlocks`](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Block Markup
 

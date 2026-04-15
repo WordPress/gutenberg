@@ -21,17 +21,17 @@
 
 ## Supports
 
-- [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [align](/block-editor/reference-guides/block-api/block-supports/#align): `"center"`, `"wide"`, `"full"`
-- [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [enableContrastChecker](/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
-  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
-- [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
-- [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
+- [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`align`](/block-editor/reference-guides/block-api/block-supports/#align): `"center"`, `"wide"`, `"full"`
+- [`color`](/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`enableContrastChecker`](/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
+  - [`gradients`](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [`background`](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [`text`](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
+- [`spacing`](/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - [`margin`](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
+- [`interactivity`](/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - [`clientNavigation`](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Block Styles
 
