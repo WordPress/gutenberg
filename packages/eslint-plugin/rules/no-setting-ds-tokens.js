@@ -1,9 +1,17 @@
-const { DS_TOKEN_PREFIX } = require( '../utils/ds-token-utils' );
+const {
+	DS_TOKEN_PREFIX,
+	collectTokenOccurrences,
+} = require( '../utils/ds-token-utils' );
 
 const wpdsDeclarationRegex = new RegExp(
 	`(?:^|[^\\w])--${ DS_TOKEN_PREFIX }[\\w-]+\\s*:`,
 	'i'
 );
+const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
+const dynamicDeclarationStartRegex = new RegExp(
+	`--${ DS_TOKEN_PREFIX }[\\w-]*$`
+);
+const dynamicDeclarationEndRegex = /^[\w-]*\s*:/;
 
 module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	meta: {
@@ -20,6 +28,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 	},
 	create( context ) {
 		const staticDeclarationAST = `:matches(Literal[value=${ wpdsDeclarationRegex }], TemplateLiteral[expressions.length=0] TemplateElement[value.raw=${ wpdsDeclarationRegex }])`;
+		const dynamicTemplateLiteralAST = `TemplateLiteral[expressions.length>0]:has(TemplateElement[value.raw=${ wpdsTokensRegex }])`;
 
 		return {
 			/** @param {import('estree').Property} node */
@@ -35,6 +44,33 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					node,
 					messageId: 'disallowedSet',
 				} );
+			},
+			/** @param {import('estree').TemplateLiteral} node */
+			[ dynamicTemplateLiteralAST ]( node ) {
+				for ( let index = 0; index < node.quasis.length; index++ ) {
+					const quasi = node.quasis[ index ];
+					const value = quasi.value.cooked ?? quasi.value.raw;
+					const nextValue =
+						node.quasis[ index + 1 ]?.value.cooked ??
+						node.quasis[ index + 1 ]?.value.raw;
+					const hasStaticDeclaration = collectTokenOccurrences(
+						value,
+						DS_TOKEN_PREFIX
+					).some( ( { declaration } ) => declaration );
+					const hasSplitDeclaration =
+						! quasi.tail &&
+						dynamicDeclarationStartRegex.test( value ) &&
+						nextValue &&
+						dynamicDeclarationEndRegex.test( nextValue );
+
+					if ( hasStaticDeclaration || hasSplitDeclaration ) {
+						context.report( {
+							node,
+							messageId: 'disallowedSet',
+						} );
+						return;
+					}
+				}
 			},
 		};
 	},
