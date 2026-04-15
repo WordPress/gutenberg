@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/heading-has-content */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Text } from '../index';
 import { Stack } from '../../stack';
@@ -18,6 +17,10 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * Important: Setting the `variant` prop to a `heading` variant will not automatically render a heading element.
+ * Use the `render` prop to render a heading element with the appropriate level.
+ */
 export const AllVariants: Story = {
 	render: () => (
 		<Stack
@@ -65,4 +68,3 @@ export const WithRenderProp: Story = {
 		</Stack>
 	),
 };
-/* eslint-enable jsx-a11y/heading-has-content */

@@ -6,6 +6,7 @@ import { type LinkProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 
 /**
  * A styled anchor element with support for semantic color tones and an
@@ -39,6 +40,7 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		ref,
 		props: mergeProps< 'a' >( props, {
 			className: clsx(
+				defenseStyles.a,
 				resetStyles[ 'box-sizing' ],
 				focusStyles[ 'outset-ring--focus' ],
 				variant !== 'unstyled' && styles.link,

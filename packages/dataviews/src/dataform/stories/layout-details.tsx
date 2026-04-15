@@ -123,7 +123,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'filesize',
-		label: 'File Size',
+		label: 'File size',
 		type: 'integer',
 		readOnly: true,
 	},
@@ -170,7 +170,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'longDescription',
-		label: 'Long Description',
+		label: 'Long description',
 		type: 'text',
 		Edit: {
 			control: 'textarea',
@@ -179,7 +179,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'comment_status',
-		label: 'Comment Status',
+		label: 'Comment status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
@@ -189,7 +189,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'ping_status',
-		label: 'Allow Pings/Trackbacks',
+		label: 'Allow pings/trackbacks',
 		type: 'boolean',
 	},
 	{
@@ -223,7 +223,7 @@ const fields: Field< SamplePost >[] = [
 	},
 	{
 		id: 'flight_status',
-		label: 'Flight Status',
+		label: 'Flight status',
 		type: 'text',
 		Edit: 'radio',
 		elements: [
