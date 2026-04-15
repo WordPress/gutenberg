@@ -79,7 +79,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 				className
 			) }
 		>
-			<ThemeProvider hasLayoutBox>
+			<ThemeProvider>
 				<_Popover.Popup
 					ref={ mergedPopupRef }
 					initialFocus={ resolvedInitialFocus }

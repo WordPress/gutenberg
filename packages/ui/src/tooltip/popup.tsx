@@ -48,7 +48,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 				    them;
 				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
 					*/ }
-				<ThemeProvider color={ { bg: '#1e1e1e' } } hasLayoutBox>
+				<ThemeProvider color={ { bg: '#1e1e1e' } }>
 					<Tooltip.Popup
 						ref={ ref }
 						className={ styles.popup }

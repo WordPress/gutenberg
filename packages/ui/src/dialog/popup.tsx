@@ -42,7 +42,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	return (
 		<_Dialog.Portal container={ container }>
 			<_Dialog.Backdrop className={ styles.backdrop } />
-			<ThemeProvider hasLayoutBox>
+			<ThemeProvider>
 				<_Dialog.Popup
 					ref={ mergedRef }
 					className={ clsx(
