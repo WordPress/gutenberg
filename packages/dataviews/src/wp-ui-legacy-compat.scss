@@ -1,0 +1,22 @@
+// Legacy z-index compatibility for @wordpress/ui overlays.
+//
+// Sets --wp-ui-*-z-index custom properties so that @wordpress/ui
+// overlays (Dialog, Tooltip, etc.) stack correctly alongside legacy
+// @wordpress/components overlays during the transition period.
+//
+// These overrides follow the Phase 2 strategy described in
+// docs/explanations/architecture/overlay-migration-plan.md and should
+// be removed once all overlays share a single portal context (Phase 5).
+
+@use "@wordpress/base-styles/z-index" as *;
+
+// Generic defaults — match the base @wordpress/components overlay values.
+:root {
+	--wp-ui-dialog-z-index: #{z-index(".components-modal__screen-overlay")};
+	--wp-ui-tooltip-z-index: #{z-index(".components-tooltip")};
+}
+
+// Specific override — action modals must stack above legacy popovers.
+.dataviews-action-modal-portal {
+	--wp-ui-dialog-z-index: #{z-index(".dataviews-action-modal")};
+}

@@ -17,7 +17,7 @@ import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { AlertDialog, Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
+import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -170,19 +170,15 @@ export function ActionModal< Item >( {
 		contentRef
 	);
 
-	// AlertDialog.Root provides `role="alertdialog"` and blocks backdrop-click
-	// dismissal via the shared Base UI DialogStore. Dialog.Popup is used instead
-	// of AlertDialog.Popup because RenderModal provides its own buttons.
-	const DialogRoot = action.hideModalHeader ? AlertDialog.Root : Dialog.Root;
-
 	return (
-		<DialogRoot
+		<Dialog.Root
 			open
 			onOpenChange={ ( open ) => {
 				if ( ! open ) {
 					closeModal();
 				}
 			} }
+			disablePointerDismissal={ action.hideModalHeader }
 		>
 			<Dialog.Popup
 				size={ mapModalSize( action.modalSize ) }
@@ -193,6 +189,9 @@ export function ActionModal< Item >( {
 					<Dialog.Portal className="dataviews-action-modal-portal" />
 				}
 				initialFocus={ initialFocus }
+				{ ...( action.hideModalHeader && {
+					role: 'alertdialog' as const,
+				} ) }
 			>
 				{ action.hideModalHeader ? (
 					<VisuallyHidden
@@ -211,7 +210,7 @@ export function ActionModal< Item >( {
 					/>
 				</div>
 			</Dialog.Popup>
-		</DialogRoot>
+		</Dialog.Root>
 	);
 }
 
