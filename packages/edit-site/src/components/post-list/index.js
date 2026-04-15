@@ -322,7 +322,7 @@ export default function PostList( { postType } ) {
 				} }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
-				defaultLayouts={ defaultLayouts ?? {} }
+				defaultLayouts={ defaultLayouts }
 				onReset={
 					isModified
 						? () => {

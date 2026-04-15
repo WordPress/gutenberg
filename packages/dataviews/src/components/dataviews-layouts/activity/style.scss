@@ -35,7 +35,7 @@
 			overflow: hidden;
 
 			&--clickable {
-				cursor: pointer;
+				cursor: var(--wpds-cursor-control);
 
 				&:focus-visible {
 					outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);

@@ -14,10 +14,6 @@ test.describe( 'Style Book', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin, editor, styleBook, page } ) => {
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
@@ -25,6 +21,10 @@ test.describe( 'Style Book', () => {
 		await expect(
 			page.locator( 'role=region[name="Style Book"i]' )
 		).toBeVisible();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should disable toolbar buttons when open', async ( { page } ) => {

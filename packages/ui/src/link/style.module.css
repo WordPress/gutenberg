@@ -65,7 +65,7 @@
 
 	.link-icon {
 		margin-inline-start: var(--wpds-dimension-padding-xs);
-		font-weight: var(--wpds-font-weight-regular);
+		font-weight: var(--wpds-typography-font-weight-regular);
 	}
 
 	.link-icon::after {

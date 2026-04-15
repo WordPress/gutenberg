@@ -63,6 +63,11 @@ export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
+	 * A parent element to render the portal into.
+	 */
+	container?: _AlertDialog.Portal.Props[ 'container' ];
+
+	/**
 	 * The semantic intent of the dialog, which determines its styling.
 	 *
 	 * All intents use `role="alertdialog"`, are always modal, and block

@@ -14,7 +14,6 @@
 		background: $components-color-gray-100;
 		border-color: $components-color-gray-400;
 		cursor: default;
-		opacity: 1;
 	}
 
 	&.is-active {
@@ -208,6 +207,6 @@
 	}
 
 	&:not(.is-empty) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

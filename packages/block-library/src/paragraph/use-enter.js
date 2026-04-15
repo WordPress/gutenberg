@@ -90,12 +90,12 @@ export function useOnEnter( props ) {
 			}
 
 			const defaultBlockName = getDefaultBlockName();
+			const wrapperBlockName = getBlockName( wrapperClientId );
+			const grandparentClientId = getBlockRootClientId( wrapperClientId );
 
 			if (
-				! canInsertBlockType(
-					defaultBlockName,
-					getBlockRootClientId( wrapperClientId )
-				)
+				! canInsertBlockType( defaultBlockName, grandparentClientId ) ||
+				! canInsertBlockType( wrapperBlockName, grandparentClientId )
 			) {
 				return;
 			}
@@ -119,7 +119,7 @@ export function useOnEnter( props ) {
 				insertBlock(
 					createBlock( defaultBlockName ),
 					blockIndex + 1,
-					getBlockRootClientId( wrapperClientId ),
+					grandparentClientId,
 					true
 				);
 			} );
