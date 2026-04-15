@@ -23,14 +23,14 @@ _This block has no custom attributes._
 
 - [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
-  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typographytextalign): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
+  - [textAlign](/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `["horizontal","vertical"]`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `["horizontal","vertical"]`
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 
 ## Context

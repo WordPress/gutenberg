@@ -29,20 +29,20 @@
 - [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-  - [heading](/block-editor/reference-guides/block-api/block-supports/#colorheading): `true`
-  - [button](/block-editor/reference-guides/block-api/block-supports/#colorbutton): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [heading](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
+  - [button](/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 - [allowedBlocks](/block-editor/reference-guides/block-api/block-supports/#allowedblocks): `true`
 
 ## Block Markup

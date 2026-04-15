@@ -73,17 +73,17 @@ The structural CSS for the navigation block targets generic classnames across me
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [inserter](/block-editor/reference-guides/block-api/block-supports/#inserter): `true`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
-  - [units](/block-editor/reference-guides/block-api/block-supports/#spacingunits): `["px","em","rem","vh","vw"]`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+  - [units](/block-editor/reference-guides/block-api/block-supports/#spacing-units): `["px","em","rem","vh","vw"]`
 - [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
-  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
-  - [allowVerticalAlignment](/block-editor/reference-guides/block-api/block-supports/#layoutallowverticalalignment): `false`
-  - [allowSizingOnChildren](/block-editor/reference-guides/block-api/block-supports/#layoutallowsizingonchildren): `true`
-  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
+  - [allowVerticalAlignment](/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
+  - [allowSizingOnChildren](/block-editor/reference-guides/block-api/block-supports/#layout-allowsizingonchildren): `true`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity): `true`
 - [renaming](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 
