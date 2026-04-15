@@ -69,6 +69,27 @@ const NOTICES_CONTEXT = 'media-modal';
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
+const defaultLayouts: SupportedLayouts = {
+	[ LAYOUT_PICKER_GRID ]: {
+		fields: [],
+		showTitle: false,
+		layout: {
+			previewSize: 170,
+			density: 'compact',
+		},
+	},
+	[ LAYOUT_PICKER_TABLE ]: {
+		fields: [
+			'filename',
+			'filesize',
+			'media_dimensions',
+			'author',
+			'date',
+		],
+		showTitle: true,
+	},
+};
+
 interface MediaUploadModalProps {
 	/**
 	 * Array of allowed media types.
@@ -192,30 +213,6 @@ export function MediaUploadModal( {
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
-
-	const defaultLayouts: SupportedLayouts = useMemo(
-		() => ( {
-			[ LAYOUT_PICKER_GRID ]: {
-				fields: [],
-				showTitle: false,
-				layout: {
-					previewSize: 170,
-					density: 'compact',
-				},
-			},
-			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [
-					'filename',
-					'filesize',
-					'media_dimensions',
-					'author',
-					'date',
-				],
-				showTitle: true,
-			},
-		} ),
-		[]
-	);
 
 	// Persist view configuration across sessions via the preferences store.
 	const { view, updateView, isModified, resetToDefault } = useView( {
