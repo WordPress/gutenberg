@@ -18,6 +18,7 @@
 	z-index: 1;
 }
 
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
 .header-title {
 	overflow: hidden;
 	text-overflow: ellipsis;
