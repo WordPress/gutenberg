@@ -4,7 +4,9 @@
 
 ### Enhancements
 
-- `EditPost`: Use `--wpds-cursor-control` for interactive cursor styling. [#77360](https://github.com/WordPress/gutenberg/pull/77360)
+- Use `--wpds-cursor-control` for interactive cursor styling. [#77360](https://github.com/WordPress/gutenberg/pull/77360)
+
+## 8.44.0 (2026-04-15)
 
 ## 8.43.0 (2026-04-01)
 

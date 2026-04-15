@@ -10,11 +10,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { store as coreContentGuidelinesStore } from './store';
+import { store as coreGuidelinesStore } from './store';
 import type {
 	RestGuidelinesResponse,
 	GuidelinesImportData,
-	ContentGuidelinesRevision,
+	GuidelinesRevision,
 	Categories,
 } from './types';
 
@@ -33,11 +33,11 @@ function isValidGuidelinesImport(
 	);
 }
 
-export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
+export async function fetchGuidelines(): Promise< RestGuidelinesResponse > {
+	const { setFromResponse } = dispatch( coreGuidelinesStore );
 
 	const response = ( await apiFetch( {
-		path: '/wp/v2/content-guidelines?context=edit',
+		path: '/wp/v2/guidelines?context=edit',
 	} ) ) as RestGuidelinesResponse;
 
 	setFromResponse( response );
@@ -45,10 +45,10 @@ export async function fetchContentGuidelines(): Promise< RestGuidelinesResponse 
 	return response;
 }
 
-export async function saveContentGuidelines(): Promise< RestGuidelinesResponse > {
-	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
+export async function saveGuidelines(): Promise< RestGuidelinesResponse > {
+	const { setFromResponse } = dispatch( coreGuidelinesStore );
 
-	const guidelinesStore = select( coreContentGuidelinesStore );
+	const guidelinesStore = select( coreGuidelinesStore );
 
 	const id = guidelinesStore.getId();
 	const status = guidelinesStore.getStatus() || 'draft';
@@ -97,9 +97,7 @@ async function saveGuidelinesBypassingStore(
 		},
 	};
 
-	const path = id
-		? `/wp/v2/content-guidelines/${ id }`
-		: '/wp/v2/content-guidelines';
+	const path = id ? `/wp/v2/guidelines/${ id }` : '/wp/v2/guidelines';
 	const method = id ? 'PUT' : 'POST';
 
 	const response = ( await apiFetch( {
@@ -112,12 +110,12 @@ async function saveGuidelinesBypassingStore(
 }
 
 /**
- * Opens file selector, reads the selected file and imports the content guidelines.
- * @param file Content Guidelines JSON file
+ * Opens file selector, reads the selected file and imports the guidelines.
+ * @param file Guidelines JSON file
  */
-export async function importContentGuidelines( file: File ): Promise< void > {
-	const { setFromResponse } = dispatch( coreContentGuidelinesStore );
-	const guidelinesStore = select( coreContentGuidelinesStore );
+export async function importGuidelines( file: File ): Promise< void > {
+	const { setFromResponse } = dispatch( coreGuidelinesStore );
+	const guidelinesStore = select( coreGuidelinesStore );
 	const { createSuccessNotice } = dispatch( noticesStore );
 
 	const parsed: unknown = JSON.parse( await file.text() );
@@ -177,13 +175,13 @@ export async function importContentGuidelines( file: File ): Promise< void > {
 }
 
 /**
- * Exports the content guidelines as a JSON file.
+ * Exports the guidelines as a JSON file.
  */
-export function exportContentGuidelines(): void {
+export function exportGuidelines(): void {
 	const { createSuccessNotice } = dispatch( noticesStore );
 
-	const guidelinesStore = select( coreContentGuidelinesStore );
-	const contentGuidelinesCategories = guidelinesStore.getAllGuidelines();
+	const guidelinesStore = select( coreGuidelinesStore );
+	const guidelinesCategories = guidelinesStore.getAllGuidelines();
 	const blockGuidelines = guidelinesStore.getBlockGuidelines();
 
 	const data = {
@@ -193,8 +191,7 @@ export function exportContentGuidelines(): void {
 					guidelineCategory,
 					{
 						guidelines:
-							contentGuidelinesCategories[ guidelineCategory ] ??
-							'',
+							guidelinesCategories[ guidelineCategory ] ?? '',
 					},
 				] )
 			),
@@ -226,7 +223,7 @@ export function exportContentGuidelines(): void {
 	} );
 }
 
-export async function fetchContentGuidelinesRevisions( {
+export async function fetchGuidelinesRevisions( {
 	guidelinesId,
 	page = 1,
 	perPage = 10,
@@ -237,7 +234,7 @@ export async function fetchContentGuidelinesRevisions( {
 	perPage?: number;
 	search?: string;
 } ): Promise< {
-	revisions: ContentGuidelinesRevision[];
+	revisions: GuidelinesRevision[];
 	total: number;
 	totalPages: number;
 } > {
@@ -249,11 +246,11 @@ export async function fetchContentGuidelinesRevisions( {
 	} );
 
 	const response = ( await apiFetch( {
-		path: `/wp/v2/content-guidelines/${ guidelinesId }/revisions?${ params }`,
+		path: `/wp/v2/guidelines/${ guidelinesId }/revisions?${ params }`,
 		parse: false,
 	} ) ) as Response;
 
-	const revisions = ( await response.json() ) as ContentGuidelinesRevision[];
+	const revisions = ( await response.json() ) as GuidelinesRevision[];
 	const total = parseInt( response.headers.get( 'X-WP-Total' ) ?? '0', 10 );
 	const totalPages = parseInt(
 		response.headers.get( 'X-WP-TotalPages' ) ?? '0',
@@ -263,12 +260,12 @@ export async function fetchContentGuidelinesRevisions( {
 	return { revisions, total, totalPages };
 }
 
-export async function restoreContentGuidelinesRevision(
+export async function restoreGuidelinesRevision(
 	guidelinesId: number,
 	revisionId: number
 ): Promise< RestGuidelinesResponse > {
 	return ( await apiFetch( {
-		path: `/wp/v2/content-guidelines/${ guidelinesId }/revisions/${ revisionId }/restore`,
+		path: `/wp/v2/guidelines/${ guidelinesId }/revisions/${ revisionId }/restore`,
 		method: 'POST',
 	} ) ) as RestGuidelinesResponse;
 }

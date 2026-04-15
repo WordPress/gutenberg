@@ -9,7 +9,7 @@ let bootstrapped = false;
 
 /**
  * Bootstraps the block registry with Core blocks only.
- * Used on the Content Guidelines admin page so block icons (and later
+ * Used on the Guidelines admin page so block icons (and later
  * 3rd party/experimental block support) are available without loading
  * the full block editor.
  */

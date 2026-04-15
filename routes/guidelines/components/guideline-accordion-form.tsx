@@ -18,8 +18,8 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { store as coreContentGuidelinesStore } from '../store';
-import { saveContentGuidelines } from '../api';
+import { store as coreGuidelinesStore } from '../store';
+import { saveGuidelines } from '../api';
 import type { GuidelineAccordionFormProps } from '../types';
 
 export default function GuidelineAccordionForm( {
@@ -28,7 +28,7 @@ export default function GuidelineAccordionForm( {
 	headingId,
 	descriptionId,
 }: GuidelineAccordionFormProps ) {
-	const { setGuideline } = useDispatch( coreContentGuidelinesStore );
+	const { setGuideline } = useDispatch( coreGuidelinesStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ loading, setLoading ] = useState( false );
 	const [ error, setError ] = useState< string | null >( null );
@@ -37,7 +37,7 @@ export default function GuidelineAccordionForm( {
 
 	const { value } = useSelect(
 		( select ) => ( {
-			value: select( coreContentGuidelinesStore ).getGuideline( slug ),
+			value: select( coreGuidelinesStore ).getGuideline( slug ),
 		} ),
 		[ slug ]
 	);
@@ -75,7 +75,7 @@ export default function GuidelineAccordionForm( {
 		event.preventDefault();
 		setGuideline( slug, draft );
 		setLoading( true );
-		saveContentGuidelines()
+		saveGuidelines()
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines saved.' ), {
@@ -103,7 +103,7 @@ export default function GuidelineAccordionForm( {
 		// This is because the API will only remove the guideline if the value is an empty string.
 		setGuideline( slug, '' );
 		setLoading( true );
-		saveContentGuidelines()
+		saveGuidelines()
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines cleared.' ), {
@@ -132,7 +132,7 @@ export default function GuidelineAccordionForm( {
 			aria-labelledby={ headingId }
 			aria-describedby={ descriptionId }
 			onSubmit={ handleSave }
-			className="content-guidelines__accordion-form"
+			className="guidelines__accordion-form"
 		>
 			<VStack spacing={ 4 }>
 				<DataForm

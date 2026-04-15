@@ -22,13 +22,13 @@ import type { View, Field, Action } from '@wordpress/dataviews';
 /**
  * Internal dependencies
  */
-import { store as coreContentGuidelinesStore } from '../store';
+import { store as coreGuidelinesStore } from '../store';
 import {
-	fetchContentGuidelinesRevisions,
-	restoreContentGuidelinesRevision,
-	fetchContentGuidelines,
+	fetchGuidelinesRevisions,
+	restoreGuidelinesRevision,
+	fetchGuidelines,
 } from '../api';
-import type { ContentGuidelinesRevision } from '../types';
+import type { GuidelinesRevision } from '../types';
 
 const DEFAULT_VIEW: View = {
 	type: 'table' as const,
@@ -42,19 +42,17 @@ const DEFAULT_VIEW: View = {
 
 export default function RevisionHistory() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
-	const [ revisions, setRevisions ] = useState< ContentGuidelinesRevision[] >(
-		[]
-	);
+	const [ revisions, setRevisions ] = useState< GuidelinesRevision[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ revisionToRestore, setRevisionToRestore ] =
-		useState< ContentGuidelinesRevision | null >( null );
+		useState< GuidelinesRevision | null >( null );
 	const [ isRestoring, setIsRestoring ] = useState( false );
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
 	const guidelinesId = useSelect(
-		( select ) => select( coreContentGuidelinesStore ).getId(),
+		( select ) => select( coreGuidelinesStore ).getId(),
 		[]
 	);
 
@@ -68,7 +66,7 @@ export default function RevisionHistory() {
 			// Fetch all revisions at once so client-side filtering works
 			// across the full dataset. Server-side pagination + filtering
 			// will be done together in a follow-up.
-			const result = await fetchContentGuidelinesRevisions( {
+			const result = await fetchGuidelinesRevisions( {
 				guidelinesId: guidelinesId!,
 				page: 1,
 				perPage: 100,
@@ -98,7 +96,7 @@ export default function RevisionHistory() {
 		].map( ( name ) => ( { value: name, label: name } ) );
 	}, [ revisions ] );
 
-	const fields = useMemo< Field< ContentGuidelinesRevision >[] >(
+	const fields = useMemo< Field< GuidelinesRevision >[] >(
 		() => [
 			{
 				id: 'date',
@@ -142,7 +140,7 @@ export default function RevisionHistory() {
 		[ authorElements ]
 	);
 
-	const actions = useMemo< Action< ContentGuidelinesRevision >[] >(
+	const actions = useMemo< Action< GuidelinesRevision >[] >(
 		() => [
 			{
 				id: 'restore-revision',
@@ -167,11 +165,11 @@ export default function RevisionHistory() {
 		}
 		setIsRestoring( true );
 		try {
-			await restoreContentGuidelinesRevision(
+			await restoreGuidelinesRevision(
 				guidelinesId,
 				revisionToRestore.id
 			);
-			await fetchContentGuidelines();
+			await fetchGuidelines();
 			setRevisionToRestore( null );
 			await loadRevisions();
 			createSuccessNotice( __( 'Revision restored.' ), {
@@ -196,10 +194,10 @@ export default function RevisionHistory() {
 	};
 
 	return (
-		<div className="content-guidelines__revision-history">
+		<div className="guidelines__revision-history">
 			<Navigator.BackButton
 				icon={ isRTL() ? chevronRight : chevronLeft }
-				className="content-guidelines__revision-history-back"
+				className="guidelines__revision-history-back"
 				onClick={ navigateToGuidelines }
 			>
 				{ __( 'Revision history' ) }
@@ -255,7 +253,7 @@ export default function RevisionHistory() {
 					</VStack>
 					<HStack
 						justify="flex-end"
-						className="content-guidelines__restore-modal-actions"
+						className="guidelines__restore-modal-actions"
 					>
 						<Button
 							variant="tertiary"

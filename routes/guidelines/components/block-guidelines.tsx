@@ -25,8 +25,8 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import BlockGuidelineModal from './block-guideline-modal';
-import { saveContentGuidelines } from '../api';
-import { store as coreContentGuidelinesStore } from '../store';
+import { saveGuidelines } from '../api';
+import { store as coreGuidelinesStore } from '../store';
 import './block-guidelines.scss';
 
 const PER_PAGE = 5;
@@ -83,7 +83,7 @@ export default function BlockGuidelines() {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const blockGuidelines = useSelect(
-		( select ) => select( coreContentGuidelinesStore ).getBlockGuidelines(),
+		( select ) => select( coreGuidelinesStore ).getBlockGuidelines(),
 		[]
 	);
 
@@ -106,7 +106,7 @@ export default function BlockGuidelines() {
 		[ blockGuidelines, blockTypes ]
 	);
 
-	const { setBlockGuideline } = useDispatch( coreContentGuidelinesStore );
+	const { setBlockGuideline } = useDispatch( coreGuidelinesStore );
 
 	const handleRowClick = ( id: string ) => {
 		setSelectedItem( id );
@@ -144,7 +144,7 @@ export default function BlockGuidelines() {
 		// This is because the API will only remove the guideline if the value is an empty string.
 		setBlockGuideline( itemToDelete.id, '' );
 		setBusy( true );
-		saveContentGuidelines()
+		saveGuidelines()
 			.then( () => {
 				setError( null );
 				createSuccessNotice( __( 'Guidelines removed.' ), {

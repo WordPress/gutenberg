@@ -8,14 +8,14 @@ import { createReduxStore, register } from '@wordpress/data';
  */
 import type {
 	Categories,
-	ContentGuidelinesState,
+	GuidelinesState,
 	RestGuidelinesResponse,
 } from './types';
 
 export type { Categories };
-export const STORE_NAME = 'core/content-guidelines';
+export const STORE_NAME = 'core/guidelines';
 
-const DEFAULT_STATE: ContentGuidelinesState = {
+const DEFAULT_STATE: GuidelinesState = {
 	id: null,
 	status: null,
 	categories: {
@@ -56,7 +56,7 @@ type Action = ReturnType< ( typeof actions )[ keyof typeof actions ] >;
 
 function parseResponse(
 	response: RestGuidelinesResponse | null | undefined
-): Partial< ContentGuidelinesState > {
+): Partial< GuidelinesState > {
 	if ( ! response || typeof response !== 'object' ) {
 		return {};
 	}
@@ -91,9 +91,9 @@ function parseResponse(
 }
 
 function reducer(
-	state: ContentGuidelinesState = DEFAULT_STATE,
+	state: GuidelinesState = DEFAULT_STATE,
 	action: Action
-): ContentGuidelinesState {
+): GuidelinesState {
 	switch ( action.type ) {
 		case 'SET_FROM_RESPONSE':
 			return {
@@ -133,29 +133,24 @@ function reducer(
 
 const selectors = {
 	getGuideline(
-		state: ContentGuidelinesState,
+		state: GuidelinesState,
 		category: string
 	): string | Record< string, string > {
 		return state.categories[ category ];
 	},
-	getAllGuidelines( state: ContentGuidelinesState ): Categories {
+	getAllGuidelines( state: GuidelinesState ): Categories {
 		return state.categories;
 	},
-	getBlockGuidelines(
-		state: ContentGuidelinesState
-	): Record< string, string > {
+	getBlockGuidelines( state: GuidelinesState ): Record< string, string > {
 		return state.categories.blocks;
 	},
-	getBlockGuideline(
-		state: ContentGuidelinesState,
-		blockName: string
-	): string {
+	getBlockGuideline( state: GuidelinesState, blockName: string ): string {
 		return state.categories.blocks[ blockName ] ?? '';
 	},
-	getId( state: ContentGuidelinesState ): number | null {
+	getId( state: GuidelinesState ): number | null {
 		return state.id;
 	},
-	getStatus( state: ContentGuidelinesState ): string | null {
+	getStatus( state: GuidelinesState ): string | null {
 		return state.status;
 	},
 };

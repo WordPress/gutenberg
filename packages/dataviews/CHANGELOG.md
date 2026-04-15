@@ -2,11 +2,16 @@
 
 ## Unreleased
 
+## 14.1.0 (2026-04-15)
+
 ### Enhancements
 
+- DataForm: Add `min`/`max` date range validation support for `date` and `datetime` fields. [#77201](https://github.com/WordPress/gutenberg/pull/77201)
 - DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling. [#77259](https://github.com/WordPress/gutenberg/pull/77259)
 - DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
 - DataForm: Show tooltip in edit button in `panel` layout. [#77024](https://github.com/WordPress/gutenberg/pull/77024)
+- DataViewsPicker: Add `onReset` prop to support view reset functionality. [#77288](https://github.com/WordPress/gutenberg/pull/77288)
 
 ### Bug Fixes
 
