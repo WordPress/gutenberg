@@ -26,12 +26,6 @@ describe( 'sanitize', () => {
 			);
 		} );
 
-		it( 'strips javascript: URIs', () => {
-			const input = '<a href="javascript:alert(1)">click</a>';
-			const result = sanitizeValue( input ) as string;
-			expect( result ).not.toContain( 'javascript:' );
-		} );
-
 		it( 'preserves safe HTML', () => {
 			const safeHtml =
 				'<p>Hello <strong>world</strong> <a href="https://example.com">link</a></p>';

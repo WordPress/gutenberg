@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import DOMPurify from 'dompurify';
+import { safeHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -9,12 +9,13 @@ import DOMPurify from 'dompurify';
 import type { ObjectData } from './types';
 
 /**
- * Recursively sanitizes all string values in an object using DOMPurify.
- * This prevents XSS attacks from malicious content injected by a remote
- * RTC collaborator into the shared CRDT document.
+ * Recursively sanitizes all string values in a plain object graph using
+ * `safeHTML`, which strips `<script>` tags and `on*` event-handler attributes.
+ * This prevents XSS attacks from malicious content injected by a remote RTC
+ * collaborator into the shared CRDT document.
  *
- * Non-string primitives (numbers, booleans, null, undefined) are passed
- * through unchanged. Arrays and plain objects are traversed recursively.
+ * Non-string primitives (numbers, booleans, null, undefined) pass through
+ * unchanged. Arrays and plain objects are traversed recursively.
  *
  * @param {unknown} value The value to sanitize.
  * @return {unknown} The sanitized value.
@@ -25,21 +26,15 @@ export function sanitizeValue( value: unknown ): unknown {
 			return value;
 		}
 
-		return DOMPurify.sanitize( value, {
-			// FORCE_BODY ensures leading HTML comments are not stripped.
-			// WordPress block markup relies on comment delimiters
-			// (e.g. <!-- wp:paragraph -->) that may precede any element.
-			FORCE_BODY: true,
-			// Allow HTML comment nodes so block delimiters survive.
-			ADD_TAGS: [ '#comment' ],
-		} );
+		return safeHTML( value );
 	}
 
 	if ( Array.isArray( value ) ) {
 		return value.map( sanitizeValue );
 	}
 
-	if ( value && 'object' === typeof value && ! isSpecialObject( value ) ) {
+	// Recurse into plain objects
+	if ( value && 'object' === typeof value && isPlainObject( value ) ) {
 		return sanitizeObjectData( value as Record< string, unknown > );
 	}
 
@@ -47,15 +42,15 @@ export function sanitizeValue( value: unknown ): unknown {
 }
 
 /**
- * Returns true for objects that should not be recursively traversed, such
- * as class instances from Yjs or the DOM.
+ * Returns true only for plain objects (object literals or
+ * `Object.create( null )`). Used to skip recursion into other class instances.
  *
  * @param {Object} value The object to check.
- * @return {boolean} Whether the object is a class instance or has a non-standard prototype.
+ * @return {boolean} Whether the value is a plain object.
  */
-function isSpecialObject( value: object ): boolean {
+function isPlainObject( value: object ): boolean {
 	const proto = Object.getPrototypeOf( value );
-	return proto !== Object.prototype && proto !== null;
+	return proto === Object.prototype || proto === null;
 }
 
 /**

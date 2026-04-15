@@ -766,17 +766,13 @@ describe( 'SyncManager', () => {
 		it( 'sanitizes remote changes when marked untrusted', async () => {
 			// Capture the Y.Doc and the trustworthy callback from the provider.
 			let capturedDoc: Y.Doc | null = null;
-			let trustworthyCallback: ( ( v: boolean ) => void ) | null =
-				null;
+			let trustworthyCallback: ( ( v: boolean ) => void ) | null = null;
 			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
 				capturedDoc = ydoc;
 				return {
 					destroy: jest.fn(),
 					on: jest.fn(
-						(
-							event: string,
-							cb: ( ...args: any[] ) => void
-						) => {
+						( event: string, cb: ( ...args: any[] ) => void ) => {
 							if ( event === 'trustworthy' ) {
 								trustworthyCallback = cb;
 							}
@@ -808,10 +804,7 @@ describe( 'SyncManager', () => {
 			const remoteDoc = new Y.Doc();
 			remoteDoc
 				.getMap( CRDT_RECORD_MAP_KEY )
-				.set(
-					'title',
-					'<script>alert("xss")</script>Safe Title'
-				);
+				.set( 'title', '<script>alert("xss")</script>Safe Title' );
 			Y.applyUpdateV2(
 				capturedDoc as unknown as Y.Doc,
 				Y.encodeStateAsUpdateV2( remoteDoc )
@@ -851,12 +844,10 @@ describe( 'SyncManager', () => {
 			expect( capturedDoc ).not.toBeNull();
 
 			// Simulate a remote change with HTML content that would be
-			// modified by DOMPurify (e.g. an img with onerror).
+			// modified by the sanitizer (e.g. an img with onerror).
 			const remoteDoc = new Y.Doc();
 			const htmlContent = '<img src="x" onerror="alert(1)">';
-			remoteDoc
-				.getMap( CRDT_RECORD_MAP_KEY )
-				.set( 'title', htmlContent );
+			remoteDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'title', htmlContent );
 			Y.applyUpdateV2(
 				capturedDoc as unknown as Y.Doc,
 				Y.encodeStateAsUpdateV2( remoteDoc )
