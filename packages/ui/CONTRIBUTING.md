@@ -140,12 +140,12 @@ export const Title = forwardRef( function MyTitle(
 ```tsx
 // Render function — useful when the default needs to compose
 // other components or add additional props.
-const defaultRender = ( props: React.ComponentProps< typeof Stack > ) => (
+const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
     <Stack { ...props } direction="column" gap="sm" />
 );
 
 export const Root = forwardRef( function MyRoot(
-    { className, render = defaultRender, ...restProps },
+    { className, render = DEFAULT_RENDER, ...restProps },
     ref
 ) {
     return (

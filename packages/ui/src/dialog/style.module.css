@@ -98,7 +98,10 @@
 	}
 
 	.title {
-		/* Workaround the higher specificity of the global CSS defense styles */
+		margin-inline-end: auto;
+
+		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+		 * Keep both so the layout survives GCD removal. */
 		--_gcd-heading-margin: 0 auto 0 0;
 
 		&:dir(rtl) {
