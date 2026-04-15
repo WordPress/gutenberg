@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- `EditSite`: Use `--wpds-cursor-control` for interactive cursor styling. [#77362](https://github.com/WordPress/gutenberg/pull/77362)
+
 ## 6.43.0 (2026-04-01)
 
 ## 6.42.0 (2026-03-18)
