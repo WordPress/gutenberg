@@ -19,7 +19,8 @@ import type {
 /**
  * Internal dependencies
  */
-import { selectorArgsToStateKey, onSubKey } from './utils';
+import { onSubKey } from '../on-sub-key';
+import { selectorArgsToStateKey } from './utils';
 
 type Action =
 	| ReturnType< typeof startResolution >
