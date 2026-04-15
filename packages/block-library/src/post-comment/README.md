@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/avatar`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/)
 - [`core/comment-author-name`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-name/)
 - [`core/comment-content`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-content/)

@@ -10,10 +10,10 @@
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/navigation`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/navigation-link`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
 - [`core/navigation-submenu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
 - [`core/page-list`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)

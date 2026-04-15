@@ -12,7 +12,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/social-link`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-link/)
 
 ## Attributes

@@ -25,7 +25,7 @@ The structural CSS for the navigation block targets generic classnames across me
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/navigation-link`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
 - [`core/search`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 - [`core/social-links`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)

@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/accordion-item`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-item/)
 
 ## Attributes

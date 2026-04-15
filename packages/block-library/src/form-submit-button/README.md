@@ -12,10 +12,10 @@
 
 ## Block Relationships
 
-**Ancestor blocks:**
+**[Ancestor](/block-editor/reference-guides/block-api/block-metadata/#ancestor) blocks:**
 - [`core/form`](/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form/)
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/buttons`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)
 - [`core/button`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-button/)
 

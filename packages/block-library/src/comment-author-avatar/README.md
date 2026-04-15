@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Ancestor blocks:**
+**[Ancestor](/block-editor/reference-guides/block-api/block-metadata/#ancestor) blocks:**
 - [`core/comment-template`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-comment-template/)
 
 ## Attributes

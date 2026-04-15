@@ -33,7 +33,7 @@ Starting from WordPress 6.9, it's possible to add custom social icons to your si
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/social-links`](/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
 
 ## Attributes

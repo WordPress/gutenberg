@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/tabs-menu`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/)
 - [`core/tab-panel`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
 

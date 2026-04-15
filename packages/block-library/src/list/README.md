@@ -12,7 +12,7 @@
 
 ## Block Relationships
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/list-item`](/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-list-item/)
 
 ## Attributes

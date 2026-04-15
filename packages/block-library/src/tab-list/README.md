@@ -10,10 +10,10 @@
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/tabs`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
 
-**Allowed inner blocks:**
+**[Allowed](/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/tabs-menu-item`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu-item/)
 
 ## Attributes

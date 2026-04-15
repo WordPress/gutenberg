@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Parent blocks (direct):**
+**[Parent](/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/accordion-item`](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-accordion-item/)
 
 ## Attributes

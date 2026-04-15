@@ -10,7 +10,7 @@
 
 ## Block Relationships
 
-**Ancestor blocks:**
+**[Ancestor](/block-editor/reference-guides/block-api/block-metadata/#ancestor) blocks:**
 - [`core/terms-query`](/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-terms-query/)
 
 ## Attributes
