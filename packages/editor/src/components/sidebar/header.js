@@ -17,7 +17,8 @@ import { sidebars } from './constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-const SidebarHeader = ( _, ref ) => {
+const SidebarHeader = ( props, ref ) => {
+	const { hasInspector } = props;
 	const { postTypeLabel, isAttachment, isRevisionsMode } = useSelect(
 		( select ) => {
 			const { getPostTypeLabel, getCurrentPostType } =
@@ -55,7 +56,7 @@ const SidebarHeader = ( _, ref ) => {
 			>
 				{ documentLabel }
 			</Tabs.Tab>
-			{ ! isAttachment && (
+			{ ! isAttachment && hasInspector && (
 				<Tabs.Tab
 					tabId={ sidebars.block }
 					// Used for focus management in the SettingsSidebar component.

@@ -18,6 +18,7 @@ import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -60,6 +61,7 @@ const SidebarContent = ( {
 	onActionPerformed,
 	extraPanels,
 	postType,
+	hasInspector,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -132,7 +134,10 @@ const SidebarContent = ( {
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
+					<SidebarHeader
+						ref={ tabListRef }
+						hasInspector={ hasInspector }
+					/>
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -214,9 +219,26 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 		[ enableComplementaryArea ]
 	);
 
+	const hasInspector = useSelect( ( select ) => {
+		const clientId = select( blockEditorStore ).getBlockSelectionStart();
+
+		if ( ! clientId ) {
+			return true;
+		}
+
+		const block = select( blockEditorStore ).getBlock( clientId );
+		const blockType = select( blocksStore ).getBlockType( block?.name );
+
+		return blockType?.supports?.inspector !== false;
+	}, [] );
+
 	return (
 		<Tabs
-			selectedTabId={ tabName }
+			selectedTabId={
+				tabName === sidebars.block && ! hasInspector
+					? sidebars.document
+					: tabName
+			}
 			onSelect={ onTabSelect }
 			selectOnMove={ false }
 		>
@@ -227,6 +249,7 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
 				postType={ postType }
+				hasInspector={ hasInspector }
 			/>
 		</Tabs>
 	);
