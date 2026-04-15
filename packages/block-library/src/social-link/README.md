@@ -51,7 +51,7 @@ Starting from WordPress 6.9, it's possible to add custom social icons to your si
 - [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

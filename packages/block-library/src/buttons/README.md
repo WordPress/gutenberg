@@ -27,21 +27,21 @@ _This block has no custom attributes._
 - [align](/block-editor/reference-guides/block-api/block-supports/#align): `"wide"`, `"full"`
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `["horizontal","vertical"]`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `["top","bottom"]`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `["horizontal","vertical"]`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `["top","bottom"]`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
-  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
-  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 - [listView](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 - [contentRole](/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 

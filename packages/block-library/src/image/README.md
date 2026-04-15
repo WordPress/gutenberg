@@ -41,12 +41,12 @@
 - [align](/block-editor/reference-guides/block-api/block-supports/#align): `"left"`, `"center"`, `"right"`, `"wide"`, `"full"`
 - [anchor](/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
-  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `false`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
 - [filter](/block-editor/reference-guides/block-api/block-supports/#filter):
-  - [duotone](/block-editor/reference-guides/block-api/block-supports/#filterduotone): `true`
+  - [duotone](/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
 - [shadow](/block-editor/reference-guides/block-api/block-supports/#shadow):
 
 ## Context

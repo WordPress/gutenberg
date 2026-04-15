@@ -27,13 +27,13 @@
 - [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

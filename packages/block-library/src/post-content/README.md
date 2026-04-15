@@ -23,23 +23,23 @@
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [layout](/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [background](/block-editor/reference-guides/block-api/block-supports/#background):
-  - [backgroundImage](/block-editor/reference-guides/block-api/block-supports/#backgroundbackgroundimage): `true`
-  - [backgroundSize](/block-editor/reference-guides/block-api/block-supports/#backgroundbackgroundsize): `true`
+  - [backgroundImage](/block-editor/reference-guides/block-api/block-supports/#background-backgroundimage): `true`
+  - [backgroundSize](/block-editor/reference-guides/block-api/block-supports/#background-backgroundsize): `true`
 - [dimensions](/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - [minHeight](/block-editor/reference-guides/block-api/block-supports/#dimensionsminheight): `true`
+  - [minHeight](/block-editor/reference-guides/block-api/block-supports/#dimensions-minheight): `true`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
-  - [heading](/block-editor/reference-guides/block-api/block-supports/#colorheading): `true`
-  - [link](/block-editor/reference-guides/block-api/block-supports/#colorlink): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
+  - [heading](/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
+  - [link](/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
 - [typography](/block-editor/reference-guides/block-api/block-supports/#typography):
-  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typographyfontsize): `true`
-  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typographylineheight): `true`
+  - [fontSize](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
+  - [lineHeight](/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

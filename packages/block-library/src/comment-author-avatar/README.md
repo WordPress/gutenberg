@@ -27,13 +27,13 @@
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [inserter](/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
-  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Context
 

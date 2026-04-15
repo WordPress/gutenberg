@@ -43,20 +43,20 @@
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [units](/block-editor/reference-guides/block-api/block-supports/#units): `"px"`, `"em"`, `"rem"`, `"vh"`, `"vw"`
 - [spacing](/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacingmargin): `true`
-  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacingpadding): `true`
-  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacingblockgap): `["horizontal","vertical"]`
+  - [margin](/block-editor/reference-guides/block-api/block-supports/#spacing-margin): `true`
+  - [padding](/block-editor/reference-guides/block-api/block-supports/#spacing-padding): `true`
+  - [blockGap](/block-editor/reference-guides/block-api/block-supports/#spacing-blockgap): `["horizontal","vertical"]`
 - [color](/block-editor/reference-guides/block-api/block-supports/#color):
-  - [text](/block-editor/reference-guides/block-api/block-supports/#colortext): `false`
-  - [background](/block-editor/reference-guides/block-api/block-supports/#colorbackground): `true`
-  - [gradients](/block-editor/reference-guides/block-api/block-supports/#colorgradients): `true`
+  - [text](/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
+  - [background](/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
+  - [gradients](/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
 - [layout](/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layoutallowswitching): `false`
-  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layoutallowinheriting): `false`
-  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layoutallowediting): `false`
-  - [default](/block-editor/reference-guides/block-api/block-supports/#layoutdefault): `{"type":"flex"}`
+  - [allowSwitching](/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
+  - [allowInheriting](/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
+  - [allowEditing](/block-editor/reference-guides/block-api/block-supports/#layout-allowediting): `false`
+  - [default](/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex"}`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 - [listView](/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 
 ## Context

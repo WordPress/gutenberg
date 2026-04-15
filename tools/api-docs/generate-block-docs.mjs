@@ -170,7 +170,7 @@ function formatAttributesTable( attributes ) {
  */
 const SUPPORTS_BASE = '/block-editor/reference-guides/block-api/block-supports/';
 function supportsLink( property ) {
-	const anchor = property.toLowerCase().replace( /\./g, '' );
+	const anchor = property.toLowerCase().replace( /\./g, '-' );
 	return `${ SUPPORTS_BASE }#${ anchor }`;
 }
 

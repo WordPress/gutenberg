@@ -26,7 +26,7 @@
 - [reusable](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [renaming](/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 
 ## Block Markup
 

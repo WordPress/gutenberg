@@ -28,7 +28,7 @@ _This block has no custom attributes._
 - [html](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [visibility](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [interactivity](/block-editor/reference-guides/block-api/block-supports/#interactivity):
-  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivityclientnavigation): `true`
+  - [clientNavigation](/block-editor/reference-guides/block-api/block-supports/#interactivity-clientnavigation): `true`
 - [customCSS](/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
 
 ## Block Markup
