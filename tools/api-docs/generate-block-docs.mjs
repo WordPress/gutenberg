@@ -638,9 +638,7 @@ function writeBlockReadme( blockDir, apiSection ) {
 
 	if ( ! fs.existsSync( readmePath ) ) {
 		// Case 1: No README — create full file.
-		const header = `# ${ title }\n\n${
-			description ? `> ${ description }\n\n` : ''
-		}`;
+		const header = `# ${ title }\n\n`;
 		fs.writeFileSync( readmePath, header + apiSection, {
 			encoding: 'utf8',
 		} );
