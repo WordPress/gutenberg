@@ -19,19 +19,33 @@ jobs:
               uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea # v7.0.1
               with:
                   script: |
+                      // -----------------------------------------------------------------
+                      // Step 1: Gather basic context about the pull request being checked.
+                      // -----------------------------------------------------------------
                       const { owner, repo } = context.repo;
                       const pr = context.payload.pull_request;
                       const prNumber = pr.number;
                       const body = pr.body || '';
 
-                      // Strip HTML comments so template placeholders like
-                      // "Closes <!-- #ISSUE-NUMBER -->" are ignored.
+                      // -----------------------------------------------------------------
+                      // Step 2: Normalise the PR body before parsing.
+                      //
+                      // HTML comments are stripped so placeholders like
+                      // `Closes <!-- #ISSUE-NUMBER -->` in the PR template don't match
+                      // as real issue references.
+                      // -----------------------------------------------------------------
                       const visibleBody = body.replace( /<!--[\s\S]*?-->/g, '' );
 
-                      // Collect referenced issue numbers from:
-                      //   - bare `#123`
-                      //   - `GH-123`
-                      //   - full URLs to issues in this repo
+                      // -----------------------------------------------------------------
+                      // Step 3: Extract every issue number mentioned in the description.
+                      //
+                      // Three forms are recognised:
+                      //   - `#1234`              (short reference)
+                      //   - `GH-1234`            (alternative short form)
+                      //   - Full URLs to issues or pulls in this repo
+                      //
+                      // Numbers are collected into a Set so duplicates collapse.
+                      // -----------------------------------------------------------------
                       const referenced = new Set();
 
                       const shortRefRegex = /(?:^|[^&\w])(?:GH-|#)(\d+)\b/gi;
@@ -48,9 +62,17 @@ jobs:
                           referenced.add( Number( m[ 1 ] ) );
                       }
 
-                      // The PR's own number isn't an "issue mention".
+                      // The PR's own number can appear in URLs (e.g. a screenshot link)
+                      // and is never an "issue mention" of itself.
                       referenced.delete( prNumber );
 
+                      // -----------------------------------------------------------------
+                      // Step 4: Look for an existing bot comment so we can update or
+                      // remove it rather than posting a fresh comment on every run.
+                      //
+                      // A hidden HTML-comment marker uniquely identifies comments left
+                      // by this workflow.
+                      // -----------------------------------------------------------------
                       const marker = '<!-- check-linked-issues-bot -->';
 
                       const comments = await github.paginate(
@@ -76,13 +98,26 @@ jobs:
                           }
                       };
 
+                      // -----------------------------------------------------------------
+                      // Step 5: Early-exit when the description mentions no issues.
+                      //
+                      // If a previous run left a comment, clear it now so the thread
+                      // reflects the current state of the PR body.
+                      // -----------------------------------------------------------------
                       if ( referenced.size === 0 ) {
                           core.info( 'No issue references detected in PR body.' );
                           await clearExistingComment();
                           return;
                       }
 
-                      // Fetch linked issues (the "Development" relationship) via GraphQL.
+                      // -----------------------------------------------------------------
+                      // Step 6: Ask GraphQL which issues GitHub considers "linked".
+                      //
+                      // `closingIssuesReferences` is the exact set of issues that power
+                      // the *Development* section of the right sidebar — populated
+                      // either by closing keywords in the body or by manual linking
+                      // via the UI.
+                      // -----------------------------------------------------------------
                       const query = `
                           query($owner: String!, $repo: String!, $number: Int!) {
                               repository(owner: $owner, name: $repo) {
@@ -105,9 +140,17 @@ jobs:
                           )
                       );
 
-                      // Verify each referenced number is actually an issue in this repo
-                      // (filters out PR-number references, cross-repo refs that happened
-                      // to match, and stale numbers).
+                      // -----------------------------------------------------------------
+                      // Step 7: Reduce `referenced` to the set that is truly unlinked
+                      // and is a real issue in this repository.
+                      //
+                      // `issues.get` is also used to filter out:
+                      //   - references that are actually pull requests (data.pull_request
+                      //     is set for PRs),
+                      //   - numbers that don't exist (404), which can happen for
+                      //     cross-repo or stale references that happened to match the
+                      //     `#N` pattern.
+                      // -----------------------------------------------------------------
                       const unlinked = [];
                       for ( const number of referenced ) {
                           if ( linked.has( number ) ) {
@@ -119,7 +162,6 @@ jobs:
                                   repo,
                                   issue_number: number,
                               } );
-                              // `issues.get` also returns PRs; skip those.
                               if ( data.pull_request ) {
                                   continue;
                               }
@@ -132,6 +174,9 @@ jobs:
                           }
                       }
 
+                      // -----------------------------------------------------------------
+                      // Step 8: Everything is linked — clean up and finish.
+                      // -----------------------------------------------------------------
                       if ( unlinked.length === 0 ) {
                           core.info(
                               'All referenced issues are linked via the Development field.'
@@ -140,6 +185,10 @@ jobs:
                           return;
                       }
 
+                      // -----------------------------------------------------------------
+                      // Step 9: Build the advisory comment body listing unlinked issues
+                      // and explaining the two ways to resolve the notice.
+                      // -----------------------------------------------------------------
                       const list = unlinked
                           .sort( ( a, b ) => a - b )
                           .map( ( n ) => `- #${ n }` )
@@ -161,6 +210,11 @@ jobs:
                           'If a reference is intentionally informational (e.g. *Follow up to #1234*, *See #1234*), no action is needed. This check is advisory and will not block the PR.',
                       ].join( '\n' );
 
+                      // -----------------------------------------------------------------
+                      // Step 10: Post a new comment or update the existing one in place.
+                      // An update is skipped when the body hasn't changed to avoid
+                      // needless notifications on every PR edit.
+                      // -----------------------------------------------------------------
                       if ( existing ) {
                           if ( existing.body !== message ) {
                               await github.rest.issues.updateComment( {
@@ -179,6 +233,8 @@ jobs:
                           } );
                       }
 
+                      // Surface the detection in the Actions log as a warning so it's
+                      // visible in the checks UI without failing the run.
                       core.warning(
                           `Unlinked issue mentions detected: ${ unlinked
                               .map( ( n ) => `#${ n }` )
