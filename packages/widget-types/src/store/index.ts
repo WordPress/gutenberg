@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, register, combineReducers } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -13,7 +13,7 @@ import * as selectors from './selectors';
 export const STORE_NAME = 'core/widget-types';
 
 export const store = createReduxStore( STORE_NAME, {
-	reducer: widgetTypes,
+	reducer: combineReducers( { widgetTypes } ),
 	actions,
 	selectors,
 } );
