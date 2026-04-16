@@ -371,7 +371,7 @@ export default dedupePlugins( [
 		rules: {
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
-			'@wordpress/ui-no-unsafe-render-order': 'error',
+			'@wordpress/no-unsafe-render-order': 'error',
 		},
 	},
 
@@ -612,7 +612,7 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/ui/src/**' ],
 		rules: {
-			'@wordpress/ui-no-unsafe-render-order': [
+			'@wordpress/no-unsafe-render-order': [
 				'error',
 				{ checkLocalImports: true },
 			],

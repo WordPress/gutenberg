@@ -1,5 +1,5 @@
 import { RuleTester } from 'eslint';
-import rule from '../ui-no-unsafe-render-order';
+import rule from '../no-unsafe-render-order';
 
 const ruleTester = new RuleTester( {
 	languageOptions: {
@@ -13,7 +13,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'ui-no-unsafe-render-order', rule, {
+ruleTester.run( 'no-unsafe-render-order', rule, {
 	valid: [
 		{
 			code: `

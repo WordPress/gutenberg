@@ -13,8 +13,8 @@ module.exports = {
 		type: 'problem',
 		docs: {
 			description:
-				'Prevent render-prop composition orders that silently remove @wordpress/ui semantics.',
-			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/ui-no-unsafe-render-order.md',
+				'Prevent render-prop composition orders that silently remove semantics.',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md',
 		},
 		schema: [
 			{
@@ -23,7 +23,7 @@ module.exports = {
 					checkLocalImports: {
 						type: 'boolean',
 						description:
-							'When true, also checks tracked components imported from relative paths (for use inside @wordpress/ui).',
+							'When true, also checks tracked components imported from relative paths.',
 					},
 				},
 				additionalProperties: false,
@@ -85,7 +85,7 @@ module.exports = {
 		 * Resolves a JSX name to the tracked imported component name.
 		 *
 		 * Examples:
-		 * - `UIDialog.Title` -> `Dialog.Title`
+		 * - `UILink` -> `Link`
 		 * - `UI.Link` -> `Link`
 		 *
 		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
