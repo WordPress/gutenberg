@@ -221,6 +221,29 @@ describe( 'parseComponents', () => {
 			},
 		] );
 	} );
+
+	it( 'should list a component only once when multiple story files contribute entries', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				description: 'A badge component.',
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				description: 'A badge component.',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+			},
+		} );
+
+		expect( parseComponents( components ) ).toEqual( [
+			{
+				name: 'Badge',
+				description: 'A badge component.',
+				packageName: '@wordpress/ui',
+			},
+		] );
+	} );
 } );
 
 describe( 'parseComponentDetail', () => {
@@ -344,6 +367,41 @@ describe( 'parseComponentDetail', () => {
 		expect(
 			parseComponentDetail( components, 'ThemeProvider' )
 		).toBeNull();
+	} );
+
+	it( 'should include stories from every story file contributing to a component', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+				stories: [
+					{ name: 'Default', snippet: '<Badge />' },
+					{ name: 'High', snippet: '<Badge intent="high" />' },
+				],
+			},
+			'badge-intent': {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				stories: [
+					{
+						name: 'High',
+						snippet: '<Badge intent="high">Contextual</Badge>',
+					},
+					{ name: 'All Intents', snippet: '<Badge />' },
+				],
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Badge' );
+		expect( result?.stories ).toEqual( [
+			{ name: 'Default', snippet: '<Badge />' },
+			{ name: 'High', snippet: '<Badge intent="high" />' },
+			{
+				name: 'High',
+				snippet: '<Badge intent="high">Contextual</Badge>',
+			},
+			{ name: 'All Intents', snippet: '<Badge />' },
+		] );
 	} );
 
 	it( 'should return detail for a compound component by its root identifier', () => {

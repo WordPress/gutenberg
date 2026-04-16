@@ -87,7 +87,10 @@ export function parseProps(
 }
 
 /**
- * Parse manifest components into a flat list from allowed packages.
+ * Parse manifest components into a flat list from allowed packages. When a
+ * component is defined across multiple story files (e.g. `index.story.tsx`
+ * and a companion file documenting a specific aspect), it is collapsed to a
+ * single entry keyed by its canonical name and package.
  *
  * @param components - The manifest components record.
  * @return Components from allowed packages.
@@ -95,21 +98,39 @@ export function parseProps(
 export function parseComponents(
 	components: Record< string, ManifestComponent >
 ): Component[] {
-	return Object.values( components )
-		.map( ( component ) => ( {
-			name: canonicalComponentName( component.name ),
+	const seen = new Set< string >();
+	const result: Component[] = [];
+
+	for ( const component of Object.values( components ) ) {
+		const packageName = packageNameFromPath( component.path );
+		if ( ! packageName ) {
+			continue;
+		}
+
+		const name = canonicalComponentName( component.name );
+		const key = `${ packageName }:${ name }`;
+		if ( seen.has( key ) ) {
+			continue;
+		}
+		seen.add( key );
+
+		result.push( {
+			name,
 			description: component.description || '',
-			packageName: packageNameFromPath( component.path ),
-		} ) )
-		.filter(
-			( component ): component is Component =>
-				component.packageName !== null
-		);
+			packageName,
+		} );
+	}
+
+	return result;
 }
 
 /**
- * Find a single component by name (case-insensitive) and return its
- * full detail including props and stories.
+ * Find a single component by name (case-insensitive) and return its full
+ * detail including props and stories. When a component is spread across
+ * multiple story files, stories from every contributing file are collected
+ * in manifest order; descriptions and props are taken from the first match
+ * (they are authored on the component itself and do not vary between story
+ * files).
  *
  * @param components - The manifest components record.
  * @param name       - The component name to look up.
@@ -119,6 +140,8 @@ export function parseComponentDetail(
 	components: Record< string, ManifestComponent >,
 	name: string
 ): ComponentDetail | null {
+	let detail: ComponentDetail | null = null;
+
 	for ( const component of Object.values( components ) ) {
 		const canonicalName = canonicalComponentName( component.name );
 		if ( canonicalName.toLowerCase() !== name.toLowerCase() ) {
@@ -126,17 +149,23 @@ export function parseComponentDetail(
 		}
 
 		const pkg = packageNameFromPath( component.path );
-		if ( pkg ) {
-			return {
+		if ( ! pkg ) {
+			continue;
+		}
+
+		if ( ! detail ) {
+			detail = {
 				name: canonicalName,
 				description: component.description || '',
 				packageName: pkg,
 				importStatement: `import { ${ canonicalName } } from '${ pkg }';`,
 				props: parseProps( component.reactDocgen?.props || {} ),
-				stories: component.stories || [],
+				stories: [ ...( component.stories || [] ) ],
 			};
+		} else if ( detail.packageName === pkg ) {
+			detail.stories.push( ...( component.stories || [] ) );
 		}
 	}
 
-	return null;
+	return detail;
 }
