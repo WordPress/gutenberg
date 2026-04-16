@@ -17,12 +17,10 @@ export function createBoardStore() {
 		let changed = false;
 		for ( const entry of entries ) {
 			const id = idByElement.get( entry.target );
-			if ( id !== undefined ) {
-				const newHeight = entry.target.scrollHeight;
-				if ( heights[ id ] !== newHeight ) {
-					heights[ id ] = newHeight;
-					changed = true;
-				}
+			const newHeight = entry.borderBoxSize[ 0 ].blockSize;
+			if ( heights[ id ] !== newHeight ) {
+				heights[ id ] = newHeight;
+				changed = true;
 			}
 		}
 		if ( changed ) {
