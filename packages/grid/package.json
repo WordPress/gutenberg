@@ -23,10 +23,26 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
-	"types": "build-types/index.d.ts",
+	"wpScript": false,
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@dnd-kit/core": "^6.3.1",
