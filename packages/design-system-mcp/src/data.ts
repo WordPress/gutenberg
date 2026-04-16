@@ -6,9 +6,11 @@ import {
 import type { Component, ComponentDetail, ManifestComponent } from './types';
 
 const COMPONENTS_MANIFEST_URL =
+	process.env.COMPONENTS_MANIFEST_URL ||
 	'https://wordpress.github.io/gutenberg/manifests/components.json';
 
 const DESIGN_TOKENS_URL =
+	process.env.DESIGN_TOKENS_URL ||
 	'https://raw.githubusercontent.com/WordPress/gutenberg/refs/heads/trunk/packages/theme/docs/tokens.md';
 
 let cachedComponents: Record< string, ManifestComponent > | null = null;
