@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -150,7 +145,7 @@ export default function Edit( {
 		id: tabPanelId,
 		role: 'tabpanel',
 		tabIndex: isSelectedTab ? 0 : -1,
-		className: clsx( 'wp-block-tab__editor-content', layoutClassNames ),
+		className: layoutClassNames,
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
