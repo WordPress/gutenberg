@@ -188,8 +188,10 @@ export function useSuggestionsProvider() {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { getBlockAttributes: selectBlockAttributes } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes: selectBlockAttributes,
+		getClientIdsWithDescendants: selectClientIdsWithDescendants,
+	} = useSelect( blockEditorStore );
 
 	const createSuggestion = useCallback(
 		async ( { clientId, blockName, operations } ) => {
@@ -329,14 +331,46 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
-			const currentAttributes = selectBlockAttributes( clientId );
+			// `thread.blockClientId` is derived by matching `metadata.noteId`
+			// on blocks currently in the editor. If the Suggest author never
+			// auto-saved the post after the comment was created — or the
+			// author reloaded before the save landed — the metadata linkage
+			// won't exist yet and the caller will pass `clientId: undefined`.
+			// Fall back to scanning the live block tree for a block whose
+			// `metadata.noteId` matches the comment id.
+			let targetClientId = clientId;
+			if ( ! targetClientId ) {
+				const liveIds = selectClientIdsWithDescendants?.() ?? [];
+				for ( const id of liveIds ) {
+					if (
+						selectBlockAttributes( id )?.metadata?.noteId ===
+						commentId
+					) {
+						targetClientId = id;
+						break;
+					}
+				}
+			}
+
+			if ( ! targetClientId ) {
+				createNotice(
+					'error',
+					__(
+						'Could not find the block this suggestion applies to.'
+					),
+					{ type: 'snackbar', isDismissible: true }
+				);
+				return;
+			}
+
+			const currentAttributes = selectBlockAttributes( targetClientId );
 			const newAttributes = applyOperations(
 				currentAttributes,
 				payload.operations
 			);
 
 			try {
-				updateBlockAttributes( clientId, newAttributes );
+				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
 					'root',
@@ -356,7 +390,7 @@ export function useSuggestionsProvider() {
 			} catch ( error ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
-				updateBlockAttributes( clientId, currentAttributes );
+				updateBlockAttributes( targetClientId, currentAttributes );
 				createNotice(
 					'error',
 					error?.message || __( 'Failed to save suggestion status.' ),
@@ -368,6 +402,7 @@ export function useSuggestionsProvider() {
 			saveEntityRecord,
 			updateBlockAttributes,
 			selectBlockAttributes,
+			selectClientIdsWithDescendants,
 			createNotice,
 		]
 	);

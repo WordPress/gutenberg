@@ -47,7 +47,9 @@ $suggestion-color: #007017;
 
 // Inline accept/reject buttons live in the note header, right-aligned next
 // to the author info. Force both icons to render at the same box so the
-// checkmark (a thin glyph) visually matches the close glyph next to it.
+// checkmark (a thin glyph) visually matches the close glyph next to it,
+// and thicken the check stroke so it reads at a similar visual weight to
+// the denser close glyph.
 .editor-collab-sidebar-panel__suggestion-header-actions {
 	margin-left: auto;
 
@@ -58,8 +60,18 @@ $suggestion-color: #007017;
 		padding: 0;
 
 		svg {
-			width: $grid-unit-30;
-			height: $grid-unit-30;
+			width: $grid-unit-40;
+			height: $grid-unit-40;
+		}
+
+		// The check path in @wordpress/icons is drawn with a lighter weight
+		// than the close glyph, so pair the filled path with a 1px stroke to
+		// lift it to the same visual density.
+		&[aria-label="Accept suggestion"] svg path {
+			stroke: currentColor;
+			stroke-width: 1;
+			stroke-linecap: round;
+			stroke-linejoin: round;
 		}
 	}
 }
