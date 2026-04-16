@@ -66,19 +66,17 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	);
 
 	const handleDragStart = ( event: DragMoveEvent ) => {
-		// @ts-expect-error activatorEvent.target always has getBoundingClientRect
+		const target = event.activatorEvent.target as Element;
 		// eslint-disable-next-line react-compiler/react-compiler -- Ref mutation during drag is intentional
-		initialAnchorPosition.current =
-			event.activatorEvent.target.getBoundingClientRect();
+		initialAnchorPosition.current = target.getBoundingClientRect();
 	};
 
 	const handleDragMove = ( event: DragMoveEvent ) => {
 		if ( ! initialAnchorPosition.current ) {
 			return;
 		}
-		// @ts-expect-error activatorEvent.target always has getBoundingClientRect
-		const currentPosition =
-			event.activatorEvent.target.getBoundingClientRect();
+		const target = event.activatorEvent.target as Element;
+		const currentPosition = target.getBoundingClientRect();
 		const deltaX = currentPosition.x - initialAnchorPosition.current.x;
 		const deltaY = currentPosition.y - initialAnchorPosition.current.y;
 		const anchorDelta = {
