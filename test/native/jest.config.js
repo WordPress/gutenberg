@@ -1,8 +1,14 @@
 /**
  * External dependencies
  */
-const glob = require( 'glob' ).sync;
 const path = require( 'path' );
+const glob = require( 'glob' ).sync;
+
+// Ensure globs and Babel config resolve relative to the repo root,
+// regardless of which directory npm runs this script from.
+const ROOT_DIR = path.resolve( __dirname, '../..' );
+
+process.chdir( ROOT_DIR );
 
 const defaultPlatform = 'android';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
@@ -14,9 +20,12 @@ if ( process.env.TEST_RN_PLATFORM ) {
 	console.log( 'Setting RN platform to: default (' + defaultPlatform + ')' );
 }
 
-const transpiledPackageNames = glob( 'packages/*/src/index.{js,ts}' ).map(
-	( fileName ) => fileName.split( '/' )[ 1 ]
-);
+const transpiledPackageNames = glob(
+	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
+).map( ( fileName ) => {
+	const relative = path.relative( ROOT_DIR, fileName );
+	return relative.split( path.sep )[ 1 ];
+} );
 
 // The following unit tests related to the `raw-handling` API will be enabled when addressing
 // the various errors we encounter when running them in the native version.
