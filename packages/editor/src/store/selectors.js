@@ -24,6 +24,7 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
+	EDITOR_INTENT_EDIT,
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { getTemplatePartIcon } from '../utils/get-template-part-icon';
@@ -1388,6 +1389,24 @@ export function isInserterOpened( state ) {
 export const getEditorMode = createRegistrySelector(
 	( select ) => () =>
 		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
+);
+
+/**
+ * Returns the current editor intent. The intent represents the user's
+ * editing purpose — directly editing content (`edit`), suggesting changes
+ * that the author can apply or reject (`suggest`), or viewing the post in
+ * a read-only mode (`view`).
+ *
+ * The intent is orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
+ */
+export const getEditorIntent = createRegistrySelector(
+	( select ) => () =>
+		select( preferencesStore ).get( 'core', 'editorIntent' ) ??
+		EDITOR_INTENT_EDIT
 );
 
 /*

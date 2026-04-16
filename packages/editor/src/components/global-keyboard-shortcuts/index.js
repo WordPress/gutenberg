@@ -10,6 +10,11 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import {
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+} from '../../store/constants';
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -35,6 +40,7 @@ export default function EditorKeyboardShortcuts() {
 		setIsListViewOpened,
 		switchEditorMode,
 		toggleDistractionFree,
+		setEditorIntent,
 	} = useDispatch( editorStore );
 	const {
 		isEditedPostDirty,
@@ -98,6 +104,21 @@ export default function EditorKeyboardShortcuts() {
 			event.preventDefault();
 			setIsListViewOpened( true );
 		}
+	} );
+
+	useShortcut( 'core/editor/intent-edit', ( event ) => {
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_EDIT );
+	} );
+
+	useShortcut( 'core/editor/intent-suggest', ( event ) => {
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_SUGGEST );
+	} );
+
+	useShortcut( 'core/editor/intent-view', ( event ) => {
+		event.preventDefault();
+		setEditorIntent( EDITOR_INTENT_VIEW );
 	} );
 
 	useShortcut( 'core/editor/toggle-sidebar', ( event ) => {
