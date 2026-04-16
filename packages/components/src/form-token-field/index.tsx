@@ -323,19 +323,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 		if ( items.length > 1 ) {
 			const tokensToProcess = items.slice( 0, -1 );
-			addNewTokens( tokensToProcess );
+			const addedTokens = addNewTokens( tokensToProcess );
 
-			// Keep tokens that failed validation in the input
-			// instead of silently discarding them.
+			// Keep tokens that were not accepted (invalid,
+			// duplicate, or empty after transform) in the input
+			// so the user can see what was rejected and fix it.
 			const failedTokens = tokensToProcess.filter( ( token ) => {
 				const transformed = saveTransform( token );
-				if ( ! transformed ) {
-					return false;
-				}
-				return (
-					valueContainsToken( transformed ) ||
-					! __experimentalValidateInput( transformed )
-				);
+				return transformed && ! addedTokens.has( transformed );
 			} );
 
 			if ( failedTokens.length > 0 ) {
@@ -497,7 +492,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		return preventDefault;
 	}
 
-	function addNewTokens( tokens: string[] ) {
+	function addNewTokens( tokens: string[] ): Set< string > {
 		const tokensToAdd = [
 			...new Set(
 				tokens
@@ -513,6 +508,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			newValue.splice( getIndexOfInput(), 0, ...tokensToAdd );
 			onChange( newValue );
 		}
+
+		return new Set( tokensToAdd );
 	}
 
 	function addNewToken( token: string ): boolean {
