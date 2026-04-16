@@ -29,6 +29,7 @@ _Defined via the [`supports`](/block-editor/reference-guides/block-api/block-sup
 - [`anchor`](/block-editor/reference-guides/block-api/block-supports/#anchor): `false`
 - [`html`](/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`reusable`](/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
+- [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`lock`](/block-editor/reference-guides/block-api/block-supports/#lock): `false`
 - [`dimensions`](/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `aspectRatio`: `false`
