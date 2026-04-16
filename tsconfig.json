@@ -84,6 +84,7 @@
 		{ "path": "packages/views" },
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
+		{ "path": "packages/widget-types" },
 		{ "path": "packages/wordcount" },
 		{ "path": "packages/worker-threads" },
 		{ "path": "packages/wp-build" },
