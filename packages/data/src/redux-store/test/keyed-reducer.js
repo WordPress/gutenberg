@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import deepFreeze from 'deep-freeze';
-
-/**
  * Internal dependencies
  */
-import onSubKey from '../on-sub-key';
+import { keyedReducer } from '../keyed-reducer';
 
-describe( 'onSubKey', () => {
+describe( 'keyedReducer', () => {
 	function createEnhancedReducer( actionProperty ) {
-		const enhanceReducer = onSubKey( actionProperty );
+		const enhanceReducer = keyedReducer( actionProperty );
 		return enhanceReducer(
 			( state, action ) => 'Called by ' + action.caller
 		);
@@ -24,7 +19,7 @@ describe( 'onSubKey', () => {
 	} );
 
 	it( 'should ignore actions where property not present', () => {
-		const state = deepFreeze( {} );
+		const state = {};
 		const reducer = createEnhancedReducer( 'caller' );
 		const nextState = reducer( state, { type: 'DO_FOO' } );
 
@@ -34,7 +29,7 @@ describe( 'onSubKey', () => {
 	it( 'should key by action property', () => {
 		const reducer = createEnhancedReducer( 'caller' );
 
-		let state = deepFreeze( {} );
+		let state = Object.freeze( {} );
 		state = reducer( state, { type: 'DO_FOO', caller: 1 } );
 		state = reducer( state, { type: 'DO_FOO', caller: 2 } );
 

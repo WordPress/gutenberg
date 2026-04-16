@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-04-15)
+
 ### Breaking Changes
 
 -   `Text`: Apply `margin: 0`, removing user-agent margins when the component renders as block-level elements (for example `p` or `h1`–`h6` via `render` prop) ([#76970](https://github.com/WordPress/gutenberg/pull/76970)).
@@ -36,6 +38,7 @@
 -   `AlertDialog`: Rewrite internals to use Base UI's `AlertDialog` primitives directly instead of `Dialog` wrappers. Introduces an internal state machine for async confirm flows ([#76937](https://github.com/WordPress/gutenberg/pull/76937)).
 -   `Field.Label`, `Fieldset.Legend`, `Field.Details`: Refactor `VisuallyHidden` composition to preserve semantic HTML elements when visually hiding content.
 -   `Badge`: Use `Text` component for typography ([#77295](https://github.com/WordPress/gutenberg/pull/77295)).
+-   `Notice.ActionLink`: Use `Text` component for typography ([#77332](https://github.com/WordPress/gutenberg/pull/77332)).
 -   Update `@base-ui/react` from `1.3.0` to `1.4.0` ([#77308](https://github.com/WordPress/gutenberg/pull/77308)).
 
 ## 0.10.0 (2026-04-01)
