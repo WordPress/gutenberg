@@ -12,6 +12,7 @@ export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,
+	hasAttributeConflict,
 	parseSuggestionPayload,
 	SCHEMA_VERSION,
 } from './provider';

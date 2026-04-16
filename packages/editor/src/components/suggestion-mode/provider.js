@@ -97,6 +97,37 @@ export function applyOperations( currentAttributes, operations ) {
 }
 
 /**
+ * Report whether applying the suggestion's operations over the block's
+ * current attributes would overwrite concurrent changes made by someone
+ * else. A suggestion is considered conflicting only when the baseline
+ * captured at suggest-time differs from the attribute's current value —
+ * simply reopening the post after any auto-save doesn't qualify.
+ *
+ * @param {Object}                currentAttributes Block's current attributes.
+ * @param {SuggestionOperation[]} operations        Operations from the payload.
+ * @return {boolean} True if at least one targeted attribute has diverged.
+ */
+export function hasAttributeConflict( currentAttributes, operations ) {
+	if ( ! Array.isArray( operations ) ) {
+		return false;
+	}
+	for ( const op of operations ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		if (
+			! isAttributeEqual(
+				op.before ?? null,
+				currentAttributes?.[ op.attribute ] ?? null
+			)
+		) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
  * Parse a `_wp_suggestion` meta value into a typed payload.
  *
  * @param {string|undefined} raw The raw JSON string from comment meta.
@@ -298,20 +329,6 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
-			if (
-				payload.baseRevision &&
-				postModified &&
-				payload.baseRevision !== postModified
-			) {
-				createNotice(
-					'warning',
-					__(
-						'Post content has changed since this suggestion. Review carefully.'
-					),
-					{ type: 'snackbar', isDismissible: true }
-				);
-			}
-
 			const currentAttributes = selectBlockAttributes( clientId );
 			const newAttributes = applyOperations(
 				currentAttributes,
@@ -348,7 +365,6 @@ export function useSuggestionsProvider() {
 			}
 		},
 		[
-			postModified,
 			saveEntityRecord,
 			updateBlockAttributes,
 			selectBlockAttributes,

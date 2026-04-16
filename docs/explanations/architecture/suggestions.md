@@ -124,7 +124,7 @@ The current implementation (`provider.js`) uses comment meta. A future Yjs-backe
 
 - **Accept**: runs `applyOperations(currentAttributes, payload.operations)` to produce new attributes, dispatches `updateBlockAttributes`, marks the note as resolved with `_wp_suggestion_status = 'applied'`.
 - **Reject**: marks the note as resolved with `_wp_suggestion_status = 'rejected'`. No content change.
-- **Staleness**: if `baseRevision` differs from the current `post_modified_gmt`, a warning snackbar is shown but apply is not blocked (conservative approach — the user reviews and decides).
+- **Conflict detection**: accept-time staleness is checked at the attribute level, not the post level. `hasAttributeConflict(currentAttributes, operations)` compares each operation's captured `before` to the block's current value; only a real divergence on a targeted attribute prompts the "apply anyway" confirmation. Post-level `baseRevision` is still stamped into the payload for provenance, but does not drive the prompt — every auto-save bumps `post_modified_gmt`, so a post-level compare would flag nearly every suggestion as stale.
 
 ## Review UI
 

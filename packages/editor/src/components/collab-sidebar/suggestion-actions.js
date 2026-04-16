@@ -18,11 +18,11 @@ import { check, close } from '@wordpress/icons';
  * Internal dependencies
  */
 import {
+	hasAttributeConflict,
 	parseSuggestionPayload,
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
-import { store as editorStore } from '../../store';
 
 /**
  * Read-only status constants — keep in sync with `_wp_suggestion_status`
@@ -49,22 +49,32 @@ function useSuggestionDecision( thread ) {
 	const [ busy, setBusy ] = useState( false );
 	const [ showStaleDialog, setShowStaleDialog ] = useState( false );
 
-	const { blockExists, isStale } = useSelect(
+	// "Conflict" is checked per attribute rather than from the post's
+	// `modified_gmt`: every auto-saved suggestion bumps the post's
+	// modification time, so a post-level revision compare flags nearly
+	// every suggestion as stale even when the block content hasn't
+	// diverged. We only prompt when the specific attributes a suggestion
+	// targets have actually moved away from the captured baseline.
+	const { blockExists, hasConflict } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
-			const post = select( editorStore ).getCurrentPost?.();
-			const currentModified = post?.modified_gmt ?? null;
+			const { getBlock, getBlockAttributes } = select( blockEditorStore );
+			const currentAttributes = thread?.blockClientId
+				? getBlockAttributes( thread.blockClientId )
+				: null;
 			return {
 				blockExists: thread?.blockClientId
 					? !! getBlock( thread.blockClientId )
 					: false,
-				isStale:
-					!! payload?.baseRevision &&
-					!! currentModified &&
-					payload.baseRevision !== currentModified,
+				hasConflict:
+					!! payload &&
+					!! currentAttributes &&
+					hasAttributeConflict(
+						currentAttributes,
+						payload.operations
+					),
 			};
 		},
-		[ thread?.blockClientId, payload?.baseRevision ]
+		[ thread?.blockClientId, payload ]
 	);
 
 	if ( ! payload ) {
@@ -90,7 +100,7 @@ function useSuggestionDecision( thread ) {
 	};
 
 	const onApplyClick = () => {
-		if ( isStale ) {
+		if ( hasConflict ) {
 			setShowStaleDialog( true );
 			return;
 		}
@@ -227,7 +237,7 @@ export default function SuggestionActions( { thread } ) {
 					confirmButtonText={ __( 'Apply anyway' ) }
 				>
 					{ __(
-						'The post has changed since this suggestion was made. Applying it may produce unexpected results. Continue?'
+						'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
 					) }
 				</ConfirmDialog>
 			) }
