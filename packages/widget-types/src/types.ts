@@ -13,15 +13,6 @@ export interface WidgetType {
 		elements?: Array< { value: string; label: string } >;
 	} >;
 	example?: Record< string, unknown >;
-	layout?: {
-		contentPadding?: boolean;
-		scrollableContent?: boolean;
-	};
-	defaults?: {
-		width?: number;
-		height?: number;
-		order?: number;
-	};
 }
 
 export interface WidgetTypesState {

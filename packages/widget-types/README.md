@@ -193,17 +193,13 @@ interface WidgetType {
 		elements?: Array< { value: string; label: string } >;
 	} >;
 	example?: Record< string, unknown >;
-	layout?: {
-		contentPadding?: boolean;
-		scrollableContent?: boolean;
-	};
-	defaults?: {
-		width?: number;
-		height?: number;
-		order?: number;
-	};
 }
 ```
+
+Layout-related properties (dimensions, position, padding, scroll)
+belong to the surface that renders the widget (e.g., a grid layout
+manager), not to the widget type itself. A `WidgetType` describes
+identity and capabilities — how it's placed is the layout's concern.
 
 ### Field reference
 
@@ -218,8 +214,6 @@ interface WidgetType {
 | `render_module` | yes | Script module ID for lazy-loaded component |
 | `attributes` | no | User-configurable fields (settings UI) |
 | `example` | no | Preview data for widget picker |
-| `layout` | no | Content rendering hints |
-| `defaults` | no | Initial grid dimensions and sort order |
 
 ## PHP registration
 
