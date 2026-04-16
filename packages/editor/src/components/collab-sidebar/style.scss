@@ -16,9 +16,16 @@
 }
 
 .editor-collab-sidebar-panel {
+	position: relative;
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
-	overflow: hidden;
+	overflow-y: auto;
+	overflow-x: hidden;
+	scrollbar-width: none; // Firefox
+
+	&::-webkit-scrollbar {
+		display: none; // Chrome/Safari
+	}
 }
 
 .editor-collab-sidebar-panel__thread {

@@ -1,13 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	useFloating,
-	offset as offsetMiddleware,
-	autoUpdate,
-} from '@floating-ui/react-dom';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -24,6 +15,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -34,9 +26,9 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { calculateAllOffsets } from './utils';
+import { calculateNotePositions } from './utils';
 
-const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
 	const queryArgs = {
@@ -333,92 +325,81 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
-export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+export function useFloatingBoard( {
+	threads,
+	selectedNoteId,
+	isFloating,
+	commentSidebarRef,
+} ) {
+	const [ notePositions, setNotePositions ] = useState( {} );
+	const [ contentHeight, setContentHeight ] = useState( 0 );
 	const [ store ] = useState( createBoardStore );
-	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
-	// when deps change, so back-to-back updates collapse into one paint.
+	// Positions are computed with scrollTop baked in; the panel mirrors the
+	// editor's scroll so notes track their blocks without per-frame recalc.
 	useEffect( () => {
-		if ( ! isFloating ) {
+		if ( ! isFloating || ! commentSidebarRef?.current ) {
 			return;
 		}
 
+		const panel = commentSidebarRef.current;
+		const blockEl = store.getFirstBlockElement();
+		// Climb to the block-list root so nested scroll containers
+		// (e.g. a Group with overflow:auto) don't shadow the canvas.
+		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
+		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
+
+		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
 		const rafId = window.requestAnimationFrame( () => {
-			const { offsets, minHeight } = calculateAllOffsets( {
+			const result = calculateNotePositions( {
 				threads,
 				selectedNoteId,
 				blockRects: store.getBlockRects(),
 				heights,
+				scrollTop: canvas?.scrollTop ?? 0,
 			} );
-			setBoardOffsets( offsets );
-			setCanvasMinHeight( minHeight );
+
+			setNotePositions( result.positions );
+			setContentHeight( result.contentHeight );
+
+			if ( canvas ) {
+				panel.scrollTop = canvas.scrollTop;
+			}
 		} );
 
-		return () => window.cancelAnimationFrame( rafId );
+		const onScroll = () => {
+			panel.scrollTop = canvas.scrollTop;
+		};
+
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		const view = canvas?.ownerDocument?.defaultView;
+		view?.addEventListener( 'scroll', onScroll, {
+			passive: true,
+			capture: true,
+		} );
+
+		return () => {
+			window.cancelAnimationFrame( rafId );
+			view?.removeEventListener( 'scroll', onScroll, {
+				capture: true,
+			} );
+		};
 	}, [
+		commentSidebarRef,
 		heights,
 		isFloating,
 		selectedNoteId,
-		setCanvasMinHeight,
 		store,
 		threads,
 	] );
 
 	return {
-		boardOffsets,
+		notePositions,
+		contentHeight,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
-	};
-}
-
-export function useFloatingThread( {
-	thread,
-	calculatedOffset,
-	registerThread,
-	unregisterThread,
-} ) {
-	const blockElement = useBlockElement( thread.blockClientId );
-
-	// Use floating-ui to track the block element's position with the calculated offset.
-	const { y, refs } = useFloating( {
-		placement: 'right-start',
-		middleware: [
-			offsetMiddleware( {
-				crossAxis: calculatedOffset || -16,
-			} ),
-		],
-		whileElementsMounted: autoUpdate,
-	} );
-
-	// Set the floating-ui reference element.
-	useEffect( () => {
-		if ( blockElement ) {
-			refs.setReference( blockElement );
-		}
-	}, [ blockElement, refs ] );
-
-	// Register block + floating elements with the board.
-	// The board's ResizeObserver tracks height changes automatically.
-	useEffect( () => {
-		const floatingEl = refs.floating?.current;
-		if ( floatingEl && registerThread ) {
-			registerThread( thread.id, blockElement, floatingEl );
-		}
-		return () => unregisterThread?.( thread.id );
-	}, [
-		blockElement,
-		thread.id,
-		refs.floating,
-		registerThread,
-		unregisterThread,
-	] );
-
-	return {
-		y,
-		refs,
 	};
 }
