@@ -12,9 +12,6 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, Stack } from '@wordpress/ui';
 
 /**

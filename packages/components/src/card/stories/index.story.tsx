@@ -37,9 +37,9 @@ const meta: Meta< typeof Card > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Design is in flux, and may differ from the version used in `@wordpress/dataviews`.',
+			notes: 'Use `Card` or `CollapsibleCard` from `@wordpress/ui` instead.',
 		},
 	},
 };
