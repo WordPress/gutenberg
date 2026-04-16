@@ -46,6 +46,16 @@ import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
+import {
+	SuggestionOverlayProvider,
+	SuggestionCommitBar,
+	registerSuggestionOverlayFilter,
+} from '../suggestion-mode';
+
+// Register the `editor.BlockEdit` filter once when the editor provider module
+// loads. The filter is a no-op outside of the `suggest` intent, so it's safe
+// to register globally.
+registerSuggestionOverlayFilter();
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -433,27 +443,30 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							{ children }
-							{ ! settings.isPreviewMode && (
-								<>
-									<PatternsMenuItems />
-									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
-									{ type === 'wp_navigation' && (
-										<NavigationBlockEditingMode />
-									) }
-									<EditorKeyboardShortcuts />
-									<KeyboardShortcutHelpModal />
-									<BlockRemovalWarnings />
-									<StartPageOptions />
-									<StartTemplateOptions />
-									<PatternRenameModal />
-									<PatternDuplicateModal />
-									<MediaEditorModalMount />
-								</>
-							) }
+							<SuggestionOverlayProvider>
+								{ children }
+								{ ! settings.isPreviewMode && (
+									<>
+										<PatternsMenuItems />
+										<TemplatePartMenuItems />
+										{ mode === 'template-locked' && (
+											<DisableNonPageContentBlocks />
+										) }
+										{ type === 'wp_navigation' && (
+											<NavigationBlockEditingMode />
+										) }
+										<EditorKeyboardShortcuts />
+										<KeyboardShortcutHelpModal />
+										<BlockRemovalWarnings />
+										<StartPageOptions />
+										<StartTemplateOptions />
+										<PatternRenameModal />
+										<PatternDuplicateModal />
+										<MediaEditorModalMount />
+										<SuggestionCommitBar />
+									</>
+								) }
+							</SuggestionOverlayProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</EntityProvider>

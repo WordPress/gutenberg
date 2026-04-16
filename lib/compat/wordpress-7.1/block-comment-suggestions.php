@@ -1,0 +1,88 @@
+<?php
+/**
+ * Suggestion support for block notes.
+ *
+ * Notes ship in WordPress core as `note`-type comments. Suggest mode layers a
+ * proposed edit on top of a note by attaching it as comment meta, so the
+ * suggestion is reviewable in context and can be applied or rejected without
+ * rewriting the note's discussion content. Two meta fields drive it:
+ *
+ *   - `_wp_suggestion`        — proposed edit, JSON payload. Presence of this
+ *                               meta is what makes a note a suggestion.
+ *   - `_wp_suggestion_status` — suggestion lifecycle (`pending` / `applied`
+ *                               / `rejected`). Set on apply or reject so the
+ *                               comment thread persists as evidence even
+ *                               after the suggestion is resolved.
+ *
+ * The suggestion is stored as comment meta rather than `comment_content`
+ * because the payload is JSON (surfacing it to comment-feed renderers would
+ * break them) and because a note can carry both a discussion and a proposed
+ * edit so users can reply to a suggestion.
+ *
+ * @package gutenberg
+ */
+
+/**
+ * Registers the comment meta fields used by suggest mode.
+ *
+ * Notes themselves (and their `_wp_note_status` meta) are registered by
+ * WordPress core; this only adds the suggestion-specific fields.
+ */
+function gutenberg_register_block_comment_suggestion_metadata() {
+	// Suggestion payload attached to a note. A note comment with this meta set
+	// is a suggested edit: the value is a JSON-encoded payload describing the
+	// block, baseline revision, and proposed operations. See
+	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
+	register_meta(
+		'comment',
+		'_wp_suggestion',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
+
+	// Lifecycle status for a suggestion. `pending` on creation; moved to
+	// `applied` or `rejected` by the apply/reject actions.
+	register_meta(
+		'comment',
+		'_wp_suggestion_status',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Suggestion lifecycle status.', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+					'enum' => array( 'pending', 'applied', 'rejected' ),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_block_comment_suggestion_metadata' );
+
+/**
+ * Re-registers the comments REST route with the suggestion-aware controller.
+ *
+ * Runs after core registers `/wp/v2/comments` (priority 10) so the subclass
+ * takes over the route. The subclass only adds suggestion behavior; all note
+ * and comment handling is inherited from core's controller.
+ */
+function gutenberg_register_comment_suggestions_rest_route() {
+	$controller = new Gutenberg_REST_Comment_Suggestions_Controller();
+	$controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_comment_suggestions_rest_route', 11 );
