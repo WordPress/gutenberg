@@ -44,7 +44,9 @@ import { useFloatingBoard, useFloatingThread } from './hooks';
 import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
-import SuggestionActions from './suggestion-actions';
+import SuggestionActions, {
+	SuggestionActionButtons,
+} from './suggestion-actions';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -676,6 +678,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					date={ thread?.date }
 					userId={ thread?.author }
 				/>
+				<SuggestionActionButtons thread={ thread } />
 				{ isExpanded && (
 					<FlexItem
 						className="editor-collab-sidebar-panel__comment-status"

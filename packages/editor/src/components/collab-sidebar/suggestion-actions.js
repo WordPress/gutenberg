@@ -32,15 +32,14 @@ const APPLIED = 'applied';
 const REJECTED = 'rejected';
 
 /**
- * Controls rendered inside a note comment's thread when the comment has
- * a `_wp_suggestion` payload. Surfaces the diff, plus Apply / Reject
- * buttons. Shows a staleness confirmation when the post has changed since
- * the suggestion was captured, and disables Apply when the target block
- * is no longer present in the block tree.
+ * Shared accept/reject wiring for a note that carries a suggestion payload.
+ * Both the header icon buttons and the body (for resolution state and the
+ * staleness dialog) consume the same hook so their behavior never diverges.
  *
- * @param {{ thread: Object }} props
+ * @param {Object} thread The note thread.
+ * @return {Object|null} Controls, or null if the thread has no payload.
  */
-export default function SuggestionActions( { thread } ) {
+function useSuggestionDecision( thread ) {
 	const payload = useMemo(
 		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
 		[ thread?.meta?._wp_suggestion ]
@@ -114,52 +113,117 @@ export default function SuggestionActions( { thread } ) {
 		? __( 'Target block has been deleted.' )
 		: undefined;
 
+	return {
+		payload,
+		suggestionStatus,
+		isResolved,
+		busy,
+		onApplyClick,
+		onReject,
+		applyDisabled,
+		applyDisabledReason,
+		showStaleDialog,
+		dismissStaleDialog: () => setShowStaleDialog( false ),
+		confirmStaleApply: () => {
+			setShowStaleDialog( false );
+			runApply();
+		},
+	};
+}
+
+/**
+ * Header-slot icon buttons (check and close) for accepting or rejecting a
+ * suggestion. Rendered inline with the note's author info so the decision
+ * affordance is always in view, even when the thread is long.
+ *
+ * @param {{ thread: Object }} props
+ */
+export function SuggestionActionButtons( { thread } ) {
+	const decision = useSuggestionDecision( thread );
+	if ( ! decision || decision.isResolved ) {
+		return null;
+	}
+
+	return (
+		<HStack
+			className="editor-collab-sidebar-panel__suggestion-header-actions"
+			spacing="0"
+			justify="flex-end"
+			expanded={ false }
+			onClick={ ( event ) => {
+				// Keep the click from bubbling into the thread's expand/
+				// collapse handler — the icon button is its own affordance.
+				event.stopPropagation();
+			} }
+		>
+			<Button
+				size="small"
+				icon={ check }
+				iconSize={ 20 }
+				label={ __( 'Accept suggestion' ) }
+				showTooltip
+				disabled={ decision.applyDisabled }
+				accessibleWhenDisabled
+				onClick={ decision.onApplyClick }
+			/>
+			<Button
+				size="small"
+				icon={ close }
+				iconSize={ 20 }
+				label={ __( 'Reject suggestion' ) }
+				showTooltip
+				disabled={ decision.busy }
+				accessibleWhenDisabled
+				onClick={ decision.onReject }
+			/>
+		</HStack>
+	);
+}
+
+/**
+ * Body for a note that carries a suggestion payload: the compact
+ * Add/Delete/Formatting summary, a resolved-state label if applicable, and
+ * the staleness confirm dialog. Accept/Reject themselves live in the
+ * header slot via `SuggestionActionButtons`.
+ *
+ * @param {{ thread: Object }} props
+ */
+export default function SuggestionActions( { thread } ) {
+	const decision = useSuggestionDecision( thread );
+	if ( ! decision ) {
+		return null;
+	}
+
+	const {
+		payload,
+		suggestionStatus,
+		isResolved,
+		applyDisabledReason,
+		showStaleDialog,
+		dismissStaleDialog,
+		confirmStaleApply,
+	} = decision;
+
 	return (
 		<VStack spacing="2" className="editor-collab-sidebar-panel__suggestion">
 			<SuggestionSummary operations={ payload.operations } />
-			{ isResolved ? (
+			{ isResolved && (
 				<Text variant="muted" size="12px">
 					{ suggestionStatus === APPLIED
 						? __( 'Applied' )
 						: __( 'Rejected' ) }
 				</Text>
-			) : (
-				<>
-					{ applyDisabledReason && (
-						<Text variant="muted" size="12px">
-							{ applyDisabledReason }
-						</Text>
-					) }
-					<HStack spacing="1" justify="flex-start">
-						<Button
-							size="small"
-							icon={ check }
-							label={ __( 'Accept suggestion' ) }
-							showTooltip
-							disabled={ applyDisabled }
-							accessibleWhenDisabled
-							onClick={ onApplyClick }
-						/>
-						<Button
-							size="small"
-							icon={ close }
-							label={ __( 'Reject suggestion' ) }
-							showTooltip
-							disabled={ busy }
-							accessibleWhenDisabled
-							onClick={ onReject }
-						/>
-					</HStack>
-				</>
+			) }
+			{ ! isResolved && applyDisabledReason && (
+				<Text variant="muted" size="12px">
+					{ applyDisabledReason }
+				</Text>
 			) }
 			{ showStaleDialog && (
 				<ConfirmDialog
 					isOpen
-					onConfirm={ () => {
-						setShowStaleDialog( false );
-						runApply();
-					} }
-					onCancel={ () => setShowStaleDialog( false ) }
+					onConfirm={ confirmStaleApply }
+					onCancel={ dismissStaleDialog }
 					confirmButtonText={ __( 'Apply anyway' ) }
 				>
 					{ __(
