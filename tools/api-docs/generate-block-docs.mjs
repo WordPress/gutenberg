@@ -64,6 +64,10 @@ const ATTRIBUTES_DOC_PATH = path.join(
 	ROOT_DIR,
 	'docs/reference-guides/block-api/block-attributes.md'
 );
+const SUPPORTS_DOC_PATH = path.join(
+	ROOT_DIR,
+	'docs/reference-guides/block-api/block-supports.md'
+);
 
 /**
  * Human-readable labels for block categories.
@@ -129,7 +133,10 @@ function getBlockFiles( blockDir ) {
 // ─── Anchor validation ──────────────────────────────────────────────────────
 
 /**
- * Slugify a Markdown heading the same way most renderers do.
+ * Slugify a Markdown heading into an anchor the way the WordPress handbook
+ * renderer does: lowercase, strip markup escapes, convert dots and spaces
+ * to dashes, remove everything else that isn't alphanumeric, a dash, or
+ * an underscore.
  *
  * @param {string} heading Raw heading text (without the leading `#` marks).
  * @return {string} Slug suitable for use as an anchor.
@@ -138,39 +145,39 @@ function slugifyHeading( heading ) {
 	return heading
 		.toLowerCase()
 		.trim()
-		.replace( /[^\w\s-]/g, '' )
-		.replace( /\s+/g, '-' );
+		.replace( /\\\\/g, '' ) // strip markdown backslash escapes
+		.replace( /[.\s]+/g, '-' ) // dots and spaces → dashes
+		.replace( /[^\w-]/g, '' ); // drop everything else
 }
 
 /**
- * Read block-attributes.md, extract heading anchors, and warn if any anchor
- * in ATTRIBUTE_ANCHORS no longer matches a heading in the file.
+ * Read a markdown doc file, extract heading anchors, and warn if any
+ * expected anchor is missing. Helps catch drift when headings are renamed.
+ *
+ * @param {string}   docPath         Absolute path to the markdown file.
+ * @param {string[]} expectedAnchors Anchors the generator relies on.
+ * @param {string}   label           Short name for warning messages.
  */
-function validateAttributeAnchors() {
-	if ( ! fs.existsSync( ATTRIBUTES_DOC_PATH ) ) {
+function validateDocAnchors( docPath, expectedAnchors, label ) {
+	if ( ! fs.existsSync( docPath ) ) {
 		// eslint-disable-next-line no-console
-		console.warn(
-			`⚠  Cannot validate attribute anchors: ${ ATTRIBUTES_DOC_PATH } not found.`
-		);
+		console.warn( `⚠  Cannot validate anchors: ${ docPath } not found.` );
 		return;
 	}
 
-	const content = fs.readFileSync( ATTRIBUTES_DOC_PATH, 'utf-8' );
+	const content = fs.readFileSync( docPath, 'utf-8' );
 	const anchors = new Set(
 		Array.from( content.matchAll( /^#{1,6}\s+(.+)$/gm ), ( m ) =>
 			slugifyHeading( m[ 1 ] )
 		)
 	);
 
-	const expectedAnchors = [
-		...new Set( Object.values( ATTRIBUTE_ANCHORS ) ),
-	];
 	for ( const anchor of expectedAnchors ) {
 		if ( ! anchors.has( anchor ) ) {
 			// eslint-disable-next-line no-console
 			console.warn(
-				`⚠  Attribute anchor "#${ anchor }" not found in block-attributes.md. ` +
-					`Update ATTRIBUTE_ANCHORS in generate-block-docs.mjs.`
+				`⚠  Anchor "#${ anchor }" not found in ${ label }. ` +
+					`Update the corresponding map in generate-block-docs.mjs.`
 			);
 		}
 	}
@@ -499,19 +506,31 @@ function formatSelectors( selectors ) {
 }
 
 /**
- * Determine block type (static, dynamic, hybrid).
+ * Determine block type (static, dynamic, hybrid) from source file presence
+ * and block.json metadata.
  *
- * @param {Object} files File existence flags.
+ * Server-side rendering is indicated by index.php (render_callback) or the
+ * `render` property in block.json (typically `file:./render.php`).
+ *
+ * - save.js only              → static:  markup is saved in post content by the editor.
+ * - server rendering only     → dynamic: markup is rendered on the server at request time.
+ * - save.js + server rendering → hybrid:  editor saves static markup, server may enhance
+ *   it during rendering (e.g. injecting dynamic data or wrapping with extra HTML).
+ *
+ * @param {Object} files     File existence flags from getBlockFiles().
+ * @param {Object} blockJson Parsed block.json contents.
  * @return {string} One of 'static', 'dynamic', 'hybrid', 'unknown'.
  */
-function getBlockType( files ) {
-	if ( files.hasSaveJs && files.hasIndexPhp ) {
+function getBlockType( files, blockJson ) {
+	const hasServerRender = files.hasIndexPhp || !! blockJson.render;
+
+	if ( files.hasSaveJs && hasServerRender ) {
 		return 'hybrid';
 	}
 	if ( files.hasSaveJs ) {
 		return 'static';
 	}
-	if ( files.hasIndexPhp ) {
+	if ( hasServerRender ) {
 		return 'dynamic';
 	}
 	return 'unknown';
@@ -558,7 +577,7 @@ function generateBlockCommentExample( slug, attributes, blockType ) {
 function generateBlockApiSection( blockDir ) {
 	const blockJson = readBlockJson( blockDir );
 	const files = getBlockFiles( blockDir );
-	const blockType = getBlockType( files );
+	const blockType = getBlockType( files, blockJson );
 
 	const {
 		name,
@@ -831,7 +850,16 @@ function generateCategoryPage( category, label, blocks ) {
 
 // ─── Main ───────────────────────────────────────────────────────────────────
 
-validateAttributeAnchors();
+validateDocAnchors(
+	ATTRIBUTES_DOC_PATH,
+	[ ...new Set( Object.values( ATTRIBUTE_ANCHORS ) ) ],
+	'block-attributes.md'
+);
+validateDocAnchors(
+	SUPPORTS_DOC_PATH,
+	[ ...new Set( [ ...SUPPORTS_SUB_ANCHORS ].map( ( p ) => p.toLowerCase().replace( /\./g, '-' ) ) ) ],
+	'block-supports.md'
+);
 
 const blockDirs = getBlockDirs();
 
