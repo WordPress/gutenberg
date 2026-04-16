@@ -1,22 +1,36 @@
 /**
  * External dependencies
  */
-import type { Reducer, Action } from 'redux';
+import type { AnyAction, Reducer } from 'redux';
 
 /**
  * Higher-order reducer creator which creates a combined reducer object, keyed
  * by a property on the action object.
  *
  * @param actionProperty Action property by which to key object.
- *
  * @return Higher-order reducer.
+ *
+ * @example
+ * ```js
+ * import { keyedReducer } from '@wordpress/data';
+ *
+ * const itemsByContext = keyedReducer( 'context' )( ( state = [], action ) => {
+ *   switch ( action.type ) {
+ *     case 'ADD_ITEM':
+ *       return [ ...state, action.item ];
+ *   }
+ *   return state;
+ * } );
+ * ```
  */
-export const onSubKey =
-	( actionProperty: string ) =>
-	< S, A extends Action & Record< string, any > >(
-		reducer: Reducer< S, A >
+export const keyedReducer =
+	< TState extends unknown, TAction extends AnyAction >(
+		actionProperty: string
 	) =>
-	( state: Record< string, S > = {}, action: A ) => {
+	(
+		reducer: Reducer< TState, TAction >
+	): Reducer< Record< string, TState >, TAction > =>
+	( state: Record< string, TState > = {}, action ) => {
 		// Retrieve subkey from action. Do not track if undefined; useful for cases
 		// where reducer is scoped by action shape.
 		const key = action[ actionProperty ];
@@ -36,5 +50,3 @@ export const onSubKey =
 			[ key ]: nextKeyState,
 		};
 	};
-
-export default onSubKey;
