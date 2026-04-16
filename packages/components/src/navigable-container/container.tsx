@@ -7,6 +7,7 @@ import type { ForwardedRef } from 'react';
  * WordPress dependencies
  */
 import { forwardRef, useRef, useEffect, useCallback } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -153,19 +154,10 @@ function UnforwardedNavigableContainer(
 		getFocusableContext,
 	] );
 
-	return (
-		<div
-			ref={ ( node ) => {
-				containerRef.current = node;
+	const mergedRef = useMergeRefs( [ containerRef, ref ] );
 
-				if ( typeof ref === 'function' ) {
-					ref( node );
-				} else if ( ref ) {
-					ref.current = node;
-				}
-			} }
-			{ ...restProps }
-		>
+	return (
+		<div ref={ mergedRef } { ...restProps }>
 			{ children }
 		</div>
 	);
