@@ -32,7 +32,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
-import { trash } from '@wordpress/icons';
+import { trash, undo } from '@wordpress/icons';
 
 interface EntityConfig {
 	slug: string;
@@ -40,6 +40,7 @@ interface EntityConfig {
 	_user_created: boolean;
 	_source: 'core' | 'plugin' | 'user';
 	_orphaned: boolean;
+	_customized: boolean;
 	labels: Record< string, string >;
 	description: string;
 	public: boolean;
@@ -256,6 +257,15 @@ function EntityEdit() {
 		setIsSaving( false );
 	}, [ config, entityType, slug, createSuccessNotice, createErrorNotice ] );
 
+	// Plugin-registered entities that are still active are "reverted" (overrides
+	// cleared; plugin re-registers it on next request). User-created and
+	// orphaned entities are "deleted" (stored config removed). Revert is only
+	// available when the entity has actually been customized.
+	const isRevert =
+		config?._source === 'plugin' &&
+		! config?._orphaned &&
+		!! config?._customized;
+
 	const handleDelete = useCallback( async () => {
 		setIsDeleting( true );
 		try {
@@ -265,22 +275,29 @@ function EntityEdit() {
 			} );
 			sessionStorage.setItem(
 				'gutenberg_entity_saved',
-				__( 'Entity deleted successfully.' )
+				isRevert
+					? __( 'Entity reverted successfully.' )
+					: __( 'Entity deleted successfully.' )
 			);
-			// Always reload — a deleted entity affects the admin menu.
+			// Always reload — a deleted/reverted entity affects the admin menu.
 			const url = new URL( window.location.href );
 			url.searchParams.set( 'p', '/' );
 			url.searchParams.set( 'tab', entityType );
 			window.location.href = url.toString();
 		} catch {
-			createErrorNotice( __( 'Failed to delete entity.' ), {
-				type: 'snackbar',
-				id: 'entity-delete-error',
-			} );
+			createErrorNotice(
+				isRevert
+					? __( 'Failed to revert entity.' )
+					: __( 'Failed to delete entity.' ),
+				{
+					type: 'snackbar',
+					id: 'entity-delete-error',
+				}
+			);
 			setIsDeleting( false );
 			setShowDeleteConfirm( false );
 		}
-	}, [ entityType, slug, createErrorNotice ] );
+	}, [ entityType, slug, isRevert, createErrorNotice ] );
 
 	if ( isLoading ) {
 		return (
@@ -321,11 +338,17 @@ function EntityEdit() {
 						>
 							{ __( 'Back' ) }
 						</Button>
-						{ ( config._user_created || config._orphaned ) && (
+						{ ( config._user_created ||
+							config._orphaned ||
+							isRevert ) && (
 							<Button
-								icon={ trash }
-								label={ __( 'Delete' ) }
-								isDestructive
+								icon={ isRevert ? undo : trash }
+								label={
+									isRevert
+										? __( 'Revert to default' )
+										: __( 'Delete' )
+								}
+								isDestructive={ ! isRevert }
 								onClick={ () => setShowDeleteConfirm( true ) }
 								disabled={ isDeleting }
 								size="compact"
@@ -658,14 +681,24 @@ function EntityEdit() {
 					isOpen
 					onConfirm={ handleDelete }
 					onCancel={ () => setShowDeleteConfirm( false ) }
-					confirmButtonText={ __( 'Delete' ) }
+					confirmButtonText={
+						isRevert ? __( 'Revert' ) : __( 'Delete' )
+					}
 					isBusy={ isDeleting }
 				>
-					{ sprintf(
-						/* translators: %s: entity name */
-						__( 'Are you sure you want to delete "%s"?' ),
-						config.labels?.name || config.slug
-					) }
+					{ isRevert
+						? sprintf(
+								/* translators: %s: entity name */
+								__(
+									'Are you sure you want to revert "%s" to its default state? All your customizations will be lost.'
+								),
+								config.labels?.name || config.slug
+						  )
+						: sprintf(
+								/* translators: %s: entity name */
+								__( 'Are you sure you want to delete "%s"?' ),
+								config.labels?.name || config.slug
+						  ) }
 				</ConfirmDialog>
 			) }
 		</>

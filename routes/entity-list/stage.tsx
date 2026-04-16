@@ -33,6 +33,7 @@ interface EntityConfig {
 	_user_created: boolean;
 	_source: 'core' | 'plugin' | 'user';
 	_orphaned: boolean;
+	_customized: boolean;
 	labels?: Record< string, string >;
 	description?: string;
 	public?: boolean;
@@ -217,19 +218,11 @@ function EntityList() {
 					method: 'DELETE',
 				} )
 					.then( () => {
-						setAllConfigs( ( prev ) =>
-							prev.filter(
-								( c ) =>
-									! (
-										c.slug === item.slug &&
-										c.entity_type === item.entity_type
-									)
-							)
+						sessionStorage.setItem(
+							'gutenberg_entity_saved',
+							__( 'Entity deleted successfully.' )
 						);
-						createSuccessNotice(
-							__( 'Entity deleted successfully.' ),
-							{ type: 'snackbar', id: 'entity-delete-success' }
-						);
+						window.location.reload();
 					} )
 					.catch( () => {
 						createErrorNotice( __( 'Failed to delete entity.' ), {
@@ -239,10 +232,49 @@ function EntityList() {
 					} );
 			},
 		} ),
-		[ createSuccessNotice, createErrorNotice ]
+		[ createErrorNotice ]
 	);
 
-	const actions = useMemo( () => [ deleteAction ], [ deleteAction ] );
+	const revertAction: Action< EntityConfig > = useMemo(
+		() => ( {
+			id: 'revert',
+			label: __( 'Revert to default' ),
+			isPrimary: false,
+			isEligible( item: EntityConfig ) {
+				return (
+					item._source === 'plugin' &&
+					! item._orphaned &&
+					item._customized
+				);
+			},
+			callback( items: EntityConfig[] ) {
+				const item = items[ 0 ];
+				apiFetch( {
+					path: `/gutenberg/v1/entity-configs/${ item.entity_type }/${ item.slug }`,
+					method: 'DELETE',
+				} )
+					.then( () => {
+						sessionStorage.setItem(
+							'gutenberg_entity_saved',
+							__( 'Entity reverted successfully.' )
+						);
+						window.location.reload();
+					} )
+					.catch( () => {
+						createErrorNotice( __( 'Failed to revert entity.' ), {
+							type: 'snackbar',
+							id: 'entity-revert-error',
+						} );
+					} );
+			},
+		} ),
+		[ createErrorNotice ]
+	);
+
+	const actions = useMemo(
+		() => [ deleteAction, revertAction ],
+		[ deleteAction, revertAction ]
+	);
 
 	return (
 		<Page title={ __( 'Entities' ) }>

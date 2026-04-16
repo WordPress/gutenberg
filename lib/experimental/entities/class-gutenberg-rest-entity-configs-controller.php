@@ -272,6 +272,7 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		// Merge updated fields into existing config.
 		$config                   = array_merge( $existing, $updated );
 		$config['_user_created']  = $existing['_user_created'];
+		$config['_customized']    = true;
 		$configs[ $key ][ $slug ] = $config;
 
 		update_option( Gutenberg_Entity_Manager::OPTION_NAME, $configs, false );
@@ -308,24 +309,39 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		$is_registered = 'post_type' === $entity_type
 			? post_type_exists( $slug )
 			: taxonomy_exists( $slug );
-		$is_orphaned   = ! $is_registered && empty( $config['_user_created'] );
 
-		// Only user-created entities and orphans (stored but no longer
-		// registered) can be deleted. Actively registered non-user entities
-		// belong to core/plugins/themes and must not be deleted here.
-		if ( empty( $config['_user_created'] ) && ! $is_orphaned ) {
+		// Determine if this is a core-registered entity (not user-created).
+		$is_core = false;
+		if ( empty( $config['_user_created'] ) && $is_registered ) {
+			if ( 'post_type' === $entity_type ) {
+				$object  = get_post_type_object( $slug );
+				$is_core = ! empty( $object->_builtin );
+			} else {
+				$object  = get_taxonomy( $slug );
+				$is_core = ! empty( $object->_builtin );
+			}
+		}
+
+		// Core entities cannot be deleted or reverted via this endpoint.
+		if ( $is_core ) {
 			return new WP_Error(
 				'rest_entity_config_not_deletable',
-				__( 'This entity is registered by core, a plugin, or a theme and cannot be deleted.', 'gutenberg' ),
+				__( 'Core entities cannot be deleted.', 'gutenberg' ),
 				array( 'status' => 403 )
 			);
 		}
 
-		// Unregister the entity.
-		if ( 'post_type' === $entity_type && post_type_exists( $slug ) ) {
-			unregister_post_type( $slug );
-		} elseif ( 'taxonomy' === $entity_type && taxonomy_exists( $slug ) ) {
-			unregister_taxonomy( $slug );
+		// For user-created entities, unregister so the type/taxonomy is
+		// fully removed. For plugin-registered entities (revert), leave the
+		// live registration alone — the plugin re-registers it on every
+		// request, and auto-detection will re-seed the config with default
+		// values on the next page load.
+		if ( ! empty( $config['_user_created'] ) ) {
+			if ( 'post_type' === $entity_type && post_type_exists( $slug ) ) {
+				unregister_post_type( $slug );
+			} elseif ( 'taxonomy' === $entity_type && taxonomy_exists( $slug ) ) {
+				unregister_taxonomy( $slug );
+			}
 		}
 
 		unset( $configs[ $key ][ $slug ] );
@@ -377,6 +393,7 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 				'entity_type' => $entity_type,
 				'_source'     => $source,
 				'_orphaned'   => $is_orphaned,
+				'_customized' => ! empty( $config['_customized'] ),
 			)
 		);
 	}
