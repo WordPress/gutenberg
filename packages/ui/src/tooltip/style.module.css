@@ -1,12 +1,12 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
 /*
- * Base UI ≥1.4.0 uses checkVisibility() to detect tabbable elements.
- * checkVisibility() returns false for display:contents (no generated box),
- * which breaks the focus-trap when ThemeProvider wraps the popup.
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
  *
- * This rule must be unlayered to override ThemeProvider's unlayered
- * display:contents.
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
  */
 [data-wpds-theme-provider-id]:has(> .popup) {
 	display: block;
