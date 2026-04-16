@@ -80,7 +80,6 @@ function Edit( {
 	// checks and click handling.
 	const tabListIndex = tab.index ?? menuItemIndex;
 
-	const tabId = tab.id || `tab-${ menuItemIndex }`;
 	const tabClientId = tab.clientId || '';
 	const label = tab.label || '';
 
@@ -123,10 +122,6 @@ function Edit( {
 			'is-active': isActive,
 			'is-selected': isSelected,
 		} ),
-		'aria-controls': tabId,
-		'aria-selected': isActive,
-		id: `${ tabId }--tab`,
-		role: 'tab',
 		tabIndex: -1,
 		onClick: handleTabClick,
 	} );

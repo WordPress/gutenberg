@@ -14,7 +14,6 @@ import { useMemo, useRef, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import Controls from './controls';
-import slugFromLabel from './slug-from-label';
 
 const TEMPLATE = [
 	[
@@ -28,15 +27,12 @@ const TEMPLATE = [
 const { cancelAnimationFrame } = window;
 
 export default function Edit( {
-	attributes,
 	clientId,
 	context,
 	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const focusRef = useRef();
-
-	const { anchor, label } = attributes;
 
 	// Consume tab indices from context
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
@@ -132,18 +128,8 @@ export default function Edit( {
 		return false;
 	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
 
-	// Use a custom anchor, if set. Otherwise fall back to the slug generated from the label text.
-	const tabPanelId = useMemo(
-		() => anchor || slugFromLabel( label, blockIndex ),
-		[ anchor, label, blockIndex ]
-	);
-	const tabLabelId = useMemo( () => `${ tabPanelId }--tab`, [ tabPanelId ] );
-
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
-		'aria-labelledby': tabLabelId,
-		id: tabPanelId,
-		role: 'tabpanel',
 		tabIndex: isSelectedTab ? 0 : -1,
 		className: layoutClassNames,
 	} );

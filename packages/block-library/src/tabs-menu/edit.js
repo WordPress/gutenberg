@@ -30,7 +30,6 @@ function Edit( { clientId, __unstableLayoutClassNames: layoutClassNames } ) {
 
 	const blockProps = useBlockProps( {
 		className: clsx( layoutClassNames ),
-		role: 'tablist',
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
