@@ -11,8 +11,8 @@ import type { WidgetType } from './types';
 
 interface RegisteredEntry {
 	name: string;
-	render_module: string;
-	widget_module: string;
+	render_module?: string;
+	widget_module?: string;
 }
 
 declare global {
@@ -27,6 +27,10 @@ export async function bootstrapWidgetTypes(): Promise< void > {
 	const results = await Promise.all(
 		registered.map( async ( entry ) => {
 			try {
+				if ( ! entry.widget_module ) {
+					return null;
+				}
+
 				const module = await import(
 					/* webpackIgnore: true */ entry.widget_module
 				);
@@ -38,7 +42,7 @@ export async function bootstrapWidgetTypes(): Promise< void > {
 				return {
 					...( module.default as Partial< WidgetType > ),
 					name: entry.name,
-					render_module: entry.render_module,
+					render_module: entry.render_module ?? '',
 				};
 			} catch {
 				return null;
