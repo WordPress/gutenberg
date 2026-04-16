@@ -12,7 +12,10 @@ export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
+	applyOperations,
+	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
 } from './provider';
+export { default as SuggestionDiff, wordDiff } from './suggestion-diff';

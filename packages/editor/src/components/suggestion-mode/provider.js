@@ -143,13 +143,53 @@ function isAttributeEqual( a, b ) {
 }
 
 /**
- * Comment-meta backed suggestions provider. Phase 2 implements only
- * `createSuggestion`. Apply and reject are stubbed and will be implemented
- * alongside the diff preview in Phase 3. The provider shape is stable so
- * Phase 3 / a future Yjs-backed provider can swap in without touching the
- * UI.
+ * Apply a suggestion payload's operations to a block's current attributes
+ * to produce the new attributes. Pure function — no side effects.
  *
- * Storage: a new `note` comment with the suggestion payload serialized to
+ * @param {Object}                currentAttributes Block's current attributes.
+ * @param {SuggestionOperation[]} operations        Operations from the payload.
+ * @return {Object} Merged attributes with suggestions applied.
+ */
+export function applyOperations( currentAttributes, operations ) {
+	const result = { ...currentAttributes };
+	for ( const op of operations ) {
+		if ( op.type === 'attribute-set' ) {
+			result[ op.attribute ] = op.after;
+		}
+	}
+	return result;
+}
+
+/**
+ * Parse a `_wp_suggestion` meta value into a typed payload.
+ *
+ * @param {string|undefined} raw The raw JSON string from comment meta.
+ * @return {SuggestionPayload|null} Parsed payload, or null if invalid.
+ */
+export function parseSuggestionPayload( raw ) {
+	if ( ! raw ) {
+		return null;
+	}
+	try {
+		const parsed = JSON.parse( raw );
+		if (
+			typeof parsed === 'object' &&
+			parsed !== null &&
+			Array.isArray( parsed.operations )
+		) {
+			return parsed;
+		}
+		return null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Comment-meta backed suggestions provider. The provider shape is stable so
+ * a future Yjs-backed provider can swap in without touching the UI.
+ *
+ * Storage: a `note` comment with the suggestion payload serialized to
  * the `_wp_suggestion` comment meta. Linkage to a block reuses the existing
  * `metadata.noteId` block attribute.
  *
@@ -266,12 +306,102 @@ export function useSuggestionsProvider() {
 		]
 	);
 
-	const applySuggestion = useCallback( async () => {
-		throw new Error( 'applySuggestion is not implemented in Phase 2.' );
-	}, [] );
-	const rejectSuggestion = useCallback( async () => {
-		throw new Error( 'rejectSuggestion is not implemented in Phase 2.' );
-	}, [] );
+	const applySuggestion = useCallback(
+		async ( { commentId, clientId, payload } ) => {
+			if ( ! payload || ! Array.isArray( payload.operations ) ) {
+				createNotice( 'error', __( 'Invalid suggestion payload.' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				return;
+			}
+
+			if (
+				payload.baseRevision &&
+				postModified &&
+				payload.baseRevision !== postModified
+			) {
+				createNotice(
+					'warning',
+					__(
+						'Post content has changed since this suggestion. Review carefully.'
+					),
+					{ type: 'snackbar', isDismissible: true }
+				);
+			}
+
+			const currentAttributes = selectBlockAttributes( clientId );
+			const newAttributes = applyOperations(
+				currentAttributes,
+				payload.operations
+			);
+
+			try {
+				updateBlockAttributes( clientId, newAttributes );
+
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id: commentId,
+						status: 'approved',
+						meta: { _wp_suggestion_status: 'applied' },
+					},
+					{ throwOnError: true }
+				);
+
+				createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+			} catch ( error ) {
+				// Roll back the block change so the UI isn't left in a
+				// half-applied state if the server rejected the update.
+				updateBlockAttributes( clientId, currentAttributes );
+				createNotice(
+					'error',
+					error?.message || __( 'Failed to save suggestion status.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+			}
+		},
+		[
+			postModified,
+			saveEntityRecord,
+			updateBlockAttributes,
+			selectBlockAttributes,
+			createNotice,
+		]
+	);
+
+	const rejectSuggestion = useCallback(
+		async ( { commentId } ) => {
+			try {
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id: commentId,
+						status: 'approved',
+						meta: { _wp_suggestion_status: 'rejected' },
+					},
+					{ throwOnError: true }
+				);
+
+				createNotice( 'snackbar', __( 'Suggestion rejected.' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message || __( 'Failed to reject suggestion.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+			}
+		},
+		[ saveEntityRecord, createNotice ]
+	);
 
 	return { createSuggestion, applySuggestion, rejectSuggestion };
 }
