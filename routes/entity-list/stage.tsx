@@ -141,13 +141,21 @@ const fields: Field< EntityConfig >[] = [
 		id: 'modified',
 		label: __( 'Modified' ),
 		render: ( { item }: { item: EntityConfig } ) => {
+			if ( item._user_created ) {
+				return <>{ __( 'N/A' ) }</>;
+			}
 			return <>{ item._customized ? __( 'Yes' ) : __( 'No' ) }</>;
 		},
-		getValue: ( { item }: { item: EntityConfig } ) =>
-			item._customized ? 'yes' : 'no',
+		getValue: ( { item }: { item: EntityConfig } ) => {
+			if ( item._user_created ) {
+				return 'n/a';
+			}
+			return item._customized ? 'yes' : 'no';
+		},
 		elements: [
 			{ value: 'yes', label: __( 'Yes' ) },
 			{ value: 'no', label: __( 'No' ) },
+			{ value: 'n/a', label: __( 'N/A' ) },
 		],
 		filterBy: {
 			operators: [ 'is' as const ],
