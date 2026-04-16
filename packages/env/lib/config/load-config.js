@@ -68,22 +68,21 @@ module.exports = async function loadConfig(
 		}
 	}
 
-	// Traditional cache directory name
-	const md5CacheDirectoryPath = path.resolve(
+	// Legacy cache directory name
+	const legacyCacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
 		md5( configFilePath )
 	);
 
-	// Descriptive cache directory name
-	const directory = path.basename( path.dirname( configFilePath ) );
+	// Descriptive cache directory name. Format: wp-env-<project-dir>[-<variant>]-<short-hash>
 	const descriptiveCacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
-		'wp-env-' + directory + '-' + md5( configFilePath )
+		buildDescriptiveCacheDirectoryName( configFilePath )
 	);
 
 	// If cache doesn't exist, create with new name
-	const cacheDirectoryPath = existsSync( md5CacheDirectoryPath )
-		? md5CacheDirectoryPath
+	const cacheDirectoryPath = existsSync( legacyCacheDirectoryPath )
+		? legacyCacheDirectoryPath
 		: descriptiveCacheDirectoryPath;
 
 	// Parse any configuration we found in the given directory.
@@ -136,6 +135,53 @@ module.exports = async function loadConfig(
 		env: config.env,
 	};
 };
+
+/**
+ * Derives the descriptive cache directory name for a given config file path.
+ *
+ * Format: `wp-env-<project-dir>[-<variant>]-<short-hash>`.
+ *
+ * @param {string} configFilePath Absolute path to the resolved config file.
+ *
+ * @return {string} The directory name to use as the cache directory.
+ */
+function buildDescriptiveCacheDirectoryName( configFilePath ) {
+	const projectDirectory = path.basename( path.dirname( configFilePath ) );
+	const variant = getConfigVariant( configFilePath );
+	const shortHash = md5( configFilePath ).slice( 0, 8 );
+
+	const segments = [ 'wp-env', projectDirectory ];
+	if ( variant ) {
+		segments.push( variant );
+	}
+	segments.push( shortHash );
+
+	return segments.join( '-' );
+}
+
+/**
+ * Extracts a variant label from a config file name.
+ *
+ * Example: `.wp-env.test.json`   -> 'test'
+ *
+ * @param {string} configFilePath Absolute path to the resolved config file.
+ *
+ * @return {string} The sanitized variant, or '' if none could be derived.
+ */
+function getConfigVariant( configFilePath ) {
+	const basename = path.basename( configFilePath, '.json' );
+
+	let variant;
+	if ( basename === '.wp-env' ) {
+		variant = '';
+	} else if ( basename.startsWith( '.wp-env.' ) ) {
+		variant = basename.slice( '.wp-env.'.length );
+	} else {
+		variant = basename;
+	}
+
+	return variant.replace( /[^a-zA-Z0-9._]+/g, '-' ).replace( /^-+|-+$/g, '' );
+}
 
 /**
  * Checks to see whether or not there is any configuration present in the directory.
