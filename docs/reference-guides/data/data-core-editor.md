@@ -381,6 +381,20 @@ _Returns_
 
 -   `Array`: Block list.
 
+### getEditorIntent
+
+Returns the current editor intent. The intent represents the user's editing purpose — directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`).
+
+The intent is orthogonal to the `editorMode` preference (visual vs. code).
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `string`: The current editor intent. One of `edit`, `suggest`, `view`.
+
 ### getEditorMode
 
 Returns the current editing mode.
@@ -1494,6 +1508,16 @@ _Parameters_
 _Returns_
 
 -   `Object`: Action object.
+
+### setEditorIntent
+
+Sets the current editor intent.
+
+The intent represents the user's editing purpose: directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`). It is orthogonal to the `editorMode` preference (visual vs. code).
+
+_Parameters_
+
+-   _intent_ `'edit'|'suggest'|'view'`: The editor intent to set.
 
 ### setIsInserterOpened
 

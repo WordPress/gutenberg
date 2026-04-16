@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added an `editorIntent` preference (`edit`, `suggest`, `view`) with a matching `setEditorIntent` action and `getEditorIntent` selector. Surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes. The `view` intent puts the block editor into a read-only preview. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows / ⌘⌥⇧Z/X/C on macOS.
+
 ## 14.48.1 (2026-06-16)
 
 ## 14.48.0 (2026-06-10)
