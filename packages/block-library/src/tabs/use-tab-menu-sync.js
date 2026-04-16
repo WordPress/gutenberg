@@ -38,17 +38,10 @@ export default function useTabMenuSync( {
 
 	const prevSyncStateRef = useRef( null );
 	useEffect( () => {
-		const currentTabs = tabs.map( ( tab ) => ( {
-			clientId: tab.clientId,
-		} ) );
-		const currentMenuItems = menuItems.map( ( m ) => ( {
-			clientId: m.clientId,
-		} ) );
-
 		if ( prevSyncStateRef.current === null ) {
 			prevSyncStateRef.current = {
-				tabs: currentTabs,
-				menuItems: currentMenuItems,
+				tabs: [ ...tabs ],
+				menuItems: [ ...menuItems ],
 			};
 			return;
 		}
@@ -56,9 +49,8 @@ export default function useTabMenuSync( {
 		const { tabs: prevTabs, menuItems: prevMenuItems } =
 			prevSyncStateRef.current;
 
-		const tabCountChange = currentTabs.length - prevTabs.length;
-		const menuItemCountChange =
-			currentMenuItems.length - prevMenuItems.length;
+		const tabCountChange = tabs.length - prevTabs.length;
+		const menuItemCountChange = menuItems.length - prevMenuItems.length;
 
 		const tabsInserted = tabCountChange > 0;
 		const menuItemsInserted = menuItemCountChange > 0;
@@ -72,11 +64,11 @@ export default function useTabMenuSync( {
 			if (
 				tabCountChange === 0 &&
 				tabPanelClientId &&
-				currentMenuItems.some(
+				menuItems.some(
 					( m, i ) => m.clientId !== prevMenuItems[ i ]?.clientId
 				)
 			) {
-				const reorderedTabs = currentMenuItems
+				const reorderedTabs = menuItems
 					.map( ( menuItem ) => {
 						const oldIndex = prevMenuItems.findIndex(
 							( pm ) => pm.clientId === menuItem.clientId
@@ -94,8 +86,8 @@ export default function useTabMenuSync( {
 				}
 			}
 			prevSyncStateRef.current = {
-				tabs: currentTabs,
-				menuItems: currentMenuItems,
+				tabs: [ ...tabs ],
+				menuItems: [ ...menuItems ],
 			};
 			return;
 		}
@@ -107,8 +99,8 @@ export default function useTabMenuSync( {
 			( tabCountChange < 0 && menuItemCountChange < 0 )
 		) {
 			prevSyncStateRef.current = {
-				tabs: currentTabs,
-				menuItems: currentMenuItems,
+				tabs: [ ...tabs ],
+				menuItems: [ ...menuItems ],
 			};
 			return;
 		}
@@ -124,13 +116,13 @@ export default function useTabMenuSync( {
 
 		// Update snapshot to the current state.
 		prevSyncStateRef.current = {
-			tabs: currentTabs,
-			menuItems: currentMenuItems,
+			tabs: [ ...tabs ],
+			menuItems: [ ...menuItems ],
 		};
 
-		const currentTabIds = new Set( currentTabs.map( ( t ) => t.clientId ) );
+		const currentTabIds = new Set( tabs.map( ( t ) => t.clientId ) );
 		const currentMenuItemIds = new Set(
-			currentMenuItems.map( ( m ) => m.clientId )
+			menuItems.map( ( m ) => m.clientId )
 		);
 
 		if ( tabCountChange < 0 ) {
@@ -172,7 +164,7 @@ export default function useTabMenuSync( {
 		} else if ( tabsInserted ) {
 			// A tab was pasted or duplicated — insert matching menu items.
 			const prevTabIds = new Set( prevTabs.map( ( t ) => t.clientId ) );
-			const newMenuItems = currentTabs
+			const newMenuItems = tabs
 				.map( ( tab, tabIndex ) =>
 					! prevTabIds.has( tab.clientId )
 						? {
@@ -203,7 +195,7 @@ export default function useTabMenuSync( {
 			const prevMenuItemIds = new Set(
 				prevMenuItems.map( ( m ) => m.clientId )
 			);
-			const newTabs = currentMenuItems
+			const newTabs = menuItems
 				.map( ( menuItem, menuItemIndex ) => {
 					if ( prevMenuItemIds.has( menuItem.clientId ) ) {
 						return null;
