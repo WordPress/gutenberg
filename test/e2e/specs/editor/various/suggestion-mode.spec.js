@@ -50,6 +50,37 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( 'plus suggested' );
 	} );
 
+	test( 'captures non-text attribute changes (heading level)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Change level' } )
+			.click();
+		await page.getByRole( 'radio', { name: 'Heading 3' } ).click();
+
+		// Overlay should have captured the level change — the serialized
+		// post content stays at H2 because the block-editor store was never
+		// written.
+		await expect( heading ).toBeVisible();
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<!-- wp:heading' );
+		expect( serialized ).not.toContain( '"level":3' );
+	} );
+
 	test( 'restores baseline when switching back to Edit intent', async ( {
 		editor,
 		page,
