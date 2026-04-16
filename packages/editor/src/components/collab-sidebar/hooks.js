@@ -62,9 +62,9 @@ export function useBlockComments( postId ) {
 	}, [] );
 
 	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
 		// Single pass over clientIds: build clientId->noteId map AND reverse lookup.
@@ -106,7 +106,7 @@ export function useBlockComments( postId ) {
 		}
 
 		if ( rootThreads.length === 0 ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
 		// Single partition over notes-in-block-order.
@@ -132,14 +132,14 @@ export function useBlockComments( postId ) {
 		);
 
 		return {
-			resultComments: [ ...unresolved, ...resolved, ...orphans ],
-			unresolvedSortedThreads: unresolved,
+			notes: [ ...unresolved, ...resolved, ...orphans ],
+			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return {
-		resultComments,
-		unresolvedSortedThreads,
+		notes,
+		unresolvedNotes,
 	};
 }
 
