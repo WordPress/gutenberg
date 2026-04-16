@@ -3,6 +3,8 @@
  */
 import {
 	operationsFromOverlay,
+	applyOperations,
+	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
 } from '../provider';
@@ -95,6 +97,40 @@ describe( 'operationsFromOverlay', () => {
 	} );
 } );
 
+describe( 'applyOperations', () => {
+	it( 'applies attribute-set operations to produce new attributes', () => {
+		const result = applyOperations(
+			{ content: 'Hello', level: 2, align: 'left' },
+			[
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'Hello',
+					after: 'Hi',
+				},
+				{
+					type: 'attribute-set',
+					attribute: 'level',
+					before: 2,
+					after: 3,
+				},
+			]
+		);
+		expect( result ).toEqual( {
+			content: 'Hi',
+			level: 3,
+			align: 'left',
+		} );
+	} );
+
+	it( 'returns a copy even when operations are empty', () => {
+		const attrs = { content: 'Same' };
+		const result = applyOperations( attrs, [] );
+		expect( result ).toEqual( attrs );
+		expect( result ).not.toBe( attrs );
+	} );
+} );
+
 describe( 'payloadByteLength', () => {
 	it( 'measures ASCII payload byte length', () => {
 		// {"a":"hello"} is 13 bytes.
@@ -109,5 +145,37 @@ describe( 'payloadByteLength', () => {
 	it( 'exposes a numeric size cap', () => {
 		expect( PAYLOAD_MAX_BYTES ).toBeGreaterThan( 0 );
 		expect( typeof PAYLOAD_MAX_BYTES ).toBe( 'number' );
+	} );
+} );
+
+describe( 'parseSuggestionPayload', () => {
+	it( 'parses a valid JSON payload', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 1,
+			blockName: 'core/paragraph',
+			baseRevision: '2026-04-15T00:00:00',
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.operations ).toHaveLength( 1 );
+		expect( result.blockName ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'returns null for missing, empty, or invalid input', () => {
+		expect( parseSuggestionPayload( undefined ) ).toBeNull();
+		expect( parseSuggestionPayload( '' ) ).toBeNull();
+		expect( parseSuggestionPayload( 'not json' ) ).toBeNull();
+		expect( parseSuggestionPayload( '42' ) ).toBeNull();
+		expect(
+			parseSuggestionPayload( JSON.stringify( { noOps: true } ) )
+		).toBeNull();
 	} );
 } );
