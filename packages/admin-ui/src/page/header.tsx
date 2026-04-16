@@ -55,7 +55,7 @@ export default function Header( {
 						<Text
 							className={ styles[ 'header-title' ] }
 							render={ <HeadingTag /> }
-							variant="body-lg"
+							variant="heading-lg"
 						>
 							{ title }
 						</Text>
