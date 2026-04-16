@@ -301,7 +301,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				// requests that carry document updates. Awareness-only polls
 				// still represent an active participant whose capabilities
 				// must be considered when computing shared room permissions.
-				$this->storage->track_contributor( $room, get_current_user_id() );
+				if ( method_exists( $this->storage, 'track_contributor' ) ) {
+					$this->storage->track_contributor( $room, get_current_user_id() );
+				}
 
 				// Merge awareness state.
 				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
@@ -605,7 +607,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// in the room share a given RTC-related ability. The client uses
 			// these to decide things like whether to sanitize remote CRDT
 			// changes before writing them to the local entity store.
-			$contributors = $this->storage->get_contributors( $room );
+			$contributors = method_exists( $this->storage, 'get_contributors' )
+				? $this->storage->get_contributors( $room )
+				: array();
 
 			$permissions = array(
 				'unfiltered_html' => $this->all_contributors_have_cap(
