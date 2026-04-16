@@ -213,14 +213,8 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		};
 	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
-	/**
-	 * Block props for the tabs container.
-	 */
 	const blockProps = useBlockProps();
 
-	/**
-	 * Innerblocks props for the tabs container.
-	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
