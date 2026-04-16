@@ -375,28 +375,34 @@ export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
+	// Defer rect reads + offset calculation to a rAF so rapid-fire
+	// changes (ResizeObserver, selection, threads) coalesce into one recalc.
 	useEffect( () => {
 		if ( ! isFloating ) {
 			return;
 		}
 
-		const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
-			threads,
-			selectedNoteId,
-			blockRects: store.getBlockRects(),
-			heights,
+		const rafId = window.requestAnimationFrame( () => {
+			const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
+				threads,
+				selectedNoteId,
+				blockRects: store.getBlockRects(),
+				heights,
+			} );
+			if ( Object.keys( newOffsets ).length > 0 ) {
+				setBoardOffsets( newOffsets );
+			}
+			setCanvasMinHeight( minHeight );
 		} );
-		if ( Object.keys( newOffsets ).length > 0 ) {
-			setBoardOffsets( newOffsets );
-		}
-		setCanvasMinHeight( minHeight );
+
+		return () => window.cancelAnimationFrame( rafId );
 	}, [
 		heights,
 		isFloating,
-		threads,
 		selectedNoteId,
 		setCanvasMinHeight,
 		store,
+		threads,
 	] );
 
 	return {
