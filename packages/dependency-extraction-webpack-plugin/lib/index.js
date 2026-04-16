@@ -2,9 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
-const webpack = require( 'webpack' );
 const json2php = require( 'json2php' );
-const { createHash } = webpack.util;
 
 /**
  * Internal dependencies
@@ -14,9 +12,6 @@ const {
 	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 } = require( './util' );
-
-const { RawSource } = webpack.sources;
-const { AsyncDependenciesBlock } = webpack;
 
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
@@ -147,12 +142,13 @@ class DependencyExtractionWebpackPlugin {
 	/** @type {webpack.WebpackPluginInstance['apply']} */
 	apply( compiler ) {
 		this.useModules = Boolean( compiler.options.output?.module );
+		const { webpack } = compiler;
 
 		/**
 		 * Offload externalization work to the ExternalsPlugin.
 		 * @type {webpack.ExternalsPlugin}
 		 */
-		this.externalsPlugin = new compiler.webpack.ExternalsPlugin(
+		this.externalsPlugin = new webpack.ExternalsPlugin(
 			this.useModules ? 'import' : 'window',
 			this.externalizeWpDeps.bind( this )
 		);
@@ -165,7 +161,7 @@ class DependencyExtractionWebpackPlugin {
 				compilation.hooks.processAssets.tap(
 					{
 						name: this.constructor.name,
-						stage: compiler.webpack.Compilation
+						stage: webpack.Compilation
 							.PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY,
 					},
 					() => this.checkForMagicComments( compilation )
@@ -173,8 +169,7 @@ class DependencyExtractionWebpackPlugin {
 				compilation.hooks.processAssets.tap(
 					{
 						name: this.constructor.name,
-						stage: compiler.webpack.Compilation
-							.PROCESS_ASSETS_STAGE_ANALYSE,
+						stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ANALYSE,
 					},
 					() => this.addAssets( compilation )
 				);
@@ -246,6 +241,10 @@ class DependencyExtractionWebpackPlugin {
 			outputFormat,
 			outputFilename,
 		} = this.options;
+
+		const { webpack } = compilation.compiler;
+		const { RawSource } = webpack.sources;
+		const { createHash } = webpack.util;
 
 		// Dump actually externalized dependencies to a report file.
 		if ( externalizedReport ) {
@@ -492,6 +491,9 @@ class DependencyExtractionWebpackPlugin {
 			);
 			return true;
 		}
+
+		const { webpack } = compilation.compiler;
+		const { AsyncDependenciesBlock } = webpack;
 
 		const staticDependentModules = incomingConnections.flatMap(
 			( connection ) => {
