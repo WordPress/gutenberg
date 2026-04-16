@@ -282,13 +282,37 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
+	useFeaturedImage,
+	onToggleFeaturedImage,
 } ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
 
-	const { id, title, url } = style?.background?.backgroundImage || {
+	const featuredImageData = useSelect( ( select ) => {
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		// eslint-disable-next-line @wordpress/data-no-store-string-literals
+		const { getMedia } = select( 'core' );
+
+		const featuredMediaId = getEditedPostAttribute( 'featured_media' );
+
+		return featuredMediaId ? getMedia( featuredMediaId ) : null;
+	}, [] );
+
+	const { id, title, url, featuredImage } = style?.background
+		?.backgroundImage || {
 		...inheritedValue?.background?.backgroundImage,
 	};
+	const useFeaturedImageValue =
+		typeof useFeaturedImage !== 'undefined'
+			? useFeaturedImage
+			: !! featuredImage;
+
+	const displayUrl =
+		useFeaturedImageValue && featuredImageData?.source_url
+			? featuredImageData.source_url
+			: url;
+
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
@@ -303,6 +327,39 @@ function BackgroundImageControls( {
 				undefined
 			)
 		);
+
+	const toggleFeaturedImage = () => {
+		const currentBackgroundImage =
+			style?.background?.backgroundImage &&
+			typeof style.background.backgroundImage === 'object'
+				? style.background.backgroundImage
+				: {};
+
+		const nextValue = ! useFeaturedImageValue;
+
+		if ( nextValue && featuredImageData?.source_url ) {
+			onChange(
+				setImmutably( style, [ 'background', 'backgroundImage' ], {
+					url: featuredImageData.source_url,
+					id: featuredImageData.id,
+					source: 'featured',
+					title: featuredImageData.title?.rendered,
+					featuredImage: true,
+				} )
+			);
+			return;
+		}
+
+		onChange(
+			setImmutably( style, [ 'background', 'backgroundImage' ], {
+				...currentBackgroundImage,
+				featuredImage: false,
+			} )
+		);
+	};
+
+	const onToggleFeaturedImageHandler =
+		onToggleFeaturedImage || toggleFeaturedImage;
 
 	const onSelectMedia = ( media ) => {
 		if ( ! media || ! media.url ) {
@@ -382,16 +439,18 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel = title || getFilename( url ) || __( 'Image' );
+	const imgLabel = title || getFilename( displayUrl ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
 			{ isUploading && <LoadingSpinner /> }
 			<MediaReplaceFlow
 				mediaId={ id }
-				mediaURL={ url }
+				mediaURL={ displayUrl }
 				allowedTypes={ [ IMAGE_BACKGROUND_TYPE ] }
 				accept="image/*"
+				useFeaturedImage={ useFeaturedImageValue }
+				onToggleFeaturedImage={ onToggleFeaturedImageHandler }
 				onSelect={ onSelectMedia }
 				popoverProps={ {
 					className: clsx( {
@@ -401,7 +460,7 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						imgUrl={ url }
+						imgUrl={ displayUrl }
 						filename={ title }
 						label={ imgLabel }
 					/>
@@ -657,6 +716,8 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceEnabled(),
+	useFeaturedImage,
+	onToggleFeaturedImage,
 } ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -762,6 +823,8 @@ export default function BackgroundImagePanel( {
 							onRemoveImage={ () => setIsDropDownOpen( false ) }
 							defaultValues={ defaultValues }
 							containerRef={ containerRef }
+							useFeaturedImage={ useFeaturedImage }
+							onToggleFeaturedImage={ onToggleFeaturedImage }
 						/>
 						<BackgroundSizeControls
 							onChange={ onChange }
@@ -783,6 +846,8 @@ export default function BackgroundImagePanel( {
 					} }
 					onRemoveImage={ () => setIsDropDownOpen( false ) }
 					containerRef={ containerRef }
+					useFeaturedImage={ useFeaturedImage }
+					onToggleFeaturedImage={ onToggleFeaturedImage }
 				/>
 			) }
 		</div>
