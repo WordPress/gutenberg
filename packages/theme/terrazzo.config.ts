@@ -64,6 +64,8 @@ const config: Config = {
 				) {
 					return '499';
 				}
+
+				return undefined;
 			},
 			baseSelector: ':root',
 			modeSelectors: [
