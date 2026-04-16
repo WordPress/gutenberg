@@ -1078,22 +1078,22 @@ export const switchEditorMode =
  * (`suggest`), or viewing the post in a read-only mode (`view`). It is
  * orthogonal to the `editorMode` preference (visual vs. code).
  *
+ * The intent is *session-scoped* — reloading the editor always returns to
+ * `edit`. Persisting suggest/view across reloads surprises users who don't
+ * realize they left the editor in a non-default state.
+ *
  * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
  */
 export const setEditorIntent =
 	( intent ) =>
-	( { registry } ) => {
+	( { select, dispatch, registry } ) => {
 		if ( ! EDITOR_INTENTS.includes( intent ) ) {
 			return;
 		}
 
-		const previousIntent = registry
-			.select( preferencesStore )
-			.get( 'core', 'editorIntent' );
+		const previousIntent = select.getEditorIntent();
 
-		registry
-			.dispatch( preferencesStore )
-			.set( 'core', 'editorIntent', intent );
+		dispatch( { type: 'SET_EDITOR_INTENT', intent } );
 
 		// Skip the snackbar/announcement on the initial set (when there is no
 		// previous intent, e.g. during editor boot) so the user isn't greeted
