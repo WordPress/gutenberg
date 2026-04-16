@@ -1065,6 +1065,36 @@ export const switchEditorMode =
 	};
 
 /**
+ * Sets the current editor intent.
+ *
+ * The intent represents the user's editing purpose: directly editing content
+ * (`edit`), suggesting changes that the author can apply or reject
+ * (`suggest`), or viewing the post in a read-only mode (`view`). It is
+ * orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
+ */
+export const setEditorIntent =
+	( intent ) =>
+	( { registry } ) => {
+		if ( intent !== 'edit' && intent !== 'suggest' && intent !== 'view' ) {
+			return;
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'editorIntent', intent );
+
+		if ( intent === 'edit' ) {
+			speak( __( 'Edit mode selected' ), 'assertive' );
+		} else if ( intent === 'suggest' ) {
+			speak( __( 'Suggest mode selected' ), 'assertive' );
+		} else if ( intent === 'view' ) {
+			speak( __( 'View mode selected' ), 'assertive' );
+		}
+	};
+
+/**
  * Returns an action object used in signalling that the user opened the publish
  * sidebar.
  *

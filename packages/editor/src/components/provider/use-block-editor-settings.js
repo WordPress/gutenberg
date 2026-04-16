@@ -129,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		focusMode,
 		hasFixedToolbar,
 		isDistractionFree,
+		isViewIntent,
 		keepCaretInsideBlock,
 		hasUploadPermissions,
 		hiddenBlockTypes,
@@ -199,6 +200,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					get( 'core', 'fixedToolbar' ) || ! isLargeViewport,
 				hiddenBlockTypes: get( 'core', 'hiddenBlockTypes' ),
 				isDistractionFree: get( 'core', 'distractionFree' ),
+				isViewIntent: get( 'core', 'editorIntent' ) === 'view',
 				keepCaretInsideBlock: get( 'core', 'keepCaretInsideBlock' ),
 				hasUploadPermissions:
 					canUser( 'create', {
@@ -403,13 +405,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
-		if ( isRevisionsMode ) {
+		if ( isRevisionsMode || isViewIntent ) {
 			blockEditorSettings.isPreviewMode = true;
 		}
 
 		return blockEditorSettings;
 	}, [
 		isRevisionsMode,
+		isViewIntent,
 		allowedBlockTypes,
 		allowRightClickOverrides,
 		focusMode,
