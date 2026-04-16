@@ -455,4 +455,241 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'reopen'   => array( 'reopen' ),
 		);
 	}
+
+	/**
+	 * Test that a suggestion payload can be stored and retrieved via meta.
+	 */
+	public function test_create_note_with_suggestion_meta() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$payload = wp_json_encode(
+			array(
+				'schemaVersion' => 1,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => '2026-04-15T00:00:00',
+				'operations'    => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'before'    => 'Hello',
+						'after'     => 'Hello world',
+					),
+				),
+			)
+		);
+
+		$params = array(
+			'post'    => $post_id,
+			'content' => '',
+			'type'    => 'note',
+			'author'  => self::$editor_id,
+			'meta'    => array(
+				'_wp_suggestion' => $payload,
+			),
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertSame( $payload, $data['meta']['_wp_suggestion'] );
+		$this->assertSame( '', $data['meta']['_wp_suggestion_status'] );
+	}
+
+	/**
+	 * Test that an editor can update a note they did not author (edit_post check).
+	 */
+	public function test_editor_can_update_note_on_own_post() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		// Admin creates a note on editor's post.
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$admin_id,
+				'comment_content'  => 'suggestion note',
+			)
+		);
+
+		// Editor (post author) updates the note they did not author.
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertSame( 'applied', $data['meta']['_wp_suggestion_status'] );
+	}
+
+	/**
+	 * Test that a subscriber cannot update a note on someone else's post.
+	 */
+	public function test_subscriber_cannot_update_note() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+				'user_id'         => self::$editor_id,
+				'comment_content' => 'a suggestion',
+			)
+		);
+
+		// Subscriber tries to update the note.
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'rejected',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that _wp_suggestion_status does not persist invalid enum values.
+	 */
+	public function test_suggestion_status_ignores_invalid_value() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+			)
+		);
+
+		// First set a valid value.
+		update_comment_meta( $comment_id, '_wp_suggestion_status', 'pending' );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion_status' => 'invalid_value',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		// Even if the request succeeds, the invalid value should not
+		// overwrite the existing valid value.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion_status', true );
+		$this->assertSame( 'pending', $stored );
+	}
+
+	/**
+	 * Test that a subscriber cannot apply a suggestion even if the request
+	 * only touches the suggestion-lifecycle fields.
+	 */
+	public function test_subscriber_cannot_apply_suggestion() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => '',
+			)
+		);
+
+		wp_set_current_user( self::$subscriber_id );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'status' => 'approved',
+					'meta'   => array(
+						'_wp_suggestion_status' => 'applied',
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
+
+	/**
+	 * Test that an editor cannot rewrite the content of a note they did
+	 * not author — even on their own post. The suggestion-lifecycle
+	 * shortcut should not expand their permissions beyond applying/rejecting.
+	 */
+	public function test_editor_cannot_rewrite_foreign_note_content() {
+		wp_set_current_user( self::$admin_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$admin_id,
+				'comment_content'  => 'original content',
+			)
+		);
+
+		wp_set_current_user( self::$editor_id );
+
+		// Include a `content` field in addition to the lifecycle fields.
+		// The override should refuse because content is outside the
+		// suggestion-lifecycle allowed fields, falling back to core's
+		// edit_comment check — which the editor doesn't satisfy for
+		// admin-authored notes.
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'content' => 'rewritten',
+					'status'  => 'approved',
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+	}
 }
