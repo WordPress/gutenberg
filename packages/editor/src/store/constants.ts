@@ -37,3 +37,18 @@ export const DESIGN_POST_TYPES = [
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 ];
+
+/**
+ * Editor intent values. The intent represents the user's current editing
+ * purpose (edit the post directly, suggest changes, or view in read-only).
+ * It is orthogonal to the `editorMode` preference (visual vs. code).
+ */
+export const EDITOR_INTENT_EDIT = 'edit';
+export const EDITOR_INTENT_SUGGEST = 'suggest';
+export const EDITOR_INTENT_VIEW = 'view';
+export const EDITOR_INTENTS = [
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+] as const;
+export type EditorIntent = ( typeof EDITOR_INTENTS )[ number ];

@@ -120,6 +120,36 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/intent-edit',
+			category: 'global',
+			description: __( 'Switch to Edit mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-suggest',
+			category: 'global',
+			description: __( 'Switch to Suggest mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'x',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/editor/intent-view',
+			category: 'global',
+			description: __( 'Switch to View mode.' ),
+			keyCombination: {
+				modifier: 'secondary',
+				character: 'c',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),

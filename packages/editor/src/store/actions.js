@@ -30,6 +30,12 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+import {
+	EDITOR_INTENTS,
+	EDITOR_INTENT_EDIT,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
+} from './constants';
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -1061,6 +1067,36 @@ export const switchEditorMode =
 				dispatch.toggleDistractionFree();
 			}
 			speak( __( 'Code editor selected' ), 'assertive' );
+		}
+	};
+
+/**
+ * Sets the current editor intent.
+ *
+ * The intent represents the user's editing purpose: directly editing content
+ * (`edit`), suggesting changes that the author can apply or reject
+ * (`suggest`), or viewing the post in a read-only mode (`view`). It is
+ * orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
+ */
+export const setEditorIntent =
+	( intent ) =>
+	( { registry } ) => {
+		if ( ! EDITOR_INTENTS.includes( intent ) ) {
+			return;
+		}
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'editorIntent', intent );
+
+		if ( intent === EDITOR_INTENT_EDIT ) {
+			speak( __( 'Edit mode selected' ), 'assertive' );
+		} else if ( intent === EDITOR_INTENT_SUGGEST ) {
+			speak( __( 'Suggest mode selected' ), 'assertive' );
+		} else if ( intent === EDITOR_INTENT_VIEW ) {
+			speak( __( 'View mode selected' ), 'assertive' );
 		}
 	};
 
