@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -296,9 +297,10 @@ export default function PostTemplateEdit( {
 			return;
 		}
 
-		const hasLayoutChanged =
-			JSON.stringify( previousLayoutRef.current ) !==
-			JSON.stringify( layout );
+		const hasLayoutChanged = ! fastDeepEqual(
+			previousLayoutRef.current,
+			layout
+		);
 
 		if (
 			hasLayoutChanged &&
