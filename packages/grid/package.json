@@ -1,0 +1,45 @@
+{
+	"name": "@wordpress/grid",
+	"version": "0.1.0",
+	"description": "Grid component with drag-and-drop reordering and resize for dashboard layouts.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"grid",
+		"dashboard"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/grid/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/grid"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types/index.d.ts",
+	"sideEffects": false,
+	"dependencies": {
+		"@dnd-kit/core": "^6.3.1",
+		"@dnd-kit/sortable": "^10.0.0",
+		"@dnd-kit/utilities": "^3.2.2",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/element": "file:../element"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0",
+		"react-dom": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
