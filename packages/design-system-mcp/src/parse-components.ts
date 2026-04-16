@@ -34,6 +34,21 @@ export function packageNameFromPath( storyPath: string ): string | null {
 }
 
 /**
+ * For components exported as a namespace (e.g. `AlertDialog`, with members
+ * `AlertDialog.Root`, `AlertDialog.Trigger`, etc.), the manifest lists the
+ * primary entry under a dotted name like `AlertDialog.Root`. The canonical
+ * name we expose is the top-level identifier a consumer actually imports,
+ * which is the portion before the first dot. For simple components (e.g.
+ * `Button`), this is a no-op.
+ *
+ * @param name - The component name from the manifest.
+ * @return The top-level importable identifier.
+ */
+function canonicalComponentName( name: string ): string {
+	return name.split( '.', 1 )[ 0 ];
+}
+
+/**
  * Parse props from a component's reactDocgen data, filtering out
  * deprecated and ignored props.
  *
@@ -82,7 +97,7 @@ export function parseComponents(
 ): Component[] {
 	return Object.values( components )
 		.map( ( component ) => ( {
-			name: component.name,
+			name: canonicalComponentName( component.name ),
 			description: component.description || '',
 			packageName: packageNameFromPath( component.path ),
 		} ) )
@@ -105,17 +120,18 @@ export function parseComponentDetail(
 	name: string
 ): ComponentDetail | null {
 	for ( const component of Object.values( components ) ) {
-		if ( component.name.toLowerCase() !== name.toLowerCase() ) {
+		const canonicalName = canonicalComponentName( component.name );
+		if ( canonicalName.toLowerCase() !== name.toLowerCase() ) {
 			continue;
 		}
 
 		const pkg = packageNameFromPath( component.path );
 		if ( pkg ) {
 			return {
-				name: component.name,
+				name: canonicalName,
 				description: component.description || '',
 				packageName: pkg,
-				importStatement: `import { ${ component.name } } from '${ pkg }';`,
+				importStatement: `import { ${ canonicalName } } from '${ pkg }';`,
 				props: parseProps( component.reactDocgen?.props || {} ),
 				stories: component.stories || [],
 			};

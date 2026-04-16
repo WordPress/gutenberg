@@ -203,6 +203,24 @@ describe( 'parseComponents', () => {
 		const result = parseComponents( components );
 		expect( result[ 0 ].description ).toBe( 'A badge component.' );
 	} );
+
+	it( 'should use the root identifier as the canonical name for compound components', () => {
+		const components = createComponents( {
+			'alert-dialog': {
+				name: 'AlertDialog.Root',
+				description: 'An alert dialog.',
+				path: '../packages/ui/src/alert-dialog/stories/index.story.tsx',
+			},
+		} );
+
+		expect( parseComponents( components ) ).toEqual( [
+			{
+				name: 'AlertDialog',
+				description: 'An alert dialog.',
+				packageName: '@wordpress/ui',
+			},
+		] );
+	} );
 } );
 
 describe( 'parseComponentDetail', () => {
@@ -326,5 +344,23 @@ describe( 'parseComponentDetail', () => {
 		expect(
 			parseComponentDetail( components, 'ThemeProvider' )
 		).toBeNull();
+	} );
+
+	it( 'should return detail for a compound component by its root identifier', () => {
+		const components = createComponents( {
+			'alert-dialog': {
+				name: 'AlertDialog.Root',
+				description: 'An alert dialog.',
+				path: '../packages/ui/src/alert-dialog/stories/index.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'AlertDialog' );
+		expect( result ).toEqual(
+			expect.objectContaining( {
+				name: 'AlertDialog',
+				importStatement: "import { AlertDialog } from '@wordpress/ui';",
+			} )
+		);
 	} );
 } );
