@@ -581,9 +581,9 @@ function poll(): void {
 				// Signal current shared-contributor permissions before processing
 				// document updates, so the sync manager can decide whether to
 				// sanitize remote changes.
-				roomState.onPermissionsChange( {
-					unfilteredHtml: room.permissions?.unfiltered_html ?? true,
-				} );
+				const unfilteredHtml =
+					room.permissions?.unfiltered_html === true;
+				roomState.onPermissionsChange( { unfilteredHtml } );
 
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );

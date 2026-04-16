@@ -264,7 +264,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			handlers,
 			objectId,
 			objectType,
-			permissions: { unfilteredHtml: true },
+			permissions: { unfilteredHtml: false },
 			syncConfig,
 			unload,
 			ydoc,

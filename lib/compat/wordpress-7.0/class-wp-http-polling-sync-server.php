@@ -605,17 +605,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// in the room share a given RTC-related ability. The client uses
 			// these to decide things like whether to sanitize remote CRDT
 			// changes before writing them to the local entity store.
-			$permissions = array(
-				'unfiltered_html' => true,
-			);
-
 			$contributors = $this->storage->get_contributors( $room );
-			foreach ( $contributors as $contributor_id ) {
-				if ( ! user_can( $contributor_id, 'unfiltered_html' ) ) {
-					$permissions['unfiltered_html'] = false;
-					break;
-				}
-			}
+
+			$permissions = array(
+				'unfiltered_html' => $this->all_contributors_have_cap(
+					$contributors,
+					'unfiltered_html'
+				),
+			);
 
 			return array(
 				'end_cursor'     => $this->storage->get_cursor( $room ),
@@ -625,6 +622,28 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				'total_updates'  => $total_updates,
 				'updates'        => $typed_updates,
 			);
+		}
+
+		/**
+		 * Determines whether every tracked contributor in a room holds a
+		 * given capability.
+		 *
+		 * @param int[]  $contributors WordPress user IDs tracked for the room.
+		 * @param string $capability   Capability name (e.g. 'unfiltered_html').
+		 * @return bool True only when the list is non-empty and every user has the cap.
+		 */
+		private function all_contributors_have_cap( array $contributors, string $capability ): bool {
+			if ( empty( $contributors ) ) {
+				return false;
+			}
+
+			foreach ( $contributors as $contributor_id ) {
+				if ( ! user_can( $contributor_id, $capability ) ) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 	}
 }

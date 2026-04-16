@@ -601,7 +601,7 @@ describe( 'polling-manager', () => {
 			} );
 		} );
 
-		it( 'defaults permissions to true when absent from response', async () => {
+		it( 'defaults permissions to false when absent from response', async () => {
 			mockPostSyncUpdate.mockResolvedValue( syncResponse );
 
 			const onPermissionsChange = jest.fn();
@@ -619,7 +619,43 @@ describe( 'polling-manager', () => {
 			await jest.advanceTimersByTimeAsync( 0 );
 
 			expect( onPermissionsChange ).toHaveBeenCalledWith( {
-				unfilteredHtml: true,
+				unfilteredHtml: false,
+			} );
+		} );
+
+		it( 'defaults permissions to false for non-boolean values', async () => {
+			// A malformed response from a future or buggy server should not
+			// be silently treated as trusted.
+			mockPostSyncUpdate.mockResolvedValue( {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: {},
+						updates: [],
+						permissions: {
+							unfiltered_html: 'true' as unknown as boolean,
+						},
+					},
+				],
+			} );
+
+			const onPermissionsChange = jest.fn();
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+				onPermissionsChange,
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( onPermissionsChange ).toHaveBeenCalledWith( {
+				unfilteredHtml: false,
 			} );
 		} );
 	} );
