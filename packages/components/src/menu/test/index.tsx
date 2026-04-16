@@ -353,6 +353,15 @@ describe( 'Menu', () => {
 				expect( screen.getByRole( 'menu' ) ).toHaveFocus()
 			);
 
+			const expectFocusedMenuItem = ( name: string ) =>
+				waitFor( () =>
+					expect(
+						screen.getByRole( 'menuitem', {
+							name,
+						} )
+					).toHaveFocus()
+				);
+
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa
 			await press.ArrowDown();
@@ -392,11 +401,7 @@ describe( 'Menu', () => {
 
 			// Arrow right/left can be used to enter/leave submenus
 			await press.ArrowRight();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu item 1',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowDown();
 			expect(
@@ -406,40 +411,20 @@ describe( 'Menu', () => {
 			).toHaveFocus();
 
 			await press.ArrowLeft();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu trigger item' );
 
 			// Spacebar or enter key can also be used to enter a submenu
 			await press.Enter();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu item 1',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowLeft();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu trigger item' );
 
 			await press.Space();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu item 1',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowLeft();
-			expect(
-				screen.getByRole( 'menuitem', {
-					name: 'Submenu trigger item',
-				} )
-			).toHaveFocus();
+			await expectFocusedMenuItem( 'Submenu trigger item' );
 		} );
 
 		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
