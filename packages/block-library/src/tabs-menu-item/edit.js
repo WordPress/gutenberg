@@ -22,11 +22,7 @@ import Controls from './controls';
 
 const EMPTY_ARRAY = [];
 
-function Edit( {
-	context,
-	clientId,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function Edit( { context, clientId } ) {
 	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
@@ -118,7 +114,7 @@ function Edit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: clsx( layoutClassNames, {
+		className: clsx( {
 			'is-active': isActive,
 			'is-selected': isSelected,
 		} ),

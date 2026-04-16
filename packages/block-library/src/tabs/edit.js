@@ -49,12 +49,7 @@ const TABS_TEMPLATE = [
 	],
 ];
 
-function Edit( {
-	clientId,
-	attributes,
-	setAttributes,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**
@@ -221,9 +216,7 @@ function Edit( {
 	/**
 	 * Block props for the tabs container.
 	 */
-	const blockProps = useBlockProps( {
-		className: layoutClassNames,
-	} );
+	const blockProps = useBlockProps();
 
 	/**
 	 * Innerblocks props for the tabs container.

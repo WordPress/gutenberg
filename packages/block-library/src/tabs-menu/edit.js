@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -19,7 +14,7 @@ import { useSelect } from '@wordpress/data';
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
-function Edit( { clientId, __unstableLayoutClassNames: layoutClassNames } ) {
+function Edit( { clientId } ) {
 	const { tabsClientId } = useSelect(
 		( select ) => ( {
 			tabsClientId:
@@ -28,9 +23,7 @@ function Edit( { clientId, __unstableLayoutClassNames: layoutClassNames } ) {
 		[ clientId ]
 	);
 
-	const blockProps = useBlockProps( {
-		className: clsx( layoutClassNames ),
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/tabs-menu-item' ],

@@ -26,12 +26,7 @@ const TEMPLATE = [
 
 const { cancelAnimationFrame } = window;
 
-export default function Edit( {
-	clientId,
-	context,
-	isSelected,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+export default function Edit( { clientId, context, isSelected } ) {
 	const focusRef = useRef();
 
 	// Consume tab indices from context
@@ -131,7 +126,6 @@ export default function Edit( {
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
 		tabIndex: isSelectedTab ? 0 : -1,
-		className: layoutClassNames,
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {

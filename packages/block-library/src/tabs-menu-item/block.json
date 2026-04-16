@@ -48,9 +48,6 @@
 			"color": true,
 			"width": true,
 			"style": true
-		},
-		"layout": {
-			"allowEditing": false
 		}
 	},
 	"editorScript": "file:./index.js",
