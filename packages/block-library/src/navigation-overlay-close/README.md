@@ -14,9 +14,9 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `displayMode` | `string` | `"icon"` | Enum: `icon`, `text`, `both` |
+| `displayMode` | `string` | `"icon"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
 | `text` | `string` | — | — |
 
 ## Supports

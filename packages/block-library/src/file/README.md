@@ -14,17 +14,17 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `id` | `number` | — | — |
-| `blob` | `string` | — | Role: `local` |
-| `href` | `string` | — | Role: `content` |
-| `fileId` | `string` | — | Source: `attribute`. Selector: `a:not([download])`. HTML attr: `id` |
-| `fileName` | `rich-text` | — | Source: `rich-text`. Selector: `a:not([download])`. Role: `content` |
-| `textLinkHref` | `string` | — | Source: `attribute`. Selector: `a:not([download])`. HTML attr: `href`. Role: `content` |
-| `textLinkTarget` | `string` | — | Source: `attribute`. Selector: `a:not([download])`. HTML attr: `target` |
+| `blob` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
+| `href` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `fileId` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a:not([download])`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `id` |
+| `fileName` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a:not([download])`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `textLinkHref` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a:not([download])`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `href`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `textLinkTarget` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a:not([download])`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `target` |
 | `showDownloadButton` | `boolean` | `true` | — |
-| `downloadButtonText` | `rich-text` | — | Source: `rich-text`. Selector: `a[download]`. Role: `content` |
+| `downloadButtonText` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a[download]`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `displayPreview` | `boolean` | — | — |
 | `previewHeight` | `number` | `600` | — |
 

@@ -17,12 +17,12 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `openByDefault` | `boolean` | `false` | — |
-| `title` | `rich-text` | — | Source: `rich-text`. Selector: `.wp-block-accordion-heading__toggle-title`. Role: `content` |
+| `title` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-accordion-heading__toggle-title`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `level` | `number` | — | — |
-| `iconPosition` | `string` | `"right"` | Enum: `left`, `right` |
+| `iconPosition` | `string` | `"right"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `left`, `right` |
 | `showIcon` | `boolean` | `true` | — |
 
 ## Supports

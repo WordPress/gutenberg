@@ -14,15 +14,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `blob` | `string` | — | Role: `local` |
-| `src` | `string` | — | Source: `attribute`. Selector: `audio`. HTML attr: `src`. Role: `content` |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
-| `id` | `number` | — | Role: `content` |
-| `autoplay` | `boolean` | — | Source: `attribute`. Selector: `audio`. HTML attr: `autoplay` |
-| `loop` | `boolean` | — | Source: `attribute`. Selector: `audio`. HTML attr: `loop` |
-| `preload` | `string` | — | Source: `attribute`. Selector: `audio`. HTML attr: `preload` |
+| `blob` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
+| `src` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `audio`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `src`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figcaption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `id` | `number` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `autoplay` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `audio`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `autoplay` |
+| `loop` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `audio`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `loop` |
+| `preload` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `audio`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `preload` |
 
 ## Supports
 

@@ -12,13 +12,13 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `level` | `number` | `2` | — |
 | `levelOptions` | `array` | — | — |
-| `isLink` | `boolean` | `false` | Role: `content` |
-| `rel` | `string` | `""` | HTML attr: `rel`. Role: `content` |
-| `linkTarget` | `string` | `"_self"` | Role: `content` |
+| `isLink` | `boolean` | `false` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `rel` | `string` | `""` | [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `rel`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `linkTarget` | `string` | `"_self"` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `placeholder` | `string` | — | — |
 
 ## Supports

@@ -40,11 +40,11 @@ Starting from WordPress 6.9, it's possible to add custom social icons to your si
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `url` | `string` | — | Role: `content` |
+| `url` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `service` | `string` | — | — |
-| `label` | `string` | — | Role: `content` |
+| `label` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `rel` | `string` | — | — |
 
 ## Supports

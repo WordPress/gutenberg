@@ -14,18 +14,18 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `blob` | `string` | — | Role: `local` |
-| `url` | `string` | — | Source: `attribute`. Selector: `img`. HTML attr: `src`. Role: `content` |
-| `alt` | `string` | `""` | Source: `attribute`. Selector: `img`. HTML attr: `alt`. Role: `content` |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
+| `blob` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
+| `url` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `img`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `src`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `alt` | `string` | `""` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `img`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `alt`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figcaption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `lightbox` | `object` | — | — |
-| `title` | `string` | — | Source: `attribute`. Selector: `img`. HTML attr: `title`. Role: `content` |
-| `href` | `string` | — | Source: `attribute`. Selector: `figure > a`. HTML attr: `href`. Role: `content` |
-| `rel` | `string` | — | Source: `attribute`. Selector: `figure > a`. HTML attr: `rel` |
-| `linkClass` | `string` | — | Source: `attribute`. Selector: `figure > a`. HTML attr: `class` |
-| `id` | `number` | — | Role: `content` |
+| `title` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `img`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `title`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `href` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure > a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `href`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `rel` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure > a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `rel` |
+| `linkClass` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure > a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `class` |
+| `id` | `number` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `width` | `string` | — | — |
 | `height` | `string` | — | — |
 | `aspectRatio` | `string` | — | — |
@@ -33,7 +33,7 @@ _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-a
 | `focalPoint` | `object` | — | — |
 | `sizeSlug` | `string` | — | — |
 | `linkDestination` | `string` | — | — |
-| `linkTarget` | `string` | — | Source: `attribute`. Selector: `figure > a`. HTML attr: `target` |
+| `linkTarget` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure > a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `target` |
 
 ## Supports
 

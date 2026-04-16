@@ -14,20 +14,20 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `align` | `string` | `"none"` | — |
-| `mediaAlt` | `string` | `""` | Source: `attribute`. Selector: `figure img`. HTML attr: `alt`. Role: `content` |
+| `mediaAlt` | `string` | `""` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure img`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `alt`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `mediaPosition` | `string` | `"left"` | — |
-| `mediaId` | `number` | — | Role: `content` |
-| `mediaUrl` | `string` | — | Source: `attribute`. Selector: `figure video,figure img`. HTML attr: `src`. Role: `content` |
+| `mediaId` | `number` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `mediaUrl` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure video,figure img`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `src`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `mediaLink` | `string` | — | — |
 | `linkDestination` | `string` | — | — |
-| `linkTarget` | `string` | — | Source: `attribute`. Selector: `figure a`. HTML attr: `target` |
-| `href` | `string` | — | Source: `attribute`. Selector: `figure a`. HTML attr: `href`. Role: `content` |
-| `rel` | `string` | — | Source: `attribute`. Selector: `figure a`. HTML attr: `rel` |
-| `linkClass` | `string` | — | Source: `attribute`. Selector: `figure a`. HTML attr: `class` |
-| `mediaType` | `string` | — | Role: `content` |
+| `linkTarget` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `target` |
+| `href` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `href`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `rel` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `rel` |
+| `linkClass` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figure a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `class` |
+| `mediaType` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `mediaWidth` | `number` | `50` | — |
 | `mediaSizeSlug` | `string` | — | — |
 | `isStackedOnMobile` | `boolean` | `true` | — |

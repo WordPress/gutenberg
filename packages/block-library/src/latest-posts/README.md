@@ -14,7 +14,7 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `categories` | `array` | — | — |
 | `selectedAuthor` | `number` | — | — |
@@ -29,7 +29,7 @@ _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-a
 | `order` | `string` | `"desc"` | — |
 | `orderBy` | `string` | `"date"` | — |
 | `displayFeaturedImage` | `boolean` | `false` | — |
-| `featuredImageAlign` | `string` | — | Enum: `left`, `center`, `right` |
+| `featuredImageAlign` | `string` | — | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `left`, `center`, `right` |
 | `featuredImageSizeSlug` | `string` | `"thumbnail"` | — |
 | `featuredImageSizeWidth` | `number` | `null` | — |
 | `featuredImageSizeHeight` | `number` | `null` | — |

@@ -17,11 +17,11 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `verticalAlignment` | `string` | — | — |
 | `isStackedOnMobile` | `boolean` | `true` | — |
-| `templateLock` | `string \| boolean` | — | Enum: `all`, `insert`, `contentOnly`, `false` |
+| `templateLock` | `string \| boolean` | — | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `all`, `insert`, `contentOnly`, `false` |
 
 ## Supports
 

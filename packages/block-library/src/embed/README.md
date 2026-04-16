@@ -12,15 +12,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `url` | `string` | — | Role: `content` |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
-| `type` | `string` | — | Role: `content` |
-| `providerNameSlug` | `string` | — | Role: `content` |
+| `url` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figcaption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `type` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `providerNameSlug` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `allowResponsive` | `boolean` | `true` | — |
-| `responsive` | `boolean` | `false` | Role: `content` |
-| `previewable` | `boolean` | `true` | Role: `content` |
+| `responsive` | `boolean` | `false` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `previewable` | `boolean` | `true` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

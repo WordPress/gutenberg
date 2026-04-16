@@ -14,7 +14,7 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `taxonomy` | `string` | `"category"` | — |
 | `displayAsDropdown` | `boolean` | `false` | — |
@@ -22,7 +22,7 @@ _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-a
 | `showPostCounts` | `boolean` | `false` | — |
 | `showOnlyTopLevel` | `boolean` | `false` | — |
 | `showEmpty` | `boolean` | `false` | — |
-| `label` | `string` | — | Role: `content` |
+| `label` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `showLabel` | `boolean` | `true` | — |
 
 ## Supports

@@ -43,7 +43,7 @@ The structural CSS for the navigation block targets generic classnames across me
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `ref` | `number` | — | — |
 | `textColor` | `string` | — | — |
@@ -53,7 +53,7 @@ _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-a
 | `customBackgroundColor` | `string` | — | — |
 | `rgbBackgroundColor` | `string` | — | — |
 | `showSubmenuIcon` | `boolean` | `true` | — |
-| `submenuVisibility` | `string` | `"hover"` | Enum: `hover`, `click`, `always` |
+| `submenuVisibility` | `string` | `"hover"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `hover`, `click`, `always` |
 | `overlayMenu` | `string` | `"mobile"` | — |
 | `overlay` | `string` | — | — |
 | `icon` | `string` | `"handle"` | — |
@@ -64,7 +64,7 @@ _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-a
 | `overlayTextColor` | `string` | — | — |
 | `customOverlayTextColor` | `string` | — | — |
 | `maxNestingLevel` | `number` | `5` | — |
-| `templateLock` | `string \| boolean` | — | Enum: `all`, `insert`, `contentOnly`, `false` |
+| `templateLock` | `string \| boolean` | — | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `all`, `insert`, `contentOnly`, `false` |
 
 ## Supports
 

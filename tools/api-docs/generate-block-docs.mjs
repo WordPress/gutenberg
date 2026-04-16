@@ -42,6 +42,30 @@ const SOURCE_URL_BASE =
 	'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/';
 
 /**
+ * Reference path and heading anchors for the Block Attributes docs page.
+ *
+ * Keep anchors in sync with the headings in
+ * docs/reference-guides/block-api/block-attributes.md.
+ * The validateAttributeAnchors() helper warns at generation time if any
+ * anchor listed here no longer exists in that file.
+ */
+const ATTRIBUTES_REF =
+	'/block-editor/reference-guides/block-api/block-attributes/';
+const ATTRIBUTE_ANCHORS = {
+	type: 'type-validation',
+	default: 'default-value',
+	source: 'value-source',
+	selector: 'value-source',
+	attribute: 'attribute-source',
+	enum: 'enum-validation',
+	role: 'role',
+};
+const ATTRIBUTES_DOC_PATH = path.join(
+	ROOT_DIR,
+	'docs/reference-guides/block-api/block-attributes.md'
+);
+
+/**
  * Human-readable labels for block categories.
  */
 const CATEGORY_LABELS = {
@@ -102,6 +126,57 @@ function getBlockFiles( blockDir ) {
 	};
 }
 
+// ─── Anchor validation ──────────────────────────────────────────────────────
+
+/**
+ * Slugify a Markdown heading the same way most renderers do.
+ *
+ * @param {string} heading Raw heading text (without the leading `#` marks).
+ * @return {string} Slug suitable for use as an anchor.
+ */
+function slugifyHeading( heading ) {
+	return heading
+		.toLowerCase()
+		.trim()
+		.replace( /[^\w\s-]/g, '' )
+		.replace( /\s+/g, '-' );
+}
+
+/**
+ * Read block-attributes.md, extract heading anchors, and warn if any anchor
+ * in ATTRIBUTE_ANCHORS no longer matches a heading in the file.
+ */
+function validateAttributeAnchors() {
+	if ( ! fs.existsSync( ATTRIBUTES_DOC_PATH ) ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`⚠  Cannot validate attribute anchors: ${ ATTRIBUTES_DOC_PATH } not found.`
+		);
+		return;
+	}
+
+	const content = fs.readFileSync( ATTRIBUTES_DOC_PATH, 'utf-8' );
+	const anchors = new Set(
+		Array.from(
+			content.matchAll( /^#{1,6}\s+(.+)$/gm ),
+			( m ) => slugifyHeading( m[ 1 ] )
+		)
+	);
+
+	const expectedAnchors = [
+		...new Set( Object.values( ATTRIBUTE_ANCHORS ) ),
+	];
+	for ( const anchor of expectedAnchors ) {
+		if ( ! anchors.has( anchor ) ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`⚠  Attribute anchor "#${ anchor }" not found in block-attributes.md. ` +
+					`Update ATTRIBUTE_ANCHORS in generate-block-docs.mjs.`
+			);
+		}
+	}
+}
+
 // ─── Formatting helpers ─────────────────────────────────────────────────────
 
 /**
@@ -115,8 +190,11 @@ function formatAttributesTable( attributes ) {
 		return '_This block has no custom attributes._';
 	}
 
+	const attrLink = ( label, anchor ) =>
+		`[${ label }](${ ATTRIBUTES_REF }#${ ATTRIBUTE_ANCHORS[ anchor ] })`;
+
 	const rows = [
-		'| Attribute | Type | Default | Description |',
+		`| Attribute | ${ attrLink( 'Type', 'type' ) } | ${ attrLink( 'Default', 'default' ) } | Description |`,
 		'|-----------|------|---------|-------------|',
 	];
 
@@ -131,23 +209,31 @@ function formatAttributesTable( attributes ) {
 
 		const descParts = [];
 		if ( attrDef.source ) {
-			descParts.push( `Source: \`${ attrDef.source }\`` );
+			descParts.push(
+				`${ attrLink( 'Source', 'source' ) }: \`${ attrDef.source }\``
+			);
 		}
 		if ( attrDef.selector ) {
-			descParts.push( `Selector: \`${ attrDef.selector }\`` );
+			descParts.push(
+				`${ attrLink( 'Selector', 'selector' ) }: \`${ attrDef.selector }\``
+			);
 		}
 		if ( attrDef.attribute ) {
-			descParts.push( `HTML attr: \`${ attrDef.attribute }\`` );
+			descParts.push(
+				`${ attrLink( 'HTML attr', 'attribute' ) }: \`${ attrDef.attribute }\``
+			);
 		}
 		if ( attrDef.enum ) {
 			descParts.push(
-				`Enum: ${ attrDef.enum
+				`${ attrLink( 'Enum', 'enum' ) }: ${ attrDef.enum
 					.map( ( v ) => `\`${ v }\`` )
 					.join( ', ' ) }`
 			);
 		}
 		if ( attrDef.role ) {
-			descParts.push( `Role: \`${ attrDef.role }\`` );
+			descParts.push(
+				`${ attrLink( 'Role', 'role' ) }: \`${ attrDef.role }\``
+			);
 		}
 
 		const desc = descParts.length > 0 ? descParts.join( '. ' ) : '—';
@@ -295,14 +381,15 @@ function formatContext( usesContext, providesContext ) {
  */
 function blockLink( blockName ) {
 	const slug = blockName.replace( 'core/', '' );
-	const blockJsonPath = path.join( BLOCK_LIBRARY_DIR, slug, 'block.json' );
+	const blockJsonExists = fs.existsSync(
+		path.join( BLOCK_LIBRARY_DIR, slug, 'block.json' )
+	);
 
-	if ( ! fs.existsSync( blockJsonPath ) ) {
+	if ( ! blockJsonExists ) {
 		return `\`${ blockName }\``;
 	}
 
-	const json = JSON.parse( fs.readFileSync( blockJsonPath, 'utf-8' ) );
-	const category = json.category || 'uncategorized';
+	const { category = 'uncategorized' } = readBlockJson( slug );
 	const url = `/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ slug }/`;
 	return `[\`${ blockName }\`](${ url })`;
 }
@@ -736,6 +823,8 @@ function generateCategoryPage( category, label, blocks ) {
 }
 
 // ─── Main ───────────────────────────────────────────────────────────────────
+
+validateAttributeAnchors();
 
 const blockDirs = getBlockDirs();
 
