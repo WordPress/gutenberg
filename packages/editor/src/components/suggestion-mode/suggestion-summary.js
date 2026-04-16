@@ -37,6 +37,93 @@ const FORMAT_ATTRIBUTE_LABELS = {
 };
 
 /**
+ * Mapping of inline HTML tags — as emitted by RichText serialization — to
+ * human-readable format names. The key is the lower-cased tag name; the
+ * value is what appears in a "Formatting:" line. Tags not in this map are
+ * reported by their raw name (``<mark>`` → "mark") so a future rich-text
+ * format isn't silently swallowed.
+ */
+const INLINE_FORMAT_TAG_LABELS = {
+	strong: __( 'bold' ),
+	b: __( 'bold' ),
+	em: __( 'italic' ),
+	i: __( 'italic' ),
+	u: __( 'underline' ),
+	s: __( 'strikethrough' ),
+	del: __( 'strikethrough' ),
+	strike: __( 'strikethrough' ),
+	code: __( 'code' ),
+	mark: __( 'highlight' ),
+	a: __( 'link' ),
+	sub: __( 'subscript' ),
+	sup: __( 'superscript' ),
+	kbd: __( 'keyboard' ),
+};
+
+const TAG_REGEX = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
+
+/**
+ * Strip HTML tags from a string, leaving only the visible text. Used to
+ * decide whether a content change is purely a formatting change (same
+ * visible text wrapped in different markup) or a real text edit.
+ *
+ * @param {string} html Possibly-HTML content.
+ * @return {string} The visible text, with whitespace collapsed.
+ */
+function stripTags( html ) {
+	return html
+		.replace( /<[^>]*>/g, '' )
+		.replace( /&nbsp;/gi, ' ' )
+		.replace( /\s+/g, ' ' )
+		.trim();
+}
+
+/**
+ * Count occurrences of each opening tag in an HTML string. Self-closing
+ * and void tags (e.g. `<br>`) are counted the same way as paired tags
+ * since we only care about presence, not balance.
+ *
+ * @param {string} html Possibly-HTML content.
+ * @return {Map<string, number>} Tag name → count.
+ */
+function countTags( html ) {
+	const counts = new Map();
+	let match;
+	TAG_REGEX.lastIndex = 0;
+	while ( ( match = TAG_REGEX.exec( html ) ) !== null ) {
+		const name = match[ 1 ].toLowerCase();
+		counts.set( name, ( counts.get( name ) ?? 0 ) + 1 );
+	}
+	return counts;
+}
+
+/**
+ * Diff the tag usage between two HTML strings. Returns a set of format
+ * names (mapped via `INLINE_FORMAT_TAG_LABELS`) whose count differs, which
+ * indicates an inline format was added or removed regardless of direction.
+ *
+ * @param {string} before HTML before the edit.
+ * @param {string} after  HTML after the edit.
+ * @return {string[]} Ordered, deduplicated list of changed format labels.
+ */
+function diffInlineFormats( before, after ) {
+	const beforeCounts = countTags( before );
+	const afterCounts = countTags( after );
+	const changed = new Set();
+	const tags = new Set( [ ...beforeCounts.keys(), ...afterCounts.keys() ] );
+	for ( const tag of tags ) {
+		if (
+			( beforeCounts.get( tag ) ?? 0 ) === ( afterCounts.get( tag ) ?? 0 )
+		) {
+			continue;
+		}
+		const label = INLINE_FORMAT_TAG_LABELS[ tag ] ?? tag;
+		changed.add( label );
+	}
+	return Array.from( changed );
+}
+
+/**
  * Join an array of label strings with a comma, using `__()`-friendly
  * punctuation. Deduplicated and lowercased for display.
  *
@@ -105,11 +192,12 @@ export function summarizeOperations( operations ) {
 	}
 
 	const lines = [];
-	const formatAttributes = [];
+	const attributeLabels = [];
+	const formattingLabels = [];
 
 	for ( const op of operations ) {
 		if ( op.type !== 'attribute-set' ) {
-			formatAttributes.push( op.attribute );
+			attributeLabels.push( op.attribute );
 			continue;
 		}
 
@@ -117,30 +205,51 @@ export function summarizeOperations( operations ) {
 		const canTextDiff =
 			isContent && isTextLike( op.before ) && isTextLike( op.after );
 
-		if ( canTextDiff ) {
-			const { inserted, deleted } = textDelta(
-				op.before ?? '',
-				op.after ?? ''
-			);
-			if ( inserted ) {
-				lines.push( { label: __( 'Add:' ), value: `“${ inserted }”` } );
+		if ( ! canTextDiff ) {
+			attributeLabels.push( op.attribute );
+			continue;
+		}
+
+		const before = op.before ?? '';
+		const after = op.after ?? '';
+
+		// A pure inline-format change produces identical visible text with
+		// different markup — surface it as "Formatting: bold" rather than
+		// leaking raw `<strong>…</strong>` into an Add/Delete quote.
+		if ( stripTags( before ) === stripTags( after ) && before !== after ) {
+			const changedFormats = diffInlineFormats( before, after );
+			if ( changedFormats.length > 0 ) {
+				formattingLabels.push( ...changedFormats );
+			} else {
+				attributeLabels.push( op.attribute );
 			}
-			if ( deleted ) {
-				lines.push( {
-					label: __( 'Delete:' ),
-					value: `“${ deleted }”`,
-				} );
-			}
-			if ( ! inserted && ! deleted ) {
-				formatAttributes.push( op.attribute );
-			}
-		} else {
-			formatAttributes.push( op.attribute );
+			continue;
+		}
+
+		const { inserted, deleted } = textDelta( before, after );
+		if ( inserted ) {
+			lines.push( { label: __( 'Add:' ), value: `“${ inserted }”` } );
+		}
+		if ( deleted ) {
+			lines.push( {
+				label: __( 'Delete:' ),
+				value: `“${ deleted }”`,
+			} );
+		}
+		if ( ! inserted && ! deleted ) {
+			attributeLabels.push( op.attribute );
 		}
 	}
 
-	if ( formatAttributes.length > 0 ) {
-		const labels = formatAttributes.map(
+	if ( formattingLabels.length > 0 ) {
+		lines.push( {
+			label: __( 'Formatting:' ),
+			value: joinLabels( formattingLabels ),
+		} );
+	}
+
+	if ( attributeLabels.length > 0 ) {
+		const labels = attributeLabels.map(
 			( key ) => FORMAT_ATTRIBUTE_LABELS[ key ] ?? key
 		);
 		lines.push( { label: __( 'Format:' ), value: joinLabels( labels ) } );
