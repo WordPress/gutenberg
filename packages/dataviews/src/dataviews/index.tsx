@@ -22,6 +22,7 @@ import { Stack } from '@wordpress/ui';
  */
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
+import { getRegisteredLayout } from '../components/dataviews-layouts/registry';
 import {
 	Filters,
 	FiltersToggled,
@@ -260,7 +261,12 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
-	if ( ! defaultLayouts[ view.type ] ) {
+	// Built-ins must be opted into via defaultLayouts; registered layouts
+	// (via registerLayout) are global and don't require a defaultLayouts entry.
+	const isKnownBuiltIn =
+		!! defaultLayouts[ view.type as keyof typeof defaultLayouts ];
+	const isRegistered = !! getRegisteredLayout( view.type );
+	if ( ! isKnownBuiltIn && ! isRegistered ) {
 		return null;
 	}
 

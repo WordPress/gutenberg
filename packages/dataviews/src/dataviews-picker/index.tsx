@@ -222,7 +222,9 @@ function DataViewsPicker< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
-	if ( ! defaultLayouts[ view.type ] ) {
+	// Picker only supports built-in layouts. The cast restores the narrowing
+	// that ViewCustom's addition to the View union took away.
+	if ( ! defaultLayouts[ view.type as keyof typeof defaultLayouts ] ) {
 		return null;
 	}
 

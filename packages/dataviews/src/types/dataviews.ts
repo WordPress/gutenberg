@@ -342,13 +342,26 @@ export interface ViewPickerTable extends ViewBase {
 	};
 }
 
+/**
+ * Layouts registered at runtime via `registerLayout()` opt in to this
+ * permissive variant. The `type` field is anything that isn't a built-in
+ * DataViews layout type, and `layout` is whatever shape the registered
+ * component chooses to read. Intentionally loose — narrowing is the
+ * responsibility of the registered layout's own component.
+ */
+export interface ViewCustom extends ViewBase {
+	type: string;
+	layout?: Record< string, any >;
+}
+
 export type View =
 	| ViewList
 	| ViewGrid
 	| ViewTable
 	| ViewPickerGrid
 	| ViewPickerTable
-	| ViewActivity;
+	| ViewActivity
+	| ViewCustom;
 
 interface ActionBase< Item > {
 	/**
