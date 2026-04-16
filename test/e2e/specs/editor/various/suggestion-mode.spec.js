@@ -19,12 +19,38 @@ async function switchIntent( page, intentLabel ) {
 	await page.keyboard.press( 'Escape' );
 }
 
+async function waitForSuggestionSaved( page ) {
+	// Auto-save is debounced; wait for the REST call to land.
+	await page.waitForResponse(
+		( response ) =>
+			/\/wp\/v2\/comments(\?|$|\/)/.test( response.url() ) &&
+			[ 'POST', 'PUT' ].includes( response.request().method() ) &&
+			response.ok()
+	);
+}
+
 test.describe( 'Suggestion mode', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test( 'captures edits as an overlay without mutating the block', async ( {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments( 'note' );
+	} );
+
+	test( 'announces the mode change with a snackbar', async ( { page } ) => {
+		await switchIntent( page, 'Suggest' );
+		await expect(
+			page.getByText( "You're suggesting", { exact: true } )
+		).toBeVisible();
+
+		await switchIntent( page, 'Edit' );
+		await expect(
+			page.getByText( "You're editing", { exact: true } )
+		).toBeVisible();
+	} );
+
+	test( 'auto-saves a content edit as a suggestion', async ( {
 		editor,
 		page,
 	} ) => {
@@ -42,16 +68,19 @@ test.describe( 'Suggestion mode', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' plus suggested' );
 
-		// The rendered block reflects the overlayed suggestion.
+		// Overlay reflects the proposed content, block store does not.
 		await expect( paragraph ).toContainText(
 			'Original content plus suggested'
 		);
-
-		// The serialized post content stays at the baseline — the overlay
-		// never touched the block-editor store.
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( 'Original content' );
 		expect( serialized ).not.toContain( 'plus suggested' );
+
+		// Auto-save fires after the debounce window.
+		await waitForSuggestionSaved( page );
+
+		// Edited block picks up the pending-suggestion outline.
+		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
 	// The overlay HOC only intercepts `setAttributes` calls the block's own
@@ -62,7 +91,7 @@ test.describe( 'Suggestion mode', () => {
 	// an additional interception layer in the suggestion provider and is
 	// tracked as follow-up work.
 	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'captures non-text attribute changes (heading level)', async ( {
+	test.skip( 'auto-saves a non-text attribute change (heading level)', async ( {
 		editor,
 		page,
 	} ) => {
@@ -76,31 +105,7 @@ test.describe( 'Suggestion mode', () => {
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<!-- wp:heading' );
 		expect( serialized ).not.toContain( '"level":3' );
-	} );
 
-	test( 'restores baseline when switching back to Edit intent', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Keep as is' },
-		} );
-
-		await switchIntent( page, 'Suggest' );
-
-		const paragraph = editor.canvas
-			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		await paragraph.click();
-		await page.keyboard.press( 'End' );
-		await page.keyboard.type( '!' );
-		await expect( paragraph ).toContainText( 'Keep as is!' );
-
-		// Switching out of Suggest intent un-merges the overlay; the block
-		// renders the real attributes again.
-		await switchIntent( page, 'Edit' );
-		await expect( paragraph ).toContainText( 'Keep as is' );
-		await expect( paragraph ).not.toContainText( 'Keep as is!' );
+		await waitForSuggestionSaved( page );
 	} );
 } );

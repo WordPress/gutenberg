@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { check, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ import {
 	parseSuggestionPayload,
 	useSuggestionsProvider,
 } from '../suggestion-mode';
-import SuggestionDiff from '../suggestion-mode/suggestion-diff';
+import SuggestionSummary from '../suggestion-mode/suggestion-summary';
 import { store as editorStore } from '../../store';
 
 /**
@@ -115,7 +116,7 @@ export default function SuggestionActions( { thread } ) {
 
 	return (
 		<VStack spacing="2" className="editor-collab-sidebar-panel__suggestion">
-			<SuggestionDiff operations={ payload.operations } />
+			<SuggestionSummary operations={ payload.operations } />
 			{ isResolved ? (
 				<Text variant="muted" size="12px">
 					{ suggestionStatus === APPLIED
@@ -129,25 +130,25 @@ export default function SuggestionActions( { thread } ) {
 							{ applyDisabledReason }
 						</Text>
 					) }
-					<HStack spacing="2" justify="flex-start">
+					<HStack spacing="1" justify="flex-start">
 						<Button
-							variant="primary"
 							size="small"
+							icon={ check }
+							label={ __( 'Accept suggestion' ) }
+							showTooltip
 							disabled={ applyDisabled }
 							accessibleWhenDisabled
 							onClick={ onApplyClick }
-						>
-							{ __( 'Apply' ) }
-						</Button>
+						/>
 						<Button
-							variant="secondary"
 							size="small"
+							icon={ close }
+							label={ __( 'Reject suggestion' ) }
+							showTooltip
 							disabled={ busy }
 							accessibleWhenDisabled
 							onClick={ onReject }
-						>
-							{ __( 'Reject' ) }
-						</Button>
+						/>
 					</HStack>
 				</>
 			) }

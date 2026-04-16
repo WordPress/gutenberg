@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -131,10 +136,49 @@ const withSuggestionOverlay = createHigherOrderComponent(
 	'withSuggestionOverlay'
 );
 
+/**
+ * HOC that tags the rendered block list item with a class whenever it has a
+ * pending suggestion overlay. The class is the hook for the "bracket"
+ * styling that makes edited blocks discoverable without relying on the
+ * block toolbar being visible.
+ */
+const withSuggestionBlockClassName = createHigherOrderComponent(
+	( BlockListBlock ) =>
+		function BlockListBlockWithSuggestionClass( props ) {
+			const { clientId } = props;
+			const { entries } = useSuggestionOverlay();
+			const isSuggestMode = useSelect(
+				( select ) =>
+					select( EDITOR_STORE_NAME ).getEditorIntent?.() ===
+					'suggest',
+				[]
+			);
+			const entry = entries[ clientId ];
+			const hasPendingOverlay =
+				!! entry &&
+				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
+
+			if ( ! isSuggestMode || ! hasPendingOverlay ) {
+				return <BlockListBlock { ...props } />;
+			}
+
+			return (
+				<BlockListBlock
+					{ ...props }
+					className={ clsx(
+						props.className,
+						'is-suggestion-pending'
+					) }
+				/>
+			);
+		},
+	'withSuggestionBlockClassName'
+);
+
 let filterRegistered = false;
 
 /**
- * Register the overlay filter. Idempotent — safe to call multiple times
+ * Register the overlay filters. Idempotent — safe to call multiple times
  * (hot reload, dynamic imports).
  */
 export function registerSuggestionOverlayFilter() {
@@ -146,6 +190,11 @@ export function registerSuggestionOverlayFilter() {
 		'editor.BlockEdit',
 		'core/editor/suggestion-mode-overlay',
 		withSuggestionOverlay
+	);
+	addFilter(
+		'editor.BlockListBlock',
+		'core/editor/suggestion-mode-block-class',
+		withSuggestionBlockClassName
 	);
 }
 
