@@ -12,6 +12,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import {
+	useState,
 	useEffect,
 	useMemo,
 	useCallback,
@@ -33,7 +34,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
-import { noop } from './utils';
+import { calculateAllOffsets, noop } from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -366,26 +367,69 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
+export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
+	const [ heights, setHeights ] = useState( {} );
+	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+	const [ blockRefs, setBlockRefs ] = useState( {} );
+
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+
+	const registerThread = useCallback( ( id, el ) => {
+		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: el } ) );
+	}, [] );
+
+	const reportHeight = useCallback( ( id, newHeight ) => {
+		setHeights( ( prev ) => {
+			if ( prev[ id ] !== newHeight ) {
+				return { ...prev, [ id ]: newHeight };
+			}
+			return prev;
+		} );
+	}, [] );
+
+	useEffect( () => {
+		if ( ! isFloating ) {
+			return;
+		}
+
+		// Batch all rect reads before any writes to avoid layout thrashing.
+		const blockRects = Object.fromEntries(
+			Object.entries( blockRefs ).flatMap( ( [ id, el ] ) =>
+				el ? [ [ id, el.getBoundingClientRect() ] ] : []
+			)
+		);
+
+		const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
+			threads,
+			selectedNoteId,
+			blockRects,
+			heights,
+		} );
+		if ( Object.keys( newOffsets ).length > 0 ) {
+			setBoardOffsets( newOffsets );
+		}
+		setCanvasMinHeight( minHeight );
+	}, [
+		heights,
+		blockRefs,
+		isFloating,
+		threads,
+		selectedNoteId,
+		setCanvasMinHeight,
+	] );
+
+	return { boardOffsets, registerThread, reportHeight };
+}
+
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
-	setHeights,
+	reportHeight,
 	selectedThread,
-	setBlockRef,
+	registerThread,
 	commentLastUpdated,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
-	const updateHeight = useCallback(
-		( id, newHeight ) => {
-			setHeights( ( prev ) => {
-				if ( prev[ id ] !== newHeight ) {
-					return { ...prev, [ id ]: newHeight };
-				}
-				return prev;
-			} );
-		},
-		[ setHeights ]
-	);
 
 	// Use floating-ui to track the block element's position with the calculated offset.
 	const { y, refs } = useFloating( {
@@ -405,22 +449,22 @@ export function useFloatingThread( {
 		}
 	}, [ blockElement, refs, commentLastUpdated ] );
 
-	// Track thread heights.
+	// Register the block element so the board can read its rect.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
-			setBlockRef( thread.id, blockElement );
+			registerThread( thread.id, blockElement );
 		}
-	}, [ blockElement, thread.id, refs.floating, setBlockRef ] );
+	}, [ blockElement, thread.id, refs.floating, registerThread ] );
 
-	// When the selected thread changes, update heights, triggering offset recalculation.
+	// When the selected thread changes, report height to trigger offset recalculation.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
-			updateHeight( thread.id, newHeight );
+			reportHeight( thread.id, newHeight );
 		}
 	}, [
 		thread.id,
-		updateHeight,
+		reportHeight,
 		refs.floating,
 		selectedThread,
 		commentLastUpdated,
