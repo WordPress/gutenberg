@@ -746,17 +746,18 @@ export function prepareItem( id: QueueItemId ) {
 			file.type
 		);
 
+		const { imageOutputFormats } = settings;
+		const isJxl = file.type === 'image/jxl';
+		const outputMimeType = imageOutputFormats?.[ file.type ];
+
 		// JXL requires the wp-vips-jxl canonical plugin for the WASM module.
 		// If the input is JXL and the plugin is unavailable, fall through
 		// to server-side processing. If only the output is JXL and the plugin
 		// is unavailable, skip JXL transcoding but still process client-side.
-		const isJxl = file.type === 'image/jxl';
 		let jxlAvailable = false;
 
-		if ( ( isJxl || isVipsSupported ) && self.crossOriginIsolated ) {
-			const { imageOutputFormats: formats } = settings;
-			const needsJxl = isJxl || formats?.[ file.type ] === 'image/jxl';
-
+		if ( isVipsSupported && self.crossOriginIsolated ) {
+			const needsJxl = isJxl || outputMimeType === 'image/jxl';
 			if ( needsJxl ) {
 				const jxlConfig = await ensureVipsJxlAvailable();
 				if ( jxlConfig ) {
@@ -772,13 +773,10 @@ export function prepareItem( id: QueueItemId ) {
 			isVipsSupported = false;
 		}
 
-		const { imageOutputFormats } = settings;
-
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
-			const outputMimeType = imageOutputFormats?.[ file.type ];
 			// Skip JXL transcoding if the plugin is not available.
 			if (
 				outputMimeType &&
