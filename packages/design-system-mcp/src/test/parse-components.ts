@@ -33,13 +33,29 @@ describe( 'packageNameFromPath', () => {
 } );
 
 describe( 'parseProps', () => {
-	it( 'should parse basic props', () => {
+	it( 'should parse props with readable type expressions', () => {
 		const result = parseProps( {
 			disabled: {
 				required: false,
 				tsType: { name: 'boolean' },
 				description: 'Whether the button is disabled.',
 				defaultValue: { value: 'false' },
+			},
+			variant: {
+				required: false,
+				tsType: {
+					name: 'union',
+					raw: "'solid' | 'outline' | 'minimal' | 'unstyled'",
+				},
+				description: 'The button variant.',
+			},
+			style: {
+				required: false,
+				tsType: {
+					name: 'ReactCSSProperties',
+					raw: 'React.CSSProperties',
+				},
+				description: 'Inline styles.',
 			},
 		} );
 
@@ -50,6 +66,20 @@ describe( 'parseProps', () => {
 				required: false,
 				description: 'Whether the button is disabled.',
 				defaultValue: 'false',
+			},
+			{
+				name: 'variant',
+				type: "'solid' | 'outline' | 'minimal' | 'unstyled'",
+				required: false,
+				description: 'The button variant.',
+				defaultValue: null,
+			},
+			{
+				name: 'style',
+				type: 'React.CSSProperties',
+				required: false,
+				description: 'Inline styles.',
+				defaultValue: null,
 			},
 		] );
 	} );

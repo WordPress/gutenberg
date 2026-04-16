@@ -61,7 +61,10 @@ export function parseProps(
 		} )
 		.map( ( [ propName, propInfo ] ) => ( {
 			name: propName,
-			type: propInfo.tsType?.name || 'unknown',
+			// Prefer `raw` when present, as it carries the source-authored type
+			// expression a consumer could use directly. Primitives emit only
+			// `name`, so fall back if `raw` is not present.
+			type: propInfo.tsType?.raw || propInfo.tsType?.name || 'unknown',
 			required: propInfo.required || false,
 			description: propInfo.description || '',
 			defaultValue: propInfo.defaultValue?.value ?? null,
