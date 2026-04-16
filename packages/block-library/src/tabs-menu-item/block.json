@@ -3,7 +3,7 @@
 	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs-menu-item",
-	"title": "Tab Menu Item",
+	"title": "Tab",
 	"description": "A single tab button in the tabs menu.",
 	"category": "design",
 	"textdomain": "default",

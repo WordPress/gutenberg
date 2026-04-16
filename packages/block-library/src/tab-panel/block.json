@@ -3,7 +3,7 @@
 	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab-panel",
-	"title": "Tab Panel",
+	"title": "Tab Panels",
 	"description": "Container for tab panel content in a tabbed interface.",
 	"category": "design",
 	"textdomain": "default",

@@ -3,7 +3,7 @@
 	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs-menu",
-	"title": "Tabs Menu",
+	"title": "Tab List",
 	"description": "Display the tab buttons for a tabbed interface.",
 	"category": "design",
 	"textdomain": "default",
