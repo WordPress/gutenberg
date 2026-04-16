@@ -20,20 +20,10 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 		openInNewTab = false,
 		render,
 		className,
-		onClick,
 		...props
 	},
 	ref
 ) {
-	const isInternalAnchor = !! props.href?.startsWith( '#' );
-
-	const handleClick = ( event: React.MouseEvent< HTMLAnchorElement > ) => {
-		if ( openInNewTab && isInternalAnchor ) {
-			event.preventDefault();
-		}
-		onClick?.( event );
-	};
-
 	const element = useRender( {
 		render,
 		defaultTagName: 'a',
@@ -49,7 +39,6 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				openInNewTab && styles[ 'has-link-icon' ],
 				className
 			),
-			onClick: handleClick,
 			target: openInNewTab ? '_blank' : undefined,
 			children: openInNewTab ? (
 				<>
