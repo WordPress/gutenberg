@@ -106,6 +106,13 @@ export default ( props ) => ( element ) => {
 		handleChange( change );
 	}
 
+	// Set to true by onFocus when the element was already selected. Tells
+	// the next handleSelectionChange call to restore the record's selection
+	// instead of accepting whatever the browser reports. This handles the
+	// case where a programmatic .focus() (e.g. returning from a popover)
+	// resets the browser selection to position 0.
+	let restoreSelectionOnFocus = false;
+
 	/**
 	 * Syncs the selection to local state. A callback for the `selectionchange`
 	 * event.
@@ -149,6 +156,7 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( start === oldRecord.start && end === oldRecord.end ) {
+			restoreSelectionOnFocus = false;
 			// Sometimes the browser may set the selection on the placeholder
 			// element, in which case the caret is not visible. We need to set
 			// the caret before the placeholder if that's the case.
@@ -157,6 +165,18 @@ export default ( props ) => ( element ) => {
 			}
 
 			return;
+		}
+
+		// After a programmatic .focus() call (e.g. returning from a
+		// popover), the browser may reset the selection to position 0.
+		// When the record has a valid selection that the browser lost,
+		// restore it instead of accepting the wrong DOM position.
+		if ( restoreSelectionOnFocus ) {
+			restoreSelectionOnFocus = false;
+			if ( oldRecord.start !== undefined ) {
+				applyRecord( oldRecord );
+				return;
+			}
 		}
 
 		const newValue = {
@@ -237,6 +257,9 @@ export default ( props ) => ( element ) => {
 			};
 		} else {
 			applyRecord( record.current, { domOnly: true } );
+			// Signal handleSelectionChange (deferred via microtask below)
+			// to restore the record's selection if the browser lost it.
+			restoreSelectionOnFocus = true;
 		}
 
 		onSelectionChange( record.current.start, record.current.end );
