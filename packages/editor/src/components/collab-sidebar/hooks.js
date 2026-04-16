@@ -66,105 +66,126 @@ export function useBlockComments( postId ) {
 	}, [] );
 
 	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
-		if ( ! threads || threads.length === 0 ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
-		}
-
-		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
-			if ( commentId ) {
-				results[ clientId ] = commentId;
+	const { resultComments, unresolvedSortedThreads, resolvedSortedThreads } =
+		useMemo( () => {
+			if ( ! threads || threads.length === 0 ) {
+				return {
+					resultComments: [],
+					unresolvedSortedThreads: [],
+					resolvedSortedThreads: [],
+				};
 			}
-			return results;
-		}, {} );
 
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
+			const blocksWithComments = clientIds.reduce(
+				( results, clientId ) => {
+					const commentId =
+						getBlockAttributes( clientId )?.metadata?.noteId;
+					if ( commentId ) {
+						results[ clientId ] = commentId;
+					}
+					return results;
+				},
+				{}
+			);
 
-		// Create a reverse map for faster lookup.
-		const commentIdToBlockClientId = Object.keys(
-			blocksWithComments
-		).reduce( ( mapping, clientId ) => {
-			mapping[ blocksWithComments[ clientId ] ] = clientId;
-			return mapping;
-		}, {} );
+			// Create a compare to store the references to all objects by id.
+			const compare = {};
+			const result = [];
 
-		// Initialize each object with an empty `reply` array and map blockClientId.
-		threads.forEach( ( item ) => {
-			const itemBlock = commentIdToBlockClientId[ item.id ];
+			// Create a reverse map for faster lookup.
+			const commentIdToBlockClientId = Object.keys(
+				blocksWithComments
+			).reduce( ( mapping, clientId ) => {
+				mapping[ blocksWithComments[ clientId ] ] = clientId;
+				return mapping;
+			}, {} );
 
-			compare[ item.id ] = {
+			// Initialize each object with an empty `reply` array and map blockClientId.
+			threads.forEach( ( item ) => {
+				const itemBlock = commentIdToBlockClientId[ item.id ];
+
+				compare[ item.id ] = {
+					...item,
+					reply: [],
+					blockClientId: item.parent === 0 ? itemBlock : null,
+				};
+			} );
+
+			// Iterate over the data to build the tree structure.
+			threads.forEach( ( item ) => {
+				if ( item.parent === 0 ) {
+					// If parent is 0, it's a root item, push it to the result array.
+					result.push( compare[ item.id ] );
+				} else if ( compare[ item.parent ] ) {
+					// Otherwise, find its parent and push it to the parent's `reply` array.
+					compare[ item.parent ].reply.push( compare[ item.id ] );
+				}
+			} );
+
+			if ( 0 === result?.length ) {
+				return {
+					resultComments: [],
+					unresolvedSortedThreads: [],
+					resolvedSortedThreads: [],
+				};
+			}
+
+			const updatedResult = result.map( ( item ) => ( {
 				...item,
-				reply: [],
-				blockClientId: item.parent === 0 ? itemBlock : null,
+				reply: [ ...item.reply ].reverse(),
+			} ) );
+
+			const threadIdMap = new Map(
+				updatedResult.map( ( thread ) => [
+					String( thread.id ),
+					thread,
+				] )
+			);
+
+			// Prepare sets to determine which threads are linked to existing blocks.
+			const mappedIds = new Set(
+				Object.values( blocksWithComments ).map( ( id ) =>
+					String( id )
+				)
+			);
+
+			// Get comments by block order, first unresolved, then resolved.
+			const unresolvedSortedComments = Object.values( blocksWithComments )
+				.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
+				.filter(
+					( thread ) =>
+						thread !== undefined && thread.status === 'hold'
+				);
+
+			const resolvedSortedComments = Object.values( blocksWithComments )
+				.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
+				.filter(
+					( thread ) =>
+						thread !== undefined && thread.status === 'approved'
+				);
+
+			// Append orphaned notes (whose related block was deleted or missing).
+			const orphanedComments = updatedResult.filter(
+				( thread ) => ! mappedIds.has( String( thread.id ) )
+			);
+
+			const allSortedComments = [
+				...unresolvedSortedComments,
+				...resolvedSortedComments,
+				...orphanedComments,
+			];
+
+			return {
+				resultComments: allSortedComments,
+				unresolvedSortedThreads: unresolvedSortedComments,
+				resolvedSortedThreads: resolvedSortedComments,
 			};
-		} );
-
-		// Iterate over the data to build the tree structure.
-		threads.forEach( ( item ) => {
-			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
-			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
-		}
-
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
-
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
-		);
-
-		// Prepare sets to determine which threads are linked to existing blocks.
-		const mappedIds = new Set(
-			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
-		);
-
-		// Get comments by block order, first unresolved, then resolved.
-		const unresolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) => thread !== undefined && thread.status === 'hold'
-			);
-
-		const resolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status === 'approved'
-			);
-
-		// Append orphaned notes (whose related block was deleted or missing).
-		const orphanedComments = updatedResult.filter(
-			( thread ) => ! mappedIds.has( String( thread.id ) )
-		);
-
-		const allSortedComments = [
-			...unresolvedSortedComments,
-			...resolvedSortedComments,
-			...orphanedComments,
-		];
-
-		return {
-			resultComments: allSortedComments,
-			unresolvedSortedThreads: unresolvedSortedComments,
-		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+		}, [ clientIds, threads, getBlockAttributes ] );
 
 	return {
 		resultComments,
 		unresolvedSortedThreads,
+		resolvedSortedThreads,
 		reflowComments,
 		commentLastUpdated,
 	};

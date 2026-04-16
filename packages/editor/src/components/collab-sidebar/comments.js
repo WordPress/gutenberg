@@ -24,7 +24,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDebounce } from '@wordpress/compose';
-
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';

@@ -37,8 +37,10 @@
 	}
 
 	&:focus {
-		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+		outline:
+			var(--wp-admin-border-width-focus) solid
+			var(--wp-admin-theme-color);
+		outline-offset: calc(( -1 * var(--wp-admin-border-width-focus) ));
 	}
 
 	&.is-floating {
@@ -183,4 +185,10 @@
 			font-size: $helptext-font-size;
 		}
 	}
+}
+
+// Appearance menu trigger
+.editor-collab-sidebar__appearance-button {
+	color: var(--wp-admin-theme-color);
+	flex-shrink: 0;
 }
