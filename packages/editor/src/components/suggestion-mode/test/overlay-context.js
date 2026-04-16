@@ -123,4 +123,48 @@ describe( 'overlayReducer', () => {
 		} );
 		expect( next ).toBe( state );
 	} );
+
+	it( 'isolates overlays between multiple blocks', () => {
+		// Two blocks both get baselines and overlays; each is tracked
+		// independently.
+		let state = overlayReducer( INITIAL, {
+			type: 'CAPTURE_BASELINE',
+			clientId: 'block-a',
+			blockName: 'core/paragraph',
+			attributes: { content: 'A-original' },
+		} );
+		state = overlayReducer( state, {
+			type: 'CAPTURE_BASELINE',
+			clientId: 'block-b',
+			blockName: 'core/heading',
+			attributes: { content: 'B-original', level: 2 },
+		} );
+		state = overlayReducer( state, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: 'block-a',
+			attributes: { content: 'A-proposed' },
+		} );
+		state = overlayReducer( state, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: 'block-b',
+			attributes: { level: 3 },
+		} );
+
+		expect( state[ 'block-a' ].overlayAttributes ).toEqual( {
+			content: 'A-proposed',
+		} );
+		expect( state[ 'block-b' ].overlayAttributes ).toEqual( { level: 3 } );
+		expect( state[ 'block-b' ].baselineAttributes ).toEqual( {
+			content: 'B-original',
+			level: 2,
+		} );
+
+		// Clearing one doesn't affect the other.
+		const afterClear = overlayReducer( state, {
+			type: 'CLEAR_OVERLAY',
+			clientId: 'block-a',
+		} );
+		expect( afterClear[ 'block-a' ] ).toBeUndefined();
+		expect( afterClear[ 'block-b' ] ).toEqual( state[ 'block-b' ] );
+	} );
 } );
