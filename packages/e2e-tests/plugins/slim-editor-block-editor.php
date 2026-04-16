@@ -56,7 +56,6 @@ function gutenberg_test_slim_editor_enqueue_scripts( $hook_suffix ) {
 	wp_enqueue_style( 'wp-edit-blocks' );
 	wp_enqueue_style( 'wp-components' );
 	wp_enqueue_style( 'wp-format-library' );
-
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_test_slim_editor_enqueue_scripts' );
 
