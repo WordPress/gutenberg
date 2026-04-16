@@ -24,7 +24,7 @@ const EMPTY_ARRAY = [];
 
 function Edit( { context, clientId } ) {
 	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
 	const effectiveActiveIndex = useMemo( () => {

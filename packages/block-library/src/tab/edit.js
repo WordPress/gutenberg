@@ -30,7 +30,7 @@ export default function Edit( { clientId, context, isSelected } ) {
 	const focusRef = useRef();
 
 	// Consume tab indices from context
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
