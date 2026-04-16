@@ -61,6 +61,10 @@
 		text-decoration: underline;
 		text-decoration-color: inherit;
 		text-decoration-thickness: 0.5px;
+
+		.is-unstyled & {
+			text-decoration: none;
+		}
 	}
 
 	.link-icon {
