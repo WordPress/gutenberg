@@ -115,7 +115,7 @@ export function parseComponentDetail(
 				name: component.name,
 				description: component.description || '',
 				packageName: pkg,
-				importStatement: component.import ?? null,
+				importStatement: `import { ${ component.name } } from '${ pkg }';`,
 				props: parseProps( component.reactDocgen?.props || {} ),
 				stories: component.stories || [],
 			};

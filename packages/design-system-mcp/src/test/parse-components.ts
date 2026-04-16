@@ -191,21 +191,6 @@ describe( 'parseComponents', () => {
 		expect( parseComponents( components ) ).toHaveLength( 0 );
 	} );
 
-	it( 'should not be confused by stories that import from allowed packages', () => {
-		const components = createComponents( {
-			example: {
-				name: 'ThemeProvider',
-				// Story lives in the theme package, not ui
-				path: '../packages/theme/src/stories/index.story.tsx',
-				// But the import mentions @wordpress/ui
-				import: 'import { Badge, Button } from "@wordpress/ui";',
-			},
-		} );
-
-		// Path-based detection correctly excludes this
-		expect( parseComponents( components ) ).toHaveLength( 0 );
-	} );
-
 	it( 'should include description from manifest', () => {
 		const components = createComponents( {
 			badge: {
@@ -227,7 +212,6 @@ describe( 'parseComponentDetail', () => {
 				name: 'Button',
 				description: 'A button component.',
 				path: '../packages/ui/src/button/stories/index.story.tsx',
-				import: 'import { Button } from "@wordpress/ui";',
 				reactDocgen: {
 					props: {
 						variant: {
@@ -246,7 +230,7 @@ describe( 'parseComponentDetail', () => {
 			name: 'Button',
 			description: 'A button component.',
 			packageName: '@wordpress/ui',
-			importStatement: 'import { Button } from "@wordpress/ui";',
+			importStatement: "import { Button } from '@wordpress/ui';",
 			props: [
 				{
 					name: 'variant',
@@ -336,7 +320,6 @@ describe( 'parseComponentDetail', () => {
 			example: {
 				name: 'ThemeProvider',
 				path: './stories/design-system/theme-example-application.story.tsx',
-				import: 'import { Badge } from "@wordpress/ui";',
 			},
 		} );
 

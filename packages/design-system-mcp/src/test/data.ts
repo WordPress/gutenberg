@@ -95,7 +95,7 @@ describe( 'data', () => {
 				name: 'Button',
 				description: 'A button.',
 				packageName: '@wordpress/ui',
-				importStatement: 'import { Button } from "@wordpress/ui";',
+				importStatement: "import { Button } from '@wordpress/ui';",
 				props: [
 					{
 						name: 'variant',

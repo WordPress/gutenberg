@@ -76,7 +76,7 @@ A button component.
 			name: 'Button',
 			description: '',
 			packageName: '@wordpress/ui',
-			importStatement: 'import { Button } from "@wordpress/ui";',
+			importStatement: "import { Button } from '@wordpress/ui';",
 			props: [],
 			stories: [],
 		} );
@@ -89,7 +89,7 @@ A button component.
 ## Import
 
 \`\`\`ts
-import { Button } from "@wordpress/ui";
+import { Button } from '@wordpress/ui';
 \`\`\``
 		);
 	} );

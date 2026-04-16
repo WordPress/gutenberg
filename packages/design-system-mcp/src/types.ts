@@ -2,7 +2,6 @@ export interface ManifestComponent {
 	id: string;
 	name: string;
 	path: string;
-	import?: string;
 	description?: string;
 	stories?: Array< {
 		name: string;
