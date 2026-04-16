@@ -361,23 +361,21 @@ export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	// Defer rect reads + offset calculation to a rAF so rapid-fire
-	// changes (ResizeObserver, selection, threads) coalesce into one recalc.
+	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
+	// when deps change, so back-to-back updates collapse into one paint.
 	useEffect( () => {
 		if ( ! isFloating ) {
 			return;
 		}
 
 		const rafId = window.requestAnimationFrame( () => {
-			const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
+			const { offsets, minHeight } = calculateAllOffsets( {
 				threads,
 				selectedNoteId,
 				blockRects: store.getBlockRects(),
 				heights,
 			} );
-			if ( Object.keys( newOffsets ).length > 0 ) {
-				setBoardOffsets( newOffsets );
-			}
+			setBoardOffsets( offsets );
 			setCanvasMinHeight( minHeight );
 		} );
 
