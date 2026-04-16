@@ -194,3 +194,12 @@ html :where(.is-position-sticky) {
 		/* stylelint-enable length-zero-no-unit */
 	}
 }
+
+/*
+ * Change the position of the more block on the front,
+ * by making it a block level element.
+ * https://github.com/WordPress/gutenberg/issues/65934
+ */
+.more-link {
+	display: block;
+}
