@@ -29,6 +29,9 @@
 		"jest-watch-typeahead": "^2.2.2",
 		"reassure": "^0.7.1"
 	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"test:native": "cross-env NODE_ENV=test jest --config jest.config.js",
 		"test:native:watch": "npm run test:native -- --watch",
