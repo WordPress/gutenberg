@@ -2,7 +2,7 @@
 // Using `:where` keeps specificity at 0 so global styles, theme.json,
 // and inspector controls can override it without difficulty.
 :where(.wp-block-latest-comments) {
-	padding: 0;
+	padding-left: 0;
 }
 
 // Lower specificity - target list element.
