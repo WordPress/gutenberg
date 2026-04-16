@@ -652,7 +652,11 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 		},
 	];
 
-	const canResolve = thread.parent === 0;
+	// Suggestion threads expose their own Accept/Reject affordance in the
+	// header; the generic "Resolve" button would duplicate that action with
+	// a confusingly similar checkmark icon, so hide it for suggestion notes.
+	const hasSuggestionPayload = !! thread?.meta?._wp_suggestion;
+	const canResolve = thread.parent === 0 && ! hasSuggestionPayload;
 	const moreActions =
 		parent?.status !== 'approved'
 			? actions.filter( ( item ) => item.isEligible( thread ) )
