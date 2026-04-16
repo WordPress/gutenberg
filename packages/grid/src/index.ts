@@ -1,3 +1,2 @@
-export * from './grid';
-export * from './resize-handle';
-export * from './types';
+export { Grid } from './grid';
+export type { GridLayoutItem, GridProps } from './types';
