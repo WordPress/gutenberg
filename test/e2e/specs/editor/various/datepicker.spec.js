@@ -15,6 +15,7 @@ const TIMEZONES = [ 'Pacific/Honolulu', 'UTC', 'Australia/Sydney' ];
 TIMEZONES.forEach( ( timezone ) => {
 	test.describe( `Datepicker: ${ timezone }`, () => {
 		let originalTimezone;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			originalTimezone = ( await requestUtils.getSiteSettings() )
 				.timezone;

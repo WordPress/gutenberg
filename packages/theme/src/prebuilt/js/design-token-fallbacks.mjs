@@ -141,23 +141,24 @@ export default {
 		'0 1px 2px 0 #0000000d, 0 2px 3px 0 #0000000a, 0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005',
 	'--wpds-elevation-xs':
 		'0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005, 0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003',
-	'--wpds-font-family-body':
+	'--wpds-typography-font-family-body':
 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
-	'--wpds-font-family-heading':
+	'--wpds-typography-font-family-heading':
 		'-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu", "Cantarell", "Helvetica Neue", sans-serif',
-	'--wpds-font-family-mono': '"Menlo", "Consolas", monaco, monospace',
-	'--wpds-font-line-height-2xl': '40px',
-	'--wpds-font-line-height-lg': '28px',
-	'--wpds-font-line-height-md': '24px',
-	'--wpds-font-line-height-sm': '20px',
-	'--wpds-font-line-height-xl': '32px',
-	'--wpds-font-line-height-xs': '16px',
-	'--wpds-font-size-2xl': '32px',
-	'--wpds-font-size-lg': '15px',
-	'--wpds-font-size-md': '13px',
-	'--wpds-font-size-sm': '12px',
-	'--wpds-font-size-xl': '20px',
-	'--wpds-font-size-xs': '11px',
-	'--wpds-font-weight-medium': '499',
-	'--wpds-font-weight-regular': '400',
+	'--wpds-typography-font-family-mono':
+		'"Menlo", "Consolas", monaco, monospace',
+	'--wpds-typography-font-size-2xl': '32px',
+	'--wpds-typography-font-size-lg': '15px',
+	'--wpds-typography-font-size-md': '13px',
+	'--wpds-typography-font-size-sm': '12px',
+	'--wpds-typography-font-size-xl': '20px',
+	'--wpds-typography-font-size-xs': '11px',
+	'--wpds-typography-font-weight-medium': '499',
+	'--wpds-typography-font-weight-regular': '400',
+	'--wpds-typography-line-height-2xl': '40px',
+	'--wpds-typography-line-height-lg': '28px',
+	'--wpds-typography-line-height-md': '24px',
+	'--wpds-typography-line-height-sm': '20px',
+	'--wpds-typography-line-height-xl': '32px',
+	'--wpds-typography-line-height-xs': '16px',
 };

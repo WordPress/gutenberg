@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../asset-loader" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },

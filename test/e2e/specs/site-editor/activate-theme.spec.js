@@ -8,9 +8,11 @@ test.describe( 'Activate theme', () => {
 		await admin.visitAdminPage( 'themes.php' );
 		await page.getByLabel( 'Live Preview Emptytheme' ).click();
 	} );
+
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
+
 	test( 'activate block theme when live previewing from sidebar save button', async ( {
 		admin,
 		page,
@@ -27,6 +29,7 @@ test.describe( 'Activate theme', () => {
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
+
 	test( 'activate block theme when live previewing in edit mode', async ( {
 		editor,
 		admin,

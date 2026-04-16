@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.0.0 (2026-04-15)
+
 ### Breaking Changes
 
 -   The bundled `eslint` dependency has been upgraded from v8 to v10 ([#76654](https://github.com/WordPress/gutenberg/pull/76654)).

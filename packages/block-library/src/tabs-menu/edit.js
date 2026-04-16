@@ -36,6 +36,7 @@ function Edit( { clientId, __unstableLayoutClassNames: layoutClassNames } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: [ 'core/tabs-menu-item' ],
 		orientation: 'horizontal',
+		templateLock: false,
 		renderAppender: false,
 	} );
 

@@ -37,7 +37,7 @@
 	appearance: none;
 
 	&:not(:disabled) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:focus {
@@ -60,7 +60,7 @@
 		opacity: 1; // Override style from wp-admin forms.css.
 
 		&:checked::before {
-			border-color: $components-color-gray-300;
+			border-color: $components-color-gray-400;
 			opacity: 1; // Override style from wp-admin forms.css.
 
 		}
@@ -72,7 +72,7 @@
 	grid-row: 1;
 
 	.components-radio-control:not(:disabled) & {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	line-height: $radio-input-size-sm;

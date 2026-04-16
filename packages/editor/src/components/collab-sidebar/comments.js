@@ -10,7 +10,6 @@ import {
 	useState,
 	RawHTML,
 	useEffect,
-	useCallback,
 	useMemo,
 	useRef,
 } from '@wordpress/element';
@@ -41,7 +40,8 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingThread } from './hooks';
+import { useFloatingBoard, useFloatingThread } from './hooks';
+import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 
@@ -58,13 +58,7 @@ export function Comments( {
 	isFloating = false,
 	commentLastUpdated,
 } ) {
-	const [ heights, setHeights ] = useState( {} );
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ blockRefs, setBlockRefs ] = useState( {} );
-
-	const { setCanvasMinHeight, selectNote } = unlock(
-		useDispatch( editorStore )
-	);
+	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -182,151 +176,11 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	// Recalculate floating comment thread offsets whenever the heights change.
-	useEffect( () => {
-		/**
-		 * Calculate the y offsets for all comment threads. Account for potentially
-		 * overlapping threads and adjust their positions accordingly.
-		 */
-		const calculateAllOffsets = () => {
-			const offsets = {};
-
-			if ( ! isFloating ) {
-				return { offsets, minHeight: 0 };
-			}
-
-			// Find the index of the selected thread.
-			const selectedThreadIndex = threads.findIndex(
-				( t ) => t.id === selectedNote
-			);
-
-			const breakIndex =
-				selectedThreadIndex === -1 ? 0 : selectedThreadIndex;
-
-			// If there is a selected thread, push threads above up and threads below down.
-			const selectedThreadData = threads[ breakIndex ];
-
-			if (
-				! selectedThreadData ||
-				! blockRefs[ selectedThreadData.id ]
-			) {
-				return { offsets, minHeight: 0 };
-			}
-
-			let blockElement = blockRefs[ selectedThreadData.id ];
-			let blockRect = blockElement?.getBoundingClientRect();
-			const selectedThreadTop = blockRect?.top || 0;
-			const selectedThreadHeight = heights[ selectedThreadData.id ] || 0;
-
-			offsets[ selectedThreadData.id ] = -16;
-
-			let previousThreadData = {
-				threadTop: selectedThreadTop - 16,
-				threadHeight: selectedThreadHeight,
-			};
-
-			// Process threads after the selected thread, offsetting any overlapping
-			// threads downward.
-			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
-				const thread = threads[ i ];
-				if ( ! blockRefs[ thread.id ] ) {
-					continue;
-				}
-
-				blockElement = blockRefs[ thread.id ];
-				blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
-				const threadHeight = heights[ thread.id ] || 0;
-
-				let additionalOffset = -16;
-
-				// Check if the thread overlaps with the previous one.
-				const previousBottom =
-					previousThreadData.threadTop +
-					previousThreadData.threadHeight;
-				if ( threadTop < previousBottom + 16 ) {
-					// Shift down by the difference plus a margin to avoid overlap.
-					additionalOffset = previousBottom - threadTop + 20;
-				}
-
-				offsets[ thread.id ] = additionalOffset;
-
-				// Update for next iteration.
-				previousThreadData = {
-					threadTop: threadTop + additionalOffset,
-					threadHeight,
-				};
-			}
-
-			// Process threads before the selected thread, offsetting any overlapping
-			// threads upward.
-			let nextThreadData = {
-				threadTop: selectedThreadTop - 16,
-			};
-
-			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
-				const thread = threads[ i ];
-				if ( ! blockRefs[ thread.id ] ) {
-					continue;
-				}
-
-				blockElement = blockRefs[ thread.id ];
-				blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
-				const threadHeight = heights[ thread.id ] || 0;
-
-				let additionalOffset = -16;
-
-				// Calculate the bottom position of this thread with default offset.
-				const threadBottom = threadTop + threadHeight;
-
-				// Check if this thread's bottom would overlap with the next thread's top.
-				if ( threadBottom > nextThreadData.threadTop ) {
-					// Shift up by the difference plus a margin to avoid overlap.
-					additionalOffset =
-						nextThreadData.threadTop -
-						threadTop -
-						threadHeight -
-						20;
-				}
-
-				offsets[ thread.id ] = additionalOffset;
-
-				// Update for next iteration (going upward).
-				nextThreadData = {
-					threadTop: threadTop + additionalOffset,
-				};
-			}
-
-			let editorMinHeight = 0;
-			// Take the calculated top of the final note plus its height as the editor min height.
-			const lastThread = threads[ threads.length - 1 ];
-			if ( blockRefs[ lastThread.id ] ) {
-				const lastBlockElement = blockRefs[ lastThread.id ];
-				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
-				const lastThreadTop = lastBlockRect?.top || 0;
-				const lastThreadHeight = heights[ lastThread.id ] || 0;
-				const lastThreadOffset = offsets[ lastThread.id ] || 0;
-				editorMinHeight =
-					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
-			}
-
-			return { offsets, minHeight: editorMinHeight };
-		};
-		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
-		if ( Object.keys( newOffsets ).length > 0 ) {
-			setBoardOffsets( newOffsets );
-		}
-		// Ensure the editor has enough height to scroll to all notes.
-		setCanvasMinHeight( minHeight );
-	}, [
-		heights,
-		blockRefs,
-		isFloating,
+	const { boardOffsets, registerThread, reportHeight } = useFloatingBoard( {
 		threads,
-		selectedNote,
-		setCanvasMinHeight,
-	] );
+		selectedNoteId: selectedNote,
+		isFloating,
+	} );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -393,10 +247,6 @@ export function Comments( {
 		}
 	};
 
-	const setBlockRef = useCallback( ( id, blockRef ) => {
-		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
-	}, [] );
-
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	// A special case for `template-locked` mode - https://github.com/WordPress/gutenberg/pull/72646.
 	if ( ! hasThreads && ! isFloating ) {
@@ -426,11 +276,17 @@ export function Comments( {
 					isSelected={ selectedNote === thread.id }
 					commentSidebarRef={ commentSidebarRef }
 					reflowComments={ reflowComments }
-					isFloating={ isFloating }
-					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-					setHeights={ setHeights }
-					setBlockRef={ setBlockRef }
-					commentLastUpdated={ commentLastUpdated }
+					floating={
+						isFloating
+							? {
+									calculatedOffset:
+										boardOffsets[ thread.id ] ?? 0,
+									reportHeight,
+									registerThread,
+									commentLastUpdated,
+							  }
+							: undefined
+					}
 					onKeyDown={ ( event ) =>
 						handleThreadNavigation(
 							event,
@@ -452,13 +308,10 @@ function Thread( {
 	isSelected,
 	commentSidebarRef,
 	reflowComments,
-	isFloating,
-	calculatedOffset,
-	setHeights,
-	setBlockRef,
-	commentLastUpdated,
+	floating,
 	onKeyDown,
 } ) {
+	const isFloating = !! floating;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -474,11 +327,11 @@ function Thread( {
 	);
 	const { y, refs } = useFloatingThread( {
 		thread,
-		calculatedOffset,
-		setHeights,
-		setBlockRef,
+		calculatedOffset: floating?.calculatedOffset ?? 0,
+		reportHeight: floating?.reportHeight,
+		registerThread: floating?.registerThread,
 		selectedThread: selectedNote,
-		commentLastUpdated,
+		commentLastUpdated: floating?.commentLastUpdated,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
 
@@ -571,18 +424,16 @@ function Thread( {
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
-				isFloating={ isFloating }
-				y={ y }
-				refs={ refs }
+				floating={ { y, refs } }
 			/>
 		);
 	}
 
 	return (
-		<VStack
+		<FloatingContainer
+			floating={ isFloating ? { y, refs } : undefined }
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
-				'is-floating': isFloating,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
@@ -607,8 +458,6 @@ function Thread( {
 			role="treeitem"
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
-			ref={ isFloating ? refs.setFloating : undefined }
-			style={ isFloating ? { top: y } : undefined }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-to-comment"
@@ -759,7 +608,7 @@ function Thread( {
 					{ __( 'Back to block' ) }
 				</Button>
 			) }
-		</VStack>
+		</FloatingContainer>
 	);
 }
 

@@ -18,6 +18,11 @@ export function sanitizeCommentString( str ) {
  */
 export function noop() {}
 
+const THREAD_ALIGN_OFFSET = -16;
+const THREAD_GAP = 16;
+const OVERLAP_MARGIN = 20;
+const BOARD_BOTTOM_PADDING = 32;
+
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
  * the editor's semantic UI colors (Delta E > 10 between all pairs).
@@ -89,6 +94,114 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 
 	const isTrimmed = trimmedExcerpt !== rawText;
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
+}
+
+/**
+ * Calculate y offsets for all floating comment threads. Adjusts positions
+ * to prevent overlapping by pushing threads above the selected one upward
+ * and threads below it downward.
+ *
+ * @param {Object}                  params
+ * @param {Array}                   params.threads        Ordered list of thread objects.
+ * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
+ * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
+ * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
+ * @return {{ offsets: Object<string,number>, minHeight: number }} Computed offsets and minimum editor height.
+ */
+export function calculateAllOffsets( {
+	threads,
+	selectedNoteId,
+	blockRects,
+	heights,
+} ) {
+	const offsets = {};
+
+	const anchorIndex = Math.max(
+		0,
+		threads.findIndex( ( thread ) => thread.id === selectedNoteId )
+	);
+
+	const anchorThread = threads[ anchorIndex ];
+
+	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
+		return { offsets, minHeight: 0 };
+	}
+
+	const anchorRect = blockRects[ anchorThread.id ];
+	const anchorTop = anchorRect.top || 0;
+	const anchorHeight = heights[ anchorThread.id ] || 0;
+
+	offsets[ anchorThread.id ] = THREAD_ALIGN_OFFSET;
+
+	// Process threads after the anchor, offsetting overlapping threads downward.
+	let prevAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
+	let prevHeight = anchorHeight;
+
+	for ( let i = anchorIndex + 1; i < threads.length; i++ ) {
+		const thread = threads[ i ];
+		const threadRect = blockRects[ thread.id ];
+		if ( ! threadRect ) {
+			continue;
+		}
+
+		const threadTop = threadRect.top || 0;
+		const threadHeight = heights[ thread.id ] || 0;
+
+		let offset = THREAD_ALIGN_OFFSET;
+
+		const prevBottom = prevAdjustedTop + prevHeight;
+		if ( threadTop < prevBottom + THREAD_GAP ) {
+			offset = prevBottom - threadTop + OVERLAP_MARGIN;
+		}
+
+		offsets[ thread.id ] = offset;
+
+		prevAdjustedTop = threadTop + offset;
+		prevHeight = threadHeight;
+	}
+
+	// Process threads before the anchor, offsetting overlapping threads upward.
+	let belowAdjustedTop = anchorTop + THREAD_ALIGN_OFFSET;
+
+	for ( let i = anchorIndex - 1; i >= 0; i-- ) {
+		const thread = threads[ i ];
+		const threadRect = blockRects[ thread.id ];
+		if ( ! threadRect ) {
+			continue;
+		}
+
+		const threadTop = threadRect.top || 0;
+		const threadHeight = heights[ thread.id ] || 0;
+
+		let offset = THREAD_ALIGN_OFFSET;
+
+		const threadBottom = threadTop + threadHeight;
+
+		if ( threadBottom > belowAdjustedTop ) {
+			offset =
+				belowAdjustedTop - threadTop - threadHeight - OVERLAP_MARGIN;
+		}
+
+		offsets[ thread.id ] = offset;
+
+		belowAdjustedTop = threadTop + offset;
+	}
+
+	let editorMinHeight = 0;
+	const lastThread = threads[ threads.length - 1 ];
+	const lastBlockRect = blockRects[ lastThread.id ];
+	if ( lastBlockRect ) {
+		const lastThreadTop = lastBlockRect.top || 0;
+		const lastThreadHeight = heights[ lastThread.id ] || 0;
+		const lastThreadOffset = offsets[ lastThread.id ] || 0;
+		editorMinHeight =
+			lastThreadTop +
+			lastThreadHeight +
+			lastThreadOffset +
+			BOARD_BOTTOM_PADDING;
+	}
+
+	return { offsets, minHeight: editorMinHeight };
 }
 
 /**
