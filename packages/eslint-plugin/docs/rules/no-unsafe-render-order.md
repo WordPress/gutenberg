@@ -49,5 +49,4 @@ When set to `true`, the rule also checks tracked components imported from relati
 
 -   By default, the rule checks `VisuallyHidden`, `Text`, and `Link` when they are imported from `@wordpress/ui`.
 -   Named import aliases such as `import { Link as UILink }` are tracked.
--   Namespace imports such as `import * as UI from '@wordpress/ui'` are also tracked.
--   When `checkLocalImports` is enabled, the rule also tracks local component imports for the covered patterns.
+-   When `checkLocalImports` is enabled, the rule also tracks local named imports for the covered patterns.

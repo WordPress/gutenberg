@@ -33,13 +33,6 @@ ruleTester.run( 'no-unsafe-render-order', rule, {
 		},
 		{
 			code: `
-				import * as UI from '@wordpress/ui';
-
-				<UI.Text render={ <UI.Link href="#" /> }>Read more</UI.Text>;
-			`,
-		},
-		{
-			code: `
 				import { Popover } from '@wordpress/ui';
 				import { VisuallyHidden } from 'some-other-package';
 
@@ -89,16 +82,6 @@ ruleTester.run( 'no-unsafe-render-order', rule, {
 		},
 		{
 			code: `
-				import * as UI from '@wordpress/ui';
-
-				<UI.Popover.Title render={ <UI.VisuallyHidden /> }>
-					Title
-				</UI.Popover.Title>;
-			`,
-			errors: [ { messageId: 'visuallyHiddenOrder' } ],
-		},
-		{
-			code: `
 				import { VisuallyHidden } from '@wordpress/ui';
 
 				<CustomThing render={ <VisuallyHidden /> }>
@@ -124,16 +107,6 @@ ruleTester.run( 'no-unsafe-render-order', rule, {
 				<UILink href="#" render={ <UIText /> }>
 					Read more
 				</UILink>;
-			`,
-			errors: [ { messageId: 'linkTextOrder' } ],
-		},
-		{
-			code: `
-				import * as UI from '@wordpress/ui';
-
-				<UI.Link href="#" render={ <UI.Text /> }>
-					Read more
-				</UI.Link>;
 			`,
 			errors: [ { messageId: 'linkTextOrder' } ],
 		},

@@ -41,7 +41,6 @@ module.exports = {
 		const checkLocalImports =
 			context.options[ 0 ]?.checkLocalImports ?? false;
 		const trackedImports = new Map();
-		const namespaceImports = new Set();
 
 		/**
 		 * @param {string} source
@@ -61,57 +60,14 @@ module.exports = {
 
 		/**
 		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
-		 * @return {string|null} Fully qualified JSX name or null.
-		 */
-		function getJsxName( node ) {
-			if ( node.type === 'JSXIdentifier' ) {
-				return node.name;
-			}
-
-			if ( node.type === 'JSXMemberExpression' ) {
-				const objectName = getJsxName( node.object );
-
-				if ( ! objectName ) {
-					return null;
-				}
-
-				return `${ objectName }.${ node.property.name }`;
-			}
-
-			return null;
-		}
-
-		/**
-		 * Resolves a JSX name to the tracked imported component name.
-		 *
-		 * Examples:
-		 * - `UILink` -> `Link`
-		 * - `UI.Link` -> `Link`
-		 *
-		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
 		 * @return {string|null} Tracked component name or null.
 		 */
 		function resolveTrackedJsxName( node ) {
-			const jsxName = getJsxName( node );
-
-			if ( ! jsxName ) {
+			if ( node.type !== 'JSXIdentifier' ) {
 				return null;
 			}
 
-			const [ root, ...rest ] = jsxName.split( '.' );
-			const importedRoot = trackedImports.get( root );
-
-			if ( importedRoot ) {
-				return rest.length
-					? `${ importedRoot }.${ rest.join( '.' ) }`
-					: importedRoot;
-			}
-
-			if ( namespaceImports.has( root ) && rest.length ) {
-				return rest.join( '.' );
-			}
-
-			return null;
+			return trackedImports.get( node.name ) ?? null;
 		}
 
 		/**
@@ -166,22 +122,6 @@ module.exports = {
 							trackedImports.set(
 								specifier.local.name,
 								importedName
-							);
-						}
-
-						return;
-					}
-
-					if ( specifier.type === 'ImportNamespaceSpecifier' ) {
-						if ( source === '@wordpress/ui' ) {
-							namespaceImports.add( specifier.local.name );
-							return;
-						}
-
-						if ( TRACKED_COMPONENTS.has( specifier.local.name ) ) {
-							trackedImports.set(
-								specifier.local.name,
-								specifier.local.name
 							);
 						}
 					}
