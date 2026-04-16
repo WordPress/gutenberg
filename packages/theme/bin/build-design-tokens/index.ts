@@ -1,5 +1,5 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
+import { dirname, resolve, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, build } from '@terrazzo/parser';
 import config from '../../terrazzo.config';
@@ -7,7 +7,7 @@ import config from '../../terrazzo.config';
 const sources = await Promise.all(
 	config.tokens.map( async ( tokenUrl: URL ) => ( {
 		filename: tokenUrl,
-		src: await fs.readFile( fileURLToPath( tokenUrl ), 'utf8' ),
+		src: await readFile( fileURLToPath( tokenUrl ), 'utf8' ),
 	} ) )
 );
 
@@ -39,15 +39,15 @@ const { outputFiles } = await build( tokens, {
 const outDir = fileURLToPath( config.outDir );
 
 for ( const file of outputFiles ) {
-	const filePath = path.resolve( outDir, file.filename );
-	await fs.mkdir( path.dirname( filePath ), { recursive: true } );
-	await fs.writeFile( filePath, file.contents );
+	const filePath = resolve( outDir, file.filename );
+	await mkdir( dirname( filePath ), { recursive: true } );
+	await writeFile( filePath, file.contents );
 }
 
-const configDir = path.dirname( fileURLToPath( import.meta.url ) );
+const configDir = dirname( fileURLToPath( import.meta.url ) );
 console.log(
-	`Built ${ outputFiles.length } files to ${ path.relative(
-		path.resolve( configDir, '../..' ),
+	`Built ${ outputFiles.length } files to ${ relative(
+		resolve( configDir, '../..' ),
 		outDir
 	) }/`
 );
