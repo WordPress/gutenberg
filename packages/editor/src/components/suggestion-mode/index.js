@@ -19,3 +19,7 @@ export {
 	SCHEMA_VERSION,
 } from './provider';
 export { default as SuggestionDiff, wordDiff } from './suggestion-diff';
+export {
+	default as SuggestionSummary,
+	summarizeOperations,
+} from './suggestion-summary';
