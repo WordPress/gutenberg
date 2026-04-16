@@ -49,7 +49,7 @@ const DEFAULT_VIEW: View = {
 		field: 'slug',
 		direction: 'asc' as const,
 	},
-	fields: [ 'slug', 'description', 'public', 'source' ],
+	fields: [ 'slug', 'description', 'public', 'source', 'modified' ],
 	titleField: 'name',
 };
 
@@ -132,6 +132,22 @@ const fields: Field< EntityConfig >[] = [
 			{ value: 'plugin', label: __( 'Plugin' ) },
 			{ value: 'user', label: __( 'Custom' ) },
 			{ value: 'orphaned', label: __( 'Orphaned' ) },
+		],
+		filterBy: {
+			operators: [ 'is' as const ],
+		},
+	},
+	{
+		id: 'modified',
+		label: __( 'Modified' ),
+		render: ( { item }: { item: EntityConfig } ) => {
+			return <>{ item._customized ? __( 'Yes' ) : __( 'No' ) }</>;
+		},
+		getValue: ( { item }: { item: EntityConfig } ) =>
+			item._customized ? 'yes' : 'no',
+		elements: [
+			{ value: 'yes', label: __( 'Yes' ) },
+			{ value: 'no', label: __( 'No' ) },
 		],
 		filterBy: {
 			operators: [ 'is' as const ],
