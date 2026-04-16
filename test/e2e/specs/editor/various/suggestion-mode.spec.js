@@ -67,6 +67,48 @@ test.describe( 'Suggestion mode', () => {
 		// which the commit-bar wires after the REST create succeeds.
 	} );
 
+	test( 'captures non-text attribute changes (heading level)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		// Select the heading block.
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+
+		// Change heading level to H3 via the block toolbar.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Change level' } )
+			.click();
+		await page.getByRole( 'radio', { name: 'Heading 3' } ).click();
+
+		// The overlay should have captured the level change — the rendered
+		// block should show H3, but serialized content stays at H2.
+		await expect( heading ).toBeVisible();
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( '<!-- wp:heading' );
+		expect( serialized ).not.toContain( '"level":3' );
+
+		// Submit the suggestion.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Submit suggestion' } )
+			.click();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toBeVisible();
+	} );
+
 	test( 'discards overlay without creating a note', async ( {
 		editor,
 		page,
