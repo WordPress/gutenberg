@@ -12,9 +12,9 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `content` | `rich-text` | — | Source: `rich-text`. Selector: `code`. Role: `content` |
+| `content` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `code`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

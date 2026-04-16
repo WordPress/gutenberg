@@ -14,9 +14,9 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `content` | `string` | — | Source: `raw`. Role: `content` |
+| `content` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `raw`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

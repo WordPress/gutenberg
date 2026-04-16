@@ -14,9 +14,9 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `content` | `rich-text` | — | Source: `rich-text`. Selector: `h1,h2,h3,h4,h5,h6`. Role: `content` |
+| `content` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `h1,h2,h3,h4,h5,h6`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `level` | `number` | `2` | — |
 | `levelOptions` | `array` | — | — |
 | `placeholder` | `string` | — | — |

@@ -19,15 +19,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `type` | `string` | `"text"` | — |
 | `name` | `string` | — | — |
-| `label` | `rich-text` | `"Label"` | Source: `rich-text`. Selector: `.wp-block-form-input__label-content`. Role: `content` |
+| `label` | `rich-text` | `"Label"` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-form-input__label-content`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `inlineLabel` | `boolean` | `false` | — |
-| `required` | `boolean` | `false` | Source: `attribute`. Selector: `.wp-block-form-input__input`. HTML attr: `required` |
-| `placeholder` | `string` | — | Source: `attribute`. Selector: `.wp-block-form-input__input`. HTML attr: `placeholder`. Role: `content` |
-| `value` | `string` | `""` | Source: `attribute`. Selector: `input`. HTML attr: `value` |
+| `required` | `boolean` | `false` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-form-input__input`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `required` |
+| `placeholder` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-form-input__input`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `placeholder`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `value` | `string` | `""` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `input`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `value` |
 | `visibilityPermissions` | `string` | `"all"` | — |
 
 ## Supports

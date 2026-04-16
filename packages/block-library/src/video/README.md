@@ -14,20 +14,20 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `autoplay` | `boolean` | — | Source: `attribute`. Selector: `video`. HTML attr: `autoplay` |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
-| `controls` | `boolean` | `true` | Source: `attribute`. Selector: `video`. HTML attr: `controls` |
-| `id` | `number` | — | Role: `content` |
-| `loop` | `boolean` | — | Source: `attribute`. Selector: `video`. HTML attr: `loop` |
-| `muted` | `boolean` | — | Source: `attribute`. Selector: `video`. HTML attr: `muted` |
-| `poster` | `string` | — | Source: `attribute`. Selector: `video`. HTML attr: `poster` |
-| `preload` | `string` | `"metadata"` | Source: `attribute`. Selector: `video`. HTML attr: `preload` |
-| `blob` | `string` | — | Role: `local` |
-| `src` | `string` | — | Source: `attribute`. Selector: `video`. HTML attr: `src`. Role: `content` |
-| `playsInline` | `boolean` | — | Source: `attribute`. Selector: `video`. HTML attr: `playsinline` |
-| `tracks` | `array` | `[]` | Role: `content` |
+| `autoplay` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `autoplay` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figcaption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `controls` | `boolean` | `true` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `controls` |
+| `id` | `number` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `loop` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `loop` |
+| `muted` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `muted` |
+| `poster` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `poster` |
+| `preload` | `string` | `"metadata"` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `preload` |
+| `blob` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
+| `src` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `src`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `playsInline` | `boolean` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `video`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `playsinline` |
+| `tracks` | `array` | `[]` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

@@ -14,11 +14,11 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `showContent` | `boolean` | `false` | — |
-| `summary` | `rich-text` | — | Source: `rich-text`. Selector: `summary`. Role: `content` |
-| `name` | `string` | — | Source: `attribute`. Selector: `.wp-block-details`. HTML attr: `name` |
+| `summary` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `summary`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `name` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.wp-block-details`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `name` |
 | `placeholder` | `string` | — | — |
 
 ## Supports

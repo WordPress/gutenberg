@@ -12,15 +12,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `textAlign` | `string` | — | — |
 | `avatarSize` | `number` | `48` | — |
 | `showAvatar` | `boolean` | `true` | — |
 | `showBio` | `boolean` | — | — |
 | `byline` | `string` | — | — |
-| `isLink` | `boolean` | `false` | Role: `content` |
-| `linkTarget` | `string` | `"_self"` | Role: `content` |
+| `isLink` | `boolean` | `false` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `linkTarget` | `string` | `"_self"` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 
 ## Supports
 

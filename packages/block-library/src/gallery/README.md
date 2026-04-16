@@ -19,14 +19,14 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `images` | `array` | `[]` | Source: `query`. Selector: `.blocks-gallery-item` |
+| `images` | `array` | `[]` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.blocks-gallery-item` |
 | `ids` | `array` | `[]` | — |
-| `navigationButtonType` | `string` | `"icon"` | Enum: `icon`, `text`, `both` |
+| `navigationButtonType` | `string` | `"icon"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `icon`, `text`, `both` |
 | `shortCodeTransforms` | `array` | `[]` | — |
 | `columns` | `number` | — | — |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `.blocks-gallery-caption`. Role: `content` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `.blocks-gallery-caption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `imageCrop` | `boolean` | `true` | — |
 | `randomOrder` | `boolean` | `false` | — |
 | `fixedHeight` | `boolean` | `true` | — |

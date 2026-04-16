@@ -17,15 +17,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `label` | `string` | — | Role: `content` |
+| `label` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `type` | `string` | — | — |
 | `description` | `string` | — | — |
 | `rel` | `string` | — | — |
 | `id` | `number` | — | — |
 | `opensInNewTab` | `boolean` | `false` | — |
-| `url` | `string` | — | Role: `content` |
+| `url` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `title` | `string` | — | — |
 | `kind` | `string` | — | — |
 | `isTopLevelItem` | `boolean` | — | — |

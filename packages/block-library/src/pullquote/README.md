@@ -12,10 +12,10 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `value` | `rich-text` | — | Source: `rich-text`. Selector: `p`. Role: `content` |
-| `citation` | `rich-text` | — | Source: `rich-text`. Selector: `cite`. Role: `content` |
+| `value` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `p`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `citation` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `cite`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `textAlign` | `string` | — | — |
 
 ## Supports

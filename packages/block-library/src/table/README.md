@@ -12,13 +12,13 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `hasFixedLayout` | `boolean` | `true` | — |
-| `caption` | `rich-text` | — | Source: `rich-text`. Selector: `figcaption`. Role: `content` |
-| `head` | `array` | `[]` | Source: `query`. Selector: `thead tr` |
-| `body` | `array` | `[]` | Source: `query`. Selector: `tbody tr` |
-| `foot` | `array` | `[]` | Source: `query`. Selector: `tfoot tr` |
+| `caption` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `figcaption`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `head` | `array` | `[]` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `thead tr` |
+| `body` | `array` | `[]` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `tbody tr` |
+| `foot` | `array` | `[]` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `query`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `tfoot tr` |
 
 ## Supports
 

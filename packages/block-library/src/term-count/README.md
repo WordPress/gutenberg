@@ -12,9 +12,9 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `bracketType` | `string` | `"round"` | Enum: `none`, `round`, `square`, `curly`, `angle` |
+| `bracketType` | `string` | `"round"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `none`, `round`, `square`, `curly`, `angle` |
 
 ## Supports
 

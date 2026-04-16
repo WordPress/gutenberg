@@ -12,11 +12,11 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
 | `width` | `number` | — | — |
-| `isLink` | `boolean` | `true` | Role: `content` |
-| `linkTarget` | `string` | `"_self"` | Role: `content` |
+| `isLink` | `boolean` | `true` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `linkTarget` | `string` | `"_self"` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `shouldSyncIcon` | `boolean` | — | — |
 
 ## Supports

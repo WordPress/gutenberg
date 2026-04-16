@@ -19,15 +19,15 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `tagName` | `string` | `"a"` | Enum: `a`, `button` |
+| `tagName` | `string` | `"a"` | [Enum](/block-editor/reference-guides/block-api/block-attributes/#enum-validation): `a`, `button` |
 | `type` | `string` | `"button"` | — |
-| `url` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `href`. Role: `content` |
-| `title` | `string` | — | Source: `attribute`. Selector: `a,button`. HTML attr: `title`. Role: `content` |
-| `text` | `rich-text` | — | Source: `rich-text`. Selector: `a,button`. Role: `content` |
-| `linkTarget` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `target`. Role: `content` |
-| `rel` | `string` | — | Source: `attribute`. Selector: `a`. HTML attr: `rel`. Role: `content` |
+| `url` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `href`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `title` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a,button`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `title`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `text` | `rich-text` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `rich-text`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a,button`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `linkTarget` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `target`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `rel` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `attribute`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `a`. [HTML attr](/block-editor/reference-guides/block-api/block-attributes/#attribute-source): `rel`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `placeholder` | `string` | — | — |
 | `backgroundColor` | `string` | — | — |
 | `textColor` | `string` | — | — |

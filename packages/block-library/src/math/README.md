@@ -14,10 +14,10 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `latex` | `string` | — | Role: `content` |
-| `mathML` | `string` | — | Source: `html`. Selector: `math` |
+| `latex` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `mathML` | `string` | — | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `html`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `math` |
 
 ## Supports
 

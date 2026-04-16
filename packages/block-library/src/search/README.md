@@ -14,14 +14,14 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `label` | `string` | — | Role: `content` |
+| `label` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `showLabel` | `boolean` | `true` | — |
-| `placeholder` | `string` | `""` | Role: `content` |
+| `placeholder` | `string` | `""` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `width` | `number` | — | — |
 | `widthUnit` | `string` | — | — |
-| `buttonText` | `string` | — | Role: `content` |
+| `buttonText` | `string` | — | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `buttonPosition` | `string` | `"button-outside"` | — |
 | `buttonUseIcon` | `boolean` | `false` | — |
 | `query` | `object` | `{}` | — |

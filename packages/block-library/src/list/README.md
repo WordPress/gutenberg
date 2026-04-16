@@ -19,10 +19,10 @@
 
 _Defined via the [`attributes`](/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-| Attribute | Type | Default | Description |
+| Attribute | [Type](/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `ordered` | `boolean` | `false` | Role: `content` |
-| `values` | `string` | `""` | Source: `html`. Selector: `ol,ul`. Role: `content` |
+| `ordered` | `boolean` | `false` | [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `values` | `string` | `""` | [Source](/block-editor/reference-guides/block-api/block-attributes/#value-source): `html`. [Selector](/block-editor/reference-guides/block-api/block-attributes/#value-source): `ol,ul`. [Role](/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `type` | `string` | — | — |
 | `start` | `number` | — | — |
 | `reversed` | `boolean` | — | — |
