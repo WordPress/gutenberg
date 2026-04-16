@@ -82,8 +82,8 @@ export type Rules< Item > = {
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: number;
-	max?: number;
+	min?: number | string;
+	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -125,8 +125,8 @@ export type NormalizedRules< Item > = {
 	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
-	min?: NormalizedRule< Item, number >;
-	max?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
 	custom?: CustomValidator< Item >;
 };
 
@@ -184,12 +184,9 @@ export type EditConfig =
 	| EditConfigDatetime
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
 export type Field< Item > = {
 	/**
-	 * Type of the fields.
+	 * Type of the field.
 	 */
 	type?: FieldTypeName;
 
@@ -235,7 +232,12 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * Callback used to validate the field.
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
 

@@ -32,7 +32,10 @@ function mergeMetaboxes( metaboxes = [], newMetaboxes ) {
 			( box ) => box.id === metabox.id
 		);
 		if ( existing !== -1 ) {
-			mergedMetaboxes[ existing ] = metabox;
+			mergedMetaboxes[ existing ] = {
+				...mergedMetaboxes[ existing ],
+				...metabox,
+			};
 		} else {
 			mergedMetaboxes.push( metabox );
 		}
@@ -83,28 +86,10 @@ function metaBoxesInitialized( state = false, action ) {
 	return state;
 }
 
-/**
- * Reducer tracking meta box IDs marked as compatible with real-time collaboration
- * via the add_meta_box() __rtc_compatible_meta_box compatibility flag.
- *
- * @param {string[]} state  Previous state.
- * @param {Object}   action Action Object.
- *
- * @return {string[]} Updated state.
- */
-export function rtcCompatibleMetaBoxIds( state = [], action ) {
-	switch ( action.type ) {
-		case 'SET_RTC_COMPATIBLE_META_BOX_IDS':
-			return action.ids;
-	}
-	return state;
-}
-
 const metaBoxes = combineReducers( {
 	isSaving: isSavingMetaBoxes,
 	locations: metaBoxLocations,
 	initialized: metaBoxesInitialized,
-	rtcCompatibleIds: rtcCompatibleMetaBoxIds,
 } );
 
 export default combineReducers( {

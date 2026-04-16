@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	BlockControls,
@@ -22,13 +22,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 export default function AddTabToolbarControl( { tabsClientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	const { tabPanelClientId, tabsMenuClientId, tabCount } = useSelect(
+	const { tabPanelClientId, tabsMenuClientId } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
 					tabPanelClientId: null,
 					tabsMenuClientId: null,
-					tabCount: 0,
 				};
 			}
 			const { getBlocks } = select( blockEditorStore );
@@ -42,7 +41,6 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			return {
 				tabPanelClientId: tabPanel?.clientId || null,
 				tabsMenuClientId: tabsMenu?.clientId || null,
-				tabCount: tabPanel?.innerBlocks?.length || 0,
 			};
 		},
 		[ tabsClientId ]
@@ -54,8 +52,7 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		}
 
 		const newTabBlock = createBlock( 'core/tab', {
-			/* translators: %d: tab number */
-			label: sprintf( __( 'Tab %d' ), tabCount + 1 ),
+			label: __( 'Tab' ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelClientId );
 
