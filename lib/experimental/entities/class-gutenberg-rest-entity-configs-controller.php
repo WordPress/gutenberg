@@ -304,12 +304,19 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$config = $configs[ $key ][ $slug ];
+		$config        = $configs[ $key ][ $slug ];
+		$is_registered = 'post_type' === $entity_type
+			? post_type_exists( $slug )
+			: taxonomy_exists( $slug );
+		$is_orphaned   = ! $is_registered && empty( $config['_user_created'] );
 
-		if ( empty( $config['_user_created'] ) ) {
+		// Only user-created entities and orphans (stored but no longer
+		// registered) can be deleted. Actively registered non-user entities
+		// belong to core/plugins/themes and must not be deleted here.
+		if ( empty( $config['_user_created'] ) && ! $is_orphaned ) {
 			return new WP_Error(
 				'rest_entity_config_not_deletable',
-				__( 'Built-in entities cannot be deleted.', 'gutenberg' ),
+				__( 'This entity is registered by core, a plugin, or a theme and cannot be deleted.', 'gutenberg' ),
 				array( 'status' => 403 )
 			);
 		}
@@ -339,11 +346,37 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 	 * @return array The response data.
 	 */
 	private function prepare_config_for_response( $slug, $entity_type, $config ) {
+		$is_registered = 'post_type' === $entity_type
+			? post_type_exists( $slug )
+			: taxonomy_exists( $slug );
+
+		// An entity is orphaned when it's stored but no longer registered
+		// (e.g., the plugin that created it was deactivated).
+		$is_orphaned = ! $is_registered && empty( $config['_user_created'] );
+
+		// Compute _source from the live type object when possible so the
+		// classification self-heals even if the stored config predates the
+		// _source field or the entity's source has changed.
+		if ( ! empty( $config['_user_created'] ) ) {
+			$source = 'user';
+		} elseif ( 'post_type' === $entity_type && $is_registered ) {
+			$type_object = get_post_type_object( $slug );
+			$source      = ! empty( $type_object->_builtin ) ? 'core' : 'plugin';
+		} elseif ( 'taxonomy' === $entity_type && $is_registered ) {
+			$taxonomy_object = get_taxonomy( $slug );
+			$source          = ! empty( $taxonomy_object->_builtin ) ? 'core' : 'plugin';
+		} else {
+			// Orphaned and unknown: fall back to stored value or 'plugin'.
+			$source = $config['_source'] ?? 'plugin';
+		}
+
 		return array_merge(
 			$config,
 			array(
 				'slug'        => $slug,
 				'entity_type' => $entity_type,
+				'_source'     => $source,
+				'_orphaned'   => $is_orphaned,
 			)
 		);
 	}
@@ -441,7 +474,7 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 			),
 			'rest_base'    => array(
 				'description' => __( 'The REST API base slug.', 'gutenberg' ),
-				'type'        => 'string',
+				'type'        => array( 'string', 'boolean', 'null' ),
 			),
 			'show_ui'      => array(
 				'description' => __( 'Whether to show a UI for the entity.', 'gutenberg' ),

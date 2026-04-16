@@ -31,6 +31,8 @@ interface EntityConfig {
 	slug: string;
 	entity_type: 'post_type' | 'taxonomy';
 	_user_created: boolean;
+	_source: 'core' | 'plugin' | 'user';
+	_orphaned: boolean;
 	labels?: Record< string, string >;
 	description?: string;
 	public?: boolean;
@@ -46,7 +48,7 @@ const DEFAULT_VIEW: View = {
 		field: 'slug',
 		direction: 'asc' as const,
 	},
-	fields: [ 'slug', 'description', 'public', 'user_created' ],
+	fields: [ 'slug', 'description', 'public', 'source' ],
 	titleField: 'name',
 };
 
@@ -102,18 +104,33 @@ const fields: Field< EntityConfig >[] = [
 		},
 	},
 	{
-		id: 'user_created',
-		label: __( 'Custom' ),
+		id: 'source',
+		label: __( 'Source' ),
 		render: ( { item }: { item: EntityConfig } ) => {
-			return (
-				<>{ item._user_created ? __( 'Custom' ) : __( 'Built-in' ) }</>
-			);
+			if ( item._orphaned ) {
+				return <>{ __( 'Orphaned' ) }</>;
+			}
+			switch ( item._source ) {
+				case 'core':
+					return <>{ __( 'Core' ) }</>;
+				case 'user':
+					return <>{ __( 'Custom' ) }</>;
+				case 'plugin':
+				default:
+					return <>{ __( 'Plugin' ) }</>;
+			}
 		},
-		getValue: ( { item }: { item: EntityConfig } ) =>
-			item._user_created ? 'custom' : 'built-in',
+		getValue: ( { item }: { item: EntityConfig } ) => {
+			if ( item._orphaned ) {
+				return 'orphaned';
+			}
+			return item._source ?? 'plugin';
+		},
 		elements: [
-			{ value: 'custom', label: __( 'Custom' ) },
-			{ value: 'built-in', label: __( 'Built-in' ) },
+			{ value: 'core', label: __( 'Core' ) },
+			{ value: 'plugin', label: __( 'Plugin' ) },
+			{ value: 'user', label: __( 'Custom' ) },
+			{ value: 'orphaned', label: __( 'Orphaned' ) },
 		],
 		filterBy: {
 			operators: [ 'is' as const ],
@@ -191,7 +208,7 @@ function EntityList() {
 			label: __( 'Delete' ),
 			isPrimary: false,
 			isEligible( item: EntityConfig ) {
-				return item._user_created;
+				return item._user_created || item._orphaned;
 			},
 			callback( items: EntityConfig[] ) {
 				const item = items[ 0 ];

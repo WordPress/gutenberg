@@ -38,6 +38,8 @@ interface EntityConfig {
 	slug: string;
 	entity_type: 'post_type' | 'taxonomy';
 	_user_created: boolean;
+	_source: 'core' | 'plugin' | 'user';
+	_orphaned: boolean;
 	labels: Record< string, string >;
 	description: string;
 	public: boolean;
@@ -241,11 +243,14 @@ function EntityEdit() {
 				type: 'snackbar',
 				id: 'entity-save-success',
 			} );
-		} catch {
-			createErrorNotice( __( 'Failed to update entity.' ), {
-				type: 'snackbar',
-				id: 'entity-save-error',
-			} );
+		} catch ( error: any ) {
+			createErrorNotice(
+				error?.message || __( 'Failed to update entity.' ),
+				{
+					type: 'snackbar',
+					id: 'entity-save-error',
+				}
+			);
 		}
 
 		setIsSaving( false );
@@ -316,7 +321,7 @@ function EntityEdit() {
 						>
 							{ __( 'Back' ) }
 						</Button>
-						{ config._user_created && (
+						{ ( config._user_created || config._orphaned ) && (
 							<Button
 								icon={ trash }
 								label={ __( 'Delete' ) }
@@ -340,10 +345,24 @@ function EntityEdit() {
 			>
 				<div style={ { padding: 16 } }>
 					<VStack spacing={ 4 }>
-						{ ! config._user_created && (
+						{ config._orphaned && (
 							<Notice status="warning" isDismissible={ false }>
 								{ __(
-									'Warning: you are editing a built-in entity, which might have unexpected consequences.'
+									'This entity is no longer registered. The plugin or theme that created it may be deactivated. Saving changes will have no effect until it is registered again.'
+								) }
+							</Notice>
+						) }
+						{ ! config._orphaned && config._source === 'core' && (
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Warning: you are editing a core WordPress entity. Changes might have unexpected consequences.'
+								) }
+							</Notice>
+						) }
+						{ ! config._orphaned && config._source === 'plugin' && (
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'Warning: you are editing an entity registered by a plugin or theme. If it is updated or deactivated, your changes may be lost.'
 								) }
 							</Notice>
 						) }

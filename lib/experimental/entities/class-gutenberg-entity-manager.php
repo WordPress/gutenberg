@@ -39,6 +39,7 @@ class Gutenberg_Entity_Manager {
 	 */
 	public static function apply_entity_configs() {
 		$configs = get_option( self::OPTION_NAME, null );
+		$dirty   = false;
 
 		// First activation: seed from current state.
 		if ( null === $configs || false === $configs ) {
@@ -47,26 +48,53 @@ class Gutenberg_Entity_Manager {
 			return;
 		}
 
-		// Apply post type configs.
-		if ( ! empty( $configs['post_types'] ) ) {
-			foreach ( $configs['post_types'] as $slug => $config ) {
-				if ( empty( $config['_user_created'] ) && post_type_exists( $slug ) ) {
-					self::modify_post_type( $slug, $config );
-				} elseif ( ! empty( $config['_user_created'] ) && ! post_type_exists( $slug ) ) {
-					self::register_custom_post_type( $slug, $config );
-				}
+		if ( ! isset( $configs['post_types'] ) ) {
+			$configs['post_types'] = array();
+		}
+		if ( ! isset( $configs['taxonomies'] ) ) {
+			$configs['taxonomies'] = array();
+		}
+
+		// Auto-detect new post types registered by plugins since last run.
+		$post_types = get_post_types( array(), 'objects' );
+		foreach ( $post_types as $slug => $type_object ) {
+			if ( ! isset( $configs['post_types'][ $slug ] ) ) {
+				$configs['post_types'][ $slug ] = self::extract_post_type_config( $slug, $type_object );
+				$dirty                          = true;
 			}
 		}
 
-		// Apply taxonomy configs.
-		if ( ! empty( $configs['taxonomies'] ) ) {
-			foreach ( $configs['taxonomies'] as $slug => $config ) {
-				if ( empty( $config['_user_created'] ) && taxonomy_exists( $slug ) ) {
-					self::modify_taxonomy( $slug, $config );
-				} elseif ( ! empty( $config['_user_created'] ) && ! taxonomy_exists( $slug ) ) {
-					self::register_custom_taxonomy( $slug, $config );
-				}
+		// Auto-detect new taxonomies registered by plugins since last run.
+		$taxonomies = get_taxonomies( array(), 'objects' );
+		foreach ( $taxonomies as $slug => $taxonomy_object ) {
+			if ( ! isset( $configs['taxonomies'][ $slug ] ) ) {
+				$configs['taxonomies'][ $slug ] = self::extract_taxonomy_config( $slug, $taxonomy_object );
+				$dirty                          = true;
 			}
+		}
+
+		// Apply post type configs.
+		foreach ( $configs['post_types'] as $slug => $config ) {
+			if ( empty( $config['_user_created'] ) && post_type_exists( $slug ) ) {
+				self::modify_post_type( $slug, $config );
+			} elseif ( ! empty( $config['_user_created'] ) && ! post_type_exists( $slug ) ) {
+				self::register_custom_post_type( $slug, $config );
+			}
+			// If not user-created and doesn't exist, it's an orphan — skip silently.
+		}
+
+		// Apply taxonomy configs.
+		foreach ( $configs['taxonomies'] as $slug => $config ) {
+			if ( empty( $config['_user_created'] ) && taxonomy_exists( $slug ) ) {
+				self::modify_taxonomy( $slug, $config );
+			} elseif ( ! empty( $config['_user_created'] ) && ! taxonomy_exists( $slug ) ) {
+				self::register_custom_taxonomy( $slug, $config );
+			}
+			// If not user-created and doesn't exist, it's an orphan — skip silently.
+		}
+
+		if ( $dirty ) {
+			update_option( self::OPTION_NAME, $configs, false );
 		}
 	}
 
@@ -126,6 +154,7 @@ class Gutenberg_Entity_Manager {
 
 		return array(
 			'_user_created' => false,
+			'_source'       => ! empty( $type_object->_builtin ) ? 'core' : 'plugin',
 			'labels'        => $labels,
 			'description'   => $type_object->description ?? '',
 			'public'        => (bool) ( $type_object->public ?? false ),
@@ -165,6 +194,7 @@ class Gutenberg_Entity_Manager {
 
 		return array(
 			'_user_created' => false,
+			'_source'       => ! empty( $taxonomy_object->_builtin ) ? 'core' : 'plugin',
 			'labels'        => $labels,
 			'description'   => $taxonomy_object->description ?? '',
 			'public'        => (bool) ( $taxonomy_object->public ?? false ),
