@@ -371,7 +371,6 @@ export default dedupePlugins( [
 		rules: {
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
-			'@wordpress/no-unsafe-render-order': 'error',
 		},
 	},
 
