@@ -54,9 +54,7 @@ export function Comments( {
 	onAddReply,
 	onCommentDelete,
 	commentSidebarRef,
-	reflowComments,
 	isFloating = false,
-	commentLastUpdated,
 } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
@@ -277,7 +275,6 @@ export function Comments( {
 					onEditComment={ onEditComment }
 					isSelected={ selectedNote === thread.id }
 					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
 					floating={
 						isFloating
 							? {
@@ -285,7 +282,6 @@ export function Comments( {
 										boardOffsets[ thread.id ] ?? 0,
 									registerThread,
 									unregisterThread,
-									commentLastUpdated,
 							  }
 							: undefined
 					}
@@ -309,7 +305,6 @@ function Thread( {
 	onCommentDelete,
 	isSelected,
 	commentSidebarRef,
-	reflowComments,
 	floating,
 	onKeyDown,
 } ) {
@@ -328,7 +323,6 @@ function Thread( {
 		calculatedOffset: floating?.calculatedOffset ?? 0,
 		registerThread: floating?.registerThread,
 		unregisterThread: floating?.unregisterThread,
-		commentLastUpdated: floating?.commentLastUpdated,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
 
@@ -420,7 +414,6 @@ function Thread( {
 			<AddComment
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
 				floating={ { y, refs } }
 			/>
 		);
@@ -493,7 +486,6 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -504,7 +496,6 @@ function Thread( {
 						isExpanded={ isSelected }
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
-						reflowComments={ reflowComments }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -540,7 +531,6 @@ function Thread( {
 					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
-					reflowComments={ reflowComments }
 				/>
 			) }
 			{ isSelected && (
@@ -587,7 +577,6 @@ function Thread( {
 								thread.id,
 								thread.author_name
 							) }
-							reflowComments={ reflowComments }
 						/>
 					</VStack>
 				</VStack>
@@ -609,14 +598,7 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( {
-	thread,
-	parent,
-	isExpanded,
-	onEdit,
-	onDelete,
-	reflowComments,
-} ) => {
+const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
@@ -776,7 +758,6 @@ const CommentBoard = ( {
 						thread.id,
 						thread.author_name
 					) }
-					reflowComments={ reflowComments }
 				/>
 			) : (
 				<RawHTML

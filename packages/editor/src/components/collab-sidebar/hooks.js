@@ -15,7 +15,6 @@ import {
 	useState,
 	useEffect,
 	useMemo,
-	useReducer,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
@@ -35,16 +34,11 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { calculateAllOffsets, noop } from './utils';
+import { calculateAllOffsets } from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
-	const [ commentLastUpdated, reflowComments ] = useReducer(
-		() => Date.now(),
-		0
-	);
-
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -167,12 +161,10 @@ export function useBlockComments( postId ) {
 	return {
 		resultComments,
 		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
 	};
 }
 
-export function useBlockCommentsActions( reflowComments = noop ) {
+export function useBlockCommentsActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -226,10 +218,8 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -294,9 +284,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -328,9 +316,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -417,7 +403,6 @@ export function useFloatingThread( {
 	calculatedOffset,
 	registerThread,
 	unregisterThread,
-	commentLastUpdated,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
 
@@ -437,7 +422,7 @@ export function useFloatingThread( {
 		if ( blockElement ) {
 			refs.setReference( blockElement );
 		}
-	}, [ blockElement, refs, commentLastUpdated ] );
+	}, [ blockElement, refs ] );
 
 	// Register block + floating elements with the board.
 	// The board's ResizeObserver tracks height changes automatically.
