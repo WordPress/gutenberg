@@ -157,9 +157,8 @@ function validateAttributeAnchors() {
 
 	const content = fs.readFileSync( ATTRIBUTES_DOC_PATH, 'utf-8' );
 	const anchors = new Set(
-		Array.from(
-			content.matchAll( /^#{1,6}\s+(.+)$/gm ),
-			( m ) => slugifyHeading( m[ 1 ] )
+		Array.from( content.matchAll( /^#{1,6}\s+(.+)$/gm ), ( m ) =>
+			slugifyHeading( m[ 1 ] )
 		)
 	);
 
@@ -180,6 +179,17 @@ function validateAttributeAnchors() {
 // ─── Formatting helpers ─────────────────────────────────────────────────────
 
 /**
+ * Build a markdown link to a specific anchor on the Block Attributes docs page.
+ *
+ * @param {string} label  Display text for the link.
+ * @param {string} anchor Key in ATTRIBUTE_ANCHORS.
+ * @return {string} Markdown link.
+ */
+function attrLink( label, anchor ) {
+	return `[${ label }](${ ATTRIBUTES_REF }#${ ATTRIBUTE_ANCHORS[ anchor ] })`;
+}
+
+/**
  * Format attributes as a Markdown table.
  *
  * @param {Object} attributes
@@ -190,11 +200,11 @@ function formatAttributesTable( attributes ) {
 		return '_This block has no custom attributes._';
 	}
 
-	const attrLink = ( label, anchor ) =>
-		`[${ label }](${ ATTRIBUTES_REF }#${ ATTRIBUTE_ANCHORS[ anchor ] })`;
-
 	const rows = [
-		`| Attribute | ${ attrLink( 'Type', 'type' ) } | ${ attrLink( 'Default', 'default' ) } | Description |`,
+		`| Attribute | ${ attrLink( 'Type', 'type' ) } | ${ attrLink(
+			'Default',
+			'default'
+		) } | Description |`,
 		'|-----------|------|---------|-------------|',
 	];
 
@@ -208,31 +218,28 @@ function formatAttributesTable( attributes ) {
 				: '—';
 
 		const descParts = [];
-		if ( attrDef.source ) {
-			descParts.push(
-				`${ attrLink( 'Source', 'source' ) }: \`${ attrDef.source }\``
-			);
+
+		// Simple key-value description fields.
+		const simpleFields = [
+			[ 'source', 'Source' ],
+			[ 'selector', 'Selector' ],
+			[ 'attribute', 'HTML attr' ],
+			[ 'role', 'Role' ],
+		];
+		for ( const [ field, label ] of simpleFields ) {
+			if ( attrDef[ field ] ) {
+				descParts.push(
+					`${ attrLink( label, field ) }: \`${ attrDef[ field ] }\``
+				);
+			}
 		}
-		if ( attrDef.selector ) {
-			descParts.push(
-				`${ attrLink( 'Selector', 'selector' ) }: \`${ attrDef.selector }\``
-			);
-		}
-		if ( attrDef.attribute ) {
-			descParts.push(
-				`${ attrLink( 'HTML attr', 'attribute' ) }: \`${ attrDef.attribute }\``
-			);
-		}
+
+		// Enum needs special formatting (list of values).
 		if ( attrDef.enum ) {
 			descParts.push(
 				`${ attrLink( 'Enum', 'enum' ) }: ${ attrDef.enum
 					.map( ( v ) => `\`${ v }\`` )
 					.join( ', ' ) }`
-			);
-		}
-		if ( attrDef.role ) {
-			descParts.push(
-				`${ attrLink( 'Role', 'role' ) }: \`${ attrDef.role }\``
 			);
 		}
 
