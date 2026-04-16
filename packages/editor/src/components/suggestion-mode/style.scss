@@ -44,3 +44,22 @@ $suggestion-color: #007017;
 		color: $gray-700;
 	}
 }
+
+// Inline accept/reject buttons live in the note header, right-aligned next
+// to the author info. Force both icons to render at the same box so the
+// checkmark (a thin glyph) visually matches the close glyph next to it.
+.editor-collab-sidebar-panel__suggestion-header-actions {
+	margin-left: auto;
+
+	.components-button.has-icon {
+		width: $grid-unit-40;
+		height: $grid-unit-40;
+		min-width: $grid-unit-40;
+		padding: 0;
+
+		svg {
+			width: $grid-unit-30;
+			height: $grid-unit-30;
+		}
+	}
+}
