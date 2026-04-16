@@ -1087,16 +1087,37 @@ export const setEditorIntent =
 			return;
 		}
 
+		const previousIntent = registry
+			.select( preferencesStore )
+			.get( 'core', 'editorIntent' );
+
 		registry
 			.dispatch( preferencesStore )
 			.set( 'core', 'editorIntent', intent );
 
+		// Skip the snackbar/announcement on the initial set (when there is no
+		// previous intent, e.g. during editor boot) so the user isn't greeted
+		// with a mode notice they didn't trigger.
+		if ( previousIntent === intent || previousIntent === undefined ) {
+			return;
+		}
+
+		let label;
 		if ( intent === EDITOR_INTENT_EDIT ) {
-			speak( __( 'Edit mode selected' ), 'assertive' );
+			label = __( "You're editing" );
 		} else if ( intent === EDITOR_INTENT_SUGGEST ) {
-			speak( __( 'Suggest mode selected' ), 'assertive' );
+			label = __( "You're suggesting" );
 		} else if ( intent === EDITOR_INTENT_VIEW ) {
-			speak( __( 'View mode selected' ), 'assertive' );
+			label = __( "You're viewing" );
+		}
+
+		if ( label ) {
+			speak( label, 'assertive' );
+			registry.dispatch( noticesStore ).createNotice( 'info', label, {
+				id: 'editor-intent-mode',
+				type: 'snackbar',
+				isDismissible: true,
+			} );
 		}
 	};
 

@@ -207,10 +207,6 @@ export function useSuggestionsProvider() {
 					} );
 				}
 
-				createNotice( 'snackbar', __( 'Suggestion submitted.' ), {
-					type: 'snackbar',
-					isDismissible: true,
-				} );
 				return savedRecord;
 			} catch ( error ) {
 				createNotice(
@@ -229,6 +225,67 @@ export function useSuggestionsProvider() {
 			selectBlockAttributes,
 			createNotice,
 		]
+	);
+
+	const updateSuggestion = useCallback(
+		async ( { commentId, blockName, operations } ) => {
+			if ( ! commentId ) {
+				throw new Error( 'No comment id for suggestion update.' );
+			}
+
+			const payload = /** @type {SuggestionPayload} */ ( {
+				schemaVersion: SCHEMA_VERSION,
+				blockName,
+				baseRevision: postModified,
+				operations,
+			} );
+
+			try {
+				return await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						id: commentId,
+						meta: {
+							_wp_suggestion: JSON.stringify( payload ),
+						},
+					},
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message || __( 'Unable to update suggestion.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+				throw error;
+			}
+		},
+		[ postModified, saveEntityRecord, createNotice ]
+	);
+
+	const deleteSuggestion = useCallback(
+		async ( { commentId } ) => {
+			if ( ! commentId ) {
+				return;
+			}
+			try {
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{ id: commentId, status: 'trash' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message || __( 'Unable to remove suggestion.' ),
+					{ type: 'snackbar', isDismissible: true }
+				);
+				throw error;
+			}
+		},
+		[ saveEntityRecord, createNotice ]
 	);
 
 	const applySuggestion = useCallback(
@@ -328,7 +385,13 @@ export function useSuggestionsProvider() {
 		[ saveEntityRecord, createNotice ]
 	);
 
-	return { createSuggestion, applySuggestion, rejectSuggestion };
+	return {
+		createSuggestion,
+		updateSuggestion,
+		deleteSuggestion,
+		applySuggestion,
+		rejectSuggestion,
+	};
 }
 
 export { SCHEMA_VERSION };
