@@ -3,8 +3,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
-	box-shadow: none;
-
 	.interface-complementary-area-header {
 		display: none;
 	}
@@ -19,6 +17,10 @@
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
+
+	.editor-collab-sidebar & {
+		background-color: var(--wp-editor-canvas-background);
+	}
 }
 
 .editor-collab-sidebar-panel__thread {

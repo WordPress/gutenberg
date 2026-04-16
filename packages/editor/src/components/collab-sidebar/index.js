@@ -25,7 +25,6 @@ import { Comments } from './comments';
 import { store as editorStore } from '../../store';
 import AddCommentMenuItem from './comment-menu-item';
 import CommentAvatarIndicator from './comment-indicator-toolbar';
-import { useGlobalStylesContext } from '../global-styles-provider';
 import {
 	useBlockComments,
 	useBlockCommentsActions,
@@ -153,10 +152,6 @@ function NotesSidebar( { postId } ) {
 		}
 	);
 
-	// Get the global styles to set the background color of the sidebar.
-	const { merged: GlobalStyles } = useGlobalStylesContext();
-	const backgroundColor = GlobalStyles?.styles?.color?.background;
-
 	// Find the current thread for the selected block.
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
@@ -234,16 +229,12 @@ function NotesSidebar( { postId } ) {
 					identifier={ FLOATING_NOTES_SIDEBAR }
 					className="editor-collab-sidebar"
 					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
-						styles={ {
-							backgroundColor,
-						} }
 						isFloating
 					/>
 				</PluginSidebar>
