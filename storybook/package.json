@@ -19,6 +19,10 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"exports": {
+		"./main": "./main.ts",
+		"./preview": "./preview.jsx"
+	},
 	"devDependencies": {
 		"@storybook/addon-a11y": "^10.2.8",
 		"@storybook/addon-docs": "^10.2.8",

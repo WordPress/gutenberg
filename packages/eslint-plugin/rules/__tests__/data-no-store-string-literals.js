@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../data-no-store-string-literals';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -38,41 +38,86 @@ const valid = [
 	`import { controls as controlsAlias } from '@wordpress/data'; import { store as coreStore } from '@wordpress/core-data'; controlsAlias.resolveSelect( coreStore );`,
 ];
 
-const createSuggestionTestCase = ( code, output ) => ( {
+const createErrorWithSuggestions = ( storeName, output ) => [
+	{
+		messageId: 'doNotUseStringLiteral',
+		data: { argument: storeName },
+		suggestions: [
+			{
+				desc: 'Replace literal with store definition. Import store if necessary.',
+				output,
+			},
+		],
+	},
+];
+
+const createSuggestionTestCase = ( code, output, storeName = 'core' ) => ( {
 	code,
-	errors: [
-		{
-			suggestions: [
-				{
-					desc: 'Replace literal with store definition. Import store if necessary.',
-					output,
-				},
-			],
-		},
-	],
+	errors: createErrorWithSuggestions( storeName, output ),
 } );
 
 const invalid = [
 	// Callback functions.
-	`import { createRegistrySelector } from '@wordpress/data'; createRegistrySelector(( select ) => { select( 'core' ); });`,
-	`import { useSelect } from '@wordpress/data'; useSelect(( select ) => { select( 'core' ); });`,
-	`import { withSelect } from '@wordpress/data'; withSelect(( select ) => { select( 'core' ); });`,
-	`import { withDispatch } from '@wordpress/data'; withDispatch(( select ) => { select( 'core' ); });`,
-	`import { withDispatch as withDispatchAlias } from '@wordpress/data'; withDispatchAlias(( select ) => { select( 'core' ); });`,
+	createSuggestionTestCase(
+		`import { createRegistrySelector } from '@wordpress/data'; createRegistrySelector(( select ) => { select( 'core' ); });`,
+		`import { createRegistrySelector } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; createRegistrySelector(( select ) => { select( coreStore ); });`
+	),
+	createSuggestionTestCase(
+		`import { useSelect } from '@wordpress/data'; useSelect(( select ) => { select( 'core' ); });`,
+		`import { useSelect } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; useSelect(( select ) => { select( coreStore ); });`
+	),
+	createSuggestionTestCase(
+		`import { withSelect } from '@wordpress/data'; withSelect(( select ) => { select( 'core' ); });`,
+		`import { withSelect } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; withSelect(( select ) => { select( coreStore ); });`
+	),
+	createSuggestionTestCase(
+		`import { withDispatch } from '@wordpress/data'; withDispatch(( select ) => { select( 'core' ); });`,
+		`import { withDispatch } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; withDispatch(( select ) => { select( coreStore ); });`
+	),
+	createSuggestionTestCase(
+		`import { withDispatch as withDispatchAlias } from '@wordpress/data'; withDispatchAlias(( select ) => { select( 'core' ); });`,
+		`import { withDispatch as withDispatchAlias } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; withDispatchAlias(( select ) => { select( coreStore ); });`
+	),
 
 	// Direct function calls.
-	`import { useDispatch } from '@wordpress/data'; useDispatch( 'core' );`,
-	`import { dispatch } from '@wordpress/data'; dispatch( 'core' );`,
-	`import { useSelect } from '@wordpress/data'; useSelect( 'core' );`,
-	`import { select } from '@wordpress/data'; select( 'core' );`,
-	`import { resolveSelect } from '@wordpress/data'; resolveSelect( 'core' );`,
-	`import { resolveSelect as resolveSelectAlias } from '@wordpress/data'; resolveSelectAlias( 'core' );`,
+	createSuggestionTestCase(
+		`import { useDispatch } from '@wordpress/data'; useDispatch( 'core' );`,
+		`import { useDispatch } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; useDispatch( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { dispatch } from '@wordpress/data'; dispatch( 'core' );`,
+		`import { dispatch } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; dispatch( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { useSelect } from '@wordpress/data'; useSelect( 'core' );`,
+		`import { useSelect } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; useSelect( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { resolveSelect } from '@wordpress/data'; resolveSelect( 'core' );`,
+		`import { resolveSelect } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; resolveSelect( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { resolveSelect as resolveSelectAlias } from '@wordpress/data'; resolveSelectAlias( 'core' );`,
+		`import { resolveSelect as resolveSelectAlias } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; resolveSelectAlias( coreStore );`
+	),
 
 	// Object property function calls.
-	`import { controls } from '@wordpress/data'; controls.select( 'core' );`,
-	`import { controls } from '@wordpress/data'; controls.dispatch( 'core' );`,
-	`import { controls } from '@wordpress/data'; controls.resolveSelect( 'core' );`,
-	`import { controls as controlsAlias } from '@wordpress/data'; controlsAlias.resolveSelect( 'core' );`,
+	createSuggestionTestCase(
+		`import { controls } from '@wordpress/data'; controls.select( 'core' );`,
+		`import { controls } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; controls.select( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { controls } from '@wordpress/data'; controls.dispatch( 'core' );`,
+		`import { controls } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; controls.dispatch( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { controls } from '@wordpress/data'; controls.resolveSelect( 'core' );`,
+		`import { controls } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; controls.resolveSelect( coreStore );`
+	),
+	createSuggestionTestCase(
+		`import { controls as controlsAlias } from '@wordpress/data'; controlsAlias.resolveSelect( 'core' );`,
+		`import { controls as controlsAlias } from '@wordpress/data';\nimport { store as coreStore } from '@wordpress/core-data'; controlsAlias.resolveSelect( coreStore );`
+	),
 
 	// Direct function calls suggestions
 	// Replace core with coreStore and import coreStore.
@@ -105,23 +150,18 @@ const invalid = [
 	// Replace block-editor with blockEditorStore.
 	createSuggestionTestCase(
 		`import { select } from '@wordpress/data'; select( 'core/block-editor' );`,
-		`import { select } from '@wordpress/data';\nimport { store as blockEditorStore } from '@wordpress/block-editor'; select( blockEditorStore );`
+		`import { select } from '@wordpress/data';\nimport { store as blockEditorStore } from '@wordpress/block-editor'; select( blockEditorStore );`,
+		'core/block-editor'
 	),
 	// Replace notices with noticesStore.
 	createSuggestionTestCase(
 		`import { select } from '@wordpress/data'; select( 'core/notices' );`,
-		`import { select } from '@wordpress/data';\nimport { store as noticesStore } from '@wordpress/notices'; select( noticesStore );`
+		`import { select } from '@wordpress/data';\nimport { store as noticesStore } from '@wordpress/notices'; select( noticesStore );`,
+		'core/notices'
 	),
-];
-const errors = [
-	{
-		message: `Do not use string literals ( 'core' ) for accessing @wordpress/data stores. Pass the store definition instead`,
-	},
 ];
 
 ruleTester.run( 'data-no-store-string-literals', rule, {
 	valid: valid.map( ( code ) => ( { code } ) ),
-	invalid: invalid.map( ( code ) =>
-		typeof code === 'string' ? { code, errors } : code
-	),
+	invalid,
 } );

@@ -4,11 +4,6 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Navigation block - Submenu Visibility', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMenus();
-		await requestUtils.deleteAllPages();
-	} );
-
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
 		await admin.createNewPost();
 
@@ -36,6 +31,11 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		} );
 		await expect( navBlock ).toBeVisible();
 		await editor.selectBlocks( navBlock );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMenus();
+		await requestUtils.deleteAllPages();
 	} );
 
 	test( 'When Always is selected, submenus are visible on the page', async ( {
@@ -139,6 +139,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 		const pageListBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Page List',
 		} );
+
 		await test.step( 'Test setup', async () => {
 			// Create parent and child pages for testing
 			const parentPage = await requestUtils.createPage( {
@@ -206,6 +207,7 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 
 			await expect( submenuVisibilityGroup ).toBeVisible();
 		} );
+
 		await test.step( 'Set submenu visibility to always', async () => {
 			const settingsPanel = page
 				.getByRole( 'region', { name: 'Editor settings' } )

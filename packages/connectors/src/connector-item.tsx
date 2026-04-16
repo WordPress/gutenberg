@@ -190,9 +190,9 @@ export function DefaultConnectorSettings( {
 			className="connector-settings"
 			style={
 				readOnly
-					? ( {
+					? {
 							'--wp-components-color-background': '#f0f0f0',
-					  } as React.CSSProperties )
+					  }
 					: undefined
 			}
 		>

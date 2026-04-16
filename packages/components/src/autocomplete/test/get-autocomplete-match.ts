@@ -71,7 +71,7 @@ describe( 'getAutocompleteMatch', () => {
 		} );
 	} );
 
-	it( 'should select the completer with the latest trigger index', () => {
+	it( 'should prefer the rightmost matching trigger when multiple completers match', () => {
 		const slashCompleter = createCompleter( {
 			name: 'slash',
 			triggerPrefix: '/',
@@ -219,6 +219,46 @@ describe( 'getAutocompleteMatch', () => {
 		);
 		expect( result ).not.toBeNull();
 		expect( result?.filterValue ).toBe( 'cafe' );
+	} );
+
+	it( 'should match the longer trigger when prefixes overlap', () => {
+		const singleAt = createCompleter( {
+			name: 'single',
+			triggerPrefix: '@',
+		} );
+		const doubleAt = createCompleter( {
+			name: 'double',
+			triggerPrefix: '@@',
+		} );
+		const result = getAutocompleteMatch(
+			'@@user',
+			[ singleAt, doubleAt ],
+			1,
+			false,
+			() => ''
+		);
+		expect( result?.completer.name ).toBe( 'double' );
+		expect( result?.filterValue ).toBe( 'user' );
+	} );
+
+	it( 'should match the shorter trigger when only it is present', () => {
+		const singleAt = createCompleter( {
+			name: 'single',
+			triggerPrefix: '@',
+		} );
+		const doubleAt = createCompleter( {
+			name: 'double',
+			triggerPrefix: '@@',
+		} );
+		const result = getAutocompleteMatch(
+			'hello @user',
+			[ singleAt, doubleAt ],
+			1,
+			false,
+			() => ''
+		);
+		expect( result?.completer.name ).toBe( 'single' );
+		expect( result?.filterValue ).toBe( 'user' );
 	} );
 
 	it( 'should handle special regex characters in trigger prefix', () => {

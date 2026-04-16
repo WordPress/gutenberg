@@ -203,10 +203,8 @@ describe( 'Dialog', () => {
 						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 						<Dialog.Popup>
 							<Dialog.Header>
-								{ /* @ts-expect-error this is just for test purposes */ }
-								<Dialog.Title>
-									{ /* Empty title */ }
-								</Dialog.Title>
+								{ /* Empty title */ }
+								<Dialog.Title />
 							</Dialog.Header>
 							<p>Content with empty title</p>
 							<Dialog.Footer>
@@ -421,6 +419,67 @@ describe( 'Dialog', () => {
 			} );
 
 			expect( customFocus ).toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'container', () => {
+		it( 'should render inside the container when provided', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<div data-testid="wrapper">
+					<Dialog.Root>
+						<Dialog.Trigger>Open</Dialog.Trigger>
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Dialog.Popup container={ containerRef }>
+							<Dialog.Header>
+								<Dialog.Title>Title</Dialog.Title>
+							</Dialog.Header>
+							Dialog content
+						</Dialog.Popup>
+					</Dialog.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText( 'Dialog content' );
+			expect( content ).toBeVisible();
+
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				content
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="wrapper">
+					<Dialog.Root>
+						<Dialog.Trigger>Open</Dialog.Trigger>
+						<Dialog.Popup>
+							<Dialog.Header>
+								<Dialog.Title>Title</Dialog.Title>
+							</Dialog.Header>
+							Portal content
+						</Dialog.Popup>
+					</Dialog.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const content = await screen.findByText( 'Portal content' );
+			expect( content ).toBeVisible();
+
+			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
+				content
+			);
 		} );
 	} );
 } );

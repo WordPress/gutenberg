@@ -9,6 +9,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Icon, chevronDown } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -50,7 +51,7 @@ export function LinkPreview( { title, url, image, badges } ) {
 							numberOfLines={ 1 }
 							className="link-preview-button__title"
 						>
-							{ title }
+							{ stripHTML( title ) }
 						</Truncate>
 						{ url && (
 							<Truncate

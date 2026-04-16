@@ -2,10 +2,12 @@ import { RuleTester } from 'eslint';
 import rule from '../no-setting-ds-tokens';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );
@@ -44,7 +46,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `<div style={ { '--wpds-font-size-md': '10px', color: 'blue' } } />`,
+			code: `<div style={ { '--wpds-typography-font-size-md': '10px', color: 'blue' } } />`,
 			errors: [
 				{
 					messageId: 'disallowedSet',
@@ -60,7 +62,7 @@ ruleTester.run( 'no-setting-ds-tokens', rule, {
 			],
 		},
 		{
-			code: `function getStyles() { return { '--wpds-font-size-md': '10px' }; }`,
+			code: `function getStyles() { return { '--wpds-typography-font-size-md': '10px' }; }`,
 			errors: [
 				{
 					messageId: 'disallowedSet',

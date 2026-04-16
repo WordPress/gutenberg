@@ -9,6 +9,7 @@
 		{ "path": "../blob" },
 		{ "path": "../block-library" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -40,6 +41,7 @@
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
 		{ "path": "../views" },
 		{ "path": "../wordcount" }
 	],
