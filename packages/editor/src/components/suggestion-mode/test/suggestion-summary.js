@@ -116,6 +116,63 @@ describe( 'summarizeOperations', () => {
 		expect( lines[ 0 ].value.endsWith( '…”' ) ).toBe( true );
 	} );
 
+	it( 'reports bold toggled on as Formatting: bold', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 's magna elementum platea neque.',
+				after: 's magna elementum platea <strong>neque</strong>.',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+	} );
+
+	it( 'reports bold toggled off as Formatting: bold', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello <strong>brave</strong> world',
+				after: 'Hello brave world',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+	} );
+
+	it( 'collapses multiple inline format changes into one Formatting: line', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'hello world',
+				after: '<strong><em>hello</em></strong> world',
+			},
+		] );
+		expect( lines ).toHaveLength( 1 );
+		expect( lines[ 0 ].label ).toBe( 'Formatting:' );
+		expect( lines[ 0 ].value ).toMatch( /bold/ );
+		expect( lines[ 0 ].value ).toMatch( /italic/ );
+	} );
+
+	it( 'still reports Add/Delete when text also changed alongside formatting', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Hello world',
+				after: 'Hello <strong>brave</strong> world',
+			},
+		] );
+		// Visible text differs ("brave" inserted), so this takes the text-diff
+		// path rather than the Formatting: path.
+		expect( lines ).toEqual(
+			expect.arrayContaining( [
+				{ label: 'Add:', value: expect.stringContaining( 'brave' ) },
+			] )
+		);
+	} );
+
 	it( 'treats non-text content attributes as a format change', () => {
 		const lines = summarizeOperations( [
 			{
