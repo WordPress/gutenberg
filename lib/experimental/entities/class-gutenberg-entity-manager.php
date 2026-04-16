@@ -73,6 +73,30 @@ class Gutenberg_Entity_Manager {
 			}
 		}
 
+		// Clean up uncustomized orphans: stored plugin entities that are no
+		// longer registered and were never customized have no reason to
+		// linger in the option.
+		foreach ( $configs['post_types'] as $slug => $config ) {
+			if (
+				empty( $config['_user_created'] ) &&
+				empty( $config['_customized'] ) &&
+				! post_type_exists( $slug )
+			) {
+				unset( $configs['post_types'][ $slug ] );
+				$dirty = true;
+			}
+		}
+		foreach ( $configs['taxonomies'] as $slug => $config ) {
+			if (
+				empty( $config['_user_created'] ) &&
+				empty( $config['_customized'] ) &&
+				! taxonomy_exists( $slug )
+			) {
+				unset( $configs['taxonomies'][ $slug ] );
+				$dirty = true;
+			}
+		}
+
 		// Apply post type configs.
 		foreach ( $configs['post_types'] as $slug => $config ) {
 			if ( empty( $config['_user_created'] ) && post_type_exists( $slug ) ) {
