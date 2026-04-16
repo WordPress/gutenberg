@@ -21,11 +21,7 @@ const EMPTY_ARRAY = [];
 const TABS_TEMPLATE = [
 	[
 		'core/tabs-menu',
-		{
-			lock: {
-				remove: true,
-			},
-		},
+		{},
 		[
 			[ 'core/tabs-menu-item', {} ],
 			[ 'core/tabs-menu-item', {} ],
@@ -33,11 +29,7 @@ const TABS_TEMPLATE = [
 	],
 	[
 		'core/tab-panel',
-		{
-			lock: {
-				remove: true,
-			},
-		},
+		{},
 		[
 			[
 				'core/tab',
@@ -239,7 +231,7 @@ function Edit( {
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
-		templateLock: false,
+		templateLock: 'all',
 		renderAppender: false,
 	} );
 
