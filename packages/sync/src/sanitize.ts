@@ -1,21 +1,69 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import { safeHTML } from '@wordpress/dom';
+import DOMPurify, {
+	type Config as DOMPurifyConfig,
+	type UponSanitizeAttributeHook,
+} from 'dompurify';
 
 /**
  * Internal dependencies
  */
-import type { ObjectData } from './types';
+import type { KsesAllowedHtml, ObjectData } from './types';
+
+const allowedHtml: KsesAllowedHtml = window._wpCollaborationKsesHtml ?? {};
+
+const allowedTags = Object.keys( allowedHtml );
+const allowedAttrs = Array.from(
+	new Set(
+		allowedTags.flatMap( ( tag ) => Object.keys( allowedHtml[ tag ] ) )
+	)
+);
+
+// Enforce per-tag attribute filtering to match kses semantics. DOMPurify's
+// `ALLOWED_ATTR` is a flat global set; kses scopes attributes to specific
+// tags. Without this hook, an attribute allowed on one tag would be allowed
+// on every tag.
+const enforcePerTagAttributes: UponSanitizeAttributeHook = ( node, data ) => {
+	if ( 0 === allowedTags.length ) {
+		return;
+	}
+
+	const tag = node.nodeName.toLowerCase();
+	const attr = data.attrName.toLowerCase();
+	const tagAttrs = allowedHtml[ tag ];
+
+	if ( ! tagAttrs || ! tagAttrs[ attr ] ) {
+		data.keepAttr = false;
+	}
+};
+
+DOMPurify.addHook( 'uponSanitizeAttribute', enforcePerTagAttributes );
+
+// URI scheme filtering is left to DOMPurify's built-in `IS_ALLOWED_URI`
+// pattern (blocks `javascript:`, `data:`, `vbscript:`, etc.) rather than a
+// hand-rolled regex around `wp_allowed_protocols()`. Slightly stricter than
+// kses (a few exotic schemes like `irc:`, `webcal:` are dropped), which is
+// acceptable for a security-first sanitizer.
+const sanitizeConfig: DOMPurifyConfig = {
+	// FORCE_BODY ensures leading HTML comments are not stripped.
+	// WordPress block markup relies on comment delimiters
+	// (e.g. <!-- wp:paragraph -->) that may precede any element.
+	FORCE_BODY: true,
+	// Allow HTML comment nodes so block delimiters survive.
+	ADD_TAGS: [ '#comment' ],
+	...( allowedTags.length > 0 ? { ALLOWED_TAGS: allowedTags } : {} ),
+	...( allowedAttrs.length > 0 ? { ALLOWED_ATTR: allowedAttrs } : {} ),
+};
 
 /**
- * Recursively sanitizes all string values in a plain object graph using
- * `safeHTML`, which strips `<script>` tags and `on*` event-handler attributes.
- * This prevents XSS attacks from malicious content injected by a remote RTC
- * collaborator into the shared CRDT document.
+ * Recursively sanitizes all string values in an object using DOMPurify
+ * configured with the kses-post allowlist injected from PHP. This prevents
+ * XSS attacks from malicious content injected by a remote RTC collaborator
+ * into the shared CRDT document.
  *
- * Non-string primitives (numbers, booleans, null, undefined) pass through
- * unchanged. Arrays and plain objects are traversed recursively.
+ * Non-string primitives (numbers, booleans, null, undefined) are passed
+ * through unchanged. Arrays and plain objects are traversed recursively.
  *
  * @param {unknown} value The value to sanitize.
  * @return {unknown} The sanitized value.
@@ -26,14 +74,13 @@ export function sanitizeValue( value: unknown ): unknown {
 			return value;
 		}
 
-		return safeHTML( value );
+		return DOMPurify.sanitize( value, sanitizeConfig );
 	}
 
 	if ( Array.isArray( value ) ) {
 		return value.map( sanitizeValue );
 	}
 
-	// Recurse into plain objects
 	if ( value && 'object' === typeof value && isPlainObject( value ) ) {
 		return sanitizeObjectData( value as Record< string, unknown > );
 	}

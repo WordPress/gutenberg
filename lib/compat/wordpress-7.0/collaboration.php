@@ -221,7 +221,8 @@ function gutenberg_inject_real_time_collaboration_setting() {
 
 	wp_add_inline_script(
 		'wp-core-data',
-		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';',
+		'window._wpCollaborationEnabled = ' . wp_json_encode( $enabled ) . ';' .
+			'window._wpCollaborationKsesHtml = ' . wp_json_encode( wp_kses_allowed_html( 'post' ) ) . ';',
 		'after'
 	);
 }
