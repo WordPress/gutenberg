@@ -47,7 +47,7 @@ import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import {
 	SuggestionOverlayProvider,
-	SuggestionCommitBar,
+	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
@@ -478,7 +478,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<PatternRenameModal />
 										<PatternDuplicateModal />
 										<SuggestionStoreInterceptor />
-										<SuggestionCommitBar />
+										<SuggestionAutoSave />
 									</>
 								) }
 							</SuggestionOverlayProvider>
