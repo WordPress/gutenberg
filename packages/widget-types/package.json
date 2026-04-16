@@ -43,6 +43,14 @@
 	"wpScript": true,
 	"wpScriptModuleExports": "./build-module/index.mjs",
 	"types": "build-types",
+	"sideEffects": [
+		"src/index.{js,ts}",
+		"src/store/index.{js,ts}",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
+	],
 	"dependencies": {
 		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
