@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added [`no-unsafe-render-order`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md) rule to flag unsafe render-prop composition with `VisuallyHidden` and `Link`/`Text` ([#77428](https://github.com/WordPress/gutenberg/pull/77428)).
+
 ## 25.0.0 (2026-04-15)
 
 ### Breaking Changes
