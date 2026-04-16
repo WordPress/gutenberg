@@ -1523,6 +1523,8 @@ Sets the current editor intent.
 
 The intent represents the user's editing purpose: directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`). It is orthogonal to the `editorMode` preference (visual vs. code).
 
+The intent is _session-scoped_ — reloading the editor always returns to `edit`. Persisting suggest/view across reloads surprises users who don't realize they left the editor in a non-default state.
+
 _Parameters_
 
 -   _intent_ `'edit'|'suggest'|'view'`: The editor intent to set.
