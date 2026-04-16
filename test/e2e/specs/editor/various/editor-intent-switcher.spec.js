@@ -59,4 +59,44 @@ test.describe( 'Editor intent switcher', () => {
 			'true'
 		);
 	} );
+
+	test( 'View intent prevents suggestion overlay and commit bar', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Protected content' },
+		} );
+
+		// First enter Suggest mode and type to create an overlay.
+		await openIntentSwitcher( page );
+		await page.getByRole( 'menuitemradio', { name: 'Suggest' } ).click();
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' added' );
+		await expect( paragraph ).toContainText( 'Protected content added' );
+
+		// Submit suggestion button should be visible in Suggest mode.
+		const submitButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Submit suggestion' } );
+		await expect( submitButton ).toBeVisible();
+
+		// Switch to View — the editor becomes read-only and the commit
+		// bar should disappear because isSuggestMode === false.
+		await openIntentSwitcher( page );
+		await page.getByRole( 'menuitemradio', { name: 'View' } ).click();
+
+		await expect( submitButton ).toBeHidden();
+
+		// The serialized content is unchanged — no suggestion leaked.
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).toContain( 'Protected content' );
+		expect( serialized ).not.toContain( 'added' );
+	} );
 } );

@@ -131,4 +131,31 @@ describe( 'withSuggestionOverlay', () => {
 			'proposed'
 		);
 	} );
+
+	it( 'passes through in View intent — no overlay, no diversion', () => {
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId="a"
+				name="core/paragraph"
+				attributes={ { content: 'Untouched' } }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'view' }
+		);
+
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'Untouched'
+		);
+
+		act( () => {
+			screen.getByRole( 'button', { name: 'edit' } ).click();
+		} );
+
+		// In view intent the HOC is a pass-through, so the real
+		// setAttributes is invoked and the overlay is never used.
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+	} );
 } );
