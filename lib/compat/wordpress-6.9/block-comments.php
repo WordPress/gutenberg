@@ -53,26 +53,44 @@ function gutenberg_register_block_comment_metadata() {
 	// is a suggested edit: the value is a JSON-encoded payload describing the
 	// block, baseline revision, and proposed operations. See
 	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
+	//
+	// Maximum payload size is 64KB. Requests exceeding this are truncated by
+	// the sanitize_callback — this prevents a malicious user from flooding
+	// the meta table with arbitrarily large JSON blobs.
+	$max_suggestion_payload_bytes = 65536;
+
 	register_meta(
 		'comment',
 		'_wp_suggestion',
 		array(
-			'type'          => 'string',
-			'description'   => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
-			'single'        => true,
-			'show_in_rest'  => array(
+			'type'              => 'string',
+			'description'       => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
+			'single'            => true,
+			'show_in_rest'      => array(
 				'schema' => array(
-					'type' => 'string',
+					'type'      => 'string',
+					'maxLength' => $max_suggestion_payload_bytes,
 				),
 			),
-			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+			'sanitize_callback' => function ( $value ) use ( $max_suggestion_payload_bytes ) {
+				if ( ! is_string( $value ) ) {
+					return '';
+				}
+				if ( strlen( $value ) > $max_suggestion_payload_bytes ) {
+					return substr( $value, 0, $max_suggestion_payload_bytes );
+				}
+				return $value;
+			},
+			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
+				$comment = get_comment( $object_id );
+				if ( $comment && 'note' === $comment->comment_type ) {
+					return current_user_can( 'edit_post', $comment->comment_post_ID );
+				}
 				return current_user_can( 'edit_comment', $object_id );
 			},
 		)
 	);
 
-	// Lifecycle status for a suggestion. `pending` on creation; moved to
-	// `applied` or `rejected` by Phase 3's apply/reject actions.
 	register_meta(
 		'comment',
 		'_wp_suggestion_status',
@@ -87,6 +105,10 @@ function gutenberg_register_block_comment_metadata() {
 				),
 			),
 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				$comment = get_comment( $object_id );
+				if ( $comment && 'note' === $comment->comment_type ) {
+					return current_user_can( 'edit_post', $comment->comment_post_ID );
+				}
 				return current_user_can( 'edit_comment', $object_id );
 			},
 		)

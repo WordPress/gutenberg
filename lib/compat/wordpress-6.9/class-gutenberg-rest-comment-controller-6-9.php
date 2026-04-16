@@ -131,6 +131,96 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to update a comment.
+	 *
+	 * Extends core's check so that users who can `edit_post` on the parent
+	 * post are also allowed to update note-type comments — but only for
+	 * suggestion-lifecycle fields (status and `_wp_suggestion_status` meta).
+	 * This unblocks the suggestion workflow where a post editor applies or
+	 * rejects a suggestion authored by someone else, without granting them
+	 * the ability to rewrite the note's content, reassign authorship, or
+	 * otherwise modify another user's comment.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		// For note comments, allow users who can edit the parent post to
+		// update suggestion-lifecycle fields only.
+		if (
+			'note' === $comment->comment_type &&
+			self::is_suggestion_lifecycle_update( $request )
+		) {
+			$post = get_post( $comment->comment_post_ID );
+			if ( $post && current_user_can( 'edit_post', $post->ID ) ) {
+				return true;
+			}
+		}
+
+		// Fall back to core's default check (moderate_comments or edit_comment).
+		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Determines whether a note-update request touches only the fields used
+	 * by the suggestion apply/reject lifecycle.
+	 *
+	 * Allowed fields:
+	 *  - `status` (limited to `approved` or `hold`)
+	 *  - `meta._wp_suggestion_status`
+	 *
+	 * Any other field present in the request body disqualifies the request
+	 * from the `edit_post` shortcut, forcing it through core's edit_comment
+	 * check instead.
+	 *
+	 * @param WP_REST_Request $request
+	 * @return bool
+	 */
+	private static function is_suggestion_lifecycle_update( $request ) {
+		$params       = $request->get_json_params();
+		$body_is_json = is_array( $params );
+		if ( ! $body_is_json ) {
+			// When the body isn't JSON, fall back to inspecting known
+			// request params. Non-JSON updates are rare from the block
+			// editor client, so a stricter fallback is safer.
+			return false;
+		}
+
+		$allowed_keys = array( 'id', 'status', 'meta' );
+		foreach ( array_keys( $params ) as $key ) {
+			if ( ! in_array( $key, $allowed_keys, true ) ) {
+				return false;
+			}
+		}
+
+		if (
+			isset( $params['status'] ) &&
+			! in_array( $params['status'], array( 'approved', 'hold' ), true )
+		) {
+			return false;
+		}
+
+		if ( isset( $params['meta'] ) ) {
+			if ( ! is_array( $params['meta'] ) ) {
+				return false;
+			}
+			$allowed_meta = array( '_wp_suggestion_status' );
+			foreach ( array_keys( $params['meta'] ) as $meta_key ) {
+				if ( ! in_array( $meta_key, $allowed_meta, true ) ) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && 'note' === $request['type'];
 
