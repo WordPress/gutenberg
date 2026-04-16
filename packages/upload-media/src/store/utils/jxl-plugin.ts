@@ -9,11 +9,43 @@ import { dispatch, resolveSelect } from '@wordpress/data';
 const CORE_STORE = 'core';
 
 /**
+ * Minimal shape of the core-data dispatch surface used here.
+ */
+interface CoreDataDispatch {
+	saveEntityRecord: (
+		kind: string,
+		name: string,
+		record: Record< string, unknown >,
+		options?: { throwOnError?: boolean }
+	) => Promise< unknown >;
+}
+
+/**
+ * Minimal shape of the core-data resolveSelect surface used here.
+ */
+interface CoreDataResolveSelect {
+	canUser: (
+		action: string,
+		resource: { kind: string; name: string }
+	) => Promise< boolean | undefined >;
+}
+
+/**
  * Vips JXL WASM configuration provided by the wp-vips-jxl plugin.
  */
 export interface VipsJxlConfig {
 	/** URL to the vips-jxl.wasm binary. */
 	wasmUrl: string;
+}
+
+interface WpApiSettings {
+	root?: string;
+	nonce?: string;
+}
+
+interface JxlWindowGlobals {
+	__vipsJxlConfig?: unknown;
+	wpApiSettings?: WpApiSettings;
 }
 
 /**
@@ -30,15 +62,38 @@ const JXL_PLUGIN_SLUG = 'wp-vips-jxl';
 let cachedConfig: VipsJxlConfig | null | undefined;
 
 /**
+ * Returns the window object typed with the globals we read/write.
+ */
+function getWindowGlobals(): JxlWindowGlobals {
+	return window as unknown as JxlWindowGlobals;
+}
+
+/**
+ * Validates that an unknown value has the VipsJxlConfig shape.
+ *
+ * The REST endpoint and inline script are external/boundary inputs
+ * that may be stale, corrupted, or (in the inline-script case) even
+ * tampered with by another plugin. Validate before trusting.
+ * @param value
+ */
+function isVipsJxlConfig( value: unknown ): value is VipsJxlConfig {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		typeof ( value as { wasmUrl?: unknown } ).wasmUrl === 'string' &&
+		( value as { wasmUrl: string } ).wasmUrl.length > 0
+	);
+}
+
+/**
  * Returns vips JXL WASM config if the plugin is active.
  *
  * Checks window.__vipsJxlConfig which is set by the plugin
  * via wp_add_inline_script on editor page load.
  */
 function getVipsJxlConfig(): VipsJxlConfig | null {
-	const config = ( window as unknown as Record< string, unknown > )
-		.__vipsJxlConfig as VipsJxlConfig | undefined;
-	return config ?? null;
+	const config = getWindowGlobals().__vipsJxlConfig;
+	return isVipsJxlConfig( config ) ? config : null;
 }
 
 /**
@@ -49,37 +104,36 @@ function getVipsJxlConfig(): VipsJxlConfig | null {
  */
 async function fetchVipsJxlConfig(): Promise< VipsJxlConfig | null > {
 	try {
-		const response = await window.fetch(
-			// Use wpApiSettings.root if available for proper REST URL prefix.
-			( (
-				window as unknown as Record<
-					string,
-					{ root?: string } | undefined
-				>
-			 ).wpApiSettings?.root ?? '/wp-json/' ) + 'wp-vips-jxl/v1/config',
-			{
-				credentials: 'same-origin',
-				headers: {
-					// Include the nonce for authentication.
-					'X-WP-Nonce':
-						( (
-							window as unknown as Record<
-								string,
-								{ nonce?: string } | undefined
-							>
-						 ).wpApiSettings?.nonce as string ) ?? '',
-				},
-			}
-		);
+		const { wpApiSettings } = getWindowGlobals();
+		const root = wpApiSettings?.root ?? '/wp-json/';
+		const nonce = wpApiSettings?.nonce ?? '';
+		const response = await window.fetch( root + 'wp-vips-jxl/v1/config', {
+			credentials: 'same-origin',
+			headers: {
+				'X-WP-Nonce': nonce,
+			},
+		} );
 		if ( ! response.ok ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`wp-vips-jxl: config endpoint returned ${ response.status }`
+			);
 			return null;
 		}
-		const config = ( await response.json() ) as VipsJxlConfig;
+		const config: unknown = await response.json();
+		if ( ! isVipsJxlConfig( config ) ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'wp-vips-jxl: config endpoint returned malformed data'
+			);
+			return null;
+		}
 		// Cache on the global for subsequent calls.
-		( window as unknown as Record< string, unknown > ).__vipsJxlConfig =
-			config;
+		getWindowGlobals().__vipsJxlConfig = config;
 		return config;
-	} catch {
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn( 'wp-vips-jxl: failed to fetch config', error );
 		return null;
 	}
 }
@@ -91,23 +145,16 @@ async function fetchVipsJxlConfig(): Promise< VipsJxlConfig | null > {
  */
 async function installVipsJxlPlugin(): Promise< boolean > {
 	try {
-		await (
-			dispatch( CORE_STORE ) as {
-				saveEntityRecord: (
-					kind: string,
-					name: string,
-					record: Record< string, unknown >,
-					options?: Record< string, unknown >
-				) => Promise< unknown >;
-			}
-		 ).saveEntityRecord(
+		await ( dispatch( CORE_STORE ) as CoreDataDispatch ).saveEntityRecord(
 			'root',
 			'plugin',
 			{ slug: JXL_PLUGIN_SLUG, status: 'active' },
 			{ throwOnError: true }
 		);
 		return true;
-	} catch {
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.warn( 'wp-vips-jxl: plugin install failed', error );
 		return false;
 	}
 }
@@ -138,12 +185,7 @@ export async function ensureVipsJxlAvailable(): Promise< VipsJxlConfig | null > 
 	// Plugin not active — can we install it?
 	// Use resolveSelect to wait for permission data to load.
 	const canInstall = await (
-		resolveSelect( CORE_STORE ) as {
-			canUser: (
-				action: string,
-				resource: Record< string, string >
-			) => Promise< boolean >;
-		}
+		resolveSelect( CORE_STORE ) as CoreDataResolveSelect
 	 ).canUser( 'create', {
 		kind: 'root',
 		name: 'plugin',
@@ -164,4 +206,13 @@ export async function ensureVipsJxlAvailable(): Promise< VipsJxlConfig | null > 
 	const freshConfig = await fetchVipsJxlConfig();
 	cachedConfig = freshConfig;
 	return freshConfig;
+}
+
+/**
+ * Resets cached state. Exposed for tests only.
+ *
+ * @internal
+ */
+export function __resetCachedConfigForTesting(): void {
+	cachedConfig = undefined;
 }
