@@ -123,8 +123,8 @@ function UnforwardedTooltip(
 					id={ describedById }
 					overflowPadding={ 0.5 }
 					store={ tooltipStore }
-					disablePointerEventsOnApproach={false}
-					wrapperProps={{ style: { pointerEvents: 'none' } }}
+					disablePointerEventsOnApproach={ false }
+					wrapperProps={ { style: { pointerEvents: 'none' } } }
 				>
 					{ text }
 					{ shortcut && (

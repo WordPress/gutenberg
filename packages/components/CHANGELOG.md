@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+### Bug Fixes
+-   `Tooltip`: Ensure tooltips do not capture pointer events, allowing clicks to pass through to underlying elements ([#77415](https://github.com/WordPress/gutenberg/pull/77415)).
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
