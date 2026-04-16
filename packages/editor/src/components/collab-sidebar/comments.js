@@ -176,11 +176,13 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	const { boardOffsets, registerThread, reportHeight } = useFloatingBoard( {
-		threads,
-		selectedNoteId: selectedNote,
-		isFloating,
-	} );
+	const { boardOffsets, registerThread, unregisterThread } = useFloatingBoard(
+		{
+			threads,
+			selectedNoteId: selectedNote,
+			isFloating,
+		}
+	);
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -281,8 +283,8 @@ export function Comments( {
 							? {
 									calculatedOffset:
 										boardOffsets[ thread.id ] ?? 0,
-									reportHeight,
 									registerThread,
+									unregisterThread,
 									commentLastUpdated,
 							  }
 							: undefined
@@ -316,10 +318,6 @@ function Thread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -328,9 +326,8 @@ function Thread( {
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset: floating?.calculatedOffset ?? 0,
-		reportHeight: floating?.reportHeight,
 		registerThread: floating?.registerThread,
-		selectedThread: selectedNote,
+		unregisterThread: floating?.unregisterThread,
 		commentLastUpdated: floating?.commentLastUpdated,
 	} );
 	const isKeyboardTabbingRef = useRef( false );

@@ -15,8 +15,8 @@ import {
 	useState,
 	useEffect,
 	useMemo,
-	useCallback,
 	useReducer,
+	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -34,6 +34,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
+import { createBoardStore } from './board-store';
 import { calculateAllOffsets, noop } from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -368,41 +369,21 @@ export function useEnableFloatingSidebar( enabled = false ) {
 }
 
 export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
-	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ blockRefs, setBlockRefs ] = useState( {} );
-
+	const [ store ] = useState( createBoardStore );
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 
-	const registerThread = useCallback( ( id, el ) => {
-		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: el } ) );
-	}, [] );
-
-	const reportHeight = useCallback( ( id, newHeight ) => {
-		setHeights( ( prev ) => {
-			if ( prev[ id ] !== newHeight ) {
-				return { ...prev, [ id ]: newHeight };
-			}
-			return prev;
-		} );
-	}, [] );
+	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
 	useEffect( () => {
 		if ( ! isFloating ) {
 			return;
 		}
 
-		// Batch all rect reads before any writes to avoid layout thrashing.
-		const blockRects = Object.fromEntries(
-			Object.entries( blockRefs ).flatMap( ( [ id, el ] ) =>
-				el ? [ [ id, el.getBoundingClientRect() ] ] : []
-			)
-		);
-
 		const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
 			threads,
 			selectedNoteId,
-			blockRects,
+			blockRects: store.getBlockRects(),
 			heights,
 		} );
 		if ( Object.keys( newOffsets ).length > 0 ) {
@@ -411,22 +392,25 @@ export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
 		setCanvasMinHeight( minHeight );
 	}, [
 		heights,
-		blockRefs,
 		isFloating,
 		threads,
 		selectedNoteId,
 		setCanvasMinHeight,
+		store,
 	] );
 
-	return { boardOffsets, registerThread, reportHeight };
+	return {
+		boardOffsets,
+		registerThread: store.registerThread,
+		unregisterThread: store.unregisterThread,
+	};
 }
 
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
-	reportHeight,
-	selectedThread,
 	registerThread,
+	unregisterThread,
 	commentLastUpdated,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
@@ -442,32 +426,27 @@ export function useFloatingThread( {
 		whileElementsMounted: autoUpdate,
 	} );
 
-	// Store the block reference for each thread.
+	// Set the floating-ui reference element.
 	useEffect( () => {
 		if ( blockElement ) {
 			refs.setReference( blockElement );
 		}
 	}, [ blockElement, refs, commentLastUpdated ] );
 
-	// Register the block element so the board can read its rect.
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver tracks height changes automatically.
 	useEffect( () => {
-		if ( refs.floating?.current ) {
-			registerThread( thread.id, blockElement );
+		const floatingEl = refs.floating?.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, blockElement, floatingEl );
 		}
-	}, [ blockElement, thread.id, refs.floating, registerThread ] );
-
-	// When the selected thread changes, report height to trigger offset recalculation.
-	useEffect( () => {
-		if ( refs.floating?.current ) {
-			const newHeight = refs.floating.current.scrollHeight;
-			reportHeight( thread.id, newHeight );
-		}
+		return () => unregisterThread?.( thread.id );
 	}, [
+		blockElement,
 		thread.id,
-		reportHeight,
 		refs.floating,
-		selectedThread,
-		commentLastUpdated,
+		registerThread,
+		unregisterThread,
 	] );
 
 	return {
