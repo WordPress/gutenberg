@@ -44,6 +44,11 @@ import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
+import {
+	SuggestionDiff,
+	parseSuggestionPayload,
+	useSuggestionsProvider,
+} from '../suggestion-mode';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -968,6 +973,7 @@ const CommentBoard = ( {
 						: thread?.content?.rendered }
 				</RawHTML>
 			) }
+			<SuggestionActions thread={ thread } />
 			{ 'delete' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }
@@ -981,5 +987,80 @@ const CommentBoard = ( {
 		</VStack>
 	);
 };
+
+function SuggestionActions( { thread } ) {
+	const payload = useMemo(
+		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
+		[ thread?.meta?._wp_suggestion ]
+	);
+	const suggestionStatus = thread?.meta?._wp_suggestion_status;
+	const { applySuggestion, rejectSuggestion } = useSuggestionsProvider();
+	const [ busy, setBusy ] = useState( false );
+
+	if ( ! payload ) {
+		return null;
+	}
+
+	const isResolved =
+		suggestionStatus === 'applied' || suggestionStatus === 'rejected';
+
+	return (
+		<VStack spacing="2" className="editor-collab-sidebar-panel__suggestion">
+			<SuggestionDiff operations={ payload.operations } />
+			{ isResolved ? (
+				<Text variant="muted" size="12px">
+					{ suggestionStatus === 'applied'
+						? __( 'Applied' )
+						: __( 'Rejected' ) }
+				</Text>
+			) : (
+				<HStack spacing="2" justify="flex-start">
+					<Button
+						variant="primary"
+						size="small"
+						disabled={ busy }
+						accessibleWhenDisabled
+						onClick={ async () => {
+							setBusy( true );
+							try {
+								await applySuggestion( {
+									commentId: thread.id,
+									clientId: thread.blockClientId,
+									payload,
+								} );
+							} catch {
+								// Notice surfaced by the provider.
+							} finally {
+								setBusy( false );
+							}
+						} }
+					>
+						{ __( 'Apply' ) }
+					</Button>
+					<Button
+						variant="secondary"
+						size="small"
+						disabled={ busy }
+						accessibleWhenDisabled
+						onClick={ async () => {
+							setBusy( true );
+							try {
+								await rejectSuggestion( {
+									commentId: thread.id,
+								} );
+							} catch {
+								// Notice surfaced by the provider.
+							} finally {
+								setBusy( false );
+							}
+						} }
+					>
+						{ __( 'Reject' ) }
+					</Button>
+				</HStack>
+			) }
+		</VStack>
+	);
+}
 
 export default Comments;

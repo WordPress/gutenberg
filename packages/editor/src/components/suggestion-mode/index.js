@@ -11,5 +11,8 @@ export { default as SuggestionCommitBar } from './commit-bar';
 export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
+	applyOperations,
+	parseSuggestionPayload,
 	SCHEMA_VERSION,
 } from './provider';
+export { default as SuggestionDiff, wordDiff } from './suggestion-diff';
