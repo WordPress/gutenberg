@@ -262,9 +262,7 @@ if ( ! function_exists( 'gutenberg_clear_sync_contributors_on_save' ) ) {
 
 		$room    = 'postType/' . $post->post_type . ':' . $post_id;
 		$storage = new WP_Sync_Post_Meta_Storage();
-		if ( method_exists( $storage, 'clear_contributors' ) ) {
-			$storage->clear_contributors( $room );
-		}
+		$storage->clear_contributors( $room );
 	}
 	add_action( 'save_post', 'gutenberg_clear_sync_contributors_on_save', 10, 2 );
 }
