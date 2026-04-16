@@ -66,13 +66,15 @@ function gutenberg_register_block_comment_metadata() {
 				),
 			),
 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				$comment = get_comment( $object_id );
+				if ( $comment && 'note' === $comment->comment_type ) {
+					return current_user_can( 'edit_post', $comment->comment_post_ID );
+				}
 				return current_user_can( 'edit_comment', $object_id );
 			},
 		)
 	);
 
-	// Lifecycle status for a suggestion. `pending` on creation; moved to
-	// `applied` or `rejected` by Phase 3's apply/reject actions.
 	register_meta(
 		'comment',
 		'_wp_suggestion_status',
@@ -87,6 +89,10 @@ function gutenberg_register_block_comment_metadata() {
 				),
 			),
 			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				$comment = get_comment( $object_id );
+				if ( $comment && 'note' === $comment->comment_type ) {
+					return current_user_can( 'edit_post', $comment->comment_post_ID );
+				}
 				return current_user_can( 'edit_comment', $object_id );
 			},
 		)

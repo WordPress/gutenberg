@@ -256,12 +256,6 @@ export function useSuggestionsProvider() {
 			);
 			updateBlockAttributes( clientId, newAttributes );
 
-			// TODO: Core's update_item_permissions_check requires edit_comment,
-			// which means only the suggestion author or a moderator can update
-			// the note. Post editors who didn't author the suggestion can't
-			// apply it. Fix in a follow-up PR by overriding
-			// update_item_permissions_check in the Gutenberg REST controller
-			// to allow edit_post holders to update notes on their posts.
 			await saveEntityRecord(
 				'root',
 				'comment',

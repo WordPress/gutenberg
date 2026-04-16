@@ -131,6 +131,35 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		return true;
 	}
 
+	/**
+	 * Checks if a given request has access to update a comment.
+	 *
+	 * Extends core's check so that users who can `edit_post` on the parent
+	 * post are also allowed to update note-type comments. This is necessary
+	 * for the suggestion workflow where a post editor applies or rejects a
+	 * suggestion authored by someone else.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		$comment = $this->get_comment( $request['id'] );
+		if ( is_wp_error( $comment ) ) {
+			return $comment;
+		}
+
+		// For note comments, allow users who can edit the parent post.
+		if ( 'note' === $comment->comment_type ) {
+			$post = get_post( $comment->comment_post_ID );
+			if ( $post && current_user_can( 'edit_post', $post->ID ) ) {
+				return true;
+			}
+		}
+
+		// Fall back to core's default check (moderate_comments or edit_comment).
+		return parent::update_item_permissions_check( $request );
+	}
+
 	public function create_item_permissions_check( $request ) {
 		$is_note = ! empty( $request['type'] ) && 'note' === $request['type'];
 

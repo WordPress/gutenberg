@@ -96,5 +96,5 @@ Server-side persistence (comment meta) is still needed for users without RTC, so
 
 - **Structural suggestions** (block insert, remove, move) are not yet supported. The `operations` array is designed to accept `block-insert-after` and `block-remove` types in the future.
 - **Inline text selections** are not anchored — suggestions apply to the entire attribute, not a sub-range. Fragment-level suggestions depend on inline annotation infrastructure tracked separately.
-- **Permissions**: applying another user's suggestion requires `moderate_comments` today because WordPress core's `update_item_permissions_check` gates on `edit_comment`. A future PR should override this for notes to allow post editors to apply suggestions on their posts.
+- **Permissions**: the Gutenberg REST comment controller overrides `update_item_permissions_check` so that users with `edit_post` on the parent can update note comments (and their suggestion meta). This allows post editors to apply or reject suggestions authored by other users. The `_wp_suggestion` and `_wp_suggestion_status` meta auth callbacks follow the same pattern.
 - **Rich-text format fidelity**: the word-level diff operates on the serialized HTML string, which may produce noisy diffs when formatting (bold, links) changes. Progressive enhancement planned.
