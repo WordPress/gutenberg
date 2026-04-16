@@ -74,8 +74,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$style_attribute = '';
-
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
 	foreach ( $block->inner_blocks as $inner_block ) {

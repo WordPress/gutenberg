@@ -138,7 +138,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$classes         = array();
+	$classes = array();
 
 	// Render inner blocks first to check if any menu items will actually display.
 	$inner_blocks_html = '';
