@@ -39,6 +39,7 @@ _Defined via the [`supports`](/block-editor/reference-guides/block-api/block-sup
 - [`typography`](/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
 - [`renaming`](/block-editor/reference-guides/block-api/block-supports/#renaming): `true`
+- [`visibility`](/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Context
 
