@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/ColorPalette',
 	id: 'components-colorpalette',
 	component: ColorPalette,

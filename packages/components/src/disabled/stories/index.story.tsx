@@ -18,6 +18,7 @@ import TextareaControl from '../../textarea-control/';
 import { VStack } from '../../v-stack/';
 
 const meta: Meta< typeof Disabled > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/Disabled',
 	id: 'components-disabled',
 	component: Disabled,

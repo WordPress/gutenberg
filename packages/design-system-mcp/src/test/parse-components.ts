@@ -7,20 +7,17 @@ import {
 import type { ManifestComponent } from '../types';
 
 describe( 'packageNameFromPath', () => {
-	it( 'should return @wordpress/ui for packages/ui paths', () => {
+	it( 'should derive @wordpress/<package> from any packages path', () => {
 		expect(
 			packageNameFromPath(
 				'../packages/ui/src/button/stories/index.story.tsx'
 			)
 		).toBe( '@wordpress/ui' );
-	} );
-
-	it( 'should return null for non-allowed packages', () => {
 		expect(
 			packageNameFromPath(
 				'../packages/components/src/button/stories/index.story.tsx'
 			)
-		).toBeNull();
+		).toBe( '@wordpress/components' );
 	} );
 
 	it( 'should return null for non-package paths', () => {
@@ -163,11 +160,11 @@ function createComponents(
 }
 
 describe( 'parseComponents', () => {
-	it( 'should return only components from allowed packages', () => {
+	it( 'should return components from any recognized @wordpress/* package', () => {
 		const components = createComponents( {
-			'ui-button': {
-				name: 'Button',
-				path: '../packages/ui/src/button/stories/index.story.tsx',
+			'ui-badge': {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
 			},
 			'components-button': {
 				name: 'Button',
@@ -175,9 +172,18 @@ describe( 'parseComponents', () => {
 			},
 		} );
 
-		const result = parseComponents( components );
-		expect( result ).toHaveLength( 1 );
-		expect( result[ 0 ].packageName ).toBe( '@wordpress/ui' );
+		expect( parseComponents( components ) ).toEqual( [
+			{
+				name: 'Badge',
+				description: '',
+				packageName: '@wordpress/ui',
+			},
+			{
+				name: 'Button',
+				description: '',
+				packageName: '@wordpress/components',
+			},
+		] );
 	} );
 
 	it( 'should exclude components with non-package paths', () => {
@@ -301,34 +307,24 @@ describe( 'parseComponentDetail', () => {
 		expect( parseComponentDetail( {}, 'NonExistent' ) ).toBeNull();
 	} );
 
-	it( 'should prefer @wordpress/ui over other packages', () => {
+	it( 'should return detail for a component from @wordpress/components', () => {
 		const components = createComponents( {
-			'components-button': {
+			button: {
 				name: 'Button',
+				description: 'A button component.',
 				path: '../packages/components/src/button/stories/index.story.tsx',
-				description: 'Old button.',
-			},
-			'ui-button': {
-				name: 'Button',
-				path: '../packages/ui/src/button/stories/index.story.tsx',
-				description: 'New button.',
 			},
 		} );
 
 		const result = parseComponentDetail( components, 'Button' );
-		expect( result?.packageName ).toBe( '@wordpress/ui' );
-		expect( result?.description ).toBe( 'New button.' );
-	} );
-
-	it( 'should return null for components only in non-allowed packages', () => {
-		const components = createComponents( {
-			oldButton: {
+		expect( result ).toEqual(
+			expect.objectContaining( {
 				name: 'Button',
-				path: '../packages/components/src/button/stories/index.story.tsx',
-			},
-		} );
-
-		expect( parseComponentDetail( components, 'Button' ) ).toBeNull();
+				packageName: '@wordpress/components',
+				importStatement:
+					"import { Button } from '@wordpress/components';",
+			} )
+		);
 	} );
 
 	it( 'should filter deprecated props from detail', () => {

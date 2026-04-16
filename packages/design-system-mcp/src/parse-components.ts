@@ -6,31 +6,19 @@ import type {
 } from './types';
 
 /**
- * Map from directory name (in the story file path) to npm package name. The
- * manifest `path` field uses relative paths from the Storybook configuration.
- * For example, `../packages/ui/src/button/stories/index.story.tsx`.
- *
- * This also serves a dual purpose of filtering components to only include those
- * from allowed packages, since alternative ways of implementing a mapping would
- * be to respect the `package.json` package name (slow), or simply prepend the
- * `@wordpress/` npm namespace (not always accurate, see `packages/wp-build`).
- */
-const PACKAGE_DIR_TO_NAME: Record< string, string > = {
-	ui: '@wordpress/ui',
-};
-
-/**
  * Derive the npm package name from the story file path.
  *
- * Manifest paths look like `../packages/<dir>/src/.../index.story.tsx`.
- * We extract `<dir>` and map it through PACKAGE_DIR_TO_NAME.
+ * Manifest paths look like `../packages/<dir>/src/.../index.story.tsx`. We
+ * extract `<dir>` and prepend the `@wordpress/` npm namespace. Curation of
+ * which components appear in the manifest is handled upstream via Storybook
+ * tags, so this only needs to recognize package-shaped paths.
  *
  * @param storyPath - The story file path from the manifest.
- * @return The npm package name, or null if not an allowed package.
+ * @return The npm package name, or null for paths outside `packages/*`.
  */
 export function packageNameFromPath( storyPath: string ): string | null {
 	const match = storyPath.match( /\.\.\/packages\/([^/]+)\// );
-	return ( match && PACKAGE_DIR_TO_NAME[ match[ 1 ] ] ) ?? null;
+	return match ? `@wordpress/${ match[ 1 ] }` : null;
 }
 
 /**
@@ -87,13 +75,13 @@ export function parseProps(
 }
 
 /**
- * Parse manifest components into a flat list from allowed packages. When a
- * component is defined across multiple story files (e.g. `index.story.tsx`
- * and a companion file documenting a specific aspect), it is collapsed to a
- * single entry keyed by its canonical name and package.
+ * Parse manifest components into a flat list. When a component is defined
+ * across multiple story files (e.g. `index.story.tsx` and a companion file
+ * documenting a specific aspect), it is collapsed to a single entry keyed by
+ * its canonical name and package.
  *
  * @param components - The manifest components record.
- * @return Components from allowed packages.
+ * @return Flat list of components derived from the manifest.
  */
 export function parseComponents(
 	components: Record< string, ManifestComponent >

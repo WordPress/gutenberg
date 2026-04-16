@@ -45,7 +45,7 @@ describe( 'data', () => {
 	} );
 
 	describe( 'getComponents', () => {
-		it( 'should fetch manifest and return only allowed components', async () => {
+		it( 'should fetch manifest and return parsed components', async () => {
 			mockFetchResponses( {
 				[ MANIFEST_URL ]: { ok: true, body: manifestFixture },
 			} );
@@ -54,9 +54,14 @@ describe( 'data', () => {
 
 			expect( result ).toEqual( [
 				{
+					name: 'Badge',
+					description: 'A badge.',
+					packageName: '@wordpress/ui',
+				},
+				{
 					name: 'Button',
 					description: 'A button.',
-					packageName: '@wordpress/ui',
+					packageName: '@wordpress/components',
 				},
 			] );
 		} );
@@ -94,8 +99,9 @@ describe( 'data', () => {
 			expect( result ).toEqual( {
 				name: 'Button',
 				description: 'A button.',
-				packageName: '@wordpress/ui',
-				importStatement: "import { Button } from '@wordpress/ui';",
+				packageName: '@wordpress/components',
+				importStatement:
+					"import { Button } from '@wordpress/components';",
 				props: [
 					{
 						name: 'variant',

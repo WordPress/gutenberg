@@ -1,11 +1,16 @@
 {
 	"v": 0,
 	"components": {
-		"ui-button": {
-			"id": "ui-button",
+		"ui-badge": {
+			"id": "ui-badge",
+			"name": "Badge",
+			"path": "../packages/ui/src/badge/stories/index.story.tsx",
+			"description": "A badge."
+		},
+		"components-button": {
+			"id": "components-button",
 			"name": "Button",
-			"path": "../packages/ui/src/button/stories/index.story.tsx",
-			"import": "import { Button } from \"@wordpress/ui\";",
+			"path": "../packages/components/src/button/stories/index.story.tsx",
 			"description": "A button.",
 			"reactDocgen": {
 				"props": {
@@ -17,18 +22,6 @@
 				}
 			},
 			"stories": [ { "name": "Default", "snippet": "<Button />" } ]
-		},
-		"components-button": {
-			"id": "components-button",
-			"name": "Button",
-			"path": "../packages/components/src/button/stories/index.story.tsx",
-			"import": "import { Button } from \"@wordpress/components\";"
-		},
-		"theme-provider": {
-			"id": "theme-provider",
-			"name": "ThemeProvider",
-			"path": "../packages/theme/src/stories/index.story.tsx",
-			"import": "import { ThemeProvider } from \"@wordpress/theme\";"
 		}
 	}
 }
