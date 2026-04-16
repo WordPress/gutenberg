@@ -13,6 +13,7 @@ export {
 	useSuggestionsProvider,
 	operationsFromOverlay,
 	applyOperations,
+	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
