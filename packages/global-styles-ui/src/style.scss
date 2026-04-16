@@ -21,6 +21,10 @@
 	width: 100%;
 }
 
+.global-styles-ui-preview__content {
+	cursor: var(--wpds-cursor-control);
+}
+
 .global-styles-ui-typography-preview {
 	display: flex;
 	align-items: center;

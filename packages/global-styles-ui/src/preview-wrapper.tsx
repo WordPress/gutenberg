@@ -107,11 +107,15 @@ function PreviewWrapper( {
 					tabIndex={ -1 }
 				>
 					<motion.div
+						className={
+							withHoverView
+								? 'global-styles-ui-preview__content'
+								: undefined
+						}
 						style={ {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={
