@@ -52,7 +52,7 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		}
 
 		const newTabBlock = createBlock( 'core/tab', {
-			label: __( 'Tab Panel' ),
+			label: __( 'Tab' ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelClientId );
 
