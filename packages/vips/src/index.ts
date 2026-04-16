@@ -58,16 +58,14 @@ async function getVips(): Promise< typeof Vips > {
 		return await vipsPromise;
 	}
 
-	const dynamicLibraries = [ 'vips-heif.wasm' ];
-	if ( jxlWasmUrl ) {
-		dynamicLibraries.push( 'vips-jxl.wasm' );
-	}
-
 	vipsPromise = Vips( {
 		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
 		// JXL is loaded conditionally when the wp-vips-jxl canonical plugin
 		// provides the WASM URL.
-		dynamicLibraries,
+		dynamicLibraries: [
+			'vips-heif.wasm',
+			...( jxlWasmUrl ? [ 'vips-jxl.wasm' ] : [] ),
+		],
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
