@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
  * Internal dependencies
  */
 import withSuggestionOverlay from '../with-suggestion-overlay';
-import { SuggestionOverlayProvider } from '../overlay-context';
+import {
+	SuggestionOverlayProvider,
+	useSuggestionOverlay,
+} from '../overlay-context';
 import { store as editorStore } from '../../../store';
 
 function renderWithProviders( ui, { intent = 'edit' } = {} ) {
@@ -66,9 +69,7 @@ describe( 'withSuggestionOverlay', () => {
 
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
 
-		act( () => {
-			screen.getByRole( 'button', { name: 'edit' } ).click();
-		} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			content: 'proposed',
@@ -87,9 +88,7 @@ describe( 'withSuggestionOverlay', () => {
 			{ intent: 'suggest' }
 		);
 
-		act( () => {
-			screen.getByRole( 'button', { name: 'edit' } ).click();
-		} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 
 		// Real setAttributes is never called; block renders merged value.
 		expect( setAttributes ).not.toHaveBeenCalled();
@@ -110,9 +109,7 @@ describe( 'withSuggestionOverlay', () => {
 			{ intent: 'suggest' }
 		);
 
-		act( () => {
-			screen.getByRole( 'button', { name: 'edit' } ).click();
-		} );
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
@@ -130,5 +127,77 @@ describe( 'withSuggestionOverlay', () => {
 		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
 			'proposed'
 		);
+	} );
+
+	it( 'passes through in View intent — no overlay, no diversion', () => {
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<Wrapped
+				clientId="a"
+				name="core/paragraph"
+				attributes={ { content: 'Untouched' } }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'view' }
+		);
+
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'Untouched'
+		);
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+
+		// In view intent the HOC is a pass-through, so the real
+		// setAttributes is invoked and the overlay is never used.
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			content: 'proposed',
+		} );
+	} );
+
+	it( 're-captures baseline when overlay is cleared then re-edited', () => {
+		// Regression: after Submit/Discard clears the overlay entry, a
+		// later edit must create a new baseline + overlay rather than
+		// silently no-oping.
+		let clearOverlayHandle;
+		function Harness() {
+			const { clearOverlay } = useSuggestionOverlay();
+			clearOverlayHandle = clearOverlay;
+			return null;
+		}
+
+		const setAttributes = jest.fn();
+		renderWithProviders(
+			<>
+				<Harness />
+				<Wrapped
+					clientId="a"
+					name="core/paragraph"
+					attributes={ { content: 'Hello' } }
+					setAttributes={ setAttributes }
+				/>
+			</>,
+			{ intent: 'suggest' }
+		);
+
+		// First edit — creates overlay.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'proposed'
+		);
+
+		// Simulate Submit/Discard clearing the overlay.
+		act( () => {
+			clearOverlayHandle( 'a' );
+		} );
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent( 'Hello' );
+
+		// Second edit — must capture a new baseline and record the
+		// overlay, not silently no-op.
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit' } ) );
+		expect( screen.getByTestId( 'content' ) ).toHaveTextContent(
+			'proposed'
+		);
+		// The real setAttributes is still never invoked in suggest mode.
+		expect( setAttributes ).not.toHaveBeenCalled();
 	} );
 } );
