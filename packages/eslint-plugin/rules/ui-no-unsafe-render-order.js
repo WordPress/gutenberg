@@ -1,29 +1,9 @@
 /**
- * Components whose semantics are lost if they host `render={<VisuallyHidden />}`.
+ * Components tracked by this rule.
  *
  * @type {Set<string>}
  */
-const VISUALLY_HIDDEN_HOST_COMPONENTS = new Set( [
-	'Dialog.Title',
-	'Popover.Title',
-	'Field.Label',
-	'Fieldset.Legend',
-] );
-
-/**
- * Root components tracked by this rule.
- *
- * @type {Set<string>}
- */
-const TRACKED_COMPONENTS = new Set( [
-	'Dialog',
-	'Field',
-	'Fieldset',
-	'Link',
-	'Popover',
-	'Text',
-	'VisuallyHidden',
-] );
+const TRACKED_COMPONENTS = new Set( [ 'Link', 'Text', 'VisuallyHidden' ] );
 
 /**
  * @type {import('eslint').Rule.RuleModule}
@@ -51,7 +31,7 @@ module.exports = {
 		],
 		messages: {
 			visuallyHiddenOrder:
-				'Use `VisuallyHidden` as the outer component and pass `{{ component }}` via `render` so `{{ component }}` keeps its semantic element.',
+				'Do not pass `VisuallyHidden` via `render`. Make `VisuallyHidden` the outer component instead.',
 			linkTextOrder:
 				'Use `Text` as the outer component and pass `Link` via `render` so the resulting element stays an `<a>`.',
 		},
@@ -209,29 +189,19 @@ module.exports = {
 			},
 
 			JSXOpeningElement( node ) {
-				const elementName = resolveTrackedJsxName( node.name );
-
-				if ( ! elementName ) {
-					return;
-				}
-
 				const renderedComponentName = getRenderedComponentName(
 					node.attributes
 				);
 
-				if (
-					renderedComponentName === 'VisuallyHidden' &&
-					VISUALLY_HIDDEN_HOST_COMPONENTS.has( elementName )
-				) {
+				if ( renderedComponentName === 'VisuallyHidden' ) {
 					context.report( {
 						node,
 						messageId: 'visuallyHiddenOrder',
-						data: {
-							component: elementName,
-						},
 					} );
 					return;
 				}
+
+				const elementName = resolveTrackedJsxName( node.name );
 
 				if (
 					elementName === 'Link' &&

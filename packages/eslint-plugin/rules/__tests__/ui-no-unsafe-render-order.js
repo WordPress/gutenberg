@@ -57,10 +57,12 @@ ruleTester.run( 'ui-no-unsafe-render-order', rule, {
 		},
 		{
 			code: `
-				import * as Field from '../index';
-				import { VisuallyHidden } from '../../../visually-hidden';
+				import { Link } from '@wordpress/ui';
+				import { VisuallyHidden } from 'some-other-package';
 
-				<Field.Label render={ <VisuallyHidden /> }>Name</Field.Label>;
+				<Link href="#" render={ <VisuallyHidden /> }>
+					Read more
+				</Link>;
 			`,
 		},
 	],
@@ -73,12 +75,7 @@ ruleTester.run( 'ui-no-unsafe-render-order', rule, {
 					Title
 				</Dialog.Title>;
 			`,
-			errors: [
-				{
-					messageId: 'visuallyHiddenOrder',
-					data: { component: 'Dialog.Title' },
-				},
-			],
+			errors: [ { messageId: 'visuallyHiddenOrder' } ],
 		},
 		{
 			code: `
@@ -88,12 +85,7 @@ ruleTester.run( 'ui-no-unsafe-render-order', rule, {
 					Title
 				</UIDialog.Title>;
 			`,
-			errors: [
-				{
-					messageId: 'visuallyHiddenOrder',
-					data: { component: 'Dialog.Title' },
-				},
-			],
+			errors: [ { messageId: 'visuallyHiddenOrder' } ],
 		},
 		{
 			code: `
@@ -103,12 +95,17 @@ ruleTester.run( 'ui-no-unsafe-render-order', rule, {
 					Title
 				</UI.Popover.Title>;
 			`,
-			errors: [
-				{
-					messageId: 'visuallyHiddenOrder',
-					data: { component: 'Popover.Title' },
-				},
-			],
+			errors: [ { messageId: 'visuallyHiddenOrder' } ],
+		},
+		{
+			code: `
+				import { VisuallyHidden } from '@wordpress/ui';
+
+				<CustomThing render={ <VisuallyHidden /> }>
+					Hidden content
+				</CustomThing>;
+			`,
+			errors: [ { messageId: 'visuallyHiddenOrder' } ],
 		},
 		{
 			code: `
@@ -142,20 +139,13 @@ ruleTester.run( 'ui-no-unsafe-render-order', rule, {
 		},
 		{
 			code: `
-				import * as Fieldset from '../';
+				import * as Field from '../index';
 				import { VisuallyHidden } from '../../../visually-hidden';
 
-				<Fieldset.Legend render={ <VisuallyHidden /> }>
-					Legend
-				</Fieldset.Legend>;
+				<Field.Label render={ <VisuallyHidden /> }>Name</Field.Label>;
 			`,
 			options: [ { checkLocalImports: true } ],
-			errors: [
-				{
-					messageId: 'visuallyHiddenOrder',
-					data: { component: 'Fieldset.Legend' },
-				},
-			],
+			errors: [ { messageId: 'visuallyHiddenOrder' } ],
 		},
 		{
 			code: `
