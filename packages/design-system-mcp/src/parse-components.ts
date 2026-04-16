@@ -75,10 +75,10 @@ export function parseProps(
 }
 
 /**
- * Parse manifest components into a flat list. When a component is defined
- * across multiple story files (e.g. `index.story.tsx` and a companion file
- * documenting a specific aspect), it is collapsed to a single entry keyed by
- * its canonical name and package.
+ * Parse manifest components into a flat list sorted alphabetically by name.
+ * When a component is defined across multiple story files (e.g. a companion
+ * file documenting a specific aspect), it is collapsed to a single entry keyed
+ * by its canonical name and package.
  *
  * @param components - The manifest components record.
  * @return Flat list of components derived from the manifest.
@@ -109,7 +109,7 @@ export function parseComponents(
 		} );
 	}
 
-	return result;
+	return result.sort( ( a, b ) => a.name.localeCompare( b.name ) );
 }
 
 /**

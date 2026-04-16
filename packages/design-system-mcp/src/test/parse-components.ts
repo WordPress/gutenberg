@@ -228,6 +228,30 @@ describe( 'parseComponents', () => {
 		] );
 	} );
 
+	it( 'should return components sorted alphabetically by name', () => {
+		const components = createComponents( {
+			a: {
+				name: 'Tabs',
+				path: '../packages/components/src/tabs/stories/index.story.tsx',
+			},
+			b: {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			c: {
+				name: 'Notice',
+				path: '../packages/components/src/notice/stories/index.story.tsx',
+			},
+		} );
+
+		const result = parseComponents( components );
+		expect( result.map( ( c ) => c.name ) ).toEqual( [
+			'Badge',
+			'Notice',
+			'Tabs',
+		] );
+	} );
+
 	it( 'should list a component only once when multiple story files contribute entries', () => {
 		const components = createComponents( {
 			'badge-index': {
