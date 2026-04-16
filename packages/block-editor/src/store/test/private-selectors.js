@@ -768,15 +768,21 @@ describe( 'private selectors', () => {
 					...baseState.blocks,
 					attributes: new Map(),
 					controlledInnerBlocks: {},
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
 				},
 				// The Group (ef45d5fd) is the section being edited.
 				editedContentOnlySection:
 					'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
-				] ),
 				// The edited Group itself has 'default' mode (set by the reducer)
 				// so it does not appear in derivedBlockEditingModes. Only the
 				// Header (6cf70164), which is outside the edited section, is disabled.
