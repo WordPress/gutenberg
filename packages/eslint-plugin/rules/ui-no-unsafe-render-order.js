@@ -1,0 +1,248 @@
+/**
+ * Components whose semantics are lost if they host `render={<VisuallyHidden />}`.
+ *
+ * @type {Set<string>}
+ */
+const VISUALLY_HIDDEN_HOST_COMPONENTS = new Set( [
+	'Dialog.Title',
+	'Popover.Title',
+	'Field.Label',
+	'Fieldset.Legend',
+] );
+
+/**
+ * Root components tracked by this rule.
+ *
+ * @type {Set<string>}
+ */
+const TRACKED_COMPONENTS = new Set( [
+	'Dialog',
+	'Field',
+	'Fieldset',
+	'Link',
+	'Popover',
+	'Text',
+	'VisuallyHidden',
+] );
+
+/**
+ * @type {import('eslint').Rule.RuleModule}
+ */
+module.exports = {
+	meta: {
+		type: 'problem',
+		docs: {
+			description:
+				'Prevent render-prop composition orders that silently remove @wordpress/ui semantics.',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/ui-no-unsafe-render-order.md',
+		},
+		schema: [
+			{
+				type: 'object',
+				properties: {
+					checkLocalImports: {
+						type: 'boolean',
+						description:
+							'When true, also checks tracked components imported from relative paths (for use inside @wordpress/ui).',
+					},
+				},
+				additionalProperties: false,
+			},
+		],
+		messages: {
+			visuallyHiddenOrder:
+				'Use `VisuallyHidden` as the outer component and pass `{{ component }}` via `render` so `{{ component }}` keeps its semantic element.',
+			linkTextOrder:
+				'Use `Text` as the outer component and pass `Link` via `render` so the resulting element stays an `<a>`.',
+		},
+	},
+
+	create( context ) {
+		const checkLocalImports =
+			context.options[ 0 ]?.checkLocalImports ?? false;
+		const trackedImports = new Map();
+		const namespaceImports = new Set();
+
+		/**
+		 * @param {string} source
+		 * @return {boolean} Whether the import should be tracked.
+		 */
+		function shouldTrackImportSource( source ) {
+			if ( source === '@wordpress/ui' ) {
+				return true;
+			}
+
+			if ( checkLocalImports ) {
+				return source.startsWith( '.' ) || source.startsWith( '/' );
+			}
+
+			return false;
+		}
+
+		/**
+		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
+		 * @return {string|null} Fully qualified JSX name or null.
+		 */
+		function getJsxName( node ) {
+			if ( node.type === 'JSXIdentifier' ) {
+				return node.name;
+			}
+
+			if ( node.type === 'JSXMemberExpression' ) {
+				const objectName = getJsxName( node.object );
+
+				if ( ! objectName ) {
+					return null;
+				}
+
+				return `${ objectName }.${ node.property.name }`;
+			}
+
+			return null;
+		}
+
+		/**
+		 * Resolves a JSX name to the tracked imported component name.
+		 *
+		 * Examples:
+		 * - `UIDialog.Title` -> `Dialog.Title`
+		 * - `UI.Link` -> `Link`
+		 *
+		 * @param {import('estree-jsx').JSXIdentifier|import('estree-jsx').JSXMemberExpression} node
+		 * @return {string|null} Tracked component name or null.
+		 */
+		function resolveTrackedJsxName( node ) {
+			const jsxName = getJsxName( node );
+
+			if ( ! jsxName ) {
+				return null;
+			}
+
+			const [ root, ...rest ] = jsxName.split( '.' );
+			const importedRoot = trackedImports.get( root );
+
+			if ( importedRoot ) {
+				return rest.length
+					? `${ importedRoot }.${ rest.join( '.' ) }`
+					: importedRoot;
+			}
+
+			if ( namespaceImports.has( root ) && rest.length ) {
+				return rest.join( '.' );
+			}
+
+			return null;
+		}
+
+		/**
+		 * @param {Array}  attributes    JSX attributes to inspect.
+		 * @param {string} attributeName Attribute name to match.
+		 * @return {import('estree-jsx').JSXAttribute|undefined} Matching attribute.
+		 */
+		function getJsxAttribute( attributes, attributeName ) {
+			return attributes.find(
+				( attribute ) =>
+					attribute.type === 'JSXAttribute' &&
+					attribute.name?.name === attributeName
+			);
+		}
+
+		/**
+		 * @param {Array} attributes
+		 * @return {string|null} Resolved JSX name inside `render={ <... /> }`.
+		 */
+		function getRenderedComponentName( attributes ) {
+			const renderAttribute = getJsxAttribute( attributes, 'render' );
+
+			if (
+				! renderAttribute?.value ||
+				renderAttribute.value.type !== 'JSXExpressionContainer' ||
+				renderAttribute.value.expression.type !== 'JSXElement'
+			) {
+				return null;
+			}
+
+			return resolveTrackedJsxName(
+				renderAttribute.value.expression.openingElement.name
+			);
+		}
+
+		return {
+			ImportDeclaration( node ) {
+				const source = node.source.value;
+
+				if (
+					typeof source !== 'string' ||
+					! shouldTrackImportSource( source )
+				) {
+					return;
+				}
+
+				node.specifiers.forEach( ( specifier ) => {
+					if ( specifier.type === 'ImportSpecifier' ) {
+						const importedName = specifier.imported.name;
+
+						if ( TRACKED_COMPONENTS.has( importedName ) ) {
+							trackedImports.set(
+								specifier.local.name,
+								importedName
+							);
+						}
+
+						return;
+					}
+
+					if ( specifier.type === 'ImportNamespaceSpecifier' ) {
+						if ( source === '@wordpress/ui' ) {
+							namespaceImports.add( specifier.local.name );
+							return;
+						}
+
+						if ( TRACKED_COMPONENTS.has( specifier.local.name ) ) {
+							trackedImports.set(
+								specifier.local.name,
+								specifier.local.name
+							);
+						}
+					}
+				} );
+			},
+
+			JSXOpeningElement( node ) {
+				const elementName = resolveTrackedJsxName( node.name );
+
+				if ( ! elementName ) {
+					return;
+				}
+
+				const renderedComponentName = getRenderedComponentName(
+					node.attributes
+				);
+
+				if (
+					renderedComponentName === 'VisuallyHidden' &&
+					VISUALLY_HIDDEN_HOST_COMPONENTS.has( elementName )
+				) {
+					context.report( {
+						node,
+						messageId: 'visuallyHiddenOrder',
+						data: {
+							component: elementName,
+						},
+					} );
+					return;
+				}
+
+				if (
+					elementName === 'Link' &&
+					renderedComponentName === 'Text'
+				) {
+					context.report( {
+						node,
+						messageId: 'linkTextOrder',
+					} );
+				}
+			},
+		};
+	},
+};

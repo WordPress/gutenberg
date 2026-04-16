@@ -371,6 +371,7 @@ export default dedupePlugins( [
 		rules: {
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
+			'@wordpress/ui-no-unsafe-render-order': 'error',
 		},
 	},
 
@@ -601,6 +602,17 @@ export default dedupePlugins( [
 				{ checkLocalImports: true },
 			],
 			'@wordpress/components-no-missing-40px-size-prop': [
+				'error',
+				{ checkLocalImports: true },
+			],
+		},
+	},
+
+	// Override: UI src — check local imports for unsafe render order rule.
+	{
+		files: [ 'packages/ui/src/**' ],
+		rules: {
+			'@wordpress/ui-no-unsafe-render-order': [
 				'error',
 				{ checkLocalImports: true },
 			],
