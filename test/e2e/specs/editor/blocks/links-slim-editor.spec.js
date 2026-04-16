@@ -86,12 +86,10 @@ test.describe( 'Links in standalone BlockEditorProvider', () => {
 		// MARKER would appear at the very start of the paragraph.
 		await page.keyboard.type( 'MARKER' );
 
-		const textContent = await richText.textContent();
-
 		// The selection should be restored to "link text" (which was
 		// selected before the popover opened), so typing MARKER replaces
 		// the selected text. Without the fix, the cursor jumps to
 		// position 0 and MARKER appears at the start.
-		expect( textContent ).toBe( 'Before MARKER after' );
+		await expect( richText ).toHaveText( 'Before MARKER after' );
 	} );
 } );
