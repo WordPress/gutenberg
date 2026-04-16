@@ -315,6 +315,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		if ( isset( $request['meta']['_wp_note_status'] ) ) {
 			$prepared_comment['meta']['_wp_note_status'] = $request['meta']['_wp_note_status'];
 		}
+		if ( isset( $request['meta']['_wp_suggestion'] ) ) {
+			$prepared_comment['meta']['_wp_suggestion'] = $request['meta']['_wp_suggestion'];
+		}
 
 		if ( ! $this->check_is_comment_content_allowed( $prepared_comment ) ) {
 			return new WP_Error(
@@ -601,6 +604,15 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			'note' === $check['comment_type'] &&
 			isset( $check['meta']['_wp_note_status'] ) &&
 			in_array( $check['meta']['_wp_note_status'], array( 'resolved', 'reopen' ), true )
+		) {
+			return true;
+		}
+
+		// Allow empty content when a suggestion payload is attached.
+		if (
+			isset( $check['comment_type'] ) &&
+			'note' === $check['comment_type'] &&
+			! empty( $check['meta']['_wp_suggestion'] )
 		) {
 			return true;
 		}

@@ -48,6 +48,49 @@ function gutenberg_register_block_comment_metadata() {
 			},
 		)
 	);
+
+	// Suggestion payload attached to a note. A note comment with this meta set
+	// is a suggested edit: the value is a JSON-encoded payload describing the
+	// block, baseline revision, and proposed operations. See
+	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
+	register_meta(
+		'comment',
+		'_wp_suggestion',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
+
+	// Lifecycle status for a suggestion. `pending` on creation; moved to
+	// `applied` or `rejected` by Phase 3's apply/reject actions.
+	register_meta(
+		'comment',
+		'_wp_suggestion_status',
+		array(
+			'type'          => 'string',
+			'description'   => __( 'Suggestion lifecycle status.', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type' => 'string',
+					'enum' => array( 'pending', 'applied', 'rejected' ),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_block_comment_metadata' );
 
