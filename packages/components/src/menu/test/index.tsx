@@ -18,6 +18,19 @@ const delay = ( delayInMs: number ) => {
 	return new Promise( ( resolve ) => setTimeout( resolve, delayInMs ) );
 };
 
+const waitForFocusedMenu = () =>
+	waitFor( () => expect( screen.getByRole( 'menu' ) ).toHaveFocus() );
+
+const waitForFocusedMenuItem = ( name: string ) =>
+	waitFor( () =>
+		expect( screen.getByRole( 'menuitem', { name } ) ).toHaveFocus()
+	);
+
+const waitForFocusedButton = ( name: string ) =>
+	waitFor( () =>
+		expect( screen.getByRole( 'button', { name } ) ).toHaveFocus()
+	);
+
 // Open dropdown => open menu
 // Submenu trigger item => open submenu
 
@@ -114,7 +127,7 @@ describe( 'Menu', () => {
 			await click( toggleButton );
 
 			// Menu open, focus is on the menu wrapper
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 		} );
 
 		it( 'should open and focus the first item when pressing the arrow down key on the trigger', async () => {
@@ -145,9 +158,7 @@ describe( 'Menu', () => {
 
 			// Menu open, focus is on the first focusable item
 			// (disabled items are still focusable and accessible)
-			expect(
-				screen.getByRole( 'menuitem', { name: 'First item' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'First item' );
 		} );
 
 		it( 'should open and focus the first item when pressing the space key on the trigger', async () => {
@@ -178,9 +189,7 @@ describe( 'Menu', () => {
 
 			// Menu open, focus is on the first focusable item
 			// (disabled items are still focusable and accessible
-			expect(
-				screen.getByRole( 'menuitem', { name: 'First item' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'First item' );
 		} );
 
 		it( 'should close when pressing the escape key', async () => {
@@ -201,18 +210,14 @@ describe( 'Menu', () => {
 
 			// Focuses menu on mouse click, focuses first item on keyboard press
 			// Can be changed with a custom useEffect
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			// Pressing esc will close the menu and move focus to the toggle
 			await press.Escape();
 
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
-			await waitFor( () =>
-				expect(
-					screen.getByRole( 'button', { name: 'Open dropdown' } )
-				).toHaveFocus()
-			);
+			await waitForFocusedButton( 'Open dropdown' );
 		} );
 
 		it( 'should close when clicking outside of the content', async () => {
@@ -348,17 +353,8 @@ describe( 'Menu', () => {
 				</Menu>
 			);
 
-			const waitForFocusedMenuItem = ( name: string ) =>
-				waitFor( () =>
-					expect(
-						screen.getByRole( 'menuitem', { name } )
-					).toHaveFocus()
-				);
-
 			// The menu is focused automatically when `defaultOpen` is set.
-			await waitFor( () =>
-				expect( screen.getByRole( 'menu' ) ).toHaveFocus()
-			);
+			await waitForFocusedMenu();
 
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa
@@ -851,7 +847,7 @@ describe( 'Menu', () => {
 			);
 
 			// Menu open, focus is on the menu wrapper
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			expect(
 				screen.queryByRole( 'button', {
@@ -881,7 +877,7 @@ describe( 'Menu', () => {
 			);
 
 			// Menu open, focus is on the menu wrapper
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			// Menu is not modal, therefore the outer button is part of the
 			// accessibility tree and can be found.
@@ -892,8 +888,10 @@ describe( 'Menu', () => {
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
 			await press.Tab();
-			expect( outerButton ).toBeInTheDocument();
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			await waitFor( () => {
+				expect( outerButton ).toHaveFocus();
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			} );
 		} );
 	} );
 
@@ -1033,13 +1031,11 @@ describe( 'Menu', () => {
 					name: 'Open dropdown',
 				} )
 			);
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			// Type "tw", it should match and focus the item with content "Two"
 			await type( 'tw' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Two' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'Two' );
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1047,9 +1043,7 @@ describe( 'Menu', () => {
 
 			// Type "on", it should match and focus the item with content "One"
 			await type( 'on' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'One' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'One' );
 		} );
 
 		it( 'should keep previous focus when no matches are found', async () => {
@@ -1069,11 +1063,11 @@ describe( 'Menu', () => {
 					name: 'Open dropdown',
 				} )
 			);
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
 			await type( 'abc' );
-			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
+			await waitForFocusedMenu();
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1081,9 +1075,7 @@ describe( 'Menu', () => {
 
 			// Type "on", it should match and focus the item with content "One"
 			await type( 'on' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'One' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'One' );
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1091,9 +1083,7 @@ describe( 'Menu', () => {
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
 			await type( 'abc' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'One' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'One' );
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1101,9 +1091,7 @@ describe( 'Menu', () => {
 
 			// Type "tw", it should match and focus the item with content "Two"
 			await type( 'tw' );
-			expect(
-				screen.getByRole( 'menuitem', { name: 'Two' } )
-			).toHaveFocus();
+			await waitForFocusedMenuItem( 'Two' );
 		} );
 	} );
 } );
