@@ -15,11 +15,9 @@ import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 function Edit( { clientId } ) {
-	const { tabsClientId } = useSelect(
-		( select ) => ( {
-			tabsClientId:
-				select( blockEditorStore ).getBlockRootClientId( clientId ),
-		} ),
+	const tabsClientId = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockRootClientId( clientId ),
 		[ clientId ]
 	);
 
