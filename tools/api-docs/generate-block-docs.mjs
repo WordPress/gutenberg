@@ -857,7 +857,13 @@ validateDocAnchors(
 );
 validateDocAnchors(
 	SUPPORTS_DOC_PATH,
-	[ ...new Set( [ ...SUPPORTS_SUB_ANCHORS ].map( ( p ) => p.toLowerCase().replace( /\./g, '-' ) ) ) ],
+	[
+		...new Set(
+			[ ...SUPPORTS_SUB_ANCHORS ].map( ( p ) =>
+				p.toLowerCase().replace( /\./g, '-' )
+			)
+		),
+	],
 	'block-supports.md'
 );
 
