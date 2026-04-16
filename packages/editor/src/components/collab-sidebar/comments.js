@@ -44,6 +44,7 @@ import { useFloatingBoard, useFloatingThread } from './hooks';
 import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
+import SuggestionActions from './suggestion-actions';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -795,6 +796,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 						: thread?.content?.rendered }
 				</RawHTML>
 			) }
+			<SuggestionActions thread={ thread } />
 			{ 'delete' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }

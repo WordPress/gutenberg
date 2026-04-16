@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import { operationsFromOverlay } from '../provider';
+import {
+	operationsFromOverlay,
+	applyOperations,
+	parseSuggestionPayload,
+} from '../provider';
 
 describe( 'operationsFromOverlay', () => {
 	it( 'emits one attribute-set op per changed key', () => {
@@ -63,5 +67,71 @@ describe( 'operationsFromOverlay', () => {
 	it( 'returns an empty array for an empty overlay', () => {
 		expect( operationsFromOverlay( { a: 1 }, {} ) ).toEqual( [] );
 		expect( operationsFromOverlay( { a: 1 }, null ) ).toEqual( [] );
+	} );
+} );
+
+describe( 'applyOperations', () => {
+	it( 'applies attribute-set operations to produce new attributes', () => {
+		const result = applyOperations(
+			{ content: 'Hello', level: 2, align: 'left' },
+			[
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'Hello',
+					after: 'Hi',
+				},
+				{
+					type: 'attribute-set',
+					attribute: 'level',
+					before: 2,
+					after: 3,
+				},
+			]
+		);
+		expect( result ).toEqual( {
+			content: 'Hi',
+			level: 3,
+			align: 'left',
+		} );
+	} );
+
+	it( 'returns a copy even when operations are empty', () => {
+		const attrs = { content: 'Same' };
+		const result = applyOperations( attrs, [] );
+		expect( result ).toEqual( attrs );
+		expect( result ).not.toBe( attrs );
+	} );
+} );
+
+describe( 'parseSuggestionPayload', () => {
+	it( 'parses a valid JSON payload', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 1,
+			blockName: 'core/paragraph',
+			baseRevision: '2026-04-15T00:00:00',
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.operations ).toHaveLength( 1 );
+		expect( result.blockName ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'returns null for missing, empty, or invalid input', () => {
+		expect( parseSuggestionPayload( undefined ) ).toBeNull();
+		expect( parseSuggestionPayload( '' ) ).toBeNull();
+		expect( parseSuggestionPayload( 'not json' ) ).toBeNull();
+		expect( parseSuggestionPayload( '42' ) ).toBeNull();
+		expect(
+			parseSuggestionPayload( JSON.stringify( { noOps: true } ) )
+		).toBeNull();
 	} );
 } );
