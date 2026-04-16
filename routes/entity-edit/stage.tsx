@@ -257,12 +257,12 @@ function EntityEdit() {
 		setIsSaving( false );
 	}, [ config, entityType, slug, createSuccessNotice, createErrorNotice ] );
 
-	// Plugin-registered entities that are still active are "reverted" (overrides
-	// cleared; plugin re-registers it on next request). User-created and
-	// orphaned entities are "deleted" (stored config removed). Revert is only
-	// available when the entity has actually been customized.
+	// Core and active plugin entities are "reverted" (overrides cleared;
+	// core/plugin re-registers them on next request). User-created and orphaned
+	// entities are "deleted" (stored config removed). Revert is only available
+	// when the entity has actually been customized.
 	const isRevert =
-		config?._source === 'plugin' &&
+		( config?._source === 'plugin' || config?._source === 'core' ) &&
 		! config?._orphaned &&
 		!! config?._customized;
 

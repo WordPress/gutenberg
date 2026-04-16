@@ -242,7 +242,7 @@ function EntityList() {
 			isPrimary: false,
 			isEligible( item: EntityConfig ) {
 				return (
-					item._source === 'plugin' &&
+					( item._source === 'plugin' || item._source === 'core' ) &&
 					! item._orphaned &&
 					item._customized
 				);

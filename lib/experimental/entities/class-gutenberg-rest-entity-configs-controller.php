@@ -322,8 +322,10 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 			}
 		}
 
-		// Core entities cannot be deleted or reverted via this endpoint.
-		if ( $is_core ) {
+		// Core entities can only be reverted (when they have been customized),
+		// never deleted. An uncustomized core entity has no stored deviations
+		// to remove, so blocking prevents accidental no-op churn.
+		if ( $is_core && empty( $config['_customized'] ) ) {
 			return new WP_Error(
 				'rest_entity_config_not_deletable',
 				__( 'Core entities cannot be deleted.', 'gutenberg' ),
