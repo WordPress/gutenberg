@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, cloneElement } from '@wordpress/element';
 import { link, more, wordpress } from '@wordpress/icons';
-import * as Tabs from '../index';
+import * as Tabs from '../';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Tabs.Root > = {

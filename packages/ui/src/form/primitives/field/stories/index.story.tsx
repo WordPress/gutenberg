@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId } from '@wordpress/element';
-import * as Field from '../index';
+import * as Field from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Field.Root > = {

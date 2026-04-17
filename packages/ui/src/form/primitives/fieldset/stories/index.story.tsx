@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import * as Fieldset from '../index';
+import * as Fieldset from '../';
 import { DETAILS_EXAMPLE } from '../../../stories/shared';
 
 const meta: Meta< typeof Fieldset.Root > = {
