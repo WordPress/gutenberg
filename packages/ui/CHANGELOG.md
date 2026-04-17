@@ -17,6 +17,7 @@
 
 ### Internal
 
+-   Storybook: add global preview head styles (`body` positioning and `#storybook-root` isolation) so layered `@wordpress/ui` overlays render predictably in the dev preview ([#77451](https://github.com/WordPress/gutenberg/pull/77451)).
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
 
