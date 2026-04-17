@@ -169,7 +169,7 @@ export function logPlayError( error ) {
  * @param {boolean}  options.autoPlay           - Whether to auto-play when ready.
  * @param {Function} options.onEnded            - Callback when track ends.
  * @param {Object}   options.labels             - Translated button labels.
- * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   options.waveformStyle      - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
