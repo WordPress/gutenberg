@@ -31,19 +31,19 @@
 }
 
 .admin-ui-page__header-visual {
-	display: flex;
-	align-items: center;
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
 	flex-shrink: 0;
 	// TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm.
 	width: 24px;
 	height: 24px;
 
-	img,
-	svg {
-		display: block;
-		width: 100%;
-		height: 100%;
-		object-fit: cover;
+	> * {
+		grid-column: 1 / -1;
+		grid-row: 1 / -1;
+		max-width: 100%;
+		max-height: 100%;
 	}
 }
 

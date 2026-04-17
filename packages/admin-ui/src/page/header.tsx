@@ -43,7 +43,10 @@ export default function Header( {
 						/>
 					) }
 					{ visual && (
-						<div className="admin-ui-page__header-visual">
+						<div
+							className="admin-ui-page__header-visual"
+							aria-hidden="true"
+						>
 							{ visual }
 						</div>
 					) }
