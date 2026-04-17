@@ -437,7 +437,7 @@ export function ImageEdit( {
 					! lockUrlControls &&
 					! isSmallContainer &&
 					__(
-						'Drag and drop an image, upload, or choose from your library.'
+						'Drag and drop an image, upload it, or choose from your library.'
 					)
 				}
 				style={ {
