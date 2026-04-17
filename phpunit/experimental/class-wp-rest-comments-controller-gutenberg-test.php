@@ -668,13 +668,19 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Test that an editor cannot rewrite the content of a note they did
-	 * not author — even on their own post. The suggestion-lifecycle
-	 * shortcut should not expand their permissions beyond applying/rejecting.
+	 * Test that a user with `edit_post` but no `moderate_comments` (Author
+	 * role) cannot rewrite the content of a note they did not author —
+	 * even on their own post. The suggestion-lifecycle shortcut must not
+	 * expand their permissions beyond applying/rejecting.
+	 *
+	 * Uses the Author role rather than the Editor role because WordPress
+	 * grants Editors `moderate_comments` by default, which lets them edit
+	 * any comment via core's base permission check regardless of the
+	 * suggestion-lifecycle override.
 	 */
-	public function test_editor_cannot_rewrite_foreign_note_content() {
+	public function test_post_author_cannot_rewrite_foreign_note_content() {
 		wp_set_current_user( self::$admin_id );
-		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
 
 		$comment_id = self::factory()->comment->create(
 			array(
@@ -686,12 +692,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 
-		wp_set_current_user( self::$editor_id );
+		wp_set_current_user( self::$author_id );
 
 		// Include a `content` field in addition to the lifecycle fields.
 		// The override should refuse because content is outside the
 		// suggestion-lifecycle allowed fields, falling back to core's
-		// edit_comment check — which the editor doesn't satisfy for
+		// edit_comment check — which the author doesn't satisfy for
 		// admin-authored notes.
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
 		$request->add_header( 'Content-Type', 'application/json' );
