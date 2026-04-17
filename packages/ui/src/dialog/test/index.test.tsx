@@ -1,36 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Component, createRef } from '@wordpress/element';
-import type { ReactNode } from 'react';
+import { createRef, useState } from '@wordpress/element';
 import * as Dialog from '../index';
 
-class TestErrorBoundary extends Component<
-	{ children: ReactNode; onError: ( error: Error ) => void },
-	{ hasError: boolean }
-> {
-	constructor( props: {
-		children: ReactNode;
-		onError: ( error: Error ) => void;
-	} ) {
-		super( props );
-		this.state = { hasError: false };
-	}
-
-	static getDerivedStateFromError() {
-		return { hasError: true };
-	}
-
-	componentDidCatch( error: Error ) {
-		this.props.onError( error );
-	}
-
-	render() {
-		if ( this.state.hasError ) {
-			return null;
-		}
-
-		return this.props.children;
-	}
+function collectUncaughtErrors() {
+	const errors: Error[] = [];
+	const handler = ( event: ErrorEvent ) => {
+		event.preventDefault();
+		errors.push( event.error );
+	};
+	window.addEventListener( 'error', handler );
+	return {
+		errors,
+		cleanup: () => window.removeEventListener( 'error', handler ),
+	};
 }
 
 describe( 'Dialog', () => {
@@ -81,7 +64,9 @@ describe( 'Dialog', () => {
 	} );
 
 	describe( 'Development mode validation', () => {
-		// Suppress React's error boundary logging for these tests.
+		// Suppress console.error from React act() warnings and jsdom
+		// unhandled-error logging. Validation errors are caught via
+		// collectUncaughtErrors (window 'error' event) instead.
 		let originalConsoleError: typeof console.error;
 
 		beforeEach( () => {
@@ -98,210 +83,305 @@ describe( 'Dialog', () => {
 
 		it( 'should throw when Dialog.Title is missing', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								{ /* Missing Dialog.Title */ }
-							</Dialog.Header>
-							<p>Content without a title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							{ /* Missing Dialog.Title */ }
+						</Dialog.Header>
+						<p>Content without a title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Open the dialog - this will trigger the error in useEffect
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
 			await waitFor( () => {
-				expect( onError ).toHaveBeenCalled();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
-			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
+			expect( errors[ 0 ].message ).toBe(
 				'Dialog: Missing <Dialog.Title>. ' +
 					'For accessibility, every dialog requires a title. ' +
 					'If needed, the title can be visually hidden but must not be omitted.'
 			);
+
+			cleanup();
 		} );
 
 		it( 'should not throw before opening the dialog', async () => {
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								<Dialog.Title>My Title</Dialog.Title>
-							</Dialog.Header>
-							<p>Content with a title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+						</Dialog.Header>
+						<p>Content with a title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Check that the dialog itself hasn't been rendered in the DOM.
 			await expect( screen.findByRole( 'dialog' ) ).rejects.toThrow();
+			expect( errors ).toHaveLength( 0 );
 
-			expect( onError ).not.toHaveBeenCalled();
+			cleanup();
 		} );
 
 		it( 'should not throw when Dialog.Title is present', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								<Dialog.Title>My Title</Dialog.Title>
-							</Dialog.Header>
-							<p>Content with a title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>My Title</Dialog.Title>
+						</Dialog.Header>
+						<p>Content with a title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Open the dialog - should not throw
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
-			// Wait for the dialog to appear and ensure validation does not trigger errors
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-			expect( onError ).not.toHaveBeenCalled();
+
+			// Allow deferred validation to settle.
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( errors ).toHaveLength( 0 );
+
+			cleanup();
 		} );
 
 		it( 'should throw when Dialog.Title is empty', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								{ /* Empty title */ }
-								<Dialog.Title />
-							</Dialog.Header>
-							<p>Content with empty title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title />
+						</Dialog.Header>
+						<p>Content with empty title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Open the dialog - this will trigger the error
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
 			await waitFor( () => {
-				expect( onError ).toHaveBeenCalled();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
-			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
+			expect( errors[ 0 ].message ).toBe(
 				'Dialog: <Dialog.Title> cannot be empty. ' +
 					'Provide meaningful text content for the dialog title.'
 			);
+
+			cleanup();
 		} );
 
 		it( 'should throw when Dialog.Title contains only whitespace', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								<Dialog.Title> </Dialog.Title>
-							</Dialog.Header>
-							<p>Content with whitespace-only title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title> </Dialog.Title>
+						</Dialog.Header>
+						<p>Content with whitespace-only title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Open the dialog - this will trigger the error
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
 			await waitFor( () => {
-				expect( onError ).toHaveBeenCalled();
+				expect( errors.length ).toBeGreaterThan( 0 );
 			} );
 
-			expect( onError.mock.calls[ 0 ][ 0 ] ).toBeInstanceOf( Error );
-			expect( ( onError.mock.calls[ 0 ][ 0 ] as Error ).message ).toBe(
+			expect( errors[ 0 ].message ).toBe(
 				'Dialog: <Dialog.Title> cannot be empty. ' +
 					'Provide meaningful text content for the dialog title.'
 			);
+
+			cleanup();
 		} );
 
 		it( 'should not throw when Dialog.Title contains mixed content with text', async () => {
 			const user = userEvent.setup();
-			const onError = jest.fn();
+			const { errors, cleanup } = collectUncaughtErrors();
 
 			render(
-				<TestErrorBoundary onError={ onError }>
-					<Dialog.Root>
-						<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-						<Dialog.Popup>
-							<Dialog.Header>
-								<Dialog.Title>
-									<span aria-hidden="true">🎉</span>
-									Settings
-								</Dialog.Title>
-							</Dialog.Header>
-							<p>Content with icon and text title</p>
-							<Dialog.Footer>
-								<Dialog.Action>Close</Dialog.Action>
-							</Dialog.Footer>
-						</Dialog.Popup>
-					</Dialog.Root>
-				</TestErrorBoundary>
+				<Dialog.Root>
+					<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Header>
+							<Dialog.Title>
+								<span aria-hidden="true">🎉</span>
+								Settings
+							</Dialog.Title>
+						</Dialog.Header>
+						<p>Content with icon and text title</p>
+						<Dialog.Footer>
+							<Dialog.Action>Close</Dialog.Action>
+						</Dialog.Footer>
+					</Dialog.Popup>
+				</Dialog.Root>
 			);
 
-			// Open the dialog - should not throw
 			await user.click(
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
-			// Wait for the dialog to appear and ensure validation does not trigger errors
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-			expect( onError ).not.toHaveBeenCalled();
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( errors ).toHaveLength( 0 );
+
+			cleanup();
+		} );
+
+		it( 'should throw when title is removed after mount', async () => {
+			const user = userEvent.setup();
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			function Test() {
+				const [ showTitle, setShowTitle ] = useState( true );
+				return (
+					<Dialog.Root>
+						<Dialog.Trigger>Open</Dialog.Trigger>
+						<Dialog.Popup>
+							{ showTitle && (
+								<Dialog.Title>My Title</Dialog.Title>
+							) }
+							<button onClick={ () => setShowTitle( false ) }>
+								Remove Title
+							</button>
+						</Dialog.Popup>
+					</Dialog.Root>
+				);
+			}
+
+			render( <Test /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			} );
+
+			// Let initial validation settle — no errors expected.
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			expect( errors ).toHaveLength( 0 );
+
+			// Remove the title.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Remove Title' } )
+			);
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			expect( errors[ 0 ].message ).toBe(
+				'Dialog: Missing <Dialog.Title>. ' +
+					'For accessibility, every dialog requires a title. ' +
+					'If needed, the title can be visually hidden but must not be omitted.'
+			);
+
+			cleanup();
+		} );
+
+		it( 'should recover when title is added back', async () => {
+			const user = userEvent.setup();
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			function Test() {
+				const [ showTitle, setShowTitle ] = useState( false );
+				return (
+					<Dialog.Root>
+						<Dialog.Trigger>Open</Dialog.Trigger>
+						<Dialog.Popup>
+							{ showTitle && (
+								<Dialog.Title>My Title</Dialog.Title>
+							) }
+							<button
+								onClick={ () => setShowTitle( ( s ) => ! s ) }
+							>
+								Toggle Title
+							</button>
+						</Dialog.Popup>
+					</Dialog.Root>
+				);
+			}
+
+			render( <Test /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			} );
+
+			// Initially no title — should error.
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			const errorCountAfterInitial = errors.length;
+
+			// Add the title back.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Toggle Title' } )
+			);
+
+			// Wait for deferred validation to settle.
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+
+			// No new errors should have been thrown.
+			expect( errors ).toHaveLength( errorCountAfterInitial );
+
+			cleanup();
 		} );
 	} );
 

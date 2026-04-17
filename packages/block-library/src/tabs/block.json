@@ -5,7 +5,6 @@
 	"name": "core/tabs",
 	"title": "Tabs",
 	"description": "Display content in a tabbed interface to help users navigate detailed content with ease.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"allowedBlocks": [ "core/tabs-menu", "core/tab-panel" ],
