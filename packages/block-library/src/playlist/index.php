@@ -128,9 +128,9 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		'data-wp-context',
 		json_encode(
 			array(
-				'playlistId'         => $playlist_id,
-				'currentId'          => $current_unique_id,
-				'tracks'             => $playlist_tracks,
+				'playlistId'    => $playlist_id,
+				'currentId'     => $current_unique_id,
+				'tracks'        => $playlist_tracks,
 				'waveformStyle' => $waveform_style,
 			)
 		)
