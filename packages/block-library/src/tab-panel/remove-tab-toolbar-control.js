@@ -10,9 +10,9 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
- * "Remove Tab" button in the block toolbar for the tab block.
- * Removes the currently active core/tab and its corresponding
- * core/tabs-menu-item, keeping both in sync.
+ * "Remove Tab" button in the block toolbar for the tabs block.
+ * Removes the currently active core/tab-panel and its corresponding
+ * core/tab, keeping both in sync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
@@ -49,14 +49,14 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 				tabsAttributes?.activeTabIndex ??
 				0;
 			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
+			const tabPanels = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
 			);
-			const tabs = tabPanel?.innerBlocks || [];
-			const menuItems = tabsMenu?.innerBlocks || [];
+			const tabs = tabPanels?.innerBlocks || [];
+			const menuItems = tabList?.innerBlocks || [];
 			const activeTab = tabs[ activeIndex ];
 			const activeMenuItem = menuItems[ activeIndex ];
 			return {

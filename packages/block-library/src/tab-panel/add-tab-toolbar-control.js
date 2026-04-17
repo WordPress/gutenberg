@@ -11,9 +11,9 @@ import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
- * "Add tab" button in the block toolbar for the tab block.
- * Inserts a new core/tab into the tab-panel and a new core/tabs-menu-item
- * into the tabs-menu, keeping both in sync.
+ * "Add tab" button in the block toolbar for the tabs block.
+ * Inserts a new core/tab-panel into the tab-panels and a new core/tab
+ * into the tab-list, keeping both in sync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
@@ -32,15 +32,15 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			}
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
+			const tabPanels = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
 			);
 			return {
-				tabPanelClientId: tabPanel?.clientId || null,
-				tabsMenuClientId: tabsMenu?.clientId || null,
+				tabPanelClientId: tabPanels?.clientId || null,
+				tabsMenuClientId: tabList?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -51,14 +51,14 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			return;
 		}
 
-		const newTabBlock = createBlock( 'core/tab', {
+		const newTabBlock = createBlock( 'core/tab-panel', {
 			label: __( 'Tab' ),
 		} );
 		insertBlock( newTabBlock, undefined, tabPanelClientId );
 
-		// Insert a corresponding menu item into the tabs-menu.
+		// Insert a corresponding menu item into the tab-list.
 		if ( tabsMenuClientId ) {
-			const newMenuItemBlock = createBlock( 'core/tabs-menu-item', {} );
+			const newMenuItemBlock = createBlock( 'core/tab', {} );
 			insertBlock( newMenuItemBlock, undefined, tabsMenuClientId );
 		}
 	};

@@ -21,26 +21,26 @@ const EMPTY_ARRAY = [];
 
 const TABS_TEMPLATE = [
 	[
-		'core/tabs-menu',
+		'core/tab-list',
 		{},
 		[
-			[ 'core/tabs-menu-item', {} ],
-			[ 'core/tabs-menu-item', {} ],
+			[ 'core/tab', {} ],
+			[ 'core/tab', {} ],
 		],
 	],
 	[
-		'core/tab-panel',
+		'core/tab-panels',
 		{},
 		[
 			[
-				'core/tab',
+				'core/tab-panel',
 				{
 					label: __( 'Tab' ),
 				},
 				[ [ 'core/paragraph' ] ],
 			],
 			[
-				'core/tab',
+				'core/tab-panel',
 				{
 					label: __( 'Tab' ),
 				},
@@ -68,18 +68,18 @@ function Edit( { clientId, attributes, setAttributes } ) {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
+			const tabPanels = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
 			);
 
 			return {
-				tabs: tabPanel?.innerBlocks ?? EMPTY_ARRAY,
-				tabPanelClientId: tabPanel?.clientId ?? null,
-				menuItems: tabsMenu?.innerBlocks ?? EMPTY_ARRAY,
-				tabsMenuClientId: tabsMenu?.clientId ?? null,
+				tabs: tabPanels?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanelClientId: tabPanels?.clientId ?? null,
+				menuItems: tabList?.innerBlocks ?? EMPTY_ARRAY,
+				tabsMenuClientId: tabList?.clientId ?? null,
 			};
 		},
 		[ clientId ]

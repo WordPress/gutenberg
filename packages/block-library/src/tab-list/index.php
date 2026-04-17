@@ -1,15 +1,15 @@
 <?php
 /**
- * Tabs Menu Block
+ * Tab List Block
  *
  * @package WordPress
  */
 
 /**
- * Render callback for core/tabs-menu.
+ * Render callback for core/tab-list.
  *
- * Re-renders each tabs-menu-item inner block with per-item context (index, id,
- * label) injected from the tabs-list, so the tabs-menu-item render callback
+ * Re-renders each tab inner block with per-item context (index, id,
+ * label) injected from the tabs-list, so the tab render callback
  * can add the correct IAPI directives for each button.
  *
  * @since 7.0.0
@@ -20,20 +20,20 @@
  *
  * @return string Updated HTML.
  */
-function block_core_tabs_menu_render_callback( array $attributes, string $content, \WP_Block $block ): string {
+function block_core_tab_list_render_callback( array $attributes, string $content, \WP_Block $block ): string {
 	$tabs_list = $block->context['core/tabs-list'] ?? array();
 
 	if ( empty( $tabs_list ) ) {
 		return $content;
 	}
 
-	// Re-render each tabs-menu-item with per-item context (index, id, label).
+	// Re-render each tab with per-item context (index, id, label).
 	// Match by position so items align with their corresponding tabs.
 	$buttons_html       = '';
 	$menu_item_position = 0;
 
 	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
-		if ( 'core/tabs-menu-item' !== ( $parsed_menu_item['blockName'] ?? '' ) ) {
+		if ( 'core/tab' !== ( $parsed_menu_item['blockName'] ?? '' ) ) {
 			continue;
 		}
 
@@ -49,9 +49,9 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 		$item_context = array_merge(
 			$block->context,
 			array(
-				'core/tabs-menu-item-index' => $tab_index,
-				'core/tabs-menu-item-id'    => $tab['id'] ?? '',
-				'core/tabs-menu-item-label' => $tab['label'] ?? '',
+				'core/tab-index' => $tab_index,
+				'core/tab-id'    => $tab['id'] ?? '',
+				'core/tab-label' => $tab['label'] ?? '',
 			)
 		);
 
@@ -65,16 +65,16 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 }
 
 /**
- * Registers the `core/tabs-menu` block on the server.
+ * Registers the `core/tab-list` block on the server.
  *
  * @since 7.0.0
  */
-function register_block_core_tabs_menu() {
+function register_block_core_tab_list() {
 	register_block_type_from_metadata(
-		__DIR__ . '/tabs-menu',
+		__DIR__ . '/tab-list',
 		array(
-			'render_callback' => 'block_core_tabs_menu_render_callback',
+			'render_callback' => 'block_core_tab_list_render_callback',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_tabs_menu' );
+add_action( 'init', 'register_block_core_tab_list' );

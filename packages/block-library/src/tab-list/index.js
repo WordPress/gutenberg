@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { tabsMenu as icon } from '@wordpress/icons';
+import { tabList as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
