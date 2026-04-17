@@ -131,6 +131,17 @@ const restrictedImports = [
 	},
 ];
 
+// Common `no-restricted-imports` configuration for `@wordpress/ui` paths,
+// which occur across multiple override configs. The exclusion here allows
+// Base UI to be imported directly in `@wordpress/ui`, which is the intended
+// abstraction layer for BaseUI components.
+const UI_RESTRICTED_IMPORTS = {
+	paths: restrictedImports.filter(
+		( { name } ) => name !== '@base-ui/react'
+	),
+	patterns: [],
+};
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -664,12 +675,29 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/ui/src/**' ],
 		rules: {
+			'no-restricted-imports': [ 'error', UI_RESTRICTED_IMPORTS ],
+		},
+	},
+
+	// Override: UI stories — prevent barrel imports. Namespace re-exports cause
+	// react-docgen-typescript to resolve the wrong component when a story's
+	// component is imported via the barrel.
+	//
+	// See: https://github.com/storybookjs/storybook/issues/32839
+	{
+		files: [ 'packages/ui/src/**/stories/*.story.@(ts|tsx)' ],
+		rules: {
 			'no-restricted-imports': [
 				'error',
 				{
-					paths: restrictedImports.filter(
-						( { name } ) => ! [ '@base-ui/react' ].includes( name )
-					),
+					...UI_RESTRICTED_IMPORTS,
+					patterns: UI_RESTRICTED_IMPORTS.patterns.concat( [
+						{
+							regex: '^\\.\\.(/\\.\\.)+/?$',
+							message:
+								"Don't import from the `@wordpress/ui` barrel in stories, which break import resolution in Storybook. Use an import from the component's own directory instead (e.g. `import { Icon } from '../icon';`).",
+						},
+					] ),
 				},
 			],
 		},
