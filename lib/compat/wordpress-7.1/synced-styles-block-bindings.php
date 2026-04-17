@@ -62,7 +62,7 @@ function gutenberg_register_block_bindings_synced_styles_source() {
 	register_block_bindings_source(
 		'core/synced-styles',
 		array(
-			'label'              => _x( 'Synced Styles', 'block bindings source' ),
+			'label'              => _x( 'Synced Styles', 'block bindings source', 'gutenberg' ),
 			'get_value_callback' => 'gutenberg_block_bindings_synced_styles_get_value',
 		)
 	);
@@ -82,6 +82,8 @@ add_action( 'init', 'gutenberg_register_block_bindings_synced_styles_source' );
  * `block_bindings_supported_attributes_{block_type}` returning the merged list.
  * The list below covers the full set of block-support style attributes.
  */
+// NOTE: Keep in sync with STYLE_ATTRIBUTES in
+// packages/block-library/src/accordion-heading/edit.js.
 $gutenberg_synced_styles_bindable_attributes = array(
 	'style',
 	'textColor',

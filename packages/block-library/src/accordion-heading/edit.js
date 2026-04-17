@@ -17,6 +17,8 @@ import { useDispatch, useRegistry } from '@wordpress/data';
 
 const SYNCED_STYLES_SOURCE = 'core/synced-styles';
 const SYNCED_STYLES_CONTEXT_KEY = 'core/synced-styles/accordion-heading';
+// NOTE: Keep in sync with $gutenberg_synced_styles_bindable_attributes in
+// lib/compat/wordpress-7.1/synced-styles-block-bindings.php.
 const STYLE_ATTRIBUTES = [
 	'style',
 	'textColor',
