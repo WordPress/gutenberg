@@ -3,17 +3,11 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import apiFetch from '@wordpress/api-fetch';
-import {
-	Button,
-	Spinner,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -93,12 +87,7 @@ function ExperimentsPage() {
 		editedRecord: siteSettings,
 		save: saveSettings,
 		edit,
-		isSaving,
-		edits,
 	} = useEntityRecord( 'root', 'site' );
-
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
 
 	const separateOptionExperiments = useMemo(
 		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
@@ -167,31 +156,15 @@ function ExperimentsPage() {
 		}
 
 		edit( editPayload );
+		saveSettings();
 	};
-
-	const onSave = async () => {
-		try {
-			await saveSettings( { throwOnError: true } );
-			createSuccessNotice( __( 'Experimental settings saved.' ), {
-				id: 'experiments-save-success',
-				type: 'snackbar',
-			} );
-		} catch {
-			createErrorNotice( __( 'Failed to save experimental settings.' ), {
-				id: 'experiments-save-error',
-				type: 'snackbar',
-			} );
-		}
-	};
-
-	const hasChanges = Object.keys( edits || {} ).length > 0;
 
 	const fields = useMemo( () => {
 		if ( ! experiments?.length ) {
 			return [];
 		}
 		return experiments.map( ( experiment ) => ( {
-			Edit: 'checkbox' as const,
+			Edit: 'toggle' as const,
 			id: experiment.id,
 			label: experiment.label,
 			description: experiment.description,
@@ -218,8 +191,12 @@ function ExperimentsPage() {
 		).map( ( groupId ) => ( {
 			id: `gutenberg-experiments--${ groupId }`,
 			label: GROUP_LABELS[ groupId ] || groupId,
-			type: 'group' as const,
-			labelPosition: 'side' as const,
+			layout: {
+				type: 'card' as const,
+				withHeader: true as const,
+				isCollapsible: true,
+				isOpened: true,
+			},
 			children: groupedExperiments[ groupId ],
 		} ) );
 	}, [ experiments ] );
@@ -229,31 +206,14 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<Page
-			title={ __( 'Experimental settings' ) }
-			actions={
-				<HStack>
-					<Button
-						variant="primary"
-						onClick={ onSave }
-						__next40pxDefaultSize
-						disabled={ ! hasChanges || isSaving }
-						accessibleWhenDisabled
-						isBusy={ isSaving }
-					>
-						{ __( 'Save' ) }
-					</Button>
-				</HStack>
-			}
-		>
+		<Page title={ __( 'Experimental settings' ) }>
 			<div className="experiments-page__form">
 				<DataForm
 					data={ settings }
 					fields={ fields }
 					form={ {
+						layout: { type: 'card' },
 						fields: formFields,
-						labelPosition: 'side',
-						type: 'regular',
 					} }
 					onChange={ ( values: Record< string, boolean > ) => {
 						setSettings( values );
