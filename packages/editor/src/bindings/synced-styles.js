@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -17,6 +18,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 export default {
 	name: 'core/synced-styles',
+	label: __( 'Synced Styles' ),
 	getValues( { context, bindings } ) {
 		// All bindings for this source share the same context key.
 		const contextKey = Object.values( bindings )[ 0 ]?.args?.context;
