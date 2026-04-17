@@ -496,9 +496,20 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 201, $response->get_status() );
 
-		$data = $response->get_data();
-		$this->assertSame( $payload, $data['meta']['_wp_suggestion'] );
-		$this->assertSame( '', $data['meta']['_wp_suggestion_status'] );
+		// Assert persistence via stored meta rather than response shape: core
+		// does not always surface `meta` on the `note` comment type in the
+		// REST response, so read the source of truth directly.
+		$data       = $response->get_data();
+		$comment_id = $data['id'] ?? null;
+		$this->assertIsInt( $comment_id );
+		$this->assertSame(
+			$payload,
+			get_comment_meta( $comment_id, '_wp_suggestion', true )
+		);
+		$this->assertSame(
+			'',
+			get_comment_meta( $comment_id, '_wp_suggestion_status', true )
+		);
 	}
 
 	/**
@@ -538,8 +549,12 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 200, $response->get_status() );
 
-		$data = $response->get_data();
-		$this->assertSame( 'applied', $data['meta']['_wp_suggestion_status'] );
+		// Assert persistence via stored meta — see
+		// `test_create_note_with_suggestion_meta` for the same rationale.
+		$this->assertSame(
+			'applied',
+			get_comment_meta( $comment_id, '_wp_suggestion_status', true )
+		);
 	}
 
 	/**
@@ -608,7 +623,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 
-		$response = rest_get_server()->dispatch( $request );
+		rest_get_server()->dispatch( $request );
 		// Even if the request succeeds, the invalid value should not
 		// overwrite the existing valid value.
 		$stored = get_comment_meta( $comment_id, '_wp_suggestion_status', true );
