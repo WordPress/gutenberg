@@ -129,7 +129,7 @@ export function GridItem( {
 				right: -previewDelta.width,
 				bottom: -previewDelta.height,
 				border: '2px dashed var(--wpds-color-stroke-interactive-brand, #3858e9)',
-				background: 'var(--wpds-color-bg-surface-brand, #ecf0fa)',
+				background: 'transparent',
 				pointerEvents: 'none',
 				zIndex: 1,
 			} }
