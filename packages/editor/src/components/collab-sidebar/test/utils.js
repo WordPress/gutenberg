@@ -162,24 +162,4 @@ describe( 'calculateNotePositions', () => {
 		// Thread 2: 300 + 500 + (-16) = 784.
 		expect( positions[ 2 ] ).toBe( 784 );
 	} );
-
-	it( 'computes contentHeight from the last note bottom', () => {
-		const threads = [ { id: 1 }, { id: 2 } ];
-		const blockRects = {
-			1: makeRect( 100 ),
-			2: makeRect( 300 ),
-		};
-		const heights = { 1: 50, 2: 60 };
-
-		const { contentHeight } = calculateNotePositions( {
-			threads,
-			selectedNoteId: 1,
-			blockRects,
-			heights,
-			scrollTop: 0,
-		} );
-
-		// Last note bottom = position(284) + height(60) = 344, + padding(32) = 376.
-		expect( contentHeight ).toBe( 376 );
-	} );
 } );

@@ -16,7 +16,6 @@ export function sanitizeCommentString( str ) {
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;
-const BOARD_BOTTOM_PADDING = 32;
 
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
@@ -102,7 +101,7 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
  * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
- * @return {{ positions: Object<string,number>, contentHeight: number }} Computed top positions and content height.
+ * @return {{ positions: Object<string,number> }} Computed top positions.
  */
 export function calculateNotePositions( {
 	threads,
@@ -121,7 +120,7 @@ export function calculateNotePositions( {
 	const anchorThread = threads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { positions: {}, contentHeight: 0 };
+		return { positions: {} };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -185,25 +184,17 @@ export function calculateNotePositions( {
 	}
 
 	// blockRect.top + scrollTop is the block's absolute y within the editor's
-	// scroll content. The sidebar mirrors that scroll, so positions stay valid
-	// without per-frame recalculation.
+	// scroll content; CSS translates each thread by -scrollTop at render time.
 	const positions = {};
-	let contentHeight = 0;
 	for ( const thread of threads ) {
 		const blockRect = blockRects[ thread.id ];
 		if ( blockRect && offsets[ thread.id ] !== undefined ) {
 			positions[ thread.id ] =
 				blockRect.top + scrollTop + offsets[ thread.id ];
-			const bottom =
-				positions[ thread.id ] + ( heights[ thread.id ] || 0 );
-			if ( bottom > contentHeight ) {
-				contentHeight = bottom;
-			}
 		}
 	}
-	contentHeight += BOARD_BOTTOM_PADDING;
 
-	return { positions, contentHeight };
+	return { positions };
 }
 
 /**

@@ -174,7 +174,7 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	const { notePositions, contentHeight, registerThread, unregisterThread } =
+	const { notePositions, registerThread, unregisterThread } =
 		useFloatingBoard( {
 			threads,
 			selectedNoteId: selectedNote,
@@ -260,9 +260,6 @@ export function Comments( {
 
 	return (
 		<>
-			{ isFloating && contentHeight > 0 && (
-				<div style={ { height: contentHeight } } aria-hidden="true" />
-			) }
 			{ ! isFloating && selectedNote === 'new' && (
 				<AddComment
 					onSubmit={ onAddReply }

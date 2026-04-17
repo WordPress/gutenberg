@@ -332,13 +332,12 @@ export function useFloatingBoard( {
 	commentSidebarRef,
 } ) {
 	const [ notePositions, setNotePositions ] = useState( {} );
-	const [ contentHeight, setContentHeight ] = useState( 0 );
 	const [ store ] = useState( createBoardStore );
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	// Positions are computed with scrollTop baked in; the panel mirrors the
-	// editor's scroll so notes track their blocks without per-frame recalc.
+	// Notes are positioned in canvas content-space; CSS inherits
+	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
 		if ( ! isFloating || ! commentSidebarRef?.current ) {
 			return;
@@ -351,6 +350,13 @@ export function useFloatingBoard( {
 		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
 		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
 
+		const applyScroll = () => {
+			panel.style.setProperty(
+				'--canvas-scroll',
+				`${ -( canvas?.scrollTop ?? 0 ) }px`
+			);
+		};
+
 		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
 		const rafId = window.requestAnimationFrame( () => {
 			const result = calculateNotePositions( {
@@ -362,30 +368,18 @@ export function useFloatingBoard( {
 			} );
 
 			setNotePositions( result.positions );
-			setContentHeight( result.contentHeight );
-
-			if ( canvas ) {
-				panel.scrollTop = canvas.scrollTop;
-			}
+			applyScroll();
 		} );
-
-		const onScroll = () => {
-			panel.scrollTop = canvas.scrollTop;
-		};
 
 		// Root scrolling elements (documentElement/body) don't fire scroll
 		// on themselves; capture on the window catches them in either canvas.
 		const view = canvas?.ownerDocument?.defaultView;
-		view?.addEventListener( 'scroll', onScroll, {
-			passive: true,
-			capture: true,
-		} );
+		const listenerOptions = { passive: true, capture: true };
+		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
 
 		return () => {
 			window.cancelAnimationFrame( rafId );
-			view?.removeEventListener( 'scroll', onScroll, {
-				capture: true,
-			} );
+			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
 	}, [
 		commentSidebarRef,
@@ -398,7 +392,6 @@ export function useFloatingBoard( {
 
 	return {
 		notePositions,
-		contentHeight,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
 	};
