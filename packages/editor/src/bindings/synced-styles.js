@@ -39,7 +39,7 @@ export default {
 			return;
 		}
 
-		const { getBlockParents, getBlockName, getBlockAttributes } =
+		const { getBlockParents, getBlockName, getBlockAttributes, getBlocks } =
 			select( blockEditorStore );
 
 		// Walk up the block tree to find the ancestor that provides this context key.
@@ -64,18 +64,47 @@ export default {
 		const currentSyncedStyles =
 			getBlockAttributes( parentClientId )?.[ parentAttributeName ] ?? {};
 		const updatedStyles = { ...currentSyncedStyles };
+		const ownAttributeUpdates = {};
 
 		for ( const [ attrName, { newValue } ] of Object.entries( bindings ) ) {
 			if ( newValue === undefined || newValue === null ) {
 				delete updatedStyles[ attrName ];
+				ownAttributeUpdates[ attrName ] = undefined;
 			} else {
 				updatedStyles[ attrName ] = newValue;
+				ownAttributeUpdates[ attrName ] = newValue;
 			}
 		}
 
+		// Update the canonical synced styles on the parent.
 		dispatch( blockEditorStore ).updateBlockAttributes( parentClientId, {
 			[ parentAttributeName ]: updatedStyles,
 		} );
+
+		// The block wrapper (BlockListBlock) uses raw store attributes — not
+		// binding-resolved computed attributes — when applying CSS classes and
+		// inline styles. Write the resolved values back to each bound
+		// descendant's own attributes so the editor visual reflects the change.
+		const updateBoundDescendants = ( blocks ) => {
+			for ( const block of blocks ) {
+				const defaultBinding =
+					block.attributes?.metadata?.bindings?.__default;
+				if (
+					defaultBinding?.source === 'core/synced-styles' &&
+					defaultBinding?.args?.context === contextKey
+				) {
+					dispatch( blockEditorStore ).updateBlockAttributes(
+						block.clientId,
+						ownAttributeUpdates
+					);
+				}
+				if ( block.innerBlocks?.length ) {
+					updateBoundDescendants( block.innerBlocks );
+				}
+			}
+		};
+
+		updateBoundDescendants( getBlocks( parentClientId ) );
 	},
 	canUserEditValue: () => true,
 };
