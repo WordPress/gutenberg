@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { css, keyframes } from '@emotion/react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -31,51 +31,6 @@ const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLO
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
-const fadeIn = keyframes`
-	from {
-		opacity: 0;
-	}
-
-	to {
-		opacity: 1;
-	}
-`;
-const slideInFromBottom = keyframes`
-	from {
-		transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-	}
-
-	to {
-		transform: translateY( 0 );
-	}
-`;
-const slideInFromTop = keyframes`
-	from {
-		transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-	}
-
-	to {
-		transform: translateY( 0 );
-	}
-`;
-const slideInFromLeft = keyframes`
-	from {
-		transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-	}
-
-	to {
-		transform: translateX( 0 );
-	}
-`;
-const slideInFromRight = keyframes`
-	from {
-		transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-	}
-
-	to {
-		transform: translateX( 0 );
-	}
-`;
 
 export const Menu = styled( Ariakit.Menu )`
 	position: relative;
@@ -112,66 +67,57 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 `;
 
 /**
- * Outer wrapper for root menu open motion. `Menu.Popover` uses Ariakit’s
- * `render` prop so this element wraps the inner surface that receives all
- * merged menu props (ref, role, `data-*`, children). Open-only animation lives
- * here so closing stays immediate for scroll lock (see comment in motion block).
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
+ * this element wraps the inner surface that receives all merged menu props
+ * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
+ * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
+ * surface via `:has(> …)`.
  */
 export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
-		/* Open animation only. Closing should be immediate so Ariakit can
-		 * release body scroll lock without waiting for a leave transition.
-		 */
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-open]
-			) {
-			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
-				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
-				${ DROPDOWN_MOTION_CSS.FADE_EASING };
-			animation-fill-mode: both;
-		}
+		transition-property: transform, opacity;
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+		will-change: transform, opacity;
 
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-side='bottom']
-			) {
-			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-side='top']
-			) {
-			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-side='left']
-			) {
-			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-side='right']
-			) {
-			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
-		}
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ) {
+			/* Regardless of the side, fade in and out. */
+			opacity: 0;
+			&:has( > ${ MenuSurface }[data-enter] ) {
+				opacity: 1;
+			}
 
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-open][data-side='bottom']
-			) {
-			animation-name: ${ slideInFromBottom }, ${ fadeIn };
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-open][data-side='top']
-			) {
-			animation-name: ${ slideInFromTop }, ${ fadeIn };
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-open][data-side='left']
-			) {
-			animation-name: ${ slideInFromLeft }, ${ fadeIn };
-		}
-		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
-				> ${ MenuSurface }[data-open][data-side='right']
-			) {
-			animation-name: ${ slideInFromRight }, ${ fadeIn };
+			/* Slide in the direction the menu is opening. */
+			&:has( > ${ MenuSurface }[data-side='bottom'] ) {
+				transform: translateY(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='top'] ) {
+				transform: translateY(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='left'] ) {
+				transform: translateX(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='right'] ) {
+				transform: translateX(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='bottom'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='top'] ) {
+				transform: translateY( 0 );
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='left'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='right'] ) {
+				transform: translateX( 0 );
+			}
 		}
 	}
 `;
