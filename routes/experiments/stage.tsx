@@ -1,27 +1,26 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Spinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
-import { DataForm } from '@wordpress/dataviews';
-import { __, _x } from '@wordpress/i18n';
 import { useEntityRecord } from '@wordpress/core-data';
-import { useMemo, useState } from '@wordpress/element';
+import { DataForm } from '@wordpress/dataviews';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { Page } from '@wordpress/admin-ui';
-import { useExperiments } from '../experiments-context';
+import './style.scss';
+import type { Experiment, SettingsSchema } from './types';
 
-/**
- * Group labels for experiment categories.
- */
-const GROUP_LABELS = {
+const GROUP_LABELS: Record< string, string > = {
 	blocks: _x( 'Blocks', 'experiment group' ),
 	media: _x( 'Media', 'experiment group' ),
 	collaboration: _x( 'Collaboration', 'experiment group' ),
@@ -32,9 +31,6 @@ const GROUP_LABELS = {
 	other: _x( 'Other', 'experiment group' ),
 };
 
-/**
- * Order in which groups should appear.
- */
 const GROUP_ORDER = [
 	'blocks',
 	'media',
@@ -46,7 +42,50 @@ const GROUP_ORDER = [
 	'other',
 ];
 
-export default function ExperimentsPage() {
+function useExperiments(): Experiment[] | null {
+	const [ experiments, setExperiments ] = useState< Experiment[] | null >(
+		null
+	);
+
+	useEffect( () => {
+		let active = true;
+		apiFetch< SettingsSchema >( {
+			path: '/wp/v2/settings',
+			method: 'OPTIONS',
+		} )
+			.then( ( response ) => {
+				if ( ! active ) {
+					return;
+				}
+				const properties =
+					response?.schema?.properties?.[ 'gutenberg-experiments' ]
+						?.properties ?? {};
+				const list: Experiment[] = Object.entries( properties ).map(
+					( [ id, schema ] ) => ( {
+						id,
+						label: schema.title ?? id,
+						description: schema.description ?? '',
+						group: schema.group ?? 'other',
+						separateOption: schema.separate_option ?? false,
+						optionName: schema.option_name,
+					} )
+				);
+				setExperiments( list );
+			} )
+			.catch( () => {
+				if ( active ) {
+					setExperiments( [] );
+				}
+			} );
+		return () => {
+			active = false;
+		};
+	}, [] );
+
+	return experiments;
+}
+
+function ExperimentsPage() {
 	const experiments = useExperiments();
 	const [ isResetConfirmOpen, setIsResetConfirmOpen ] = useState( false );
 
@@ -58,47 +97,32 @@ export default function ExperimentsPage() {
 		edits,
 	} = useEntityRecord( 'root', 'site' );
 
-	// Get experiments that use separate options (like active_templates).
-	const separateOptionExperiments = useMemo( () => {
-		if ( ! experiments ) {
-			return [];
-		}
-		return experiments.filter( ( exp ) => exp.separateOption );
-	}, [ experiments ] );
+	const separateOptionExperiments = useMemo(
+		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
+		[ experiments ]
+	);
 
-	// Memoize the gutenberg-experiments to avoid creating new objects on each render.
 	const gutenbergExperiments = useMemo(
-		() => siteSettings[ 'gutenberg-experiments' ] || {},
+		() => siteSettings?.[ 'gutenberg-experiments' ] || {},
 		[ siteSettings ]
 	);
 
-	// Build the combined settings object for the form.
-	// This merges gutenberg-experiments with separate option values.
-	// Ensure all experiments have explicit boolean values to avoid
-	// uncontrolled to controlled input warnings.
 	const settings = useMemo( () => {
-		const combined = {};
+		const combined: Record< string, boolean > = {};
 
-		// Initialize all experiments with false, then override with actual values.
-		if ( experiments ) {
-			for ( const exp of experiments ) {
-				combined[ exp.id ] = false;
-			}
+		for ( const exp of experiments ?? [] ) {
+			combined[ exp.id ] = false;
 		}
 
-		// Override with actual saved values from gutenberg-experiments.
 		for ( const [ key, value ] of Object.entries( gutenbergExperiments ) ) {
 			combined[ key ] = Boolean( value );
 		}
 
-		// Add separate option experiments to the combined settings.
 		for ( const exp of separateOptionExperiments ) {
-			// For active_templates, it's enabled when the option is an object.
-			if ( exp.id === 'active_templates' ) {
-				combined[ exp.id ] =
-					typeof siteSettings.active_templates === 'object' &&
-					siteSettings.active_templates !== null;
-			}
+			const optionName = exp.optionName ?? exp.id;
+			const optionValue = siteSettings?.[ optionName ];
+			combined[ exp.id ] =
+				typeof optionValue === 'object' && optionValue !== null;
 		}
 
 		return combined;
@@ -109,11 +133,10 @@ export default function ExperimentsPage() {
 		siteSettings,
 	] );
 
-	const setSettings = ( values ) => {
-		const regularUpdates = {};
-		const separateUpdates = {};
+	const setSettings = ( values: Record< string, boolean > ) => {
+		const regularUpdates: Record< string, boolean > = {};
+		const separateUpdates: Record< string, boolean > = {};
 
-		// Separate regular experiments from those with separate options.
 		for ( const [ key, value ] of Object.entries( values ) ) {
 			const isSeparate = separateOptionExperiments.some(
 				( exp ) => exp.id === key
@@ -125,9 +148,8 @@ export default function ExperimentsPage() {
 			}
 		}
 
-		const editPayload = {};
+		const editPayload: Record< string, unknown > = {};
 
-		// Update regular experiments.
 		if ( Object.keys( regularUpdates ).length > 0 ) {
 			editPayload[ 'gutenberg-experiments' ] = {
 				...gutenbergExperiments,
@@ -135,27 +157,23 @@ export default function ExperimentsPage() {
 			};
 		}
 
-		// Handle separate option experiments.
 		for ( const [ key, value ] of Object.entries( separateUpdates ) ) {
-			if ( key === 'active_templates' ) {
-				// Set to empty object to enable, null to disable.
-				editPayload.active_templates = value ? {} : null;
-			}
+			const exp = separateOptionExperiments.find( ( e ) => e.id === key );
+			const optionName = exp?.optionName ?? key;
+			editPayload[ optionName ] = value ? {} : null;
 		}
 
 		edit( editPayload );
 	};
 
 	const resetSettings = () => {
-		const resetPayload = {
+		const resetPayload: Record< string, unknown > = {
 			'gutenberg-experiments': null,
 		};
 
-		// Also reset separate option experiments.
 		for ( const exp of separateOptionExperiments ) {
-			if ( exp.id === 'active_templates' ) {
-				resetPayload.active_templates = null;
-			}
+			const optionName = exp.optionName ?? exp.id;
+			resetPayload[ optionName ] = null;
 		}
 
 		edit( resetPayload );
@@ -168,28 +186,25 @@ export default function ExperimentsPage() {
 		( value ) => value === false
 	);
 
-	// Generate fields from experiments passed from PHP.
 	const fields = useMemo( () => {
-		if ( ! experiments || ! experiments.length ) {
+		if ( ! experiments?.length ) {
 			return [];
 		}
 		return experiments.map( ( experiment ) => ( {
-			Edit: 'checkbox',
+			Edit: 'checkbox' as const,
 			id: experiment.id,
 			label: experiment.label,
 			description: experiment.description,
-			type: 'boolean',
+			type: 'boolean' as const,
 		} ) );
 	}, [ experiments ] );
 
-	// Generate form groups from experiments.
 	const formFields = useMemo( () => {
-		if ( ! experiments || ! experiments.length ) {
+		if ( ! experiments?.length ) {
 			return [];
 		}
 
-		// Group experiments by their group property.
-		const groupedExperiments = {};
+		const groupedExperiments: Record< string, string[] > = {};
 		experiments.forEach( ( experiment ) => {
 			const group = experiment.group || 'other';
 			if ( ! groupedExperiments[ group ] ) {
@@ -198,19 +213,18 @@ export default function ExperimentsPage() {
 			groupedExperiments[ group ].push( experiment.id );
 		} );
 
-		// Create form field groups in the defined order.
 		return GROUP_ORDER.filter(
 			( groupId ) => groupedExperiments[ groupId ]
 		).map( ( groupId ) => ( {
 			id: `gutenberg-experiments--${ groupId }`,
 			label: GROUP_LABELS[ groupId ] || groupId,
-			type: 'group',
-			labelPosition: 'side',
+			type: 'group' as const,
+			labelPosition: 'side' as const,
 			children: groupedExperiments[ groupId ],
 		} ) );
 	}, [ experiments ] );
 
-	if ( ! settings ) {
+	if ( experiments === null || ! siteSettings ) {
 		return <Spinner />;
 	}
 
@@ -257,7 +271,7 @@ export default function ExperimentsPage() {
 							labelPosition: 'side',
 							type: 'regular',
 						} }
-						onChange={ ( values ) => {
+						onChange={ ( values: Record< string, boolean > ) => {
 							setSettings( values );
 						} }
 					/>
@@ -282,3 +296,9 @@ export default function ExperimentsPage() {
 		</>
 	);
 }
+
+function Stage() {
+	return <ExperimentsPage />;
+}
+
+export const stage = Stage;

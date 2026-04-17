@@ -52,8 +52,8 @@ function gutenberg_menu() {
 		__( 'Experiments Settings', 'gutenberg' ),
 		__( 'Experiments', 'gutenberg' ),
 		'manage_options',
-		'gutenberg-experiments',
-		'the_gutenberg_experiments'
+		'experiments-wp-admin',
+		'gutenberg_experiments_wp_admin_render_page'
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );

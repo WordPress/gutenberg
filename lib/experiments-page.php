@@ -5,16 +5,6 @@
  * @package gutenberg
  */
 
-if ( isset( $_GET['page'] ) && 'gutenberg-experiments' === $_GET['page'] ) {
-	// Default to is-fullscreen-mode to avoid jumps in the UI.
-	add_filter(
-		'admin_body_class',
-		static function ( $classes ) {
-			return "$classes is-fullscreen-mode";
-		}
-	);
-}
-
 /**
  * Returns the list of Gutenberg experiments with their metadata.
  *
@@ -154,42 +144,6 @@ function gutenberg_get_experiments() {
 	);
 }
 
-if ( ! function_exists( 'the_gutenberg_experiments' ) ) {
-	/**
-	 * The main entry point for the Gutenberg experiments page.
-	 *
-	 * @since 6.3.0
-	 */
-	function the_gutenberg_experiments() {
-		$block_editor_context = new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) );
-		$custom_settings      = array(
-			'siteUrl' => site_url(),
-		);
-
-		$editor_settings = get_block_editor_settings( $custom_settings, $block_editor_context );
-
-		wp_register_style(
-			'wp-gutenberg-experiments',
-			gutenberg_url( 'build/edit-site/experiments.css' ),
-			array( 'wp-components', 'wp-commands', 'wp-edit-site' )
-		);
-		wp_enqueue_style( 'wp-gutenberg-experiments' );
-		wp_add_inline_script(
-			'wp-edit-site',
-			sprintf(
-				'wp.domReady( function() {
-					wp.editSite.initializeExperiments( "gutenberg-experiments", %s, %s );
-				} );',
-				wp_json_encode( $editor_settings ),
-				wp_json_encode( gutenberg_get_experiments() )
-			)
-		);
-		wp_enqueue_script( 'wp-edit-site' );
-		wp_enqueue_media();
-		echo '<div id="gutenberg-experiments"></div>';
-	}
-}
-
 /**
  * Set up the experiments settings.
  *
@@ -200,11 +154,22 @@ function gutenberg_initialize_experiments_settings() {
 	$properties  = array();
 
 	foreach ( $experiments as $experiment ) {
-		// Skip experiments that use separate options (like active_templates).
+		$property = array(
+			'type'        => 'boolean',
+			'title'       => $experiment['label'],
+			'description' => $experiment['description'],
+			'group'       => $experiment['group'],
+		);
+
+		// Metadata-only entry: values for separateOption experiments live in
+		// their own option (e.g. `active_templates`). Surfaced here so the UI
+		// can render them from the settings schema.
 		if ( ! empty( $experiment['separateOption'] ) ) {
-			continue;
+			$property['separate_option'] = true;
+			$property['option_name']     = $experiment['id'];
 		}
-		$properties[ $experiment['id'] ] = array( 'type' => 'boolean' );
+
+		$properties[ $experiment['id'] ] = $property;
 	}
 
 	register_setting(
@@ -226,3 +191,31 @@ function gutenberg_initialize_experiments_settings() {
 
 add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
+
+/**
+ * Registers a hidden submenu for the legacy `gutenberg-experiments` page so
+ * `load-*` hooks fire and can redirect to the new `experiments-wp-admin` page.
+ */
+function gutenberg_experiments_legacy_menu() {
+	add_submenu_page(
+		'',
+		'',
+		'',
+		'manage_options',
+		'gutenberg-experiments',
+		'__return_empty_string'
+	);
+}
+add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
+
+/**
+ * Redirects the legacy `?page=gutenberg-experiments` URL to the new
+ * `?page=experiments-wp-admin` URL.
+ */
+function gutenberg_redirect_legacy_experiments_page() {
+	wp_safe_redirect( admin_url( 'admin.php?page=experiments-wp-admin' ) );
+	exit;
+}
+add_action( 'load-admin_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
+add_action( 'load-toplevel_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
+add_action( 'load-gutenberg_page_gutenberg-experiments', 'gutenberg_redirect_legacy_experiments_page' );
