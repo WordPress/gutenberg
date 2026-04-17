@@ -166,30 +166,26 @@ Grid                 orchestrator: columns, gap, edit mode, DndContext
 - `@wordpress/compose` — `useResizeObserver`, `useDebounce`, `useEvent`
 - `@wordpress/element` — React re-exports
 
-### Relationship to `@wordpress/widget-types`
+### Consumer responsibility
 
-`Grid` is a **layout primitive**, not a widget surface. It knows
-nothing about widget types, the `core/widget-types` store, or the
-dashboard. A surface combines the two:
+`Grid` is a **layout primitive** and is agnostic about what each
+tile contains — children can be widgets, plain text, blocks, or any
+React node. The consumer owns the layout state (positions, sizes)
+and decides how each tile's content is rendered:
 
 ```jsx
 import { Grid } from '@wordpress/grid';
 
-function Dashboard( { types, layout, onChangeLayout } ) {
+function Surface( { items, layout, onChangeLayout } ) {
 	return (
 		<Grid layout={ layout } editMode onChangeLayout={ onChangeLayout }>
-			{ types.map( ( type ) => (
-				<div key={ type.name }>{ type.title }</div>
+			{ items.map( ( item ) => (
+				<div key={ item.key }>{ item.content }</div>
 			) ) }
 		</Grid>
 	);
 }
 ```
-
-`types` comes from the widget-types store; the surface is responsible
-for reading it, passing `layout` in, and persisting `onChangeLayout`.
-Layout state (positions, sizes) belongs to the surface — never to the
-widget type itself.
 
 ## Follow-ups
 
@@ -197,10 +193,9 @@ This package is a direct port from `@automattic/grid` to unblock
 Radical Speed Month. Two potential follow-ups, with very different
 scope, are worth separating:
 
-- **Swap the custom resize handle for a shared resize primitive.**
-  Small, realistic change: the bottom-right resize affordance can be
-  delegated to an existing resize primitive, which would also let us
-  drop the nested drag context currently used inside each handle.
+- **Swap the custom resize handle for a shared resize primitive**,
+  which would also let us drop the nested drag context currently
+  used inside each handle.
 - **Replace the sortable layer with a Gutenberg-native sortable.**
   Not a drop-in: drop-zone hooks only provide drop-target detection.
   A full sortable experience (pick-up, transform, reorder, keyboard
