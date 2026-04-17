@@ -9,7 +9,7 @@
 ### Internal
 
 -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
--   `Menu`: Refactor popover to use Ariakit’s `render` prop with an outer motion wrapper and inner surface; panel motion remains transition-based like `trunk` ([#77450](https://github.com/WordPress/gutenberg/pull/77450)).
+-   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
 
 ## 32.6.0 (2026-04-15)
 
