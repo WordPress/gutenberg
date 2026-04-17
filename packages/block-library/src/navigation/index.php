@@ -1824,7 +1824,7 @@ function block_core_navigation_get_most_recently_published_navigation() {
  * @param array $attributes Navigation block attributes.
  * @return str Block gap preset css variable.
  */
-function block_core_get_navigation_block_gap( $attributes ) {
+function block_core_navigation_get_block_gap( $attributes ) {
 	$block_gap = $attributes['style']['spacing']['blockGap'] ?? '';
 
 	if ( empty( $block_gap ) ) {
@@ -1878,7 +1878,7 @@ function block_core_navigation_build_css_separators( $attributes ) {
 		sanitize_html_class( $visibility )
 	);
 
-	$block_gap = block_core_get_navigation_block_gap( $attributes );
+	$block_gap = block_core_navigation_get_block_gap( $attributes );
 	if ( $block_gap ) {
 		$separators['inline_styles'] .= sprintf(
 			'--wp-navigation-link-separator-gap: %s;',
