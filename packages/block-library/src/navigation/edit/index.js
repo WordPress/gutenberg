@@ -690,7 +690,7 @@ function Navigation( {
 			'--wp-navigation-link-separator': hasLinkSeparator
 				? `"${ separatorChar }"`
 				: undefined,
-			'--wp-navigation-link-separator-gap': separatorGap,
+			'--wp-navigation-link-separator-gap': separatorGap || '1em',
 		},
 	} );
 
@@ -971,9 +971,7 @@ function Navigation( {
 							isShownByDefault
 						>
 							<ToggleGroupControl
-								label={
-									__( 'Separator' ) + ': ' + linkSeparator
-								}
+								label={ __( 'Separator' ) }
 								value={ linkSeparator }
 								onChange={ ( value ) =>
 									setAttributes( { linkSeparator: value } )

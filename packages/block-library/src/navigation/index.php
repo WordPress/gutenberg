@@ -1884,6 +1884,8 @@ function block_core_navigation_build_css_separators( $attributes ) {
 			'--wp-navigation-link-separator-gap: %s;',
 			esc_attr( $block_gap )
 		);
+	} else {
+		$separators['inline_styles'] .= '--wp-navigation-link-separator-gap: 1em;';
 	}
 
 	$separators['inline_styles'] .= sprintf(
