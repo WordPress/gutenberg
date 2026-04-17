@@ -16,7 +16,7 @@ describe( 'Link', () => {
 		expect( ref.current ).toBeInstanceOf( HTMLAnchorElement );
 	} );
 
-	it( 'calls onClick when clicked', async () => {
+	it( 'calls onClick when clicked (often used for analytics tracking)', async () => {
 		const user = userEvent.setup();
 		const onClick = jest.fn(
 			( event: React.MouseEvent< HTMLAnchorElement > ) =>
