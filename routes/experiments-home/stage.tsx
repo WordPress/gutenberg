@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
@@ -15,83 +14,18 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import './style.scss';
+import { fetchExperiments, type Experiment } from './api';
 
-interface Experiment {
-	id: string;
-	label: string;
-	description: string;
-	group: string;
-	groupLabel: string;
-	separateOption: boolean;
-	optionName?: string;
-}
-
-interface SettingsSchema {
-	schema?: {
-		properties?: {
-			'gutenberg-experiments'?: {
-				properties?: Record<
-					string,
-					{
-						title?: string;
-						description?: string;
-						group?: string;
-						group_label?: string;
-						separate_option?: boolean;
-						option_name?: string;
-					}
-				>;
-			};
-		};
-	};
-}
-
-function useExperiments(): Experiment[] | null {
+function ExperimentsPage() {
 	const [ experiments, setExperiments ] = useState< Experiment[] | null >(
 		null
 	);
 
 	useEffect( () => {
-		let active = true;
-		apiFetch< SettingsSchema >( {
-			path: '/wp/v2/settings',
-			method: 'OPTIONS',
-		} )
-			.then( ( response ) => {
-				if ( ! active ) {
-					return;
-				}
-				const properties =
-					response?.schema?.properties?.[ 'gutenberg-experiments' ]
-						?.properties ?? {};
-				const list: Experiment[] = Object.entries( properties ).map(
-					( [ id, schema ] ) => ( {
-						id,
-						label: schema.title ?? id,
-						description: schema.description ?? '',
-						group: schema.group ?? 'other',
-						groupLabel: schema.group_label ?? '',
-						separateOption: schema.separate_option ?? false,
-						optionName: schema.option_name,
-					} )
-				);
-				setExperiments( list );
-			} )
-			.catch( () => {
-				if ( active ) {
-					setExperiments( [] );
-				}
-			} );
-		return () => {
-			active = false;
-		};
+		fetchExperiments()
+			.then( setExperiments )
+			.catch( () => setExperiments( [] ) );
 	}, [] );
-
-	return experiments;
-}
-
-function ExperimentsPage() {
-	const experiments = useExperiments();
 
 	const {
 		editedRecord,
