@@ -16,7 +16,7 @@
 		width: 100%;
 		padding: 6px;
 		outline: none;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		white-space: nowrap;
 		font-weight: $font-weight-regular;
 

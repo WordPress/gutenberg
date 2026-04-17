@@ -19,6 +19,7 @@ import {
 	convertImageFormat,
 	compressImage,
 	resizeImage,
+	batchResizeImage,
 	rotateImage,
 	hasTransparency,
 } from './index';
@@ -31,6 +32,7 @@ const api = {
 	convertImageFormat,
 	compressImage,
 	resizeImage,
+	batchResizeImage,
 	rotateImage,
 	hasTransparency,
 };

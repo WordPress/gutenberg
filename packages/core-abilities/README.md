@@ -29,6 +29,18 @@ Simply import the package to initialize the WordPress abilities:
 import '@wordpress/core-abilities';
 ```
 
+Initialization is asynchronous because categories and abilities are fetched from the REST API. To wait for registration to finish before calling `getAbilities()` or `executeAbility()`, await the exported `ready` promise:
+
+```js
+import { ready } from '@wordpress/core-abilities';
+import { getAbilities, executeAbility } from '@wordpress/abilities';
+
+await ready;
+
+console.log( getAbilities() );
+console.log( await executeAbility( 'core/get-site-info' ) );
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

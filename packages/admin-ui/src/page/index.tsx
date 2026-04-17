@@ -41,7 +41,7 @@ function Page( {
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
-			{ ( title || breadcrumbs || badges ) && (
+			{ ( title || breadcrumbs || badges || actions ) && (
 				<Header
 					headingLevel={ headingLevel }
 					breadcrumbs={ breadcrumbs }

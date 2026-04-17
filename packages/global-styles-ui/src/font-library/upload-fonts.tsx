@@ -131,7 +131,7 @@ function UploadFonts() {
 			const buffer = await readFileAsArrayBuffer( file );
 			await font.fromDataBuffer( buffer, 'font' );
 			return true;
-		} catch ( error ) {
+		} catch {
 			return false;
 		}
 	}

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {

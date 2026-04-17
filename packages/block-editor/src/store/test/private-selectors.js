@@ -131,13 +131,13 @@ describe( 'private selectors', () => {
 						'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
 					],
 				] ),
+				blockEditingModes: new Map(),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
-			blockEditingModes: new Map( [] ),
-			derivedBlockEditingModes: new Map( [] ),
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
+			derivedBlockEditingModes: new Map(),
 		};
 
 		const hasContentRoleAttribute = jest.fn( () => false );
@@ -152,8 +152,11 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is not disabled', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				isBlockSubtreeDisabled(
@@ -166,9 +169,12 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -187,7 +193,10 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [ [ '', 'disabled' ] ] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -208,10 +217,13 @@ describe( 'private selectors', () => {
 		it( 'should return true when top level block is disabled and there are disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -229,10 +241,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
@@ -250,10 +265,13 @@ describe( 'private selectors', () => {
 		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -331,10 +349,10 @@ describe( 'private selectors', () => {
 					],
 				] ),
 			},
-			blockListSettings: {
-				'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337': {},
-				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f': {},
-			},
+			blockListSettings: new Map( [
+				[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', {} ],
+				[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', {} ],
+			] ),
 		};
 		getEnabledClientIdsTree.registry = {
 			select: jest.fn( () => ( {} ) ),
@@ -343,8 +361,11 @@ describe( 'private selectors', () => {
 		it( 'should return tree containing only clientId and innerBlocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
@@ -381,8 +402,11 @@ describe( 'private selectors', () => {
 		it( 'should return a subtree when rootBlockClientId is given', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [] ),
-				derivedBlockEditingModes: new Map( [] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
 			};
 			expect(
 				getEnabledClientIdsTree(
@@ -413,11 +437,20 @@ describe( 'private selectors', () => {
 		it( 'should filter out disabled blocks', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'b26fc763-417d-4f01-b81c-2ec61e14a972', 'contentOnly' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'contentOnly' ],
-				] ),
+				blocks: {
+					...baseState.blocks,
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[
+							'b26fc763-417d-4f01-b81c-2ec61e14a972',
+							'contentOnly',
+						],
+						[
+							'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
@@ -457,8 +490,8 @@ describe( 'private selectors', () => {
 						[ '6cf70164-9097-4460-bcbf-200560546988', [] ],
 						[ '', [ '6cf70164-9097-4460-bcbf-200560546988' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map(),
 			};
 			expect(
@@ -503,16 +536,16 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -556,15 +589,15 @@ describe( 'private selectors', () => {
 							[ '4c2b7140-fffd-44b4-b2a7-820c670a6514' ],
 						],
 					] ),
+					blockEditingModes: new Map( [
+						[ '', 'disabled' ],
+						[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
+					] ),
 				},
-				blockEditingModes: new Map( [
-					[ '', 'disabled' ],
-					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'default' ],
-				] ),
 				derivedBlockEditingModes: new Map( [
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 			expect(
 				getEnabledBlockParents(
@@ -766,9 +799,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
@@ -819,9 +852,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
@@ -877,9 +910,9 @@ describe( 'private selectors', () => {
 				] ),
 			},
 			settings: {},
-			blockListSettings: {
-				'parent-block': templateLock ? { templateLock } : {},
-			},
+			blockListSettings: new Map( [
+				[ 'parent-block', templateLock ? { templateLock } : {} ],
+			] ),
 		} );
 
 		it( 'returns false when block is not locked in any way', () => {
@@ -1362,12 +1395,15 @@ describe( 'private selectors', () => {
 					attributes: new Map( [ [ clientId, attributes ] ] ),
 					parents: new Map( [ [ clientId, rootClientId ] ] ),
 				},
-				blockListSettings: {
-					[ clientId ]: templateLock ? { templateLock } : {},
-					'': rootTemplateLock
-						? { templateLock: rootTemplateLock }
-						: {},
-				},
+				blockListSettings: new Map( [
+					[ clientId, templateLock ? { templateLock } : {} ],
+					[
+						'',
+						rootTemplateLock
+							? { templateLock: rootTemplateLock }
+							: {},
+					],
+				] ),
 				settings:
 					disableContentOnlyForUnsyncedPatterns !== undefined
 						? { disableContentOnlyForUnsyncedPatterns }
@@ -1437,7 +1473,7 @@ describe( 'private selectors', () => {
 						[ 'inner-pattern', 'outer-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1476,7 +1512,7 @@ describe( 'private selectors', () => {
 						[ 'block-1', 'outer-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
 			};
@@ -1502,7 +1538,7 @@ describe( 'private selectors', () => {
 						[ 'pattern-b', '' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-a',
 			};
@@ -1521,7 +1557,7 @@ describe( 'private selectors', () => {
 					attributes: new Map( [ [ 'block-1', {} ] ] ),
 					parents: new Map( [ [ 'block-1', '' ] ] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1547,7 +1583,7 @@ describe( 'private selectors', () => {
 						[ 'inner-block', 'pattern-block' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1575,7 +1611,7 @@ describe( 'private selectors', () => {
 						[ 'inner-block', 'pattern-block' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-block',
 			};
@@ -1612,7 +1648,7 @@ describe( 'private selectors', () => {
 						[ 'deep-block', 'nested-pattern' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
 			};
@@ -1643,7 +1679,7 @@ describe( 'private selectors', () => {
 						[ 'pattern-b', '' ],
 					] ),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-b',
 			};

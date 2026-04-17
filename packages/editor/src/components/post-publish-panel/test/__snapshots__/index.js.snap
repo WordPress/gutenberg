@@ -89,7 +89,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noreferrer noopener"
+            rel="external noopener"
             target="_blank"
           >
             <span
@@ -316,7 +316,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           <a
             class="components-external-link"
             href="https://wordpress.local/sample-page/"
-            rel="external noreferrer noopener"
+            rel="external noopener"
             target="_blank"
           >
             <span

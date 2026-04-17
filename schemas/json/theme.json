@@ -43,6 +43,11 @@
 							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
 							"type": "boolean",
 							"default": false
+						},
+						"gradient": {
+							"description": "Allow users to set a gradient background.",
+							"type": "boolean",
+							"default": false
 						}
 					},
 					"additionalProperties": false
