@@ -17,3 +17,4 @@ export * as Tabs from './tabs';
 export * from './text';
 export * as Tooltip from './tooltip';
 export * from './visually-hidden';
+export * as Menu from './menu';
