@@ -663,6 +663,26 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
+	const MAX_HEIGHT = 60;
+	const hiddenCommentRef = useRef( null );
+	const [ isOverflowing, setIsOverflowing ] = useState( false );
+	const [ collapsed, setCollapsed ] = useState( null );
+
+	useEffect( () => {
+		const commentElement = hiddenCommentRef.current;
+		if ( ! commentElement ) {
+			return;
+		}
+
+		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
+			setIsOverflowing( true );
+			setCollapsed( true );
+		} else {
+			setIsOverflowing( false );
+			setCollapsed( null );
+		}
+	}, [ thread?.content?.rendered ] );
+
 	return (
 		<VStack
 			spacing="2"
@@ -764,6 +784,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					className={ clsx(
 						'editor-collab-sidebar-panel__user-comment',
 						{
+							'is-collapsed': collapsed,
 							'editor-collab-sidebar-panel__resolution-text':
 								isResolutionComment,
 						}
@@ -794,6 +815,27 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 						  } )()
 						: thread?.content?.rendered }
 				</RawHTML>
+			) }
+			<div
+				ref={ hiddenCommentRef }
+				style={ {
+					visibility: 'hidden',
+					position: 'absolute',
+					maxHeight: MAX_HEIGHT,
+				} }
+			>
+				<RawHTML className="editor-collab-sidebar-panel__user-comment--hidden">
+					{ thread?.content?.rendered }
+				</RawHTML>
+			</div>
+			{ isOverflowing && (
+				<Button
+					variant="tertiary"
+					size="small"
+					onClick={ () => setCollapsed( ! collapsed ) }
+				>
+					{ collapsed ? __( 'Show More' ) : __( 'Show Less' ) }
+				</Button>
 			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog

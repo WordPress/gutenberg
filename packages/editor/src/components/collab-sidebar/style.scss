@@ -70,6 +70,14 @@
 	p:last-child {
 		margin-bottom: 0;
 	}
+
+	&.is-collapsed {
+		-webkit-line-clamp: 3;
+		line-clamp: 3;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
 }
 
 .editor-collab-sidebar-panel__user-avatar {
