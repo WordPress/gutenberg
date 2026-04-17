@@ -11,6 +11,10 @@
 	max-width: 100%;
 	display: block;
 	width: 100%;
+
+	&.is-hoverable {
+		cursor: var(--wpds-cursor-control);
+	}
 }
 
 .global-styles-ui-typography-preview {

@@ -36,26 +36,23 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >( function Link(
 				variant !== 'unstyled' && styles.link,
 				variant !== 'unstyled' && styles[ `is-${ tone }` ],
 				variant === 'unstyled' && styles[ 'is-unstyled' ],
-				openInNewTab && styles[ 'has-link-icon' ],
 				className
 			),
 			target: openInNewTab ? '_blank' : undefined,
-			children: openInNewTab ? (
+			children: (
 				<>
-					<span className={ styles[ 'link-contents' ] }>
-						{ children }
-					</span>
-					<span
-						className={ styles[ 'link-icon' ] }
-						role="img"
-						aria-label={
-							/* translators: accessibility text appended to link text */
-							__( '(opens in a new tab)' )
-						}
-					/>
+					{ children }
+					{ openInNewTab && (
+						<span
+							className={ styles[ 'link-icon' ] }
+							role="img"
+							aria-label={
+								/* translators: accessibility text appended to link text */
+								__( '(opens in a new tab)' )
+							}
+						/>
+					) }
 				</>
-			) : (
-				children
 			),
 		} ),
 	} );

@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
 -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
 
 ### Enhancements
