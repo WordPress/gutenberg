@@ -86,7 +86,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'             => 'active_templates',
 					'label'          => __( 'Template Activation', 'gutenberg' ),
-					'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.', 'gutenberg' ),
+					'description'    => __( 'Allows multiple templates of the same type to be created, of which one can be active at a time. (Warning: when you deactivate this experiment, it is best to delete all created templates except for the active ones.)', 'gutenberg' ),
 					'separateOption' => true,
 				),
 			),
