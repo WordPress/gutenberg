@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- Rename Tabs-related blocks:
+  - `Tabs Menu` → `Tab List`
+  - `Tab Menu Item` → `Tab`
+  - `Tab` → `Tab Panel`
+  - `Tab Panel` → `Tab Panels`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+
+## 12.2.0 (2026-04-15)
+
 ## 12.2.0 (2026-04-15)
 
 ## 12.1.0 (2026-04-01)
