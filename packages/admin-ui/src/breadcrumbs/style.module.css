@@ -14,5 +14,6 @@
 	.admin-ui-breadcrumbs__separator {
 		color: var(--wpds-color-stroke-surface-neutral);
 		margin: 0 var(--wpds-dimension-gap-sm);
+		user-select: none;
 	}
 }
