@@ -109,12 +109,22 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 			? TOOLBAR_VARIANT_BOX_SHADOW
 			: DEFAULT_BOX_SHADOW };
 	` }
+`;
 
-	/* Open animation only. Closing should be immediate so Ariakit can
-	 * release body scroll lock without waiting for a leave transition.
-	 */
+/**
+ * Outer wrapper for root menu open motion. `Menu.Popover` uses Ariakit’s
+ * `render` prop so this element wraps the inner surface that receives all
+ * merged menu props (ref, role, `data-*`, children). Open-only animation lives
+ * here so closing stays immediate for scroll lock (see comment in motion block).
+ */
+export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
-		${ Menu }:not( [data-submenu] )[data-open] > & {
+		/* Open animation only. Closing should be immediate so Ariakit can
+		 * release body scroll lock without waiting for a leave transition.
+		 */
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-open]
+			) {
 			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
 				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
 			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
@@ -122,29 +132,45 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 			animation-fill-mode: both;
 		}
 
-		${ Menu }:not( [data-submenu] )[data-side='bottom'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-side='bottom']
+			) {
 			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
-		${ Menu }:not( [data-submenu] )[data-side='top'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-side='top']
+			) {
 			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
-		${ Menu }:not( [data-submenu] )[data-side='left'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-side='left']
+			) {
 			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
-		${ Menu }:not( [data-submenu] )[data-side='right'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-side='right']
+			) {
 			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
 		}
 
-		${ Menu }:not( [data-submenu] )[data-open][data-side='bottom'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-open][data-side='bottom']
+			) {
 			animation-name: ${ slideInFromBottom }, ${ fadeIn };
 		}
-		${ Menu }:not( [data-submenu] )[data-open][data-side='top'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-open][data-side='top']
+			) {
 			animation-name: ${ slideInFromTop }, ${ fadeIn };
 		}
-		${ Menu }:not( [data-submenu] )[data-open][data-side='left'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-open][data-side='left']
+			) {
 			animation-name: ${ slideInFromLeft }, ${ fadeIn };
 		}
-		${ Menu }:not( [data-submenu] )[data-open][data-side='right'] > & {
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ):has(
+				> ${ MenuSurface }[data-open][data-side='right']
+			) {
 			animation-name: ${ slideInFromRight }, ${ fadeIn };
 		}
 	}

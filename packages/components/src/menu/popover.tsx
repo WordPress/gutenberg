@@ -25,7 +25,7 @@ export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
 >( function Popover(
-	{ gutter, children, shift, modal = true, ...otherProps },
+	{ gutter, shift, modal = true, ...otherProps },
 	ref
 ) {
 	const menuContext = useContext( Context );
@@ -70,6 +70,18 @@ export const Popover = forwardRef<
 		);
 	}
 
+	const renderMenu = useCallback(
+		( htmlProps: React.ComponentPropsWithRef< 'div' > ) => (
+			<Styled.MenuMotionRoot>
+				<Styled.MenuSurface
+					{ ...htmlProps }
+					variant={ menuContext.variant }
+				/>
+			</Styled.MenuMotionRoot>
+		),
+		[ menuContext.variant ]
+	);
+
 	return (
 		<Styled.Menu
 			{ ...otherProps }
@@ -88,10 +100,7 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-		>
-			<Styled.MenuSurface variant={ menuContext.variant }>
-				{ children }
-			</Styled.MenuSurface>
-		</Styled.Menu>
+			render={ renderMenu }
+		/>
 	);
 } );
