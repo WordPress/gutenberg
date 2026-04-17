@@ -14,7 +14,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import Controls from './controls';
-import useTabListSync from './use-tab-list-sync';
+import useTabListItemsSync from './use-tab-list-items-sync';
 
 const EMPTY_ARRAY = [];
 
@@ -35,12 +35,12 @@ const TABS_TEMPLATE = [ [ 'core/tab-list' ], [ 'core/tab-panels' ] ];
 function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
-	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
+	const { tabPanels, tabListClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			const tabPanelBlocks = innerBlocks.find(
+			const tabPanelsBlock = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
 			const tabList = innerBlocks.find(
@@ -48,21 +48,14 @@ function Edit( { clientId, attributes, setAttributes } ) {
 			);
 
 			return {
-				tabPanels: tabPanelBlocks?.innerBlocks ?? EMPTY_ARRAY,
-				tabPanelsClientId: tabPanelBlocks?.clientId ?? null,
-				tabs: tabList?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanels: tabPanelsBlock?.innerBlocks ?? EMPTY_ARRAY,
 				tabListClientId: tabList?.clientId ?? null,
 			};
 		},
 		[ clientId ]
 	);
 
-	useTabListSync( {
-		tabPanels,
-		tabs,
-		tabPanelsClientId,
-		tabListClientId,
-	} );
+	useTabListItemsSync( { tabPanels, tabListClientId } );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
@@ -70,7 +63,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	const contextValue = useMemo( () => {
 		/**
 		 * Compute tabs list from innerblocks to provide via context.
-		 * This traverses the tab-panel block to find all tab blocks
+		 * This traverses the tab-panels block to find all tab-panel blocks
 		 * and extracts their label and anchor for the tab-list to consume.
 		 */
 		const tabList = tabPanels.map( ( tab, index ) => ( {

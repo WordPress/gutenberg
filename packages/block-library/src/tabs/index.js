@@ -22,16 +22,12 @@ export const settings = {
 		innerBlocks: [
 			{
 				name: 'core/tab-list',
-				innerBlocks: [
-					{
-						name: 'core/tab',
-						attributes: { anchor: 'tab-1-button' },
-					},
-					{
-						name: 'core/tab',
-						attributes: { anchor: 'tab-2-button' },
-					},
-				],
+				attributes: {
+					tabs: [
+						{ label: __( 'Tab 1' ) },
+						{ label: __( 'Tab 2' ) },
+					],
+				},
 			},
 			{
 				name: 'core/tab-panels',

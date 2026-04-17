@@ -988,16 +988,6 @@ Add white space between blocks and customize its height. ([Source](https://githu
 -	**Supports:** anchor, interactivity (clientNavigation), spacing (margin)
 -	**Attributes:** height, width
 
-## Tab
-
-A single tab button in the tab list. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
-
--	**Name:** core/tab
--	**Experimental:** true
--	**Category:** design
--	**Parent:** core/tab-list
--	**Supports:** color (background, text), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
-
 ## Tab List
 
 Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-list))
@@ -1006,8 +996,8 @@ Display the tab buttons for a tabbed interface. ([Source](https://github.com/Wor
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
--	**Allowed Blocks:** core/tab
 -	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Attributes:** tabs
 
 ## Tab Panel
 

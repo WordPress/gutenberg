@@ -12,22 +12,28 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * "Add tab" button in the block toolbar for the tabs block.
- * Inserts a new core/tab-panel into the tab-panels and a new core/tab
- * into the tab-list, keeping both in sync.
+ * Inserts a new core/tab-panel into the tab-panels. The tab-list items
+ * attribute is kept in sync automatically via useTabListItemsSync.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
  * @return {React.JSX.Element} The toolbar control element.
  */
 export default function AddTabToolbarControl( { tabsClientId } ) {
-	const { insertBlock } = useDispatch( blockEditorStore );
+	const {
+		insertBlock,
+		updateBlockAttributes,
+		selectBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
-	const { tabPanelsClientId, tabsListClientId } = useSelect(
+	const { tabPanelsClientId, tabCount, tabListClientId } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
 					tabPanelsClientId: null,
-					tabsListClientId: null,
+					tabCount: 0,
+					tabListClientId: null,
 				};
 			}
 			const { getBlocks } = select( blockEditorStore );
@@ -40,7 +46,8 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			);
 			return {
 				tabPanelsClientId: tabPanels?.clientId || null,
-				tabsListClientId: tabList?.clientId || null,
+				tabCount: tabPanels?.innerBlocks?.length || 0,
+				tabListClientId: tabList?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
@@ -54,12 +61,18 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 		const newTabPanelBlock = createBlock( 'core/tab-panel', {
 			label: __( 'Tab' ),
 		} );
-		insertBlock( newTabPanelBlock, undefined, tabPanelsClientId );
+		insertBlock( newTabPanelBlock, undefined, tabPanelsClientId, false );
 
-		// Insert a corresponding tab into the tab-list.
-		if ( tabsListClientId ) {
-			const newTabBlock = createBlock( 'core/tab', {} );
-			insertBlock( newTabBlock, undefined, tabsListClientId );
+		// Switch editor active tab to the new tab.
+		const newIndex = tabCount;
+		__unstableMarkNextChangeAsNotPersistent();
+		updateBlockAttributes( tabsClientId, {
+			editorActiveTabIndex: newIndex,
+		} );
+
+		// Select the tab-list block so focus stays in the menu area.
+		if ( tabListClientId ) {
+			selectBlock( tabListClientId );
 		}
 	};
 
