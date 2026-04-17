@@ -97,16 +97,42 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$configs = get_option( Gutenberg_Entity_Manager::OPTION_NAME, array() );
-		$result  = array();
+		$stored_post_types = $configs['post_types'] ?? array();
+		$stored_taxonomies = $configs['taxonomies'] ?? array();
+		$result            = array();
+		$seen_post_types   = array();
+		$seen_taxonomies   = array();
 
-		if ( ! empty( $configs['post_types'] ) ) {
-			foreach ( $configs['post_types'] as $slug => $config ) {
+		// Live-registered post types: merge with stored config if any.
+		$post_types = get_post_types( array(), 'objects' );
+		foreach ( $post_types as $slug => $type_object ) {
+			$config = isset( $stored_post_types[ $slug ] )
+				? $stored_post_types[ $slug ]
+				: Gutenberg_Entity_Manager::extract_post_type_config( $slug, $type_object );
+			$result[]                   = $this->prepare_config_for_response( $slug, 'post_type', $config );
+			$seen_post_types[ $slug ] = true;
+		}
+
+		// Stored-but-not-registered post types (orphans and user-created
+		// whose registration failed).
+		foreach ( $stored_post_types as $slug => $config ) {
+			if ( ! isset( $seen_post_types[ $slug ] ) ) {
 				$result[] = $this->prepare_config_for_response( $slug, 'post_type', $config );
 			}
 		}
 
-		if ( ! empty( $configs['taxonomies'] ) ) {
-			foreach ( $configs['taxonomies'] as $slug => $config ) {
+		// Live-registered taxonomies: merge with stored config if any.
+		$taxonomies = get_taxonomies( array(), 'objects' );
+		foreach ( $taxonomies as $slug => $taxonomy_object ) {
+			$config = isset( $stored_taxonomies[ $slug ] )
+				? $stored_taxonomies[ $slug ]
+				: Gutenberg_Entity_Manager::extract_taxonomy_config( $slug, $taxonomy_object );
+			$result[]                 = $this->prepare_config_for_response( $slug, 'taxonomy', $config );
+			$seen_taxonomies[ $slug ] = true;
+		}
+
+		foreach ( $stored_taxonomies as $slug => $config ) {
+			if ( ! isset( $seen_taxonomies[ $slug ] ) ) {
 				$result[] = $this->prepare_config_for_response( $slug, 'taxonomy', $config );
 			}
 		}
@@ -125,16 +151,28 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		$slug        = $request['slug'];
 		$configs     = get_option( Gutenberg_Entity_Manager::OPTION_NAME, array() );
 		$key         = 'post_type' === $entity_type ? 'post_types' : 'taxonomies';
+		$config      = $configs[ $key ][ $slug ] ?? null;
 
-		if ( empty( $configs[ $key ][ $slug ] ) ) {
-			return new WP_Error(
-				'rest_entity_config_not_found',
-				__( 'Entity configuration not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+		// No stored config — fall back to the live registration.
+		if ( null === $config ) {
+			if ( 'post_type' === $entity_type && post_type_exists( $slug ) ) {
+				$config = Gutenberg_Entity_Manager::extract_post_type_config(
+					$slug,
+					get_post_type_object( $slug )
+				);
+			} elseif ( 'taxonomy' === $entity_type && taxonomy_exists( $slug ) ) {
+				$config = Gutenberg_Entity_Manager::extract_taxonomy_config(
+					$slug,
+					get_taxonomy( $slug )
+				);
+			} else {
+				return new WP_Error(
+					'rest_entity_config_not_found',
+					__( 'Entity configuration not found.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			}
 		}
-
-		$config = $configs[ $key ][ $slug ];
 
 		return rest_ensure_response( $this->prepare_config_for_response( $slug, $entity_type, $config ) );
 	}
@@ -258,22 +296,44 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		$configs     = get_option( Gutenberg_Entity_Manager::OPTION_NAME, array() );
 		$key         = 'post_type' === $entity_type ? 'post_types' : 'taxonomies';
 
+		// If no stored config yet, seed it from the live registration so
+		// customizations can be applied on top of the defaults.
 		if ( empty( $configs[ $key ][ $slug ] ) ) {
-			return new WP_Error(
-				'rest_entity_config_not_found',
-				__( 'Entity configuration not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+			if ( 'post_type' === $entity_type && post_type_exists( $slug ) ) {
+				$existing = Gutenberg_Entity_Manager::extract_post_type_config(
+					$slug,
+					get_post_type_object( $slug )
+				);
+			} elseif ( 'taxonomy' === $entity_type && taxonomy_exists( $slug ) ) {
+				$existing = Gutenberg_Entity_Manager::extract_taxonomy_config(
+					$slug,
+					get_taxonomy( $slug )
+				);
+			} else {
+				return new WP_Error(
+					'rest_entity_config_not_found',
+					__( 'Entity configuration not found.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			}
+		} else {
+			$existing = $configs[ $key ][ $slug ];
 		}
 
-		$existing = $configs[ $key ][ $slug ];
-		$updated  = $this->prepare_config_from_request( $request, $entity_type );
+		$updated = $this->prepare_config_from_request( $request, $entity_type );
 
 		// Merge updated fields into existing config.
 		$config                   = array_merge( $existing, $updated );
-		$config['_user_created']  = $existing['_user_created'];
+		$config['_user_created']  = ! empty( $existing['_user_created'] );
 		$config['_customized']    = true;
 		$configs[ $key ][ $slug ] = $config;
+
+		if ( ! isset( $configs['post_types'] ) ) {
+			$configs['post_types'] = array();
+		}
+		if ( ! isset( $configs['taxonomies'] ) ) {
+			$configs['taxonomies'] = array();
+		}
 
 		update_option( Gutenberg_Entity_Manager::OPTION_NAME, $configs, false );
 
