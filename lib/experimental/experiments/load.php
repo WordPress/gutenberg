@@ -16,17 +16,17 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-block-experiments',
-					'label'       => __( 'Add experimental blocks', 'gutenberg' ),
+					'label'       => __( 'Experimental blocks', 'gutenberg' ),
 					'description' => __( 'Enables experimental blocks on a rolling basis as they are developed. (Warning: these blocks may have significant changes during development that cause validation errors and display issues.)', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-form-blocks',
-					'label'       => __( 'Add Form and input blocks', 'gutenberg' ),
+					'label'       => __( 'Form and input blocks', 'gutenberg' ),
 					'description' => __( 'Enables new blocks to allow building forms. You are likely to experience UX issues that are being addressed.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-grid-interactivity',
-					'label'       => __( 'Add Grid interactivity', 'gutenberg' ),
+					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
 				array(
@@ -68,7 +68,7 @@ function gutenberg_initialize_experiments_settings() {
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-sync-collaboration',
-					'label'       => __( 'Add real time editing', 'gutenberg' ),
+					'label'       => __( 'Real time editing', 'gutenberg' ),
 					'description' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
 				),
 			),
@@ -112,7 +112,7 @@ function gutenberg_initialize_experiments_settings() {
 		),
 		array(
 			'slug'  => 'content-only',
-			'label' => _x( 'contentOnly', 'experiments group name', 'gutenberg' ),
+			'label' => _x( 'Content Only', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
 					'id'          => 'gutenberg-content-only-pattern-insertion',
