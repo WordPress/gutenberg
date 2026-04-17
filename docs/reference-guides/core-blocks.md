@@ -1059,7 +1059,7 @@ A single tab button in the tabs menu. ([Source](https://github.com/WordPress/gut
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs-menu
--	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, text), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Tag Cloud
 

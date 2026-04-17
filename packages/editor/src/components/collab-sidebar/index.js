@@ -38,12 +38,9 @@ function NotesSidebarContent( {
 	styles,
 	comments,
 	commentSidebarRef,
-	reflowComments,
-	commentLastUpdated,
 	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } =
-		useBlockCommentsActions( reflowComments );
+	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
 		<VStack
@@ -70,8 +67,6 @@ function NotesSidebarContent( {
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
-				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
 			/>
 		</VStack>
@@ -119,12 +114,8 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const {
-		resultComments,
-		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
-	} = useBlockComments( postId );
+	const { resultComments, unresolvedSortedThreads } =
+		useBlockComments( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -239,8 +230,6 @@ function NotesSidebar( { postId } ) {
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 						styles={ {
 							backgroundColor,
 						} }
