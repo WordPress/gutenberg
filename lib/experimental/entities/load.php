@@ -28,11 +28,11 @@ add_action(
 add_action( 'admin_menu', 'gutenberg_register_entities_admin_submenu', 11 );
 
 /**
- * Registers the Entities submenu item under Appearance.
+ * Registers the Entities submenu item under Settings.
  */
 function gutenberg_register_entities_admin_submenu() {
 	add_submenu_page(
-		'themes.php',
+		'options-general.php',
 		__( 'Entities', 'gutenberg' ),
 		__( 'Entities', 'gutenberg' ),
 		'manage_options',
