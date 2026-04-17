@@ -1061,12 +1061,11 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		 * The last unclosed element with a class attribute is the best candidate
 		 * for the inner-block wrapper.
 		 */
-		$tag_stack          = array();
-		$html_void_elements = array( 'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr' );
+		$tag_stack = array();
 		while ( $first_chunk_processor->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
 			if ( $first_chunk_processor->is_tag_closer() ) {
 				array_pop( $tag_stack );
-			} elseif ( ! in_array( strtolower( $first_chunk_processor->get_tag() ), $html_void_elements, true ) ) {
+			} elseif ( ! WP_HTML_Processor::is_void( $first_chunk_processor->get_tag() ) ) {
 				$tag_stack[] = $first_chunk_processor->get_attribute( 'class' );
 			}
 		}
