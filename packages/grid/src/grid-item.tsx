@@ -128,8 +128,8 @@ export function GridItem( {
 				left: 0,
 				right: -previewDelta.width,
 				bottom: -previewDelta.height,
-				border: '2px dashed var(--wp-admin-theme-color, #0087be)',
-				background: 'rgba(0, 135, 190, 0.1)',
+				border: '2px dashed var(--wpds-color-stroke-interactive-brand, #3858e9)',
+				background: 'var(--wpds-color-bg-surface-brand, #ecf0fa)',
 				pointerEvents: 'none',
 				zIndex: 1,
 			} }

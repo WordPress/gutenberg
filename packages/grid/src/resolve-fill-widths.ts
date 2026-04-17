@@ -8,8 +8,10 @@ import type { GridLayoutItem } from './types';
  * Simulates CSS Grid row packing to determine remaining space in each row,
  * then assigns that space to `fillWidth` items.
  *
- * Complexity: O(n). The inner look-ahead breaks at fill/full boundaries,
- * so each fixed item is visited by at most one fill's look-ahead.
+ * Complexity: O(n). The inner look-ahead breaks at the next `fillWidth`
+ * or `fullWidth` item, so the fixed items between two fills are scanned
+ * exactly once — each fixed item is visited by at most one fill's
+ * look-ahead.
  *
  * @param sortedKeys - Item keys in display order.
  * @param layoutMap  - Map of key to GridLayoutItem.
