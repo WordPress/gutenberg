@@ -196,6 +196,17 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 			}
 		}
 
+		/**
+		 * Filters the script module dependencies for the page module.
+		 *
+		 * Allows extensions to add script modules (static or dynamic) to the
+		 * page's dependency tree. Dynamic dependencies appear in the browser
+		 * import map without being eagerly loaded.
+		 *
+		 * @param array $boot_dependencies Array of dependency arrays with 'id' and 'import' keys.
+		 */
+		$boot_dependencies = apply_filters( '{{PAGE_SLUG}}-wp-admin_script_module_dependencies', $boot_dependencies );
+
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(
 			'{{PAGE_SLUG}}-wp-admin',
