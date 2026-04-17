@@ -94,7 +94,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		/**
 		 * Compute tabs list from innerblocks to provide via context.
 		 * This traverses the tab-panel block to find all tab blocks
-		 * and extracts their label and anchor for the tabs-menu to consume.
+		 * and extracts their label and anchor for the tab-list to consume.
 		 */
 		const tabList = tabs.map( ( tab, index ) => ( {
 			id: tab.attributes.anchor || `tab-${ index }`,
