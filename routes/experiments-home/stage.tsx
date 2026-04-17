@@ -6,13 +6,14 @@ import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Spinner,
-	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -87,7 +88,6 @@ function useExperiments(): Experiment[] | null {
 
 function ExperimentsPage() {
 	const experiments = useExperiments();
-	const [ isResetConfirmOpen, setIsResetConfirmOpen ] = useState( false );
 
 	const {
 		editedRecord: siteSettings,
@@ -96,6 +96,9 @@ function ExperimentsPage() {
 		isSaving,
 		edits,
 	} = useEntityRecord( 'root', 'site' );
+
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const separateOptionExperiments = useMemo(
 		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
@@ -166,25 +169,22 @@ function ExperimentsPage() {
 		edit( editPayload );
 	};
 
-	const resetSettings = () => {
-		const resetPayload: Record< string, unknown > = {
-			'gutenberg-experiments': null,
-		};
-
-		for ( const exp of separateOptionExperiments ) {
-			const optionName = exp.optionName ?? exp.id;
-			resetPayload[ optionName ] = null;
+	const onSave = async () => {
+		try {
+			await saveSettings( { throwOnError: true } );
+			createSuccessNotice( __( 'Experimental settings saved.' ), {
+				id: 'experiments-save-success',
+				type: 'snackbar',
+			} );
+		} catch {
+			createErrorNotice( __( 'Failed to save experimental settings.' ), {
+				id: 'experiments-save-error',
+				type: 'snackbar',
+			} );
 		}
-
-		edit( resetPayload );
-		saveSettings();
 	};
 
 	const hasChanges = Object.keys( edits || {} ).length > 0;
-
-	const allSettingsAreDisabled = Object.values( settings ).every(
-		( value ) => value === false
-	);
 
 	const fields = useMemo( () => {
 		if ( ! experiments?.length ) {
@@ -229,71 +229,38 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<>
-			<Page
-				title={ __( 'Experimental settings' ) }
-				actions={
-					<HStack>
-						<Button
-							variant="tertiary"
-							isDestructive
-							onClick={ () => {
-								setIsResetConfirmOpen( true );
-							} }
-							__next40pxDefaultSize
-							disabled={ isSaving || allSettingsAreDisabled }
-							accessibleWhenDisabled
-							isBusy={ isSaving }
-						>
-							{ __( 'Reset to default' ) }
-						</Button>
-						<Button
-							variant="primary"
-							onClick={ () => {
-								saveSettings();
-							} }
-							__next40pxDefaultSize
-							disabled={ ! hasChanges || isSaving }
-							accessibleWhenDisabled
-							isBusy={ isSaving }
-						>
-							{ __( 'Save' ) }
-						</Button>
-					</HStack>
-				}
-			>
-				<div className="experiments-page__form">
-					<DataForm
-						data={ settings }
-						fields={ fields }
-						form={ {
-							fields: formFields,
-							labelPosition: 'side',
-							type: 'regular',
-						} }
-						onChange={ ( values: Record< string, boolean > ) => {
-							setSettings( values );
-						} }
-					/>
-				</div>
-			</Page>
-			<ConfirmDialog
-				isOpen={ isResetConfirmOpen }
-				onConfirm={ () => {
-					resetSettings();
-					setIsResetConfirmOpen( false );
-				} }
-				onCancel={ () => {
-					setIsResetConfirmOpen( false );
-				} }
-				confirmButtonText={ __( 'Reset' ) }
-				cancelButtonText={ __( 'Cancel' ) }
-			>
-				{ __(
-					'Are you sure you want to reset all experimental settings to their defaults? This action cannot be undone.'
-				) }
-			</ConfirmDialog>
-		</>
+		<Page
+			title={ __( 'Experimental settings' ) }
+			actions={
+				<HStack>
+					<Button
+						variant="primary"
+						onClick={ onSave }
+						__next40pxDefaultSize
+						disabled={ ! hasChanges || isSaving }
+						accessibleWhenDisabled
+						isBusy={ isSaving }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</HStack>
+			}
+		>
+			<div className="experiments-page__form">
+				<DataForm
+					data={ settings }
+					fields={ fields }
+					form={ {
+						fields: formFields,
+						labelPosition: 'side',
+						type: 'regular',
+					} }
+					onChange={ ( values: Record< string, boolean > ) => {
+						setSettings( values );
+					} }
+				/>
+			</div>
+		</Page>
 	);
 }
 
