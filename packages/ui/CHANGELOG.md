@@ -6,6 +6,14 @@
 
 -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
 
+### Enhancements
+
+-   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+
+### Internal
+
+-   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
+
 ## 0.11.0 (2026-04-15)
 
 ### Breaking Changes
@@ -34,7 +42,6 @@
 -   `Dialog`, `AlertDialog`, `Tooltip`, `Select`: Add `container` prop to `Popup` for custom portal targets ([#77163](https://github.com/WordPress/gutenberg/pull/77163)).
 -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
 -   `VisuallyHidden`: Improve Storybook stories and documentation for the `render` prop composition pattern.
--   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 
 ### Internal
 
@@ -45,7 +52,6 @@
 -   `Badge`: Use `Text` component for typography ([#77295](https://github.com/WordPress/gutenberg/pull/77295)).
 -   `Notice.ActionLink`: Use `Text` component for typography ([#77332](https://github.com/WordPress/gutenberg/pull/77332)).
 -   Update `@base-ui/react` from `1.3.0` to `1.4.0` ([#77308](https://github.com/WordPress/gutenberg/pull/77308)).
--   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 
 ## 0.10.0 (2026-04-01)
 
