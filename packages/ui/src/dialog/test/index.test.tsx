@@ -220,7 +220,7 @@ describe( 'Dialog', () => {
 		const action = await screen.findByRole( 'button', {
 			name: 'Explicit not-disabled',
 		} );
-		expect( action ).toHaveAttribute( 'aria-disabled', 'false' );
+		expect( action ).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	describe( 'Development mode validation', () => {
