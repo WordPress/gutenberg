@@ -274,6 +274,29 @@ describe( 'parseComponents', () => {
 			},
 		] );
 	} );
+
+	it( 'should prefer a non-empty description when merging entries', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				// First entry has no description
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				description: 'A badge component.',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+			},
+		} );
+
+		expect( parseComponents( components ) ).toEqual( [
+			{
+				name: 'Badge',
+				description: 'A badge component.',
+				packageName: '@wordpress/ui',
+			},
+		] );
+	} );
 } );
 
 describe( 'parseComponentDetail', () => {
@@ -422,6 +445,50 @@ describe( 'parseComponentDetail', () => {
 			},
 			{ name: 'All Intents', snippet: '<Badge />' },
 		] );
+	} );
+
+	it( 'should prefer a non-empty description when merging story files', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				// First entry has no description
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				description: 'A badge component.',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Badge' );
+		expect( result?.description ).toBe( 'A badge component.' );
+	} );
+
+	it( 'should prefer non-empty props when merging story files', () => {
+		const components = createComponents( {
+			'badge-index': {
+				name: 'Badge',
+				// First entry has no reactDocgen props
+				path: '../packages/ui/src/badge/stories/index.story.tsx',
+			},
+			'badge-intent': {
+				name: 'Badge',
+				path: '../packages/ui/src/badge/stories/choosing-intent.story.tsx',
+				reactDocgen: {
+					props: {
+						intent: {
+							tsType: { name: 'string' },
+							description: 'The badge intent.',
+						},
+					},
+				},
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Badge' );
+		expect( result?.props ).toHaveLength( 1 );
+		expect( result?.props[ 0 ].name ).toBe( 'intent' );
 	} );
 
 	it( 'should return detail for a compound component by its root identifier', () => {

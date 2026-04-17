@@ -86,8 +86,7 @@ export function parseProps(
 export function parseComponents(
 	components: Record< string, ManifestComponent >
 ): Component[] {
-	const seen = new Set< string >();
-	const result: Component[] = [];
+	const byKey = new Map< string, Component >();
 
 	for ( const component of Object.values( components ) ) {
 		const packageName = packageNameFromPath( component.path );
@@ -97,28 +96,30 @@ export function parseComponents(
 
 		const name = canonicalComponentName( component.name );
 		const key = `${ packageName }:${ name }`;
-		if ( seen.has( key ) ) {
-			continue;
-		}
-		seen.add( key );
+		const existing = byKey.get( key );
+		const description = component.description || '';
 
-		result.push( {
-			name,
-			description: component.description || '',
-			packageName,
-		} );
+		if ( ! existing ) {
+			byKey.set( key, { name, description, packageName } );
+		} else {
+			// Prefer a non-empty description from a later entry over an
+			// empty one from the first.
+			existing.description ||= description;
+		}
 	}
 
-	return result.sort( ( a, b ) => a.name.localeCompare( b.name ) );
+	return Array.from( byKey.values() ).sort( ( a, b ) =>
+		a.name.localeCompare( b.name )
+	);
 }
 
 /**
  * Find a single component by name (case-insensitive) and return its full
  * detail including props and stories. When a component is spread across
  * multiple story files, stories from every contributing file are collected
- * in manifest order; descriptions and props are taken from the first match
- * (they are authored on the component itself and do not vary between story
- * files).
+ * in manifest order. Descriptions and props are also authored on the component
+ * itself, so in principle they should be identical across story files; in
+ * practice one file may omit them, so we prefer any non-empty value found.
  *
  * @param components - The manifest components record.
  * @param name       - The component name to look up.
@@ -141,17 +142,25 @@ export function parseComponentDetail(
 			continue;
 		}
 
+		const description = component.description || '';
+		const props = parseProps( component.reactDocgen?.props || {} );
+		const stories = component.stories || [];
+
 		if ( ! detail ) {
 			detail = {
 				name: canonicalName,
-				description: component.description || '',
+				description,
 				packageName: pkg,
 				importStatement: `import { ${ canonicalName } } from '${ pkg }';`,
-				props: parseProps( component.reactDocgen?.props || {} ),
-				stories: [ ...( component.stories || [] ) ],
+				props,
+				stories: [ ...stories ],
 			};
 		} else if ( detail.packageName === pkg ) {
-			detail.stories.push( ...( component.stories || [] ) );
+			detail.description ||= description;
+			if ( detail.props.length === 0 ) {
+				detail.props = props;
+			}
+			detail.stories.push( ...stories );
 		}
 	}
 
