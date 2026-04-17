@@ -565,13 +565,20 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				}
 			}
 
+			// Collect the list of enqueued (to-be-executed) module IDs.
+			// The import map only maps IDs to URLs; to actually run a module inside
+			// the iframed editor we also need to inject <script type="module"> tags
+			// for every module that was explicitly enqueued.
+			$enqueued_script_modules = $script_modules->get_queue();
+
 			return array(
-				'scripts'        => $scripts_data,
-				'styles'         => $styles_data,
-				'inline_scripts' => $inline_scripts,
-				'inline_styles'  => $inline_styles,
-				'html_templates' => $html_templates,
-				'script_modules' => $import_map,
+				'scripts'                 => $scripts_data,
+				'styles'                  => $styles_data,
+				'inline_scripts'          => $inline_scripts,
+				'inline_styles'           => $inline_styles,
+				'html_templates'          => $html_templates,
+				'script_modules'          => $import_map,
+				'enqueued_script_modules' => $enqueued_script_modules,
 			);
 		}
 
@@ -649,9 +656,15 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 						'type'        => 'object',
 						'readonly'    => true,
 					),
-					'script_modules' => array(
+					'script_modules'          => array(
 						'description' => __( 'Script modules to load into the import map.', 'gutenberg' ),
 						'type'        => 'object',
+						'readonly'    => true,
+					),
+					'enqueued_script_modules' => array(
+						'description' => __( 'Script module IDs that should be executed in the editor iframe.', 'gutenberg' ),
+						'type'        => 'array',
+						'items'       => array( 'type' => 'string' ),
 						'readonly'    => true,
 					),
 				),
