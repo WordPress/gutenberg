@@ -393,6 +393,7 @@ function EntityEdit() {
 							<PanelBody title={ __( 'General' ) } initialOpen>
 								<VStack spacing={ 4 }>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Name (Plural)' ) }
 										value={ config.labels?.name || '' }
@@ -401,6 +402,7 @@ function EntityEdit() {
 										}
 									/>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Singular Name' ) }
 										value={
@@ -414,6 +416,7 @@ function EntityEdit() {
 										}
 									/>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Slug' ) }
 										value={ config.slug }
@@ -421,6 +424,7 @@ function EntityEdit() {
 										readOnly
 									/>
 									<TextareaControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Description' ) }
 										value={ config.description || '' }
@@ -512,6 +516,7 @@ function EntityEdit() {
 										/>
 									</PanelRow>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'REST Base' ) }
 										value={ config.rest_base || '' }
@@ -571,6 +576,7 @@ function EntityEdit() {
 								>
 									<VStack spacing={ 4 }>
 										<TextControl
+											__next40pxDefaultSize
 											__nextHasNoMarginBottom
 											label={ __( 'Menu Icon' ) }
 											help={ __(
@@ -585,6 +591,7 @@ function EntityEdit() {
 											}
 										/>
 										<TextControl
+											__next40pxDefaultSize
 											__nextHasNoMarginBottom
 											label={ __( 'Menu Position' ) }
 											type="number"
@@ -658,6 +665,7 @@ function EntityEdit() {
 										'menu_name',
 									].map( ( labelKey ) => (
 										<TextControl
+											__next40pxDefaultSize
 											key={ labelKey }
 											__nextHasNoMarginBottom
 											label={ labelKey }

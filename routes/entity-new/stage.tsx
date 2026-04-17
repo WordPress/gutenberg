@@ -264,6 +264,7 @@ function EntityNew() {
 						<PanelBody title={ __( 'General' ) } initialOpen>
 							<VStack spacing={ 4 }>
 								<TextControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={ __( 'Slug' ) }
 									help={ __(
@@ -280,6 +281,7 @@ function EntityNew() {
 									}
 								/>
 								<TextControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={ __( 'Name (Plural)' ) }
 									value={ config.labels.name || '' }
@@ -288,6 +290,7 @@ function EntityNew() {
 									}
 								/>
 								<TextControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={ __( 'Singular Name' ) }
 									value={ config.labels.singular_name || '' }
@@ -296,6 +299,7 @@ function EntityNew() {
 									}
 								/>
 								<TextareaControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={ __( 'Description' ) }
 									value={ config.description }
@@ -381,6 +385,7 @@ function EntityNew() {
 									/>
 								</PanelRow>
 								<TextControl
+									__next40pxDefaultSize
 									__nextHasNoMarginBottom
 									label={ __( 'REST Base' ) }
 									value={ config.rest_base }
@@ -431,6 +436,7 @@ function EntityNew() {
 							>
 								<VStack spacing={ 4 }>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Menu Icon' ) }
 										help={ __(
@@ -442,6 +448,7 @@ function EntityNew() {
 										}
 									/>
 									<TextControl
+										__next40pxDefaultSize
 										__nextHasNoMarginBottom
 										label={ __( 'Menu Position' ) }
 										type="number"
