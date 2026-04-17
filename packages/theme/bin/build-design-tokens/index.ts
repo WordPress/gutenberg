@@ -1,5 +1,5 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
-import { dirname, resolve, relative } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse, build } from '@terrazzo/parser';
 import config from '../../terrazzo.config';
@@ -43,11 +43,3 @@ for ( const file of outputFiles ) {
 	await mkdir( dirname( filePath ), { recursive: true } );
 	await writeFile( filePath, file.contents );
 }
-
-const configDir = dirname( fileURLToPath( import.meta.url ) );
-console.log(
-	`Built ${ outputFiles.length } files to ${ relative(
-		resolve( configDir, '../..' ),
-		outDir
-	) }/`
-);
