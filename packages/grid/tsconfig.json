@@ -1,5 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"types": [ "jest" ]
+	},
 	"references": [ { "path": "../compose" }, { "path": "../element" } ]
 }
