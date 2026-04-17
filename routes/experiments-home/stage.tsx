@@ -37,6 +37,8 @@ function ExperimentsPage() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	// `separateOption` experiments (e.g. `active_templates`) live in their own
+	// top-level WP option instead of the `gutenberg-experiments` array.
 	const separateOptionExperiments = useMemo(
 		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
 		[ experiments ]
@@ -58,6 +60,7 @@ function ExperimentsPage() {
 			combined[ key ] = Boolean( value );
 		}
 
+		// For separate-option experiments, an object value means enabled.
 		for ( const exp of separateOptionExperiments ) {
 			const optionName = exp.optionName ?? exp.id;
 			const optionValue = siteSettings?.[ optionName ];
@@ -74,6 +77,7 @@ function ExperimentsPage() {
 	] );
 
 	const setSettings = async ( values: Record< string, boolean > ) => {
+		// Split updates by storage: regular flags vs. separate top-level options.
 		const regularUpdates: Record< string, boolean > = {};
 		const separateUpdates: Record< string, boolean > = {};
 
