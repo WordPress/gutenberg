@@ -123,15 +123,22 @@ function NotesSidebar( { postId } ) {
 	const { resultComments, unresolvedSortedThreads } =
 		useBlockComments( postId );
 
+	const isOtherSidebarOpen = useSelect( ( select ) => {
+		const activeArea =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		return !! activeArea && activeArea !== FLOATING_NOTES_SIDEBAR;
+	}, [] );
+
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
 	const showAllNotesSidebar =
 		resultComments.length > 0 || ! showFloatingSidebar;
-	useEnableFloatingSidebar(
+
+	const shouldShowFloatingNotes =
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
-	);
+		( unresolvedSortedThreads.length > 0 || selectedNote !== undefined );
+	useEnableFloatingSidebar( shouldShowFloatingNotes );
 
 	useShortcut(
 		'core/editor/new-note',
@@ -181,7 +188,7 @@ function NotesSidebar( { postId } ) {
 
 		const currentArea = await getActiveComplementaryArea( 'core' );
 		// Bail out if the current active area is not one of note sidebars.
-		if ( ! SIDEBARS.includes( currentArea ) ) {
+		if ( ! SIDEBARS.includes( currentArea ) && ! shouldShowFloatingNotes ) {
 			return;
 		}
 
@@ -224,30 +231,32 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
-				<CollabSidebarFill>
-					<div
-						className="editor-collab-sidebar"
-						style={ {
-							position: 'absolute',
-							right: 0,
-							top: 0,
-							width: '280px',
-							zIndex: 20,
-							backgroundColor,
-						} }
-					>
-						<NotesSidebarContent
-							comments={ unresolvedSortedThreads }
-							commentSidebarRef={ commentSidebarRef }
-							styles={ {
+			{ isLargeViewport &&
+				shouldShowFloatingNotes &&
+				! isOtherSidebarOpen && (
+					<CollabSidebarFill>
+						<div
+							className="editor-collab-sidebar"
+							style={ {
+								position: 'absolute',
+								right: 0,
+								top: 0,
+								width: '280px',
+								zIndex: 20,
 								backgroundColor,
 							} }
-							isFloating
-						/>
-					</div>
-				</CollabSidebarFill>
-			) }
+						>
+							<NotesSidebarContent
+								comments={ unresolvedSortedThreads }
+								commentSidebarRef={ commentSidebarRef }
+								styles={ {
+									backgroundColor,
+								} }
+								isFloating
+							/>
+						</div>
+					</CollabSidebarFill>
+				) }
 		</>
 	);
 }
