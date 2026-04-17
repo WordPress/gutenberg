@@ -87,6 +87,16 @@ exhaustive unit tests.
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `className` | `string` | — | Extra class on the grid root. |
 
+### Child-level props
+
+Children render with the layout entry that matches their `key`. An optional
+prop read off the child lets you keep controls interactive while edit mode
+is on:
+
+| Child prop | Type | Description |
+|------------|------|-------------|
+| `actionableArea` | `ReactNode` | Content rendered above the draggable surface of the grid item. Useful for close buttons, menus, or links that must stay clickable in edit mode. |
+
 ## Modes
 
 ### Fixed columns
@@ -122,7 +132,23 @@ When `editMode` is true:
 
 During an interaction the component uses an internal `temporaryLayout`
 to preview changes without triggering parent re-renders; the final
-state is only emitted once the interaction commits.
+state is only emitted once the interaction commits. The underlying
+`SortableContext` is intentionally configured with a no-op strategy —
+visual reordering is driven by `temporaryLayout` + CSS Grid re-render,
+not by dnd-kit's built-in transforms.
+
+## Accessibility
+
+Edit mode is operable from the keyboard via `@dnd-kit`'s keyboard
+sensor:
+
+- `Tab` to focus a grid item.
+- `Space` to pick it up.
+- Arrow keys to move it between positions.
+- `Space` to drop, or `Escape` to cancel.
+
+Resize is currently pointer-only. Improving keyboard and screen-reader
+support for resize is tracked as a follow-up.
 
 ## Architecture
 
@@ -147,24 +173,39 @@ nothing about widget types, the `core/widget-types` store, or the
 dashboard. A surface combines the two:
 
 ```jsx
-const types = useSelect( ( s ) => s( widgetTypesStore ).getWidgetTypes() );
+import { Grid } from '@wordpress/grid';
 
-<Grid layout={ userLayout } editMode onChangeLayout={ save }>
-	{ types.map( ( type ) => (
-		<WidgetChrome key={ type.name } type={ type } />
-	) ) }
-</Grid>
+function Dashboard( { types, layout, onChangeLayout } ) {
+	return (
+		<Grid layout={ layout } editMode onChangeLayout={ onChangeLayout }>
+			{ types.map( ( type ) => (
+				<div key={ type.name }>{ type.title }</div>
+			) ) }
+		</Grid>
+	);
+}
 ```
 
-Layout state (positions, sizes) belongs to the surface that persists
-user preferences — never to the widget type itself.
+`types` comes from the widget-types store; the surface is responsible
+for reading it, passing `layout` in, and persisting `onChangeLayout`.
+Layout state (positions, sizes) belongs to the surface — never to the
+widget type itself.
 
 ## Follow-ups
 
-This package is a direct port from Calypso to unblock Radical Speed
-Month. Post-sprint, the DnD layer should be rewritten on top of
-Gutenberg primitives (`useDropZone`, `ResizableBox` / `re-resizable`)
-to reduce the external surface area.
+This package is a direct port from `@automattic/grid` to unblock
+Radical Speed Month. Two potential follow-ups, with very different
+scope, are worth separating:
+
+- **Swap the custom resize handle for a shared resize primitive.**
+  Small, realistic change: the bottom-right resize affordance can be
+  delegated to an existing resize primitive, which would also let us
+  drop the nested drag context currently used inside each handle.
+- **Replace the sortable layer with a Gutenberg-native sortable.**
+  Not a drop-in: drop-zone hooks only provide drop-target detection.
+  A full sortable experience (pick-up, transform, reorder, keyboard
+  nav) would have to be rebuilt on top. Defer until there is a clear
+  reason beyond dependency reduction.
 
 ## Contributing to this package
 
