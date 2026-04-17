@@ -7,6 +7,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Story demo uses the new DS primitive; Storybook loads the required stylesheet.
+import { IconButton } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -84,20 +87,58 @@ function Tile( {
 	);
 }
 
-function WidgetActions( { onClose }: { onClose: () => void } ) {
+function TileActions( {
+	isFill,
+	isFull,
+	onToggleFill,
+	onToggleFull,
+	onRemove,
+}: {
+	isFill: boolean;
+	isFull: boolean;
+	onToggleFill: () => void;
+	onToggleFull: () => void;
+	onRemove: () => void;
+} ) {
 	return (
 		<div
 			style={ {
 				position: 'absolute',
 				display: 'flex',
-				alignItems: 'right',
-				justifyContent: 'right',
-				top: 2,
-				right: 2,
+				gap: 4,
+				top: 4,
+				right: 4,
 				zIndex: 2,
 			} }
 		>
-			<button onClick={ onClose }>x</button>
+			<IconButton
+				size="small"
+				variant="solid"
+				tone="neutral"
+				icon={ justifyStretch }
+				label="Fill width"
+				aria-pressed={ isFill }
+				onClick={ onToggleFill }
+			/>
+
+			<IconButton
+				size="small"
+				variant="solid"
+				tone="neutral"
+				icon={ stretchFullWidth }
+				label="Full width"
+				aria-pressed={ isFull }
+				onClick={ onToggleFull }
+			/>
+
+			<IconButton
+				size="small"
+				variant="solid"
+				tone="neutral"
+				icon={ close }
+				label="Remove"
+				onClick={ onRemove }
+			/>
 		</div>
 	);
 }
@@ -315,17 +356,109 @@ export const RowHeight: Story = {
 export const EditMode: Story = {
 	parameters: { layout: '' },
 	render: function EditModeStory() {
-		const [ layout, setLayout ] = useState< GridLayoutItem[] >( [
-			{ key: 'fill', fillWidth: true, height: 1, order: 1 },
-			{ key: 'fixed-1', width: 1, height: 1, order: 2 },
-			{ key: 'fixed-2', width: 5, height: 1, order: 3 },
-			{ key: 'full', fullWidth: true, height: 1, order: 4 },
-			{ key: 'fixed-3', width: 2, height: 1, order: 5 },
-			{ key: 'fixed-4', width: 2, height: 1, order: 6 },
-		] );
+		const initialLayout: ( GridLayoutItem & {
+			tone: Tone;
+			label: string;
+		} )[] = [
+			{
+				key: 'fill',
+				fillWidth: true,
+				height: 1,
+				order: 1,
+				tone: 'info',
+				label: 'fillWidth — resize me',
+			},
+			{
+				key: 'fixed-1',
+				width: 1,
+				height: 1,
+				order: 2,
+				tone: 'success',
+				label: 'width: 1',
+			},
+			{
+				key: 'fixed-2',
+				width: 5,
+				height: 1,
+				order: 3,
+				tone: 'brand',
+				label: 'width: 5',
+			},
+			{
+				key: 'full',
+				fullWidth: true,
+				height: 1,
+				order: 4,
+				tone: 'neutral',
+				label: 'fullWidth — resize me',
+			},
+			{
+				key: 'fixed-3',
+				width: 2,
+				height: 1,
+				order: 5,
+				tone: 'warning',
+				label: 'width: 2',
+			},
+			{
+				key: 'fixed-4',
+				width: 2,
+				height: 1,
+				order: 6,
+				tone: 'error',
+				label: 'width: 2',
+			},
+		];
+
+		const [ tiles, setTiles ] = useState( initialLayout );
+
+		const layout: GridLayoutItem[] = tiles.map(
+			( { tone: _tone, label: _label, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: GridLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+						label: existing?.label ?? '',
+					};
+				} )
+			);
+		};
 
 		const removeTile = ( key: string ) => {
-			setLayout( layout.filter( ( item ) => item.key !== key ) );
+			setTiles( tiles.filter( ( tile ) => tile.key !== key ) );
+		};
+
+		const toggleFill = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								fillWidth: tile.fillWidth ? undefined : true,
+								fullWidth: undefined,
+						  }
+						: tile
+				)
+			);
+		};
+
+		const toggleFull = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								fullWidth: tile.fullWidth ? undefined : true,
+								fillWidth: undefined,
+						  }
+						: tile
+				)
+			);
 		};
 
 		return (
@@ -336,74 +469,29 @@ export const EditMode: Story = {
 					rowHeight={ 80 }
 					spacing={ 2 }
 					editMode
-					onChangeLayout={ setLayout }
+					onChangeLayout={ onChangeLayout }
 				>
-					<Tile
-						key="fill"
-						tone="info"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'fill' ) }
-							/>
-						}
-					>
-						fillWidth — resize me
-					</Tile>
-					<Tile
-						key="fixed-1"
-						tone="success"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'fixed-1' ) }
-							/>
-						}
-					>
-						width: 1
-					</Tile>
-					<Tile
-						key="fixed-2"
-						tone="brand"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'fixed-2' ) }
-							/>
-						}
-					>
-						width: 5
-					</Tile>
-					<Tile
-						key="full"
-						tone="neutral"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'full' ) }
-							/>
-						}
-					>
-						fullWidth — resize me
-					</Tile>
-					<Tile
-						key="fixed-3"
-						tone="warning"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'fixed-3' ) }
-							/>
-						}
-					>
-						width: 2
-					</Tile>
-					<Tile
-						key="fixed-4"
-						tone="error"
-						actionableArea={
-							<WidgetActions
-								onClose={ () => removeTile( 'fixed-4' ) }
-							/>
-						}
-					>
-						width: 2
-					</Tile>
+					{ tiles.map( ( tile ) => (
+						<Tile
+							key={ tile.key }
+							tone={ tile.tone }
+							actionableArea={
+								<TileActions
+									isFill={ !! tile.fillWidth }
+									isFull={ !! tile.fullWidth }
+									onToggleFill={ () =>
+										toggleFill( tile.key )
+									}
+									onToggleFull={ () =>
+										toggleFull( tile.key )
+									}
+									onRemove={ () => removeTile( tile.key ) }
+								/>
+							}
+						>
+							{ tile.label }
+						</Tile>
+					) ) }
 				</Grid>
 
 				<LayoutStatePanel layout={ layout } />
