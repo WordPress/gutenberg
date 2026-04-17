@@ -8,10 +8,6 @@ import type { DragMoveEvent } from '@dnd-kit/core';
  * WordPress dependencies
  */
 import { useThrottle } from '@wordpress/compose';
-
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 
 interface ResizeHandleProps {

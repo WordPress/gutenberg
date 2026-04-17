@@ -40,12 +40,6 @@ export type GridLayoutItem =
 			fillWidth?: false | undefined;
 	  } );
 
-export type NormalizedGridLayoutItem = GridLayoutItem & {
-	order: number;
-	width: number;
-	height: number;
-};
-
 /**
  * Props for the Grid component
  */
