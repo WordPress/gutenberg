@@ -94,10 +94,11 @@ function ExperimentsPage() {
 	const experiments = useExperiments();
 
 	const {
-		editedRecord: siteSettings,
+		editedRecord,
 		save: saveSettings,
 		edit,
-	} = useEntityRecord( 'root', 'site' );
+	} = useEntityRecord( 'root', 'site', undefined as unknown as string );
+	const siteSettings = editedRecord as Record< string, unknown > | undefined;
 
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
