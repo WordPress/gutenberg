@@ -414,8 +414,6 @@ export function RichTextWrapper(
 					preserveWhiteSpace,
 				} );
 
-				// Allows us to ask for this information when we get a report.
-				// eslint-disable-next-line no-console
 				window.console.log( 'Received items:\n\n', files );
 
 				if ( onReplace && isEmpty( value ) ) {
@@ -700,4 +698,4 @@ PrivateRichText.Raw = forwardRef( ( props, ref ) => (
 export default PrivateRichText;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';

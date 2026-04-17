@@ -21,14 +21,15 @@ const InserterDraggableBlocks = ( {
 	children,
 	pattern,
 } ) => {
+	const blockName = blocks.length === 1 ? blocks[ 0 ].name : undefined;
 	const blockTypeIcon = useSelect(
 		( select ) => {
-			const { getBlockType } = select( blocksStore );
 			return (
-				blocks.length === 1 && getBlockType( blocks[ 0 ].name )?.icon
+				blockName &&
+				select( blocksStore ).getBlockType( blockName )?.icon
 			);
 		},
-		[ blocks ]
+		[ blockName ]
 	);
 
 	const { startDragging, stopDragging } = unlock(
@@ -57,13 +58,23 @@ const InserterDraggableBlocks = ( {
 			transferData={ { type: 'inserter', blocks: draggableBlocks } }
 			onDragStart={ ( event ) => {
 				startDragging();
+				const addedTypes = new Set();
 				for ( const block of draggableBlocks ) {
 					const type = `wp-block:${ block.name }`;
-					// This will fill in the dataTransfer.types array so that
-					// the drop zone can check if the draggable is eligible.
-					// Unfortuantely, on drag start, we don't have access to the
-					// actual data, only the data keys/types.
-					event.dataTransfer.items.add( '', type );
+					/*
+					 * Only add each block type once to avoid DataTransferItemList::add `NotSupportedError`
+					 * when patterns contain multiple blocks of the same type.
+					 */
+					if ( ! addedTypes.has( type ) ) {
+						/*
+						 * This will fill in the dataTransfer.types array so that
+						 * the drop zone can check if the draggable is eligible.
+						 * Unfortuantely, on drag start, we don't have access to the
+						 * actual data, only the data keys/types.
+						 */
+						event.dataTransfer.items.add( '', type );
+						addedTypes.add( type );
+					}
 				}
 			} }
 			onDragEnd={ () => {

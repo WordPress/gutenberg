@@ -54,10 +54,18 @@ export function FormFileUpload( {
 	const ui = render ? (
 		render( { openFileDialog } )
 	) : (
+		// Disable reason: the parent component already takes care of the `__next40pxDefaultSize` prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<Button onClick={ openFileDialog } { ...props }>
 			{ children }
 		</Button>
 	);
+
+	// iOS browsers may not reliably handle 'audio/*' in the accept attribute.
+	// Adding explicit audio MIME types improves compatibility across all devices.
+	const compatAccept = accept?.includes( 'audio/*' )
+		? `${ accept }, audio/mp3, audio/x-m4a, audio/x-m4b, audio/x-m4p, audio/x-wav, audio/webm`
+		: accept;
 
 	return (
 		<div className="components-form-file-upload">
@@ -67,7 +75,7 @@ export function FormFileUpload( {
 				ref={ ref }
 				multiple={ multiple }
 				style={ { display: 'none' } }
-				accept={ accept }
+				accept={ compatAccept }
 				onChange={ onChange }
 				onClick={ onClick }
 				data-testid="form-file-upload-input"

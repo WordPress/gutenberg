@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+
+/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
@@ -10,11 +15,6 @@ import MenuGroup from '..';
 import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
 
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
 const meta: Meta< typeof MenuGroup > = {
 	title: 'Components/Actions/MenuGroup',
 	component: MenuGroup,
@@ -25,6 +25,11 @@ const meta: Meta< typeof MenuGroup > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Subcomponent of `DropdownMenu`.',
+		},
 	},
 };
 export default meta;

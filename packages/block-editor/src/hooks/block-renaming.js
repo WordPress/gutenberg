@@ -28,8 +28,11 @@ export function addLabelCallback( settings ) {
 		settings.__experimentalLabel = ( attributes, { context } ) => {
 			const { metadata } = attributes;
 
-			// In the list view, use the block's name attribute as the label.
-			if ( context === 'list-view' && metadata?.name ) {
+			// In the list view and breadcrumb, use the block's name attribute as the label.
+			if (
+				( context === 'list-view' || context === 'breadcrumb' ) &&
+				metadata?.name
+			) {
 				return metadata.name;
 			}
 		};

@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.block-editor-content-only-controls__link {
+	width: 100%;
+	box-shadow: inset 0 0 0 $border-width $gray-400;
+
+	&:focus:not(:disabled) {
+		// Allow smooth transition between focused and unfocused box-shadow states.
+		box-shadow: 0 0 0 currentColor inset, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+}
+
+.block-editor-content-only-controls__link-row {
+	align-items: center;
+}
+
+.block-editor-content-only-controls__link-title {
+	width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

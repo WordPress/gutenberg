@@ -23,7 +23,19 @@ import { list, grid } from '@wordpress/icons';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
-	[ 'core/post-date' ],
+	[
+		'core/post-date',
+		{
+			metadata: {
+				bindings: {
+					datetime: {
+						source: 'core/post-data',
+						args: { field: 'date' },
+					},
+				},
+			},
+		},
+	],
 	[ 'core/post-excerpt' ],
 ];
 
@@ -140,20 +152,31 @@ export default function PostTemplateEdit( {
 					per_page: -1,
 					context: 'view',
 				} );
-				// We have to build the tax query for the REST API and use as
-				// keys the taxonomies `rest_base` with the `term ids` as values.
-				const builtTaxQuery = Object.entries( taxQuery ).reduce(
-					( accumulator, [ taxonomySlug, terms ] ) => {
-						const taxonomy = taxonomies?.find(
-							( { slug } ) => slug === taxonomySlug
-						);
-						if ( taxonomy?.rest_base ) {
-							accumulator[ taxonomy?.rest_base ] = terms;
-						}
-						return accumulator;
-					},
-					{}
-				);
+				// Build REST API parameters from taxonomy terms, e.g.
+				// `category`, `tags_exclude`.
+				const buildTaxQuery = ( terms, suffix = '' ) => {
+					return Object.entries( terms || {} ).reduce(
+						( accumulator, [ taxonomySlug, termIds ] ) => {
+							const taxonomy = taxonomies?.find(
+								( { slug } ) => slug === taxonomySlug
+							);
+							if ( taxonomy?.rest_base && termIds?.length ) {
+								accumulator[ taxonomy.rest_base + suffix ] =
+									termIds;
+							}
+							return accumulator;
+						},
+						{}
+					);
+				};
+				const builtTaxQuery = buildTaxQuery( taxQuery.include );
+				if ( taxQuery.exclude ) {
+					Object.assign(
+						builtTaxQuery,
+						buildTaxQuery( taxQuery.exclude, '_exclude' )
+					);
+				}
+
 				if ( !! Object.keys( builtTaxQuery ).length ) {
 					Object.assign( query, builtTaxQuery );
 				}

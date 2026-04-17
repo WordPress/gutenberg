@@ -1,4 +1,9 @@
 @use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+@use "../utils/theme-variables" as *;
 
 $toggle-width: $grid-unit-40;
 $toggle-height: $grid-unit-20;
@@ -99,7 +104,40 @@ $transition-duration: 0.2s;
 	// Disabled state:
 	&.is-disabled,
 	.components-disabled & {
-		opacity: 0.3;
+		.components-form-toggle__track {
+			background-color: $components-color-gray-100;
+			border-color: $components-color-gray-300;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+			}
+		}
+
+		.components-form-toggle__thumb {
+			background-color: $components-color-gray-400;
+			box-shadow: none;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+			}
+		}
+
+		&.is-checked .components-form-toggle__track {
+			background-color: $components-color-gray-400;
+			border-color: $components-color-gray-400;
+
+			@media ( forced-colors: active ) {
+				border-color: GrayText;
+
+				&::after {
+					border-top-color: GrayText;
+				}
+			}
+		}
+
+		&.is-checked .components-form-toggle__thumb {
+			background-color: $white;
+		}
 	}
 }
 
@@ -127,6 +165,6 @@ $transition-duration: 0.2s;
 	}
 
 	&:not(:disabled, [aria-disabled="true"]) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 }

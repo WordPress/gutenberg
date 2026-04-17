@@ -26,7 +26,7 @@ const getExternalLink = ( url, text ) =>
 	`<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`;
 
 const getExternalLinkAttributes = ( url ) =>
-	`href="${ url }" target="_blank" rel="noreferrer noopener"`;
+	`href="${ url }" target="_blank" rel="noopener"`;
 
 const getOpenverseLicense = ( license, licenseVersion ) => {
 	let licenseName = license.trim();
@@ -63,7 +63,7 @@ const getOpenverseCaption = ( item ) => {
 	if ( _creator ) {
 		_caption = title
 			? sprintf(
-					// translators: %1s: Title of a media work from Openverse; %2s: Name of the work's creator; %3s: Work's licence e.g: "CC0 1.0".
+					// translators: %1s: Title of a media work from Openverse; %2$s: Name of the work's creator; %3s: Work's licence e.g: "CC0 1.0".
 					_x( '"%1$s" by %2$s/ %3$s', 'caption' ),
 					getExternalLink(
 						foreignLandingUrl,
@@ -125,10 +125,14 @@ const getOpenverseCaption = ( item ) => {
 };
 
 const coreMediaFetch = async ( query = {} ) => {
-	const mediaItems = await resolveSelect( coreStore ).getMediaItems( {
-		...query,
-		orderBy: !! query?.search ? 'relevance' : 'date',
-	} );
+	const mediaItems = await resolveSelect( coreStore ).getEntityRecords(
+		'postType',
+		'attachment',
+		{
+			...query,
+			orderBy: !! query?.search ? 'relevance' : 'date',
+		}
+	);
 	return mediaItems.map( ( mediaItem ) => ( {
 		...mediaItem,
 		alt: mediaItem.alt_text,

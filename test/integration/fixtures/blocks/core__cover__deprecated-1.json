@@ -15,11 +15,15 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "<strong>Cover Image</strong>",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}
