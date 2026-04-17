@@ -12,7 +12,6 @@
 	}
 
 	.popup {
-		/* Shared menu sizing and spacing defaults. */
 		--wp-ui-menu-min-width: 160px;
 		--wp-ui-menu-max-width: 320px;
 		--wp-ui-menu-padding: var(--wpds-dimension-padding-xs);
@@ -23,6 +22,9 @@
 		--wp-ui-menu-prefix-gap: var(--wpds-dimension-gap-sm);
 		--wp-ui-menu-content-gap: var(--wpds-dimension-gap-md);
 		--wp-ui-menu-line-gap: var(--wpds-dimension-gap-xs);
+		--wp-ui-menu-focus-ring-width: 1.5px;
+		--wp-ui-menu-outline-width: 2px;
+		--wp-ui-menu-submenu-chevron-size: 12px;
 
 		position: relative;
 
@@ -48,7 +50,7 @@
 		color: var(--wpds-color-fg-content-neutral);
 
 		/* Visible only in high contrast mode. */
-		outline: 2px solid transparent;
+		outline: var(--wp-ui-menu-outline-width) solid transparent;
 	}
 
 	.item {
@@ -64,10 +66,18 @@
 		grid-template-columns: minmax(0, max-content) 1fr;
 		align-items: center;
 
+		@supports ( grid-template-columns: subgrid ) {
+			grid-template-columns: subgrid;
+		}
+
 		padding-block: var(--wp-ui-menu-item-padding-block);
 		padding-inline: var(--wp-ui-menu-item-padding-inline);
 		scroll-margin: var(--wp-ui-menu-padding);
 		border-radius: var(--wpds-border-radius-sm);
+		font-family: inherit;
+		font-size: var(--wpds-typography-font-size-md);
+		font-weight: var(--wpds-typography-font-weight-regular);
+		line-height: var(--wpds-typography-line-height-sm);
 		color: inherit;
 
 		cursor: default;
@@ -111,9 +121,14 @@
 	}
 
 	.itemHelpText {
-		display: block;
+		display: -webkit-box;
 		color: var(--wpds-color-fg-content-neutral-weak);
+		overflow: hidden;
 		overflow-wrap: anywhere;
+		text-overflow: ellipsis;
+		-webkit-box-orient: block-axis;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		white-space: normal;
 	}
 
@@ -132,6 +147,7 @@
 	}
 
 	.indicatorPrefix {
+		/* Keep checkbox/radio rows aligned even when unchecked icons are hidden. */
 		min-width: var(--wp-ui-menu-prefix-min-width);
 		margin-inline-end: var(--wp-ui-menu-prefix-gap);
 	}
@@ -142,6 +158,8 @@
 
 	.suffix {
 		flex: 0 1 fit-content;
+		min-width: 0;
+		width: fit-content;
 
 		display: flex;
 		align-items: center;
@@ -152,8 +170,8 @@
 	}
 
 	.submenuChevron {
-		width: 12px;
-		height: 12px;
+		width: var(--wp-ui-menu-submenu-chevron-size);
+		height: var(--wp-ui-menu-submenu-chevron-size);
 		flex: 0 0 auto;
 		margin-inline-start: var(--wpds-dimension-gap-xs);
 		fill: currentColor;
@@ -173,9 +191,9 @@
 
 	.item[data-focus-visible] {
 		box-shadow:
-			0 0 0 1.5px
+			0 0 0 var(--wp-ui-menu-focus-ring-width)
 			var(--wpds-color-stroke-interactive-brand);
-		outline: 2px solid transparent;
+		outline: var(--wp-ui-menu-outline-width) solid transparent;
 	}
 
 	/* Match Components behavior for open submenu trigger item. */
@@ -183,10 +201,6 @@
 	:not(:focus) > .item[aria-expanded="true"]:not([data-highlighted]) {
 		background-color: var(--wpds-color-bg-interactive-neutral-weak);
 		color: var(--wpds-color-fg-content-neutral);
-	}
-
-	.item svg {
-		fill: currentColor;
 	}
 
 	.item[data-highlighted]:not([data-focus-visible]) .prefix,
@@ -212,7 +226,7 @@
 		margin-block: var(--wpds-dimension-gap-sm);
 		margin-inline: var(--wp-ui-menu-item-padding-inline);
 
-		outline: 2px solid transparent;
+		outline: var(--wp-ui-menu-outline-width) solid transparent;
 	}
 
 	.groupLabel {
