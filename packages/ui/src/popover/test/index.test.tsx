@@ -447,9 +447,7 @@ describe( 'Popover', () => {
 						/>
 						<Popover.Popup
 							portal={
-								<Popover.Portal
-									container={ containerRef }
-								/>
+								<Popover.Portal container={ containerRef } />
 							}
 						>
 							<Popover.Title>Title</Popover.Title>
