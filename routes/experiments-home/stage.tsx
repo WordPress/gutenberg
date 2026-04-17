@@ -8,7 +8,7 @@ import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -21,6 +21,7 @@ interface Experiment {
 	label: string;
 	description: string;
 	group: string;
+	groupLabel: string;
 	separateOption: boolean;
 	optionName?: string;
 }
@@ -35,6 +36,7 @@ interface SettingsSchema {
 						title?: string;
 						description?: string;
 						group?: string;
+						group_label?: string;
 						separate_option?: boolean;
 						option_name?: string;
 					}
@@ -43,28 +45,6 @@ interface SettingsSchema {
 		};
 	};
 }
-
-const GROUP_LABELS: Record< string, string > = {
-	blocks: _x( 'Blocks', 'experiment group' ),
-	media: _x( 'Media', 'experiment group' ),
-	collaboration: _x( 'Collaboration', 'experiment group' ),
-	'data-views': _x( 'Data Views', 'experiment group' ),
-	interactivity: _x( 'Interactivity', 'experiment group' ),
-	'content-only': _x( 'contentOnly', 'experiment group' ),
-	templates: _x( 'Templates', 'experiment group' ),
-	other: _x( 'Other', 'experiment group' ),
-};
-
-const GROUP_ORDER = [
-	'blocks',
-	'media',
-	'collaboration',
-	'data-views',
-	'interactivity',
-	'content-only',
-	'templates',
-	'other',
-];
 
 function useExperiments(): Experiment[] | null {
 	const [ experiments, setExperiments ] = useState< Experiment[] | null >(
@@ -90,6 +70,7 @@ function useExperiments(): Experiment[] | null {
 						label: schema.title ?? id,
 						description: schema.description ?? '',
 						group: schema.group ?? 'other',
+						groupLabel: schema.group_label ?? '',
 						separateOption: schema.separate_option ?? false,
 						optionName: schema.option_name,
 					} )
@@ -191,9 +172,7 @@ function ExperimentsPage() {
 		const changedExperiment = ( experiments ?? [] ).find(
 			( exp ) => exp.id === changedId
 		);
-		const groupLabel =
-			GROUP_LABELS[ changedExperiment?.group ?? 'other' ] ??
-			GROUP_LABELS.other;
+		const groupLabel = changedExperiment?.groupLabel ?? '';
 
 		edit( editPayload );
 		try {
@@ -236,27 +215,28 @@ function ExperimentsPage() {
 			return [];
 		}
 
-		const groupedExperiments: Record< string, string[] > = {};
+		const groups = new Map< string, { label: string; items: string[] } >();
 		experiments.forEach( ( experiment ) => {
-			const group = experiment.group || 'other';
-			if ( ! groupedExperiments[ group ] ) {
-				groupedExperiments[ group ] = [];
+			const slug = experiment.group || 'other';
+			if ( ! groups.has( slug ) ) {
+				groups.set( slug, {
+					label: experiment.groupLabel || slug,
+					items: [],
+				} );
 			}
-			groupedExperiments[ group ].push( experiment.id );
+			groups.get( slug )!.items.push( experiment.id );
 		} );
 
-		return GROUP_ORDER.filter(
-			( groupId ) => groupedExperiments[ groupId ]
-		).map( ( groupId ) => ( {
-			id: `gutenberg-experiments--${ groupId }`,
-			label: GROUP_LABELS[ groupId ] || groupId,
+		return Array.from( groups.entries() ).map( ( [ slug, group ] ) => ( {
+			id: `gutenberg-experiments--${ slug }`,
+			label: group.label,
 			layout: {
 				type: 'card' as const,
 				withHeader: true as const,
 				isCollapsible: true,
 				isOpened: true,
 			},
-			children: groupedExperiments[ groupId ],
+			children: group.items,
 		} ) );
 	}, [ experiments ] );
 
@@ -274,7 +254,7 @@ function ExperimentsPage() {
 						layout: { type: 'card' },
 						fields: formFields,
 					} }
-					onChange={ ( values: Record< string, boolean > ) => {
+					onChange={ ( values ) => {
 						setSettings( values );
 					} }
 				/>
