@@ -56,7 +56,7 @@ export default defineConfig( {
 				// See: https://issues.chromium.org/issues/40552893
 				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
 				if (
-					token.id.startsWith( 'wpds-font.weight.' ) &&
+					token.id.startsWith( 'wpds-typography.font-weight.' ) &&
 					token.$value === 500
 				) {
 					return '499';
@@ -235,22 +235,22 @@ export default defineConfig( {
 				{
 					name: 'FontFamily',
 					description: 'Font family variants.',
-					patterns: [ /^wpds-font\.family\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-family\.([^.]+)$/ ],
 				},
 				{
 					name: 'FontSize',
 					description: 'Font size scale.',
-					patterns: [ /^wpds-font\.size\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-size\.([^.]+)$/ ],
 				},
 				{
 					name: 'FontWeight',
 					description: 'Font weight variants.',
-					patterns: [ /^wpds-font\.weight\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-weight\.([^.]+)$/ ],
 				},
 				{
 					name: 'LineHeight',
 					description: 'Line height scale.',
-					patterns: [ /^wpds-font\.line-height\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.line-height\.([^.]+)$/ ],
 				},
 			],
 		} ),
