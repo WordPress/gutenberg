@@ -44,7 +44,8 @@ export interface PopupProps
 	 * rendered as this portal's children (do not pass `children` on the portal
 	 * element; they would be ignored).
 	 *
-	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
+	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props,
+	 * rendering the portal in the current document's `<body>`.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
