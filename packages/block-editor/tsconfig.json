@@ -32,6 +32,7 @@
 		{ "path": "../style-engine" },
 		{ "path": "../token-list" },
 		{ "path": "../url" },
+		{ "path": "../ui" },
 		{ "path": "../upload-media" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
