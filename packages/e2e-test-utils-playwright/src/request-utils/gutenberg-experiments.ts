@@ -33,12 +33,23 @@ async function setGutenbergExperiments(
 		'gutenberg-experiments': experimentsData,
 	};
 
-	// active_templates is enabled when the option is set to an object (even empty).
-	// Only include the key when explicitly requested; omitting it leaves the
-	// stored value unchanged and avoids a schema-validation error (the setting
-	// is registered as type "object" and does not accept null).
+	// active_templates lives in a separate top-level option. Sending `{}`
+	// enables the experiment; sending `null` deletes the option and disables
+	// it.
 	if ( hasActiveTemplates ) {
 		settingsData.active_templates = {};
+	} else {
+		// WP_REST_Settings_Controller rejects null updates when the stored
+		// value does not match the `type: 'object'` schema (including when the
+		// option is absent and `get_option` falls back to `false`), so we only
+		// send null when the option actually exists.
+		const currentSiteSettings =
+			( await this.getSiteSettings() ) as unknown as {
+				active_templates?: unknown;
+			};
+		if ( currentSiteSettings.active_templates !== null ) {
+			settingsData.active_templates = null;
+		}
 	}
 
 	await this.rest( {
