@@ -24,10 +24,7 @@ import { Context } from './context';
 export const Popover = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< PopoverProps, 'div', false >
->( function Popover(
-	{ gutter, shift, modal = true, ...otherProps },
-	ref
-) {
+>( function Popover( { gutter, shift, modal = true, ...otherProps }, ref ) {
 	const menuContext = useContext( Context );
 
 	// Extract the side from the applied placement — useful for animations.
