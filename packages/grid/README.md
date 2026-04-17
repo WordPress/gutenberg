@@ -85,6 +85,7 @@ exhaustive unit tests.
 | `rowHeight` | `number \| 'auto'` | `'auto'` | Row height in pixels, or `'auto'` to let content size rows. |
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
+| `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
 | `className` | `string` | — | Extra class on the grid root. |
 
 ### Child-level props
@@ -129,6 +130,9 @@ When `editMode` is true:
 - Items become draggable (powered by `@dnd-kit`).
 - A resize handle appears on the bottom-right of each item.
 - `onChangeLayout` fires after drop or resize with the new layout.
+- `onPreviewLayout` fires continuously during the interaction for
+  live feedback; the committed layout is still emitted via
+  `onChangeLayout`.
 
 During an interaction the component uses an internal `temporaryLayout`
 to preview changes without triggering parent re-renders; the final

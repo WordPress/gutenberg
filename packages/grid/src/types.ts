@@ -84,6 +84,14 @@ interface BaseGridProps {
 	 * Callback fired when layout changes due to item dragging.
 	 */
 	onChangeLayout?: ( newLayout: GridLayoutItem[] ) => void;
+
+	/**
+	 * Callback fired continuously during a drag or resize interaction
+	 * with the in-progress layout. Useful for live feedback in the
+	 * surface (e.g., displaying the current width/position). The final
+	 * committed layout is still emitted via `onChangeLayout`.
+	 */
+	onPreviewLayout?: ( previewLayout: GridLayoutItem[] ) => void;
 }
 
 interface StandardGridProps extends BaseGridProps {
