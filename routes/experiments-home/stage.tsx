@@ -180,7 +180,12 @@ function ExperimentsPage() {
 	}
 
 	return (
-		<Page title={ __( 'Experimental settings' ) }>
+		<Page
+			title={ __( 'Experimental settings' ) }
+			subTitle={ __(
+				"The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production."
+			) }
+		>
 			<div className="experiments-page__form">
 				<DataForm
 					data={ settings }
