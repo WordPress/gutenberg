@@ -1,0 +1,138 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createRef } from '@wordpress/element';
+import * as Autocomplete from '../index';
+
+const ITEMS = [
+	{ id: '1', value: 'Item 1' },
+	{ id: '2', value: 'Item 2' },
+	{ id: '3', value: 'Item 3' },
+];
+
+describe( 'Autocomplete', () => {
+	it( 'forwards ref', async () => {
+		const user = userEvent.setup();
+		const inputRef = createRef< HTMLInputElement >();
+		const popupRef = createRef< HTMLDivElement >();
+		const listRef = createRef< HTMLDivElement >();
+		const listBodyRef = createRef< HTMLDivElement >();
+		const itemRef = createRef< HTMLDivElement >();
+		const clearRef = createRef< HTMLButtonElement >();
+		const emptyRef = createRef< HTMLDivElement >();
+
+		render(
+			<Autocomplete.Root items={ ITEMS }>
+				<Autocomplete.Input ref={ inputRef } placeholder="Search" />
+				<Autocomplete.Popup ref={ popupRef }>
+					<Autocomplete.Empty ref={ emptyRef }>
+						No results found.
+					</Autocomplete.Empty>
+					<Autocomplete.List ref={ listRef }>
+						<Autocomplete.ListBody ref={ listBodyRef }>
+							<Autocomplete.Collection>
+								{ ( item ) => (
+									<Autocomplete.Item
+										key={ item.id }
+										ref={
+											item.id === '1'
+												? itemRef
+												: undefined
+										}
+										value={ item }
+									>
+										{ item.value }
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+					<Autocomplete.Clear ref={ clearRef } />
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
+
+		await user.type( inputRef.current!, 'Item' );
+
+		await waitFor( () => {
+			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+		} );
+		expect( listRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( listBodyRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( clearRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( emptyRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'clears the input value when Clear is pressed', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Autocomplete.Root items={ ITEMS }>
+				<Autocomplete.Input placeholder="Search" />
+				<Autocomplete.Popup>
+					<Autocomplete.Empty>No results found.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( item ) => (
+									<Autocomplete.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+					<Autocomplete.Clear />
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		const input = screen.getByRole( 'combobox' );
+		await user.type( input, 'Item' );
+
+		const clearButton = await screen.findByRole( 'button', {
+			name: 'Clear',
+		} );
+		await user.click( clearButton );
+
+		expect( input ).toHaveValue( '' );
+	} );
+
+	it( 'shows the empty state when there are no matches', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Autocomplete.Root items={ ITEMS }>
+				<Autocomplete.Input placeholder="Search" />
+				<Autocomplete.Popup>
+					<Autocomplete.Empty>No results found.</Autocomplete.Empty>
+					<Autocomplete.List>
+						<Autocomplete.ListBody>
+							<Autocomplete.Collection>
+								{ ( item ) => (
+									<Autocomplete.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Autocomplete.Item>
+								) }
+							</Autocomplete.Collection>
+						</Autocomplete.ListBody>
+					</Autocomplete.List>
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		await user.type( screen.getByRole( 'combobox' ), 'zzz' );
+
+		await waitFor( () => {
+			expect( screen.getByText( 'No results found.' ) ).toBeVisible();
+		} );
+	} );
+} );
