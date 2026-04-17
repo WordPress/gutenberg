@@ -13,7 +13,34 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import type { Experiment, SettingsSchema } from './types';
+
+interface Experiment {
+	id: string;
+	label: string;
+	description: string;
+	group: string;
+	separateOption: boolean;
+	optionName?: string;
+}
+
+interface SettingsSchema {
+	schema?: {
+		properties?: {
+			'gutenberg-experiments'?: {
+				properties?: Record<
+					string,
+					{
+						title?: string;
+						description?: string;
+						group?: string;
+						separate_option?: boolean;
+						option_name?: string;
+					}
+				>;
+			};
+		};
+	};
+}
 
 const GROUP_LABELS: Record< string, string > = {
 	blocks: _x( 'Blocks', 'experiment group' ),
