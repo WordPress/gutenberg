@@ -1,6 +1,6 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -8,6 +8,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { renderPortalChildren } from '../utils/render-portal-children';
 import { DialogValidationProvider } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -22,10 +23,8 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
  * Renders the dialog popup element that contains the dialog content.
  * Uses a portal to render outside the DOM hierarchy.
  *
- * When `portal` is omitted, defaults to `Dialog.Portal`. The
- * `cloneElement` / `isValidElement` portal wiring matches the other overlay
- * `Popup` implementations on purpose so each component stays explicit rather
- * than sharing a cross-package helper.
+ * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
+ * handled by `renderPortalChildren` (shared with other overlay `Popup`s).
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
@@ -45,7 +44,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 
-	const rootPortal = portal ?? <Portal />;
 	const portalChildren = (
 		<>
 			<_Dialog.Backdrop className={ styles.backdrop } />
@@ -69,11 +67,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		</>
 	);
 
-	if ( isValidElement( rootPortal ) ) {
-		return cloneElement( rootPortal, { children: portalChildren } );
-	}
-
-	return <Portal>{ portalChildren }</Portal>;
+	return renderPortalChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

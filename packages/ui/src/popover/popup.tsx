@@ -1,6 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
-import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -9,6 +9,7 @@ import {
 import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { renderPortalChildren } from '../utils/render-portal-children';
 import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -100,7 +101,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</_Popover.Positioner>
 	);
 
-	const rootPortal = portal ?? <Portal />;
 	const portalChildren = (
 		<>
 			{ backdropElement }
@@ -108,11 +108,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</>
 	);
 
-	if ( isValidElement( rootPortal ) ) {
-		return cloneElement( rootPortal, { children: portalChildren } );
-	}
-
-	return <Portal>{ portalChildren }</Portal>;
+	return renderPortalChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

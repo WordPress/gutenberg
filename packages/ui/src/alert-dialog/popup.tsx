@@ -1,17 +1,13 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
-import {
-	cloneElement,
-	forwardRef,
-	isValidElement,
-	useContext,
-} from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	type ThemeProvider as ThemeProviderType,
 	privateApis as themePrivateApis,
 } from '@wordpress/theme';
 
+import { renderPortalChildren } from '../utils/render-portal-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
 import { unlock } from '../lock-unlock';
@@ -50,7 +46,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
-		const rootPortal = portal ?? <Portal />;
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
@@ -118,11 +113,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			</>
 		);
 
-		if ( isValidElement( rootPortal ) ) {
-			return cloneElement( rootPortal, { children: portalChildren } );
-		}
-
-		return <Portal>{ portalChildren }</Portal>;
+		return renderPortalChildren( portal, <Portal />, portalChildren );
 	}
 );
 

@@ -1,12 +1,13 @@
 import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
-import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import {
 	type ThemeProvider as ThemeProviderType,
 	privateApis as themePrivateApis,
 } from '@wordpress/theme';
 import { unlock } from '../../../lock-unlock';
 import { Portal } from './portal';
+import { renderPortalChildren } from '../../../utils/render-portal-children';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import styles from './style.module.css';
@@ -21,7 +22,6 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 		{ className, portal, children, style, ...restProps },
 		ref
 	) {
-		const rootPortal = portal ?? <Portal />;
 		const portalChildren = (
 			<_Select.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
@@ -55,10 +55,6 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 			</_Select.Positioner>
 		);
 
-		if ( isValidElement( rootPortal ) ) {
-			return cloneElement( rootPortal, { children: portalChildren } );
-		}
-
-		return <Portal>{ portalChildren }</Portal>;
+		return renderPortalChildren( portal, <Portal />, portalChildren );
 	}
 );
