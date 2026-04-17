@@ -34,27 +34,12 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
 					'description' => __( 'Disables the TinyMCE and Classic block.', 'gutenberg' ),
 				),
-				array(
-					'id'          => 'gutenberg-customizable-navigation-overlays',
-					'label'       => __( 'Customizable Navigation Overlays', 'gutenberg' ),
-					'description' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-hide-blocks-based-on-screen-size',
-					'label'       => __( 'Hide blocks based on screen size', 'gutenberg' ),
-					'description' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
-				),
 			),
 		),
 		array(
 			'slug'  => 'media',
 			'label' => _x( 'Media', 'experiments group name', 'gutenberg' ),
 			'items' => array(
-				array(
-					'id'          => 'gutenberg-media-processing',
-					'label'       => __( 'Client-side media processing', 'gutenberg' ),
-					'description' => __( "Enables client-side media processing to leverage the browser's capabilities to handle tasks like image resizing and compression.", 'gutenberg' ),
-				),
 				array(
 					'id'          => 'gutenberg-media-editor',
 					'label'       => __( 'Media Editor', 'gutenberg' ),
@@ -63,34 +48,18 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'collaboration',
-			'label' => _x( 'Collaboration', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'          => 'gutenberg-sync-collaboration',
-					'label'       => __( 'Real time editing', 'gutenberg' ),
-					'description' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
-				),
-			),
-		),
-		array(
 			'slug'  => 'data-views',
 			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
 			'items' => array(
 				array(
-					'id'          => 'gutenberg-new-posts-dashboard',
-					'label'       => __( 'Enable for Posts', 'gutenberg' ),
-					'description' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-quick-edit-dataviews',
-					'label'       => __( 'Add Quick Edit', 'gutenberg' ),
-					'description' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-				),
-				array(
 					'id'          => 'gutenberg-dataviews-media-modal',
 					'label'       => __( 'New media modal', 'gutenberg' ),
 					'description' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-content-only-inspector-fields',
+					'label'       => __( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
+					'description' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dataform-inspector',
@@ -107,22 +76,6 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-full-page-client-side-navigation',
 					'label'       => __( 'Full-page client-side navigation', 'gutenberg' ),
 					'description' => __( 'Enables full-page client-side navigation, powered by the Interactivity API.', 'gutenberg' ),
-				),
-			),
-		),
-		array(
-			'slug'  => 'content-only',
-			'label' => _x( 'Content Only', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'          => 'gutenberg-content-only-pattern-insertion',
-					'label'       => __( 'Make patterns contentOnly by default upon insertion', 'gutenberg' ),
-					'description' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-				),
-				array(
-					'id'          => 'gutenberg-content-only-inspector-fields',
-					'label'       => __( 'Enable editable inspector fields', 'gutenberg' ),
-					'description' => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
 				),
 			),
 		),
