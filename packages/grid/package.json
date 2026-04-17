@@ -49,7 +49,9 @@
 		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.2",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element"
+		"@wordpress/element": "file:../element",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
