@@ -159,22 +159,16 @@ function gutenberg_initialize_experiments_settings() {
 	);
 }
 
-add_action( 'admin_init', 'gutenberg_initialize_experiments_settings' );
 add_action( 'rest_api_init', 'gutenberg_initialize_experiments_settings' );
 
 /**
- * Registers a hidden submenu for the legacy `gutenberg-experiments` page so
- * `load-*` hooks fire and can redirect to the new `experiments-wp-admin` page.
+ * Allows the legacy `gutenberg-experiments` route. Without this, accessing
+ * `?page=gutenberg-experiments` results in an HTTP 403 error.
+ *
+ * Allowing the route is done by adding a wp-admin submenu page that won't be rendered.
  */
 function gutenberg_experiments_legacy_menu() {
-	add_submenu_page(
-		'',
-		'',
-		'',
-		'manage_options',
-		'gutenberg-experiments',
-		'__return_empty_string'
-	);
+	add_submenu_page( '', '', '', 'manage_options', 'gutenberg-experiments', '__return_empty_string' );
 }
 add_action( 'admin_menu', 'gutenberg_experiments_legacy_menu', 9 );
 
