@@ -6,7 +6,7 @@ import styles from './style.module.css';
 import type { DescriptionProps } from './types';
 
 /**
- * A paragraph with additional information about the dialog.
+ * Renders a paragraph with additional information about the dialog.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 	function DialogDescription( { className, render, ...props }, ref ) {

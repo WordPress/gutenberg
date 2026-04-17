@@ -52,10 +52,15 @@ export interface PopupProps
 	 * Renders the dialog at a preset width (excluding additional padding from
 	 * the viewport edges).
 	 *
+	 * Height is not directly controlled by `size`: for every value except
+	 * `'full'`, the dialog fits its content up to the viewport height
+	 * (minus the viewport inset) and scrolls internally when it overflows.
+	 * `'full'` stretches the dialog to the available viewport height.
+	 *
 	 * - `'small'` — narrow max-width.
 	 * - `'medium'` — moderate max-width.
 	 * - `'large'` — wide max-width.
-	 * - `'stretch'` — no max-width, stretches to fill available space.
+	 * - `'stretch'` — no max-width, stretches to fill available width.
 	 * - `'full'` — stretches to fill available width and height.
 	 *
 	 * @default 'medium'

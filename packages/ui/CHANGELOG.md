@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, and skip the backdrop when `modal` is not `true` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
 -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
 

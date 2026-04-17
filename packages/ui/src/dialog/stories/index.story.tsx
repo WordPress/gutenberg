@@ -48,11 +48,11 @@ export const _Default: Story = {
 						<Dialog.Title>Welcome</Dialog.Title>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p>
+					<Dialog.Description>
 						This dialog demonstrates best practices for
 						informational dialogs. It includes a close icon because
 						dismissing it is safe and expected.
-					</p>
+					</Dialog.Description>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>

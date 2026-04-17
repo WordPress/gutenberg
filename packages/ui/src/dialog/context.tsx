@@ -114,16 +114,16 @@ function DialogValidationProviderDev( {
 		[ scheduleValidation ]
 	);
 
+	const contextValue = useMemo(
+		() => ( { registerTitle } ),
+		[ registerTitle ]
+	);
+
 	// Schedule an initial validation on mount to catch missing titles
 	// (when no Title component is rendered, registerTitle is never called).
 	useEffect( () => {
 		scheduleValidation();
 	}, [ scheduleValidation ] );
-
-	const contextValue = useMemo(
-		() => ( { registerTitle } ),
-		[ registerTitle ]
-	);
 
 	return (
 		<DialogValidationContext.Provider value={ contextValue }>

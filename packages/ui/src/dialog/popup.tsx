@@ -30,10 +30,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
 		className,
 		portal,
+		children,
 		size = 'medium',
 		initialFocus,
 		finalFocus,
-		children,
 		...props
 	},
 	ref
@@ -47,6 +47,11 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 
 	const portalChildren = (
 		<>
+			{ /*
+			 * Only render a backdrop for fully modal dialogs. Non-modal dialogs
+			 * should not dim the page, and `trap-focus` keeps outside pointer
+			 * interactions enabled, so a backdrop would misrepresent that mode.
+			 */ }
 			{ modal === true && (
 				<_Dialog.Backdrop className={ styles.backdrop } />
 			) }
