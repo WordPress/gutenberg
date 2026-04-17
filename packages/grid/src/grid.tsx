@@ -242,9 +242,20 @@ export function Grid( {
 			const updatedLayout = activeLayout.map( ( item ) => {
 				if ( item.key === id ) {
 					const resolvedItem = resolvedItemMap.get( id );
-					const baseWidth = item.fillWidth
-						? resolvedItem?.width ?? item.width ?? 1
-						: item.width ?? 1;
+					/*
+					 * When the tile uses `fillWidth` or `fullWidth`, the
+					 * resize starts from the currently rendered column
+					 * span and drops the flag, converting to a concrete
+					 * width.
+					 */
+					let baseWidth: number;
+					if ( item.fullWidth ) {
+						baseWidth = effectiveColumns;
+					} else if ( item.fillWidth ) {
+						baseWidth = resolvedItem?.width ?? item.width ?? 1;
+					} else {
+						baseWidth = item.width ?? 1;
+					}
 					return {
 						...item,
 						width: Math.max(
@@ -259,7 +270,8 @@ export function Grid( {
 							( item.height ?? 1 ) + relativeDelta.height
 						),
 						fillWidth: undefined,
-					};
+						fullWidth: undefined,
+					} as GridLayoutItem;
 				}
 				return item;
 			} );
