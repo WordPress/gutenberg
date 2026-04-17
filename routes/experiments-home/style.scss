@@ -1,10 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .experiments-page__form {
-	padding: 16px 48px 96px 48px;
-	height: 100%;
+	padding: $grid-unit-20 $grid-unit-60;
 	overflow-y: auto;
 
 	// Avoid clipping the first toggle's focus ring by the card's overflow.
 	.dataforms-layouts-regular__field:first-child {
-		padding-top: 4px;
+		padding-top: $grid-unit-05;
 	}
 }
