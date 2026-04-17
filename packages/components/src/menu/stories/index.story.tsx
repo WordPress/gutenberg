@@ -48,7 +48,7 @@ const meta: Meta< typeof Menu > = {
 	argTypes: {
 		children: { control: false },
 	},
-	tags: [ 'status-private', 'manifest' ],
+	tags: [ 'status-private' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: {

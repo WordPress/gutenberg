@@ -30,7 +30,7 @@ const meta: Meta< typeof Tabs > = {
 		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
-	tags: [ 'status-private', 'manifest' ],
+	tags: [ 'status-private' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
