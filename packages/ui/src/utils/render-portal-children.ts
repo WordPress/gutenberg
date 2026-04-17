@@ -13,7 +13,10 @@ type PortalMountElement = ReactElement< { children?: ReactNode } >;
  *
  * Shared by overlay `Popup` components so portal merge behavior stays consistent.
  *
- * @param portal        Optional element from the `portal` prop; when omitted, `defaultPortal` is used.
+ * @param portal        Optional element from the `portal` prop (should have no
+ *                      `children`; callers type this via `Omit<PortalProps,'children'>`).
+ *                      When omitted, `defaultPortal` is used. Injected `children`
+ *                      replace any subtree on the portal element.
  * @param defaultPortal Unpopulated default portal element (e.g. `<Dialog.Portal />`).
  * @param children      Popup subtree (backdrop, positioner, etc.) to inject as the portal’s children.
  */

@@ -68,11 +68,12 @@ export interface PopupProps
 	/**
 	 * Optional portal element, typically `<Popover.Portal />` with custom
 	 * `container` for cross-document rendering. Floating content is rendered
-	 * as this portal's children.
+	 * as this portal's children (do not pass `children` on the portal element;
+	 * they would be ignored).
 	 *
 	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
 	 */
-	portal?: ReactElement< PortalProps >;
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * The visual style variant of the popup.

@@ -39,9 +39,10 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
 	 * Optional portal element, typically `<Select.Portal />` with custom
 	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
-	 * default props.
+	 * default props. Do not pass `children` on the portal element; they would
+	 * be ignored.
 	 */
-	portal?: ReactElement< PortalProps >;
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
 
 export type SelectItemProps = Omit<

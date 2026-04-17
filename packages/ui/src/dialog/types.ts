@@ -39,11 +39,12 @@ export interface PopupProps
 	/**
 	 * Optional portal element, typically `<Dialog.Portal />` with custom
 	 * `container`, `className`, or `style`. The popup and backdrop are
-	 * rendered as this portal's children.
+	 * rendered as this portal's children (do not pass `children` on the portal
+	 * element; they would be ignored).
 	 *
 	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
 	 */
-	portal?: ReactElement< PortalProps >;
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * Renders the dialog at a preset width (excluding additional padding from

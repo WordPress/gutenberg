@@ -66,12 +66,13 @@ export interface PopupProps
 	/**
 	 * Optional portal element, typically `<AlertDialog.Portal />` with
 	 * custom `container`, `className`, or `style`. Overlay content is
-	 * rendered as this portal's children.
+	 * rendered as this portal's children (do not pass `children` on the portal
+	 * element; they would be ignored).
 	 *
 	 * When omitted, `AlertDialog.Popup` uses `AlertDialog.Portal` with default
 	 * props.
 	 */
-	portal?: ReactElement< PortalProps >;
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * The semantic intent of the dialog, which determines its styling.

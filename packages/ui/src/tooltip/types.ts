@@ -29,7 +29,8 @@ export interface PopupProps
 	/**
 	 * Optional portal element, typically `<Tooltip.Portal />` with custom
 	 * `container`. When omitted, `Tooltip.Popup` uses `Tooltip.Portal` with
-	 * default props.
+	 * default props. Do not pass `children` on the portal element; they would
+	 * be ignored.
 	 */
-	portal?: ReactElement< PortalProps >;
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 }
