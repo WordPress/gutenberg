@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
@@ -32,17 +33,19 @@ export default function useShortcutEventMatch(): (
 	 *
 	 * @return True if the event matches the shortcuts, false if not.
 	 */
-	function isMatch( name: string, event: KeyboardEvent ) {
-		return getAllShortcutKeyCombinations( name ).some( ( combination ) => {
-			if ( ! combination ) {
-				return false;
-			}
-			return isKeyboardEvent[ combination.modifier ?? 'undefined' ](
-				event,
-				combination.character
+	return useCallback(
+		( name: string, event: KeyboardEvent ) => {
+			return getAllShortcutKeyCombinations( name ).some(
+				( combination ) => {
+					if ( ! combination ) {
+						return false;
+					}
+					return isKeyboardEvent[
+						combination.modifier ?? 'undefined'
+					]( event, combination.character );
+				}
 			);
-		} );
-	}
-
-	return isMatch;
+		},
+		[ getAllShortcutKeyCombinations ]
+	);
 }
