@@ -34,11 +34,11 @@ async function setGutenbergExperiments(
 	};
 
 	// active_templates is enabled when the option is set to an object (even empty).
-	// Setting it to null disables the experiment.
+	// Only include the key when it was explicitly requested; omitting it leaves
+	// the stored value unchanged and avoids a schema-validation error (the
+	// setting is registered as type "object" and does not accept null).
 	if ( hasActiveTemplates ) {
 		settingsData.active_templates = {};
-	} else {
-		settingsData.active_templates = null;
 	}
 
 	await this.rest( {
