@@ -1,7 +1,8 @@
 import type { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 
 import type { ComponentProps } from '../utils/types';
+import type { PortalProps } from './portal';
 
 /**
  * The return type of `onConfirm`. Return `void` (or nothing) to auto-close
@@ -63,9 +64,14 @@ export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick< _AlertDialog.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<AlertDialog.Portal />` with
+	 * custom `container`, `className`, or `style`. Overlay content is
+	 * rendered as this portal's children.
+	 *
+	 * When omitted, `AlertDialog.Popup` uses `AlertDialog.Portal` with default
+	 * props.
 	 */
-	container?: _AlertDialog.Portal.Props[ 'container' ];
+	portal?: ReactElement< PortalProps >;
 
 	/**
 	 * The semantic intent of the dialog, which determines its styling.

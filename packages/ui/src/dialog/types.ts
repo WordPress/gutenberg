@@ -1,6 +1,8 @@
 import type { Dialog as _Dialog } from '@base-ui/react/dialog';
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
+
 import type { Button } from '../button';
+import type { PortalProps } from './portal';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
@@ -35,9 +37,13 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Dialog.Portal />` with custom
+	 * `container`, `className`, or `style`. The popup and backdrop are
+	 * rendered as this portal's children.
+	 *
+	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
 	 */
-	container?: _Dialog.Portal.Props[ 'container' ];
+	portal?: ReactElement< PortalProps >;
 
 	/**
 	 * Renders the dialog at a preset width (excluding additional padding from

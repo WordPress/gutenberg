@@ -13,6 +13,7 @@ const meta: Meta< typeof Popover.Root > = {
 	component: Popover.Root,
 	subcomponents: {
 		'Popover.Trigger': Popover.Trigger,
+		'Popover.Portal': Popover.Portal,
 		'Popover.Popup': Popover.Popup,
 		'Popover.Arrow': Popover.Arrow,
 		'Popover.Title': Popover.Title,
@@ -443,10 +444,11 @@ export const OverlayPlacement: Story = {
 };
 
 /**
- * To render the popup inline (without a portal), create a local ref to a
- * `<span>` with `display: contents` and pass it as the `container` prop.
- * The popup will render inside the span rather than being portaled to
- * `document.body`, while retaining all positioning behavior.
+ * To keep the floating layer **in page flow** next to surrounding layout,
+ * create a local ref to a `<span>` with `display: contents` and pass
+ * `portal={ <Popover.Portal container={ ref } /> }`. The popup still uses a
+ * portal, but the portal **mounts** into that subtree instead of
+ * `document.body`, while retaining positioning behavior.
  *
  * **Note:** `backdrop` will not cover the full viewport in this mode.
  */
@@ -463,7 +465,11 @@ export const Inline: Story = {
 						ref={ inlineContainerRef }
 						style={ { display: 'contents' } }
 					/>
-					<Popover.Popup container={ inlineContainerRef }>
+					<Popover.Popup
+						portal={
+							<Popover.Portal container={ inlineContainerRef } />
+						}
+					>
 						<Popover.Arrow />
 						<Popover.Title
 							style={ {
@@ -473,8 +479,10 @@ export const Inline: Story = {
 							Inline Popover
 						</Popover.Title>
 						<Popover.Description>
-							This popup is rendered in place — no portal is used.
-							Inspect the DOM to see it lives inside its parent.
+							This example still uses `Popover.Portal`, but the
+							portal `container` is the in-tree span above, so the
+							portal node mounts inside the wrapper instead of
+							`document.body`.
 						</Popover.Description>
 					</Popover.Popup>
 				</Popover.Root>
@@ -624,8 +632,12 @@ export const CrossIframe: Story = {
 									Popover&apos;s anchor (inside iframe)
 								</Popover.Trigger>
 								<Popover.Popup
-									container={
-										portalContainerRef as React.RefObject< HTMLElement >
+									portal={
+										<Popover.Portal
+											container={
+												portalContainerRef as React.RefObject< HTMLElement >
+											}
+										/>
 									}
 									collisionBoundary={
 										iframeBoundary ?? undefined
@@ -661,9 +673,9 @@ export const CrossIframe: Story = {
  * `@wordpress/components` as the render target.
  *
  * The `Slot` renders a `div` in the parent document, and its forwarded ref
- * is passed to `Popover.Popup`'s `container` prop so the popup portals into
- * the slot element. This mirrors the legacy Popover's `WithSlotOutsideIframe`
- * pattern.
+ * is passed to `Popover.Portal`'s `container` prop (via `Popover.Popup`'s
+ * `portal` prop) so the popup portals into the slot element. This mirrors the
+ * legacy Popover's `WithSlotOutsideIframe` pattern.
  */
 export const CrossIframeWithSlotFill: Story = {
 	name: 'Cross-Iframe (SlotFill)',
@@ -713,8 +725,12 @@ export const CrossIframeWithSlotFill: Story = {
 									Popover&apos;s anchor (inside iframe)
 								</Popover.Trigger>
 								<Popover.Popup
-									container={
-										slotRef as React.RefObject< HTMLElement >
+									portal={
+										<Popover.Portal
+											container={
+												slotRef as React.RefObject< HTMLElement >
+											}
+										/>
 									}
 									collisionBoundary={
 										iframeBoundary ?? undefined

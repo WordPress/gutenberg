@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Tooltip } from '@base-ui/react/tooltip';
+
 import type { ComponentProps } from '../utils/types';
+import type { PortalProps } from './portal';
 
 export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
 
@@ -25,7 +27,9 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Tooltip.Portal />` with custom
+	 * `container`. When omitted, `Tooltip.Popup` uses `Tooltip.Portal` with
+	 * default props.
 	 */
-	container?: Tooltip.Portal.Props[ 'container' ];
+	portal?: ReactElement< PortalProps >;
 }

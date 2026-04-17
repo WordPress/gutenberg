@@ -1,6 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { cloneElement, forwardRef, isValidElement } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -10,6 +10,7 @@ import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { PopoverValidationProvider } from './context';
+import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -22,8 +23,9 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
  * Renders the floating popup container for the popover content.
  *
  * Handles portal rendering, positioning relative to the anchor, collision
- * avoidance, focus management, and optional backdrop. Supply a `container`
- * element for cross-document scenarios such as iframes.
+ * avoidance, focus management, and optional backdrop. Use
+ * `portal={ <Popover.Portal container={ ... } /> }` for cross-document
+ * scenarios such as iframes.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
@@ -38,7 +40,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		collisionAvoidance,
 		collisionBoundary,
 		collisionPadding,
-		container,
+		portal,
 		finalFocus,
 		initialFocus,
 		side = 'bottom',
@@ -98,12 +100,19 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</_Popover.Positioner>
 	);
 
-	return (
-		<_Popover.Portal container={ container }>
+	const rootPortal = portal ?? <Portal />;
+	const portalChildren = (
+		<>
 			{ backdropElement }
 			{ positioner }
-		</_Popover.Portal>
+		</>
 	);
+
+	if ( isValidElement( rootPortal ) ) {
+		return cloneElement( rootPortal, { children: portalChildren } );
+	}
+
+	return <Portal>{ portalChildren }</Portal>;
 } );
 
 export { Popup };

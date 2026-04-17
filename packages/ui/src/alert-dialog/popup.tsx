@@ -1,6 +1,11 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
-import { forwardRef, useContext } from '@wordpress/element';
+import {
+	cloneElement,
+	forwardRef,
+	isValidElement,
+	useContext,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -13,6 +18,7 @@ import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
 import { Text } from '../text';
 import { AlertDialogContext } from './context';
+import { Portal } from './portal';
 import alertDialogStyles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -23,7 +29,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function AlertDialogPopup(
 		{
 			className,
-			container,
+			portal,
 			intent = 'default',
 			title,
 			description,
@@ -44,8 +50,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
-		return (
-			<_AlertDialog.Portal container={ container }>
+		const rootPortal = portal ?? <Portal />;
+		const portalChildren = (
+			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup
@@ -108,8 +115,14 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						</Stack>
 					</_AlertDialog.Popup>
 				</ThemeProvider>
-			</_AlertDialog.Portal>
+			</>
 		);
+
+		if ( isValidElement( rootPortal ) ) {
+			return cloneElement( rootPortal, { children: portalChildren } );
+		}
+
+		return <Portal>{ portalChildren }</Portal>;
 	}
 );
 

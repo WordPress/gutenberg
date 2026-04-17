@@ -502,8 +502,8 @@ describe( 'Dialog', () => {
 		} );
 	} );
 
-	describe( 'container', () => {
-		it( 'should render inside the container when provided', async () => {
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
 
@@ -515,7 +515,11 @@ describe( 'Dialog', () => {
 							ref={ containerRef }
 							data-testid="custom-container"
 						/>
-						<Dialog.Popup container={ containerRef }>
+						<Dialog.Popup
+							portal={
+								<Dialog.Portal container={ containerRef } />
+							}
+						>
 							<Dialog.Header>
 								<Dialog.Title>Title</Dialog.Title>
 							</Dialog.Header>

@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import type { Popover as _Popover } from '@base-ui/react/popover';
+
 import type { ComponentProps } from '../utils/types';
+import type { PortalProps } from './portal';
 
 export interface RootProps
 	extends Pick<
@@ -64,12 +66,13 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Popover.Portal />` with custom
+	 * `container` for cross-document rendering. Floating content is rendered
+	 * as this portal's children.
 	 *
-	 * Useful for cross-document rendering, such as rendering a popover
-	 * in a parent document when the trigger is inside an iframe.
+	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
 	 */
-	container?: _Popover.Portal.Props[ 'container' ];
+	portal?: ReactElement< PortalProps >;
 
 	/**
 	 * The visual style variant of the popup.
