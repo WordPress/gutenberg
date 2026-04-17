@@ -90,9 +90,7 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	let resolved;
 	try {
 		// Preferred: resolve the package.json subpath directly.
-		resolved = localRequire.resolve(
-			`${ fullPackageName }/package.json`
-		);
+		resolved = localRequire.resolve( `${ fullPackageName }/package.json` );
 	} catch {
 		// Fallback for packages whose `exports` field does not expose
 		// `./package.json`.  Walk up the directory tree checking each

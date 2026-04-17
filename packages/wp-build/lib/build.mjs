@@ -7,7 +7,6 @@ import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { createHash } from 'node:crypto';
-import { createRequire } from 'node:module';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
@@ -202,9 +201,7 @@ function getAllPackages() {
 	// 1. Directory-based discovery (local packages first, then source dirs).
 	for ( const dir of PACKAGE_DIRS ) {
 		const pkgJsonPaths = glob.sync(
-			normalizePath(
-				path.join( dir, '*', 'package.json' )
-			)
+			normalizePath( path.join( dir, '*', 'package.json' ) )
 		);
 
 		for ( const pkgJsonPath of pkgJsonPaths ) {
@@ -802,13 +799,18 @@ async function bundlePackage( packageName, options = {} ) {
 			// External sources preserve their npm identity as the
 			// script-module ID (e.g. `@acme/shared-ui`).  Local
 			// packages are scoped under the plugin's namespace.
-			const scriptModuleId = isExternalSource
-				? ( exportName === '.'
+			let scriptModuleId;
+			if ( isExternalSource ) {
+				scriptModuleId =
+					exportName === '.'
 						? packageName
-						: `${ packageName }/${ fileName }` )
-				: ( exportName === '.'
+						: `${ packageName }/${ fileName }`;
+			} else {
+				scriptModuleId =
+					exportName === '.'
 						? `@${ packageNamespace }/${ packageName }`
-						: `@${ packageNamespace }/${ packageName }/${ fileName }` );
+						: `@${ packageNamespace }/${ packageName }/${ fileName }`;
+			}
 
 			builtModules.push( {
 				id: scriptModuleId,
