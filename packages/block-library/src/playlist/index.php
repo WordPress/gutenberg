@@ -118,10 +118,10 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$processor = new WP_HTML_Tag_Processor( $content );
 	$processor->next_tag( 'figure' );
 	$processor->set_attribute( 'data-wp-interactive', 'core/playlist' );
-	// Extract the visualization style from the block style variation class.
-	$visualization_style = 'bars';
+	// Extract the waveform style from the block style variation class.
+	$waveform_style = 'bars';
 	if ( ! empty( $attributes['className'] ) && preg_match( '/is-style-(\w+)/', $attributes['className'], $matches ) ) {
-		$visualization_style = $matches[1];
+		$waveform_style = $matches[1];
 	}
 
 	$processor->set_attribute(
@@ -131,7 +131,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'playlistId'         => $playlist_id,
 				'currentId'          => $current_unique_id,
 				'tracks'             => $playlist_tracks,
-				'visualizationStyle' => $visualization_style,
+				'waveformStyle' => $waveform_style,
 			)
 		)
 	);

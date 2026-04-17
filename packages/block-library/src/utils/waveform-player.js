@@ -20,7 +20,7 @@ import { initWaveformPlayer } from './waveform-utils';
  * @param {string}   props.title              - The track title.
  * @param {string}   props.artist             - The artist name.
  * @param {string}   props.image              - The artwork image URL.
- * @param {string}   props.visualizationStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {string}   props.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @param {Function} props.onEnded            - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
@@ -29,7 +29,7 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
-	visualizationStyle,
+	waveformStyle,
 	onEnded,
 } ) {
 	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
@@ -58,7 +58,7 @@ export function WaveformPlayer( {
 					title,
 					artist,
 					image,
-					visualizationStyle,
+					waveformStyle,
 					onEnded: () => onEndedRef.current?.(),
 				} );
 				playerDestroy = destroy;
@@ -79,7 +79,7 @@ export function WaveformPlayer( {
 				playerDestroy?.();
 			};
 		},
-		[ src, title, artist, image, visualizationStyle ]
+		[ src, title, artist, image, waveformStyle ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;

@@ -58,8 +58,8 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 
-	// Extract the visualization style from the block style variation class.
-	const visualizationStyle =
+	// Extract the waveform style from the block style variation class.
+	const waveformStyle =
 		attributes.className?.match( /is-style-(\w+)/ )?.[ 1 ] || 'bars';
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
@@ -378,7 +378,7 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
-						visualizationStyle={ visualizationStyle }
+						waveformStyle={ waveformStyle }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
