@@ -172,7 +172,7 @@ function gutenberg_setup_static_template() {
 			// that will prevent the option from being set to an empty array.
 			'show_in_rest' => array(
 				'schema' => array(
-					'type'                 => array( 'object', 'null' ),
+					'type'                 => 'object',
 					// Properties can be integers, strings, or false
 					// (deactivated).
 					'additionalProperties' => true,
