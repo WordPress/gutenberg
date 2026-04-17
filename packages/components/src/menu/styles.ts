@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import { css } from '@emotion/react';
+import { css, keyframes } from '@emotion/react';
 import styled from '@emotion/styled';
 
 /**
@@ -31,13 +31,63 @@ const DEFAULT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ DEFAULT_BORDER_COLO
 const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VARIANT_BORDER_COLOR }`;
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
+const fadeIn = keyframes`
+	from {
+		opacity: 0;
+	}
 
-export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
+	to {
+		opacity: 1;
+	}
+`;
+const slideInFromBottom = keyframes`
+	from {
+		transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+	}
+
+	to {
+		transform: translateY( 0 );
+	}
+`;
+const slideInFromTop = keyframes`
+	from {
+		transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+	}
+
+	to {
+		transform: translateY( 0 );
+	}
+`;
+const slideInFromLeft = keyframes`
+	from {
+		transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+	}
+
+	to {
+		transform: translateX( 0 );
+	}
+`;
+const slideInFromRight = keyframes`
+	from {
+		transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+	}
+
+	to {
+		transform: translateX( 0 );
+	}
+`;
+
+export const Menu = styled( Ariakit.Menu )`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
+`;
+
+export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 	display: grid;
 	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	grid-template-rows: auto;
@@ -60,54 +110,42 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 			: DEFAULT_BOX_SHADOW };
 	` }
 
-	/* Only visible in Windows High Contrast mode */
-	outline: 2px solid transparent !important;
-
-	/* Open/close animation */
+	/* Open animation only. Closing should be immediate so Ariakit can
+	 * release body scroll lock without waiting for a leave transition.
+	 */
 	@media not ( prefers-reduced-motion ) {
-		transition-property: transform, opacity;
-		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
-			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
-			${ DROPDOWN_MOTION_CSS.FADE_EASING };
-		will-change: transform, opacity;
+		${ Menu }:not( [data-submenu] )[data-open] > & {
+			animation-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+				${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+			animation-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+				${ DROPDOWN_MOTION_CSS.FADE_EASING };
+			animation-fill-mode: both;
+		}
 
-		&:not( [data-submenu] ) {
-			/* Regardless of the side, fade in and out. */
-			opacity: 0;
-			&[data-enter] {
-				opacity: 1;
-			}
+		${ Menu }:not( [data-submenu] )[data-side='bottom'] > & {
+			transform: translateY( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		${ Menu }:not( [data-submenu] )[data-side='top'] > & {
+			transform: translateY( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		${ Menu }:not( [data-submenu] )[data-side='left'] > & {
+			transform: translateX( ${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
+		${ Menu }:not( [data-submenu] )[data-side='right'] > & {
+			transform: translateX( -${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE } );
+		}
 
-			/* Slide in the direction the menu is opening. */
-			&[data-side='bottom'] {
-				transform: translateY(
-					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
-				);
-			}
-			&[data-side='top'] {
-				transform: translateY(
-					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
-				);
-			}
-			&[data-side='left'] {
-				transform: translateX(
-					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
-				);
-			}
-			&[data-side='right'] {
-				transform: translateX(
-					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
-				);
-			}
-			&[data-enter][data-side='bottom'],
-			&[data-enter][data-side='top'] {
-				transform: translateY( 0 );
-			}
-			&[data-enter][data-side='left'],
-			&[data-enter][data-side='right'] {
-				transform: translateX( 0 );
-			}
+		${ Menu }:not( [data-submenu] )[data-open][data-side='bottom'] > & {
+			animation-name: ${ slideInFromBottom }, ${ fadeIn };
+		}
+		${ Menu }:not( [data-submenu] )[data-open][data-side='top'] > & {
+			animation-name: ${ slideInFromTop }, ${ fadeIn };
+		}
+		${ Menu }:not( [data-submenu] )[data-open][data-side='left'] > & {
+			animation-name: ${ slideInFromLeft }, ${ fadeIn };
+		}
+		${ Menu }:not( [data-submenu] )[data-open][data-side='right'] > & {
+			animation-name: ${ slideInFromRight }, ${ fadeIn };
 		}
 	}
 `;

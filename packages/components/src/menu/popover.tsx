@@ -88,9 +88,10 @@ export const Popover = forwardRef<
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide
-			variant={ menuContext.variant }
 		>
-			{ children }
+			<Styled.MenuSurface variant={ menuContext.variant }>
+				{ children }
+			</Styled.MenuSurface>
 		</Styled.Menu>
 	);
 } );
