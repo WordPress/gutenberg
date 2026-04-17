@@ -663,20 +663,18 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
-	const MAX_HEIGHT = 60;
-	const hiddenCommentRef = useRef( null );
+	const commentRef = useRef( null );
 	const [ isOverflowing, setIsOverflowing ] = useState( false );
-	const [ collapsed, setCollapsed ] = useState( null );
+	const [ collapsed, setCollapsed ] = useState( true );
 
 	useEffect( () => {
-		const commentElement = hiddenCommentRef.current;
+		const commentElement = commentRef.current;
 		if ( ! commentElement ) {
 			return;
 		}
 
 		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
 			setIsOverflowing( true );
-			setCollapsed( true );
 		} else {
 			setIsOverflowing( false );
 			setCollapsed( null );
@@ -780,7 +778,8 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					) }
 				/>
 			) : (
-				<RawHTML
+				<div
+					ref={ commentRef }
 					className={ clsx(
 						'editor-collab-sidebar-panel__user-comment',
 						{
@@ -790,48 +789,40 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 						}
 					) }
 				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+					<RawHTML>
+						{ isResolutionComment
+							? ( () => {
+									const actionText =
+										thread.meta._wp_note_status ===
+										'resolved'
+											? __( 'Marked as resolved' )
+											: __( 'Reopened' );
+									const content = thread?.content?.raw;
 
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
+									if (
+										content &&
+										typeof content === 'string' &&
+										content.trim() !== ''
+									) {
+										return sprintf(
+											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+											__( '%1$s: %2$s' ),
+											actionText,
+											content
+										);
+									}
+									// If no content, just show the action.
+									return actionText;
+							  } )()
+							: thread?.content?.rendered }
+					</RawHTML>
+				</div>
 			) }
-			<div
-				ref={ hiddenCommentRef }
-				style={ {
-					visibility: 'hidden',
-					position: 'absolute',
-					maxHeight: MAX_HEIGHT,
-				} }
-			>
-				<RawHTML className="editor-collab-sidebar-panel__user-comment--hidden">
-					{ thread?.content?.rendered }
-				</RawHTML>
-			</div>
 			{ isOverflowing && (
 				<Button
 					variant="tertiary"
 					size="small"
+					className="editor-collab-sidebar-panel__show-more-button"
 					onClick={ () => setCollapsed( ! collapsed ) }
 				>
 					{ collapsed ? __( 'Show More' ) : __( 'Show Less' ) }
