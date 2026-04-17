@@ -21,12 +21,6 @@ const meta: Meta< typeof Dialog.Root > = {
 		modal: {
 			control: 'inline-radio',
 			options: [ true, false, 'trap-focus' ],
-			table: {
-				defaultValue: { summary: 'true' },
-				type: {
-					summary: 'boolean | "trap-focus"',
-				},
-			},
 		},
 	},
 };
