@@ -265,6 +265,18 @@ _Returns_
 
 Undocumented declaration.
 
+### BlockStyleSettingsMenuControls
+
+Fill component for adding items into the styles section of the block settings dropdown (alongside copy/paste styles).
+
+_Parameters_
+
+-   _props_ `Object`: Fill props, including the render-prop children.
+
+_Returns_
+
+-   `Element`: Element.
+
 ### BlockTitle
 
 Renders the block's configured title as a string, or empty if the title cannot be determined.

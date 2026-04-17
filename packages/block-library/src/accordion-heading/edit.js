@@ -10,9 +10,9 @@ import {
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
 	store as blockEditorStore,
-	InspectorControls,
+	BlockStyleSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { Notice, Button } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { useDispatch, useRegistry } from '@wordpress/data';
 
 const SYNCED_STYLES_SOURCE = 'core/synced-styles';
@@ -132,29 +132,28 @@ export default function Edit( {
 
 	return (
 		<>
-			{ isSyncedStyles && (
-				<InspectorControls group="styles">
-					<Notice status="info" isDismissible={ false }>
-						{ __(
-							'Styles are synced across all Accordion Heading blocks.'
-						) }{ ' ' }
-						<Button variant="link" onClick={ handleUnlink }>
-							{ __( 'Unlink' ) }
-						</Button>
-					</Notice>
-				</InspectorControls>
-			) }
-			{ isUnlinkedSyncedStyles && (
-				<InspectorControls group="styles">
-					<Notice status="info" isDismissible={ false }>
-						{ __(
-							'Styles are not synced with other Accordion Heading blocks.'
-						) }{ ' ' }
-						<Button variant="link" onClick={ handleRelink }>
-							{ __( 'Relink' ) }
-						</Button>
-					</Notice>
-				</InspectorControls>
+			{ ( isSyncedStyles || isUnlinkedSyncedStyles ) && (
+				<BlockStyleSettingsMenuControls>
+					{ ( { onClose, selectedClientIds } ) =>
+						selectedClientIds?.length === 1 &&
+						clientId === selectedClientIds[ 0 ] && (
+							<MenuItem
+								onClick={ () => {
+									if ( isSyncedStyles ) {
+										handleUnlink();
+									} else {
+										handleRelink();
+									}
+									onClose?.();
+								} }
+							>
+								{ isSyncedStyles
+									? __( 'Unlink styles' )
+									: __( 'Link styles' ) }
+							</MenuItem>
+						)
+					}
+				</BlockStyleSettingsMenuControls>
 			) }
 			<TagName { ...blockProps }>
 				<button

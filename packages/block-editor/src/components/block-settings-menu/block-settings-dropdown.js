@@ -22,6 +22,7 @@ import CommentIconSlotFill from '../../components/collab/block-comment-icon-slot
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
+import BlockStyleSettingsMenuControls from '../block-style-settings-menu-controls';
 import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -357,20 +358,49 @@ export function BlockSettingsDropdown( {
 										/>
 									) }
 								</MenuGroup>
-								{ canCopyStyles && ! isContentOnly && (
-									<MenuGroup>
-										<CopyMenuItem
-											clientIds={ clientIds }
-											onCopy={ onCopy }
-											label={ __( 'Copy styles' ) }
-											eventType="copyStyles"
-										/>
-										{ canEdit && (
-											<MenuItem onClick={ onPasteStyles }>
-												{ __( 'Paste styles' ) }
-											</MenuItem>
-										) }
-									</MenuGroup>
+								{ ! isContentOnly && (
+									<BlockStyleSettingsMenuControls.Slot
+										fillProps={ {
+											onClose,
+											selectedClientIds: clientIds,
+										} }
+									>
+										{ ( styleFills ) =>
+											( canCopyStyles ||
+												styleFills?.length > 0 ) && (
+												<MenuGroup>
+													{ canCopyStyles && (
+														<>
+															<CopyMenuItem
+																clientIds={
+																	clientIds
+																}
+																onCopy={
+																	onCopy
+																}
+																label={ __(
+																	'Copy styles'
+																) }
+																eventType="copyStyles"
+															/>
+															{ canEdit && (
+																<MenuItem
+																	onClick={
+																		onPasteStyles
+																	}
+																>
+																	{ __(
+																		'Paste styles'
+																	) }
+																</MenuItem>
+															) }
+														</>
+													) }
+													{ styleFills }
+												</MenuGroup>
+											)
+										}
+									</BlockStyleSettingsMenuControls.Slot>
 								) }
 								{ ! isContentOnly && (
 									<BlockSettingsMenuControls.Slot
