@@ -15,7 +15,7 @@ import { Grid } from '../grid';
 import type { GridLayoutItem } from '../types';
 
 const meta: Meta< typeof Grid > = {
-	title: 'Grid',
+	title: 'Design System/Components/Grid',
 	component: Grid,
 	tags: [ 'autodocs' ],
 	parameters: {
@@ -29,13 +29,36 @@ export default meta;
 
 type Story = StoryObj< typeof Grid >;
 
-function Card( {
-	color,
+type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
+
+// Static token maps so the build-time token fallback plugin can inject
+// fallbacks into each `var()` call. Using literal strings keeps the
+// `@wordpress/no-unknown-ds-tokens` lint rule happy.
+const bgTokens: Record< Tone, string > = {
+	brand: 'var(--wpds-color-bg-surface-brand)',
+	info: 'var(--wpds-color-bg-surface-info)',
+	success: 'var(--wpds-color-bg-surface-success)',
+	warning: 'var(--wpds-color-bg-surface-warning)',
+	error: 'var(--wpds-color-bg-surface-error)',
+	neutral: 'var(--wpds-color-bg-surface-neutral-weak)',
+};
+
+const fgTokens: Record< Tone, string > = {
+	brand: 'var(--wpds-color-fg-content-info)',
+	info: 'var(--wpds-color-fg-content-info)',
+	success: 'var(--wpds-color-fg-content-success)',
+	warning: 'var(--wpds-color-fg-content-warning)',
+	error: 'var(--wpds-color-fg-content-error)',
+	neutral: 'var(--wpds-color-fg-content-neutral)',
+};
+
+function Tile( {
+	tone,
 	children,
 	actionableArea,
 	...props
 }: {
-	color: string;
+	tone: Tone;
 	children: React.ReactNode;
 	actionableArea?: React.ReactNode;
 } & React.HTMLAttributes< HTMLDivElement > ) {
@@ -43,14 +66,16 @@ function Card( {
 		<div
 			{ ...props }
 			style={ {
-				backgroundColor: color,
-				color: 'white',
+				backgroundColor: bgTokens[ tone ],
+				color: fgTokens[ tone ],
 				padding: '20px',
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
 				height: '100%',
 				boxSizing: 'border-box',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				fontSize: 'var(--wpds-typography-font-size-sm)',
 				...props?.style,
 			} }
 		>
@@ -83,9 +108,9 @@ function LayoutStatePanel( { layout }: { layout: GridLayoutItem[] } ) {
 			style={ {
 				marginBottom: 16,
 				padding: 12,
-				background: '#f5f5f5',
+				background: 'var(--wpds-color-bg-surface-neutral-weak)',
 				borderRadius: 4,
-				fontFamily: 'monospace',
+				fontFamily: 'var(--wpds-typography-font-family-mono)',
 				fontSize: 12,
 			} }
 		>
@@ -103,7 +128,9 @@ function LayoutStatePanel( { layout }: { layout: GridLayoutItem[] } ) {
 }
 
 /**
- * Static grid with a fixed number of columns.
+ * Static grid with a fixed number of columns. Each item declares its
+ * column span via `width`. Items flow left-to-right and wrap to new
+ * rows as the total exceeds `columns`.
  */
 export const Default: Story = {
 	args: {
@@ -116,89 +143,136 @@ export const Default: Story = {
 		],
 		columns: 6,
 		children: [
-			<Card key="a" color="#f44336">
+			<Tile key="a" tone="brand">
 				width: 1
-			</Card>,
-			<Card key="b" color="#2196f3">
+			</Tile>,
+			<Tile key="b" tone="info">
 				width: 3
-			</Card>,
-			<Card key="c" color="#4caf50">
+			</Tile>,
+			<Tile key="c" tone="success">
 				width: 2
-			</Card>,
-			<Card key="d" color="#ff9800">
+			</Tile>,
+			<Tile key="d" tone="warning">
 				width: 4
-			</Card>,
-			<Card key="e" color="#9c27b0">
+			</Tile>,
+			<Tile key="e" tone="error">
 				width: 2
-			</Card>,
+			</Tile>,
 		],
 	},
 };
 
 /**
- * Responsive grid that adapts column count based on container width.
- * Combines all three width modes: fixed, fillWidth, and fullWidth.
+ * Responsive grid: the column count is derived from the container
+ * width using `minColumnWidth` as the lower bound per column. A
+ * `ResizeObserver` recomputes the count on container resize.
  */
 export const Responsive: Story = {
 	parameters: { layout: '' },
 	args: {
 		layout: [
-			{ key: 'fill', fillWidth: true, height: 1, order: 1 },
-			{ key: 'fixed-1', width: 1, height: 1, order: 2 },
-			{ key: 'fixed-2', width: 2, height: 1, order: 3 },
-			{ key: 'fixed-3', width: 2, height: 1, order: 4 },
-			{ key: 'fixed-4', width: 2, height: 1, order: 5 },
-			{
-				key: 'full',
-				fullWidth: true,
-				height: 1,
-				order: 6,
-			},
-			{ key: 'fixed-5', width: 1, height: 1, order: 7 },
-			{ key: 'fixed-6', width: 1, height: 1, order: 8 },
-			{
-				key: 'fill-2',
-				fillWidth: true,
-				height: 1,
-				order: 9,
-			},
+			{ key: 'a', width: 1, order: 1 },
+			{ key: 'b', width: 2, order: 2 },
+			{ key: 'c', width: 2, order: 3 },
+			{ key: 'd', width: 1, order: 4 },
+			{ key: 'e', width: 2, order: 5 },
+			{ key: 'f', width: 2, order: 6 },
 		],
 		rowHeight: 96,
 		minColumnWidth: 192,
 		children: [
-			<Card key="fill" color="#2196f3">
-				fillWidth
-			</Card>,
-			<Card key="fixed-1" color="#4caf50">
+			<Tile key="a" tone="brand">
 				width: 1
-			</Card>,
-			<Card key="fixed-2" color="#f44336">
+			</Tile>,
+			<Tile key="b" tone="info">
 				width: 2
-			</Card>,
-			<Card key="fixed-3" color="#ff9800">
+			</Tile>,
+			<Tile key="c" tone="success">
 				width: 2
-			</Card>,
-			<Card key="fixed-4" color="#9c27b0">
-				width: 2
-			</Card>,
-			<Card key="full" color="#607d8b">
-				fullWidth
-			</Card>,
-			<Card key="fixed-5" color="#795548">
+			</Tile>,
+			<Tile key="d" tone="warning">
 				width: 1
-			</Card>,
-			<Card key="fixed-6" color="#e91e63">
-				width: 1
-			</Card>,
-			<Card key="fill-2" color="#00bcd4">
-				fillWidth
-			</Card>,
+			</Tile>,
+			<Tile key="e" tone="error">
+				width: 2
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				width: 2
+			</Tile>,
 		],
 	},
 };
 
 /**
- * Numeric row height with multi-row items.
+ * A `fillWidth` item expands to cover the remaining columns in its
+ * row. Mix `fillWidth` with fixed-width items on either side to
+ * build sidebar-like layouts that adapt to the column count.
+ */
+export const FillWidth: Story = {
+	args: {
+		layout: [
+			{ key: 'left', width: 1 },
+			{ key: 'fill', fillWidth: true },
+			{ key: 'right', width: 2 },
+			{ key: 'solo', fillWidth: true },
+		],
+		columns: 6,
+		children: [
+			<Tile key="left" tone="brand">
+				width: 1
+			</Tile>,
+			<Tile key="fill" tone="info">
+				fillWidth
+			</Tile>,
+			<Tile key="right" tone="success">
+				width: 2
+			</Tile>,
+			<Tile key="solo" tone="warning">
+				fillWidth (alone in row)
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * A `fullWidth` item spans every column (`grid-column: 1 / -1`),
+ * forcing a row break around it. Useful for dividers, hero banners,
+ * or embedded content that should always take the full width.
+ */
+export const FullWidth: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 2 },
+			{ key: 'b', width: 4 },
+			{ key: 'hero', fullWidth: true, height: 1 },
+			{ key: 'c', width: 3 },
+			{ key: 'd', width: 3 },
+		],
+		columns: 6,
+		children: [
+			<Tile key="a" tone="brand">
+				width: 2
+			</Tile>,
+			<Tile key="b" tone="info">
+				width: 4
+			</Tile>,
+			<Tile key="hero" tone="success">
+				fullWidth
+			</Tile>,
+			<Tile key="c" tone="warning">
+				width: 3
+			</Tile>,
+			<Tile key="d" tone="error">
+				width: 3
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * Numeric `rowHeight` lets items span multiple rows via `height`.
+ * Combined with `width`, this produces tile-based dashboards where
+ * each cell can be tuned independently.
  */
 export const RowHeight: Story = {
 	parameters: { layout: '' },
@@ -213,48 +287,39 @@ export const RowHeight: Story = {
 		columns: 6,
 		rowHeight: 80,
 		children: [
-			<Card key="a" color="#f44336">
-				2 cols x 2 rows
-			</Card>,
-			<Card key="b" color="#2196f3">
-				2 cols x 1 row
-			</Card>,
-			<Card key="c" color="#4caf50">
-				2 cols x 3 rows
-			</Card>,
-			<Card key="d" color="#ff9800">
-				4 cols x 1 row
-			</Card>,
-			<Card key="e" color="#9c27b0">
-				2 cols x 1 row
-			</Card>,
+			<Tile key="a" tone="brand">
+				2 cols × 2 rows
+			</Tile>,
+			<Tile key="b" tone="info">
+				2 cols × 1 row
+			</Tile>,
+			<Tile key="c" tone="success">
+				2 cols × 3 rows
+			</Tile>,
+			<Tile key="d" tone="warning">
+				4 cols × 1 row
+			</Tile>,
+			<Tile key="e" tone="error">
+				2 cols × 1 row
+			</Tile>,
 		],
 	},
 };
 
 /**
- * Edit mode with drag, resize, and all width modes.
- * A state panel shows the raw layout JSON. Drag items to reorder,
- * resize from the bottom-right handle.
+ * Edit mode with drag, resize, and all width modes. A state panel
+ * shows the raw layout JSON. Drag items to reorder; resize from the
+ * bottom-right handle. Keyboard sensor is enabled: use Tab to focus
+ * an item, Space to grab, arrow keys to move, Space to drop.
  */
 export const EditMode: Story = {
 	parameters: { layout: '' },
 	render: function EditModeStory() {
 		const [ layout, setLayout ] = useState< GridLayoutItem[] >( [
-			{
-				key: 'fill',
-				fillWidth: true,
-				height: 1,
-				order: 1,
-			},
+			{ key: 'fill', fillWidth: true, height: 1, order: 1 },
 			{ key: 'fixed-1', width: 1, height: 1, order: 2 },
 			{ key: 'fixed-2', width: 5, height: 1, order: 3 },
-			{
-				key: 'full',
-				fullWidth: true,
-				height: 1,
-				order: 4,
-			},
+			{ key: 'full', fullWidth: true, height: 1, order: 4 },
 			{ key: 'fixed-3', width: 2, height: 1, order: 5 },
 			{ key: 'fixed-4', width: 2, height: 1, order: 6 },
 		] );
@@ -273,9 +338,9 @@ export const EditMode: Story = {
 					editMode
 					onChangeLayout={ setLayout }
 				>
-					<Card
+					<Tile
 						key="fill"
-						color="#2196f3"
+						tone="info"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'fill' ) }
@@ -283,10 +348,10 @@ export const EditMode: Story = {
 						}
 					>
 						fillWidth — resize me
-					</Card>
-					<Card
+					</Tile>
+					<Tile
 						key="fixed-1"
-						color="#4caf50"
+						tone="success"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'fixed-1' ) }
@@ -294,21 +359,21 @@ export const EditMode: Story = {
 						}
 					>
 						width: 1
-					</Card>
-					<Card
+					</Tile>
+					<Tile
 						key="fixed-2"
-						color="#f44336"
+						tone="brand"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'fixed-2' ) }
 							/>
 						}
 					>
-						width: 2
-					</Card>
-					<Card
+						width: 5
+					</Tile>
+					<Tile
 						key="full"
-						color="#607d8b"
+						tone="neutral"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'full' ) }
@@ -316,10 +381,10 @@ export const EditMode: Story = {
 						}
 					>
 						fullWidth — resize me
-					</Card>
-					<Card
+					</Tile>
+					<Tile
 						key="fixed-3"
-						color="#ff9800"
+						tone="warning"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'fixed-3' ) }
@@ -327,10 +392,10 @@ export const EditMode: Story = {
 						}
 					>
 						width: 2
-					</Card>
-					<Card
+					</Tile>
+					<Tile
 						key="fixed-4"
-						color="#9c27b0"
+						tone="error"
 						actionableArea={
 							<WidgetActions
 								onClose={ () => removeTile( 'fixed-4' ) }
@@ -338,7 +403,7 @@ export const EditMode: Story = {
 						}
 					>
 						width: 2
-					</Card>
+					</Tile>
 				</Grid>
 
 				<LayoutStatePanel layout={ layout } />
