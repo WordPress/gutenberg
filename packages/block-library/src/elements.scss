@@ -2,5 +2,6 @@
  * Element styles.
  */
 .wp-element-button {
-	cursor: var(--wpds-cursor-control);
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Links should always use pointer. */
+	cursor: pointer;
 }

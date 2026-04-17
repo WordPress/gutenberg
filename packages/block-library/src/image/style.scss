@@ -181,7 +181,8 @@
 		}
 
 		&:hover {
-			cursor: var(--wpds-cursor-control);
+			/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+			cursor: pointer;
 			opacity: 1;
 		}
 
@@ -216,7 +217,8 @@
 		top: calc(env(safe-area-inset-top) + 16px); // equivalent to $grid-unit-20
 		right: calc(env(safe-area-inset-right) + 16px); // equivalent to $grid-unit-20
 		padding: 0 4px;
-		cursor: var(--wpds-cursor-control);
+		/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+		cursor: pointer;
 		z-index: 5000000;
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px
@@ -253,7 +255,8 @@
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
 		gap: 4px;
 		display: flex;
-		cursor: var(--wpds-cursor-control);
+		/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+		cursor: pointer;
 		align-items: center;
 		justify-content: center;
 		bottom: 16px;

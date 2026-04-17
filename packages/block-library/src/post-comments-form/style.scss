@@ -42,7 +42,8 @@
 	// Styles copied from button block styles.
 	:where(input[type="submit"]) {
 		box-shadow: none;
-		cursor: var(--wpds-cursor-control);
+		/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+		cursor: pointer;
 		display: inline-block;
 		text-align: center;
 		overflow-wrap: break-word;

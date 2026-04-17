@@ -363,7 +363,8 @@ button.wp-block-navigation-item__content {
 }
 
 .wp-block-navigation-submenu__toggle {
-	cursor: var(--wpds-cursor-control);
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+	cursor: pointer;
 
 	// Rotate submenu icon when open.
 	&[aria-expanded="true"] {
@@ -766,7 +767,8 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation__responsive-container-open,
 .wp-block-navigation__responsive-container-close {
 	vertical-align: middle;
-	cursor: var(--wpds-cursor-control);
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+	cursor: pointer;
 	color: currentColor;
 	background: transparent;
 	border: none;

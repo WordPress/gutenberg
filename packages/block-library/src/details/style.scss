@@ -3,5 +3,6 @@
 }
 
 .wp-block-details summary {
-	cursor: var(--wpds-cursor-control);
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Would only be using token for backend styles. */
+	cursor: pointer;
 }

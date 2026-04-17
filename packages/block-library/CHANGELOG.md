@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Replace `cursor: pointer` with `--wpds-cursor-control` variable (excluding `button/style.scss` and `social-link/editor.scss`) ([#77355](https://github.com/WordPress/gutenberg/pull/77355)).
+-   Disable rule declaration-property-value-disallowed-list for `cusor:pointer` as token `--wpds-cursor-control` is not required. ([#77355](https://github.com/WordPress/gutenberg/pull/77355)).
 
 ## 9.44.0 (2026-04-15)
 
