@@ -42,8 +42,12 @@ function {{PREFIX}}_register_script_modules() {
 		$asset = file_exists( $asset_path ) ? require $asset_path : array();
 
 		// Deregister first to override any previously registered version
-		// (e.g., Core's default modules when running as a plugin).
-		wp_deregister_script_module( $module['id'] );
+		// of Core's default script modules. Scoped to `@wordpress/*` — the
+		// only namespace Core registers by default — so plugin-local and
+		// shared packages preserve Core's idempotent "first-wins" semantics.
+		if ( str_starts_with( $module['id'], '@wordpress/' ) ) {
+			wp_deregister_script_module( $module['id'] );
+		}
 
 		wp_register_script_module(
 			$module['id'],

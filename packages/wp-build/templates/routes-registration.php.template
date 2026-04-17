@@ -54,8 +54,11 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 				$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 				// Deregister first to override any previously registered version
-				// (e.g., Core's default modules when running as a plugin).
-				wp_deregister_script_module( $content_handle );
+				// of Core's default script modules. Scoped to `@wordpress/*` — the
+				// only namespace Core registers by default.
+				if ( str_starts_with( $content_handle, '@wordpress/' ) ) {
+					wp_deregister_script_module( $content_handle );
+				}
 				wp_register_script_module(
 					$content_handle,
 					$build_constants['build_url'] . 'routes/' . $route['name'] . '/content' . $extension,
@@ -73,8 +76,11 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 				$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
 				$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 				// Deregister first to override any previously registered version
-				// (e.g., Core's default modules when running as a plugin).
-				wp_deregister_script_module( $route_handle );
+				// of Core's default script modules. Scoped to `@wordpress/*` — the
+				// only namespace Core registers by default.
+				if ( str_starts_with( $route_handle, '@wordpress/' ) ) {
+					wp_deregister_script_module( $route_handle );
+				}
 				wp_register_script_module(
 					$route_handle,
 					$build_constants['build_url'] . 'routes/' . $route['name'] . '/route' . $extension,
