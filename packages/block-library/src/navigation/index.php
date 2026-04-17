@@ -1085,7 +1085,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 		}
 
 		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
-		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$parsed_blocks           = block_core_navigation_convert_menu_items_to_blocks( $menu_items_by_parent_id[0] ?? array(), $menu_items_by_parent_id );
 		return new WP_Block_List( $parsed_blocks, $attributes );
 	}
 }
@@ -1584,11 +1584,14 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
 
 /**
- * Turns menu item data into a nested array of parsed blocks
+ * Turns menu item data into a nested array of parsed blocks.
  *
- * @since 5.9.0
+ * Internal (non-deprecated) implementation used by
+ * block_core_navigation_get_inner_blocks_from_unstable_location() and the
+ * deprecated block_core_navigation_parse_blocks_from_menu_items().
  *
- * @deprecated 6.3.0 Use WP_Navigation_Fallback::parse_blocks_from_menu_items() instead.
+ * @since 6.8.0
+ * @access private
  *
  * @param array $menu_items               An array of menu items that represent
  *                                        an individual level of a menu.
@@ -1598,10 +1601,7 @@ add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_back
  *                                        that parent.
  * @return array An array of parsed block data.
  */
-function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
-
-	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Navigation_Fallback::parse_blocks_from_menu_items' );
-
+function block_core_navigation_convert_menu_items_to_blocks( $menu_items, $menu_items_by_parent_id ) {
 	if ( empty( $menu_items ) ) {
 		return array();
 	}
@@ -1632,7 +1632,7 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
 		);
 
 		$block['innerBlocks']  = isset( $menu_items_by_parent_id[ $menu_item->ID ] )
-			? block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
+			? block_core_navigation_convert_menu_items_to_blocks( $menu_items_by_parent_id[ $menu_item->ID ], $menu_items_by_parent_id )
 			: array();
 		$block['innerContent'] = array_map( 'serialize_block', $block['innerBlocks'] );
 
@@ -1640,6 +1640,26 @@ function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_
 	}
 
 	return $blocks;
+}
+
+/**
+ * Turns menu item data into a nested array of parsed blocks
+ *
+ * @since 5.9.0
+ *
+ * @deprecated 6.3.0 Use WP_Classic_To_Block_Menu_Converter::to_blocks() instead.
+ *
+ * @param array $menu_items               An array of menu items that represent
+ *                                        an individual level of a menu.
+ * @param array $menu_items_by_parent_id  An array keyed by the id of the
+ *                                        parent menu where each element is an
+ *                                        array of menu items that belong to
+ *                                        that parent.
+ * @return array An array of parsed block data.
+ */
+function block_core_navigation_parse_blocks_from_menu_items( $menu_items, $menu_items_by_parent_id ) {
+	_deprecated_function( __FUNCTION__, '6.3.0', 'WP_Classic_To_Block_Menu_Converter::to_blocks' );
+	return block_core_navigation_convert_menu_items_to_blocks( $menu_items, $menu_items_by_parent_id );
 }
 
 /**
