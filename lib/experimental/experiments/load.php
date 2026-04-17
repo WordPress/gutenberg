@@ -6,12 +6,10 @@
  */
 
 /**
- * Returns the list of Gutenberg experiment groups with their metadata.
- *
- * @return array List of experiment groups with slug, label, and items.
+ * Set up the experiments settings.
  */
-function gutenberg_get_experiments() {
-	return array(
+function gutenberg_initialize_experiments_settings() {
+	$groups = array(
 		array(
 			'slug'  => 'blocks',
 			'label' => _x( 'Blocks', 'experiments group name', 'gutenberg' ),
@@ -167,15 +165,7 @@ function gutenberg_get_experiments() {
 			),
 		),
 	);
-}
 
-/**
- * Set up the experiments settings.
- *
- * @since 6.8.0
- */
-function gutenberg_initialize_experiments_settings() {
-	$groups     = gutenberg_get_experiments();
 	$properties = array();
 
 	foreach ( $groups as $group ) {
@@ -205,7 +195,6 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		array(
 			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
-			'description'  => __( "The block editor includes experimental features that are usable while they're in development. Select the ones you'd like to enable. These features are likely to change, so avoid using them in production.", 'gutenberg' ),
 			'show_in_rest' => array(
 				'schema' => array(
 					'type'       => 'object',
