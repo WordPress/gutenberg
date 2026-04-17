@@ -33,6 +33,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
 import { MediaPreview } from '../media';
+import { CollabSidebarSlot } from '../collab-sidebar';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -246,6 +247,7 @@ export default function EditorInterface( {
 								postId={ postId }
 								postType={ postType }
 							/>
+							<CollabSidebarSlot />
 						</>
 					) }
 				</>

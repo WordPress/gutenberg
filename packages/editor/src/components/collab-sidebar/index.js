@@ -3,7 +3,10 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	createSlotFill,
+} from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -33,6 +36,9 @@ import {
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+
+export const { Slot: CollabSidebarSlot, Fill: CollabSidebarFill } =
+	createSlotFill( 'CollabSidebar' );
 
 function NotesSidebarContent( {
 	styles,
@@ -219,23 +225,28 @@ function NotesSidebar( { postId } ) {
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
-				<PluginSidebar
-					isPinnable={ false }
-					header={ false }
-					identifier={ FLOATING_NOTES_SIDEBAR }
-					className="editor-collab-sidebar"
-					headerClassName="editor-collab-sidebar__header"
-					backgroundColor={ backgroundColor }
-				>
-					<NotesSidebarContent
-						comments={ unresolvedSortedThreads }
-						commentSidebarRef={ commentSidebarRef }
-						styles={ {
+				<CollabSidebarFill>
+					<div
+						className="editor-collab-sidebar"
+						style={ {
+							position: 'absolute',
+							right: 0,
+							top: 0,
+							width: '280px',
+							zIndex: 20,
 							backgroundColor,
 						} }
-						isFloating
-					/>
-				</PluginSidebar>
+					>
+						<NotesSidebarContent
+							comments={ unresolvedSortedThreads }
+							commentSidebarRef={ commentSidebarRef }
+							styles={ {
+								backgroundColor,
+							} }
+							isFloating
+						/>
+					</div>
+				</CollabSidebarFill>
 			) }
 		</>
 	);
