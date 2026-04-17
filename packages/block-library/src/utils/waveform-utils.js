@@ -160,16 +160,16 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element                    - The container element (must be in DOM).
- * @param {Object}   options                    - Configuration options.
- * @param {string}   options.src                - The audio file URL.
- * @param {string}   options.title              - The track title.
- * @param {string}   options.artist             - The artist name.
- * @param {string}   options.image              - The artwork image URL.
- * @param {boolean}  options.autoPlay           - Whether to auto-play when ready.
- * @param {Function} options.onEnded            - Callback when track ends.
- * @param {Object}   options.labels             - Translated button labels.
- * @param {string}   options.waveformStyle      - Waveform style (bars, mirror, line, blocks, dots, seekbar).
+ * @param {Element}  element               - The container element (must be in DOM).
+ * @param {Object}   options               - Configuration options.
+ * @param {string}   options.src           - The audio file URL.
+ * @param {string}   options.title         - The track title.
+ * @param {string}   options.artist        - The artist name.
+ * @param {string}   options.image         - The artwork image URL.
+ * @param {boolean}  options.autoPlay      - Whether to auto-play when ready.
+ * @param {Function} options.onEnded       - Callback when track ends.
+ * @param {Object}   options.labels        - Translated button labels.
+ * @param {string}   options.waveformStyle - Waveform style (bars, mirror, line, blocks, dots, seekbar).
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
