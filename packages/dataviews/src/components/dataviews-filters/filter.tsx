@@ -9,17 +9,15 @@ import type { RefObject } from 'react';
  */
 import {
 	Dropdown,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	FlexItem,
 	SelectControl,
 	Tooltip,
 	Icon,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { dateI18n, getDate } from '@wordpress/date';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -30,18 +28,12 @@ import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
 	NormalizedField,
-	NormalizedFieldDate,
-	NormalizedFieldNumber,
-	NormalizedFieldInteger,
 	NormalizedFilter,
 	Operator,
 	Option,
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
-import parseDateTime from '../../field-types/utils/parse-date-time';
-import { formatNumber } from '../../field-types/number';
-import { formatInteger } from '../../field-types/integer';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -59,7 +51,7 @@ interface OperatorSelectorProps {
 }
 
 interface FilterProps extends OperatorSelectorProps {
-	addFilterRef: RefObject< HTMLButtonElement >;
+	addFilterRef: RefObject< HTMLButtonElement | null >;
 	openedFilter: string | null;
 	fields: NormalizedField< any >[];
 }
@@ -100,10 +92,12 @@ function OperatorSelector( {
 	const value = currentFilter?.operator || filter.operators[ 0 ];
 	return (
 		operatorOptions.length > 1 && (
-			<HStack
-				spacing={ 2 }
+			<Stack
+				direction="row"
+				gap="sm"
 				justify="flex-start"
 				className="dataviews-filters__summary-operators-container"
+				align="center"
 			>
 				<FlexItem className="dataviews-filters__summary-operators-filter-name">
 					{ filter.name }
@@ -169,10 +163,9 @@ function OperatorSelector( {
 					} }
 					size="small"
 					variant="minimal"
-					__nextHasNoMarginBottom
 					hideLabelFromVision
 				/>
-			</HStack>
+			</Stack>
 		)
 	);
 }
@@ -190,6 +183,20 @@ export default function Filter( {
 	);
 
 	let activeElements: Option[] = [];
+	const field = useMemo( () => {
+		const currentField = fields.find( ( f ) => f.id === filter.field );
+		if ( currentField ) {
+			return {
+				...currentField,
+				// Configure getValue as if Item was a plain object.
+				// See related input-widget.tsx
+				getValue: ( { item }: { item: any } ) =>
+					item[ currentField.id ],
+			};
+		}
+
+		return currentField;
+	}, [ fields, filter.field ] );
 
 	const { elements } = useElements( {
 		elements: filter.elements,
@@ -197,44 +204,46 @@ export default function Filter( {
 	} );
 
 	if ( elements.length > 0 ) {
+		// When there are elements, we favor those
 		activeElements = elements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
 				return element.value === filterInView?.value;
 			}
 			return filterInView?.value?.includes( element.value );
 		} );
-	} else if ( filterInView?.value !== undefined ) {
-		const field = fields.find( ( f ) => f.id === filter.field );
-		let label = filterInView.value;
+	} else if ( Array.isArray( filterInView?.value ) ) {
+		// or, filterInView.value can also be array
+		// for the between operator, as in [ 1, 2 ]
+		const label = filterInView.value.map( ( v ) => {
+			const formattedValue = field?.getValueFormatted( {
+				item: { [ field.id ]: v },
+				field,
+			} );
+			return formattedValue || String( v );
+		} );
 
-		if ( field?.type === 'date' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateI18n(
-						( field as NormalizedFieldDate< any > ).format.date,
-						getDate( label )
-					);
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'datetime' && typeof label === 'string' ) {
-			try {
-				const dateValue = parseDateTime( label );
-				if ( dateValue !== null ) {
-					label = dateValue.toLocaleString();
-				}
-			} catch ( e ) {
-				label = filterInView.value;
-			}
-		} else if ( field?.type === 'number' && typeof label === 'number' ) {
-			const numberField = field as NormalizedFieldNumber< any >;
-			label = formatNumber( label, numberField.format );
-		} else if ( field?.type === 'integer' && typeof label === 'number' ) {
-			const integerField = field as NormalizedFieldInteger< any >;
-			label = formatInteger( label, integerField.format );
-		}
+		activeElements = [
+			{
+				value: filterInView.value,
+				// @ts-ignore
+				label,
+			},
+		];
+	} else if ( typeof filterInView?.value === 'object' ) {
+		// or, it can also be object for the inThePast/over operators,
+		// as in { value: '1', units: 'days' }
+		activeElements = [
+			{ value: filterInView.value, label: filterInView.value },
+		];
+	} else if ( filterInView?.value !== undefined ) {
+		// otherwise, filterInView.value is a single value
+		const label =
+			field !== undefined
+				? field.getValueFormatted( {
+						item: { [ field.id ]: filterInView.value },
+						field,
+				  } )
+				: String( filterInView.value );
 
 		activeElements = [
 			{
@@ -340,7 +349,7 @@ export default function Filter( {
 			) }
 			renderContent={ () => {
 				return (
-					<VStack spacing={ 0 } justify="flex-start">
+					<Stack direction="column" justify="flex-start">
 						<OperatorSelector { ...commonProps } />
 						{ commonProps.filter.hasElements ? (
 							<SearchWidget
@@ -353,7 +362,7 @@ export default function Filter( {
 						) : (
 							<InputWidget { ...commonProps } fields={ fields } />
 						) }
-					</VStack>
+					</Stack>
 				);
 			} }
 		/>

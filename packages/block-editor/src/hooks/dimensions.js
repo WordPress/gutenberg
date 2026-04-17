@@ -159,6 +159,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	if ( feature === 'any' ) {
 		return !! (
 			support?.aspectRatio ||
+			!! support?.height ||
 			!! support?.minHeight ||
 			!! support?.width
 		);
@@ -169,13 +170,13 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 
 export default {
 	useBlockProps,
-	attributeKeys: [ 'minHeight', 'width', 'style' ],
+	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
 	hasSupport( name ) {
 		return hasDimensionsSupport( name );
 	},
 };
 
-function useBlockProps( { name, minHeight, style } ) {
+function useBlockProps( { name, height, minHeight, style } ) {
 	if (
 		! hasDimensionsSupport( name, 'aspectRatio' ) ||
 		shouldSkipSerialization( name, DIMENSIONS_SUPPORT_KEY, 'aspectRatio' )
@@ -192,16 +193,22 @@ function useBlockProps( { name, minHeight, style } ) {
 	const inlineStyleOverrides = {};
 
 	// Apply rules to unset incompatible styles.
-	// Note that a set `aspectRatio` will win out if both an aspect ratio and a minHeight are set.
+	// Note that a set `aspectRatio` will win out if both an aspect ratio and height-related properties are set.
 	// This is because the aspect ratio is a newer block support, so (in theory) any aspect ratio
-	// that is set should be intentional and should override any existing minHeight. The Cover block
-	// and dimensions controls have logic that will manually clear the aspect ratio if a minHeight
-	// is set.
+	// that is set should be intentional and should override any existing height properties. The Cover block
+	// and dimensions controls have logic that will manually clear the aspect ratio if height properties
+	// are set.
 	if ( style?.dimensions?.aspectRatio ) {
-		// To ensure the aspect ratio does not get overridden by `minHeight` unset any existing rule.
+		// To ensure the aspect ratio does not get overridden by `minHeight` or `height` unset any existing rule.
 		inlineStyleOverrides.minHeight = 'unset';
-	} else if ( minHeight || style?.dimensions?.minHeight ) {
-		// To ensure the minHeight does not get overridden by `aspectRatio` unset any existing rule.
+		inlineStyleOverrides.height = 'unset';
+	} else if (
+		minHeight ||
+		style?.dimensions?.minHeight ||
+		height ||
+		style?.dimensions?.height
+	) {
+		// To ensure height properties do not get overridden by `aspectRatio` unset any existing rule.
 		inlineStyleOverrides.aspectRatio = 'unset';
 	}
 

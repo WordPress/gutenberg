@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.36.0",
+	"version": "14.44.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,13 +22,21 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -42,12 +50,12 @@
 		"src/store/index.js",
 		"src/hooks/**",
 		"src/bindings/**",
-		"build/index.js",
-		"build/store/index.js",
+		"build/index.cjs",
+		"build/store/index.cjs",
 		"build/hooks/**",
 		"build/bindings/**",
-		"build-module/index.js",
-		"build-module/store/index.js",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs",
 		"build-module/hooks/**",
 		"build-module/bindings/**"
 	],
@@ -58,6 +66,7 @@
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/commands": "file:../commands",
 		"@wordpress/components": "file:../components",
@@ -79,6 +88,8 @@
 		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-editor": "file:../media-editor",
+		"@wordpress/media-fields": "file:../media-fields",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
@@ -88,18 +99,25 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",
+		"colord": "^2.7.0",
 		"date-fns": "^3.6.0",
+		"diff": "^4.0.2",
 		"fast-deep-equal": "^3.1.3",
 		"memize": "^2.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"remove-accents": "^0.5.0",
 		"uuid": "^9.0.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

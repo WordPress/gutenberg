@@ -4,16 +4,20 @@
 	flex-grow: 1;
 	box-sizing: border-box;
 
+	& > *:first-child {
+		margin-top: 0;
+	}
+	& > *:last-child {
+		margin-bottom: 0;
+	}
+
 	&[hidden],
 	&:empty {
 		display: none !important;
 	}
-	&:not(.wp-block):focus {
-		outline: none;
-	}
 }
 
-.wp-block-tab.wp-block section.has-background,
+.wp-block-tab.wp-block.has-background,
 .wp-block-tab:not(.wp-block).has-background {
 	padding: var(--wp--preset--spacing--30);
 }

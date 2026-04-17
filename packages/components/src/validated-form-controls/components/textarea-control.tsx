@@ -17,11 +17,7 @@ const UnforwardedValidatedTextareaControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof TextareaControl >,
-		'__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof TextareaControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLTextAreaElement >
 ) => {
 	const validityTargetRef = useRef< HTMLTextAreaElement >( null );
@@ -34,11 +30,7 @@ const UnforwardedValidatedTextareaControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<TextareaControl
-				__nextHasNoMarginBottom
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<TextareaControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -46,3 +38,4 @@ const UnforwardedValidatedTextareaControl = (
 export const ValidatedTextareaControl = forwardRef(
 	UnforwardedValidatedTextareaControl
 );
+ValidatedTextareaControl.displayName = 'ValidatedTextareaControl';

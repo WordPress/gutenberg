@@ -380,10 +380,17 @@ function filterRange( node, range, filter ) {
  *
  * @param {HTMLElement} element
  * @param {boolean}     isRoot
+ * @param {boolean}     hasPrecedingSpace
+ * @param {boolean}     hasTrailingSpace
  *
  * @return {HTMLElement} New element with collapsed whitespace.
  */
-function collapseWhiteSpace( element, isRoot = true ) {
+function collapseWhiteSpace(
+	element,
+	isRoot = true,
+	hasPrecedingSpace = false,
+	hasTrailingSpace = false
+) {
 	const clone = element.cloneNode( true );
 	clone.normalize();
 	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
@@ -398,19 +405,36 @@ function collapseWhiteSpace( element, isRoot = true ) {
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+			if (
+				i === 0 &&
+				newNodeValue.startsWith( ' ' ) &&
+				( isRoot || hasPrecedingSpace )
+			) {
 				newNodeValue = newNodeValue.slice( 1 );
-			} else if (
-				isRoot &&
+			}
+			if (
 				i === nodes.length - 1 &&
-				newNodeValue.endsWith( ' ' )
+				newNodeValue.endsWith( ' ' ) &&
+				( isRoot || hasTrailingSpace )
 			) {
 				newNodeValue = newNodeValue.slice( 0, -1 );
 			}
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			node.replaceWith( collapseWhiteSpace( node, false ) );
+			const { previousSibling, nextSibling } = node;
+			const prevHasSpace = previousSibling?.textContent.endsWith( ' ' );
+			const nextHasSpace = nextSibling?.textContent.startsWith( ' ' );
+			node.replaceWith(
+				collapseWhiteSpace(
+					node,
+					false,
+					previousSibling
+						? prevHasSpace
+						: isRoot || hasPrecedingSpace,
+					nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
+				)
+			);
 		}
 	} );
 	return clone;

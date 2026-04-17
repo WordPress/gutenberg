@@ -77,12 +77,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'listbox', { name: 'Blocks' } )
 				.getByRole( 'option' )
-		).toHaveText( [
-			'Paragraph',
-			'Success Message',
-			'Warning Message',
-			'Stretchy Paragraph',
-		] );
+		).toHaveText( [ 'Paragraph', 'Success Message', 'Warning Message' ] );
 	} );
 
 	test( 'Insert the Success Message block variation', async ( {
@@ -142,7 +137,7 @@ test.describe( 'Block variations', () => {
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
 
 		// Select the quote block.
-		await page.keyboard.press( 'ArrowUp' );
+		await pageUtils.pressKeys( 'primary+a' );
 
 		await expect(
 			page

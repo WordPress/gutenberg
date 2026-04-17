@@ -92,7 +92,6 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						} }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open by default' ) }
 							checked={ showContent }
 							onChange={ () =>

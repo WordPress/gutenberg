@@ -10,6 +10,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalHStack as HStack,
+	// TODO: Replace this ZStack with ad hoc CSS.
+	// eslint-disable-next-line @wordpress/use-recommended-components
 	__experimentalZStack as ZStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	MenuGroup,
@@ -118,9 +120,8 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 	</HStack>
 );
 
-const renderToggle =
-	( duotone, resetDuotone ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( duotone, resetDuotone ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const duotoneButtonRef = useRef( undefined );
 
 		const toggleProps = {

@@ -9,6 +9,9 @@ import { privateApis as patternPrivateApis } from '@wordpress/patterns';
  */
 import { unlock } from '../lock-unlock';
 
+// Attachments / media
+export const ATTACHMENT_POST_TYPE = 'attachment';
+
 // Navigation
 export const NAVIGATION_POST_TYPE = 'wp_navigation';
 

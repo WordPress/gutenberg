@@ -66,9 +66,17 @@ const BaseComponent = ( {
 const TestComponent = withNotices( BaseComponent );
 
 const TestNoticeOperations = withNotices(
-	forwardRef( ( props, ref ) => {
+	forwardRef<
+		unknown,
+		WithNoticeProps & { notifications?: ReturnType< typeof noticesFrom > }
+	>( ( props, ref ) => {
 		useImperativeHandle( ref, () => ( { ...props.noticeOperations } ) );
-		return <BaseComponent { ...props } />;
+		return (
+			<BaseComponent
+				{ ...props }
+				notifications={ props.notifications ?? [] }
+			/>
+		);
 	} )
 );
 
@@ -83,9 +91,9 @@ describe( 'withNotices return type', () => {
 } );
 
 describe( 'withNotices operations', () => {
-	let handle: React.MutableRefObject< any >;
+	let handle: React.RefObject< any >;
 	const Handle = ( props: any ) => {
-		handle = useRef();
+		handle = useRef( null );
 		return <TestNoticeOperations { ...props } ref={ handle } />;
 	};
 

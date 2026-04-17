@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -68,6 +74,7 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -87,6 +94,8 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
+import * as playlist from './playlist';
+import * as playlistTrack from './playlist-track';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -127,9 +136,12 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
+import * as tabPanel from './tab-panel';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
+import * as tabsMenu from './tabs-menu';
+import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -254,7 +266,9 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
@@ -262,13 +276,8 @@ const getAllBlocks = () => {
 		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( breadcrumbs );
-		blocks.push( tab );
-		blocks.push( tabs );
-	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
@@ -277,8 +286,14 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
-	if ( window?.__experimentalNavigationOverlays ) {
-		blocks.push( navigationOverlayClose );
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tab );
+		blocks.push( tabs );
+		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
+		blocks.push( tabPanel );
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
 	}
 
 	// When in a WordPress context, conditionally
@@ -350,8 +365,10 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
+				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -376,11 +393,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},

@@ -4,12 +4,13 @@
 	"private": true,
 	"route": {
 		"path": "/types/$type/edit/$id",
-		"page": "gutenberg-boot"
+		"page": "site-editor-v2"
 	},
 	"dependencies": {
 		"@wordpress/core-data": "file:../../packages/core-data",
 		"@wordpress/data": "file:../../packages/data",
-		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/html-entities": "file:../../packages/html-entities",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"@wordpress/route": "file:../../packages/route"
 	}
 }

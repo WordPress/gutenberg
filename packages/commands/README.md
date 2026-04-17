@@ -10,6 +10,7 @@ There are two ways to register commands: static or dynamic. Both methods receive
 -   `label`: A human-readable label
 -   `icon`: An SVG icon
 -   `callback`: A callback function that is called when the command is selected
+-   `category`: (Optional) The category of the command. See [Command categories](#command-categories) below
 -   `context`: (Optional) The context of the command
 -   `keywords`: (Optional) An array of keywords for search matching
 
@@ -36,6 +37,17 @@ At the moment, three contexts have been implemented:
 As the usage of the Command Palette expands, more contexts will be added.
 
 Attaching a command or command loader to a given context is as simple as adding the `context` property (with the right context value from the available contexts above) to the `useCommand` or `useCommandLoader` calls.
+
+## Command categories
+
+Each command can be assigned a `category` that describes what kind of action it performs. Categories are used by the Command Palette to visually differentiate commands. The following categories are available:
+
+-   `command`: Executes code or toggles a command (e.g., Add block, duplicating a block).
+-   `view`: Navigates to an area in the admin or opens a panel (e.g., "Go to: Templates").
+-   `edit`: Navigates to edit a document (e.g., editing a template, editing a page).
+-   `action`: A generic fallback for commands that don't fit the other categories. This is also the default when an invalid category is provided.
+
+If no `category` is specified, the command will have `action` set. If an invalid value is provided, a warning is emitted in development mode and the category defaults to `action`.
 
 ## WordPress Data API
 
@@ -104,6 +116,7 @@ useCommand( {
 	name: 'myplugin/my-command-name',
 	label: __( 'Add new post' ),
 	icon: plus,
+	category: 'command',
 	callback: ( { close } ) => {
 		document.location.href = 'post-new.php';
 		close();
@@ -122,65 +135,66 @@ Attach a command loader to the command palette. Used for dynamic commands.
 _Usage_
 
 ```js
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 import { useCommandLoader } from '@wordpress/commands';
-import { post, page, layout, symbolFilled } from '@wordpress/icons';
-
-const icons = {
-    post,
-    page,
-    wp_template: layout,
-    wp_template_part: symbolFilled,
-};
+import { page } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useMemo } from '@wordpress/element';
 
 function usePageSearchCommandLoader( { search } ) {
-    // Retrieve the pages for the "search" term.
-    const { records, isLoading } = useSelect( ( select ) => {
-        const { getEntityRecords } = select( coreStore );
-        const query = {
-            search: !! search ? search : undefined,
-            per_page: 10,
-            orderby: search ? 'relevance' : 'date',
-        };
-        return {
-            records: getEntityRecords( 'postType', 'page', query ),
-            isLoading: ! select( coreStore ).hasFinishedResolution(
-                'getEntityRecords',
-                'postType', 'page', query ]
-            ),
-        };
-    }, [ search ] );
+	// Retrieve the pages for the "search" term.
+	const { records, isLoading } = useSelect(
+		( select ) => {
+			const { getEntityRecords } = select( coreStore );
+			const query = {
+				search: !! search ? search : undefined,
+				per_page: 10,
+				orderby: search ? 'relevance' : 'date',
+			};
+			return {
+				records: getEntityRecords( 'postType', 'page', query ),
+				isLoading: ! select( coreStore ).hasFinishedResolution(
+					'getEntityRecords',
+					[ 'postType', 'page', query ]
+				),
+			};
+		},
+		[ search ]
+	);
 
-    // Create the commands.
-    const commands = useMemo( () => {
-        return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
-            return {
-                name: record.title?.rendered + ' ' + record.id,
-                label: record.title?.rendered
-                    ? record.title?.rendered
-                    : __( '(no title)' ),
-                icon: icons[ postType ],
-                callback: ( { close } ) => {
-                    const args = {
-                        postType,
-                        postId: record.id,
-                        ...extraArgs,
-                    };
-                    document.location = addQueryArgs( 'site-editor.php', args );
-                    close();
-                },
-            };
-        } );
-    }, [ records, history ] );
+	// Create the commands.
+	const commands = useMemo( () => {
+		return ( records ?? [] ).slice( 0, 10 ).map( ( record ) => {
+			return {
+				name: record.title?.rendered + ' ' + record.id,
+				label: record.title?.rendered
+					? record.title?.rendered
+					: __( '(no title)' ),
+				icon: page,
+				category: 'edit',
+				callback: ( { close } ) => {
+					const args = {
+						p: '/page',
+						postId: record.id,
+					};
+					document.location = addQueryArgs( 'site-editor.php', args );
+					close();
+				},
+			};
+		} );
+	}, [ records ] );
 
-    return {
-        commands,
-        isLoading,
-    };
+	return {
+		commands,
+		isLoading,
+	};
 }
 
 useCommandLoader( {
-    name: 'myplugin/page-search',
-    hook: usePageSearchCommandLoader,
+	name: 'myplugin/page-search',
+	hook: usePageSearchCommandLoader,
 } );
 ```
 
@@ -203,6 +217,7 @@ useCommands( [
 		name: 'myplugin/add-post',
 		label: __( 'Add new post' ),
 		icon: plus,
+		category: 'command',
 		callback: ( { close } ) => {
 			document.location.href = 'post-new.php';
 			close();
@@ -212,6 +227,7 @@ useCommands( [
 		name: 'myplugin/edit-posts',
 		label: __( 'Edit posts' ),
 		icon: pencil,
+		category: 'view',
 		callback: ( { close } ) => {
 			document.location.href = 'edit.php';
 			close();

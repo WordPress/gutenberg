@@ -237,6 +237,7 @@ The settings section has the following structure:
 		"custom": {},
 		"dimensions": {
 			"aspectRatio": false,
+			"height": false,
 			"minHeight": false,
 			"width": false,
 		},
@@ -272,6 +273,7 @@ The settings section has the following structure:
 			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
+			"textIndent": true,
 			"textTransform": true
 		},
 		"blocks": {
@@ -302,7 +304,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: aspectRatio, minHeight, width
+- dimensions: aspectRatio, height, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -772,6 +774,7 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"dimensions": {
 			"aspectRatio": "value",
+			"height": "value"
 			"minHeight": "value"
 			"width": "value"
 		},
@@ -931,7 +934,7 @@ If you register a background color for the root using styles.color.background:
 	}
 ```
 
-You can use `ref: "styles.color.background"`  to re-use the style for a block:
+You can use `ref: "styles.color.background"`  to reuse the style for a block:
 
 ```JSON
 {
@@ -1270,14 +1273,14 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 **Presets** such as `--wp--preset--color--black` can be divided into the following chunks:
 
 - `--wp`: prefix to namespace the CSS variable.
-- `preset `: indicates is a CSS variable that belongs to the presets.
+- `preset `: indicates that this is a CSS variable that belongs to the presets.
 - `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
 - `black`: the `slug` of the particular preset value.
 
 **Custom** properties such as `--wp--custom--line-height--body`, which can be divided into the following chunks:
 
 - `--wp`: prefix to namespace the CSS variable.
-- `custom`: indicates is a "free-form" CSS variable created by the theme.
+- `custom`: indicates that this is a "free-form" CSS variable created by the theme.
 - `line-height--body`: the result of converting the "custom" object keys into a string.
 
 The `--` as a separator has two functions:

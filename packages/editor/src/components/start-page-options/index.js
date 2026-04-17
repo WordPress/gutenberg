@@ -17,7 +17,11 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	ATTACHMENT_POST_TYPE,
+	TEMPLATE_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../store/constants';
 import { store as editorStore } from '../../store';
 
 export function useStartPatterns() {
@@ -148,11 +152,14 @@ export default function StartPageOptions() {
 			'core',
 			'enableChoosePatternModal'
 		);
+		const currentPostType = getCurrentPostType();
 		return {
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
-				TEMPLATE_POST_TYPE !== getCurrentPostType(),
+				ATTACHMENT_POST_TYPE !== currentPostType &&
+				TEMPLATE_POST_TYPE !== currentPostType &&
+				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};
 	}, [] );
 

@@ -26,7 +26,6 @@ const descriptionField: Partial< Field< Updatable< Attachment > > > = {
 				value={ getRawContent( data.description ) || '' }
 				onChange={ ( value ) => onChange( { description: value } ) }
 				rows={ 5 }
-				__nextHasNoMarginBottom
 			/>
 		);
 	},

@@ -174,7 +174,6 @@ function SuggestionList( {
 		<>
 			{ showSearchControl && (
 				<SearchControl
-					__nextHasNoMarginBottom
 					onChange={ setSearch }
 					value={ search }
 					label={ labels.search_items }

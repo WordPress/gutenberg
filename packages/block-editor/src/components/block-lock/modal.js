@@ -76,6 +76,12 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
+	const isDirty =
+		lock.move !== isMoveLocked ||
+		lock.remove !== isRemoveLocked ||
+		( allowsEditLocking && lock.edit !== isEditLocked ) ||
+		( hasTemplateLock && applyTemplateLock !== !! templateLock );
+
 	return (
 		<Modal
 			title={ sprintf(
@@ -90,6 +96,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
+					if ( ! isDirty ) {
+						return;
+					}
 					updateBlockAttributes( [ clientId ], {
 						lock,
 						templateLock: applyTemplateLock
@@ -196,7 +205,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 					{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 					{ hasTemplateLock && (
 						<ToggleControl
-							__nextHasNoMarginBottom
 							className="block-editor-block-lock-modal__template-lock"
 							label={ __( 'Apply to all blocks inside' ) }
 							checked={ applyTemplateLock }
@@ -225,6 +233,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 						<Button
 							variant="primary"
 							type="submit"
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
 							__next40pxDefaultSize
 						>
 							{ __( 'Apply' ) }

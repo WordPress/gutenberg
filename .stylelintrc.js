@@ -1,7 +1,10 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
-	plugins: [ 'stylelint-plugin-logical-css' ],
+	plugins: [
+		'stylelint-plugin-logical-css',
+		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+	],
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -48,11 +51,25 @@ module.exports = {
 		'scss/at-else-empty-line-before': null,
 		'scss/at-if-closing-brace-space-after': null,
 		'no-invalid-position-at-import-rule': null,
+		'plugin-wpds/no-token-fallback-values': true,
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.css' ],
+			files: [ '**/*.module.{css,scss}' ],
 			rules: {
+				'function-no-unknown': [
+					true,
+					{
+						ignoreFunctions: [
+							// CSS stepped value math functions in Baseline 2024.
+							// This rule exception can likely be removed when
+							// updating to a more recent version of Stylelint.
+							'round',
+							'rem',
+							'mod',
+						],
+					},
+				],
 				'declaration-property-max-values': {
 					// Prevents left/right values with shorthand property names (unclear for RTL)
 					margin: 3,
@@ -80,6 +97,15 @@ module.exports = {
 							'padding-bottom',
 							'top',
 							'bottom',
+						],
+					},
+				],
+				'property-no-unknown': [
+					true,
+					{
+						ignoreProperties: [
+							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
+							'composes',
 						],
 					},
 				],

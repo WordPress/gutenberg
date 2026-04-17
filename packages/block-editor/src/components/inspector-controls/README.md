@@ -122,14 +122,12 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 						/>
 
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label="Toggle Field"
 							checked={ toggleField }
 							onChange={ onChangeToggleField }
 						/>
 
 						<SelectControl
-							__nextHasNoMarginBottom
 							label="Select Control"
 							value={ selectField }
 							options={ [

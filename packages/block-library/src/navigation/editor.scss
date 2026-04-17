@@ -631,12 +631,6 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	opacity: 1;
 }
 
-.wp-block-navigation__menu-inspector-controls {
-	overflow-x: auto;
-
-	@include custom-scrollbars-on-hover(transparent, $gray-600);
-}
-
 .wp-block-navigation__menu-inspector-controls__empty-message {
 	margin-left: 24px;
 }
@@ -650,7 +644,80 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	grid-column: span 2;
 }
 
-.wp-block-navigation__overlay-edit-button {
+.wp-block-navigation__overlay-selector {
+	position: relative;
+}
+
+.wp-block-navigation__overlay-selector-controls {
+	margin-bottom: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-create-button {
+	position: absolute;
+	// Align with SelectControl label by offsetting by button padding
+	// Small icon buttons have 0 padding, but we align with default button top padding (4px = $grid-unit-05)
+	top: -$grid-unit-05;
+	right: 0;
+	z-index: 1;
+}
+
+// Overlay Preview styles
+.wp-block-navigation__overlay-preview {
+	border: 1px solid $gray-300;
+	border-radius: 2px;
+	overflow-y: auto;
+	max-height: 200px;
+	background: $white;
+}
+
+.wp-block-navigation__overlay-preview-loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	background: $gray-100;
+}
+
+.wp-block-navigation__overlay-preview-empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 200px;
+	padding: $grid-unit-20;
+	text-align: center;
+	color: $gray-700;
+	background: $gray-100;
+	font-style: italic;
+}
+
+.wp-block-navigation__overlay-preview-placeholder {
+	width: 100%;
+	height: 200px;
+	background: $gray-100;
+	animation: wp-block-navigation-overlay-preview-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes wp-block-navigation-overlay-preview-pulse {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.5;
+	}
+}
+
+.wp-block-navigation__deleted-overlay-warning {
+	margin-top: $grid-unit-15;
+}
+
+// Create Overlay button
+.wp-block-navigation__overlay-create-button-prominent {
+	width: 100%;
+	justify-content: center;
+	margin-bottom: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-help-text-wrapper {
 	margin-top: $grid-unit-10;
-	width: fit-content;
 }

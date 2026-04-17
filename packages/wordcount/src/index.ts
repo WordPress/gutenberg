@@ -137,4 +137,4 @@ export function count(
 }
 
 // Export types for external usage
-export * from './types';
+export type * from './types';

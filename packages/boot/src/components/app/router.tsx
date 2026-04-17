@@ -7,7 +7,7 @@ import type { ComponentType } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { Page } from '@wordpress/admin-ui';
 import {
 	privateApis as routePrivateApis,
@@ -52,29 +52,33 @@ function NotFoundComponent() {
  * @param parentRoute Parent route.
  * @return Tanstack Route.
  */
-async function createRouteFromDefinition(
-	route: Route,
-	parentRoute: AnyRoute
-) {
-	let routeConfig: RouteConfig = {};
-
-	if ( route.route_module ) {
-		const module = await import( route.route_module );
-		routeConfig = module.route || {};
-	}
-
+function createRouteFromDefinition( route: Route, parentRoute: AnyRoute ) {
 	// Create route without component initially
 	let tanstackRoute = createRoute( {
 		getParentRoute: () => parentRoute,
 		path: route.path,
-		beforeLoad: routeConfig.beforeLoad
-			? ( opts: any ) =>
-					routeConfig.beforeLoad!( {
+		beforeLoad: async ( opts: any ) => {
+			// Import route module here (lazy)
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				const routeConfig = module.route || {};
+
+				if ( routeConfig.beforeLoad ) {
+					return routeConfig.beforeLoad( {
 						params: opts.params || {},
 						search: opts.search || {},
-					} )
-			: undefined,
+					} );
+				}
+			}
+		},
 		loader: async ( opts: any ) => {
+			// Import route module here (lazy)
+			let routeConfig: RouteConfig = {};
+			if ( route.route_module ) {
+				const module = await import( route.route_module );
+				routeConfig = module.route || {};
+			}
+
 			const context: RouteLoaderContext = {
 				params: opts.params || {},
 				search: opts.deps || {},
@@ -154,7 +158,7 @@ async function createRouteFromDefinition(
  * @param rootComponent Root component to use for the router.
  * @return Router tree.
  */
-async function createRouteTree(
+function createRouteTree(
 	routes: Route[],
 	rootComponent: ComponentType = Root
 ) {
@@ -163,9 +167,9 @@ async function createRouteTree(
 		context: () => ( {} ),
 	} );
 
-	// Create routes from definitions
-	const dynamicRoutes = await Promise.all(
-		routes.map( ( route ) => createRouteFromDefinition( route, rootRoute ) )
+	// Create routes from definitions (now synchronous)
+	const dynamicRoutes = routes.map( ( route ) =>
+		createRouteFromDefinition( route, rootRoute )
 	);
 
 	return rootRoute.addChildren( dynamicRoutes );
@@ -197,37 +201,36 @@ export default function Router( {
 	routes,
 	rootComponent = Root,
 }: RouterProps ) {
-	const [ router, setRouter ] = useState< any >( null );
+	const router = useMemo( () => {
+		const history = createPathHistory();
+		const routeTree = createRouteTree( routes, rootComponent );
 
-	useEffect( () => {
-		let cancelled = false;
+		return createRouter( {
+			history,
+			routeTree,
+			defaultPreload: 'intent',
+			defaultNotFoundComponent: NotFoundComponent,
+			defaultViewTransition: {
+				types: ( {
+					fromLocation,
+				}: {
+					fromLocation?: unknown;
+					toLocation: unknown;
+					pathChanged: boolean;
+					hrefChanged: boolean;
+					hashChanged: boolean;
+				} ) => {
+					// Disable view transition on initial navigation (no previous location)
+					if ( ! fromLocation ) {
+						return false;
+					}
 
-		async function initializeRouter() {
-			const history = createPathHistory();
-			const routeTree = await createRouteTree( routes, rootComponent );
-
-			if ( ! cancelled ) {
-				const newRouter = createRouter( {
-					history,
-					routeTree,
-					defaultPreload: 'intent',
-					defaultNotFoundComponent: NotFoundComponent,
-					defaultViewTransition: true,
-				} );
-				setRouter( newRouter );
-			}
-		}
-
-		initializeRouter();
-
-		return () => {
-			cancelled = true;
-		};
+					// Enable with navigation type for subsequent navigations
+					return [ 'navigate' ];
+				},
+			},
+		} );
 	}, [ routes, rootComponent ] );
-
-	if ( ! router ) {
-		return <div>Loading routes...</div>;
-	}
 
 	return <RouterProvider router={ router } />;
 }

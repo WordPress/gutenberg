@@ -10,7 +10,6 @@
  * with the built result from the plugin.
  */
 function gutenberg_reregister_core_block_types() {
-	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
 		__DIR__ . '/../build/scripts/block-library/',
 		__DIR__ . '/../build/scripts/edit-widgets/blocks/',
@@ -18,31 +17,22 @@ function gutenberg_reregister_core_block_types() {
 	);
 
 	foreach ( $blocks_dirs as $blocks_dir ) {
-		if ( ! is_dir( $blocks_dir ) ) {
-			continue;
-		}
+		$manifest_path = $blocks_dir . 'blocks-manifest.php';
+		$blocks        = require $manifest_path;
 
-		// Scan for block directories (those with block.json).
-		$block_json_files = glob( $blocks_dir . '*/block.json' );
-
-		foreach ( $block_json_files as $block_json_file ) {
-			$block_folder      = dirname( $block_json_file );
-			$block_name_folder = basename( $block_folder );
-
-			// Read block.json to get block name.
-			$metadata = json_decode( file_get_contents( $block_json_file ), true );
+		foreach ( $blocks as $block_name_folder => $metadata ) {
 			if ( ! is_array( $metadata ) || ! isset( $metadata['name'] ) ) {
 				continue;
 			}
 
-			// Deregister core version.
 			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
 			gutenberg_register_core_block_assets( $block_name_folder );
-			$php_file = dirname( $block_folder ) . '/' . $block_name_folder . '.php';
+
+			$php_file = $blocks_dir . $block_name_folder . '.php';
 			if ( file_exists( $php_file ) ) {
 				require_once $php_file;
 			} else {
-				register_block_type_from_metadata( $block_json_file );
+				register_block_type_from_metadata( $blocks_dir . $block_name_folder );
 			}
 		}
 	}
@@ -63,8 +53,8 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  *                 $script_handle,
  *                 $script_uri,
  *                 $script_dependencies,
- * -           isset( $script_asset['version'] ) ? $script_asset['version'] : false
- * +         isset( $script_asset['version'] ) ? $script_asset['version'] : false,
+ * -           $script_asset['version'] ?? false
+ * +         $script_asset['version'] ?? false,
  * +         array( 'strategy' => 'defer' )
  *         );
  *         if ( ! $result ) {
@@ -114,6 +104,15 @@ function gutenberg_deregister_core_block_and_assets( $block_name ) {
  * @return void
  */
 function gutenberg_register_core_block_assets( $block_name ) {
+	static $gutenberg_url_root = null;
+	// Running `gutenberg_url` inside of a loop can be expensive in systems with
+	// many callbacks attached to the `plugins_url` hook.
+	// Since all of the paths have the same root, we can instead retrieve the
+	// corresponding URL root once, and manually concatenate the URL below.
+	if ( is_null( $gutenberg_url_root ) ) {
+		$gutenberg_url_root = gutenberg_url( '/' );
+	}
+
 	if ( ! wp_should_load_separate_core_block_assets() ) {
 		return;
 	}
@@ -123,10 +122,11 @@ function gutenberg_register_core_block_assets( $block_name ) {
 	// When in production, use the plugin's version as the default asset version;
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+	$suffix          = SCRIPT_DEBUG ? '' : '.min';
 
 	$style_path      = "build/styles/block-library/$block_name/";
-	$stylesheet_url  = gutenberg_url( $style_path . 'style.css' );
-	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl.css' : 'style.css' );
+	$stylesheet_url  = $gutenberg_url_root . $style_path . 'style' . $suffix . '.css';
+	$stylesheet_path = gutenberg_dir_path() . $style_path . ( is_rtl() ? 'style-rtl' . $suffix . '.css' : 'style' . $suffix . '.css' );
 
 	if ( file_exists( $stylesheet_path ) ) {
 
@@ -138,6 +138,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+		wp_style_add_data( "wp-block-{$block_name}", 'suffix', $suffix );
 		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
 		wp_style_add_data( "wp-block-{$block_name}", 'path', $stylesheet_path );
 	} else {
@@ -152,32 +153,34 @@ function gutenberg_register_core_block_assets( $block_name ) {
 
 		// Get the path to the block's stylesheet.
 		$theme_style_path = is_rtl()
-			? "build/styles/block-library/$block_name/theme-rtl.css"
-			: "build/styles/block-library/$block_name/theme.css";
+			? "build/styles/block-library/$block_name/theme-rtl{$suffix}.css"
+			: "build/styles/block-library/$block_name/theme{$suffix}.css";
 
 		// If the file exists, enqueue it.
 		if ( file_exists( gutenberg_dir_path() . $theme_style_path ) ) {
 			wp_deregister_style( "wp-block-{$block_name}-theme" );
 			wp_register_style(
 				"wp-block-{$block_name}-theme",
-				gutenberg_url( $theme_style_path ),
+				$gutenberg_url_root . $theme_style_path,
 				array(),
 				$default_version
 			);
 			wp_style_add_data( "wp-block-{$block_name}-theme", 'path', gutenberg_dir_path() . $theme_style_path );
+			wp_style_add_data( "wp-block-{$block_name}-theme", 'suffix', $suffix );
 		}
 	}
 
-	$editor_style_path = "build/styles/block-library/$block_name/style-editor.css";
+	$editor_style_path = "build/styles/block-library/$block_name/style-editor{$suffix}.css";
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
 		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
 			"wp-block-{$block_name}-editor",
-			gutenberg_url( $editor_style_path ),
+			$gutenberg_url_root . $editor_style_path,
 			array(),
 			$default_version
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
+		wp_style_add_data( "wp-block-{$block_name}-editor", 'suffix', $suffix );
 	} else {
 		wp_register_style( "wp-block-{$block_name}-editor", false );
 	}
@@ -195,7 +198,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
  * This shim is INTENTIONALLY left out of core, as Social Links have never
  * landed there.
  *
- * @see https://github.com/WordPress/gutenberg/pull/19887
+ * @link https://github.com/WordPress/gutenberg/pull/19887
  */
 function gutenberg_register_legacy_social_link_blocks() {
 	$services = array(

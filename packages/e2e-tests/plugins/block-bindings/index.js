@@ -1,9 +1,4 @@
 const { registerBlockBindingsSource } = wp.blocks;
-const { InspectorControls } = wp.blockEditor;
-const { PanelBody, TextControl } = wp.components;
-const { createHigherOrderComponent } = wp.compose;
-const { createElement: el, Fragment } = wp.element;
-const { addFilter } = wp.hooks;
 const { fieldsList } = window.testingBindings || {};
 
 const getValues = ( { bindings } ) => {
@@ -64,42 +59,3 @@ registerBlockBindingsSource( {
 	getValues,
 	canUserEditValue: () => true,
 } );
-
-const withBlockBindingsInspectorControl = createHigherOrderComponent(
-	( BlockEdit ) => {
-		return ( props ) => {
-			if ( ! props.attributes?.metadata?.bindings?.content ) {
-				return el( BlockEdit, props );
-			}
-
-			return el(
-				Fragment,
-				{},
-				el( BlockEdit, props ),
-				el(
-					InspectorControls,
-					{},
-					el(
-						PanelBody,
-						{ title: 'Bindings' },
-						el( TextControl, {
-							__next40pxDefaultSize: true,
-							label: 'Content',
-							value: props.attributes.content,
-							onChange: ( content ) =>
-								props.setAttributes( {
-									content,
-								} ),
-						} )
-					)
-				)
-			);
-		};
-	}
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'testing/bindings-inspector-control',
-	withBlockBindingsInspectorControl
-);

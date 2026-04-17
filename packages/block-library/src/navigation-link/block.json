@@ -63,6 +63,7 @@
 		"style"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"__experimentalSlashInserter": true,
@@ -82,6 +83,11 @@
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"states": {
+			"@current": ".wp-block-navigation .current-menu-item"
 		}
 	},
 	"editorStyle": "wp-block-navigation-link-editor",

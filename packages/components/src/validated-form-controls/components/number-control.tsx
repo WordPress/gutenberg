@@ -46,3 +46,4 @@ const UnforwardedValidatedNumberControl = (
 export const ValidatedNumberControl = forwardRef(
 	UnforwardedValidatedNumberControl
 );
+ValidatedNumberControl.displayName = 'ValidatedNumberControl';

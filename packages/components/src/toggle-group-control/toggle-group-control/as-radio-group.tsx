@@ -122,3 +122,4 @@ function UnforwardedToggleGroupControlAsRadioGroup(
 export const ToggleGroupControlAsRadioGroup = forwardRef(
 	UnforwardedToggleGroupControlAsRadioGroup
 );
+ToggleGroupControlAsRadioGroup.displayName = 'ToggleGroupControlAsRadioGroup';

@@ -34,7 +34,7 @@ const { state } = store( 'router', {
 
 			try {
 				yield actions.navigate( e.target.href, { force, timeout } );
-			} catch ( error ) {
+			} catch {
 				state.status = 'fail';
 			}
 

@@ -134,6 +134,13 @@ async function dev() {
 			{ silent: true }
 		);
 
+		// Step 2.5: Generate worker placeholders
+		// This must happen before TypeScript compilation because some packages
+		// (like vips) have source files that import from generated worker-code.ts
+		await exec( 'node', [
+			'./bin/packages/generate-worker-placeholders.mjs',
+		] );
+
 		// Step 3: Validate TypeScript version
 		console.log( '\n🔍 Validating TypeScript version...' );
 		await exec( 'node', [
@@ -166,9 +173,6 @@ async function dev() {
 			) }s)\n`
 		);
 
-		// Write a marker file to signal that the build is ready
-		readyMarkerFile.create();
-
 		// Step 7: Start watch mode with both TypeScript and package builds
 		console.log( '👀 Starting watch mode...\n' );
 		console.log( '   - TypeScript compiler watching for type changes' );
@@ -181,8 +185,13 @@ async function dev() {
 			'--preserveWatchOutput',
 		] );
 
-		// Start package build watch
-		const buildWatch = execAsync( 'wp-build', [ '--watch' ], {
+		// Start package build watch and wait for initial build to complete
+		// before signaling ready. wp-build outputs "Watching for changes..."
+		// when its initial build is done.
+		const buildWatch = spawn( 'wp-build', [ '--watch' ], {
+			cwd: ROOT_DIR,
+			stdio: [ 'inherit', 'pipe', 'inherit' ],
+			shell: true,
 			env: { ...process.env, NODE_ENV: 'development' },
 		} );
 
@@ -197,6 +206,47 @@ async function dev() {
 
 		process.on( 'SIGINT', cleanup );
 		process.on( 'SIGTERM', cleanup );
+
+		// Wait for wp-build to complete its initial build, then signal ready.
+		// Using .then() ensures cleanup handlers are registered before awaiting,
+		// so early termination still triggers cleanup.
+		let isReady = false;
+		buildWatch.stdout.on( 'data', async ( data ) => {
+			const output = data.toString();
+			process.stdout.write( output );
+			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
+				isReady = true;
+
+				// Build blocks manifests after initial build completes
+				const blocksDirs = [
+					{
+						input: 'build/scripts/block-library',
+						output: 'build/scripts/block-library/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/edit-widgets/blocks',
+						output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/widgets/blocks',
+						output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+					},
+				];
+				for ( const { input, output: outputPath } of blocksDirs ) {
+					await exec(
+						'wp-scripts',
+						[
+							'build-blocks-manifest',
+							`--input=${ input }`,
+							`--output=${ outputPath }`,
+						],
+						{ silent: true }
+					);
+				}
+
+				readyMarkerFile.create();
+			}
+		} );
 
 		// Keep the process running
 		await new Promise( () => {} );

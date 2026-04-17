@@ -19,7 +19,7 @@ const UnforwardedValidatedRangeControl = (
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof RangeControl >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+		'__next40pxDefaultSize'
 	> &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
@@ -36,7 +36,6 @@ const UnforwardedValidatedRangeControl = (
 		>
 			<RangeControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				ref={ mergedRefs }
 				{ ...restProps }
 			/>
@@ -47,3 +46,4 @@ const UnforwardedValidatedRangeControl = (
 export const ValidatedRangeControl = forwardRef(
 	UnforwardedValidatedRangeControl
 );
+ValidatedRangeControl.displayName = 'ValidatedRangeControl';

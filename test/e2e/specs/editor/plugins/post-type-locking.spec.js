@@ -352,8 +352,6 @@ test.describe( 'Post-type locking', () => {
 					.getByRole( 'menu', { name: 'Paragraph', exact: true } )
 					.getByRole( 'menuitem' )
 			).toHaveText( [
-				'Paragraph',
-				'Stretchy Paragraph',
 				'Heading',
 				'List',
 				'Quote',
@@ -363,7 +361,8 @@ test.describe( 'Post-type locking', () => {
 				'Details',
 				'Group',
 				'Preformatted',
-				'Verse',
+				'Pullquote',
+				'Poetry',
 			] );
 		} );
 	} );

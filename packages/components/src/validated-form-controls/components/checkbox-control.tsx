@@ -46,3 +46,4 @@ const UnforwardedValidatedCheckboxControl = (
 export const ValidatedCheckboxControl = forwardRef(
 	UnforwardedValidatedCheckboxControl
 );
+ValidatedCheckboxControl.displayName = 'ValidatedCheckboxControl';

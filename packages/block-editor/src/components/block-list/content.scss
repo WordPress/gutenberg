@@ -108,6 +108,9 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		height: 0;
 		border: none !important;
 		padding: 0 !important;
+		opacity: 0;
+		margin-top: 0 !important;
+		margin-bottom: 0 !important;
 	}
 
 	&.is-layout-flex:not(.is-vertical) > .is-block-hidden {
@@ -115,6 +118,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		height: auto;
 		align-self: stretch;
 		white-space: nowrap !important;
+		margin-left: 0 !important;
+		margin-right: 0 !important;
 	}
 
 	// Re-enable it on components inside.
@@ -184,27 +189,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		.block-editor-warning {
 			pointer-events: all;
 		}
-	}
-
-	// Scrim overlay.
-	&.has-warning::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		background-color: rgba($white, 0.4);
-	}
-
-	// Avoid conflict with the multi-selection highlight color.
-	&.has-warning.is-multi-selected::after {
-		background-color: transparent;
-	}
-
-	// Reusable blocks parent border.
-	&.is-reusable.has-child-selected::after {
-		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
 
 	// Clear floats.
@@ -406,31 +390,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
+	// HTML input is always LTR regardless of language.
+	/*rtl:ignore*/
+	direction: ltr;
+
 	@media not ( prefers-reduced-motion ) {
 		transition: padding 0.2s linear;
 	}
 
 	&:focus {
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-	}
-}
-
-
-/**
- * Warnings.
- */
-
-.block-editor-block-list__block .block-editor-warning {
-	z-index: z-index(".block-editor-warning");
-	position: relative;
-
-	&.block-editor-block-list__block-crash-warning {
-		// The block crash warning has no block preview underneath it.
-		// The lack of a preview combined with the negative margin that
-		// the warning normally has results in crashed blocks overlapping
-		// any blocks that come after them. Resetting the margin to `auto`
-		// solves this.
-		margin-bottom: auto;
 	}
 }
 
@@ -476,3 +445,14 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	cursor: grabbing;
 }
 
+.is-preview-mode {
+	pointer-events: none;
+
+	.block-editor-block-list__block {
+		pointer-events: auto;
+
+		> *:not(.block-editor-block-list__block) {
+			pointer-events: none;
+		}
+	}
+}

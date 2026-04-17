@@ -23,7 +23,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		// Open the block inspector sidebar and use variations to change level.
 		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'button', { name: 'Heading 3', exact: true } )
+			.getByRole( 'radio', { name: 'Transform to Heading 3' } )
 			.click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
@@ -104,7 +104,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );

@@ -3,7 +3,7 @@
  */
 import {
 	fireEvent,
-	render,
+	render as baseRender,
 	screen,
 	waitFor,
 	within,
@@ -13,6 +13,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * WordPress dependencies
  */
+import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -78,6 +79,10 @@ afterEach( () => {
 	mockFetchSearchSuggestions.mockReset();
 	mockFetchRichUrlData?.mockReset(); // Conditionally reset as it may NOT be a mock.
 } );
+
+function render( ui ) {
+	return baseRender( ui, { wrapper: SlotFillProvider } );
+}
 
 /**
  * Workaround to trigger an arrow up keypress event.
@@ -1055,6 +1060,31 @@ describe( 'Link submission', () => {
 		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
 
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
+	} );
+
+	it( 'should disable Apply button when URL is cleared', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// Clear the input
+		await user.clear( searchInput );
+
+		// Apply button should be disabled when input is empty
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// onChange should not be called
+		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
 } );
 
@@ -2212,13 +2242,13 @@ describe( 'Rich link previews', () => {
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichImagePreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-image'
+			'.block-editor-link-control__preview-image'
 		);
 
 		// Todo: refactor to use user-facing queries.
 		// eslint-disable-next-line testing-library/no-node-access
 		const hasRichDescriptionPreview = linkPreview.querySelector(
-			'.block-editor-link-control__search-item-description'
+			'.block-editor-link-control__preview-description'
 		);
 
 		expect( hasRichImagePreview ).not.toBeInTheDocument();
@@ -2247,7 +2277,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		expect( titlePreview.parentElement.parentElement ).toHaveClass(
-			'block-editor-link-control__search-item-title'
+			'block-editor-link-control__preview-title'
 		);
 	} );
 
@@ -2271,7 +2301,7 @@ describe( 'Rich link previews', () => {
 
 		// eslint-disable-next-line testing-library/no-node-access
 		const iconPreview = linkPreview.querySelector(
-			`.block-editor-link-control__search-item-icon`
+			`.block-editor-link-control__preview-icon`
 		);
 
 		// eslint-disable-next-line testing-library/no-node-access
@@ -2310,7 +2340,7 @@ describe( 'Rich link previews', () => {
 
 			// eslint-disable-next-line testing-library/no-node-access
 			const missingDataItem = linkPreview.querySelector(
-				`.block-editor-link-control__search-item-${ dataItem }`
+				`.block-editor-link-control__preview-${ dataItem }`
 			);
 
 			expect( missingDataItem ).not.toBeInTheDocument();
@@ -2802,14 +2832,10 @@ describe( 'Entity handling', () => {
 
 		// Verify that onChange was called with entity metadata cleared.
 		// Kind should be undefined (no longer an entity).
-		// Note: Currently when clicking Apply (vs selecting a suggestion),
-		// type and id are also undefined - that's a separate issue with the
-		// TODO: Apply button handler not processing URLs through handleDirectEntry,
-		// so the shape of the data for a custom link can be different depending on
-		// how it was submitted.
+		// The URL should be normalized (https:// prepended to bare domain).
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress.org',
+				url: 'https://www.wordpress.org',
 				kind: undefined,
 			} )
 		);
@@ -3233,6 +3259,358 @@ describe( 'Custom settings rendering', () => {
 	} );
 } );
 
+describe( 'URL validation', () => {
+	const user = userEvent.setup();
+	const mockOnChange = jest.fn();
+
+	beforeEach( () => {
+		mockOnChange.mockClear();
+	} );
+
+	it.each( [
+		{
+			description: 'URLs with spaces',
+			inputUrl: 'not a url',
+		},
+		{
+			description: 'single words without TLD or protocol',
+			inputUrl: 'wordpress',
+		},
+	] )(
+		'should prevent submission for $description',
+		async ( { inputUrl } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
+
+			// Press Enter - this should trigger validation
+			triggerEnter( searchInput );
+
+			// Wait for validation error to appear
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeInTheDocument();
+			} );
+
+			// onChange should NOT have been called (submission prevented)
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		}
+	);
+
+	it.each( [
+		{
+			description: 'valid URLs with protocol',
+			inputUrl: 'https://wordpress.org',
+			expectedUrl: 'https://wordpress.org',
+			searchPattern: /https:\/\/wordpress\.org/,
+		},
+		{
+			description: 'valid URLs without protocol (without http://)',
+			inputUrl: 'www.wordpress.org',
+			expectedUrl: 'https://www.wordpress.org',
+			searchPattern: /www\.wordpress\.org/,
+		},
+		{
+			description: 'hash links (internal anchor links)',
+			inputUrl: '#section',
+			expectedUrl: '#section',
+			searchPattern: /#section/,
+		},
+		{
+			description: 'relative paths (URLs starting with /)',
+			inputUrl: '/handbook',
+			expectedUrl: '/handbook',
+			searchPattern: /\/handbook/,
+		},
+	] )(
+		'should accept $description',
+		async ( { inputUrl, expectedUrl, searchPattern } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
+
+			// Wait for suggestion to appear and become stable
+			await screen.findByRole( 'option', {
+				name: searchPattern,
+			} );
+
+			triggerEnter( searchInput );
+
+			// No validation error - should succeed
+			await waitFor( () => {
+				expect( mockOnChange ).toHaveBeenCalled();
+			} );
+
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: expectedUrl,
+				} )
+			);
+		}
+	);
+
+	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
+		const entityLink = {
+			id: 1,
+			title: 'Hello Page',
+			type: 'page',
+			url: '?p=1',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+				hasTextControl
+			/>
+		);
+
+		// Make a change by toggling the "Open in new tab" setting
+		// Entity links with unchanged URLs skip validation
+		const advancedButton = screen.getByRole( 'button', {
+			name: 'Advanced',
+		} );
+		await user.click( advancedButton );
+
+		const newTabToggle = screen.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+		await user.click( newTabToggle );
+
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+		await user.click( submitButton );
+
+		// Should succeed without validation error
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+		expect(
+			screen.queryByText( 'Please enter a valid URL.' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should show validation error when clicking Apply button with invalid URL', async () => {
+		// When editing an existing link, use Apply button
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.clear( searchInput );
+		await user.type( searchInput, 'invalid url' );
+
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+
+		// Click the button - validation will run and prevent submission
+		await user.click( submitButton );
+
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
+
+		// onChange should not be called because validation prevented submission
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should show validation error when pressing Enter to submit with an invalid URL', async () => {
+		// When editing an existing link, use Apply button
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.clear( searchInput );
+		await user.type( searchInput, 'invalid url' );
+
+		// Click without blur - use fireEvent for synchronous click
+		triggerEnter( searchInput );
+
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
+
+		// onChange should not be called because validation prevented submission
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should allow URLs that pass native URL constructor validation', async () => {
+		render(
+			<LinkControl
+				value={ { url: '' } }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// This URL may seem invalid but passes native URL constructor
+		await user.type( searchInput, 'www.wordpress' );
+
+		// Wait for suggestion to appear and become stable
+		await screen.findByRole( 'option', {
+			name: /www\.wordpress/,
+		} );
+
+		triggerEnter( searchInput );
+
+		// Should be accepted (validation philosophy: native URL constructor is authoritative)
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+
+		// This URL passes native URL constructor validation, so we allow it.
+		// While "www.wordpress" (without a TLD like .com or .org) is technically
+		// valid and could resolve (e.g., on an intranet), it's unlikely to be
+		// a useful URL in practice. However, our validation philosophy is to
+		// trust the native URL constructor as the authoritative source - if the
+		// browser accepts it, we accept it.
+		// Note: The URL gets normalized with https:// prepended since it's a bare domain.
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'https://www.wordpress',
+			} )
+		);
+	} );
+
+	// Note: mailto: and tel: protocol URLs are handled by the validation logic
+	// (they skip URL constructor validation if they have a valid protocol),
+	// but testing them in the jsdom environment is problematic as the native
+	// URL constructor behavior may differ. These URLs are covered by the
+	// isURLLike validation which checks for valid protocols.
+} );
+
+describe( 'inputValue prop', () => {
+	it( 'should use inputValue as initial value when no link value is provided', () => {
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'wordpress' );
+	} );
+
+	it( 'should not use inputValue when value.url is provided', () => {
+		const value = {
+			url: 'https://example.com',
+		};
+
+		render(
+			<LinkControl
+				value={ value }
+				inputValue="wordpress"
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'https://example.com' );
+	} );
+
+	it( 'should respect user input over inputValue after user types', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from inputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User types something
+		await user.clear( searchInput );
+		await user.type( searchInput, 'example' );
+
+		expect( searchInput.value ).toBe( 'example' );
+	} );
+
+	it( 'should respect empty string after user clears input, not revert to inputValue', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from inputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User clears the input
+		await user.clear( searchInput );
+
+		// Should be empty, NOT revert to "wordpress"
+		expect( searchInput.value ).toBe( '' );
+	} );
+
+	it( 'should call onInputChange when user types, with observable pattern', async () => {
+		const user = userEvent.setup();
+		const onInputChange = jest.fn();
+
+		render(
+			<LinkControl
+				inputValue="wordpress"
+				onInputChange={ onInputChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// User types
+		await user.type( searchInput, 'test' );
+
+		// onInputChange should be called for each character typed
+		expect( onInputChange ).toHaveBeenCalled();
+		// Last call should have the full value
+		expect( onInputChange ).toHaveBeenLastCalledWith( 'wordpresstest' );
+	} );
+} );
+
 function getSettingsDrawerToggle() {
 	return screen.queryByRole( 'button', {
 		name: 'Advanced',
@@ -3244,3 +3622,119 @@ async function toggleSettingsDrawer( user ) {
 
 	await user.click( settingsToggle );
 }
+
+describe( 'Link preview with entity data from navigation blocks', () => {
+	describe( 'Featured image display', () => {
+		it( 'should display featured image in link preview when entity provides image', () => {
+			const linkWithImage = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				image: 'https://example.com/featured.jpg',
+			};
+
+			render( <LinkControl value={ linkWithImage } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const imagePreview = linkPreview.querySelector(
+				'.block-editor-link-control__preview-image img'
+			);
+
+			expect( imagePreview ).toBeInTheDocument();
+			expect( imagePreview ).toHaveAttribute(
+				'src',
+				'https://example.com/featured.jpg'
+			);
+		} );
+
+		it( 'should not display featured image section when entity has no image', () => {
+			const linkWithoutImage = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+			};
+
+			render( <LinkControl value={ linkWithoutImage } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const imagePreview = linkPreview.querySelector(
+				'.block-editor-link-control__preview-image'
+			);
+
+			expect( imagePreview ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Entity status badges', () => {
+		it( 'should display badges in link preview when entity provides badges', () => {
+			const linkWithBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				badges: [
+					{ label: 'Draft', intent: 'warning' },
+					{ label: 'Page', intent: 'default' },
+				],
+			};
+
+			render( <LinkControl value={ linkWithBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).toBeInTheDocument();
+		} );
+
+		it( 'should not display badges section when entity provides no badges', () => {
+			const linkWithoutBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+			};
+
+			render( <LinkControl value={ linkWithoutBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not display badges section when entity provides empty badges array', () => {
+			const linkWithEmptyBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				badges: [],
+			};
+
+			render( <LinkControl value={ linkWithEmptyBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).not.toBeInTheDocument();
+		} );
+	} );
+} );

@@ -47,6 +47,7 @@ const userList = [
 		password: 'sm1lingsmyfavorite',
 	},
 ];
+
 test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all(
@@ -61,18 +62,14 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-autocompleter' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllUsers();
-		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test.afterEach( async ( { editor } ) => {
-		await editor.publishPost();
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllUsers();
+		await requestUtils.deactivatePlugin( 'gutenberg-test-autocompleter' );
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	[
@@ -80,6 +77,7 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 		[ 'Custom Completer', 'option' ],
 	].forEach( ( completerAndOptionType ) => {
 		const [ completer, type ] = completerAndOptionType;
+
 		test( `${ completer }: should insert ${ type }`, async ( {
 			page,
 			editor,
@@ -159,7 +157,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 			await pageUtils.pressKeys( 'ArrowLeft', { times: 'you.'.length } );
 			await page.keyboard.type( testData.triggerString );
 			await expect(
-				page.locator( `role=option[name="${ testData.optionText }"i]` )
+				page.getByRole( 'option', {
+					name: testData.optionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( ' ' );
@@ -197,16 +198,18 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.click();
 			await page.keyboard.type( testData.firstTriggerString );
 			await expect(
-				page.locator(
-					`role=option[name="${ testData.firstOptionText }"i]`
-				)
+				page.getByRole( 'option', {
+					name: testData.firstOptionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( testData.secondTriggerString );
 			await expect(
-				page.locator(
-					`role=option[name="${ testData.secondOptionText }"i]`
-				)
+				page.getByRole( 'option', {
+					name: testData.secondOptionText,
+					selected: true,
+				} )
 			).toBeVisible();
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( '.' );
@@ -238,11 +241,10 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 				.locator( 'role=button[name="Add default block"i]' )
 				.click();
 			await page.keyboard.type( testData.triggerString );
-			await expect(
-				page.locator( `role=option[name="${ testData.optionText }"i]` )
-			).toBeVisible();
 			await page
-				.locator( `role=option[name="${ testData.optionText }"i]` )
+				.getByRole( 'option', {
+					name: testData.optionText,
+				} )
 				.click();
 
 			await expect

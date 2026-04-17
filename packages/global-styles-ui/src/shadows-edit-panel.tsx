@@ -488,7 +488,6 @@ function ShadowPopover( { shadowObj, onChange }: ShadowPopoverProps ) {
 			/>
 			<ToggleGroupControl
 				label={ __( 'Shadow Type' ) }
-				__nextHasNoMarginBottom
 				value={ shadowObj.inset ? 'inset' : 'outset' }
 				isBlock
 				onChange={ ( value ) =>

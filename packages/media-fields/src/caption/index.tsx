@@ -24,7 +24,6 @@ const captionField: Partial< Field< Updatable< Attachment > > > = {
 				value={ getRawContent( data.caption ) || '' }
 				onChange={ ( value ) => onChange( { caption: value } ) }
 				rows={ 2 }
-				__nextHasNoMarginBottom
 			/>
 		);
 	},

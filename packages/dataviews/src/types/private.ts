@@ -3,10 +3,6 @@
  */
 import type {
 	CustomValidator,
-	Field,
-	FormatDate,
-	FormatInteger,
-	FormatNumber,
 	NormalizedField,
 	Operator,
 	Validator,
@@ -16,18 +12,17 @@ export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
 export type FieldType< Item > = Pick<
 	NormalizedField< Item >,
-	'type' | 'render' | 'sort' | 'enableSorting' | 'enableGlobalSearch'
+	| 'type'
+	| 'render'
+	| 'sort'
+	| 'enableSorting'
+	| 'enableGlobalSearch'
+	| 'format'
+	| 'getValueFormatted'
 > & {
 	Edit: string | null;
 	validOperators: Operator[];
 	defaultOperators: Operator[];
-	getFormat: (
-		field: Field< Item >
-	) =>
-		| Record< string, any >
-		| Required< FormatDate >
-		| Required< FormatNumber >
-		| Required< FormatInteger >;
 	validate: {
 		required?: Validator< Item >;
 		elements?: Validator< Item >;

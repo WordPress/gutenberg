@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
 import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
@@ -182,7 +181,6 @@ function ScreenBlockList() {
 				) }
 			/>
 			<SearchControl
-				__nextHasNoMarginBottom
 				className="global-styles-ui-block-types-search"
 				onChange={ setFilterValue }
 				value={ filterValue }

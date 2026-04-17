@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -19,7 +19,7 @@ const ColorGen = ( props: {
 };
 
 const meta: Meta< typeof ColorGen > = {
-	title: 'Design System/Theme Provider/Color Scales',
+	title: 'Design System/Theme/Theme Provider/Color Scales',
 	component: ColorGen,
 	argTypes: {
 		background: {
@@ -36,7 +36,6 @@ const meta: Meta< typeof ColorGen > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

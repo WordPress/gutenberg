@@ -9,6 +9,7 @@
 	li {
 		display: inline-flex;
 		margin: 0;
+		white-space: nowrap;
 
 		.block-editor-block-breadcrumb__separator {
 			fill: currentColor;

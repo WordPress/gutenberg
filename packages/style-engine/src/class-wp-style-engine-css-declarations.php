@@ -50,7 +50,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				return $this;
 			}
 
-			// Trims the value. If empty, bail early.
+			// Bail early if value is not a string. Prevents fatal errors from malformed block markup.
+			if ( ! is_string( $value ) ) {
+				return $this;
+			}
 			$value = trim( $value );
 			if ( '' === $value ) {
 				return $this;

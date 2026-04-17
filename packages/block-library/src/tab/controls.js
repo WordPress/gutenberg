@@ -5,62 +5,60 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import {
+	CheckboxControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import AddTabToolbarControl from './add-tab-toolbar-control';
-import slugFromLabel from './slug-from-label';
+import RemoveTabToolbarControl from './remove-tab-toolbar-control';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-export default function Controls( {
-	attributes,
-	setAttributes,
-	tabsClientId,
-	blockIndex,
-	isDefaultTab,
-} ) {
-	const { label } = attributes;
-
+export default function Controls( { tabsClientId, blockIndex, isDefaultTab } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-				attributes={ attributes }
-			/>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Tab Settings' ) }>
-					<TextControl
-						label={ __( 'Tab Label' ) }
-						value={ decodeEntities( label ) }
-						onChange={ ( value ) => {
-							setAttributes( {
-								label: value,
-								anchor: slugFromLabel( value, blockIndex ),
-							} );
-						} }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-					/>
-					<ToggleControl
-						label={ __( 'Default Tab' ) }
-						checked={ isDefaultTab }
-						onChange={ ( value ) => {
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						updateBlockAttributes( tabsClientId, {
+							activeTabIndex: 0,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Default tab' ) }
+						hasValue={ () => isDefaultTab && blockIndex !== 0 }
+						onDeselect={ () => {
 							updateBlockAttributes( tabsClientId, {
-								activeTabIndex: value ? blockIndex : 0,
+								activeTabIndex: 0,
 							} );
 						} }
-						help={ __(
-							'If toggled, this tab will be selected when the page loads.'
-						) }
-						__nextHasNoMarginBottom
-					/>
-				</PanelBody>
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Default tab' ) }
+							checked={ isDefaultTab }
+							onChange={ ( value ) => {
+								updateBlockAttributes( tabsClientId, {
+									activeTabIndex: value ? blockIndex : 0,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 		</>
 	);

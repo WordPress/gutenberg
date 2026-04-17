@@ -67,6 +67,12 @@ function gutenberg_get_experiments() {
 			'group'       => 'media',
 		),
 		array(
+			'id'          => 'gutenberg-media-editor',
+			'label'       => __( 'Media Editor', 'gutenberg' ),
+			'description' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
+			'group'       => 'media',
+		),
+		array(
 			'id'          => 'gutenberg-sync-collaboration',
 			'label'       => __( 'Add real time editing', 'gutenberg' ),
 			'description' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
@@ -88,6 +94,12 @@ function gutenberg_get_experiments() {
 			'id'          => 'gutenberg-dataviews-media-modal',
 			'label'       => __( 'New media modal', 'gutenberg' ),
 			'description' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
+			'group'       => 'data-views',
+		),
+		array(
+			'id'          => 'gutenberg-dataform-inspector',
+			'label'       => __( 'Editor Inspector: Use DataForm', 'gutenberg' ),
+			'description' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
 			'group'       => 'data-views',
 		),
 		array(
@@ -118,6 +130,18 @@ function gutenberg_get_experiments() {
 			'id'          => 'gutenberg-workflow-palette',
 			'label'       => __( 'Workflow Palette', 'gutenberg' ),
 			'description' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
+			'group'       => 'other',
+		),
+		array(
+			'id'          => 'gutenberg-extensible-site-editor',
+			'label'       => __( 'Extensible Site Editor', 'gutenberg' ),
+			'description' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+			'group'       => 'other',
+		),
+		array(
+			'id'          => 'gutenberg-guidelines',
+			'label'       => __( 'Guidelines', 'gutenberg' ),
+			'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
 			'group'       => 'other',
 		),
 		array(

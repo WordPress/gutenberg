@@ -121,7 +121,6 @@ export default function CustomValueControls( {
 				value={ parsedQuantity }
 				withInputField={ false }
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			/>
 		</>
 	);

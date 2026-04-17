@@ -8,7 +8,7 @@ import type {
 	SortDirection,
 } from '../types';
 import type { FieldType } from '../types/private';
-import { getControl } from '../dataform-controls';
+import { getControl } from '../components/dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';
@@ -28,6 +28,8 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
+import getFilter from './utils/get-filter';
+import getFormat from './utils/get-format';
 
 /**
  *
@@ -94,6 +96,10 @@ export default function normalizeFields< Item >(
 			getElements: field.getElements,
 			hasElements: hasElements( field ),
 			isVisible: field.isVisible,
+			isDisabled:
+				typeof field.isDisabled === 'function'
+					? field.isDisabled
+					: () => !! field.isDisabled,
 			enableHiding: field.enableHiding ?? true,
 			readOnly: field.readOnly ?? false,
 			// The type provides defaults for the following props
@@ -110,7 +116,10 @@ export default function normalizeFields< Item >(
 				fieldType.defaultOperators,
 				fieldType.validOperators
 			),
-			format: fieldType.getFormat( field ),
+			filter: getFilter( fieldType ),
+			format: getFormat( field, fieldType ),
+			getValueFormatted:
+				field.getValueFormatted ?? fieldType.getValueFormatted,
 		};
 	} );
 }

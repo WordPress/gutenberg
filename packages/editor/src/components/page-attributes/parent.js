@@ -60,7 +60,7 @@ export const getItemPriority = ( name, searchValue ) => {
  */
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( editorStore );
-	const [ fieldValue, setFieldValue ] = useState( false );
+	const [ fieldValue, setFieldValue ] = useState( '' );
 	const {
 		isHierarchical,
 		parentPostId,
@@ -194,7 +194,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }

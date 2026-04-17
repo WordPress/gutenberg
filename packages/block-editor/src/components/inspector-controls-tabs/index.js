@@ -6,9 +6,9 @@ import {
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,9 +17,10 @@ import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW, TAB_CONTENT } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
+import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -31,51 +32,140 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
+	const listViewRef = useRef( null );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
-	// The tabs panel will mount before fills are rendered to the list view
-	// slot. This means the list view tab isn't initially included in the
-	// available tabs so the panel defaults selection to the settings tab
-	// which at the time is the first tab. This check allows blocks known to
-	// include the list view tab to set it as the tab selected by default.
-	const initialTabName = ! useIsListViewTabDisabled( blockName )
-		? TAB_LIST_VIEW.name
-		: undefined;
+	// Get any requested inspector tab (used for initial state when programmatically switching)
+	const { requestedTab } = useSelect( ( select ) => ( {
+		requestedTab: unlock(
+			select( blockEditorStore )
+		).getRequestedInspectorTab(),
+	} ) );
 
 	const [ selectedTabId, setSelectedTabId ] = useState(
-		initialTabName ?? tabs[ 0 ]?.name
+		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
+	);
+	const hasUserSelectionRef = useRef( false );
+	const isProgrammaticSwitchRef = useRef( false );
+	const {
+		__unstableSetOpenListViewPanel: setOpenListViewPanel,
+		__unstableIncrementListViewExpandRevision:
+			incrementListViewExpandRevision,
+		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
+	} = useDispatch( blockEditorStore );
+	const { clearRequestedInspectorTab } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
-	// When the active tab is not amongst the available `tabs`, it indicates
-	// the list of tabs was changed dynamically with the active one being
-	// removed. Set the active tab back to the first tab.
+	// Reset when switching blocks
 	useEffect( () => {
-		// Skip this behavior if `initialTabName` is supplied. In the navigation
-		// block, the list view tab isn't present in `tabs` initially. The early
-		// return here prevents the dynamic behavior that follows from overriding
-		// `initialTabName`.
-		if ( initialTabName ) {
+		hasUserSelectionRef.current = false;
+	}, [ clientId ] );
+
+	// Handle explicit inspector tab requests (panel opening, refs, clear).
+	// Tab state is initialized from requestedTab above.
+	useEffect( () => {
+		if ( ! requestedTab ) {
 			return;
 		}
 
-		if ( tabs?.length && selectedTabId ) {
-			const activeTab = tabs.find(
-				( tab ) => tab.name === selectedTabId
-			);
-			if ( ! activeTab ) {
-				setSelectedTabId( tabs[ 0 ].name );
-			}
+		// Switch to the requested tab
+		setSelectedTabId( requestedTab.tabName );
+
+		// Handle tab-specific options
+		if (
+			requestedTab.tabName === TAB_LIST_VIEW.name &&
+			requestedTab.options?.openPanel
+		) {
+			// Open the specific panel for List View
+			setOpenListViewPanel( requestedTab.options.openPanel );
+			incrementListViewExpandRevision();
 		}
-	}, [ tabs, selectedTabId, initialTabName ] );
+
+		// Mark as handled (programmatic switch)
+		isProgrammaticSwitchRef.current = true;
+		hasUserSelectionRef.current = true;
+
+		// Clear the request
+		clearRequestedInspectorTab();
+	}, [
+		requestedTab,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+		clearRequestedInspectorTab,
+	] );
+
+	// Initialize List View panels when the tab is selected and clientId changes
+	useEffect( () => {
+		if (
+			selectedTabId === TAB_LIST_VIEW.name &&
+			! hasUserSelectionRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+	}, [
+		clientId,
+		selectedTabId,
+		setAllListViewPanelsOpen,
+		incrementListViewExpandRevision,
+	] );
+
+	// Auto-select first available tab unless user has made a selection
+	useEffect( () => {
+		if (
+			! tabs?.length ||
+			( hasUserSelectionRef.current &&
+				tabs.some( ( tab ) => tab.name === selectedTabId ) )
+		) {
+			return;
+		}
+
+		const firstTabName = tabs[ 0 ]?.name;
+		if ( selectedTabId !== firstTabName ) {
+			setSelectedTabId( firstTabName );
+		}
+	}, [ tabs, selectedTabId ] );
+
+	const handleTabSelect = ( tabId ) => {
+		setSelectedTabId( tabId );
+		hasUserSelectionRef.current = true;
+
+		// If manually switching to List View tab (not via click-through), open all panels
+		if (
+			tabId === TAB_LIST_VIEW.name &&
+			! isProgrammaticSwitchRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+
+		// Reset the flag
+		isProgrammaticSwitchRef.current = false;
+	};
+
+	const hasListViewTab = tabs.some(
+		( tab ) => tab.name === TAB_LIST_VIEW.name
+	);
+
+	const switchToListView = ( targetClientId ) => {
+		if ( hasListViewTab ) {
+			// Open only the target panel
+			setOpenListViewPanel( targetClientId );
+			incrementListViewExpandRevision();
+			// Mark this as a programmatic switch
+			isProgrammaticSwitchRef.current = true;
+			handleTabSelect( TAB_LIST_VIEW.name );
+		}
+	};
 
 	return (
 		<div className="block-editor-block-inspector__tabs">
 			<Tabs
-				defaultTabId={ initialTabName }
 				selectedTabId={ selectedTabId }
-				onSelect={ setSelectedTabId }
+				onSelect={ handleTabSelect }
 				key={ clientId }
 			>
 				<Tabs.TabList>
@@ -96,6 +186,18 @@ export default function InspectorControlsTabs( {
 						)
 					) }
 				</Tabs.TabList>
+				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
+					<InspectorControls.Slot group="content" />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+					<InspectorControls.Slot group="list" ref={ listViewRef } />
+					<ListViewContentPopover listViewRef={ listViewRef } />
+				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab showAdvancedControls={ !! blockName } />
 				</Tabs.TabPanel>
@@ -107,15 +209,6 @@ export default function InspectorControlsTabs( {
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
 					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<ContentTab
-						rootClientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
-					<InspectorControls.Slot group="list" />
 				</Tabs.TabPanel>
 			</Tabs>
 		</div>

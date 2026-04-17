@@ -80,9 +80,9 @@ The following configurable variables are used with the template files. Template 
 
 -   `pluginURI` (no default) – the home page of the plugin.
 -   `version` (default: `'0.1.0'`) – the current version number of the plugin.
--   `requiresAtLeast` (default: `'6.7'`) – the lowest WordPress version that the plugin will work on.
+-   `requiresAtLeast` (default: `'6.8'`) – the lowest WordPress version that the plugin will work on.
 -   `requiresPHP` (default: `'7.4'`) – the minimum required PHP version for use with this plugin.
--   `testedUpTo` (default: `'6.7'`) – the highest WordPress version that the plugin has been tested against.
+-   `testedUpTo` (default: `'6.8'`) – the highest WordPress version that the plugin has been tested against.
 -   `author` (default: `'The WordPress Contributors'`) – the name of the plugin author(s).
 -   `license` (default: `'GPL-2.0-or-later'`) – the short name of the plugin’s license.
 -   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`) – a link to the full text of the license.

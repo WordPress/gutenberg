@@ -113,6 +113,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const {
@@ -138,21 +139,36 @@ export default {
 			}
 		}
 
+		// Use the global blockGap value as fallback when available.
+		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations.
+		let fallbackGapValue = '1.2rem';
+		if ( globalBlockGapValue ) {
+			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
+			const gapParts = processedGap.split( ' ' );
+			fallbackGapValue =
+				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+		}
+
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
 		const blockGapValue =
 			style?.spacing?.blockGap &&
 			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
 				: undefined;
 
 		let output = '';
 		const rules = [];
 
 		if ( minimumColumnWidth && columnCount > 0 ) {
-			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
-				blockGapValue || '1.2rem'
-			}*${ columnCount - 1 }) ) / ${ columnCount })`;
+			let blockGapToUse = blockGapValue || fallbackGapValue;
+			// Ensure 0 values have a unit so they work in calc().
+			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
+				blockGapToUse = '0px';
+			}
+			const maxValue = `max(min( ${ minimumColumnWidth }, 100%), ( 100% - (${ blockGapToUse }*${
+				columnCount - 1
+			}) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
 				`container-type: inline-size`
@@ -267,7 +283,6 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				<FlexItem isBlock>
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -356,7 +371,6 @@ function GridLayoutColumnsAndRowsControl( {
 						) : (
 							<RangeControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								value={ columnCount ?? 1 }
 								onChange={ ( value ) =>
 									onChange( {
@@ -429,7 +443,6 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
 			onChange={ onChangeType }

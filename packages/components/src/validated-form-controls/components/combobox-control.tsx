@@ -19,7 +19,7 @@ const UnforwardedValidatedComboboxControl = (
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof ComboboxControl >,
-		'__next40pxDefaultSize' | '__nextHasNoMarginBottom'
+		'__next40pxDefaultSize'
 	> &
 		ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
@@ -52,11 +52,7 @@ const UnforwardedValidatedComboboxControl = (
 				)
 			}
 		>
-			<ComboboxControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				{ ...restProps }
-			/>
+			<ComboboxControl __next40pxDefaultSize { ...restProps } />
 		</ControlWithError>
 	);
 };
@@ -64,3 +60,4 @@ const UnforwardedValidatedComboboxControl = (
 export const ValidatedComboboxControl = forwardRef(
 	UnforwardedValidatedComboboxControl
 );
+ValidatedComboboxControl.displayName = 'ValidatedComboboxControl';

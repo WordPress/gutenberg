@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -29,6 +29,11 @@ const meta: Meta< typeof CustomSelectControl > = {
 		controls: { expanded: true },
 		docs: {
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 	decorators: [
@@ -57,6 +62,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 	return (
 		<CustomSelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ onChange }
 			value={ value }

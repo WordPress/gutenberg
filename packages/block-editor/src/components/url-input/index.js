@@ -16,6 +16,7 @@ import {
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	compose,
@@ -30,6 +31,9 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 /**
  * Whether the argument is a function.
@@ -53,6 +57,7 @@ class URLInput extends Component {
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = props.inputRef || createRef();
+		this.hasRenderedValidation = { current: false };
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -426,6 +431,8 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
+			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -450,8 +457,10 @@ class URLInput extends Component {
 		const inputProps = {
 			id: inputId,
 			value,
-			required: true,
+			required: this.props.required ?? true,
 			type: 'text',
+			name: inputId,
+			autoComplete: 'off',
 			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
 			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
@@ -471,13 +480,38 @@ class URLInput extends Component {
 			help,
 		};
 
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
+		};
+
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		// Use ValidatedInputControl if customValidity has ever had a non-undefined value.
+		if ( customValidity !== undefined ) {
+			this.hasRenderedValidation.current = true;
+		}
+
+		const MaybeValidatedInputControl = this.hasRenderedValidation.current
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
-			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<InputControl { ...inputProps } __next40pxDefaultSize />
+			<BaseControl { ...controlProps }>
+				<MaybeValidatedInputControl
+					{ ...inputProps }
+					{ ...( this.hasRenderedValidation.current
+						? validationProps
+						: {} ) }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

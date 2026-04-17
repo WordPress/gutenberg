@@ -147,7 +147,6 @@ function SingleTrackEditor( {
 			<VStack spacing="4">
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }
@@ -161,7 +160,6 @@ function SingleTrackEditor( {
 				/>
 				<ToggleControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Set as default track' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }

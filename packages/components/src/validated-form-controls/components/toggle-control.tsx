@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -19,23 +19,11 @@ const UnforwardedValidatedToggleControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof ToggleControl >,
-		'__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
-
-	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
-	// so we need to set it manually.
-	useEffect( () => {
-		if ( validityTargetRef.current ) {
-			validityTargetRef.current.required = required ?? false;
-		}
-	}, [ required ] );
 
 	return (
 		<ControlWithError
@@ -45,8 +33,8 @@ const UnforwardedValidatedToggleControl = (
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				ref={ mergedRefs }
+				required={ required }
 				{ ...restProps }
 			/>
 		</ControlWithError>
@@ -56,3 +44,4 @@ const UnforwardedValidatedToggleControl = (
 export const ValidatedToggleControl = forwardRef(
 	UnforwardedValidatedToggleControl
 );
+ValidatedToggleControl.displayName = 'ValidatedToggleControl';

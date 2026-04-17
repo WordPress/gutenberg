@@ -23,7 +23,7 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		// @ts-expect-error - Prevent passing this to `input`.
+		// Prevent passing this to `input`.
 		__nextHasNoMarginBottom: _,
 		__next40pxDefaultSize = false,
 		label,
@@ -48,7 +48,6 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -93,5 +92,6 @@ function UnforwardedTextControl(
  * ```
  */
 export const TextControl = forwardRef( UnforwardedTextControl );
+TextControl.displayName = 'TextControl';
 
 export default TextControl;

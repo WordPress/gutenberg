@@ -76,7 +76,7 @@ export async function visitSiteEditor(
 				// doesn't make it under the default timeout value.
 				timeout: 60_000,
 			} );
-		} catch ( error ) {
+		} catch {
 			// If the canvas loader is already disappeared, skip the waiting.
 			await this.page
 				.getByRole( 'region', { name: 'Editor content' } )

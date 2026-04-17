@@ -179,6 +179,15 @@ export interface FormTokenFieldProps
 	 */
 	__experimentalRenderItem?: ( args: { item: string } ) => ReactNode;
 	/**
+	 * Start opting into the new margin-free styles that will become the default in a future version.
+	 *
+	 * @deprecated Default behavior since WP 7.0. Prop can be safely removed.
+	 * @ignore
+	 *
+	 * @default false
+	 */
+	__nextHasNoMarginBottom?: boolean;
+	/**
 	 * If true, add any incompleteTokenValue as a new token when the field loses focus.
 	 *
 	 * @default false

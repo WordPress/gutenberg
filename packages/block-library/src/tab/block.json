@@ -5,7 +5,6 @@
 	"name": "core/tab",
 	"title": "Tab",
 	"description": "Content for a tab in a tabbed interface.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"attributes": {
@@ -14,19 +13,25 @@
 			"default": ""
 		}
 	},
-	"parent": [ "core/tabs" ],
+	"parent": [ "core/tab-panel" ],
+	"usesContext": [
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-id"
+	],
 	"supports": {
 		"anchor": true,
 		"html": false,
 		"reusable": false,
-		"layout": {
-			"allowSwitching": true,
-			"allowInheriting": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true,
-			"allowSizingOnChildren": true
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
 		},
+		"layout": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,
@@ -38,9 +43,10 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"__experimentalFontFamily": true
-			},
-			"__experimentalSkipSerialization": true
-		}
+			}
+		},
+		"renaming": true,
+		"visibility": false
 	},
 	"providesContext": {
 		"core/tab-label": "label"

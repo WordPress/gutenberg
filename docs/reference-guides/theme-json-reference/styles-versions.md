@@ -48,6 +48,7 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.margin.left`         | 5.8 | 5.9 |
 | `spacing.margin.bottom`       | 5.8 | 5.9 |
 | `spacing.blockGap`            | 5.9 | 5.9 |
+| `dimensions.height`           | 7.0 | N/A |
 | `dimensions.minHeight`        | 6.2 | N/A |
 | `dimensions.width`            | 7.0 | N/A |
 | `outline.color`               | 6.2 | N/A |

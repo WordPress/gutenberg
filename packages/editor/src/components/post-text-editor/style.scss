@@ -39,15 +39,7 @@ textarea.editor-post-text-editor {
 		position: relative;
 	}
 
-	&::-webkit-input-placeholder {
-		color: $dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
+	&::placeholder {
 		color: $dark-gray-placeholder;
 	}
 }

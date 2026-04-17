@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import styled from '@emotion/styled';
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -29,7 +29,6 @@ import { createSlotFill, Provider as SlotFillProvider } from '../../slot-fill';
 const meta: Meta< typeof ToolsPanel > = {
 	title: 'Components/ToolsPanel',
 	component: ToolsPanel,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { ToolsPanelItem },
 	argTypes: {
 		as: { control: false },
@@ -46,6 +45,10 @@ const meta: Meta< typeof ToolsPanel > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -116,7 +119,6 @@ export const Default: StoryFn< typeof ToolsPanel > = ( {
 						onDeselect={ () => setScale( undefined ) }
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }
@@ -472,7 +474,6 @@ export const WithConditionalDefaultControl: StoryFn< typeof ToolsPanel > = ( {
 					isShownByDefault={ !! height }
 				>
 					<ToggleGroupControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label="Scale"
 						value={ scale }
@@ -576,7 +577,6 @@ export const WithConditionallyRenderedControl: StoryFn<
 						isShownByDefault
 					>
 						<ToggleGroupControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label="Scale"
 							value={ scale }

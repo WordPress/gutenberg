@@ -22,7 +22,7 @@ import OverlayMenuIcon from './overlay-menu-icon';
  * @param {boolean}  props.hasIcon       Whether the overlay menu has an icon.
  * @param {string}   props.icon          Icon type for overlay menu.
  * @param {Function} props.setAttributes Function to update block attributes.
- * @return {JSX.Element}                The overlay menu preview controls.
+ * @return {React.JSX.Element}                The overlay menu preview controls.
  */
 export default function OverlayMenuPreviewControls( {
 	hasIcon,
@@ -32,7 +32,6 @@ export default function OverlayMenuPreviewControls( {
 	return (
 		<VStack spacing={ 4 }>
 			<ToggleControl
-				__nextHasNoMarginBottom
 				label={ __( 'Show icon button' ) }
 				help={ __(
 					'Configure the visual appearance of the button that toggles the overlay menu.'
@@ -42,7 +41,6 @@ export default function OverlayMenuPreviewControls( {
 			/>
 			<ToggleGroupControl
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 				className="wp-block-navigation__overlay-menu-icon-toggle-group"
 				label={ __( 'Icon' ) }
 				value={ icon }

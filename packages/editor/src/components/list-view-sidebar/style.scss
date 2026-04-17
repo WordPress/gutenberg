@@ -22,8 +22,10 @@
 	// This allows items in the list view to have equidistant padding left and right
 	// right up until a scrollbar is present.
 	scrollbar-gutter: auto;
+}
 
-	// The table cells use an extra pixels of space left and right. We compensate for that here.
+// The table cells use an extra pixels of space left and right. We compensate for that here.
+.editor-list-view-sidebar__list-view-panel-content {
 	padding: $grid-unit-05;
 }
 
@@ -31,6 +33,10 @@
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+
+	> .document-outline {
+		padding: $grid-unit-20;
+	}
 }
 
 .editor-list-view-sidebar__tab-panel {

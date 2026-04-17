@@ -2,29 +2,37 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalInputControl as InputControl,
-	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
-import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { linkOff as unlinkIcon } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from './update-attributes';
+import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
+import { getSuggestionsQuery } from '../link-ui';
+import { useLinkPreview } from './use-link-preview';
+import { useIsInvalidLink } from './use-is-invalid-link';
+import { unlock } from '../../lock-unlock';
+
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -63,63 +71,91 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props               - Component props
- * @param {Object}   props.attributes    - Block attributes
- * @param {Function} props.setAttributes - Function to update block attributes
- * @param {string}   props.clientId      - Block client ID
+ * @param {Object}   props                - Component props
+ * @param {Object}   props.attributes     - Block attributes
+ * @param {Function} props.setAttributes  - Function to update block attributes
+ * @param {string}   props.clientId       - Block client ID
+ * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
  */
-export function Controls( { attributes, setAttributes, clientId } ) {
+export function Controls( {
+	attributes,
+	setAttributes,
+	clientId,
+	isLinkEditable = true,
+} ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const urlInputRef = useRef();
-	const shouldFocusURLInputRef = useRef( false );
-	const inputId = useInstanceId( Controls, 'link-input' );
-	const helpTextId = `${ inputId }__help`;
 
-	// Local state to control the input value
-	const [ inputValue, setInputValue ] = useState( url );
-
-	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
-	useEffect( () => {
-		setInputValue( url );
-		lastURLRef.current = url;
-	}, [ url ] );
-
-	// Use the entity binding hook internally
-	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
+	// Use the entity binding hook for UI state (help text, link preview, etc.)
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
 		useEntityBinding( {
 			clientId,
 			attributes,
 		} );
 
-	// Get direct store dispatch to bypass setBoundAttributes wrapper
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		attributes.kind,
+		attributes.type,
+		entityRecord?.id,
+		hasUrlBinding
+	);
 
-	const unsyncBoundLink = () => {
-		// Clear the binding first
-		clearBinding();
+	let helpText = '';
 
-		// Use direct store dispatch to bypass block bindings safeguards
-		// which prevent updates to bound attributes when calling setAttributes.
-		// setAttributes is actually setBoundAttributes, a wrapper function that
-		// processes attributes through the binding system.
-		// See: packages/block-editor/src/components/block-edit/edit.js
-		updateBlockAttributes( clientId, {
-			url: lastURLRef.current, // set the lastURLRef as the new editable value so we avoid bugs from empty link states
-			id: undefined,
+	if ( isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ) ) {
+		// Show invalid link help text for:
+		// 1. Invalid post-type links (trashed/deleted posts/pages) - via useIsInvalidLink
+		// 2. Missing bound taxonomy entities (deleted categories/tags) - useIsInvalidLink only checks post-types
+		helpText = getInvalidLinkHelpText();
+	} else if ( isDraft ) {
+		helpText = getDraftHelpText( {
+			type: attributes.type,
+			kind: attributes.kind,
 		} );
-	};
+	}
+	// Get the link change handler with built-in binding management
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
+	} );
 
-	useEffect( () => {
-		// Only want to focus the input if the url is not bound to an entity.
-		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
-			// focuses and highlights the url input value, giving the user
-			// the ability to delete the value quickly or edit it.
-			urlInputRef.current?.select();
-		}
-		shouldFocusURLInputRef.current = false;
-	}, [ hasUrlBinding ] );
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
+	const blockEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
+		[ clientId ]
+	);
+
+	const isContentOnly = blockEditingMode === 'contentOnly';
+
+	const preview = useLinkPreview( {
+		url,
+		entityRecord,
+		type: attributes.type,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
+
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		!! url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
 		<ToolsPanel
@@ -152,136 +188,92 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				/>
 			</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
-				isShownByDefault
-			>
-				<InputControl
-					ref={ urlInputRef }
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					id={ inputId }
-					label={ __( 'Link' ) }
-					value={ ( () => {
-						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
-							return '';
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								id: undefined,
+								kind: undefined,
+								type: undefined,
+							} )
 						}
-						return inputValue ? safeDecodeURI( inputValue ) : '';
-					} )() }
-					autoComplete="off"
-					type="url"
-					disabled={ hasUrlBinding }
-					aria-invalid={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'true'
-							: undefined
-					}
-					aria-describedby={ helpTextId }
-					className={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'navigation-link-control__input-with-error-suffix'
-							: undefined
-					}
-					onChange={ ( newValue ) => {
-						if ( isBoundEntityAvailable ) {
-							return;
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ handleLinkChange }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
+							) }
+							label={ __( 'Link to' ) }
+							help={ helpText ? helpText : undefined }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
 						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
 
-						// Defer updating the url attribute until onBlur to prevent the canvas from
-						// treating a temporary empty value as a committed value, which replaces the
-						// label with placeholder text.
-						setInputValue( newValue );
-					} }
-					onFocus={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-						lastURLRef.current = url;
-					} }
-					onBlur={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-
-						const finalValue = ! inputValue
-							? lastURLRef.current
-							: inputValue;
-
-						// Update local state immediately so input reflects the reverted value if the value was cleared
-						setInputValue( finalValue );
-
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes( { url: finalValue }, setAttributes, {
-							...attributes,
-							url: lastURLRef.current,
-						} );
-					} }
-					help={
-						hasUrlBinding && ! isBoundEntityAvailable ? (
-							<MissingEntityHelp
-								id={ helpTextId }
-								type={ attributes.type }
-								kind={ attributes.kind }
-							/>
-						) : (
-							isBoundEntityAvailable && (
-								<BindingHelpText
-									type={ attributes.type }
-									kind={ attributes.kind }
-								/>
-							)
-						)
-					}
-					suffix={
-						hasUrlBinding && (
+					{ !! url &&
+						hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
 							<Button
-								icon={ unlinkIcon }
+								variant="secondary"
 								onClick={ () => {
-									unsyncBoundLink();
-									// Focus management to send focus to the URL input
-									// on next render after disabled state is removed.
-									shouldFocusURLInputRef.current = true;
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
 								} }
-								aria-describedby={ helpTextId }
-								showTooltip
-								label={ __( 'Unsync and edit' ) }
 								__next40pxDefaultSize
-								className={
-									hasUrlBinding && ! isBoundEntityAvailable
-										? 'navigation-link-control__error-suffix-button'
-										: undefined
-								}
-							/>
-						)
-					}
-				/>
-			</ToolsPanelItem>
-
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
+								className="navigation-link-to__action-button"
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
+						>
+							{ __( 'View' ) }
+						</Button>
+					) }
+				</>
+			) }
 
 			<ToolsPanelItem
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
 				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextareaControl
-					__nextHasNoMarginBottom
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {
@@ -297,7 +289,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! rel }
 				label={ __( 'Rel attribute' ) }
 				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
 					__next40pxDefaultSize
@@ -315,45 +307,32 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		</ToolsPanel>
 	);
 }
-
 /**
- * Component to display help text for bound URL attributes.
+ * Returns help text for invalid links.
  *
- * @param {Object} props      - Component props
- * @param {string} props.type - The entity type
- * @param {string} props.kind - The entity kind
- * @return {string} Help text for the bound URL
+ * @return {string} Error help text string (empty string if valid).
  */
-export function BindingHelpText( { type, kind } ) {
-	const entityType = getEntityTypeName( type, kind );
-	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced with the selected %s.' ),
-		entityType
+export function getInvalidLinkHelpText() {
+	return __(
+		'This link is invalid and will not appear on your site. Please update the link.'
 	);
 }
 
 /**
- * Component to display error help text for missing entity bindings.
+ * Returns the help text for links to draft entities
  *
- * @param {Object} props      - Component props
+ * @param {Object} props      - Function props
  * @param {string} props.type - The entity type
  * @param {string} props.kind - The entity kind
- * @return {JSX.Element} Error help text component
+ * @return {string} Draft help text
  */
-export function MissingEntityHelpText( { type, kind } ) {
+function getDraftHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced %s is missing. Please update or remove this link.' ),
+		/* translators: %1$s is the entity type (e.g., "page", "post", "category") */
+		__(
+			'This link is to a draft %1$s and will not appear on your site until the %1$s is published.'
+		),
 		entityType
-	);
-}
-
-function MissingEntityHelp( { id, type, kind } ) {
-	return (
-		<span id={ id } className="navigation-link-control__error-text">
-			<MissingEntityHelpText type={ type } kind={ kind } />
-		</span>
 	);
 }

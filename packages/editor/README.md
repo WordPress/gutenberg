@@ -341,17 +341,7 @@ _Returns_
 
 ### EditorNotices
 
-This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
-
-_Usage_
-
-```jsx
-<EditorNotices />
-```
-
-_Returns_
-
--   `React.ReactNode`: The rendered EditorNotices component.
+> **Deprecated** since 7.0, use `wp.notices.InlineNotices` instead.
 
 ### EditorProvider
 
@@ -387,11 +377,7 @@ _Returns_
 
 ### EditorSnackbars
 
-Renders the editor snackbars component.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+> **Deprecated** since 7.0, use `wp.notices.SnackbarNotices` instead.
 
 ### EntitiesSavedStates
 
@@ -442,11 +428,11 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 ### getTemplatePartIcon
 
-Helper function to retrieve the corresponding icon by area name or icon name.
+Helper function to retrieve the corresponding icon by area name.
 
 _Parameters_
 
--   _areaOrIconName_ `string`: The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
+-   _areaOrIconName_ `string`: The area name (e.g., 'header', 'navigation-overlay').
 
 _Returns_
 
@@ -467,6 +453,14 @@ _Returns_
 ### InspectorControls
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InspectorControls` instead.
+
+### linkAutocompleter
+
+A link completer for posts and pages.
+
+_Type_
+
+-   `Object`
 
 ### LocalAutosaveMonitor
 
@@ -1267,7 +1261,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').ComponentType`: The component.
+-   `React.ComponentType`: The component.
 
 ### PostSchedule
 

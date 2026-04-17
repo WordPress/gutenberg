@@ -29,7 +29,13 @@ const transforms = {
 						),
 						content,
 						anchor,
-						textAlign,
+						...( textAlign && {
+							style: {
+								typography: {
+									textAlign,
+								},
+							},
+						} ),
 					} );
 				} ),
 		},
@@ -64,7 +70,13 @@ const transforms = {
 					textAlign === 'center' ||
 					textAlign === 'right'
 				) {
-					attributes.align = textAlign;
+					attributes.style = {
+						...attributes.style,
+						typography: {
+							...attributes.style?.typography,
+							textAlign,
+						},
+					};
 				}
 
 				return createBlock( 'core/heading', attributes );
@@ -93,7 +105,8 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( attributes ) =>
 				attributes.map( ( _attributes ) => {
-					const { content, textAlign } = _attributes;
+					const { content, style } = _attributes;
+					const textAlign = style?.typography?.textAlign;
 					return createBlock( 'core/paragraph', {
 						...getTransformedAttributes(
 							_attributes,

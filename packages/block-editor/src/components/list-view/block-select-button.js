@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -21,7 +22,6 @@ import {
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -34,6 +34,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -61,32 +62,24 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, hasPatternName } =
-		useSelect(
-			( select ) => {
-				const { getBlockName, getBlockAttributes } =
-					select( blockEditorStore );
-				const { isBlockHidden: _isBlockHidden } = unlock(
-					select( blockEditorStore )
-				);
-				const blockAttributes = getBlockAttributes( clientId );
-				return {
-					canToggleBlockVisibility: hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					),
-					isBlockHidden: _isBlockHidden( clientId ),
-					hasPatternName: !! blockAttributes?.metadata?.patternName,
-				};
-			},
-			[ clientId ]
-		);
+	const { hasPatternName, blockVisibility } = useSelect(
+		( select ) => {
+			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
+			const attributes = getBlockAttributes( clientId );
+			return {
+				hasPatternName: !! attributes?.metadata?.patternName,
+				blockVisibility: attributes?.metadata?.blockVisibility,
+			};
+		},
+		[ clientId ]
+	);
+
 	const shouldShowLockIcon = isLocked;
-	const shouldShowBlockVisibilityIcon =
-		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+
+	// Determine visibility label from blockVisibility metadata
+	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -170,10 +163,15 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ shouldShowBlockVisibilityIcon && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
+				{ !! visibilityLabel && (
+					<Tooltip text={ visibilityLabel }>
+						<span
+							className="block-editor-list-view-block-select-button__block-visibility"
+							aria-hidden="true"
+						>
+							<Icon icon={ unseen } />
+						</span>
+					</Tooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">

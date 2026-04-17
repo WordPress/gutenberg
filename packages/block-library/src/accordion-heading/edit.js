@@ -9,7 +9,9 @@ import {
 	RichText,
 	getTypographyClassesAndStyles as useTypographyProps,
 	useSettings,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useDispatch } from '@wordpress/data';
 
 export default function Edit( { attributes, setAttributes, context } ) {
 	const { title } = attributes;
@@ -19,16 +21,24 @@ export default function Edit( { attributes, setAttributes, context } ) {
 		'core/accordion-heading-level': headingLevel,
 	} = context;
 	const TagName = 'h' + headingLevel;
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Set icon attributes.
 	useEffect( () => {
 		if ( iconPosition !== undefined && showIcon !== undefined ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				iconPosition,
 				showIcon,
 			} );
 		}
-	}, [ iconPosition, showIcon, setAttributes ] );
+	}, [
+		iconPosition,
+		showIcon,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',

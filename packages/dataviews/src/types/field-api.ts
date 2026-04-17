@@ -82,8 +82,8 @@ export type Rules< Item > = {
 	pattern?: string;
 	minLength?: number;
 	maxLength?: number;
-	min?: number;
-	max?: number;
+	min?: number | string;
+	max?: number | string;
 	custom?:
 		| ( ( item: Item, field: NormalizedField< Item > ) => null | string )
 		| ( (
@@ -104,6 +104,16 @@ export type CustomValidator< Item > =
 			field: NormalizedField< Item >
 	  ) => Promise< null | string > );
 
+export type FilterOperator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >,
+	filterValue: any
+) => boolean;
+
+export type FilterOperatorMap< Item > = Partial<
+	Record< Operator, FilterOperator< Item > >
+>;
+
 type NormalizedRule< Item, ConstraintType > = {
 	constraint: ConstraintType;
 	validate: Validator< Item >;
@@ -115,8 +125,8 @@ export type NormalizedRules< Item > = {
 	pattern?: NormalizedRule< Item, string >;
 	minLength?: NormalizedRule< Item, number >;
 	maxLength?: NormalizedRule< Item, number >;
-	min?: NormalizedRule< Item, number >;
-	max?: NormalizedRule< Item, number >;
+	min?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
+	max?: NormalizedRule< Item, number > | NormalizedRule< Item, string >;
 	custom?: CustomValidator< Item >;
 };
 
@@ -147,10 +157,21 @@ export type EditConfigText = {
 };
 
 /**
- * Edit configuration for other control types (excluding 'text' and 'textarea').
+ * Edit configuration for datetime controls.
+ */
+export type EditConfigDatetime = {
+	control: 'datetime';
+	/**
+	 * Whether to render a compact version without the calendar widget.
+	 */
+	compact?: boolean;
+};
+
+/**
+ * Edit configuration for other control types (excluding 'text', 'textarea', and 'datetime').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control: Exclude< FieldTypeName, 'text' | 'textarea' | 'datetime' >;
 };
 
 /**
@@ -160,14 +181,12 @@ export type EditConfigGeneric = {
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
+	| EditConfigDatetime
 	| EditConfigGeneric;
 
-/**
- * A dataview field for a specific property of a data type.
- */
 export type Field< Item > = {
 	/**
-	 * Type of the fields.
+	 * Type of the field.
 	 */
 	type?: FieldTypeName;
 
@@ -190,7 +209,7 @@ export type Field< Item > = {
 	/**
 	 * A description of the field.
 	 */
-	description?: string;
+	description?: string | ReactElement;
 
 	/**
 	 * Placeholder for the field.
@@ -213,7 +232,12 @@ export type Field< Item > = {
 	sort?: ( a: Item, b: Item, direction: SortDirection ) => number;
 
 	/**
-	 * Callback used to validate the field.
+	 * Validation config for the field.
+	 *
+	 * Range rules are normalized according to `type`:
+	 * - `'integer' | 'number'`: `min`/`max` accept `number`
+	 * - `'date' | 'datetime'`: `min`/`max` accept `string`
+	 * - all other field types ignore `min`/`max`
 	 */
 	isValid?: Rules< Item >;
 
@@ -221,6 +245,18 @@ export type Field< Item > = {
 	 * Callback used to decide if a field should be displayed.
 	 */
 	isVisible?: ( item: Item ) => boolean;
+
+	/**
+	 * Whether a field should be disabled.
+	 * Can be a boolean or a callback receiving the current item and field.
+	 * Defaults to false.
+	 */
+	isDisabled?:
+		| boolean
+		| ( ( args: {
+				item: Item;
+				field: NormalizedField< Item >;
+		  } ) => boolean );
 
 	/**
 	 * Whether the field is sortable.
@@ -273,14 +309,38 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate | FormatNumber | FormatInteger;
+	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+
+	/**
+	 * Callback used to format the value of the field for display.
+	 */
+	getValueFormatted?: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
+};
+
+/**
+ * Format for datetime fields:
+ *
+ * - datetime: the format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm").
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+export type FormatDatetime = {
+	datetime?: string;
+	weekStartsOn?: DayNumber;
 };
 
 /**
  * Format for date fields:
  *
- * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
- * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ * - date: the format string (e.g., 'F j, Y' for 'March 10, 2023')
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
  */
@@ -316,7 +376,10 @@ export type FormatInteger = {
 	separatorThousand?: string;
 };
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'isValid'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -329,30 +392,25 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	enableHiding: boolean;
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;
+	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
-	format: {};
+	isDisabled: ( args: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => boolean;
+	format:
+		| {}
+		| Required< FormatDate >
+		| Required< FormatInteger >
+		| Required< FormatNumber >;
+	getValueFormatted: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
-
-export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
-	type: 'date';
-	format: Required< FormatDate >;
-};
-
-export type NormalizedFieldNumber< Item > = NormalizedFieldBase< Item > & {
-	type: 'number';
-	format: Required< FormatNumber >;
-};
-
-export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
-	type: 'integer';
-	format: Required< FormatInteger >;
-};
-
-export type NormalizedField< Item > =
-	| NormalizedFieldBase< Item >
-	| NormalizedFieldDate< Item >
-	| NormalizedFieldNumber< Item >
-	| NormalizedFieldInteger< Item >;
 
 /**
  * A collection of dataview fields for a data type.
@@ -401,6 +459,10 @@ export type DataFormControlProps< Item > = {
 	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
 	/**
+	 * Label the control as "optional" when _not_ required, instead of showing "required".
+	 */
+	markWhenOptional?: boolean;
+	/**
 	 * The currently selected filter operator for this field.
 	 *
 	 * Used by DataViews filters to determine which control to render based on the operator type.
@@ -417,6 +479,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		compact?: boolean;
 	};
 };
 

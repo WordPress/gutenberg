@@ -132,6 +132,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	// When in production, use the plugin's version as the asset version;
 	// else (for development or test) default to use the current time.
 	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+	$suffix  = SCRIPT_DEBUG ? '' : '.min';
 
 	// wp-components: add dashicons (icon font dependency)
 	$styles->query( 'wp-components', 'registered' )->deps[] = 'dashicons';
@@ -151,25 +152,40 @@ function gutenberg_register_packages_styles( $styles ) {
 	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
 	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
 
+	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
+	gutenberg_override_style(
+		$styles,
+		'wp-base-styles',
+		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-base-styles', 'suffix', $suffix );
+	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes' . $suffix . '.css' );
+	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
+
 	gutenberg_override_style(
 		$styles,
 		'wp-block-editor-content',
-		gutenberg_url( 'build/styles/block-editor/content.css' ),
+		gutenberg_url( 'build/styles/block-editor/content' . $suffix . '.css' ),
 		array( 'wp-components' ),
 		$version
 	);
 	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-editor-content', 'suffix', $suffix );
 
 	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
-		gutenberg_url( 'build/styles/block-library/' . $block_library_filename . '.css' ),
+		gutenberg_url( 'build/styles/block-library/' . $block_library_filename . $suffix . '.css' ),
 		array(),
 		$version
 	);
 	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
-	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/styles/block-library/' . $block_library_filename . '.css' );
+	$styles->add_data( 'wp-block-library', 'suffix', $suffix );
+	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/styles/block-library/' . $block_library_filename . $suffix . '.css' );
 
 	// Only add CONTENT styles here that should be enqueued in the iframe!
 	$wp_edit_blocks_dependencies = array(
@@ -181,6 +197,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		// Until #37466, we can't specifically add them as editor styles yet,
 		// so we must hard-code it here as a dependency.
 		'wp-block-editor-content',
+		'wp-base-styles',
 	);
 
 	// Only load the default layout and margin styles for themes without theme.json file.
@@ -197,57 +214,63 @@ function gutenberg_register_packages_styles( $styles ) {
 	gutenberg_override_style(
 		$styles,
 		'wp-reset-editor-styles',
-		gutenberg_url( 'build/styles/block-library/reset.css' ),
+		gutenberg_url( 'build/styles/block-library/reset' . $suffix . '.css' ),
 		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Admin styles.
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-reset-editor-styles', 'suffix', $suffix );
 
 	gutenberg_override_style(
 		$styles,
 		'wp-editor-classic-layout-styles',
-		gutenberg_url( 'build/styles/edit-post/classic.css' ),
+		gutenberg_url( 'build/styles/edit-post/classic' . $suffix . '.css' ),
 		array(),
 		$version
 	);
 	$styles->add_data( 'wp-editor-classic-layout-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-editor-classic-layout-styles', 'suffix', $suffix );
 
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library-editor',
-		gutenberg_url( 'build/styles/block-library/editor.css' ),
+		gutenberg_url( 'build/styles/block-library/editor' . $suffix . '.css' ),
 		array(),
 		$version
 	);
 	$styles->add_data( 'wp-block-library-editor', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library-editor', 'suffix', $suffix );
 
 	gutenberg_override_style(
 		$styles,
 		'wp-edit-blocks',
-		gutenberg_url( 'build/styles/block-library/editor.css' ),
+		gutenberg_url( 'build/styles/block-library/editor' . $suffix . '.css' ),
 		$wp_edit_blocks_dependencies,
 		$version
 	);
 	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+	$styles->add_data( 'wp-edit-blocks', 'suffix', $suffix );
 
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library-theme',
-		gutenberg_url( 'build/styles/block-library/theme.css' ),
+		gutenberg_url( 'build/styles/block-library/theme' . $suffix . '.css' ),
 		array(),
 		$version
 	);
 	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library-theme', 'suffix', $suffix );
 
 	gutenberg_override_style(
 		$styles,
 		'classic-theme-styles',
-		gutenberg_url( 'build/styles/block-library/classic.css' ),
+		gutenberg_url( 'build/styles/block-library/classic' . $suffix . '.css' ),
 		array(),
 		$version
 	);
 	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
-	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/styles/block-library/classic.css' );
+	$styles->add_data( 'classic-theme-styles', 'suffix', $suffix );
+	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/styles/block-library/classic' . $suffix . '.css' );
 }
 add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
 
@@ -260,7 +283,7 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
  *
  * @since 6.1
  *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
@@ -344,31 +367,34 @@ function gutenberg_enqueue_stored_styles( $options = array() ) {
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$extension = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
-	gutenberg_override_script(
-		$scripts,
-		'react',
-		gutenberg_url( 'build/scripts/vendors/react' . $extension ),
-		// See https://github.com/pmmmwh/react-refresh-webpack-plugin/blob/main/docs/TROUBLESHOOTING.md#externalising-react.
-		SCRIPT_DEBUG ? array( 'wp-react-refresh-entry', 'wp-polyfill' ) : array( 'wp-polyfill' ),
-		'18'
-	);
-	gutenberg_override_script(
-		$scripts,
-		'react-dom',
-		gutenberg_url( 'build/scripts/vendors/react-dom' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
-	gutenberg_override_script(
-		$scripts,
-		'react-jsx-runtime',
-		gutenberg_url( 'build/scripts/vendors/react-jsx-runtime' . $extension ),
-		array( 'react' ),
-		'18'
-	);
+	foreach ( $vendor_handles as $handle ) {
+		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
+		$dependencies = $asset['dependencies'] ?? array();
+		$version      = $asset['version'] ?? '0';
+
+		gutenberg_override_script(
+			$scripts,
+			$handle,
+			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
+			$dependencies,
+			$version
+		);
+	}
+
+	// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry`
+	// as a dependency to `react` when `SCRIPT_DEBUG` is true. Preserve that here.
+	if ( SCRIPT_DEBUG ) {
+		$react = $scripts->query( 'react', 'registered' );
+		if ( $react && ! in_array( 'wp-react-refresh-entry', $react->deps, true ) ) {
+			$react->deps[] = 'wp-react-refresh-entry';
+		}
+	}
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
@@ -413,6 +439,22 @@ add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
 function gutenberg_enqueue_latex_to_mathml_loader() {
 	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
+}
+
+/**
+ * Enqueue the vips loader script module in the block editor.
+ *
+ * This registers @wordpress/vips/worker as a dynamic dependency in the import map,
+ * enabling on-demand loading of the ~3.8MB WASM-based image processing module
+ * when client-side media processing is triggered via @wordpress/upload-media.
+ *
+ * @see packages/vips/src/loader.ts
+ */
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
+}
+function gutenberg_enqueue_vips_loader() {
+	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );

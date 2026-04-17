@@ -35,7 +35,6 @@ export default function ZoomDropdown() {
 				<DropdownContentWrapper paddingSize="medium">
 					<RangeControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Zoom' ) }
 						min={ MIN_ZOOM }
 						max={ MAX_ZOOM }

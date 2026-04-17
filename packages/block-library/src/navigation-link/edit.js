@@ -23,13 +23,10 @@ import {
 	store as blockEditorStore,
 	getColorClassName,
 	useInnerBlocksProps,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { decodeEntities } from '@wordpress/html-entities';
 import { link as linkIcon, addSubmenu } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 
 /**
@@ -40,8 +37,13 @@ import {
 	Controls,
 	LinkUI,
 	useEntityBinding,
-	MissingEntityHelpText,
+	getInvalidLinkHelpText,
 	useHandleLinkChange,
+	useIsInvalidLink,
+	InvalidDraftDisplay,
+	useEnableLinkStatusValidation,
+	useIsDraggingWithin,
+	selectLabelText,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -49,113 +51,6 @@ const NESTING_BLOCK_NAMES = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
-
-/**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [ elementRef ] );
-
-	return isDraggingWithin;
-};
-
-const useIsInvalidLink = ( kind, type, id, enabled ) => {
-	const isPostType =
-		kind === 'post-type' || type === 'post' || type === 'page';
-	const hasId = Number.isInteger( id );
-	const blockEditingMode = useBlockEditingMode();
-
-	const { postStatus, isDeleted } = useSelect(
-		( select ) => {
-			if ( ! isPostType ) {
-				return { postStatus: null, isDeleted: false };
-			}
-
-			// Fetching the posts status is an "expensive" operation. Especially for sites with large navigations.
-			// When the block is rendered in a template or other disabled contexts we can skip this check in order
-			// to avoid all these additional requests that don't really add any value in that mode.
-			if ( blockEditingMode === 'disabled' || ! enabled ) {
-				return { postStatus: null, isDeleted: false };
-			}
-
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
-			const entityRecord = getEntityRecord( 'postType', type, id );
-			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
-				'postType',
-				type,
-				id,
-			] );
-
-			// If resolution has finished and entityRecord is undefined, the entity was deleted.
-			const deleted = hasResolved && entityRecord === undefined;
-
-			return {
-				postStatus: entityRecord?.status,
-				isDeleted: deleted,
-			};
-		},
-		[ isPostType, blockEditingMode, enabled, type, id ]
-	);
-
-	// Check Navigation Link validity if:
-	// 1. Link is 'post-type'.
-	// 2. It has an id.
-	// 3. It's neither null, nor undefined, as valid items might be either of those while loading.
-	// If those conditions are met, check if
-	// 1. The post status is trash (trashed).
-	// 2. The entity doesn't exist (deleted).
-	// If either of those is true, invalidate.
-	const isInvalid =
-		isPostType &&
-		hasId &&
-		( isDeleted || ( postStatus && 'trash' === postStatus ) );
-	const isDraft = 'draft' === postStatus;
-
-	return [ isInvalid, isDraft ];
-};
 
 function getMissingText( type ) {
 	let missingText = '';
@@ -224,7 +119,6 @@ export default function NavigationLinkEdit( {
 		isTopLevelLink,
 		isParentOfSelectedBlock,
 		hasChildren,
-		validateLinkStatus,
 		parentBlockClientId,
 		isSubmenu,
 	} = useSelect(
@@ -235,12 +129,10 @@ export default function NavigationLinkEdit( {
 				getBlockRootClientId,
 				hasSelectedInnerBlock,
 				getBlockParentsByBlockName,
-				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
 			const parentBlockName = getBlockName( rootClientId );
 			const isTopLevel = parentBlockName === 'core/navigation';
-			const selectedBlockClientId = getSelectedBlockClientId();
 			const rootNavigationClientId = isTopLevel
 				? rootClientId
 				: getBlockParentsByBlockName(
@@ -254,11 +146,6 @@ export default function NavigationLinkEdit( {
 					? rootClientId
 					: rootNavigationClientId;
 
-			// Enable when the root Navigation block is selected or any of its inner blocks.
-			const enableLinkStatusValidation =
-				selectedBlockClientId === rootNavigationClientId ||
-				hasSelectedInnerBlock( rootNavigationClientId, true );
-
 			return {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, NESTING_BLOCK_NAMES )
@@ -269,20 +156,22 @@ export default function NavigationLinkEdit( {
 					true
 				),
 				hasChildren: !! getBlockCount( clientId ),
-				validateLinkStatus: enableLinkStatusValidation,
 				parentBlockClientId: parentBlockId,
 				isSubmenu: parentBlockName === 'core/navigation-submenu',
 			};
 		},
 		[ clientId, maxNestingLevel ]
 	);
+
+	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -356,7 +245,7 @@ export default function NavigationLinkEdit( {
 		// If the label looks like a URL, focus and select the label text.
 		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
-			selectLabelText();
+			selectLabelText( ref );
 		} else {
 			// If the link was just created, we want to select the block so the inspector controls
 			// are accurate.
@@ -379,21 +268,6 @@ export default function NavigationLinkEdit( {
 			}
 		}
 	}, [ url, isLinkOpen, isNewLink, label ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	/**
 	 * Removes the current link if set.
@@ -493,10 +367,7 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
-	/* translators: Whether the navigation link is Invalid or a Draft. */
-	const placeholderText = `(${
-		isInvalid ? __( 'Invalid' ) : __( 'Draft' )
-	})`;
+	const invalidLinkHelpText = getInvalidLinkHelpText();
 
 	return (
 		<>
@@ -521,7 +392,7 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -531,7 +402,7 @@ export default function NavigationLinkEdit( {
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>
-						<MissingEntityHelpText type={ type } kind={ kind } />
+						{ invalidLinkHelpText }
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
@@ -578,31 +449,12 @@ export default function NavigationLinkEdit( {
 								</>
 							) }
 							{ ( isInvalid || isDraft ) && (
-								<div
-									className={ clsx(
-										'wp-block-navigation-link__placeholder-text',
-										'wp-block-navigation-link__label',
-										{
-											'is-invalid': isInvalid,
-											'is-draft': isDraft,
-										}
-									) }
-								>
-									<span>
-										{
-											// Some attributes are stored in an escaped form. It's a legacy issue.
-											// Ideally they would be stored in a raw, unescaped form.
-											// Unescape is used here to "recover" the escaped characters
-											// so they display without encoding.
-											// See `updateAttributes` for more details.
-											`${ decodeEntities( label ) } ${
-												isInvalid || isDraft
-													? placeholderText
-													: ''
-											}`.trim()
-										}
-									</span>
-								</div>
+								<InvalidDraftDisplay
+									label={ label }
+									isInvalid={ isInvalid }
+									isDraft={ isDraft }
+									className="wp-block-navigation-link__label"
+								/>
 							) }
 						</>
 					) }
@@ -611,6 +463,11 @@ export default function NavigationLinkEdit( {
 							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link and no binding, remove the auto-inserted block.
