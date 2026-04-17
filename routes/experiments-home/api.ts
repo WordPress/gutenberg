@@ -9,8 +9,6 @@ export interface Experiment {
 	description: string;
 	group: string;
 	groupLabel: string;
-	separateOption: boolean;
-	optionName?: string;
 }
 
 interface SettingsSchema {
@@ -49,7 +47,5 @@ export async function fetchExperiments(): Promise< Experiment[] > {
 		description: schema.description ?? '',
 		group: schema.group ?? 'other',
 		groupLabel: schema.group_label ?? '',
-		separateOption: schema.separate_option ?? false,
-		optionName: schema.option_name,
 	} ) );
 }

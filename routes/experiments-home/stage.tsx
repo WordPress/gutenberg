@@ -37,13 +37,6 @@ function ExperimentsPage() {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	// `separateOption` experiments (e.g. `active_templates`) live in their own
-	// top-level WP option instead of the `gutenberg-experiments` array.
-	const separateOptionExperiments = useMemo(
-		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
-		[ experiments ]
-	);
-
 	const gutenbergExperiments = useMemo(
 		() => siteSettings?.[ 'gutenberg-experiments' ] || {},
 		[ siteSettings ]
@@ -60,57 +53,35 @@ function ExperimentsPage() {
 			combined[ key ] = Boolean( value );
 		}
 
-		// For separate-option experiments, an object value means enabled.
-		for ( const exp of separateOptionExperiments ) {
-			const optionName = exp.optionName ?? exp.id;
-			const optionValue = siteSettings?.[ optionName ];
-			combined[ exp.id ] =
-				typeof optionValue === 'object' && optionValue !== null;
-		}
+		// `active_templates` lives in its own top-level WP option.
+		// An object value means enabled.
+		const activeTemplates = siteSettings?.active_templates;
+		combined.active_templates =
+			typeof activeTemplates === 'object' && activeTemplates !== null;
 
 		return combined;
-	}, [
-		experiments,
-		gutenbergExperiments,
-		separateOptionExperiments,
-		siteSettings,
-	] );
+	}, [ experiments, gutenbergExperiments, siteSettings ] );
 
 	const setSettings = async ( values: Record< string, boolean > ) => {
-		// Split updates by storage: regular flags vs. separate top-level options.
-		const regularUpdates: Record< string, boolean > = {};
-		const separateUpdates: Record< string, boolean > = {};
-
-		for ( const [ key, value ] of Object.entries( values ) ) {
-			const isSeparate = separateOptionExperiments.some(
-				( exp ) => exp.id === key
-			);
-			if ( isSeparate ) {
-				separateUpdates[ key ] = value;
-			} else {
-				regularUpdates[ key ] = value;
-			}
-		}
-
-		const editPayload: Record< string, unknown > = {};
-
-		if ( Object.keys( regularUpdates ).length > 0 ) {
-			editPayload[ 'gutenberg-experiments' ] = {
-				...gutenbergExperiments,
-				...regularUpdates,
-			};
-		}
-
-		for ( const [ key, value ] of Object.entries( separateUpdates ) ) {
-			const exp = separateOptionExperiments.find( ( e ) => e.id === key );
-			const optionName = exp?.optionName ?? key;
-			editPayload[ optionName ] = value ? {} : null;
-		}
-
 		const [ changedId ] = Object.keys( values );
 		const changedExperiment = ( experiments ?? [] ).find(
 			( exp ) => exp.id === changedId
 		);
+
+		const editPayload: Record< string, unknown > = {};
+
+		// `active_templates` lives in its own top-level WP option.
+		if ( 'active_templates' in values ) {
+			editPayload.active_templates = values.active_templates ? {} : null;
+			delete values.active_templates;
+		}
+
+		if ( Object.keys( values ).length > 0 ) {
+			editPayload[ 'gutenberg-experiments' ] = {
+				...gutenbergExperiments,
+				...values,
+			};
+		}
 		const groupLabel = changedExperiment?.groupLabel ?? '';
 
 		edit( editPayload );
