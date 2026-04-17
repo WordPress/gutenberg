@@ -20,8 +20,7 @@ export default function useShortcutEventMatch(): (
 	event: KeyboardEvent
 ) => boolean {
 	const { getAllShortcutKeyCombinations } = useSelect(
-		( select ) => select( keyboardShortcutsStore ),
-		[]
+		keyboardShortcutsStore
 	);
 
 	/**
@@ -31,15 +30,17 @@ export default function useShortcutEventMatch(): (
 	 * @param name  Shortcut name.
 	 * @param event Event to check.
 	 *
-	 * @return True if the event matches unknown shortcuts, false if not.
+	 * @return True if the event matches the shortcuts, false if not.
 	 */
 	function isMatch( name: string, event: KeyboardEvent ) {
 		return getAllShortcutKeyCombinations( name ).some( ( combination ) => {
 			if ( ! combination ) {
 				return false;
 			}
-			const { modifier, character } = combination;
-			return isKeyboardEvent[ modifier! ]( event, character );
+			return isKeyboardEvent[ combination.modifier ?? 'undefined' ](
+				event,
+				combination.character
+			);
 		} );
 	}
 

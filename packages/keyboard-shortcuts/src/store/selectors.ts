@@ -309,7 +309,10 @@ export const getAllShortcutKeyCombinations = createSelector(
 		return [
 			getShortcutKeyCombination( state, name ),
 			...getShortcutAliases( state, name ),
-		].filter( Boolean );
+		].filter(
+			( combination ): combination is ShortcutKeyCombination =>
+				!! combination
+		);
 	},
 	( state, name ) => [ state[ name ] ]
 );
