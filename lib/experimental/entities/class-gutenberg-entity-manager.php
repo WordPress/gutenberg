@@ -102,7 +102,6 @@ class Gutenberg_Entity_Manager {
 
 		return array(
 			'_user_created' => false,
-			'_source'       => ! empty( $type_object->_builtin ) ? 'core' : 'plugin',
 			'labels'        => $labels,
 			'description'   => $type_object->description ?? '',
 			'public'        => (bool) ( $type_object->public ?? false ),
@@ -142,7 +141,6 @@ class Gutenberg_Entity_Manager {
 
 		return array(
 			'_user_created' => false,
-			'_source'       => ! empty( $taxonomy_object->_builtin ) ? 'core' : 'plugin',
 			'labels'        => $labels,
 			'description'   => $taxonomy_object->description ?? '',
 			'public'        => (bool) ( $taxonomy_object->public ?? false ),
@@ -223,7 +221,6 @@ class Gutenberg_Entity_Manager {
 				}
 			}
 		}
-
 	}
 
 	/**

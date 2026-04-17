@@ -322,18 +322,13 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 
 		$updated = $this->prepare_config_from_request( $request, $entity_type );
 
-		// Merge updated fields into existing config.
-		$config                   = array_merge( $existing, $updated );
-		$config['_user_created']  = ! empty( $existing['_user_created'] );
-		$config['_customized']    = true;
+		// Merge updated fields into existing config. _customized is only
+		// meaningful for non-user-created entities (it gates the Revert UI).
+		$config = array_merge( $existing, $updated );
+		if ( empty( $config['_user_created'] ) ) {
+			$config['_customized'] = true;
+		}
 		$configs[ $key ][ $slug ] = $config;
-
-		if ( ! isset( $configs['post_types'] ) ) {
-			$configs['post_types'] = array();
-		}
-		if ( ! isset( $configs['taxonomies'] ) ) {
-			$configs['taxonomies'] = array();
-		}
 
 		update_option( Gutenberg_Entity_Manager::OPTION_NAME, $configs, false );
 
@@ -346,7 +341,11 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 	/**
 	 * Deletes an entity configuration.
 	 *
-	 * Only user-created entities can be deleted.
+	 * For user-created entities this is a real deletion (stored config
+	 * removed and the type unregistered). For customized core/plugin
+	 * entities it is a "revert": the stored overrides are removed, and the
+	 * live registration is left alone so the type reverts to whatever core
+	 * or the plugin registered.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object or error.
@@ -394,10 +393,9 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		}
 
 		// For user-created entities, unregister so the type/taxonomy is
-		// fully removed. For plugin-registered entities (revert), leave the
-		// live registration alone — the plugin re-registers it on every
-		// request, and auto-detection will re-seed the config with default
-		// values on the next page load.
+		// fully removed. For core/plugin entities (revert), leave the live
+		// registration alone — core or the plugin re-registers it on every
+		// request, restoring the original defaults.
 		if ( ! empty( $config['_user_created'] ) ) {
 			if ( 'post_type' === $entity_type && post_type_exists( $slug ) ) {
 				unregister_post_type( $slug );
@@ -432,20 +430,20 @@ class Gutenberg_REST_Entity_Configs_Controller extends WP_REST_Controller {
 		// (e.g., the plugin that created it was deactivated).
 		$is_orphaned = ! $is_registered && empty( $config['_user_created'] );
 
-		// Compute _source from the live type object when possible so the
-		// classification self-heals even if the stored config predates the
-		// _source field or the entity's source has changed.
+		// Compute _source from the live type object. Orphans fall back to
+		// 'plugin' since the original registrant is gone.
 		if ( ! empty( $config['_user_created'] ) ) {
 			$source = 'user';
 		} elseif ( 'post_type' === $entity_type && $is_registered ) {
-			$type_object = get_post_type_object( $slug );
-			$source      = ! empty( $type_object->_builtin ) ? 'core' : 'plugin';
+			$source = ! empty( get_post_type_object( $slug )->_builtin )
+				? 'core'
+				: 'plugin';
 		} elseif ( 'taxonomy' === $entity_type && $is_registered ) {
-			$taxonomy_object = get_taxonomy( $slug );
-			$source          = ! empty( $taxonomy_object->_builtin ) ? 'core' : 'plugin';
+			$source = ! empty( get_taxonomy( $slug )->_builtin )
+				? 'core'
+				: 'plugin';
 		} else {
-			// Orphaned and unknown: fall back to stored value or 'plugin'.
-			$source = $config['_source'] ?? 'plugin';
+			$source = 'plugin';
 		}
 
 		return array_merge(
