@@ -6,6 +6,43 @@ import type {
 } from './types';
 
 /**
+ * Mapping of canonical name to actual exported identifier, keyed by
+ * `package:name`. A package's actual exported identifier may be different from
+ * the canonical name in the internal implementation that's known to Storybook.
+ *
+ * Ideally we could derive this from the package's source code, but MCP
+ * consumers aren't guaranteed to have these packages installed. Since this
+ * is a legacy convention, we expect this list will only ever shrink over time
+ * and can eventually be removed.
+ */
+const EXPORT_ALIASES: Record< string, string > = {
+	'@wordpress/components:ConfirmDialog': '__experimentalConfirmDialog',
+	'@wordpress/components:InputControl': '__experimentalInputControl',
+	'@wordpress/components:ItemGroup': '__experimentalItemGroup',
+	'@wordpress/components:ToggleGroupControl':
+		'__experimentalToggleGroupControl',
+	'@wordpress/components:TreeGrid': '__experimentalTreeGrid',
+	'@wordpress/components:Truncate': '__experimentalTruncate',
+};
+
+/**
+ * Build the import statement a consumer should use to bring a component into
+ * scope under its canonical name. For aliased components, emit an `as` rename
+ * so that subsequent code samples (which reference the canonical name) resolve
+ * against the actual export.
+ *
+ * @param name        - The canonical component name.
+ * @param packageName - The npm package name.
+ * @return The import statement as a single-line string.
+ */
+function buildImportStatement( name: string, packageName: string ): string {
+	const exported = EXPORT_ALIASES[ `${ packageName }:${ name }` ];
+	return exported
+		? `import { ${ exported } as ${ name } } from '${ packageName }';`
+		: `import { ${ name } } from '${ packageName }';`;
+}
+
+/**
  * Derive the npm package name from the story file path.
  *
  * Manifest paths look like `../packages/<dir>/src/.../index.story.tsx`. We
@@ -151,7 +188,7 @@ export function parseComponentDetail(
 				name: canonicalName,
 				description,
 				packageName: pkg,
-				importStatement: `import { ${ canonicalName } } from '${ pkg }';`,
+				importStatement: buildImportStatement( canonicalName, pkg ),
 				props,
 				stories: [ ...stories ],
 			};

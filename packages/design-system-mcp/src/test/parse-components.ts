@@ -374,6 +374,20 @@ describe( 'parseComponentDetail', () => {
 		);
 	} );
 
+	it( 'should emit an aliased import for a component exported with an __experimental prefix', () => {
+		const components = createComponents( {
+			truncate: {
+				name: 'Truncate',
+				path: '../packages/components/src/truncate/stories/index.story.tsx',
+			},
+		} );
+
+		const result = parseComponentDetail( components, 'Truncate' );
+		expect( result?.importStatement ).toBe(
+			"import { __experimentalTruncate as Truncate } from '@wordpress/components';"
+		);
+	} );
+
 	it( 'should filter deprecated props from detail', () => {
 		const components = createComponents( {
 			button: {
