@@ -194,3 +194,10 @@ html :where(.is-position-sticky) {
 		/* stylelint-enable length-zero-no-unit */
 	}
 }
+
+/**
+ * Prevent global link font sizes from overriding block level font sizes.
+ */
+html :where(.has-custom-font-size, [class*="-font-size"], [style*="font-size"]) a:where(:not(.wp-element-button)) {
+	font-size: inherit;
+}
