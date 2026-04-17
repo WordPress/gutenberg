@@ -5,9 +5,11 @@ import { Page } from '@wordpress/admin-ui';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -116,6 +118,9 @@ function ExperimentsPage() {
 		edit,
 	} = useEntityRecord( 'root', 'site' );
 
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
 	const separateOptionExperiments = useMemo(
 		() => ( experiments ?? [] ).filter( ( exp ) => exp.separateOption ),
 		[ experiments ]
@@ -152,7 +157,7 @@ function ExperimentsPage() {
 		siteSettings,
 	] );
 
-	const setSettings = ( values: Record< string, boolean > ) => {
+	const setSettings = async ( values: Record< string, boolean > ) => {
 		const regularUpdates: Record< string, boolean > = {};
 		const separateUpdates: Record< string, boolean > = {};
 
@@ -182,8 +187,35 @@ function ExperimentsPage() {
 			editPayload[ optionName ] = value ? {} : null;
 		}
 
+		const [ changedId ] = Object.keys( values );
+		const changedExperiment = ( experiments ?? [] ).find(
+			( exp ) => exp.id === changedId
+		);
+		const groupLabel =
+			GROUP_LABELS[ changedExperiment?.group ?? 'other' ] ??
+			GROUP_LABELS.other;
+
 		edit( editPayload );
-		saveSettings();
+		try {
+			await saveSettings();
+			createSuccessNotice(
+				sprintf(
+					/* translators: %s: Experiment group name, e.g. "Blocks". */
+					__( '%s settings updated.' ),
+					groupLabel
+				),
+				{ type: 'snackbar' }
+			);
+		} catch {
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Experiment group name, e.g. "Blocks". */
+					__( 'Failed to update %s settings.' ),
+					groupLabel
+				),
+				{ type: 'snackbar' }
+			);
+		}
 	};
 
 	const fields = useMemo( () => {
