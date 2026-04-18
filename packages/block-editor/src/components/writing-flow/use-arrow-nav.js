@@ -115,9 +115,13 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		// If it's a block and there are nested focusable nodes, skip because
-		// there are better candidates.
+		// If it's a block wrapper (not itself a contenteditable editing surface)
+		// and there are nested focusable nodes, skip because there are better
+		// candidates. We must not skip contenteditable nodes that happen to
+		// contain links or other focusable inline elements, since those are the
+		// correct navigation targets.
 		if (
+			node.contentEditable !== 'true' &&
 			getBlockClientId( node ) &&
 			focus.focusable
 				.find( node )
