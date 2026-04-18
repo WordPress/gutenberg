@@ -366,6 +366,41 @@ export async function init() {
 
 The `init()` function is **mandatory** - all init modules must export this named function. Init modules are loaded as static dependencies and executed sequentially before the boot system registers menu items and routes.
 
+**Extending Page Dependencies:**
+
+Generated page templates expose a PHP filter that lets extensions append script modules to the page's dependency tree. This is useful for plugins that want modules available in the browser import map — for eager or lazy loading — without re-registering the page itself.
+
+Two filter names are available, one per page mode:
+
+```php
+// Full-page mode
+apply_filters( '{page-slug}_script_module_dependencies', $boot_dependencies );
+
+// WP-admin mode
+apply_filters( '{page-slug}-wp-admin_script_module_dependencies', $boot_dependencies );
+```
+
+The callback receives the current `$boot_dependencies` array and must return it. Each entry is an array with `id` (script module ID) and `import` (`'static'` or `'dynamic'`):
+
+```php
+add_filter( 'my-page_script_module_dependencies', function ( $deps ) {
+	$deps[] = array(
+		'import' => 'dynamic',
+		'id'     => '@my-plugin/settings',
+	);
+	return $deps;
+} );
+```
+
+- **`static`** imports are loaded immediately when the page boots.
+- **`dynamic`** imports appear in the browser import map but are only fetched on demand via `import( id )`. Good for code paths that may or may not be rendered.
+
+**Example use cases:**
+
+- **Lazy-loaded components**: Declare feature modules as dynamic deps so `lazy( () => import( id ) )` resolves at render time without eagerly loading everything.
+- **Conditional feature modules**: Register modules only when certain capabilities, settings, or feature flags are met — the page module sees them, but the browser only fetches them when needed.
+- **Third-party extensions**: Other plugins can hook the filter to inject their own modules into a page owned by someone else, without touching the original page's registration code.
+
 ### Example: WordPress Core (Gutenberg)
 
 ```json
