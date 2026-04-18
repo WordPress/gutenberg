@@ -2,6 +2,7 @@ import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useRegisterPanel } from './context';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 import type { TabPanelProps } from './types';
 
@@ -18,7 +19,11 @@ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 		return (
 			<_Tabs.Panel
 				ref={ forwardedRef }
-				className={ clsx( styles.tabpanel, className ) }
+				className={ clsx(
+					defenseStyles.div,
+					styles.tabpanel,
+					className
+				) }
 				{ ...otherProps }
 			/>
 		);
