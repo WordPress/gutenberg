@@ -9,9 +9,7 @@ import {
 	TextareaControl,
 	ToggleControl,
 	CheckboxControl,
-	Panel,
-	PanelBody,
-	PanelRow,
+	privateApis as componentsPrivateApis,
 	// @ts-ignore
 	__experimentalVStack as VStack,
 	// @ts-ignore
@@ -22,6 +20,13 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 interface EntityConfig {
 	slug: string;
@@ -259,240 +264,227 @@ function EntityNew() {
 			}
 		>
 			<div style={ { padding: 16 } }>
-				<VStack spacing={ 4 }>
-					<Panel>
-						<PanelBody title={ __( 'General' ) } initialOpen>
+				<Tabs>
+					<Tabs.TabList>
+						<Tabs.Tab tabId="general">{ __( 'General' ) }</Tabs.Tab>
+						<Tabs.Tab tabId="visibility">
+							{ __( 'Visibility' ) }
+						</Tabs.Tab>
+						<Tabs.Tab tabId="rest-api">
+							{ __( 'REST API' ) }
+						</Tabs.Tab>
+						{ ! isPostType && (
+							<Tabs.Tab tabId="post-types">
+								{ __( 'Post Types' ) }
+							</Tabs.Tab>
+						) }
+						{ isPostType && (
+							<Tabs.Tab tabId="menu">{ __( 'Menu' ) }</Tabs.Tab>
+						) }
+						{ isPostType && (
+							<Tabs.Tab tabId="supports">
+								{ __( 'Supports' ) }
+							</Tabs.Tab>
+						) }
+					</Tabs.TabList>
+
+					<Tabs.TabPanel tabId="general" focusable={ false }>
+						<VStack spacing={ 4 }>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Slug' ) }
+								help={ __(
+									'A unique identifier. Lowercase letters, numbers, and hyphens only.'
+								) }
+								value={ config.slug }
+								onChange={ ( value: string ) =>
+									updateField(
+										'slug',
+										value
+											.toLowerCase()
+											.replace( /[^a-z0-9_-]/g, '' )
+									)
+								}
+							/>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Name (Plural)' ) }
+								value={ config.labels.name || '' }
+								onChange={ ( value: string ) =>
+									updateLabel( 'name', value )
+								}
+							/>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Singular Name' ) }
+								value={ config.labels.singular_name || '' }
+								onChange={ ( value: string ) =>
+									updateLabel( 'singular_name', value )
+								}
+							/>
+							<TextareaControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'Description' ) }
+								value={ config.description }
+								onChange={ ( value: string ) =>
+									updateField( 'description', value )
+								}
+							/>
+						</VStack>
+					</Tabs.TabPanel>
+
+					<Tabs.TabPanel tabId="visibility" focusable={ false }>
+						<VStack spacing={ 3 }>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Public' ) }
+								checked={ config.public }
+								onChange={ ( value: boolean ) =>
+									updateField( 'public', value )
+								}
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Hierarchical' ) }
+								checked={ config.hierarchical }
+								onChange={ ( value: boolean ) =>
+									updateField( 'hierarchical', value )
+								}
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show UI' ) }
+								checked={ config.show_ui }
+								onChange={ ( value: boolean ) =>
+									updateField( 'show_ui', value )
+								}
+							/>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show in Menu' ) }
+								checked={ config.show_in_menu }
+								onChange={ ( value: boolean ) =>
+									updateField( 'show_in_menu', value )
+								}
+							/>
+							{ isPostType && (
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Has Archive' ) }
+									checked={ !! config.has_archive }
+									onChange={ ( value: boolean ) =>
+										updateField( 'has_archive', value )
+									}
+								/>
+							) }
+						</VStack>
+					</Tabs.TabPanel>
+
+					<Tabs.TabPanel tabId="rest-api" focusable={ false }>
+						<VStack spacing={ 4 }>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __( 'Show in REST' ) }
+								checked={ config.show_in_rest }
+								onChange={ ( value: boolean ) =>
+									updateField( 'show_in_rest', value )
+								}
+							/>
+							<TextControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								label={ __( 'REST Base' ) }
+								value={ config.rest_base }
+								onChange={ ( value: string ) =>
+									updateField( 'rest_base', value )
+								}
+							/>
+						</VStack>
+					</Tabs.TabPanel>
+
+					{ ! isPostType && (
+						<Tabs.TabPanel tabId="post-types" focusable={ false }>
+							<VStack spacing={ 3 }>
+								{ availablePostTypes.map( ( pt ) => (
+									<CheckboxControl
+										key={ pt.slug }
+										__nextHasNoMarginBottom
+										label={ pt.labels?.name || pt.slug }
+										checked={ config.object_type.includes(
+											pt.slug
+										) }
+										onChange={ ( value: boolean ) =>
+											toggleObjectType( pt.slug, value )
+										}
+									/>
+								) ) }
+								{ availablePostTypes.length === 0 && (
+									<p>{ __( 'No post types available.' ) }</p>
+								) }
+							</VStack>
+						</Tabs.TabPanel>
+					) }
+
+					{ isPostType && (
+						<Tabs.TabPanel tabId="menu" focusable={ false }>
 							<VStack spacing={ 4 }>
 								<TextControl
 									__next40pxDefaultSize
 									__nextHasNoMarginBottom
-									label={ __( 'Slug' ) }
+									label={ __( 'Menu Icon' ) }
 									help={ __(
-										'A unique identifier. Lowercase letters, numbers, and hyphens only.'
+										'A dashicon class name or URL to an icon image.'
 									) }
-									value={ config.slug }
+									value={ config.menu_icon || '' }
+									onChange={ ( value: string ) =>
+										updateField( 'menu_icon', value )
+									}
+								/>
+								<TextControl
+									__next40pxDefaultSize
+									__nextHasNoMarginBottom
+									label={ __( 'Menu Position' ) }
+									type="number"
+									value={
+										config.menu_position !== null
+											? String( config.menu_position )
+											: ''
+									}
 									onChange={ ( value: string ) =>
 										updateField(
-											'slug',
-											value
-												.toLowerCase()
-												.replace( /[^a-z0-9_-]/g, '' )
+											'menu_position',
+											value ? Number( value ) : null
 										)
 									}
 								/>
-								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Name (Plural)' ) }
-									value={ config.labels.name || '' }
-									onChange={ ( value: string ) =>
-										updateLabel( 'name', value )
-									}
-								/>
-								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Singular Name' ) }
-									value={ config.labels.singular_name || '' }
-									onChange={ ( value: string ) =>
-										updateLabel( 'singular_name', value )
-									}
-								/>
-								<TextareaControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'Description' ) }
-									value={ config.description }
-									onChange={ ( value: string ) =>
-										updateField( 'description', value )
-									}
-								/>
 							</VStack>
-						</PanelBody>
-					</Panel>
-
-					<Panel>
-						<PanelBody title={ __( 'Visibility' ) } initialOpen>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Public' ) }
-									checked={ config.public }
-									onChange={ ( value: boolean ) =>
-										updateField( 'public', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Hierarchical' ) }
-									checked={ config.hierarchical }
-									onChange={ ( value: boolean ) =>
-										updateField( 'hierarchical', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show UI' ) }
-									checked={ config.show_ui }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_ui', value )
-									}
-								/>
-							</PanelRow>
-							<PanelRow>
-								<ToggleControl
-									__nextHasNoMarginBottom
-									label={ __( 'Show in Menu' ) }
-									checked={ config.show_in_menu }
-									onChange={ ( value: boolean ) =>
-										updateField( 'show_in_menu', value )
-									}
-								/>
-							</PanelRow>
-							{ isPostType && (
-								<PanelRow>
-									<ToggleControl
-										__nextHasNoMarginBottom
-										label={ __( 'Has Archive' ) }
-										checked={ !! config.has_archive }
-										onChange={ ( value: boolean ) =>
-											updateField( 'has_archive', value )
-										}
-									/>
-								</PanelRow>
-							) }
-						</PanelBody>
-					</Panel>
-
-					<Panel>
-						<PanelBody
-							title={ __( 'REST API' ) }
-							initialOpen={ false }
-						>
-							<VStack spacing={ 4 }>
-								<PanelRow>
-									<ToggleControl
-										__nextHasNoMarginBottom
-										label={ __( 'Show in REST' ) }
-										checked={ config.show_in_rest }
-										onChange={ ( value: boolean ) =>
-											updateField( 'show_in_rest', value )
-										}
-									/>
-								</PanelRow>
-								<TextControl
-									__next40pxDefaultSize
-									__nextHasNoMarginBottom
-									label={ __( 'REST Base' ) }
-									value={ config.rest_base }
-									onChange={ ( value: string ) =>
-										updateField( 'rest_base', value )
-									}
-								/>
-							</VStack>
-						</PanelBody>
-					</Panel>
-
-					{ ! isPostType && (
-						<Panel>
-							<PanelBody title={ __( 'Post Types' ) } initialOpen>
-								{ availablePostTypes.map( ( pt ) => (
-									<PanelRow key={ pt.slug }>
-										<CheckboxControl
-											__nextHasNoMarginBottom
-											label={ pt.labels?.name || pt.slug }
-											checked={ config.object_type.includes(
-												pt.slug
-											) }
-											onChange={ ( value: boolean ) =>
-												toggleObjectType(
-													pt.slug,
-													value
-												)
-											}
-										/>
-									</PanelRow>
-								) ) }
-								{ availablePostTypes.length === 0 && (
-									<PanelRow>
-										<p>
-											{ __( 'No post types available.' ) }
-										</p>
-									</PanelRow>
-								) }
-							</PanelBody>
-						</Panel>
+						</Tabs.TabPanel>
 					) }
 
 					{ isPostType && (
-						<Panel>
-							<PanelBody
-								title={ __( 'Menu' ) }
-								initialOpen={ false }
-							>
-								<VStack spacing={ 4 }>
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={ __( 'Menu Icon' ) }
-										help={ __(
-											'A dashicon class name or URL to an icon image.'
-										) }
-										value={ config.menu_icon || '' }
-										onChange={ ( value: string ) =>
-											updateField( 'menu_icon', value )
-										}
-									/>
-									<TextControl
-										__next40pxDefaultSize
-										__nextHasNoMarginBottom
-										label={ __( 'Menu Position' ) }
-										type="number"
-										value={
-											config.menu_position !== null
-												? String( config.menu_position )
-												: ''
-										}
-										onChange={ ( value: string ) =>
-											updateField(
-												'menu_position',
-												value ? Number( value ) : null
-											)
-										}
-									/>
-								</VStack>
-							</PanelBody>
-						</Panel>
-					) }
-
-					{ isPostType && (
-						<Panel>
-							<PanelBody
-								title={ __( 'Supports' ) }
-								initialOpen={ false }
-							>
+						<Tabs.TabPanel tabId="supports" focusable={ false }>
+							<VStack spacing={ 3 }>
 								{ POST_TYPE_SUPPORTS.map( ( feature ) => (
-									<PanelRow key={ feature }>
-										<CheckboxControl
-											__nextHasNoMarginBottom
-											label={ feature }
-											checked={
-												!! config.supports[ feature ]
-											}
-											onChange={ ( value: boolean ) =>
-												updateSupport( feature, value )
-											}
-										/>
-									</PanelRow>
+									<CheckboxControl
+										key={ feature }
+										__nextHasNoMarginBottom
+										label={ feature }
+										checked={
+											!! config.supports[ feature ]
+										}
+										onChange={ ( value: boolean ) =>
+											updateSupport( feature, value )
+										}
+									/>
 								) ) }
-							</PanelBody>
-						</Panel>
+							</VStack>
+						</Tabs.TabPanel>
 					) }
-				</VStack>
+				</Tabs>
 			</div>
 		</Page>
 	);

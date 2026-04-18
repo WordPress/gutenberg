@@ -10,10 +10,8 @@ import {
 	TextareaControl,
 	ToggleControl,
 	CheckboxControl,
-	Panel,
-	PanelBody,
-	PanelRow,
 	Spinner,
+	privateApis as componentsPrivateApis,
 	// @ts-ignore
 	__experimentalConfirmDialog as ConfirmDialog,
 	// @ts-ignore
@@ -33,6 +31,13 @@ import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch } from '@wordpress/data';
 import { trash, undo } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+const { Tabs } = unlock( componentsPrivateApis );
 
 interface EntityConfig {
 	slug: string;
@@ -389,8 +394,38 @@ function EntityEdit() {
 								) }
 							</Notice>
 						) }
-						<Panel>
-							<PanelBody title={ __( 'General' ) } initialOpen>
+						<Tabs>
+							<Tabs.TabList>
+								<Tabs.Tab tabId="general">
+									{ __( 'General' ) }
+								</Tabs.Tab>
+								<Tabs.Tab tabId="visibility">
+									{ __( 'Visibility' ) }
+								</Tabs.Tab>
+								<Tabs.Tab tabId="rest-api">
+									{ __( 'REST API' ) }
+								</Tabs.Tab>
+								{ ! isPostType && (
+									<Tabs.Tab tabId="post-types">
+										{ __( 'Post Types' ) }
+									</Tabs.Tab>
+								) }
+								{ isPostType && (
+									<Tabs.Tab tabId="menu">
+										{ __( 'Menu' ) }
+									</Tabs.Tab>
+								) }
+								{ isPostType && (
+									<Tabs.Tab tabId="supports">
+										{ __( 'Supports' ) }
+									</Tabs.Tab>
+								) }
+								<Tabs.Tab tabId="labels">
+									{ __( 'Labels' ) }
+								</Tabs.Tab>
+							</Tabs.TabList>
+
+							<Tabs.TabPanel tabId="general" focusable={ false }>
 								<VStack spacing={ 4 }>
 									<TextControl
 										__next40pxDefaultSize
@@ -433,12 +468,13 @@ function EntityEdit() {
 										}
 									/>
 								</VStack>
-							</PanelBody>
-						</Panel>
+							</Tabs.TabPanel>
 
-						<Panel>
-							<PanelBody title={ __( 'Visibility' ) } initialOpen>
-								<PanelRow>
+							<Tabs.TabPanel
+								tabId="visibility"
+								focusable={ false }
+							>
+								<VStack spacing={ 3 }>
 									<ToggleControl
 										__nextHasNoMarginBottom
 										label={ __( 'Public' ) }
@@ -447,8 +483,6 @@ function EntityEdit() {
 											updateField( 'public', value )
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<ToggleControl
 										__nextHasNoMarginBottom
 										label={ __( 'Hierarchical' ) }
@@ -457,8 +491,6 @@ function EntityEdit() {
 											updateField( 'hierarchical', value )
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<ToggleControl
 										__nextHasNoMarginBottom
 										label={ __( 'Show UI' ) }
@@ -467,8 +499,6 @@ function EntityEdit() {
 											updateField( 'show_ui', value )
 										}
 									/>
-								</PanelRow>
-								<PanelRow>
 									<ToggleControl
 										__nextHasNoMarginBottom
 										label={ __( 'Show in Menu' ) }
@@ -477,9 +507,7 @@ function EntityEdit() {
 											updateField( 'show_in_menu', value )
 										}
 									/>
-								</PanelRow>
-								{ isPostType && (
-									<PanelRow>
+									{ isPostType && (
 										<ToggleControl
 											__nextHasNoMarginBottom
 											label={ __( 'Has Archive' ) }
@@ -491,30 +519,20 @@ function EntityEdit() {
 												)
 											}
 										/>
-									</PanelRow>
-								) }
-							</PanelBody>
-						</Panel>
+									) }
+								</VStack>
+							</Tabs.TabPanel>
 
-						<Panel>
-							<PanelBody
-								title={ __( 'REST API' ) }
-								initialOpen={ false }
-							>
+							<Tabs.TabPanel tabId="rest-api" focusable={ false }>
 								<VStack spacing={ 4 }>
-									<PanelRow>
-										<ToggleControl
-											__nextHasNoMarginBottom
-											label={ __( 'Show in REST' ) }
-											checked={ config.show_in_rest }
-											onChange={ ( value: boolean ) =>
-												updateField(
-													'show_in_rest',
-													value
-												)
-											}
-										/>
-									</PanelRow>
+									<ToggleControl
+										__nextHasNoMarginBottom
+										label={ __( 'Show in REST' ) }
+										checked={ config.show_in_rest }
+										onChange={ ( value: boolean ) =>
+											updateField( 'show_in_rest', value )
+										}
+									/>
 									<TextControl
 										__next40pxDefaultSize
 										__nextHasNoMarginBottom
@@ -525,18 +543,17 @@ function EntityEdit() {
 										}
 									/>
 								</VStack>
-							</PanelBody>
-						</Panel>
+							</Tabs.TabPanel>
 
-						{ ! isPostType && (
-							<Panel>
-								<PanelBody
-									title={ __( 'Post Types' ) }
-									initialOpen
+							{ ! isPostType && (
+								<Tabs.TabPanel
+									tabId="post-types"
+									focusable={ false }
 								>
-									{ availablePostTypes.map( ( pt ) => (
-										<PanelRow key={ pt.slug }>
+									<VStack spacing={ 3 }>
+										{ availablePostTypes.map( ( pt ) => (
 											<CheckboxControl
+												key={ pt.slug }
 												__nextHasNoMarginBottom
 												label={
 													pt.labels?.name || pt.slug
@@ -553,27 +570,20 @@ function EntityEdit() {
 													)
 												}
 											/>
-										</PanelRow>
-									) ) }
-									{ availablePostTypes.length === 0 && (
-										<PanelRow>
+										) ) }
+										{ availablePostTypes.length === 0 && (
 											<p>
 												{ __(
 													'No post types available.'
 												) }
 											</p>
-										</PanelRow>
-									) }
-								</PanelBody>
-							</Panel>
-						) }
+										) }
+									</VStack>
+								</Tabs.TabPanel>
+							) }
 
-						{ isPostType && (
-							<Panel>
-								<PanelBody
-									title={ __( 'Menu' ) }
-									initialOpen={ false }
-								>
+							{ isPostType && (
+								<Tabs.TabPanel tabId="menu" focusable={ false }>
 									<VStack spacing={ 4 }>
 										<TextControl
 											__next40pxDefaultSize
@@ -612,44 +622,42 @@ function EntityEdit() {
 											}
 										/>
 									</VStack>
-								</PanelBody>
-							</Panel>
-						) }
+								</Tabs.TabPanel>
+							) }
 
-						{ isPostType && (
-							<Panel>
-								<PanelBody
-									title={ __( 'Supports' ) }
-									initialOpen={ false }
+							{ isPostType && (
+								<Tabs.TabPanel
+									tabId="supports"
+									focusable={ false }
 								>
-									{ POST_TYPE_SUPPORTS.map( ( feature ) => (
-										<PanelRow key={ feature }>
-											<CheckboxControl
-												__nextHasNoMarginBottom
-												label={ feature }
-												checked={
-													!! config.supports?.[
-														feature
-													]
-												}
-												onChange={ ( value: boolean ) =>
-													updateSupport(
-														feature,
-														value
-													)
-												}
-											/>
-										</PanelRow>
-									) ) }
-								</PanelBody>
-							</Panel>
-						) }
+									<VStack spacing={ 3 }>
+										{ POST_TYPE_SUPPORTS.map(
+											( feature ) => (
+												<CheckboxControl
+													key={ feature }
+													__nextHasNoMarginBottom
+													label={ feature }
+													checked={
+														!! config.supports?.[
+															feature
+														]
+													}
+													onChange={ (
+														value: boolean
+													) =>
+														updateSupport(
+															feature,
+															value
+														)
+													}
+												/>
+											)
+										) }
+									</VStack>
+								</Tabs.TabPanel>
+							) }
 
-						<Panel>
-							<PanelBody
-								title={ __( 'Labels' ) }
-								initialOpen={ false }
-							>
+							<Tabs.TabPanel tabId="labels" focusable={ false }>
 								<VStack spacing={ 4 }>
 									{ [
 										'add_new',
@@ -679,8 +687,8 @@ function EntityEdit() {
 										/>
 									) ) }
 								</VStack>
-							</PanelBody>
-						</Panel>
+							</Tabs.TabPanel>
+						</Tabs>
 					</VStack>
 				</div>
 			</Page>
