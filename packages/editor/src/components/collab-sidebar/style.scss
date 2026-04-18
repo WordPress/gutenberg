@@ -86,12 +86,15 @@
 	line-height: 16px;
 }
 
-.editor-collab-sidebar-panel__note-preview-img {
-	display: block;
-	width: 18px;
-	height: 18px;
-	border-radius: 1px;
-	object-fit: cover;
+.editor-collab-sidebar-panel__note-preview-image {
+	.editor-collab-sidebar-panel__note-preview-img {
+		display: block;
+		width: 18px;
+		height: 18px;
+		border-radius: 1px;
+		object-fit: cover;
+		object-position: 0% 0%;
+	}
 }
 
 .editor-collab-sidebar-panel__note-preview-text {
