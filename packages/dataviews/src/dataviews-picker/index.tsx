@@ -71,6 +71,7 @@ type DataViewsPickerProps< Item > = {
 	};
 	itemListLabel?: string;
 	empty?: ReactNode;
+	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -143,6 +144,7 @@ function DataViewsPicker< Item >( {
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	itemListLabel,
 	empty,
+	onReset,
 }: DataViewsPickerProps< Item > ) {
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
 	const { data: displayData, setVisibleEntries } = useData( {
@@ -250,6 +252,7 @@ function DataViewsPicker< Item >( {
 				config,
 				itemListLabel,
 				empty,
+				onReset,
 				hasInitiallyLoaded: true,
 				intersectionObserver,
 			} }

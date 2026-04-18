@@ -21,28 +21,22 @@ export const useMetaBoxInitialization = ( enabled ) => {
 	const {
 		isEnabledAndEditorReady,
 		isCollaborationEnabled,
-		hasMetaBoxes,
-		allMetaBoxes,
-		rtcCompatibleIds,
+		hasIncompatibleMetaBoxes,
 	} = useSelect(
 		( select ) => ( {
 			isEnabledAndEditorReady:
 				enabled && select( editorStore ).__unstableIsEditorReady(),
 			isCollaborationEnabled:
 				select( editorStore ).isCollaborationEnabledForCurrentPost(),
-			hasMetaBoxes: enabled
-				? select( editPostStore ).hasMetaBoxes()
+			hasIncompatibleMetaBoxes: enabled
+				? select( editPostStore )
+						.getAllMetaBoxes()
+						.some( ( metaBox ) => ! metaBox.__rtc_compatible )
 				: false,
-			allMetaBoxes: enabled
-				? select( editPostStore ).getAllMetaBoxes()
-				: [],
-			rtcCompatibleIds:
-				select( editPostStore ).getRtcCompatibleMetaBoxIds(),
 		} ),
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
-
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
 
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
@@ -51,17 +45,9 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		if ( isEnabledAndEditorReady ) {
 			initializeMetaBoxes();
 
-			// Disable real-time collaboration when legacy meta boxes are detected.
-			// Meta boxes marked with __rtc_compatible_meta_box on the server
-			// have their IDs stored via setRtcCompatibleMetaBoxIds().
-			if ( isCollaborationEnabled ) {
-				const hasIncompatibleMetaBoxes = allMetaBoxes.some(
-					( metaBox ) => ! rtcCompatibleIds.includes( metaBox.id )
-				);
-
-				if ( hasIncompatibleMetaBoxes ) {
-					setCollaborationSupported( false );
-				}
+			// Disable real-time collaboration when incompatible meta boxes are detected.
+			if ( isCollaborationEnabled && hasIncompatibleMetaBoxes ) {
+				setCollaborationSupported( false );
 			}
 		}
 	}, [
@@ -69,8 +55,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		setCollaborationSupported,
-		hasMetaBoxes,
-		allMetaBoxes,
-		rtcCompatibleIds,
+		hasIncompatibleMetaBoxes,
 	] );
 };

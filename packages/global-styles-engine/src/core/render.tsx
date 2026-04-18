@@ -7,8 +7,8 @@ import {
 	getBlockSupport,
 	getBlockTypes,
 	store as blocksStore,
-	// @ts-expect-error - @wordpress/blocks module doesn't have TypeScript declarations
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { getCSSRules, getCSSValueFromRawStyle } from '@wordpress/style-engine';
 import { select } from '@wordpress/data';
 
@@ -34,12 +34,7 @@ import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getSetting } from '../settings/get-setting';
-import type {
-	BlockStyleVariation,
-	BlockType,
-	GlobalStylesConfig,
-	GlobalStylesStyles,
-} from '../types';
+import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -143,6 +138,8 @@ export type BlockSelectors = Record<
 	}
 >;
 
+type ElementName = keyof typeof ELEMENTS;
+
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
 	button: 'wp-element-button',
@@ -157,6 +154,13 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	dimensions: 'dimensions',
 	spacing: 'spacing',
 	typography: 'typography',
+};
+
+// The valid pseudo-selectors that can be used for blocks.
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS.
+const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
+	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
 /**
@@ -857,12 +861,23 @@ const STYLE_KEYS = [
 ];
 
 function pickStyleKeys( treeToPickFrom: any ): any {
+	return pickStyleAndPseudoKeys( treeToPickFrom );
+}
+
+function pickStyleAndPseudoKeys(
+	treeToPickFrom: any,
+	blockName?: string
+): any {
 	if ( ! treeToPickFrom ) {
 		return {};
 	}
 	const entries = Object.entries( treeToPickFrom );
-	const pickedEntries = entries.filter( ( [ key ] ) =>
-		STYLE_KEYS.includes( key )
+	const allowedPseudoSelectors = blockName
+		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		: [];
+	const pickedEntries = entries.filter(
+		( [ key ] ) =>
+			STYLE_KEYS.includes( key ) || allowedPseudoSelectors.includes( key )
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -870,6 +885,92 @@ function pickStyleKeys( treeToPickFrom: any ): any {
 		JSON.parse( JSON.stringify( style ) ),
 	] );
 	return Object.fromEntries( clonedEntries );
+}
+
+function appendPseudoSelectorStyles(
+	styles: Record< string, any >,
+	selector: string,
+	ruleset: string,
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	treeSettings: Record< string, any > | undefined,
+	blockName: string | undefined,
+	styleVariationSelector?: string
+): string {
+	const pseudoSelectorStyles = Object.entries( styles ).filter( ( [ key ] ) =>
+		key.startsWith( ':' )
+	);
+
+	if ( ! pseudoSelectorStyles.length ) {
+		return ruleset;
+	}
+
+	pseudoSelectorStyles.forEach( ( [ pseudoKey, pseudoStyle ] ) => {
+		if ( ! pseudoStyle || typeof pseudoStyle !== 'object' ) {
+			return;
+		}
+
+		const remainingPseudoStyles = JSON.parse(
+			JSON.stringify( pseudoStyle )
+		);
+
+		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
+			let pseudoFeatureDeclarations = getFeatureDeclarations(
+				featureSelectors,
+				remainingPseudoStyles
+			);
+
+			pseudoFeatureDeclarations = updateParagraphTextIndentSelector(
+				pseudoFeatureDeclarations,
+				treeSettings,
+				blockName
+			);
+
+			pseudoFeatureDeclarations = updateButtonWidthDeclarations(
+				pseudoFeatureDeclarations,
+				treeSettings
+			);
+
+			Object.entries( pseudoFeatureDeclarations ).forEach(
+				( [ baseSelector, declarations ] ) => {
+					if ( ! declarations.length ) {
+						return;
+					}
+					const pseudoFeatureSelector = appendToSelector(
+						baseSelector,
+						pseudoKey
+					);
+					const cssSelector = styleVariationSelector
+						? concatFeatureVariationSelectorString(
+								pseudoFeatureSelector,
+								styleVariationSelector
+						  )
+						: pseudoFeatureSelector;
+					const rules = declarations.join( ';' );
+					ruleset += `:root :where(${ cssSelector }){${ rules };}`;
+				}
+			);
+		}
+
+		const pseudoDeclarations = getStylesDeclarations(
+			remainingPseudoStyles
+		);
+
+		if ( ! pseudoDeclarations.length ) {
+			return;
+		}
+
+		const pseudoSelector = appendToSelector( selector, pseudoKey );
+		const pseudoRule = `:root :where(${ pseudoSelector }){${ pseudoDeclarations.join(
+			';'
+		) };}`;
+
+		ruleset += pseudoRule;
+	} );
+
+	return ruleset;
 }
 
 export const getNodesWithStyles = (
@@ -923,7 +1024,7 @@ export const getNodesWithStyles = (
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockStyles = pickStyleKeys( node );
+			const blockStyles = pickStyleAndPseudoKeys( node, blockName );
 			const typedNode = node as BlockNode;
 
 			// Store variation data for later processing, but don't add to nodes yet.
@@ -935,8 +1036,10 @@ export const getNodesWithStyles = (
 				Object.entries( typedNode.variations ).forEach(
 					( [ variationName, variation ] ) => {
 						const typedVariation = variation as BlockVariation;
-						variations[ variationName ] =
-							pickStyleKeys( typedVariation );
+						variations[ variationName ] = pickStyleAndPseudoKeys(
+							typedVariation,
+							blockName
+						);
 						if ( typedVariation?.css ) {
 							variations[ variationName ].css =
 								typedVariation.css;
@@ -956,12 +1059,15 @@ export const getNodesWithStyles = (
 						Object.entries(
 							typedVariation?.elements ?? {}
 						).forEach( ( [ element, elementStyles ] ) => {
-							if ( elementStyles && ELEMENTS[ element ] ) {
+							if (
+								elementStyles &&
+								ELEMENTS[ element as ElementName ]
+							) {
 								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
-										ELEMENTS[ element ]
+										ELEMENTS[ element as ElementName ]
 									),
 								} );
 							}
@@ -1002,7 +1108,10 @@ export const getNodesWithStyles = (
 										: undefined;
 
 								const variationBlockStyleNodes =
-									pickStyleKeys( variationBlockStyles );
+									pickStyleAndPseudoKeys(
+										variationBlockStyles,
+										variationBlockName
+									);
 
 								if ( variationBlockStyles?.css ) {
 									variationBlockStyleNodes.css =
@@ -1040,14 +1149,16 @@ export const getNodesWithStyles = (
 									] ) => {
 										if (
 											variationBlockElementStyles &&
-											ELEMENTS[ variationBlockElement ]
+											ELEMENTS[
+												variationBlockElement as ElementName
+											]
 										) {
 											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
 													ELEMENTS[
-														variationBlockElement
+														variationBlockElement as ElementName
 													]
 												),
 											} );
@@ -1088,7 +1199,7 @@ export const getNodesWithStyles = (
 						typeof blockSelectors !== 'string' &&
 						value &&
 						blockSelectors?.[ blockName ] &&
-						ELEMENTS[ elementName ]
+						ELEMENTS[ elementName as ElementName ]
 					) {
 						nodes.push( {
 							styles: value,
@@ -1096,7 +1207,9 @@ export const getNodesWithStyles = (
 								.split( ',' )
 								.map( ( sel: string ) => {
 									const elementSelectors =
-										ELEMENTS[ elementName ].split( ',' );
+										ELEMENTS[
+											elementName as ElementName
+										].split( ',' );
 									return elementSelectors.map(
 										( elementSelector: string ) =>
 											sel + ' ' + elementSelector
@@ -1558,6 +1671,17 @@ export const transformToStyles = (
 										`:root :where(${ styleVariationSelector })`
 									);
 								}
+
+								ruleset = appendPseudoSelectorStyles(
+									styleVariations,
+									styleVariationSelector as string,
+									ruleset,
+									featureSelectors,
+									tree.settings,
+									name,
+									styleVariationSelector as string
+								);
+
 								// Generate layout styles for the variation if it supports layout and has blockGap defined.
 								if (
 									hasLayoutSupport &&
@@ -1579,45 +1703,14 @@ export const transformToStyles = (
 					);
 				}
 
-				// Check for pseudo selector in `styles` and handle separately.
-				const pseudoSelectorStyles = Object.entries( styles ).filter(
-					( [ key ] ) => key.startsWith( ':' )
+				ruleset = appendPseudoSelectorStyles(
+					styles,
+					selector,
+					ruleset,
+					featureSelectors,
+					tree.settings,
+					name
 				);
-
-				if ( pseudoSelectorStyles?.length ) {
-					pseudoSelectorStyles.forEach(
-						( [ pseudoKey, pseudoStyle ] ) => {
-							const pseudoDeclarations =
-								getStylesDeclarations( pseudoStyle );
-
-							if ( ! pseudoDeclarations?.length ) {
-								return;
-							}
-
-							// `selector` may be provided in a form
-							// where block level selectors have sub element
-							// selectors appended to them as a comma separated
-							// string.
-							// e.g. `h1 a,h2 a,h3 a,h4 a,h5 a,h6 a`;
-							// Split and append pseudo selector to create
-							// the proper rules to target the elements.
-							const _selector = selector
-								.split( ',' )
-								.map( ( sel: string ) => sel + pseudoKey )
-								.join( ',' );
-
-							// As pseudo classes such as :hover, :focus etc. have class-level
-							// specificity, they must use the `:root :where()` wrapper. This.
-							// caps the specificity at `0-1-0` to allow proper nesting of variations
-							// and block type element styles.
-							const pseudoRule = `:root :where(${ _selector }){${ pseudoDeclarations.join(
-								';'
-							) };}`;
-
-							ruleset += pseudoRule;
-						}
-					);
-				}
 			}
 		);
 	}
@@ -1726,10 +1819,9 @@ export const getBlockSelectors = (
 				'color.__experimentalDuotone',
 				false
 			);
-			duotoneSelector =
-				duotoneSupport &&
-				rootSelector &&
-				scopeSelector( rootSelector, duotoneSupport );
+			if ( typeof duotoneSupport === 'string' && rootSelector ) {
+				duotoneSelector = scopeSelector( rootSelector, duotoneSupport );
+			}
 		}
 
 		const hasLayoutSupport =
@@ -1741,7 +1833,7 @@ export const getBlockSelectors = (
 
 		const blockStyleVariations = getBlockStyles( name );
 		const styleVariationSelectors: Record< string, string > = {};
-		blockStyleVariations?.forEach( ( variation: BlockStyleVariation ) => {
+		blockStyleVariations?.forEach( ( variation ) => {
 			const variationSuffix = variationInstanceId
 				? `-${ variationInstanceId }`
 				: '';

@@ -278,19 +278,6 @@ export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 }
 
 /**
- * Stores the IDs of meta boxes marked as compatible with real-time collaboration
- * via the __rtc_compatible_meta_box flag on the server.
- *
- * @param {string[]} ids Meta box IDs that are RTC-compatible.
- */
-export function setRtcCompatibleMetaBoxIds( ids ) {
-	return {
-		type: 'SET_RTC_COMPATIBLE_META_BOX_IDS',
-		ids,
-	};
-}
-
-/**
  * Update a metabox.
  */
 export const requestMetaBoxUpdates =

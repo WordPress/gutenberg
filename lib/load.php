@@ -215,8 +215,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
 
-// Content Guidelines (only load when experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' ) ) {
-	require __DIR__ . '/experimental/content-guidelines/load.php';
-	require __DIR__ . '/experimental/content-guidelines/index.php';
+// Guidelines (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
+	require __DIR__ . '/experimental/guidelines/load.php';
+	require __DIR__ . '/experimental/guidelines/index.php';
 }

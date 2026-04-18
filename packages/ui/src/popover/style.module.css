@@ -1,11 +1,33 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
 @layer wp-ui-components {
 	.positioner {
 		z-index: var(--wp-ui-popover-z-index, initial);
 	}
 
-	.popup {
+	/*
+	 * Structural marker; no visual styles. Always applied to the popup so
+	 * the ThemeProvider display workaround above matches regardless of
+	 * `variant`. Visuals live in `.default`.
+	 */
+	/* stylelint-disable-next-line block-no-empty -- structural marker for the
+	 * ThemeProvider display workaround above; kept class-based (not a data
+	 * attribute) so it is defined alongside the other component classes. */
+	.popup {}
+
+	.default {
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		padding: var(--wpds-dimension-padding-lg);
 		border-radius: var(--wpds-border-radius-md);

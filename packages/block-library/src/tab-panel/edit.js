@@ -27,10 +27,8 @@ export default function Edit( { clientId } ) {
 
 	// Get the parent tabs block clientId
 	const tabsClientId = useSelect(
-		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
-			return getBlockRootClientId( clientId );
-		},
+		( select ) =>
+			select( blockEditorStore ).getBlockRootClientId( clientId ),
 		[ clientId ]
 	);
 
