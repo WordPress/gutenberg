@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Disable Composer 2.8+ `audit.block-insecure` before installing PHPUnit in the tests-cli image so that advisories on abandoned PHPUnit majors don't block the image build. ([#77470](https://github.com/WordPress/gutenberg/issues/77470))
+
 ## 11.4.0 (2026-04-15)
 
 ### Bug Fixes

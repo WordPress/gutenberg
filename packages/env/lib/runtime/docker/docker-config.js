@@ -230,7 +230,7 @@ RUN rm /tmp/composer-setup.php`;
 	dockerFileContent += `
 USER $HOST_UID:$HOST_GID
 ENV PATH="\${PATH}:/home/$HOST_USERNAME/.composer/vendor/bin"
-RUN composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
+RUN composer config --global audit.block-insecure false && composer global require --dev phpunit/phpunit:"^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0 || ^10.0"
 USER root`;
 
 	return dockerFileContent;
