@@ -249,21 +249,4 @@
 			rotate: 180deg;
 		}
 	}
-
-	.tabpanel {
-		&:focus {
-			box-shadow: none;
-			outline: none;
-		}
-
-		&:focus-visible {
-			box-shadow:
-				0 0 0 var(--wpds-border-width-focus)
-				var(--wpds-color-stroke-focus-brand);
-
-			/* Windows high contrast mode. */
-			outline: 2px solid transparent;
-			outline-offset: 0;
-		}
-	}
 }
