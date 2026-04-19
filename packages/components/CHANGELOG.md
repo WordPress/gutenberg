@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   `Popover`: Reset `will-change` after positioning to fix blurry rendering on certain GPUs ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
 -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
 -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
