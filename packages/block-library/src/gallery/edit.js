@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
+	BaseControl,
 	SelectControl,
 	ToggleControl,
 	RangeControl,
@@ -16,6 +17,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalVStack as VStack,
 	ToolbarDropdownMenu,
 	PanelBody,
 } from '@wordpress/components';
@@ -29,6 +31,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
+import { useInstanceId } from '@wordpress/compose';
 import { Platform, useEffect, useMemo } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -158,6 +161,8 @@ export default function GalleryEdit( props ) {
 		linkTo,
 		sizeSlug,
 		aspectRatio,
+		showCaptionInGallery,
+		showCaptionInLightbox,
 	} = attributes;
 
 	const {
@@ -231,6 +236,11 @@ export default function GalleryEdit( props ) {
 		  ).length > 0
 		: images.filter( ( image ) => image.attributes.lightbox?.enabled )
 				.length > 0;
+
+	const captionsGroupId = useInstanceId(
+		GalleryEdit,
+		'gallery-captions-group'
+	);
 
 	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
 		label: name,
@@ -844,6 +854,62 @@ export default function GalleryEdit( props ) {
 								</ToggleGroupControl>
 							) }
 						</ToolsPanelItem>
+						{ hasLightboxImages && (
+							<ToolsPanelItem
+								label={ __( 'Captions' ) }
+								isShownByDefault
+								hasValue={ () =>
+									showCaptionInGallery === false ||
+									showCaptionInLightbox === false
+								}
+								onDeselect={ () =>
+									setAttributes( {
+										showCaptionInGallery: undefined,
+										showCaptionInLightbox: undefined,
+									} )
+								}
+							>
+								<BaseControl
+									__nextHasNoMarginBottom
+									id={ captionsGroupId }
+									label={ __( 'Captions' ) }
+								>
+									<VStack spacing={ 4 }>
+										<ToggleControl
+											__nextHasNoMarginBottom
+											label={ __( 'Show in gallery' ) }
+											checked={
+												showCaptionInGallery !== false
+											}
+											onChange={ ( value ) =>
+												setAttributes( {
+													showCaptionInGallery: value,
+												} )
+											}
+											help={ __(
+												'Display image captions beneath each image on the page.'
+											) }
+										/>
+										<ToggleControl
+											__nextHasNoMarginBottom
+											label={ __( 'Show in lightbox' ) }
+											checked={
+												showCaptionInLightbox !== false
+											}
+											onChange={ ( value ) =>
+												setAttributes( {
+													showCaptionInLightbox:
+														value,
+												} )
+											}
+											help={ __(
+												'Display image captions at the bottom of the lightbox overlay.'
+											) }
+										/>
+									</VStack>
+								</BaseControl>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				) }
 				{ Platform.isNative && (

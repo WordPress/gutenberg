@@ -12,7 +12,9 @@
 		"postId",
 		"postType",
 		"queryId",
-		"galleryId"
+		"galleryId",
+		"showCaptionInGallery",
+		"showCaptionInLightbox"
 	],
 	"description": "Insert an image to make a visual statement.",
 	"keywords": [ "img", "photo", "picture" ],
