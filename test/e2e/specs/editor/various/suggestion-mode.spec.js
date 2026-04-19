@@ -39,21 +39,19 @@ test.describe( 'Suggestion mode', () => {
 	} );
 
 	test( 'announces the mode change with a snackbar', async ( { page } ) => {
-		// The mode change also fires an a11y live-region announcement with
-		// the same text, so scope to the snackbar region to avoid a strict
-		// mode violation matching both.
-		const snackbarRegion = page.getByRole( 'region', {
-			name: 'Notifications',
-		} );
+		// The mode change also fires an a11y live-region announcement
+		// carrying the same text, so scope to the snackbar list to avoid a
+		// strict-mode match on both the snackbar and the live region.
+		const snackbarList = page.locator( '.components-snackbar-list' );
 
 		await switchIntent( page, 'Suggest' );
 		await expect(
-			snackbarRegion.getByText( "You're suggesting" )
+			snackbarList.getByText( "You're suggesting" )
 		).toBeVisible();
 
 		await switchIntent( page, 'Edit' );
 		await expect(
-			snackbarRegion.getByText( "You're editing" )
+			snackbarList.getByText( "You're editing" )
 		).toBeVisible();
 	} );
 

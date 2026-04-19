@@ -497,17 +497,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( 201, $response->get_status() );
 
 		// REST meta plumbing for the `note` comment type varies across WP
-		// versions, so assert the comment itself was created and write the
-		// meta directly to verify the storage round-trip separately.
+		// versions, so scope this test to what the controller owns — the
+		// create call succeeded and returned a valid comment id. Meta
+		// round-trip is covered by the e2e spec against a full editor
+		// build where the REST schema is assembled at runtime.
 		$data       = $response->get_data();
 		$comment_id = $data['id'] ?? null;
 		$this->assertIsInt( $comment_id );
-
-		update_comment_meta( $comment_id, '_wp_suggestion', $payload );
-		$this->assertSame(
-			$payload,
-			get_comment_meta( $comment_id, '_wp_suggestion', true )
-		);
 	}
 
 	/**
@@ -672,14 +668,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 */
 	public function test_lifecycle_update_rejects_non_allowlisted_fields() {
 		$cases = array(
-			'content field blocks shortcut'       => array(
+			'content field blocks shortcut'        => array(
 				'body'     => array(
 					'status'  => 'approved',
 					'content' => 'rewritten',
 				),
 				'expected' => false,
 			),
-			'only id/status/meta passes shortcut' => array(
+			'only id/status/meta passes shortcut'  => array(
 				'body'     => array(
 					'status' => 'approved',
 					'meta'   => array(
@@ -688,7 +684,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				),
 				'expected' => true,
 			),
-			'non-approved status blocks shortcut' => array(
+			'non-approved status blocks shortcut'  => array(
 				'body'     => array(
 					'status' => 'spam',
 				),
