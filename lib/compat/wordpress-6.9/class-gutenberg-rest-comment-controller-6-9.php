@@ -720,5 +720,6 @@ add_action(
 	function () {
 		$controller = new Gutenberg_REST_Comment_Controller_6_9();
 		$controller->register_routes();
-	}
+	},
+	11
 );
