@@ -1,5 +1,17 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
 @layer wp-ui-utilities {
 	.popup {
 		composes: dropdown-motion from "./dropdown-motion.module.css";
@@ -16,8 +28,8 @@
 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
 		line-height: 1.4;
 		color: var(--wpds-color-fg-interactive-neutral);
 	}

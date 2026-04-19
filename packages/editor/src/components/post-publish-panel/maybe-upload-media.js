@@ -102,7 +102,7 @@ function Image( { clientId, alt, url } ) {
 				height: '32px',
 				objectFit: 'cover',
 				borderRadius: '2px',
-				cursor: 'pointer',
+				cursor: 'var(--wpds-cursor-control)',
 			} }
 			whileHover={ { scale: 1.08 } }
 		/>

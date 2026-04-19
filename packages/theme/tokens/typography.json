@@ -1,6 +1,6 @@
 {
-	"wpds-font": {
-		"family": {
+	"wpds-typography": {
+		"font-family": {
 			"$type": "fontFamily",
 			"heading": {
 				"$value": [
@@ -35,7 +35,7 @@
 				"$description": "Monospace font family"
 			}
 		},
-		"size": {
+		"font-size": {
 			"$type": "dimension",
 			"xs": {
 				"$value": { "value": 11, "unit": "px" },
@@ -95,7 +95,7 @@
 				"com.figma.scopes": [ "LINE_HEIGHT" ]
 			}
 		},
-		"weight": {
+		"font-weight": {
 			"$type": "fontWeight",
 			"regular": {
 				"$value": 400,

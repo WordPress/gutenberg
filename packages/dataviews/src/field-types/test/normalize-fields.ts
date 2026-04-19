@@ -339,6 +339,50 @@ describe( 'normalizeFields: default getValue', () => {
 		} );
 	} );
 
+	describe( 'validation normalization', () => {
+		it( 'ignores string min/max rules on numeric fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'price',
+					type: 'number',
+					isValid: {
+						min: '1',
+						max: '10',
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
+		} );
+
+		it( 'ignores numeric min/max rules on date-like fields', () => {
+			const fields: Field< {} >[] = [
+				{
+					id: 'publishDate',
+					type: 'date',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
+				{
+					id: 'publishedAt',
+					type: 'datetime',
+					isValid: {
+						min: 1,
+						max: 10,
+					},
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			expect( normalizedFields[ 0 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 0 ].isValid.max ).toBeUndefined();
+			expect( normalizedFields[ 1 ].isValid.min ).toBeUndefined();
+			expect( normalizedFields[ 1 ].isValid.max ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'format normalization', () => {
 		it( 'applies default format when not provided for date fields', () => {
 			const fields: Field< {} >[] = [

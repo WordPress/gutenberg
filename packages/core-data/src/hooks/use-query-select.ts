@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import memoize from './memoize';
+import memoize from 'memize';
 import { Status } from './constants';
 
 export const META_SELECTORS = [

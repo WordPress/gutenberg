@@ -28,6 +28,7 @@ const allEventListeners = [
 export function useEventListeners( props ) {
 	const propsRef = useRef( props );
 	useInsertionEffect( () => {
+		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		propsRef.current = props;
 	} );
 	const refEffects = useMemo(

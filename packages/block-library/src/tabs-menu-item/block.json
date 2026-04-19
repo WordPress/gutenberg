@@ -5,7 +5,6 @@
 	"name": "core/tabs-menu-item",
 	"title": "Tab Menu Item",
 	"description": "A single tab button in the tabs menu.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/tabs-menu" ],
@@ -17,15 +16,10 @@
 		"core/tabs-menu-item-id",
 		"core/tabs-menu-item-label"
 	],
-	"attributes": {
-		"anchor": {
-			"type": "string",
-			"default": ""
-		}
-	},
 	"supports": {
 		"html": false,
 		"reusable": false,
+		"visibility": false,
 		"lock": false,
 		"color": {
 			"background": true,
@@ -54,9 +48,6 @@
 			"color": true,
 			"width": true,
 			"style": true
-		},
-		"layout": {
-			"allowEditing": false
 		}
 	},
 	"editorScript": "file:./index.js",

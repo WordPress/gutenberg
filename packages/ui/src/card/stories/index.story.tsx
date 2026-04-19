@@ -10,10 +10,10 @@ function Text( { children }: { children: React.ReactNode } ) {
 		<p
 			style={ {
 				margin: 0,
-				fontFamily: 'var(--wpds-font-family-body)',
-				fontSize: 'var(--wpds-font-size-md)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-sm)',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				fontSize: 'var(--wpds-typography-font-size-md)',
+				fontWeight: 'var(--wpds-typography-font-weight-regular)',
+				lineHeight: 'var(--wpds-typography-line-height-sm)',
 				textWrap: 'pretty',
 				color: 'var(--wpds-color-fg-content-neutral-weak)',
 			} }
@@ -116,7 +116,6 @@ export const CustomSemantics: Story = {
 		children: (
 			<>
 				<Card.Header>
-					{ /* eslint-disable-next-line jsx-a11y/heading-has-content -- content provided via render prop */ }
 					<Card.Title render={ <h2 /> }>Section heading</Card.Title>
 				</Card.Header>
 				<Card.Content>

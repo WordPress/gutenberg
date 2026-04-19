@@ -78,13 +78,9 @@ function GridItem< Item >( {
 }: GridItemProps< Item > ) {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
-	const elementRef = useRef< HTMLElement | null >( null );
+	const elementRef = useRef< HTMLButtonElement >( null );
 
 	const isSelected = selection.includes( id );
-
-	const setElementRef = ( element: HTMLElement | null ) => {
-		elementRef.current = element;
-	};
 
 	useIntersectionObserver( elementRef, posinset );
 
@@ -102,7 +98,7 @@ function GridItem< Item >( {
 
 	return (
 		<Composite.Item
-			ref={ setElementRef }
+			ref={ elementRef }
 			aria-label={
 				titleField
 					? titleField.getValue( { item } ) || __( '(no title)' )

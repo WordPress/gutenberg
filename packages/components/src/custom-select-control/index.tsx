@@ -13,7 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import _CustomSelect from '../custom-select-control-v2/custom-select';
+import CustomSelect from '../custom-select-control-v2/custom-select';
 import CustomSelectItem from '../custom-select-control-v2/item';
 import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps, CustomSelectOption } from './types';
@@ -189,7 +189,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 
 	return (
 		<>
-			<_CustomSelect
+			<CustomSelect
 				aria-describedby={ descriptionId }
 				renderSelectedValue={ renderSelectedValue }
 				size={ translatedSize }
@@ -203,7 +203,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 				{ ...restProps }
 			>
 				{ children }
-			</_CustomSelect>
+			</CustomSelect>
 			<VisuallyHidden>
 				<span id={ descriptionId }>
 					{ getDescribedBy( selectedOption?.name, describedBy ) }

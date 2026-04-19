@@ -469,7 +469,7 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view__expander {
 	height: $icon-size;
 	width: $icon-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {
