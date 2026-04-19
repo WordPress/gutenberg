@@ -120,6 +120,9 @@ export function getClosestTabbable(
 		// candidates. We must not skip contenteditable nodes that happen to
 		// contain links or other focusable inline elements, since those are the
 		// correct navigation targets.
+		//
+		// See https://github.com/WordPress/gutenberg/pull/77474
+		// TODO: Consider fixing focus.tabbable
 		if (
 			node.contentEditable !== 'true' &&
 			getBlockClientId( node ) &&
