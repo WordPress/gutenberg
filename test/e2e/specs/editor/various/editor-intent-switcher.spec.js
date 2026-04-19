@@ -14,7 +14,7 @@ test.describe( 'Editor intent switcher', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'defaults to Edit intent and persists across reload', async ( {
+	test( 'defaults to Edit intent on every editor load', async ( {
 		page,
 		editor,
 	} ) => {
@@ -38,13 +38,16 @@ test.describe( 'Editor intent switcher', () => {
 		await expect( viewChoice ).toBeVisible();
 		await expect( editChoice ).toHaveAttribute( 'aria-checked', 'true' );
 
-		// Select Suggest and confirm selection persists across reload.
+		// The intent is session-scoped: switching to Suggest and reloading
+		// must fall back to Edit rather than persist the previous choice.
 		await suggestChoice.click();
 		await page.reload();
 		await editor.canvas.locator( 'body' ).waitFor();
 		await openIntentSwitcher( page );
 		await expect(
-			page.getByRole( 'menuitemradio', { name: /^Suggest/ } )
+			page.getByRole( 'menuitemradio', {
+				name: /^Edit\s+Edit content directly/,
+			} )
 		).toHaveAttribute( 'aria-checked', 'true' );
 	} );
 
