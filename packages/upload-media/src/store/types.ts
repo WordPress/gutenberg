@@ -1,3 +1,19 @@
+/**
+ * Sub-size data returned by the sideload endpoint.
+ *
+ * Each sideload returns this lightweight object instead of a full attachment.
+ * The client accumulates these and sends them all to the finalize endpoint.
+ */
+export interface SubSizeData {
+	image_size: string;
+	width?: number;
+	height?: number;
+	file: string;
+	mime_type?: string;
+	filesize?: number;
+	original_image?: string;
+}
+
 export type QueueItemId = string;
 
 export type QueueStatus = 'active' | 'paused';
@@ -26,6 +42,7 @@ export interface QueueItem {
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	parentId?: QueueItemId;
+	subSizes?: SubSizeData[];
 }
 
 export interface State {
@@ -52,6 +69,7 @@ export enum Type {
 	CacheBlobUrl = 'CACHE_BLOB_URL',
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
+	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -104,6 +122,10 @@ export type UpdateProgressAction = Action<
 	Type.UpdateProgress,
 	{ id: QueueItemId; progress: number }
 >;
+export type AccumulateSubSizeAction = Action<
+	Type.AccumulateSubSize,
+	{ id: QueueItemId; subSize: SubSizeData }
+>;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
 	{ settings: Partial< Settings > }
@@ -145,8 +167,8 @@ export interface SideloadMediaArgs {
 	additionalData?: AdditionalData;
 	/** Function called when an error happens. */
 	onError?: OnErrorHandler;
-	/** Function called when the file or a temporary representation is available. */
-	onFileChange?: OnChangeHandler;
+	/** Function called when the sideload completes with sub-size data. */
+	onSuccess?: ( subSize: SubSizeData ) => void;
 	/** Abort signal to cancel the sideload operation. */
 	signal?: AbortSignal;
 }
@@ -182,7 +204,7 @@ export interface Settings {
 	// Default is 0.82 if not set.
 	imageQuality?: number;
 	// Function for finalizing an upload after all client-side processing is complete.
-	mediaFinalize?: ( id: number ) => Promise< void >;
+	mediaFinalize?: ( id: number, subSizes: SubSizeData[] ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.
