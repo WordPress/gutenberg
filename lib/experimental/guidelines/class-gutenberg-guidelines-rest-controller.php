@@ -169,6 +169,9 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 		$prepared             = $this->prepare_item_for_database( $request );
 		$prepared->post_type  = $this->post_type;
 		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
+		$prepared->tax_input  = array(
+			Gutenberg_Guidelines_Post_Type::TAXONOMY => array( Gutenberg_Guidelines_Post_Type::TERM_CONTENT ),
+		);
 
 		if ( ! isset( $prepared->post_status ) ) {
 			$prepared->post_status = 'draft';
