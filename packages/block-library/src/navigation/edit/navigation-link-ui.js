@@ -23,6 +23,8 @@ export function NavigationLinkUI( {
 	insertedBlock,
 	setInsertedBlock,
 	editingBlock,
+	editingPopoverAnchor,
+	editingPopoverProps,
 	setEditingBlock,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
@@ -48,6 +50,14 @@ export function NavigationLinkUI( {
 	} );
 
 	if ( ! showLinkControls && ! isEditingExistingBlock ) {
+		return null;
+	}
+
+	if (
+		isEditingExistingBlock &&
+		editingPopoverProps &&
+		! editingPopoverAnchor
+	) {
 		return null;
 	}
 
@@ -102,8 +112,12 @@ export function NavigationLinkUI( {
 		<LinkUI
 			clientId={ activeBlock?.clientId }
 			link={ activeBlock?.attributes }
+			anchor={ isEditingExistingBlock ? editingPopoverAnchor : undefined }
 			onBlockInsert={ handleSetActiveBlock }
 			onClose={ cleanupActiveBlock }
+			popoverProps={
+				isEditingExistingBlock ? editingPopoverProps : undefined
+			}
 			onChange={ ( updatedValue ) => {
 				// updateAttributes determines the final state and returns metadata
 				const { isEntityLink, attributes: updatedAttributes } =

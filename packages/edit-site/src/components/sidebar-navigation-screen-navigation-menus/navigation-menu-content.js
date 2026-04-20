@@ -6,9 +6,16 @@ import {
 	store as blockEditorStore,
 	BlockList,
 } from '@wordpress/block-editor';
+import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
@@ -39,6 +46,9 @@ const PAGES_QUERY = [
 
 export default function NavigationMenuContent( { rootClientId } ) {
 	const [ editingBlock, setEditingBlock ] = useState( null );
+	const [ editingPopoverAnchor, setEditingPopoverAnchor ] = useState( null );
+	const listViewRef = useRef( null );
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
@@ -96,11 +106,41 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
-	const LeafMoreMenuWithEditingBlock = useCallback( ( props ) => {
-		return (
-			<LeafMoreMenu { ...props } setEditingBlock={ setEditingBlock } />
+	useLayoutEffect( () => {
+		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
+			setEditingPopoverAnchor( null );
+			return;
+		}
+
+		setEditingPopoverAnchor(
+			listViewRef.current.querySelector(
+				`[data-block="${ editingBlock.clientId }"]`
+			)
 		);
-	}, [] );
+	}, [ editingBlock ] );
+
+	const editingPopoverProps = useMemo(
+		() =>
+			isMobile
+				? undefined
+				: {
+						placement: 'right-start',
+						offset: 16,
+				  },
+		[ isMobile ]
+	);
+
+	const LeafMoreMenuWithEditingBlock = useCallback(
+		( props ) => {
+			return (
+				<LeafMoreMenu
+					{ ...props }
+					setEditingBlock={ setEditingBlock }
+				/>
+			);
+		},
+		[ setEditingBlock ]
+	);
 
 	const NavigationLinkUIWithEditingBlock = useCallback(
 		( props ) => {
@@ -108,11 +148,18 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				<NavigationLinkUI
 					{ ...props }
 					editingBlock={ editingBlock }
+					editingPopoverAnchor={ editingPopoverAnchor }
+					editingPopoverProps={ editingPopoverProps }
 					setEditingBlock={ setEditingBlock }
 				/>
 			);
 		},
-		[ editingBlock ]
+		[
+			editingBlock,
+			editingPopoverAnchor,
+			editingPopoverProps,
+			setEditingBlock,
+		]
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -121,6 +168,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		<>
 			{ ! isLoading && (
 				<PrivateListView
+					ref={ listViewRef }
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenuWithEditingBlock }
