@@ -242,6 +242,11 @@
 							"description": "Allow users to set caption colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"code": {
+							"description": "Allow users to set code colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -1973,6 +1978,9 @@
 				},
 				"caption": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"code": {
+					"$ref": "#/definitions/stylesProperties"
 				},
 				"cite": {
 					"$ref": "#/definitions/stylesPropertiesComplete"

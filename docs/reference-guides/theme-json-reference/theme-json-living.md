@@ -99,6 +99,7 @@ Settings related to colors.
 | heading | Allow users to set heading colors in a block. | `boolean` | `true` |
 | button | Allow users to set button colors in a block. | `boolean` | `true` |
 | caption | Allow users to set caption colors in a block. | `boolean` | `true` |
+| code | Allow users to set code colors in a block. | `boolean` | `true` |
 
 ---
 
