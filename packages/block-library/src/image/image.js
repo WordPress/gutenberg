@@ -390,7 +390,19 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
+	const { onNavigateToEntityRecord, onEditMedia } = getSettings();
+
+	const handleMediaUpdate = useCallback(
+		( { id: newId, source_url: newUrl } ) => {
+			if ( typeof newId === 'number' && newId !== id ) {
+				setAttributes( {
+					id: newId,
+					url: newUrl ?? url,
+				} );
+			}
+		},
+		[ id, url, setAttributes ]
+	);
 
 	const {
 		replaceBlocks,
@@ -875,7 +887,15 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								onEditMedia && id
+									? () =>
+											onEditMedia( {
+												attachmentId: id,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

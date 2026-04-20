@@ -210,6 +210,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-media-editor-modal',
+		__( 'Media Editor Modal', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the in-place Media Editor modal for editing attachments (e.g. from the image block) without navigating to the attachment post type.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor-modal',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-guidelines',
 		__( 'Guidelines', 'gutenberg' ),
 		'gutenberg_display_experiment_field',

@@ -2,6 +2,8 @@
 
 Media editor components for WordPress.
 
+> **Experimental (private):** This package exposes a private `MediaEditorModal` component and a `core/media-editor` data store via `privateApis`. They are gated behind the `gutenberg-media-editor-modal` Gutenberg experiment and are not part of the public API. Consumers inside core should wire into the modal using the `onEditMedia` block editor setting, which `@wordpress/editor` exposes when the experiment is enabled.
+
 ## Installation
 
 ```bash
