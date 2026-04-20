@@ -520,6 +520,13 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 				'orderby'        => 'date',
 				'order'          => 'DESC',
 				'no_found_rows'  => true,
+				'tax_query'      => array(
+					array(
+						'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+					),
+				),
 			)
 		);
 

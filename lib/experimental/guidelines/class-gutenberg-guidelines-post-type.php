@@ -29,6 +29,13 @@ class Gutenberg_Guidelines_Post_Type {
 	const TAXONOMY = 'wp_guideline_type';
 
 	/**
+	 * Taxonomy term slug used for site-wide content guidelines.
+	 *
+	 * @var string
+	 */
+	const TERM_CONTENT = 'content';
+
+	/**
 	 * The standard guideline category meta keys.
 	 *
 	 * @var array
@@ -129,8 +136,8 @@ class Gutenberg_Guidelines_Post_Type {
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
 				'default_term'       => array(
-					'name' => 'content',
-					'slug' => 'content',
+					'name' => self::TERM_CONTENT,
+					'slug' => self::TERM_CONTENT,
 				),
 			)
 		);
