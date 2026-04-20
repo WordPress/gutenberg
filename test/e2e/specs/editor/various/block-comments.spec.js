@@ -61,11 +61,11 @@ test.describe( 'Block Comments', () => {
 			} )
 			.fill( 'A test comment' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'button', { name: 'Add note', exact: true } )
 			.click();
 		const thread = page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'treeitem', {
 				name: 'Note: A test comment',
 			} );
@@ -91,7 +91,7 @@ test.describe( 'Block Comments', () => {
 
 		await commentForm.fill( 'Test reply' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'button', { name: 'Reply', exact: true } )
 			.click();
 		await expect( commentText ).toHaveText( 'Test reply' );
@@ -114,7 +114,7 @@ test.describe( 'Block Comments', () => {
 			.first()
 			.fill( 'Test comment after edit.' );
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: 'Collab panel' } )
 			.getByRole( 'button', { name: 'Update', exact: true } )
 			.click();
 
@@ -254,7 +254,7 @@ test.describe( 'Block Comments', () => {
 
 		const threadsContainer = page
 			.getByRole( 'region', {
-				name: 'Editor settings',
+				name: 'Collab panel',
 			} )
 			.getByRole( 'tree' );
 		const threads = threadsContainer.getByRole( 'treeitem' );
@@ -315,7 +315,7 @@ test.describe( 'Block Comments', () => {
 
 					const thread = page
 						.getByRole( 'region', {
-							name: 'Editor settings',
+							name: 'Collab panel',
 						} )
 						.getByRole( 'treeitem', {
 							name: 'Note: Test comment',
@@ -362,14 +362,14 @@ test.describe( 'Block Comments', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const secondThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Two',
@@ -405,14 +405,14 @@ test.describe( 'Block Comments', () => {
 
 			const firstThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: One',
 				} );
 			const lastThread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Three',
@@ -438,7 +438,7 @@ test.describe( 'Block Comments', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment escape',
@@ -464,7 +464,7 @@ test.describe( 'Block Comments', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -489,7 +489,7 @@ test.describe( 'Block Comments', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -514,7 +514,7 @@ test.describe( 'Block Comments', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem' )
 				.first();
@@ -535,7 +535,7 @@ test.describe( 'Block Comments', () => {
 			} );
 			const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 			const replyButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } );
 
 			await replyForm.fill( 'First reply' );
@@ -557,7 +557,7 @@ test.describe( 'Block Comments', () => {
 
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -591,17 +591,17 @@ test.describe( 'Block Comments', () => {
 				comment: 'Third block comment',
 			} );
 			const firstThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: First block comment',
 				} );
 			const secondThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Second block comment',
 				} );
 			const thirdThread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Third block comment',
 				} );
@@ -664,7 +664,7 @@ test.describe( 'Block Comments', () => {
 			} );
 			await commentForm.fill( 'Test reply' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } )
 				.click();
 			await blockCommentUtils.clickBlockCommentActionMenuItem(
@@ -676,7 +676,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
 				} );
@@ -695,7 +695,7 @@ test.describe( 'Block Comments', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -727,7 +727,7 @@ test.describe( 'Block Comments', () => {
 			} );
 			const thread = page
 				.getByRole( 'region', {
-					name: 'Editor settings',
+					name: 'Collab panel',
 				} )
 				.getByRole( 'treeitem', {
 					name: 'Note: Test comment',
@@ -766,14 +766,14 @@ test.describe( 'Block Comments', () => {
 			// Test focus on action button when comment editing is cancelled.
 			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Cancel' } )
 				.first()
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Collab panel' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
@@ -784,13 +784,13 @@ test.describe( 'Block Comments', () => {
 				.first()
 				.fill( 'Test comment after edit.' );
 			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'button', { name: 'Update' } )
 				.click();
 
 			await expect(
 				page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Collab panel' } )
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 		} );
@@ -810,7 +810,7 @@ test.describe( 'Block Comments', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -845,7 +845,7 @@ test.describe( 'Block Comments', () => {
 				exact: true,
 			} );
 			const thread = page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: 'Collab panel' } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A test comment',
 				} );
@@ -881,7 +881,7 @@ class BlockCommentUtils {
 		if ( isClosed ) {
 			await toggleButton.click();
 			await this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: /Collab panel|Editor settings/ } )
 				.getByRole( 'button', { name: 'Close Notes' } )
 				.waitFor();
 		}
@@ -905,13 +905,13 @@ class BlockCommentUtils {
 					} )
 					.fill( comment );
 				await this.#page
-					.getByRole( 'region', { name: 'Editor settings' } )
+					.getByRole( 'region', { name: 'Collab panel' } )
 					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
 				await expect(
 					this.#page
 						.getByRole( 'region', {
-							name: 'Editor settings',
+							name: 'Collab panel',
 						} )
 						.getByRole( 'treeitem', {
 							name: `Note: ${ comment }`,
@@ -924,7 +924,7 @@ class BlockCommentUtils {
 
 	async clickBlockCommentActionMenuItem( actionName, index = 0 ) {
 		await this.#page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: /Collab panel|Editor settings/ } )
 			.getByRole( 'button', { name: 'Actions' } )
 			.nth( index )
 			.click();

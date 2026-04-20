@@ -236,6 +236,8 @@ function NotesSidebar( { postId } ) {
 				! isOtherSidebarOpen && (
 					<CollabSidebarFill>
 						<div
+							role="region"
+							aria-label={ __( 'Collab panel' ) }
 							className="editor-collab-sidebar"
 							style={ {
 								position: 'absolute',
