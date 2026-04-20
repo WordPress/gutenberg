@@ -6,13 +6,24 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
+import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
-	useState,
-	useCallback,
-	useEffect,
-	useRef,
-	useId,
-} from '@wordpress/element';
+	Button,
+	SelectControl,
+	RangeControl,
+	ToggleControl,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
+import {
+	rotateLeft,
+	rotateRight,
+	flipHorizontal,
+	flipVertical,
+	reset as resetIcon,
+	cloudUpload,
+	download as downloadIcon,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,6 +68,37 @@ const IMAGE_CREDIT = (
 		{ ' by See-ming Lee (SML) is licensed under CC BY 2.0.' }
 	</p>
 );
+
+// Hook: manage a swappable image source. Defaults to the sample image.
+// When a file is picked, reads it as a data URL so the <img> src updates
+// without leaving the page. The consumer also gets a reset callback to
+// return to the sample.
+function useUploadableImage() {
+	const [ src, setSrc ] = useState< string >( SAMPLE_IMAGE );
+	const [ isCustom, setIsCustom ] = useState( false );
+	const handleFileChange = useCallback(
+		( event: React.ChangeEvent< HTMLInputElement > ) => {
+			const file = event.target.files?.[ 0 ];
+			if ( ! file ) {
+				return;
+			}
+			const reader = new FileReader();
+			reader.onload = () => {
+				if ( typeof reader.result === 'string' ) {
+					setSrc( reader.result );
+					setIsCustom( true );
+				}
+			};
+			reader.readAsDataURL( file );
+		},
+		[]
+	);
+	const resetToSample = useCallback( () => {
+		setSrc( SAMPLE_IMAGE );
+		setIsCustom( false );
+	}, [] );
+	return { src, isCustom, handleFileChange, resetToSample };
+}
 
 /**
  * Resolve an aspect ratio value from the select dropdown.
@@ -126,11 +168,28 @@ const WithControlsComponent = () => {
 		setCropRect,
 		snapRotate90,
 		reset,
+		isDirty,
 	} = controller;
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( false );
-	const [ exportFormat, setExportFormat ] = useState( 'image/jpeg' );
+	const { src, isCustom, handleFileChange, resetToSample } =
+		useUploadableImage();
+	const fileInputRef = useRef< HTMLInputElement >( null );
+	const openFilePicker = useCallback( () => {
+		fileInputRef.current?.click();
+	}, [] );
+
+	// Reset crop/pan/zoom when the image changes so the old framing
+	// doesn't linger on a newly-shaped image.
+	const prevSrcRef = useRef( src );
+	useEffect( () => {
+		if ( prevSrcRef.current !== src ) {
+			prevSrcRef.current = src;
+			reset();
+			setAspectRatioValue( '0' );
+		}
+	}, [ src, reset ] );
 
 	// Compute the crop dimensions in source pixels.
 	const cropDimensions = state.image
@@ -159,10 +218,11 @@ const WithControlsComponent = () => {
 	}, [ snapRotate90 ] );
 
 	const handleRotationSlider = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			setRotation(
-				baseAngle + parseFloat( event.target.value ) * visualDir
-			);
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setRotation( baseAngle + value * visualDir );
 		},
 		[ baseAngle, setRotation, visualDir ]
 	);
@@ -182,15 +242,17 @@ const WithControlsComponent = () => {
 	}, [ state.flip, setFlip ] );
 
 	const handleZoomChange = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			setZoom( parseFloat( event.target.value ) );
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setZoom( value );
 		},
 		[ setZoom ]
 	);
 
 	const handleAspectRatioChange = useCallback(
-		( event: React.ChangeEvent< HTMLSelectElement > ) => {
-			const value = event.target.value;
+		( value: string ) => {
 			setAspectRatioValue( value );
 
 			// In fixed mode (freeformCrop=false), the cropper's useEffect
@@ -242,113 +304,143 @@ const WithControlsComponent = () => {
 
 	return (
 		<div>
-			<div className="image-editor-story__controls">
-				<div className="image-editor-story__row">
-					<strong>Rotation: { state.rotation }deg</strong>
-					<button onClick={ handleRotateLeft }>-90</button>
-					<button onClick={ handleRotateRight }>+90</button>
-				</div>
-				<input
-					className="image-editor-story__slider"
-					type="range"
-					min={ -MAX_ROTATION_OFFSET }
-					max={ MAX_ROTATION_OFFSET }
-					step="0.5"
-					value={ fineOffset }
-					onChange={ handleRotationSlider }
-				/>
-
-				<div className="image-editor-story__row">
-					<strong>
-						Flip: H={ state.flip.horizontal ? 'Yes' : 'No' }, V=
-						{ state.flip.vertical ? 'Yes' : 'No' }
-					</strong>
-					<button onClick={ handleFlipHorizontal }>
-						Flip Horizontal
-					</button>
-					<button onClick={ handleFlipVertical }>
-						Flip Vertical
-					</button>
-				</div>
-
-				<div className="image-editor-story__row">
-					<strong>Zoom: { state.zoom.toFixed( 2 ) }</strong>
-					<input
-						type="range"
+			<input
+				ref={ fileInputRef }
+				type="file"
+				accept="image/*"
+				onChange={ handleFileChange }
+				className="image-editor-story__hidden-file"
+			/>
+			<div className="image-editor-story__toolbar">
+				<Flex align="center" gap={ 2 } wrap>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ cloudUpload }
+							onClick={ openFilePicker }
+						>
+							Upload
+						</Button>
+					</FlexItem>
+					{ isCustom && (
+						<FlexItem>
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ resetToSample }
+							>
+								Use sample
+							</Button>
+						</FlexItem>
+					) }
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateLeft }
+							label="Rotate 90° counter-clockwise"
+							showTooltip
+							onClick={ handleRotateLeft }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateRight }
+							label="Rotate 90° clockwise"
+							showTooltip
+							onClick={ handleRotateRight }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipHorizontal }
+							label="Flip horizontal"
+							showTooltip
+							isPressed={ state.flip.horizontal }
+							onClick={ handleFlipHorizontal }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipVertical }
+							label="Flip vertical"
+							showTooltip
+							isPressed={ state.flip.vertical }
+							onClick={ handleFlipVertical }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label="Aspect ratio"
+							hideLabelFromVision
+							value={ aspectRatioValue }
+							onChange={ handleAspectRatioChange }
+							options={ DEFAULT_ASPECT_RATIOS.map(
+								( preset ) => ( {
+									label: preset.label,
+									value: preset.value.toString(),
+								} )
+							) }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label="Freeform"
+							checked={ freeformCrop }
+							onChange={ setFreeformCrop }
+						/>
+					</FlexItem>
+					<FlexItem isBlock />
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ resetIcon }
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
+							onClick={ handleReset }
+						>
+							Reset
+						</Button>
+					</FlexItem>
+				</Flex>
+				<div className="image-editor-story__sliders">
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label="Fine rotation"
+						min={ -MAX_ROTATION_OFFSET }
+						max={ MAX_ROTATION_OFFSET }
+						step={ 0.5 }
+						value={ fineOffset }
+						onChange={ handleRotationSlider }
+					/>
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label="Zoom"
 						min={ MIN_ZOOM }
 						max={ MAX_ZOOM }
-						step="0.1"
+						step={ 0.1 }
 						value={ state.zoom }
 						onChange={ handleZoomChange }
 					/>
-				</div>
-
-				<div className="image-editor-story__row">
-					<strong>Aspect Ratio:</strong>
-					<select
-						value={ aspectRatioValue }
-						onChange={ handleAspectRatioChange }
-					>
-						{ DEFAULT_ASPECT_RATIOS.map( ( preset ) => (
-							<option
-								key={ preset.label }
-								value={ preset.value.toString() }
-							>
-								{ preset.label }
-							</option>
-						) ) }
-					</select>
-				</div>
-
-				<div className="image-editor-story__row">
-					{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control -- checkbox is nested */ }
-					<label>
-						<input
-							type="checkbox"
-							checked={ freeformCrop }
-							onChange={ ( e ) =>
-								setFreeformCrop( e.target.checked )
-							}
-						/>{ ' ' }
-						Freeform Crop
-					</label>
-				</div>
-
-				<div className="image-editor-story__row">
-					<button onClick={ handleReset }>Reset</button>
-					<select
-						value={ exportFormat }
-						onChange={ ( e ) => setExportFormat( e.target.value ) }
-					>
-						<option value="image/jpeg">JPEG</option>
-						<option value="image/png">PNG</option>
-						<option value="image/webp">WebP</option>
-					</select>
-					<button
-						onClick={ () =>
-							downloadCroppedImage(
-								SAMPLE_IMAGE,
-								state,
-								'cropped',
-								exportFormat,
-								0.9
-							)
-						}
-					>
-						Download
-					</button>
-					{ cropDimensions && (
-						<span style={ { fontSize: 12, color: '#666' } }>
-							{ Math.round( cropDimensions.width ) } &times;{ ' ' }
-							{ Math.round( cropDimensions.height ) } px
-						</span>
-					) }
 				</div>
 			</div>
 
 			<div className="image-editor-story__resizable">
 				<Cropper
-					src={ SAMPLE_IMAGE }
+					src={ src }
 					controller={ controller }
 					showGrid
 					showDimming
@@ -359,7 +451,21 @@ const WithControlsComponent = () => {
 					) }
 				/>
 			</div>
-			{ IMAGE_CREDIT }
+			<Flex justify="space-between" align="center">
+				<FlexItem>{ ! isCustom && IMAGE_CREDIT }</FlexItem>
+				{ cropDimensions && (
+					<FlexItem
+						style={ {
+							fontSize: 11,
+							color: '#757575',
+							fontFamily: 'monospace',
+						} }
+					>
+						{ Math.round( cropDimensions.width ) } ×{ ' ' }
+						{ Math.round( cropDimensions.height ) } px
+					</FlexItem>
+				) }
+			</Flex>
 
 			<div style={ { marginTop: 16 } }>
 				<strong>Current State:</strong>
@@ -402,13 +508,33 @@ export const WithControls: Story = {
  */
 const DebugComponent = () => {
 	const controller = useCropperState();
-	const { state, setRotation, setZoom, setFlip, snapRotate90, reset } =
-		controller;
+	const {
+		state,
+		setRotation,
+		setZoom,
+		setFlip,
+		snapRotate90,
+		reset,
+		isDirty,
+	} = controller;
 
 	const [ freeformCrop, setFreeformCrop ] = useState( false );
-	const freeformToggleId = useId();
+	const [ exportFormat, setExportFormat ] =
+		useState< string >( 'image/jpeg' );
+	const { src, isCustom, handleFileChange, resetToSample } =
+		useUploadableImage();
+	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ previewSrc, setPreviewSrc ] = useState< string | null >( null );
 	const imageRef = useRef< HTMLImageElement | null >( null );
+
+	// Reset crop/pan/zoom when the image changes.
+	const prevSrcRef = useRef( src );
+	useEffect( () => {
+		if ( prevSrcRef.current !== src ) {
+			prevSrcRef.current = src;
+			reset();
+		}
+	}, [ src, reset ] );
 
 	const [ containerSize, setContainerSize ] = useState( {
 		width: 0,
@@ -416,12 +542,18 @@ const DebugComponent = () => {
 	} );
 	const containerRef = useRef< HTMLDivElement >( null );
 
-	// Load the source image once.
+	// Load the source image whenever the src changes (sample or uploaded).
 	useEffect( () => {
-		loadImage( SAMPLE_IMAGE ).then( ( img ) => {
-			imageRef.current = img;
+		let cancelled = false;
+		loadImage( src ).then( ( img ) => {
+			if ( ! cancelled ) {
+				imageRef.current = img;
+			}
 		} );
-	}, [] );
+		return () => {
+			cancelled = true;
+		};
+	}, [ src ] );
 
 	// Re-render the preview whenever state changes.
 	useEffect( () => {
@@ -525,17 +657,21 @@ const DebugComponent = () => {
 	}, [ snapRotate90 ] );
 
 	const handleRotationSlider = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			setRotation(
-				baseAngle + parseFloat( event.target.value ) * visualDir
-			);
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setRotation( baseAngle + value * visualDir );
 		},
 		[ baseAngle, setRotation, visualDir ]
 	);
 
 	const handleZoomChange = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			setZoom( parseFloat( event.target.value ) );
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setZoom( value );
 		},
 		[ setZoom ]
 	);
@@ -554,43 +690,162 @@ const DebugComponent = () => {
 		} );
 	}, [ state.flip, setFlip ] );
 
+	const openFilePicker = useCallback( () => {
+		fileInputRef.current?.click();
+	}, [] );
+
 	return (
 		<div>
-			<div className="image-editor-story__controls">
-				<div className="image-editor-story__row">
-					<button onClick={ handleRotateLeft }>-90</button>
-					<input
-						className="image-editor-story__slider"
-						type="range"
+			<input
+				ref={ fileInputRef }
+				type="file"
+				accept="image/*"
+				onChange={ handleFileChange }
+				className="image-editor-story__hidden-file"
+			/>
+			<div className="image-editor-story__toolbar">
+				<Flex align="center" gap={ 2 } wrap>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ cloudUpload }
+							onClick={ openFilePicker }
+						>
+							Upload
+						</Button>
+					</FlexItem>
+					{ isCustom && (
+						<FlexItem>
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ resetToSample }
+							>
+								Use sample
+							</Button>
+						</FlexItem>
+					) }
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateLeft }
+							label="Rotate 90° counter-clockwise"
+							showTooltip
+							onClick={ handleRotateLeft }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateRight }
+							label="Rotate 90° clockwise"
+							showTooltip
+							onClick={ handleRotateRight }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipHorizontal }
+							label="Flip horizontal"
+							showTooltip
+							isPressed={ state.flip.horizontal }
+							onClick={ handleFlipHorizontal }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipVertical }
+							label="Flip vertical"
+							showTooltip
+							isPressed={ state.flip.vertical }
+							onClick={ handleFlipVertical }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label="Freeform"
+							checked={ freeformCrop }
+							onChange={ setFreeformCrop }
+						/>
+					</FlexItem>
+					<FlexItem isBlock />
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ resetIcon }
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
+							onClick={ () => reset() }
+						>
+							Reset
+						</Button>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label="Format"
+							hideLabelFromVision
+							value={ exportFormat as 'image/jpeg' }
+							onChange={ ( value ) =>
+								setExportFormat( value as string )
+							}
+							options={ [
+								{ label: 'JPEG', value: 'image/jpeg' },
+								{ label: 'PNG', value: 'image/png' },
+								{ label: 'WebP', value: 'image/webp' },
+							] }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ downloadIcon }
+							onClick={ () =>
+								downloadCroppedImage(
+									src,
+									state,
+									'cropped',
+									exportFormat,
+									0.9
+								)
+							}
+						>
+							Download
+						</Button>
+					</FlexItem>
+				</Flex>
+				<div className="image-editor-story__sliders">
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label="Fine rotation"
 						min={ -MAX_ROTATION_OFFSET }
 						max={ MAX_ROTATION_OFFSET }
-						step="0.5"
+						step={ 0.5 }
 						value={ fineOffset }
 						onChange={ handleRotationSlider }
 					/>
-					<button onClick={ handleRotateRight }>+90</button>
-					<input
-						type="range"
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label="Zoom"
 						min={ MIN_ZOOM }
 						max={ MAX_ZOOM }
-						step="0.1"
+						step={ 0.1 }
 						value={ state.zoom }
 						onChange={ handleZoomChange }
 					/>
-					<button onClick={ handleFlipHorizontal }>Flip H</button>
-					<button onClick={ handleFlipVertical }>Flip V</button>
-					<label htmlFor={ freeformToggleId }>
-						<input
-							id={ freeformToggleId }
-							type="checkbox"
-							checked={ freeformCrop }
-							onChange={ ( e ) =>
-								setFreeformCrop( e.target.checked )
-							}
-						/>{ ' ' }
-						Freeform crop
-					</label>
-					<button onClick={ () => reset() }>Reset</button>
 				</div>
 			</div>
 
@@ -603,14 +858,14 @@ const DebugComponent = () => {
 				>
 					<div className="image-editor-story__container">
 						<Cropper
-							src={ SAMPLE_IMAGE }
+							src={ src }
 							controller={ controller }
 							showGrid
 							showDimming
 							freeformCrop={ freeformCrop }
 						/>
 					</div>
-					{ IMAGE_CREDIT }
+					{ ! isCustom && IMAGE_CREDIT }
 				</div>
 
 				<div

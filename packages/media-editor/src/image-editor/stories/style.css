@@ -18,26 +18,26 @@
 	position: relative;
 }
 
-.image-editor-story__controls {
+.image-editor-story__toolbar {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	margin-bottom: 16px;
-	max-width: 100%;
+	padding: 8px;
+	margin-bottom: 12px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	background: #fafafa;
 }
 
-.image-editor-story__row {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	align-items: center;
+.image-editor-story__sliders {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	padding: 0 4px;
 }
 
-.image-editor-story__slider {
-	width: 100%;
-	/* Override parent touch-action: none so the browser handles
-	   slider dragging natively. */
-	touch-action: auto;
+.image-editor-story__hidden-file {
+	display: none;
 }
 
 .image-editor-story__json {
