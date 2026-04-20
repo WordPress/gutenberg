@@ -648,6 +648,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			$sub_size_data['file']      = wp_basename( $path );
 			$sub_size_data['mime_type'] = $type;
 			$sub_size_data['filesize']  = wp_filesize( $path );
-		}		return rest_ensure_response( $sub_size_data );
+		}
+
+		return rest_ensure_response( $sub_size_data );
 	}
 }
