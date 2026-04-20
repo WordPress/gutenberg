@@ -337,14 +337,21 @@ function getMinZoomForCover(
 	cropRect: NormalizedRect
 ): number {
 	const aspectRatio = Math.max( imageAspectRatio, Number.EPSILON );
-	const { visualW, visualH, absC, absS } = getVisualDimensions(
-		rotation,
+	// The crop rect lives in the SNAP-rotation visual bbox — that's how the
+	// stencil and preview position it (see createCamera / getImageFit). Use
+	// the snap-rotation dimensions to convert crop fractions to pixels.
+	const snapRotation = Math.round( rotation / 90 ) * 90;
+	const { visualW: snapVisualW, visualH: snapVisualH } = getVisualDimensions(
+		snapRotation,
 		aspectRatio
 	);
+	// Projection into the image-local frame uses the TRUE rotation angle —
+	// that's the actual orientation of the image under the stencil.
+	const { absC, absS } = getVisualDimensions( rotation, aspectRatio );
 
 	// Crop half-extents in pixel-proportional space.
-	const cropHalfW = ( cropRect.width * visualW ) / 2;
-	const cropHalfH = ( cropRect.height * visualH ) / 2;
+	const cropHalfW = ( cropRect.width * snapVisualW ) / 2;
+	const cropHalfH = ( cropRect.height * snapVisualH ) / 2;
 
 	// AABB of the crop rect projected into the image-local (unrotated) frame.
 	const spanAlpha = cropHalfW * absC + cropHalfH * absS;
@@ -476,10 +483,14 @@ export function restrictCropRect(
 	imageAspectRatio: number
 ): NormalizedRect {
 	const aspectRatio = Math.max( imageAspectRatio, Number.EPSILON );
-	const { visualW, visualH, absC, absS } = getVisualDimensions(
-		rotation,
+	// Crop rect lives in the SNAP-rotation visual bbox (matching the stencil
+	// layout); projection into the image-local frame uses the TRUE rotation.
+	const snapRotation = Math.round( rotation / 90 ) * 90;
+	const { visualW, visualH } = getVisualDimensions(
+		snapRotation,
 		aspectRatio
 	);
+	const { absC, absS } = getVisualDimensions( rotation, aspectRatio );
 	const W = cropRect.width;
 	const H = cropRect.height;
 
