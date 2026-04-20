@@ -1049,7 +1049,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		);
 
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 200, $response->get_status(), 'CI DIAG finalize status ' . $response->get_status() . ' body ' . wp_json_encode( $response->get_data() ) );
 
 		$metadata = wp_get_attachment_metadata( $attachment_id, true );
 
