@@ -3,7 +3,7 @@
  */
 import type { CropperAction, CropperState, Size } from './types';
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
-import { restrictPanZoom } from './camera';
+import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
 const DOUBLE_TAP_TIME = 300;
@@ -420,7 +420,7 @@ export class InteractionController {
 		doc: Document = document
 	): void {
 		// Second finger arriving during an existing gesture — snapshot
-		// pinch start values. onTouchMove will detect 2 touches and
+		// pinch start values. handleTouchMove will detect 2 touches and
 		// handle pinch automatically.
 		if ( this.touch && e.touches.length === 2 ) {
 			const s = this.options.getState();
@@ -441,96 +441,17 @@ export class InteractionController {
 			return;
 		}
 
-		const currentState = this.options.getState();
-		const containerSize = this.options.getContainerSize();
-		const imgSize = this.options.getImageSize();
-
 		if ( e.touches.length === 1 ) {
-			// Double-tap detection: toggle between fit and 2x zoom.
-			const now = Date.now();
 			const tapX = e.touches[ 0 ].clientX;
 			const tapY = e.touches[ 0 ].clientY;
-			const lastTap = this.lastTap;
-
-			if ( lastTap ) {
-				const timeDelta = now - lastTap.time;
-				const distDelta = Math.sqrt(
-					( tapX - lastTap.x ) ** 2 + ( tapY - lastTap.y ) ** 2
-				);
-
-				if (
-					timeDelta < DOUBLE_TAP_TIME &&
-					distDelta < DOUBLE_TAP_DISTANCE
-				) {
-					// It's a double-tap — suppress browser zoom.
-					e.preventDefault();
-					this.lastTap = null;
-
-					// Toggle: if past halfway to doubleTapZoom, go back to 1x.
-					const targetZoom =
-						currentState.zoom >
-						( this.minZoom + this.doubleTapZoom ) / 2
-							? this.minZoom
-							: this.doubleTapZoom;
-					const visSize = imgSize ?? containerSize;
-
-					// Enable zoom animation before dispatching.
-					this.setStatus( { isZooming: true } );
-					clearTimeout( this.zoomTimer );
-					this.zoomTimer = setTimeout( () => {
-						this.setStatus( { isZooming: false } );
-					}, ZOOM_ANIMATION_DURATION );
-
-					if ( visSize.width > 0 && visSize.height > 0 ) {
-						const fx =
-							tapX - containerRect.left - containerSize.width / 2;
-						const fy =
-							tapY - containerRect.top - containerSize.height / 2;
-
-						const zoomRatio = 1 - targetZoom / currentState.zoom;
-						const focalNormX = fx / visSize.width;
-						const focalNormY = fy / visSize.height;
-						const newCropX =
-							currentState.pan.x +
-							( focalNormX - currentState.pan.x ) * zoomRatio;
-						const newCropY =
-							currentState.pan.y +
-							( focalNormY - currentState.pan.y ) * zoomRatio;
-
-						const { pan: clampedCrop } = restrictPanZoom(
-							{
-								...currentState,
-								zoom: targetZoom,
-								pan: {
-									x: newCropX,
-									y: newCropY,
-								},
-							},
-							getImageSizeFromState( currentState ),
-							currentState.cropRect
-						);
-						this.options.dispatch( {
-							type: 'SET_ZOOM_AT_POINT',
-							payload: {
-								zoom: targetZoom,
-								pan: clampedCrop,
-							},
-						} );
-					} else {
-						this.options.dispatch( {
-							type: 'SET_ZOOM',
-							payload: targetZoom,
-						} );
-					}
-					return;
-				}
+			if ( this.tryDoubleTap( e, tapX, tapY, containerRect ) ) {
+				return;
 			}
 
-			// Record this tap for future double-tap detection.
-			this.lastTap = { time: now, x: tapX, y: tapY };
+			const currentState = this.options.getState();
 
 			// Record touch state. Don't decide pan vs pinch yet —
-			// that happens in onTouchMove based on touches.length.
+			// that happens in handleTouchMove based on touches.length.
 			this.touch = {
 				startDistance: 0,
 				startZoom: currentState.zoom,
@@ -547,6 +468,7 @@ export class InteractionController {
 			this.options.onGestureStart?.();
 		} else if ( e.touches.length === 2 ) {
 			// Both fingers landed simultaneously (rare but possible).
+			const currentState = this.options.getState();
 			const distance = getTouchDistance( e.touches[ 0 ], e.touches[ 1 ] );
 			const midX =
 				( e.touches[ 0 ].clientX + e.touches[ 1 ].clientX ) / 2;
@@ -568,175 +490,11 @@ export class InteractionController {
 			this.options.onGestureStart?.();
 		}
 
-		// All mode decisions happen here based on moveEvent.touches.length.
-		// This eliminates timing sensitivity — it doesn't matter if
-		// fingers land 0ms or 200ms apart.
-		const onTouchMove = ( moveEvent: TouchEvent ) => {
-			const touch = this.touch;
-			if ( ! touch ) {
-				return;
-			}
-
-			cancelAnimationFrame( this.rafId );
-			this.rafId = requestAnimationFrame( () => {
-				const s = this.options.getState();
-
-				if ( moveEvent.touches.length === 2 ) {
-					// Two fingers → always pinch, regardless of how gesture
-					// started. Initialize pinch state on first 2-finger move.
-					if ( ! touch.didPinch ) {
-						touch.didPinch = true;
-						touch.startDistance = getTouchDistance(
-							moveEvent.touches[ 0 ],
-							moveEvent.touches[ 1 ]
-						);
-						touch.startZoom = s.zoom;
-						touch.startPanX = s.pan.x;
-						touch.startPanY = s.pan.y;
-						touch.startMidX =
-							( moveEvent.touches[ 0 ].clientX +
-								moveEvent.touches[ 1 ].clientX ) /
-							2;
-						touch.startMidY =
-							( moveEvent.touches[ 0 ].clientY +
-								moveEvent.touches[ 1 ].clientY ) /
-							2;
-						this.setStatus( { isDragging: false } );
-						return;
-					}
-					const latestContainerSize = this.options.getContainerSize();
-					const latestImageSize = this.options.getImageSize();
-
-					// Pinch zoom with focal point at finger midpoint,
-					// plus simultaneous pan from midpoint drift.
-					const t0 = moveEvent.touches[ 0 ];
-					const t1 = moveEvent.touches[ 1 ];
-					const currentDistance = getTouchDistance( t0, t1 );
-					const ratio = currentDistance / touch.startDistance;
-					const newZoom = Math.min(
-						this.maxZoom,
-						Math.max( this.minZoom, touch.startZoom * ratio )
-					);
-
-					const visSize = latestImageSize ?? latestContainerSize;
-					const rect = touch.containerRect;
-					if ( visSize.width > 0 && visSize.height > 0 && rect ) {
-						// Current midpoint.
-						const mx =
-							( t0.clientX + t1.clientX ) / 2 -
-							rect.left -
-							latestContainerSize.width / 2;
-						const my =
-							( t0.clientY + t1.clientY ) / 2 -
-							rect.top -
-							latestContainerSize.height / 2;
-
-						// Pan from midpoint drift (fingers moving together).
-						const startMx =
-							touch.startMidX -
-							rect.left -
-							latestContainerSize.width / 2;
-						const startMy =
-							touch.startMidY -
-							rect.top -
-							latestContainerSize.height / 2;
-						const panDx =
-							visSize.width > 0
-								? ( mx - startMx ) / visSize.width
-								: 0;
-						const panDy =
-							visSize.height > 0
-								? ( my - startMy ) / visSize.height
-								: 0;
-
-						// Focal-point zoom correction.
-						const zoomRatio =
-							s.zoom !== 0 ? 1 - newZoom / s.zoom : 0;
-						const focalNormX = mx / visSize.width;
-						const focalNormY = my / visSize.height;
-						const zoomCropX =
-							s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
-						const zoomCropY =
-							s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
-
-						// Combined: pan drift + zoom correction.
-						const newCropX =
-							touch.startPanX + panDx + ( zoomCropX - s.pan.x );
-						const newCropY =
-							touch.startPanY + panDy + ( zoomCropY - s.pan.y );
-
-						const { pan: clampedCrop } = restrictPanZoom(
-							{
-								...s,
-								zoom: newZoom,
-								pan: { x: newCropX, y: newCropY },
-							},
-							getImageSizeFromState( s ),
-							s.cropRect
-						);
-						this.options.dispatch( {
-							type: 'SET_ZOOM_AT_POINT',
-							payload: { zoom: newZoom, pan: clampedCrop },
-						} );
-					} else if ( newZoom !== s.zoom ) {
-						this.options.dispatch( {
-							type: 'SET_ZOOM',
-							payload: newZoom,
-						} );
-					}
-				} else if (
-					moveEvent.touches.length === 1 &&
-					! touch.didPinch
-				) {
-					// One finger and no pinch ever detected → pan.
-					// If fingers went 2→1 (didPinch is true), we do NOT
-					// switch to pan — avoids accidental pan after releasing
-					// one finger from a pinch.
-					if ( ! touch.moved ) {
-						touch.moved = true;
-						this.setStatus( { isDragging: true } );
-					}
-					const panImageSize = this.options.getImageSize();
-					const panContainerSize = this.options.getContainerSize();
-					const panSize = panImageSize ?? panContainerSize;
-					const deltaX =
-						panSize.width > 0
-							? ( moveEvent.touches[ 0 ].clientX -
-									touch.lastTouchX ) /
-							  panSize.width
-							: 0;
-					const deltaY =
-						panSize.height > 0
-							? ( moveEvent.touches[ 0 ].clientY -
-									touch.lastTouchY ) /
-							  panSize.height
-							: 0;
-
-					const { pan: newCrop } = restrictPanZoom(
-						{
-							...s,
-							pan: {
-								x: touch.startPanX + deltaX,
-								y: touch.startPanY + deltaY,
-							},
-						},
-						getImageSizeFromState( s ),
-						s.cropRect
-					);
-
-					this.options.dispatch( {
-						type: 'SET_PAN',
-						payload: newCrop,
-					} );
-				}
-			} );
-		};
-
 		const onTouchEnd = () => {
 			this.touch = null;
 			this.touchCleanup = null;
 			cancelAnimationFrame( this.rafId );
-			doc.removeEventListener( 'touchmove', onTouchMove );
+			doc.removeEventListener( 'touchmove', this.handleTouchMove );
 			doc.removeEventListener( 'touchend', onTouchEnd );
 			doc.removeEventListener( 'touchcancel', onTouchEnd );
 			this.setStatus( { isDragging: false } );
@@ -746,13 +504,262 @@ export class InteractionController {
 		// Clean up any previous touch listeners before registering new ones.
 		this.touchCleanup?.();
 
-		doc.addEventListener( 'touchmove', onTouchMove, {
+		doc.addEventListener( 'touchmove', this.handleTouchMove, {
 			passive: false,
 		} );
 		doc.addEventListener( 'touchend', onTouchEnd );
 		doc.addEventListener( 'touchcancel', onTouchEnd );
 
 		this.touchCleanup = onTouchEnd;
+	}
+
+	// Handle a touchmove event during an active touch gesture. Decides pinch
+	// vs. pan based on current `moveEvent.touches.length`, so the gesture
+	// can transition between modes without timing sensitivity (e.g. fingers
+	// landing 0ms vs 200ms apart). Arrow-property binding so `this` stays
+	// attached when used as an event listener.
+	private handleTouchMove = ( moveEvent: TouchEvent ): void => {
+		const touch = this.touch;
+		if ( ! touch ) {
+			return;
+		}
+
+		cancelAnimationFrame( this.rafId );
+		this.rafId = requestAnimationFrame( () => {
+			const s = this.options.getState();
+
+			if ( moveEvent.touches.length === 2 ) {
+				// Two fingers → always pinch, regardless of how gesture
+				// started. Initialize pinch state on first 2-finger move.
+				if ( ! touch.didPinch ) {
+					touch.didPinch = true;
+					touch.startDistance = getTouchDistance(
+						moveEvent.touches[ 0 ],
+						moveEvent.touches[ 1 ]
+					);
+					touch.startZoom = s.zoom;
+					touch.startPanX = s.pan.x;
+					touch.startPanY = s.pan.y;
+					touch.startMidX =
+						( moveEvent.touches[ 0 ].clientX +
+							moveEvent.touches[ 1 ].clientX ) /
+						2;
+					touch.startMidY =
+						( moveEvent.touches[ 0 ].clientY +
+							moveEvent.touches[ 1 ].clientY ) /
+						2;
+					this.setStatus( { isDragging: false } );
+					return;
+				}
+				const latestContainerSize = this.options.getContainerSize();
+				const latestImageSize = this.options.getImageSize();
+
+				// Pinch zoom with focal point at finger midpoint,
+				// plus simultaneous pan from midpoint drift.
+				const t0 = moveEvent.touches[ 0 ];
+				const t1 = moveEvent.touches[ 1 ];
+				const currentDistance = getTouchDistance( t0, t1 );
+				const ratio = currentDistance / touch.startDistance;
+				const newZoom = Math.min(
+					this.maxZoom,
+					Math.max( this.minZoom, touch.startZoom * ratio )
+				);
+
+				const visSize = latestImageSize ?? latestContainerSize;
+				const rect = touch.containerRect;
+				if ( visSize.width > 0 && visSize.height > 0 && rect ) {
+					// Current midpoint.
+					const mx =
+						( t0.clientX + t1.clientX ) / 2 -
+						rect.left -
+						latestContainerSize.width / 2;
+					const my =
+						( t0.clientY + t1.clientY ) / 2 -
+						rect.top -
+						latestContainerSize.height / 2;
+
+					// Pan from midpoint drift (fingers moving together).
+					const startMx =
+						touch.startMidX -
+						rect.left -
+						latestContainerSize.width / 2;
+					const startMy =
+						touch.startMidY -
+						rect.top -
+						latestContainerSize.height / 2;
+					const panDx =
+						visSize.width > 0
+							? ( mx - startMx ) / visSize.width
+							: 0;
+					const panDy =
+						visSize.height > 0
+							? ( my - startMy ) / visSize.height
+							: 0;
+
+					// Focal-point zoom correction.
+					const zoomRatio = s.zoom !== 0 ? 1 - newZoom / s.zoom : 0;
+					const focalNormX = mx / visSize.width;
+					const focalNormY = my / visSize.height;
+					const zoomCropX =
+						s.pan.x + ( focalNormX - s.pan.x ) * zoomRatio;
+					const zoomCropY =
+						s.pan.y + ( focalNormY - s.pan.y ) * zoomRatio;
+
+					// Combined: pan drift + zoom correction.
+					const newCropX =
+						touch.startPanX + panDx + ( zoomCropX - s.pan.x );
+					const newCropY =
+						touch.startPanY + panDy + ( zoomCropY - s.pan.y );
+
+					const { pan: clampedCrop } = restrictPanZoom(
+						{
+							...s,
+							zoom: newZoom,
+							pan: { x: newCropX, y: newCropY },
+						},
+						getImageSizeFromState( s ),
+						s.cropRect
+					);
+					this.options.dispatch( {
+						type: 'SET_ZOOM_AT_POINT',
+						payload: { zoom: newZoom, pan: clampedCrop },
+					} );
+				} else if ( newZoom !== s.zoom ) {
+					this.options.dispatch( {
+						type: 'SET_ZOOM',
+						payload: newZoom,
+					} );
+				}
+			} else if ( moveEvent.touches.length === 1 && ! touch.didPinch ) {
+				// One finger and no pinch ever detected → pan.
+				// If fingers went 2→1 (didPinch is true), we do NOT
+				// switch to pan — avoids accidental pan after releasing
+				// one finger from a pinch.
+				if ( ! touch.moved ) {
+					touch.moved = true;
+					this.setStatus( { isDragging: true } );
+				}
+				const panImageSize = this.options.getImageSize();
+				const panContainerSize = this.options.getContainerSize();
+				const panSize = panImageSize ?? panContainerSize;
+				const deltaX =
+					panSize.width > 0
+						? ( moveEvent.touches[ 0 ].clientX -
+								touch.lastTouchX ) /
+						  panSize.width
+						: 0;
+				const deltaY =
+					panSize.height > 0
+						? ( moveEvent.touches[ 0 ].clientY -
+								touch.lastTouchY ) /
+						  panSize.height
+						: 0;
+
+				const { pan: newCrop } = restrictPanZoom(
+					{
+						...s,
+						pan: {
+							x: touch.startPanX + deltaX,
+							y: touch.startPanY + deltaY,
+						},
+					},
+					getImageSizeFromState( s ),
+					s.cropRect
+				);
+
+				this.options.dispatch( {
+					type: 'SET_PAN',
+					payload: newCrop,
+				} );
+			}
+		} );
+	};
+
+	// Handle double-tap-to-toggle-zoom. On a second tap within the configured
+	// time/distance threshold, toggles zoom between `minZoom` and
+	// `doubleTapZoom` around the tap point and dispatches. Returns `true` if
+	// the tap was handled as a double-tap (caller should early-return),
+	// `false` otherwise (caller proceeds with normal single-tap handling).
+	// Either way, records the tap for next time.
+	private tryDoubleTap(
+		e: TouchEvent,
+		tapX: number,
+		tapY: number,
+		containerRect: DOMRect
+	): boolean {
+		const now = Date.now();
+		const lastTap = this.lastTap;
+		if ( ! lastTap ) {
+			this.lastTap = { time: now, x: tapX, y: tapY };
+			return false;
+		}
+		const timeDelta = now - lastTap.time;
+		const distDelta = Math.sqrt(
+			( tapX - lastTap.x ) ** 2 + ( tapY - lastTap.y ) ** 2
+		);
+		const isDoubleTap =
+			timeDelta < DOUBLE_TAP_TIME && distDelta < DOUBLE_TAP_DISTANCE;
+		if ( ! isDoubleTap ) {
+			this.lastTap = { time: now, x: tapX, y: tapY };
+			return false;
+		}
+
+		// It's a double-tap — suppress browser zoom.
+		e.preventDefault();
+		this.lastTap = null;
+
+		const currentState = this.options.getState();
+		const containerSize = this.options.getContainerSize();
+		const imgSize = this.options.getImageSize();
+
+		// Toggle: if past halfway to doubleTapZoom, go back to 1x.
+		const targetZoom =
+			currentState.zoom > ( this.minZoom + this.doubleTapZoom ) / 2
+				? this.minZoom
+				: this.doubleTapZoom;
+		const visSize = imgSize ?? containerSize;
+
+		// Enable zoom animation before dispatching.
+		this.setStatus( { isZooming: true } );
+		clearTimeout( this.zoomTimer );
+		this.zoomTimer = setTimeout( () => {
+			this.setStatus( { isZooming: false } );
+		}, ZOOM_ANIMATION_DURATION );
+
+		if ( visSize.width > 0 && visSize.height > 0 ) {
+			const fx = tapX - containerRect.left - containerSize.width / 2;
+			const fy = tapY - containerRect.top - containerSize.height / 2;
+
+			const zoomRatio = 1 - targetZoom / currentState.zoom;
+			const focalNormX = fx / visSize.width;
+			const focalNormY = fy / visSize.height;
+			const newCropX =
+				currentState.pan.x +
+				( focalNormX - currentState.pan.x ) * zoomRatio;
+			const newCropY =
+				currentState.pan.y +
+				( focalNormY - currentState.pan.y ) * zoomRatio;
+
+			const { pan: clampedCrop } = restrictPanZoom(
+				{
+					...currentState,
+					zoom: targetZoom,
+					pan: { x: newCropX, y: newCropY },
+				},
+				getImageSizeFromState( currentState ),
+				currentState.cropRect
+			);
+			this.options.dispatch( {
+				type: 'SET_ZOOM_AT_POINT',
+				payload: { zoom: targetZoom, pan: clampedCrop },
+			} );
+		} else {
+			this.options.dispatch( {
+				type: 'SET_ZOOM',
+				payload: targetZoom,
+			} );
+		}
+		return true;
 	}
 
 	/**

@@ -105,7 +105,7 @@ function stencilCornersViaCssPath(
 /**
  * Compute the stencil corner positions using the camera path.
  *
- * This replicates the exact math from restrictPanZoom in camera.ts:
+ * This replicates the exact math from restrictPanZoom in containment.ts:
  *   baseCamera = createCamera(state with zoom=1, pan=0)
  *   visibleBounds = getVisibleBounds(baseCamera)
  *   stencilX = visibleBounds.left + cropRect.x * visibleBounds.width

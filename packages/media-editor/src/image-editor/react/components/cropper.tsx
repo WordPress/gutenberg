@@ -27,9 +27,11 @@ import type {
 	NormalizedRect,
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
-import { getImageFit, getCropBounds } from '../../core/camera';
+import { getImageFit } from '../../core/camera';
+import { getCropBounds } from '../../core/containment';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
+import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
@@ -37,8 +39,37 @@ import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
-/** Debounce delay for ARIA live announcements (ms). */
-const ARIA_DEBOUNCE_MS = 300;
+
+// Largest rect of the given pixel aspect ratio that fits inside the visual
+// bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
+// rect (1×1) if `aspectRatio` is unset or non-positive.
+function computeInscribedRect(
+	aspectRatio: number | undefined,
+	visualSize: Size
+): NormalizedRect {
+	let w = 1;
+	let h = 1;
+	if ( aspectRatio && aspectRatio > 0 && visualSize.width > 0 ) {
+		// normalizedRatio = w/h in normalized space that produces the
+		// desired pixel aspect ratio.
+		// pixelW = w * visualW, pixelH = h * visualH
+		// pixelW / pixelH = aspectRatio
+		// => w / h = aspectRatio * visualH / visualW
+		const normalizedRatio =
+			( aspectRatio * visualSize.height ) / visualSize.width;
+		if ( normalizedRatio <= 1 ) {
+			w = normalizedRatio;
+		} else {
+			h = 1 / normalizedRatio;
+		}
+	}
+	return {
+		x: ( 1 - w ) / 2,
+		y: ( 1 - h ) / 2,
+		width: w,
+		height: h,
+	};
+}
 
 /**
  * Props for the Cropper component.
@@ -85,24 +116,6 @@ export interface CropperProps {
 	onGestureEnd?: () => void;
 	/** Additional className for the container. */
 	className?: string;
-}
-
-/**
- * Build an announcement string for screen readers from cropper state.
- *
- * @param state The current cropper state.
- * @return A human-readable description of the current state.
- */
-function buildAnnouncement( state: CropperState ): string {
-	const parts: string[] = [];
-	parts.push( `Zoom ${ Math.round( state.zoom * 100 ) }%` );
-	if ( state.rotation !== 0 ) {
-		parts.push( `Rotation ${ Math.round( state.rotation ) } degrees` );
-	}
-	const cropW = Math.round( state.cropRect.width * 100 );
-	const cropH = Math.round( state.cropRect.height * 100 );
-	parts.push( `Crop ${ cropW }% by ${ cropH }%` );
-	return parts.join( ', ' );
 }
 
 /**
@@ -193,31 +206,7 @@ function CropperInner(
 	}, [ state, onStateChange ] );
 
 	// ARIA live region: announce significant state changes for screen readers.
-	const [ ariaMessage, setAriaMessage ] = useState( '' );
-	const ariaTimerRef = useRef< ReturnType< typeof setTimeout > >();
-	const prevAnnouncementRef = useRef( '' );
-
-	useEffect( () => {
-		// Debounce announcements to avoid flooding during drag/mousemove.
-		clearTimeout( ariaTimerRef.current );
-		ariaTimerRef.current = setTimeout( () => {
-			const msg = buildAnnouncement( state );
-			if ( msg !== prevAnnouncementRef.current ) {
-				prevAnnouncementRef.current = msg;
-				setAriaMessage( msg );
-			}
-		}, ARIA_DEBOUNCE_MS );
-
-		return () => {
-			clearTimeout( ariaTimerRef.current );
-		};
-	}, [
-		state.zoom,
-		state.rotation,
-		state.cropRect.width,
-		state.cropRect.height,
-		state,
-	] );
+	const ariaMessage = useAriaAnnouncer( state );
 
 	// Compute fitted image dimensions and visual bounds from camera math.
 	const naturalWidth = state.image?.naturalWidth ?? 0;
@@ -242,40 +231,21 @@ function CropperInner(
 		) {
 			return;
 		}
-		let w = 1;
-		let h = 1;
-		if ( aspectRatio && aspectRatio > 0 ) {
-			// normalizedRatio = w/h in normalized space that produces
-			// the desired pixel aspect ratio.
-			// pixelW = w * visualW, pixelH = h * visualH
-			// pixelW / pixelH = aspectRatio
-			// => w / h = aspectRatio * visualH / visualW
-			const normalizedRatio =
-				( aspectRatio * visualSize.height ) / visualSize.width;
-			if ( normalizedRatio <= 1 ) {
-				// Crop is narrower than full width — constrain width.
-				w = normalizedRatio;
-			} else {
-				// Crop is shorter than full height — constrain height.
-				h = 1 / normalizedRatio;
-			}
-		}
-		const x = ( 1 - w ) / 2;
-		const y = ( 1 - h ) / 2;
+		const rect = computeInscribedRect( aspectRatio, visualSize );
 		const current = state.cropRect;
 		if (
-			Math.abs( current.x - x ) < CROP_RECT_EPSILON &&
-			Math.abs( current.y - y ) < CROP_RECT_EPSILON &&
-			Math.abs( current.width - w ) < CROP_RECT_EPSILON &&
-			Math.abs( current.height - h ) < CROP_RECT_EPSILON
+			Math.abs( current.x - rect.x ) < CROP_RECT_EPSILON &&
+			Math.abs( current.y - rect.y ) < CROP_RECT_EPSILON &&
+			Math.abs( current.width - rect.width ) < CROP_RECT_EPSILON &&
+			Math.abs( current.height - rect.height ) < CROP_RECT_EPSILON
 		) {
 			return;
 		}
-		setCropRect( { x, y, width: w, height: h } );
+		setCropRect( rect );
 	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
 
-	// In freeform mode, when aspectRatio changes, compute the largest
-	// inscribed rect of the new ratio within the visual bounds, centered.
+	// In freeform mode, when aspectRatio changes, reshape the crop to the
+	// largest inscribed rect of the new ratio.
 	const prevAspectRatioRef = useRef( aspectRatio );
 	useEffect( () => {
 		if ( prevAspectRatioRef.current === aspectRatio ) {
@@ -286,45 +256,13 @@ function CropperInner(
 		if (
 			! freeformCrop ||
 			visualSize.width === 0 ||
-			visualSize.height === 0
+			visualSize.height === 0 ||
+			! aspectRatio ||
+			aspectRatio <= 0
 		) {
 			return;
 		}
-
-		// No aspect ratio (free) — don't resize the crop.
-		if ( ! aspectRatio || aspectRatio <= 0 ) {
-			return;
-		}
-
-		// Compute the normalized ratio for the desired pixel aspect ratio.
-		const normalizedRatio =
-			( aspectRatio * visualSize.height ) / visualSize.width;
-
-		// Largest inscribed rect at this ratio, centered in [0,1]x[0,1].
-		let w: number;
-		let h: number;
-		if ( normalizedRatio <= 1 ) {
-			w = 1;
-			h = 1 / normalizedRatio;
-			if ( h > 1 ) {
-				h = 1;
-				w = normalizedRatio;
-			}
-		} else {
-			h = 1;
-			w = normalizedRatio;
-			if ( w > 1 ) {
-				w = 1;
-				h = 1 / normalizedRatio;
-			}
-		}
-
-		setCropRect( {
-			x: ( 1 - w ) / 2,
-			y: ( 1 - h ) / 2,
-			width: w,
-			height: h,
-		} );
+		setCropRect( computeInscribedRect( aspectRatio, visualSize ) );
 	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
 
 	// Compute the crop handle bounds from the actual image footprint.

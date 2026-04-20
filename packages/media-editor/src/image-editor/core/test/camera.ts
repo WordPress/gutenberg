@@ -3,14 +3,15 @@ import {
 	worldToScreen,
 	screenToWorld,
 	getVisibleBounds,
+	createExportCamera,
+	getImageFit,
+} from '../camera';
+import {
 	restrictPanZoom,
 	restrictCropRect,
-	createExportCamera,
 	getCropBounds,
-	getImageFit,
-	getSourceRegion,
-	getSourceRegionPercent,
-} from '../camera';
+} from '../containment';
+import { getSourceRegion, getSourceRegionPercent } from '../source-region';
 import { DEFAULT_STATE } from '../constants';
 import type { CropperState, Size } from '../types';
 

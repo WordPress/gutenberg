@@ -4,7 +4,7 @@
 import type { CropperState, CropperAction, TransformOperation } from './types';
 import { DEFAULT_STATE, MAX_ZOOM } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
-import { restrictPanZoom, restrictCropRect } from './camera';
+import { restrictPanZoom, restrictCropRect } from './containment';
 
 /**
  * Translate a pipeline transform operation into the equivalent

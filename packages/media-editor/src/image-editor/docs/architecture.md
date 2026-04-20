@@ -22,13 +22,17 @@ graph TD
         cropRect["cropRect"]
     end
 
-    subgraph Camera["camera.ts — restriction source of truth"]
+    subgraph Camera["camera.ts — coordinate primitives"]
         createCamera["createCamera()"]
         getImageFit["getImageFit()"]
+        createExportCamera["createExportCamera()"]
+    end
+
+    subgraph Containment["containment.ts — restriction source of truth"]
         restrictPanZoom["restrictPanZoom()\nbuilds camera → inverse → clamp"]
         restrictCropRect["restrictCropRect()"]
         getMinZoomForCover["getMinZoomForCover()"]
-        createExportCamera["createExportCamera()"]
+        getCropBounds["getCropBounds()"]
     end
 
     subgraph Rendering["Render Path"]

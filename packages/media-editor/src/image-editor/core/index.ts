@@ -22,8 +22,8 @@ export {
 export type { AspectRatioPreset } from './constants';
 
 // Source region (pixel and percentage)
-export { getSourceRegion, getSourceRegionPercent } from './camera';
-export type { SourceRegion, SourceRegionPercent } from './camera';
+export { getSourceRegion, getSourceRegionPercent } from './source-region';
+export type { SourceRegion, SourceRegionPercent } from './source-region';
 
 // Pipeline
 export {

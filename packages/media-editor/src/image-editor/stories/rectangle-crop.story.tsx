@@ -34,13 +34,13 @@ import {
 } from '../core/export/canvas-renderer';
 import {
 	getRotatedBBox,
-	getSourceRegion,
 	createCamera,
 	screenToWorld,
 	getImageFit,
 	getVisibleBounds,
-	restrictPanZoom,
 } from '../core/camera';
+import { restrictPanZoom } from '../core/containment';
+import { getSourceRegion } from '../core/source-region';
 import './style.css';
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
