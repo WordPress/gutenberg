@@ -42,7 +42,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
-		"src/**/*.module.scss"
+		"src/**/*.module.css"
 	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
