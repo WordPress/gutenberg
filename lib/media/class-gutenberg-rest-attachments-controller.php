@@ -20,22 +20,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		// Override the parent's sideload route so that 'scaled' is included
-		// in the image_size enum. Without the override, core's handler
-		// validates first and rejects 'scaled' before ours is tried.
-		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
-
-		// Special case to set 'original_image' in attachment metadata.
-		$valid_image_sizes[] = 'original';
-		// HEIC/HEIF companion original preserved alongside the JPEG derivative.
-		// Stored under its own meta key so it never collides with 'original'
-		// (which the scaled-sideload flow also writes to).
-		$valid_image_sizes[] = 'original-heic';
-		// Client-side big image threshold: sideload the scaled version.
-		$valid_image_sizes[] = 'scaled';
-		// Used for PDF thumbnails.
-		$valid_image_sizes[] = 'full';
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
@@ -50,21 +34,47 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'type'        => 'integer',
 						),
 						'image_size'         => array(
-							'description' => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
-							'oneOf'       => array(
-								array(
-									'type' => 'string',
-									'enum' => $valid_image_sizes,
-								),
-								array(
-									'type'  => 'array',
-									'items' => array(
-										'type' => 'string',
-										'enum' => $valid_image_sizes,
-									),
-								),
+							'description'       => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
+							'type'              => array( 'string', 'array' ),
+							'items'             => array(
+								'type' => 'string',
 							),
-							'required'    => true,
+							'required'          => true,
+							// A custom callback is used instead of the default `rest_validate_request_arg`
+							// because WordPress's `rest_is_array()` treats scalar strings as single-element
+							// lists (via wp_parse_list), so a oneOf with both a string and array schema
+							// matches a plain string twice and validation fails with "matches more than one
+							// of the expected formats". The callback validates the enum per-item using the
+							// current list of registered sizes, which reflects any sizes added after the
+							// route was registered (e.g. via add_image_size() in tests).
+							'validate_callback' => static function ( $value, $request, $param ) {
+								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
+								$valid_sizes[] = 'original';
+								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = 'scaled';
+								$valid_sizes[] = 'full';
+
+								$items = is_string( $value ) ? array( $value ) : ( is_array( $value ) ? $value : null );
+								if ( null === $items ) {
+									return new WP_Error(
+										'rest_invalid_type',
+										/* translators: %s: Parameter name. */
+										sprintf( __( '%s must be a string or an array of strings.', 'gutenberg' ), $param )
+									);
+								}
+
+								foreach ( $items as $item ) {
+									if ( ! is_string( $item ) || ! in_array( $item, $valid_sizes, true ) ) {
+										return new WP_Error(
+											'rest_not_in_enum',
+											/* translators: %s: Parameter name. */
+											sprintf( __( '%s contains an invalid image size.', 'gutenberg' ), $param )
+										);
+									}
+								}
+
+								return true;
+							},
 						),
 						'generate_sub_sizes' => array(
 							'description' => __( 'Whether to generate image sub sizes from the sideloaded file.', 'gutenberg' ),
@@ -100,17 +110,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 								'type'       => 'object',
 								'properties' => array(
 									'image_size'     => array(
+										// Uses a multi-type schema instead of `oneOf` because WordPress's
+										// `rest_is_array()` treats scalar strings as single-element lists,
+										// so both a `{type: string}` and `{type: array}` oneOf schema would
+										// match a plain string and trigger a "matches more than one"
+										// validation error.
 										'description' => __( 'Size name, or an array of size names when a single file is registered under multiple sizes with matching dimensions.', 'gutenberg' ),
-										'oneOf'       => array(
-											array(
-												'type' => 'string',
-											),
-											array(
-												'type'  => 'array',
-												'items' => array(
-													'type' => 'string',
-												),
-											),
+										'type'        => array( 'string', 'array' ),
+										'items'       => array(
+											'type' => 'string',
 										),
 										'required'    => true,
 									),
