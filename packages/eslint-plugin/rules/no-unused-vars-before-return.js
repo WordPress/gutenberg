@@ -59,12 +59,14 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 		 *
 		 * @param {Object} node Node to test.
 		 *
-		 * @return {boolean} Whether declarator is emempt from consideration.
+		 * @return {boolean} Whether declarator is exempt from consideration.
 		 */
-		function isExemptObjectDestructureDeclarator( node ) {
+		function isExemptDestructureDeclarator( node ) {
 			return (
-				node.id.type === 'ObjectPattern' &&
-				node.id.properties.length > 1
+				( node.id.type === 'ObjectPattern' &&
+					node.id.properties.length > 1 ) ||
+				( node.id.type === 'ArrayPattern' &&
+					node.id.elements.filter( Boolean ).length > 1 )
 			);
 		}
 
@@ -103,7 +105,7 @@ module.exports = /** @type {import('eslint').Rule} */ ( {
 							// Target function calls as "expensive".
 							def.node.init.type === 'CallExpression' &&
 							// Allow unused if part of an object destructuring.
-							! isExemptObjectDestructureDeclarator( def.node ) &&
+							! isExemptDestructureDeclarator( def.node ) &&
 							// Only target assignments preceding `return`.
 							def.node.range[ 1 ] < node.range[ 1 ]
 						);

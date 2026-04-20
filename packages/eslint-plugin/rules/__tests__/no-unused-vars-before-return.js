@@ -62,6 +62,22 @@ function MyComponent() {
 	return <Foo />;
 }`,
 		},
+		{
+			code: `
+function example() {
+    const [ h, m, s ] = getTime();
+
+    if (h > 0) {
+        return \`\${ h }:\${ m }\`;
+    }
+
+    if (m > 0) {
+        return \`\${ m }:\${ s }\`;
+    }
+
+    return \`0:\${ s }\`;
+}`,
+		},
 	],
 	invalid: [
 		{
