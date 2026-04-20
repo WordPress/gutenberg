@@ -44,7 +44,9 @@
 		"@wordpress/components": "file:../components",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "file:../i18n",
+		"clsx": "^2.1.1",
+		"gl-matrix": "^3.4.3"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

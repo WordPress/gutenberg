@@ -1,0 +1,559 @@
+/**
+ * External dependencies
+ */
+
+import clsx from 'clsx';
+
+/**
+ * WordPress dependencies
+ */
+import {
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+	forwardRef,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import type {
+	CropperState,
+	StencilProps,
+	Size,
+	NormalizedRect,
+} from '../../core/types';
+import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
+import { getImageFit, getCropBounds } from '../../core/camera';
+import { useInteraction } from '../hooks/use-interaction';
+import { useTransformStyle } from '../hooks/use-transform-style';
+import { RectangleStencil } from './stencils/rectangle-stencil';
+import { DimmingOverlay } from './overlays/dimming-overlay';
+import { GridOverlay } from './overlays/grid-overlay';
+import './cropper.scss';
+
+/** Threshold for comparing normalized crop rect values. */
+const CROP_RECT_EPSILON = 1e-6;
+/** Debounce delay for ARIA live announcements (ms). */
+const ARIA_DEBOUNCE_MS = 300;
+
+/**
+ * Props for the Cropper component.
+ */
+export interface CropperProps {
+	/** Image source URL. */
+	src: string;
+	/** The full state/setter object from `useCropperState`. */
+	controller: UseCropperStateReturn;
+	/** Stencil component for the crop area. Defaults to RectangleStencil. */
+	stencil?: React.ComponentType< StencilProps >;
+	/** Show the rule-of-thirds grid overlay. */
+	showGrid?: boolean;
+	/** Show the dimming overlay outside the crop area. */
+	showDimming?: boolean;
+	/** Minimum zoom level. */
+	minZoom?: number;
+	/** Maximum zoom level. */
+	maxZoom?: number;
+	/** Fixed aspect ratio (width / height) in pixel space for the crop area. */
+	aspectRatio?: number;
+	/**
+	 * Enable freeform crop mode with resizable handles.
+	 * When false (default), the crop area is fixed and centered.
+	 * When true, the crop area has resize handles and can be freely repositioned.
+	 */
+	freeformCrop?: boolean;
+	/** Callback fired when the image is loaded. */
+	onImageLoaded?: ( size: Size ) => void;
+	/**
+	 * Callback fired on every state change. Fires at pointermove rate
+	 * during drags, so keep the handler light — no heavy work, no
+	 * expensive parent re-renders. For commit-style events (drag end,
+	 * settled crop), use `onGestureEnd` instead.
+	 *
+	 * Useful for lightweight syncing with external tools, analytics,
+	 * or AI agents. Receives the full state so consumers can derive
+	 * whatever they need.
+	 */
+	onStateChange?: ( state: CropperState ) => void;
+	/** Fires when a continuous gesture begins (pan drag, handle resize, pinch zoom). */
+	onGestureStart?: () => void;
+	/** Fires when a continuous gesture ends (pointerup, resize settle). */
+	onGestureEnd?: () => void;
+	/** Additional className for the container. */
+	className?: string;
+}
+
+/**
+ * Build an announcement string for screen readers from cropper state.
+ *
+ * @param state The current cropper state.
+ * @return A human-readable description of the current state.
+ */
+function buildAnnouncement( state: CropperState ): string {
+	const parts: string[] = [];
+	parts.push( `Zoom ${ Math.round( state.zoom * 100 ) }%` );
+	if ( state.rotation !== 0 ) {
+		parts.push( `Rotation ${ Math.round( state.rotation ) } degrees` );
+	}
+	const cropW = Math.round( state.cropRect.width * 100 );
+	const cropH = Math.round( state.cropRect.height * 100 );
+	parts.push( `Crop ${ cropW }% by ${ cropH }%` );
+	return parts.join( ', ' );
+}
+
+/**
+ * The main image cropper component.
+ *
+ * Renders an image within a container with interactive crop overlays.
+ * Creates the camera once per render via getImageFit, then passes
+ * derived values to stencil, overlays, and interaction hooks.
+ *
+ * The component fills its parent container (100% width and height).
+ * Wrap it in a sized container to control its dimensions.
+ *
+ * @param root0                Component props implementing CropperProps.
+ * @param root0.src            Image source URL.
+ * @param root0.controller     The full state/setter object from `useCropperState`.
+ * @param root0.stencil        Custom stencil component.
+ * @param root0.showGrid       Show rule-of-thirds grid overlay.
+ * @param root0.showDimming    Show dimming overlay outside crop.
+ * @param root0.minZoom        Minimum zoom level.
+ * @param root0.maxZoom        Maximum zoom level.
+ * @param root0.aspectRatio    Fixed aspect ratio (width/height).
+ * @param root0.freeformCrop   Enable resize handles.
+ * @param root0.onImageLoaded  Image load callback.
+ * @param root0.onStateChange  Every-frame state callback.
+ * @param root0.onGestureStart Gesture boundary start.
+ * @param root0.onGestureEnd   Gesture boundary end.
+ * @param root0.className      Additional CSS class.
+ * @param ref                  Forwarded ref for the container div.
+ */
+function CropperInner(
+	{
+		src,
+		controller,
+		stencil: StencilComponent = RectangleStencil,
+		showGrid = false,
+		showDimming = true,
+		minZoom,
+		maxZoom,
+		aspectRatio,
+		freeformCrop = false,
+		onImageLoaded,
+		onStateChange,
+		onGestureStart,
+		onGestureEnd,
+		className,
+	}: CropperProps,
+	ref: React.ForwardedRef< HTMLDivElement >
+) {
+	const {
+		state,
+		setImage,
+		setCropRect,
+		settleCrop,
+		__dispatch: dispatch,
+	} = controller;
+	// Container measurement via ResizeObserver.
+	const containerRef = useRef< HTMLDivElement >( null );
+	const [ containerSize, setContainerSize ] = useState< Size >( {
+		width: 0,
+		height: 0,
+	} );
+
+	useEffect( () => {
+		const element = containerRef.current;
+		if ( ! element ) {
+			return;
+		}
+		const observer = new ResizeObserver( ( entries ) => {
+			for ( const entry of entries ) {
+				const { width, height } = entry.contentRect;
+				setContainerSize( ( prev ) => {
+					if ( prev.width === width && prev.height === height ) {
+						return prev;
+					}
+					return { width, height };
+				} );
+			}
+		} );
+		observer.observe( element );
+		return () => {
+			observer.disconnect();
+		};
+	}, [] );
+
+	const [ naturalSize, setNaturalSize ] = useState< Size >( {
+		width: 0,
+		height: 0,
+	} );
+
+	// Notify consumer of state changes.
+	useEffect( () => {
+		onStateChange?.( state );
+	}, [ state, onStateChange ] );
+
+	// ARIA live region: announce significant state changes for screen readers.
+	const [ ariaMessage, setAriaMessage ] = useState( '' );
+	const ariaTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const prevAnnouncementRef = useRef( '' );
+
+	useEffect( () => {
+		// Debounce announcements to avoid flooding during drag/mousemove.
+		clearTimeout( ariaTimerRef.current );
+		ariaTimerRef.current = setTimeout( () => {
+			const msg = buildAnnouncement( state );
+			if ( msg !== prevAnnouncementRef.current ) {
+				prevAnnouncementRef.current = msg;
+				setAriaMessage( msg );
+			}
+		}, ARIA_DEBOUNCE_MS );
+
+		return () => {
+			clearTimeout( ariaTimerRef.current );
+		};
+	}, [
+		state.zoom,
+		state.rotation,
+		state.cropRect.width,
+		state.cropRect.height,
+		state,
+	] );
+
+	// Compute fitted image dimensions and visual bounds from camera math.
+	const { elementSize, visualSize } = useMemo(
+		() => getImageFit( containerSize, naturalSize, state.rotation ),
+		[ containerSize, naturalSize, state.rotation ]
+	);
+
+	// In fixed-crop mode, auto-size the crop rect to fill the visual area
+	// while respecting the aspect ratio. The crop is always centered.
+	useEffect( () => {
+		if (
+			freeformCrop ||
+			visualSize.width === 0 ||
+			visualSize.height === 0
+		) {
+			return;
+		}
+		let w = 1;
+		let h = 1;
+		if ( aspectRatio && aspectRatio > 0 ) {
+			// normalizedRatio = w/h in normalized space that produces
+			// the desired pixel aspect ratio.
+			// pixelW = w * visualW, pixelH = h * visualH
+			// pixelW / pixelH = aspectRatio
+			// => w / h = aspectRatio * visualH / visualW
+			const normalizedRatio =
+				( aspectRatio * visualSize.height ) / visualSize.width;
+			if ( normalizedRatio <= 1 ) {
+				// Crop is narrower than full width — constrain width.
+				w = normalizedRatio;
+			} else {
+				// Crop is shorter than full height — constrain height.
+				h = 1 / normalizedRatio;
+			}
+		}
+		const x = ( 1 - w ) / 2;
+		const y = ( 1 - h ) / 2;
+		const current = state.cropRect;
+		if (
+			Math.abs( current.x - x ) < CROP_RECT_EPSILON &&
+			Math.abs( current.y - y ) < CROP_RECT_EPSILON &&
+			Math.abs( current.width - w ) < CROP_RECT_EPSILON &&
+			Math.abs( current.height - h ) < CROP_RECT_EPSILON
+		) {
+			return;
+		}
+		setCropRect( { x, y, width: w, height: h } );
+	}, [ freeformCrop, aspectRatio, visualSize, setCropRect, state.cropRect ] );
+
+	// In freeform mode, when aspectRatio changes, compute the largest
+	// inscribed rect of the new ratio within the visual bounds, centered.
+	const prevAspectRatioRef = useRef( aspectRatio );
+	useEffect( () => {
+		if ( prevAspectRatioRef.current === aspectRatio ) {
+			return;
+		}
+		prevAspectRatioRef.current = aspectRatio;
+
+		if (
+			! freeformCrop ||
+			visualSize.width === 0 ||
+			visualSize.height === 0
+		) {
+			return;
+		}
+
+		// No aspect ratio (free) — don't resize the crop.
+		if ( ! aspectRatio || aspectRatio <= 0 ) {
+			return;
+		}
+
+		// Compute the normalized ratio for the desired pixel aspect ratio.
+		const normalizedRatio =
+			( aspectRatio * visualSize.height ) / visualSize.width;
+
+		// Largest inscribed rect at this ratio, centered in [0,1]x[0,1].
+		let w: number;
+		let h: number;
+		if ( normalizedRatio <= 1 ) {
+			w = 1;
+			h = 1 / normalizedRatio;
+			if ( h > 1 ) {
+				h = 1;
+				w = normalizedRatio;
+			}
+		} else {
+			h = 1;
+			w = normalizedRatio;
+			if ( w > 1 ) {
+				w = 1;
+				h = 1 / normalizedRatio;
+			}
+		}
+
+		setCropRect( {
+			x: ( 1 - w ) / 2,
+			y: ( 1 - h ) / 2,
+			width: w,
+			height: h,
+		} );
+	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
+
+	// Compute the crop handle bounds from the actual image footprint.
+	// Depends on the full state object because getCropBounds reads
+	// crop, zoom, rotation, flip, and image. React Compiler requires
+	// the complete dependency; the computation is lightweight (a few
+	// trig ops + 4 corner transforms).
+	const cropBounds = useMemo( () => {
+		if ( ! state.image || elementSize.width === 0 ) {
+			return undefined;
+		}
+		return getCropBounds( state, elementSize, visualSize, containerSize );
+	}, [ state, elementSize, visualSize, containerSize ] );
+
+	// Use the interaction hook for mouse, touch, and keyboard events.
+	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
+		state,
+		dispatch,
+		containerSize,
+		visualSize,
+		{
+			minZoom,
+			maxZoom,
+			onGestureStart,
+			onGestureEnd,
+		}
+	);
+
+	// Register wheel handler natively with { passive: false } so
+	// preventDefault works. React's onWheel registers as passive.
+	useEffect( () => {
+		const el = containerRef.current;
+		if ( ! el ) {
+			return;
+		}
+		el.addEventListener( 'wheel', onWheelNative, {
+			passive: false,
+		} );
+		return () => {
+			el.removeEventListener( 'wheel', onWheelNative );
+		};
+	}, [ onWheelNative ] );
+
+	// Use the transform style hook for the image CSS transform.
+	const transformString = useTransformStyle( state, visualSize );
+
+	/**
+	 * Handle the image load event.
+	 */
+	const handleImageLoad = useCallback(
+		( event: React.SyntheticEvent< HTMLImageElement > ) => {
+			const img = event.currentTarget;
+			const size: Size = {
+				width: img.naturalWidth,
+				height: img.naturalHeight,
+			};
+
+			setNaturalSize( size );
+
+			setImage( {
+				src,
+				naturalWidth: size.width,
+				naturalHeight: size.height,
+			} );
+
+			onImageLoaded?.( size );
+		},
+		[ src, setImage, onImageLoaded ]
+	);
+
+	/**
+	 * Handle crop rect changes from the stencil (during drag).
+	 */
+	const handleCropChange = useCallback(
+		( rect: NormalizedRect ) => {
+			setCropRect( rect );
+		},
+		[ setCropRect ]
+	);
+
+	// Settling animation: brief linear transition after resize end.
+	const [ settling, setSettling ] = useState( false );
+	const settleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+
+	// Clear the pending settle timer on unmount so it can't fire a
+	// state update on an unmounted component.
+	useEffect( () => {
+		return () => {
+			clearTimeout( settleTimerRef.current );
+		};
+	}, [] );
+
+	/**
+	 * Handle resize end — settle the crop rect (re-center, fill height).
+	 */
+	const handleResizeEnd = useCallback( () => {
+		setSettling( true );
+		settleCrop();
+		onGestureEnd?.();
+		clearTimeout( settleTimerRef.current );
+		settleTimerRef.current = setTimeout( () => {
+			setSettling( false );
+		}, 200 );
+	}, [ settleCrop, onGestureEnd ] );
+
+	const imageTransition =
+		settling || isZooming ? 'transform 150ms linear' : undefined;
+	const settleStencilTransition = settling
+		? 'left 150ms linear, top 150ms linear, width 150ms linear, height 150ms linear'
+		: undefined;
+
+	// Compute the image's CSS style.
+	const imageStyle = useMemo( (): React.CSSProperties => {
+		if ( elementSize.width === 0 || elementSize.height === 0 ) {
+			return {};
+		}
+		const centerX = ( containerSize.width - elementSize.width ) / 2;
+		const centerY = ( containerSize.height - elementSize.height ) / 2;
+		return {
+			width: elementSize.width,
+			height: elementSize.height,
+			maxWidth: elementSize.width,
+			maxHeight: elementSize.height,
+			left: centerX,
+			top: centerY,
+			transform: transformString,
+			transition: imageTransition,
+		};
+	}, [ containerSize, elementSize, transformString, imageTransition ] );
+
+	// Merge the forwarded ref with the internal container ref.
+	const setContainerRef = useCallback(
+		( element: HTMLDivElement | null ) => {
+			(
+				containerRef as React.MutableRefObject< HTMLDivElement | null >
+			 ).current = element;
+			if ( typeof ref === 'function' ) {
+				ref( element );
+			} else if ( ref ) {
+				(
+					ref as React.MutableRefObject< HTMLDivElement | null >
+				 ).current = element;
+			}
+		},
+		[ ref ]
+	);
+
+	return (
+		<div
+			ref={ setContainerRef }
+			className={ clsx(
+				'wp-media-editor-image-editor',
+				isDragging && 'wp-media-editor-image-editor--dragging',
+				className
+			) }
+			// The container is focusable so keyboard users can pan/zoom
+			// with arrow keys and +/−. We deliberately do NOT use
+			// role="application" — it disables the screen reader's
+			// normal keyboard interception, which is too heavy-handed
+			// for a single widget in a page. Screen reader users get
+			// the ARIA live region (below) as the announcement channel.
+			tabIndex={ 0 }
+			role="group"
+			aria-label={ __( 'Image editor' ) }
+			{ ...handlers }
+		>
+			{ /* The image layer */ }
+			<img
+				className="wp-media-editor-image-editor__image"
+				src={ src }
+				alt=""
+				onLoad={ handleImageLoad }
+				style={ imageStyle }
+				draggable={ false }
+			/>
+
+			{ /* Dimming overlay outside the crop area */ }
+			{ showDimming && (
+				<DimmingOverlay
+					cropRect={ state.cropRect }
+					containerSize={ containerSize }
+					imageSize={ visualSize }
+				/>
+			) }
+
+			{ /* The stencil (crop area with handles) */ }
+			<StencilComponent
+				cropRect={ state.cropRect }
+				containerSize={ containerSize }
+				imageSize={ visualSize }
+				onCropChange={ handleCropChange }
+				onResizeStart={ onGestureStart }
+				onResizeEnd={ handleResizeEnd }
+				aspectRatio={ aspectRatio }
+				freeformCrop={ freeformCrop }
+				stencilTransition={ settleStencilTransition }
+				cropBounds={ cropBounds }
+			/>
+
+			{ /* Rule-of-thirds grid */ }
+			{ showGrid && (
+				<GridOverlay
+					cropRect={ state.cropRect }
+					containerSize={ containerSize }
+					imageSize={ visualSize }
+				/>
+			) }
+
+			{ /* ARIA live region for screen reader announcements */ }
+			<div
+				aria-live="polite"
+				aria-atomic="true"
+				className="wp-media-editor-image-editor__aria-live"
+				style={ {
+					position: 'absolute',
+					width: 1,
+					height: 1,
+					padding: 0,
+					margin: -1,
+					overflow: 'hidden',
+					clip: 'rect(0, 0, 0, 0)',
+					whiteSpace: 'nowrap',
+					border: 0,
+				} }
+			>
+				{ ariaMessage }
+			</div>
+		</div>
+	);
+}
+
+export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
+	CropperInner
+);
