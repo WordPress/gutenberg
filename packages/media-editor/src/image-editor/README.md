@@ -1,5 +1,7 @@
 # Image Editor
 
+> **Status: internal.** This module is not exported from `@wordpress/media-editor`'s public API. Only code inside `@wordpress/media-editor` should import it, via relative paths (e.g. `../image-editor`). When the module is promoted to the package's public surface, the `@wordpress/media-editor` import paths used in these docs will work.
+
 A modular image editor inside `@wordpress/media-editor`. Two layers:
 
 - **Core** — framework-agnostic state, math, and interaction logic. Pure TypeScript + `gl-matrix`. The export helpers in `core/export/` are browser-only (they use `HTMLCanvasElement` and `Image`), but everything else — reducer, camera math, interaction controller — has no DOM or React dependency. A non-React UI layer (Vue, Svelte, vanilla) can reuse core directly.
@@ -8,7 +10,7 @@ A modular image editor inside `@wordpress/media-editor`. Two layers:
 ## Quick start
 
 ```tsx
-import { Cropper, useCropperState } from '@wordpress/media-editor';
+import { Cropper, useCropperState } from '../image-editor';
 
 function ImageEditor() {
   const controller = useCropperState();
@@ -30,9 +32,7 @@ function ImageEditor() {
 
 ## Styles
 
-The cropper's styles are compiled as part of `@wordpress/media-editor`'s SCSS build and output to `build-style/style.css`. Consumers that already load `@wordpress/media-editor`'s stylesheet (e.g. via `wp_enqueue_style( 'wp-media-editor' )` in WordPress or `import '@wordpress/media-editor/build-style/style.css'` in JS bundles) will automatically get the cropper styles.
-
-If you're using the cropper components without the rest of the media editor, you still need to load the package's stylesheet — the cropper will not render correctly without it. All CSS classes use the `wp-media-editor-image-editor` prefix, so themes can override styles with equal or higher specificity.
+The cropper's styles are compiled as part of `@wordpress/media-editor`'s SCSS build. Internal callers that render `<Cropper>` inherit them automatically when the package's stylesheet is loaded. All CSS classes use the `wp-media-editor-image-editor` prefix.
 
 ## Docs
 

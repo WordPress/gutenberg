@@ -1,5 +1,7 @@
 # Recipes and Getting Started
 
+> **Status: internal.** The module is not exported from `@wordpress/media-editor`'s public API. Code examples use the relative path `../image-editor` because only internal callers can reach the module. When it's promoted to the package's public surface, swap the import for `@wordpress/media-editor`.
+
 Getting started, extension points, and integration patterns.
 
 ## Getting started
@@ -7,7 +9,7 @@ Getting started, extension points, and integration patterns.
 ### Step 1: Mount a basic cropper
 
 ```tsx
-import { Cropper, useCropperState } from '@wordpress/media-editor';
+import { Cropper, useCropperState } from '../image-editor';
 
 function ImageEditor() {
   const controller = useCropperState();
@@ -66,11 +68,11 @@ const {
 const blob = await getCroppedImage( 'image/jpeg', 0.9 );
 
 // As source-pixel coordinates (for server-side processing):
-import { getSourceRegion } from '@wordpress/media-editor';
+import { getSourceRegion } from '../image-editor';
 const region = getSourceRegion( state, { width: naturalWidth, height: naturalHeight } );
 
 // As percentages (for WP REST API /edit endpoint):
-import { getSourceRegionPercent } from '@wordpress/media-editor';
+import { getSourceRegionPercent } from '../image-editor';
 const pct = getSourceRegionPercent( state, { width: naturalWidth, height: naturalHeight } );
 ```
 
@@ -100,8 +102,8 @@ Pipeline / Export          -- TransformOperation[] → canvas → Blob
 The crop area UI is fully pluggable. Any component that implements `StencilProps` can replace the default `RectangleStencil`.
 
 ```tsx
-import { Cropper, useCropperState } from '@wordpress/media-editor';
-import type { StencilProps } from '@wordpress/media-editor';
+import { Cropper, useCropperState } from '../image-editor';
+import type { StencilProps } from '../image-editor';
 
 function CircularStencil( { cropRect, containerSize, imageSize, onCropChange }: StencilProps ) {
   // Render a circular crop overlay using cropRect bounds.
@@ -134,8 +136,8 @@ function MyCropper() {
 The pipeline is the primary interface for programmatic control. Operations are JSON-serializable, making them ideal for AI agents, undo/redo stacks, and remote control.
 
 ```typescript
-import { useCropperState } from '@wordpress/media-editor';
-import type { TransformOperation } from '@wordpress/media-editor';
+import { useCropperState } from '../image-editor';
+import type { TransformOperation } from '../image-editor';
 
 // An AI agent generates a list of operations:
 const operations: TransformOperation[] = [
@@ -155,7 +157,7 @@ for ( const op of operations ) {
 **Replay from scratch:**
 
 ```typescript
-import { stateFromPipeline } from '@wordpress/media-editor';
+import { stateFromPipeline } from '../image-editor';
 
 // Replay a pipeline from initial state:
 const finalState = stateFromPipeline( operations );
@@ -177,7 +179,7 @@ const ops = JSON.parse( json );
 The export system converts cropper state to canvas output. Use `applyToCanvas()` to chain custom processing with the cropper transforms.
 
 ```typescript
-import { applyToCanvas } from '@wordpress/media-editor';
+import { applyToCanvas } from '../image-editor';
 
 // 1. Apply your own processing first (brightness, filters, etc.):
 const processedCanvas = applyBrightness( sourceImage, { brightness: 1.2 } );
@@ -206,7 +208,7 @@ The state is a plain object and the hook returns one `controller` bundle of stat
 When the cropper and controls are in the same component:
 
 ```tsx
-import { Cropper, useCropperState } from '@wordpress/media-editor';
+import { Cropper, useCropperState } from '../image-editor';
 
 function ImageEditor() {
   const controller = useCropperState();
@@ -227,7 +229,7 @@ function ImageEditor() {
 When controls and the cropper are in different parts of the tree, use `CropperProvider` to avoid prop-drilling. Any descendant can call `useCropper()` to access the controller:
 
 ```tsx
-import { Cropper, CropperProvider, useCropper } from '@wordpress/media-editor';
+import { Cropper, CropperProvider, useCropper } from '../image-editor';
 
 function ImageEditor() {
   return (
@@ -281,7 +283,7 @@ controller.settleCrop();
 `getSourceRegion()` converts the current crop state to source-pixel coordinates. This is the bridge between the cropper and external tools (image processing libraries, AI APIs, server-side processing) that work in source-pixel coordinates.
 
 ```typescript
-import { getSourceRegion } from '@wordpress/media-editor';
+import { getSourceRegion } from '../image-editor';
 
 const region = getSourceRegion( state, { width: naturalWidth, height: naturalHeight } );
 // region = { x, y, width, height, rotation, flip, zoom }
@@ -309,7 +311,7 @@ const aiRequest = {
 `applyToCanvas()` applies the cropper's transform to an existing canvas or image source. This enables multi-step editing where an upstream tool (brightness, color, filters) has already processed the image.
 
 ```typescript
-import { applyToCanvas } from '@wordpress/media-editor';
+import { applyToCanvas } from '../image-editor';
 
 // Step 1: Apply brightness/color adjustments to a canvas
 const processedCanvas = applyBrightness( sourceImage, { brightness: 1.2 } );
@@ -453,7 +455,7 @@ import {
   stateFromPipeline,
   getSourceRegion,
   exportCroppedImage,
-} from '@wordpress/media-editor';
+} from '../image-editor';
 
 // 1. Build state from operations (pure — runs in Node, workers, anywhere)
 const state = stateFromPipeline( [
@@ -508,8 +510,8 @@ The `Cropper` component fires `onGestureStart` and `onGestureEnd` callbacks at t
 See the `UndoRedo` story for a complete working example. Here is the core pattern:
 
 ```tsx
-import { Cropper, useCropperState } from '@wordpress/media-editor';
-import type { CropperState, TransformOperation } from '@wordpress/media-editor';
+import { Cropper, useCropperState } from '../image-editor';
+import type { CropperState, TransformOperation } from '../image-editor';
 import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 
 function ImageEditorWithUndo( { src }: { src: string } ) {
@@ -660,128 +662,6 @@ The cropper is keyboard-accessible and screen-reader friendly:
 - Custom stencils should preserve `tabIndex`, `role`, and `aria-*` attributes on interactive elements
 - Use `aria-live="polite"` for any custom state announcements
 - Ensure custom overlays don't trap keyboard focus
-
-## WordPress integration patterns
-
-These patterns show how the cropper integrates with WordPress-specific systems. They consume the existing API — no package changes needed.
-
-### Theme-aware aspect ratio presets
-
-WordPress themes register image sizes via `add_image_size()`. The cropper can suggest aspect ratios that match the active theme's layout:
-
-```typescript
-import { DEFAULT_ASPECT_RATIOS } from '@wordpress/media-editor';
-import type { AspectRatioPreset } from '@wordpress/media-editor';
-
-// Build presets from theme's registered image sizes.
-function getThemePresets( imageSizes ): AspectRatioPreset[] {
-  const themePresets = imageSizes
-    .filter( size => size.width && size.height )
-    .map( size => ( {
-      label: `${ size.name } (${ size.width }×${ size.height })`,
-      value: size.width / size.height,
-    } ) );
-  return [ ...DEFAULT_ASPECT_RATIOS, ...themePresets ];
-}
-
-// Or let plugins add presets via WordPress hooks:
-const presets = wp.hooks.applyFilters(
-  'imageEditing.aspectRatioPresets',
-  DEFAULT_ASPECT_RATIOS
-);
-```
-
-### Block context integration
-
-When the cropper opens from a block (Image, Cover, Media & Text), the block knows its target layout. Pass the block's aspect ratio as the default:
-
-```typescript
-// In the Image block's edit component:
-const blockAspectRatio = getBlockAspectRatio( blockAttributes );
-
-<Cropper
-  src={ imageUrl }
-  controller={ controller }
-  aspectRatio={ blockAspectRatio }  // Pre-set to match block layout
-/>
-```
-
-Cover blocks at 16:9 open the cropper at 16:9. Avatar blocks open at 1:1. The user sees the right crop immediately.
-
-### WordPress hooks integration
-
-Use `onStateChange` to bridge into the WordPress hooks system:
-
-```typescript
-<Cropper
-  src={ imageUrl }
-  controller={ controller }
-  onStateChange={ ( currentState ) => {
-    // Let plugins react to crop changes.
-    wp.hooks.doAction( 'imageEditing.stateChanged', currentState );
-  } }
-/>
-
-// In a plugin:
-wp.hooks.addAction( 'imageEditing.stateChanged', 'my-plugin', ( state ) => {
-  // Update preview, sync with server, trigger AI analysis, etc.
-} );
-```
-
-Plugins can also filter the available controls:
-
-```typescript
-// Let plugins add custom toolbar buttons.
-const extraControls = wp.hooks.applyFilters(
-  'imageEditing.toolbarControls',
-  [],
-  state
-);
-
-// Let plugins modify the export before saving.
-wp.hooks.addFilter( 'imageEditing.beforeSave', 'my-plugin', ( blob, state ) => {
-  // Add watermark, compress further, convert format, etc.
-  return processedBlob;
-} );
-```
-
-### REST API and media library
-
-Save crop metadata to the attachment via the REST API so the server can regenerate crops:
-
-```typescript
-import { getSourceRegion } from '@wordpress/media-editor';
-
-// After the user finishes editing:
-const region = getSourceRegion( state, {
-  width: attachment.naturalWidth,
-  height: attachment.naturalHeight,
-} );
-
-// Save to the attachment's metadata.
-wp.apiFetch( {
-  path: `/wp/v2/media/${ attachment.id }`,
-  method: 'POST',
-  data: {
-    meta: {
-      crop_region: {
-        x: region.x,
-        y: region.y,
-        width: region.width,
-        height: region.height,
-        rotation: region.rotation,
-        flip: region.flip,
-      },
-    },
-  },
-} );
-```
-
-This enables:
-- Server-side crop regeneration when themes change image sizes
-- Crop history per attachment
-- "Reset to original" using stored metadata
-- Multiple crops per registered size (future)
 
 ## Testing
 
