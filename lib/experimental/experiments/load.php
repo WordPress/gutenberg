@@ -7,6 +7,11 @@
 
 /**
  * Set up the experiments settings.
+ *
+ * Registering an experiment here only exposes it on the Experiments screen.
+ * To actually enable a new experiment in the editor, add a matching bridge
+ * (e.g. a `window.__experimental*` global) in `gutenberg_enable_experiments()`
+ * in `lib/experimental/editor-settings.php`.
  */
 function gutenberg_initialize_experiments_settings() {
 	$groups = array(
