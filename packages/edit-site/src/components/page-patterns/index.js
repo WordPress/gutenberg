@@ -185,7 +185,7 @@ export default function DataviewsPatterns() {
 				actions={
 					<PatternsActions
 						categoryId={ categoryId }
-						postType={ postType }
+						type={ postType }
 					/>
 				}
 			>
@@ -214,7 +214,7 @@ export default function DataviewsPatterns() {
 					} }
 					view={ view }
 					onChangeView={ updateView }
-					defaultLayouts={ defaultLayouts ?? {} }
+					defaultLayouts={ defaultLayouts }
 					onReset={ isModified ? resetToDefault : false }
 				/>
 			</Page>

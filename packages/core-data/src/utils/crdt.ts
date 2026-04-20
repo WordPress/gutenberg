@@ -6,11 +6,12 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-// @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	type CRDTDoc,
 	type ObjectData,
+	type ObjectID,
+	type ObjectType,
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
@@ -426,6 +427,19 @@ export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+};
+
+/**
+ * This default collection sync config can be used to sync entity collections
+ * (e.g., block comments) where we are not interested in merging changes at the
+ * individual record level, but instead want to replace the entire collection
+ * when changes are detected.
+ */
+export const defaultCollectionSyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: () => {},
+	getChangesFromCRDTDoc: () => ( {} ),
+	shouldSync: ( _: ObjectType, objectId: ObjectID | null ) =>
+		null === objectId,
 };
 
 /**

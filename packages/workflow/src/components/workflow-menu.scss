@@ -69,7 +69,7 @@
 
 	[cmdk-item] {
 		border-radius: $radius-small;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: flex;
 		align-items: center;
 		color: $gray-900;

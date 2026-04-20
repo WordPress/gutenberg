@@ -56,6 +56,7 @@ test.describe( 'Collaboration - Refresh', () => {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
+			undefined,
 			{ timeout: 15000 }
 		);
 
@@ -96,6 +97,7 @@ test.describe( 'Collaboration - Refresh', () => {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
+			undefined,
 			{ timeout: 15000 }
 		);
 		editor2 = new Editor( { page: page2 } );
@@ -142,6 +144,7 @@ test.describe( 'Collaboration - Refresh', () => {
 				( window as any )._wpCollaborationEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
+			undefined,
 			{ timeout: 15000 }
 		);
 

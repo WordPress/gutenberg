@@ -7,7 +7,7 @@ export default {
 				cursor: [ 'pointer' ],
 			},
 			{
-				message: ( property, value ) => {
+				message: ( property ) => {
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Select } from '../../../..';
+import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
 	title: 'Design System/Components/Form/Primitives/Select',

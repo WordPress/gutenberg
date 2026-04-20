@@ -31,7 +31,7 @@ const GlobalStylesPageActions = ( {
 	const history = useHistory();
 
 	return (
-		<HStack>
+		<HStack className="edit-site-styles__header-actions">
 			<Button
 				isPressed={ isStyleBookOpened }
 				icon={ seen }

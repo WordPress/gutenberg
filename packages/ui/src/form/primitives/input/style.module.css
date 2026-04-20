@@ -2,6 +2,10 @@
 
 @layer wp-ui-components {
 	.input {
+		--_gcd-input-padding:
+			var(--wp-ui-input-padding-block, 0)
+			var(--wp-ui-input-layout-padding-inline, 0);
+
 		padding-block: var(--wp-ui-input-padding-block, 0);
 		padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
 		width: 100%;

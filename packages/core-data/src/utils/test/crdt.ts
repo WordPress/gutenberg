@@ -57,6 +57,7 @@ import { RichTextData } from '@wordpress/rich-text';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
@@ -81,6 +82,43 @@ const defaultSyncedProperties = new Set< string >( [
 	'tags',
 	'title',
 ] );
+
+describe( 'defaultCollectionSyncConfig', () => {
+	it( 'has no-op applyChangesToCRDTDoc', () => {
+		const doc = new Y.Doc();
+		// Should not throw and return undefined.
+		expect(
+			defaultCollectionSyncConfig.applyChangesToCRDTDoc( doc, {
+				title: 'test',
+			} )
+		).toBeUndefined();
+		doc.destroy();
+	} );
+
+	it( 'has getChangesFromCRDTDoc that returns empty object', () => {
+		const doc = new Y.Doc();
+		const result = defaultCollectionSyncConfig.getChangesFromCRDTDoc( doc, {
+			title: 'test',
+		} );
+		expect( result ).toEqual( {} );
+		doc.destroy();
+	} );
+
+	it( 'shouldSync returns true when objectId is null (collection)', () => {
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', null )
+		).toBe( true );
+	} );
+
+	it( 'shouldSync returns false when objectId is provided (individual record)', () => {
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', '123' )
+		).toBe( false );
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', 'foo' )
+		).toBe( false );
+	} );
+} );
 
 describe( 'crdt', () => {
 	let doc: Y.Doc;
