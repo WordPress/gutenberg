@@ -36,6 +36,15 @@ class Gutenberg_Guidelines_Post_Type {
 	const TERM_CONTENT = 'content';
 
 	/**
+	 * Neutral default term slug for manually-created guidelines whose type
+	 * hasn't been chosen yet. The REST controller that owns the content
+	 * singleton always writes its own term explicitly.
+	 *
+	 * @var string
+	 */
+	const TERM_ARTIFACT = 'artifact';
+
+	/**
 	 * The standard guideline category meta keys.
 	 *
 	 * @var array
@@ -137,8 +146,8 @@ class Gutenberg_Guidelines_Post_Type {
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
 				'default_term'       => array(
-					'name' => self::TERM_CONTENT,
-					'slug' => self::TERM_CONTENT,
+					'name' => __( 'Artifact', 'gutenberg' ),
+					'slug' => self::TERM_ARTIFACT,
 				),
 			)
 		);
