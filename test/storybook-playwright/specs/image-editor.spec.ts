@@ -28,6 +28,9 @@ async function readImageMatrix(
 	return match[ 1 ].split( ',' ).map( ( v ) => parseFloat( v.trim() ) );
 }
 
+// Integration smoke tests: unit tests cover the reducer / camera math;
+// these verify the browser event pipeline (passive-wheel, pointer capture,
+// keyboard focus) actually reaches it and the CSS transform is applied.
 test.describe( 'MediaEditor ImageEditor', () => {
 	test( 'default crop should render correctly', async ( { page } ) => {
 		await gotoStoryId( page, 'mediaeditor-imageeditor--default' );
