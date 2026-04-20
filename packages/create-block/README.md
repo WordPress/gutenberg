@@ -40,6 +40,19 @@ $ npx @wordpress/create-block@latest [options] [slug]
 
 When no `slug` is provided, the script will run in interactive mode and will start prompting for the input required (`slug`, title, namespace...) to scaffold the project.
 
+### `namespace`
+
+By default, blocks are created with the `create-block` namespace. You should specify your own unique namespace:
+
+```bash
+$ npx @wordpress/create-block@latest my-block --namespace=my-namespace
+```
+
+This creates `my-namespace/my-block` instead of `create-block/my-block`.
+
+If you've already created a block, update the namespace in:
+- `block.json` - the `name` property
+
 ### `slug`
 
 The use of `slug` is optional.

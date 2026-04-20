@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
 
@@ -8,126 +12,175 @@
 
 .editor-collab-sidebar {
 	height: 100%;
+	overflow: hidden;
 }
 
 .editor-collab-sidebar-panel {
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
+	overflow: hidden;
+}
 
-	&__thread {
-		position: relative;
-		padding: $grid-unit-20;
-		border-radius: $radius-large;
-		border: 1.5px solid $gray-300;
-		background-color: $gray-100;
-		margin-bottom: $grid-unit-20;
-	}
+.editor-collab-sidebar-panel__thread {
+	position: relative;
+	padding: $grid-unit-20;
+	border-radius: $radius-large;
+	border: $border-width solid $gray-300;
+	background-color: $gray-100;
+	overflow: hidden;
+	width: auto;
 
-	&__active-thread {
-		border: 1.5px solid #3858e9;
-	}
-
-	&__focus-thread {
-		border: 1.5px solid #3858e9;
+	&.is-selected {
 		background-color: $white;
-		box-shadow: 0 5.5px 7.8px -0.3px rgba(0, 0, 0, 0.102);
+		box-shadow: $elevation-medium;
+		z-index: 1;
 	}
 
-	&__comment-field {
+	&:focus {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
+	}
+
+	&.is-floating {
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		position: absolute;
+		margin-top: $grid-unit-20;
+	}
+}
+
+.editor-collab-sidebar-panel__user-name {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+	text-transform: capitalize;
+}
+
+.editor-collab-sidebar-panel__user-time {
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 16px;
+	text-align: left;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__user-comment {
+	p:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.editor-collab-sidebar-panel__user-avatar {
+	border-radius: $radius-round;
+	flex-shrink: 0;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+}
+
+.editor-collab-sidebar-panel__comment-status {
+	margin-left: auto;
+
+	button {
+		&.has-icon:not(.has-text) {
+			min-width: 24px;
+			padding: 0;
+			width: 24px;
+			height: 24px;
+			flex-shrink: 0;
+		}
+	}
+}
+
+.editor-collab-sidebar-panel__comment-dropdown-menu {
+	flex-shrink: 0;
+}
+
+.editor-collab-sidebar-panel__more-reply-separator {
+	&::before,
+	&::after {
+		content: "";
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: $gray-300;
 		flex: 1;
 	}
+}
 
-	&__child-thread {
-		margin-top: 15px;
-	}
+.editor-collab-sidebar-panel__more-reply-button {
+	font-weight: $font-weight-medium;
+}
 
-	&__user-name {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-		text-transform: capitalize;
-	}
+.editor-collab-sidebar-panel__resolution-text {
+	font-style: italic;
+}
 
-	&__user-time {
-		font-size: 12px;
-		font-weight: 400;
-		line-height: 16px;
-		text-align: left;
-		color: $gray-700;
-	}
+.editor-collab-sidebar-panel__comment-form textarea {
+	@include input-control;
+	// Vertical padding is to match the standard 40px control height when rows=1,
+	// in conjunction with the 20px line-height.
+	// "Standard" metrics are 10px 12px, but subtracts 1px each to account for the border width.
+	padding: 9px 11px;
+	line-height: 20px !important;
+	display: block;
+}
 
-	&__user-comment {
-		font-size: 13px;
-		font-weight: 400;
-		line-height: 20px;
-		text-align: left;
-		color: $gray-900;
+// Visually hidden until focused (skip link pattern)
+.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-block {
+	position: absolute;
+	top: -9999px;
+	right: -9999px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	background: $white !important;
+	z-index: -1;
 
-		p {
-			margin-bottom: 0;
-		}
-	}
-
-	&__user-avatar {
-		border-radius: $radius-round;
-		flex-shrink: 0;
-	}
-
-	&__thread-overlay {
-		background-color: rgba(0, 0, 0, 0.7);
-		width: 100%;
-		height: 100%;
-		text-align: center;
-		position: absolute;
-		top: 0;
-		left: 0;
+	&:focus {
+		overflow: visible;
+		clip-path: none;
 		z-index: 1;
-		padding: 15px;
-		border-radius: $radius-large;
-		color: $white;
-
-		p {
-			margin-bottom: 15px;
-		}
-
-		button {
-			padding: 4px 10px;
-			color: $white;
-		}
+		right: $grid-unit-10;
 	}
+}
+.editor-collab-sidebar-panel__skip-to-comment:focus {
+	top: $grid-unit-10;
+}
+.editor-collab-sidebar-panel__skip-to-block:focus {
+	top: auto;
+	bottom: $grid-unit-10;
+}
 
-	&__comment-status {
-		margin-left: auto;
+.comment-avatar {
+	width: $icon-size;
+	border-radius: $radius-round;
+	margin-left: -12px;
+	border-width: var(--wp-admin-border-width-focus);
+	border-style: solid;
+	padding: var(--wp-admin-border-width-focus);
+	background: $white;
+	box-sizing: border-box;
 
-		button {
-			&.has-icon:not(.has-text) {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-				flex-shrink: 0;
-			}
-		}
+	&:first-child {
+		margin-left: 0;
 	}
+}
 
-	&__comment-dropdown-menu {
-		flex-shrink: 0;
-
-		button {
-			&.has-icon {
-				min-width: 24px;
-				padding: 0;
-				width: 24px;
-				height: 24px;
-			}
+.show-icon-labels {
+	.comment-avatar-indicator {
+		width: auto;
+		// Hide the user avatars container when labels are set to display...
+		div {
+			display: none;
 		}
-	}
-
-	&__show-more-reply {
-		font-weight: 500;
-		font-style: italic;
-		padding: 0;
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: $helptext-font-size;
+		}
 	}
 }

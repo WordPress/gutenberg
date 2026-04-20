@@ -37,7 +37,7 @@ function useGenericPreviewBlock( block, type ) {
 		if ( block ) {
 			return cloneBlock( block );
 		}
-	}, [ type?.example ? block?.name : block, type ] );
+	}, [ block, type?.example, type?.name ] );
 }
 
 /**
@@ -63,7 +63,7 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		const { getBlockStyles } = select( blocksStore );
 
 		return {
-			block,
+			block: ! blockType?.example ? block : null,
 			blockType,
 			styles: getBlockStyles( block.name ),
 			className: block.attributes.className || '',

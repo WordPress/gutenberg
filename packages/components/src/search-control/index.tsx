@@ -2,25 +2,26 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Icon, search, closeSmall } from '@wordpress/icons';
-import { forwardRef, useMemo, useRef } from '@wordpress/element';
+import { search, closeSmall } from '@wordpress/icons';
+import { forwardRef, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
+import { InputControlPrefixWrapper } from '../input-control/input-prefix-wrapper';
+import { InputControlSuffixWrapper } from '../input-control/input-suffix-wrapper';
 import type { WordPressComponentProps } from '../context/wordpress-component';
 import type { SearchControlProps, SuffixItemProps } from './types';
-import type { ForwardedRef } from 'react';
-import { ContextSystemProvider } from '../context';
-import { StyledInputControl, SuffixItemWrapper } from './styles';
+import { StyledInputControl, StyledIcon } from './styles';
 
 function SuffixItem( {
 	searchRef,
@@ -29,7 +30,7 @@ function SuffixItem( {
 	onClose,
 }: SuffixItemProps ) {
 	if ( ! onClose && ! value ) {
-		return <Icon icon={ search } />;
+		return null;
 	}
 
 	if ( onClose ) {
@@ -44,18 +45,20 @@ function SuffixItem( {
 	};
 
 	return (
-		<Button
-			size="small"
-			icon={ closeSmall }
-			label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
-			onClick={ onClose ?? onReset }
-		/>
+		<InputControlSuffixWrapper variant="control">
+			<Button
+				size="small"
+				icon={ closeSmall }
+				label={ onClose ? __( 'Close search' ) : __( 'Reset search' ) }
+				onClick={ onClose ?? onReset }
+			/>
+		</InputControlSuffixWrapper>
 	);
 }
 
 function UnforwardedSearchControl(
 	{
-		__nextHasNoMarginBottom = false,
+		__nextHasNoMarginBottom: _, // Prevent passing to internal component
 		className,
 		onChange,
 		value,
@@ -82,51 +85,35 @@ function UnforwardedSearchControl(
 		'components-search-control'
 	);
 
-	const contextValue = useMemo(
-		() => ( {
-			BaseControl: {
-				// Overrides the underlying BaseControl `__nextHasNoMarginBottom` via the context system
-				// to provide backwards compatible margin for SearchControl.
-				// (In a standard InputControl, the BaseControl `__nextHasNoMarginBottom` is always set to true.)
-				_overrides: { __nextHasNoMarginBottom },
-				__associatedWPComponentName: 'SearchControl',
-			},
-			// `isBorderless` is still experimental and not a public prop for InputControl yet.
-			InputBase: { isBorderless: true },
-		} ),
-		[ __nextHasNoMarginBottom ]
-	);
-
 	return (
-		<ContextSystemProvider value={ contextValue }>
-			<StyledInputControl
-				__next40pxDefaultSize
-				id={ instanceId }
-				hideLabelFromVision={ hideLabelFromVision }
-				label={ label }
-				ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
-				type="search"
-				size={ size }
-				className={ clsx( 'components-search-control', className ) }
-				onChange={ ( nextValue?: string ) =>
-					onChange( nextValue ?? '' )
-				}
-				autoComplete="off"
-				placeholder={ placeholder }
-				value={ value ?? '' }
-				suffix={
-					<SuffixItemWrapper size={ size }>
-						<SuffixItem
-							searchRef={ searchRef }
-							value={ value }
-							onChange={ onChange }
-							onClose={ onClose }
-						/>
-					</SuffixItemWrapper>
-				}
-				{ ...filteredRestProps }
-			/>
-		</ContextSystemProvider>
+		<StyledInputControl
+			__next40pxDefaultSize
+			id={ instanceId }
+			hideLabelFromVision={ hideLabelFromVision }
+			label={ label }
+			ref={ useMergeRefs( [ searchRef, forwardedRef ] ) }
+			type="search"
+			size={ size }
+			className={ clsx( 'components-search-control', className ) }
+			onChange={ ( nextValue?: string ) => onChange( nextValue ?? '' ) }
+			autoComplete="off"
+			placeholder={ placeholder }
+			value={ value ?? '' }
+			prefix={
+				<InputControlPrefixWrapper variant="icon">
+					<StyledIcon icon={ search } fill="currentColor" />
+				</InputControlPrefixWrapper>
+			}
+			suffix={
+				<SuffixItem
+					searchRef={ searchRef }
+					value={ value }
+					onChange={ onChange }
+					onClose={ onClose }
+				/>
+			}
+			{ ...filteredRestProps }
+		/>
 	);
 }
 
@@ -142,7 +129,6 @@ function UnforwardedSearchControl(
  *
  *   return (
  *     <SearchControl
- *       __nextHasNoMarginBottom
  *       value={ searchInput }
  *       onChange={ setSearchInput }
  *     />
@@ -151,5 +137,6 @@ function UnforwardedSearchControl(
  * ```
  */
 export const SearchControl = forwardRef( UnforwardedSearchControl );
+SearchControl.displayName = 'SearchControl';
 
 export default SearchControl;

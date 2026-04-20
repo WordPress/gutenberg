@@ -1,0 +1,239 @@
+@use "@wordpress/base-styles/colors";
+
+// Disable view transitions on mobile devices
+// to avoid conflicts with sidebar navigation.
+@media (max-width: 782px) {
+	* {
+		view-transition-name: none !important;
+	}
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 250ms;
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	.boot-layout__canvas .interface-interface-skeleton__header {
+		view-transition-name: boot--canvas-header;
+	}
+
+	.boot-layout__canvas .interface-interface-skeleton__sidebar {
+		view-transition-name: boot--canvas-sidebar;
+	}
+
+	.boot-layout.has-full-canvas
+	.boot-layout__canvas
+	.boot-site-icon-link,
+	.boot-layout:not(.has-full-canvas)
+	.boot-site-hub
+	.boot-site-icon-link {
+		view-transition-name: boot--site-icon-link;
+	}
+
+	// Default (non-Safari) view transition names
+	.boot-layout__stage {
+		view-transition-name: boot--stage;
+	}
+
+	.boot-layout__inspector {
+		view-transition-name: boot--inspector;
+	}
+
+	.boot-layout__canvas:not(.is-full-canvas),
+	.boot-layout__canvas.is-full-canvas
+	.interface-interface-skeleton__content {
+		view-transition-name: boot--canvas;
+	}
+
+	// Safari-specific view transition names
+	// Uses CSS feature detection instead of .is-safari class
+	@supports (-webkit-hyphens:none) and (not (-moz-appearance:none)) {
+		.boot-layout__stage {
+			view-transition-name: boot-safari--stage;
+		}
+
+		.boot-layout__inspector {
+			view-transition-name: boot-safari--inspector;
+		}
+
+		.boot-layout__canvas:not(.is-full-canvas),
+		.boot-layout__canvas.is-full-canvas
+		.interface-interface-skeleton__content {
+			view-transition-name: boot-safari--canvas;
+		}
+	}
+
+	// For any popover that stays open across a query change.
+	// Naming it avoids the stage overlaying it.
+	.components-popover:first-of-type {
+		view-transition-name: boot--components-popover;
+	}
+}
+
+::view-transition-group(boot--canvas-header),
+::view-transition-group(boot--canvas-sidebar),
+::view-transition-group(boot-safari--canvas),
+::view-transition-group(boot--canvas) {
+	z-index: 1;
+}
+
+::view-transition-group(boot--site-icon-link) {
+	z-index: 2;
+}
+
+::view-transition-new(boot--site-icon-link),
+::view-transition-old(boot--site-icon-link) {
+	animation: none;
+}
+
+// Safari-specific pseudo-element styles with width: auto fix
+::view-transition-new(boot-safari--canvas),
+::view-transition-old(boot-safari--canvas),
+::view-transition-new(boot-safari--stage),
+::view-transition-old(boot-safari--stage),
+::view-transition-old(boot-safari--inspector),
+::view-transition-new(boot-safari--inspector) {
+	width: auto;
+}
+
+// Safari trips up with using object fit on the pseudo images and filling out
+// background.
+::view-transition-new(boot--canvas),
+::view-transition-old(boot--canvas),
+::view-transition-new(boot--stage),
+::view-transition-old(boot--stage),
+::view-transition-new(boot--inspector),
+::view-transition-old(boot--inspector) {
+	background: colors.$white;
+	border-radius: 8px;
+	width: 100%;
+	height: 100%;
+	object-fit: none;
+	object-position: left top;
+	overflow: hidden;
+}
+
+::view-transition-new(boot--canvas),
+::view-transition-old(boot--canvas) {
+	object-position: center top;
+}
+
+::view-transition-old(boot-safari--inspector):only-child,
+::view-transition-old(boot--inspector):only-child,
+::view-transition-old(boot-safari--stage):only-child,
+::view-transition-old(boot--stage):only-child {
+	animation-name: zoomOut;
+	will-change: transform, opacity;
+}
+
+::view-transition-new(boot-safari--inspector):only-child,
+::view-transition-new(boot--inspector):only-child,
+::view-transition-new(boot-safari--stage):only-child,
+::view-transition-new(boot--stage):only-child {
+	animation-name: zoomIn;
+	will-change: transform, opacity;
+}
+
+@keyframes zoomOut {
+	from {
+		transform: scale(1);
+		opacity: 1;
+	}
+
+	to {
+		transform: scale(0.9);
+		opacity: 0;
+	}
+}
+
+@keyframes zoomIn {
+	from {
+		transform: scale(0.95);
+		opacity: 0;
+	}
+
+	to {
+		transform: scale(1);
+		opacity: 1;
+	}
+}
+
+::view-transition-new(boot-safari--canvas):only-child,
+::view-transition-new(boot--canvas):only-child {
+	animation-name: slideFromRight;
+	will-change: transform;
+}
+
+::view-transition-old(boot-safari--canvas):only-child,
+::view-transition-old(boot--canvas):only-child {
+	animation-name: slideToRight;
+	will-change: transform;
+}
+
+@keyframes slideFromRight {
+	from {
+		// Should ideally be 100% + 16px, but we also need to take into account
+		// that the canvas can be the editor-interface-skeleton__content, which
+		// not placed on the right side.
+		transform: translateX(100vw);
+	}
+
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes slideToRight {
+	from {
+		transform: translateX(0);
+	}
+
+	to {
+		transform: translateX(100vw);
+	}
+}
+
+::view-transition-new(boot--canvas-header):only-child {
+	animation-name: slideHeaderFromTop;
+	will-change: transform;
+}
+
+::view-transition-old(boot--canvas-header):only-child {
+	animation-name: slideHeaderToTop;
+	will-change: transform;
+}
+
+@keyframes slideHeaderFromTop {
+	from {
+		transform: translateY(-100%);
+	}
+}
+
+@keyframes slideHeaderToTop {
+	to {
+		transform: translateY(-100%);
+	}
+}
+
+::view-transition-new(boot--canvas-sidebar):only-child {
+	animation-name: slideSidebarFromRight;
+	will-change: transform;
+}
+
+::view-transition-old(boot--canvas-sidebar):only-child {
+	animation-name: slideSidebarToRight;
+	will-change: transform;
+}
+
+@keyframes slideSidebarFromRight {
+	from {
+		transform: translateX(100%);
+	}
+}
+
+@keyframes slideSidebarToRight {
+	to {
+		transform: translateX(100%);
+	}
+}

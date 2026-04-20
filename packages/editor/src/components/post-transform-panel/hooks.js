@@ -40,7 +40,7 @@ function injectThemeAttributeInBlockTemplateContent(
  * Filter all patterns and return only the ones that are compatible with the current template.
  *
  * @param {Array}  patterns An array of patterns.
- * @param {Object} template The current template.
+ * @param {Object} template The current template. Required values are `area`, `name`, and `slug`.
  * @return {Array} Array of patterns that are compatible with the current template.
  */
 function filterPatterns( patterns, template ) {
@@ -49,8 +49,20 @@ function filterPatterns( patterns, template ) {
 		index === items.findIndex( ( item ) => currentItem.name === item.name );
 
 	// Filter out core/directory patterns not included in theme.json.
-	const filterOutExcludedPatternSources = ( pattern ) =>
-		! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
+	// Exception: navigation-overlay patterns should always show core patterns.
+	// We only want them to show here, we want them excluded everywhere else
+	// to avoid showing them in the inserter or the patterns page.
+	const filterOutExcludedPatternSources = ( pattern ) => {
+		if (
+			template.area === 'navigation-overlay' &&
+			pattern.blockTypes?.includes(
+				'core/template-part/navigation-overlay'
+			)
+		) {
+			return true;
+		}
+		return ! EXCLUDED_PATTERN_SOURCES.includes( pattern.source );
+	};
 
 	// Looks for patterns that have the same template type as the current template,
 	// or have a block type that matches the current template area.
@@ -83,7 +95,7 @@ function preparePatterns( patterns, currentThemeStylesheet ) {
 	} ) );
 }
 
-export function useAvailablePatterns( template ) {
+export function useAvailablePatterns( { area, name, slug } ) {
 	const { blockPatterns, restBlockPatterns, currentThemeStylesheet } =
 		useSelect( ( select ) => {
 			const { getEditorSettings } = select( editorStore );
@@ -104,11 +116,18 @@ export function useAvailablePatterns( template ) {
 			...( blockPatterns || [] ),
 			...( restBlockPatterns || [] ),
 		];
-		const filteredPatterns = filterPatterns( mergedPatterns, template );
-		return preparePatterns(
-			filteredPatterns,
-			template,
-			currentThemeStylesheet
-		);
-	}, [ blockPatterns, restBlockPatterns, template, currentThemeStylesheet ] );
+		const filteredPatterns = filterPatterns( mergedPatterns, {
+			area,
+			name,
+			slug,
+		} );
+		return preparePatterns( filteredPatterns, currentThemeStylesheet );
+	}, [
+		area,
+		name,
+		slug,
+		blockPatterns,
+		restBlockPatterns,
+		currentThemeStylesheet,
+	] );
 }

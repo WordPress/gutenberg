@@ -21,7 +21,7 @@ const apiFetchPromise = Promise.resolve( {} );
  * @param {Object}                                            [options]                Configuration options for the transformation.
  * @param {number}                                            [options.isMediaBlock]   True if the block transformation will result in a media block.
  * @param {number}                                            [options.hasInnerBlocks] True if the block transformation will result in a block that contains inner blocks.
- * @return {import('react-test-renderer').ReactTestInstance} Block instance after the block transformation result.
+ * @return {ReturnType<import('@testing-library/react-native').RenderAPI['getByTestId']>} Block instance after the block transformation result.
  */
 export const transformBlock = async (
 	screen,
@@ -37,7 +37,7 @@ export const transformBlock = async (
 	fireEvent.press( getByText( 'Transform block…' ) );
 	fireEvent.press( getByText( targetBlockName ) );
 
-	// For media blocks, we must wait for the media fetch via `getMedia`.
+	// For media blocks, we must wait for the media fetch via `getEntityRecord`.
 	if ( isMediaBlock ) {
 		await act( () => apiFetchPromise );
 	}

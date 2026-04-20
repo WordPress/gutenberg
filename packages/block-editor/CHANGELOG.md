@@ -2,6 +2,58 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77354](https://github.com/WordPress/gutenberg/pull/77354)).
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
+## 15.14.0 (2026-03-04)
+
+## 15.13.0 (2026-02-18)
+
+### Bug Fixes
+
+-   Store: `insertBlock` - the meta argument is now the 6th argument of the action, the 5th argument is `initialPosition` ([#75197](https://github.com/WordPress/gutenberg/pull/75197)).
+
+## 15.12.0 (2026-01-29)
+
+## 15.11.0 (2026-01-16)
+
+## 15.9.0 (2025-11-26)
+
+## 15.8.0 (2025-11-12)
+
+## 15.7.0 (2025-10-29)
+
+## 15.6.0 (2025-10-17)
+
+## 15.5.0 (2025-10-01)
+
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking Changes
+
+-   Store: Deprecate the block hovered global state and related action/selector ([#70731](https://github.com/WordPress/gutenberg/pull/70731))
+
+## 14.21.0 (2025-06-25)
+
+## 14.20.0 (2025-06-04)
+
+## 14.19.0 (2025-05-22)
+
 ## 14.18.0 (2025-05-07)
 
 ## 14.17.0 (2025-04-11)

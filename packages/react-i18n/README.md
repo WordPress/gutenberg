@@ -44,7 +44,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Children wrapped in the I18nProvider.
+-   Children wrapped in the I18nProvider.
 
 ### useI18n
 

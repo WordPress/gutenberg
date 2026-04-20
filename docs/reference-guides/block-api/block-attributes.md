@@ -48,7 +48,7 @@ Attributes without a `source` will be automatically saved in the block [comment 
 
 For example, using the above attributes definition you would need to ensure that your `save` function has a corresponding img tag for the `url` attribute. The `title` and `size` attributes will be saved in the comment delimiter.
 
-_Example_: Example `save` function that contains the `url` attribute
+_Example_: Example `save` function that contains the `url` attribute.
 
 ```js
 function YourBlockSave( { attributes } ) {
@@ -461,3 +461,36 @@ _Example_: Example `default` values.
 	}
 }
 ```
+
+## Role
+
+The `role` property designates an attribute as being of a particular conceptual type. This property can be applied to any attribute to provide semantic meaning about how the attribute should be handled.
+
+Use `content` to designate the attribute as user-editable content. Blocks with attributes marked as `content` may be enabled for privileged editing in special circumstances such as content only locking.
+Use `local` to mark the attribute as temporary and non-persistable. Attributes marked as `local` are ignored by the Block Serializer and never saved to post content.
+
+_Example_: `content` role used by the paragraph block.
+
+```js
+{
+    content: {
+        type: 'string',
+        source: 'html',
+        selector: 'p',
+        role: 'content',
+    }
+}
+```
+
+_Example_: `local` role used for temporary data.
+
+```js
+{
+    blob: {
+        type: 'string',
+        role: 'local',
+    }
+}
+```
+
+Learn more in the [WordPress 6.7 dev note](https://make.wordpress.org/core/2024/10/20/miscellaneous-block-editor-changes-in-wordpress-6-7/#stabilized-role-property-for-block-attributes).

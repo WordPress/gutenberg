@@ -2,7 +2,6 @@
  * External dependencies
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
@@ -108,6 +107,14 @@ const baseConfig = {
 		filename: '[name].js',
 		chunkFilename: '[name].js?ver=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
+		// Clean output directory before emit, except when modules flag is enabled
+		// to prevent the 2 compilations from cleaning each other's output
+		...( ! hasExperimentalModulesFlag && {
+			clean: {
+				// Keep fonts and images directories
+				keep: /^(fonts|images)\//,
+			},
+		} ),
 	},
 	resolve: {
 		alias: {
@@ -313,16 +320,6 @@ const scriptConfig = {
 			'globalThis.SCRIPT_DEBUG': JSON.stringify( ! isProduction ),
 			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
-
-		// If we run a modules build, the 2 compilations can "clean" each other's output
-		// Prevent the cleaning from happening
-		! hasExperimentalModulesFlag &&
-			new CleanWebpackPlugin( {
-				cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
-				// Prevent it from deleting webpack assets during builds that have
-				// multiple configurations returned in the webpack config.
-				cleanStaleWebpackAssets: false,
-			} ),
 
 		new PhpFilePathsPlugin( {
 			context: getProjectSourcePath(),

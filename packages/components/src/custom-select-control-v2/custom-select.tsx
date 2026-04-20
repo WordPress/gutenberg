@@ -7,19 +7,19 @@ import * as Ariakit from '@ariakit/react';
  * WordPress dependencies
  */
 import { createContext, useCallback, useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '..';
+import { VisuallyHidden } from '../visually-hidden';
 import * as Styled from './styles';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
-	_CustomSelectInternalProps,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
 import InputBase from '../input-control/input-base';
@@ -28,9 +28,10 @@ import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
+CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -43,8 +44,11 @@ function defaultRenderSelectedValue(
 	if ( Array.isArray( value ) ) {
 		return value.length === 1
 			? value[ 0 ]
-			: // translators: %s: number of items selected (it will always be 2 or more items)
-			  sprintf( __( '%s items selected' ), value.length );
+			: sprintf(
+					// translators: %d: number of items selected (it will always be 2 or more items)
+					_n( '%d item selected', '%d items selected', value.length ),
+					value.length
+			  );
 	}
 
 	return value;
@@ -81,8 +85,8 @@ const CustomSelectButton = ( {
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectInternalProps &
+function CustomSelect(
+	props: CustomSelectInternalProps &
 		_CustomSelectProps &
 		CustomSelectStore &
 		CustomSelectButtonSize
@@ -157,4 +161,4 @@ function _CustomSelect(
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

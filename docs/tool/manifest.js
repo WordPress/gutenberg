@@ -40,10 +40,20 @@ function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+		const packageJson = require(
+			join(
+				__dirname,
+				'..',
+				'..',
+				'packages',
+				folderName,
+				'package.json'
+			)
+		);
 
 		// First add any README files to the TOC
 		manifest.push( {
-			title: `@wordpress/${ folderName }`,
+			title: packageJson.name,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',

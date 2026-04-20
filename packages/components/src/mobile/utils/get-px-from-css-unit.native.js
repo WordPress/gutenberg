@@ -26,7 +26,7 @@ function parseUnit( cssUnit ) {
 function calculate( expression ) {
 	try {
 		return Function( `'use strict'; return (${ expression })` )();
-	} catch ( err ) {
+	} catch {
 		return null;
 	}
 }
@@ -116,7 +116,7 @@ function isMathExpression( cssUnit ) {
  * Evaluates the math expression and return a px value.
  *
  * @param {string} cssUnit the cssUnit value being evaluated.
- * @return {string} return a converfted value to px.
+ * @return {string} return a converted value to px.
  */
 function evalMathExpression( cssUnit ) {
 	let errorFound = false;

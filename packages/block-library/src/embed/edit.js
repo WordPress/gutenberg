@@ -118,11 +118,9 @@ const EmbedEdit = ( props ) => {
 			responsive
 		);
 
-	const toggleResponsive = () => {
-		const { allowResponsive, className } = attributes;
+	function toggleResponsive( newAllowResponsive ) {
+		const { className } = attributes;
 		const { html } = preview;
-		const newAllowResponsive = ! allowResponsive;
-
 		setAttributes( {
 			allowResponsive: newAllowResponsive,
 			className: getClassNames(
@@ -131,7 +129,7 @@ const EmbedEdit = ( props ) => {
 				responsive && newAllowResponsive
 			),
 		} );
-	};
+	}
 
 	useEffect( () => {
 		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {

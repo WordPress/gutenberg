@@ -140,6 +140,27 @@ _Returns_
 
 Returns whether widget saving is locked.
 
+_Usage_
+
+```jsx
+import { __ } from '@wordpress/i18n';
+import { store as widgetStore } from '@wordpress/edit-widgets';
+import { useSelect } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const isSavingLocked = useSelect(
+		( select ) => select( widgetStore ).isWidgetSavingLocked(),
+		[]
+	);
+
+	return isSavingLocked ? (
+		<p>{ __( 'Widget saving is locked' ) }</p>
+	) : (
+		<p>{ __( 'Widget saving is not locked' ) }</p>
+	);
+};
+```
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -165,6 +186,22 @@ _Returns_
 ### lockWidgetSaving
 
 Returns an action object used to signal that widget saving is locked.
+
+_Usage_
+
+```js
+import { store as widgetStore } from '@wordpress/edit-widgets';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { lockWidgetSaving } = useDispatch( widgetStore );
+	return (
+		<Button onClick={ () => lockWidgetSaving( 'lockName' ) }>
+			{ __( 'Lock Widget Saving' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 
@@ -297,6 +334,22 @@ _Returns_
 ### unlockWidgetSaving
 
 Returns an action object used to signal that widget saving is unlocked.
+
+_Usage_
+
+```js
+import { store as widgetStore } from '@wordpress/edit-widgets';
+import { useDispatch } from '@wordpress/data';
+
+const ExampleComponent = () => {
+	const { unlockWidgetSaving } = useDispatch( widgetStore );
+	return (
+		<Button onClick={ () => unlockWidgetSaving( 'lockName' ) }>
+			{ __( 'Unlock Widget Saving' ) }
+		</Button>
+	);
+};
+```
 
 _Parameters_
 

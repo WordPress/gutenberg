@@ -4,23 +4,34 @@
 import EquivalentKeyMap from 'equivalent-key-map';
 import type { Reducer } from 'redux';
 
+import type {
+	startResolution,
+	finishResolution,
+	failResolution,
+	startResolutions,
+	finishResolutions,
+	failResolutions,
+	invalidateResolution,
+	invalidateResolutionForStore,
+	invalidateResolutionForStoreSelector,
+} from './actions';
+
 /**
  * Internal dependencies
  */
-import { selectorArgsToStateKey, onSubKey } from './utils';
+import { keyedReducer } from '../keyed-reducer';
+import { selectorArgsToStateKey } from './utils';
 
 type Action =
-	| ReturnType< typeof import('./actions').startResolution >
-	| ReturnType< typeof import('./actions').finishResolution >
-	| ReturnType< typeof import('./actions').failResolution >
-	| ReturnType< typeof import('./actions').startResolutions >
-	| ReturnType< typeof import('./actions').finishResolutions >
-	| ReturnType< typeof import('./actions').failResolutions >
-	| ReturnType< typeof import('./actions').invalidateResolution >
-	| ReturnType< typeof import('./actions').invalidateResolutionForStore >
-	| ReturnType<
-			typeof import('./actions').invalidateResolutionForStoreSelector
-	  >;
+	| ReturnType< typeof startResolution >
+	| ReturnType< typeof finishResolution >
+	| ReturnType< typeof failResolution >
+	| ReturnType< typeof startResolutions >
+	| ReturnType< typeof finishResolutions >
+	| ReturnType< typeof failResolutions >
+	| ReturnType< typeof invalidateResolution >
+	| ReturnType< typeof invalidateResolutionForStore >
+	| ReturnType< typeof invalidateResolutionForStoreSelector >;
 
 type StateKey = unknown[] | unknown;
 export type StateValue =
@@ -36,10 +47,13 @@ export type State = EquivalentKeyMap< StateKey, StateValue >;
  *
  *  selectorName -> EquivalentKeyMap<Array,boolean>
  */
-const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
-	State,
+const subKeysIsResolved: Reducer<
+	Record< string, State >,
 	Action
->( 'selectorName' )( ( state = new EquivalentKeyMap(), action: Action ) => {
+> = keyedReducer< State, Action >( 'selectorName' )( (
+	state = new EquivalentKeyMap(),
+	action: Action
+) => {
 	switch ( action.type ) {
 		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );
@@ -142,8 +156,9 @@ const isResolved = ( state: Record< string, State > = {}, action: Action ) => {
 		case 'FAIL_RESOLUTIONS':
 		case 'INVALIDATE_RESOLUTION':
 			return subKeysIsResolved( state, action );
+		default:
+			return state;
 	}
-	return state;
 };
 
 export default isResolved;

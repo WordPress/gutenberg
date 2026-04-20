@@ -317,6 +317,26 @@ export function isListViewOpened( state ) {
  *
  * @param {Object} state Global application state.
  *
+ * @example
+ * ```jsx
+ * import { __ } from '@wordpress/i18n';
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const isSavingLocked = useSelect(
+ * 		( select ) => select( widgetStore ).isWidgetSavingLocked(),
+ * 		[]
+ * 	);
+ *
+ * 	return isSavingLocked ? (
+ * 		<p>{ __( 'Widget saving is locked' ) }</p>
+ * 	) : (
+ * 		<p>{ __( 'Widget saving is not locked' ) }</p>
+ * 	);
+ * };
+ * ```
+ *
  * @return {boolean} Is locked.
  */
 export function isWidgetSavingLocked( state ) {
