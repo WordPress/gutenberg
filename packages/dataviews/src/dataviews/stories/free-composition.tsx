@@ -162,8 +162,8 @@ export const FreeCompositionComponent = () => {
 			actions={ actions }
 			onChangeView={ setView }
 			defaultLayouts={ {
-				table: {},
-				grid: {},
+				table: true,
+				grid: true,
 			} }
 			empty={
 				<Stack

@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
 import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,

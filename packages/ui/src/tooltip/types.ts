@@ -23,4 +23,9 @@ export interface PopupProps
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * A parent element to render the portal into.
+	 */
+	container?: Tooltip.Portal.Props[ 'container' ];
 }

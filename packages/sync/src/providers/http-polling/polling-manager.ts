@@ -58,7 +58,10 @@ type LogFunction = (
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
 	retryNow: () => void;
-	unregisterRoom: ( room: string ) => void;
+	unregisterRoom: (
+		room: string,
+		options?: { sendDisconnectSignal?: boolean }
+	) => void;
 }
 
 interface RegisterRoomOptions {
@@ -83,6 +86,124 @@ interface RoomState {
 	room: string;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
+}
+
+/**
+ * Minimal shape of a WordPress REST API error as it arrives on the client
+ * via apiFetch. WP_Error is serialized to JSON with a `data.status` field
+ * containing the HTTP status code; `code` and `message` are best-effort.
+ */
+interface WPRestError {
+	code?: string;
+	message?: string;
+	data: { status: number };
+}
+
+/**
+ * Check if an error is a forbidden (403) response from the WordPress REST
+ * API. These errors have a `data.status` property set by WP_Error.
+ *
+ * @param error The caught error to inspect.
+ */
+function isForbiddenError( error: unknown ): error is WPRestError {
+	return ( error as WPRestError | undefined )?.data?.status === 403;
+}
+
+/**
+ * Try to identify which room caused a forbidden error by checking if any
+ * room name from the request appears in the error message. The WordPress
+ * REST API includes the room name in per-entity permission errors (e.g.
+ * "You do not have permission to sync this entity: postType/post:123.").
+ * Room names are never translated, so substring matching is reliable.
+ *
+ * Returns the room name if found, or null for generic auth failures
+ * (e.g. "not logged in") where no specific room is identified.
+ *
+ * @param error The forbidden error, narrowed via isForbiddenError.
+ * @param rooms The room names from the request payload.
+ */
+function identifyForbiddenRoom(
+	error: WPRestError,
+	rooms: string[]
+): string | null {
+	const message = typeof error.message === 'string' ? error.message : '';
+
+	// Sort rooms by length descending so the longest match wins. Room names
+	// embed numeric IDs (e.g. "postType/post:1", "postType/post:10"), and a
+	// shorter name can be a substring of a longer one. Without sorting, the
+	// iteration order is the room registration order, so a 403 referencing
+	// "postType/post:10" could incorrectly match "postType/post:1" first.
+	const sortedRooms = [ ...rooms ].sort( ( a, b ) => b.length - a.length );
+
+	for ( const room of sortedRooms ) {
+		if ( message.includes( room ) ) {
+			return room;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Handle a 403 from the sync endpoint. Silently unregisters the affected
+ * rooms, and restores pending updates for the remaining rooms so they retry on
+ * the next poll cycle.
+ *
+ * @param error          The forbidden error, narrowed via isForbiddenError.
+ * @param requestedRooms The rooms that were in the failing request.
+ */
+function handleForbiddenError(
+	error: WPRestError,
+	requestedRooms: SyncPayload[ 'rooms' ]
+): void {
+	const forbiddenRoom = identifyForbiddenRoom(
+		error,
+		requestedRooms.map( ( r ) => r.room )
+	);
+
+	if ( forbiddenRoom ) {
+		// A specific room was denied — unregister only that room.
+		const state = roomStates.get( forbiddenRoom );
+		if ( state ) {
+			state.log(
+				'Permission denied, unregistering room',
+				{ error },
+				'error',
+				true // force
+			);
+			unregisterRoom( forbiddenRoom, { sendDisconnectSignal: false } );
+		}
+
+		// Restore updates for remaining rooms so they can be retried on
+		// the next poll cycle.
+		for ( const room of requestedRooms ) {
+			if (
+				room.room === forbiddenRoom ||
+				! roomStates.has( room.room )
+			) {
+				continue;
+			}
+			const remainingState = roomStates.get( room.room )!;
+			if ( room.updates.length > 0 ) {
+				remainingState.updateQueue.restore( room.updates );
+			}
+		}
+	} else {
+		// Generic auth failure (e.g. not logged in) — unregister all rooms.
+		const rooms = [ ...roomStates.keys() ];
+		for ( const room of rooms ) {
+			const state = roomStates.get( room );
+			if ( state ) {
+				state.log(
+					'Permission denied, unregistering room',
+					{ error },
+					'error',
+					true // force
+				);
+				unregisterRoom( room, { sendDisconnectSignal: false } );
+			}
+		}
+	}
 }
 
 const roomStates: Map< string, RoomState > = new Map();
@@ -523,71 +644,86 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
-			// Use the explicit retry delay schedule for backoff.
-			consecutiveFailures++;
-			const retrySchedule = hasCollaborators
-				? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
-				: ERROR_RETRY_DELAYS_SOLO_MS;
-			if ( consecutiveFailures <= retrySchedule.length ) {
-				pollInterval = retrySchedule[ consecutiveFailures - 1 ];
+			// A 403 response means the user does not have permission to
+			// sync a specific entity. Silently unregister the affected
+			// room(s) and let polling continue for the rest.
+			if ( isForbiddenError( error ) ) {
+				handleForbiddenError( error, payload.rooms );
+
+				// If every room was unregistered, stop the poll loop
+				// instead of scheduling another tick. Reset isPolling
+				// so a future registerRoom() call can restart it.
+				if ( roomStates.size === 0 ) {
+					isPolling = false;
+					return;
+				}
 			} else {
-				pollInterval = DISCONNECT_DIALOG_RETRY_MS;
-			}
-
-			// After a manual retry, use a shorter interval for one cycle.
-			if ( isManualRetry ) {
-				pollInterval = MANUAL_RETRY_INTERVAL_MS;
-				isManualRetry = false;
-			}
-
-			// Recover from the failed request. We don't know whether the server stored
-			// our updates before the error occurred (e.g. a network timeout after a
-			// successful write). Re-sending the same updates via restore() would
-			// duplicate them on the server and cause unbounded storage growth.
-			//
-			// Instead, for rooms that had outgoing updates, replace the queue with a
-			// single compaction (full document state). This is idempotent: if the
-			// server already stored the updates, the compaction safely supersedes
-			// them; if it didn't, the compaction includes them. Updates not seen by
-			// this client are preserved in both cases.
-			for ( const room of payload.rooms ) {
-				if ( ! roomStates.has( room.room ) ) {
-					continue;
+				// Use the explicit retry delay schedule for backoff.
+				consecutiveFailures++;
+				const retrySchedule = hasCollaborators
+					? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
+					: ERROR_RETRY_DELAYS_SOLO_MS;
+				if ( consecutiveFailures <= retrySchedule.length ) {
+					pollInterval = retrySchedule[ consecutiveFailures - 1 ];
+				} else {
+					pollInterval = DISCONNECT_DIALOG_RETRY_MS;
 				}
 
-				const state = roomStates.get( room.room )!;
-
-				if ( room.updates.length > 0 && state.endCursor > 0 ) {
-					state.updateQueue.clear();
-					state.updateQueue.add( state.createCompactionUpdate() );
-				} else if ( room.updates.length > 0 ) {
-					state.updateQueue.restore( room.updates );
+				// After a manual retry, use a shorter interval for one cycle.
+				if ( isManualRetry ) {
+					pollInterval = MANUAL_RETRY_INTERVAL_MS;
+					isManualRetry = false;
 				}
 
-				state.log(
-					'Error posting sync update, will retry with backoff',
-					{ error, nextPoll: pollInterval },
-					'error',
-					true // force
-				);
-			}
+				// Recover from the failed request. We don't know whether the server stored
+				// our updates before the error occurred (e.g. a network timeout after a
+				// successful write). Re-sending the same updates via restore() would
+				// duplicate them on the server and cause unbounded storage growth.
+				//
+				// Instead, for rooms that had outgoing updates, replace the queue with a
+				// single compaction (full document state). This is idempotent: if the
+				// server already stored the updates, the compaction safely supersedes
+				// them; if it didn't, the compaction includes them. Updates not seen by
+				// this client are preserved in both cases.
+				for ( const room of payload.rooms ) {
+					if ( ! roomStates.has( room.room ) ) {
+						continue;
+					}
 
-			// Don't report disconnected status when the request was aborted
-			// due to page unload (e.g. during a refresh) to avoid briefly
-			// flashing the disconnect dialog before the new page loads.
-			if ( ! isUnloadPending ) {
-				const backgroundRetriesFailed =
-					consecutiveFailures > retrySchedule.length;
+					const state = roomStates.get( room.room )!;
 
-				roomStates.forEach( ( state ) => {
-					state.onStatusChange( {
-						status: 'disconnected',
-						canManuallyRetry: true,
-						consecutiveFailures,
-						backgroundRetriesFailed,
-						willAutoRetryInMs: pollInterval,
+					if ( room.updates.length > 0 && state.endCursor > 0 ) {
+						state.updateQueue.clear();
+						state.updateQueue.add( state.createCompactionUpdate() );
+					} else if ( room.updates.length > 0 ) {
+						state.updateQueue.restore( room.updates );
+					}
+
+					state.log(
+						'Error posting sync update, will retry with backoff',
+						{ error, nextPoll: pollInterval },
+						'error',
+						true // force
+					);
+				}
+
+				// Don't report disconnected status when the request was aborted
+				// due to page unload (e.g. during a refresh) to avoid briefly
+				// flashing the disconnect dialog before the new page loads.
+				if ( ! isUnloadPending ) {
+					const backgroundRetriesFailed =
+						consecutiveFailures > retrySchedule.length;
+
+					roomStates.forEach( ( state ) => {
+						state.onStatusChange( {
+							status: 'disconnected',
+							canManuallyRetry: true,
+							consecutiveFailures,
+							backgroundRetriesFailed,
+							willAutoRetryInMs: pollInterval,
+						} );
 					} );
-				} );
+				}
 			}
 		}
 
@@ -725,22 +861,28 @@ function registerRoom( {
 	}
 }
 
-function unregisterRoom( room: string ): void {
+function unregisterRoom(
+	room: string,
+	{ sendDisconnectSignal = true }: { sendDisconnectSignal?: boolean } = {}
+): void {
 	const state = roomStates.get( room );
 	if ( state ) {
-		// Send a disconnect signal so the server removes this client's
-		// awareness entry immediately instead of waiting for the timeout.
-		const rooms = [
-			{
-				after: 0,
-				awareness: null,
-				client_id: state.clientId,
-				room,
-				updates: [],
-			},
-		];
+		if ( sendDisconnectSignal ) {
+			// Send a disconnect signal so the server removes this client's
+			// awareness entry immediately instead of waiting for the timeout.
+			const rooms = [
+				{
+					after: 0,
+					awareness: null,
+					client_id: state.clientId,
+					room,
+					updates: [],
+				},
+			];
 
-		postSyncUpdateNonBlocking( { rooms } );
+			postSyncUpdateNonBlocking( { rooms } );
+		}
+
 		state.unregister();
 		roomStates.delete( room );
 	}

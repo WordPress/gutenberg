@@ -2,7 +2,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useRef, useState } from '@wordpress/element';
 import { SlotFillProvider, Slot } from '@wordpress/components';
 import { close, info } from '@wordpress/icons';
-import { Popover, VisuallyHidden } from '../..';
+import * as Popover from '../';
+import { VisuallyHidden } from '../../visually-hidden';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
 import { GenericIframe, useMeasure } from './utils';
@@ -1267,7 +1268,7 @@ export const HoverTrigger: Story = {
  * popup itself, it's a popover. If the trigger's purpose is unrelated to
  * opening the popup, it's a tooltip.
  */
-export const InfoTip: Story = {
+export const Infotip: Story = {
 	parameters: { controls: { disable: true } },
 	render: function Render( args ) {
 		return (

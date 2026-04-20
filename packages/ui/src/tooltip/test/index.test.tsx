@@ -84,4 +84,65 @@ describe( 'Tooltip', () => {
 			screen.queryByText( 'Tooltip content' )
 		).not.toBeInTheDocument();
 	} );
+
+	describe( 'container', () => {
+		it( 'should render inside the container when provided', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<TestProvider>
+					<div data-testid="wrapper">
+						<Tooltip.Root>
+							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+							<div
+								ref={ containerRef }
+								data-testid="custom-container"
+							/>
+							<Tooltip.Popup container={ containerRef }>
+								Tooltip content
+							</Tooltip.Popup>
+						</Tooltip.Root>
+					</div>
+				</TestProvider>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: 'Hover me' } )
+			);
+
+			const content = await screen.findByText( 'Tooltip content' );
+			expect( content ).toBeVisible();
+
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				content
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<TestProvider>
+					<div data-testid="wrapper">
+						<Tooltip.Root>
+							<Tooltip.Trigger>Hover me</Tooltip.Trigger>
+							<Tooltip.Popup>Tooltip content</Tooltip.Popup>
+						</Tooltip.Root>
+					</div>
+				</TestProvider>
+			);
+
+			await user.hover(
+				screen.getByRole( 'button', { name: 'Hover me' } )
+			);
+
+			const content = await screen.findByText( 'Tooltip content' );
+			expect( content ).toBeVisible();
+
+			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
+				content
+			);
+		} );
+	} );
 } );

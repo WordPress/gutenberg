@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
+import { useScheduleValidation } from '../utils/use-schedule-validation';
 
 /**
  * Whether validation is enabled. This is a build-time constant that allows
@@ -14,7 +15,7 @@ import {
 const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
 type DialogValidationContextType = {
-	registerTitle: ( element: HTMLElement | null ) => void;
+	registerTitle: ( element: HTMLElement | null ) => () => void;
 };
 
 // Context is only created in development mode.
@@ -54,19 +55,7 @@ function DialogValidationProviderDev( {
 } ) {
 	const titleElementRef = useRef< HTMLElement | null >( null );
 
-	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
-		titleElementRef.current = element;
-	}, [] );
-
-	const contextValue = useMemo(
-		() => ( { registerTitle } ),
-		[ registerTitle ]
-	);
-
-	// Validate that Dialog.Title is rendered with non-empty text content
-	useEffect( () => {
-		// useLayoutEffect in Title runs before this useEffect,
-		// so titleElementRef should already be set if Title is present
+	const scheduleValidation = useScheduleValidation( () => {
 		const titleElement = titleElementRef.current;
 
 		if ( ! titleElement ) {
@@ -84,7 +73,31 @@ function DialogValidationProviderDev( {
 					'Provide meaningful text content for the dialog title.'
 			);
 		}
-	}, [] );
+	} );
+
+	const registerTitle = useCallback(
+		( element: HTMLElement | null ) => {
+			titleElementRef.current = element;
+			scheduleValidation();
+
+			return () => {
+				titleElementRef.current = null;
+				scheduleValidation();
+			};
+		},
+		[ scheduleValidation ]
+	);
+
+	// Schedule an initial validation on mount to catch missing titles
+	// (when no Title component is rendered, registerTitle is never called).
+	useEffect( () => {
+		scheduleValidation();
+	}, [ scheduleValidation ] );
+
+	const contextValue = useMemo(
+		() => ( { registerTitle } ),
+		[ registerTitle ]
+	);
 
 	return (
 		<DialogValidationContext.Provider value={ contextValue }>

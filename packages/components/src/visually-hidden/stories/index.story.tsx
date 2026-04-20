@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
+	tags: [ 'manifest' ],
 	component: VisuallyHidden,
 	title: 'Components/Typography/VisuallyHidden',
 	id: 'components-visuallyhidden',
