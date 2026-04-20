@@ -76,6 +76,10 @@ class Gutenberg_Guidelines_Post_Type {
 	 * Register the custom post type.
 	 */
 	public static function register() {
+		if ( post_type_exists( self::POST_TYPE ) ) {
+			return;
+		}
+
 		$args = array(
 			'labels'                          => array(
 				'name'          => __( 'Guidelines', 'gutenberg' ),
