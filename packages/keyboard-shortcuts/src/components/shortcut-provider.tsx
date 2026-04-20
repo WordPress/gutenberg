@@ -10,25 +10,35 @@ import { context } from '../context';
 
 const { Provider } = context;
 
+type ShortcutCallback = ( event: KeyboardEvent ) => void;
+
+interface ShortcutProviderProps extends React.HTMLAttributes< HTMLDivElement > {
+	onKeyDown?: ( event: React.KeyboardEvent< HTMLDivElement > ) => void;
+}
+
 /**
  * Handles callbacks added to context by `useShortcut`.
  * Adding a provider allows to register contextual shortcuts
  * that are only active when a certain part of the UI is focused.
  *
- * @param {Object} props Props to pass to `div`.
+ * @param props Props to pass to `div`.
  *
- * @return {Element} Component.
+ * @return Component.
  */
-export function ShortcutProvider( props ) {
-	const [ keyboardShortcuts ] = useState( () => new Set() );
+export function ShortcutProvider( props: ShortcutProviderProps ) {
+	const [ keyboardShortcuts ] = useState(
+		() => new Set< ShortcutCallback >()
+	);
 
-	function onKeyDown( event ) {
+	function onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ) {
 		if ( props.onKeyDown ) {
 			props.onKeyDown( event );
 		}
 
+		// Convert React event to native KeyboardEvent for compatibility
+		const nativeEvent = event.nativeEvent;
 		for ( const keyboardShortcut of keyboardShortcuts ) {
-			keyboardShortcut( event );
+			keyboardShortcut( nativeEvent );
 		}
 	}
 
