@@ -8,7 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
@@ -38,6 +38,8 @@ const PAGES_QUERY = [
 ];
 
 export default function NavigationMenuContent( { rootClientId } ) {
+	const [ editingBlock, setEditingBlock ] = useState( null );
+
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -94,6 +96,25 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
 	);
 
+	const LeafMoreMenuWithEditingBlock = useCallback( ( props ) => {
+		return (
+			<LeafMoreMenu { ...props } setEditingBlock={ setEditingBlock } />
+		);
+	}, [] );
+
+	const NavigationLinkUIWithEditingBlock = useCallback(
+		( props ) => {
+			return (
+				<NavigationLinkUI
+					{ ...props }
+					editingBlock={ editingBlock }
+					setEditingBlock={ setEditingBlock }
+				/>
+			);
+		},
+		[ editingBlock ]
+	);
+
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
@@ -102,9 +123,9 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
 					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenu }
+					blockSettingsMenu={ LeafMoreMenuWithEditingBlock }
 					showAppender
-					additionalBlockContent={ NavigationLinkUI }
+					additionalBlockContent={ NavigationLinkUIWithEditingBlock }
 					isExpanded
 				/>
 			) }
