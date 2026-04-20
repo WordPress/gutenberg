@@ -105,10 +105,22 @@ export function useCropperState(
 	const initialRef = useRef< CropperState >(
 		enforceContainment( { ...DEFAULT_STATE, ...initialState } )
 	);
+	// Keep a ref to the latest state so callbacks with stable identity
+	// (reset, setImage) can read fresh state without re-creating themselves.
+	const stateRef = useRef( state );
+	stateRef.current = state;
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
 			dispatch( { type: 'SET_IMAGE', payload: image } );
+			// Refresh the "clean" snapshot to match the post-load state
+			// produced by the reducer. Otherwise containment can nudge
+			// pan/zoom by tiny amounts on load and `isDirty` would
+			// report true from the start.
+			initialRef.current = enforceContainment( {
+				...initialRef.current,
+				image,
+			} );
 		},
 		[ dispatch ]
 	);
@@ -172,8 +184,14 @@ export function useCropperState(
 	const reset = useCallback(
 		( resetState?: Partial< CropperState > ) => {
 			dispatch( { type: 'RESET', payload: resetState } );
+			// Mirror the reducer's RESET exactly so isDirty stays in
+			// sync. RESET preserves the currently-loaded image; the
+			// containment step can tweak pan/zoom/cropRect by float ulp,
+			// which we must fold into the "initial" snapshot or isDirty
+			// would report true after a reset.
 			initialRef.current = enforceContainment( {
 				...DEFAULT_STATE,
+				image: stateRef.current.image,
 				...resetState,
 			} );
 		},

@@ -325,6 +325,53 @@ describe( 'useCropperState', () => {
 
 			expect( result.current.isDirty ).toBe( false );
 		} );
+
+		// Regression: loading an image runs the new state through
+		// enforceContainment, which can nudge pan/zoom by float ulp on
+		// non-square images. The initial snapshot must be refreshed so
+		// isDirty still reports false at a "clean" post-load state.
+		it( 'should be false after setImage on a non-square image', () => {
+			const { result } = renderHook( () => useCropperState() );
+
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1600,
+					naturalHeight: 900,
+				} );
+			} );
+
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		// Regression: reset() on a loaded image must produce a "clean"
+		// snapshot that matches what the reducer actually stored
+		// (preserving the image, re-enforcing containment). Otherwise
+		// isDirty reports true right after reset.
+		it( 'should be false after reset on a loaded image', () => {
+			const { result } = renderHook( () => useCropperState() );
+
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1600,
+					naturalHeight: 900,
+				} );
+			} );
+
+			act( () => {
+				result.current.setZoom( 2 );
+				result.current.setRotation( 45 );
+			} );
+
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => {
+				result.current.reset();
+			} );
+
+			expect( result.current.isDirty ).toBe( false );
+		} );
 	} );
 
 	describe( 'containment enforcement', () => {
