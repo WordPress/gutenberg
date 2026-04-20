@@ -158,7 +158,6 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
 	}
 
 	/* Active item (including hover) */
