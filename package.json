@@ -33,7 +33,8 @@
 			},
 			"font-library",
 			"options-connectors",
-			"guidelines"
+			"guidelines",
+			"taxonomies"
 		]
 	},
 	"config": {
