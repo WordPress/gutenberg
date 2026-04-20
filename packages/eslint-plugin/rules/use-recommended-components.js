@@ -31,6 +31,10 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
+		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
+		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
+		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
 	},

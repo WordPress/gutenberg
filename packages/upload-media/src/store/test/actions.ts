@@ -27,25 +27,6 @@ jest.mock( '../utils', () => ( {
 			} )
 		)
 	),
-	vipsBatchResizeImage: jest.fn( ( _id, file, outputType, configs ) =>
-		Promise.resolve(
-			configs.map(
-				( c: {
-					name: string;
-					resize: { width: number; height: number };
-				} ) => ( {
-					name: c.name,
-					file: new File(
-						[ 'batch-resized' ],
-						`example-${ c.resize.width }x${ c.resize.height }.${
-							outputType.split( '/' )[ 1 ]
-						}`,
-						{ type: outputType }
-					),
-				} )
-			)
-		)
-	),
 	vipsRotateImage: jest.fn(),
 	vipsHasTransparency: jest.fn( () => Promise.resolve( false ) ),
 	vipsConvertImageFormat: jest.fn(),
@@ -352,6 +333,179 @@ describe( 'actions', () => {
 				true
 			);
 			expect( updatedItem.additionalData.convert_format ).toBe( true );
+		} );
+	} );
+
+	describe( 'concurrent sideloads', () => {
+		it( 'does not pause sideload items targeting the same post', async () => {
+			// Configure mediaSideload so sideload uploads can proceed.
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload: jest.fn(),
+			} );
+
+			// Use a fake parentId so we only test sideload scheduling.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add two sideload items targeting the same post.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 100, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 100, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue to trigger processing.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			const items = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+			const sideloadItems = items.filter(
+				( item ) => item.parentId === fakeParentId
+			);
+
+			// Neither sideload item should be paused.
+			for ( const item of sideloadItems ) {
+				expect( item.status ).not.toBe( ItemStatus.Paused );
+			}
+		} );
+
+		it( 'allows multiple sideloads to the same attachment to upload concurrently', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 5,
+			} );
+
+			// Add a parent item first.
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const parentItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Add 3 sideload items to same post.
+			for ( const size of [ 'thumbnail', 'medium', 'large' ] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: parentItem.id,
+					additionalData: { post: 200, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// All 3 sideloads should have started (not serialized).
+			expect( mediaSideload ).toHaveBeenCalledTimes( 3 );
+		} );
+
+		it( 'respects maxConcurrentUploads for sideloads', async () => {
+			const mediaSideload = jest.fn();
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 2,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot. Only sideload items compete for slots.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 4 sideload items.
+			for ( const size of [
+				'thumbnail',
+				'medium',
+				'large',
+				'medium_large',
+			] ) {
+				unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+					file: jpegFile,
+					parentId: fakeParentId,
+					additionalData: { post: 300, image_size: size },
+					operations: [ OperationType.Upload ],
+				} );
+			}
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 2 should have started due to concurrency limit.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'starts pending sideloads after one finishes', async () => {
+			let onSuccessCallback:
+				| ( ( subSize: Record< string, unknown > ) => void )
+				| undefined;
+			const mediaSideload = jest.fn( ( { onSuccess } ) => {
+				// Capture the first callback to simulate completion later.
+				if ( ! onSuccessCallback ) {
+					onSuccessCallback = onSuccess;
+				}
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				mediaSideload,
+				maxConcurrentUploads: 1,
+			} );
+
+			// Use a fake parentId so the parent item does not consume
+			// an upload slot.
+			const fakeParentId = 'fake-parent-id';
+
+			// Add 2 sideload items.
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'thumbnail' },
+				operations: [ OperationType.Upload ],
+			} );
+			unlock( registry.dispatch( uploadStore ) ).addSideloadItem( {
+				file: jpegFile,
+				parentId: fakeParentId,
+				additionalData: { post: 400, image_size: 'medium' },
+				operations: [ OperationType.Upload ],
+			} );
+
+			// Resume the queue.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			// Only 1 should have started due to maxConcurrentUploads=1.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 1 );
+
+			// Complete the first upload to trigger the pending one.
+			onSuccessCallback?.( {
+				image_size: 'thumbnail',
+				width: 150,
+				height: 150,
+				file: 'image-150x150.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 5000,
+			} );
+
+			// Allow async dispatch to propagate.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// The second sideload should now have started.
+			expect( mediaSideload ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'resumeItemByPostId is not on private dispatch', () => {
+			const privateDispatch = unlock( registry.dispatch( uploadStore ) );
+			expect(
+				( privateDispatch as Record< string, unknown > )
+					.resumeItemByPostId
+			).toBeUndefined();
 		} );
 	} );
 

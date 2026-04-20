@@ -1,6 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
 import { usePopoverValidationContext } from './context';
 import type { TitleProps } from './types';
@@ -27,8 +27,11 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
 
-		useLayoutEffect( () => {
-			validationContext?.registerTitle( internalRef.current );
+		useEffect( () => {
+			if ( validationContext ) {
+				return validationContext.registerTitle( internalRef.current );
+			}
+			return undefined;
 		}, [ validationContext ] );
 
 		return (

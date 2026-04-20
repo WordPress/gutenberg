@@ -1,30 +1,32 @@
-/** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
 
 /**
  * Keyboard key combination.
- *
- * @typedef {Object} WPShortcutKeyCombination
- *
- * @property {string}                      character Character.
- * @property {WPKeycodeModifier|undefined} modifier  Modifier.
  */
+export interface ShortcutKeyCombination {
+	character: string;
+	modifier: WPKeycodeModifier | undefined;
+}
 
 /**
  * Configuration of a registered keyboard shortcut.
- *
- * @typedef {Object} WPShortcutConfig
- *
- * @property {string}                     name           Shortcut name.
- * @property {string}                     category       Shortcut category.
- * @property {string}                     description    Shortcut description.
- * @property {WPShortcutKeyCombination}   keyCombination Shortcut key combination.
- * @property {WPShortcutKeyCombination[]} [aliases]      Shortcut aliases.
  */
+export interface ShortcutConfig {
+	name: string;
+	category: string;
+	description: string;
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
+}
+
+export type ShortcutAction =
+	| ReturnType< typeof registerShortcut >
+	| ReturnType< typeof unregisterShortcut >;
 
 /**
  * Returns an action object used to register a new keyboard shortcut.
  *
- * @param {WPShortcutConfig} config Shortcut config.
+ * @param {ShortcutConfig} config Shortcut config.
  *
  * @example
  *
@@ -72,9 +74,9 @@ export function registerShortcut( {
 	description,
 	keyCombination,
 	aliases,
-} ) {
+}: ShortcutConfig ) {
 	return {
-		type: 'REGISTER_SHORTCUT',
+		type: 'REGISTER_SHORTCUT' as const,
 		name,
 		category,
 		keyCombination,
@@ -120,9 +122,9 @@ export function registerShortcut( {
  *```
  * @return {Object} action.
  */
-export function unregisterShortcut( name ) {
+export function unregisterShortcut( name: string ) {
 	return {
-		type: 'UNREGISTER_SHORTCUT',
+		type: 'UNREGISTER_SHORTCUT' as const,
 		name,
 	};
 }

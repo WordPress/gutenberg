@@ -5,7 +5,6 @@
 	"name": "core/tabs-menu",
 	"title": "Tabs Menu",
 	"description": "Display the tab buttons for a tabbed interface.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/tabs" ],

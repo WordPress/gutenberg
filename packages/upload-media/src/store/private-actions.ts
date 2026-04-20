@@ -19,13 +19,13 @@ import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
 	vipsResizeImage,
-	vipsBatchResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
 	terminateVipsWorker,
 } from './utils';
 import type {
+	AccumulateSubSizeAction,
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
@@ -44,12 +44,12 @@ import type {
 	PauseQueueAction,
 	QueueItem,
 	QueueItemId,
-	ResumeItemAction,
 	ResumeQueueAction,
 	RevokeBlobUrlsAction,
 	SideloadAdditionalData,
 	Settings,
 	State,
+	SubSizeData,
 	UpdateProgressAction,
 	UpdateSettingsAction,
 } from './types';
@@ -63,8 +63,6 @@ type ActionCreators = {
 	addItem: typeof addItem;
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
-	pauseItem: typeof pauseItem;
-	resumeItemByPostId: typeof resumeItemByPostId;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
@@ -94,32 +92,6 @@ type ThunkArgs = {
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
 };
-
-/**
- * Determines if an upload should be paused to avoid race conditions.
- *
- * When sideloading thumbnails, we need to pause uploads if another
- * upload to the same post is already in progress.
- *
- * @param item      Queue item to check.
- * @param operation Current operation type.
- * @param select    Store selectors.
- * @return Whether the upload should be paused.
- */
-function shouldPauseForSideload(
-	item: QueueItem,
-	operation: OperationType | undefined,
-	select: Selectors
-): boolean {
-	if (
-		operation !== OperationType.Upload ||
-		! item.parentId ||
-		! item.additionalData.post
-	) {
-		return false;
-	}
-	return select.isUploadingToPost( item.additionalData.post as number );
-}
 
 interface AddItemArgs {
 	// It should always be a File, but some consumers might still pass Blobs only.
@@ -306,16 +278,6 @@ export function processItem( id: QueueItemId ) {
 		const operationArgs = Array.isArray( item.operations?.[ 0 ] )
 			? item.operations[ 0 ][ 1 ]
 			: undefined;
-
-		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
-		// It will be resumed after the previous upload finishes.
-		if ( shouldPauseForSideload( item, operation, select ) ) {
-			dispatch< PauseItemAction >( {
-				type: Type.PauseItem,
-				id,
-			} );
-			return;
-		}
 
 		/*
 		 * If the next operation is an upload, check concurrency limit.
@@ -514,28 +476,6 @@ export function pauseItem( id: QueueItemId ) {
 			type: Type.PauseItem,
 			id,
 		} );
-	};
-}
-
-/**
- * Resumes processing for a given post/attachment ID.
- *
- * This function looks up paused uploads by post ID and resumes them.
- * It's typically called after a sideload completes to resume paused
- * thumbnail uploads.
- *
- * @param postOrAttachmentId Post or attachment ID.
- */
-export function resumeItemByPostId( postOrAttachmentId: number ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getPausedUploadForPost( postOrAttachmentId );
-		if ( item ) {
-			dispatch< ResumeItemAction >( {
-				type: Type.ResumeItem,
-				id: item.id,
-			} );
-			dispatch.processItem( item.id );
-		}
 	};
 }
 
@@ -849,13 +789,19 @@ export function sideloadItem( id: QueueItemId ) {
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
-			onFileChange: ( [ attachment ] ) => {
-				dispatch.finishOperation( id, { attachment } );
-				dispatch.resumeItemByPostId( post as number );
+			onSuccess: ( subSize: SubSizeData ) => {
+				// Accumulate sub-size data on the parent item for finalize.
+				if ( item.parentId ) {
+					dispatch< AccumulateSubSizeAction >( {
+						type: Type.AccumulateSubSize,
+						id: item.parentId,
+						subSize,
+					} );
+				}
+				dispatch.finishOperation( id, {} );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
-				dispatch.resumeItemByPostId( post as number );
 			},
 		} );
 	};
@@ -1168,35 +1114,6 @@ export function generateThumbnails( id: QueueItemId ) {
 				);
 			}
 
-			// Determine the actual output type for thumbnails.
-			// If transcoding is configured, use that format; otherwise
-			// use the source format.
-			const thumbnailOutputType = thumbnailTranscodeOperation
-				? `image/${ thumbnailTranscodeOperation[ 1 ].outputFormat }`
-				: sourceType;
-
-			const quality = thumbnailTranscodeOperation
-				? thumbnailTranscodeOperation[ 1 ].outputQuality ??
-				  DEFAULT_OUTPUT_QUALITY
-				: DEFAULT_OUTPUT_QUALITY;
-
-			// Collect all resize configs for batch processing.
-			const batchConfigs: Array< {
-				name: string;
-				resize: {
-					width: number;
-					height: number;
-					crop?:
-						| boolean
-						| [
-								'left' | 'center' | 'right',
-								'top' | 'center' | 'bottom',
-						  ];
-				};
-				quality: number;
-				scaledSuffix?: boolean;
-			} > = [];
-
 			for ( const name of sizesToGenerate ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
@@ -1207,122 +1124,53 @@ export function generateThumbnails( id: QueueItemId ) {
 					continue;
 				}
 
-				batchConfigs.push( {
-					name,
-					resize: imageSize,
-					quality,
+				// Build operations list for this thumbnail.
+				const thumbnailOperations: Operation[] = [
+					[ OperationType.ResizeCrop, { resize: imageSize } ],
+				];
+
+				// Add transcoding if format conversion is configured and
+				// the transparency check passed.
+				if ( thumbnailTranscodeOperation ) {
+					thumbnailOperations.push( thumbnailTranscodeOperation );
+				}
+
+				thumbnailOperations.push( OperationType.Upload );
+
+				dispatch.addSideloadItem( {
+					file,
+					batchId,
+					parentId: item.id,
+					additionalData: {
+						// Sideloading does not use the parent post ID but the
+						// attachment ID as the image sizes need to be added to it.
+						post: attachment.id,
+						image_size: name,
+						convert_format: false,
+					},
+					operations: thumbnailOperations,
 				} );
 			}
 
-			// Check if a scaled version is needed.
+			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
-			let needsScaling = false;
 			if ( bigImageSizeThreshold && attachment.id ) {
+				// Check if the image actually exceeds the threshold.
+				// Only create a scaled version for images larger than the threshold,
+				// matching WordPress core's wp_create_image_subsizes() behavior.
 				const bitmap = await createImageBitmap( item.sourceFile );
-				needsScaling =
+				const needsScaling =
 					bitmap.width > bigImageSizeThreshold ||
 					bitmap.height > bigImageSizeThreshold;
 				bitmap.close();
 
 				if ( needsScaling ) {
-					batchConfigs.push( {
-						name: 'scaled',
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						quality,
-						scaledSuffix: true,
-					} );
-				}
-			}
+					// Rename sourceFile to match the server attachment filename.
+					const sourceForScaled = attachment.filename
+						? renameFile( item.sourceFile, attachment.filename )
+						: item.sourceFile;
 
-			// Batch resize: decode source once via copyMemory(),
-			// generate all sub-sizes with thumbnailImage(), and
-			// write each directly to the output format.
-			// Falls back to per-thumbnail processing on failure.
-			let batchResults: Awaited<
-				ReturnType< typeof vipsBatchResizeImage >
-			> | null = null;
-
-			if ( batchConfigs.length > 0 ) {
-				try {
-					batchResults = await vipsBatchResizeImage(
-						item.id,
-						file,
-						thumbnailOutputType,
-						batchConfigs,
-						false
-					);
-				} catch {
-					// eslint-disable-next-line no-console
-					console.warn(
-						'Batch resize failed, falling back to per-thumbnail processing'
-					);
-				}
-			}
-
-			if ( batchResults ) {
-				// Batch succeeded — enqueue upload-only sideloads.
-				for ( const result of batchResults ) {
-					dispatch.addSideloadItem( {
-						file: result.file,
-						onChange: ( [ updatedAttachment ] ) => {
-							if ( isBlobURL( updatedAttachment.url ) ) {
-								return;
-							}
-							item.onChange?.( [ updatedAttachment ] );
-						},
-						batchId,
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: result.name,
-							convert_format: false,
-						},
-						operations: [ OperationType.Upload ],
-					} );
-				}
-			} else {
-				// Fallback: per-thumbnail processing (original approach
-				// without batch resize).
-				for ( const name of sizesToGenerate ) {
-					const imageSize = allImageSizes[ name ];
-					if ( ! imageSize ) {
-						continue;
-					}
-
-					const thumbnailOperations: Operation[] = [
-						[ OperationType.ResizeCrop, { resize: imageSize } ],
-					];
-
-					if ( thumbnailTranscodeOperation ) {
-						thumbnailOperations.push( thumbnailTranscodeOperation );
-					}
-
-					thumbnailOperations.push( OperationType.Upload );
-
-					dispatch.addSideloadItem( {
-						file,
-						onChange: ( [ updatedAttachment ] ) => {
-							if ( isBlobURL( updatedAttachment.url ) ) {
-								return;
-							}
-							item.onChange?.( [ updatedAttachment ] );
-						},
-						batchId,
-						parentId: item.id,
-						additionalData: {
-							post: attachment.id,
-							image_size: name,
-							convert_format: false,
-						},
-						operations: thumbnailOperations,
-					} );
-				}
-
-				// Fallback scaled version.
-				if ( needsScaling && bigImageSizeThreshold && attachment.id ) {
+					// Add scaling to queue.
 					const scaledOperations: Operation[] = [
 						[
 							OperationType.ResizeCrop,
@@ -1336,6 +1184,7 @@ export function generateThumbnails( id: QueueItemId ) {
 						],
 					];
 
+					// Add transcoding if format conversion is configured.
 					if ( thumbnailTranscodeOperation ) {
 						scaledOperations.push( thumbnailTranscodeOperation );
 					}
@@ -1343,13 +1192,7 @@ export function generateThumbnails( id: QueueItemId ) {
 					scaledOperations.push( OperationType.Upload );
 
 					dispatch.addSideloadItem( {
-						file,
-						onChange: ( [ updatedAttachment ] ) => {
-							if ( isBlobURL( updatedAttachment.url ) ) {
-								return;
-							}
-							item.onChange?.( [ updatedAttachment ] );
-						},
+						file: sourceForScaled,
 						batchId,
 						parentId: item.id,
 						additionalData: {
@@ -1389,7 +1232,7 @@ export function finalizeItem( id: QueueItemId ) {
 		// Only finalize if we have an attachment ID and a mediaFinalize callback.
 		if ( attachment?.id && mediaFinalize ) {
 			try {
-				await mediaFinalize( attachment.id );
+				await mediaFinalize( attachment.id, item.subSizes || [] );
 			} catch ( error ) {
 				// Log but don't fail the upload if finalization fails.
 				// eslint-disable-next-line no-console

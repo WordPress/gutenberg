@@ -38,12 +38,9 @@ function NotesSidebarContent( {
 	styles,
 	comments,
 	commentSidebarRef,
-	reflowComments,
-	commentLastUpdated,
 	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } =
-		useBlockCommentsActions( reflowComments );
+	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
 		<VStack
@@ -70,8 +67,6 @@ function NotesSidebarContent( {
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
-				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
 			/>
 		</VStack>
@@ -119,21 +114,15 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const {
-		resultComments,
-		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
-	} = useBlockComments( postId );
+	const { notes, unresolvedNotes } = useBlockComments( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar =
-		resultComments.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
+			( unresolvedNotes.length > 0 || selectedNote !== undefined )
 	);
 
 	useShortcut(
@@ -159,7 +148,7 @@ function NotesSidebar( { postId } ) {
 
 	// Find the current thread for the selected block.
 	const currentThread = blockCommentId
-		? resultComments.find( ( thread ) => thread.id === blockCommentId )
+		? notes.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
 	async function openTheSidebar( selectedClientId ) {
@@ -169,7 +158,7 @@ function NotesSidebar( { postId } ) {
 			selectedClientId && selectedClientId !== clientId
 				? selectedClientId
 				: clientId;
-		const targetNote = resultComments.find(
+		const targetNote = notes.find(
 			( note ) => note.blockClientId === targetClientId
 		);
 
@@ -222,7 +211,7 @@ function NotesSidebar( { postId } ) {
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NotesSidebarContent
-						comments={ resultComments }
+						comments={ notes }
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				</PluginSidebar>
@@ -237,10 +226,8 @@ function NotesSidebar( { postId } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
-						comments={ unresolvedSortedThreads }
+						comments={ unresolvedNotes }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 						styles={ {
 							backgroundColor,
 						} }

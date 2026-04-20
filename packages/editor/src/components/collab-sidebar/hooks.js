@@ -12,10 +12,10 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import {
+	useState,
 	useEffect,
 	useMemo,
-	useCallback,
-	useReducer,
+	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -33,16 +33,12 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
-import { noop } from './utils';
+import { createBoardStore } from './board-store';
+import { calculateAllOffsets } from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
-	const [ commentLastUpdated, reflowComments ] = useReducer(
-		() => Date.now(),
-		0
-	);
-
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -66,111 +62,88 @@ export function useBlockComments( postId ) {
 	}, [] );
 
 	// Process comments to build the tree structure.
-	const { resultComments, unresolvedSortedThreads } = useMemo( () => {
+	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+			return { notes: [], unresolvedNotes: [] };
 		}
 
-		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
-			if ( commentId ) {
-				results[ clientId ] = commentId;
+		// Single pass over clientIds: build clientId->noteId map AND reverse lookup.
+		const blocksWithComments = {};
+		const clientIdByNoteId = new Map();
+		for ( const clientId of clientIds ) {
+			const noteId = getBlockAttributes( clientId )?.metadata?.noteId;
+			if ( noteId ) {
+				const key = String( noteId );
+				blocksWithComments[ clientId ] = key;
+				clientIdByNoteId.set( key, clientId );
 			}
-			return results;
-		}, {} );
+		}
 
-		// Create a compare to store the references to all objects by id.
-		const compare = {};
-		const result = [];
-
-		// Create a reverse map for faster lookup.
-		const commentIdToBlockClientId = Object.keys(
-			blocksWithComments
-		).reduce( ( mapping, clientId ) => {
-			mapping[ blocksWithComments[ clientId ] ] = clientId;
-			return mapping;
-		}, {} );
-
-		// Initialize each object with an empty `reply` array and map blockClientId.
-		threads.forEach( ( item ) => {
-			const itemBlock = commentIdToBlockClientId[ item.id ];
-
-			compare[ item.id ] = {
+		// Materialize threads; collect roots; replies linked in a second pass
+		// via unshift to invert order (matches prior reverse semantics).
+		const threadsById = new Map();
+		const rootThreads = [];
+		for ( const item of threads ) {
+			const thread = {
 				...item,
 				reply: [],
-				blockClientId: item.parent === 0 ? itemBlock : null,
+				blockClientId:
+					item.parent === 0
+						? clientIdByNoteId.get( String( item.id ) ) ?? null
+						: null,
 			};
-		} );
-
-		// Iterate over the data to build the tree structure.
-		threads.forEach( ( item ) => {
+			threadsById.set( item.id, thread );
 			if ( item.parent === 0 ) {
-				// If parent is 0, it's a root item, push it to the result array.
-				result.push( compare[ item.id ] );
-			} else if ( compare[ item.parent ] ) {
-				// Otherwise, find its parent and push it to the parent's `reply` array.
-				compare[ item.parent ].reply.push( compare[ item.id ] );
+				rootThreads.push( thread );
 			}
-		} );
-
-		if ( 0 === result?.length ) {
-			return { resultComments: [], unresolvedSortedThreads: [] };
+		}
+		for ( const item of threads ) {
+			if ( item.parent !== 0 ) {
+				threadsById
+					.get( item.parent )
+					?.reply.unshift( threadsById.get( item.id ) );
+			}
 		}
 
-		const updatedResult = result.map( ( item ) => ( {
-			...item,
-			reply: [ ...item.reply ].reverse(),
-		} ) );
+		if ( rootThreads.length === 0 ) {
+			return { notes: [], unresolvedNotes: [] };
+		}
 
-		const threadIdMap = new Map(
-			updatedResult.map( ( thread ) => [ String( thread.id ), thread ] )
+		// Single partition over notes-in-block-order.
+		const unresolved = [];
+		const resolved = [];
+		for ( const noteId of Object.values( blocksWithComments ) ) {
+			const thread =
+				threadsById.get( Number( noteId ) ) ??
+				threadsById.get( noteId );
+			if ( ! thread ) {
+				continue;
+			}
+			if ( thread.status === 'hold' ) {
+				unresolved.push( thread );
+			} else if ( thread.status === 'approved' ) {
+				resolved.push( thread );
+			}
+		}
+
+		// Orphans: root threads without a linked block. They only need to come last.
+		const orphans = rootThreads.filter(
+			( thread ) => ! thread.blockClientId
 		);
-
-		// Prepare sets to determine which threads are linked to existing blocks.
-		const mappedIds = new Set(
-			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
-		);
-
-		// Get comments by block order, first unresolved, then resolved.
-		const unresolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) => thread !== undefined && thread.status === 'hold'
-			);
-
-		const resolvedSortedComments = Object.values( blocksWithComments )
-			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
-			.filter(
-				( thread ) =>
-					thread !== undefined && thread.status === 'approved'
-			);
-
-		// Append orphaned notes (whose related block was deleted or missing).
-		const orphanedComments = updatedResult.filter(
-			( thread ) => ! mappedIds.has( String( thread.id ) )
-		);
-
-		const allSortedComments = [
-			...unresolvedSortedComments,
-			...resolvedSortedComments,
-			...orphanedComments,
-		];
 
 		return {
-			resultComments: allSortedComments,
-			unresolvedSortedThreads: unresolvedSortedComments,
+			notes: [ ...unresolved, ...resolved, ...orphans ],
+			unresolvedNotes: unresolved,
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
 	return {
-		resultComments,
-		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
+		notes,
+		unresolvedNotes,
 	};
 }
 
-export function useBlockCommentsActions( reflowComments = noop ) {
+export function useBlockCommentsActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -224,10 +197,8 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -292,9 +263,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -326,9 +295,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -366,26 +333,55 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
+export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
+	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+	const [ store ] = useState( createBoardStore );
+	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
+
+	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
+
+	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
+	// when deps change, so back-to-back updates collapse into one paint.
+	useEffect( () => {
+		if ( ! isFloating ) {
+			return;
+		}
+
+		const rafId = window.requestAnimationFrame( () => {
+			const { offsets, minHeight } = calculateAllOffsets( {
+				threads,
+				selectedNoteId,
+				blockRects: store.getBlockRects(),
+				heights,
+			} );
+			setBoardOffsets( offsets );
+			setCanvasMinHeight( minHeight );
+		} );
+
+		return () => window.cancelAnimationFrame( rafId );
+	}, [
+		heights,
+		isFloating,
+		selectedNoteId,
+		setCanvasMinHeight,
+		store,
+		threads,
+	] );
+
+	return {
+		boardOffsets,
+		registerThread: store.registerThread,
+		unregisterThread: store.unregisterThread,
+	};
+}
+
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
-	setHeights,
-	selectedThread,
-	setBlockRef,
-	commentLastUpdated,
+	registerThread,
+	unregisterThread,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
-	const updateHeight = useCallback(
-		( id, newHeight ) => {
-			setHeights( ( prev ) => {
-				if ( prev[ id ] !== newHeight ) {
-					return { ...prev, [ id ]: newHeight };
-				}
-				return prev;
-			} );
-		},
-		[ setHeights ]
-	);
 
 	// Use floating-ui to track the block element's position with the calculated offset.
 	const { y, refs } = useFloating( {
@@ -398,32 +394,27 @@ export function useFloatingThread( {
 		whileElementsMounted: autoUpdate,
 	} );
 
-	// Store the block reference for each thread.
+	// Set the floating-ui reference element.
 	useEffect( () => {
 		if ( blockElement ) {
 			refs.setReference( blockElement );
 		}
-	}, [ blockElement, refs, commentLastUpdated ] );
+	}, [ blockElement, refs ] );
 
-	// Track thread heights.
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver tracks height changes automatically.
 	useEffect( () => {
-		if ( refs.floating?.current ) {
-			setBlockRef( thread.id, blockElement );
+		const floatingEl = refs.floating?.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, blockElement, floatingEl );
 		}
-	}, [ blockElement, thread.id, refs.floating, setBlockRef ] );
-
-	// When the selected thread changes, update heights, triggering offset recalculation.
-	useEffect( () => {
-		if ( refs.floating?.current ) {
-			const newHeight = refs.floating.current.scrollHeight;
-			updateHeight( thread.id, newHeight );
-		}
+		return () => unregisterThread?.( thread.id );
 	}, [
+		blockElement,
 		thread.id,
-		updateHeight,
 		refs.floating,
-		selectedThread,
-		commentLastUpdated,
+		registerThread,
+		unregisterThread,
 	] );
 
 	return {

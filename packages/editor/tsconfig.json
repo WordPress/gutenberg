@@ -29,6 +29,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor" },
 		{ "path": "../media-fields" },
 		{ "path": "../media-utils" },
