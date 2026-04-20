@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/private-apis",
-	"version": "1.44.0",
+	"version": "1.44.1-next.v.202604201441.0+dab6d8c07",
 	"description": "Internal experimental APIs for WordPress core.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

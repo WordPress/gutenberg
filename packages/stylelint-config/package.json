@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/stylelint-config",
-	"version": "23.36.0",
+	"version": "23.36.1-next.v.202604201441.0+dab6d8c07",
 	"description": "stylelint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "MIT",
