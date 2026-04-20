@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Add `wpPlugin.packageSources` configuration for discovering packages from additional directories or by npm name. Named sources (e.g. `@acme/shared-ui`) preserve their npm identity as the script-module ID.
+-   Add `wpPlugin.packageSources` configuration for discovering packages from additional directories. Discovered packages are treated identically to local `./packages/` entries.
 
 ## 0.12.0 (2026-04-15)
 

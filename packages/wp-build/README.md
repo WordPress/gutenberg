@@ -257,9 +257,7 @@ If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` �
 
 ### `wpPlugin.packageSources`
 
-Additional package sources to discover and compile. By default the tool only discovers packages under `./packages/`. The `packageSources` field accepts an array that can contain two types of entries:
-
-**Directory paths** — relative paths pointing to a directory containing packages:
+Additional directories to scan for packages. By default the tool only discovers packages under `./packages/`. Paths are resolved relative to the project root:
 
 ```json
 {
@@ -269,31 +267,9 @@ Additional package sources to discover and compile. By default the tool only dis
 }
 ```
 
-With this configuration the tool scans both `./packages/*` and `../js-packages/*`. Local packages always take priority: if a sources-discovered package has the same directory name as a local one, the local one wins.
+With this configuration the tool scans both `./packages/*` and `../js-packages/*`. Discovered packages are treated identically to local ones: they are transpiled, bundled, and registered under the plugin's `packageNamespace`.
 
-**Package names** — npm package names resolved via Node's module resolution:
-
-```json
-{
-	"wpPlugin": {
-		"packageSources": [ "@acme/shared-ui", "@acme/formatters" ]
-	}
-}
-```
-
-Named package sources are resolved from `node_modules`, so they work with any package manager's workspace protocol (pnpm `workspace:*`, yarn `workspace:*`, npm workspaces). The package must be declared as a dependency and installed.
-
-Named sources **preserve their npm identity** as the script-module ID. For example, `@acme/shared-ui` is registered as `@acme/shared-ui` — not rewritten under the consumer's `packageNamespace`. This enables proper deduplication when multiple plugins consume the same shared package. Each named source is externalized individually (by exact package name, not the entire `@scope/*`), so only the packages explicitly listed in `packageSources` are treated as externals. The source package must have a `wpScriptModuleExports` field in its `package.json` for the externals plugin to detect it as a script module.
-
-Both types can be mixed in a single array:
-
-```json
-{
-	"wpPlugin": {
-		"packageSources": [ "../shared-packages", "@acme/shared-ui" ]
-	}
-}
-```
+Local packages always take priority. If a package discovered through `packageSources` has the same directory name as a local one, the local entry wins.
 
 ### `wpPlugin.pages` (Experimental)
 
