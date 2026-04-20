@@ -115,10 +115,12 @@
 			"default": "auto"
 		},
 		"showCaptionInGallery": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		},
 		"showCaptionInLightbox": {
-			"type": "boolean"
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"providesContext": {

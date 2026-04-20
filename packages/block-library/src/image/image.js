@@ -311,7 +311,7 @@ export default function Image( {
 		setOffsetTop( imageElement?.offsetTop ?? 0 );
 	}, [ imageElement ] );
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
-	const { allowResize = true } = context;
+	const { allowResize = true, showCaptionInGallery } = context;
 
 	const { image, canUserEdit, attachmentResolutionError } = useSelect(
 		( select ) => {
@@ -1333,18 +1333,20 @@ export default function Image( {
 			{ img }
 			{ resizableBox }
 
-			<Caption
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				isSelected={ isSingleSelected }
-				insertBlocksAfter={ insertBlocksAfter }
-				label={ __( 'Image caption text' ) }
-				showToolbarButton={
-					isSingleSelected &&
-					( hasNonContentControls || isContentOnlyMode ) &&
-					! hideCaptionControls
-				}
-			/>
+			{ showCaptionInGallery !== false && (
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Image caption text' ) }
+					showToolbarButton={
+						isSingleSelected &&
+						( hasNonContentControls || isContentOnlyMode ) &&
+						! hideCaptionControls
+					}
+				/>
+			) }
 		</>
 	);
 }
