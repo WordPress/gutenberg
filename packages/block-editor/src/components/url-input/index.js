@@ -191,11 +191,22 @@ class URLInput extends Component {
 					return;
 				}
 
+				// Determine whether or not to show suggestions.
+				// Suggestions should be shown if there are any results,
+				// or if the renderSuggestions prop is a function and we're not showing initial
+				// suggestions (which means we're showing search results).
+				const shouldShowSuggestions =
+					!! suggestions.length ||
+					( isFunction(
+						this.props.__experimentalRenderSuggestions
+					) &&
+						! isInitialSuggestions );
+
 				this.setState( {
 					suggestions,
 					suggestionsValue: value,
 					loading: false,
-					showSuggestions: !! suggestions.length,
+					showSuggestions: shouldShowSuggestions,
 				} );
 
 				if ( !! suggestions.length ) {
@@ -211,7 +222,7 @@ class URLInput extends Component {
 						),
 						'assertive'
 					);
-				} else {
+				} else if ( ! isInitialSuggestions ) {
 					this.props.debouncedSpeak(
 						__( 'No results.' ),
 						'assertive'
@@ -533,7 +544,7 @@ class URLInput extends Component {
 			loading,
 		} = this.state;
 
-		if ( ! showSuggestions || suggestions.length === 0 ) {
+		if ( ! showSuggestions ) {
 			return null;
 		}
 
