@@ -1,5 +1,17 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
 @layer wp-ui-components {
 	.backdrop {
 		position: fixed;
@@ -98,7 +110,10 @@
 	}
 
 	.title {
-		/* Workaround the higher specificity of the global CSS defense styles */
+		margin-inline-end: auto;
+
+		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+		 * Keep both so the layout survives GCD removal. */
 		--_gcd-heading-margin: 0 auto 0 0;
 
 		&:dir(rtl) {

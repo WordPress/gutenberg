@@ -1,16 +1,9 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalHStack as HStack } from '@wordpress/components';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -22,19 +15,13 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread, noop } from './utils';
+import { FloatingContainer } from './floating-container';
+import { focusCommentThread } from './utils';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddComment( {
-	onSubmit,
-	commentSidebarRef,
-	reflowComments = noop,
-	isFloating = false,
-	y,
-	refs,
-} ) {
+export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 	const { clientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
@@ -60,23 +47,15 @@ export function AddComment( {
 	}
 
 	return (
-		<VStack
-			className={ clsx(
-				'editor-collab-sidebar-panel__thread is-selected',
-				{
-					'is-floating': isFloating,
-				}
-			) }
+		<FloatingContainer
+			floating={ floating }
+			className="editor-collab-sidebar-panel__thread is-selected"
 			spacing="3"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
 			role="treeitem"
-			ref={ isFloating ? refs.setFloating : undefined }
 			style={
-				isFloating
-					? // Delay showing the floating note box until a Y position is known to prevent blink.
-					  { top: y, opacity: ! y ? 0 : undefined }
-					: undefined
+				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
 			onBlur={ ( event ) => {
 				// Don't deselect notes when the browser window/tab loses focus.
@@ -100,10 +79,9 @@ export function AddComment( {
 					focusCommentThread( id, commentSidebarRef.current );
 				} }
 				onCancel={ unselectThread }
-				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }
 			/>
-		</VStack>
+		</FloatingContainer>
 	);
 }

@@ -142,8 +142,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
