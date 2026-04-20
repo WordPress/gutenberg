@@ -663,23 +663,39 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 			  )
 			: __( 'Are you sure you want to delete this reply?' );
 
+	const prevContentRef = useRef( thread?.content?.rendered );
 	const commentRef = useRef( null );
 	const [ isOverflowing, setIsOverflowing ] = useState( false );
 	const [ collapsed, setCollapsed ] = useState( true );
 
 	useEffect( () => {
+		if ( prevContentRef.current !== thread?.content?.rendered ) {
+			setCollapsed( true );
+		}
+	}, [ thread?.content?.rendered ] );
+
+	useEffect( () => {
+		if ( ! collapsed ) {
+			return;
+		}
+
 		const commentElement = commentRef.current;
 		if ( ! commentElement ) {
 			return;
 		}
 
+		const isEdit = prevContentRef.current !== thread?.content?.rendered;
+		prevContentRef.current = thread?.content?.rendered;
+
 		if ( commentElement.scrollHeight > commentElement.clientHeight ) {
 			setIsOverflowing( true );
+			if ( isEdit ) {
+				setCollapsed( false );
+			}
 		} else {
 			setIsOverflowing( false );
-			setCollapsed( null );
 		}
-	}, [ thread?.content?.rendered ] );
+	}, [ collapsed, thread?.content?.rendered ] );
 
 	return (
 		<VStack
@@ -818,7 +834,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					</RawHTML>
 				</div>
 			) }
-			{ isOverflowing && (
+			{ isOverflowing && 'edit' !== actionState && (
 				<Button
 					variant="tertiary"
 					size="small"
