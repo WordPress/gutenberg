@@ -58,3 +58,15 @@ export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
  * the CRDT document (and synced to peers) without creating undo levels.
  */
 export const LOCAL_UNDO_IGNORED_ORIGIN = 'gutenberg-undo-ignored';
+
+/**
+ * Origin string for applying a persisted CRDT document to a live Y.Doc at
+ * initial load. Transactions tagged with this origin are treated as
+ * initialization data rather than peer-originated edits, so the record
+ * observer in the sync manager skips dispatching `editRecord` for them.
+ *
+ * Reserved for internal sync-manager use. Providers must not tag their own
+ * transactions with this origin; doing so would cause the record observer
+ * to silently drop legitimate peer updates.
+ */
+export const PERSISTED_DOC_INIT_ORIGIN = 'persistedDocInit';

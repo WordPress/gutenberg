@@ -354,6 +354,58 @@ describe( 'SyncManager', () => {
 					1
 				);
 			} );
+
+			it( 'does not dispatch editRecord from the record observer when applying the persisted CRDT doc', async () => {
+				// Persisted CRDT doc has drifted from the REST record. Before
+				// PERSISTED_DOC_INIT_ORIGIN was introduced, the Y.Doc observer
+				// treated the apply as a peer update and dispatched editRecord
+				// with the drifted value, falsely dirtying the editor on load.
+				mockSyncConfig = {
+					...mockSyncConfig,
+					getPersistedCRDTDoc: jest.fn( () =>
+						createPersistedCRDTDoc( {
+							...mockRecord,
+							title: 'Drifted title from persisted CRDT doc',
+						} )
+					),
+				};
+
+				const manager = createSyncManager();
+
+				await manager.load(
+					mockSyncConfig,
+					'post',
+					'123',
+					mockRecord,
+					mockHandlers
+				);
+
+				// Flush microtasks so any async observer side effects would
+				// have had a chance to run.
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+				// Negative: observer must not have dispatched editRecord for
+				// the persisted-doc init transaction.
+				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
+
+				// Positive: confirm the reconciliation path still ran, so
+				// this test cannot pass vacuously (e.g. if _applyPersistedCrdtDoc
+				// became a no-op, only the negative assertion above would hold).
+				expect(
+					mockSyncConfig.getChangesFromCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect(
+					mockSyncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect(
+					mockSyncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), {
+					title: mockRecord.title,
+				} );
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
+			} );
 		} );
 	} );
 

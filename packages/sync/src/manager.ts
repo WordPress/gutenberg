@@ -12,6 +12,7 @@ import {
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
+	PERSISTED_DOC_INIT_ORIGIN,
 } from './config';
 import {
 	logPerformanceTiming,
@@ -212,6 +213,22 @@ export function createSyncManager( debug = false ): SyncManager {
 			_events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
+			// Skip transactions that apply the persisted CRDT document at initial
+			// load. These are initialization data, not peer-originated edits — the
+			// reconciliation path in _applyPersistedCrdtDoc heals any drift between
+			// the persisted doc and the REST record without routing through the
+			// edit store, so we must not dispatch editRecord here or the editor
+			// would be falsely marked dirty on load / after publish.
+			if ( transaction.origin === PERSISTED_DOC_INIT_ORIGIN ) {
+				return;
+			}
+
+			// PERSISTED_DOC_INIT_ORIGIN transactions are also local and would
+			// be caught by the guard below, but we filter them explicitly
+			// above so the intent is clear and the suppression is preserved
+			// even if the locality semantics of the apply change in Yjs.
+			// This guard covers all other local non-undo origins (e.g.
+			// LOCAL_SYNC_MANAGER_ORIGIN from the reconciliation transact).
 			if (
 				transaction.local &&
 				! ( transaction.origin instanceof Y.UndoManager )
@@ -495,8 +512,13 @@ export function createSyncManager( debug = false ): SyncManager {
 		// IMPORTANT: Do not wrap this in a transaction with the local origin. It
 		// effectively advances the state vector for the current client, which causes
 		// Yjs to think that another client is using this client ID.
+		//
+		// Tag the apply with PERSISTED_DOC_INIT_ORIGIN so that the record observer
+		// above recognizes this as initialization data rather than a peer edit and
+		// does not dispatch editRecord for it. The reconciliation below still heals
+		// any drift between persisted doc and REST record.
 		const update = Y.encodeStateAsUpdateV2( tempDoc );
-		Y.applyUpdateV2( targetDoc, update );
+		Y.applyUpdateV2( targetDoc, update, PERSISTED_DOC_INIT_ORIGIN );
 
 		// Compute the differences between the persisted doc and the current
 		// record. This can happen when:
