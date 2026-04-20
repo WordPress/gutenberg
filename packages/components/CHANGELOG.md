@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
+
 ### Breaking Changes
 
 -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
