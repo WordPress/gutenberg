@@ -50,7 +50,7 @@ const SOURCE_URL_BASE =
  * anchor listed here no longer exists in that file.
  */
 const ATTRIBUTES_REF =
-	'/docs/reference-guides/block-api/block-attributes.md';
+	'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/';
 const ATTRIBUTE_ANCHORS = {
 	type: 'type-validation',
 	default: 'default-value',
@@ -269,7 +269,7 @@ function formatAttributesTable( attributes ) {
  * @return {string} Absolute handbook path with anchor.
  */
 const SUPPORTS_BASE =
-	'/docs/reference-guides/block-api/block-supports.md';
+	'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/';
 const SUPPORTS_SUB_ANCHORS = new Set( [
 	'color.background',
 	'color.button',
@@ -416,7 +416,7 @@ function blockLink( blockName ) {
  */
 function formatRelationships( blockJson ) {
 	const METADATA_BASE =
-		'/docs/reference-guides/block-api/block-metadata.md';
+		'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/';
 	const parts = [];
 
 	if ( blockJson.parent && blockJson.parent.length > 0 ) {
@@ -598,18 +598,17 @@ function generateBlockApiSection( blockDir ) {
 
 	// Metadata.
 	lines.push( `**Name:** \`${ name }\`` );
-	const catSlug = `core-blocks-${ category }`;
 	lines.push(
-		`**Category:** [${ category }](/docs/reference-guides/core-blocks/category-${ category }.md)`
+		`**Category:** [${ category }](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
 	);
 	if ( apiVersion ) {
 		lines.push(
-			`**API Version:** [${ apiVersion }](/docs/reference-guides/block-api/block-api-versions/)`
+			`**API Version:** [${ apiVersion }](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)`
 		);
 	}
 
 	const RENDERING_GUIDE =
-		'/docs/getting-started/fundamentals/static-dynamic-rendering.md';
+		'https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/';
 	const typeLabel = {
 		static: `[Static](${ RENDERING_GUIDE }) (saved in post content)`,
 		dynamic: `[Dynamic](${ RENDERING_GUIDE }) (server-rendered)`,
@@ -645,7 +644,7 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '## Attributes' );
 	lines.push( '' );
 	lines.push(
-		'_Defined via the [`attributes`](/docs/reference-guides/block-api/block-attributes.md) property in block.json._'
+		'_Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._'
 	);
 	lines.push( '' );
 	lines.push( formatAttributesTable( attributes ) );
@@ -655,7 +654,7 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '## Supports' );
 	lines.push( '' );
 	lines.push(
-		'_Defined via the [`supports`](/docs/reference-guides/block-api/block-supports.md) property in block.json._'
+		'_Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._'
 	);
 	lines.push( '' );
 	lines.push( formatSupports( supports ) );
@@ -667,7 +666,7 @@ function generateBlockApiSection( blockDir ) {
 		lines.push( '## Context' );
 		lines.push( '' );
 		lines.push(
-			'_Defined via the [`usesContext` and `providesContext`](/docs/reference-guides/block-api/block-context.md) properties in block.json._'
+			'_Defined via the [`usesContext` and `providesContext`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/) properties in block.json._'
 		);
 		lines.push( '' );
 		lines.push( contextSection );
@@ -680,7 +679,7 @@ function generateBlockApiSection( blockDir ) {
 		lines.push( '## Block Styles' );
 		lines.push( '' );
 		lines.push(
-			'_Defined via the [`styles`](/docs/reference-guides/block-api/block-styles.md) property in block.json._'
+			'_Defined via the [`styles`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) property in block.json._'
 		);
 		lines.push( '' );
 		lines.push( stylesSection );
@@ -693,7 +692,7 @@ function generateBlockApiSection( blockDir ) {
 		lines.push( '## CSS Selectors' );
 		lines.push( '' );
 		lines.push(
-			'_Defined via the [`selectors`](/docs/reference-guides/block-api/block-selectors.md) property in block.json._'
+			'_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._'
 		);
 		lines.push( '' );
 		lines.push( selectorsSection );
@@ -705,17 +704,17 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '' );
 	if ( blockType === 'dynamic' ) {
 		lines.push(
-			'This is a [**dynamic block**](/docs/getting-started/fundamentals/static-dynamic-rendering.md). It is rendered on the server and does not save HTML in post content.'
+			'This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.'
 		);
 		lines.push( '' );
 		lines.push( 'In post content, it is stored as a block comment:' );
 	} else if ( blockType === 'hybrid' ) {
 		lines.push(
-			'This is a [**hybrid block**](/docs/getting-started/fundamentals/static-dynamic-rendering.md). It saves static markup that the server may enhance during rendering.'
+			'This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.'
 		);
 	} else {
 		lines.push(
-			'This is a [**static block**](/docs/getting-started/fundamentals/static-dynamic-rendering.md). The markup is saved directly in the post content.'
+			'This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.'
 		);
 	}
 	lines.push( '' );
@@ -728,7 +727,7 @@ function generateBlockApiSection( blockDir ) {
 	lines.push( '## Source' );
 	lines.push( '' );
 	lines.push(
-		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](/docs/reference-guides/block-api/block-metadata.md))`
+		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))`
 	);
 	if ( files.hasEditJs ) {
 		lines.push( `- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)` );

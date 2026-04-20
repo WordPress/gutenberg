@@ -149,7 +149,7 @@ function readBlockJSON( filename ) {
 		allowedBlocks,
 	} = blockjson;
 	const blockdir = path.basename( path.dirname( filename ) );
-	const blockDetailUrl = `/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockdir }/`;
+	const blockDetailUrl = `https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/core-block-${ blockdir }/`;
 	const blockInfoList = [ `-	**Name:** [${ name }](${ blockDetailUrl })` ];
 
 	if ( __experimental ) {
@@ -157,7 +157,7 @@ function readBlockJSON( filename ) {
 	}
 	if ( category?.length > 0 ) {
 		blockInfoList.push(
-			`-	**Category:** [${ category }](/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
+			`-	**Category:** [${ category }](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
 		);
 	}
 	if ( parent?.length > 0 ) {
