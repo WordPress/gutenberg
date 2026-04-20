@@ -1,72 +1,86 @@
 #!/usr/bin/env node
 'use strict';
 
-const { spawnSync } = require( 'node:child_process' );
+const { spawn } = require( 'node:child_process' );
 
-const STALE_SUPPRESSIONS_PATTERN = new RegExp(
-	[
-		'There are suppressions left that do not occur anymore\\.',
-		'To resolve this, re-run the command with `--prune-suppressions` to remove unused suppressions\\.',
-		'To ignore unused suppressions, use `--pass-on-unpruned-suppressions`\\.',
-	].join( '\\s+' )
-);
+const STALE_SUPPRESSIONS_TOKEN = '--prune-suppressions';
 
 const PRUNE_HELP_MESSAGE =
-	'Stale ESLint suppressions detected. Run `npm run lint:js:prune-suppressions` and commit the updated `eslint-suppressions.json`.';
+	'👉 Run `npm run lint:js:prune-suppressions` and commit the updated `eslint-suppressions.json`.';
 
 const args = process.argv.slice( 2 );
 const wpScriptsBin = require.resolve( '../packages/scripts/bin/wp-scripts.js' );
 
-const result = spawnSync(
-	process.execPath,
-	[ wpScriptsBin, 'lint-js', ...args ],
-	{
-		encoding: 'utf8',
+// Detect stale suppressions by scanning the child's output for ESLint's
+// own `--prune-suppressions` hint. A small sliding tail buffer is used so
+// the child's output can be streamed straight to the user instead of being
+// buffered in full.
+const tailLength = STALE_SUPPRESSIONS_TOKEN.length - 1;
+let outputTail = '';
+let staleSuppressionsDetected = false;
+
+const child = spawn( process.execPath, [ wpScriptsBin, 'lint-js', ...args ], {
+	stdio: [ 'inherit', 'pipe', 'pipe' ],
+} );
+
+child.stdout.on( 'data', handleChunk( process.stdout ) );
+child.stderr.on( 'data', handleChunk( process.stderr ) );
+
+child.on( 'error', ( error ) => {
+	throw error;
+} );
+
+child.on( 'close', ( code, signal ) => {
+	if ( shouldShowPruneHint() ) {
+		process.stderr.write( `\n${ PRUNE_HELP_MESSAGE }\n` );
 	}
-);
 
-if ( result.error ) {
-	throw result.error;
-}
+	if ( signal ) {
+		process.kill( process.pid, signal );
+		return;
+	}
 
-const stdout = stripStaleSuppressionsMessage( result.stdout );
-const stderr = stripStaleSuppressionsMessage( result.stderr );
-
-if ( stdout ) {
-	process.stdout.write( stdout );
-}
-
-if ( stderr ) {
-	process.stderr.write( stderr );
-}
-
-if ( hasStaleSuppressions( result, args ) ) {
-	process.stderr.write( `\n${ PRUNE_HELP_MESSAGE }\n` );
-}
-
-process.exit( result.status ?? 1 );
+	process.exitCode = code ?? 1;
+} );
 
 /**
- * @param {import( 'node:child_process' ).SpawnSyncReturns<string>} lintResult Spawn result.
- * @param {string[]}                                                cliArgs    Passed CLI arguments.
+ * @param {NodeJS.WritableStream} destination Stream to forward chunks to.
  *
- * @return {boolean} Whether stale suppressions were detected.
+ * @return {(chunk: Buffer) => void} Data event handler.
  */
-function hasStaleSuppressions( lintResult, cliArgs ) {
-	const output = `${ lintResult.stdout ?? '' }\n${ lintResult.stderr ?? '' }`;
+function handleChunk( destination ) {
+	return ( chunk ) => {
+		destination.write( chunk );
+		scanForStaleSuppressions( chunk );
+	};
+}
 
+/**
+ * @param {Buffer} chunk Chunk of child output.
+ */
+function scanForStaleSuppressions( chunk ) {
+	if ( staleSuppressionsDetected ) {
+		return;
+	}
+
+	const window = outputTail + chunk.toString( 'utf8' );
+
+	if ( window.includes( STALE_SUPPRESSIONS_TOKEN ) ) {
+		staleSuppressionsDetected = true;
+		outputTail = '';
+		return;
+	}
+
+	outputTail = window.slice( -tailLength );
+}
+
+/**
+ * @return {boolean} Whether to print the repo-specific prune hint.
+ */
+function shouldShowPruneHint() {
 	return (
-		! cliArgs.includes( '--pass-on-unpruned-suppressions' ) &&
-		! cliArgs.includes( '--prune-suppressions' ) &&
-		STALE_SUPPRESSIONS_PATTERN.test( output )
+		staleSuppressionsDetected &&
+		! args.includes( '--pass-on-unpruned-suppressions' ) &&
+		! args.includes( STALE_SUPPRESSIONS_TOKEN )
 	);
-}
-
-/**
- * @param {string|undefined} output Process output.
- *
- * @return {string} Output without ESLint's generic stale suppressions message.
- */
-function stripStaleSuppressionsMessage( output ) {
-	return ( output ?? '' ).replace( STALE_SUPPRESSIONS_PATTERN, '' );
 }
