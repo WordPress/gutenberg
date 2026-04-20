@@ -4,7 +4,6 @@
  * External dependencies
  */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
-import { existsSync } from 'fs';
 import path from 'path';
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
@@ -94,13 +93,8 @@ const TEST_FILE_PATTERNS = [
  * A discovered package in the registry.
  *
  * @typedef {Object} PackageEntry
- * @property {string}                                    dir              Absolute path to the package directory.
- * @property {import('./package-utils.mjs').PackageJson} packageJson      Parsed package.json contents.
- * @property {boolean}                                   [externalSource] True when the entry comes from a named
- *                                                                        package source (e.g. `@scope/name`).
- *                                                                        These packages preserve their own npm
- *                                                                        identity for script-module IDs instead
- *                                                                        of being scoped under `packageNamespace`.
+ * @property {string}                                    dir         Absolute path to the package directory.
+ * @property {import('./package-utils.mjs').PackageJson} packageJson Parsed package.json contents.
  */
 
 const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
@@ -109,96 +103,29 @@ const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
 
 /**
- * Check whether a sources entry is a npm package name rather than a
- * relative/absolute directory path.
- *
- * Package names follow the npm naming rules:
- *  - Scoped: `@scope/name`
- *  - Bare:   `my-package` (starts with a letter or digit, no path separators)
- *
- * Directory paths start with `.`, `/`, or a drive letter on Windows (`C:\`).
- *
- * @param {string} source A single entry from `wpPlugin.packageSources`.
- * @return {boolean} True when the entry looks like a package name.
- */
-function isPackageName( source ) {
-	if ( source.startsWith( '@' ) ) {
-		return true;
-	}
-	// Relative or absolute paths.
-	if ( source.startsWith( '.' ) || path.isAbsolute( source ) ) {
-		return false;
-	}
-	// Bare package name (no slashes → not a path).
-	return ! source.includes( '/' );
-}
-
-/**
- * Resolve a npm package name to its directory and parsed package.json.
- * Uses Node's module resolution from the project root context so that
- * workspace symlinks (pnpm, yarn, npm) are followed automatically.
- *
- * @param {string} npmName Full package name (e.g. `@acme/shared-ui`).
- * @return {{ dir: string, packageJson: import('./package-utils.mjs').PackageJson }|null}
- *   Resolved entry or null when the package is not resolvable.
- */
-function resolveNamedSource( npmName ) {
-	// Read directly from node_modules instead of require.resolve() to
-	// avoid ERR_PACKAGE_PATH_NOT_EXPORTED when the package's `exports`
-	// field does not include `./package.json`.
-	const pkgJsonPath = path.join(
-		ROOT_DIR,
-		'node_modules',
-		npmName,
-		'package.json'
-	);
-
-	if ( ! existsSync( pkgJsonPath ) ) {
-		console.warn(
-			`⚠️  Source "${ npmName }" could not be resolved. ` +
-				'Make sure it is listed in dependencies and installed.'
-		);
-		return null;
-	}
-
-	return {
-		dir: path.dirname( pkgJsonPath ),
-		packageJson: getPackageInfoFromFile( pkgJsonPath ),
-	};
-}
-
-/**
  * Directories to scan for packages. Always starts with `./packages/`.
- * Additional directory-type entries from `wpPlugin.packageSources` are
- * appended.  Package-name entries are handled separately in
- * `getAllPackages()`.
+ * Additional directories from `wpPlugin.packageSources` are appended
+ * and resolved relative to the project root.
  *
  * @type {string[]}
  */
-const PACKAGE_SOURCES = WP_PLUGIN_CONFIG.packageSources || [];
 const PACKAGE_DIRS = [
 	PACKAGES_DIR,
-	...PACKAGE_SOURCES.filter( ( s ) => ! isPackageName( s ) ).map( ( s ) =>
+	...( WP_PLUGIN_CONFIG.packageSources || [] ).map( ( s ) =>
 		path.resolve( ROOT_DIR, s )
 	),
 ];
-const NAMED_SOURCES = PACKAGE_SOURCES.filter( isPackageName );
 
 /**
- * Get all packages by scanning every directory in PACKAGE_DIRS and
- * resolving every named source in NAMED_SOURCES.
- *
- * Local packages (`./packages/`) are scanned first, so they take priority.
- * Named sources are resolved last — they preserve their npm identity
- * (e.g. `@acme/shared-ui` stays `@acme/shared-ui` in script-module
- * IDs instead of being rewritten to `@<packageNamespace>/shared-ui`).
+ * Discover every package by scanning each directory in PACKAGE_DIRS.
+ * Local packages (`./packages/`) are scanned first, so they take
+ * priority when two directories contain a package with the same name.
  *
  * @return {Map<string, PackageEntry>} Map of package names to their entry data.
  */
 function getAllPackages() {
 	const registry = new Map();
 
-	// 1. Directory-based discovery (local packages first, then source dirs).
 	for ( const dir of PACKAGE_DIRS ) {
 		const pkgJsonPaths = glob.sync(
 			normalizePath( path.join( dir, '*', 'package.json' ) )
@@ -217,29 +144,6 @@ function getAllPackages() {
 		}
 	}
 
-	// 2. Named sources — resolve via require.resolve() and preserve
-	//    the full npm name as the registry key.
-	for ( const npmName of NAMED_SOURCES ) {
-		if ( registry.has( npmName ) ) {
-			continue;
-		}
-
-		const entry = resolveNamedSource( npmName );
-		if ( entry ) {
-			if ( ! entry.packageJson.wpScriptModuleExports ) {
-				console.warn(
-					`⚠️  Source "${ npmName }" does not declare wpScriptModuleExports. ` +
-						'Imports will be bundled inline instead of externalized.'
-				);
-			}
-
-			registry.set( npmName, {
-				...entry,
-				externalSource: true,
-			} );
-		}
-	}
-
 	return registry;
 }
 
@@ -247,14 +151,8 @@ const PACKAGES = getAllPackages();
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
-const PAGES = WP_PLUGIN_CONFIG.pages || [];
-
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
-
-// Individual packages from named sources to externalize.  Unlike
-// EXTERNAL_NAMESPACES (which externalizes an entire `@scope/*`), this
-// targets only the exact packages listed in `packageSources`.
-const EXTERNAL_PACKAGES = new Set( NAMED_SOURCES );
+const PAGES = WP_PLUGIN_CONFIG.pages || [];
 
 /**
  * Interprets a configuration value as a boolean, where `"true"` and `"1"`
@@ -296,8 +194,7 @@ const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX,
-	EXTERNAL_PACKAGES
+	HANDLE_PREFIX
 );
 
 /**
@@ -635,7 +532,6 @@ async function bundlePackage( packageName, options = {} ) {
 	const packageEntry = PACKAGES.get( packageName );
 	const packageDir = packageEntry.dir;
 	const packageJson = packageEntry.packageJson;
-	const isExternalSource = !! packageEntry.externalSource;
 
 	const builds = [];
 
@@ -796,21 +692,10 @@ async function bundlePackage( packageName, options = {} ) {
 				);
 			}
 
-			// External sources preserve their npm identity as the
-			// script-module ID (e.g. `@acme/shared-ui`).  Local
-			// packages are scoped under the plugin's namespace.
-			let scriptModuleId;
-			if ( isExternalSource ) {
-				scriptModuleId =
-					exportName === '.'
-						? packageName
-						: `${ packageName }/${ fileName }`;
-			} else {
-				scriptModuleId =
-					exportName === '.'
-						? `@${ packageNamespace }/${ packageName }`
-						: `@${ packageNamespace }/${ packageName }/${ fileName }`;
-			}
+			const scriptModuleId =
+				exportName === '.'
+					? `@${ packageNamespace }/${ packageName }`
+					: `@${ packageNamespace }/${ packageName }/${ fileName }`;
 
 			builtModules.push( {
 				id: scriptModuleId,
@@ -1894,13 +1779,6 @@ async function buildAll( baseUrlExpression ) {
 		await Promise.all(
 			level.map( async ( fullName ) => {
 				const packageName = fullToShort.get( fullName );
-				const entry = PACKAGES.get( packageName );
-
-				// External sources are pre-built — only bundle, skip transpilation.
-				if ( entry.externalSource ) {
-					return;
-				}
-
 				const buildTime = await transpilePackage( packageName );
 				console.log(
 					`   ✔ Transpiled ${ packageName } (${ buildTime }ms)`
@@ -2068,13 +1946,8 @@ async function watchMode() {
 	async function rebuildPackage( packageName ) {
 		try {
 			const startTime = Date.now();
-			const entry = PACKAGES.get( packageName );
 
-			// External sources are pre-built — only rebundle.
-			if ( ! entry.externalSource ) {
-				await transpilePackage( packageName );
-			}
-
+			await transpilePackage( packageName );
 			await bundlePackage( packageName );
 
 			const buildTime = Date.now() - startTime;

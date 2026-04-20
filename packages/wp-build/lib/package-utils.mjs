@@ -87,35 +87,9 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	const contextPath = path.join( packageRoot, 'package.json' );
 	const localRequire = createRequire( contextPath );
 
-	let resolved;
-	try {
-		// Preferred: resolve the package.json subpath directly.
-		resolved = localRequire.resolve( `${ fullPackageName }/package.json` );
-	} catch {
-		// Fallback for packages whose `exports` field does not expose
-		// `./package.json`.  Walk up the directory tree checking each
-		// `node_modules/` — mirrors Node's resolution algorithm without
-		// the exports restriction.
-		let searchDir = packageRoot;
-		const fsRoot = path.parse( searchDir ).root;
-		while ( searchDir !== fsRoot ) {
-			const directPath = path.join(
-				searchDir,
-				'node_modules',
-				fullPackageName,
-				'package.json'
-			);
-			if ( existsSync( directPath ) ) {
-				resolved = directPath;
-				break;
-			}
-			searchDir = path.dirname( searchDir );
-		}
-
-		if ( ! resolved ) {
-			return null;
-		}
-	}
+	const resolved = localRequire.resolve(
+		`${ fullPackageName }/package.json`
+	);
 
 	const result = getPackageInfoFromFile( resolved );
 	packageJsonCache.set( cacheKey, result );

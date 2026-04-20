@@ -50,15 +50,13 @@ async function generateContentHash(
  * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
  * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
  * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
- * @param {Set<string>}  [externalPackages] Individual package names to externalize by exact match (e.g., `@acme/shared-ui`). Used for named `packageSources` entries.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
 export function createWordpressExternalsPlugin(
 	packageNamespace,
 	scriptGlobal,
 	externalNamespaces = {},
-	handlePrefix,
-	externalPackages = new Set()
+	handlePrefix
 ) {
 	/**
 	 * WordPress externals plugin for esbuild.
@@ -278,68 +276,6 @@ export function createWordpressExternalsPlugin(
 								};
 							}
 
-							return undefined;
-						}
-					);
-				}
-
-				// Handle individual package externals from packageSources.
-				// These match exact package names rather than whole scopes,
-				// avoiding over-broad externalization.
-				for ( const extPkg of externalPackages ) {
-					const escaped = extPkg.replace(
-						/[.*+?^${}()|[\]\\]/g,
-						'\\$&'
-					);
-					build.onResolve(
-						{ filter: new RegExp( `^${ escaped }(/|$)` ) },
-						/** @param {import('esbuild').OnResolveArgs} args */
-						( args ) => {
-							const subpath =
-								args.path.length > extPkg.length
-									? args.path.slice( extPkg.length + 1 )
-									: null;
-
-							const packageJson = getPackageInfo(
-								extPkg,
-								args.resolveDir
-							);
-							if ( ! packageJson ) {
-								return undefined;
-							}
-
-							const isScriptModule = isScriptModuleImport(
-								packageJson,
-								subpath
-							);
-							if ( isScriptModule ) {
-								const kind =
-									args.kind === 'dynamic-import'
-										? 'dynamic'
-										: 'static';
-								if ( kind === 'static' ) {
-									moduleDependencies.set(
-										args.path,
-										'static'
-									);
-								} else if (
-									! moduleDependencies.has( args.path )
-								) {
-									moduleDependencies.set(
-										args.path,
-										'dynamic'
-									);
-								}
-
-								return {
-									path: args.path,
-									external: true,
-									sideEffects: !! packageJson.sideEffects,
-								};
-							}
-
-							// Not a script module — let esbuild
-							// bundle it inline.
 							return undefined;
 						}
 					);
