@@ -81,12 +81,12 @@
 }
 
 .image-editor-story__export-preview {
-	margin-top: 16px;
+	margin-bottom: 16px;
+	max-width: 200px;
 }
 
 .image-editor-story__export-image {
 	display: block;
-	margin-top: 8px;
 	max-width: 100%;
 	border: 1px solid #ccc;
 	border-radius: 4px;

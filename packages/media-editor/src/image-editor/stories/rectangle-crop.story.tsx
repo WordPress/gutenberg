@@ -878,8 +878,17 @@ const DebugComponent = () => {
 						maxHeight: 500,
 					} }
 				>
-					<h4 style={ { margin: '0 0 8px' } }>Debug</h4>
-
+					<div className="image-editor-story__export-preview">
+						{ previewSrc ? (
+							<img
+								className="image-editor-story__export-image"
+								src={ previewSrc }
+								alt="Crop preview"
+							/>
+						) : (
+							<p>Loading...</p>
+						) }
+					</div>
 					<strong>Containment</strong>
 					<div
 						style={ {
@@ -1019,19 +1028,6 @@ aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
 							</div>
 						) }
 				</div>
-			</div>
-
-			<div className="image-editor-story__export-preview">
-				<strong>Export Preview</strong>
-				{ previewSrc ? (
-					<img
-						className="image-editor-story__export-image"
-						src={ previewSrc }
-						alt="Crop preview"
-					/>
-				) : (
-					<p>Loading...</p>
-				) }
 			</div>
 		</div>
 	);
