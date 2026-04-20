@@ -161,7 +161,7 @@ add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
  * @param WP_REST_Request $request       The REST request.
  * @return stdClass|WP_Error Filtered post object, or WP_Error to abort.
  */
-function gutenberg_validate_user_taxonomy_slug( $prepared_post, $request ) {
+function gutenberg_validate_user_taxonomy_slug( $prepared_post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	$slug = ! empty( $prepared_post->post_name )
 		? (string) $prepared_post->post_name
 		: '';
