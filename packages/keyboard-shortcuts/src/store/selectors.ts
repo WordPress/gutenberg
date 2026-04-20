@@ -8,41 +8,57 @@ import {
 	rawShortcut,
 } from '@wordpress/keycodes';
 
-/** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
+/**
+ * Internal dependencies
+ */
+import type { ShortcutKeyCombination } from './actions';
 
-/** @typedef {import('@wordpress/keycodes').WPKeycodeHandlerByModifier} WPKeycodeHandlerByModifier */
+interface ShortcutState {
+	category: string;
+	keyCombination: ShortcutKeyCombination;
+	aliases?: ShortcutKeyCombination[];
+	description: string;
+}
+
+type ShortcutsState = Record< string, ShortcutState >;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
- *
- * @type {Array<any>}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: ShortcutKeyCombination[] = [];
 
 /**
  * Shortcut formatting methods.
- *
- * @property {WPKeycodeHandlerByModifier} display     Display formatting.
- * @property {WPKeycodeHandlerByModifier} rawShortcut Raw shortcut formatting.
- * @property {WPKeycodeHandlerByModifier} ariaLabel   ARIA label formatting.
  */
 const FORMATTING_METHODS = {
+	/**
+	 * Display formatting.
+	 */
 	display: displayShortcut,
+	/**
+	 * Raw shortcut formatting.
+	 */
 	raw: rawShortcut,
+	/**
+	 * ARIA label formatting.
+	 */
 	ariaLabel: shortcutAriaLabel,
 };
 
 /**
  * Returns a string representing the key combination.
  *
- * @param {?WPShortcutKeyCombination} shortcut       Key combination.
- * @param {keyof FORMATTING_METHODS}  representation Type of representation
- *                                                   (display, raw, ariaLabel).
+ * @param shortcut       Key combination.
+ * @param representation Type of representation
+ *                       (display, raw, ariaLabel).
  *
- * @return {?string} Shortcut representation.
+ * @return Shortcut representation.
  */
-function getKeyCombinationRepresentation( shortcut, representation ) {
+function getKeyCombinationRepresentation(
+	shortcut: ShortcutKeyCombination | null,
+	representation: keyof typeof FORMATTING_METHODS
+): string | null {
 	if ( ! shortcut ) {
 		return null;
 	}
@@ -93,9 +109,12 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  * };
  *```
  *
- * @return {WPShortcutKeyCombination?} Key combination.
+ * @return {ShortcutKeyCombination?} Key combination.
  */
-export function getShortcutKeyCombination( state, name ) {
+export function getShortcutKeyCombination(
+	state: ShortcutsState,
+	name: string
+): ShortcutKeyCombination | null {
 	return state[ name ] ? state[ name ].keyCombination : null;
 }
 
@@ -138,10 +157,10 @@ export function getShortcutKeyCombination( state, name ) {
  * @return {?string} Shortcut representation.
  */
 export function getShortcutRepresentation(
-	state,
-	name,
-	representation = 'display'
-) {
+	state: ShortcutsState,
+	name: string,
+	representation: keyof typeof FORMATTING_METHODS = 'display'
+): string | null {
 	const shortcut = getShortcutKeyCombination( state, name );
 	return getKeyCombinationRepresentation( shortcut, representation );
 }
@@ -174,7 +193,10 @@ export function getShortcutRepresentation(
  *```
  * @return {?string} Shortcut description.
  */
-export function getShortcutDescription( state, name ) {
+export function getShortcutDescription(
+	state: ShortcutsState,
+	name: string
+): string | null {
 	return state[ name ] ? state[ name ].description : null;
 }
 
@@ -222,9 +244,12 @@ export function getShortcutDescription( state, name ) {
  * };
  *```
  *
- * @return {WPShortcutKeyCombination[]} Key combinations.
+ * @return {ShortcutKeyCombination[]} Key combinations.
  */
-export function getShortcutAliases( state, name ) {
+export function getShortcutAliases(
+	state: ShortcutsState,
+	name: string
+): ShortcutKeyCombination[] {
 	return state[ name ] && state[ name ].aliases
 		? state[ name ].aliases
 		: EMPTY_ARRAY;
@@ -277,14 +302,17 @@ export function getShortcutAliases( state, name ) {
  * };
  *```
  *
- * @return {WPShortcutKeyCombination[]} Key combinations.
+ * @return {ShortcutKeyCombination[]} Key combinations.
  */
 export const getAllShortcutKeyCombinations = createSelector(
 	( state, name ) => {
 		return [
 			getShortcutKeyCombination( state, name ),
 			...getShortcutAliases( state, name ),
-		].filter( Boolean );
+		].filter(
+			( combination ): combination is ShortcutKeyCombination =>
+				!! combination
+		);
 	},
 	( state, name ) => [ state[ name ] ]
 );
@@ -382,10 +410,10 @@ export const getAllShortcutRawKeyCombinations = createSelector(
  * @return {string[]} Shortcut names.
  */
 export const getCategoryShortcuts = createSelector(
-	( state, categoryName ) => {
-		return Object.entries( state )
+	( state: ShortcutsState, categoryName: string ): string[] => {
+		return Object.entries< ShortcutState >( state )
 			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
 			.map( ( [ name ] ) => name );
 	},
-	( state ) => [ state ]
+	( state: ShortcutsState ) => [ state ]
 );
