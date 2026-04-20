@@ -1,5 +1,9 @@
 # WordPress Design System MCP
 
+<div class="callout callout-alert">
+This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI coding agents with component documentation, prop definitions, usage examples, and design tokens.
 
 ## Setup
