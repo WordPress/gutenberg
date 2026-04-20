@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 33.0.0-next.0 (2026-04-20)
+
 ### Enhancements
 
 -   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))

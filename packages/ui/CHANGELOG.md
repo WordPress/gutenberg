@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.12.0-next.0 (2026-04-20)
+
 ### Documentation
 
 -   Restructure setup docs into "Within standard WordPress editor screens" and "Elsewhere" for clarity ([#77338](https://github.com/WordPress/gutenberg/pull/77338)).
