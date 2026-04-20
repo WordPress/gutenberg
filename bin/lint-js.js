@@ -19,8 +19,20 @@ const tailLength = STALE_SUPPRESSIONS_TOKEN.length - 1;
 let outputTail = '';
 let staleSuppressionsDetected = false;
 
+// The child's stdout/stderr are pipes (not TTYs) so it can be scanned, which
+// would otherwise disable color in ESLint's output. Re-enable color when the
+// parent has a TTY so interactive runs look the same as the unwrapped command.
+const childEnv = { ...process.env };
+if (
+	childEnv.FORCE_COLOR === undefined &&
+	( process.stdout.isTTY || process.stderr.isTTY )
+) {
+	childEnv.FORCE_COLOR = '1';
+}
+
 const child = spawn( process.execPath, [ wpScriptsBin, 'lint-js', ...args ], {
 	stdio: [ 'inherit', 'pipe', 'pipe' ],
+	env: childEnv,
 } );
 
 child.stdout.on( 'data', handleChunk( process.stdout ) );
