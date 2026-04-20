@@ -48,6 +48,7 @@
 		{ "path": "packages/is-shallow-equal" },
 		{ "path": "packages/jest-console" },
 		{ "path": "packages/keycodes" },
+		{ "path": "packages/keyboard-shortcuts" },
 		{ "path": "packages/latex-to-mathml" },
 		{ "path": "packages/lazy-editor" },
 		{ "path": "packages/lazy-import" },

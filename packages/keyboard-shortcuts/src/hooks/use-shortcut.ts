@@ -9,22 +9,26 @@ import { useContext, useEffect, useRef } from '@wordpress/element';
 import useShortcutEventMatch from './use-shortcut-event-match';
 import { context } from '../context';
 
+interface UseShortcutOptions {
+	isDisabled?: boolean;
+}
+
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string}   name               Shortcut name.
- * @param {Function} callback           Shortcut callback.
- * @param {Object}   options            Shortcut options.
- * @param {boolean}  options.isDisabled Whether to disable to shortut.
+ * @param name               Shortcut name.
+ * @param callback           Shortcut callback.
+ * @param options            Shortcut options.
+ * @param options.isDisabled Whether to disable the shortcut.
  */
 export default function useShortcut(
-	name,
-	callback,
-	{ isDisabled = false } = {}
+	name: string,
+	callback: ( event: KeyboardEvent ) => void,
+	{ isDisabled = false }: UseShortcutOptions = {}
 ) {
 	const shortcuts = useContext( context );
 	const isMatch = useShortcutEventMatch();
-	const callbackRef = useRef();
+	const callbackRef = useRef< ( event: KeyboardEvent ) => void >();
 
 	useEffect( () => {
 		callbackRef.current = callback;
@@ -35,8 +39,8 @@ export default function useShortcut(
 			return;
 		}
 
-		function _callback( event ) {
-			if ( isMatch( name, event ) ) {
+		function _callback( event: KeyboardEvent ) {
+			if ( isMatch( name, event ) && callbackRef.current ) {
 				callbackRef.current( event );
 			}
 		}
@@ -45,5 +49,5 @@ export default function useShortcut(
 		return () => {
 			shortcuts.delete( _callback );
 		};
-	}, [ name, isDisabled, shortcuts ] );
+	}, [ name, isDisabled, shortcuts, isMatch ] );
 }
