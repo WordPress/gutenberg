@@ -133,6 +133,7 @@ class Gutenberg_Guidelines_Post_Type {
 				'query_var'          => false,
 				'rewrite'            => false,
 				'show_ui'            => true,
+				'show_admin_column'  => true,
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
 				'default_term'       => array(
