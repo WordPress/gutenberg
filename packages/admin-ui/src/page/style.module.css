@@ -23,7 +23,7 @@
 }
 
 .header-title {
-	// @TODO: use Text component from UI when available.
+	/* @TODO: use Text component from UI when available. */
 	font-family: var(--wpds-typography-font-family-heading);
 	font-size: var(--wpds-typography-font-size-lg);
 	font-weight: var(--wpds-typography-font-weight-medium);
