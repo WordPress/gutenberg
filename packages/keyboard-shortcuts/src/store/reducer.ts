@@ -1,12 +1,21 @@
 /**
+ * Internal dependencies
+ */
+import type { ShortcutAction } from './actions';
+import type { ShortcutsState } from './types';
+
+/**
  * Reducer returning the registered shortcuts
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-function reducer( state = {}, action ) {
+function reducer(
+	state: ShortcutsState = {},
+	action: ShortcutAction
+): ShortcutsState {
 	switch ( action.type ) {
 		case 'REGISTER_SHORTCUT':
 			return {

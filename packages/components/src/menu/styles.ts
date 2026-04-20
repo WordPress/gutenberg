@@ -114,6 +114,7 @@ export const Menu = styled( Ariakit.Menu )< Pick< ContextProps, 'variant' > >`
 
 const baseItem = css`
 	all: unset;
+	cursor: pointer;
 
 	position: relative;
 	min-height: ${ space( 8 ) };
@@ -157,7 +158,6 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
 	}
 
 	/* Active item (including hover) */

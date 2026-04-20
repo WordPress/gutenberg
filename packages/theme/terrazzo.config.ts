@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { defineConfig } from '@terrazzo/cli';
+import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
 
@@ -15,7 +15,7 @@ import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/ind
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
 
-export default defineConfig( {
+const config: Config = {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
@@ -25,6 +25,11 @@ export default defineConfig( {
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',
+
+	// Preserve source ordering of tokens in output. This is important because
+	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
+	// to understand that size progression in the original order.
+	alphabetize: false,
 
 	plugins: [
 		inlineAliasValues( {
@@ -40,8 +45,6 @@ export default defineConfig( {
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
-			// See: https://github.com/terrazzoapp/terrazzo/pull/632
-			// @ts-expect-error - Valid return types excluded from package types.
 			transform( token ) {
 				// This addresses a specific browser issue where Chrome renders
 				// a font-weight of 500 as 600 instead of 400 when the target
@@ -61,25 +64,27 @@ export default defineConfig( {
 				) {
 					return '499';
 				}
+
+				return undefined;
 			},
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: 'compact',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
 					],
 				},
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: 'comfortable',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
 					],
 				},
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: '.',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='default']",
@@ -299,4 +304,8 @@ export default defineConfig( {
 	// 		],
 	// 	},
 	// },
+};
+
+export default defineConfig( config, {
+	cwd: new URL( './', import.meta.url ),
 } );

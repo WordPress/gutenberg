@@ -73,7 +73,7 @@ function Avatar( {
 					'--editor-avatar-name-color': nameColor,
 			  }
 			: {} ),
-	} as React.CSSProperties;
+	};
 
 	const avatar = (
 		<div

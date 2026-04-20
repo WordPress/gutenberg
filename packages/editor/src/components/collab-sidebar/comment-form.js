@@ -15,13 +15,13 @@ import {
 	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useInstanceId, useDebounce } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import { sanitizeCommentString, noop } from './utils';
+import { sanitizeCommentString } from './utils';
 
 function CommentForm( {
 	onSubmit,
@@ -29,18 +29,10 @@ function CommentForm( {
 	thread,
 	submitButtonText,
 	labelText,
-	reflowComments = noop,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
 		thread?.content?.raw ?? ''
 	);
-
-	// Regularly trigger a reflow as the user types since the textarea may grow or shrink.
-	const debouncedCommentUpdated = useDebounce( reflowComments, 100 );
-
-	const updateComment = ( value ) => {
-		setInputComment( value );
-	};
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );
 	const isDisabled =
@@ -64,10 +56,9 @@ function CommentForm( {
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
-				onChange={ ( comment ) => {
-					updateComment( comment.target.value );
-					debouncedCommentUpdated();
-				} }
+				onChange={ ( comment ) =>
+					setInputComment( comment.target.value )
+				}
 				rows={ 1 }
 				maxRows={ 20 }
 				onKeyDown={ ( event ) => {
