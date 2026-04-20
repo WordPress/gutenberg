@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import Header from './header';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
-import styles from './style.module.scss';
+import styles from './style.module.css';
 
 function Page( {
 	headingLevel,

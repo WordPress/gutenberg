@@ -12,7 +12,7 @@ import {
  * Internal dependencies
  */
 import type { BreadcrumbsProps } from './types';
-import styles from './style.module.scss';
+import styles from './style.module.css';
 
 /**
  * Renders a breadcrumb navigation trail.

@@ -7,7 +7,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
-import styles from './style.module.scss';
+import styles from './style.module.css';
 
 export default function Header( {
 	headingLevel = 2,
