@@ -10,12 +10,8 @@
 }
 
 .header {
-	padding:
-		var(--wpds-dimension-padding-lg)
-		var(--wpds-dimension-padding-2xl);
-	border-block-end:
-		var(--wpds-border-width-xs) solid
-		var(--wpds-color-stroke-surface-neutral-weak);
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	background: var(--wpds-color-bg-surface-neutral-strong);
 	position: sticky;
 	inset-block-start: 0;
@@ -70,8 +66,6 @@
 	flex-direction: column;
 
 	&.has-padding {
-		padding:
-			var(--wpds-dimension-padding-lg)
-			var(--wpds-dimension-padding-2xl);
+		padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
 	}
 }

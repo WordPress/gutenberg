@@ -13,8 +13,7 @@
 
 	li:not(:last-child)::after {
 		content: "/";
-		margin-block: 0;
-		margin-inline: var(--wpds-dimension-gap-sm);
+		margin: 0 var(--wpds-dimension-gap-sm);
 	}
 
 	h1 {
