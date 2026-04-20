@@ -5,6 +5,7 @@
 import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import {
 	store as preferencesStore,
@@ -55,20 +56,38 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
+	const {
+		showBlockBreadcrumbsOption,
+		showCollaborationOptions,
+		collaborationPreferencesDisabled,
+	} = useSelect(
 		( select ) => {
+			const editorSel = select( editorStore );
+			const coreSel = select( coreStore );
 			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
-				select( editorStore );
+				editorSel;
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
+			const currentPostType = editorSel.getCurrentPostType();
+			const entityConfig = coreSel.getEntityConfig(
+				'postType',
+				currentPostType
+			);
+			const hasCollaborationInfrastructure = Boolean(
+				unlock( coreSel ).isCollaborationSupported() &&
+					entityConfig?.syncConfig &&
+					window._wpCollaborationEnabled
+			);
+			const collaborationEnabled = isCollaborationEnabledForCurrentPost();
 			return {
 				showBlockBreadcrumbsOption:
 					! isDistractionFreeEnabled &&
 					isLargeViewport &&
 					isRichEditingEnabled,
-				showCollaborationOptions:
-					isCollaborationEnabledForCurrentPost(),
+				showCollaborationOptions: hasCollaborationInfrastructure,
+				collaborationPreferencesDisabled:
+					hasCollaborationInfrastructure && ! collaborationEnabled,
 			};
 		},
 		[ isLargeViewport ]
@@ -127,7 +146,17 @@ function PreferencesModalContents( { extraSections = {} } ) {
 								/>
 								{ showCollaborationOptions && (
 									<>
+										{ collaborationPreferencesDisabled && (
+											<p className="components-base-control__help">
+												{ __(
+													'Real-time collaboration is unavailable while post revisions are disabled.'
+												) }
+											</p>
+										) }
 										<PreferenceToggleControl
+											disabled={
+												collaborationPreferencesDisabled
+											}
 											scope="core"
 											featureName="showCollaborationCursor"
 											help={ __(
@@ -138,6 +167,9 @@ function PreferencesModalContents( { extraSections = {} } ) {
 											) }
 										/>
 										<PreferenceToggleControl
+											disabled={
+												collaborationPreferencesDisabled
+											}
 											scope="core"
 											featureName="showCollaborationNotifications"
 											help={ __(
@@ -362,6 +394,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 		[
 			showBlockBreadcrumbsOption,
 			showCollaborationOptions,
+			collaborationPreferencesDisabled,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

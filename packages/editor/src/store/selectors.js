@@ -1883,6 +1883,9 @@ export function isPublishSidebarOpened( state ) {
 /**
  * Returns whether the collaboration is enabled for the current post.
  *
+ * Collaboration stays off when the post type does not support revisions
+ * (even if the global option and script flag are on).
+ *
  * @return {boolean} Whether collaboration is enabled.
  */
 export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
@@ -1897,9 +1900,15 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 			'postType',
 			currentPostType
 		);
+		const postTypeRecord =
+			select( coreStore ).getPostType( currentPostType );
+		const revisionsSupportedForType =
+			! postTypeRecord || postTypeRecord.supports?.revisions;
 
 		return Boolean(
-			entityConfig?.syncConfig && window._wpCollaborationEnabled
+			entityConfig?.syncConfig &&
+				window._wpCollaborationEnabled &&
+				revisionsSupportedForType
 		);
 	}
 );

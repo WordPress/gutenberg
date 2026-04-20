@@ -8,6 +8,7 @@ import { ToggleControl } from '@wordpress/components';
 import type { BaseOptionProps } from './types';
 
 function BaseOption( {
+	disabled,
 	help,
 	label,
 	isChecked,
@@ -17,6 +18,7 @@ function BaseOption( {
 	return (
 		<div className="preference-base-option">
 			<ToggleControl
+				disabled={ disabled }
 				help={ help }
 				label={ label }
 				checked={ isChecked }

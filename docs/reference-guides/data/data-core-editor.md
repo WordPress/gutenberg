@@ -775,6 +775,8 @@ _Returns_
 
 Returns whether the collaboration is enabled for the current post.
 
+Collaboration stays off when the post type does not support revisions (even if the global option and script flag are on).
+
 _Returns_
 
 -   `boolean`: Whether collaboration is enabled.
