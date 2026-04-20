@@ -516,7 +516,7 @@
 	},
 	"packages/editor/src/components/collab-sidebar/add-comment.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/editor/src/components/collab-sidebar/comment-author-info.js": {
