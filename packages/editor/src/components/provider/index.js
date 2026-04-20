@@ -22,6 +22,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
+import { getQueryArg } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -308,6 +309,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setCurrentTemplateId,
 			setEditedPost,
 			setRenderingMode,
+			setCurrentRevisionId,
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 
@@ -336,6 +338,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			updatePostLock( settings.postLock );
 			setupEditor( post, initialEdits, settings.template );
 			if ( settings.autosave ) {
+				const autosaveId = parseInt(
+					getQueryArg( settings.autosave.editLink, 'revision' ),
+					10
+				);
 				createWarningNotice(
 					__(
 						'There is an autosave of this post that is more recent than the version below.'
@@ -345,7 +351,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 						actions: [
 							{
 								label: __( 'View the autosave' ),
-								url: settings.autosave.editLink,
+								onClick: () =>
+									setCurrentRevisionId( autosaveId ),
 							},
 						],
 					}
