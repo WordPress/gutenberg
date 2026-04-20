@@ -54,9 +54,7 @@ export function Comments( {
 	onAddReply,
 	onCommentDelete,
 	commentSidebarRef,
-	reflowComments,
 	isFloating = false,
-	commentLastUpdated,
 } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
@@ -176,11 +174,13 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	const { boardOffsets, registerThread, reportHeight } = useFloatingBoard( {
-		threads,
-		selectedNoteId: selectedNote,
-		isFloating,
-	} );
+	const { boardOffsets, registerThread, unregisterThread } = useFloatingBoard(
+		{
+			threads,
+			selectedNoteId: selectedNote,
+			isFloating,
+		}
+	);
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -275,15 +275,13 @@ export function Comments( {
 					onEditComment={ onEditComment }
 					isSelected={ selectedNote === thread.id }
 					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
 					floating={
 						isFloating
 							? {
 									calculatedOffset:
 										boardOffsets[ thread.id ] ?? 0,
-									reportHeight,
 									registerThread,
-									commentLastUpdated,
+									unregisterThread,
 							  }
 							: undefined
 					}
@@ -307,7 +305,6 @@ function Thread( {
 	onCommentDelete,
 	isSelected,
 	commentSidebarRef,
-	reflowComments,
 	floating,
 	onKeyDown,
 } ) {
@@ -316,10 +313,6 @@ function Thread( {
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
@@ -328,10 +321,8 @@ function Thread( {
 	const { y, refs } = useFloatingThread( {
 		thread,
 		calculatedOffset: floating?.calculatedOffset ?? 0,
-		reportHeight: floating?.reportHeight,
 		registerThread: floating?.registerThread,
-		selectedThread: selectedNote,
-		commentLastUpdated: floating?.commentLastUpdated,
+		unregisterThread: floating?.unregisterThread,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
 
@@ -423,7 +414,6 @@ function Thread( {
 			<AddComment
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
 				floating={ { y, refs } }
 			/>
 		);
@@ -496,7 +486,6 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -507,7 +496,6 @@ function Thread( {
 						isExpanded={ isSelected }
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
-						reflowComments={ reflowComments }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -543,7 +531,6 @@ function Thread( {
 					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
-					reflowComments={ reflowComments }
 				/>
 			) }
 			{ isSelected && (
@@ -590,7 +577,6 @@ function Thread( {
 								thread.id,
 								thread.author_name
 							) }
-							reflowComments={ reflowComments }
 						/>
 					</VStack>
 				</VStack>
@@ -612,14 +598,7 @@ function Thread( {
 	);
 }
 
-const CommentBoard = ( {
-	thread,
-	parent,
-	isExpanded,
-	onEdit,
-	onDelete,
-	reflowComments,
-} ) => {
+const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
@@ -779,7 +758,6 @@ const CommentBoard = ( {
 						thread.id,
 						thread.author_name
 					) }
-					reflowComments={ reflowComments }
 				/>
 			) : (
 				<RawHTML

@@ -15,8 +15,7 @@ import {
 	useState,
 	useEffect,
 	useMemo,
-	useCallback,
-	useReducer,
+	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -34,16 +33,12 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
-import { calculateAllOffsets, noop } from './utils';
+import { createBoardStore } from './board-store';
+import { calculateAllOffsets } from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export function useBlockComments( postId ) {
-	const [ commentLastUpdated, reflowComments ] = useReducer(
-		() => Date.now(),
-		0
-	);
-
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -166,12 +161,10 @@ export function useBlockComments( postId ) {
 	return {
 		resultComments,
 		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
 	};
 }
 
-export function useBlockCommentsActions( reflowComments = noop ) {
+export function useBlockCommentsActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -225,10 +218,8 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			setTimeout( reflowComments, 300 );
 			return savedRecord;
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -293,9 +284,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					isDismissible: true,
 				}
 			);
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -327,9 +316,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -368,66 +355,52 @@ export function useEnableFloatingSidebar( enabled = false ) {
 }
 
 export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
-	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ blockRefs, setBlockRefs ] = useState( {} );
-
+	const [ store ] = useState( createBoardStore );
 	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 
-	const registerThread = useCallback( ( id, el ) => {
-		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: el } ) );
-	}, [] );
+	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	const reportHeight = useCallback( ( id, newHeight ) => {
-		setHeights( ( prev ) => {
-			if ( prev[ id ] !== newHeight ) {
-				return { ...prev, [ id ]: newHeight };
-			}
-			return prev;
-		} );
-	}, [] );
-
+	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
+	// when deps change, so back-to-back updates collapse into one paint.
 	useEffect( () => {
 		if ( ! isFloating ) {
 			return;
 		}
 
-		// Batch all rect reads before any writes to avoid layout thrashing.
-		const blockRects = Object.fromEntries(
-			Object.entries( blockRefs ).flatMap( ( [ id, el ] ) =>
-				el ? [ [ id, el.getBoundingClientRect() ] ] : []
-			)
-		);
-
-		const { offsets: newOffsets, minHeight } = calculateAllOffsets( {
-			threads,
-			selectedNoteId,
-			blockRects,
-			heights,
+		const rafId = window.requestAnimationFrame( () => {
+			const { offsets, minHeight } = calculateAllOffsets( {
+				threads,
+				selectedNoteId,
+				blockRects: store.getBlockRects(),
+				heights,
+			} );
+			setBoardOffsets( offsets );
+			setCanvasMinHeight( minHeight );
 		} );
-		if ( Object.keys( newOffsets ).length > 0 ) {
-			setBoardOffsets( newOffsets );
-		}
-		setCanvasMinHeight( minHeight );
+
+		return () => window.cancelAnimationFrame( rafId );
 	}, [
 		heights,
-		blockRefs,
 		isFloating,
-		threads,
 		selectedNoteId,
 		setCanvasMinHeight,
+		store,
+		threads,
 	] );
 
-	return { boardOffsets, registerThread, reportHeight };
+	return {
+		boardOffsets,
+		registerThread: store.registerThread,
+		unregisterThread: store.unregisterThread,
+	};
 }
 
 export function useFloatingThread( {
 	thread,
 	calculatedOffset,
-	reportHeight,
-	selectedThread,
 	registerThread,
-	commentLastUpdated,
+	unregisterThread,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
 
@@ -442,32 +415,27 @@ export function useFloatingThread( {
 		whileElementsMounted: autoUpdate,
 	} );
 
-	// Store the block reference for each thread.
+	// Set the floating-ui reference element.
 	useEffect( () => {
 		if ( blockElement ) {
 			refs.setReference( blockElement );
 		}
-	}, [ blockElement, refs, commentLastUpdated ] );
+	}, [ blockElement, refs ] );
 
-	// Register the block element so the board can read its rect.
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver tracks height changes automatically.
 	useEffect( () => {
-		if ( refs.floating?.current ) {
-			registerThread( thread.id, blockElement );
+		const floatingEl = refs.floating?.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, blockElement, floatingEl );
 		}
-	}, [ blockElement, thread.id, refs.floating, registerThread ] );
-
-	// When the selected thread changes, report height to trigger offset recalculation.
-	useEffect( () => {
-		if ( refs.floating?.current ) {
-			const newHeight = refs.floating.current.scrollHeight;
-			reportHeight( thread.id, newHeight );
-		}
+		return () => unregisterThread?.( thread.id );
 	}, [
+		blockElement,
 		thread.id,
-		reportHeight,
 		refs.floating,
-		selectedThread,
-		commentLastUpdated,
+		registerThread,
+		unregisterThread,
 	] );
 
 	return {

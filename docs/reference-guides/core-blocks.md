@@ -398,7 +398,7 @@ Gather blocks in a layout container.
 
 -	**Name:** [core/group](/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
--	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (full, wide), allowedBlocks, anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, button, gradients, heading, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), layout (allowSizingOnChildren), position (sticky), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** tagName, templateLock
 
 ## Heading
@@ -1059,7 +1059,7 @@ A single tab button in the tabs menu.
 -	**Experimental:** true
 -	**Category:** [design](/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/tabs-menu
--	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** color (background, text), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Tag Cloud
 

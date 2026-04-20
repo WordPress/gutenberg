@@ -607,31 +607,7 @@ _Parameters_
 
 ### registerBlockType
 
-Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
-
-For more in-depth information on registering a custom block see the [Create a block tutorial](https://developer.wordpress.org/block-editor/getting-started/create-block/).
-
-_Usage_
-
-```js
-import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-
-registerBlockType( 'namespace/block-name', {
-	title: __( 'My First Block' ),
-	edit: () => <div>{ __( 'Hello from the editor!' ) }</div>,
-	save: () => <div>Hello from the saved content!</div>,
-} );
-```
-
-_Parameters_
-
--   _blockNameOrMetadata_ `string | Record< string, unknown >`: Block type name or its metadata.
--   _settings_ `Partial< BlockType >`: Block settings.
-
-_Returns_
-
--   `BlockType | undefined`: The block, if it has been successfully registered; otherwise `undefined`.
+Undocumented declaration.
 
 ### registerBlockVariation
 
@@ -666,7 +642,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variation_ `BlockVariation`: Object describing a block variation.
+-   _variation_ `BlockVariation | BlockVariation[]`: Object describing a block variation.
 
 ### serialize
 
@@ -943,7 +919,7 @@ const ExampleComponent = () => {
 _Parameters_
 
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
--   _variationName_ `string`: Name of the variation defined for the block.
+-   _variationName_ `string | string[]`: Name of the variation defined for the block.
 
 ### updateCategory
 

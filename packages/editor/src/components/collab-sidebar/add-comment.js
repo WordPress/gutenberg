@@ -16,17 +16,12 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { FloatingContainer } from './floating-container';
-import { focusCommentThread, noop } from './utils';
+import { focusCommentThread } from './utils';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddComment( {
-	onSubmit,
-	commentSidebarRef,
-	reflowComments = noop,
-	floating,
-} ) {
+export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 	const { clientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
@@ -84,7 +79,6 @@ export function AddComment( {
 					focusCommentThread( id, commentSidebarRef.current );
 				} }
 				onCancel={ unselectThread }
-				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }
 			/>

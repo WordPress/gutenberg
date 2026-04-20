@@ -22,13 +22,9 @@ import Controls from './controls';
 
 const EMPTY_ARRAY = [];
 
-function Edit( {
-	context,
-	clientId,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function Edit( { context, clientId } ) {
 	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
 	const effectiveActiveIndex = useMemo( () => {
@@ -80,7 +76,6 @@ function Edit( {
 	// checks and click handling.
 	const tabListIndex = tab.index ?? menuItemIndex;
 
-	const tabId = tab.id || `tab-${ menuItemIndex }`;
 	const tabClientId = tab.clientId || '';
 	const label = tab.label || '';
 
@@ -119,14 +114,10 @@ function Edit( {
 	);
 
 	const blockProps = useBlockProps( {
-		className: clsx( layoutClassNames, {
+		className: clsx( {
 			'is-active': isActive,
 			'is-selected': isSelected,
 		} ),
-		'aria-controls': tabId,
-		'aria-selected': isActive,
-		id: `${ tabId }--tab`,
-		role: 'tab',
 		tabIndex: -1,
 		onClick: handleTabClick,
 	} );

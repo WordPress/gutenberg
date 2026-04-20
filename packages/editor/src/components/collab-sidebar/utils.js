@@ -13,11 +13,6 @@ export function sanitizeCommentString( str ) {
 	return str.trim();
 }
 
-/**
- * A no-operation function that does nothing.
- */
-export function noop() {}
-
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;

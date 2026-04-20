@@ -84,7 +84,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					ref={ mergedPopupRef }
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+					className={ clsx(
+						styles.popup,
+						variant !== 'unstyled' && styles.default
+					) }
 					{ ...props }
 				>
 					<PopoverValidationProvider>

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -19,7 +14,6 @@ import { useMemo, useRef, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import Controls from './controls';
-import slugFromLabel from './slug-from-label';
 
 const TEMPLATE = [
 	[
@@ -32,19 +26,11 @@ const TEMPLATE = [
 
 const { cancelAnimationFrame } = window;
 
-export default function Edit( {
-	attributes,
-	clientId,
-	context,
-	isSelected,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+export default function Edit( { clientId, context, isSelected } ) {
 	const focusRef = useRef();
 
-	const { anchor, label } = attributes;
-
 	// Consume tab indices from context
-	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
+	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ];
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
 
@@ -137,20 +123,9 @@ export default function Edit( {
 		return false;
 	}, [ isSelected, hasInnerBlocksSelected, isActiveTab ] );
 
-	// Use a custom anchor, if set. Otherwise fall back to the slug generated from the label text.
-	const tabPanelId = useMemo(
-		() => anchor || slugFromLabel( label, blockIndex ),
-		[ anchor, label, blockIndex ]
-	);
-	const tabLabelId = useMemo( () => `${ tabPanelId }--tab`, [ tabPanelId ] );
-
 	const blockProps = useBlockProps( {
 		hidden: ! isSelectedTab,
-		'aria-labelledby': tabLabelId,
-		id: tabPanelId,
-		role: 'tabpanel',
 		tabIndex: isSelectedTab ? 0 : -1,
-		className: clsx( 'wp-block-tab__editor-content', layoutClassNames ),
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
