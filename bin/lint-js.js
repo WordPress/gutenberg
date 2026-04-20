@@ -139,6 +139,19 @@ function formatSuppressionsFile( lintExitCode ) {
 			return;
 		}
 
-		process.exitCode = lintExitCode ?? formatCode ?? 1;
+		process.exitCode = resolveExitCode( lintExitCode, formatCode );
 	} );
+}
+
+/**
+ * @param {number|null} lintExitCode Exit code from the lint child process.
+ * @param {number|null} formatCode   Exit code from the format child process.
+ * @return {number} Exit code to use for the wrapper process.
+ */
+function resolveExitCode( lintExitCode, formatCode ) {
+	if ( lintExitCode !== null && lintExitCode !== 0 ) {
+		return lintExitCode;
+	}
+
+	return formatCode ?? lintExitCode ?? 1;
 }
