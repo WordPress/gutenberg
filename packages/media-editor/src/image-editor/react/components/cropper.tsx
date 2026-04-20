@@ -187,11 +187,6 @@ function CropperInner(
 		};
 	}, [] );
 
-	const [ naturalSize, setNaturalSize ] = useState< Size >( {
-		width: 0,
-		height: 0,
-	} );
-
 	// Notify consumer of state changes.
 	useEffect( () => {
 		onStateChange?.( state );
@@ -225,9 +220,16 @@ function CropperInner(
 	] );
 
 	// Compute fitted image dimensions and visual bounds from camera math.
+	const naturalWidth = state.image?.naturalWidth ?? 0;
+	const naturalHeight = state.image?.naturalHeight ?? 0;
 	const { elementSize, visualSize } = useMemo(
-		() => getImageFit( containerSize, naturalSize, state.rotation ),
-		[ containerSize, naturalSize, state.rotation ]
+		() =>
+			getImageFit(
+				containerSize,
+				{ width: naturalWidth, height: naturalHeight },
+				state.rotation
+			),
+		[ containerSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
 	// In fixed-crop mode, auto-size the crop rect to fill the visual area
@@ -379,8 +381,6 @@ function CropperInner(
 				width: img.naturalWidth,
 				height: img.naturalHeight,
 			};
-
-			setNaturalSize( size );
 
 			setImage( {
 				src,
