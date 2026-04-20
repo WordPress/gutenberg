@@ -2,11 +2,19 @@
 'use strict';
 
 const { spawn } = require( 'node:child_process' );
+const path = require( 'node:path' );
+const fs = require( 'node:fs' );
 
 const STALE_SUPPRESSIONS_TOKEN = '--prune-suppressions';
 
 const PRUNE_HELP_MESSAGE =
 	'👉 Run `npm run lint:js:prune-suppressions` and commit the updated `eslint-suppressions.json`.';
+
+const SUPPRESSIONS_FILE = path.join(
+	__dirname,
+	'..',
+	'eslint-suppressions.json'
+);
 
 const args = process.argv.slice( 2 );
 const wpScriptsBin = require.resolve( '../packages/scripts/bin/wp-scripts.js' );
@@ -49,6 +57,20 @@ child.on( 'close', ( code, signal ) => {
 
 	if ( signal ) {
 		process.kill( process.pid, signal );
+		return;
+	}
+
+	// ESLint writes `eslint-suppressions.json` with two-space indentation
+	// when invoked with `--prune-suppressions`. Format it through the
+	// repo's Prettier config so the working-tree diff matches what
+	// lint-staged would produce on commit. Done here (rather than in the
+	// npm script) so it runs even when the lint pass exits non-zero from
+	// unrelated errors elsewhere in the codebase.
+	if (
+		args.includes( STALE_SUPPRESSIONS_TOKEN ) &&
+		fs.existsSync( SUPPRESSIONS_FILE )
+	) {
+		formatSuppressionsFile( code );
 		return;
 	}
 
@@ -95,4 +117,28 @@ function shouldShowPruneHint() {
 		! args.includes( '--pass-on-unpruned-suppressions' ) &&
 		! args.includes( STALE_SUPPRESSIONS_TOKEN )
 	);
+}
+
+/**
+ * @param {number|null} lintExitCode Exit code from the lint child process.
+ */
+function formatSuppressionsFile( lintExitCode ) {
+	const formatChild = spawn(
+		process.execPath,
+		[ wpScriptsBin, 'format', SUPPRESSIONS_FILE ],
+		{ stdio: 'inherit', env: childEnv }
+	);
+
+	formatChild.on( 'error', ( error ) => {
+		throw error;
+	} );
+
+	formatChild.on( 'close', ( formatCode, formatSignal ) => {
+		if ( formatSignal ) {
+			process.kill( process.pid, formatSignal );
+			return;
+		}
+
+		process.exitCode = lintExitCode ?? formatCode ?? 1;
+	} );
 }
