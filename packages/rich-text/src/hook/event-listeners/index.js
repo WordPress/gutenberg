@@ -14,6 +14,7 @@ import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
 import { preventFocusCapture } from './prevent-focus-capture';
+import textInputRules from './text-input-rules';
 
 const allEventListeners = [
 	copyHandler,
@@ -23,6 +24,7 @@ const allEventListeners = [
 	inputAndSelection,
 	selectionChangeCompat,
 	preventFocusCapture,
+	textInputRules,
 ];
 
 export function useEventListeners( props ) {
