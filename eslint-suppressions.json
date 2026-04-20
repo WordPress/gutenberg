@@ -539,6 +539,11 @@
 			"count": 3
 		}
 	},
+	"packages/editor/src/components/collab-sidebar/floating-container.js": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/collab-sidebar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
