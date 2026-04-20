@@ -895,6 +895,109 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that sideloading with an array of size names registers the same
+	 * file under all of the given sizes in attachment metadata.
+	 *
+	 * This supports deduplication of client-side generated sub-sizes when multiple
+	 * registered sizes share identical dimensions (e.g. Twenty Eleven's `large`
+	 * is 768x1024, matching core's `medium_large`). One physical file should be
+	 * registered under every matching size name.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::register_routes
+	 */
+	public function test_sideload_item_accepts_array_of_image_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		// Register a custom size with the same dimensions as `medium` so both
+		// sizes resolve to one sideloaded file.
+		add_image_size( 'duplicate_of_medium', 300, 300, false );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-300x200.jpg' );
+		$request->set_param( 'image_size', array( 'medium', 'duplicate_of_medium' ) );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_image_size( 'duplicate_of_medium' );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'sizes', $data['media_details'] );
+
+		// Both sizes should be registered with the identical file in metadata.
+		$this->assertArrayHasKey( 'medium', $data['media_details']['sizes'] );
+		$this->assertArrayHasKey( 'duplicate_of_medium', $data['media_details']['sizes'] );
+		$this->assertSame( 'canola-300x200.jpg', $data['media_details']['sizes']['medium']['file'] );
+		$this->assertSame( 'canola-300x200.jpg', $data['media_details']['sizes']['duplicate_of_medium']['file'] );
+		$this->assertSame(
+			$data['media_details']['sizes']['medium']['file'],
+			$data['media_details']['sizes']['duplicate_of_medium']['file']
+		);
+
+		// Verify the stored metadata (not just the REST response) registers
+		// both sizes pointing at the single sideloaded file.
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertArrayHasKey( 'medium', $metadata['sizes'] );
+		$this->assertArrayHasKey( 'duplicate_of_medium', $metadata['sizes'] );
+		$this->assertSame(
+			$metadata['sizes']['medium']['file'],
+			$metadata['sizes']['duplicate_of_medium']['file']
+		);
+	}
+
+	/**
+	 * Verifies that sideloading with a single-element array of size names
+	 * works identically to passing a plain string.
+	 *
+	 * @covers ::sideload_item
+	 */
+	public function test_sideload_item_accepts_single_element_array() {
+		wp_set_current_user( self::$admin_id );
+
+		$attachment_id = self::factory()->attachment->create_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array(
+				'post_mime_type' => 'image/jpeg',
+			)
+		);
+
+		wp_update_attachment_metadata(
+			$attachment_id,
+			wp_generate_attachment_metadata( $attachment_id, DIR_TESTDATA . '/images/canola.jpg' )
+		);
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-thumb-single.jpg' );
+		$request->set_param( 'image_size', array( 'thumbnail' ) );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertArrayHasKey( 'thumbnail', $data['media_details']['sizes'] );
+		$this->assertSame( 'canola-thumb-single.jpg', $data['media_details']['sizes']['thumbnail']['file'] );
+	}
+
+	/**
 	 * Verifies metadata consistency between server-side and client-side upload flows.
 	 *
 	 * The same image uploaded with server-side processing (generate_sub_sizes=true)

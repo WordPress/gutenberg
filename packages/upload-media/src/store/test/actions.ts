@@ -769,6 +769,88 @@ describe( 'actions', () => {
 			] );
 		} );
 
+		it( 'should not deduplicate sizes that share dimensions but differ by crop', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					// Same width/height, different crop — must be treated as distinct.
+					soft: { width: 300, height: 300, crop: false },
+					hard: { width: 300, height: 300, crop: true },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'soft', 'hard' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			// Two separate sideloads because crop differs.
+			expect( sideloadItems ).toHaveLength( 2 );
+
+			// Each sideload passes a single string (not an array).
+			for ( const sideload of sideloadItems ) {
+				expect(
+					typeof sideload.additionalData?.image_size === 'string'
+				).toBe( true );
+			}
+			const imageSizes = sideloadItems.map(
+				( i ) => i.additionalData?.image_size
+			);
+			expect( imageSizes ).toEqual(
+				expect.arrayContaining( [ 'soft', 'hard' ] )
+			);
+		} );
+
+		it( 'should group three sizes with identical dimensions into one sideload', async () => {
+			mockCreateImageBitmap( 800, 600 );
+
+			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
+				bigImageSizeThreshold: 2560,
+				allImageSizes: {
+					medium: { width: 300, height: 300, crop: false },
+					alias_a: { width: 300, height: 300, crop: false },
+					alias_b: { width: 300, height: 300, crop: false },
+				},
+			} );
+
+			const item = await setupItemForThumbnailGeneration( {
+				attachment: {
+					missing_image_sizes: [ 'medium', 'alias_a', 'alias_b' ],
+				},
+			} );
+			await unlock( registry.dispatch( uploadStore ) ).generateThumbnails(
+				item.id
+			);
+
+			const allItems = unlock(
+				registry.select( uploadStore )
+			).getAllItems();
+
+			const sideloadItems = allItems.filter(
+				( i ) => i.parentId === item.id
+			);
+			// One sideload, all three names grouped together.
+			expect( sideloadItems ).toHaveLength( 1 );
+			expect( sideloadItems[ 0 ].additionalData!.image_size ).toEqual( [
+				'medium',
+				'alias_a',
+				'alias_b',
+			] );
+		} );
+
 		it( 'should skip thumbnail generation when item has no attachment', async () => {
 			// Add an item without going through the attachment setup.
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
