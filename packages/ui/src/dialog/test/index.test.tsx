@@ -68,6 +68,29 @@ describe( 'Dialog', () => {
 		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
+	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
+		const user = userEvent.setup();
+		const popupRef = createRef< HTMLDivElement >();
+
+		render(
+			<Dialog.Root>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+				<Dialog.Popup ref={ popupRef }>
+					<Dialog.Title>Title</Dialog.Title>
+					<Dialog.Description>My description</Dialog.Description>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		await waitFor( () => {
+			expect( popupRef.current ).toHaveAccessibleDescription(
+				'My description'
+			);
+		} );
+	} );
+
 	it( 'renders Dialog.Footer and supports render/className props', async () => {
 		const user = userEvent.setup();
 
