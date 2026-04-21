@@ -1,19 +1,19 @@
 export interface State {
 	isOpen: boolean;
-	attachmentId: number | null;
+	id: number | null;
 	invocationId: number | null;
 }
 
 export const DEFAULT_STATE: State = {
 	isOpen: false,
-	attachmentId: null,
+	id: null,
 	invocationId: null,
 };
 
 type Action =
 	| {
 			type: 'OPEN_MEDIA_EDITOR_MODAL';
-			attachmentId: number;
+			id: number;
 			invocationId: number;
 	  }
 	| { type: 'CLOSE_MEDIA_EDITOR_MODAL' };
@@ -24,13 +24,13 @@ export default function reducer(
 ): State {
 	switch ( action.type ) {
 		case 'OPEN_MEDIA_EDITOR_MODAL': {
-			const { attachmentId, invocationId } = action as Extract<
+			const { id, invocationId } = action as Extract<
 				Action,
 				{ type: 'OPEN_MEDIA_EDITOR_MODAL' }
 			>;
 			return {
 				isOpen: true,
-				attachmentId,
+				id,
 				invocationId,
 			};
 		}

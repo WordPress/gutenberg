@@ -18,12 +18,12 @@ export interface MediaEditorModalUpdate {
 }
 
 interface OpenMediaEditorModalArgs {
-	attachmentId: number;
+	id: number;
 	onUpdate?: ( updated: MediaEditorModalUpdate ) => void;
 }
 
 export function openMediaEditorModal( {
-	attachmentId,
+	id,
 	onUpdate,
 }: OpenMediaEditorModalArgs ) {
 	return ( { select, dispatch }: { select: any; dispatch: any } ) => {
@@ -34,7 +34,7 @@ export function openMediaEditorModal( {
 
 		dispatch( {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			attachmentId,
+			id,
 			invocationId,
 		} );
 	};

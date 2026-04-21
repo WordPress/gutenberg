@@ -104,25 +104,25 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 }
 
 export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
-	const { isOpen, attachmentId, onUpdate } = useSelect( ( select ) => {
+	const { isOpen, id, onUpdate } = useSelect( ( select ) => {
 		const s = select( mediaEditorStore );
 		return {
 			isOpen: s.isMediaEditorModalOpen(),
-			attachmentId: s.getMediaEditorModalAttachmentId(),
+			id: s.getMediaEditorModalId(),
 			onUpdate: s.getMediaEditorModalOnUpdate(),
 		};
 	}, [] );
 
 	const media = useSelect(
 		( select ) =>
-			attachmentId
+			id
 				? ( select( coreStore ).getEditedEntityRecord(
 						'postType',
 						'attachment',
-						attachmentId
+						id
 				  ) as Media )
 				: null,
-		[ attachmentId ]
+		[ id ]
 	);
 
 	const { editEntityRecord, saveEditedEntityRecord } =
@@ -171,12 +171,12 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		[]
 	);
 
-	if ( ! isOpen || ! attachmentId ) {
+	if ( ! isOpen || ! id ) {
 		return null;
 	}
 
 	const handleChange = ( updates: Partial< Media > ) => {
-		editEntityRecord( 'postType', 'attachment', attachmentId, updates );
+		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
 
 	const handleCancel = () => {
@@ -184,7 +184,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 			editEntityRecord(
 				'postType',
 				'attachment',
-				attachmentId,
+				id,
 				originalFieldValuesRef.current
 			);
 		}
@@ -197,7 +197,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 			const saved = ( await saveEditedEntityRecord(
 				'postType',
 				'attachment',
-				attachmentId
+				id
 			) ) as Media | undefined;
 
 			const next = ( saved ?? media ) as Media | null;

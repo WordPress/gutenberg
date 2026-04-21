@@ -8,8 +8,8 @@ export function isMediaEditorModalOpen( state: State ): boolean {
 	return state.isOpen;
 }
 
-export function getMediaEditorModalAttachmentId( state: State ): number | null {
-	return state.attachmentId;
+export function getMediaEditorModalId( state: State ): number | null {
+	return state.id;
 }
 
 export function getMediaEditorModalInvocationId( state: State ): number | null {

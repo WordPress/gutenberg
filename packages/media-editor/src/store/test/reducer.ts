@@ -9,15 +9,15 @@ describe( 'core/media-editor reducer', () => {
 		expect( state ).toEqual( DEFAULT_STATE );
 	} );
 
-	it( 'opens the modal with attachmentId and invocationId', () => {
+	it( 'opens the modal with id and invocationId', () => {
 		const state = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			attachmentId: 42,
+			id: 42,
 			invocationId: 1,
 		} );
 		expect( state ).toEqual( {
 			isOpen: true,
-			attachmentId: 42,
+			id: 42,
 			invocationId: 1,
 		} );
 	} );
@@ -25,17 +25,17 @@ describe( 'core/media-editor reducer', () => {
 	it( 'replaces state on a subsequent open (new invocationId)', () => {
 		const first = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			attachmentId: 42,
+			id: 42,
 			invocationId: 1,
 		} );
 		const second = reducer( first, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			attachmentId: 99,
+			id: 99,
 			invocationId: 2,
 		} );
 		expect( second ).toEqual( {
 			isOpen: true,
-			attachmentId: 99,
+			id: 99,
 			invocationId: 2,
 		} );
 	} );
@@ -43,7 +43,7 @@ describe( 'core/media-editor reducer', () => {
 	it( 'clears state on close', () => {
 		const opened = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			attachmentId: 42,
+			id: 42,
 			invocationId: 1,
 		} );
 		const closed = reducer( opened, {

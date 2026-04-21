@@ -891,7 +891,7 @@ export default function Image( {
 								onEditMedia && id
 									? () =>
 											onEditMedia( {
-												attachmentId: id,
+												id,
 												onUpdate: handleMediaUpdate,
 											} )
 									: () => setIsEditingImage( true )
