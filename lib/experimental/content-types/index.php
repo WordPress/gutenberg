@@ -15,28 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Capability map: every write operation requires `manage_options`.
- * Read is allowed for any authenticated user that can `edit_posts` so the
- * REST endpoint can be consumed by the Settings pages without exposing the
- * records to unauthenticated visitors.
- *
- * @return array
- */
-function _gutenberg_content_types_admin_only_capabilities() {
-	return array(
-		'read'                   => 'edit_posts',
-		'create_posts'           => 'manage_options',
-		'edit_posts'             => 'manage_options',
-		'edit_published_posts'   => 'manage_options',
-		'delete_posts'           => 'manage_options',
-		'delete_published_posts' => 'manage_options',
-		'edit_others_posts'      => 'manage_options',
-		'delete_others_posts'    => 'manage_options',
-		'publish_posts'          => 'manage_options',
-	);
-}
-
-/**
  * Registers the wp_user_taxonomy CPT.
  */
 function gutenberg_register_user_taxonomy_cpt() {
@@ -55,7 +33,23 @@ function gutenberg_register_user_taxonomy_cpt() {
 			'show_in_rest'       => true,
 			'rest_base'          => 'user-taxonomies',
 			'capability_type'    => 'post',
-			'capabilities'       => _gutenberg_content_types_admin_only_capabilities(),
+			'capabilities'       => array(
+				/**
+				 * Capability map: every write operation requires `manage_options`.
+				 * Read is allowed for any authenticated user that can `edit_posts` so the
+				 * REST endpoint can be consumed by the Settings pages without exposing the
+				 * records to unauthenticated visitors.
+				 */
+				'read'                   => 'edit_posts',
+				'create_posts'           => 'manage_options',
+				'edit_posts'             => 'manage_options',
+				'edit_published_posts'   => 'manage_options',
+				'delete_posts'           => 'manage_options',
+				'delete_published_posts' => 'manage_options',
+				'edit_others_posts'      => 'manage_options',
+				'delete_others_posts'    => 'manage_options',
+				'publish_posts'          => 'manage_options',
+			),
 			'map_meta_cap'       => true,
 			'supports'           => array( 'title', 'editor' ),
 			'hierarchical'       => false,
