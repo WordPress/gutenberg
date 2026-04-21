@@ -14,9 +14,20 @@ export interface RootProps
 		| 'onOpenChangeComplete'
 		| 'defaultOpen'
 		| 'modal'
-		| 'swipeDirection'
 		| 'disablePointerDismissal'
 	> {
+	/**
+	 * The edge the drawer slides in from, and the direction used to dismiss it
+	 * via swipe gesture.
+	 *
+	 * - `'left'` / `'right'`: side drawers; swipe horizontally to dismiss.
+	 * - `'down'`: bottom sheet; swipe down to dismiss.
+	 * - `'up'`: top drawer; swipe up to dismiss.
+	 *
+	 * @default 'left'
+	 */
+	swipeDirection?: _Drawer.Root.Props[ 'swipeDirection' ];
+
 	/**
 	 * The content to be rendered inside the component.
 	 */
