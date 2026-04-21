@@ -304,6 +304,29 @@ function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
 add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
 
 /**
+ * Detects whether the current request is running in WordPress Playground.
+ *
+ * Playground runs PHP via WebAssembly (PHP.wasm) and serves WordPress inside a
+ * cross-origin-isolated iframe controlled by a ServiceWorker that already sets
+ * Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy. Injecting a
+ * Document-Isolation-Policy header on top of that would move the document into
+ * a separate agent cluster and break Playground's parent/iframe messaging.
+ *
+ * @return bool True if running inside Playground.
+ */
+function gutenberg_is_playground(): bool {
+	if ( ! empty( $_SERVER['SERVER_SOFTWARE'] ) && false !== stripos( (string) $_SERVER['SERVER_SOFTWARE'], 'wasm' ) ) {
+		return true;
+	}
+
+	if ( defined( 'WP_ENVIRONMENT_TYPE' ) && 'playground' === WP_ENVIRONMENT_TYPE ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Returns the major Chromium version from the current request's User-Agent.
  *
  * Matches all Chromium-based browsers (Chrome, Edge, Opera, Brave).
@@ -331,6 +354,14 @@ function gutenberg_set_up_cross_origin_isolation() {
 	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
 	// may have added a filter to disable client-side media processing.
 	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+
+	// WordPress Playground is already cross-origin isolated via its ServiceWorker's
+	// COOP/COEP headers, so SharedArrayBuffer is available without DIP. Sending DIP
+	// would isolate the document into its own agent cluster and break Playground's
+	// parent/iframe communication.
+	if ( gutenberg_is_playground() ) {
 		return;
 	}
 
@@ -484,6 +515,13 @@ function gutenberg_add_crossorigin_attributes( string $html ): string {
  * could have assets loaded from a different domain.
  */
 function gutenberg_override_media_templates(): void {
+	// Playground does not need DIP, so the crossorigin attribute rewrite is
+	// unnecessary and would be skipped anyway — bail early to avoid the
+	// output buffer cost.
+	if ( gutenberg_is_playground() ) {
+		return;
+	}
+
 	remove_action( 'admin_footer', 'wp_print_media_templates' );
 	add_action(
 		'admin_footer',
