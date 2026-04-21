@@ -95,6 +95,12 @@ export const WithVisualAndBreadcrumbs: Story = {
 	},
 };
 
+/**
+ * Demonstrates that large images are constrained by the header visual styles.
+ *
+ * The `img` uses an empty `alt` because the visual region is hidden from assistive
+ * technologies and the page title carries the accessible name.
+ */
 export const WithImageVisual: Story = {
 	args: {
 		title: 'Page title',
