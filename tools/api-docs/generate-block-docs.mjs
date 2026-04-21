@@ -548,7 +548,10 @@ function getBlockType( files, blockJson ) {
  * @param {string} slug       Block slug without core/ prefix.
  * @param {Object} attributes Block attributes definition.
  * @param {string} blockType  'static', 'dynamic', or 'hybrid'.
- * @return {string} HTML block comment example.
+ * @return {string} HTML block comment example. Dynamic blocks with no
+ *                  attribute defaults render a `{ \/* attributes *\/ }`
+ *                  placeholder rather than a bare stub, to make the
+ *                  syntactic shape visible without fabricating values.
  */
 function generateBlockCommentExample( slug, attributes, blockType ) {
 	const exampleAttrs = {};
@@ -560,10 +563,14 @@ function generateBlockCommentExample( slug, attributes, blockType ) {
 		}
 	}
 
-	const attrsStr =
-		Object.keys( exampleAttrs ).length > 0
-			? ` ${ JSON.stringify( exampleAttrs ) }`
-			: '';
+	const hasAttrs = Object.keys( exampleAttrs ).length > 0;
+
+	let attrsStr = '';
+	if ( hasAttrs ) {
+		attrsStr = ` ${ JSON.stringify( exampleAttrs ) }`;
+	} else if ( blockType === 'dynamic' ) {
+		attrsStr = ' { /* attributes */ }';
+	}
 
 	if ( blockType === 'dynamic' ) {
 		return `<!-- wp:${ slug }${ attrsStr } /-->`;
