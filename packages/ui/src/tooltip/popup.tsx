@@ -8,7 +8,7 @@ import {
 import type { PopupProps } from './types';
 import { unlock } from '../lock-unlock';
 import { Portal } from './portal';
-import { renderPortalChildren } from '../utils/render-portal-children';
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
 
@@ -61,7 +61,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 		</Tooltip.Positioner>
 	);
 
-	return renderPortalChildren( portal, <Portal />, portalChildren );
+	return renderPortalWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

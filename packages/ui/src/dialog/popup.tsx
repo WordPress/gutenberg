@@ -8,7 +8,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
-import { renderPortalChildren } from '../utils/render-portal-children';
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DialogValidationProvider } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -24,7 +24,7 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
  * Uses a portal to render outside the DOM hierarchy.
  *
  * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
- * handled by `renderPortalChildren` (shared with other overlay `Popup`s).
+ * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
@@ -67,7 +67,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		</>
 	);
 
-	return renderPortalChildren( portal, <Portal />, portalChildren );
+	return renderPortalWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

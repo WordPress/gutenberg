@@ -20,7 +20,7 @@ type PortalMountElement = ReactElement< { children?: ReactNode } >;
  * @param defaultPortal Unpopulated default portal element (e.g. `<Dialog.Portal />`).
  * @param children      Popup subtree (backdrop, positioner, etc.) to inject as the portal’s children.
  */
-export function renderPortalChildren(
+export function renderPortalWithChildren(
 	portal: ReactElement | undefined,
 	defaultPortal: ReactElement,
 	children: ReactNode
