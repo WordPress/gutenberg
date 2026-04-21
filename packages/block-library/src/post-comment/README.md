@@ -53,6 +53,8 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 <!-- /wp:post-comment -->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__post-comment.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-comment/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

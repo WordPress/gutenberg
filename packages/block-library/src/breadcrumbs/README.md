@@ -59,6 +59,8 @@ In post content, it is stored as a block comment:
 <!-- wp:breadcrumbs {"prefersTaxonomy":false,"separator":"/","showHomeItem":true,"showCurrentItem":true,"showOnHomePage":false} /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__breadcrumbs.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/breadcrumbs/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

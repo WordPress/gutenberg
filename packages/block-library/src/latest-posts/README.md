@@ -64,6 +64,8 @@ In post content, it is stored as a block comment:
 <!-- wp:latest-posts {"postsToShow":5,"displayPostContent":false,"displayPostContentRadio":"excerpt","excerptLength":55,"displayAuthor":false,"displayPostDate":false,"postLayout":"list","columns":3,"order":"desc","orderBy":"date","displayFeaturedImage":false,"featuredImageSizeSlug":"thumbnail","featuredImageSizeWidth":null,"featuredImageSizeHeight":null,"addLinkToFeaturedImage":false} /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__latest-posts.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/latest-posts/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

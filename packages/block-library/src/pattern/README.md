@@ -37,6 +37,8 @@ In post content, it is stored as a block comment:
 <!-- wp:pattern { /* attributes */ } /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__pattern.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pattern/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))
