@@ -86,10 +86,10 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`dynamic-import\` sh
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`error\` should produce expected output 1`] = `
-"ERROR in ./index.js 5:0-23
+"ERROR in ./index.js 1:0-23
 Module not found: Error: Attempted to use WordPress script in a module: jquery, which is not supported yet.
 
-ERROR in ./index.js 6:23-55
+ERROR in ./index.js 3:23-55
 Module not found: Error: Attempted to use WordPress script in a module: @wordpress/api-fetch, which is not supported yet.
 "
 `;
@@ -335,7 +335,7 @@ exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin modules Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '363140026eaa9abcaf33', 'type' => 'module');
+"<?php return array('dependencies' => array('lodash', array('id' => '@wordpress/interactivity', 'import' => 'dynamic')), 'version' => '3004d92fa670e58cb987', 'type' => 'module');
 "
 `;
 
@@ -760,7 +760,7 @@ exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress\` should 
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts Webpack \`wordpress-interactivity\` should produce expected output: Asset file 'main.asset.php' should match snapshot 1`] = `
-"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => 'b16015e38aea0509f75f');
+"<?php return array('dependencies' => array('lodash', 'wp-interactivity'), 'version' => '5d6f3787a67ec0f2886d');
 "
 `;
 

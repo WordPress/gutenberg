@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { formDecorator } from './story-utils';
 import { ValidatedToggleControl } from '../toggle-control';
 
 const meta: Meta< typeof ValidatedToggleControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedToggleControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedToggleControl',
+	id: 'components-validatedtogglecontrol',
 	component: ValidatedToggleControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -34,10 +35,18 @@ export const Default: StoryObj< typeof ValidatedToggleControl > = {
 			<ValidatedToggleControl
 				{ ...args }
 				checked={ checked }
-				onChange={ ( value ) => {
-					setChecked( value );
-					onChange?.( value );
+				onChange={ ( newValue ) => {
+					setChecked( newValue );
+					onChange?.( newValue );
 				} }
+				customValidity={
+					checked
+						? {
+								type: 'invalid',
+								message: 'This toggle may not be enabled.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -46,10 +55,4 @@ Default.args = {
 	required: true,
 	label: 'Toggle',
 	help: 'This toggle may neither be enabled nor disabled.',
-	customValidator: ( value ) => {
-		if ( value ) {
-			return 'This toggle may not be enabled.';
-		}
-		return undefined;
-	},
 };

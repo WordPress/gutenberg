@@ -9,20 +9,36 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
+import { getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
+const EMPTY_OBJECT = {};
+
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
+ *
+ * Known Issue: Every-time state.undoManager changes, the getUndoManager
+ * private selector is called (if used within useSelect and things like that)
+ * which ensures the UI is always properly reactive. But, it's not the case with
+ * the custom "sync" undo manager.
+ *
+ * Assumption: When an undo/redo is created, other parts of the core-data state
+ * are likely changing simultaneously, which will trigger the selectors again.
+ *
+ * This issue is acceptable based on the assumption above.
+ *
+ * @see https://github.com/WordPress/gutenberg/pull/72407/files#r2580214235 for more details.
  *
  * @param state State tree.
  *
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
-	return state.undoManager;
+	// undoManager is undefined until the first sync-enabled entity is loaded.
+	return getSyncManager()?.undoManager ?? state.undoManager;
 }
 
 /**
@@ -156,13 +172,23 @@ export const getHomePage = createRegistrySelector( ( select ) =>
 			).getDefaultTemplateId( {
 				slug: 'front-page',
 			} );
-			// Still resolving getDefaultTemplateId.
-			if ( ! frontPageTemplateId ) {
-				return null;
+			if ( frontPageTemplateId ) {
+				return {
+					postType: 'wp_template',
+					postId: frontPageTemplateId,
+				};
 			}
-			return { postType: 'wp_template', postId: frontPageTemplateId };
+			// Resolution is finished and no front-page template exists.
+			if ( frontPageTemplateId === '' ) {
+				return EMPTY_OBJECT;
+			}
+			// Still resolving getDefaultTemplateId.
+			return null;
 		},
 		( state ) => [
+			// Even though getDefaultTemplateId.shouldInvalidate returns true when root/site changes,
+			// it doesn't seem to invalidate this cache, I'm not sure why.
+			getEntityRecord( state, 'root', 'site' ),
 			getEntityRecord( state, 'root', '__unstableBase' ),
 			getDefaultTemplateId( state, {
 				slug: 'front-page',
@@ -265,3 +291,59 @@ export const getTemplateId = createRegistrySelector(
 		} );
 	}
 );
+
+/**
+ * Returns the editor settings.
+ *
+ * @param state Data state.
+ * @return Editor settings object or null if not loaded.
+ */
+export function getEditorSettings(
+	state: State
+): Record< string, any > | null {
+	return state.editorSettings;
+}
+
+/**
+ * Returns the editor assets.
+ *
+ * @param state Data state.
+ * @return Editor assets object or null if not loaded.
+ */
+export function getEditorAssets( state: State ): Record< string, any > | null {
+	return state.editorAssets;
+}
+
+/**
+ * Returns whether collaboration is supported.
+ *
+ * @param state Data state.
+ * @return Whether collaboration is supported.
+ */
+export function isCollaborationSupported( state: State ): boolean {
+	return state.collaborationSupported;
+}
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string
+): Record< string, any > | undefined {
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+			form: undefined,
+		}
+	);
+}

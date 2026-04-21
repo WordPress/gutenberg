@@ -42,6 +42,39 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
+### ariaKeyShortcut
+
+An object that contains functions to get shortcuts in a format compatible with the [`aria-keyshortcuts` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts).
+
+**Note**: The provided shortcut character strings (ie. not the modifiers) should follow the values specified in the [UI Events KeyboardEvent key Values spec](https://www.w3.org/TR/uievents-key/) — for example, "Enter", "Tab", "ArrowRight", "PageDown", "Escape", "Plus", or "F1". The spacebar key should be represented with the "Space" string (an exception to the UI Events KeyboardEvent key Values spec).
+
+_Related_
+
+-   <https://www.w3.org/TR/wai-aria-1.2/#aria-keyshortcuts>
+-   <https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Reference/Attributes/aria-keyshortcuts>
+-   <https://www.w3.org/TR/uievents-key/>
+
+_Usage_
+
+```js
+// Assuming macOS:
+ariaKeyShortcut.primary( 'm' );
+// "Meta+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Meta+Alt+M"
+
+// Assuming Windows:
+ariaKeyShortcut.primary( 'm' );
+// "Control+M"
+
+ariaKeyShortcut.primaryAlt( 'm' );
+// "Control+Alt+M"
+
+ariaKeyShortcut.primaryShift( 'del' );
+// "Control+Shift+Delete"
+```
+
 ### BACKSPACE
 
 Keycode for BACKSPACE key.
@@ -167,7 +200,7 @@ _Usage_
 ```js
 // Assuming macOS:
 rawShortcut.primary( 'm' );
-// "meta+m""
+// "meta+m"
 ```
 
 ### RIGHT

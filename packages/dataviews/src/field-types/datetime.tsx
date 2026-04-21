@@ -1,18 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	SortDirection,
-	NormalizedField,
-	FieldTypeDefinition,
-} from '../types';
-import { renderFromElements } from '../utils';
+import type { FormatDatetime, NormalizedField, SortDirection } from '../types';
+import type { FieldType } from '../types/private';
+import isValidElements from './utils/is-valid-elements';
 import {
 	OPERATOR_ON,
 	OPERATOR_NOT_ON,
@@ -23,56 +19,77 @@ import {
 	OPERATOR_IN_THE_PAST,
 	OPERATOR_OVER,
 } from '../constants';
+import isValidRequired from './utils/is-valid-required';
+import { isValidMaxDate, isValidMinDate } from './utils/is-valid-date-boundary';
+import render from './utils/render-default';
 
-function sort( a: any, b: any, direction: SortDirection ) {
+const format = {
+	datetime: getSettings().formats.datetime,
+	weekStartsOn: getSettings().l10n.startOfWeek,
+};
+
+function getValueFormatted< Item >( {
+	item,
+	field,
+}: {
+	item: Item;
+	field: NormalizedField< Item >;
+} ): string {
+	const value = field.getValue( { item } );
+	if ( [ '', undefined, null ].includes( value ) ) {
+		return '';
+	}
+
+	let formatDatetime: Required< FormatDatetime >;
+	if ( field.type !== 'datetime' ) {
+		formatDatetime = format;
+	} else {
+		formatDatetime = field.format as Required< FormatDatetime >;
+	}
+
+	return dateI18n( formatDatetime.datetime, getDate( value ) );
+}
+
+const sort = ( a: any, b: any, direction: SortDirection ) => {
 	const timeA = new Date( a ).getTime();
 	const timeB = new Date( b ).getTime();
 
 	return direction === 'asc' ? timeA - timeB : timeB - timeA;
-}
+};
 
 export default {
-	sort,
-	isValid: {
-		custom: ( item: any, field: NormalizedField< any > ) => {
-			const value = field.getValue( { item } );
-			if ( field?.elements ) {
-				const validValues = field.elements.map( ( f ) => f.value );
-				if ( ! validValues.includes( value ) ) {
-					return __( 'Value must be one of the elements.' );
-				}
-			}
-
-			return null;
-		},
-	},
+	type: 'datetime',
+	render,
 	Edit: 'datetime',
-	render: ( { item, field }: DataViewRenderFieldProps< any > ) => {
-		return field.elements
-			? renderFromElements( { item, field } )
-			: field.getValue( { item } );
-	},
+	sort,
 	enableSorting: true,
-	filterBy: {
-		defaultOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-		],
-		validOperators: [
-			OPERATOR_ON,
-			OPERATOR_NOT_ON,
-			OPERATOR_BEFORE,
-			OPERATOR_AFTER,
-			OPERATOR_BEFORE_INC,
-			OPERATOR_AFTER_INC,
-			OPERATOR_IN_THE_PAST,
-			OPERATOR_OVER,
-		],
+	enableGlobalSearch: false,
+	defaultOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	validOperators: [
+		OPERATOR_ON,
+		OPERATOR_NOT_ON,
+		OPERATOR_BEFORE,
+		OPERATOR_AFTER,
+		OPERATOR_BEFORE_INC,
+		OPERATOR_AFTER_INC,
+		OPERATOR_IN_THE_PAST,
+		OPERATOR_OVER,
+	],
+	format,
+	getValueFormatted,
+	validate: {
+		required: isValidRequired,
+		elements: isValidElements,
+		min: isValidMinDate,
+		max: isValidMaxDate,
 	},
-} satisfies FieldTypeDefinition< any >;
+} satisfies FieldType< any >;

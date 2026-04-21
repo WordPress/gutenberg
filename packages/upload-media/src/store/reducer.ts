@@ -2,22 +2,32 @@
  * Internal dependencies
  */
 import {
+	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
 	type CancelAction,
+	ItemStatus,
 	type OperationFinishAction,
 	type OperationStartAction,
+	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
 	type RemoveAction,
+	type ResumeItemAction,
 	type ResumeQueueAction,
+	type RetryItemAction,
 	type RevokeBlobUrlsAction,
 	type State,
 	Type,
 	type UnknownAction,
+	type UpdateProgressAction,
 	type UpdateSettingsAction,
 } from './types';
+import {
+	DEFAULT_MAX_CONCURRENT_UPLOADS,
+	DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
+} from './constants';
 
 const noop = () => {};
 
@@ -27,13 +37,19 @@ const DEFAULT_STATE: State = {
 	blobUrls: {},
 	settings: {
 		mediaUpload: noop,
+		maxConcurrentUploads: DEFAULT_MAX_CONCURRENT_UPLOADS,
+		maxConcurrentImageProcessing: DEFAULT_MAX_CONCURRENT_IMAGE_PROCESSING,
 	},
 };
 
 type Action =
+	| AccumulateSubSizeAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
+	| RetryItemAction
+	| PauseItemAction
+	| ResumeItemAction
 	| PauseQueueAction
 	| ResumeQueueAction
 	| AddOperationsAction
@@ -41,6 +57,7 @@ type Action =
 	| OperationStartAction
 	| CacheBlobUrlAction
 	| RevokeBlobUrlsAction
+	| UpdateProgressAction
 	| UpdateSettingsAction
 	| UnknownAction;
 
@@ -63,6 +80,34 @@ function reducer(
 			};
 		}
 
+		case Type.PauseItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Paused,
+							  }
+							: item
+				),
+			};
+
+		case Type.ResumeItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Processing,
+							  }
+							: item
+				),
+			};
+
 		case Type.Add:
 			return {
 				...state,
@@ -78,6 +123,22 @@ function reducer(
 							? {
 									...item,
 									error: action.error,
+							  }
+							: item
+				),
+			};
+
+		case Type.RetryItem:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									status: ItemStatus.Processing,
+									error: undefined,
+									retryCount: ( item.retryCount ?? 0 ) + 1,
 							  }
 							: item
 				),
@@ -177,6 +238,37 @@ function reducer(
 				blobUrls: newBlobUrls,
 			};
 		}
+
+		case Type.UpdateProgress:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									progress: action.progress,
+							  }
+							: item
+				),
+			};
+
+		case Type.AccumulateSubSize:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									subSizes: [
+										...( item.subSizes || [] ),
+										action.subSize,
+									],
+							  }
+							: item
+				),
+			};
 
 		case Type.UpdateSettings: {
 			return {

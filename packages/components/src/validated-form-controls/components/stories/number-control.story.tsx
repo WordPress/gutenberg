@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -15,7 +15,8 @@ import { ValidatedNumberControl } from '../number-control';
 import { formDecorator } from './story-utils';
 
 const meta: Meta< typeof ValidatedNumberControl > = {
-	title: 'Components (Experimental)/Validated Form Controls/ValidatedNumberControl',
+	title: 'Components/Selection & Input/Validated Form Controls/ValidatedNumberControl',
+	id: 'components-validatednumbercontrol',
 	component: ValidatedNumberControl,
 	tags: [ 'status-private' ],
 	decorators: formDecorator,
@@ -41,10 +42,18 @@ export const Default: StoryObj< typeof ValidatedNumberControl > = {
 			<ValidatedNumberControl
 				{ ...args }
 				value={ value }
-				onChange={ ( newValue, ...rest ) => {
+				onChange={ ( newValue, extra ) => {
 					setValue( newValue );
-					onChange?.( newValue, ...rest );
+					onChange?.( newValue, extra );
 				} }
+				customValidity={
+					value && parseInt( value.toString(), 10 ) % 2 !== 0
+						? {
+								type: 'invalid',
+								message: 'Choose an even number.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},
@@ -53,10 +62,4 @@ Default.args = {
 	required: true,
 	label: 'Number',
 	help: 'Odd numbers are not allowed.',
-	customValidator: ( value ) => {
-		if ( value && parseInt( value.toString(), 10 ) % 2 !== 0 ) {
-			return 'Choose an even number.';
-		}
-		return undefined;
-	},
 };

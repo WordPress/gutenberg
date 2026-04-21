@@ -1,0 +1,28 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.dataforms-layouts-card__field {
+	width: 100%;
+}
+
+.dataforms-layouts-card__field-header-content {
+	min-height: 24px; // TODO: use size / height DS token when available
+}
+
+.dataforms-layouts-card__field-header-content-description {
+	display: contents;
+}
+
+.dataforms-layouts-card__field-description {
+	color: $gray-700;
+	display: block;
+	font-size: $font-size-medium;
+	margin-bottom: $grid-unit-20;
+}
+
+.dataforms-layouts-card__field-summary {
+	display: flex;
+	flex-direction: row;
+	gap: $grid-unit-20;
+	align-items: center;
+}

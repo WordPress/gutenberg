@@ -291,6 +291,7 @@ function ComplementaryArea( {
 					target={ name }
 					scope={ scope }
 					icon={ icon }
+					identifier={ identifier }
 				>
 					{ title }
 				</ComplementaryAreaMoreMenuItem>

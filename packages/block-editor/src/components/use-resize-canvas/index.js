@@ -29,12 +29,17 @@ export default function useResizeCanvas( deviceType ) {
 	const getCanvasWidth = ( device ) => {
 		let deviceWidth;
 
+		/*
+		 * Matches the breakpoints in packages/base-styles/_breakpoints.scss,
+		 * and breakpoints in packages/compose/src/hooks/use-viewport-match/index.js.
+		 * minus 1 to trigger the media query for device preview.
+		 */
 		switch ( device ) {
 			case 'Tablet':
-				deviceWidth = 780;
+				deviceWidth = 782 - 1; // preview for useViewportMatch( 'medium', '<' )
 				break;
 			case 'Mobile':
-				deviceWidth = 360;
+				deviceWidth = 480 - 1; // preview for useViewportMatch( 'mobile', '<' )
 				break;
 			default:
 				return null;

@@ -15,10 +15,10 @@ import type {
 	View,
 	Action,
 	NormalizedField,
-	SupportedLayouts,
+	NormalizedSupportedLayouts,
 	NormalizedFilter,
 } from '../../types';
-import type { SetSelection } from '../../private-types';
+import type { SetSelection } from '../../types/private';
 import { LAYOUT_TABLE } from '../../constants';
 
 type DataViewsContextType< Item > = {
@@ -50,12 +50,16 @@ type DataViewsContextType< Item > = {
 	resizeObserverRef:
 		| ( ( element?: HTMLDivElement | null ) => void )
 		| React.RefObject< HTMLDivElement >;
-	defaultLayouts: SupportedLayouts;
+	defaultLayouts: NormalizedSupportedLayouts;
 	filters: NormalizedFilter[];
 	isShowingFilter: boolean;
 	setIsShowingFilter: ( value: boolean ) => void;
-	perPageSizes: number[];
+	config: { perPageSizes: number[] };
 	empty?: ReactNode;
+	hasInitiallyLoaded?: boolean;
+	itemListLabel?: string;
+	onReset?: ( () => void ) | false;
+	intersectionObserver?: IntersectionObserver | null;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -81,7 +85,13 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	filters: [],
 	isShowingFilter: false,
 	setIsShowingFilter: () => {},
-	perPageSizes: [],
+	hasInitiallyLoaded: false,
+	config: {
+		perPageSizes: [],
+	},
+	intersectionObserver: null,
 } );
+
+DataViewsContext.displayName = 'DataViewsContext';
 
 export default DataViewsContext;

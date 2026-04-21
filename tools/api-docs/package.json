@@ -1,0 +1,42 @@
+{
+	"name": "@wordpress/api-docs-generator",
+	"version": "0.0.0",
+	"description": "Tools for generating Gutenberg API documentation.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"api-docs"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/api-docs",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/api-docs"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"devDependencies": {
+		"@apidevtools/json-schema-ref-parser": "^11.6.4",
+		"@babel/core": "^7.25.7",
+		"chalk": "^4.1.1",
+		"comment-parser": "^1.1.1",
+		"execa": "^4.0.2",
+		"fast-glob": "^3.2.7",
+		"glob": "^7.1.2",
+		"json2md": "^2.0.1",
+		"react-docgen-typescript": "^2.2.2"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"docs:api-ref": "node ./update-api-docs.js",
+		"docs:blocks": "node ./gen-block-lib-list.js",
+		"docs:components": "node ./gen-components-docs/index.mjs",
+		"docs:theme-ref": "node ./gen-theme-reference.mjs"
+	}
+}

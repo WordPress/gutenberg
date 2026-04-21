@@ -47,11 +47,11 @@ const defaultProps = {
 };
 
 const ControlledCustomSelectControl = ( props: CustomSelectProps ) => {
-	const [ value, setValue ] = useState< string | string[] >();
+	const [ value, setValue ] = useState< string | readonly string[] >();
 	return (
 		<UncontrolledCustomSelectControlV2
 			{ ...props }
-			onChange={ ( nextValue: string | string[] ) => {
+			onChange={ ( nextValue ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
@@ -375,7 +375,7 @@ describe.each( [
 	} );
 
 	it( 'Should allow rendering a custom value when using `renderSelectedValue`', async () => {
-		const renderValue = ( value: string | string[] ) => {
+		const renderValue = ( value: string | readonly string[] ) => {
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 

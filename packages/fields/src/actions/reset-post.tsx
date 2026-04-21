@@ -25,6 +25,12 @@ import apiFetch from '@wordpress/api-fetch';
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
 import type { CoreDataError, Template, TemplatePart } from '../types';
 
+declare global {
+	interface Window {
+		__experimentalTemplateActivate?: boolean;
+	}
+}
+
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
 ) => {
@@ -179,6 +185,15 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	id: 'reset-post',
 	label: __( 'Reset' ),
 	isEligible: ( item ) => {
+		if ( window?.__experimentalTemplateActivate ) {
+			return (
+				item.type === 'wp_template_part' &&
+				item?.source === 'custom' &&
+				item?.has_theme_file
+			);
+		}
+
+		// When experiment is disabled: use wp/6.9 logic for both templates and template parts.
 		return (
 			isTemplateOrTemplatePart( item ) &&
 			item?.source === 'custom' &&

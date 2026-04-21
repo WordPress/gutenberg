@@ -215,6 +215,30 @@ describe( 'NavigableMenu', () => {
 		expect( externalWrapperOnKeyDownSpy ).toHaveBeenCalledTimes( 2 );
 	} );
 
+	it( 'should keep forwarded callback refs stable across rerenders', () => {
+		const refSpy = jest.fn();
+
+		const { rerender } = render(
+			<NavigableMenu ref={ refSpy }>
+				<button>Item 1</button>
+			</NavigableMenu>
+		);
+
+		expect( refSpy ).toHaveBeenCalledTimes( 1 );
+		expect( refSpy ).toHaveBeenCalledWith( expect.any( HTMLElement ) );
+
+		rerender(
+			<NavigableMenu ref={ refSpy }>
+				<button>Item 1</button>
+			</NavigableMenu>
+		);
+
+		// With a stable merged ref (useMergeRefs), the callback ref should
+		// not be called again on rerender. Previously, an inline ref callback
+		// would cause React to detach (null) and reattach on every render.
+		expect( refSpy ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'skips its internal logic when the tab key is pressed', async () => {
 		const user = userEvent.setup();
 
