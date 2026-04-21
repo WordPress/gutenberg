@@ -14,10 +14,10 @@ import {
 	checkDeps,
 	collectDeps,
 	readPackageJson,
-} from '../packages/scripts/utils/license.js';
+} from '../../packages/scripts/utils/license.js';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
-const ROOT_DIR = path.resolve( __dirname, '..' );
+const ROOT_DIR = path.resolve( __dirname, '../..' );
 
 /*
  * This script checks licenses for production dependencies of packages that are

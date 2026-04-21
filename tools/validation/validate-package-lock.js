@@ -18,7 +18,7 @@ const { red, yellow } = require( 'chalk' );
  */
 // Ignore reason: `package-lock.json` exists outside `bin` `rootDir`.
 // @ts-ignore
-const packageLock = require( '../package-lock' );
+const packageLock = require( '../../package-lock' );
 
 const dependencies = Object.entries( packageLock.packages );
 for ( const [ name, dependency ] of dependencies ) {
