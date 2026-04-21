@@ -341,7 +341,7 @@ export function getPostChangesFromCRDTDoc(
 
 				case 'meta': {
 					const currentMeta =
-						( currentValue as PostChanges[ 'meta' ] ) ?? {};
+						( currentValue ?? {} ) as PostChanges[ 'meta' ];
 
 					allowedMetaChanges = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
