@@ -1,11 +1,14 @@
-import type { ReactNode } from 'react';
-import type { Tooltip } from '@base-ui/react/tooltip';
+import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
+import type { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
+
 import type { ComponentProps } from '../utils/types';
 
-export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
+export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
+
+export type RootProps = Pick< _Tooltip.Root.Props, 'disabled' | 'children' >;
 
 export type ProviderProps = Pick<
-	Tooltip.Provider.Props,
+	_Tooltip.Provider.Props,
 	'delay' | 'children'
 >;
 
@@ -18,14 +21,17 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 
 export interface PopupProps
 	extends ComponentProps< 'div' >,
-		Pick< Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
+		Pick< _Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Tooltip.Portal />` with custom
+	 * `container`. When omitted, `Tooltip.Popup` uses `Tooltip.Portal` with
+	 * default props. Do not pass `children` on the portal element; they would
+	 * be ignored.
 	 */
-	container?: Tooltip.Portal.Props[ 'container' ];
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 }

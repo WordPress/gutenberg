@@ -34,6 +34,8 @@
 	}
 
 	.popup {
+		--_viewport-inset: var(--wpds-dimension-padding-2xl);
+
 		position: fixed;
 		top: 50%;
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
@@ -42,8 +44,8 @@
 		transform: translate(-50%, -50%);
 		box-sizing: border-box;
 		min-width: var(--wpds-dimension-surface-width-sm);
-		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
-		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
+		width: calc(100vw - 2 * var(--_viewport-inset));
+		max-height: calc(100dvh - 2 * var(--_viewport-inset));
 		padding: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);
@@ -98,7 +100,7 @@
 			 * Force full height (full width is already in default styles).
 			 * The max-{width,height} properties will make sure some padding is shown.
 			 */
-			height: 100vh;
+			height: 100dvh;
 		}
 	}
 
@@ -119,6 +121,11 @@
 		&:dir(rtl) {
 			--_gcd-heading-margin: 0 0 0 auto;
 		}
+	}
+
+	.description {
+		margin-bottom: var(--wpds-dimension-gap-lg);
+		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 
 	.footer {

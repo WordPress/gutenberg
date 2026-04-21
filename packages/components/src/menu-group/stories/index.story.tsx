@@ -16,6 +16,7 @@ import MenuItem from '../../menu-item';
 import MenuItemsChoice from '../../menu-items-choice';
 
 const meta: Meta< typeof MenuGroup > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Actions/MenuGroup',
 	component: MenuGroup,
 	id: 'components-menugroup',

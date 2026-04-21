@@ -337,16 +337,6 @@ export function getShowStylebook( state ) {
 }
 
 /**
- * Get the canvas minimum height.
- *
- * @param {Object} state Global application state.
- * @return {number} The canvas minimum height.
- */
-export function getCanvasMinHeight( state ) {
-	return state.canvasMinHeight;
-}
-
-/**
  * Returns whether the editor is in revisions preview mode.
  *
  * @param {Object} state Global application state.
