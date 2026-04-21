@@ -40,7 +40,10 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	}
 
 	/**
-	 * Storage for script module translation data.
+	 * Storage for text-domain overrides for specific script modules.
+	 *
+	 * Only populated when a caller explicitly overrides the text domain for a
+	 * module via wp_set_script_module_translations().
 	 *
 	 * @var array<string, array{domain: string, path: string}>
 	 */
@@ -48,17 +51,19 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	$gutenberg_script_module_translations = array();
 
 	/**
-	 * Sets translated strings for a script module.
+	 * Overrides the text domain and path used to load translations for a script module.
 	 *
-	 * Works similar to wp_set_script_translations() but for script modules
-	 * registered via wp_register_script_module().
+	 * Translations for script modules are loaded automatically from the default
+	 * text domain. This function is only needed when a module's text domain
+	 * differs from 'default' or when translation files live outside the
+	 * standard location.
 	 *
 	 * @since X.X.X
 	 *
 	 * @param string $id     The identifier of the script module.
 	 * @param string $domain Optional. Text domain. Default 'default'.
 	 * @param string $path   Optional. The full file path to the directory containing translation files.
-	 * @return bool True if the text domain was successfully localized, false otherwise.
+	 * @return bool True if the text domain was registered, false if the module is not registered.
 	 */
 	function wp_set_script_module_translations( string $id, string $domain = 'default', string $path = '' ): bool {
 		global $gutenberg_script_module_translations;
@@ -77,29 +82,46 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	}
 
 	/**
-	 * Prints translations for all enqueued script modules that have translations set.
+	 * Prints translations for all enqueued script modules.
+	 *
+	 * Auto-detects the text domain for each enqueued module. Callers can opt
+	 * into a non-default text domain via wp_set_script_module_translations().
 	 *
 	 * @since X.X.X
 	 */
 	function gutenberg_print_script_module_translations() {
 		global $gutenberg_script_module_translations;
 
-		if ( empty( $gutenberg_script_module_translations ) ) {
-			return;
-		}
-
-		$queue = wp_script_modules()->get_queue();
+		$script_modules = wp_script_modules();
+		$queue          = $script_modules->get_queue();
 		if ( empty( $queue ) ) {
 			return;
 		}
 
-		foreach ( $gutenberg_script_module_translations as $id => $data ) {
-			$json_translations = load_script_module_textdomain( $id, $data['domain'], $data['path'] );
+		// Collect enqueued modules and their static/dynamic dependencies.
+		$module_ids = array();
+		$reflection = new ReflectionClass( $script_modules );
+		if ( $reflection->hasMethod( 'get_sorted_dependencies' ) ) {
+			$method = $reflection->getMethod( 'get_sorted_dependencies' );
+			$method->setAccessible( true );
+			$module_ids = $method->invoke( $script_modules, $queue );
+		} else {
+			$module_ids = $queue;
+		}
+
+		foreach ( $module_ids as $id ) {
+			if ( isset( $gutenberg_script_module_translations[ $id ] ) ) {
+				$domain = $gutenberg_script_module_translations[ $id ]['domain'];
+				$path   = $gutenberg_script_module_translations[ $id ]['path'];
+			} else {
+				$domain = 'default';
+				$path   = '';
+			}
+
+			$json_translations = load_script_module_textdomain( $id, $domain, $path );
 			if ( ! $json_translations ) {
 				continue;
 			}
-
-			$domain = $data['domain'];
 
 			$set_locale_data_js_function = <<<JS
 			( domain, translations ) => {

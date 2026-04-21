@@ -62,15 +62,6 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$content_asset['module_dependencies'] ?? array(),
 					$content_asset['version'] ?? false
 				);
-
-				// Set up translations if the module uses wp-i18n.
-				if (
-					function_exists( 'wp_set_script_module_translations' ) &&
-					isset( $content_asset['dependencies'] ) &&
-					in_array( 'wp-i18n', $content_asset['dependencies'], true )
-				) {
-					wp_set_script_module_translations( $content_handle, 'default' );
-				}
 			}
 		}
 
@@ -90,15 +81,6 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$route_asset['module_dependencies'] ?? array(),
 					$route_asset['version'] ?? false
 				);
-
-				// Set up translations if the module uses wp-i18n.
-				if (
-					function_exists( 'wp_set_script_module_translations' ) &&
-					isset( $route_asset['dependencies'] ) &&
-					in_array( 'wp-i18n', $route_asset['dependencies'], true )
-				) {
-					wp_set_script_module_translations( $route_handle, 'default' );
-				}
 			}
 		}
 
