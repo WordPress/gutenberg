@@ -113,7 +113,10 @@ function getBlockManifest( jsonPaths, catPaths ) {
 		const category = path
 			.basename( filePath, '.md' )
 			.replace( 'category-', '' );
-		const content = fs.readFileSync( filePath, 'utf8' );
+		const content = fs.readFileSync(
+			join( __dirname, '..', '..', filePath ),
+			'utf8'
+		);
 		const titleMatch = content.match( /^#\s(.+)$/m );
 		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( category );
 		manifest.push( {
