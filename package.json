@@ -144,7 +144,7 @@
 		"docs:api-ref": "npm run --workspace @wordpress/api-docs-generator docs:api-ref",
 		"docs:blocks": "npm run --workspace @wordpress/api-docs-generator docs:blocks",
 		"docs:blocks-detail": "npm run --workspace @wordpress/api-docs-generator docs:blocks-detail",
-		"docs:build": "npm-run-all docs:components docs:gen docs:blocks docs:blocks-detail docs:api-ref docs:theme-ref",
+		"docs:build": "npm-run-all docs:components docs:blocks docs:blocks-detail docs:api-ref docs:theme-ref docs:gen",
 		"docs:check-api-docs-unstaged": "node ./tools/api-docs/are-api-docs-unstaged.js",
 		"docs:components": "npm run --workspace @wordpress/api-docs-generator docs:components",
 		"docs:gen": "node ./docs/tool/index.js",
