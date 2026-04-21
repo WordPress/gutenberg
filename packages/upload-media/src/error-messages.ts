@@ -193,36 +193,3 @@ export function getErrorMessage(
 		}
 	);
 }
-
-/**
- * Gets a short retry message for displaying retry status.
- *
- * @param retryCount The current retry attempt number.
- * @param maxRetries The maximum number of retries allowed.
- * @return A localized message about the retry attempt.
- */
-export function getRetryMessage(
-	retryCount: number,
-	maxRetries: number
-): string {
-	return sprintf(
-		/* translators: 1: current attempt number, 2: maximum attempts */
-		__( 'Retrying\u2026 (attempt %1$d of %2$d)' ),
-		retryCount,
-		maxRetries
-	);
-}
-
-/**
- * Gets a message indicating that all retries have been exhausted.
- *
- * @param maxRetries The maximum number of retries that were attempted.
- * @return A localized message about exhausted retries.
- */
-export function getMaxRetriesExceededMessage( maxRetries: number ): string {
-	return sprintf(
-		/* translators: %d: number of retry attempts */
-		__( 'Upload failed after %d attempts.' ),
-		maxRetries
-	);
-}
