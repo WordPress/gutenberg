@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 // `className` on `<Modal>` is applied to `.components-modal__frame`, so the
@@ -48,18 +49,37 @@
 		}
 	}
 
-	// Match the editor's right sidebar width and let inner panels handle
-	// their own spacing so the chrome feels identical to the full editor.
+	// Matches the post editor's `.editor-sidebar` container (see
+	// `packages/editor/src/components/sidebar/style.scss`): `@include reset`
+	// sets `box-sizing: border-box` and makes all descendants inherit it.
+	// Without this, descendants (notably the active-tab underline inside
+	// `<Tabs>`) fall back to `content-box` sizing that shortens the
+	// indicator under the selected tab label.
 	.media-editor-modal__sidebar {
-		width: $sidebar-width;
-		height: 100%;
-		overflow-y: auto;
-		background: $white;
+		@include reset;
 	}
 
 	// Mirror the editor's `PostPanelSection` padding for tab body content,
 	// so the form inside the Details tab has breathing room.
 	.media-editor-modal__panel {
 		padding: $grid-unit-20;
+	}
+
+	// Match the post editor's sidebar header treatment
+	// (see `packages/editor/src/components/sidebar/style.scss`): when the tab
+	// list is rendered as `ComplementaryArea`'s header, zero the default
+	// panel-header padding so tabs sit flush to the edge and the active-tab
+	// underline can span the full tab label width.
+	.components-panel__header.media-editor-modal__sidebar-header {
+		padding-left: 0;
+		padding-right: $grid-unit-10;
+
+		.components-button.has-icon {
+			padding: 0;
+
+			@include break-medium() {
+				display: flex;
+			}
+		}
 	}
 }

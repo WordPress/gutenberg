@@ -11,11 +11,23 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { __, isRTL } from '@wordpress/i18n';
-import { drawerLeft, drawerRight } from '@wordpress/icons';
-import { InterfaceSkeleton } from '@wordpress/interface';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { drawerRight } from '@wordpress/icons';
 import type { Field } from '@wordpress/dataviews';
+import {
+	ComplementaryArea,
+	InterfaceSkeleton,
+	PinnedItems,
+	// No type declarations available for @wordpress/interface.
+	// @ts-expect-error
+} from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -45,6 +57,52 @@ interface ModalTab {
 	panel: JSX.Element;
 }
 
+// Renders the `ComplementaryArea` with a tab list in its header, mirroring
+// the post editor's pattern in
+// `packages/editor/src/components/sidebar/index.js`. The `header` prop
+// replaces `ComplementaryArea`'s default `<h2>{ title }</h2>` row — `title`
+// is still passed so it can label the pinned toolbar button. Tabs context
+// must be re-provided on both sides of the Slot/Fill because the Fill
+// doesn't preserve the Tabs React context across to the Slot.
+function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
+	const tabsContextValue = useContext( Tabs.Context );
+	return (
+		<ComplementaryArea
+			scope="media-editor"
+			identifier="media-editor/details"
+			title={ __( 'Details' ) }
+			icon={ drawerRight }
+			isActiveByDefault
+			className="media-editor-modal__sidebar"
+			panelClassName="media-editor-modal__sidebar-panel"
+			headerClassName="media-editor-modal__sidebar-header"
+			header={
+				<Tabs.Context.Provider value={ tabsContextValue }>
+					<Tabs.TabList>
+						{ tabs.map( ( tab ) => (
+							<Tabs.Tab key={ tab.id } tabId={ tab.id }>
+								{ tab.title }
+							</Tabs.Tab>
+						) ) }
+					</Tabs.TabList>
+				</Tabs.Context.Provider>
+			}
+		>
+			<Tabs.Context.Provider value={ tabsContextValue }>
+				{ tabs.map( ( tab ) => (
+					<Tabs.TabPanel
+						key={ tab.id }
+						tabId={ tab.id }
+						focusable={ false }
+					>
+						{ tab.panel }
+					</Tabs.TabPanel>
+				) ) }
+			</Tabs.Context.Provider>
+		</ComplementaryArea>
+	);
+}
+
 export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	const { isOpen, attachmentId, onUpdate } = useSelect( ( select ) => {
 		const s = select( mediaEditorStore );
@@ -71,7 +129,6 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
-	const [ isSidebarOpen, setIsSidebarOpen ] = useState( true );
 	const [ isSaving, setIsSaving ] = useState( false );
 
 	// Snapshot the original values for fields the modal edits, so Cancel can
@@ -149,27 +206,6 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		}
 	};
 
-	const sidebarContent = (
-		<Tabs>
-			<Tabs.TabList>
-				{ tabs.map( ( tab ) => (
-					<Tabs.Tab key={ tab.id } tabId={ tab.id }>
-						{ tab.title }
-					</Tabs.Tab>
-				) ) }
-			</Tabs.TabList>
-			{ tabs.map( ( tab ) => (
-				<Tabs.TabPanel
-					key={ tab.id }
-					tabId={ tab.id }
-					focusable={ false }
-				>
-					{ tab.panel }
-				</Tabs.TabPanel>
-			) ) }
-		</Tabs>
-	);
-
 	const headerActions = (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -177,15 +213,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 			expanded={ false }
 			gap={ 2 }
 		>
-			<Button
-				size="compact"
-				icon={ isRTL() ? drawerLeft : drawerRight }
-				label={
-					isSidebarOpen ? __( 'Close panel' ) : __( 'Open panel' )
-				}
-				isPressed={ isSidebarOpen }
-				onClick={ () => setIsSidebarOpen( ( open ) => ! open ) }
-			/>
+			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
 				variant="tertiary"
@@ -221,6 +249,9 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 				onChange={ handleChange }
 				settings={ { fields } }
 			>
+				<Tabs>
+					<MediaEditorModalSidebar tabs={ tabs } />
+				</Tabs>
 				<InterfaceSkeleton
 					className="media-editor-modal__skeleton"
 					content={
@@ -228,13 +259,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 							{ media ? <MediaPreview /> : <Spinner /> }
 						</div>
 					}
-					sidebar={
-						isSidebarOpen ? (
-							<div className="media-editor-modal__sidebar">
-								{ sidebarContent }
-							</div>
-						) : null
-					}
+					sidebar={ <ComplementaryArea.Slot scope="media-editor" /> }
 				/>
 			</MediaEditorProvider>
 		</Modal>
