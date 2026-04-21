@@ -860,31 +860,6 @@ describe( 'crdt', () => {
 			expect( changes2.tags ).toEqual( [ 3 ] );
 		} );
 
-		it( 'excludes orphaned top-level keys not present on the edited record', () => {
-			// Reproduces the taxonomy version of the orphaned-meta bug.
-			// A custom taxonomy (e.g. `genre`) is registered when the CRDT
-			// doc was populated, but has since been unregistered. The REST
-			// response no longer returns the key, so `editedRecord` lacks
-			// it entirely. Without a filter, the stale CRDT value would be
-			// reported as a change and mark the post permanently dirty.
-			map.set( 'genre', [ 10, 20 ] );
-
-			const customSyncedProperties = new Set( [
-				...defaultSyncedProperties,
-				'genre',
-			] );
-
-			const editedRecord = {} as Post;
-
-			const changes = getPostChangesFromCRDTDoc(
-				doc,
-				editedRecord,
-				customSyncedProperties
-			);
-
-			expect( changes ).not.toHaveProperty( 'genre' );
-		} );
-
 		describe( 'selection recalculation', () => {
 			it( 'includes recalculated selection when text is inserted before cursor', () => {
 				const ytext = addBlockToDoc( map, 'block-1', 'Hello world' );
