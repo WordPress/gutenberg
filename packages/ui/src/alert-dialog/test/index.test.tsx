@@ -1453,8 +1453,8 @@ describe( 'AlertDialog', () => {
 		} );
 	} );
 
-	describe( 'container', () => {
-		it( 'should render inside the container when provided', async () => {
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
 
@@ -1468,7 +1468,11 @@ describe( 'AlertDialog', () => {
 						/>
 						<AlertDialog.Popup
 							title="Confirm"
-							container={ containerRef }
+							portal={
+								<AlertDialog.Portal
+									container={ containerRef }
+								/>
+							}
 						/>
 					</AlertDialog.Root>
 				</div>

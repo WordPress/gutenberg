@@ -40,7 +40,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingBoard, useFloatingThread } from './hooks';
+import { useFloatingBoard } from './hooks';
 import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -174,13 +174,13 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	const { boardOffsets, registerThread, unregisterThread } = useFloatingBoard(
-		{
+	const { notePositions, registerThread, unregisterThread } =
+		useFloatingBoard( {
 			threads,
 			selectedNoteId: selectedNote,
 			isFloating,
-		}
-	);
+			commentSidebarRef,
+		} );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -278,8 +278,7 @@ export function Comments( {
 					floating={
 						isFloating
 							? {
-									calculatedOffset:
-										boardOffsets[ thread.id ] ?? 0,
+									y: notePositions[ thread.id ],
 									registerThread,
 									unregisterThread,
 							  }
@@ -318,13 +317,21 @@ function Thread( {
 		toggleBlockHighlight,
 		50
 	);
-	const { y, refs } = useFloatingThread( {
-		thread,
-		calculatedOffset: floating?.calculatedOffset ?? 0,
-		registerThread: floating?.registerThread,
-		unregisterThread: floating?.unregisterThread,
-	} );
+	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+
+	const registerThread = floating?.registerThread;
+	const unregisterThread = floating?.unregisterThread;
+
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver and autoUpdate track changes automatically.
+	useEffect( () => {
+		const floatingEl = floatingRef.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, relatedBlockElement, floatingEl );
+		}
+		return () => unregisterThread?.( thread.id );
+	}, [ relatedBlockElement, thread.id, registerThread, unregisterThread ] );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -414,14 +421,16 @@ function Thread( {
 			<AddComment
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
-				floating={ { y, refs } }
+				floating={ { y: floating.y, ref: floatingRef } }
 			/>
 		);
 	}
 
 	return (
 		<FloatingContainer
-			floating={ isFloating ? { y, refs } : undefined }
+			floating={
+				isFloating ? { y: floating.y, ref: floatingRef } : undefined
+			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }

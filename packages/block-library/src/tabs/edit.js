@@ -50,12 +50,7 @@ const TABS_TEMPLATE = [
 	],
 ];
 
-function Edit( {
-	clientId,
-	attributes,
-	setAttributes,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**
@@ -116,16 +111,8 @@ function Edit( {
 		};
 	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
-	/**
-	 * Block props for the tabs container.
-	 */
-	const blockProps = useBlockProps( {
-		className: layoutClassNames,
-	} );
+	const blockProps = useBlockProps();
 
-	/**
-	 * Innerblocks props for the tabs container.
-	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,

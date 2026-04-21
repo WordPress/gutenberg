@@ -16,6 +16,7 @@
 }
 
 .editor-collab-sidebar-panel {
+	position: relative;
 	padding: $grid-unit-20 $grid-unit-20 $grid-unit-30;
 	height: 100%;
 	overflow: hidden;
@@ -46,6 +47,10 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
+		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas scroll.
+		transform: translateY(var(--canvas-scroll, 0));
+		will-change: transform;
 	}
 }
 

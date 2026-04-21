@@ -16,6 +16,7 @@ import Button from '../../button';
 import ScrollLock from '..';
 
 const meta: Meta< typeof ScrollLock > = {
+	tags: [ 'manifest' ],
 	component: ScrollLock,
 	title: 'Components/Utilities/ScrollLock',
 	id: 'components-scrolllock',
