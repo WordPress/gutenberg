@@ -621,6 +621,19 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
+	 * Responsive breakpoint state keys and their corresponding CSS media queries.
+	 * These are available for all blocks and wrap their styles in the given media query.
+	 * Keep in sync with RESPONSIVE_BREAKPOINTS in packages/global-styles-engine/src/core/render.tsx.
+	 *
+	 * @since 7.1.0
+	 * @var array
+	 */
+	const RESPONSIVE_BREAKPOINTS = array(
+		'mobile' => '@media (width <= 480px)',
+		'tablet' => '@media (480px < width <= 782px)',
+	);
+
+	/**
 	 * Custom states for blocks that map to CSS class selectors rather than
 	 * CSS pseudo-selectors. Values use the '@' prefix (e.g. '@current') to
 	 * distinguish them from real CSS pseudo-selectors.
@@ -757,6 +770,37 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		return $pseudo_declarations;
+	}
+
+	/**
+	 * Returns CSS rules for responsive breakpoint states stored in a block node.
+	 * Unlike pseudo-selectors, breakpoint styles are available for all blocks and
+	 * are wrapped in CSS media queries rather than appended to the selector.
+	 *
+	 * @param array  $node          The block's styles node from theme.json.
+	 * @param string $base_selector The base CSS selector for the block.
+	 * @param array  $settings      The theme.json settings.
+	 * @return string CSS rules string with media query wrappers.
+	 */
+	private static function process_responsive_selectors( $node, $base_selector, $settings ) {
+		$responsive_css = '';
+
+		foreach ( static::RESPONSIVE_BREAKPOINTS as $breakpoint_key => $media_query ) {
+			if ( ! isset( $node[ $breakpoint_key ] ) ) {
+				continue;
+			}
+
+			$declarations = static::compute_style_properties( $node[ $breakpoint_key ], $settings, null, null );
+
+			if ( empty( $declarations ) ) {
+				continue;
+			}
+
+			$inner_rule      = static::to_ruleset( ":root :where($base_selector)", $declarations );
+			$responsive_css .= $media_query . '{' . $inner_rule . '}';
+		}
+
+		return $responsive_css;
 	}
 
 	/**
@@ -1087,6 +1131,11 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
+			// Add responsive breakpoint states for all blocks.
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint_state ) {
+				$schema_styles_blocks[ $block ][ $breakpoint_state ] = $styles_non_top_level;
+			}
+
 			// Add pseudo-selectors for blocks that support them.
 			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
 				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
@@ -1132,6 +1181,11 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! empty( $style_variation_names ) ) {
 				foreach ( $style_variation_names as $variation_name ) {
 					$variation_schema = $block_style_variation_styles;
+
+					// Add responsive breakpoint states to block style variations.
+					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint_state ) {
+						$variation_schema[ $breakpoint_state ] = $styles_non_top_level;
+					}
 
 					// Add pseudo-selectors to variations for blocks that support them.
 					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
@@ -3245,6 +3299,7 @@ class WP_Theme_JSON_Gutenberg {
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
 		$style_variation_declarations    = array();
 		$style_variation_custom_css      = array();
+		$style_variation_responsive_css  = array();
 		$style_variation_layout_metadata = array();
 		if ( ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
@@ -3295,6 +3350,12 @@ class WP_Theme_JSON_Gutenberg {
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
 					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
+				}
+
+				// Store responsive breakpoint CSS for the style variation.
+				$variation_responsive_css = static::process_responsive_selectors( $style_variation_node, $style_variation['selector'], $settings );
+				if ( ! empty( $variation_responsive_css ) ) {
+					$style_variation_responsive_css[ $style_variation['selector'] ] = $variation_responsive_css;
 				}
 
 				// Store variation metadata and node for layout styles generation.
@@ -3474,6 +3535,9 @@ class WP_Theme_JSON_Gutenberg {
 			if ( isset( $style_variation_custom_css[ $style_variation_selector ] ) ) {
 				$block_rules .= $style_variation_custom_css[ $style_variation_selector ];
 			}
+			if ( isset( $style_variation_responsive_css[ $style_variation_selector ] ) ) {
+				$block_rules .= $style_variation_responsive_css[ $style_variation_selector ];
+			}
 		}
 
 		// 7. Generate and append any custom CSS rules.
@@ -3484,6 +3548,11 @@ class WP_Theme_JSON_Gutenberg {
 			}
 			$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
 			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
+		}
+
+		// 8. Generate and append responsive breakpoint rules.
+		if ( ! $is_root_selector ) {
+			$block_rules .= static::process_responsive_selectors( $node, $selector, $settings );
 		}
 
 		return $block_rules;
@@ -4006,6 +4075,13 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// Re-add and process responsive breakpoint styles.
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+				if ( isset( $input[ $breakpoint ] ) ) {
+					$output[ $breakpoint ] = static::remove_insecure_styles( $input[ $breakpoint ] );
+				}
+			}
+
 			if ( ! empty( $output ) ) {
 				_wp_array_set( $sanitized, $metadata['path'], $output );
 			}
@@ -4025,6 +4101,13 @@ class WP_Theme_JSON_Gutenberg {
 
 					if ( isset( $variation_input['elements'] ) ) {
 						$variation_output['elements'] = static::remove_insecure_element_styles( $variation_input['elements'] );
+					}
+
+					// Re-add and process responsive breakpoint styles for variations.
+					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+						if ( isset( $variation_input[ $breakpoint ] ) ) {
+							$variation_output[ $breakpoint ] = static::remove_insecure_styles( $variation_input[ $breakpoint ] );
+						}
 					}
 
 					if ( ! empty( $variation_output ) ) {

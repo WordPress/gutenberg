@@ -52,15 +52,26 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 };
 
 /**
+ * Responsive breakpoint states available for all blocks.
+ * These map to CSS media queries wrapping the block's styles.
+ */
+export const RESPONSIVE_STATES: StateDefinition[] = [
+	{ value: 'mobile', label: __( 'Mobile' ) },
+	{ value: 'tablet', label: __( 'Tablet' ) },
+];
+
+/**
  * Get the valid states for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
  * @return Array of valid state definitions, or empty array if none
  */
 export function getValidStates( name: string ): StateDefinition[] {
-	// Check if it's a block
-	if ( VALID_BLOCK_STATES[ name ] ) {
-		return VALID_BLOCK_STATES[ name ];
+	// Check if it's a block (contains a slash, e.g. 'core/button').
+	// All blocks receive responsive states by default.
+	if ( name.includes( '/' ) ) {
+		const blockPseudoStates = VALID_BLOCK_STATES[ name ] ?? [];
+		return [ ...blockPseudoStates, ...RESPONSIVE_STATES ];
 	}
 
 	// Check if it's an element

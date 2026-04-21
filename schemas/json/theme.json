@@ -1863,6 +1863,21 @@
 		"stylesBlocksPseudoSelectorsPropertyNames": {
 			"enum": [ ":hover", ":focus", ":focus-visible", ":active" ]
 		},
+		"stylesBlocksResponsiveSelectorsProperties": {
+			"description": "Responsive block states keyed by breakpoint name. Each breakpoint supports the same style properties as the default block state.",
+			"type": "object",
+			"properties": {
+				"mobile": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				},
+				"tablet": {
+					"$ref": "#/definitions/stylesPropertiesComplete"
+				}
+			}
+		},
+		"stylesBlocksResponsiveSelectorsPropertyNames": {
+			"enum": [ "mobile", "tablet" ]
+		},
 		"stylesElementsPseudoSelectorsProperties": {
 			"type": "object",
 			"properties": {
@@ -2040,6 +2055,9 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+						},
+						{
 							"type": "object",
 							"properties": {
 								"variations": {
@@ -2051,6 +2069,9 @@
 													"$ref": "#/definitions/stylesProperties"
 												},
 												{
+													"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+												},
+												{
 													"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
 												},
 												{
@@ -2059,6 +2080,9 @@
 														"anyOf": [
 															{
 																"$ref": "#/definitions/stylesPropertyNames"
+															},
+															{
+																"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 															},
 															{
 																"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
@@ -2084,6 +2108,9 @@
 									},
 									{
 										"enum": [ "variations" ]
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
@@ -2223,6 +2250,9 @@
 					"allOf": [
 						{
 							"$ref": "#/definitions/stylesPropertiesAndElementsComplete"
+						},
+						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
 						},
 						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
@@ -2417,6 +2447,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2433,6 +2466,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements", "variations" ]
@@ -2556,6 +2592,9 @@
 							"$ref": "#/definitions/stylesProperties"
 						},
 						{
+							"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+						},
+						{
 							"$ref": "#/definitions/stylesBlocksPseudoSelectorsProperties"
 						},
 						{
@@ -2564,6 +2603,9 @@
 								"anyOf": [
 									{
 										"$ref": "#/definitions/stylesPropertyNames"
+									},
+									{
+										"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 									},
 									{
 										"$ref": "#/definitions/stylesBlocksPseudoSelectorsPropertyNames"
@@ -2887,6 +2929,9 @@
 					"$ref": "#/definitions/stylesProperties"
 				},
 				{
+					"$ref": "#/definitions/stylesBlocksResponsiveSelectorsProperties"
+				},
+				{
 					"type": "object",
 					"properties": {
 						"elements": {
@@ -2900,6 +2945,9 @@
 						"anyOf": [
 							{
 								"$ref": "#/definitions/stylesPropertyNames"
+							},
+							{
+								"$ref": "#/definitions/stylesBlocksResponsiveSelectorsPropertyNames"
 							},
 							{
 								"enum": [ "elements" ]
