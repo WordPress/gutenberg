@@ -13,7 +13,6 @@
 ### Bug Fixes
 
 -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
--   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by `ThemeProvider`'s `display: contents` and Base UI's `checkVisibility()` by updating `@base-ui/react` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1) ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
 -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
 -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
 
@@ -25,7 +24,7 @@
 
 ### Internal
 
--   Update `@base-ui/react` from `1.4.0` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1). Marks `date-fns` / `@date-fns/tz` as optional peer dependencies, resolving [#77395](https://github.com/WordPress/gutenberg/issues/77395).
+-   Update `@base-ui/react` from `1.4.0` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1) ([#77520](https://github.com/WordPress/gutenberg/pull/77520)). Restores tabbability through `ThemeProvider`'s `display: contents` wrapper in `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, and `Select`; and marks `date-fns` / `@date-fns/tz` as optional peer dependencies, resolving [#77395](https://github.com/WordPress/gutenberg/issues/77395).
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
 
