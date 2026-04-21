@@ -79,7 +79,23 @@
 		overflow-block: auto;
 		overscroll-behavior: contain;
 		touch-action: auto;
-		will-change: transform;
+
+		&[data-open],
+		&[data-swiping] {
+			will-change: transform;
+
+			@media not (prefers-reduced-motion) {
+				transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+
+				&[data-ending-style] {
+					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+				}
+
+				&[data-swiping] {
+					transition-duration: 0ms;
+				}
+			}
+		}
 
 		/*
 		 * TODO: should top/bottom sides use different tokens for the height
@@ -107,18 +123,6 @@
 
 		&[data-swiping] {
 			user-select: none;
-		}
-
-		@media not (prefers-reduced-motion) {
-			transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
-
-			&[data-ending-style] {
-				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
-			}
-
-			&[data-swiping] {
-				transition-duration: 0ms;
-			}
 		}
 
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
@@ -204,6 +208,14 @@
 
 	.content {
 		padding: var(--wpds-dimension-padding-2xl);
+	}
+
+	.popup[data-swipe-direction="left"] > .content {
+		padding-inline-start: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+	}
+
+	.popup[data-swipe-direction="right"] > .content {
+		padding-inline-end: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
 	}
 
 	.popup[data-swipe-direction="down"] > .content {
