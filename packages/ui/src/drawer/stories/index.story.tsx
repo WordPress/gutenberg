@@ -35,7 +35,6 @@ type Story = StoryObj< typeof Drawer.Root >;
  */
 export const _Default: Story = {
 	args: {
-		swipeDirection: 'left',
 		children: (
 			<>
 				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
@@ -68,52 +67,62 @@ const directions = [
  * drawer from the corresponding edge.
  */
 export const AllSides: Story = {
-	render: () => (
-		<div
-			style={ {
-				display: 'grid',
-				gridTemplateColumns: '1fr 1fr',
-				gap: '8px',
-				maxWidth: '300px',
-			} }
-		>
-			{ directions.map( ( { swipeDirection, label, title } ) => (
-				<Drawer.Root
-					key={ swipeDirection }
-					swipeDirection={ swipeDirection }
-				>
-					<Drawer.Trigger>{ label }</Drawer.Trigger>
-					<Drawer.Popup>
-						<Drawer.Header>
-							<Drawer.Title>{ title }</Drawer.Title>
-							<Drawer.CloseIcon />
-						</Drawer.Header>
-						<Drawer.Description>
-							Slides in from the { label.toLowerCase() } edge.
-							Swipe to dismiss.
-						</Drawer.Description>
-						<Drawer.Footer>
-							<Drawer.Action>Close</Drawer.Action>
-						</Drawer.Footer>
-					</Drawer.Popup>
-				</Drawer.Root>
-			) ) }
-		</div>
-	),
+	render: function AllSidesRender( args ) {
+		return (
+			<div
+				style={ {
+					display: 'grid',
+					gridTemplateColumns: '1fr 1fr',
+					gap: '8px',
+					maxWidth: '300px',
+				} }
+			>
+				{ directions.map( ( { swipeDirection, label, title } ) => (
+					<Drawer.Root
+						key={ swipeDirection }
+						{ ...args }
+						swipeDirection={ swipeDirection }
+					>
+						<Drawer.Trigger>{ label }</Drawer.Trigger>
+						<Drawer.Popup>
+							<Drawer.Header>
+								<Drawer.Title>{ title }</Drawer.Title>
+								<Drawer.CloseIcon />
+							</Drawer.Header>
+							<Drawer.Description>
+								Slides in from the { label.toLowerCase() } edge.
+								Swipe to dismiss.
+							</Drawer.Description>
+							<Drawer.Footer>
+								<Drawer.Action>Close</Drawer.Action>
+							</Drawer.Footer>
+						</Drawer.Popup>
+					</Drawer.Root>
+				) ) }
+			</div>
+		);
+	},
+	argTypes: {
+		children: { control: false },
+		swipeDirection: { control: false },
+	},
 };
 
 /**
  * A controlled drawer where the open state is managed externally.
  */
 export const Controlled: Story = {
-	render: function ControlledRender() {
+	render: function ControlledRender( args ) {
 		const [ open, setOpen ] = useState( false );
 		return (
-			<Drawer.Root
-				open={ open }
-				onOpenChange={ setOpen }
-				swipeDirection="left"
-			>
+			<Drawer.Root { ...args } open={ open } onOpenChange={ setOpen }>
+				{ args.children }
+			</Drawer.Root>
+		);
+	},
+	args: {
+		children: (
+			<>
 				<Drawer.Trigger>Open Controlled Drawer</Drawer.Trigger>
 				<Drawer.Popup>
 					<Drawer.Header>
@@ -128,8 +137,14 @@ export const Controlled: Story = {
 						<Drawer.Action>Close</Drawer.Action>
 					</Drawer.Footer>
 				</Drawer.Popup>
-			</Drawer.Root>
-		);
+			</>
+		),
+	},
+	argTypes: {
+		open: { control: false },
+		defaultOpen: { control: false },
+		onOpenChange: { control: false },
+		onOpenChangeComplete: { control: false },
 	},
 };
 
@@ -159,6 +174,9 @@ export const NonModal: Story = {
 				</Drawer.Popup>
 			</>
 		),
+	},
+	render: function NonModalRender( args ) {
+		return <Drawer.Root { ...args }>{ args.children }</Drawer.Root>;
 	},
 };
 
@@ -238,15 +256,14 @@ function DirectionSelector( {
  * directions. Size controls the width (left/right) or height (up/down).
  */
 export const SizePlayground: Story = {
-	render: function SizePlaygroundRender() {
+	render: function SizePlaygroundRender( args ) {
 		const [ size, setSize ] =
 			useState< ComponentProps< typeof Drawer.Popup >[ 'size' ] >();
-		const [ direction, setDirection ] =
-			useState<
-				ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
-			>( 'left' );
+		const [ direction, setDirection ] = useState<
+			ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
+		>( args.swipeDirection ?? 'left' );
 		return (
-			<Drawer.Root swipeDirection={ direction }>
+			<Drawer.Root { ...args } swipeDirection={ direction }>
 				<div
 					style={ {
 						display: 'flex',
@@ -291,5 +308,8 @@ export const SizePlayground: Story = {
 				</Drawer.Popup>
 			</Drawer.Root>
 		);
+	},
+	argTypes: {
+		swipeDirection: { control: false },
 	},
 };
