@@ -1,21 +1,4 @@
 /**
- * Internal dependencies
- */
-import {
-	createUpgradedEmbedBlock,
-	getClassNames,
-	removeAspectRatioClasses,
-	fallback,
-	getEmbedInfoByProvider,
-	getMergedAttributesWithPreview,
-} from './util';
-import EmbedControls from './embed-controls';
-import { embedContentIcon } from './icons';
-import EmbedLoading from './embed-loading';
-import EmbedPlaceholder from './embed-placeholder';
-import EmbedPreview from './embed-preview';
-
-/**
  * External dependencies
  */
 import clsx from 'clsx';
@@ -31,6 +14,23 @@ import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 import { getAuthority } from '@wordpress/url';
 import { Caption } from '../utils/caption';
+
+/**
+ * Internal dependencies
+ */
+import {
+	createUpgradedEmbedBlock,
+	getClassNames,
+	removeAspectRatioClasses,
+	fallback,
+	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
+} from './util';
+import EmbedControls from './embed-controls';
+import { embedContentIcon } from './icons';
+import EmbedLoading from './embed-loading';
+import EmbedPlaceholder from './embed-placeholder';
+import EmbedPreview from './embed-preview';
 
 const EmbedEdit = ( props ) => {
 	const {
@@ -131,38 +131,28 @@ const EmbedEdit = ( props ) => {
 		} );
 	}
 
+	// When the preview can't be embedded, try rewriting the URL and resubmit.
 	useEffect( () => {
-		if ( preview?.html || ! cannotEmbed || ! hasResolved ) {
-			return;
-		}
-
-		// At this stage, we're not fetching the preview and know it can't be embedded,
-		// so try removing any trailing slash, and resubmit.
-		const newURL = attributesUrl.replace( /\/$/, '' );
-		setURL( newURL );
-		setIsEditingURL( false );
-		setAttributes( { url: newURL } );
-	}, [
-		preview?.html,
-		attributesUrl,
-		cannotEmbed,
-		hasResolved,
-		setAttributes,
-	] );
-
-	// Try a different provider in case the embed url is not supported.
-	useEffect( () => {
-		if ( ! cannotEmbed || fetching || ! url ) {
+		if ( ! cannotEmbed || ! hasResolved || ! attributesUrl ) {
 			return;
 		}
 
 		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
-		if ( getAuthority( url ) === 'x.com' ) {
-			const newURL = new URL( url );
+		if ( getAuthority( attributesUrl ) === 'x.com' ) {
+			const newURL = new URL( attributesUrl );
 			newURL.host = 'twitter.com';
 			setAttributes( { url: newURL.toString() } );
+			return;
 		}
-	}, [ url, cannotEmbed, fetching, setAttributes ] );
+
+		// Otherwise, try removing any trailing slash.
+		const newURL = attributesUrl.replace( /\/$/, '' );
+		if ( newURL !== attributesUrl ) {
+			setURL( newURL );
+			setIsEditingURL( false );
+			setAttributes( { url: newURL } );
+		}
+	}, [ attributesUrl, cannotEmbed, hasResolved, setAttributes ] );
 
 	// Handle incoming preview.
 	useEffect( () => {
