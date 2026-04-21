@@ -41,7 +41,7 @@ This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getti
 In post content, it is stored as a block comment:
 
 ```html
-<!-- wp:calendar /-->
+<!-- wp:calendar { /* attributes */ } /-->
 ```
 
 ## Source

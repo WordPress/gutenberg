@@ -50,7 +50,7 @@ This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getti
 In post content, it is stored as a block comment:
 
 ```html
-<!-- wp:comment-content /-->
+<!-- wp:comment-content { /* attributes */ } /-->
 ```
 
 ## Source
