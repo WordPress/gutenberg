@@ -18,7 +18,7 @@ import { canvasConvertToJpeg } from '../canvas-utils';
 import { isClientSideMediaSupported } from '../feature-detection';
 import { CLIENT_SIDE_SUPPORTED_MIME_TYPES, HEIC_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
-import { UploadError } from '../upload-error';
+import { ErrorCode, UploadError } from '../upload-error';
 import { measure } from './utils/debug-logger';
 import {
 	vipsResizeImage,
@@ -730,7 +730,7 @@ export function prepareItem( id: QueueItemId ) {
 				dispatch.cancelItem(
 					id,
 					new UploadError( {
-						code: 'HEIC_DECODE_ERROR',
+						code: ErrorCode.HEIC_DECODE_ERROR,
 						message:
 							'This browser cannot decode HEIC images and the server does not support them either. Please convert to JPEG before uploading.',
 						file,
@@ -966,7 +966,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_TRANSCODING_ERROR',
+					code: ErrorCode.IMAGE_TRANSCODING_ERROR,
 					message: 'File could not be uploaded',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
@@ -1040,7 +1040,7 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'IMAGE_ROTATION_ERROR',
+					code: ErrorCode.IMAGE_ROTATION_ERROR,
 					message: 'Image could not be rotated',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
@@ -1126,7 +1126,7 @@ export function transcodeImageItem(
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
-					code: 'MEDIA_TRANSCODING_ERROR',
+					code: ErrorCode.MEDIA_TRANSCODING_ERROR,
 					message:
 						'Image could not be transcoded to the target format',
 					file: item.file,

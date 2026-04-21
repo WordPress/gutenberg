@@ -6,29 +6,29 @@
  * and user-friendly error messages.
  */
 export enum ErrorCode {
-	// Retryable network errors
-	NETWORK_ERROR = 'NETWORK_ERROR',
-	TIMEOUT_ERROR = 'TIMEOUT_ERROR',
-	SERVER_ERROR = 'SERVER_ERROR', // 5xx responses
+	// Validation errors (non-retryable)
+	EMPTY_FILE = 'EMPTY_FILE',
+	SIZE_ABOVE_LIMIT = 'SIZE_ABOVE_LIMIT',
+	MIME_TYPE_NOT_SUPPORTED = 'MIME_TYPE_NOT_SUPPORTED',
+	MIME_TYPE_NOT_ALLOWED_FOR_USER = 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
 
-	// Non-retryable client errors
-	VALIDATION_ERROR = 'VALIDATION_ERROR',
-	PERMISSION_DENIED = 'PERMISSION_DENIED', // 403
-	NOT_FOUND = 'NOT_FOUND', // 404
-	FILE_TOO_LARGE = 'FILE_TOO_LARGE',
-	INVALID_MIME_TYPE = 'INVALID_MIME_TYPE',
-	INVALID_IMAGE_DIMENSIONS = 'INVALID_IMAGE_DIMENSIONS', // Sideload dimension mismatch
-
-	// Processing errors (conditionally retryable)
+	// Processing errors (not retryable — the same file will fail again)
+	HEIC_DECODE_ERROR = 'HEIC_DECODE_ERROR',
 	IMAGE_TRANSCODING_ERROR = 'IMAGE_TRANSCODING_ERROR',
 	IMAGE_ROTATION_ERROR = 'IMAGE_ROTATION_ERROR',
-	VIPS_WORKER_ERROR = 'VIPS_WORKER_ERROR',
-	MEMORY_ERROR = 'MEMORY_ERROR',
+	MEDIA_TRANSCODING_ERROR = 'MEDIA_TRANSCODING_ERROR',
+
+	// Network / server errors (retryable). Not currently produced by the
+	// package, but the vocabulary lets consumers wrap fetch failures in
+	// UploadError and drive retry decisions off `isRetryable`.
+	NETWORK_ERROR = 'NETWORK_ERROR',
+	TIMEOUT_ERROR = 'TIMEOUT_ERROR',
+	SERVER_ERROR = 'SERVER_ERROR',
 
 	// User action
 	ABORTED = 'ABORTED',
 
-	// Generic
+	// Generic fallback
 	GENERAL = 'GENERAL',
 }
 
@@ -40,7 +40,6 @@ const RETRYABLE_CODES: ErrorCode[] = [
 	ErrorCode.NETWORK_ERROR,
 	ErrorCode.TIMEOUT_ERROR,
 	ErrorCode.SERVER_ERROR,
-	ErrorCode.VIPS_WORKER_ERROR,
 ];
 
 interface UploadErrorArgs {

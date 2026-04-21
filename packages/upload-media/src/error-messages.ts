@@ -35,10 +35,82 @@ export interface ErrorMessageConfig {
  * @return Error message configuration with title, description, and action.
  */
 export function getErrorMessage(
-	code: string,
+	code: ErrorCode | string,
 	fileName: string
 ): ErrorMessageConfig {
 	const messages: Record< string, ErrorMessageConfig > = {
+		[ ErrorCode.EMPTY_FILE ]: {
+			title: __( 'Empty file' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( '"%s" is empty.' ),
+				fileName
+			),
+			action: __( 'Please choose a different file.' ),
+		},
+		[ ErrorCode.SIZE_ABOVE_LIMIT ]: {
+			title: __( 'File too large' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( '"%s" exceeds the maximum upload size.' ),
+				fileName
+			),
+			action: __( 'Please reduce the file size and try again.' ),
+		},
+		[ ErrorCode.MIME_TYPE_NOT_SUPPORTED ]: {
+			title: __( 'Unsupported file type' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( '"%s" is not a supported file type.' ),
+				fileName
+			),
+			action: __( 'Please upload a different file format.' ),
+		},
+		[ ErrorCode.MIME_TYPE_NOT_ALLOWED_FOR_USER ]: {
+			title: __( 'File type not allowed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'You are not allowed to upload "%s".' ),
+				fileName
+			),
+			action: __( 'Please contact your site administrator.' ),
+		},
+		[ ErrorCode.HEIC_DECODE_ERROR ]: {
+			title: __( 'HEIC decode failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to decode HEIC file "%s".' ),
+				fileName
+			),
+			action: __( 'Try converting the image to JPEG or PNG first.' ),
+		},
+		[ ErrorCode.IMAGE_TRANSCODING_ERROR ]: {
+			title: __( 'Image processing failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to process "%s".' ),
+				fileName
+			),
+			action: __( 'The image may be corrupted. Try a different file.' ),
+		},
+		[ ErrorCode.IMAGE_ROTATION_ERROR ]: {
+			title: __( 'Image rotation failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to rotate "%s".' ),
+				fileName
+			),
+			action: __( 'The image may be corrupted. Try a different file.' ),
+		},
+		[ ErrorCode.MEDIA_TRANSCODING_ERROR ]: {
+			title: __( 'Media processing failed' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__( 'Failed to convert "%s" to the target format.' ),
+				fileName
+			),
+			action: __( 'The file may be corrupted. Try a different file.' ),
+		},
 		[ ErrorCode.NETWORK_ERROR ]: {
 			title: __( 'Network error' ),
 			description: sprintf(
@@ -67,100 +139,6 @@ export function getErrorMessage(
 				fileName
 			),
 			action: __( 'Please try again later.' ),
-		},
-		[ ErrorCode.FILE_TOO_LARGE ]: {
-			title: __( 'File too large' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( '"%s" exceeds the maximum upload size.' ),
-				fileName
-			),
-			action: __( 'Please reduce the file size and try again.' ),
-		},
-		[ ErrorCode.INVALID_MIME_TYPE ]: {
-			title: __( 'Unsupported file type' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( '"%s" is not a supported file type.' ),
-				fileName
-			),
-			action: __( 'Please upload a different file format.' ),
-		},
-		[ ErrorCode.INVALID_IMAGE_DIMENSIONS ]: {
-			title: __( 'Invalid image dimensions' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( '"%s" does not match the expected dimensions.' ),
-				fileName
-			),
-			action: __(
-				'The image size does not match the target thumbnail size.'
-			),
-		},
-		[ ErrorCode.PERMISSION_DENIED ]: {
-			title: __( 'Permission denied' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'You do not have permission to upload "%s".' ),
-				fileName
-			),
-			action: __( 'Please contact your site administrator.' ),
-		},
-		[ ErrorCode.NOT_FOUND ]: {
-			title: __( 'Not found' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'The upload destination for "%s" was not found.' ),
-				fileName
-			),
-			action: __( 'Please refresh the page and try again.' ),
-		},
-		[ ErrorCode.VALIDATION_ERROR ]: {
-			title: __( 'Validation failed' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( '"%s" failed validation.' ),
-				fileName
-			),
-			action: __( 'Please check the file and try again.' ),
-		},
-		[ ErrorCode.IMAGE_TRANSCODING_ERROR ]: {
-			title: __( 'Image processing failed' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'Failed to process "%s".' ),
-				fileName
-			),
-			action: __( 'The image may be corrupted. Try a different file.' ),
-		},
-		[ ErrorCode.IMAGE_ROTATION_ERROR ]: {
-			title: __( 'Image rotation failed' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'Failed to rotate "%s".' ),
-				fileName
-			),
-			action: __( 'The image may be corrupted. Try a different file.' ),
-		},
-		[ ErrorCode.VIPS_WORKER_ERROR ]: {
-			title: __( 'Image processing error' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'An error occurred while processing "%s".' ),
-				fileName
-			),
-			action: __( 'Please try again.' ),
-		},
-		[ ErrorCode.MEMORY_ERROR ]: {
-			title: __( 'Not enough memory' ),
-			description: sprintf(
-				/* translators: %s: file name */
-				__( 'Not enough memory to process "%s".' ),
-				fileName
-			),
-			action: __(
-				'Try closing other tabs or uploading a smaller image.'
-			),
 		},
 		[ ErrorCode.ABORTED ]: {
 			title: __( 'Upload cancelled' ),
