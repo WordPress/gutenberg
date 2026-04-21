@@ -70,9 +70,12 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	ResolutionTool,
+	mediaEditKey,
+	openMediaEditorModalKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -390,7 +393,9 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const { onNavigateToEntityRecord, onEditMedia } = getSettings();
+	const settings = getSettings();
+	const { onNavigateToEntityRecord } = settings;
+	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
 
 	const handleMediaUpdate = useCallback(
 		( { id: newId, url: newUrl } ) => {
@@ -888,9 +893,9 @@ export default function Image( {
 					{ allowCrop && (
 						<ToolbarButton
 							onClick={
-								onEditMedia && id
+								openMediaEditorModal && id
 									? () =>
-											onEditMedia( {
+											openMediaEditorModal( {
 												id,
 												onUpdate: handleMediaUpdate,
 											} )

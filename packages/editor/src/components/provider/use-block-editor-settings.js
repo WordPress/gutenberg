@@ -76,7 +76,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'fontSizes',
 	'gradients',
 	'generateAnchors',
-	'onEditMedia',
 	'onNavigateToEntityRecord',
 	'imageDefaultSize',
 	'imageDimensions',
@@ -111,6 +110,7 @@ const {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 } = unlock( privateApis );
 
 /**
@@ -344,7 +344,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
 				: undefined,
-			onEditMedia: window?.__experimentalMediaEditorModal
+			[ openMediaEditorModalKey ]: window?.__experimentalMediaEditorModal
 				? ( { id, onUpdate } ) =>
 						openMediaEditorModal( { id, onUpdate } )
 				: undefined,
