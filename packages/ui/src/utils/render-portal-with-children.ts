@@ -2,12 +2,6 @@ import { cloneElement } from '@wordpress/element';
 import type { ReactElement, ReactNode } from 'react';
 
 /**
- * Portal elements accept injected children; widen `ReactElement` so `cloneElement`
- * props are not inferred as `unknown` (which breaks package TypeScript builds).
- */
-type PortalMountElement = ReactElement< { children?: ReactNode } >;
-
-/**
  * Renders overlay markup (`children`) through an optional `portal` element from
  * `portal={ <Component.Portal … /> }`, or through the package default portal.
  *
@@ -27,7 +21,7 @@ export function renderPortalWithChildren(
 ): ReactElement {
 	const rootPortal = portal ?? defaultPortal;
 
-	return cloneElement( rootPortal as PortalMountElement, {
+	return cloneElement( rootPortal, {
 		children,
 	} );
 }
