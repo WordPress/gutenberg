@@ -5,6 +5,13 @@
 ### Enhancement
 
 - Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).
+- Add `ErrorCode` enum, `UploadError#isRetryable` getter, and localized `getErrorMessage()` helper. Existing `UploadError` throw sites now use enum values, and `ErrorCode` / `getErrorMessage` are exported from the package entry point ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+- Log upload cancellations, missing `onError` handlers, and batch completions via `@wordpress/warning` (only fires under `SCRIPT_DEBUG`) ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+- Emit User Timings API entries for upload, sideload, resize, rotate, and transcode operations under a custom "Upload Media" DevTools track when `SCRIPT_DEBUG` is enabled ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
+
+### Bug Fix
+
+- `uploadItem` no longer dispatches `finishOperation` twice when both `onFileChange` and `onSuccess` fire for the same attachment ([#74917](https://github.com/WordPress/gutenberg/pull/74917)).
 
 ## 0.29.0 (2026-04-15)
 
