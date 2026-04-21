@@ -1161,10 +1161,20 @@ async function generatePagesPhp( pageData, replacements ) {
 						.join( '\n' )
 				: '\t\t\t// No init modules configured';
 
-		// The menuSlug option controls the admin URL base. Full-page mode uses
-		// it as-is; WP-Admin mode appends `-wp-admin` by convention. When
-		// unset, it falls back to the page id.
+		// Full-page mode uses `menuSlug` (defaults to the page id).
+		// WP-Admin mode uses `menuSlugAdmin` (defaults to `{menuSlug}-wp-admin`).
+		// Both templates are always generated and register hooks on every
+		// request, so the two slugs must differ to avoid the full-page
+		// `admin_init` hook intercepting WP-Admin mode requests.
 		const menuSlug = page.menuSlug || page.slug;
+		const menuSlugAdmin = page.menuSlugAdmin || `${ menuSlug }-wp-admin`;
+		if ( menuSlug === menuSlugAdmin ) {
+			throw new Error(
+				`Page "${ page.slug }": menuSlug and menuSlugAdmin must differ ` +
+					`(both resolved to "${ menuSlug }"). The full-page and ` +
+					`WP-Admin templates both listen on $_GET['page'] and would collide.`
+			);
+		}
 
 		const templateReplacements = {
 			...replacements,
@@ -1174,6 +1184,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
 			'{{MENU_SLUG}}': menuSlug,
+			'{{MENU_SLUG_ADMIN}}': menuSlugAdmin,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1825,6 +1836,7 @@ async function buildAll( baseUrlExpression ) {
 				init: [],
 				title: undefined,
 				menuSlug: undefined,
+				menuSlugAdmin: undefined,
 			};
 		}
 		return {
@@ -1833,6 +1845,7 @@ async function buildAll( baseUrlExpression ) {
 			title: page.title || undefined,
 			experimental: page.experimental || false,
 			menuSlug: page.menuSlug || undefined,
+			menuSlugAdmin: page.menuSlugAdmin || undefined,
 		};
 	} );
 
@@ -1855,6 +1868,7 @@ async function buildAll( baseUrlExpression ) {
 			initModules: page.init,
 			title: page.title,
 			menuSlug: page.menuSlug,
+			menuSlugAdmin: page.menuSlugAdmin,
 		};
 	} );
 
