@@ -1,5 +1,4 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
-import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../text';
 import styles from './style.module.css';
@@ -11,13 +10,13 @@ import type { DescriptionProps } from './types';
  * The rendered element is linked to the popup via `aria-describedby`.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
-	function PopoverDescription( { className, children, ...props }, ref ) {
+	function PopoverDescription( { children, ...props }, ref ) {
 		return (
 			<Text
 				ref={ ref }
 				variant="body-md"
 				render={ <_Popover.Description { ...props } /> }
-				className={ clsx( styles.description, className ) }
+				className={ styles.description }
 			>
 				{ children }
 			</Text>

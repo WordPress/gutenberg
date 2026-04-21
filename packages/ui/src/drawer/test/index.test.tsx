@@ -121,6 +121,26 @@ describe( 'Drawer', () => {
 		container.remove();
 	} );
 
+	it( 'merges user `className` on Drawer.Title with the internal one', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open</Drawer.Trigger>
+				<Drawer.Popup>
+					<Drawer.Title className="custom-title">Title</Drawer.Title>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		const heading = await screen.findByRole( 'heading', { name: 'Title' } );
+		expect( heading ).toHaveClass( 'custom-title' );
+		// The internal module-scoped class name starts with a hashed prefix; assert both classes coexist.
+		expect( heading.className ).toMatch( /title/ );
+	} );
+
 	it( 'associates Drawer.Description with the popup via aria-describedby', async () => {
 		const user = userEvent.setup();
 		const popupRef = createRef< HTMLDivElement >();
