@@ -134,7 +134,7 @@ class Gutenberg_Guidelines_Post_Type {
 			array(
 				'public'             => false,
 				'publicly_queryable' => false,
-				'hierarchical'       => false,
+				'hierarchical'       => true,
 				'labels'             => array(
 					'name'          => __( 'Guideline Types', 'gutenberg' ),
 					'singular_name' => __( 'Guideline Type', 'gutenberg' ),
@@ -151,6 +151,32 @@ class Gutenberg_Guidelines_Post_Type {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Resolves a taxonomy term by slug, creating it if it doesn't exist yet.
+	 *
+	 * @param string $slug Term slug.
+	 * @param string $name Human-readable term name, used when creating.
+	 * @return int|WP_Error Term ID on success, WP_Error on failure.
+	 */
+	public static function get_or_create_term_id( $slug, $name ) {
+		$term = get_term_by( 'slug', $slug, self::TAXONOMY );
+		if ( $term ) {
+			return (int) $term->term_id;
+		}
+
+		$inserted = wp_insert_term(
+			$name,
+			self::TAXONOMY,
+			array( 'slug' => $slug )
+		);
+
+		if ( is_wp_error( $inserted ) ) {
+			return $inserted;
+		}
+
+		return (int) $inserted['term_id'];
 	}
 
 	/**
