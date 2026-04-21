@@ -340,7 +340,9 @@ function formatSupports( supports ) {
 						: `\`${ subKey }\``;
 					if ( typeof subValue === 'object' && subValue !== null ) {
 						lines.push(
-							`  - ${ subLabel }: \`${ JSON.stringify( subValue ) }\``
+							`  - ${ subLabel }: \`${ JSON.stringify(
+								subValue
+							) }\``
 						);
 					} else {
 						lines.push( `  - ${ subLabel }: \`${ subValue }\`` );
