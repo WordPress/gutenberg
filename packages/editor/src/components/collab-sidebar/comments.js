@@ -841,7 +841,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					className="editor-collab-sidebar-panel__show-more-button"
 					onClick={ () => setCollapsed( ! collapsed ) }
 				>
-					{ collapsed ? __( 'Show More' ) : __( 'Show Less' ) }
+					{ collapsed ? __( 'Show more' ) : __( 'Show less' ) }
 				</Button>
 			) }
 			{ 'delete' === actionState && (
