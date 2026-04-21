@@ -580,8 +580,8 @@ export const CollisionAvoidance: Story = {
 
 /**
  * When the popover's trigger lives inside an iframe but the popover should
- * render in the parent document, pass a parent-document element to the
- * `container` prop on `Popover.Popup`.
+ * render in the parent document, pass a parent-document element through
+ * `portal={ <Popover.Portal container={ ... } /> }` on `Popover.Popup`.
  *
  * This technique is used in Gutenberg where the block editor canvas is an
  * iframe but toolbars and menus must appear outside it.
