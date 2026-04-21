@@ -202,7 +202,9 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 
 			const next = ( saved ?? media ) as Media | null;
 			if ( next && next.id && onUpdate ) {
-				onUpdate( { ...next, id: next.id } );
+				// Normalize to the public callback shape — see
+				// `MediaEditorModalUpdate` in `../../store/actions.ts`.
+				onUpdate( { id: next.id, url: next.source_url } );
 			}
 			closeMediaEditorModal();
 		} finally {

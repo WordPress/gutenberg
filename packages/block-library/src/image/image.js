@@ -393,7 +393,7 @@ export default function Image( {
 	const { onNavigateToEntityRecord, onEditMedia } = getSettings();
 
 	const handleMediaUpdate = useCallback(
-		( { id: newId, source_url: newUrl } ) => {
+		( { id: newId, url: newUrl } ) => {
 			if ( typeof newId === 'number' && newId !== id ) {
 				setAttributes( {
 					id: newId,
