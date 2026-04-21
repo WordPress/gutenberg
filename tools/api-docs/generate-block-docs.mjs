@@ -326,21 +326,25 @@ function formatSupports( supports ) {
 					.join( ', ' ) }`
 			);
 		} else if ( typeof value === 'object' && value !== null ) {
-			lines.push( `- ${ keyLink }:` );
-			for ( const [ subKey, subValue ] of Object.entries( value ) ) {
-				if ( subKey.startsWith( '__' ) ) {
-					continue;
-				}
-				const subProp = `${ key }.${ subKey }`;
-				const subLabel = SUPPORTS_SUB_ANCHORS.has( subProp )
-					? `[\`${ subKey }\`](${ supportsLink( subProp ) })`
-					: `\`${ subKey }\``;
-				if ( typeof subValue === 'object' && subValue !== null ) {
-					lines.push(
-						`  - ${ subLabel }: \`${ JSON.stringify( subValue ) }\``
-					);
-				} else {
-					lines.push( `  - ${ subLabel }: \`${ subValue }\`` );
+			const subEntries = Object.entries( value ).filter(
+				( [ subKey ] ) => ! subKey.startsWith( '__' )
+			);
+			if ( subEntries.length === 0 ) {
+				lines.push( `- ${ keyLink }: \`true\`` );
+			} else {
+				lines.push( `- ${ keyLink }:` );
+				for ( const [ subKey, subValue ] of subEntries ) {
+					const subProp = `${ key }.${ subKey }`;
+					const subLabel = SUPPORTS_SUB_ANCHORS.has( subProp )
+						? `[\`${ subKey }\`](${ supportsLink( subProp ) })`
+						: `\`${ subKey }\``;
+					if ( typeof subValue === 'object' && subValue !== null ) {
+						lines.push(
+							`  - ${ subLabel }: \`${ JSON.stringify( subValue ) }\``
+						);
+					} else {
+						lines.push( `  - ${ subLabel }: \`${ subValue }\`` );
+					}
 				}
 			}
 		} else {
