@@ -101,7 +101,7 @@ export const WithImageVisual: Story = {
 		visual: (
 			<img
 				src="https://secure.gravatar.com/avatar/c0ccdd53794779bcc07fcae7b79c4d80?s=48&r=g&d=mm"
-				alt="Page visual"
+				alt=""
 			/>
 		),
 		showSidebarToggle: false,
