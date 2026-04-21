@@ -1161,6 +1161,13 @@ async function generatePagesPhp( pageData, replacements ) {
 						.join( '\n' )
 				: '\t\t\t// No init modules configured';
 
+		// The menuSlug option (single value) customizes the admin URL for both
+		// page modes. When unset, each mode falls back to its conventional
+		// default: full-page mode uses the page id, WP-Admin mode appends
+		// `-wp-admin`.
+		const fullPageMenuSlug = page.menuSlug || page.slug;
+		const wpAdminMenuSlug = page.menuSlug || `${ page.slug }-wp-admin`;
+
 		const templateReplacements = {
 			...replacements,
 			'{{PAGE_SLUG}}': page.slug,
@@ -1168,7 +1175,8 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
-			'{{MENU_SLUG}}': page.menuSlug,
+			'{{FULL_PAGE_MENU_SLUG}}': fullPageMenuSlug,
+			'{{WP_ADMIN_MENU_SLUG}}': wpAdminMenuSlug,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1819,7 +1827,7 @@ async function buildAll( baseUrlExpression ) {
 				id: page,
 				init: [],
 				title: undefined,
-				menuSlug: `${ page }-wp-admin`,
+				menuSlug: undefined,
 			};
 		}
 		return {
@@ -1827,7 +1835,7 @@ async function buildAll( baseUrlExpression ) {
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
-			menuSlug: page.menuSlug || `${ page.id }-wp-admin`,
+			menuSlug: page.menuSlug || undefined,
 		};
 	} );
 

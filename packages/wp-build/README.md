@@ -280,7 +280,7 @@ Pages can be defined as simple strings or as objects with initialization modules
 - **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "menuSlug": "custom-url" }` - Page with optional init modules and a custom menu slug
   - **`id`** (required): The page identifier. Used for generated PHP function names, action hook names, and generated file paths.
   - **`init`** (optional): Array of script module IDs to execute during page initialization
-  - **`menuSlug`** (optional): The menu slug passed to `add_submenu_page()` / `add_menu_page()`, which controls the admin URL (`admin.php?page={menuSlug}`). Defaults to `{id}-wp-admin`. Set this to customize the URL independently from `id`.
+  - **`menuSlug`** (optional): The menu slug passed to `add_menu_page()` (full-page mode) or `add_submenu_page()` (WP-Admin mode), which controls the admin URL (`admin.php?page={menuSlug}`). When set, it applies to both modes. When omitted, full-page mode falls back to `{id}` and WP-Admin mode to `{id}-wp-admin`. Set this to customize the URL independently from `id`.
 
 **Generated Files:**
 
