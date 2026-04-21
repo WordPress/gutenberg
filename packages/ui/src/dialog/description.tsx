@@ -9,7 +9,6 @@ import type { DescriptionProps } from './types';
  * Renders a paragraph with additional information about the dialog.
  *
  * The rendered element is linked to the popup via `aria-describedby`.
- * Uses the `body-md` text variant by default.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 	function DialogDescription( { className, render, ...props }, ref ) {
