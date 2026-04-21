@@ -8,7 +8,9 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
+import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -20,17 +22,12 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
 /**
  * Renders the drawer popup element that contains the drawer content.
  * Uses a portal to render outside the DOM hierarchy.
+ *
+ * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
+ * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
-	{
-		className,
-		children,
-		container,
-		size,
-		initialFocus,
-		finalFocus,
-		...props
-	},
+	{ className, portal, children, size, initialFocus, finalFocus, ...props },
 	ref
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
@@ -40,15 +37,18 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDrawerModal();
 
-	return (
-		<_Drawer.Portal container={ container }>
+	const portalChildren = (
+		<>
 			{ /*
 			 * Only render a backdrop for fully modal drawers. Non-modal drawers
 			 * should not dim the page, and `trap-focus` keeps outside pointer
 			 * interactions enabled, so a backdrop would misrepresent that mode.
 			 */ }
 			{ modal === true && (
-				<_Drawer.Backdrop className={ styles.backdrop } />
+				<_Drawer.Backdrop
+					className={ styles.backdrop }
+					data-wp-ui-drawer-backdrop=""
+				/>
 			) }
 			<_Drawer.Viewport className={ styles.viewport }>
 				{ /*
@@ -84,8 +84,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 					</_Drawer.Popup>
 				</ThemeProvider>
 			</_Drawer.Viewport>
-		</_Drawer.Portal>
+		</>
 	);
+
+	return renderPortalWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

@@ -4,6 +4,7 @@ import { Description } from './description';
 import { Footer } from './footer';
 import { Header } from './header';
 import { Popup } from './popup';
+import { Portal } from './portal';
 import { Root } from './root';
 import { Title } from './title';
 import { Trigger } from './trigger';
@@ -15,6 +16,7 @@ export {
 	Footer,
 	Header,
 	Popup,
+	Portal,
 	Root,
 	Title,
 	Trigger,

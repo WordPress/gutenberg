@@ -1,8 +1,10 @@
 import type { Drawer as _Drawer } from '@base-ui/react/drawer';
-import type { ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 import type { Button } from '../button';
 import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
+
+export type PortalProps = ComponentPropsWithoutRef< typeof _Drawer.Portal >;
 
 export interface RootProps
 	extends Pick<
@@ -37,12 +39,15 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Drawer.Portal />` with custom
+	 * `container`, `className`, or `style`. The backdrop and inner viewport
+	 * are rendered as this portal's children (do not pass `children` on the
+	 * portal element; they would be ignored).
 	 *
-	 * Useful for cross-document rendering, such as rendering a drawer
-	 * in a parent document when the trigger is inside an iframe.
+	 * When omitted, `Drawer.Popup` uses `Drawer.Portal` with default props,
+	 * rendering the portal in the current document's `<body>`.
 	 */
-	container?: _Drawer.Portal.Props[ 'container' ];
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * Controls the size of the drawer along its relevant axis (width for

@@ -6,17 +6,21 @@ import styles from './style.module.css';
 import type { DescriptionProps } from './types';
 
 /**
- * Renders a paragraph with additional information about the drawer.
+ * Renders an optional paragraph that describes the drawer content.
+ *
+ * The rendered element is linked to the popup via `aria-describedby`.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
-	function DrawerDescription( { className, render, ...props }, ref ) {
+	function DrawerDescription( { className, children, ...props }, ref ) {
 		return (
-			<_Drawer.Description
+			<Text
 				ref={ ref }
-				render={ <Text variant="body-md" render={ render ?? <p /> } /> }
+				variant="body-md"
+				render={ <_Drawer.Description { ...props } /> }
 				className={ clsx( styles.description, className ) }
-				{ ...props }
-			/>
+			>
+				{ children }
+			</Text>
 		);
 	}
 );

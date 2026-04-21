@@ -103,7 +103,9 @@ describe( 'Drawer', () => {
 		render(
 			<Drawer.Root>
 				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-				<Drawer.Popup container={ container }>
+				<Drawer.Popup
+					portal={ <Drawer.Portal container={ container } /> }
+				>
 					<Drawer.Title>In custom container</Drawer.Title>
 				</Drawer.Popup>
 			</Drawer.Root>
@@ -119,7 +121,34 @@ describe( 'Drawer', () => {
 		container.remove();
 	} );
 
+	it( 'associates Drawer.Description with the popup via aria-describedby', async () => {
+		const user = userEvent.setup();
+		const popupRef = createRef< HTMLDivElement >();
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open</Drawer.Trigger>
+				<Drawer.Popup ref={ popupRef }>
+					<Drawer.Title>Title</Drawer.Title>
+					<Drawer.Description>My description</Drawer.Description>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		await waitFor( () => {
+			expect( popupRef.current ).toHaveAccessibleDescription(
+				'My description'
+			);
+		} );
+	} );
+
 	it( 'renders backdrop only when modal is true', async () => {
+		const getBackdrops = () =>
+			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-drawer-backdrop` attribute (mirroring the Drawer close-icon pattern) is more robust than the Base UI role/state it inherits.
+			document.querySelectorAll( '[data-wp-ui-drawer-backdrop]' );
+
 		const view = render(
 			<Drawer.Root open modal>
 				<Drawer.Popup>
@@ -129,11 +158,7 @@ describe( 'Drawer', () => {
 		);
 
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect(
-			screen
-				.getAllByRole( 'presentation', { hidden: true } )
-				.filter( ( element ) => element.hasAttribute( 'data-open' ) )
-		).toHaveLength( 2 );
+		expect( getBackdrops() ).toHaveLength( 1 );
 
 		view.rerender(
 			<Drawer.Root open modal={ false }>
@@ -143,11 +168,7 @@ describe( 'Drawer', () => {
 			</Drawer.Root>
 		);
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect(
-			screen
-				.getAllByRole( 'presentation', { hidden: true } )
-				.filter( ( element ) => element.hasAttribute( 'data-open' ) )
-		).toHaveLength( 1 );
+		expect( getBackdrops() ).toHaveLength( 0 );
 
 		view.rerender(
 			<Drawer.Root open modal="trap-focus">
@@ -157,11 +178,7 @@ describe( 'Drawer', () => {
 			</Drawer.Root>
 		);
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect(
-			screen
-				.getAllByRole( 'presentation', { hidden: true } )
-				.filter( ( element ) => element.hasAttribute( 'data-open' ) )
-		).toHaveLength( 1 );
+		expect( getBackdrops() ).toHaveLength( 0 );
 	} );
 
 	it( 'deprioritizes close icon for initial focus', async () => {

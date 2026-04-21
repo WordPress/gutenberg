@@ -15,10 +15,10 @@ const DrawerModalContext =
 	createContext< _Drawer.Root.Props[ 'modal' ] >( true );
 
 export function DrawerModalProvider( {
-	modal = true,
+	modal,
 	children,
 }: {
-	modal?: _Drawer.Root.Props[ 'modal' ];
+	modal: _Drawer.Root.Props[ 'modal' ];
 	children: React.ReactNode;
 } ) {
 	return (
@@ -44,14 +44,21 @@ type DrawerValidationContextType = {
 	registerTitle: ( element: HTMLElement | null ) => () => void;
 };
 
+// Context is only created in development mode.
 const DrawerValidationContext = VALIDATION_ENABLED
 	? createContext< DrawerValidationContextType | null >( null )
 	: ( null as unknown as React.Context< DrawerValidationContextType | null > );
 
+/**
+ * Development-only hook to access the drawer validation context.
+ */
 function useDrawerValidationContextDev() {
 	return useContext( DrawerValidationContext );
 }
 
+/**
+ * Production no-op hook.
+ */
 function useDrawerValidationContextProd() {
 	return null;
 }
@@ -64,12 +71,16 @@ export const useDrawerValidationContext = VALIDATION_ENABLED
 	? useDrawerValidationContextDev
 	: useDrawerValidationContextProd;
 
+/**
+ * Development-only provider that tracks whether Drawer.Title is rendered.
+ */
 function DrawerValidationProviderDev( {
 	children,
 }: {
 	children: React.ReactNode;
 } ) {
 	const titleElementRef = useRef< HTMLElement | null >( null );
+
 	const scheduleValidation = useScheduleValidation( () => {
 		const titleElement = titleElementRef.current;
 
@@ -121,6 +132,9 @@ function DrawerValidationProviderDev( {
 	);
 }
 
+/**
+ * Production no-op provider that just renders children.
+ */
 function DrawerValidationProviderProd( {
 	children,
 }: {

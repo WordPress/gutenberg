@@ -1,4 +1,5 @@
 import { Drawer as _Drawer } from '@base-ui/react/drawer';
+import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
@@ -25,7 +26,7 @@ import type { TitleProps } from './types';
  * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function DrawerTitle( { children, ...props }, forwardedRef ) {
+	function DrawerTitle( { children, className, ...props }, forwardedRef ) {
 		const validationContext = useDrawerValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
@@ -42,7 +43,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 				ref={ mergedRef }
 				variant="heading-xl"
 				render={ <_Drawer.Title { ...props } /> }
-				className={ styles.title }
+				className={ clsx( styles.title, className ) }
 			>
 				{ children }
 			</Text>

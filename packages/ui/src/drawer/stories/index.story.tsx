@@ -9,6 +9,7 @@ const meta: Meta< typeof Drawer.Root > = {
 	component: Drawer.Root,
 	subcomponents: {
 		'Drawer.Trigger': Drawer.Trigger,
+		'Drawer.Portal': Drawer.Portal,
 		'Drawer.Popup': Drawer.Popup,
 		'Drawer.Header': Drawer.Header,
 		'Drawer.Title': Drawer.Title,
