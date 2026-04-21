@@ -1,25 +1,14 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { textAlign, content } = attributes;
-
-	const className = classnames( {
-		[ `has-text-align-${ textAlign }` ]: textAlign,
-	} );
+	const { content } = attributes;
 
 	return (
-		<RichText.Content
-			tagName="pre"
-			className={ className }
-			value={ content }
-		/>
+		<pre { ...useBlockProps.save() }>
+			<RichText.Content value={ content } />
+		</pre>
 	);
 }

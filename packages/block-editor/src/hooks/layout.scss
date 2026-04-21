@@ -1,0 +1,30 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+.block-editor-hooks__layout-constrained {
+	.components-base-control {
+		margin-bottom: 0; // Cancel out margins added by block inspector
+	}
+}
+
+.block-editor-hooks__layout-constrained-helptext {
+	color: $gray-700;
+	font-size: $helptext-font-size;
+	margin-bottom: 0; // Cancel out margins added by common.css
+}
+
+.block-editor-hooks__flex-layout-justification-controls,
+.block-editor-hooks__flex-layout-orientation-controls {
+	margin-bottom: $grid-unit-15;
+	legend {
+		margin-bottom: $grid-unit-10;
+	}
+}
+
+.block-editor-hooks__grid-layout-columns-and-rows-controls,
+.block-editor-hooks__grid-layout-minimum-width-control {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+	margin: 0;
+}

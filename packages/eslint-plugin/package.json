@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "7.1.0",
+	"version": "25.0.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -10,7 +10,7 @@
 		"eslint",
 		"plugin"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-plugin/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/eslint-plugin/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -19,30 +19,66 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
 	"files": [
 		"configs",
+		"eslintrc",
 		"rules",
 		"utils",
 		"index.js"
 	],
 	"main": "index.js",
+	"exports": {
+		".": {
+			"default": "./index.js"
+		},
+		"./eslintrc": {
+			"default": "./eslintrc/index.js"
+		},
+		"./package.json": "./package.json"
+	},
 	"dependencies": {
+		"@babel/eslint-parser": "^7.28.6",
+		"@eslint-community/eslint-plugin-eslint-comments": "^4.4.0",
+		"@eslint/compat": "^2.0.0",
+		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",
-		"babel-eslint": "^10.1.0",
+		"@wordpress/theme": "file:../theme",
 		"cosmiconfig": "^7.0.0",
-		"eslint-config-prettier": "^6.10.1",
-		"eslint-plugin-jest": "^23.8.2",
-		"eslint-plugin-jsdoc": "^30.2.2",
-		"eslint-plugin-jsx-a11y": "^6.2.3",
-		"eslint-plugin-prettier": "^3.1.2",
-		"eslint-plugin-react": "^7.20.0",
-		"eslint-plugin-react-hooks": "^4.0.4",
-		"globals": "^12.0.0",
-		"prettier": "npm:wp-prettier@2.0.5",
-		"requireindex": "^1.2.0"
+		"eslint-config-prettier": "^10.0.0",
+		"eslint-import-resolver-typescript": "^4.4.4",
+		"eslint-plugin-import": "^2.31.0",
+		"eslint-plugin-jest": "^28.0.0",
+		"eslint-plugin-jsdoc": "^50.0.0",
+		"eslint-plugin-jsx-a11y": "^6.10.0",
+		"eslint-plugin-playwright": "^2.1.0",
+		"eslint-plugin-prettier": "^5.0.0",
+		"eslint-plugin-react": "^7.37.0",
+		"eslint-plugin-react-hooks": "^5.0.0",
+		"globals": "^16.0.0",
+		"requireindex": "^1.2.0",
+		"typescript-eslint": "^8.0.0"
+	},
+	"devDependencies": {
+		"@types/eslint": "^9",
+		"@types/estree": "1.0.5"
 	},
 	"peerDependencies": {
-		"eslint": "^6 || ^7"
+		"@babel/core": ">=7",
+		"eslint": "^9.0.0 || ^10.0.0",
+		"prettier": ">=3",
+		"typescript": ">=5"
+	},
+	"peerDependenciesMeta": {
+		"prettier": {
+			"optional": true
+		},
+		"typescript": {
+			"optional": true
+		}
 	},
 	"publishConfig": {
 		"access": "public"

@@ -1,8 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import createSelector from 'rememo';
-import { includes, difference, keys, has } from 'lodash';
+import { createSelector } from '@wordpress/data';
 
 /**
  * An object containing information about a guide.
@@ -25,15 +24,15 @@ import { includes, difference, keys, has } from 'lodash';
 export const getAssociatedGuide = createSelector(
 	( state, tipId ) => {
 		for ( const tipIds of state.guides ) {
-			if ( includes( tipIds, tipId ) ) {
-				const nonDismissedTips = difference(
-					tipIds,
-					keys( state.preferences.dismissedTips )
+			if ( tipIds.includes( tipId ) ) {
+				const nonDismissedTips = tipIds.filter(
+					( tId ) =>
+						! Object.keys(
+							state.preferences.dismissedTips
+						).includes( tId )
 				);
-				const [
-					currentTipId = null,
-					nextTipId = null,
-				] = nonDismissedTips;
+				const [ currentTipId = null, nextTipId = null ] =
+					nonDismissedTips;
 				return { tipIds, currentTipId, nextTipId };
 			}
 		}
@@ -58,7 +57,7 @@ export function isTipVisible( state, tipId ) {
 		return false;
 	}
 
-	if ( has( state.preferences.dismissedTips, [ tipId ] ) ) {
+	if ( state.preferences.dismissedTips?.hasOwnProperty( tipId ) ) {
 		return false;
 	}
 

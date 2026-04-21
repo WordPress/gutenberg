@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .wp-block[data-align="center"] > .wp-block-button {
 	text-align: center;
 	margin-left: auto;
@@ -13,11 +15,6 @@
 	position: relative;
 	cursor: text;
 
-	// Make placeholder text white unless custom colors or outline versions are chosen.
-	&:not(.has-text-color):not(.is-style-outline) [data-rich-text-placeholder]::after {
-		color: $white;
-	}
-
 	// Add outline to button on focus to indicate focus-state
 	&:focus {
 		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
@@ -30,40 +27,6 @@
 	// Increase placeholder opacity to meet contrast ratios.
 	&[data-rich-text-placeholder]::after {
 		opacity: 0.8;
-	}
-}
-
-.wp-block-button__inline-link {
-	color: $dark-gray-500;
-	height: 0;
-	overflow: hidden;
-	max-width: 290px;
-
-	&-input__suggestions {
-		max-width: 290px;
-	}
-
-	@include break-medium() {
-		max-width: 260px;
-
-		&-input__suggestions {
-			max-width: 260px;
-		}
-
-	}
-	@include break-large() {
-		max-width: 290px;
-
-		&-input__suggestions {
-			max-width: 290px;
-		}
-
-	}
-
-	.is-selected & {
-		height: auto;
-		overflow: visible;
-		margin-top: $grid-unit-20;
 	}
 }
 

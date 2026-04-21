@@ -1,0 +1,27 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// This creates a "slot" where the block you're dragging appeared.
+// We use !important as one of the rules are meant to be overridden.
+.block-editor-block-list__layout .is-dragging {
+	opacity: 0.1;
+
+	iframe {
+		pointer-events: none;
+	}
+
+	// Hide the multi selection indicator when dragging.
+	&::selection {
+		background: transparent !important;
+	}
+
+	&::after {
+		content: none !important;
+	}
+}
+
+// Images are draggable by default, so disable drag for them if not explicitly
+// set. This is done so that the block can capture the drag event instead.
+.wp-block img:not([draggable]),
+.wp-block svg:not([draggable]) {
+	pointer-events: none;
+}

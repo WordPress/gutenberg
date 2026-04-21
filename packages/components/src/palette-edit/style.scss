@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.components-palette-edit__popover-gradient-picker {
+	width: 260px;
+	padding: $grid-unit-10;
+}
+.components-dropdown-menu__menu {
+	.components-palette-edit__menu-button {
+		width: 100%;
+	}
+}

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { create, join, split, toHTMLString } from '@wordpress/rich-text';
+import { create, join, toHTMLString } from '@wordpress/rich-text';
 
 const transforms = {
 	from: [
@@ -17,9 +17,8 @@ const transforms = {
 							attributes.map( ( { content } ) =>
 								create( { html: content } )
 							),
-							'\u2028'
+							'\n'
 						),
-						multilineTag: 'p',
 					} ),
 					anchor: attributes.anchor,
 				} );
@@ -30,7 +29,7 @@ const transforms = {
 			blocks: [ 'core/heading' ],
 			transform: ( { content, anchor } ) => {
 				return createBlock( 'core/pullquote', {
-					value: `<p>${ content }</p>`,
+					value: content,
 					anchor,
 				} );
 			},
@@ -42,19 +41,14 @@ const transforms = {
 			blocks: [ 'core/paragraph' ],
 			transform: ( { value, citation } ) => {
 				const paragraphs = [];
-				if ( value && value !== '<p></p>' ) {
+				if ( value ) {
 					paragraphs.push(
-						...split(
-							create( { html: value, multilineTag: 'p' } ),
-							'\u2028'
-						).map( ( piece ) =>
-							createBlock( 'core/paragraph', {
-								content: toHTMLString( { value: piece } ),
-							} )
-						)
+						createBlock( 'core/paragraph', {
+							content: value,
+						} )
 					);
 				}
-				if ( citation && citation !== '<p></p>' ) {
+				if ( citation ) {
 					paragraphs.push(
 						createBlock( 'core/paragraph', {
 							content: citation,
@@ -72,37 +66,27 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { value, citation, ...attrs } ) => {
+			transform: ( { value, citation } ) => {
 				// If there is no pullquote content, use the citation as the
 				// content of the resulting heading. A nonexistent citation
 				// will result in an empty heading.
-				if ( value === '<p></p>' ) {
+				if ( ! value ) {
 					return createBlock( 'core/heading', {
 						content: citation,
 					} );
 				}
-				const pieces = split(
-					create( { html: value, multilineTag: 'p' } ),
-					'\u2028'
-				);
 				const headingBlock = createBlock( 'core/heading', {
-					content: toHTMLString( { value: pieces[ 0 ] } ),
+					content: value,
 				} );
-				if ( ! citation && pieces.length === 1 ) {
+				if ( ! citation ) {
 					return headingBlock;
 				}
-				const quotePieces = pieces.slice( 1 );
-				const pullquoteBlock = createBlock( 'core/pullquote', {
-					...attrs,
-					citation,
-					value: toHTMLString( {
-						value: quotePieces.length
-							? join( pieces.slice( 1 ), '\u2028' )
-							: create(),
-						multilineTag: 'p',
+				return [
+					headingBlock,
+					createBlock( 'core/heading', {
+						content: citation,
 					} ),
-				} );
-				return [ headingBlock, pullquoteBlock ];
+				];
 			},
 		},
 	],

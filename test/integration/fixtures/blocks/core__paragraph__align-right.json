@@ -1,0 +1,16 @@
+[
+	{
+		"name": "core/paragraph",
+		"isValid": true,
+		"attributes": {
+			"content": "... like this one, which is separate from the above and right aligned.",
+			"dropCap": false,
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

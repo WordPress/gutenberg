@@ -1,0 +1,26 @@
+[
+	{
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"showSubmenuIcon": true,
+			"overlayMenu": "mobile",
+			"icon": "handle",
+			"hasIcon": true,
+			"maxNestingLevel": 5,
+			"submenuVisibility": "hover"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

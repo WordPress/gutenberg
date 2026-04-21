@@ -1,64 +1,113 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
 import {
-	ComplementaryArea,
-	ComplementaryAreaMoreMenuItem,
-} from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
+	createContext,
+	useContext,
+	useState,
+	useRef,
+	useLayoutEffect,
+} from '@wordpress/element';
+import { focus } from '@wordpress/dom';
 
-const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
-	'EditSiteSidebarInspector'
-);
-export const SidebarInspectorFill = InspectorFill;
-const BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+export const SidebarNavigationContext = createContext( () => {} );
+SidebarNavigationContext.displayName = 'SidebarNavigationContext';
 
-const DefaultSidebar = ( { identifier, title, icon, children } ) => {
+// Focus a sidebar element after a navigation. The element to focus is either
+// specified by `focusSelector` (when navigating back) or it is the first
+// tabbable element (usually the "Back" button).
+function focusSidebarElement( el, direction, focusSelector ) {
+	let elementToFocus;
+	if ( direction === 'back' && focusSelector ) {
+		elementToFocus = el.querySelector( focusSelector );
+	}
+	if ( direction !== null && ! elementToFocus ) {
+		const [ firstTabbable ] = focus.tabbable.find( el );
+		elementToFocus = firstTabbable ?? el;
+	}
+	elementToFocus?.focus();
+}
+
+// Navigation state that is updated when navigating back or forward. Helps us
+// manage the animations and also focus.
+function createNavState() {
+	let state = {
+		direction: null,
+		focusSelector: null,
+	};
+
+	return {
+		get() {
+			return state;
+		},
+		navigate( direction, focusSelector = null ) {
+			state = {
+				direction,
+				focusSelector:
+					direction === 'forward' && focusSelector
+						? focusSelector
+						: state.focusSelector,
+			};
+		},
+	};
+}
+
+function SidebarContentWrapper( { children, shouldAnimate } ) {
+	const navState = useContext( SidebarNavigationContext );
+	const wrapperRef = useRef();
+	const [ navAnimation, setNavAnimation ] = useState( null );
+
+	useLayoutEffect( () => {
+		const { direction, focusSelector } = navState.get();
+		focusSidebarElement( wrapperRef.current, direction, focusSelector );
+		setNavAnimation( direction );
+	}, [ navState ] );
+
+	const wrapperCls = clsx(
+		'edit-site-sidebar__screen-wrapper',
+		/*
+		 * Some panes do not have sub-panes and therefore
+		 * should not animate when clicked on.
+		 */
+		shouldAnimate
+			? {
+					'slide-from-left': navAnimation === 'back',
+					'slide-from-right': navAnimation === 'forward',
+			  }
+			: {}
+	);
+
 	return (
-		<>
-			<ComplementaryArea
-				scope="core/edit-site"
-				identifier={ identifier }
-				title={ title }
-				icon={ icon }
+		<div ref={ wrapperRef } className={ wrapperCls }>
+			{ children }
+		</div>
+	);
+}
+
+export function SidebarNavigationProvider( { children } ) {
+	const [ navState ] = useState( createNavState );
+
+	return (
+		<SidebarNavigationContext.Provider value={ navState }>
+			{ children }
+		</SidebarNavigationContext.Provider>
+	);
+}
+
+export function SidebarContent( { routeKey, shouldAnimate, children } ) {
+	return (
+		<div className="edit-site-sidebar__content">
+			<SidebarContentWrapper
+				shouldAnimate={ shouldAnimate }
+				key={ routeKey }
 			>
 				{ children }
-			</ComplementaryArea>
-			<ComplementaryAreaMoreMenuItem
-				scope="core/edit-site"
-				identifier={ identifier }
-				icon={ icon }
-			>
-				{ title }
-			</ComplementaryAreaMoreMenuItem>
-		</>
-	);
-};
-
-export function SidebarComplementaryAreaFills() {
-	return (
-		<>
-			<DefaultSidebar
-				identifier="edit-site/block-inspector"
-				title={ __( 'Block Inspector' ) }
-				icon={ cog }
-				isActiveByDefault={ BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT }
-			>
-				<InspectorSlot bubblesVirtually />
-			</DefaultSidebar>
-			<DefaultSidebar
-				identifier="edit-site/global-styles"
-				title={ __( 'Global Styles' ) }
-				icon={ pencil }
-			>
-				<p>Global Styles area</p>
-			</DefaultSidebar>
-		</>
+			</SidebarContentWrapper>
+		</div>
 	);
 }

@@ -2,18 +2,17 @@
  * External dependencies
  */
 import { useRoute, useNavigation } from '@react-navigation/native';
-import React from 'react';
 
 /**
  * WordPress dependencies
  */
 import { useContext, useMemo } from '@wordpress/element';
-import { BottomSheetContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import ColorPicker from '../../color-picker';
+import { ColorPicker } from '../../color-picker';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
 const PickerScreen = () => {
 	const route = useRoute();
@@ -44,6 +43,7 @@ const PickerScreen = () => {
 				onHandleHardwareButtonPress={ onHandleHardwareButtonPress }
 			/>
 		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [
 		setColor,
 		currentValue,

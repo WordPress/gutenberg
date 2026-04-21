@@ -2,47 +2,33 @@
  * External dependencies
  */
 import Mousetrap from 'mousetrap';
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { includes, castArray } from 'lodash';
+import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
 
 /**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
+import { isAppleOS } from '@wordpress/keycodes';
 
 /**
  * A block selection object.
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean} [bindGlobal]  Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}  [eventName]   Event name used to trigger the handler, defaults to keydown.
- * @property {boolean} [isDisabled]  Disables the keyboard handler if the value is true.
- * @property {Object}  [target]      React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}                             [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}                              [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}                             [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {React.RefObject<HTMLElement | null>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
-
-/**
- * Return true if platform is MacOS.
- *
- * @param {Object} _window   window object by default; used for DI testing.
- *
- * @return {boolean} True if MacOS; false otherwise.
- */
-function isAppleOS( _window = window ) {
-	const { platform } = _window.navigator;
-
-	return (
-		platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform )
-	);
-}
 
 /**
  * Attach a keyboard shortcut handler.
  *
- * @param {string[]|string}         shortcuts  Keyboard Shortcuts.
- * @param {Function}                callback   Shortcut callback.
- * @param {WPKeyboardShortcutConfig} options    Shortcut options.
+ * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
+ *
+ * @param {string[]|string}                                             shortcuts Keyboard Shortcuts.
+ * @param {(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
+ * @param {WPKeyboardShortcutConfig}                                    options   Shortcut options.
  */
 function useKeyboardShortcut(
 	shortcuts,
@@ -54,17 +40,27 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useRef( callback );
+	const currentCallbackRef = useRef( callback );
 	useEffect( () => {
-		currentCallback.current = callback;
+		currentCallbackRef.current = callback;
 	}, [ callback ] );
 
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
 		}
-		const mousetrap = new Mousetrap( target ? target.current : document );
-		castArray( shortcuts ).forEach( ( shortcut ) => {
+		const mousetrap = new Mousetrap(
+			target && target.current
+				? target.current
+				: // We were passing `document` here previously, so to successfully cast it to Element we must cast it first to `unknown`.
+				  // Not sure if this is a mistake but it was the behavior previous to the addition of types so we're just doing what's
+				  // necessary to maintain the existing behavior.
+				  /** @type {Element} */ ( /** @type {unknown} */ ( document ) )
+		);
+		const shortcutsArray = Array.isArray( shortcuts )
+			? shortcuts
+			: [ shortcuts ];
+		shortcutsArray.forEach( ( shortcut ) => {
 			const keys = shortcut.split( '+' );
 			// Determines whether a key is a modifier by the length of the string.
 			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
@@ -87,9 +83,12 @@ function useKeyboardShortcut(
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
+			// @ts-ignore `bindGlobal` is an undocumented property
 			mousetrap[ bindFn ](
 				shortcut,
-				( ...args ) => currentCallback.current( ...args ),
+				(
+					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
+				) => currentCallbackRef.current( ...args ),
 				eventName
 			);
 		} );

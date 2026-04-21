@@ -1,0 +1,114 @@
+.container {
+	background-color: $light-ultra-dim;
+	border-radius: 4px;
+	flex-direction: row;
+	align-items: center;
+}
+
+.containerDark {
+	background-color: $dark-ultra-dim;
+}
+
+@mixin circle($width) {
+	width: $width;
+	height: $width;
+	border-radius: $width*0.5;
+}
+
+.iconContainer {
+	background-color: $light-ultra-dim;
+	margin: 12px 16px;
+	align-items: center;
+	justify-content: center;
+	@include circle(37px);
+}
+
+.iconContainerDark {
+	background-color: $dark-ultra-dim;
+}
+
+.icon {
+	color: $light-secondary;
+}
+
+.iconDark {
+	color: $dark-secondary;
+}
+
+.iconDisabled {
+	color: $light-quaternary;
+}
+
+.iconDisabledDark {
+	color: $dark-quaternary;
+}
+
+.disabledIcon {
+	color: $black;
+}
+
+.titleContainer {
+	padding: 12px 16px 12px 0;
+	flex: 1;
+}
+
+.titleContainerIOS {
+	margin-top: -1px;
+}
+
+.titleContainerAndroid {
+	margin-top: -2px;
+}
+
+.title {
+	font-size: 17;
+	margin-bottom: 1px;
+	color: $light-primary;
+}
+
+.titleDark {
+	color: $dark-primary;
+}
+
+.subtitleContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.subtitle {
+	font-size: 12;
+	color: $light-secondary;
+}
+
+.subtitleDark {
+	color: $dark-secondary;
+}
+
+.buttonBackground {
+	margin: 12px 16px;
+	padding: 8px 16px;
+	border-radius: 500px;
+	background-color: $light-ultra-dim;
+}
+
+.buttonBackgroundDark {
+	background-color: $dark-ultra-dim;
+}
+
+.buttonText {
+	font-size: 14;
+	font-weight: 500;
+	color: $blue-wordpress;
+}
+
+.errorIcon {
+	margin-right: 4px;
+}
+
+.uploadFailed {
+	color: $red-50;
+}
+
+.uploadFailedDark {
+	color: $red-30;
+}

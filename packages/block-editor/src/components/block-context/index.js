@@ -3,7 +3,7 @@
  */
 import { createContext, useContext, useMemo } from '@wordpress/element';
 
-/** @typedef {import('react').ReactNode} ReactNode */
+/** @typedef {React.ReactNode} ReactNode */
 
 /**
  * @typedef BlockContextProviderProps
@@ -13,22 +13,23 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
  * @property {ReactNode}        children Component children.
  */
 
-/** @type {import('react').Context<Record<string,*>>} */
+/** @type {React.Context<Record<string,*>>} */
 const Context = createContext( {} );
+Context.displayName = 'BlockContext';
 
 /**
  * Component which merges passed value with current consumed block context.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-context/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-context/README.md
  *
  * @param {BlockContextProviderProps} props
  */
 export function BlockContextProvider( { value, children } ) {
 	const context = useContext( Context );
-	const nextValue = useMemo( () => ( { ...context, ...value } ), [
-		context,
-		value,
-	] );
+	const nextValue = useMemo(
+		() => ( { ...context, ...value } ),
+		[ context, value ]
+	);
 
 	return <Context.Provider value={ nextValue } children={ children } />;
 }

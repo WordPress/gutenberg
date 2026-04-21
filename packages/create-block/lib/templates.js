@@ -1,47 +1,87 @@
 /**
  * External dependencies
  */
+const { existsSync } = require( 'fs' );
+const { mkdtemp, readFile } = require( 'fs' ).promises;
+const { tmpdir } = require( 'os' );
+const { join, resolve } = require( 'path' );
+const inquirer = require( '@inquirer/prompts' );
+const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
-const { readFile } = require( 'fs' ).promises;
-const { fromPairs } = require( 'lodash' );
-const { join } = require( 'path' );
+const npmPackageArg = require( 'npm-package-arg' );
+const rimraf = require( 'rimraf' ).sync;
 
 /**
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
+const { info } = require( './log' );
 const prompts = require( './prompts' );
 
-const predefinedBlockTemplates = {
+const predefinedPluginTemplates = {
 	es5: {
 		defaultValues: {
-			slug: 'es5-example',
-			title: 'ES5 Example',
+			slug: 'example-static-es5',
+			title: 'Example Static (ES5)',
 			description:
-				'Example block written with ES5 standard and no JSX – no build step required.',
+				'Example block scaffolded with Create Block tool – no build step required.',
+			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
 			wpScripts: false,
-			editorScript: 'file:./index.js',
-			editorStyle: 'file:./editor.css',
-			style: 'file:./style.css',
+			editorScript: null,
+			editorStyle: null,
+			style: null,
+			viewStyle: null,
+			viewScript: 'file:./view.js',
+			example: {},
+		},
+		templatesPath: join( __dirname, 'templates', 'es5' ),
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic-es5',
+				title: 'Example Dynamic (ES5)',
+				render: 'file:./render.php',
+			},
 		},
 	},
-	esnext: {
+	standard: {
 		defaultValues: {
-			slug: 'esnext-example',
-			title: 'ESNext Example',
-			description:
-				'Example block written with ESNext standard and JSX support – build step required.',
+			slug: 'example-static',
+			title: 'Example Static',
+			description: 'Example block scaffolded with Create Block tool.',
+			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
+			viewScript: 'file:./view.js',
+			example: {},
+			folderName: './src/$slug',
+			npmDependencies: [
+				'@wordpress/block-editor',
+				'@wordpress/blocks',
+				'@wordpress/i18n',
+			],
+		},
+		variants: {
+			static: {},
+			dynamic: {
+				slug: 'example-dynamic',
+				title: 'Example Dynamic',
+				render: 'file:./render.php',
+			},
 		},
 	},
 };
 
-const getOutputTemplates = async ( name ) => {
-	const outputTemplatesPath = join( __dirname, 'templates', name );
+const getOutputTemplates = async ( outputTemplatesPath ) => {
 	const outputTemplatesFiles = await glob( '**/*.mustache', {
 		cwd: outputTemplatesPath,
 		dot: true,
 	} );
-	return fromPairs(
+	return Object.fromEntries(
 		await Promise.all(
 			outputTemplatesFiles.map( async ( outputTemplateFile ) => {
 				const outputFile = outputTemplateFile.replace(
@@ -58,49 +98,255 @@ const getOutputTemplates = async ( name ) => {
 	);
 };
 
-const getBlockTemplate = async ( templateName ) => {
-	if ( ! predefinedBlockTemplates[ templateName ] ) {
-		throw new CLIError(
-			`Invalid block template type name. Allowed values: ${ Object.keys(
-				predefinedBlockTemplates
-			).join( ', ' ) }.`
-		);
+const getOutputAssets = async ( outputAssetsPath ) => {
+	const outputAssetFiles = await glob( '**/*', {
+		cwd: outputAssetsPath,
+		dot: true,
+	} );
+	return Object.fromEntries(
+		await Promise.all(
+			outputAssetFiles.map( async ( outputAssetFile ) => {
+				const outputAsset = await readFile(
+					join( outputAssetsPath, outputAssetFile )
+				);
+				return [ outputAssetFile, outputAsset ];
+			} )
+		)
+	);
+};
+
+const externalTemplateExists = async ( templateName ) => {
+	try {
+		await command( `npm view ${ templateName }` );
+	} catch {
+		return false;
 	}
+	return true;
+};
+
+const configToTemplate = async ( {
+	pluginTemplatesPath,
+	blockTemplatesPath,
+	assetsPath,
+	defaultValues = {},
+	variants = {},
+	...deprecated
+} ) => {
+	if ( defaultValues === null || typeof defaultValues !== 'object' ) {
+		throw new CLIError( 'Template found but invalid definition provided.' );
+	}
+
+	if ( deprecated.templatesPath ) {
+		pluginTemplatesPath = deprecated.templatesPath;
+		defaultValues = {
+			folderName: '.',
+			editorScript: 'file:./build/index.js',
+			editorStyle: 'file:./build/index.css',
+			style: 'file:./build/style-index.css',
+			...defaultValues,
+		};
+	} else {
+		pluginTemplatesPath =
+			pluginTemplatesPath || join( __dirname, 'templates', 'plugin' );
+		blockTemplatesPath =
+			blockTemplatesPath || join( __dirname, 'templates', 'block' );
+	}
+
+	// Process variant-specific template paths
+	const variantTemplates = {};
+	for ( const [ variantName, variantConfig ] of Object.entries( variants ) ) {
+		if ( ! variantConfig ) {
+			continue;
+		}
+
+		const variantPluginTemplatesPath = variantConfig.pluginTemplatesPath;
+		const variantBlockTemplatesPath = variantConfig.blockTemplatesPath;
+		const variantAssetsPath = variantConfig.assetsPath;
+
+		let pluginOutputTemplates = null;
+		if ( variantPluginTemplatesPath === null ) {
+			pluginOutputTemplates = {};
+		} else if ( variantPluginTemplatesPath ) {
+			pluginOutputTemplates = await getOutputTemplates(
+				variantPluginTemplatesPath
+			);
+		}
+
+		let blockOutputTemplates = null;
+		if ( variantBlockTemplatesPath === null ) {
+			blockOutputTemplates = {};
+		} else if ( variantBlockTemplatesPath ) {
+			blockOutputTemplates = await getOutputTemplates(
+				variantBlockTemplatesPath
+			);
+		}
+
+		let outputAssets = null;
+		if ( variantAssetsPath === null ) {
+			outputAssets = {};
+		} else if ( variantAssetsPath ) {
+			outputAssets = await getOutputAssets( variantAssetsPath );
+		}
+
+		variantTemplates[ variantName ] = {
+			pluginOutputTemplates,
+			blockOutputTemplates,
+			outputAssets,
+		};
+	}
+
 	return {
-		...predefinedBlockTemplates[ templateName ],
-		outputTemplates: await getOutputTemplates( templateName ),
+		blockOutputTemplates: blockTemplatesPath
+			? await getOutputTemplates( blockTemplatesPath )
+			: {},
+		pluginOutputTemplates: await getOutputTemplates( pluginTemplatesPath ),
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		defaultValues,
+		variants,
+		variantTemplates,
 	};
 };
 
-const getDefaultValues = ( blockTemplate ) => {
+const getProjectTemplate = async ( templateName ) => {
+	if ( predefinedPluginTemplates[ templateName ] ) {
+		return await configToTemplate(
+			predefinedPluginTemplates[ templateName ]
+		);
+	}
+
+	try {
+		if ( existsSync( resolve( templateName ) ) ) {
+			return await configToTemplate( require( resolve( templateName ) ) );
+		}
+		return await configToTemplate( require( templateName ) );
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else if ( error.code !== 'MODULE_NOT_FOUND' ) {
+			throw new CLIError(
+				`Invalid block template loaded. Error: ${ error.message }`
+			);
+		}
+	}
+
+	if ( ! ( await externalTemplateExists( templateName ) ) ) {
+		throw new CLIError(
+			`Invalid plugin template type name: "${ templateName }". Allowed values: ` +
+				Object.keys( predefinedPluginTemplates )
+					.map( ( name ) => `"${ name }"` )
+					.join( ', ' ) +
+				', or an existing npm package name.'
+		);
+	}
+
+	let tempCwd;
+
+	try {
+		info( '' );
+		info( 'Downloading template files. It might take some time...' );
+
+		tempCwd = await mkdtemp( join( tmpdir(), 'wp-create-block-' ) );
+
+		await command( `npm install ${ templateName } --no-save`, {
+			cwd: tempCwd,
+		} );
+
+		const { name } = npmPackageArg( templateName );
+		return await configToTemplate(
+			require(
+				require.resolve( name, {
+					paths: [ tempCwd ],
+				} )
+			)
+		);
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else {
+			throw new CLIError(
+				`Invalid plugin template downloaded. Error: ${ error.message }`
+			);
+		}
+	} finally {
+		if ( tempCwd ) {
+			rimraf( tempCwd );
+		}
+	}
+};
+
+const getDefaultValues = ( projectTemplate, variant ) => {
 	return {
+		$schema: 'https://schemas.wp.org/trunk/block.json',
+		apiVersion: 3,
 		namespace: 'create-block',
-		dashicon: 'smiley',
 		category: 'widgets',
+		textdomain: '',
 		author: 'The WordPress Contributors',
 		license: 'GPL-2.0-or-later',
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
+		requiresAtLeast: '6.8',
+		requiresPHP: '7.4',
+		testedUpTo: '6.8',
 		wpScripts: true,
-		editorScript: 'file:./build/index.js',
-		editorStyle: 'file:./build/index.css',
-		style: 'file:./build/style-index.css',
-		...blockTemplate.defaultValues,
+		customScripts: {},
+		wpEnv: false,
+		npmDependencies: [],
+		folderName: './src',
+		editorScript: 'file:./index.js',
+		editorStyle: 'file:./index.css',
+		style: 'file:./style-index.css',
+		transformer: ( view ) => view,
+		...projectTemplate.defaultValues,
+		...projectTemplate.variants?.[ variant ],
+		variantVars: getVariantVars( projectTemplate.variants, variant ),
 	};
 };
 
-const getPrompts = ( blockTemplate ) => {
-	const defaultValues = getDefaultValues( blockTemplate );
-	return Object.keys( prompts ).map( ( promptName ) => {
-		return {
-			...prompts[ promptName ],
+const runPrompts = async (
+	projectTemplate,
+	promptNames,
+	variant,
+	optionsValues
+) => {
+	const defaultValues = getDefaultValues( projectTemplate, variant );
+	const result = {};
+	for ( const promptName of promptNames ) {
+		if ( Object.keys( optionsValues ).includes( promptName ) ) {
+			continue;
+		}
+
+		const { type, ...config } = prompts[ promptName ];
+		result[ promptName ] = await inquirer[ type ]( {
+			...config,
 			default: defaultValues[ promptName ],
-		};
-	} );
+		} );
+	}
+
+	return result;
+};
+
+const getVariantVars = ( variants, variant ) => {
+	const variantVars = {};
+	const variantNames = Object.keys( variants );
+	if ( variantNames.length === 0 ) {
+		return variantVars;
+	}
+
+	const currentVariant = variant ?? variantNames[ 0 ];
+	for ( const variantName of variantNames ) {
+		const key =
+			variantName.charAt( 0 ).toUpperCase() + variantName.slice( 1 );
+		variantVars[ `is${ key }Variant` ] = currentVariant === variantName;
+	}
+
+	return variantVars;
 };
 
 module.exports = {
-	getBlockTemplate,
 	getDefaultValues,
-	getPrompts,
+	getProjectTemplate,
+	runPrompts,
+	getOutputTemplates,
+	getOutputAssets,
 };

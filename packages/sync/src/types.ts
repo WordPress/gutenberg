@@ -1,0 +1,198 @@
+/**
+ * WordPress dependencies
+ */
+import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
+
+/**
+ * External dependencies
+ */
+import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
+
+/**
+ * Internal dependencies
+ */
+import type { ConnectionError } from './errors';
+
+/* globalThis */
+declare global {
+	interface Window {
+		_wpCollaborationEnabled?: string;
+	}
+}
+
+export type CRDTDoc = Y.Doc;
+export type AwarenessID = string;
+export type EntityID = string;
+export type ObjectID = string;
+export type ObjectType = string;
+
+// An origin is a value passed by the transactor to identify the source of a
+// change. It can be any value, and is not used internally by Yjs. Origins are
+// preserved locally, while a remote change will have the provider instance as
+// its origin.
+export type Origin = any;
+
+// Object data represents any entity record. There are not any expectations that
+// can hold on its shape, beyond a record with string keys and unknown values.
+export type ObjectData = Record< string, unknown >;
+
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: ConnectionStatus;
+}
+
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
+export interface ProviderCreatorResult {
+	destroy: () => void;
+	on: ProviderOn;
+}
+
+/**
+ * Current connection status of a sync provider.
+ */
+export interface ConnectionStatusConnected {
+	status: 'connected';
+}
+
+export interface ConnectionStatusConnecting {
+	status: 'connecting';
+}
+
+export interface ConnectionStatusDisconnected {
+	status: 'disconnected';
+
+	/** Optional error information. */
+	error?: ConnectionError;
+
+	/** Whether the error condition is retryable via user action. */
+	canManuallyRetry?: boolean;
+
+	/** Number of consecutive poll failures since the last successful connection. */
+	consecutiveFailures?: number;
+
+	/** Whether the background retry schedule has been exhausted without a successful connection. */
+	backgroundRetriesFailed?: boolean;
+
+	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
+	willAutoRetryInMs?: number;
+}
+
+export type ConnectionStatus =
+	| ConnectionStatusConnected
+	| ConnectionStatusConnecting
+	| ConnectionStatusDisconnected;
+
+export type OnStatusChangeCallback = (
+	status: ConnectionStatus | null
+) => void;
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
+}
+
+export type ProviderCreator = (
+	options: ProviderCreatorOptions
+) => Promise< ProviderCreatorResult >;
+
+export interface CollectionHandlers {
+	onStatusChange: OnStatusChangeCallback;
+	refetchRecords: () => Promise< void >;
+}
+
+export interface SyncManagerUpdateOptions {
+	isSave?: boolean;
+	isNewUndoLevel?: boolean;
+}
+
+export interface RecordHandlers {
+	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	editRecord: (
+		data: Partial< ObjectData >,
+		options?: { undoIgnore?: boolean }
+	) => void;
+	getEditedRecord: () => Promise< ObjectData >;
+	onStatusChange: OnStatusChangeCallback;
+	persistCRDTDoc: () => void;
+	refetchRecord: () => Promise< void >;
+	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+}
+
+export interface SyncConfig {
+	applyChangesToCRDTDoc: (
+		ydoc: Y.Doc,
+		changes: Partial< ObjectData >
+	) => void;
+	createAwareness?: (
+		ydoc: Y.Doc,
+		objectId?: ObjectID
+	) => Awareness | undefined;
+	getChangesFromCRDTDoc: (
+		ydoc: Y.Doc,
+		editedRecord: ObjectData
+	) => ObjectData;
+	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
+	shouldSync?: (
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	) => boolean;
+}
+
+export interface SyncManager {
+	createPersistedCRDTDoc: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => Promise< string | null >;
+	getAwareness: < State extends Awareness >(
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => State | undefined;
+	load: (
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		objectId: ObjectID,
+		record: ObjectData,
+		handlers: RecordHandlers
+	) => Promise< void >;
+	loadCollection: (
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		handlers: CollectionHandlers
+	) => Promise< void >;
+	// undoManager is undefined until the first entity is loaded.
+	undoManager: SyncUndoManager | undefined;
+	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
+	update: (
+		objectType: ObjectType,
+		objectId: ObjectID | null,
+		changes: Partial< ObjectData >,
+		origin: string,
+		options?: SyncManagerUpdateOptions
+	) => void;
+}
+
+export interface SyncUndoManager extends WPUndoManager< ObjectData > {
+	addToScope: (
+		ymap: Y.Map< any >,
+		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+	) => void;
+	stopCapturing: () => void;
+}

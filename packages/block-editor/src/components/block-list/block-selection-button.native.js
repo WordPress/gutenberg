@@ -5,6 +5,7 @@ import { Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { getBlockType } from '@wordpress/blocks';
+import { BlockIcon } from '@wordpress/block-editor';
 
 /**
  * External dependencies
@@ -15,17 +16,18 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import useBlockDisplayInformation from '../use-block-display-information';
 import SubdirectorSVG from './subdirectory-icon';
-
+import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
 const BlockSelectionButton = ( {
 	clientId,
-	blockIcon,
 	rootClientId,
 	rootBlockIcon,
 	isRTL,
 } ) => {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<View
 			style={ [
@@ -36,11 +38,9 @@ const BlockSelectionButton = ( {
 			<TouchableOpacity
 				style={ styles.button }
 				onPress={ () => {
-					/* Open BottomSheet with markup */
+					/* Open BottomSheet with markup. */
 				} }
-				disabled={
-					true
-				} /* Disable temporarily since onPress function is empty */
+				disabled /* Disable temporarily since onPress function is empty. */
 			>
 				{ rootClientId &&
 					rootBlockIcon && [
@@ -57,18 +57,20 @@ const BlockSelectionButton = ( {
 							/>
 						</View>,
 					] }
-				<Icon
-					size={ 24 }
-					icon={ blockIcon.src }
-					fill={ styles.icon.color }
-				/>
+				{ blockInformation?.icon && (
+					<BlockIcon
+						size={ 24 }
+						icon={ blockInformation.icon }
+						fill={ styles.icon.color }
+					/>
+				) }
 				<Text
 					maxFontSizeMultiplier={ 1.25 }
 					ellipsizeMode="tail"
 					numberOfLines={ 1 }
 					style={ styles.selectionButtonTitle }
 				>
-					<BlockTitle clientId={ clientId } />
+					<BlockTitle clientId={ clientId } maximumLength={ 35 } />
 				</Text>
 			</TouchableOpacity>
 		</View>
@@ -77,21 +79,12 @@ const BlockSelectionButton = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName, getSettings } = select(
-			'core/block-editor'
-		);
-
-		const blockName = getBlockName( clientId );
-		const blockType = getBlockType( blockName );
-		const blockIcon = blockType ? blockType.icon : {};
-
+		const { getBlockRootClientId, getBlockName, getSettings } =
+			select( blockEditorStore );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		if ( ! rootClientId ) {
-			return {
-				clientId,
-				blockIcon,
-			};
+			return { clientId };
 		}
 		const rootBlockName = getBlockName( rootClientId );
 		const rootBlockType = getBlockType( rootBlockName );
@@ -99,7 +92,6 @@ export default compose( [
 
 		return {
 			clientId,
-			blockIcon,
 			rootClientId,
 			rootBlockIcon,
 			isRTL: getSettings().isRTL,

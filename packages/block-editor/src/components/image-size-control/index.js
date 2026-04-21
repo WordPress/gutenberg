@@ -1,22 +1,45 @@
 /**
- * External dependencies
- */
-import { isEmpty, noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
-	Button,
-	ButtonGroup,
 	SelectControl,
-	TextControl,
+	__experimentalNumberControl as NumberControl,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import useDimensionHandler from './use-dimension-handler';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
+const noop = () => {};
+
+/**
+ * Get scaled width and height for the given scale.
+ *
+ * @param {number} scale       The scale to get the scaled width and height for.
+ * @param {number} imageWidth  The image width.
+ * @param {number} imageHeight The image height.
+ *
+ * @return {Object} The scaled width and height.
+ */
+function getScaledWidthAndHeight( scale, imageWidth, imageHeight ) {
+	const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
+	const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+
+	return {
+		scaledWidth,
+		scaledHeight,
+	};
+}
 
 export default function ImageSizeControl( {
+	imageSizeHelp,
 	imageWidth,
 	imageHeight,
 	imageSizeOptions = [],
@@ -27,87 +50,101 @@ export default function ImageSizeControl( {
 	onChange,
 	onChangeImage = noop,
 } ) {
-	function updateDimensions( nextWidth, nextHeight ) {
-		return () => {
-			onChange( { width: nextWidth, height: nextHeight } );
-		};
-	}
+	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
+		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
+
+	/**
+	 * Updates the dimensions for the given scale.
+	 * Handler for toggle group control change.
+	 *
+	 * @param {number} scale The scale to update the dimensions for.
+	 */
+	const handleUpdateDimensions = ( scale ) => {
+		if ( undefined === scale ) {
+			updateDimensions();
+			return;
+		}
+
+		const { scaledWidth, scaledHeight } = getScaledWidthAndHeight(
+			scale,
+			imageWidth,
+			imageHeight
+		);
+
+		updateDimensions( scaledHeight, scaledWidth );
+	};
+
+	/**
+	 * Add the stored image preset value to toggle group control.
+	 */
+	const selectedValue = IMAGE_SIZE_PRESETS.find( ( scale ) => {
+		const { scaledWidth, scaledHeight } = getScaledWidthAndHeight(
+			scale,
+			imageWidth,
+			imageHeight
+		);
+
+		return currentWidth === scaledWidth && currentHeight === scaledHeight;
+	} );
 
 	return (
-		<>
-			{ ! isEmpty( imageSizeOptions ) && (
+		<VStack className="block-editor-image-size-control" spacing="4">
+			{ imageSizeOptions && imageSizeOptions.length > 0 && (
 				<SelectControl
-					label={ __( 'Image size' ) }
+					label={ __( 'Resolution' ) }
 					value={ slug }
 					options={ imageSizeOptions }
 					onChange={ onChangeImage }
+					help={ imageSizeHelp }
+					size="__unstable-large"
 				/>
 			) }
 			{ isResizable && (
-				<div className="block-editor-image-size-control">
-					<p className="block-editor-image-size-control__row">
-						{ __( 'Image dimensions' ) }
-					</p>
-					<div className="block-editor-image-size-control__row">
-						<TextControl
-							type="number"
-							className="block-editor-image-size-control__width"
+				<>
+					<HStack align="baseline" spacing="4">
+						<NumberControl
 							label={ __( 'Width' ) }
-							value={ width ?? imageWidth ?? '' }
+							value={ currentWidth }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( { width: parseInt( value, 10 ) } )
+								updateDimension( 'width', value )
 							}
+							size="__unstable-large"
 						/>
-						<TextControl
-							type="number"
-							className="block-editor-image-size-control__height"
+						<NumberControl
 							label={ __( 'Height' ) }
-							value={ height ?? imageHeight ?? '' }
+							value={ currentHeight }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( {
-									height: parseInt( value, 10 ),
-								} )
+								updateDimension( 'height', value )
 							}
+							size="__unstable-large"
 						/>
-					</div>
-					<div className="block-editor-image-size-control__row">
-						<ButtonGroup aria-label={ __( 'Image size presets' ) }>
-							{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
-								const scaledWidth = Math.round(
-									imageWidth * ( scale / 100 )
-								);
-								const scaledHeight = Math.round(
-									imageHeight * ( scale / 100 )
-								);
-
-								const isCurrent =
-									width === scaledWidth &&
-									height === scaledHeight;
-
-								return (
-									<Button
-										key={ scale }
-										isSmall
-										isPrimary={ isCurrent }
-										isPressed={ isCurrent }
-										onClick={ updateDimensions(
-											scaledWidth,
-											scaledHeight
-										) }
-									>
-										{ scale }%
-									</Button>
-								);
-							} ) }
-						</ButtonGroup>
-						<Button isSmall onClick={ updateDimensions() }>
-							{ __( 'Reset' ) }
-						</Button>
-					</div>
-				</div>
+					</HStack>
+					<ToggleGroupControl
+						label={ __( 'Image size presets' ) }
+						hideLabelFromVision
+						onChange={ handleUpdateDimensions }
+						value={ selectedValue }
+						isBlock
+						__next40pxDefaultSize
+					>
+						{ IMAGE_SIZE_PRESETS.map( ( scale ) => {
+							return (
+								<ToggleGroupControlOption
+									key={ scale }
+									value={ scale }
+									label={ sprintf(
+										/* translators: %d: Percentage value. */
+										__( '%d%%' ),
+										scale
+									) }
+								/>
+							);
+						} ) }
+					</ToggleGroupControl>
+				</>
 			) }
-		</>
+		</VStack>
 	);
 }

@@ -6,7 +6,6 @@ import path from 'path';
 /**
  * WordPress dependencies
  */
-// eslint-disable-next-line no-restricted-syntax
 import {
 	jsTester,
 	phpTester,
@@ -17,7 +16,7 @@ import {
  */
 import { parse } from '../src';
 
-describe( 'block-serialization-default-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe
+describe( 'block-serialization-default-parser-js', jsTester( parse ) ); // eslint-disable-line jest/valid-describe-callback
 
 phpTester(
 	'block-serialization-default-parser-php',

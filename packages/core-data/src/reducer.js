@@ -1,43 +1,24 @@
 /**
  * External dependencies
  */
-import { keyBy, map, groupBy, flowRight, isEqual, get } from 'lodash';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
+import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { createUndoManager } from '@wordpress/undo-manager';
 
 /**
  * Internal dependencies
  */
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
-import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { ConnectionErrorCode } from './sync';
 
-/**
- * Reducer managing terms state. Keyed by taxonomy slug, the value is either
- * undefined (if no request has been made for given taxonomy), null (if a
- * request is in-flight for given taxonomy), or the array of terms for the
- * taxonomy.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function terms( state = {}, action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TERMS':
-			return {
-				...state,
-				[ action.taxonomy ]: action.terms,
-			};
-	}
-
-	return state;
-}
+/** @typedef {import('./types').AnyFunction} AnyFunction */
 
 /**
  * Reducer managing authors state. Keyed by id.
@@ -53,14 +34,18 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 			return {
 				byId: {
 					...state.byId,
-					...keyBy( action.users, 'id' ),
+					// Key users by their ID.
+					...action.users.reduce(
+						( newUsers, user ) => ( {
+							...newUsers,
+							[ user.id ]: user,
+						} ),
+						{}
+					),
 				},
 				queries: {
 					...state.queries,
-					[ action.queryID ]: map(
-						action.users,
-						( user ) => user.id
-					),
+					[ action.queryID ]: action.users.map( ( user ) => user.id ),
 				},
 			};
 	}
@@ -86,29 +71,12 @@ export function currentUser( state = {}, action ) {
 }
 
 /**
- * Reducer managing taxonomies.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function taxonomies( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_TAXONOMIES':
-			return action.taxonomies;
-	}
-
-	return state;
-}
-
-/**
  * Reducer managing the current theme.
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return {string|undefined} Updated state.
  */
 export function currentTheme( state = undefined, action ) {
 	switch ( action.type ) {
@@ -120,19 +88,36 @@ export function currentTheme( state = undefined, action ) {
 }
 
 /**
- * Reducer managing installed themes.
+ * Reducer managing the current global styles id.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {string|undefined} state  Current state.
+ * @param {Object}           action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {string|undefined} Updated state.
  */
-export function themes( state = {}, action ) {
+export function currentGlobalStylesId( state = undefined, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_CURRENT_THEME':
+		case 'RECEIVE_CURRENT_GLOBAL_STYLES_ID':
+			return action.id;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme base global styles.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeBaseGlobalStyles( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLES':
 			return {
 				...state,
-				[ action.currentTheme.stylesheet ]: action.currentTheme,
+				[ action.stylesheet ]: action.globalStyles,
 			};
 	}
 
@@ -140,24 +125,51 @@ export function themes( state = {}, action ) {
 }
 
 /**
- * Reducer managing theme supports data.
+ * Reducer managing the theme global styles variations.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return {Record<string, object>} Updated state.
  */
-export function themeSupports( state = {}, action ) {
+export function themeGlobalStyleVariations( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_THEME_SUPPORTS':
+		case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
 			return {
 				...state,
-				...action.themeSupports,
+				[ action.stylesheet ]: action.variations,
 			};
 	}
 
 	return state;
 }
+
+const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
+	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
+		const { record } = action;
+
+		let newState = state;
+		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+			newState = reducer( newState, {
+				type: 'EDIT_ENTITY_RECORD',
+				kind,
+				name,
+				recordId,
+				edits: Object.entries( changes ).reduce(
+					( acc, [ key, value ] ) => {
+						acc[ key ] =
+							action.type === 'UNDO' ? value.from : value.to;
+						return acc;
+					},
+					{}
+				),
+			} );
+		} );
+		return newState;
+	}
+
+	return reducer( state, action );
+};
 
 /**
  * Higher Order Reducer for a given entity config. It supports:
@@ -166,12 +178,14 @@ export function themeSupports( state = {}, action ) {
  *  - Editing
  *  - Saving
  *
- * @param {Object} entityConfig  Entity config.
+ * @param {Object} entityConfig Entity config.
  *
- * @return {Function} Reducer.
+ * @return {AnyFunction} Reducer.
  */
 function entity( entityConfig ) {
-	return flowRight( [
+	return compose( [
+		withMultiEntityRecordEdits,
+
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
 		ifMatchingAction(
@@ -185,21 +199,28 @@ function entity( entityConfig ) {
 		// Inject the entity config into the action.
 		replaceAction( ( action ) => {
 			return {
-				...action,
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
+				...action,
 			};
 		} ),
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-
 			edits: ( state = {}, action ) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
-						const nextState = { ...state };
+						const context = action?.query?.context ?? 'default';
+						if ( context !== 'default' ) {
+							return state;
+						}
 
-						for ( const record of action.items ) {
-							const recordId = record[ action.key ];
+						const nextState = { ...state };
+						const itemsList = Array.isArray( action.items )
+							? action.items
+							: [ action.items ];
+
+						for ( const record of itemsList ) {
+							const recordId = record?.[ action.key ];
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
 								continue;
@@ -213,14 +234,17 @@ function entity( entityConfig ) {
 										// Edits are the "raw" attribute values, but records may have
 										// objects with more properties, so we use `get` here for the
 										// comparison.
-										! isEqual(
+										! fastDeepEqual(
 											edits[ key ],
-											get(
-												record[ key ],
-												'raw',
-												record[ key ]
-											)
-										)
+											record[ key ]?.raw ?? record[ key ]
+										) &&
+										// Sometimes the server alters the sent value which means
+										// we need to also remove the edits before the api request.
+										( ! action.persistedEdits ||
+											! fastDeepEqual(
+												edits[ key ],
+												action.persistedEdits[ key ]
+											) )
 									) {
 										acc[ key ] = edits[ key ];
 									}
@@ -294,6 +318,38 @@ function entity( entityConfig ) {
 
 				return state;
 			},
+
+			revisions: ( state = {}, action ) => {
+				// Use the same queriedDataReducer shape for revisions.
+				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
+					const recordKey = action.recordKey;
+					delete action.recordKey;
+					const newState = queriedDataReducer( state[ recordKey ], {
+						...action,
+						type: 'RECEIVE_ITEMS',
+					} );
+					return {
+						...state,
+						[ recordKey ]: newState,
+					};
+				}
+
+				if ( action.type === 'REMOVE_ITEMS' ) {
+					return Object.fromEntries(
+						Object.entries( state ).filter(
+							( [ id ] ) =>
+								! action.itemIds.some( ( itemId ) => {
+									if ( Number.isInteger( itemId ) ) {
+										return itemId === +id;
+									}
+									return itemId === id;
+								} )
+						)
+					);
+				}
+
+				return state;
+			},
 		} )
 	);
 }
@@ -306,7 +362,7 @@ function entity( entityConfig ) {
  *
  * @return {Object} Updated state.
  */
-export function entitiesConfig( state = defaultEntities, action ) {
+export function entitiesConfig( state = rootEntitiesConfig, action ) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
 			return [ ...state, ...action.entities ];
@@ -326,35 +382,64 @@ export function entitiesConfig( state = defaultEntities, action ) {
 export const entities = ( state = {}, action ) => {
 	const newConfig = entitiesConfig( state.config, action );
 
-	// Generates a dynamic reducer for the entities
+	// Generates a reducer for the entities nested by `kind` and `name`.
+	// A config array with shape:
+	// ```
+	// [
+	//   { kind: 'taxonomy', name: 'category' },
+	//   { kind: 'taxonomy', name: 'post_tag' },
+	//   { kind: 'postType', name: 'post' },
+	//   { kind: 'postType', name: 'page' },
+	// ]
+	// ```
+	// generates a reducer for state tree with shape:
+	// ```
+	// {
+	//   taxonomy: {
+	//     category,
+	//     post_tag,
+	//   },
+	//   postType: {
+	//     post,
+	//     page,
+	//   },
+	// }
+	// ```
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = groupBy( newConfig, 'kind' );
-		entitiesDataReducer = combineReducers(
-			Object.entries( entitiesByKind ).reduce(
-				( memo, [ kind, subEntities ] ) => {
-					const kindReducer = combineReducers(
-						subEntities.reduce(
-							( kindMemo, entityConfig ) => ( {
-								...kindMemo,
-								[ entityConfig.name ]: entity( entityConfig ),
-							} ),
-							{}
-						)
-					);
+		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+			const { kind } = record;
+			if ( ! acc[ kind ] ) {
+				acc[ kind ] = [];
+			}
+			acc[ kind ].push( record );
+			return acc;
+		}, {} );
 
-					memo[ kind ] = kindReducer;
-					return memo;
-				},
-				{}
+		entitiesDataReducer = combineReducers(
+			Object.fromEntries(
+				Object.entries( entitiesByKind ).map(
+					( [ kind, subEntities ] ) => {
+						const kindReducer = combineReducers(
+							Object.fromEntries(
+								subEntities.map( ( entityConfig ) => [
+									entityConfig.name,
+									entity( entityConfig ),
+								] )
+							)
+						);
+
+						return [ kind, kindReducer ];
+					}
+				)
 			)
 		);
 	}
 
-	const newData = entitiesDataReducer( state.data, action );
+	const newData = entitiesDataReducer( state.records, action );
 
 	if (
-		newData === state.data &&
+		newData === state.records &&
 		newConfig === state.config &&
 		entitiesDataReducer === state.reducer
 	) {
@@ -363,131 +448,25 @@ export const entities = ( state = {}, action ) => {
 
 	return {
 		reducer: entitiesDataReducer,
-		data: newData,
+		records: newData,
 		config: newConfig,
 	};
 };
 
 /**
- * Reducer keeping track of entity edit undo history.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
+ * @type {UndoManager}
  */
-const UNDO_INITIAL_STATE = [];
-UNDO_INITIAL_STATE.offset = 0;
-let lastEditAction;
-export function undo( state = UNDO_INITIAL_STATE, action ) {
+export function undoManager( state = createUndoManager() ) {
+	return state;
+}
+
+export function editsReference( state = {}, action ) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
-		case 'CREATE_UNDO_LEVEL':
-			let isCreateUndoLevel = action.type === 'CREATE_UNDO_LEVEL';
-			const isUndoOrRedo =
-				! isCreateUndoLevel &&
-				( action.meta.isUndo || action.meta.isRedo );
-			if ( isCreateUndoLevel ) {
-				action = lastEditAction;
-			} else if ( ! isUndoOrRedo ) {
-				// Don't lose the last edit cache if the new one only has transient edits.
-				// Transient edits don't create new levels so updating the cache would make
-				// us skip an edit later when creating levels explicitly.
-				if (
-					Object.keys( action.edits ).some(
-						( key ) => ! action.transientEdits[ key ]
-					)
-				) {
-					lastEditAction = action;
-				} else {
-					lastEditAction = {
-						...action,
-						edits: {
-							...( lastEditAction && lastEditAction.edits ),
-							...action.edits,
-						},
-					};
-				}
-			}
-
-			let nextState;
-			if ( isUndoOrRedo ) {
-				nextState = [ ...state ];
-				nextState.offset =
-					state.offset + ( action.meta.isUndo ? -1 : 1 );
-
-				if ( state.flattenedUndo ) {
-					// The first undo in a sequence of undos might happen while we have
-					// flattened undos in state. If this is the case, we want execution
-					// to continue as if we were creating an explicit undo level. This
-					// will result in an extra undo level being appended with the flattened
-					// undo values.
-					isCreateUndoLevel = true;
-					action = lastEditAction;
-				} else {
-					return nextState;
-				}
-			}
-
-			if ( ! action.meta.undo ) {
-				return state;
-			}
-
-			// Transient edits don't create an undo level, but are
-			// reachable in the next meaningful edit to which they
-			// are merged. They are defined in the entity's config.
-			if (
-				! isCreateUndoLevel &&
-				! Object.keys( action.edits ).some(
-					( key ) => ! action.transientEdits[ key ]
-				)
-			) {
-				nextState = [ ...state ];
-				nextState.flattenedUndo = {
-					...state.flattenedUndo,
-					...action.edits,
-				};
-				nextState.offset = state.offset;
-				return nextState;
-			}
-
-			// Clear potential redos, because this only supports linear history.
-			nextState =
-				nextState || state.slice( 0, state.offset || undefined );
-			nextState.offset = nextState.offset || 0;
-			nextState.pop();
-			if ( ! isCreateUndoLevel ) {
-				nextState.push( {
-					kind: action.meta.undo.kind,
-					name: action.meta.undo.name,
-					recordId: action.meta.undo.recordId,
-					edits: {
-						...state.flattenedUndo,
-						...action.meta.undo.edits,
-					},
-				} );
-			}
-			// When an edit is a function it's an optimization to avoid running some expensive operation.
-			// We can't rely on the function references being the same so we opt out of comparing them here.
-			const comparisonUndoEdits = Object.values(
-				action.meta.undo.edits
-			).filter( ( edit ) => typeof edit !== 'function' );
-			const comparisonEdits = Object.values( action.edits ).filter(
-				( edit ) => typeof edit !== 'function'
-			);
-			if ( ! isShallowEqual( comparisonUndoEdits, comparisonEdits ) ) {
-				nextState.push( {
-					kind: action.kind,
-					name: action.name,
-					recordId: action.recordId,
-					edits: isCreateUndoLevel
-						? { ...state.flattenedUndo, ...action.edits }
-						: action.edits,
-				} );
-			}
-			return nextState;
+		case 'UNDO':
+		case 'REDO':
+			return {};
 	}
-
 	return state;
 }
 
@@ -515,8 +494,8 @@ export function embedPreviews( state = {}, action ) {
  * State which tracks whether the user can perform an action on a REST
  * resource.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -527,6 +506,11 @@ export function userPermissions( state = {}, action ) {
 				...state,
 				[ action.key ]: action.isAllowed,
 			};
+		case 'RECEIVE_USER_PERMISSIONS':
+			return {
+				...state,
+				...action.permissions,
+			};
 	}
 
 	return state;
@@ -535,8 +519,8 @@ export function userPermissions( state = {}, action ) {
 /**
  * Reducer returning autosaves keyed by their parent's post id.
  *
- * @param  {Object} state  Current state.
- * @param  {Object} action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -554,17 +538,231 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
+export function blockPatterns( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERNS':
+			return action.patterns;
+	}
+
+	return state;
+}
+
+export function blockPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
+			return action.categories;
+	}
+
+	return state;
+}
+
+export function userPatternCategories( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_USER_PATTERN_CATEGORIES':
+			return action.patternCategories;
+	}
+	return state;
+}
+
+export function navigationFallbackId( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
+			return action.fallbackId;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the theme global styles revisions.
+ *
+ * @param {Record<string, object>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, object>} Updated state.
+ */
+export function themeGlobalStyleRevisions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
+			return {
+				...state,
+				[ action.currentId ]: action.revisions,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the template lookup per query.
+ *
+ * @param {Record<string, string>} state  Current state.
+ * @param {Object}                 action Dispatched action.
+ *
+ * @return {Record<string, string>} Updated state.
+ */
+export function defaultTemplates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_DEFAULT_TEMPLATE':
+			return {
+				...state,
+				[ JSON.stringify( action.query ) ]: action.templateId,
+			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning an object of registered post meta.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function registeredPostMeta( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REGISTERED_POST_META':
+			return {
+				...state,
+				[ action.postType ]: action.registeredPostMeta,
+			};
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor settings.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorSettings( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_SETTINGS':
+			return action.settings;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing editor assets.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Updated state.
+ */
+export function editorAssets( state = null, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_EDITOR_ASSETS':
+			return action.assets;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncConnectionStatuses( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer managing whether collaboration is supported.
+ *
+ * Default to true, as collaboration is supported by default
+ * unless explicitly disabled due to unsupported conditions
+ * such as metaboxes.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function collaborationSupported( state = true, action ) {
+	switch ( action.type ) {
+		case 'SET_COLLABORATION_SUPPORTED':
+			return action.supported;
+
+		case 'SET_SYNC_CONNECTION_STATUS':
+			if (
+				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
+				action.status?.error?.code
+			) {
+				return false;
+			}
+
+			return state;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing view configs, keyed by `kind/name`.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function viewConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_VIEW_CONFIG':
+			return {
+				...state,
+				[ `${ action.kind }/${ action.name }` ]: action.config,
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
-	terms,
 	users,
 	currentTheme,
+	currentGlobalStylesId,
 	currentUser,
-	taxonomies,
-	themes,
-	themeSupports,
+	themeGlobalStyleVariations,
+	themeBaseGlobalStyles,
+	themeGlobalStyleRevisions,
 	entities,
-	undo,
+	editsReference,
+	undoManager,
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	blockPatterns,
+	blockPatternCategories,
+	userPatternCategories,
+	navigationFallbackId,
+	defaultTemplates,
+	registeredPostMeta,
+	editorSettings,
+	editorAssets,
+	syncConnectionStatuses,
+	collaborationSupported,
+	viewConfigs,
 } );

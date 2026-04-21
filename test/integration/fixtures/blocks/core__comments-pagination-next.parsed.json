@@ -1,0 +1,17 @@
+[
+	{
+		"blockName": "core/comments-pagination-next",
+		"attrs": {
+			"label": "Next Comments",
+			"style": {
+				"typography": {
+					"textTransform": "lowercase"
+				}
+			},
+			"fontSize": "medium"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

@@ -1,26 +1,34 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { getPostEditURL, getPostTrashedURL, BrowserURL } from '../';
+import { default as BrowserURL, getPostEditURL } from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+
+function setupUseSelectMock( { postId, postStatus } ) {
+	useSelect.mockImplementation( () => {
+		return {
+			postId,
+			postStatus,
+		};
+	} );
+}
 
 describe( 'getPostEditURL', () => {
 	it( 'should generate relative path with post and action arguments', () => {
 		const url = getPostEditURL( 1 );
 
 		expect( url ).toBe( 'post.php?post=1&action=edit' );
-	} );
-} );
-
-describe( 'getPostTrashedURL', () => {
-	it( 'should generate relative path with post and action arguments', () => {
-		const url = getPostTrashedURL( 1, 'page' );
-
-		expect( url ).toBe( 'edit.php?trashed=1&post_type=page&ids=1' );
 	} );
 } );
 
@@ -40,25 +48,28 @@ describe( 'BrowserURL', () => {
 	} );
 
 	it( 'not update URL if post is auto-draft', () => {
-		const wrapper = shallow( <BrowserURL /> );
-		wrapper.setProps( {
+		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'auto-draft',
 		} );
 
+		render( <BrowserURL /> );
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'update URL if post is no longer auto-draft', () => {
-		const wrapper = shallow( <BrowserURL /> );
-		wrapper.setProps( {
+		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'auto-draft',
 		} );
-		wrapper.setProps( {
+		const { rerender } = render( <BrowserURL /> );
+
+		setupUseSelectMock( {
+			postId: 1,
 			postStatus: 'draft',
 		} );
 
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 1 },
 			'Post 1',
@@ -67,30 +78,32 @@ describe( 'BrowserURL', () => {
 	} );
 
 	it( 'not update URL if history is already set', () => {
-		const wrapper = shallow( <BrowserURL /> );
-		wrapper.setProps( {
+		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'draft',
 		} );
-		replaceStateSpy.mockReset();
-		wrapper.setProps( {
-			postId: 1,
-		} );
+		const { rerender } = render( <BrowserURL /> );
 
+		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).not.toHaveBeenCalled();
 	} );
 
 	it( 'update URL if post ID changes', () => {
-		const wrapper = shallow( <BrowserURL /> );
-		wrapper.setProps( {
+		setupUseSelectMock( {
 			postId: 1,
 			postStatus: 'draft',
 		} );
-		replaceStateSpy.mockReset();
-		wrapper.setProps( {
-			postId: 2,
-		} );
+		const { rerender } = render( <BrowserURL /> );
 
+		setupUseSelectMock( {
+			postId: 2,
+			postStatus: 'draft',
+		} );
+		replaceStateSpy.mockReset();
+
+		rerender( <BrowserURL /> );
 		expect( replaceStateSpy ).toHaveBeenCalledWith(
 			{ id: 2 },
 			'Post 2',
@@ -99,8 +112,8 @@ describe( 'BrowserURL', () => {
 	} );
 
 	it( 'renders nothing', () => {
-		const wrapper = shallow( <BrowserURL /> );
+		const { container } = render( <BrowserURL /> );
 
-		expect( wrapper.type() ).toBeNull();
+		expect( container ).toBeEmptyDOMElement();
 	} );
 } );

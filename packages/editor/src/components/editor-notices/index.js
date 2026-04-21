@@ -1,60 +1,32 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { NoticeList, SnackbarList } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
+import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import TemplateValidationNotice from '../template-validation-notice';
 
-export function EditorNotices( { notices, onRemove } ) {
-	const dismissibleNotices = filter( notices, {
-		isDismissible: true,
-		type: 'default',
-	} );
-	const nonDismissibleNotices = filter( notices, {
-		isDismissible: false,
-		type: 'default',
-	} );
-	const snackbarNotices = filter( notices, {
-		type: 'snackbar',
+/**
+ * @deprecated since 7.0, use `wp.notices.InlineNotices` instead.
+ */
+export function EditorNotices() {
+	deprecated( 'wp.editor.EditorNotices', {
+		since: '7.0',
+		version: '7.2',
+		alternative: 'wp.notices.InlineNotices',
 	} );
 
 	return (
-		<>
-			<NoticeList
-				notices={ nonDismissibleNotices }
-				className="components-editor-notices__pinned"
-			/>
-			<NoticeList
-				notices={ dismissibleNotices }
-				className="components-editor-notices__dismissible"
-				onRemove={ onRemove }
-			>
-				<TemplateValidationNotice />
-			</NoticeList>
-			<SnackbarList
-				notices={ snackbarNotices }
-				className="components-editor-notices__snackbar"
-				onRemove={ onRemove }
-			/>
-		</>
+		<InlineNotices
+			pinnedNoticesClassName="components-editor-notices__pinned"
+			dismissibleNoticesClassName="components-editor-notices__dismissible"
+		>
+			<TemplateValidationNotice />
+		</InlineNotices>
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => ( {
-		notices: select( 'core/notices' ).getNotices(),
-	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/notices' ).removeNotice,
-	} ) ),
-] )( EditorNotices );
+export default EditorNotices;

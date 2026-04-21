@@ -1,13 +1,13 @@
 /**
- * External dependencies
- */
-import { noop, map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -15,34 +15,18 @@ import { useMemo } from '@wordpress/element';
  */
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
-import { includeVariationsInInserterItems } from '../components/inserter/utils';
 import BlockIcon from '../components/block-icon';
+import { store as blockEditorStore } from '../store';
+import { orderBy } from '../utils/sorting';
+import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
 
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
-
-/** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
-
-/** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
+const noop = () => {};
+const SHOWN_BLOCK_TYPES = 9;
 
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @param {Object} props                                   Component props.
- * @param {string} [props.getBlockInsertionParentClientId] Client ID of the parent.
- * @param {string} [props.getInserterItems]                Inserter items for parent.
- * @param {string} [props.getSelectedBlockName]            Name of selected block or null.
- *
- * @return {WPCompleter} A blocks completer.
+ * @return {Object} A blocks completer.
  */
 function createBlockCompleter() {
 	return {
@@ -51,65 +35,87 @@ function createBlockCompleter() {
 		triggerPrefix: '/',
 
 		useItems( filterValue ) {
-			const { rootClientId, selectedBlockName } = useSelect(
-				( select ) => {
+			const { rootClientId, selectedBlockId, prioritizedBlocks } =
+				useSelect( ( select ) => {
 					const {
 						getSelectedBlockClientId,
-						getBlockName,
-						getBlockInsertionPoint,
-					} = select( 'core/block-editor' );
+						getBlock,
+						getBlockListSettings,
+						getBlockRootClientId,
+					} = select( blockEditorStore );
+					const { getActiveBlockVariation } = select( blocksStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
+					const { name: blockName, attributes } = getBlock(
+						selectedBlockClientId
+					);
+					const activeBlockVariation = getActiveBlockVariation(
+						blockName,
+						attributes
+					);
+					const _rootClientId = getBlockRootClientId(
+						selectedBlockClientId
+					);
 					return {
-						selectedBlockName: selectedBlockClientId
-							? getBlockName( selectedBlockClientId )
-							: null,
-						rootClientId: getBlockInsertionPoint().rootClientId,
+						selectedBlockId: activeBlockVariation
+							? `${ blockName }/${ activeBlockVariation.name }`
+							: blockName,
+						rootClientId: _rootClientId,
+						prioritizedBlocks:
+							getBlockListSettings( _rootClientId )
+								?.prioritizedInserterBlocks,
 					};
-				},
-				[]
-			);
+				}, [] );
 			const [ items, categories, collections ] = useBlockTypesState(
 				rootClientId,
-				noop
+				noop,
+				true
 			);
 
 			const filteredItems = useMemo( () => {
-				return searchBlockItems(
-					items,
-					categories,
-					collections,
-					filterValue
-				).filter( ( item ) => item.name !== selectedBlockName );
+				const initialFilteredItems = !! filterValue.trim()
+					? searchBlockItems(
+							items,
+							categories,
+							collections,
+							filterValue
+					  )
+					: orderInserterBlockItems(
+							orderBy( items, 'frecency', 'desc' ),
+							prioritizedBlocks
+					  );
+
+				return initialFilteredItems
+					.filter( ( item ) => item.id !== selectedBlockId )
+					.slice( 0, SHOWN_BLOCK_TYPES );
 			}, [
 				filterValue,
-				selectedBlockName,
+				selectedBlockId,
 				items,
 				categories,
 				collections,
+				prioritizedBlocks,
 			] );
 
 			const options = useMemo(
 				() =>
-					includeVariationsInInserterItems( filteredItems ).map(
-						( blockItem ) => {
-							const { title, icon, isDisabled } = blockItem;
-							return {
-								key: `block-${ blockItem.id }`,
-								value: blockItem,
-								label: (
-									<>
-										<BlockIcon
-											key="icon"
-											icon={ icon }
-											showColors
-										/>
-										{ title }
-									</>
-								),
-								isDisabled,
-							};
-						}
-					),
+					filteredItems.map( ( blockItem ) => {
+						const { title, icon, isDisabled } = blockItem;
+						return {
+							key: `block-${ blockItem.id }`,
+							value: blockItem,
+							label: (
+								<>
+									<BlockIcon
+										key="icon"
+										icon={ icon }
+										showColors
+									/>
+									{ title }
+								</>
+							),
+							isDisabled,
+						};
+					} ),
 				[ filteredItems ]
 			);
 
@@ -119,14 +125,23 @@ function createBlockCompleter() {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
 		getOptionCompletion( inserterItem ) {
-			const { name, initialAttributes, innerBlocks } = inserterItem;
+			const { name, initialAttributes, innerBlocks, syncStatus, blocks } =
+				inserterItem;
+
 			return {
 				action: 'replace',
-				value: createBlock(
-					name,
-					initialAttributes,
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
-				),
+				value:
+					syncStatus === 'unsynced'
+						? ( blocks ?? [] ).map( ( block ) =>
+								cloneBlock( block )
+						  )
+						: createBlock(
+								name,
+								initialAttributes,
+								createBlocksFromInnerBlocksTemplate(
+									innerBlocks
+								)
+						  ),
 			};
 		},
 	};
@@ -135,6 +150,6 @@ function createBlockCompleter() {
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {WPCompleter} A blocks completer.
+ * @return {Object} A blocks completer.
  */
 export default createBlockCompleter();

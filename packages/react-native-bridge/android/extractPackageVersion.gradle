@@ -1,0 +1,23 @@
+import groovy.json.JsonSlurper
+
+ext.extractPackageVersion = { packagejson, packageName, section ->
+    def packageSlurper = new JsonSlurper()
+    def packageJson = packageSlurper.parse file(packagejson)
+    def dep = packageJson.get(section).get(packageName)
+
+    // Extract version from filename of tarball URL
+    def isTarball = dep.endsWith('.tgz')
+    if(isTarball) {
+        // Replace special characters of package name as "npm pack" command does, to be used in the filename.
+        // Reference: https://github.com/npm/cli/blob/699c2d708d2a24b4f495a74974b2a345f33ee08a/lib/pack.js#L66-L67
+        def packageNameSanitized = packageName.replace("@", '').replace("/", '-')
+        def fileName = dep.substring(dep.lastIndexOf('/') + 1)
+        def version = fileName.replace(packageNameSanitized + '-', '').replace('.tgz', '')
+        return version
+    }
+
+    // Extract version from hash of Git URL
+    def version = dep.substring(dep.lastIndexOf('#') + 1)
+    return version;
+}
+

@@ -2,26 +2,35 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import {
-	PlainText,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
-
-export default function CodeEdit( { attributes, setAttributes } ) {
+export default function CodeEdit( {
+	attributes,
+	setAttributes,
+	onRemove,
+	insertBlocksAfter,
+	mergeBlocks,
+} ) {
+	const blockProps = useBlockProps();
 	return (
-		<Block.pre>
-			<PlainText
-				__experimentalVersion={ 2 }
+		<pre { ...blockProps }>
+			<RichText
 				tagName="code"
+				identifier="content"
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
+				onRemove={ onRemove }
+				onMerge={ mergeBlocks }
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
+				preserveWhiteSpace
+				__unstablePastePlainText
+				__unstableOnSplitAtDoubleLineEnd={ () =>
+					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+				}
+				style={ { whiteSpace: 'break-spaces' } }
 			/>
-		</Block.pre>
+		</pre>
 	);
 }

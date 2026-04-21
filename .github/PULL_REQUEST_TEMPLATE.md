@@ -1,25 +1,37 @@
-<!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/master/docs/contributors/repository-management.md#pull-requests. -->
+<!-- Thanks for contributing to Gutenberg! Please follow the Gutenberg Contributing Guidelines:
+https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
-## Description
-<!-- Please describe what you have changed or added -->
+## What?
+<!-- Link this PR to its associated issue with an appropriate keyword: Closes, See, Follow up to, etc. -->
+Closes <!-- #ISSUE-NUMBER or URL -->
 
-## How has this been tested?
-<!-- Please describe in detail how you tested your changes. -->
-<!-- Include details of your testing environment, tests ran to see how -->
-<!-- your change affects other areas of the code, etc. -->
+<!-- In a few words, what is the PR actually doing? -->
 
-## Screenshots <!-- if applicable -->
+## Why?
+<!-- Why is this PR necessary? What problem is it solving? Reference any existing previous issue(s) or PR(s), but please add a short summary here, too -->
 
-## Types of changes
-<!-- What types of changes does your code introduce?  -->
-<!-- Bug fix (non-breaking change which fixes an issue) -->
-<!-- New feature (non-breaking change which adds functionality) -->
-<!-- Breaking change (fix or feature that would cause existing functionality to not work as expected) -->
+## How?
+<!-- How is your PR addressing the issue at hand? What are the implementation details? -->
 
-## Checklist:
-- [ ] My code is tested.
-- [ ] My code follows the WordPress code style. <!-- Check code: `npm run lint`, Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/javascript/ -->
-- [ ] My code follows the accessibility standards. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/coding-standards/accessibility-coding-standards/ -->
-- [ ] My code has proper inline documentation. <!-- Guidelines: https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/ -->
-- [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
-- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/master/docs/contributors/native-mobile.md -->
+## Testing Instructions
+<!-- Please include step by step instructions on how to test this PR. -->
+<!-- 1. Open a post or page. -->
+<!-- 2. Insert a heading block. -->
+<!-- 3. etc. -->
+
+### Testing Instructions for Keyboard
+<!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
+
+## Screenshots or screencast <!-- if applicable -->
+
+<!-- If you would like to upload screenshots, feel free to use the table below when it is useful to show the difference between before and after the change. -->
+
+|Before|After|
+|-|-|
+|<!-- Before screenshot here -->|<!-- After screenshot here -->|
+
+## Use of AI Tools
+
+<!--
+You are free to use artificial intelligence (AI) tooling to contribute, but you must disclose what tooling you are using and to what extent a pull request has been authored by AI. It is your responsibility to review and take responsibility for what AI generates. See the WordPress AI Guidelines: <https://make.wordpress.org/ai/handbook/ai-guidelines/>.
+-->

@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 .edit-post-meta-boxes-area {
 	position: relative;
@@ -19,6 +22,11 @@
 		box-sizing: border-box;
 	}
 
+	.postbox-header {
+		border-top: $border-width solid $gray-300;
+		border-bottom: 0;
+	}
+
 	/* Match width and positioning of the meta boxes. Override default styles. */
 	#poststuff {
 		margin: 0 auto;
@@ -34,7 +42,7 @@
 		color: inherit;
 		font-weight: 600;
 		outline: none;
-		padding: 15px;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 	}
@@ -46,9 +54,8 @@
 	}
 
 	.postbox > .inside {
-		border-bottom: $border-width solid $gray-200;
 		color: inherit;
-		padding: 0 $block-padding $block-padding;
+		padding: 0 $grid-unit-30 $grid-unit-30;
 		margin: 0;
 	}
 
@@ -79,24 +86,6 @@
 	// that modify `element.style.display` on the meta box.
 	.is-hidden {
 		display: none;
-	}
-
-
-	// Until checkboxes WordPress-wide are updated to match the new style,
-	// checkboxes used in metaboxes have to be slightly unstyled here.
-	// @todo: remove this entire rule once checkboxes are the same everywhere.
-	// See: https://github.com/WordPress/gutenberg/issues/18053
-	.metabox-location-side .postbox input[type="checkbox"] {
-		border: $border-width solid $dark-gray-300;
-
-		&:checked {
-			background: $white;
-			border-color: $dark-gray-300;
-		}
-
-		&::before {
-			margin: -3px -4px;
-		}
 	}
 }
 

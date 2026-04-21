@@ -6,12 +6,18 @@
 
 .horizontalContentContainer {
 	flex-direction: row;
-	flex-wrap: wrap;
 	justify-content: flex-start;
 	align-items: stretch;
-	max-width: $content-width;
 	overflow: visible;
 	width: 100%;
+}
+
+.horizontalContentContainerStretch {
+	justify-content: space-evenly;
+}
+
+.horizontalContentContainerCenter {
+	justify-content: center;
 }
 
 .switch {
@@ -51,6 +57,8 @@
 
 .containerStyleAddHere {
 	flex-direction: row;
+	padding-left: 12px;
+	padding-right: 12px;
 }
 
 .blockListFooter {
@@ -58,15 +66,17 @@
 }
 
 .defaultBlock {
-	margin: $block-edge-to-content;
+	margin: $block-edge-to-content * 0.5 $block-edge-to-content;
 }
 
 .defaultAppender {
-	margin: $block-edge-to-content;
+	margin-top: $grid-unit;
+	margin-bottom: $grid-unit;
+	width: 100%;
 }
 
 .innerAppender {
-	margin: $block-edge-to-content / 2;
+	margin: $block-edge-to-content * 0.5;
 }
 
 .blockBorder {

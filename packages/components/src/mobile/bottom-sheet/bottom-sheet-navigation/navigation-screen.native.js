@@ -2,17 +2,20 @@
  * External dependencies
  */
 import {
-	useFocusEffect,
 	useIsFocused,
 	useNavigation,
+	useFocusEffect,
 } from '@react-navigation/native';
-import { View } from 'react-native';
-import { debounce } from 'lodash';
+import {
+	ScrollView,
+	TouchableHighlight,
+	useWindowDimensions,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { BottomSheetContext } from '@wordpress/components';
 
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
@@ -20,19 +23,29 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
+import { BottomSheetContext } from '../bottom-sheet-context';
+import styles from './styles.scss';
 
-const BottomSheetNavigationScreen = ( { children } ) => {
+const BottomSheetNavigationScreen = ( {
+	children,
+	fullScreen,
+	isScrollable,
+	isNested,
+	name,
+} ) => {
 	const navigation = useNavigation();
-	const heightRef = useRef( { maxHeight: 0 } );
+	const maxHeight = useRef( 0 );
 	const isFocused = useIsFocused();
 	const {
 		onHandleHardwareButtonPress,
 		shouldEnableBottomSheetMaxHeight,
+		setIsFullScreen,
+		listProps,
+		safeAreaBottomInset,
 	} = useContext( BottomSheetContext );
+	const { height: windowHeight } = useWindowDimensions();
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
-
-	const setHeightDebounce = useCallback( debounce( setHeight, 10 ), [] );
 
 	useFocusEffect(
 		useCallback( () => {
@@ -45,23 +58,89 @@ const BottomSheetNavigationScreen = ( { children } ) => {
 				onHandleHardwareButtonPress( null );
 				return false;
 			} );
-			if ( heightRef.current.maxHeight !== 0 ) {
-				setHeight( heightRef.current.maxHeight );
-			}
-			return () => {};
+			/**
+			 * TODO: onHandleHardwareButtonPress stores a single value, which means
+			 * future invocations from sibling screens can replace the callback for
+			 * the currently active screen. Currently, the empty dependency array
+			 * passed to useCallback here is what prevents erroneous callback
+			 * replacements, but leveraging memoization to achieve this is brittle and
+			 * explicitly discouraged in the React documentation.
+			 * https://react.dev/reference/react/useMemo
+			 *
+			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
+			 * callbacks triggered based upon which screen is currently active.
+			 *
+			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
+			 *
+			 * Also see https://github.com/WordPress/gutenberg/pull/41166.
+			 */
 		}, [] )
 	);
+
+	useFocusEffect(
+		useCallback( () => {
+			if ( fullScreen ) {
+				setHeight( windowHeight );
+				setIsFullScreen( true );
+			} else if ( maxHeight.current !== 0 ) {
+				setIsFullScreen( false );
+				setHeight( maxHeight.current );
+			}
+			return () => {};
+		}, [ fullScreen, setHeight, setIsFullScreen, windowHeight ] )
+	);
+
 	const onLayout = ( { nativeEvent } ) => {
+		if ( fullScreen ) {
+			return;
+		}
 		const { height } = nativeEvent.layout;
-		if ( heightRef.current.maxHeight !== height && isFocused ) {
-			heightRef.current.maxHeight = height;
-			setHeightDebounce( height, true );
+		if ( maxHeight.current !== height && isFocused ) {
+			maxHeight.current = height;
+			setHeight( height );
 		}
 	};
 
 	return useMemo( () => {
-		return <View onLayout={ onLayout }>{ children }</View>;
-	}, [ children, isFocused ] );
+		return isScrollable || isNested ? (
+			<View
+				onLayout={ onLayout }
+				testID={ `navigation-screen-${ name }` }
+			>
+				{ children }
+			</View>
+		) : (
+			<ScrollView { ...listProps }>
+				<TouchableHighlight accessible={ false }>
+					<View
+						onLayout={ onLayout }
+						testID={ `navigation-screen-${ name }` }
+					>
+						{ children }
+						{ ! isNested && (
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
+								} }
+							/>
+						) }
+					</View>
+				</TouchableHighlight>
+			</ScrollView>
+		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
+	}, [
+		children,
+		isFocused,
+		safeAreaBottomInset,
+		listProps,
+		name,
+		isScrollable,
+		isNested,
+		onLayout,
+	] );
 };
 
 export default BottomSheetNavigationScreen;

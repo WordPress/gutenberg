@@ -1,11 +1,113 @@
+/**
+ * External dependencies
+ */
+import { TextDecoder, TextEncoder } from 'node:util';
+import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
+
+// ESLint v10's RuleTester uses structuredClone, which is not available in
+// the jsdom test environment. Polyfill it using JSON serialization.
+if ( typeof globalThis.structuredClone === 'undefined' ) {
+	globalThis.structuredClone = ( value ) =>
+		JSON.parse( JSON.stringify( value ) );
+}
+
 jest.mock( '@wordpress/compose', () => {
-	const App = () => null;
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
-		useResizeObserver: jest.fn( () => [
-			<App key={ 'mock-key' } />,
-			{ width: 700, height: 500 },
-		] ),
+	};
+} );
+
+jest.mock( '@wordpress/block-editor/src/hooks/list-view', () => {
+	return {
+		__esModule: true,
+		LIST_VIEW_SUPPORT_KEY: 'listView',
+		hasListViewSupport: jest.fn( () => false ),
+		ListViewPanel: jest.fn( () => null ),
+		default: {
+			edit: jest.fn( () => null ),
+			hasSupport: jest.fn( () => false ),
+			attributeKeys: [],
+		},
+	};
+} );
+
+/**
+ * client-zip is meant to be used in a browser and is therefore released as an ES6 module only,
+ * in order to use it in node environment, we need to mock it.
+ * See: https://github.com/Touffy/client-zip/issues/28
+ */
+jest.mock( 'client-zip', () => ( {
+	downloadZip: jest.fn(),
+} ) );
+
+global.ResizeObserver = require( 'resize-observer-polyfill' );
+
+// jsdom lacks Element.getAnimations (needed by Base UI ScrollArea ≥1.3)
+if ( ! global.HTMLElement.prototype.getAnimations ) {
+	global.HTMLElement.prototype.getAnimations = () => [];
+}
+
+/**
+ * The following mock is for block integration tests that might render
+ * components leveraging DOMRect. For example, the Cover block which now renders
+ * its ResizableBox control via the BlockPopover component.
+ */
+if ( ! window.DOMRect ) {
+	window.DOMRect = class DOMRect {};
+}
+
+/**
+ * Polyfill for Element.scrollIntoView().
+ * Necessary because it's not implemented in jsdom, and likely will never be.
+ *
+ * @see https://github.com/jsdom/jsdom/issues/1695
+ */
+global.Element.prototype.scrollIntoView = jest.fn();
+
+if ( ! global.TextDecoder ) {
+	global.TextDecoder = TextDecoder;
+}
+if ( ! global.TextEncoder ) {
+	global.TextEncoder = TextEncoder;
+}
+
+// Override jsdom built-ins with native node implementation.
+global.Blob = BlobPolyfill;
+global.File = FilePolyfill;
+
+/**
+ * Mock `userEvent.setup()` to fix the `HTMLElement.prototype` properties
+ * that `@testing-library/user-event` makes non-writable, which breaks
+ * `@ariakit/test` and other code that tries to override `focus` and `blur`.
+ * @see https://github.com/testing-library/user-event/pull/1265
+ */
+jest.mock( '@testing-library/user-event', () => {
+	const actual = jest.requireActual( '@testing-library/user-event' );
+	const patchedUserEvent = {
+		...actual.userEvent,
+		setup( ...args ) {
+			const user = actual.userEvent.setup( ...args );
+			const { focus, blur } = global.HTMLElement.prototype;
+			Object.defineProperties( global.HTMLElement.prototype, {
+				focus: {
+					configurable: true,
+					value: focus,
+					writable: true,
+				},
+				blur: {
+					configurable: true,
+					value: blur,
+					writable: true,
+				},
+			} );
+			return user;
+		},
+	};
+	return {
+		...actual,
+		userEvent: patchedUserEvent,
+		default: patchedUserEvent,
+		__esModule: true,
 	};
 } );

@@ -1,40 +1,57 @@
 # AnglePickerControl
 
-AnglePickerControl is a React component to render a UI that allows users to pick an angle.
-Users can choose an angle in a visual UI with the mouse by dragging an angle indicator inside a circle or by directly inserting the desired angle in a text field.
+<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
 
-## Usage
+<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-anglepickercontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
+`AnglePickerControl` is a React component to render a UI that allows users to
+pick an angle. Users can choose an angle in a visual UI with the mouse by
+dragging an angle indicator inside a circle or by directly inserting the
+desired angle in a text field.
 
 ```jsx
 import { useState } from '@wordpress/element';
 import { AnglePickerControl } from '@wordpress/components';
 
-const MyAnglePicker = () => {
-	const [ angle, setAngle ] = useState();
-	return <AnglePickerControl value={ angle } onChange={ setAngle } />;
-};
+function Example() {
+  const [ angle, setAngle ] = useState( 0 );
+  return (
+    <AnglePickerControl
+      value={ angle }
+      onChange={ setAngle }
+    />
+  );
+}
 ```
 
 ## Props
 
-The component accepts the following props.
+### `as`
 
-### label
+ - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Required: No
 
-Label to use for the angle picker. If not set the a translated label "Angle" is used.
+The HTML element or React component to render the component as.
 
-- Type: `String`
-- Required: No
+### `label`
 
-### value
-The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
+ - Type: `string`
+ - Required: No
+ - Default: `__( 'Angle' )`
 
-- Type: `Number`
-- Required: Yes
+Label to use for the angle picker.
 
-### onChange
+### `onChange`
+
+ - Type: `(value: number) => void`
+ - Required: Yes
+
 A function that receives the new value of the input.
 
-- Type: `function`
-- Required: Yes
+### `value`
+
+ - Type: `string | number`
+ - Required: Yes
+
+The current value of the input. The value represents an angle in degrees
+and should be a value between 0 and 360.

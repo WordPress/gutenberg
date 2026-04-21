@@ -15,11 +15,11 @@ import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
  *
  * @property {number}      page      The query page (1-based index, default 1).
  * @property {number}      perPage   Items per page for query (default 10).
- * @property {string}      stableKey An encoded stable string of all non-
- *                                   pagination, non-fields query parameters.
- * @property {?(string[])} fields    Target subset of fields to derive from
- *                                   item objects.
- * @property {?(number[])} include   Specific item IDs to include.
+ * @property {?number}     offset    Absolute item offset (default null).
+ * @property {string}      stableKey An encoded stable string of all non-pagination, non-fields query parameters.
+ * @property {?(string[])} fields    Target subset of fields to derive from item objects (default null).
+ * @property {?(number[])} include   Specific item IDs to include (default null).
+ * @property {string}      context   Scope under which the request is made; determines returned fields in response.
  */
 
 /**
@@ -39,8 +39,10 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
+		offset: null,
 		fields: null,
 		include: null,
+		context: 'default',
 	};
 
 	// Ensure stable key by sorting keys. Also more efficient for iterating.
@@ -48,7 +50,7 @@ export function getQueryParts( query ) {
 
 	for ( let i = 0; i < keys.length; i++ ) {
 		const key = keys[ i ];
-		const value = query[ key ];
+		let value = query[ key ];
 
 		switch ( key ) {
 			case 'page':
@@ -59,17 +61,42 @@ export function getQueryParts( query ) {
 				parts.perPage = Number( value );
 				break;
 
-			case 'include':
-				parts.include = getNormalizedCommaSeparable( value ).map(
-					Number
-				);
+			case 'offset': {
+				const numericOffset = Number( value );
+				if ( Number.isFinite( numericOffset ) ) {
+					parts.offset = numericOffset;
+				}
 				break;
+			}
 
-			case '_fields':
-				parts.fields = getNormalizedCommaSeparable( value );
+			case 'context':
+				parts.context = value;
 				break;
 
 			default:
+				// While in theory, we could exclude "_fields" from the stableKey
+				// because two request with different fields have the same results
+				// We're not able to ensure that because the server can decide to omit
+				// fields from the response even if we explicitly asked for it.
+				// Example: Asking for titles in posts without title support.
+				if ( key === '_fields' ) {
+					parts.fields = getNormalizedCommaSeparable( value ) ?? [];
+					// Make sure to normalize value for `stableKey`
+					value = parts.fields.join();
+				}
+
+				// Two requests with different include values cannot have same results.
+				if ( key === 'include' ) {
+					if ( typeof value === 'number' ) {
+						value = value.toString();
+					}
+					parts.include = (
+						getNormalizedCommaSeparable( value ) ?? []
+					).map( Number );
+					// Normalize value for `stableKey`.
+					value = parts.include.join();
+				}
+
 				// While it could be any deterministic string, for simplicity's
 				// sake mimic querystring encoding for stable key.
 				//

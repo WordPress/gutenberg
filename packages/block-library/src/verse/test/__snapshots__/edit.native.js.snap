@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Verse block inserts block 1`] = `
+"<!-- wp:verse -->
+<pre class="wp-block-verse"></pre>
+<!-- /wp:verse -->"
+`;
+
+exports[`Verse block renders block text set as initial content 1`] = `
+"<!-- wp:verse -->
+<pre class="wp-block-verse">Sample text</pre>
+<!-- /wp:verse -->"
+`;

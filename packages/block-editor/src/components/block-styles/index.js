@@ -1,161 +1,177 @@
 /**
  * External dependencies
  */
-import { find, noop } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { ENTER, SPACE } from '@wordpress/keycodes';
-import { _x } from '@wordpress/i18n';
+import { useState, useMemo } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { debounce } from '@wordpress/compose';
 import {
-	getBlockType,
-	cloneBlock,
-	getBlockFromExample,
-} from '@wordpress/blocks';
+	Button,
+	__experimentalTruncate as Truncate,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { getActiveStyle, replaceActiveStyle } from './utils';
-import BlockPreview from '../block-preview';
+import PreviewBlockPopover from '../block-switcher/preview-block-popover';
+import useStylesForBlocks from './use-styles-for-block';
+import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { getDefaultStyle, replaceActiveStyle } from './utils';
+import { store as blockEditorStore } from '../../store';
 
-const useGenericPreviewBlock = ( block, type ) =>
-	useMemo(
-		() =>
-			type.example
-				? getBlockFromExample( block.name, {
-						attributes: type.example.attributes,
-						innerBlocks: type.example.innerBlocks,
-				  } )
-				: cloneBlock( block ),
-		[ type.example ? block.name : block, type ]
+const noop = () => {};
+
+// Block Styles component for the Settings Sidebar.
+function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+	const canEdit = useSelect(
+		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
+		[ clientId ]
 	);
-
-function BlockStyles( {
-	clientId,
-	onSwitch = noop,
-	onHoverClassName = noop,
-	itemRole,
-} ) {
-	const selector = ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { getBlockStyles } = select( 'core/blocks' );
-		const block = getBlock( clientId );
-		const blockType = getBlockType( block.name );
-		return {
-			block,
-			type: blockType,
-			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
-		};
-	};
-
-	const { styles, block, type, className } = useSelect( selector, [
+	const {
+		onSelect,
+		stylesToRender,
+		activeStyle,
+		genericPreviewBlock,
+		className,
+	} = useStylesForBlocks( {
 		clientId,
-	] );
+		onSwitch,
+	} );
+	const [ hoveredStyle, setHoveredStyle ] = useState( null );
+	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	const genericPreviewBlock = useGenericPreviewBlock( block, type );
+	const previewBlocks = useMemo( () => {
+		if ( ! hoveredStyle || ! genericPreviewBlock ) {
+			return null;
+		}
+		const previewClassName = replaceActiveStyle(
+			className,
+			activeStyle,
+			hoveredStyle
+		);
+		return [
+			{
+				...genericPreviewBlock,
+				attributes: {
+					...( genericPreviewBlock.attributes || {} ),
+					className: previewClassName,
+				},
+			},
+		];
+	}, [ hoveredStyle, genericPreviewBlock, className, activeStyle ] );
 
-	if ( ! styles || styles.length === 0 ) {
+	if ( ! canEdit || ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
 
-	const renderedStyles = find( styles, 'isDefault' )
-		? styles
-		: [
-				{
-					name: 'default',
-					label: _x( 'Default', 'block style' ),
-					isDefault: true,
-				},
-				...styles,
-		  ];
+	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
 
-	const activeStyle = getActiveStyle( renderedStyles, className );
-	return (
-		<div className="block-editor-block-styles">
-			{ renderedStyles.map( ( style ) => {
-				const styleClassName = replaceActiveStyle(
-					className,
-					activeStyle,
-					style
-				);
-				return (
-					<BlockStyleItem
-						genericPreviewBlock={ genericPreviewBlock }
-						className={ className }
-						isActive={ activeStyle === style }
-						key={ style.name }
-						onSelect={ () => {
-							updateBlockAttributes( clientId, {
-								className: styleClassName,
-							} );
-							onHoverClassName( null );
-							onSwitch();
-						} }
-						onBlur={ () => onHoverClassName( null ) }
-						onHover={ () => onHoverClassName( styleClassName ) }
-						style={ style }
-						styleClassName={ styleClassName }
-						itemRole={ itemRole }
-					/>
-				);
-			} ) }
-		</div>
-	);
-}
+	const onSelectStylePreview = ( style ) => {
+		onSelect( style );
+		onHoverClassName( null );
+		setHoveredStyle( null );
+		debouncedSetHoveredStyle.cancel();
+	};
 
-function BlockStyleItem( {
-	genericPreviewBlock,
-	style,
-	isActive,
-	onBlur,
-	onHover,
-	onSelect,
-	styleClassName,
-	itemRole,
-} ) {
-	const previewBlocks = useMemo( () => {
-		return {
-			...genericPreviewBlock,
-			attributes: {
-				...genericPreviewBlock.attributes,
-				className: styleClassName,
-			},
-		};
-	}, [ genericPreviewBlock, styleClassName ] );
+	const styleItemHandler = ( item ) => {
+		if ( hoveredStyle === item ) {
+			debouncedSetHoveredStyle.cancel();
+			return;
+		}
+		debouncedSetHoveredStyle( item );
+		onHoverClassName( item?.name ?? null );
+	};
+
+	const defaultStyle = getDefaultStyle( stylesToRender );
+
+	const hasValue = () => {
+		return activeStyle?.name !== defaultStyle?.name;
+	};
+
+	const onDeselect = () => {
+		onSelectStylePreview( defaultStyle );
+	};
 
 	return (
-		<div
-			key={ style.name }
-			className={ classnames( 'block-editor-block-styles__item', {
-				'is-active': isActive,
-			} ) }
-			onClick={ () => onSelect() }
-			onKeyDown={ ( event ) => {
-				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
-					event.preventDefault();
-					onSelect();
-				}
-			} }
-			onMouseEnter={ onHover }
-			onMouseLeave={ onBlur }
-			role={ itemRole || 'button' }
-			tabIndex="0"
-			aria-label={ style.label || style.name }
+		<ToolsPanel
+			label={ __( 'Styles' ) }
+			resetAll={ onDeselect }
+			panelId={ clientId }
+			hasInnerWrapper
+			dropdownMenuProps={ dropdownMenuProps }
 		>
-			<div className="block-editor-block-styles__item-preview">
-				<BlockPreview viewportWidth={ 500 } blocks={ previewBlocks } />
-			</div>
-			<div className="block-editor-block-styles__item-label">
-				{ style.label || style.name }
-			</div>
-		</div>
+			<ToolsPanelItem
+				hasValue={ hasValue }
+				label={ __( 'Variation' ) }
+				onDeselect={ onDeselect }
+				isShownByDefault
+				panelId={ clientId }
+			>
+				<div
+					ref={ setBlockStylesAnchor }
+					className="block-editor-block-styles"
+				>
+					<div className="block-editor-block-styles__variants">
+						{ stylesToRender.map( ( style ) => {
+							const buttonText = style.label || style.name;
+
+							return (
+								<Button
+									__next40pxDefaultSize
+									className={ clsx(
+										'block-editor-block-styles__item',
+										{
+											'is-active':
+												activeStyle.name === style.name,
+										}
+									) }
+									key={ style.name }
+									variant="secondary"
+									label={ buttonText }
+									onMouseEnter={ () =>
+										styleItemHandler( style )
+									}
+									onFocus={ () => styleItemHandler( style ) }
+									onMouseLeave={ () =>
+										styleItemHandler( null )
+									}
+									onBlur={ () => styleItemHandler( null ) }
+									onClick={ () =>
+										onSelectStylePreview( style )
+									}
+									aria-current={
+										activeStyle.name === style.name
+									}
+								>
+									<Truncate
+										numberOfLines={ 1 }
+										className="block-editor-block-styles__item-text"
+									>
+										{ buttonText }
+									</Truncate>
+								</Button>
+							);
+						} ) }
+					</div>
+					{ previewBlocks && (
+						<PreviewBlockPopover
+							blocks={ previewBlocks }
+							placement="left-start"
+							offset={ 34 }
+							anchor={ blockStylesAnchor }
+						/>
+					) }
+				</div>
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 }
 

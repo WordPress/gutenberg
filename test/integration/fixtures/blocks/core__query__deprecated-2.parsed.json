@@ -1,0 +1,46 @@
+[
+	{
+		"blockName": "core/query",
+		"attrs": {
+			"queryId": 19,
+			"query": {
+				"perPage": 3,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [ 3, 5 ],
+				"tagIds": [ 6 ],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": false
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/post-template",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/post-title",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "",
+						"innerContent": []
+					}
+				],
+				"innerHTML": "\n\n",
+				"innerContent": [ "\n", null, "\n" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-query\">\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-query\">",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

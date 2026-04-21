@@ -1,49 +1,47 @@
 /**
  * WordPress dependencies
  */
-import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
-import {
-	BlockControls,
-	InnerBlocks,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import QueryToolbar from './query-toolbar';
-import QueryProvider from './query-provider';
-import QueryInspectorControls from './query-inspector-controls';
+import QueryContent from './query-content';
+import QueryPlaceholder from './query-placeholder';
+import { PatternSelectionModal } from './pattern-selection';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
-export default function QueryEdit( {
-	attributes: { queryId, query },
-	setAttributes,
-} ) {
-	const instanceId = useInstanceId( QueryEdit );
-	// We need this for multi-query block pagination.
-	// Query parameters for each block are scoped to their ID.
-	useEffect( () => {
-		if ( ! queryId ) {
-			setAttributes( { queryId: instanceId } );
-		}
-	}, [ queryId, instanceId ] );
-	const updateQuery = ( newQuery ) =>
-		setAttributes( { query: { ...query, ...newQuery } } );
+const QueryEdit = ( props ) => {
+	const { clientId, attributes } = props;
+	const [ isPatternSelectionModalOpen, setIsPatternSelectionModalOpen ] =
+		useState( false );
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+
 	return (
 		<>
-			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
-			<BlockControls>
-				<QueryToolbar query={ query } setQuery={ updateQuery } />
-			</BlockControls>
-			<Block.div>
-				<QueryProvider>
-					<InnerBlocks template={ TEMPLATE } />
-				</QueryProvider>
-			</Block.div>
+			<Component
+				{ ...props }
+				openPatternSelectionModal={ () =>
+					setIsPatternSelectionModalOpen( true )
+				}
+			/>
+			{ isPatternSelectionModalOpen && (
+				<PatternSelectionModal
+					clientId={ clientId }
+					attributes={ attributes }
+					setIsPatternSelectionModalOpen={
+						setIsPatternSelectionModalOpen
+					}
+				/>
+			) }
 		</>
 	);
-}
+};
 
-export * from './query-provider';
+export default QueryEdit;

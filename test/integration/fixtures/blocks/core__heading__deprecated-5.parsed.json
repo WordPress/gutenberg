@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "right",
+			"textColor": "primary"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"has-text-align-right has-primary-color has-text-color\">Text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"has-text-align-right has-primary-color has-text-color\">Text</h2>\n"
+		]
+	}
+]

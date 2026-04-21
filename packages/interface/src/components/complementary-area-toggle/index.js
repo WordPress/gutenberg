@@ -1,40 +1,66 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { usePluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
-import complementaryAreaContext from '../complementary-area-context';
+import { store as interfaceStore } from '../../store';
 
-function ComplementaryAreaToggle( {
+/**
+ * Whether the role supports checked state.
+ *
+ * @see https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+ * @param {React.AriaRole} role Role.
+ * @return {boolean} Whether the role supports checked state.
+ */
+function roleSupportsCheckedState( role ) {
+	return [
+		'checkbox',
+		'option',
+		'radio',
+		'switch',
+		'menuitemcheckbox',
+		'menuitemradio',
+		'treeitem',
+	].includes( role );
+}
+
+export default function ComplementaryAreaToggle( {
 	as = Button,
 	scope,
-	identifier,
-	icon,
+	identifier: identifierProp,
+	icon: iconProp,
 	selectedIcon,
+	name,
+	shortcut,
 	...props
 } ) {
 	const ComponentToUse = as;
+	const context = usePluginContext();
+	const icon = iconProp || context.icon;
+	const identifier = identifierProp || `${ context.name }/${ name }`;
 	const isSelected = useSelect(
 		( select ) =>
-			select( 'core/interface' ).getActiveComplementaryArea( scope ) ===
+			select( interfaceStore ).getActiveComplementaryArea( scope ) ===
 			identifier,
-		[ identifier ]
+		[ identifier, scope ]
 	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
-	);
+
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
+
 	return (
 		<ComponentToUse
 			icon={ selectedIcon && isSelected ? selectedIcon : icon }
+			aria-controls={ identifier.replace( '/', ':' ) }
+			// Make sure aria-checked matches spec https://www.w3.org/TR/wai-aria-1.1/#aria-checked
+			aria-checked={
+				roleSupportsCheckedState( props.role ) ? isSelected : undefined
+			}
 			onClick={ () => {
 				if ( isSelected ) {
 					disableComplementaryArea( scope );
@@ -42,9 +68,8 @@ function ComplementaryAreaToggle( {
 					enableComplementaryArea( scope, identifier );
 				}
 			} }
-			{ ...omit( props, [ 'name' ] ) }
+			shortcut={ shortcut }
+			{ ...props }
 		/>
 	);
 }
-
-export default complementaryAreaContext( ComplementaryAreaToggle );

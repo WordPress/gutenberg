@@ -1,36 +1,75 @@
 /**
  * External dependencies
  */
-import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
+import { capitalCase, pascalCase } from 'change-case';
 
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
+import { PostEditorAwareness } from './awareness/post-editor-awareness';
+import { getSyncManager } from './sync';
+import {
+	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
+	defaultSyncConfig,
+	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
+const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-export const defaultEntities = [
+const blocksTransientEdits = {
+	blocks: {
+		read: ( record ) => parse( record.content?.raw ?? '' ),
+		write: ( record ) => ( {
+			content: __unstableSerializeAndClean( record.blocks ),
+		} ),
+	},
+};
+
+export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
+		kind: 'root',
+		key: false,
 		name: '__unstableBase',
-		kind: 'root',
-		baseURL: '',
-	},
-	{
-		label: __( 'Site' ),
-		name: 'site',
-		kind: 'root',
-		baseURL: '/wp/v2/settings',
-		getTitle: ( record ) => {
-			return get( record, [ 'title' ], __( 'Site Title' ) );
+		baseURL: '/',
+		baseURLParams: {
+			// Please also change the preload path when changing this.
+			// @see lib/compat/wordpress-7.0/preload.php
+			_fields: [
+				'description',
+				'gmt_offset',
+				'home',
+				'image_sizes',
+				'image_size_threshold',
+				'image_output_formats',
+				'jpeg_interlaced',
+				'png_interlaced',
+				'gif_interlaced',
+				'name',
+				'site_icon',
+				'site_icon_url',
+				'site_logo',
+				'timezone_string',
+				'url',
+				'page_for_posts',
+				'page_on_front',
+				'show_on_front',
+			].join( ',' ),
 		},
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
+		plural: '__unstableBases',
+		supportsPagination: false,
 	},
 	{
 		label: __( 'Post Type' ),
@@ -38,99 +77,394 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
+		baseURLParams: { context: 'edit' },
+		plural: 'postTypes',
+		supportsPagination: false,
 	},
 	{
 		name: 'media',
 		kind: 'root',
 		baseURL: '/wp/v2/media',
+		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/taxonomies',
+		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
+		supportsPagination: false,
 	},
 	{
 		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/sidebars',
+		baseURL: '/wp/v2/sidebars',
+		baseURLParams: { context: 'edit' },
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
+		supportsPagination: false,
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		baseURLParams: { context: 'edit' },
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
+		supportsPagination: false,
+	},
+	{
+		name: 'widgetType',
+		kind: 'root',
+		baseURL: '/wp/v2/widget-types',
+		baseURLParams: { context: 'edit' },
+		plural: 'widgetTypes',
+		label: __( 'Widget types' ),
+		supportsPagination: false,
 	},
 	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		getTitle: ( record ) => record?.name || record?.slug,
+		baseURLParams: { context: 'edit' },
 		plural: 'users',
+		supportsPagination: true,
 	},
 	{
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
+		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
+		supportsPagination: true,
+		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
 		name: 'menu',
 		kind: 'root',
-		baseURL: '/__experimental/menus',
+		baseURL: '/wp/v2/menus',
+		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menuItem',
 		kind: 'root',
-		baseURL: '/__experimental/menu-items',
+		baseURL: '/wp/v2/menu-items',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
+		rawAttributes: [ 'title' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'menuLocation',
 		kind: 'root',
-		baseURL: '/__experimental/menu-locations',
+		baseURL: '/wp/v2/menu-locations',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+		supportsPagination: false,
+	},
+	{
+		label: __( 'Global Styles' ),
+		name: 'globalStyles',
+		kind: 'root',
+		baseURL: '/wp/v2/global-styles',
+		baseURLParams: { context: 'edit' },
+		plural: 'globalStylesVariations', // Should be different from name.
+		getTitle: () => __( 'Custom Styles' ),
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
+	},
+	{
+		label: __( 'Themes' ),
+		name: 'theme',
+		kind: 'root',
+		baseURL: '/wp/v2/themes',
+		baseURLParams: { context: 'edit' },
+		plural: 'themes',
+		key: 'stylesheet',
+		supportsPagination: false,
+	},
+	{
+		label: __( 'Plugins' ),
+		name: 'plugin',
+		kind: 'root',
+		baseURL: '/wp/v2/plugins',
+		baseURLParams: { context: 'edit' },
+		plural: 'plugins',
+		key: 'plugin',
+		supportsPagination: false,
+	},
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
+		supportsPagination: false,
+	},
+	{
+		label: __( 'Registered Templates' ),
+		name: 'registeredTemplate',
+		kind: 'root',
+		baseURL: '/wp/v2/registered-templates',
+		key: 'id',
+		supportsPagination: false,
+	},
+	{
+		label: __( 'Font Collections' ),
+		name: 'fontCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/font-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'fontCollections',
+		key: 'slug',
+		supportsPagination: true,
+	},
+	{
+		label: __( 'Icons' ),
+		name: 'icon',
+		kind: 'root',
+		baseURL: '/wp/v2/icons',
+		baseURLParams: { context: 'view' },
+		plural: 'icons',
+		key: 'name',
+		supportsPagination: false,
 	},
 ];
 
-export const kinds = [
-	{ name: 'postType', loadEntities: loadPostTypeEntities },
-	{ name: 'taxonomy', loadEntities: loadTaxonomyEntities },
+export const deprecatedEntities = {
+	root: {
+		media: {
+			since: '6.9',
+			alternative: {
+				kind: 'postType',
+				name: 'attachment',
+			},
+		},
+	},
+};
+
+export const additionalEntityConfigLoaders = [
+	{ kind: 'postType', loadEntities: loadPostTypeEntities },
+	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
+	{
+		kind: 'root',
+		name: 'site',
+		plural: 'sites',
+		loadEntities: loadSiteEntity,
+	},
 ];
+
+/**
+ * Apply extra edits before persisting a post type.
+ *
+ * @param {Object}  persistedRecord Already persisted Post
+ * @param {Object}  edits           Edits.
+ * @param {string}  name            Post type name.
+ * @param {boolean} isTemplate      Whether the post type is a template.
+ * @return {Promise< Object >} Updated edits.
+ */
+export const prePersistPostType = async (
+	persistedRecord,
+	edits,
+	name,
+	isTemplate
+) => {
+	const newEdits = {};
+
+	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status && ! newEdits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			! newEdits.title &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
+	}
+
+	// Add meta for persisted CRDT document.
+	if ( persistedRecord ) {
+		const objectType = `postType/${ name }`;
+		const objectId = persistedRecord.id;
+		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
+			objectType,
+			objectId
+		);
+
+		if ( serializedDoc ) {
+			newEdits.meta = {
+				...edits.meta,
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+			};
+		}
+	}
+
+	return newEdits;
+};
 
 /**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
  */
-function* loadPostTypeEntities() {
-	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
-	return map( postTypes, ( postType, name ) => {
-		return {
+async function loadPostTypeEntities() {
+	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
+	const taxonomiesPromise = window._wpCollaborationEnabled
+		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
+		: Promise.resolve( {} );
+	const [ postTypes, taxonomies ] = await Promise.all( [
+		postTypesPromise,
+		taxonomiesPromise,
+	] );
+
+	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
+		const namespace = postType?.rest_namespace ?? 'wp/v2';
+
+		const syncedProperties = new Set( [
+			'author',
+			'blocks',
+			'content',
+			'comment_status',
+			'date',
+			'excerpt',
+			'featured_media',
+			'format',
+			'meta',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'template',
+			'title',
+			...( postType.taxonomies
+				?.map( ( taxonomy ) => taxonomies?.[ taxonomy ]?.rest_base )
+				?.filter( Boolean ) ?? [] ),
+		] );
+
+		const entity = {
 			kind: 'postType',
-			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURL: `/${ namespace }/${ postType.rest_base }`,
+			baseURLParams: { context: 'edit' },
 			name,
-			label: postType.labels.singular_name,
+			label: postType.name,
 			transientEdits: {
-				blocks: true,
-				selectionStart: true,
-				selectionEnd: true,
+				...blocksTransientEdits,
+				selection: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle( record ) {
-				if ( name === 'wp_template_part' || name === 'wp_template' ) {
-					return startCase( record.slug );
-				}
-				return get( record, [ 'title', 'rendered' ], record.id );
+			rawAttributes: POST_RAW_ATTRIBUTES,
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate
+					? capitalCase( record.slug ?? '' )
+					: String( record.id ) ),
+			__unstablePrePersist: ( persistedRecord, edits ) =>
+				prePersistPostType( persistedRecord, edits, name, isTemplate ),
+			__unstable_rest_base: postType.rest_base,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey:
+				isTemplate && ! window?.__experimentalTemplateActivate
+					? 'wp_id'
+					: DEFAULT_ENTITY_KEY,
+		};
+
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		entity.syncConfig = {
+			/**
+			 * Apply changes from the local editor to the local CRDT document so
+			 * that those changes can be synced to other peers (via the provider).
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @return {void}
+			 */
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
+
+			/**
+			 * Create the awareness instance for the entity's CRDT document.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+			 * @param {import('@wordpress/sync').ObjectID} objectId
+			 * @return {import('@wordpress/sync').Awareness} Awareness instance
+			 */
+			createAwareness: ( ydoc, objectId ) => {
+				const kind = 'postType';
+				const id = parseInt( objectId, 10 );
+				return new PostEditorAwareness( ydoc, kind, name, id );
+			},
+
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					editedRecord,
+					syncedProperties
+				),
+
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').ObjectData} record
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getPersistedCRDTDoc: ( record ) => {
+				return (
+					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
+					null
+				);
 			},
 		};
+
+		return entity;
 	} );
 }
 
@@ -139,67 +473,82 @@ function* loadPostTypeEntities() {
  *
  * @return {Promise} Entities promise
  */
-function* loadTaxonomyEntities() {
-	const taxonomies = yield apiFetch( {
-		path: '/wp/v2/taxonomies?context=edit',
+async function loadTaxonomyEntities() {
+	const taxonomies = await apiFetch( {
+		path: '/wp/v2/taxonomies?context=view',
 	} );
-	return map( taxonomies, ( taxonomy, name ) => {
-		return {
+	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
+		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
+		const entity = {
 			kind: 'taxonomy',
-			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
+			baseURLParams: { context: 'edit' },
 			name,
-			label: taxonomy.labels.singular_name,
+			label: taxonomy.name,
+			getTitle: ( record ) => record?.name,
+			supportsPagination: true,
 		};
+
+		entity.syncConfig = defaultSyncConfig;
+
+		return entity;
 	} );
 }
 
 /**
- * Returns the entity's getter method name given its kind and name.
+ * Returns the Site entity.
  *
- * @param {string}  kind      Entity kind.
- * @param {string}  name      Entity name.
- * @param {string}  prefix    Function prefix.
- * @param {boolean} usePlural Whether to use the plural form or not.
+ * @return {Promise} Entity promise
+ */
+async function loadSiteEntity() {
+	const entity = {
+		label: __( 'Site' ),
+		name: 'site',
+		kind: 'root',
+		key: false,
+		baseURL: '/wp/v2/settings',
+		supportsPagination: false,
+		meta: {},
+	};
+
+	const site = await apiFetch( {
+		path: entity.baseURL,
+		method: 'OPTIONS',
+	} );
+
+	const labels = {};
+	Object.entries( site?.schema?.properties ?? {} ).forEach(
+		( [ key, value ] ) => {
+			// Ignore properties `title` and `type` keys.
+			if ( typeof value === 'object' && value.title ) {
+				labels[ key ] = value.title;
+			}
+		}
+	);
+
+	return [ { ...entity, meta: { labels } } ];
+}
+
+/**
+ * Returns the entity's getter method name given its kind and name or plural name.
+ *
+ * @example
+ * ```js
+ * const nameSingular = getMethodName( 'root', 'theme', 'get' );
+ * // nameSingular is getRootTheme
+ *
+ * const namePlural = getMethodName( 'root', 'themes', 'set' );
+ * // namePlural is setRootThemes
+ * ```
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name or plural name.
+ * @param {string} prefix Function prefix.
  *
  * @return {string} Method name
  */
-export const getMethodName = (
-	kind,
-	name,
-	prefix = 'get',
-	usePlural = false
-) => {
-	const entity = find( defaultEntities, { kind, name } );
-	const kindPrefix = kind === 'root' ? '' : upperFirst( camelCase( kind ) );
-	const nameSuffix =
-		upperFirst( camelCase( name ) ) + ( usePlural ? 's' : '' );
-	const suffix =
-		usePlural && entity.plural
-			? upperFirst( camelCase( entity.plural ) )
-			: nameSuffix;
+export const getMethodName = ( kind, name, prefix = 'get' ) => {
+	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
+	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
-
-/**
- * Loads the kind entities into the store.
- *
- * @param {string} kind  Kind
- *
- * @return {Array} Entities
- */
-export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
-	if ( entities && entities.length !== 0 ) {
-		return entities;
-	}
-
-	const kindConfig = find( kinds, { name: kind } );
-	if ( ! kindConfig ) {
-		return [];
-	}
-
-	entities = yield kindConfig.loadEntities();
-	yield addEntities( entities );
-
-	return entities;
-}

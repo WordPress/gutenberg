@@ -1,4 +1,4 @@
 module.exports = [
-	require( 'postcss-custom-properties' )(),
+	require( 'postcss-import' )(),
 	require( 'autoprefixer' )( { grid: true } ),
 ];

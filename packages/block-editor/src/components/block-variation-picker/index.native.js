@@ -8,14 +8,13 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { withSelect, useDispatch } from '@wordpress/data';
-import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -23,30 +22,18 @@ import {
 	FooterMessageControl,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import MenuItem from '../inserter/menu-item';
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
+import InserterButton from '../inserter-button';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
-function createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ) {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-}
-
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const isIOS = Platform.OS === 'ios';
 
 	const cancelButtonStyle = usePreferredColorSchemeStyle(
@@ -54,35 +41,31 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		styles.cancelButtonDark
 	);
 
-	const leftButton = useMemo(
-		() => (
-			<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
-				<View>
-					{ isIOS ? (
-						<Text
-							style={ cancelButtonStyle }
-							maxFontSizeMultiplier={ 2 }
-						>
-							{ __( 'Cancel' ) }
-						</Text>
-					) : (
-						<Icon
-							icon={ close }
-							size={ 24 }
-							style={ styles.closeIcon }
-						/>
-					) }
-				</View>
-			</TouchableWithoutFeedback>
-		),
-		[ onClose, cancelButtonStyle ]
+	const leftButton = (
+		<TouchableWithoutFeedback onPress={ onClose } hitSlop={ hitSlop }>
+			<View>
+				{ isIOS ? (
+					<Text
+						style={ cancelButtonStyle }
+						maxFontSizeMultiplier={ 2 }
+					>
+						{ __( 'Cancel' ) }
+					</Text>
+				) : (
+					<Icon
+						icon={ close }
+						size={ 24 }
+						style={ styles.closeIcon }
+					/>
+				) }
+			</View>
+		</TouchableWithoutFeedback>
 	);
 
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(
 			clientId,
-			createBlocksFromInnerBlocksTemplate( variation.innerBlocks ),
-			false
+			createBlocksFromInnerBlocksTemplate( variation.innerBlocks )
 		);
 		onClose();
 	};
@@ -94,6 +77,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			title={ __( 'Select a layout' ) }
 			contentStyle={ styles.contentStyle }
 			leftButton={ leftButton }
+			testID="block-variation-modal"
 		>
 			<ScrollView
 				horizontal
@@ -101,15 +85,13 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 				contentContainerStyle={ styles.contentContainerStyle }
 				style={ styles.containerStyle }
 			>
-				{ variations.map( ( v ) => {
-					return (
-						<MenuItem
-							item={ v }
-							key={ v.name }
-							onSelect={ () => onVariationSelect( v ) }
-						/>
-					);
-				} ) }
+				{ variations.map( ( v ) => (
+					<InserterButton
+						item={ v }
+						key={ v.name }
+						onSelect={ () => onVariationSelect( v ) }
+					/>
+				) ) }
 			</ScrollView>
 			<PanelBody>
 				<FooterMessageControl
@@ -122,12 +104,4 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	);
 }
 
-export default compose(
-	withSelect( ( select, {} ) => {
-		const { getBlockVariations } = select( 'core/blocks' );
-
-		return {
-			date: getBlockVariations( 'core/columns', 'block' ),
-		};
-	} )
-)( BlockVariationPicker );
+export default BlockVariationPicker;

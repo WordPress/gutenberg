@@ -9,7 +9,6 @@ import {
 	Animated,
 	Easing,
 } from 'react-native';
-import { take, values, map, reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -65,9 +64,8 @@ const SegmentedControls = ( {
 	addonRight,
 } ) => {
 	const selectedSegmentIndex = selectedIndex || 0;
-	const [ activeSegmentIndex, setActiveSegmentIndex ] = useState(
-		selectedSegmentIndex
-	);
+	const [ activeSegmentIndex, setActiveSegmentIndex ] =
+		useState( selectedSegmentIndex );
 	const [ segmentsDimensions, setSegmentsDimensions ] = useState( {
 		[ activeSegmentIndex ]: { width: 0, height: 0 },
 	} );
@@ -76,12 +74,14 @@ const SegmentedControls = ( {
 	useEffect( () => {
 		setActiveSegmentIndex( selectedSegmentIndex );
 		segmentHandler( segments[ selectedSegmentIndex ] );
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ segmentsDimensions ] );
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -94,6 +94,7 @@ const SegmentedControls = ( {
 			toValue: calculateEndValue( index ),
 			duration: ANIMATION_DURATION,
 			easing: Easing.ease,
+			useNativeDriver: false,
 		} ).start();
 	}
 
@@ -101,11 +102,13 @@ const SegmentedControls = ( {
 		const { paddingLeft: offset } = isIOS
 			? styles.containerIOS
 			: styles.container;
-		const widths = map( values( segmentsDimensions ), 'width' );
-		const widthsDistance = take( widths, index );
-		const widthsDistanceSum = reduce(
-			widthsDistance,
-			( sum, n ) => sum + n
+		const widths = Object.values( segmentsDimensions ).map(
+			( dimension ) => dimension.width
+		);
+		const widthsDistance = widths.slice( 0, index );
+		const widthsDistanceSum = widthsDistance.reduce(
+			( sum, n ) => sum + n,
+			0
 		);
 
 		const endValue = index === 0 ? 0 : widthsDistanceSum;
@@ -133,8 +136,8 @@ const SegmentedControls = ( {
 		styles.selectedDark
 	);
 
-	const width = segmentsDimensions[ activeSegmentIndex ].width;
-	const height = segmentsDimensions[ activeSegmentIndex ].height;
+	const width = segmentsDimensions[ activeSegmentIndex ]?.width;
+	const height = segmentsDimensions[ activeSegmentIndex ]?.height;
 
 	const outlineStyle = [ styles.outline, isIOS && styles.outlineIOS ];
 
@@ -142,6 +145,17 @@ const SegmentedControls = ( {
 		<View style={ styles.row }>
 			<View style={ styles.flex }>{ addonLeft }</View>
 			<View style={ [ containerStyle, isIOS && styles.containerIOS ] }>
+				<Animated.View
+					style={ [
+						{
+							width,
+							left: positionAnimationValue,
+							height,
+						},
+						selectedStyle,
+						outlineStyle,
+					] }
+				/>
 				{ segments.map( ( segment, index ) => {
 					return (
 						<Segment
@@ -155,7 +169,7 @@ const SegmentedControls = ( {
 							accessibilityState={ {
 								selected: activeSegmentIndex === index,
 							} }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={ segment }
 							accessibilityHint={ `${ index + 1 } on ${
 								segments.length
@@ -163,17 +177,6 @@ const SegmentedControls = ( {
 						/>
 					);
 				} ) }
-				<Animated.View
-					style={ [
-						{
-							width,
-							left: positionAnimationValue,
-							height,
-						},
-						selectedStyle,
-						outlineStyle,
-					] }
-				/>
 			</View>
 			<View style={ styles.flex }>{ addonRight }</View>
 		</View>

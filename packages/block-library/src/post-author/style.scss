@@ -1,6 +1,7 @@
 .wp-block-post-author {
 	display: flex;
 	flex-wrap: wrap;
+	box-sizing: border-box;
 
 	&__byline {
 		width: 100%;
@@ -24,7 +25,6 @@
 	}
 
 	&__name {
-		font-weight: bold;
 		margin: 0;
 	}
 }

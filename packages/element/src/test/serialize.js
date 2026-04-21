@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { noop } from 'lodash';
+/* eslint-disable testing-library/render-result-naming-convention */
 
 /**
  * Internal dependencies
@@ -23,6 +20,8 @@ import serialize, {
 	renderAttributes,
 	renderStyle,
 } from '../serialize';
+
+const noop = () => {};
 
 describe( 'serialize()', () => {
 	it( 'should allow only valid attribute names', () => {
@@ -181,6 +180,54 @@ describe( 'renderElement()', () => {
 		expect( result ).toBe( 'hello<div></div>' );
 	} );
 
+	it( 'SVG attributes with dashes should be rendered as such - even with wrong casing', () => {
+		const result = renderElement(
+			<svg>
+				<rect
+					x="0"
+					y="0"
+					strokeWidth="5"
+					// eslint-disable-next-line react/no-unknown-property
+					STROKELinejoin="miter"
+				></rect>
+			</svg>
+		);
+
+		expect( result ).toBe(
+			'<svg><rect x="0" y="0" stroke-width="5" stroke-linejoin="miter"></rect></svg>'
+		);
+	} );
+
+	it( 'Case sensitive attributes should have the right casing - even with wrong casing', () => {
+		const result = renderElement(
+			<svg
+				// eslint-disable-next-line react/no-unknown-property
+				ViEWBOx="0 0 1 1"
+				// eslint-disable-next-line react/no-unknown-property
+				preserveAsPECTRatio="slice"
+			></svg>
+		);
+
+		expect( result ).toBe(
+			'<svg viewBox="0 0 1 1" preserveAspectRatio="slice"></svg>'
+		);
+	} );
+
+	it( 'SVG attributes with colons should be rendered as such - even with wrong casing', () => {
+		const result = renderElement(
+			<svg
+				viewBox="0 0 1 1"
+				// eslint-disable-next-line react/no-unknown-property
+				XLINKROLE="some-role"
+				xlinkShow="hello"
+			></svg>
+		);
+
+		expect( result ).toBe(
+			'<svg viewBox="0 0 1 1" xlink:role="some-role" xlink:show="hello"></svg>'
+		);
+	} );
+
 	it( 'renders escaped string element', () => {
 		const result = renderElement( 'hello & world &amp; friends <img/>' );
 
@@ -287,12 +334,11 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: '1st provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
+				|
 				<Provider value={ { value: '2nd provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Fragment>
 		);
 
@@ -309,8 +355,7 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: 'inner provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 
@@ -545,7 +590,7 @@ describe( 'renderAttributes()', () => {
 			} );
 
 			expect( result ).toBe(
-				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"'
+				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;"'
 			);
 		} );
 
@@ -682,5 +727,15 @@ describe( 'renderStyle()', () => {
 
 			expect( result ).toBe( 'order:10' );
 		} );
+
+		it( 'should not render numeric units for CSS custom properties', () => {
+			const result = renderStyle( {
+				'--myOrder': 10,
+			} );
+
+			expect( result ).toBe( '--myOrder:10' );
+		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

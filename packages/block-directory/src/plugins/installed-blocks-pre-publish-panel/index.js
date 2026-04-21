@@ -2,17 +2,18 @@
  * WordPress dependencies
  */
 import { _n, sprintf } from '@wordpress/i18n';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
 import { useSelect } from '@wordpress/data';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import CompactList from '../../components/compact-list';
+import { store as blockDirectoryStore } from '../../store';
 
 export default function InstalledBlocksPrePublishPanel() {
 	const newBlockTypes = useSelect(
-		( select ) => select( 'core/block-directory' ).getNewBlockTypes(),
+		( select ) => select( blockDirectoryStore ).getNewBlockTypes(),
 		[]
 	);
 
@@ -22,7 +23,6 @@ export default function InstalledBlocksPrePublishPanel() {
 
 	return (
 		<PluginPrePublishPanel
-			icon="block-default"
 			title={ sprintf(
 				// translators: %d: number of blocks (number).
 				_n(
@@ -32,7 +32,7 @@ export default function InstalledBlocksPrePublishPanel() {
 				),
 				newBlockTypes.length
 			) }
-			initialOpen={ true }
+			initialOpen
 		>
 			<p className="installed-blocks-pre-publish-panel__copy">
 				{ _n(

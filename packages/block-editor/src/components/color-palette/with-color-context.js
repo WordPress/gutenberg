@@ -1,53 +1,52 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createHigherOrderComponent, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../use-editor-feature';
+import { useSettings } from '../use-settings';
 
-const withDisableCustomColors = createHigherOrderComponent(
-	( WrappedComponent ) => {
-		return ( props ) => {
-			const disableCustomColors = ! useEditorFeature( 'color.custom' );
+export default createHigherOrderComponent( ( WrappedComponent ) => {
+	return function WithColorContext( props ) {
+		// Get the default colors, theme colors, and custom colors
+		const [
+			defaultColors,
+			themeColors,
+			customColors,
+			enableCustomColors,
+			enableDefaultColors,
+		] = useSettings(
+			'color.palette.default',
+			'color.palette.theme',
+			'color.palette.custom',
+			'color.custom',
+			'color.defaultPalette'
+		);
 
-			return (
-				<WrappedComponent
-					{ ...props }
-					disableCustomColors={
-						props.disableCustomColors || disableCustomColors
-					}
-				/>
-			);
-		};
-	},
-	'withDisableCustomColors'
-);
+		const _colors = enableDefaultColors
+			? [
+					...( themeColors || [] ),
+					...( defaultColors || [] ),
+					...( customColors || [] ),
+			  ]
+			: [ ...( themeColors || [] ), ...( customColors || [] ) ];
 
-export default createHigherOrderComponent(
-	compose(
-		withDisableCustomColors,
-		withSelect( ( select, ownProps ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
-			const colors =
-				ownProps.colors === undefined
-					? settings.colors
-					: ownProps.colors;
+		const { colors = _colors, disableCustomColors = ! enableCustomColors } =
+			props;
 
-			return {
-				colors,
-				hasColorsToChoose:
-					! isEmpty( colors ) || ! ownProps.disableCustomColors,
-			};
-		} )
-	),
-	'withColorContext'
-);
+		const hasColorsToChoose =
+			( colors && colors.length > 0 ) || ! disableCustomColors;
+		return (
+			<WrappedComponent
+				{ ...{
+					...props,
+					colors,
+					disableCustomColors,
+					hasColorsToChoose,
+				} }
+			/>
+		);
+	};
+}, 'withColorContext' );

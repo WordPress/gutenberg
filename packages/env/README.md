@@ -14,11 +14,43 @@ $ wp-env start
 
 The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
+The database credentials are: user `root`, password `password`. For a comprehensive guide on connecting directly to the database, refer to [Accessing the MySQL Database](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/code/getting-started-with-code-contribution.md#accessing-the-mysql-database).
+
 ## Prerequisites
 
-`wp-env` requires Docker to be installed. There are instructions available for installing Docker on [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other versions of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script).
+`wp-env` relies on a few commonly used developer tools:
 
-Node.js and NPM are required. The latest LTS version of Node.js is used to develop `wp-env` and is recommended.
+-   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
+-   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+## Experimental: WordPress Playground Runtime
+
+`wp-env` now supports an experimental alternative runtime using [WordPress Playground](https://wordpress.github.io/wordpress-playground/). Playground runs WordPress entirely in WebAssembly, eliminating the need for Docker.
+
+To use the Playground runtime:
+
+```sh
+$ wp-env start --runtime=playground
+```
+
+### Playground vs Docker
+
+| Feature | Docker | Playground |
+|---------|--------|------------|
+| Requires Docker | Yes | No |
+| Xdebug | Yes | Yes |
+| SPX profiling | Yes | No |
+| phpMyAdmin | Yes | Yes |
+| MySQL database | Yes | No (SQLite) |
+| Multisite | Yes | Yes |
+| Custom PHP version | Yes | Yes |
+| Plugin/theme mounting | Yes | Yes |
+| `wp-env run` command | Yes | No |
+
+The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the `run` command for executing arbitrary commands.
+
+Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
 
 ## Installation
 
@@ -40,7 +72,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-Then modify your package.json and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute `wp-env` via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like `wp-env` installed through node modules. As an example: `npx wp-env start --update`.
+
+If you don't wish to use the global installation or `npx`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {
@@ -51,7 +85,7 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-# You must add another dash to pass the "update" flag to wp-env
+# You must add another double dash to pass flags to the script (wp-env) rather than to npm itself
 $ npm run wp-env start -- --update
 ```
 
@@ -101,7 +135,7 @@ First, check that `wp-env` is running. One way to do this is to have Docker prin
 $ docker ps
 ```
 
-In this table, by default, you should see three entries: `wordpress` with port 8888, `tests-wordpress` with port 8889 and `mariadb` with port 3306.
+In this table, by default, you should see two entries: `wordpress` with port 8888 and `mariadb`.
 
 ### 2. Check the port number
 
@@ -115,17 +149,16 @@ $ WP_ENV_PORT=3333 wp-env start
 
 Running `docker ps` and inspecting the `PORTS` column allows you to determine which port `wp-env` is currently using.
 
-You may also specify the port numbers in your `.wp-env.json` file, but the environment variables take precedent.
+You may also specify the port numbers in your `.wp-env.json` file, but the environment variables will take precedence.
 
-### 3. Restart `wp-env`
+### 3. Restart `wp-env` with updates
 
 Restarting `wp-env` will restart the underlying Docker containers which can fix many issues.
 
-To restart `wp-env`:
+To restart `wp-env`, just run `wp-env start` again. It will automatically stop and start the container. If you also pass the `--update` argument, it will download updates and configure WordPress again.
 
 ```sh
-$ wp-env stop
-$ wp-env start
+$ wp-env start --update
 ```
 
 ### 4. Restart Docker
@@ -152,43 +185,188 @@ To reset the database:
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
-$ wp-env clean all
+$ wp-env reset all
 $ wp-env start
 ```
 
-### 6. Nuke everything and start again 🔥
+### 6. Destroy everything and start again 🔥
 
-When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers and volumes. This will allow you to start from scratch.
+When all else fails, you can use `wp-env destroy` to forcibly remove all of the underlying Docker containers, volumes, and files. This will allow you to start from scratch.
 
-To nuke everything:
+To do so:
 
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
 $ wp-env destroy
+# This new instance is a fresh start with no existing data:
 $ wp-env start
 ```
+
+## Using included WordPress PHPUnit test files
+
+Out of the box `wp-env` includes the [WordPress' PHPUnit test files](https://develop.svn.wordpress.org/trunk/tests/phpunit/) corresponding to the version of WordPress installed. There is an environment variable, `WP_TESTS_DIR`, which points to the location of these files within each container. By including these files in the environment, we remove the need for you to use a package or install and mount them yourself. If you do not want to use these files, you should ignore the `WP_TESTS_DIR` environment variable and load them from the location of your choosing.
+
+### Customizing the `wp-tests-config.php` file
+
+While we do provide a default `wp-tests-config.php` file within the environment, there may be cases where you want to use your own. WordPress provides a `WP_TESTS_CONFIG_FILE_PATH` constant that you can use to change the `wp-config.php` file used for testing. Set this to a desired path in your `bootstrap.php` file and the file you've chosen will be used instead of the one included in the environment.
+
+## Using `composer`, `phpunit`, and `wp-cli` tools.
+
+For ease of use, Composer, PHPUnit, and wp-cli are available in the environment. To run these executables, use `wp-env run <container> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
+
+The `cli` and `wordpress` containers share a database and mapped volumes, but more tools are available in the `cli` container. For test isolation, use `--config` with a separate config file to run a parallel environment (see [Running parallel environments](#running-parallel-environments)).
+
+By default, the cwd of the run command is the root of the WordPress install. If you're working on a plugin, you likely need to pass `--env-cwd` to make sure composer/phpunit commands are executed relative to the plugin you're working on. For example, `wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer install`.
+
+To make this easier, it's often helpful to add scripts in your `package.json` file:
+
+```json
+{
+	"scripts": {
+		"composer": "wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer"
+	}
+}
+```
+
+Then, `npm run composer install` would run composer install in the environment. You could also do this for phpunit, wp-cli, etc.
+
+## Using Xdebug
+
+Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
+
+```sh
+# Sets the Xdebug mode to "debug" (for step debugging):
+wp-env start --xdebug
+
+# Sets the Xdebug mode to "off":
+wp-env start
+
+# Enables each of the Xdebug modes listed:
+wp-env start --xdebug=profile,trace,debug
+```
+
+When you're running `wp-env` using `npm run`, like when working in the Gutenberg repo or when `wp-env` is a local project dependency, don't forget to add an extra double dash before the `--xdebug` command:
+
+```sh
+npm run wp-env start -- --xdebug
+# Alternatively, use npx:
+npx wp-env start --xdebug
+```
+
+If you forget about that, the `--xdebug` parameter will be passed to npm instead of the `wp-env start` command and it will be ignored.
+
+You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
+
+_Since we are only installing Xdebug 3, Xdebug is only supported for PHP versions greater than or equal to 7.2 (the default). Xdebug won't be installed if `phpVersion` is set to a legacy version._
+
+### Xdebug IDE support
+
+To connect to Xdebug from your IDE, you can use these IDE settings. This bit of JSON was tested for VS Code's `launch.json` format (which you can [learn more about here](https://code.visualstudio.com/docs/editor/debugging#_launchjson-attributes)) along with [this PHP Debug extension](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug). Its path mapping also points to a specific plugin -- you should update this to point to the source you are working with inside of the wp-env instance.
+
+You should only have to translate `port` and `pathMappings` to the format used by your own IDE.
+
+```json
+{
+	"name": "Listen for XDebug",
+	"type": "php",
+	"request": "launch",
+	"port": 9003,
+	"pathMappings": {
+		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceFolder}/"
+	}
+}
+```
+
+After you create a `.vscode/launch.json` file in your repository, you probably want to add it to your [global gitignore file](https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files#configuring-ignored-files-for-all-repositories-on-your-computer) so that it stays private for you and is not committed to the repository.
+
+Once your IDEs Xdebug settings have been enabled, you should just have to launch the debugger, put a breakpoint on any line of PHP code, and then refresh your browser!
+
+Here is a summary:
+
+1. Start wp-env with xdebug enabled: `wp-env start --xdebug`
+2. Install a suitable Xdebug extension for your IDE if it does not include one already.
+3. Configure the IDE debugger to use port `9003` and the correct source files in wp-env.
+4. Launch the debugger and put a breakpoint on any line of PHP code.
+5. Refresh the URL wp-env is running at and the breakpoint should trigger.
 
 ## Command reference
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
 
+### Global options
+
+These options apply to all `wp-env` commands:
+
+```
+--debug    Enable debug output.                      [boolean] [default: false]
+--config   Path to a custom .wp-env.json configuration file.           [string]
+```
+
+The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory. Each config file gets its own isolated set of Docker containers and data.
+
+When using a custom config file, the override file is derived from its name by inserting `.override` before the extension. For example:
+- `--config=.wp-env.test.json` will look for `.wp-env.test.override.json`
+- `--config=staging.json` will look for `staging.override.json`
+- `--config=./configs/dev.wp-env.json` will look for `./configs/dev.wp-env.override.json`
+
+Override files for custom configs work the same way as `.wp-env.override.json` does for the default config (see [.wp-env.override.json](#wp-envoverridejson)).
+
+#### Running parallel environments
+
+You can run multiple wp-env environments from the same folder by using different config files and ports:
+
+```sh
+# Start first environment with default config
+wp-env start
+
+# Start second environment with custom config on different ports
+WP_ENV_PORT=8890 wp-env start --config=./staging.json
+
+# Check status of each environment
+wp-env status
+wp-env status --config=./staging.json
+
+# Stop specific environment
+wp-env stop --config=./staging.json
+```
+
+Each config file gets its own isolated Docker containers and data, so changes in one environment don't affect the other.
+
 ### `wp-env start`
 
-The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overrwrite any existing content.
+The start command installs and initializes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overwrite any existing content.
 
 ```sh
 wp-env start
 
-Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
-tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
-directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first insall, use the '--update' flag to download updates
-to mapped sources and to re-apply WordPress configuration options.
+Starts WordPress for development on port 8888 (​http://localhost:8888​)
+(override with WP_ENV_PORT). The current working directory must be a
+WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After
+first install, use the '--update' flag to download updates to mapped sources and
+to re-apply WordPress configuration options.
 
 Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
+  --runtime  Select the runtime to use. "docker" uses Docker containers,
+             "playground" uses WordPress Playground (experimental).
+                                  [string] [choices: "docker", "playground"]
+  --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
+             are set, uses "debug". You may set multiple Xdebug modes by passing
+             them in a comma-separated list: `--xdebug=develop,coverage`. See
+             https://xdebug.org/docs/all_settings#mode for information about
+             Xdebug modes.                                              [string]
+  --spx      Enables SPX profiling. If not passed, SPX is turned off. If no
+             mode is set, uses "enabled". SPX is a simple profiling extension
+             with a built-in web UI. See
+             https://github.com/NoiseByNorthwest/php-spx for more information.
+                                                                        [string]
+  --scripts    Execute any configured lifecycle scripts.
+                                                      [boolean] [default: true]
+  --auto-port  Automatically find available ports when configured ports are
+               busy.                                  [boolean]
 ```
 
 ### `wp-env stop`
@@ -196,43 +374,71 @@ Options:
 ```sh
 wp-env stop
 
-Stops running WordPress for development and tests and frees the ports.
-```
-
-### `wp-env clean [environment]`
-
-```sh
-wp-env clean [environment]
-
-Cleans the WordPress databases.
-
-Positionals:
-  environment  Which environments' databases to clean.
-            [string] [choices: "all", "development", "tests"] [default: "tests"]
-```
-
-### `wp-env run [container] [command]`
-
-```sh
-wp-env run <container> [command..]
-
-Runs an arbitrary command in one of the underlying Docker containers. For
-example, it can be useful for running wp cli commands. You can also use it to
-open shell sessions like bash and the WordPress shell in the WordPress instance.
-For example, `wp-env run cli bash` will open bash in the development WordPress
-instance.
-
-Positionals:
-  container  The container to run the command on.            [string] [required]
-  command    The command to run.                           [array] [default: []]
+Stops running WordPress for development and frees the ports.
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
+  --debug            Enable debug output.             [boolean] [default: false]
+```
+
+### `wp-env reset [environment]`
+
+```sh
+wp-env reset [environment]
+
+Resets the WordPress databases.
+
+Positionals:
+  environment  Which environments' databases to reset.
+      [string] [choices: "all", "development", "tests"] [default: "development"]
+
+Options:
   --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+```
+
+### `wp-env run <container> [command...]`
+
+The run command can be used to open shell sessions, invoke WP-CLI commands, or run any arbitrary commands inside of a container.
+
+<div class="callout callout-alert">
+<p>
+In some cases <code class="language-sh">wp-env run</code> may conflict with options that you are passing to the container.
+When this happens, <code class="language-sh">wp-env</code> will treat the option as its own and take action accordingly.
+For example, if you try <code class="language-sh">wp-env run cli php --help</code>, you will receive the <code class="language-sh">wp-env</code> help text.
+</p>
+
+<p>
+You can get around this by passing any conflicting options after a double dash. <code class="language-sh">wp-env</code> will not process anything after
+the double dash and will simply pass it on to the container. To get the PHP help text you would use <code class="language-sh">wp-env run cli php -- --help</code>.
+</p>
+</div>
+
+```sh
+wp-env run <container> [command...]
+
+Runs an arbitrary command in one of the underlying Docker containers. A double
+dash can be used to pass arguments to the container without parsing them. This
+is necessary if you are using an option that is defined below. You can use
+`bash` to open a shell session and both `composer` and `phpunit` are available
+in all WordPress and CLI containers. WP-CLI is also available in the CLI
+containers.
+
+Positionals:
+  container  The Docker service to run the command on.
+            [string] [required] [choices: "mysql", "wordpress", "cli", "composer",
+                                                                     "phpmyadmin"]
+  command    The command to run.                                      [required]
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --env-cwd  The command's working directory inside of the container. Paths
+             without a leading slash are relative to the WordPress root.
+                                                         [string] [default: "."]
 ```
 
 For example:
+
+#### Displaying the users on the development instance:
 
 ```sh
 wp-env run cli wp user list
@@ -244,16 +450,75 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
-```sh
-wp-env run tests-cli wp shell
-ℹ Starting 'wp shell' on the tests-cli container. Exit the WordPress shell with ctrl-c.
+#### Creating a post on the development instance:
 
-Starting 31911d623e75f345e9ed328b9f48cff6_mysql_1 ... done
-Starting 31911d623e75f345e9ed328b9f48cff6_tests-wordpress_1 ... done
+```sh
+wp-env run cli "wp post create --post_type=page --post_title='Ready'"
+
+ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the cli container.
+
+Success: Created post 5.
+✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'cli'. (in 3s 293ms)
+```
+
+#### Opening the WordPress shell and running PHP commands:
+
+```sh
+wp-env run cli wp shell
+ℹ Starting 'wp shell' on the cli container. Exit the WordPress shell with ctrl-c.
+
 wp> echo( 'hello world!' );
 hello world!
 wp> ^C
-✔ Ran `wp shell` in 'tests-cli'. (in 16s 400ms)
+✔ Ran `wp shell` in 'cli'. (in 16s 400ms)
+```
+
+#### Installing a plugin or theme on the development instance
+
+```sh
+wp-env run cli wp plugin install custom-post-type-ui
+
+Creating 500cd328b649d63e882d5c4695871d04_cli_run ... done
+Installing Custom Post Type UI (1.9.2)
+Downloading installation package from https://downloads.wordpress.org/plugin/custom-post-type-ui.zip...
+The authenticity of custom-post-type-ui.zip could not be verified as no signature was found.
+Unpacking the package...
+Installing the plugin...
+Plugin installed successfully.
+Success: Installed 1 of 1 plugins.
+✔ Ran `plugin install custom-post-type-ui` in 'cli'. (in 6s 483ms)
+```
+
+#### Changing the permalink structure
+
+Pretty permalinks are enabled by default using the `/%year%/%monthnum%/%day%/%postname%/` structure, matching the WordPress core behavior on fresh installs. You can change the structure if needed:
+
+**Examples**
+
+To set the permalink to just the post name:
+
+```
+wp-env run cli "wp rewrite structure /%postname%/"
+```
+
+To set the permalink to the year, month, and post name:
+
+```
+wp-env run cli "wp rewrite structure /%year%/%monthnum%/%postname%/"
+```
+
+### `wp-env cleanup`
+
+```sh
+wp-env cleanup
+
+Cleanup the WordPress environment. Removes docker containers, volumes, networks,
+and local files, but preserves docker images for faster re-starts.
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
 ```
 
 ### `wp-env destroy`
@@ -261,8 +526,13 @@ wp> ^C
 ```sh
 wp-env destroy
 
-Destroy the WordPress environment. Deletes docker containers, volumes, and
-networks associated with the WordPress environment and removes local files.
+Destroy the WordPress environment. Deletes docker containers, volumes, networks,
+and images associated with the WordPress environment and removes local files.
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
 ```
 
 ### `wp-env logs [environment]`
@@ -274,44 +544,104 @@ displays PHP and Docker logs for given WordPress environment.
 
 Positionals:
   environment  Which environment to display the logs from.
-      [string] [choices: "development", "tests", "all"] [default: "development"]
+                          [string] [choices: "development"] [default: "development"]
 
 Options:
-  --help     Show help                                                 [boolean]
-  --version  Show version number                                       [boolean]
   --debug    Enable debug output.                     [boolean] [default: false]
   --watch    Watch for logs as they happen.            [boolean] [default: true]
+```
+
+### `wp-env status`
+
+Get the status of the wp-env environment including whether it's running, URLs, ports, and configuration.
+
+Example:
+
+```sh
+$ wp-env status
+
+status: running
+    - runtime: docker
+    - install path: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+    - config: /home/user/my-plugin
+
+environment:
+        - url: http://localhost:8888
+        - multisite: no
+        - xdebug: off
+        - http port: 8888
+        - mysql port: 13306
+```
+
+```sh
+$ wp-env status --help
+Get the status of the wp-env environment including URLs, ports, and configuration.
+
+Options:
+  --debug    Enable debug output.                      [boolean] [default: false]
+  --json     Output status as JSON.                    [boolean] [default: false]
 ```
 
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-`.wp-env.json` supports six fields for options applicable to both the tests and development instances.
+To enable editor autocomplete and validation, add a `$schema` key:
 
-| Field        | Type           | Default                                | Description                                                                                                                |
-| ------------ | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.   |
-| `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                              |
-| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                             |
-| `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                |
-| `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                             |
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/wp-env.json",
+	"plugins": [ "." ]
+}
+```
 
-_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+`.wp-env.json` supports the following fields:
+
+| Field                | Type           | Default                                | Description                                                                                                                      |
+|----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
+| `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
+| `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
+| `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
+| `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
+| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. |
+| `"autoPort"`         | `boolean`      | `false`                                | Whether to automatically find available HTTP ports when configured ports are busy. |
+| `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
+| `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
+| `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
+| `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
+| `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
+
+_Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
+
+### Automatic Port Selection
+
+By default, `wp-env` uses fixed ports (`8888` for development, `8889` for tests). If a port is busy, Docker will report an error at start time.
+
+To opt in to automatic port selection, pass the `--auto-port` flag:
+
+```sh
+wp-env start --auto-port
+```
+
+When `--auto-port` (or `"autoPort": true`) is enabled and a configured port is busy, `wp-env` scans upward from the configured port to find the next available one (for example: `8888`, `8889`, `8890`, ...). Automatic port selection is disabled when `CI` is set.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
-| Type              | Format                        | Example(s)                                               |
-| ----------------- | ----------------------------- | -------------------------------------------------------- |
-| Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
-| Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
-| ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
+| Type              | Format                                       | Example(s)                                                                                                                         |
+| ----------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Relative path     | `.<path>\|~<path>`                           | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"`                                                                           |
+| Absolute path     | `/<path>\|<letter>:\<path>`                  | `"/a/directory"`, `"C:\\a\\directory"`                                                                                             |
+| GitHub repository | `<owner>/<repo>[/<path>][#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, `WordPress/themes/my-theme#my-branch`; if no branch is provided wp-env will fall back to the repo's default branch |
+| SSH repository    | `ssh://user@host/<owner>/<repo>.git[#<ref>]` | `"ssh://git@github.com/WordPress/WordPress.git"`                                                                                   |
+| ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`                                                                                  |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
-Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
+Additionally, the key `env` is available to override any of the above options on the development environment. For example, take the following `.wp-env.json` file:
 
 ```json
 {
@@ -323,26 +653,20 @@ Additionally, the key `env` is available to override any of the above options on
 	"env": {
 		"development": {
 			"themes": [ "./one-theme" ]
-		},
-		"tests": {
-			"config": {
-				"KEY_1": false
-			},
-			"port": 3000
 		}
 	}
 }
 ```
 
-On the development instance, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false. Also note that the default port, 8888, will be used as well.
+Here, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false.
 
-On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionaly, while KEY_2 is still set to false, KEY_1 is overriden and set to false. 3000 overrides the default port as well.
-
-This gives you a lot of power to change the options appliciable to each environment.
+For running a separate test environment, use `--config` with a separate config file instead of `env.tests` (see [Running parallel environments](#running-parallel-environments)).
 
 ## .wp-env.override.json
 
 Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
+
+When using `--config` with a custom config file, the override file name is derived by inserting `.override` before the extension. For example, `.wp-env.test.json` will look for `.wp-env.test.override.json`.
 
 ## Default wp-config values.
 
@@ -354,18 +678,30 @@ SCRIPT_DEBUG: true,
 WP_PHP_BINARY: 'php',
 WP_TESTS_EMAIL: 'admin@example.org',
 WP_TESTS_TITLE: 'Test Blog',
-WP_TESTS_DOMAIN: 'http://localhost',
+WP_TESTS_DOMAIN: 'localhost',
 WP_SITEURL: 'http://localhost',
 WP_HOME: 'http://localhost',
 ```
 
-On the test instance, all of the above are still defined, but `WP_DEBUG` and `SCRIPT_DEBUG` are set to false.
+These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
 
-Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
+The values referencing a URL include the specified port. So if you set `port: 2000`, `WP_HOME` (for example) will be `http://localhost:2000`.
 
-### Examples
+## Lifecycle Scripts
 
-#### Latest production WordPress + current directory as a plugin
+Using the `lifecycleScripts` option in `.wp-env.json` will allow you to set arbitrary commands to be executed at certain points in the lifecycle. This configuration
+can also be overridden using `WP_ENV_LIFECYCLE_SCRIPT_{LIFECYCLE_EVENT}` environment variables, with the remainder being the all-caps snake_case name of the option, for
+example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be executed on both fresh and existing environments, so, ensure any commands you
+build won't break on subsequent executions.
+
+* `afterStart`: Runs after `wp-env start` has finished setting up the environment.
+* `afterReset`: Runs after `wp-env reset` has finished resetting the environment.
+* `afterCleanup`: Runs after `wp-env cleanup` has cleaned up the environment.
+* `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
+
+## Examples
+
+### Latest stable WordPress + current directory as a plugin
 
 This is useful for plugin development.
 
@@ -376,9 +712,9 @@ This is useful for plugin development.
 }
 ```
 
-#### Latest development WordPress + current directory as a plugin
+### Latest development WordPress + current directory as a plugin
 
-This is useful for plugin development when upstream Core changes need to be tested.
+This is useful for plugin development when upstream Core changes need to be tested. This can also be set via the environment variable `WP_ENV_CORE`.
 
 ```json
 {
@@ -387,9 +723,11 @@ This is useful for plugin development when upstream Core changes need to be test
 }
 ```
 
-#### Local `wordpress-develop` + current directory as a plugin
+### Local `wordpress-develop` + current directory as a plugin
 
 This is useful for working on plugins and WordPress Core at the same time.
+
+If you are running a _build_ of `wordpress-develop`, point `core` to the `build` directory.
 
 ```json
 {
@@ -398,7 +736,16 @@ This is useful for working on plugins and WordPress Core at the same time.
 }
 ```
 
-#### A complete testing environment
+If you are running `wordpress-develop` in a dev mode (e.g. the watch command `dev` or the dev build `build:dev`), then point `core` to the `src` directory.
+
+```json
+{
+	"core": "../wordpress-develop/src",
+	"plugins": [ "." ]
+}
+```
+
+### A complete testing environment
 
 This is useful for integration testing: that is, testing how old versions of WordPress and different combinations of plugins and themes impact each other.
 
@@ -410,9 +757,9 @@ This is useful for integration testing: that is, testing how old versions of Wor
 }
 ```
 
-#### Add mu-plugins and other mapped directories
+### Add mu-plugins and other mapped directories
 
-You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated, despite being the "first" mapped theme.
+You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated.
 
 ```json
 {
@@ -425,9 +772,9 @@ You can add mu-plugins via the mapping config. The mapping config also allows yo
 }
 ```
 
-#### Avoid activating plugins or themes on the instance
+### Avoid activating plugins or themes on the instance
 
-Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time. The same applies for a theme which should not be activated.
+Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time.
 
 ```json
 {
@@ -438,35 +785,120 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 }
 ```
 
-#### Map a plugin only in the tests environment
+### Map a plugin only in a specific environment
 
-If you need a plugin active in one environment but not the other, you can use `env.<envName>` to set options specific to one environment. Here, we activate cwd and a test plugin on the tests instance. This plugin is not activated on any other instances.
+If you need a plugin active in one environment but not another, use `--config` with a separate config file. For example, create a `test.wp-env.json` that includes an extra test plugin:
 
 ```json
 {
-	"plugins": [ "." ],
-	"env": {
-		"tests": {
-			"plugins": [ ".", "path/to/test/plugin" ]
-		}
-	}
+	"plugins": [ ".", "path/to/test/plugin" ],
+	"port": 8889
 }
 ```
 
-#### Custom Port Numbers
+Then start it with `wp-env start --config=test.wp-env.json`.
+
+### Custom Port Numbers
 
 You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
 
 ```json
 {
 	"plugins": [ "." ],
-	"port": 4013,
-	"env": {
-		"tests": {
-			"port": 4012
-		}
+	"port": 4013
+}
+```
+
+These can also be set via environment variables:
+
+- `WP_ENV_PORT` to override the development environment's web server's port.
+- `WP_ENV_TESTS_PORT` to override the testing environment's web server's port.
+- phpMyAdmin is not enabled by default. Enable it with `"phpmyadmin": true` in `.wp-env.json`. The Docker runtime port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
+- By default, MySQL isn't exposed to the host, which means no chance of port conflicts. But this can also be overridden via `WP_ENV_MYSQL_PORT`.
+
+### Specific PHP Version
+
+You can tell `wp-env` to use a specific PHP version for compatibility and testing. This can also be set via the environment variable `WP_ENV_PHP_VERSION`.
+
+```json
+{
+	"phpVersion": "7.2",
+	"plugins": [ "." ]
+}
+```
+
+### Multisite support
+
+You can tell `wp-env` if the site should be multisite enabled.
+
+```json
+{
+	"multisite": true,
+	"plugins": [ "." ]
+}
+```
+
+### Node Lifecycle Script
+
+This is useful for performing some actions after setting up the environment, such as bootstrapping an E2E test environment.
+
+```json
+{
+	"lifecycleScripts": {
+		"afterStart": "node tests/e2e/bin/setup-env.js"
 	}
 }
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+### Advanced PHP settings
+
+You can set PHP settings by mapping an `.htaccess` file. This maps an `.htaccess` file to the WordPress root (`/var/www/html`) from the directory in which you run `wp-env`.
+
+```json
+{
+	"mappings": {
+		".htaccess": ".htaccess"
+	}
+}
+```
+
+Then, your .htaccess file can contain various settings like this:
+
+```
+# Note: the default upload value is 1G.
+php_value post_max_size 2G
+php_value upload_max_filesize 2G
+php_value memory_limit 2G
+```
+
+This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
+
+### Using SPX Profiling
+
+SPX is a simple profiling extension for PHP that provides low-overhead profiling with a built-in web UI. When enabled with `--spx`, you can access the SPX profiling interface to analyze your application's performance.
+
+To enable SPX profiling:
+
+```sh
+wp-env start --spx
+```
+
+Once enabled, you can access the SPX web UI by visiting any page in your WordPress environment with the query parameters `?SPX_KEY=dev&SPX_UI_URI=/`. For example:
+
+- `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
+
+From the SPX interface, you can:
+- Enable profiling for subsequent requests
+- View flame graphs and performance metrics
+- Analyze function call timelines
+- Examine memory usage and other performance data
+
+SPX provides a more lightweight alternative to Xdebug for profiling, with minimal performance overhead and an intuitive web-based interface.
+
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

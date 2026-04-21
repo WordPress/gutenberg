@@ -1,14 +1,30 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { navigateRegions } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { NavigableRegion } from '@wordpress/admin-ui';
+import { forwardRef, useEffect } from '@wordpress/element';
+import {
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
+import {
+	useReducedMotion,
+	useViewportMatch,
+	useResizeObserver,
+} from '@wordpress/compose';
+
+const ANIMATION_DURATION = 0.25;
+const commonTransition = {
+	type: 'tween',
+	duration: ANIMATION_DURATION,
+	ease: [ 0.6, 0, 0.4, 1 ],
+};
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -24,27 +40,68 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function InterfaceSkeleton( {
-	footer,
-	header,
-	sidebar,
-	leftSidebar,
-	content,
-	actions,
-	labels,
-	className,
-} ) {
+const headerVariants = {
+	hidden: { opacity: 1, marginTop: -60 },
+	visible: { opacity: 1, marginTop: 0 },
+	distractionFreeHover: {
+		opacity: 1,
+		marginTop: 0,
+		transition: {
+			...commonTransition,
+			delay: 0.2,
+			delayChildren: 0.2,
+		},
+	},
+	distractionFreeHidden: {
+		opacity: 0,
+		marginTop: -60,
+	},
+	distractionFreeDisabled: {
+		opacity: 0,
+		marginTop: 0,
+		transition: {
+			...commonTransition,
+			delay: 0.8,
+			delayChildren: 0.8,
+		},
+	},
+};
+
+function InterfaceSkeleton(
+	{
+		isDistractionFree,
+		footer,
+		header,
+		editorNotices,
+		sidebar,
+		secondarySidebar,
+		content,
+		actions,
+		labels,
+		className,
+	},
+	ref
+) {
+	const [ secondarySidebarResizeListener, secondarySidebarSize ] =
+		useResizeObserver();
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const disableMotion = useReducedMotion();
+	const defaultTransition = {
+		type: 'tween',
+		duration: disableMotion ? 0 : ANIMATION_DURATION,
+		ease: [ 0.6, 0, 0.4, 1 ],
+	};
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
 		/* translators: accessibility text for the top bar landmark region. */
-		header: __( 'Header' ),
+		header: _x( 'Header', 'header landmark area' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
-		sidebar: __( 'Settings' ),
+		sidebar: _x( 'Settings', 'settings landmark area' ),
 		/* translators: accessibility text for the publish landmark region. */
 		actions: __( 'Publish' ),
 		/* translators: accessibility text for the footer landmark region. */
@@ -55,73 +112,123 @@ function InterfaceSkeleton( {
 
 	return (
 		<div
-			className={ classnames(
+			ref={ ref }
+			className={ clsx(
 				className,
-				'interface-interface-skeleton'
+				'interface-interface-skeleton',
+				!! footer && 'has-footer'
 			) }
 		>
-			{ !! header && (
-				<div
-					className="interface-interface-skeleton__header"
-					role="region"
-					aria-label={ mergedLabels.header }
-					tabIndex="-1"
-				>
-					{ header }
+			<div className="interface-interface-skeleton__editor">
+				<AnimatePresence initial={ false }>
+					{ !! header && (
+						<NavigableRegion
+							as={ motion.div }
+							className="interface-interface-skeleton__header"
+							ariaLabel={ mergedLabels.header }
+							initial={
+								isDistractionFree && ! isMobileViewport
+									? 'distractionFreeHidden'
+									: 'hidden'
+							}
+							whileHover={
+								isDistractionFree && ! isMobileViewport
+									? 'distractionFreeHover'
+									: 'visible'
+							}
+							animate={
+								isDistractionFree && ! isMobileViewport
+									? 'distractionFreeDisabled'
+									: 'visible'
+							}
+							exit={
+								isDistractionFree && ! isMobileViewport
+									? 'distractionFreeHidden'
+									: 'hidden'
+							}
+							variants={ headerVariants }
+							transition={ defaultTransition }
+						>
+							{ header }
+						</NavigableRegion>
+					) }
+				</AnimatePresence>
+				{ isDistractionFree && (
+					<div className="interface-interface-skeleton__header">
+						{ editorNotices }
+					</div>
+				) }
+				<div className="interface-interface-skeleton__body">
+					<AnimatePresence initial={ false }>
+						{ !! secondarySidebar && (
+							<NavigableRegion
+								className="interface-interface-skeleton__secondary-sidebar"
+								ariaLabel={ mergedLabels.secondarySidebar }
+								as={ motion.div }
+								initial="closed"
+								animate="open"
+								exit="closed"
+								variants={ {
+									open: { width: secondarySidebarSize.width },
+									closed: { width: 0 },
+								} }
+								transition={ defaultTransition }
+							>
+								<motion.div
+									style={ {
+										position: 'absolute',
+										width: isMobileViewport
+											? '100vw'
+											: 'fit-content',
+										height: '100%',
+										left: 0,
+									} }
+									variants={ {
+										open: { x: 0 },
+										closed: { x: '-100%' },
+									} }
+									transition={ defaultTransition }
+								>
+									{ secondarySidebarResizeListener }
+									{ secondarySidebar }
+								</motion.div>
+							</NavigableRegion>
+						) }
+					</AnimatePresence>
+					<NavigableRegion
+						className="interface-interface-skeleton__content"
+						ariaLabel={ mergedLabels.body }
+					>
+						{ content }
+					</NavigableRegion>
+					{ !! sidebar && (
+						<NavigableRegion
+							className="interface-interface-skeleton__sidebar"
+							ariaLabel={ mergedLabels.sidebar }
+						>
+							{ sidebar }
+						</NavigableRegion>
+					) }
+					{ !! actions && (
+						<NavigableRegion
+							className="interface-interface-skeleton__actions"
+							ariaLabel={ mergedLabels.actions }
+						>
+							{ actions }
+						</NavigableRegion>
+					) }
 				</div>
-			) }
-			<div className="interface-interface-skeleton__body">
-				{ !! leftSidebar && (
-					<div
-						className="interface-interface-skeleton__left-sidebar"
-						role="region"
-						aria-label={ mergedLabels.leftSidebar }
-						tabIndex="-1"
-					>
-						{ leftSidebar }
-					</div>
-				) }
-				<div
-					className="interface-interface-skeleton__content"
-					role="region"
-					aria-label={ mergedLabels.body }
-					tabIndex="-1"
-				>
-					{ content }
-				</div>
-				{ !! sidebar && (
-					<div
-						className="interface-interface-skeleton__sidebar"
-						role="region"
-						aria-label={ mergedLabels.sidebar }
-						tabIndex="-1"
-					>
-						{ sidebar }
-					</div>
-				) }
-				{ !! actions && (
-					<div
-						className="interface-interface-skeleton__actions"
-						role="region"
-						aria-label={ mergedLabels.actions }
-						tabIndex="-1"
-					>
-						{ actions }
-					</div>
-				) }
 			</div>
 			{ !! footer && (
-				<div
+				<NavigableRegion
 					className="interface-interface-skeleton__footer"
-					role="region"
-					aria-label={ mergedLabels.footer }
-					tabIndex="-1"
+					ariaLabel={ mergedLabels.footer }
 				>
 					{ footer }
-				</div>
+				</NavigableRegion>
 			) }
 		</div>
 	);
 }
 
-export default navigateRegions( InterfaceSkeleton );
+export default forwardRef( InterfaceSkeleton );

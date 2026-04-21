@@ -1,128 +1,251 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+import { store as coreStore } from '@wordpress/core-data';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
-	AlignmentToolbar,
+	dateI18n,
+	humanTimeDiff,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
+import {
 	BlockControls,
 	InspectorControls,
-	__experimentalBlock as Block,
+	store as blockEditorStore,
+	useBlockProps,
+	useBlockEditingMode,
+	__experimentalDateFormatPicker as DateFormatPicker,
+	__experimentalPublishDateTimePicker as PublishDateTimePicker,
 } from '@wordpress/block-editor';
 import {
+	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
-	Popover,
-	DateTimePicker,
-	PanelBody,
-	CustomSelectControl,
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
+import { pencil } from '@wordpress/icons';
+import { DOWN } from '@wordpress/keycodes';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
-export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { textAlign, format } = attributes;
-	const { postId, postType } = context;
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
-	const [ date, setDate ] = useEntityProp(
-		'postType',
+export default function PostDateEdit( props ) {
+	const {
+		attributes,
+		context: { postType: postTypeSlug, queryId },
+		setAttributes,
+		name,
+	} = props;
+	useDeprecatedTextAlign( props );
+	const { datetime, format, isLink } = attributes;
+	const blockProps = useBlockProps();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( { anchor: popoverAnchor } ),
+		[ popoverAnchor ]
+	);
+
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	// We need to set the datetime to a default value upon first loading
+	// to discern the block from its legacy version (which would default
+	// to the containing post's publish date).
+	useEffect( () => {
+		if ( datetime === undefined ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { datetime: new Date() } );
+		}
+	}, [ datetime ] );
+
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const dateSettings = getDateSettings();
+
+	const {
 		postType,
-		'date',
-		postId
+		siteFormat = dateSettings.formats.date,
+		siteTimeFormat = dateSettings.formats.time,
+	} = useSelect(
+		( select ) => {
+			const { getPostType, getEntityRecord } = select( coreStore );
+			const siteSettings = getEntityRecord( 'root', 'site' );
+			return {
+				siteFormat: siteSettings?.date_format,
+				siteTimeFormat: siteSettings?.time_format,
+				postType: postTypeSlug ? getPostType( postTypeSlug ) : null,
+			};
+		},
+		[ postTypeSlug ]
 	);
-	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
-	const settings = __experimentalGetSettings();
-	// To know if the current time format is a 12 hour time, look for "a".
-	// Also make sure this "a" is not escaped by a "/".
-	const is12Hour = /a(?!\\)/i.test(
-		settings.formats.time
-			.toLowerCase() // Test only for the lower case "a".
-			.replace( /\\\\/g, '' ) // Replace "//" with empty strings.
-			.split( '' )
-			.reverse()
-			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
+	const activeBlockVariationName = useSelect(
+		( select ) =>
+			select( blocksStore ).getActiveBlockVariation( name, attributes )
+				?.name,
+		[ name, attributes ]
 	);
-	const formatOptions = Object.values( settings.formats ).map(
-		( formatOption ) => ( {
-			key: formatOption,
-			name: dateI18n( formatOption, date ),
-		} )
-	);
-	const resolvedFormat = format || siteFormat || settings.formats.date;
 
+	const blockEditingMode = useBlockEditingMode();
+
+	let postDate = (
+		<time dateTime={ dateI18n( 'c', datetime ) } ref={ setPopoverAnchor }>
+			{ format === 'human-diff'
+				? humanTimeDiff( datetime )
+				: dateI18n( format || siteFormat, datetime ) }
+		</time>
+	);
+
+	if ( isLink && datetime ) {
+		postDate = (
+			<a
+				href="#post-date-pseudo-link"
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ postDate }
+			</a>
+		);
+	}
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-
-				{ date && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon="edit"
-							title={ __( 'Change Date' ) }
-							onClick={ () =>
-								setIsPickerOpen(
-									( _isPickerOpen ) => ! _isPickerOpen
-								)
-							}
-						/>
-					</ToolbarGroup>
+			{ ( blockEditingMode === 'default' || ! isDescendentOfQueryLoop ) &&
+				activeBlockVariationName !== 'post-date-modified' &&
+				( ! isDescendentOfQueryLoop || ! activeBlockVariationName ) && (
+					<BlockControls group="block">
+						<ToolbarGroup>
+							<Dropdown
+								popoverProps={ popoverProps }
+								renderContent={ ( { onClose } ) => (
+									<PublishDateTimePicker
+										title={
+											activeBlockVariationName ===
+											'post-date'
+												? __( 'Publish Date' )
+												: __( 'Date' )
+										}
+										currentDate={ datetime }
+										onChange={ ( newDatetime ) =>
+											setAttributes( {
+												datetime: newDatetime,
+											} )
+										}
+										is12Hour={ is12HourFormat(
+											siteTimeFormat
+										) }
+										onClose={ onClose }
+										dateOrder={
+											/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
+											_x( 'dmy', 'date order' )
+										}
+									/>
+								) }
+								renderToggle={ ( { isOpen, onToggle } ) => {
+									const openOnArrowDown = ( event ) => {
+										if (
+											! isOpen &&
+											event.keyCode === DOWN
+										) {
+											event.preventDefault();
+											onToggle();
+										}
+									};
+									return (
+										<ToolbarButton
+											aria-expanded={ isOpen }
+											icon={ pencil }
+											title={ __( 'Change Date' ) }
+											onClick={ onToggle }
+											onKeyDown={ openOnArrowDown }
+										/>
+									);
+								} }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
 				) }
-			</BlockControls>
 
 			<InspectorControls>
-				<PanelBody title={ __( 'Format settings' ) }>
-					<CustomSelectControl
-						hideLabelFromVision
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							datetime: undefined,
+							format: undefined,
+							isLink: false,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						hasValue={ () => !! format }
 						label={ __( 'Date Format' ) }
-						options={ formatOptions }
-						onChange={ ( { selectedItem } ) =>
-							setAttributes( {
-								format: selectedItem.key,
-							} )
+						onDeselect={ () =>
+							setAttributes( { format: undefined } )
 						}
-						value={ formatOptions.find(
-							( option ) => option.key === resolvedFormat
-						) }
-					/>
-				</PanelBody>
+						isShownByDefault
+					>
+						<DateFormatPicker
+							format={ format }
+							defaultFormat={ siteFormat }
+							onChange={ ( nextFormat ) =>
+								setAttributes( { format: nextFormat } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => isLink !== false }
+						label={
+							postType?.labels.singular_name
+								? sprintf(
+										// translators: %s: Name of the post type e.g: "post".
+										__( 'Link to %s' ),
+										postType.labels.singular_name.toLowerCase()
+								  )
+								: __( 'Link to post' )
+						}
+						onDeselect={ () => setAttributes( { isLink: false } ) }
+						isShownByDefault
+					>
+						<ToggleControl
+							label={
+								postType?.labels.singular_name
+									? sprintf(
+											// translators: %s: Name of the post type e.g: "post".
+											__( 'Link to %s' ),
+											postType.labels.singular_name.toLowerCase()
+									  )
+									: __( 'Link to post' )
+							}
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
+							}
+							checked={ isLink }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
-				{ date && (
-					<time dateTime={ dateI18n( 'c', date ) }>
-						{ dateI18n( resolvedFormat, date ) }
-
-						{ isPickerOpen && (
-							<Popover
-								onClose={ setIsPickerOpen.bind( null, false ) }
-							>
-								<DateTimePicker
-									currentDate={ date }
-									onChange={ setDate }
-									is12Hour={ is12Hour }
-								/>
-							</Popover>
-						) }
-					</time>
-				) }
-				{ ! date && __( 'No Date' ) }
-			</Block.div>
+			<div { ...blockProps }>{ postDate }</div>
 		</>
 	);
+}
+
+export function is12HourFormat( format ) {
+	// To know if the time format is a 12 hour time, look for any of the 12 hour
+	// format characters: 'a', 'A', 'g', and 'h'. The character must be
+	// unescaped, i.e. not preceded by a '\'. Coincidentally, 'aAgh' is how I
+	// feel when working with regular expressions.
+	// https://www.php.net/manual/en/datetime.format.php
+	return /(?:^|[^\\])[aAgh]/.test( format );
 }

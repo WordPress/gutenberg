@@ -1,19 +1,25 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { render, screen, within, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { DOWN } from '@wordpress/keycodes';
-import { Button } from '@wordpress/components';
+import { copy } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { BlockSwitcher } from '../';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '../../block-title/use-block-display-title', () =>
+	jest.fn().mockReturnValue( 'Block Name' )
+);
 
 describe( 'BlockSwitcher', () => {
 	const headingBlock1 = {
@@ -26,66 +32,48 @@ describe( 'BlockSwitcher', () => {
 		originalContent: '<h2>How are you?</h2>',
 		clientId: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
 	};
-
-	const textBlock = {
-		attributes: {
-			content: [ 'I am great!' ],
+	const headingBlockType = {
+		apiVersion: 3,
+		category: 'text',
+		title: 'Heading',
+		edit: () => {},
+		save: () => {},
+		transforms: {
+			to: [
+				{
+					type: 'block',
+					blocks: [ 'core/paragraph' ],
+					transform: () => {},
+				},
+				{
+					type: 'block',
+					blocks: [ 'core/paragraph' ],
+					transform: () => {},
+					isMultiBlock: true,
+				},
+			],
 		},
-		isValid: true,
-		name: 'core/paragraph',
-		originalContent: '<p>I am great!</p>',
-		clientId: 'b1303fdb-3e60-43faf-a770-2e1ea656c5b8',
 	};
-
-	const headingBlock2 = {
-		attributes: {
-			content: [ 'I am the greatest!' ],
-			level: 3,
+	const paragraphBlockType = {
+		apiVersion: 3,
+		category: 'text',
+		title: 'Paragraph',
+		edit: () => {},
+		save: () => {},
+		transforms: {
+			to: [
+				{
+					type: 'block',
+					blocks: [ 'core/heading' ],
+					transform: () => {},
+				},
+			],
 		},
-		isValid: true,
-		name: 'core/heading',
-		originalContent: '<h3>I am the greatest!</h3>',
-		clientId: 'c2403fd2-4e63-5ffa-b71c-1e0ea656c5b0',
 	};
 
 	beforeAll( () => {
-		registerBlockType( 'core/heading', {
-			category: 'text',
-			title: 'Heading',
-			edit: () => {},
-			save: () => {},
-			transforms: {
-				to: [
-					{
-						type: 'block',
-						blocks: [ 'core/paragraph' ],
-						transform: () => {},
-					},
-					{
-						type: 'block',
-						blocks: [ 'core/paragraph' ],
-						transform: () => {},
-						isMultiBlock: true,
-					},
-				],
-			},
-		} );
-
-		registerBlockType( 'core/paragraph', {
-			category: 'text',
-			title: 'Paragraph',
-			edit: () => {},
-			save: () => {},
-			transforms: {
-				to: [
-					{
-						type: 'block',
-						blocks: [ 'core/heading' ],
-						transform: () => {},
-					},
-				],
-			},
-		} );
+		registerBlockType( 'core/heading', headingBlockType );
+		registerBlockType( 'core/paragraph', paragraphBlockType );
 	} );
 
 	afterAll( () => {
@@ -93,137 +81,103 @@ describe( 'BlockSwitcher', () => {
 		unregisterBlockType( 'core/paragraph' );
 	} );
 
-	test( 'should not render block switcher without blocks', () => {
-		const wrapper = shallow( <BlockSwitcher /> );
-
-		expect( wrapper.html() ).toBeNull();
-	} );
-
-	test( 'should render switcher with blocks', () => {
-		const blocks = [ headingBlock1 ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+	test( 'should render switcher with block transforms', async () => {
+		useSelect.mockImplementation( () => ( {
+			possibleBlockTransformations: [
+				{
+					name: 'core/heading',
+					title: headingBlockType.title,
+					frecency: 1,
+				},
+				{
+					name: 'core/paragraph',
+					title: paragraphBlockType.title,
+					frecency: 1,
+				},
+			],
+			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
+			canRemove: true,
+		} ) );
+		const user = userEvent.setup();
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				label="Block Name"
+			/>
 		);
-
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
-		const blocks = [ headingBlock1, textBlock ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Block Name',
+				expanded: false,
+			} )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'menu', {
+				name: 'Block Name',
+			} )
+		).not.toBeInTheDocument();
+		await user.type(
+			screen.getByRole( 'button', {
+				name: 'Block Name',
+				expanded: false,
+			} ),
+			'[ArrowDown]'
 		);
-
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	test( 'should render enabled block switcher with multi block when transforms exist', () => {
-		const blocks = [ headingBlock1, headingBlock2 ];
-		const inserterItems = [
-			{ name: 'core/heading', frecency: 1 },
-			{ name: 'core/paragraph', frecency: 1 },
-		];
-
-		const wrapper = shallow(
-			<BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } />
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: true,
+				} )
+			).toBeVisible()
 		);
-
-		expect( wrapper ).toMatchSnapshot();
+		const dropdown = screen.getByRole( 'menu', {
+			name: 'Block Name',
+		} );
+		await waitFor( () => expect( dropdown ).toBeVisible() );
+		const items = within( dropdown ).getAllByRole( 'menuitem' );
+		expect( items ).toHaveLength( 2 );
+		expect( items[ 0 ] ).toHaveTextContent( paragraphBlockType.title );
+		expect( items[ 1 ] ).toHaveTextContent( headingBlockType.title );
 	} );
 
-	describe( 'Dropdown', () => {
-		const blocks = [ headingBlock1 ];
-
-		const inserterItems = [
-			{ name: 'core/quote', frecency: 1 },
-			{ name: 'core/cover-image', frecency: 2 },
-			{ name: 'core/paragraph', frecency: 3 },
-			{ name: 'core/heading', frecency: 4 },
-			{ name: 'core/text', frecency: 5 },
-		];
-
-		const onTransformStub = jest.fn();
-		const getDropdown = () => {
-			const blockSwitcher = mount(
-				<BlockSwitcher
-					blocks={ blocks }
-					onTransform={ onTransformStub }
-					inserterItems={ inserterItems }
-				/>
-			);
-			return blockSwitcher.find( 'Dropdown' );
-		};
-
-		test( 'should dropdown exist', () => {
-			expect( getDropdown() ).toHaveLength( 1 );
-		} );
-
-		describe( '.renderToggle', () => {
-			const onToggleStub = jest.fn();
-			const mockKeyDown = {
-				preventDefault: () => {},
-				stopPropagation: () => {},
-				keyCode: DOWN,
-			};
-
-			afterEach( () => {
-				onToggleStub.mockReset();
-			} );
-
-			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
-				const toggleClosed = mount(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: false,
-					} )
-				);
-				const iconButtonClosed = toggleClosed.find( Button );
-
-				iconButtonClosed.simulate( 'keydown', mockKeyDown );
-
-				expect( onToggleStub ).toHaveBeenCalledTimes( 1 );
-			} );
-
-			test( 'should simulate a click event, which should call onToggle.', () => {
-				const toggleOpen = mount(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: true,
-					} )
-				);
-				const iconButtonOpen = toggleOpen.find( Button );
-
-				iconButtonOpen.simulate( 'keydown', mockKeyDown );
-
-				expect( onToggleStub ).toHaveBeenCalledTimes( 0 );
-			} );
-		} );
-
-		describe( '.renderContent', () => {
-			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
-				const onCloseStub = jest.fn();
-				const content = shallow(
-					<div>
-						{ getDropdown()
-							.props()
-							.renderContent( { onClose: onCloseStub } ) }
-					</div>
-				);
-				const blockList = content.find( 'BlockTransformationsMenu' );
-				expect(
-					blockList.prop( 'possibleBlockTransformations' )
-				).toHaveLength( 1 );
-			} );
-		} );
+	test( 'should render message for no available transforms', async () => {
+		useSelect.mockImplementation( () => ( {
+			possibleBlockTransformations: [],
+			blocks: [ headingBlock1 ],
+			patterns: [],
+			isUsingBindings: false,
+			canRemove: false,
+			icon: copy,
+		} ) );
+		render(
+			<BlockSwitcher
+				clientIds={ [ headingBlock1.clientId ] }
+				label="Block Name"
+			/>
+		);
+		const user = userEvent.setup();
+		await user.type(
+			screen.getByRole( 'button', {
+				name: 'Block Name',
+				expanded: false,
+			} ),
+			'[ArrowDown]'
+		);
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Block Name',
+					expanded: true,
+				} )
+			).toBeVisible()
+		);
+		expect(
+			screen.getByRole( 'menu', {
+				name: 'Block Name',
+			} )
+		).toHaveTextContent( 'No transforms.' );
 	} );
 } );

@@ -14,7 +14,7 @@ export default function ColorPaletteControl( {
 			onColorChange={ onChange }
 			colorValue={ value }
 			gradients={ [] }
-			disableCustomGradients={ true }
+			disableCustomGradients
 		/>
 	);
 }

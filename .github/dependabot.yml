@@ -1,0 +1,24 @@
+# Configure Dependabot scanning.
+version: 2
+
+updates:
+    # Check for updates to GitHub Actions.
+    - package-ecosystem: 'github-actions'
+      directories:
+          - '.github/workflows'
+          - '.github/setup-node'
+      schedule:
+          interval: 'daily'
+      open-pull-requests-limit: 10
+      labels:
+          - 'GitHub Actions'
+          - '[Type] Build Tooling'
+      ignore:
+          - dependency-name: 'actions/setup-java'
+          - dependency-name: 'gradle/*'
+          - dependency-name: 'reactivecircus/*'
+          - dependency-name: 'ruby/setup-ruby'
+      groups:
+          github-actions:
+              patterns:
+                  - '*'

@@ -1,8 +1,8 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.blockEditor.InnerBlocks;
-	var circle = el( 'circle', {
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
+	const circle = el( 'circle', {
 		cx: 10,
 		cy: 10,
 		r: 10,
@@ -10,39 +10,38 @@
 		stroke: 'blue',
 		strokeWidth: '10',
 	} );
-	var svg = el(
+	const svg = el(
 		'svg',
 		{ width: 20, height: 20, viewBox: '0 0 20 20' },
 		circle
 	);
 
 	registerBlockType( 'test/test-single-svg-icon', {
+		apiVersion: 3,
 		title: 'TestSimpleSvgIcon',
 		icon: svg,
 		category: 'text',
 
-		edit: function() {
-			return el(
-				'div',
-				{
-					className: 'test-single-svg-icon',
-					style: { outline: '1px solid gray', padding: 5 },
-				},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-					template: [
-						[
-							'core/paragraph',
-							{
-								content: 'TestSimpleSvgIcon',
-							},
-						],
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				className: 'test-single-svg-icon',
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				template: [
+					[
+						'core/paragraph',
+						{
+							content: 'TestSimpleSvgIcon',
+						},
 					],
-				} )
-			);
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -55,32 +54,31 @@
 	} );
 
 	registerBlockType( 'test/test-dash-icon', {
-		title: 'TestDashIcon',
+		apiVersion: 3,
+		title: 'TestSimpleDashIcon',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function() {
-			return el(
-				'div',
-				{
-					className: 'test-dash-icon',
-					style: { outline: '1px solid gray', padding: 5 },
-				},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-					template: [
-						[
-							'core/paragraph',
-							{
-								content: 'TestDashIcon',
-							},
-						],
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				className: 'test-dash-icon',
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				template: [
+					[
+						'core/paragraph',
+						{
+							content: 'TestDashIcon',
+						},
 					],
-				} )
-			);
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -93,34 +91,33 @@
 	} );
 
 	registerBlockType( 'test/test-function-icon', {
+		apiVersion: 3,
 		title: 'TestFunctionIcon',
-		icon: function() {
+		icon() {
 			return svg;
 		},
 		category: 'text',
 
-		edit: function() {
-			return el(
-				'div',
-				{
-					className: 'test-function-icon',
-					style: { outline: '1px solid gray', padding: 5 },
-				},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-					template: [
-						[
-							'core/paragraph',
-							{
-								content: 'TestFunctionIcon',
-							},
-						],
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				className: 'test-function-icon',
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				template: [
+					[
+						'core/paragraph',
+						{
+							content: 'TestFunctionIcon',
+						},
 					],
-				} )
-			);
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -133,6 +130,7 @@
 	} );
 
 	registerBlockType( 'test/test-dash-icon-colors', {
+		apiVersion: 3,
 		title: 'TestDashIconColors',
 		icon: {
 			background: '#010000',
@@ -141,28 +139,26 @@
 		},
 		category: 'text',
 
-		edit: function() {
-			return el(
-				'div',
-				{
-					className: 'test-dash-icon-colors',
-					style: { outline: '1px solid gray', padding: 5 },
-				},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-					template: [
-						[
-							'core/paragraph',
-							{
-								content: 'TestIconColors',
-							},
-						],
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				className: 'test-dash-icon-colors',
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				template: [
+					[
+						'core/paragraph',
+						{
+							content: 'TestIconColors',
+						},
 					],
-				} )
-			);
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{
@@ -175,6 +171,7 @@
 	} );
 
 	registerBlockType( 'test/test-svg-icon-background', {
+		apiVersion: 3,
 		title: 'TestSvgIconBackground',
 		icon: {
 			background: '#010000',
@@ -182,28 +179,26 @@
 		},
 		category: 'text',
 
-		edit: function() {
-			return el(
-				'div',
-				{
-					className: 'test-svg-icon-background',
-					style: { outline: '1px solid gray', padding: 5 },
-				},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-					template: [
-						[
-							'core/paragraph',
-							{
-								content: 'TestIconColors',
-							},
-						],
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				className: 'test-svg-icon-background',
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+				template: [
+					[
+						'core/paragraph',
+						{
+							content: 'TestIconColors',
+						},
 					],
-				} )
-			);
+				],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
-		save: function() {
+		save() {
 			return el(
 				'div',
 				{

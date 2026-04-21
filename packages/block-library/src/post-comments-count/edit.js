@@ -1,35 +1,24 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import {
-	AlignmentToolbar,
-	BlockControls,
-	Warning,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 
-export default function PostCommentsCountEdit( {
-	attributes,
-	context,
-	setAttributes,
-} ) {
-	const { textAlign } = attributes;
+export default function PostCommentsCountEdit( { context } ) {
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
+
+	const blockProps = useBlockProps();
+
 	useEffect( () => {
 		if ( ! postId ) {
 			return;
 		}
+
 		const currentPostId = postId;
+
 		apiFetch( {
 			path: addQueryArgs( '/wp/v2/comments', {
 				post: postId,
@@ -43,29 +32,18 @@ export default function PostCommentsCountEdit( {
 		} );
 	}, [ postId ] );
 
+	const hasPostAndComments = postId && commentsCount !== undefined;
+
+	const blockStyles = {
+		...blockProps.style,
+		textDecoration: hasPostAndComments
+			? blockProps.style?.textDecoration
+			: undefined,
+	};
+
 	return (
-		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
-				{ postId && commentsCount !== undefined ? (
-					commentsCount
-				) : (
-					<Warning>
-						{ __( 'Post Comments Count block: post not found.' ) }
-					</Warning>
-				) }
-			</Block.div>
-		</>
+		<div { ...blockProps } style={ blockStyles }>
+			{ hasPostAndComments ? commentsCount : '0' }
+		</div>
 	);
 }

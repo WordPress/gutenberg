@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import optimist from 'redux-optimist';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -14,13 +9,11 @@ import { combineReducers } from '@wordpress/data';
 import {
 	postId,
 	postType,
-	preferences,
+	renderingMode,
 	saving,
 	postLock,
 	postSavingLock,
-	reusableBlocks,
 	template,
-	isReady,
 	editorSettings,
 } from './reducer.js';
 
@@ -33,8 +26,8 @@ export * from './reducer.js';
 /**
  * Reducer returning the post title state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -52,8 +45,8 @@ export const postTitle = combineReducers( {
 /**
  * Reducer returning the clipboard state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -69,8 +62,8 @@ export function clipboard( state = null, action ) {
 /**
  * Reducer returning the notices state.
  *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
@@ -86,20 +79,16 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export default optimist(
-	combineReducers( {
-		postId,
-		postType,
-		postTitle,
-		preferences,
-		saving,
-		postLock,
-		postSavingLock,
-		reusableBlocks,
-		template,
-		isReady,
-		editorSettings,
-		clipboard,
-		notices,
-	} )
-);
+export default combineReducers( {
+	postId,
+	postType,
+	postTitle,
+	renderingMode,
+	saving,
+	postLock,
+	postSavingLock,
+	template,
+	editorSettings,
+	clipboard,
+	notices,
+} );

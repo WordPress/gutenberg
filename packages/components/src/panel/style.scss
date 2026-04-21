@@ -1,6 +1,10 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
 .components-panel {
 	background: $white;
-	border: $border-width solid $gray-100;
+	border: $border-width solid $gray-200;
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -18,8 +22,8 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $gray-100;
-	border-bottom: $border-width solid $gray-100;
+	border-top: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-200;
 
 	h3 {
 		margin: 0 0 0.5em;
@@ -32,12 +36,15 @@
 
 .components-panel__header {
 	display: flex;
+	flex-shrink: 0;
 	justify-content: space-between;
 	align-items: center;
 	padding: 0 $grid-unit-20;
-	height: $grid-unit-60;
-	border-top: $border-width solid $gray-200;
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-300;
+
+	// This helps ensure the correct panel height, including the border, avoiding subpixel rounding issues.
+	box-sizing: content-box;
+	height: $grid-unit-60 - $border-width;
 
 	h2 {
 		margin: 0;
@@ -50,7 +57,7 @@
 .components-panel__body + .components-panel__header,
 .components-panel__header + .components-panel__body,
 .components-panel__header + .components-panel__header {
-	margin-top: -1px;
+	margin-top: -$border-width;
 }
 
 .components-panel__body > .components-panel__body-title {
@@ -59,9 +66,12 @@
 	font-size: inherit;
 	margin-top: 0;
 	margin-bottom: 0;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
 }
+
 .components-panel__body.is-opened > .components-panel__body-title {
 	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
@@ -76,20 +86,23 @@
 
 .components-panel__body-toggle.components-button {
 	position: relative;
-	padding: $grid-unit-20;
+	padding: $grid-unit-20 $grid-unit-60 $grid-unit-20 $grid-unit-20;
 	outline: none;
 	width: 100%;
-	font-weight: 500;
+	font-weight: $font-weight-medium;
 	text-align: left;
 	color: $gray-900;
 	border: none;
 	box-shadow: none;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
+
+	@media not (prefers-reduced-motion) {
+		transition: 0.1s background ease-in-out;
+	}
+
 	height: auto;
 
 	&:focus {
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $components-color-accent;
 		border-radius: 0;
 	}
 
@@ -100,23 +113,23 @@
 		transform: translateY(-50%);
 		color: $gray-900;
 		fill: currentColor;
-		transition: 0.1s color ease-in-out;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: 0.1s color ease-in-out;
+		}
 	}
 
 	// mirror the arrow horizontally in RTL languages
 	/* rtl:begin:ignore */
 	body.rtl & .dashicons-arrow-right {
 		transform: scaleX(-1);
-		-ms-filter: fliph;
-		filter: FlipH;
 		margin-top: -10px;
 	}
 	/* rtl:end:ignore */
 }
 
 .components-panel__icon {
-	color: $dark-gray-500;
+	color: $gray-700;
 	margin: -2px 0 -2px 6px;
 }
 

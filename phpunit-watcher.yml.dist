@@ -1,0 +1,11 @@
+watch:
+  directories:
+    - ./lib/
+    - ./phpunit/
+
+notifications:
+  passingTests: false
+  failingTests: false
+
+phpunit:
+  arguments: '--filter Tests_Fonts_WpFontCollection_GetContent'

@@ -13,6 +13,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 	beforeAll( () => {
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
+			apiVersion: 3,
 			title: 'Test Gallery',
 			category: 'text',
 			attributes: {
@@ -41,6 +42,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			save: () => null,
 		} );
 		registerBlockType( 'test/broccoli', {
+			apiVersion: 3,
 			title: 'Test Broccoli',
 			category: 'text',
 			attributes: {
@@ -69,6 +71,7 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 			save: () => null,
 		} );
 		registerBlockType( 'test/fallback-broccoli', {
+			apiVersion: 3,
 			title: 'Test Fallback Broccoli',
 			category: 'text',
 			attributes: {
@@ -106,18 +109,14 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 <p>Bar</p>`;
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
 		expect( transformed ).toHaveLength( 3 );
-		expect( transformed[ 0 ] ).toBe( `<p>Foo</p>
-
-` );
+		expect( transformed[ 0 ] ).toBe( `<p>Foo</p>` );
 		const expectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo bar="apple"]',
 		} );
 		// clientId will always be random.
 		expectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( expectedBlock );
-		expect( transformed[ 2 ] ).toBe( `
-
-<p>Bar</p>` );
+		expect( transformed[ 2 ] ).toBe( `<p>Bar</p>` );
 	} );
 
 	it( 'should convert a shortcode to a block type with a passing `isMatch`', () => {
@@ -165,22 +164,22 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 <p>[foo two]</p>`;
 
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		expect( transformed[ 0 ] ).toEqual( '<p>' );
+		expect( transformed[ 0 ] ).toEqual( '' );
 		const firstExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo one]',
 		} );
 		// clientId will always be random.
 		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
-		expect( transformed[ 2 ] ).toEqual( `</p>
-<p>` );
+		expect( transformed[ 2 ] ).toEqual( `
+` );
 		const secondExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo two]',
 		} );
 		// clientId will always be random.
 		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
 		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
-		expect( transformed[ 4 ] ).toEqual( '</p>' );
+		expect( transformed[ 4 ] ).toEqual( '' );
 		expect( transformed ).toHaveLength( 5 );
 	} );
 
@@ -191,46 +190,46 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 <p>[foo four]</p>`;
 
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		expect( transformed[ 0 ] ).toEqual( '<p>' );
+		expect( transformed[ 0 ] ).toEqual( '' );
 		const firstExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo one]',
 		} );
 		// clientId will always be random.
 		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
 		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
-		expect( transformed[ 2 ] ).toEqual( `</p>
-<p>` );
+		expect( transformed[ 2 ] ).toEqual( `
+` );
 		const secondExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo two]',
 		} );
 		// clientId will always be random.
 		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
 		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
-		expect( transformed[ 4 ] ).toEqual( `</p>
-<p>` );
+		expect( transformed[ 4 ] ).toEqual( `
+` );
 		const thirdExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo three]',
 		} );
 		// clientId will always be random.
 		thirdExpectedBlock.clientId = transformed[ 5 ].clientId;
 		expect( transformed[ 5 ] ).toEqual( thirdExpectedBlock );
-		expect( transformed[ 6 ] ).toEqual( `</p>
-<p>` );
+		expect( transformed[ 6 ] ).toEqual( `
+` );
 		const fourthExpectedBlock = createBlock( 'core/shortcode', {
 			text: '[foo four]',
 		} );
 		// clientId will always be random.
 		fourthExpectedBlock.clientId = transformed[ 7 ].clientId;
 		expect( transformed[ 7 ] ).toEqual( fourthExpectedBlock );
-		expect( transformed[ 8 ] ).toEqual( '</p>' );
+		expect( transformed[ 8 ] ).toEqual( '' );
 		expect( transformed ).toHaveLength( 9 );
 	} );
 
 	it( 'should not convert inline shortcodes', () => {
 		const originalInASentence = `<p>Here is a nice [foo shortcode].</p>`;
-		expect(
-			segmentHTMLToShortcodeBlock( originalInASentence, 0 )
-		).toEqual( [ originalInASentence ] );
+		expect( segmentHTMLToShortcodeBlock( originalInASentence, 0 ) ).toEqual(
+			[ originalInASentence ]
+		);
 
 		const originalMultipleShortcodes = `<p>[foo bar] [baz quux]</p>`;
 		expect(
@@ -238,14 +237,83 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		).toEqual( [ originalMultipleShortcodes ] );
 	} );
 
+	it( 'should convert a shortcode between br tags', () => {
+		const original = `<p>Some text<br />\n[foo bar="apple"]<br />\nSome other text</p>`;
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+		expect( transformed ).toHaveLength( 3 );
+		const expectedBlock = createBlock( 'core/shortcode', {
+			text: '[foo bar="apple"]',
+		} );
+		expectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( expectedBlock );
+	} );
+
+	it( 'should not convert inline shortcodes near br tags', () => {
+		const original = `<p>Hello<br />[foo bar] world</p>`;
+		expect( segmentHTMLToShortcodeBlock( original, 0 ) ).toEqual( [
+			original,
+		] );
+	} );
+
 	it( 'should convert regardless of shortcode alias', () => {
 		const original = `<p>[my-gallery ids="1,2,3"]</p>
 <p>[my-bunch-of-images ids="4,5,6"]</p>`;
 		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
-		expect( transformed[ 0 ] ).toBe( '<p>' );
+		expect( transformed[ 0 ] ).toBe( '' );
 		expect( transformed[ 1 ] ).toHaveProperty( 'name', 'test/gallery' );
-		expect( transformed[ 2 ] ).toBe( '</p>\n<p>' );
+		expect( transformed[ 2 ] ).toBe( '\n' );
 		expect( transformed[ 3 ] ).toHaveProperty( 'name', 'test/gallery' );
-		expect( transformed[ 4 ] ).toBe( '</p>' );
+		expect( transformed[ 4 ] ).toBe( '' );
+	} );
+
+	it( 'should convert regardless of shortcode order', () => {
+		const original = `<p>[my-gallery ids="4,5,6"]</p>
+<p>[my-broccoli id="42"]</p>`;
+
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+
+		expect( transformed[ 0 ] ).toBe( '' );
+
+		let firstExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
+		// clientId will always be random.
+		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
+
+		expect( transformed[ 2 ] ).toBe( '\n' );
+
+		let secondExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		// clientId will always be random.
+		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
+		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
+
+		expect( transformed[ 4 ] ).toBe( '' );
+		expect( transformed ).toHaveLength( 5 );
+
+		// Flip the order of the shortcodes.
+		const reversed = `<p>[my-broccoli id="42"]</p>
+<p>[my-gallery ids="4,5,6"]</p>`;
+
+		const reverseTransformed = segmentHTMLToShortcodeBlock( reversed, 0 );
+
+		expect( reverseTransformed[ 0 ] ).toBe( '' );
+
+		firstExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		// clientId will always be random.
+		firstExpectedBlock.clientId = reverseTransformed[ 1 ].clientId;
+		expect( reverseTransformed[ 1 ] ).toEqual( firstExpectedBlock );
+
+		expect( reverseTransformed[ 2 ] ).toBe( '\n' );
+
+		secondExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
+		// clientId will always be random.
+		secondExpectedBlock.clientId = reverseTransformed[ 3 ].clientId;
+		expect( reverseTransformed[ 3 ] ).toEqual( secondExpectedBlock );
+
+		expect( reverseTransformed[ 4 ] ).toBe( '' );
+		expect( reverseTransformed ).toHaveLength( 5 );
 	} );
 } );

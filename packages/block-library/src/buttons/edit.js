@@ -1,37 +1,57 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import clsx from 'clsx';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { name as buttonBlockName } from '../button/';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 
-const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
-
-// Inside buttons block alignment options are not supported.
-const alignmentHooksSetting = {
-	isEmbedButton: true,
+const DEFAULT_BLOCK = {
+	name: 'core/button',
+	attributesToCopy: [
+		'backgroundColor',
+		'border',
+		'className',
+		'fontFamily',
+		'fontSize',
+		'gradient',
+		'style',
+		'textColor',
+		'width',
+	],
 };
 
-function ButtonsEdit() {
-	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					orientation="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
-	);
+function ButtonsEdit( { attributes, className } ) {
+	const { fontSize, layout, style } = attributes;
+	const blockProps = useBlockProps( {
+		className: clsx( className, {
+			'has-custom-font-size': fontSize || style?.typography?.fontSize,
+		} ),
+	} );
+	const { hasButtonVariations } = useSelect( ( select ) => {
+		const buttonVariations = select( blocksStore ).getBlockVariations(
+			'core/button',
+			'inserter'
+		);
+		return {
+			hasButtonVariations: buttonVariations.length > 0,
+		};
+	}, [] );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		defaultBlock: DEFAULT_BLOCK,
+		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
+		directInsert: ! hasButtonVariations,
+		template: [ [ 'core/button' ] ],
+		templateInsertUpdatesSelection: true,
+		orientation: layout?.orientation ?? 'horizontal',
+	} );
+
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

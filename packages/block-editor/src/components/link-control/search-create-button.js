@@ -1,21 +1,15 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Icon } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
+import { plus } from '@wordpress/icons';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
 	onClick,
 	itemProps,
-	isSelected,
 	buttonText,
 } ) => {
 	if ( ! searchTerm ) {
@@ -24,7 +18,10 @@ export const LinkControlSearchCreate = ( {
 
 	let text;
 	if ( buttonText ) {
-		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
+		text =
+			typeof buttonText === 'function'
+				? buttonText( searchTerm )
+				: buttonText;
 	} else {
 		text = createInterpolateElement(
 			sprintf(
@@ -37,27 +34,15 @@ export const LinkControlSearchCreate = ( {
 	}
 
 	return (
-		<Button
+		<MenuItem
 			{ ...itemProps }
-			className={ classnames(
-				'block-editor-link-control__search-create block-editor-link-control__search-item',
-				{
-					'is-selected': isSelected,
-				}
-			) }
+			iconPosition="left"
+			icon={ plus }
+			className="block-editor-link-control__search-item"
 			onClick={ onClick }
 		>
-			<Icon
-				className="block-editor-link-control__search-item-icon"
-				icon="insert"
-			/>
-
-			<span className="block-editor-link-control__search-item-header">
-				<span className="block-editor-link-control__search-item-title">
-					{ text }
-				</span>
-			</span>
-		</Button>
+			{ text }
+		</MenuItem>
 	);
 };
 

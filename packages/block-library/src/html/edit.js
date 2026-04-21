@@ -2,118 +2,94 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	BlockControls,
-	PlainText,
-	transformStyles,
+	BlockIcon,
+	InspectorControls,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
-	Disabled,
-	SandBox,
 	ToolbarGroup,
+	Placeholder,
+	Button,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { code } from '@wordpress/icons';
 
-class HTMLEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isPreview: false,
-			styles: [],
-		};
-		this.switchToHTML = this.switchToHTML.bind( this );
-		this.switchToPreview = this.switchToPreview.bind( this );
-	}
+/**
+ * Internal dependencies
+ */
+import Preview from './preview';
+import HTMLEditModal from './modal';
 
-	componentDidMount() {
-		const { styles } = this.props;
+export default function HTMLEdit( { attributes, setAttributes, isSelected } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const blockProps = useBlockProps( {
+		className: 'block-library-html__edit',
+	} );
 
-		// Default styles used to unset some of the styles
-		// that might be inherited from the editor style.
-		const defaultStyles = `
-			html,body,:root {
-				margin: 0 !important;
-				padding: 0 !important;
-				overflow: visible !important;
-				min-height: auto !important;
-			}
-		`;
-
-		this.setState( {
-			styles: [ defaultStyles, ...transformStyles( styles ) ],
-		} );
-	}
-
-	switchToPreview() {
-		this.setState( { isPreview: true } );
-	}
-
-	switchToHTML() {
-		this.setState( { isPreview: false } );
-	}
-
-	render() {
-		const { attributes, setAttributes } = this.props;
-		const { isPreview, styles } = this.state;
-
+	// Show placeholder when content is empty
+	if ( ! attributes.content?.trim() ) {
 		return (
-			<div className="wp-block-html">
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							className="components-tab-button"
-							isPressed={ ! isPreview }
-							onClick={ this.switchToHTML }
-						>
-							<span>HTML</span>
-						</ToolbarButton>
-						<ToolbarButton
-							className="components-tab-button"
-							isPressed={ isPreview }
-							onClick={ this.switchToPreview }
-						>
-							<span>{ __( 'Preview' ) }</span>
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-				<Disabled.Consumer>
-					{ ( isDisabled ) =>
-						isPreview || isDisabled ? (
-							<>
-								<SandBox
-									html={ attributes.content }
-									styles={ styles }
-								/>
-								{ /*	
-									An overlay is added when the block is not selected in order to register click events. 
-									Some browsers do not bubble up the clicks from the sandboxed iframe, which makes it 
-									difficult to reselect the block. 
-								*/ }
-								{ ! this.props.isSelected && (
-									<div className="block-library-html__preview-overlay"></div>
-								) }
-							</>
-						) : (
-							<PlainText
-								value={ attributes.content }
-								onChange={ ( content ) =>
-									setAttributes( { content } )
-								}
-								placeholder={ __( 'Write HTML…' ) }
-								aria-label={ __( 'HTML' ) }
-							/>
-						)
-					}
-				</Disabled.Consumer>
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ <BlockIcon icon={ code } /> }
+					label={ __( 'Custom HTML' ) }
+					instructions={ __(
+						'Add custom HTML code and preview how it looks.'
+					) }
+				>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit HTML' ) }
+					</Button>
+				</Placeholder>
+				<HTMLEditModal
+					isOpen={ isModalOpen }
+					onRequestClose={ () => setIsModalOpen( false ) }
+					content={ attributes.content }
+					setAttributes={ setAttributes }
+				/>
 			</div>
 		);
 	}
+
+	return (
+		<div { ...blockProps }>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton onClick={ () => setIsModalOpen( true ) }>
+						{ __( 'Edit code' ) }
+					</ToolbarButton>
+				</ToolbarGroup>
+			</BlockControls>
+			<InspectorControls>
+				<VStack
+					className="block-editor-block-inspector-edit-contents"
+					expanded
+				>
+					<Button
+						className="block-editor-block-inspector-edit-contents__button"
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ () => setIsModalOpen( true ) }
+					>
+						{ __( 'Edit code' ) }
+					</Button>
+				</VStack>
+			</InspectorControls>
+			<Preview content={ attributes.content } isSelected={ isSelected } />
+			<HTMLEditModal
+				isOpen={ isModalOpen }
+				onRequestClose={ () => setIsModalOpen( false ) }
+				content={ attributes.content }
+				setAttributes={ setAttributes }
+			/>
+		</div>
+	);
 }
-export default withSelect( ( select ) => {
-	const { getSettings } = select( 'core/block-editor' );
-	return {
-		styles: getSettings().styles,
-	};
-} )( HTMLEdit );

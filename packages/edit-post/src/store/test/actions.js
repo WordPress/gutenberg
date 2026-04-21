@@ -1,104 +1,145 @@
 /**
+ * WordPress dependencies
+ */
+import { createRegistry } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as editorStore,
+	privateApis as editorPrivateApis,
+} from '@wordpress/editor';
+
+/**
  * Internal dependencies
  */
-import {
-	toggleEditorPanelEnabled,
-	toggleEditorPanelOpened,
-	removeEditorPanel,
-	openPublishSidebar,
-	closePublishSidebar,
-	togglePublishSidebar,
-	openModal,
-	closeModal,
-	toggleFeature,
-	requestMetaBoxUpdates,
-} from '../actions';
+import { store as editPostStore } from '..';
+import { unlock } from '../../lock-unlock';
+
+const { interfaceStore } = unlock( editorPrivateApis );
+
+function createRegistryWithStores() {
+	// Create a registry and register used stores.
+	const registry = createRegistry();
+	[
+		editPostStore,
+		noticesStore,
+		blockEditorStore,
+		coreStore,
+		interfaceStore,
+		preferencesStore,
+		editorStore,
+	].forEach( registry.register );
+	return registry;
+}
 
 describe( 'actions', () => {
-	describe( 'openPublishSidebar', () => {
-		it( 'should return an OPEN_PUBLISH_SIDEBAR action', () => {
-			expect( openPublishSidebar() ).toEqual( {
-				type: 'OPEN_PUBLISH_SIDEBAR',
-			} );
+	let registry;
+	beforeEach( () => {
+		registry = createRegistryWithStores();
+	} );
+
+	it( 'openGeneralSidebar/closeGeneralSidebar', () => {
+		registry.dispatch( editPostStore ).openGeneralSidebar( 'test/sidebar' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBe( 'test/sidebar' );
+
+		registry
+			.dispatch( editPostStore )
+			.closeGeneralSidebar( 'test/sidebar' );
+		expect(
+			registry
+				.select( interfaceStore )
+				.getActiveComplementaryArea( 'core' )
+		).toBeNull();
+	} );
+
+	it( 'toggleFeature', () => {
+		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
+		expect(
+			registry
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
+		).toBe( true );
+
+		registry.dispatch( editPostStore ).toggleFeature( 'welcomeGuide' );
+		expect(
+			registry
+				.select( preferencesStore )
+				.get( editPostStore.name, 'welcomeGuide' )
+		).toBe( false );
+	} );
+
+	it( 'togglePinnedPluginItem', () => {
+		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
+		// Sidebars are pinned by default.
+		// @See https://github.com/WordPress/gutenberg/pull/21645
+		expect(
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
+		).toBe( false );
+		registry.dispatch( editPostStore ).togglePinnedPluginItem( 'rigatoni' );
+		expect(
+			registry.select( interfaceStore ).isItemPinned( 'core', 'rigatoni' )
+		).toBe( true );
+	} );
+
+	describe( 'hideBlockTypes', () => {
+		it( 'adds the hidden block type to the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
+
+			const expected = [ 'core/quote', 'core/table' ];
+
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
+			).toEqual( expected );
+
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expected );
 		} );
 	} );
 
-	describe( 'closePublishSidebar', () => {
-		it( 'should return an CLOSE_PUBLISH_SIDEBAR action', () => {
-			expect( closePublishSidebar() ).toEqual( {
-				type: 'CLOSE_PUBLISH_SIDEBAR',
-			} );
-		} );
-	} );
+	describe( 'showBlockTypes', () => {
+		it( 'removes the hidden block type from the preferences', () => {
+			registry
+				.dispatch( editPostStore )
+				.hideBlockTypes( [ 'core/quote', 'core/table' ] );
 
-	describe( 'togglePublishSidebar', () => {
-		it( 'should return an TOGGLE_PUBLISH_SIDEBAR action', () => {
-			expect( togglePublishSidebar() ).toEqual( {
-				type: 'TOGGLE_PUBLISH_SIDEBAR',
-			} );
-		} );
-	} );
+			const expectedA = [ 'core/quote', 'core/table' ];
 
-	describe( 'removeEditorPanel', () => {
-		it( 'should return a REMOVE_PANEL action', () => {
-			expect( removeEditorPanel( 'post-status' ) ).toEqual( {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-		} );
-	} );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
+			).toEqual( expectedA );
 
-	describe( 'toggleEditorPanelEnabled', () => {
-		it( 'should return a TOGGLE_PANEL_ENABLED action', () => {
-			expect( toggleEditorPanelEnabled( 'post-status' ) ).toEqual( {
-				type: 'TOGGLE_PANEL_ENABLED',
-				panelName: 'post-status',
-			} );
-		} );
-	} );
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedA );
 
-	describe( 'toggleEditorPanelOpened', () => {
-		it( 'should return a TOGGLE_PANEL_OPENED action', () => {
-			expect( toggleEditorPanelOpened( 'post-status' ) ).toEqual( {
-				type: 'TOGGLE_PANEL_OPENED',
-				panelName: 'post-status',
-			} );
-		} );
-	} );
+			registry
+				.dispatch( editPostStore )
+				.showBlockTypes( [ 'core/table' ] );
 
-	describe( 'openModal', () => {
-		it( 'should return OPEN_MODAL action', () => {
-			const name = 'plugin/my-name';
-			expect( openModal( name ) ).toEqual( {
-				type: 'OPEN_MODAL',
-				name,
-			} );
-		} );
-	} );
+			const expectedB = [ 'core/quote' ];
 
-	describe( 'closeModal', () => {
-		it( 'should return CLOSE_MODAL action', () => {
-			expect( closeModal() ).toEqual( {
-				type: 'CLOSE_MODAL',
-			} );
-		} );
-	} );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'hiddenBlockTypes' )
+			).toEqual( expectedB );
 
-	describe( 'toggleFeature', () => {
-		it( 'should return TOGGLE_FEATURE action', () => {
-			const feature = 'name';
-			expect( toggleFeature( feature ) ).toEqual( {
-				type: 'TOGGLE_FEATURE',
-				feature,
-			} );
-		} );
-	} );
-
-	describe( 'requestMetaBoxUpdates', () => {
-		it( 'should return the REQUEST_META_BOX_UPDATES action', () => {
-			expect( requestMetaBoxUpdates() ).toEqual( {
-				type: 'REQUEST_META_BOX_UPDATES',
-			} );
+			expect(
+				registry.select( editPostStore ).getHiddenBlockTypes()
+			).toEqual( expectedB );
 		} );
 	} );
 } );

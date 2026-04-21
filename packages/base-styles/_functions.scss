@@ -1,0 +1,24 @@
+/**
+*  Converts a hex value into the rgb equivalent.
+*
+* @param {string} hex - the hexadecimal value to convert
+* @return {string} comma separated rgb values
+*/
+
+@use "sass:color";
+@use "sass:meta";
+
+@function hex-to-rgb($hex) {
+	/*
+	 * TODO: `color.{red|green|blue}` will trigger a deprecation warning in Dart Sass,
+	 * but the Sass used by the Gutenberg project doesn't support `color.channel()` yet,
+	 * so we can't migrate to it at this time.
+	 * In the future, after the Gutenberg project has been fully migrated to Dart Sass,
+	 * Remove this conditional statement and use only `color.channel()`.
+	 */
+	@if meta.function-exists("channel", "color") {
+		@return color.channel($hex, "red"), color.channel($hex, "green"), color.channel($hex, "blue");
+	} @else {
+		@return color.red($hex), color.green($hex), color.blue($hex);
+	}
+}

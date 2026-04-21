@@ -1,73 +1,49 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import {
-	category as categoryIcon,
-	mapMarker as linkIcon,
-	page as pageIcon,
-	postTitle as postIcon,
-	tag as tagIcon,
-} from '@wordpress/icons';
+import { _x, __, sprintf } from '@wordpress/i18n';
+import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
+import { addFilter } from '@wordpress/hooks';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import { enhanceNavigationLinkVariations } from './hooks';
+import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Link' ),
-
 	icon: linkIcon,
 
-	description: __( 'Add a page, link, or another item to your navigation.' ),
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'list-view' ) {
+			return attributes?.label;
+		}
 
-	variations: [
-		{
-			name: 'link',
-			isDefault: true,
-			title: __( 'Link' ),
-			description: __( 'A link to a URL.' ),
-			attributes: {},
-		},
-		{
-			name: 'post',
-			icon: postIcon,
-			title: __( 'Post Link' ),
-			description: __( 'A link to a post.' ),
-			attributes: { type: 'post' },
-		},
-		{
-			name: 'page',
-			icon: pageIcon,
-			title: __( 'Page Link' ),
-			description: __( 'A link to a page.' ),
-			attributes: { type: 'page' },
-		},
-		{
-			name: 'category',
-			icon: categoryIcon,
-			title: __( 'Category Link' ),
-			description: __( 'A link to a category.' ),
-			attributes: { type: 'category' },
-		},
-		{
-			name: 'tag',
-			icon: tagIcon,
-			title: __( 'Tag Link' ),
-			description: __( 'A link to a tag.' ),
-			attributes: { type: 'tag' },
-		},
-	],
+		if ( context === 'appender' ) {
+			const type = attributes?.type || 'link';
+			return sprintf(
+				/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+				_x( 'Add %s', 'add default block type' ),
+				type
+			);
+		}
 
-	__experimentalLabel: ( { label } ) => label,
+		// Backwards compatibility - return label for unknown contexts
+		return attributes?.label;
+	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {
@@ -79,6 +55,13 @@ export const settings = {
 	edit,
 
 	save,
+
+	example: {
+		attributes: {
+			label: _x( 'Example Link', 'navigation link preview example' ),
+			url: 'https://example.com',
+		},
+	},
 
 	deprecated: [
 		{
@@ -123,4 +106,43 @@ export const settings = {
 			},
 		},
 	],
+	transforms,
+};
+
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'label',
+			label: __( 'Label' ),
+			type: 'text',
+			Edit: 'rich-text',
+		},
+		{
+			id: 'link',
+			label: __( 'Link' ),
+			type: 'url',
+			Edit: 'link',
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+			} ),
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'label', 'link' ],
+	};
+}
+
+export const init = () => {
+	addFilter(
+		'blocks.registerBlockType',
+		'core/navigation-link',
+		enhanceNavigationLinkVariations
+	);
+
+	return initBlock( { name, metadata, settings } );
 };

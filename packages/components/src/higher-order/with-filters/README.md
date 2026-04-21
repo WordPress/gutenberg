@@ -49,18 +49,11 @@ const MyComponent = ( { hint, title } ) => (
 
 function withHintOverridden( FilteredComponent ) {
 	return ( props ) => (
-		<FilteredComponent
-			{ ...props }
-			hint="Overridden hint"
-		/>
+		<FilteredComponent { ...props } hint="Overridden hint" />
 	);
- }
+}
 
-addFilter(
-	'MyHookName',
-	'my-plugin/with-hint-overridden',
-	withHintOverridden
-);
+addFilter( 'MyHookName', 'my-plugin/with-hint-overridden', withHintOverridden );
 
 const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
 ```

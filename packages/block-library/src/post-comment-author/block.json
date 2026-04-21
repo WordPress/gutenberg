@@ -1,8 +1,0 @@
-{
-	"name": "core/post-comment-author",
-	"category": "design",
-	"usesContext": [ "commentId" ],
-	"supports": {
-		"html": false
-	}
-}

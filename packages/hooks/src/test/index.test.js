@@ -12,7 +12,9 @@ import {
 	removeAllActions,
 	removeAllFilters,
 	doAction,
+	doActionAsync,
 	applyFilters,
+	applyFiltersAsync,
 	currentAction,
 	currentFilter,
 	doingAction,
@@ -65,7 +67,7 @@ function actionC() {
 beforeEach( () => {
 	window.actionValue = '';
 	// Reset state in between tests (clear all callbacks, `didAction` counts,
-	// etc.)  Just reseting actions and filters is not enough
+	// etc.)  Just resetting actions and filters is not enough
 	// because the internal functions have references to the original objects.
 	[ actions, filters ].forEach( ( hooks ) => {
 		for ( const k in hooks ) {
@@ -268,7 +270,7 @@ test( 'filters with the same and different priorities', () => {
 	addFilter( 'test_order', 'my_callback_fn_1d', callbacks.fn_1d, 1 );
 
 	expect( applyFilters( 'test_order', [] ) ).toEqual( [
-		// all except 2b and 3a, which we removed earlier
+		// All except 2b and 3a, which we removed earlier.
 		'1a',
 		'1b',
 		'1c',
@@ -516,7 +518,7 @@ test( 'remove all filter callbacks', () => {
 } );
 
 // Test doingAction, didAction, hasAction.
-test( 'Test doingAction, didAction and hasAction.', () => {
+test( 'doingAction, didAction and hasAction.', () => {
 	let actionCalls = 0;
 
 	addAction( 'another.action', 'my_callback', () => {} );
@@ -566,7 +568,7 @@ test( 'Test doingAction, didAction and hasAction.', () => {
 	doAction( 'another.action' );
 	expect( doingAction( 'test.action' ) ).toBe( false );
 
-	// Verify an action with no handlers is still counted
+	// Verify an action with no handlers is still counted.
 	expect( didAction( 'unattached.action' ) ).toBe( 0 );
 	doAction( 'unattached.action' );
 	expect( doingAction( 'unattached.action' ) ).toBe( false );
@@ -711,7 +713,7 @@ test( 'adding hooks as a mixin', () => {
 } );
 
 // Test context.
-test( 'Test `this` context via composition', () => {
+test( '`this` context via composition', () => {
 	const testObject = { test: 'test this' };
 
 	testObject.hooks = createHooks();
@@ -742,6 +744,23 @@ test( 'adding an action triggers a hookAdded action passing all callback details
 		actionA,
 		9
 	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookAdded', 'my_callback' );
+	hookAddedSpy.mockClear();
+
+	hooksPrivateInstance.addAction( 'hookAdded', 'my_callback', hookAddedSpy );
+	hooksPrivateInstance.addAction( 'testAction', 'my_callback2', actionA, 9 );
+
+	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookAddedSpy ).toHaveBeenCalledWith(
+		'testAction',
+		'my_callback2',
+		actionA,
+		9
+	);
 } );
 
 test( 'adding a filter triggers a hookAdded action passing all callback details', () => {
@@ -750,6 +769,23 @@ test( 'adding a filter triggers a hookAdded action passing all callback details'
 	setupActionListener( 'hookAdded', hookAddedSpy );
 
 	addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookAddedSpy ).toHaveBeenCalledWith(
+		'testFilter',
+		'my_callback3',
+		filterA,
+		8
+	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookAdded', 'my_callback' );
+	hookAddedSpy.mockClear();
+
+	hooksPrivateInstance.addAction( 'hookAdded', 'my_callback', hookAddedSpy );
+	hooksPrivateInstance.addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+
 	expect( hookAddedSpy ).toHaveBeenCalledTimes( 1 );
 	expect( hookAddedSpy ).toHaveBeenCalledWith(
 		'testFilter',
@@ -772,6 +808,27 @@ test( 'removing an action triggers a hookRemoved action passing all callback det
 		'testAction',
 		'my_callback2'
 	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookRemoved', 'my_callback' );
+	hookRemovedSpy.mockClear();
+
+	hooksPrivateInstance.addAction(
+		'hookRemoved',
+		'my_callback',
+		hookRemovedSpy
+	);
+
+	hooksPrivateInstance.addAction( 'testAction', 'my_callback2', actionA, 9 );
+	hooksPrivateInstance.removeAction( 'testAction', 'my_callback2' );
+
+	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookRemovedSpy ).toHaveBeenCalledWith(
+		'testAction',
+		'my_callback2'
+	);
 } );
 
 test( 'removing a filter triggers a hookRemoved action passing all callback details', () => {
@@ -781,6 +838,27 @@ test( 'removing a filter triggers a hookRemoved action passing all callback deta
 
 	addFilter( 'testFilter', 'my_callback3', filterA, 8 );
 	removeFilter( 'testFilter', 'my_callback3' );
+
+	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
+	expect( hookRemovedSpy ).toHaveBeenCalledWith(
+		'testFilter',
+		'my_callback3'
+	);
+
+	// Private instance.
+	const hooksPrivateInstance = createHooks();
+
+	removeAction( 'hookRemoved', 'my_callback' );
+	hookRemovedSpy.mockClear();
+
+	hooksPrivateInstance.addAction(
+		'hookRemoved',
+		'my_callback',
+		hookRemovedSpy
+	);
+
+	hooksPrivateInstance.addFilter( 'testFilter', 'my_callback3', filterA, 8 );
+	hooksPrivateInstance.removeFilter( 'testFilter', 'my_callback3' );
 
 	expect( hookRemovedSpy ).toHaveBeenCalledTimes( 1 );
 	expect( hookRemovedSpy ).toHaveBeenCalledWith(
@@ -866,4 +944,152 @@ test( 'checking hasFilter with named callbacks and removeAllActions', () => {
 	removeAllFilters( 'test.filter' );
 	expect( hasFilter( 'test.filter', 'my_callback' ) ).toBe( false );
 	expect( hasFilter( 'test.filter', 'my_second_callback' ) ).toBe( false );
+} );
+
+describe( 'async filter', () => {
+	test( 'runs all registered handlers', async () => {
+		addFilter( 'test.async.filter', 'callback_plus1', ( value ) => {
+			return new Promise( ( r ) =>
+				setTimeout( () => r( value + 1 ), 10 )
+			);
+		} );
+		addFilter( 'test.async.filter', 'callback_times2', ( value ) => {
+			return new Promise( ( r ) =>
+				setTimeout( () => r( value * 2 ), 10 )
+			);
+		} );
+
+		expect( await applyFiltersAsync( 'test.async.filter', 2 ) ).toBe( 6 );
+	} );
+
+	test( 'aborts when handler throws an error', async () => {
+		const sqrt = jest.fn( async ( value ) => {
+			if ( value < 0 ) {
+				throw new Error( 'cannot pass negative value to sqrt' );
+			}
+			return Math.sqrt( value );
+		} );
+
+		const plus1 = jest.fn( async ( value ) => {
+			return value + 1;
+		} );
+
+		addFilter( 'test.async.filter', 'callback_sqrt', sqrt );
+		addFilter( 'test.async.filter', 'callback_plus1', plus1 );
+
+		await expect(
+			applyFiltersAsync( 'test.async.filter', -1 )
+		).rejects.toThrow( 'cannot pass negative value to sqrt' );
+		expect( sqrt ).toHaveBeenCalledTimes( 1 );
+		expect( plus1 ).not.toHaveBeenCalled();
+	} );
+
+	test( 'is correctly tracked by doingFilter and didFilter', async () => {
+		addFilter( 'test.async.filter', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter' ) ).toBe( true );
+			return value;
+		} );
+
+		expect( doingFilter( 'test.async.filter' ) ).toBe( false );
+		expect( didFilter( 'test.async.filter' ) ).toBe( 0 );
+		await applyFiltersAsync( 'test.async.filter', 0 );
+		expect( doingFilter( 'test.async.filter' ) ).toBe( false );
+		expect( didFilter( 'test.async.filter' ) ).toBe( 1 );
+	} );
+
+	test( 'is correctly tracked when multiple filters run at once', async () => {
+		addFilter( 'test.async.filter1', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter1' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			return value;
+		} );
+		addFilter( 'test.async.filter2', 'callback_doing', async ( value ) => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingFilter( 'test.async.filter2' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			return value;
+		} );
+
+		await Promise.all( [
+			applyFiltersAsync( 'test.async.filter1', 0 ),
+			applyFiltersAsync( 'test.async.filter2', 0 ),
+		] );
+	} );
+} );
+
+describe( 'async action', () => {
+	test( 'runs all registered handlers sequentially', async () => {
+		const outputs = [];
+		const action1 = async () => {
+			outputs.push( 1 );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			outputs.push( 2 );
+		};
+
+		const action2 = async () => {
+			outputs.push( 3 );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			outputs.push( 4 );
+		};
+
+		addAction( 'test.async.action', 'action1', action1 );
+		addAction( 'test.async.action', 'action2', action2 );
+
+		await doActionAsync( 'test.async.action' );
+		expect( outputs ).toEqual( [ 1, 2, 3, 4 ] );
+	} );
+
+	test( 'aborts when handler throws an error', async () => {
+		const outputs = [];
+		const action1 = async () => {
+			throw new Error( 'aborting' );
+		};
+
+		const action2 = async () => {
+			outputs.push( 3 );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			outputs.push( 4 );
+		};
+
+		addAction( 'test.async.action', 'action1', action1 );
+		addAction( 'test.async.action', 'action2', action2 );
+
+		await expect( doActionAsync( 'test.async.action' ) ).rejects.toThrow(
+			'aborting'
+		);
+		expect( outputs ).toEqual( [] );
+	} );
+
+	test( 'is correctly tracked by doingAction and didAction', async () => {
+		addAction( 'test.async.action', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action' ) ).toBe( true );
+		} );
+
+		expect( doingAction( 'test.async.action' ) ).toBe( false );
+		expect( didAction( 'test.async.action' ) ).toBe( 0 );
+		await doActionAsync( 'test.async.action', 0 );
+		expect( doingAction( 'test.async.action' ) ).toBe( false );
+		expect( didAction( 'test.async.action' ) ).toBe( 1 );
+	} );
+
+	test( 'is correctly tracked when multiple actions run at once', async () => {
+		addAction( 'test.async.action1', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action1' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+		} );
+		addAction( 'test.async.action2', 'callback_doing', async () => {
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			expect( doingAction( 'test.async.action2' ) ).toBe( true );
+			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+		} );
+
+		await Promise.all( [
+			doActionAsync( 'test.async.action1', 0 ),
+			doActionAsync( 'test.async.action2', 0 ),
+		] );
+	} );
 } );

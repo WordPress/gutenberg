@@ -1,6 +1,12 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/query",
-	"category": "design",
+	"title": "Query Loop",
+	"category": "theme",
+	"description": "An advanced block that allows displaying post types based on different query parameters and visual configurations.",
+	"keywords": [ "posts", "list", "blog", "blogs", "custom post types" ],
+	"textdomain": "default",
 	"attributes": {
 		"queryId": {
 			"type": "number"
@@ -8,21 +14,47 @@
 		"query": {
 			"type": "object",
 			"default": {
-				"perPage": 3,
-				"pages": 1,
+				"perPage": null,
+				"pages": 0,
 				"offset": 0,
-				"categoryIds": [],
+				"postType": "post",
 				"order": "desc",
-				"orderBy": "date"
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true,
+				"taxQuery": null,
+				"parents": [],
+				"format": []
 			}
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
+		"namespace": {
+			"type": "string"
+		},
+		"enhancedPagination": {
+			"type": "boolean",
+			"default": false
 		}
 	},
+	"usesContext": [ "templateSlug" ],
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query"
+		"query": "query",
+		"displayLayout": "displayLayout",
+		"enhancedPagination": "enhancedPagination"
 	},
 	"supports": {
+		"anchor": true,
+		"align": [ "wide", "full" ],
 		"html": false,
-		"lightBlockWrapper": true
-	}
+		"layout": true,
+		"interactivity": true
+	},
+	"editorStyle": "wp-block-query-editor"
 }

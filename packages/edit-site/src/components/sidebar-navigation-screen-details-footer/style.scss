@@ -1,0 +1,8 @@
+.edit-site-sidebar-navigation-screen-details-footer {
+	// Default background color (no link or button).
+	div.edit-site-sidebar-navigation-item.components-item:focus,
+	div.edit-site-sidebar-navigation-item.components-item:hover,
+	div.edit-site-sidebar-navigation-item.components-item[aria-current] {
+		background: none;
+	}
+}

@@ -1,15 +1,18 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/paragraph",
+	"title": "Paragraph",
 	"category": "text",
+	"description": "Start with the basic building block of all narrative.",
+	"keywords": [ "text" ],
+	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
 		"content": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "p",
-			"default": ""
+			"role": "content"
 		},
 		"dropCap": {
 			"type": "boolean",
@@ -20,22 +23,66 @@
 		},
 		"direction": {
 			"type": "string",
-			"enum": [
-				"ltr",
-				"rtl"
-			]
+			"enum": [ "ltr", "rtl" ]
 		}
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
+		"splitting": true,
 		"anchor": true,
 		"className": false,
-		"lightBlockWrapper": true,
-		"__experimentalColor": {
-			"linkColor": true
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
 		},
-		"__experimentalFontSize": true,
-		"__experimentalLineHeight": true,
+		"color": {
+			"gradients": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"textAlign": true,
+			"textColumns": true,
+			"textIndent": true,
+			"__experimentalFontFamily": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalWritingMode": true,
+			"fitText": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
 		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true
-	}
+		"__unstablePasteTextInline": true,
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"root": "p",
+		"typography": {
+			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
+		}
+	},
+	"editorStyle": "wp-block-paragraph-editor",
+	"style": "wp-block-paragraph"
 }

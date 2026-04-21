@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/6.3/phpunit.xsd"
+		backupGlobals="true"
+		bootstrap="./Tests/bootstrap.php"
+		beStrictAboutTestsThatDoNotTestAnything="false"
+		colors="true">
+
+	<testsuites>
+		<testsuite name="Gutenberg">
+			<directory suffix="UnitTest.php">./Gutenberg/Tests/</directory>
+		</testsuite>
+	</testsuites>
+
+</phpunit>

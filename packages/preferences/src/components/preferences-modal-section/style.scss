@@ -1,0 +1,35 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.preferences-modal__section {
+	// Reset `fieldset` browser defaults.
+	border: 0;
+	padding: 0;
+
+	margin: 0 0 2.5rem 0;
+
+	&:last-child {
+		margin: 0;
+	}
+}
+
+.preferences-modal__section-legend {
+	margin-bottom: $grid-unit-10;
+}
+
+.preferences-modal__section-title {
+	font-size: 0.9rem;
+	font-weight: 600;
+	margin-top: 0;
+}
+
+.preferences-modal__section-description {
+	margin: -$grid-unit-10 0 $grid-unit-10 0;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
+}
+
+.preferences-modal__section:has(.preferences-modal__section-content:empty) {
+	display: none;
+}

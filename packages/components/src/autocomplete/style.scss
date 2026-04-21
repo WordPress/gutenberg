@@ -1,5 +1,9 @@
-.components-autocomplete__popover .components-popover__content > div {
-	padding: $grid-unit-20;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-autocomplete__popover .components-popover__content {
+	padding: $grid-unit-10;
+	min-width: 200px;
 }
 
 .components-autocomplete__result.components-button {
@@ -9,7 +13,7 @@
 	text-align: left;
 	width: 100%;
 
-	&.is-selected {
-		box-shadow: 0 0 0 2px var(--wp-admin-theme-color);
+	&:focus:not(:disabled) {
+		@include block-toolbar-button-style__focus();
 	}
 }

@@ -1,0 +1,9 @@
+{
+	"version": 3,
+	"title": "Variation - no fonts",
+	"styles": {
+		"typography": {
+			"fontFamily": "var(--wp--preset--font-family--dm-sans)"
+		}
+	}
+}

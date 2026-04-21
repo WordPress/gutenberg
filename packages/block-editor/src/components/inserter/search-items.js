@@ -1,45 +1,98 @@
 /**
  * External dependencies
  */
-import {
-	deburr,
-	differenceWith,
-	find,
-	intersectionWith,
-	isEmpty,
-	words,
-} from 'lodash';
+import removeAccents from 'remove-accents';
+import { noCase } from 'change-case';
+
+// Default search helpers.
+const defaultGetName = ( item ) => item.name || '';
+const defaultGetTitle = ( item ) => item.title;
+const defaultGetDescription = ( item ) => item.description || '';
+const defaultGetKeywords = ( item ) => item.keywords || [];
+const defaultGetCategory = ( item ) => item.category;
+const defaultGetCollection = () => null;
+
+// Normalization regexes
+const splitRegexp = [
+	/([\p{Ll}\p{Lo}\p{N}])([\p{Lu}\p{Lt}])/gu, // One lowercase or digit, followed by one uppercase.
+	/([\p{Lu}\p{Lt}])([\p{Lu}\p{Lt}][\p{Ll}\p{Lo}])/gu, // One uppercase followed by one uppercase and one lowercase.
+];
+const stripRegexp = /(\p{C}|\p{P}|\p{S})+/giu; // Anything that's not a punctuation, symbol or control/format character.
+
+// Normalization cache
+const extractedWords = new Map();
+const normalizedStrings = new Map();
+
+/**
+ * Extracts words from an input string.
+ *
+ * @param {string} input The input string.
+ *
+ * @return {Array} Words, extracted from the input string.
+ */
+export function extractWords( input = '' ) {
+	if ( extractedWords.has( input ) ) {
+		return extractedWords.get( input );
+	}
+
+	const result = noCase( input, {
+		splitRegexp,
+		stripRegexp,
+	} )
+		.split( ' ' )
+		.filter( Boolean );
+
+	extractedWords.set( input, result );
+
+	return result;
+}
+
+/**
+ * Sanitizes the search input string.
+ *
+ * @param {string} input The search input to normalize.
+ *
+ * @return {string} The normalized search input.
+ */
+export function normalizeString( input = '' ) {
+	if ( normalizedStrings.has( input ) ) {
+		return normalizedStrings.get( input );
+	}
+
+	// Disregard diacritics.
+	//  Input: "média"
+	let result = removeAccents( input );
+
+	// Accommodate leading slash, matching autocomplete expectations.
+	//  Input: "/media"
+	result = result.replace( /^\//, '' );
+
+	// Lowercase.
+	//  Input: "MEDIA"
+	result = result.toLowerCase();
+
+	normalizedStrings.set( input, result );
+
+	return result;
+}
 
 /**
  * Converts the search term into a list of normalized terms.
  *
- * @param {string} term The search term to normalize.
+ * @param {string} input The search term to normalize.
  *
  * @return {string[]} The normalized list of search terms.
  */
-export const normalizeSearchTerm = ( term = '' ) => {
-	// Disregard diacritics.
-	//  Input: "média"
-	term = deburr( term );
-
-	// Accommodate leading slash, matching autocomplete expectations.
-	//  Input: "/media"
-	term = term.replace( /^\//, '' );
-
-	// Lowercase.
-	//  Input: "MEDIA"
-	term = term.toLowerCase();
-
-	// Extract words.
-	return words( term );
+export const getNormalizedSearchTerms = ( input = '' ) => {
+	return extractWords( normalizeString( input ) );
 };
 
 const removeMatchingTerms = ( unmatchedTerms, unprocessedTerms ) => {
-	return differenceWith(
-		unmatchedTerms,
-		normalizeSearchTerm( unprocessedTerms ),
-		( unmatchedTerm, unprocessedTerm ) =>
-			unprocessedTerm.includes( unmatchedTerm )
+	return unmatchedTerms.filter(
+		( term ) =>
+			! getNormalizedSearchTerms( unprocessedTerms ).some(
+				( unprocessedTerm ) => unprocessedTerm.includes( term )
+			)
 	);
 };
 
@@ -47,108 +100,114 @@ export const searchBlockItems = (
 	items,
 	categories,
 	collections,
-	searchTerm
+	searchInput
 ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
+	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
 	}
 
 	const config = {
 		getCategory: ( item ) =>
-			find( categories, { slug: item.category } )?.title,
+			categories.find( ( { slug } ) => slug === item.category )?.title,
 		getCollection: ( item ) =>
 			collections[ item.name.split( '/' )[ 0 ] ]?.title,
-		getVariations: ( { variations = [] } ) =>
-			Array.from(
-				variations.reduce(
-					( accumulator, { title, keywords = [] } ) => {
-						accumulator.add( title );
-						keywords.forEach( ( keyword ) =>
-							accumulator.add( keyword )
-						);
-						return accumulator;
-					},
-					new Set()
-				)
-			),
 	};
-	return searchItems( items, searchTerm, config ).map( ( item ) => {
-		if ( isEmpty( item.variations ) ) {
-			return item;
-		}
 
-		const matchedVariations = item.variations.filter(
-			( { title, keywords = [] } ) => {
-				return (
-					intersectionWith(
-						normalizedSearchTerms,
-						normalizeSearchTerm( title ).concat( keywords ),
-						( termToMatch, labelTerm ) =>
-							labelTerm.includes( termToMatch )
-					).length > 0
-				);
-			}
-		);
-		// When no variations matched, fallback to all variations.
-		if ( isEmpty( matchedVariations ) ) {
-			return item;
-		}
-
-		return {
-			...item,
-			variations: matchedVariations,
-		};
-	} );
+	return searchItems( items, searchInput, config );
 };
 
 /**
  * Filters an item list given a search term.
  *
- * @param {Array} items       Item list
- * @param {string} searchTerm Search term.
- * @param {Object} config     Search Config.
- * @return {Array}            Filtered item list.
+ * @param {Array}  items       Item list
+ * @param {string} searchInput Search input.
+ * @param {Object} config      Search Config.
+ *
+ * @return {Array} Filtered item list.
  */
-export const searchItems = ( items = [], searchTerm = '', config = {} ) => {
-	const normalizedSearchTerms = normalizeSearchTerm( searchTerm );
+export const searchItems = ( items = [], searchInput = '', config = {} ) => {
+	const normalizedSearchTerms = getNormalizedSearchTerms( searchInput );
 	if ( normalizedSearchTerms.length === 0 ) {
 		return items;
 	}
 
-	const defaultGetTitle = ( item ) => item.title;
-	const defaultGetKeywords = ( item ) => item.keywords || [];
-	const defaultGetCategory = ( item ) => item.category;
-	const defaultGetCollection = () => null;
-	const defaultGetVariations = () => [];
+	const rankedItems = items
+		.map( ( item ) => {
+			return [ item, getItemSearchRank( item, searchInput, config ) ];
+		} )
+		.filter( ( [ , rank ] ) => rank > 0 );
+
+	rankedItems.sort( ( [ , rank1 ], [ , rank2 ] ) => rank2 - rank1 );
+	return rankedItems.map( ( [ item ] ) => item );
+};
+
+/**
+ * Get the search rank for a given item and a specific search term.
+ * The better the match, the higher the rank.
+ * If the rank equals 0, it should be excluded from the results.
+ *
+ * @param {Object} item       Item to filter.
+ * @param {string} searchTerm Search term.
+ * @param {Object} config     Search Config.
+ *
+ * @return {number} Search Rank.
+ */
+export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const {
+		getName = defaultGetName,
 		getTitle = defaultGetTitle,
+		getDescription = defaultGetDescription,
 		getKeywords = defaultGetKeywords,
 		getCategory = defaultGetCategory,
 		getCollection = defaultGetCollection,
-		getVariations = defaultGetVariations,
 	} = config;
 
-	return items.filter( ( item ) => {
-		const title = getTitle( item );
-		const keywords = getKeywords( item );
-		const category = getCategory( item );
-		const collection = getCollection( item );
-		const variations = getVariations( item );
+	const name = getName( item );
+	const title = getTitle( item );
+	const description = getDescription( item );
+	const keywords = getKeywords( item );
+	const category = getCategory( item );
+	const collection = getCollection( item );
 
+	const normalizedSearchInput = normalizeString( searchTerm );
+	const normalizedTitle = normalizeString( title );
+
+	let rank = 0;
+
+	// Prefers exact matches
+	// Then prefers if the beginning of the title matches the search term
+	// name, keywords, categories, collection, variations match come later.
+	if ( normalizedSearchInput === normalizedTitle ) {
+		rank += 30;
+	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
+		rank += 20;
+	} else {
 		const terms = [
+			name,
 			title,
+			description,
 			...keywords,
 			category,
 			collection,
-			...variations,
 		].join( ' ' );
-
+		const normalizedSearchTerms = extractWords( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,
 			terms
 		);
 
-		return unmatchedTerms.length === 0;
-	} );
-};
+		if ( unmatchedTerms.length === 0 ) {
+			rank += 10;
+		}
+	}
+
+	// Give a better rank to "core" namespaced items.
+	if ( rank !== 0 && name.startsWith( 'core/' ) ) {
+		const isCoreBlockVariation = name !== item.id;
+		// Give a bit better rank to "core" blocks over "core" block variations.
+		rank += isCoreBlockVariation ? 1 : 2;
+	}
+
+	return rank;
+}

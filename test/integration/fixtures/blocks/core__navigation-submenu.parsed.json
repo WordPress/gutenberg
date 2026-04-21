@@ -1,0 +1,23 @@
+[
+	{
+		"blockName": "core/navigation-submenu",
+		"attrs": {
+			"label": "A fine submenu",
+			"isTopLevelItem": true
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/navigation-link",
+				"attrs": {
+					"label": "WordPress",
+					"url": "https://wordpress.org/"
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n",
+				"innerContent": [ "\n" ]
+			}
+		],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n", null, "\n" ]
+	}
+]

@@ -1,28 +1,46 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
+import {
+	Path,
+	SVG,
+	Popover,
+	Button,
+	ExternalLink,
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalNumberControl as NumberControl,
+	TextareaControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { insertObject } from '@wordpress/rich-text';
+import { useState } from '@wordpress/element';
+import { insertObject, useAnchor } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
 	MediaUploadCheck,
 } from '@wordpress/block-editor';
-import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { keyboardReturn } from '@wordpress/icons';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
 
-const stopKeyPropagation = ( event ) => event.stopPropagation();
+/**
+ * Extracts the image ID from the className attribute.
+ *
+ * @param {Object} activeObjectAttributes The attributes of the active object.
+ * @return {number|undefined} The extracted image ID or undefined if not found.
+ */
+function getCurrentImageId( activeObjectAttributes ) {
+	if ( ! activeObjectAttributes?.className ) {
+		return undefined;
+	}
 
-function getRange() {
-	const selection = window.getSelection();
-	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	const [ , id ] =
+		activeObjectAttributes.className.match( /wp-image-(\d+)/ ) ?? [];
+
+	return id ? parseInt( id, 10 ) : undefined;
 }
 
 export const image = {
@@ -38,91 +56,133 @@ export const image = {
 		url: 'src',
 		alt: 'alt',
 	},
-	edit: class ImageEdit extends Component {
-		constructor() {
-			super( ...arguments );
-			this.onChange = this.onChange.bind( this );
-			this.onKeyDown = this.onKeyDown.bind( this );
-			this.openModal = this.openModal.bind( this );
-			this.closeModal = this.closeModal.bind( this );
-			this.anchorRef = null;
-			this.state = {
-				modal: false,
-			};
-		}
+	edit: Edit,
+};
 
-		static getDerivedStateFromProps( props, state ) {
-			const {
-				activeObjectAttributes: { style },
-			} = props;
+function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
+	const { style, alt } = activeObjectAttributes;
+	const width = style?.replace( /\D/g, '' );
+	const [ editedWidth, setEditedWidth ] = useState( width );
+	const [ editedAlt, setEditedAlt ] = useState( alt );
+	const hasChanged = editedWidth !== width || editedAlt !== alt;
+	const popoverAnchor = useAnchor( {
+		editableContentElement: contentRef.current,
+		settings: image,
+	} );
 
-			if ( style === state.previousStyle ) {
-				return null;
-			}
+	return (
+		<Popover
+			focusOnMount={ false }
+			anchor={ popoverAnchor }
+			className="block-editor-format-toolbar__image-popover"
+		>
+			<form
+				className="block-editor-format-toolbar__image-container-content"
+				onSubmit={ ( event ) => {
+					const newReplacements = value.replacements.slice();
 
-			if ( ! style ) {
-				return {
-					width: undefined,
-					previousStyle: style,
-				};
-			}
+					newReplacements[ value.start ] = {
+						type: name,
+						attributes: {
+							...activeObjectAttributes,
+							style: editedWidth
+								? `width: ${ editedWidth }px;`
+								: '',
+							alt: editedAlt,
+						},
+					};
 
-			return {
-				width: style.replace( /\D/g, '' ),
-				previousStyle: style,
-			};
-		}
+					onChange( {
+						...value,
+						replacements: newReplacements,
+					} );
 
-		onChange( width ) {
-			this.setState( { width } );
-		}
+					event.preventDefault();
+				} }
+			>
+				<VStack spacing={ 4 }>
+					<NumberControl
+						__next40pxDefaultSize
+						label={ __( 'Width' ) }
+						value={ editedWidth }
+						min={ 1 }
+						onChange={ ( newWidth ) => {
+							setEditedWidth( newWidth );
+						} }
+					/>
+					<TextareaControl
+						label={ __( 'Alternative text' ) }
+						value={ editedAlt }
+						onChange={ ( newAlt ) => {
+							setEditedAlt( newAlt );
+						} }
+						help={
+							<>
+								<ExternalLink
+									href={
+										// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+										__(
+											'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+										)
+									}
+								>
+									{ __(
+										'Describe the purpose of the image.'
+									) }
+								</ExternalLink>
+								<br />
+								{ __( 'Leave empty if decorative.' ) }
+							</>
+						}
+					/>
+					<HStack justify="right">
+						<Button
+							disabled={ ! hasChanged }
+							accessibleWhenDisabled
+							variant="primary"
+							type="submit"
+							size="compact"
+						>
+							{ __( 'Apply' ) }
+						</Button>
+					</HStack>
+				</VStack>
+			</form>
+		</Popover>
+	);
+}
 
-		onKeyDown( event ) {
-			if (
-				[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf(
-					event.keyCode
-				) > -1
-			) {
-				// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
-				event.stopPropagation();
-			}
-		}
-
-		openModal() {
-			this.setState( { modal: true } );
-		}
-
-		closeModal() {
-			this.setState( { modal: false } );
-		}
-
-		componentDidMount() {
-			this.anchorRef = getRange();
-		}
-
-		componentDidUpdate( prevProps ) {
-			// When the popover is open or when the selected image changes,
-			// update the anchorRef.
-			if (
-				( ! prevProps.isObjectActive && this.props.isObjectActive ) ||
-				prevProps.activeObjectAttributes.url !==
-					this.props.activeObjectAttributes.url
-			) {
-				this.anchorRef = getRange();
-			}
-		}
-
-		render() {
-			const {
-				value,
-				onChange,
-				onFocus,
-				isObjectActive,
-				activeObjectAttributes,
-			} = this.props;
-
-			return (
-				<MediaUploadCheck>
+function Edit( {
+	value,
+	onChange,
+	onFocus,
+	isObjectActive,
+	activeObjectAttributes,
+	contentRef,
+} ) {
+	return (
+		<MediaUploadCheck>
+			<MediaUpload
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ getCurrentImageId( activeObjectAttributes ) }
+				onSelect={ ( { id, url, alt, width: imgWidth } ) => {
+					onChange(
+						insertObject( value, {
+							type: name,
+							attributes: {
+								className: `wp-image-${ id }`,
+								style: `width: ${ Math.min(
+									imgWidth,
+									150
+								) }px;`,
+								url,
+								alt,
+							},
+						} )
+					);
+					onFocus();
+				} }
+				render={ ( { open } ) => (
 					<RichTextToolbarButton
 						icon={
 							<SVG
@@ -132,90 +192,20 @@ export const image = {
 								<Path d="M4 18.5h16V17H4v1.5zM16 13v1.5h4V13h-4zM5.1 15h7.8c.6 0 1.1-.5 1.1-1.1V6.1c0-.6-.5-1.1-1.1-1.1H5.1C4.5 5 4 5.5 4 6.1v7.8c0 .6.5 1.1 1.1 1.1zm.4-8.5h7V10l-1-1c-.3-.3-.8-.3-1 0l-1.6 1.5-1.2-.7c-.3-.2-.6-.2-.9 0l-1.3 1V6.5zm0 6.1l1.8-1.3 1.3.8c.3.2.7.2.9-.1l1.5-1.4 1.5 1.4v1.5h-7v-.9z" />
 							</SVG>
 						}
-						title={ title }
-						onClick={ this.openModal }
+						title={ isObjectActive ? __( 'Replace image' ) : title }
+						onClick={ open }
 						isActive={ isObjectActive }
 					/>
-					{ this.state.modal && (
-						<MediaUpload
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							onSelect={ ( { id, url, alt, width } ) => {
-								this.closeModal();
-								onChange(
-									insertObject( value, {
-										type: name,
-										attributes: {
-											className: `wp-image-${ id }`,
-											style: `width: ${ Math.min(
-												width,
-												150
-											) }px;`,
-											url,
-											alt,
-										},
-									} )
-								);
-								onFocus();
-							} }
-							onClose={ this.closeModal }
-							render={ ( { open } ) => {
-								open();
-								return null;
-							} }
-						/>
-					) }
-					{ isObjectActive && (
-						<Popover
-							position="bottom center"
-							focusOnMount={ false }
-							anchorRef={ this.anchorRef }
-						>
-							{
-								// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-							 }
-							<form
-								className="block-editor-format-toolbar__image-container-content"
-								onKeyPress={ stopKeyPropagation }
-								onKeyDown={ this.onKeyDown }
-								onSubmit={ ( event ) => {
-									const newReplacements = value.replacements.slice();
-
-									newReplacements[ value.start ] = {
-										type: name,
-										attributes: {
-											...activeObjectAttributes,
-											style: `width: ${ this.state.width }px;`,
-										},
-									};
-
-									onChange( {
-										...value,
-										replacements: newReplacements,
-									} );
-
-									event.preventDefault();
-								} }
-							>
-								<TextControl
-									className="block-editor-format-toolbar__image-container-value"
-									type="number"
-									label={ __( 'Width' ) }
-									value={ this.state.width }
-									min={ 1 }
-									onChange={ this.onChange }
-								/>
-								<Button
-									icon={ keyboardReturn }
-									label={ __( 'Apply' ) }
-									type="submit"
-								/>
-							</form>
-							{ /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */ }
-						</Popover>
-					) }
-				</MediaUploadCheck>
-			);
-		}
-	},
-};
+				) }
+			/>
+			{ isObjectActive && (
+				<InlineUI
+					value={ value }
+					onChange={ onChange }
+					activeObjectAttributes={ activeObjectAttributes }
+					contentRef={ contentRef }
+				/>
+			) }
+		</MediaUploadCheck>
+	);
+}

@@ -1,45 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { getProtocol, prependHTTP } from '@wordpress/url';
 import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * External dependencies
- */
-import { startsWith } from 'lodash';
 
 /**
  * Internal dependencies
  */
 import isURLLike from './is-url-like';
+import normalizeUrl from './normalize-url';
 import { CREATE_TYPE } from './constants';
+import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
 export const handleDirectEntry = ( val ) => {
-	let type = 'URL';
-
-	const protocol = getProtocol( val ) || '';
-
-	if ( protocol.includes( 'mailto' ) ) {
-		type = 'mailto';
-	}
-
-	if ( protocol.includes( 'tel' ) ) {
-		type = 'tel';
-	}
-
-	if ( startsWith( val, '#' ) ) {
-		type = 'internal';
-	}
+	const { url, type } = normalizeUrl( val );
 
 	return Promise.resolve( [
 		{
 			id: val,
 			title: val,
-			url: type === 'URL' ? prependHTTP( val ) : val,
+			url,
 			type,
 		},
 	] );
@@ -49,27 +31,26 @@ const handleEntitySearch = async (
 	val,
 	suggestionsQuery,
 	fetchSearchSuggestions,
-	directEntryHandler,
 	withCreateSuggestion,
-	withURLSuggestion
+	pageOnFront,
+	pageForPosts
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
-	let results = await Promise.all( [
-		fetchSearchSuggestions( val, suggestionsQuery ),
-		directEntryHandler( val ),
-	] );
+	const results = await fetchSearchSuggestions( val, suggestionsQuery );
 
-	const couldBeURL = ! val.includes( ' ' );
+	// Identify front page and update type to match.
+	results.map( ( result ) => {
+		if ( Number( result.id ) === pageOnFront ) {
+			result.isFrontPage = true;
+			return result;
+		} else if ( Number( result.id ) === pageForPosts ) {
+			result.isBlogHome = true;
+			return result;
+		}
 
-	// If it's potentially a URL search then concat on a URL search suggestion
-	// just for good measure. That way once the actual results run out we always
-	// have a URL option to fallback on.
-	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
-		results = results[ 0 ].concat( results[ 1 ] );
-	} else {
-		results = results[ 0 ];
-	}
+		return result;
+	} );
 
 	// If displaying initial suggestions just return plain results.
 	if ( isInitialSuggestions ) {
@@ -93,11 +74,11 @@ const handleEntitySearch = async (
 	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
-				// the `id` prop is intentionally ommitted here because it
+				// the `id` prop is intentionally omitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
-				title: val, // must match the existing `<input>`s text value
-				url: val, // must match the existing `<input>`s text value
+				title: val, // Must match the existing `<input>`s text value.
+				url: val, // Must match the existing `<input>`s text value.
 				type: CREATE_TYPE,
 		  } );
 };
@@ -105,16 +86,21 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion,
-	withURLSuggestion
+	withCreateSuggestion
 ) {
-	const { fetchSearchSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return {
-			fetchSearchSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
+	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+
+			return {
+				pageOnFront: getSettings().pageOnFront,
+				pageForPosts: getSettings().pageForPosts,
+				fetchSearchSuggestions:
+					getSettings().__experimentalFetchLinkSuggestions,
+			};
+		},
+		[]
+	);
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
@@ -128,11 +114,18 @@ export default function useSearchHandler(
 						val,
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
-						directEntryHandler,
 						withCreateSuggestion,
-						withURLSuggestion
+						pageOnFront,
+						pageForPosts
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
+		[
+			directEntryHandler,
+			fetchSearchSuggestions,
+			pageOnFront,
+			pageForPosts,
+			suggestionsQuery,
+			withCreateSuggestion,
+		]
 	);
 }

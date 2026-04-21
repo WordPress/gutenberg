@@ -3,11 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton } from '@wordpress/block-editor';
+import {
+	RichTextToolbarButton,
+	RichTextShortcut,
+} from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
-const title = __( 'Inline Code' );
+const title = __( 'Inline code' );
 
 export const code = {
 	name,
@@ -17,16 +20,18 @@ export const code = {
 	__unstableInputRule( value ) {
 		const BACKTICK = '`';
 		const { start, text } = value;
-		const characterBefore = text.slice( start - 1, start );
+		const characterBefore = text[ start - 1 ];
 
 		// Quick check the text for the necessary character.
 		if ( characterBefore !== BACKTICK ) {
 			return value;
 		}
 
-		const textBefore = text.slice( 0, start - 1 );
-		const indexBefore = textBefore.lastIndexOf( BACKTICK );
+		if ( start - 2 < 0 ) {
+			return value;
+		}
 
+		const indexBefore = text.lastIndexOf( BACKTICK, start - 2 );
 		if ( indexBefore === -1 ) {
 			return value;
 		}
@@ -46,17 +51,25 @@ export const code = {
 	},
 	edit( { value, onChange, onFocus, isActive } ) {
 		function onClick() {
-			onChange( toggleFormat( value, { type: name } ) );
+			onChange( toggleFormat( value, { type: name, title } ) );
 			onFocus();
 		}
 
 		return (
-			<RichTextToolbarButton
-				icon={ codeIcon }
-				title={ title }
-				onClick={ onClick }
-				isActive={ isActive }
-			/>
+			<>
+				<RichTextShortcut
+					type="access"
+					character="x"
+					onUse={ onClick }
+				/>
+				<RichTextToolbarButton
+					icon={ codeIcon }
+					title={ title }
+					onClick={ onClick }
+					isActive={ isActive }
+					role="menuitemcheckbox"
+				/>
+			</>
 		);
 	},
 };

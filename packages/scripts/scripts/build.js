@@ -7,19 +7,12 @@ const { sync: resolveBin } = require( 'resolve-bin' );
 /**
  * Internal dependencies
  */
-const { getWebpackArgs, hasArgInCLI } = require( '../utils' );
+const { getWebpackArgs } = require( '../utils' );
+const EXIT_ERROR_CODE = 1;
 
 process.env.NODE_ENV = process.env.NODE_ENV || 'production';
-
-if ( hasArgInCLI( '--webpack-no-externals' ) ) {
-	process.env.WP_NO_EXTERNALS = true;
-}
-
-if ( hasArgInCLI( '--webpack-bundle-analyzer' ) ) {
-	process.env.WP_BUNDLE_ANALYZER = true;
-}
 
 const { status } = spawn( resolveBin( 'webpack' ), getWebpackArgs(), {
 	stdio: 'inherit',
 } );
-process.exit( status );
+process.exit( status === null ? EXIT_ERROR_CODE : status );

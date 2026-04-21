@@ -1,14 +1,15 @@
-.components-toggle-control .components-base-control__field {
-	display: flex;
-	margin-bottom: $grid-unit-05 * 3;
-	line-height: initial;
-	align-items: center;
+@use "@wordpress/base-styles/variables" as *;
+@use "../form-toggle/style" as form-toggle;
 
-	.components-form-toggle {
-		margin-right: $grid-unit-15;
-	}
+.components-toggle-control__label {
+	line-height: form-toggle.$toggle-height;
 
-	.components-toggle-control__label {
-		display: block;
+	&:not(.is-disabled) {
+		cursor: var(--wpds-cursor-control);
 	}
+}
+
+.components-toggle-control__help {
+	display: inline-block;
+	margin-inline-start: form-toggle.$toggle-width + $grid-unit-10;
 }

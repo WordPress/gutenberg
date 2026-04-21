@@ -1,5 +1,8 @@
-.components-dropdown-menu__popover .components-popover__content {
-	width: 200px;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-dropdown-menu__toggle {
+	vertical-align: top;
 }
 
 .components-dropdown-menu__menu {
@@ -13,7 +16,9 @@
 		width: 100%;
 		padding: 6px;
 		outline: none;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
+		white-space: nowrap;
+		font-weight: $font-weight-regular;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -25,7 +30,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $gray-200;
+			background-color: $gray-300;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -33,58 +38,30 @@
 			height: 1px;
 		}
 
-		&.is-active svg {
-			// Block UI appearance.
-			color: $white;
-			background: $gray-900;
-			box-shadow: 0 0 0 $border-width $gray-900;
-			border-radius: $border-width;
+		&.is-active {
+			svg,
+			.dashicon {
+				// Block UI appearance.
+				color: $white;
+				background: $gray-900;
+				box-shadow: 0 0 0 $border-width $gray-900;
+				border-radius: $border-width;
+			}
 		}
 
-		// Formatting buttons
-		> svg {
-			border-radius: $radius-block-ui;
-			width: $button-size-small;
-			height: $button-size-small;
+		// If menu items are icon-only, make them stretch only to the icon size.
+		&.is-icon-only {
+			width: auto;
 		}
 	}
 
 	.components-menu-item__button,
 	.components-menu-item__button.components-button {
-		min-height: $button-size;
+		min-height: $grid-unit-40;
 		height: auto;
 		text-align: left;
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
-
-		.components-menu-item__info-wrapper {
-			max-width: calc(100% - #{ $button-size-small + $grid-unit-10 });
-		}
 	}
 
-	.components-menu-group {
-		padding: $grid-unit-15;
-		margin-top: 0;
-		margin-bottom: 0;
-		margin-left: -$grid-unit-15;
-		margin-right: -$grid-unit-15;
-
-		&:first-child {
-			margin-top: -$grid-unit-15;
-		}
-
-		&:last-child {
-			margin-bottom: -$grid-unit-15;
-		}
-	}
-
-	.components-menu-group + .components-menu-group {
-		margin-top: 0;
-		border-top: $border-width solid $gray-400;
-		padding: $grid-unit-15;
-
-		.is-alternate & {
-			border-color: $gray-900;
-		}
-	}
 }

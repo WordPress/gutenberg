@@ -1,19 +1,29 @@
 /** @typedef {import('estree').Comment} Comment */
 /** @typedef {import('estree').Node} Node */
+/** @typedef {import('estree').SourceLocation} SourceLocation */
 
-module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
+const DEPENDENCY_BLOCK_PATTERN =
+	/^\*?\n \* (External|Node|WordPress|Internal) dependencies\n $/;
+
+/** @type {import('eslint').Rule.RuleModule} */
+module.exports = {
 	meta: {
 		type: 'layout',
 		docs: {
 			description: 'Enforce dependencies docblocks formatting',
-			url:
-				'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
+			url: 'https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
-		schema: [],
+		schema: [
+			{
+				enum: [ 'always', 'never' ],
+			},
+		],
 		fixable: 'code',
 	},
 	create( context ) {
-		const comments = context.getSourceCode().getAllComments();
+		const mode = context.options[ 0 ] || 'always';
+		const sourceCode = context.sourceCode;
+		const comments = sourceCode.getAllComments();
 
 		/**
 		 * Locality classification of an import, one of "External",
@@ -81,7 +91,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			// - Normalize `/**` and `/*`
 			// - Case insensitive "Dependencies" vs. "dependencies"
 			// - Ending period
-			// - "Node" dependencies as an alias for External
+			// - "Node" dependencies as an alias for External.
 
 			if ( locality === 'External' ) {
 				locality = '(External|Node)';
@@ -92,6 +102,20 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 				'i'
 			);
 			return pattern.test( value );
+		}
+
+		/**
+		 * Returns true if the given comment node is any dependency block comment.
+		 *
+		 * @param {Comment} node Comment node to check.
+		 *
+		 * @return {boolean} Whether comment node is a dependency block.
+		 */
+		function isDependencyBlock( node ) {
+			return (
+				node.type === 'Block' &&
+				DEPENDENCY_BLOCK_PATTERN.test( node.value )
+			);
 		}
 
 		/**
@@ -120,7 +144,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		 * @param {Node}              node     Node to test.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
-		 * @return {WPDependencyBlockCorrection=} Correction, if applicable.
+		 * @return {WPDependencyBlockCorrection | undefined} Correction, if applicable.
 		 */
 		function getDependencyBlockCorrection( node, locality ) {
 			const value = getCommentValue( locality );
@@ -157,6 +181,44 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			 * @param {import('estree').Program} node Program node.
 			 */
 			Program( node ) {
+				if ( mode === 'never' ) {
+					for ( const comment of comments ) {
+						if ( isDependencyBlock( comment ) ) {
+							context.report( {
+								loc: /** @type {SourceLocation} */ (
+									comment.loc
+								),
+								message:
+									'Unexpected dependency group comment block',
+								fix( fixer ) {
+									if ( ! comment.range ) {
+										return null;
+									}
+
+									const text = sourceCode.getText();
+
+									// Trim preceding and trailing newlines.
+									let [ start, end ] = comment.range;
+									while (
+										start > 1 &&
+										text[ start - 1 ] === '\n' &&
+										text[ start - 2 ] === '\n'
+									) {
+										start--;
+									}
+									while ( text[ end ] === '\n' ) {
+										end++;
+									}
+
+									return fixer.removeRange( [ start, end ] );
+								},
+							} );
+						}
+					}
+
+					return;
+				}
+
 				/**
 				 * The set of package localities which have been reported for
 				 * the current program. Each locality is reported at most one
@@ -183,8 +245,9 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 					let source;
 					switch ( child.type ) {
 						case 'ImportDeclaration':
-							source = /** @type {string} */ ( child.source
-								.value );
+							source = /** @type {string} */ (
+								child.source.value
+							);
 							candidates.push( [ child, source ] );
 							break;
 
@@ -194,10 +257,12 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 								if (
 									! init ||
 									init.type !== 'CallExpression' ||
-									/** @type {import('estree').CallExpression} */ ( init )
-										.callee.type !== 'Identifier' ||
-									/** @type {import('estree').Identifier} */ ( init.callee )
-										.name !== 'require'
+									/** @type {import('estree').CallExpression} */ (
+										init
+									).callee.type !== 'Identifier' ||
+									/** @type {import('estree').Identifier} */ (
+										init.callee
+									).name !== 'require'
 								) {
 									return;
 								}
@@ -254,4 +319,4 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			},
 		};
 	},
-} );
+};

@@ -1,43 +1,88 @@
 /**
  * External dependencies
  */
+const path = require( 'path' );
 const glob = require( 'glob' ).sync;
 
+/**
+ * Path to root project directory.
+ */
+const ROOT_DIR = path.resolve( __dirname, '../..' );
+
+// Ensure Babel config resolution works from the repo root,
+// even when Jest runs from the workspace directory.
+process.chdir( ROOT_DIR );
+
 // Finds all packages which are transpiled with Babel to force Jest to use their source code.
-const transpiledPackageNames = glob( 'packages/*/src/index.js' ).map(
-	( fileName ) => fileName.split( '/' )[ 1 ]
-);
+const transpiledPackageNames = glob(
+	path.join( ROOT_DIR, 'packages/*/src/index.{js,ts,tsx}' )
+).map( ( fileName ) => {
+	const relative = path.relative( ROOT_DIR, fileName );
+	return relative.split( path.sep )[ 1 ];
+} );
+
+// Make sure the tests run in UTC timezone, regardless of the system timezone.
+process.env.TZ = 'UTC';
 
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
-		[ `@wordpress\\/(${ transpiledPackageNames.join(
-			'|'
-		) })$` ]: 'packages/$1/src',
+		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
+		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		'@wordpress/vips/worker':
+			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'packages/$1/src',
+		'@wordpress/theme/design-tokens.js':
+			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
-		'<rootDir>/test/unit/config/gutenberg-phase.js',
-		'<rootDir>/test/unit/config/register-context.js',
+		'<rootDir>/test/unit/config/gutenberg-env.js',
 	],
-	testURL: 'http://localhost',
+	setupFilesAfterEnv: [
+		'<rootDir>/test/unit/config/testing-library.js',
+		'<rootDir>/test/unit/mocks/match-media.js',
+	],
+	testEnvironmentOptions: {
+		url: 'http://localhost/',
+	},
 	testPathIgnorePatterns: [
 		'/.git/',
 		'/node_modules/',
 		'/packages/e2e-tests',
-		'<rootDir>/wordpress/',
+		'/packages/e2e-test-utils-playwright/src/test.ts',
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
+		'<rootDir>/.*/build-types/',
+		'<rootDir>/.+.d.ts$',
 		'<rootDir>/.+.native.js$',
 		'/packages/react-native-*',
 	],
+	resolver: '<rootDir>/test/unit/scripts/resolver.js',
 	transform: {
-		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
+		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
-	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	transformIgnorePatterns: [
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx)/)',
+		'\\.pnp\\.[^\\/]+$',
+	],
+	snapshotSerializers: [
+		'@emotion/jest/serializer',
+		'snapshot-diff/serializer',
+	],
+	snapshotFormat: {
+		escapeString: false,
+		printBasicPrototype: false,
+	},
 	watchPlugins: [
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',
+	],
+	reporters: [
+		'default',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 	],
 };

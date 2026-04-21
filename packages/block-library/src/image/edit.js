@@ -1,60 +1,65 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withNotices } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { isBlobURL, createBlobURL } from '@wordpress/blob';
+import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
+import { Placeholder } from '@wordpress/components';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentToolbar,
-	BlockControls,
 	BlockIcon,
+	useBlockProps,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	store as blockEditorStore,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { image as icon } from '@wordpress/icons';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
+import { useResizeObserver } from '@wordpress/compose';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
  */
+import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
+import { isValidFileType } from './utils';
+import { useMaxWidthObserver } from './use-max-width-observer';
 
 /**
  * Module constants
  */
 import {
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
-	DEFAULT_SIZE_SLUG,
+	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 
-export const pickRelevantMediaFiles = ( image ) => {
-	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+export const pickRelevantMediaFiles = ( image, size ) => {
+	const imageProps = Object.fromEntries(
+		Object.entries( image ?? {} ).filter( ( [ key ] ) =>
+			[ 'alt', 'id', 'link', 'caption' ].includes( key )
+		)
+	);
+
 	imageProps.url =
-		get( image, [ 'sizes', 'large', 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) ||
+		image?.sizes?.[ size ]?.url ||
+		image?.media_details?.sizes?.[ size ]?.source_url ||
 		image.url;
 	return imageProps;
 };
-
-/**
- * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
- * while the image is being uploaded and will not have an id yet allocated.
- *
- * @param {number=} id The id of the image.
- * @param {string=} url The url of the image.
- *
- * @return {boolean} Is the URL a Blob URL
- */
-const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 /**
  * Is the url for the image hosted externally. An externally hosted image has no
@@ -67,50 +72,152 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  */
 export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
+/**
+ * Checks if WP generated the specified image size. Size generation is skipped
+ * when the image is smaller than the said size.
+ *
+ * @param {Object} image
+ * @param {string} size
+ *
+ * @return {boolean} Whether or not it has default image size.
+ */
+function hasSize( image, size ) {
+	return (
+		'url' in ( image?.sizes?.[ size ] ?? {} ) ||
+		'source_url' in ( image?.media_details?.sizes?.[ size ] ?? {} )
+	);
+}
+
 export function ImageEdit( {
 	attributes,
 	setAttributes,
-	isSelected,
+	isSelected: isSingleSelected,
 	className,
-	noticeUI,
 	insertBlocksAfter,
-	noticeOperations,
 	onReplace,
+	context,
+	clientId,
+	__unstableParentLayout: parentLayout,
 } ) {
 	const {
 		url = '',
-		alt,
 		caption,
-		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
+		aspectRatio,
+		scale,
+		align,
+		metadata,
 	} = attributes;
 
-	const altRef = useRef();
-	useEffect( () => {
-		altRef.current = alt;
-	}, [ alt ] );
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+
+	const containerRef = useRef();
+	// Only observe the max width from the parent container when the parent layout is not flex nor grid.
+	// This won't work for them because the container width changes with the image.
+	// TODO: Find a way to observe the container width for flex and grid layouts.
+	const layoutType = parentLayout?.type || parentLayout?.default?.type;
+	const isMaxWidthContainerWidth =
+		! layoutType || ( layoutType !== 'flex' && layoutType !== 'grid' );
+	const [ maxWidthObserver, maxContentWidth ] = useMaxWidthObserver();
+
+	const [ placeholderResizeListener, { width: placeholderWidth } ] =
+		useResizeObserver();
+
+	const isSmallContainer = placeholderWidth && placeholderWidth < 160;
 
 	const captionRef = useRef();
 	useEffect( () => {
 		captionRef.current = caption;
 	}, [ caption ] );
 
-	const ref = useRef();
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return getSettings().mediaUpload;
-	} );
+	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
+		useDispatch( blockEditorStore );
 
+	useEffect( () => {
+		if ( [ 'wide', 'full' ].includes( align ) ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( {
+				width: undefined,
+				height: undefined,
+			} );
+		}
+	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
+
+	const {
+		getSettings,
+		getBlockRootClientId,
+		getBlockName,
+		canInsertBlockType,
+	} = useSelect( blockEditorStore );
+	const blockEditingMode = useBlockEditingMode();
+
+	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			url: undefined,
+			blob: undefined,
+		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
+	}
+
+	function onSelectImagesList( images ) {
+		const win = containerRef.current?.ownerDocument.defaultView;
+
+		if ( images.every( ( file ) => file instanceof win.File ) ) {
+			/** @type {File[]} */
+			const files = images;
+			const rootClientId = getBlockRootClientId( clientId );
+
+			if ( files.some( ( file ) => ! isValidFileType( file ) ) ) {
+				// Copied from the same notice in the gallery block.
+				createErrorNotice(
+					__(
+						'If uploading to a gallery all files need to be image formats'
+					),
+					{ id: 'gallery-upload-invalid-file', type: 'snackbar' }
+				);
+			}
+
+			const imageBlocks = files
+				.filter( ( file ) => isValidFileType( file ) )
+				.map( ( file ) =>
+					createBlock( 'core/image', {
+						blob: createBlobURL( file ),
+					} )
+				);
+
+			if ( getBlockName( rootClientId ) === 'core/gallery' ) {
+				replaceBlock( clientId, imageBlocks );
+			} else if ( canInsertBlockType( 'core/gallery', rootClientId ) ) {
+				const galleryBlock = createBlock(
+					'core/gallery',
+					{},
+					imageBlocks
+				);
+
+				replaceBlock( clientId, galleryBlock );
+			}
+		}
 	}
 
 	function onSelectImage( media ) {
+		if ( Array.isArray( media ) ) {
+			onSelectImagesList( media );
+			return;
+		}
+
 		if ( ! media || ! media.url ) {
 			setAttributes( {
 				url: undefined,
@@ -118,185 +225,286 @@ export function ImageEdit( {
 				id: undefined,
 				title: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
+
 			return;
 		}
 
-		let mediaAttributes = pickRelevantMediaFiles( media );
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
+		}
 
-		// If the current image is temporary but an alt text was meanwhile
-		// written by the user, make sure the text is not overwritten.
-		if ( isTemporaryImage( id, url ) ) {
-			if ( altRef.current ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
-			}
+		const { imageDefaultSize } = getSettings();
+
+		// Try to use the previous selected image size if its available
+		// otherwise try the default image size or fallback to "full"
+		let newSize = DEFAULT_MEDIA_SIZE_SLUG;
+		if ( sizeSlug && hasSize( media, sizeSlug ) ) {
+			newSize = sizeSlug;
+		} else if ( hasSize( media, imageDefaultSize ) ) {
+			newSize = imageDefaultSize;
+		}
+
+		let mediaAttributes = pickRelevantMediaFiles( media, newSize );
+
+		// Normalize newline characters in caption to <br />
+		// to preserve line breaks in both editor and frontend.
+		if (
+			typeof mediaAttributes.caption === 'string' &&
+			mediaAttributes.caption.includes( '\n' )
+		) {
+			mediaAttributes.caption = mediaAttributes.caption.replace(
+				/\n/g,
+				'<br>'
+			);
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
-			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
+		if ( captionRef.current && ! mediaAttributes.caption ) {
+			const { caption: omittedCaption, ...restMediaAttributes } =
+				mediaAttributes;
+			mediaAttributes = restMediaAttributes;
 		}
 
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
 		if ( ! media.id || media.id !== id ) {
 			additionalAttributes = {
-				width: undefined,
-				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: newSize,
 			};
-		} else {
-			// Keep the same url when selecting the same file, so "Image Size"
-			// option is not changed.
-			additionalAttributes = { url };
+		}
+
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			switch (
+				window?.wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
 		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
-
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
-		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
+			blob: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
+		setTemporaryURL();
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
-				url: newURL,
+				blob: undefined,
+				url: normalizedNewURL,
 				id: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: getSettings().imageDefaultSize,
 			} );
+			setTemporaryURL();
 		}
 	}
 
-	function updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
-			? { width: undefined, height: undefined }
-			: {};
-		setAttributes( {
-			...extraUpdatedAttributes,
-			align: nextAlign,
-		} );
-	}
-
-	const isTemp = isTemporaryImage( id, url );
-
-	// Upload a temporary image on mount.
-	useEffect( () => {
-		if ( ! isTemp ) {
-			return;
-		}
-
-		const file = getBlobByURL( url );
-
-		if ( file ) {
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ img ] ) => {
-					onSelectImage( img );
-				},
-				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: ( message ) => {
-					noticeOperations.createErrorNotice( message );
-					setAttributes( {
-						src: undefined,
-						id: undefined,
-						url: undefined,
-					} );
-				},
-			} );
-		}
-	}, [] );
-
-	// If an image is temporary, revoke the Blob url when it is uploaded (and is
-	// no longer temporary).
-	useEffect( () => {
-		if ( ! isTemp ) {
-			return;
-		}
-
-		return () => {
-			revokeBlobURL( url );
-		};
-	}, [ isTemp ] );
+	useUploadMediaFromBlobURL( {
+		url: temporaryURL,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectImage,
+		onError: onUploadError,
+	} );
 
 	const isExternal = isExternalImage( id, url );
-	const controls = (
-		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ updateAlignment }
-			/>
-		</BlockControls>
-	);
 	const src = isExternal ? url : undefined;
+
+	const isSideloading = useSelect(
+		( select ) => {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
+				return false;
+			}
+			return select( uploadStore ).isUploadingById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
 			title={ __( 'Edit image' ) }
-			className={ 'edit-image-preview' }
+			className="edit-image-preview"
 			src={ url }
 		/>
 	);
 
-	const mediaPlaceholder = (
-		<MediaPlaceholder
-			icon={ <BlockIcon icon={ icon } /> }
-			onSelect={ onSelectImage }
-			onSelectURL={ onSelectURL }
-			notices={ noticeUI }
-			onError={ onUploadError }
-			accept="image/*"
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			value={ { id, src } }
-			mediaPreview={ mediaPreview }
-			disableMediaButtons={ url }
-		/>
-	);
+	const borderProps = useBorderProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 
-	const classes = classnames( className, {
-		'is-transient': isBlobURL( url ),
+	const classes = clsx( className, {
+		'is-transient': !! temporaryURL || isSideloading,
 		'is-resized': !! width || !! height,
-		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
+		'has-custom-border':
+			!! borderProps.className ||
+			( borderProps.style &&
+				Object.keys( borderProps.style ).length > 0 ),
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockProps = useBlockProps( {
+		ref: containerRef,
+		className: classes,
+	} );
+
+	// Much of this description is duplicated from MediaPlaceholder.
+	const { lockUrlControls = false, lockUrlControlsMessage } = useSelect(
+		( select ) => {
+			if ( ! isSingleSelected ) {
+				return {};
+			}
+
+			const blockBindingsSource = getBlockBindingsSource(
+				metadata?.bindings?.url?.source
+			);
+
+			return {
+				lockUrlControls:
+					!! metadata?.bindings?.url &&
+					! blockBindingsSource?.canUserEditValue?.( {
+						select,
+						context,
+						args: metadata?.bindings?.url?.args,
+					} ),
+				lockUrlControlsMessage: blockBindingsSource?.label
+					? sprintf(
+							/* translators: %s: Label of the bindings source. */
+							__( 'Connected to %s' ),
+							blockBindingsSource.label
+					  )
+					: __( 'Connected to dynamic data' ),
+			};
+		},
+		[ context, isSingleSelected, metadata?.bindings?.url ]
+	);
+	const placeholder = ( content ) => {
+		return (
+			<Placeholder
+				className={ clsx( 'block-editor-media-placeholder', {
+					[ borderProps.className ]:
+						!! borderProps.className && ! isSingleSelected,
+				} ) }
+				icon={
+					! isSmallContainer &&
+					( lockUrlControls ? pluginsIcon : icon )
+				}
+				withIllustration={ ! isSingleSelected || isSmallContainer }
+				label={ ! isSmallContainer && __( 'Image' ) }
+				instructions={
+					! lockUrlControls &&
+					! isSmallContainer &&
+					__(
+						'Drag and drop an image, upload, or choose from your library.'
+					)
+				}
+				style={ {
+					aspectRatio:
+						! ( width && height ) && aspectRatio
+							? aspectRatio
+							: undefined,
+					width: height && aspectRatio ? '100%' : width,
+					height: width && aspectRatio ? '100%' : height,
+					objectFit: scale,
+					...borderProps.style,
+					...shadowProps.style,
+				} }
+			>
+				{ lockUrlControls &&
+					! isSmallContainer &&
+					lockUrlControlsMessage }
+
+				{ ! lockUrlControls && ! isSmallContainer && content }
+				{ placeholderResizeListener }
+			</Placeholder>
+		);
+	};
 
 	return (
 		<>
-			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
-				{ url && (
-					<Image
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						isSelected={ isSelected }
-						insertBlocksAfter={ insertBlocksAfter }
-						onReplace={ onReplace }
-						onSelectImage={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onUploadError={ onUploadError }
-						containerRef={ ref }
-					/>
-				) }
-				{ mediaPlaceholder }
-			</Block.figure>
+			<figure { ...blockProps }>
+				<Image
+					temporaryURL={ temporaryURL }
+					isSideloading={ isSideloading }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSingleSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					onReplace={ onReplace }
+					onSelectImage={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onUploadError={ onUploadError }
+					context={ context }
+					clientId={ clientId }
+					blockEditingMode={ blockEditingMode }
+					parentLayoutType={ layoutType }
+					maxContentWidth={ maxContentWidth }
+				/>
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					onSelect={ onSelectImage }
+					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
+					onError={ onUploadError }
+					placeholder={ placeholder }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					handleUpload={ ( files ) => files.length === 1 }
+					value={ { id, src } }
+					mediaPreview={ mediaPreview }
+					disableMediaButtons={ temporaryURL || url }
+				/>
+			</figure>
+			{
+				// The listener cannot be placed as the first element as it will break the in-between inserter.
+				// See https://github.com/WordPress/gutenberg/blob/71134165868298fc15e22896d0c28b41b3755ff7/packages/block-editor/src/components/block-list/use-in-between-inserter.js#L120
+				isSingleSelected && isMaxWidthContainerWidth && maxWidthObserver
+			}
 		</>
 	);
 }
 
-export default withNotices( ImageEdit );
+export default ImageEdit;

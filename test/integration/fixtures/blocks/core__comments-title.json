@@ -1,0 +1,30 @@
+[
+	{
+		"name": "core/comments-title",
+		"isValid": true,
+		"attributes": {
+			"showPostTitle": true,
+			"showCommentsCount": true,
+			"level": 4,
+			"borderColor": "vivid-red",
+			"backgroundColor": "primary",
+			"textColor": "background",
+			"fontSize": "large",
+			"style": {
+				"spacing": {
+					"padding": {
+						"top": "6px",
+						"right": "6px",
+						"bottom": "6px",
+						"left": "6px"
+					}
+				},
+				"border": {
+					"width": "3px",
+					"radius": "100px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

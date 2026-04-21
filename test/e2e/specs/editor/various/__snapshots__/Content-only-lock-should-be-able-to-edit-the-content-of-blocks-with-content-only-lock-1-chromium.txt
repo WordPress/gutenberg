@@ -1,0 +1,5 @@
+<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Hello World</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->

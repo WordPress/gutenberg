@@ -18,47 +18,43 @@
 import jsdom from 'jsdom-jscore-rn';
 import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 
-// must be called to initialize jsdom before patching prototypes
+// Must be called to initialize jsdom before patching prototypes.
 jsdom.html( '', null, null );
 
 const { core } = jsdomLevel1Core.dom.level1;
 const { Node, Element, CharacterData } = core;
 
-// Exception codes
-const {
-	NO_MODIFICATION_ALLOWED_ERR,
-	HIERARCHY_REQUEST_ERR,
-	NOT_FOUND_ERR,
-} = core;
-
-// Node types
-const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
+// Exception codes.
+const { NO_MODIFICATION_ALLOWED_ERR, HIERARCHY_REQUEST_ERR, NOT_FOUND_ERR } =
+	core;
 
 /**
- * Simple recursive implementation of Node.contains method
+ * Copy of Node.contains polyfill from polyfill-library package (https://t.ly/mehjW).
+ * This polyfill was originally used in WordPress Core (https://t.ly/4o7wQ).
  *
- * @param {number} otherNode Another node (may be the same node).
- * @return {boolean} true if otherNode is a descendant of this node, or is this
- * node, false otherwise.
+ * @param {number} node Node to check.
+ * @return {boolean} true if passed node is a descendant of this node, or the
+ * same node, false otherwise.
  *
  * This function is necessary in the mobile environment, because there are code
  * paths that make use of functions in the Gutenberg (web) project, which has
  * expectation that this is implemented (as it is in the browser environment).
  */
-Node.prototype.contains = function ( otherNode ) {
-	return (
-		this === otherNode ||
-		Array.prototype.some.call( this._childNodes, ( childNode ) => {
-			return childNode.contains( otherNode );
-		} )
-	);
+Node.prototype.contains = function ( node ) {
+	do {
+		if ( this === node ) {
+			return true;
+		}
+	} while ( ( node = node && node.parentNode ) );
+
+	return false;
 };
 
 /**
  * Copy of insertBefore function from jsdom-jscore, WRONG_DOCUMENT_ERR exception
  * disabled.
  *
- * @param {Object} newChild The node to be insterted.
+ * @param {Object} newChild The node to be inserted.
  * @param {Object} refChild The node before which newChild is inserted.
  * @return {Object} the newly inserted child node
  *
@@ -69,7 +65,7 @@ Node.prototype.contains = function ( otherNode ) {
  */
 Node.prototype.insertBefore = function (
 	/* Node */ newChild,
-	/* Node*/ refChild
+	/* Node */ refChild
 ) {
 	if ( this._readonly === true ) {
 		throw new core.DOMException(
@@ -78,7 +74,7 @@ Node.prototype.insertBefore = function (
 		);
 	}
 
-	// Adopt unowned children, for weird nodes like DocumentType
+	// Adopt unowned children, for weird nodes like DocumentType.
 	if ( ! newChild._ownerDocument ) {
 		newChild._ownerDocument = this._ownerDocument;
 	}
@@ -93,11 +89,11 @@ Node.prototype.insertBefore = function (
 	}
 	*/
 
-	if ( newChild.nodeType && newChild.nodeType === ATTRIBUTE_NODE ) {
+	if ( newChild.nodeType && newChild.nodeType === newChild.ATTRIBUTE_NODE ) {
 		throw new core.DOMException( HIERARCHY_REQUEST_ERR );
 	}
 
-	// search for parents matching the newChild
+	// Search for parents matching the newChild.
 	let current = this;
 	do {
 		if ( current === newChild ) {
@@ -105,8 +101,8 @@ Node.prototype.insertBefore = function (
 		}
 	} while ( ( current = current._parentNode ) );
 
-	// fragments are merged into the element
-	if ( newChild.nodeType === DOCUMENT_FRAGMENT_NODE ) {
+	// Fragments are merged into the element.
+	if ( newChild.nodeType === newChild.DOCUMENT_FRAGMENT_NODE ) {
 		let tmpNode,
 			i = newChild._childNodes.length;
 		while ( i-- > 0 ) {
@@ -116,7 +112,7 @@ Node.prototype.insertBefore = function (
 	} else if ( newChild === refChild ) {
 		return newChild;
 	} else {
-		// if the newChild is already in the tree elsewhere, remove it first
+		// If the newChild is already in the tree elsewhere, remove it first.
 		if ( newChild._parentNode ) {
 			newChild._parentNode.removeChild( newChild );
 		}
@@ -148,7 +144,7 @@ Node.prototype.insertBefore = function (
 	}
 
 	return newChild;
-}; // raises(DOMException);
+}; // Raises(DOMException);
 
 /*
  * This is merely an alias (polyfill not needed).
@@ -176,6 +172,18 @@ Element.prototype.closest = function ( selector ) {
 };
 
 /**
+ * Implementation of Element.prototype.remove based on polyfills:
+ * - https://github.com/chenzhenxi/element-remove/blob/master/index.js
+ * (referenced in https://developer.mozilla.org/en-US/docs/Web/API/Element/remove#see_also)
+ * - https://github.com/JakeChampion/polyfill-library/blob/master/polyfills/Element/prototype/remove/polyfill.js
+ */
+Element.prototype.remove = function () {
+	if ( this.parentNode ) {
+		this.parentNode.removeChild( this );
+	}
+};
+
+/**
  * Helper function to check if a node implements the NonDocumentTypeChildNode
  * interface
  *
@@ -200,7 +208,7 @@ Object.defineProperties( Node.prototype, {
 		get() {
 			const parent = this.parentNode;
 
-			if ( parent && parent.nodeType === Node.ELEMENT_NODE ) {
+			if ( parent && parent.nodeType === parent.ELEMENT_NODE ) {
 				return parent;
 			}
 
@@ -214,14 +222,14 @@ Object.defineProperties( Node.prototype, {
 	 */
 	previousElementSibling: {
 		get() {
-			// Property is undefined if node is not a NonDocumentTypeChildNode
+			// Property is undefined if node is not a NonDocumentTypeChildNode.
 			if ( ! isNonDocumentTypeChildNode( this ) ) {
 				return;
 			}
 
 			let sibling = this.previousSibling;
 
-			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
 				sibling = sibling.previousSibling;
 			}
 
@@ -235,19 +243,50 @@ Object.defineProperties( Node.prototype, {
 	 */
 	nextElementSibling: {
 		get() {
-			// Property is undefined if node is not a NonDocumentTypeChildNode
+			// Property is undefined if node is not a NonDocumentTypeChildNode.
 			if ( ! isNonDocumentTypeChildNode( this ) ) {
 				return;
 			}
 
 			let sibling = this.nextSibling;
 
-			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
 				sibling = sibling.nextSibling;
 			}
 
 			return sibling;
 		},
+	},
+	dataset: {
+		get() {
+			const node = this;
+
+			// Helper function to convert property name to data-* attribute name
+			function toDataAttributeName( property ) {
+				return (
+					'data-' +
+					property.replace(
+						/[A-Z]/g,
+						( match ) => '-' + match.toLowerCase()
+					)
+				);
+			}
+			return new Proxy(
+				{},
+				{
+					set( _target, property, value ) {
+						const attributeName = toDataAttributeName( property );
+						node.setAttribute( attributeName, value );
+						return true;
+					},
+					get( _target, property ) {
+						const attributeName = toDataAttributeName( property );
+						return node.getAttribute( attributeName );
+					},
+				}
+			);
+		},
+		set() {},
 	},
 } );
 

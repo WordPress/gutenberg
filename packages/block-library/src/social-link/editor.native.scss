@@ -1,4 +1,4 @@
-@import "./socials-with-bg.scss";
+@use "./socials-with-bg.scss" as *;
 
 .linkSettingsPanel {
 	padding-left: 0;
@@ -8,16 +8,11 @@
 .iconContainer {
 	height: $button-size;
 	width: $button-size;
-	border-radius: $button-size / 2;
+	border-radius: $button-size * 0.5;
 	align-items: center;
 	justify-content: center;
 }
 
-.inactiveIcon {
-	background-color: $light-quaternary;
-	color: $white;
-}
-
-.inactiveIconDark {
-	background-color: $dark-quaternary;
+.container {
+	margin: $block-selected-margin;
 }

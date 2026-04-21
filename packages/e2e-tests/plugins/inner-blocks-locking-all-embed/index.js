@@ -1,9 +1,9 @@
-( function() {
-	var registerBlockType = wp.blocks.registerBlockType;
-	var el = wp.element.createElement;
-	var InnerBlocks = wp.blockEditor.InnerBlocks;
-	var __ = wp.i18n.__;
-	var TEMPLATE = [
+( function () {
+	const registerBlockType = wp.blocks.registerBlockType;
+	const el = wp.element.createElement;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
+	const __ = wp.i18n.__;
+	const TEMPLATE = [
 		[
 			'core/paragraph',
 			{
@@ -14,20 +14,23 @@
 		[ 'core/embed' ],
 	];
 
-	var save = function() {
+	const save = function () {
 		return el( InnerBlocks.Content );
 	};
 
 	registerBlockType( 'test/test-inner-blocks-locking-all-embed', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks Locking All Embed',
 		icon: 'cart',
 		category: 'text',
 
-		edit: function( props ) {
-			return el( InnerBlocks, {
+		edit: function Edit() {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
 				template: TEMPLATE,
 				templateLock: 'all',
 			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save,

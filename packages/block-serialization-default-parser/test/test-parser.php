@@ -8,7 +8,7 @@
  */
 
 // Include the default parser.
-require_once dirname( __FILE__ ) . '/../parser.php';
+require_once __DIR__ . '/../parser.php';
 
 $parser = new WP_Block_Parser();
 

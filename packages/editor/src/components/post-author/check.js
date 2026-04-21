@@ -1,25 +1,35 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withInstanceId, compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
+import { store as editorStore } from '../../store';
 
-export function PostAuthorCheck( {
-	hasAssignAuthorAction,
-	authors,
-	children,
-} ) {
-	if ( ! hasAssignAuthorAction || authors.length < 2 ) {
+/**
+ * Wrapper component that renders its children only if the post type supports the author.
+ *
+ * @param {Object}          props          The component props.
+ * @param {React.ReactNode} props.children Children to be rendered.
+ *
+ * @return {React.ReactNode} The component to be rendered. Return `null` if the post type doesn't
+ * supports the author or if there are no authors available.
+ */
+export default function PostAuthorCheck( { children } ) {
+	const { hasAssignAuthorAction } = useSelect( ( select ) => {
+		const post = select( editorStore ).getCurrentPost();
+		const canAssignAuthor = post?._links?.[ 'wp:action-assign-author' ]
+			? true
+			: false;
+		return {
+			hasAssignAuthorAction: canAssignAuthor,
+		};
+	}, [] );
+
+	if ( ! hasAssignAuthorAction ) {
 		return null;
 	}
 
@@ -29,19 +39,3 @@ export function PostAuthorCheck( {
 		</PostTypeSupportCheck>
 	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const post = select( 'core/editor' ).getCurrentPost();
-		return {
-			hasAssignAuthorAction: get(
-				post,
-				[ '_links', 'wp:action-assign-author' ],
-				false
-			),
-			postType: select( 'core/editor' ).getCurrentPostType(),
-			authors: select( 'core' ).getAuthors(),
-		};
-	} ),
-	withInstanceId,
-] )( PostAuthorCheck );

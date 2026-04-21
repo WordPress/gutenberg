@@ -1,92 +1,117 @@
-( function() {
-	var Button = wp.components.Button;
-	var PanelBody = wp.components.PanelBody;
-	var PanelRow = wp.components.PanelRow;
-	var compose = wp.compose.compose;
-	var withDispatch = wp.data.withDispatch;
-	var withSelect = wp.data.withSelect;
-	var select = wp.data.select;
-	var dispatch = wp.data.dispatch;
-	var PlainText = wp.blockEditor.PlainText;
-	var Fragment = wp.element.Fragment;
-	var el = wp.element.createElement;
-	var Component = wp.element.Component;
-	var __ = wp.i18n.__;
-	var registerPlugin = wp.plugins.registerPlugin;
-	var PluginSidebar = wp.editPost.PluginSidebar;
-	var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+( function () {
+	const Button = wp.components.Button;
+	const PanelBody = wp.components.PanelBody;
+	const select = wp.data.select;
+	const dispatch = wp.data.dispatch;
+	const useSelect = wp.data.useSelect;
+	const useDispatch = wp.data.useDispatch;
+	const Fragment = wp.element.Fragment;
+	const el = wp.element.createElement;
+	const useState = wp.element.useState;
+	const useEffect = wp.element.useEffect;
+	const __ = wp.i18n.__;
+	const registerPlugin = wp.plugins.registerPlugin;
+	const PluginSidebar = wp.editor.PluginSidebar;
+	const PluginSidebarMoreMenuItem = wp.editor.PluginSidebarMoreMenuItem;
 
-	class SidebarContents extends Component {
-		constructor( props ) {
-			super( props );
+	function SidebarContents() {
+		const [ range, setRange ] = useState( { start: 0, end: 0 } );
 
-			this.state = {
-				start: 0,
-				end: 0,
-			}
-		}
+		const blocks = useSelect( ( sel ) => {
+			return sel( 'core/block-editor' ).getBlocks();
+		} );
 
-		render() {
-			return el(
-				PanelBody,
-				{},
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-start',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								start: reactEvent.target.value,
-							} );
+		const { __experimentalAddAnnotation: addAnnotation } =
+			useDispatch( 'core/annotations' );
+
+		const allBlocks = blocks
+			.filter( ( block ) => block.name === 'core/paragraph' )
+			.map( ( block ) => [
+				block.clientId,
+				block.attributes.content.text,
+			] );
+
+		useEffect( () => {
+			allBlocks.forEach( ( [ clientId, content ] ) => {
+				const applePosition = content.indexOf( 'apple' );
+				if ( applePosition !== -1 ) {
+					addAnnotation( {
+						source: 'test-annotation',
+						blockClientId: clientId,
+						richTextIdentifier: 'content',
+						range: {
+							start: applePosition,
+							end: applePosition + 5,
 						},
-						value: this.state.start,
-					}
-				),
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-end',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								end: reactEvent.target.value,
-							} );
-						},
-						value: this.state.end,
-					}
-				),
-				el(
-					Button,
-					{
-						isPrimary: true,
-						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
-								source: 'e2e-tests',
-								blockClientId: select( 'core/block-editor' ).getBlockOrder()[ 0 ],
-								richTextIdentifier: 'content',
-								range: {
-									start: parseInt( this.state.start, 10 ),
-									end: parseInt( this.state.end, 10 ),
-								},
-							} );
-						},
+					} );
+				}
+			} );
+		} );
+
+		return el(
+			PanelBody,
+			{},
+			el( 'input', {
+				type: 'number',
+				id: 'annotations-tests-range-start',
+				onChange: ( reactEvent ) => {
+					setRange( {
+						...range,
+						start: reactEvent.target.value,
+					} );
+				},
+				value: range.start,
+			} ),
+			el( 'input', {
+				type: 'number',
+				id: 'annotations-tests-range-end',
+				onChange: ( reactEvent ) => {
+					setRange( {
+						...range,
+						end: reactEvent.target.value,
+					} );
+				},
+				value: range.end,
+			} ),
+			el(
+				Button,
+				{
+					variant: 'primary',
+					onClick: () => {
+						dispatch(
+							'core/annotations'
+						).__experimentalAddAnnotation( {
+							source: 'e2e-tests',
+							blockClientId:
+								select(
+									'core/block-editor'
+								).getBlockOrder()[ 0 ],
+							richTextIdentifier: 'content',
+							range: {
+								start: parseInt( range.start, 10 ),
+								end: parseInt( range.end, 10 ),
+							},
+						} );
 					},
-					__( 'Add annotation' )
-				),
-				el(
-					Button,
-					{
-						isPrimary: true,
-						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
-						}
+				},
+				__( 'Add annotation' )
+			),
+			el(
+				Button,
+				{
+					variant: 'primary',
+					onClick: () => {
+						dispatch(
+							'core/annotations'
+						).__experimentalRemoveAnnotationsBySource(
+							'e2e-tests'
+						);
 					},
+				},
 
-					__( 'Remove annotations' )
-				)
-			);
-		}
+				__( 'Remove annotations' )
+			)
+		);
 	}
 
 	function AnnotationsSidebar() {
@@ -97,25 +122,22 @@
 				PluginSidebar,
 				{
 					name: 'annotations-sidebar',
-					title: __( 'Annotations Sidebar' )
+					title: __( 'Annotations' ),
 				},
-				el(
-					SidebarContents,
-					{}
-				)
+				el( SidebarContents, {} )
 			),
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'annotations-sidebar'
+					target: 'annotations-sidebar',
 				},
-				__( 'Annotations Sidebar' )
+				__( 'Annotations' )
 			)
 		);
 	}
 
 	registerPlugin( 'annotations-sidebar', {
 		icon: 'text',
-		render: AnnotationsSidebar
+		render: AnnotationsSidebar,
 	} );
 } )();

@@ -1,20 +1,25 @@
 # InputControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 InputControl components let users enter and edit text. This is an experimental component intended to (in time) merge with or replace [TextControl](../text-control).
 
 ## Usage
 
 ```js
 import { __experimentalInputControl as InputControl } from '@wordpress/components';
-import { useState } from '@wordpress/compose';
+import { useState } from 'react';
 
 const Example = () => {
 	const [ value, setValue ] = useState( '' );
 
 	return (
 		<InputControl
+			__next40pxDefaultSize
 			value={ value }
-			onChange={ ( nextValue ) => setValue( nextValue ) }
+			onChange={ ( nextValue ) => setValue( nextValue ?? '' ) }
 		/>
 	);
 };
@@ -38,13 +43,6 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
-### isFloatingLabel
-
-If true, the `label` will render with a floating interaction.
-
--   Type: `Boolean`
--   Required: No
-
 ### hideLabelFromVision
 
 If true, the label will only be visible to screen readers.
@@ -55,6 +53,13 @@ If true, the label will only be visible to screen readers.
 ### label
 
 If this property is added, a label will be generated using label property as the content.
+
+-   Type: `String`
+-   Required: No
+
+### labelPosition
+
+The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Type: `String`
 -   Required: No
@@ -101,5 +106,13 @@ Type of the input element to render. Defaults to "text".
 
 The current value of the input.
 
--   Type: `String | Number`
--   Required: Yes
+-   Type: `String`
+-   Required: No
+
+### __next40pxDefaultSize
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`

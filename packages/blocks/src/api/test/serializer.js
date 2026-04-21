@@ -12,7 +12,7 @@ import serialize, {
 	serializeAttributes,
 	getCommentDelimitedContent,
 	serializeBlock,
-	getBlockContent,
+	getBlockInnerHTML,
 } from '../serializer';
 import {
 	getBlockTypes,
@@ -56,6 +56,7 @@ describe( 'block serializer', () => {
 
 			it( 'should work when block type is passed as string', () => {
 				registerBlockType( 'core/fruit', {
+					apiVersion: 3,
 					title: 'Fruit',
 					category: 'widgets',
 					save: fruitBlockSave,
@@ -148,6 +149,30 @@ describe( 'block serializer', () => {
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
+
+		it( 'should ignore local attributes', () => {
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						blob: {
+							type: 'string',
+							role: 'local',
+						},
+						url: {
+							type: 'string',
+						},
+					},
+				},
+				{
+					blob: 'blob://false-url.com',
+					url: 'http://real-url.com',
+				}
+			);
+
+			expect( attributes ).toEqual( {
+				url: 'http://real-url.com',
+			} );
+		} );
 	} );
 
 	describe( 'serializeAttributes()', () => {
@@ -178,6 +203,18 @@ describe( 'block serializer', () => {
 		it( 'should replace quotation marks', () => {
 			expect( serializeAttributes( { a: '" and "' } ) ).toBe(
 				'{"a":"\\u0022 and \\u0022"}'
+			);
+		} );
+
+		it( 'should handle backslash and quote combinations', () => {
+			const orig = {
+				bs: '\\',
+				bsQuote: '\\"',
+				bsQuoteBs: '\\"\\',
+			};
+			expect( JSON.parse( serializeAttributes( orig ) ) ).toEqual( orig );
+			expect( serializeAttributes( orig ) ).toBe(
+				'{"bs":"\\u005c","bsQuote":"\\u005c\\u0022","bsQuoteBs":"\\u005c\\u0022\\u005c"}'
 			);
 		} );
 	} );
@@ -244,7 +281,8 @@ describe( 'block serializer', () => {
 
 	describe( 'serializeBlock()', () => {
 		it( 'serializes the freeform content fallback block without comment delimiters', () => {
-			registerBlockType( 'core/freeform-block', {
+			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -254,8 +292,8 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+			setFreeformContentHandlerName( 'core/freeform' );
+			const block = createBlock( 'core/freeform', {
 				fruit: 'Bananas',
 			} );
 
@@ -264,7 +302,8 @@ describe( 'block serializer', () => {
 			expect( content ).toBe( 'Bananas' );
 		} );
 		it( 'serializes the freeform content fallback block with comment delimiters in nested context', () => {
-			registerBlockType( 'core/freeform-block', {
+			registerBlockType( 'core/freeform', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'freeform block',
 				attributes: {
@@ -274,21 +313,22 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setFreeformContentHandlerName( 'core/freeform-block' );
-			const block = createBlock( 'core/freeform-block', {
+			setFreeformContentHandlerName( 'core/freeform' );
+			const block = createBlock( 'core/freeform', {
 				fruit: 'Bananas',
 			} );
 
 			const content = serializeBlock( block, { isInnerBlocks: true } );
 
 			expect( content ).toBe(
-				'<!-- wp:freeform-block {"fruit":"Bananas"} -->\n' +
+				'<!-- wp:freeform {"fruit":"Bananas"} -->\n' +
 					'Bananas\n' +
-					'<!-- /wp:freeform-block -->'
+					'<!-- /wp:freeform -->'
 			);
 		} );
 		it( 'serializes the unregistered fallback block without comment delimiters', () => {
 			registerBlockType( 'core/unregistered-block', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'unregistered block',
 				attributes: {
@@ -307,11 +347,56 @@ describe( 'block serializer', () => {
 
 			expect( content ).toBe( 'Bananas' );
 		} );
+		it( 'preserves content from invalid blocks when source information is present', () => {
+			registerBlockType( 'core/quote', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Quote',
+				attributes: { content: 'string' },
+				save: ( { attributes } ) =>
+					createElement( 'blockquote', {}, attributes.content ),
+			} );
+
+			const block = {
+				...createBlock( 'core/quote' ),
+				isValid: false,
+				__unstableBlockSource: {
+					blockName: 'quote',
+					attrs: {},
+					innerHTML: '<p>Not a quote</p>',
+					innerBlocks: [],
+					innerContent: [ '<p>Not a quote</p>' ],
+				},
+			};
+
+			expect( serializeBlock( block ) ).toBe(
+				'<!-- wp:quote -->\n<p>Not a quote</p>\n<!-- /wp:quote -->'
+			);
+		} );
+		it( 're-generates content from invalid blocks when source information is missing (losing content)', () => {
+			registerBlockType( 'core/quote', {
+				apiVersion: 3,
+				category: 'text',
+				title: 'Quote',
+				attributes: { content: 'string' },
+				save: ( { attributes } ) =>
+					createElement( 'blockquote', {}, attributes.content ),
+			} );
+
+			// missing attributes as a result of a failed parse
+			const block = {
+				...createBlock( 'core/quote' ),
+				isValid: false,
+			};
+
+			expect( serializeBlock( block ) ).toBe( '<!-- wp:quote /-->' );
+		} );
 	} );
 
 	describe( 'serialize()', () => {
 		beforeEach( () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					throw: {
 						type: 'boolean',
@@ -380,9 +465,10 @@ describe( 'block serializer', () => {
 		} );
 	} );
 
-	describe( 'getBlockContent', () => {
+	describe( 'getBlockInnerHTML', () => {
 		it( "should return the block's serialized inner HTML", () => {
 			const blockType = {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -403,7 +489,7 @@ describe( 'block serializer', () => {
 				},
 				isValid: true,
 			};
-			expect( getBlockContent( block ) ).toBe( 'chicken' );
+			expect( getBlockInnerHTML( block ) ).toBe( 'chicken' );
 		} );
 	} );
 } );

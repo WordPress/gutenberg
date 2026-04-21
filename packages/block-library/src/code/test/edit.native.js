@@ -1,30 +1,65 @@
 /**
  * External dependencies
  */
-import renderer from 'react-test-renderer';
+import {
+	fireEvent,
+	getEditorHtml,
+	initializeEditor,
+	addBlock,
+	getBlock,
+} from 'test/helpers';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import Code from '../edit';
-import { TextInput } from 'react-native';
+import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
+import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Code', () => {
-	it( 'renders without crashing', () => {
-		const component = renderer.create(
-			<Code attributes={ { content: '' } } />
-		);
-		const rendered = component.toJSON();
-		expect( rendered ).toBeTruthy();
+	beforeAll( () => {
+		// Register all core blocks
+		registerCoreBlocks();
 	} );
 
-	it( 'renders given text without crashing', () => {
-		const component = renderer.create(
-			<Code attributes={ { content: 'sample text' } } />
-		);
-		const testInstance = component.root;
-		const textInput = testInstance.findByType( TextInput );
-		expect( textInput ).toBeTruthy();
-		expect( textInput.props.value ).toBe( 'sample text' );
+	afterAll( () => {
+		// Clean up registered blocks
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'renders without crashing', async () => {
+		const screen = await initializeEditor();
+
+		// Add block
+		await addBlock( screen, 'Code' );
+
+		// Get block
+		const codeBlock = await getBlock( screen, 'Code' );
+		expect( codeBlock ).toBeVisible();
+
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'renders given text without crashing', async () => {
+		const initialHtml = `<!-- wp:code -->
+		<pre class="wp-block-code"><code>Sample text</code></pre>
+		<!-- /wp:code -->`;
+
+		const screen = await initializeEditor( {
+			initialHtml,
+		} );
+		const { findByPlaceholderText } = screen;
+
+		// Get block
+		const codeBlock = await getBlock( screen, 'Code' );
+		expect( codeBlock ).toBeVisible();
+		fireEvent.press( codeBlock );
+
+		// Get initial text
+		const codeBlockText = await findByPlaceholderText( 'Write code…' );
+		expect( codeBlockText ).toBeVisible();
+
+		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 } );

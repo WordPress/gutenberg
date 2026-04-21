@@ -5,7 +5,7 @@ import { postTitle } from '../reducer';
 
 describe( 'state native', () => {
 	describe( 'postTitle', () => {
-		describe( 'isSelected()', () => {
+		describe( 'isSelected', () => {
 			it( 'should not be selected by default', () => {
 				expect( postTitle( undefined, {} ).isSelected ).toBe( false );
 			} );

@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -17,8 +17,6 @@ export { metadata, name };
 
 export const settings = {
 	name,
-	title: __( 'Unsupported' ),
-	description: __( 'Your site doesn’t include support for this block.' ),
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { originalName } = attributes;
@@ -37,3 +35,5 @@ export const settings = {
 	edit,
 	save,
 };
+
+export const init = () => initBlock( { name, metadata, settings } );

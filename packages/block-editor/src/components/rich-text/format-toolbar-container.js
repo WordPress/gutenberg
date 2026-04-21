@@ -1,34 +1,48 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { Popover, ToolbarGroup } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import BlockFormatControls from '../block-format-controls';
+import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
+import NavigableToolbar from '../navigable-toolbar';
 
-const FormatToolbarContainer = ( { inline, anchorRef } ) => {
-	if ( inline ) {
-		// Render in popover
-		return (
-			<Popover
-				noArrow
-				position="top center"
-				focusOnMount={ false }
-				anchorRef={ anchorRef }
-				className="block-editor-rich-text__inline-format-toolbar"
-			>
-				<FormatToolbar />
-			</Popover>
-		);
-	}
-	// Render regular toolbar
+function InlineToolbar( { popoverAnchor } ) {
 	return (
-		<BlockFormatControls>
+		<Popover
+			placement="top"
+			focusOnMount={ false }
+			anchor={ popoverAnchor }
+			className="block-editor-rich-text__inline-format-toolbar"
+			__unstableSlotName="block-toolbar"
+		>
+			<NavigableToolbar
+				className="block-editor-rich-text__inline-format-toolbar-group"
+				/* translators: accessibility text for the inline format toolbar */
+				aria-label={ __( 'Format tools' ) }
+			>
+				<ToolbarGroup>
+					<FormatToolbar />
+				</ToolbarGroup>
+			</NavigableToolbar>
+		</Popover>
+	);
+}
+
+const FormatToolbarContainer = ( { inline, editableContentElement } ) => {
+	if ( inline ) {
+		return <InlineToolbar popoverAnchor={ editableContentElement } />;
+	}
+
+	// Render regular toolbar.
+	return (
+		<BlockControls group="inline">
 			<FormatToolbar />
-		</BlockFormatControls>
+		</BlockControls>
 	);
 };
 

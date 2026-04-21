@@ -1,0 +1,15 @@
+.selector { /* Correct usage of quotes */
+	background-image: url(images/bg.png);
+	font-family: "Helvetica Neue", sans-serif;
+	font-weight: 700;
+	line-height: 14px;
+}
+
+.another-selector { /* Correct usage of zero values */
+	font-family: Georgia, serif;
+	font-weight: bolder; /* Ignore relative font weights */
+	line-height: 1.4;
+	text-shadow:
+		0 -1px 0 rgba(0, 0, 0, 0.5),
+		0 1px 0 #fff;
+}

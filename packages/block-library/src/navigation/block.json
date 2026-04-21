@@ -1,9 +1,29 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/navigation",
-	"category": "design",
+	"title": "Navigation",
+	"category": "theme",
+	"allowedBlocks": [
+		"core/navigation-link",
+		"core/search",
+		"core/social-links",
+		"core/page-list",
+		"core/spacer",
+		"core/home-link",
+		"core/icon",
+		"core/site-title",
+		"core/site-logo",
+		"core/navigation-submenu",
+		"core/loginout",
+		"core/buttons"
+	],
+	"description": "A collection of blocks that allow visitors to get around your site.",
+	"keywords": [ "menu", "navigation", "links" ],
+	"textdomain": "default",
 	"attributes": {
-		"orientation": {
-			"type": "string"
+		"ref": {
+			"type": "number"
 		},
 		"textColor": {
 			"type": "string"
@@ -23,12 +43,52 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"itemsJustification": {
-			"type": "string"
-		},
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"submenuVisibility": {
+			"type": "string",
+			"enum": [ "hover", "click", "always" ],
+			"default": "hover"
+		},
+		"overlayMenu": {
+			"type": "string",
+			"default": "mobile"
+		},
+		"overlay": {
+			"type": "string"
+		},
+		"icon": {
+			"type": "string",
+			"default": "handle"
+		},
+		"hasIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"__unstableLocation": {
+			"type": "string"
+		},
+		"overlayBackgroundColor": {
+			"type": "string"
+		},
+		"customOverlayBackgroundColor": {
+			"type": "string"
+		},
+		"overlayTextColor": {
+			"type": "string"
+		},
+		"customOverlayTextColor": {
+			"type": "string"
+		},
+		"maxNestingLevel": {
+			"type": "number",
+			"default": 5
+		},
+		"templateLock": {
+			"type": [ "string", "boolean" ],
+			"enum": [ "all", "insert", "contentOnly", false ]
 		}
 	},
 	"providesContext": {
@@ -36,16 +96,58 @@
 		"customTextColor": "customTextColor",
 		"backgroundColor": "backgroundColor",
 		"customBackgroundColor": "customBackgroundColor",
+		"overlayTextColor": "overlayTextColor",
+		"customOverlayTextColor": "customOverlayTextColor",
+		"overlayBackgroundColor": "overlayBackgroundColor",
+		"customOverlayBackgroundColor": "customOverlayBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
-		"showSubmenuIcon": "showSubmenuIcon"
+		"showSubmenuIcon": "showSubmenuIcon",
+		"submenuVisibility": "submenuVisibility",
+		"openSubmenusOnClick": "openSubmenusOnClick",
+		"style": "style",
+		"maxNestingLevel": "maxNestingLevel"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
 		"anchor": true,
+		"align": [ "wide", "full" ],
+		"ariaLabel": true,
+		"contentRole": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true,
-		"__experimentalFontSize": true
-	}
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalTextTransform": true,
+			"__experimentalFontFamily": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalSkipSerialization": [ "textDecoration" ],
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"blockGap": true,
+			"units": [ "px", "em", "rem", "vh", "vw" ],
+			"__experimentalDefaultControls": {
+				"blockGap": true
+			}
+		},
+		"layout": {
+			"allowSwitching": false,
+			"allowInheriting": false,
+			"allowVerticalAlignment": false,
+			"allowSizingOnChildren": true,
+			"default": {
+				"type": "flex"
+			}
+		},
+		"interactivity": true,
+		"renaming": false
+	},
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
 }

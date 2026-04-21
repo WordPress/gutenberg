@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction } from 'lodash';
-import classnames from 'classnames';
-import scrollIntoView from 'dom-scroll-into-view';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,20 +12,39 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
+import {
+	compose,
+	debounce,
+	withInstanceId,
+	withSafeTimeout,
+} from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-// Since URLInput is rendered in the context of other inputs, but should be
-// considered a separate modal node, prevent keyboard events from propagating
-// as being considered from the input.
-const stopEventPropagation = ( event ) => event.stopPropagation();
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
-/* eslint-disable jsx-a11y/no-autofocus */
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
+
+/**
+ * Whether the argument is a function.
+ *
+ * @param {*} maybeFunc The argument to check.
+ * @return {boolean} True if the argument is a function, false otherwise.
+ */
+function isFunction( maybeFunc ) {
+	return typeof maybeFunc === 'function';
+}
+
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -39,21 +56,22 @@ class URLInput extends Component {
 		this.handleOnClick = this.handleOnClick.bind( this );
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = createRef();
-		this.updateSuggestions = throttle(
+		this.inputRef = props.inputRef || createRef();
+		this.hasRenderedValidation = { current: false };
+		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
 		);
 
 		this.suggestionNodes = [];
 
-		this.isUpdatingSuggestions = false;
+		this.suggestionsRequest = null;
 
 		this.state = {
 			suggestions: [],
 			showSuggestions: false,
+			suggestionsValue: null,
 			selectedSuggestion: null,
-
 			suggestionsListboxId: '',
 			suggestionOptionIdPrefix: '',
 		};
@@ -61,36 +79,32 @@ class URLInput extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { showSuggestions, selectedSuggestion } = this.state;
-		const { value } = this.props;
+		const { value, __experimentalShowInitialSuggestions = false } =
+			this.props;
 
-		// only have to worry about scrolling selected suggestion into view
-		// when already expanded
+		// Only have to worry about scrolling selected suggestion into view
+		// when already expanded.
 		if (
 			showSuggestions &&
 			selectedSuggestion !== null &&
-			this.suggestionNodes[ selectedSuggestion ] &&
-			! this.scrollingIntoView
+			this.suggestionNodes[ selectedSuggestion ]
 		) {
-			this.scrollingIntoView = true;
-			scrollIntoView(
-				this.suggestionNodes[ selectedSuggestion ],
-				this.autocompleteRef.current,
-				{
-					onlyScrollIfNeeded: true,
-				}
-			);
-
-			this.props.setTimeout( () => {
-				this.scrollingIntoView = false;
-			}, 100 );
+			this.suggestionNodes[ selectedSuggestion ].scrollIntoView( {
+				behavior: 'instant',
+				block: 'nearest',
+				inline: 'nearest',
+			} );
 		}
 
-		// Only attempt an update on suggestions if the input value has actually changed.
-		if (
-			prevProps.value !== value &&
-			this.shouldShowInitialSuggestions()
-		) {
-			this.updateSuggestions();
+		// Update suggestions when the value changes.
+		if ( prevProps.value !== value && ! this.props.disableSuggestions ) {
+			if ( value?.length ) {
+				// If the new value is not empty we need to update with suggestions for it.
+				this.updateSuggestions( value );
+			} else if ( __experimentalShowInitialSuggestions ) {
+				// If the new value is empty and we can show initial suggestions, then show initial suggestions.
+				this.updateSuggestions();
+			}
 		}
 	}
 
@@ -101,7 +115,8 @@ class URLInput extends Component {
 	}
 
 	componentWillUnmount() {
-		delete this.suggestionsRequest;
+		this.suggestionsRequest?.cancel?.();
+		this.suggestionsRequest = null;
 	}
 
 	bindSuggestionNode( index ) {
@@ -111,16 +126,10 @@ class URLInput extends Component {
 	}
 
 	shouldShowInitialSuggestions() {
-		const { suggestions } = this.state;
-		const {
-			__experimentalShowInitialSuggestions = false,
-			value,
-		} = this.props;
+		const { __experimentalShowInitialSuggestions = false, value } =
+			this.props;
 		return (
-			! this.isUpdatingSuggestions &&
-			__experimentalShowInitialSuggestions &&
-			! ( value && value.length ) &&
-			! ( suggestions && suggestions.length )
+			__experimentalShowInitialSuggestions && ! ( value && value.length )
 		);
 	}
 
@@ -134,7 +143,13 @@ class URLInput extends Component {
 			return;
 		}
 
-		const isInitialSuggestions = ! ( value && value.length );
+		// Initial suggestions may only show if there is no value
+		// (note: this includes whitespace).
+		const isInitialSuggestions = ! value?.length;
+
+		// Trim only now we've determined whether or not it originally had a "length"
+		// (even if that value was all whitespace).
+		value = value.trim();
 
 		// Allow a suggestions request if:
 		// - there are at least 2 characters in the search input (except manual searches where
@@ -144,16 +159,19 @@ class URLInput extends Component {
 			! isInitialSuggestions &&
 			( value.length < 2 || ( ! handleURLSuggestions && isURL( value ) ) )
 		) {
+			this.suggestionsRequest?.cancel?.();
+			this.suggestionsRequest = null;
+
 			this.setState( {
+				suggestions: [],
 				showSuggestions: false,
+				suggestionsValue: value,
 				selectedSuggestion: null,
 				loading: false,
 			} );
 
 			return;
 		}
-
-		this.isUpdatingSuggestions = true;
 
 		this.setState( {
 			selectedSuggestion: null,
@@ -175,6 +193,7 @@ class URLInput extends Component {
 
 				this.setState( {
 					suggestions,
+					suggestionsValue: value,
 					loading: false,
 					showSuggestions: !! suggestions.length,
 				} );
@@ -182,7 +201,7 @@ class URLInput extends Component {
 				if ( !! suggestions.length ) {
 					this.props.debouncedSpeak(
 						sprintf(
-							/* translators: %s: number of results. */
+							/* translators: %d: number of results. */
 							_n(
 								'%d result found, use up and down arrow keys to navigate.',
 								'%d results found, use up and down arrow keys to navigate.',
@@ -198,14 +217,21 @@ class URLInput extends Component {
 						'assertive'
 					);
 				}
-				this.isUpdatingSuggestions = false;
 			} )
 			.catch( () => {
+				if ( this.suggestionsRequest !== request ) {
+					return;
+				}
+
+				this.setState( {
+					loading: false,
+				} );
+			} )
+			.finally( () => {
+				// If this is the current promise then reset the reference
+				// to allow for checking if a new request is made.
 				if ( this.suggestionsRequest === request ) {
-					this.setState( {
-						loading: false,
-					} );
-					this.isUpdatingSuggestions = false;
+					this.suggestionsRequest = null;
 				}
 			} );
 
@@ -214,13 +240,8 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
-		const inputValue = event.target.value;
-
-		this.props.onChange( inputValue );
-		if ( ! this.props.disableSuggestions ) {
-			this.updateSuggestions( inputValue.trim() );
-		}
+	onChange( newValue ) {
+		this.props.onChange( newValue );
 	}
 
 	onFocus() {
@@ -229,27 +250,25 @@ class URLInput extends Component {
 
 		// When opening the link editor, if there's a value present, we want to load the suggestions pane with the results for this input search value
 		// Don't re-run the suggestions on focus if there are already suggestions present (prevents searching again when tabbing between the input and buttons)
+		// or there is already a request in progress.
 		if (
 			value &&
 			! disableSuggestions &&
-			! this.isUpdatingSuggestions &&
-			! ( suggestions && suggestions.length )
+			! ( suggestions && suggestions.length ) &&
+			this.suggestionsRequest === null
 		) {
-			// Ensure the suggestions are updated with the current input value
-			this.updateSuggestions( value.trim() );
+			// Ensure the suggestions are updated with the current input value.
+			this.updateSuggestions( value );
 		}
 	}
 
 	onKeyDown( event ) {
-		const {
-			showSuggestions,
-			selectedSuggestion,
-			suggestions,
-			loading,
-		} = this.state;
+		this.props.onKeyDown?.( event );
+		const { showSuggestions, selectedSuggestion, suggestions, loading } =
+			this.state;
 
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
-		// We shouldn't preventDefault to allow block arrow keys navigation
+		// We shouldn't preventDefault to allow block arrow keys navigation.
 		if ( ! showSuggestions || ! suggestions.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
 			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
@@ -261,10 +280,9 @@ class URLInput extends Component {
 				// position.
 				case UP: {
 					if ( 0 !== event.target.selectionStart ) {
-						event.stopPropagation();
 						event.preventDefault();
 
-						// Set the input caret to position 0
+						// Set the input caret to position 0.
 						event.target.setSelectionRange( 0, 0 );
 					}
 					break;
@@ -275,14 +293,22 @@ class URLInput extends Component {
 					if (
 						this.props.value.length !== event.target.selectionStart
 					) {
-						event.stopPropagation();
 						event.preventDefault();
 
-						// Set the input caret to the last position
+						// Set the input caret to the last position.
 						event.target.setSelectionRange(
 							this.props.value.length,
 							this.props.value.length
 						);
+					}
+					break;
+				}
+
+				// Submitting while loading should trigger onSubmit.
+				case ENTER: {
+					if ( this.props.onSubmit ) {
+						event.preventDefault();
+						this.props.onSubmit( null, event );
 					}
 					break;
 				}
@@ -291,13 +317,11 @@ class URLInput extends Component {
 			return;
 		}
 
-		const suggestion = this.state.suggestions[
-			this.state.selectedSuggestion
-		];
+		const suggestion =
+			this.state.suggestions[ this.state.selectedSuggestion ];
 
 		switch ( event.keyCode ) {
 			case UP: {
-				event.stopPropagation();
 				event.preventDefault();
 				const previousIndex = ! selectedSuggestion
 					? suggestions.length - 1
@@ -308,7 +332,6 @@ class URLInput extends Component {
 				break;
 			}
 			case DOWN: {
-				event.stopPropagation();
 				event.preventDefault();
 				const nextIndex =
 					selectedSuggestion === null ||
@@ -329,10 +352,17 @@ class URLInput extends Component {
 				break;
 			}
 			case ENTER: {
+				event.preventDefault();
 				if ( this.state.selectedSuggestion !== null ) {
-					event.stopPropagation();
 					this.selectLink( suggestion );
+
+					if ( this.props.onSubmit ) {
+						this.props.onSubmit( suggestion, event );
+					}
+				} else if ( this.props.onSubmit ) {
+					this.props.onSubmit( null, event );
 				}
+
 				break;
 			}
 		}
@@ -391,14 +421,18 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
-			label,
+			label = null,
 			className,
 			isFullWidth,
 			instanceId,
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
-			autoFocus = true,
+			hideLabelFromVision = false,
+			help = null,
+			disabled = false,
+			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -409,27 +443,30 @@ class URLInput extends Component {
 			suggestionOptionIdPrefix,
 		} = this.state;
 
+		const inputId = `url-input-control-${ instanceId }`;
+
 		const controlProps = {
-			id: `url-input-control-${ instanceId }`,
+			id: inputId, // Passes attribute to label for the for attribute
 			label,
-			className: classnames( 'block-editor-url-input', className, {
+			className: clsx( 'block-editor-url-input', className, {
 				'is-full-width': isFullWidth,
 			} ),
+			hideLabelFromVision,
 		};
 
 		const inputProps = {
+			id: inputId,
 			value,
-			required: true,
-			autoFocus,
-			className: 'block-editor-url-input__input',
+			required: this.props.required ?? true,
 			type: 'text',
-			onChange: this.onChange,
-			onFocus: this.onFocus,
-			onInput: stopEventPropagation,
+			name: inputId,
+			autoComplete: 'off',
+			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
+			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
-			onKeyDown: this.onKeyDown,
+			onKeyDown: disabled ? () => {} : this.onKeyDown, // Disable onKeyDown when disabled
 			role: 'combobox',
-			'aria-label': __( 'URL' ),
+			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
 			'aria-autocomplete': 'list',
 			'aria-owns': suggestionsListboxId,
@@ -438,15 +475,43 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			disabled,
+			suffix: this.props.suffix,
+			help,
+		};
+
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
 		};
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		// Use ValidatedInputControl if customValidity has ever had a non-undefined value.
+		if ( customValidity !== undefined ) {
+			this.hasRenderedValidation.current = true;
+		}
+
+		const MaybeValidatedInputControl = this.hasRenderedValidation.current
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
 			<BaseControl { ...controlProps }>
-				<input { ...inputProps } />
+				<MaybeValidatedInputControl
+					{ ...inputProps }
+					{ ...( this.hasRenderedValidation.current
+						? validationProps
+						: {} ) }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
@@ -456,18 +521,21 @@ class URLInput extends Component {
 		const {
 			className,
 			__experimentalRenderSuggestions: renderSuggestions,
-			value = '',
-			__experimentalShowInitialSuggestions = false,
 		} = this.props;
 
 		const {
 			showSuggestions,
 			suggestions,
+			suggestionsValue,
 			selectedSuggestion,
 			suggestionsListboxId,
 			suggestionOptionIdPrefix,
 			loading,
 		} = this.state;
+
+		if ( ! showSuggestions || suggestions.length === 0 ) {
+			return null;
+		}
 
 		const suggestionsListProps = {
 			id: suggestionsListboxId,
@@ -481,15 +549,12 @@ class URLInput extends Component {
 				tabIndex: '-1',
 				id: `${ suggestionOptionIdPrefix }-${ index }`,
 				ref: this.bindSuggestionNode( index ),
-				'aria-selected': index === selectedSuggestion,
+				'aria-selected':
+					index === selectedSuggestion ? true : undefined,
 			};
 		};
 
-		if (
-			isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
+		if ( isFunction( renderSuggestions ) ) {
 			return renderSuggestions( {
 				suggestions,
 				selectedSuggestion,
@@ -497,58 +562,43 @@ class URLInput extends Component {
 				buildSuggestionItemProps,
 				isLoading: loading,
 				handleSuggestionClick: this.handleOnClick,
-				isInitialSuggestions:
-					__experimentalShowInitialSuggestions &&
-					! ( value && value.length ),
+				isInitialSuggestions: ! suggestionsValue?.length,
+				currentInputValue: suggestionsValue,
 			} );
 		}
 
-		if (
-			! isFunction( renderSuggestions ) &&
-			showSuggestions &&
-			!! suggestions.length
-		) {
-			return (
-				<Popover position="bottom" noArrow focusOnMount={ false }>
-					<div
-						{ ...suggestionsListProps }
-						className={ classnames(
-							'block-editor-url-input__suggestions',
-							`${ className }__suggestions`
-						) }
-					>
-						{ suggestions.map( ( suggestion, index ) => (
-							<Button
-								{ ...buildSuggestionItemProps(
-									suggestion,
-									index
-								) }
-								key={ suggestion.id }
-								className={ classnames(
-									'block-editor-url-input__suggestion',
-									{
-										'is-selected':
-											index === selectedSuggestion,
-									}
-								) }
-								onClick={ () =>
-									this.handleOnClick( suggestion )
+		return (
+			<Popover placement="bottom" focusOnMount={ false }>
+				<div
+					{ ...suggestionsListProps }
+					className={ clsx( 'block-editor-url-input__suggestions', {
+						[ `${ className }__suggestions` ]: className,
+					} ) }
+				>
+					{ suggestions.map( ( suggestion, index ) => (
+						<Button
+							__next40pxDefaultSize
+							{ ...buildSuggestionItemProps( suggestion, index ) }
+							key={ suggestion.id }
+							className={ clsx(
+								'block-editor-url-input__suggestion',
+								{
+									'is-selected': index === selectedSuggestion,
 								}
-							>
-								{ suggestion.title }
-							</Button>
-						) ) }
-					</div>
-				</Popover>
-			);
-		}
-		return null;
+							) }
+							onClick={ () => this.handleOnClick( suggestion ) }
+						>
+							{ suggestion.title }
+						</Button>
+					) ) }
+				</div>
+			</Popover>
+		);
 	}
 }
-/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md
  */
 export default compose(
 	withSafeTimeout,
@@ -556,14 +606,14 @@ export default compose(
 	withInstanceId,
 	withSelect( ( select, props ) => {
 		// If a link suggestions handler is already provided then
-		// bail
+		// bail.
 		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
-			__experimentalFetchLinkSuggestions: getSettings()
-				.__experimentalFetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions:
+				getSettings().__experimentalFetchLinkSuggestions,
 		};
 	} )
 )( URLInput );

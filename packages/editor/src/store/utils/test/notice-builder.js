@@ -6,7 +6,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from '../notice-builder';
-import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
 
 describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	const postType = {
@@ -17,6 +16,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			item_scheduled: 'scheduled',
 			item_updated: 'updated',
 			view_item: 'view',
+			item_trashed: 'trash',
 		},
 		viewable: false,
 	};
@@ -26,7 +26,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 	};
 	const post = { ...previousPost };
 	const defaultExpectedAction = {
-		id: SAVE_POST_NOTICE_ID,
+		id: 'editor-save',
 		actions: [],
 		type: 'snackbar',
 	};
@@ -34,7 +34,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 		[
 			'when previous post is not published and post will not be published',
 			[ 'draft', 'draft', false ],
-			[],
+			[ 'Draft saved.', defaultExpectedAction ],
 		],
 		[
 			'when previous post is published and post will be unpublished',
@@ -70,9 +70,16 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 				'updated',
 				{
 					...defaultExpectedAction,
-					actions: [ { label: 'view', url: 'some_link' } ],
+					actions: [
+						{ label: 'view', openInNewTab: true, url: 'some_link' },
+					],
 				},
 			],
+		],
+		[
+			'when post will be trashed',
+			[ 'publish', 'trash', true ],
+			[ 'trash', defaultExpectedAction ],
 		],
 	].forEach(
 		( [
@@ -80,6 +87,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -99,7 +107,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42', message: 'Something went wrong.' };
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID };
+	const defaultExpectedAction = { id: 'editor-save' };
 	[
 		[
 			'when error code is `rest_autosave_no_changes`',
@@ -147,6 +155,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ postStatus, editsStatus ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -180,8 +189,9 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
-			const expectedValue = [ message, { id: TRASH_POST_NOTICE_ID } ];
+			const expectedValue = [ message, { id: 'editor-trash-fail' } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(
 				expectedValue
 			);

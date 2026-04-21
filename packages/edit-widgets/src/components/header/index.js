@@ -1,70 +1,71 @@
 /**
  * WordPress dependencies
  */
+import { BlockToolbar } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { NavigableMenu } from '@wordpress/components';
-import {
-	BlockNavigationDropdown,
-	BlockToolbar,
-	Inserter,
-} from '@wordpress/block-editor';
+import { Popover, VisuallyHidden } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
+import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
-import UndoButton from './undo-redo/undo';
-import RedoButton from './undo-redo/redo';
+import MoreMenu from '../more-menu';
 
-const inserterToggleProps = { isPrimary: true };
-
-function Header( { isCustomizer } ) {
+function Header() {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const rootClientId = useSelect( ( select ) => {
-		const { getBlockRootClientId, getBlockSelectionEnd } = select(
-			'core/block-editor'
-		);
-		return getBlockRootClientId( getBlockSelectionEnd() );
-	}, [] );
+	const blockToolbarRef = useRef();
+	const { hasFixedToolbar } = useSelect(
+		( select ) => ( {
+			hasFixedToolbar: !! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'fixedToolbar'
+			),
+		} ),
+		[]
+	);
 
 	return (
 		<>
 			<div className="edit-widgets-header">
-				<NavigableMenu>
-					<Inserter
-						position="bottom right"
-						showInserterHelpPanel
-						toggleProps={ inserterToggleProps }
-						rootClientId={ rootClientId }
-					/>
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
-				</NavigableMenu>
-				{ ! isCustomizer && (
-					<h1 className="edit-widgets-header__title">
-						{ __( 'Block Areas' ) }
-					</h1>
-				) }
+				<div className="edit-widgets-header__navigable-toolbar-wrapper">
+					{ isLargeViewport && (
+						<h1 className="edit-widgets-header__title">
+							{ __( 'Widgets' ) }
+						</h1>
+					) }
+					{ ! isLargeViewport && (
+						<VisuallyHidden
+							as="h1"
+							className="edit-widgets-header__title"
+						>
+							{ __( 'Widgets' ) }
+						</VisuallyHidden>
+					) }
+					<DocumentTools />
+					{ hasFixedToolbar && isLargeViewport && (
+						<>
+							<div className="selected-block-tools-wrapper">
+								<BlockToolbar hideDragHandle />
+							</div>
+							<Popover.Slot
+								ref={ blockToolbarRef }
+								name="block-toolbar"
+							/>
+						</>
+					) }
+				</div>
 				<div className="edit-widgets-header__actions">
-					{ ! isCustomizer && <SaveButton /> }
-					<PinnedItems.Slot
-						scope={
-							isCustomizer
-								? 'core/edit-widgets-customizer'
-								: 'core/edit-widgets'
-						}
-					/>
+					<PinnedItems.Slot scope="core/edit-widgets" />
+					<SaveButton />
+					<MoreMenu />
 				</div>
 			</div>
-			{ ( ! isLargeViewport || isCustomizer ) && (
-				<div className="edit-widgets-header__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</>
 	);
 }

@@ -1,83 +1,67 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-class MetaBoxesArea extends Component {
-	/**
-	 * @inheritdoc
-	 */
-	constructor() {
-		super( ...arguments );
-		this.bindContainerNode = this.bindContainerNode.bind( this );
-	}
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
 
-	/**
-	 * @inheritdoc
-	 */
-	componentDidMount() {
-		this.form = document.querySelector(
-			'.metabox-location-' + this.props.location
+/**
+ * Render metabox area.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.location metabox location.
+ * @return {Component} The component to be rendered.
+ */
+function MetaBoxesArea( { location } ) {
+	const container = useRef( null );
+	const formRef = useRef( null );
+
+	useEffect( () => {
+		formRef.current = document.querySelector(
+			'.metabox-location-' + location
 		);
-		if ( this.form ) {
-			this.container.appendChild( this.form );
+
+		if ( formRef.current ) {
+			container.current.appendChild( formRef.current );
 		}
-	}
 
-	/**
-	 * Get the meta box location form from the original location.
-	 */
-	componentWillUnmount() {
-		if ( this.form ) {
-			document.querySelector( '#metaboxes' ).appendChild( this.form );
-		}
-	}
-
-	/**
-	 * Binds the metabox area container node.
-	 *
-	 * @param {Element} node DOM Node.
-	 */
-	bindContainerNode( node ) {
-		this.container = node;
-	}
-
-	/**
-	 * @inheritdoc
-	 */
-	render() {
-		const { location, isSaving } = this.props;
-
-		const classes = classnames(
-			'edit-post-meta-boxes-area',
-			`is-${ location }`,
-			{
-				'is-loading': isSaving,
+		return () => {
+			if ( formRef.current ) {
+				document
+					.querySelector( '#metaboxes' )
+					.appendChild( formRef.current );
 			}
-		);
+		};
+	}, [ location ] );
 
-		return (
-			<div className={ classes }>
-				{ isSaving && <Spinner /> }
-				<div
-					className="edit-post-meta-boxes-area__container"
-					ref={ this.bindContainerNode }
-				/>
-				<div className="edit-post-meta-boxes-area__clear" />
-			</div>
-		);
-	}
+	const isSaving = useSelect( ( select ) => {
+		return select( editPostStore ).isSavingMetaBoxes();
+	}, [] );
+
+	const classes = clsx( 'edit-post-meta-boxes-area', `is-${ location }`, {
+		'is-loading': isSaving,
+	} );
+
+	return (
+		<div className={ classes }>
+			{ isSaving && <Spinner /> }
+			<div
+				className="edit-post-meta-boxes-area__container"
+				ref={ container }
+			/>
+			<div className="edit-post-meta-boxes-area__clear" />
+		</div>
+	);
 }
 
-export default withSelect( ( select ) => {
-	return {
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-	};
-} )( MetaBoxesArea );
+export default MetaBoxesArea;

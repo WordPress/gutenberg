@@ -2,27 +2,29 @@
  * WordPress dependencies
  */
 import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../use-editor-feature';
+import { useSettings } from '../use-settings';
 
 function FontSizePicker( props ) {
-	const fontSizes = useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings().fontSizes,
-		[]
+	const [ fontSizes, customFontSize ] = useSettings(
+		'typography.fontSizes',
+		'typography.customFontSize'
 	);
-	const disableCustomFontSizes = ! useEditorFeature( 'fontSize.custom' );
 
 	return (
 		<BaseFontSizePicker
 			{ ...props }
 			fontSizes={ fontSizes }
-			disableCustomFontSizes={ disableCustomFontSizes }
+			disableCustomFontSizes={ ! customFontSize }
+			__next40pxDefaultSize
 		/>
 	);
 }
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md
+ */
 export default FontSizePicker;

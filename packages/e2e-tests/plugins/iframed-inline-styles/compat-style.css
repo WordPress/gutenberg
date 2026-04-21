@@ -1,0 +1,4 @@
+/* Random rule with `wp-block` in the selector. */
+.wp-block-test-iframed-inline-styles {
+	display: block;
+}

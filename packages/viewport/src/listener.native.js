@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import { forEach, reduce } from 'lodash';
 import { Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { dispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store } from './store';
 
 const matchWidth = ( operator, breakpoint ) => {
 	const { width } = Dimensions.get( 'window' );
@@ -20,26 +24,25 @@ const matchWidth = ( operator, breakpoint ) => {
 };
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
-	const setIsMatching = () => {
-		const matches = reduce(
-			breakpoints,
-			( result, width, name ) => {
-				forEach( operators, ( condition, operator ) => {
-					const key = [ operator, name ].join( ' ' );
-					result[ key ] = matchWidth( condition, width );
-				} );
+	const operatorEntries = Object.entries( operators );
+	const breakpointEntries = Object.entries( breakpoints );
 
-				return result;
-			},
-			{}
+	const setIsMatching = () => {
+		const matches = Object.fromEntries(
+			breakpointEntries.flatMap( ( [ name, width ] ) => {
+				return operatorEntries.map( ( [ operator, condition ] ) => [
+					`${ operator } ${ name }`,
+					matchWidth( condition, width ),
+				] );
+			} )
 		);
 
-		dispatch( 'core/viewport' ).setIsMatching( matches );
+		dispatch( store ).setIsMatching( matches );
 	};
 
 	Dimensions.addEventListener( 'change', setIsMatching );
 
-	// Set initial values
+	// Set initial values.
 	setIsMatching();
 };
 

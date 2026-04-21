@@ -1,54 +1,48 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	RichText,
-	BlockControls,
-	AlignmentToolbar,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
-export default function VerseEdit( {
-	attributes,
-	setAttributes,
-	className,
-	mergeBlocks,
-} ) {
-	const { textAlign, content } = attributes;
+/**
+ * Internal dependencies
+ */
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
+
+export default function VerseEdit( props ) {
+	const {
+		attributes,
+		setAttributes,
+		mergeBlocks,
+		onRemove,
+		insertBlocksAfter,
+		style,
+	} = props;
+	const { content } = attributes;
+	useDeprecatedTextAlign( props );
+	const blockProps = useBlockProps( { style } );
 
 	return (
-		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-			</BlockControls>
-			<RichText
-				tagName={ Block.pre }
-				identifier="content"
-				preserveWhiteSpace
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				placeholder={ __( 'Write…' ) }
-				className={ classnames( className, {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-				onMerge={ mergeBlocks }
-				textAlign={ textAlign }
-			/>
-		</>
+		<RichText
+			tagName="pre"
+			identifier="content"
+			preserveWhiteSpace
+			value={ content }
+			onChange={ ( nextContent ) => {
+				setAttributes( {
+					content: nextContent,
+				} );
+			} }
+			aria-label={ __( 'Poetry text' ) }
+			placeholder={ __( 'Write poetry…' ) }
+			onRemove={ onRemove }
+			onMerge={ mergeBlocks }
+			{ ...blockProps }
+			__unstablePastePlainText
+			__unstableOnSplitAtDoubleLineEnd={ () =>
+				insertBlocksAfter( createBlock( getDefaultBlockName() ) )
+			}
+		/>
 	);
 }

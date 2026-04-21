@@ -1,7 +1,6 @@
-/**
- * External dependencies
- */
-import { uniqueId, take } from 'lodash';
+let uniqueIdCounter = 1;
+
+export const uniqueId = () => uniqueIdCounter++;
 
 export const fauxEntitySuggestions = [
 	{
@@ -27,8 +26,7 @@ export const fauxEntitySuggestions = [
 	},
 	{
 		id: uniqueId(),
-		title:
-			'This is another Post with a much longer title just to be really annoying and to try and break the UI',
+		title: 'This is another Post with a much longer title just to be really annoying and to try and break the UI',
 		type: 'post',
 		info: '1 month ago',
 		url: `?p=${ uniqueId() }`,
@@ -41,7 +39,7 @@ export const fetchFauxEntitySuggestions = (
 	{ isInitialSuggestions } = {}
 ) => {
 	const suggestions = isInitialSuggestions
-		? take( fauxEntitySuggestions, 3 )
+		? fauxEntitySuggestions.slice( 0, 3 )
 		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };

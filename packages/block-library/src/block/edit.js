@@ -1,235 +1,283 @@
 /**
  * External dependencies
  */
-import { partial } from 'lodash';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useRef, useMemo } from '@wordpress/element';
+import {
+	useEntityRecord,
+	store as coreStore,
+	useEntityBlockEditor,
+} from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	Disabled,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
+	useInnerBlocksProps,
+	RecursionProvider,
+	useHasRecursion,
+	useBlockProps,
+	Warning,
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
 	BlockControls,
-	BlockEditorProvider,
-	BlockList,
-	WritingFlow,
+	InnerBlocks,
 } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
-import { parse, serialize } from '@wordpress/blocks';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import ReusableBlockEditPanel from './edit-panel';
+import { unlock } from '../lock-unlock';
 
-class ReusableBlockEdit extends Component {
-	constructor( { reusableBlock } ) {
-		super( ...arguments );
+const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
-		this.startEditing = this.startEditing.bind( this );
-		this.stopEditing = this.stopEditing.bind( this );
-		this.setBlocks = this.setBlocks.bind( this );
-		this.setTitle = this.setTitle.bind( this );
-		this.save = this.save.bind( this );
+const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
-		if ( reusableBlock ) {
-			// Start in edit mode when we're working with a newly created reusable block
-			this.state = {
-				isEditing: reusableBlock.isTemporary,
-				title: reusableBlock.title,
-				blocks: parse( reusableBlock.content ),
-			};
-		} else {
-			// Start in preview mode when we're working with an existing reusable block
-			this.state = {
-				isEditing: false,
-				title: null,
-				blocks: [],
-			};
+const useInferredLayout = ( blocks, parentLayout ) => {
+	const initialInferredAlignmentRef = useRef();
+
+	return useMemo( () => {
+		// Exit early if the pattern's blocks haven't loaded yet.
+		if ( ! blocks?.length ) {
+			return {};
 		}
-	}
 
-	componentDidMount() {
-		if ( ! this.props.reusableBlock ) {
-			this.props.fetchReusableBlock();
-		}
-	}
+		let alignment = initialInferredAlignmentRef.current;
 
-	componentDidUpdate( prevProps ) {
-		if (
-			prevProps.reusableBlock !== this.props.reusableBlock &&
-			this.state.title === null
-		) {
-			this.setState( {
-				title: this.props.reusableBlock.title,
-				blocks: parse( this.props.reusableBlock.content ),
-			} );
-		}
-	}
-
-	startEditing() {
-		const { reusableBlock } = this.props;
-		this.setState( {
-			isEditing: true,
-			title: reusableBlock.title,
-			blocks: parse( reusableBlock.content ),
-		} );
-	}
-
-	stopEditing() {
-		this.setState( {
-			isEditing: false,
-			title: null,
-			blocks: [],
-		} );
-	}
-
-	setBlocks( blocks ) {
-		this.setState( { blocks } );
-	}
-
-	setTitle( title ) {
-		this.setState( { title } );
-	}
-
-	save() {
-		const { onChange, onSave } = this.props;
-		const { blocks, title } = this.state;
-		const content = serialize( blocks );
-		onChange( { title, content } );
-		onSave();
-
-		this.stopEditing();
-	}
-
-	render() {
-		const {
-			convertToStatic,
-			isSelected,
-			reusableBlock,
-			isFetching,
-			isSaving,
-			canUpdateBlock,
-			settings,
-		} = this.props;
-		const { isEditing, title, blocks } = this.state;
-
-		if ( ! reusableBlock && isFetching ) {
-			return (
-				<Placeholder>
-					<Spinner />
-				</Placeholder>
+		// Only track the initial alignment so that temporarily removed
+		// alignments can be reapplied.
+		if ( alignment === undefined ) {
+			const isConstrained = parentLayout?.type === 'constrained';
+			const hasFullAlignment = blocks.some( ( block ) =>
+				fullAlignments.includes( block.attributes.align )
 			);
+
+			alignment = isConstrained && hasFullAlignment ? 'full' : null;
+			initialInferredAlignmentRef.current = alignment;
 		}
 
-		if ( ! reusableBlock ) {
-			return (
-				<Placeholder>
-					{ __( 'Block has been deleted or is unavailable.' ) }
-				</Placeholder>
-			);
-		}
+		const layout = alignment ? parentLayout : undefined;
 
-		let element = (
-			<BlockEditorProvider
-				settings={ settings }
-				value={ blocks }
-				onChange={ this.setBlocks }
-				onInput={ this.setBlocks }
-			>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
-			</BlockEditorProvider>
-		);
+		return { alignment, layout };
+	}, [ blocks, parentLayout ] );
+};
 
-		if ( ! isEditing ) {
-			element = <Disabled>{ element }</Disabled>;
-		}
+function RecursionWarning() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
+}
 
-		return (
-			<>
-				<BlockControls>
+const NOOP = () => {};
+
+// Wrap the main Edit function for the pattern block with a recursion wrapper
+// that allows short-circuiting rendering as early as possible, before any
+// of the other effects in the block edit have run.
+export default function ReusableBlockEditRecursionWrapper( props ) {
+	const { ref } = props.attributes;
+	const hasAlreadyRendered = useHasRecursion( ref );
+
+	if ( hasAlreadyRendered ) {
+		return <RecursionWarning />;
+	}
+
+	return (
+		<RecursionProvider uniqueId={ ref }>
+			<ReusableBlockEdit { ...props } />
+		</RecursionProvider>
+	);
+}
+
+function ReusableBlockControl( {
+	recordId,
+	canOverrideBlocks,
+	hasContent,
+	handleEditOriginal,
+	resetContent,
+} ) {
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: recordId,
+			} ),
+		[ recordId ]
+	);
+
+	return (
+		<>
+			{ canUserEdit && !! handleEditOriginal && (
+				<BlockControls group="other">
 					<ToolbarGroup>
-						<ToolbarButton onClick={ convertToStatic }>
-							{ __( 'Convert to regular blocks' ) }
+						<ToolbarButton onClick={ handleEditOriginal }>
+							{ __( 'Edit original' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
-				<div className="block-library-block__reusable-block-container">
-					{ ( isSelected || isEditing ) && (
-						<ReusableBlockEditPanel
-							isEditing={ isEditing }
-							title={
-								title !== null ? title : reusableBlock.title
-							}
-							isSaving={ isSaving && ! reusableBlock.isTemporary }
-							isEditDisabled={ ! canUpdateBlock }
-							onEdit={ this.startEditing }
-							onChangeTitle={ this.setTitle }
-							onSave={ this.save }
-							onCancel={ this.stopEditing }
-						/>
-					) }
-					{ element }
-				</div>
-			</>
-		);
-	}
+			) }
+
+			{ canOverrideBlocks && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+		</>
+	);
 }
 
-export default compose( [
-	withSelect( ( select, ownProps ) => {
-		const {
-			__experimentalGetReusableBlock: getReusableBlock,
-			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
-		const { __experimentalGetParsedReusableBlock, getSettings } = select(
-			'core/block-editor'
+const EMPTY_OBJECT = {};
+
+function ReusableBlockEdit( {
+	name,
+	attributes: { ref, content },
+	__unstableParentLayout: parentLayout,
+	setAttributes,
+} ) {
+	const { record, hasResolved } = useEntityRecord(
+		'postType',
+		'wp_block',
+		ref
+	);
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: ref,
+	} );
+	const isMissing = hasResolved && ! record;
+
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
+
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		supportedBlockTypesRaw,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlockTypesRaw:
+				getSettings().__experimentalBlockBindingsSupportedAttributes ||
+				EMPTY_OBJECT,
+		};
+	}, [] );
+
+	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
+		const hasOverridableBlocks = ( _blocks ) =>
+			_blocks.some( ( block ) => {
+				if (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				) {
+					return true;
+				}
+				return hasOverridableBlocks( block.innerBlocks );
+			} );
+		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
+
+	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
+	const layoutClasses = useLayoutClasses( { layout }, name );
+
+	const blockProps = useBlockProps( {
+		className: clsx(
+			'block-library-block__reusable-block-container',
+			layout && layoutClasses,
+			{ [ `align${ alignment }` ]: alignment }
+		),
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		layout,
+		value: blocks,
+		onInput: NOOP,
+		onChange: NOOP,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
+
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
+	};
+
+	const resetContent = () => {
+		if ( content ) {
+			// Make sure any previous changes are persisted before resetting.
+			__unstableMarkLastChangeAsPersistent();
+			setAttributes( { content: undefined } );
+		}
+	};
+
+	let children = null;
+
+	if ( isMissing ) {
+		children = (
+			<Warning>
+				{ __( 'Block has been deleted or is unavailable.' ) }
+			</Warning>
 		);
-		const { ref } = ownProps.attributes;
-		const reusableBlock = getReusableBlock( ref );
+	}
 
-		return {
-			reusableBlock,
-			isFetching: isFetchingReusableBlock( ref ),
-			isSaving: isSavingReusableBlock( ref ),
-			blocks: reusableBlock
-				? __experimentalGetParsedReusableBlock( reusableBlock.id )
-				: null,
-			canUpdateBlock:
-				!! reusableBlock &&
-				! reusableBlock.isTemporary &&
-				!! canUser( 'update', 'blocks', ref ),
-			settings: getSettings(),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			__experimentalConvertBlockToStatic: convertBlockToStatic,
-			__experimentalFetchReusableBlocks: fetchReusableBlocks,
-			__experimentalUpdateReusableBlock: updateReusableBlock,
-			__experimentalSaveReusableBlock: saveReusableBlock,
-		} = dispatch( 'core/editor' );
-		const { ref } = ownProps.attributes;
+	if ( ! hasResolved ) {
+		children = (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
+	}
 
-		return {
-			fetchReusableBlock: partial( fetchReusableBlocks, ref ),
-			onChange: partial( updateReusableBlock, ref ),
-			onSave: partial( saveReusableBlock, ref ),
-			convertToStatic() {
-				convertBlockToStatic( ownProps.clientId );
-			},
-		};
-	} ),
-] )( ReusableBlockEdit );
+	return (
+		<>
+			{ hasResolved && ! isMissing && (
+				<ReusableBlockControl
+					recordId={ ref }
+					canOverrideBlocks={ canOverrideBlocks }
+					hasContent={ !! content }
+					handleEditOriginal={
+						onNavigateToEntityRecord
+							? handleEditOriginal
+							: undefined
+					}
+					resetContent={ resetContent }
+				/>
+			) }
+
+			{ children === null ? (
+				<div { ...innerBlocksProps } />
+			) : (
+				<div { ...blockProps }>{ children }</div>
+			) }
+		</>
+	);
+}

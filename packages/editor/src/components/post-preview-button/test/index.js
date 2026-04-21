@@ -1,188 +1,253 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { PostPreviewButton } from '../';
+import PostPreviewButton from '..';
+
+jest.useRealTimers();
+
+jest.mock( '@wordpress/data/src/components/use-select', () => jest.fn() );
+jest.mock( '@wordpress/data/src/components/use-dispatch/use-dispatch', () =>
+	jest.fn()
+);
+
+function mockUseSelect( overrides ) {
+	useSelect.mockImplementation( ( map ) =>
+		map( () => ( {
+			getPostType: () => ( { viewable: true } ),
+			getCurrentPostId: () => 123,
+			getCurrentPostType: () => 'post',
+			getCurrentPostAttribute: () => undefined,
+			getEditedPostPreviewLink: () => undefined,
+			isEditedPostSaveable: () => false,
+			...overrides,
+		} ) )
+	);
+	useDispatch.mockImplementation( () => ( {
+		__unstableSaveForPreview: () => Promise.resolve(),
+	} ) );
+}
 
 describe( 'PostPreviewButton', () => {
-	describe( 'setPreviewWindowLink()', () => {
-		it( 'should do nothing if there is no preview window', () => {
-			const url = 'https://wordpress.org';
-			const setter = jest.fn();
-			const wrapper = shallow( <PostPreviewButton /> );
+	const documentWrite = jest.fn();
+	const documentTitle = jest.fn();
+	const documentClose = jest.fn();
+	const setLocation = jest.fn();
 
-			wrapper.instance().setPreviewWindowLink( url );
-
-			expect( setter ).not.toHaveBeenCalled();
-		} );
-
-		it( 'set preview window location to url', () => {
-			const url = 'https://wordpress.org';
-			const setter = jest.fn();
-			const wrapper = shallow( <PostPreviewButton /> );
-			wrapper.instance().previewWindow = {
-				get location() {
-					return {
-						href: 'about:blank',
-					};
+	beforeEach( () => {
+		global.open = jest.fn( () => ( {
+			focus: jest.fn(),
+			document: {
+				write: documentWrite,
+				close: documentClose,
+				get title() {},
+				set title( value ) {
+					documentTitle( value );
 				},
-				set location( value ) {
-					setter( value );
-				},
-			};
-
-			wrapper.instance().setPreviewWindowLink( url );
-
-			expect( setter ).toHaveBeenCalledWith( url );
-		} );
+			},
+			get location() {},
+			set location( value ) {
+				setLocation( value );
+			},
+		} ) );
 	} );
 
-	describe( 'getWindowTarget()', () => {
-		it( 'returns a string unique to the post id', () => {
-			const instance = new PostPreviewButton( {
-				postId: 1,
-			} );
-
-			expect( instance.getWindowTarget() ).toBe( 'wp-preview-1' );
-		} );
+	afterEach( () => {
+		global.open.mockRestore();
+		documentWrite.mockReset();
+		documentTitle.mockReset();
+		documentClose.mockReset();
+		setLocation.mockReset();
 	} );
 
-	describe( 'componentDidUpdate()', () => {
-		it( 'should change popup location if preview link is available', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					currentPostLink="https://wordpress.org/?p=1"
-					isSaveable
-					modified="2017-08-03T15:05:50"
-				/>
-			);
+	it( 'should render with `editor-post-preview` class if no `className` is specified.', () => {
+		mockUseSelect();
 
-			const previewWindow = { location: {} };
+		render( <PostPreviewButton /> );
 
-			wrapper.instance().previewWindow = previewWindow;
-
-			wrapper.setProps( { previewLink: 'https://wordpress.org/?p=1' } );
-
-			expect( previewWindow.location ).toBe(
-				'https://wordpress.org/?p=1'
-			);
-		} );
+		const button = screen.getByRole( 'button' );
+		expect( button ).toHaveClass( 'editor-post-preview' );
 	} );
 
-	describe( 'openPreviewWindow()', () => {
-		let windowOpen;
-		beforeEach( () => {
-			windowOpen = window.open;
-		} );
-		afterEach( () => {
-			window.open = windowOpen;
-		} );
+	it( 'should render with a custom class and not `editor-post-preview` if `className` is specified.', () => {
+		mockUseSelect();
 
-		it( 'behaves like a regular link if not autosaveable', () => {
-			const preventDefault = jest.fn();
-			const autosave = jest.fn();
-			const setLocation = jest.fn();
-			window.open = jest.fn( () => ( {
-				focus: jest.fn(),
-				set location( url ) {
-					setLocation( url );
-				},
-			} ) );
+		render( <PostPreviewButton className="foo-bar" /> );
 
-			const wrapper = shallow(
-				<PostPreviewButton postId={ 1 } autosave={ autosave } />
-			);
-
-			wrapper.simulate( 'click', {
-				preventDefault,
-				target: { href: 'https://wordpress.org/?p=1' },
-			} );
-
-			expect( preventDefault ).toHaveBeenCalled();
-			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
-			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
-			expect( autosave ).not.toHaveBeenCalled();
-			expect( setLocation ).toHaveBeenCalledWith(
-				'https://wordpress.org/?p=1'
-			);
-		} );
-
-		it( 'autosaves the post if autosaveable', () => {
-			const preventDefault = jest.fn();
-			const autosave = jest.fn();
-
-			window.open = jest.fn( () => ( {
-				focus: jest.fn(),
-				document: {
-					write: jest.fn(),
-					close: jest.fn(),
-				},
-			} ) );
-
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					autosave={ autosave }
-					isAutosaveable
-				/>
-			);
-
-			wrapper.simulate( 'click', { preventDefault } );
-
-			expect( preventDefault ).toHaveBeenCalled();
-			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
-			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
-			expect( autosave ).toHaveBeenCalled();
-			expect(
-				wrapper.instance().previewWindow.document.write.mock
-					.calls[ 0 ][ 0 ]
-			).toContain( 'Generating preview…' );
-			expect(
-				wrapper.instance().previewWindow.document.close
-			).toHaveBeenCalled();
-		} );
+		const button = screen.getByRole( 'button' );
+		expect( button ).toHaveClass( 'foo-bar' );
+		expect( button ).not.toHaveClass( 'editor-post-preview' );
 	} );
 
-	describe( 'render()', () => {
-		it( 'should render previewLink if provided', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					isSaveable
-					previewLink="https://wordpress.org/?p=1&preview=true"
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
-			);
+	it( 'should render a tertiary button if no classname is specified.', () => {
+		mockUseSelect();
 
-			expect( wrapper ).toMatchSnapshot();
+		render( <PostPreviewButton /> );
+
+		const button = screen.getByRole( 'button' );
+		expect( button ).toHaveClass( 'is-tertiary' );
+	} );
+
+	it( 'should render the button in its default variant if a custom classname is specified.', () => {
+		mockUseSelect();
+
+		render( <PostPreviewButton className="foo-bar" /> );
+
+		const button = screen.getByRole( 'button' );
+		expect( button ).not.toHaveClass( 'is-primary' );
+		expect( button ).not.toHaveClass( 'is-secondary' );
+		expect( button ).not.toHaveClass( 'is-tertiary' );
+		expect( button ).not.toHaveClass( 'is-link' );
+	} );
+
+	it( 'should render `textContent` if specified.', () => {
+		mockUseSelect();
+
+		const textContent = 'Foo bar';
+
+		render( <PostPreviewButton textContent={ textContent } /> );
+
+		const button = screen.getByRole( 'button' );
+		expect( button ).toHaveTextContent( textContent );
+		expect(
+			within( button ).queryByText( 'Preview' )
+		).not.toBeInTheDocument();
+		expect(
+			within( button ).queryByText( '(opens in a new tab)' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should render `Preview` with accessibility text if `textContent` not specified.', () => {
+		mockUseSelect();
+
+		render( <PostPreviewButton /> );
+
+		const button = screen.getByRole( 'button' );
+		expect( within( button ).getByText( 'Preview' ) ).toBeVisible();
+		expect(
+			within( button ).getByText( '(opens in a new tab)' )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should be accessibly disabled if post is not saveable.', () => {
+		mockUseSelect( { isEditedPostSaveable: () => false } );
+
+		render( <PostPreviewButton /> );
+
+		expect( screen.getByRole( 'button' ) ).toBeEnabled();
+		expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+	} );
+
+	it( 'should not be disabled if post is saveable.', () => {
+		mockUseSelect( { isEditedPostSaveable: () => true } );
+
+		render( <PostPreviewButton /> );
+
+		expect( screen.getByRole( 'button' ) ).toBeEnabled();
+		expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
+			'aria-disabled',
+			'true'
+		);
+	} );
+
+	it( 'should set `href` to edited post preview link if specified.', () => {
+		const url = 'https://wordpress.org';
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => url,
+			isEditedPostSaveable: () => true,
 		} );
 
-		it( 'should render currentPostLink otherwise', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					isSaveable
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
-			);
+		render( <PostPreviewButton /> );
 
-			expect( wrapper ).toMatchSnapshot();
+		expect( screen.getByRole( 'link' ) ).toHaveAttribute( 'href', url );
+	} );
+
+	it( 'should set `href` to current post link if specified.', () => {
+		const url = 'https://wordpress.org';
+		mockUseSelect( {
+			getCurrentPostAttribute: () => url,
+			isEditedPostSaveable: () => true,
 		} );
 
-		it( 'should be disabled if post is not saveable', () => {
-			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					currentPostLink="https://wordpress.org/?p=1"
-				/>
-			);
+		render( <PostPreviewButton /> );
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		expect( screen.getByRole( 'link' ) ).toHaveAttribute( 'href', url );
+	} );
+
+	it( 'should prioritize preview link if both preview link and link attribute are specified.', () => {
+		const url1 = 'https://wordpress.org';
+		const url2 = 'https://wordpress.com';
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => url1,
+			getCurrentPostAttribute: () => url2,
+			isEditedPostSaveable: () => true,
 		} );
+
+		render( <PostPreviewButton /> );
+
+		expect( screen.getByRole( 'link' ) ).toHaveAttribute( 'href', url1 );
+	} );
+
+	it( 'should properly set link target', () => {
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => 'https://wordpress.org',
+			isEditedPostSaveable: () => true,
+		} );
+
+		render( <PostPreviewButton /> );
+
+		expect( screen.getByRole( 'link' ) ).toHaveAttribute(
+			'target',
+			'wp-preview-123'
+		);
+	} );
+
+	it( 'should open a window with the specified target', async () => {
+		const user = userEvent.setup();
+
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => 'https://wordpress.org',
+			isEditedPostSaveable: () => true,
+		} );
+
+		render( <PostPreviewButton /> );
+
+		await user.click( screen.getByRole( 'link' ) );
+
+		expect( global.open ).toHaveBeenCalledWith( '', 'wp-preview-123' );
+	} );
+
+	it( 'should display a `Generating preview` message while waiting for autosaving', async () => {
+		const user = userEvent.setup();
+
+		mockUseSelect( {
+			getEditedPostPreviewLink: () => 'https://wordpress.org',
+			isEditedPostSaveable: () => true,
+		} );
+
+		render( <PostPreviewButton /> );
+
+		await user.click( screen.getByRole( 'link' ) );
+
+		const previewText = 'Generating preview…';
+
+		expect( documentWrite ).toHaveBeenCalledWith(
+			expect.stringContaining( previewText )
+		);
+		expect( documentTitle ).toHaveBeenCalledWith( previewText );
+		expect( documentClose ).toHaveBeenCalled();
 	} );
 } );

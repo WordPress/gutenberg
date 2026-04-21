@@ -1,0 +1,19 @@
+[
+	{
+		"blockName": "core/query-no-results",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {
+					"placeholder": "Add a text or blocks that will display when the query returns no results."
+				},
+				"innerBlocks": [],
+				"innerHTML": "\n<p></p>\n",
+				"innerContent": [ "\n<p></p>\n" ]
+			}
+		],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n", null, "\n" ]
+	}
+]

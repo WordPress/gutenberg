@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { createBlock } from '../factory';
@@ -17,9 +12,11 @@ import {
 	synchronizeBlocksWithTemplate,
 } from '../templates';
 
+const noop = () => {};
+
 describe( 'templates', () => {
 	beforeAll( () => {
-		// Initialize the block store
+		// Initialize the block store.
 		require( '../../store' );
 	} );
 
@@ -31,6 +28,7 @@ describe( 'templates', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
@@ -38,10 +36,19 @@ describe( 'templates', () => {
 		} );
 
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {},
 			save: noop,
 			category: 'text',
 			title: 'test block',
+		} );
+
+		registerBlockType( 'core/missing', {
+			apiVersion: 3,
+			attributes: {},
+			save: noop,
+			category: 'text',
+			title: 'missing block',
 		} );
 	} );
 
@@ -200,6 +207,18 @@ describe( 'templates', () => {
 			expect(
 				synchronizeBlocksWithTemplate( blockList, template )
 			).toEqual( [ block1 ] );
+		} );
+
+		it( 'should replace unregistered blocks from template with core/missing block', () => {
+			const template = [
+				[ 'core/test-block' ],
+				[ 'core/test-block-2' ],
+				[ 'core/test-faker' ],
+			];
+
+			expect(
+				synchronizeBlocksWithTemplate( [], template )[ 2 ].name
+			).toEqual( 'core/missing' );
 		} );
 	} );
 } );

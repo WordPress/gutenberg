@@ -1,119 +1,67 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
-import { VisuallyHidden } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
-import GalleryImage from './gallery-image';
-import { defaultColumnsNumber } from './shared';
+import { Caption } from '../utils/caption';
 
-export const Gallery = ( props ) => {
+export default function Gallery( props ) {
 	const {
 		attributes,
-		className,
 		isSelected,
 		setAttributes,
-		selectedImage,
 		mediaPlaceholder,
-		onMoveBackward,
-		onMoveForward,
-		onRemoveImage,
-		onSelectImage,
-		onDeselectImage,
-		onSetImageAttributes,
-		onFocusGalleryCaption,
 		insertBlocksAfter,
+		blockProps,
+		__unstableLayoutClassNames: layoutClassNames,
+		isContentLocked,
+		multiGallerySelection,
 	} = props;
 
-	const {
-		align,
-		columns = defaultColumnsNumber( attributes ),
-		caption,
-		imageCrop,
-		images,
-	} = attributes;
+	const { align, columns, imageCrop } = attributes;
 
 	return (
 		<figure
-			className={ classnames( className, {
-				[ `align${ align }` ]: align,
-				[ `columns-${ columns }` ]: columns,
-				'is-cropped': imageCrop,
-			} ) }
-		>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( img, index ) => {
-					const ariaLabel = sprintf(
-						/* translators: 1: the order number of the image. 2: the total number of images. */
-						__( 'image %1$d of %2$d in gallery' ),
-						index + 1,
-						images.length
-					);
-
-					return (
-						<li
-							className="blocks-gallery-item"
-							key={ img.id || img.url }
-						>
-							<GalleryImage
-								url={ img.url }
-								alt={ img.alt }
-								id={ img.id }
-								isFirstItem={ index === 0 }
-								isLastItem={ index + 1 === images.length }
-								isSelected={
-									isSelected && selectedImage === index
-								}
-								onMoveBackward={ onMoveBackward( index ) }
-								onMoveForward={ onMoveForward( index ) }
-								onRemove={ onRemoveImage( index ) }
-								onSelect={ onSelectImage( index ) }
-								onDeselect={ onDeselectImage( index ) }
-								setAttributes={ ( attrs ) =>
-									onSetImageAttributes( index, attrs )
-								}
-								caption={ img.caption }
-								aria-label={ ariaLabel }
-								sizeSlug={ attributes.sizeSlug }
-							/>
-						</li>
-					);
-				} ) }
-			</ul>
-			{ mediaPlaceholder }
-			<RichTextVisibilityHelper
-				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-				tagName="figcaption"
-				className="blocks-gallery-caption"
-				placeholder={ __( 'Write gallery caption…' ) }
-				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
-				onChange={ ( value ) => setAttributes( { caption: value } ) }
-				inlineToolbar
-				__unstableOnSplitAtEnd={ () =>
-					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+			{ ...blockProps }
+			className={ clsx(
+				blockProps.className,
+				layoutClassNames,
+				'blocks-gallery-grid',
+				{
+					[ `align${ align }` ]: align,
+					[ `columns-${ columns }` ]: columns !== undefined,
+					[ `columns-default` ]: columns === undefined,
+					'is-cropped': imageCrop,
 				}
+			) }
+		>
+			{ blockProps.children }
+			{ isSelected && ! blockProps.children && (
+				<View className="blocks-gallery-media-placeholder-wrapper">
+					{ mediaPlaceholder }
+				</View>
+			) }
+			<Caption
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				insertBlocksAfter={ insertBlocksAfter }
+				showToolbarButton={
+					! multiGallerySelection && ! isContentLocked
+				}
+				className="blocks-gallery-caption"
+				label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Add gallery caption' ) }
 			/>
 		</figure>
 	);
-};
-
-function RichTextVisibilityHelper( { isHidden, ...richTextProps } ) {
-	return isHidden ? (
-		<VisuallyHidden as={ RichText } { ...richTextProps } />
-	) : (
-		<RichText { ...richTextProps } />
-	);
 }
-
-export default Gallery;

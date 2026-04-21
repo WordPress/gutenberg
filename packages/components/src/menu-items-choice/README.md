@@ -1,15 +1,8 @@
 # MenuItemsChoice
 
-`MenuItemsChoice` functions similarly to a set of  `MenuItem`s, but allows the user to select one option from a set of multiple choices.
+`MenuItemsChoice` functions similarly to a set of `MenuItem`s, but allows the user to select one option from a set of multiple choices.
 
 ![MenuItemsChoice Example](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice.png)
-
-1. MenuItemsChoice
-
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
 
 ## Design guidelines
 
@@ -17,7 +10,7 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 
 ### Usage
 
-`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected. 
+`MenuItemsChoice` is used in a `DropdownMenu` to present users with a set of options. When one option in a `MenuItemsChoice` is selected, the others are automatically deselected.
 
 ![MenuItemsChoice Diagram](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice-Checkbox-Keyboard-Shortcut.png)
 
@@ -28,10 +21,10 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 
 Use `MenuItemsChoice` when you want users to:
 
-- Select a single option from a set of choices in a menu.
-- Expose all available options.
+-   Select a single option from a set of choices in a menu.
+-   Expose all available options.
 
-`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`. 
+`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`.
 
 #### Defaults
 
@@ -49,18 +42,17 @@ When one choice in a set of `MenuItemsChoice` is the most desirable or frequentl
 
 Designs with a `MenuItemsChoice` option selected by default make a strong suggestion to the user. It can help them make the best decision and increase their confidence. (Use this guidance with caution, and only for good.)
 
-
 ## Development guidelines
 
 ### Usage
 
 ```jsx
+import { useState } from 'react';
 import { MenuGroup, MenuItemsChoice } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
 
-const MyMenuItemsChoice = withState( {
-	mode: 'visual',
-	choices: [
+const MyMenuItemsChoice = () => {
+	const [ mode, setMode ] = useState( 'visual' );
+	const choices = [
 		{
 			value: 'visual',
 			label: 'Visual editor',
@@ -69,14 +61,16 @@ const MyMenuItemsChoice = withState( {
 			value: 'text',
 			label: 'Code editor',
 		},
-	],
-} )( ( { mode, choices, setState } ) => (
-	<MenuGroup label="Editor">
-		<MenuItemsChoice
-			choices={ choices }
-			value={ mode }
-			onSelect={ mode => setState( { mode } ) }
-		/>
-	</MenuGroup>
-) );
+	];
+
+	return (
+		<MenuGroup label="Editor">
+			<MenuItemsChoice
+				choices={ choices }
+				value={ mode }
+				onSelect={ ( newMode ) => setMode( newMode ) }
+			/>
+		</MenuGroup>
+	);
+};
 ```

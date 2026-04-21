@@ -1,34 +1,22 @@
 {
-    "core/edit-post": {
-        "preferences": {
-            "isGeneralSidebarDismissed": true,
-            "features": {
-                "fixedToolbar": false,
-                "showInserterHelpPanel": false,
-                "fullscreenMode": true,
-                "welcomeGuide": false
-            },
-            "editorMode": "visual",
-            "pinnedPluginItems": {
-
-            },
-            "hiddenBlockTypes": [
-
-            ],
-            "preferredStyleVariations": {
-
-            }
-        }
-    },
-    "core/nux": {
-        "preferences": {
-            "areTipsEnabled": false,
-            "dismissedTips": {
-
-            }
-        }
-    },
-    "automattic/nux": {
-        "isNuxEnabled": false
-    }
+	"core/edit-post": {
+		"preferences": {
+			"isGeneralSidebarDismissed": true,
+			"features": {
+				"fixedToolbar": false,
+				"showInserterHelpPanel": false,
+				"fullscreenMode": true,
+				"welcomeGuide": false
+			},
+			"editorMode": "visual",
+			"pinnedPluginItems": {},
+			"hiddenBlockTypes": []
+		}
+	},
+	"core/nux": {
+		"preferences": {
+			"areTipsEnabled": false,
+			"dismissedTips": {}
+		}
+	}
 }

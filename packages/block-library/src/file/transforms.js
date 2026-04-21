@@ -1,14 +1,11 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { getFilename } from '@wordpress/url';
 
 const transforms = {
 	from: [
@@ -17,7 +14,7 @@ const transforms = {
 			isMatch( files ) {
 				return files.length > 0;
 			},
-			// We define a lower priorty (higher number) than the default of 10. This
+			// We define a lower priority (higher number) than the default of 10. This
 			// ensures that the File block is only created as a fallback.
 			priority: 15,
 			transform: ( files ) => {
@@ -27,13 +24,32 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push(
-						createBlock( 'core/file', {
-							href: blobURL,
-							fileName: file.name,
-							textLinkHref: blobURL,
-						} )
-					);
+					if ( file.type.startsWith( 'video/' ) ) {
+						blocks.push(
+							createBlock( 'core/video', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'image/' ) ) {
+						blocks.push(
+							createBlock( 'core/image', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else if ( file.type.startsWith( 'audio/' ) ) {
+						blocks.push(
+							createBlock( 'core/audio', {
+								blob: createBlobURL( file ),
+							} )
+						);
+					} else {
+						blocks.push(
+							createBlock( 'core/file', {
+								blob: blobURL,
+								fileName: file.name,
+							} )
+						);
+					}
 				} );
 
 				return blocks;
@@ -71,7 +87,8 @@ const transforms = {
 			transform: ( attributes ) => {
 				return createBlock( 'core/file', {
 					href: attributes.url,
-					fileName: attributes.caption,
+					fileName:
+						attributes.caption || getFilename( attributes.url ),
 					textLinkHref: attributes.url,
 					id: attributes.id,
 					anchor: attributes.anchor,
@@ -87,9 +104,9 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'audio' );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
+				return !! media && media.mime_type.includes( 'audio' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/audio', {
@@ -107,9 +124,9 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'video' );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
+				return !! media && media.mime_type.includes( 'video' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/video', {
@@ -127,9 +144,9 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
-				const media = getMedia( id );
-				return !! media && includes( media.mime_type, 'image' );
+				const { getEntityRecord } = select( coreStore );
+				const media = getEntityRecord( 'postType', 'attachment', id );
+				return !! media && media.mime_type.includes( 'image' );
 			},
 			transform: ( attributes ) => {
 				return createBlock( 'core/image', {

@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textAlign": "center",
+			"align": "wide"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"wp-block-heading alignwide has-text-align-center\">Text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"wp-block-heading alignwide has-text-align-center\">Text</h2>\n"
+		]
+	}
+]

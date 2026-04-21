@@ -1,7 +1,12 @@
+.components-external-link {
+	text-decoration: none;
+}
+
+.components-external-link__contents {
+	text-decoration: underline;
+}
+
 .components-external-link__icon {
-	width: 1.4em;
-	height: 1.4em;
-	margin: -0.2em 0.1em 0;
-	vertical-align: middle;
-	fill: currentColor;
+	margin-left: 0.5ch;
+	font-weight: 400;
 }

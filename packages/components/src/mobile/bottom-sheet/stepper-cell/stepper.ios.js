@@ -7,7 +7,7 @@ import { Text, TouchableOpacity, View } from 'react-native';
  * WordPress dependencies
  */
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { Icon, minus, plus } from '@wordpress/icons';
+import { Icon, plus, reset } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,6 +22,8 @@ function Stepper( {
 	onPressInIncrement,
 	onPressOut,
 	value,
+	children,
+	shouldDisplayTextInput,
 } ) {
 	const valueStyle = getStylesFromColorScheme(
 		styles.value,
@@ -34,16 +36,20 @@ function Stepper( {
 
 	return (
 		<View style={ styles.container }>
-			<Text style={ valueStyle }>{ value }</Text>
+			{ ! shouldDisplayTextInput && (
+				<Text style={ valueStyle }>{ value }</Text>
+			) }
+			{ children }
 			<TouchableOpacity
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }
 				onPressOut={ onPressOut }
 				style={ [ buttonStyle, isMinValue ? { opacity: 0.4 } : null ] }
 			>
-				<Icon icon={ minus } size={ 24 } color={ buttonStyle.color } />
+				<Icon icon={ reset } size={ 24 } color={ buttonStyle.color } />
 			</TouchableOpacity>
 			<TouchableOpacity
+				testID="Increment"
 				disabled={ isMaxValue }
 				onPressIn={ onPressInIncrement }
 				onPressOut={ onPressOut }

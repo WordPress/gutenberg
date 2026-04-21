@@ -8,27 +8,37 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
-	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
-			'core/edit-widgets'
-		);
+	const { hasEditedWidgetAreaIds, isSaving, isWidgetSaveLocked } = useSelect(
+		( select ) => {
+			const {
+				getEditedWidgetAreas,
+				isSavingWidgetAreas,
+				isWidgetSavingLocked,
+			} = select( editWidgetsStore );
 
-		return {
-			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
-			isSaving: isSavingWidgetAreas(),
-		};
-	}, [] );
-	const { saveEditedWidgetAreas } = useDispatch( 'core/edit-widgets' );
+			return {
+				hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
+				isSaving: isSavingWidgetAreas(),
+				isWidgetSaveLocked: isWidgetSavingLocked(),
+			};
+		},
+		[]
+	);
+	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
+
+	const isDisabled =
+		isWidgetSaveLocked || isSaving || ! hasEditedWidgetAreaIds;
 
 	return (
 		<Button
-			isPrimary
+			variant="primary"
 			isBusy={ isSaving }
-			aria-disabled={ isSaving }
-			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
-			disabled={ ! hasEditedWidgetAreaIds }
+			aria-disabled={ isDisabled }
+			onClick={ isDisabled ? undefined : saveEditedWidgetAreas }
+			size="compact"
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>

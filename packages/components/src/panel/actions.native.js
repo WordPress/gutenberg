@@ -6,16 +6,30 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import styles from './actions.scss';
 import BottomSeparatorCover from './bottom-separator-cover';
+import TextControl from '../text-control';
 
 function PanelActions( { actions, getStylesFromColorScheme } ) {
+	const mappedActions = useMemo( () => {
+		return actions.map( ( { label, onPress } ) => {
+			return (
+				<TextControl
+					label={ label }
+					onPress={ onPress }
+					labelStyle={ styles.defaultLabelStyle }
+					key={ label }
+				/>
+			);
+		} );
+	}, [ actions ] );
+
 	return (
 		<View
 			style={ getStylesFromColorScheme(
@@ -23,16 +37,7 @@ function PanelActions( { actions, getStylesFromColorScheme } ) {
 				styles.panelActionsContainerDark
 			) }
 		>
-			{ actions.map( ( { label, onPress } ) => {
-				return (
-					<TextControl
-						label={ label }
-						onPress={ onPress }
-						labelStyle={ styles.defaultLabelStyle }
-						key={ label }
-					/>
-				);
-			} ) }
+			{ mappedActions }
 			<BottomSeparatorCover />
 		</View>
 	);

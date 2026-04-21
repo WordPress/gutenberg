@@ -1,16 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
-	Disabled,
-	PanelBody,
 	RangeControl,
+	SelectControl,
+	Spinner,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import ServerSideRender from '@wordpress/server-side-render';
-import { Component } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { useDisabled } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 
 /**
  * Minimum number of comments a user can show using this block.
@@ -25,83 +33,144 @@ const MIN_COMMENTS = 1;
  */
 const MAX_COMMENTS = 100;
 
-class LatestComments extends Component {
-	constructor() {
-		super( ...arguments );
+export default function LatestComments( { attributes, setAttributes, name } ) {
+	const { commentsToShow, displayAvatar, displayDate, displayContent } =
+		attributes;
 
-		this.setCommentsToShow = this.setCommentsToShow.bind( this );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-		// Create toggles for each attribute; we create them here rather than
-		// passing `this.createToggleAttribute( 'displayAvatar' )` directly to
-		// `onChange` to avoid re-renders.
-		this.toggleDisplayAvatar = this.createToggleAttribute(
-			'displayAvatar'
-		);
-		this.toggleDisplayDate = this.createToggleAttribute( 'displayDate' );
-		this.toggleDisplayExcerpt = this.createToggleAttribute(
-			'displayExcerpt'
-		);
-	}
+	const { content, status, error } = useServerSideRender( {
+		attributes,
+		skipBlockSupportAttributes: true,
+		block: name,
+		urlQueryArgs: {
+			// The preview uses the site's locale to make it more true to how
+			// the block appears on the frontend. Setting the locale
+			// explicitly prevents any middleware from setting it to 'user'.
+			_locale: 'site',
+		},
+	} );
 
-	createToggleAttribute( propName ) {
-		return () => {
-			const value = this.props.attributes[ propName ];
-			const { setAttributes } = this.props;
+	const disabledRef = useDisabled();
+	const blockProps = useBlockProps( { ref: disabledRef } );
 
-			setAttributes( { [ propName ]: ! value } );
-		};
-	}
-
-	setCommentsToShow( commentsToShow ) {
-		this.props.setAttributes( { commentsToShow } );
-	}
-
-	render() {
-		const {
-			commentsToShow,
-			displayAvatar,
-			displayDate,
-			displayExcerpt,
-		} = this.props.attributes;
-
-		return (
-			<>
-				<InspectorControls>
-					<PanelBody title={ __( 'Latest comments settings' ) }>
+	return (
+		<>
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							commentsToShow: 5,
+							displayAvatar: true,
+							displayDate: true,
+							displayContent: 'excerpt',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						hasValue={ () => ! displayAvatar }
+						label={ __( 'Display avatar' ) }
+						onDeselect={ () =>
+							setAttributes( { displayAvatar: true } )
+						}
+						isShownByDefault
+					>
 						<ToggleControl
 							label={ __( 'Display avatar' ) }
 							checked={ displayAvatar }
-							onChange={ this.toggleDisplayAvatar }
+							onChange={ () =>
+								setAttributes( {
+									displayAvatar: ! displayAvatar,
+								} )
+							}
 						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => ! displayDate }
+						label={ __( 'Display date' ) }
+						onDeselect={ () =>
+							setAttributes( { displayDate: true } )
+						}
+						isShownByDefault
+					>
 						<ToggleControl
 							label={ __( 'Display date' ) }
 							checked={ displayDate }
-							onChange={ this.toggleDisplayDate }
+							onChange={ () =>
+								setAttributes( { displayDate: ! displayDate } )
+							}
 						/>
-						<ToggleControl
-							label={ __( 'Display excerpt' ) }
-							checked={ displayExcerpt }
-							onChange={ this.toggleDisplayExcerpt }
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => displayContent !== 'excerpt' }
+						label={ __( 'Display content' ) }
+						onDeselect={ () =>
+							setAttributes( { displayContent: 'excerpt' } )
+						}
+						isShownByDefault
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							label={ __( 'Display content' ) }
+							value={ displayContent }
+							options={ [
+								{ label: __( 'No content' ), value: 'none' },
+								{ label: __( 'Excerpt' ), value: 'excerpt' },
+								{ label: __( 'Full content' ), value: 'full' },
+							] }
+							onChange={ ( value ) =>
+								setAttributes( {
+									displayContent: value,
+								} )
+							}
 						/>
+					</ToolsPanelItem>
+
+					<ToolsPanelItem
+						hasValue={ () => commentsToShow !== 5 }
+						label={ __( 'Number of comments' ) }
+						onDeselect={ () =>
+							setAttributes( { commentsToShow: 5 } )
+						}
+						isShownByDefault
+					>
 						<RangeControl
+							__next40pxDefaultSize
 							label={ __( 'Number of comments' ) }
 							value={ commentsToShow }
-							onChange={ this.setCommentsToShow }
+							onChange={ ( value ) =>
+								setAttributes( { commentsToShow: value } )
+							}
 							min={ MIN_COMMENTS }
 							max={ MAX_COMMENTS }
 							required
 						/>
-					</PanelBody>
-				</InspectorControls>
-				<Disabled>
-					<ServerSideRender
-						block="core/latest-comments"
-						attributes={ this.props.attributes }
-					/>
-				</Disabled>
-			</>
-		);
-	}
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			{ status === 'loading' && (
+				<div { ...blockProps }>
+					<Spinner />
+				</div>
+			) }
+			{ status === 'error' && (
+				<div { ...blockProps }>
+					<p>
+						{ sprintf(
+							/* translators: %s: error message returned when rendering the block. */
+							__( 'Error: %s' ),
+							error
+						) }
+					</p>
+				</div>
+			) }
+			{ status === 'success' && (
+				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			) }
+		</>
+	);
 }
-
-export default LatestComments;

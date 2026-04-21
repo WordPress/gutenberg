@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.homepage     = package['homepage']
   s.license      = package['license']
   s.authors      = package['author']
-  s.platform     = :ios, '11.0'
+  s.platform     = :ios, '13.0'
   s.source       = { :git => 'https://github.com/WordPress/gutenberg.git' }
   s.source_files = 'ios/**/*.{h,m,swift}'
   s.requires_arc = true
@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.swift_version = '5.0'
   s.resources = 'common/**/*.{js,css,json}'
 
-  s.dependency 'React', react_native_version
+  s.dependency 'React-Core', react_native_version
   s.dependency 'React-CoreModules', react_native_version
   s.dependency 'React-RCTImage', react_native_version
 

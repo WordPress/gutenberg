@@ -1,45 +1,57 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import { __, sprintf } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { PluginArea } from '@wordpress/plugins';
+import { store as noticesStore } from '@wordpress/notices';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import ErrorBoundary from '../error-boundary';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
-import Header from '../header';
 import Sidebar from '../sidebar';
-import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
+import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
+import WelcomeGuide from '../welcome-guide';
 
 function Layout( { blockEditorSettings } ) {
-	const hasSidebarEnabled = useSelect(
-		( select ) =>
-			!! select( 'core/interface' ).getActiveComplementaryArea(
-				'core/edit-widgets'
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function onPluginAreaError( name ) {
+		createErrorNotice(
+			sprintf(
+				/* translators: %s: plugin name */
+				__(
+					'The "%s" plugin has encountered an error and cannot be rendered.'
+				),
+				name
 			)
-	);
+		);
+	}
+
+	const navigateRegionsProps = useNavigateRegions();
+
 	return (
-		<WidgetAreasBlockEditorProvider
-			blockEditorSettings={ blockEditorSettings }
-		>
-			<InterfaceSkeleton
-				header={ <Header /> }
-				sidebar={
-					hasSidebarEnabled && (
-						<ComplementaryArea.Slot scope="core/edit-widgets" />
-					)
-				}
-				content={
-					<WidgetAreasBlockEditorContent
-						blockEditorSettings={ blockEditorSettings }
-					/>
-				}
-			/>
-			<Sidebar />
-			<Popover.Slot />
-		</WidgetAreasBlockEditorProvider>
+		<ErrorBoundary>
+			<div
+				className={ navigateRegionsProps.className }
+				{ ...navigateRegionsProps }
+				ref={ navigateRegionsProps.ref }
+			>
+				<WidgetAreasBlockEditorProvider
+					blockEditorSettings={ blockEditorSettings }
+				>
+					<Interface blockEditorSettings={ blockEditorSettings } />
+					<Sidebar />
+					<PluginArea onError={ onPluginAreaError } />
+					<UnsavedChangesWarning />
+					<WelcomeGuide />
+				</WidgetAreasBlockEditorProvider>
+			</div>
+		</ErrorBoundary>
 	);
 }
 

@@ -1,37 +1,27 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
+import { store as editPostStore } from '../../store';
 
-function MetaBoxes( { location, isVisible, metaBoxes } ) {
+export default function MetaBoxes( { location } ) {
+	const metaBoxes = useSelect(
+		( select ) =>
+			select( editPostStore ).getMetaBoxesPerLocation( location ),
+		[ location ]
+	);
 	return (
 		<>
-			{ map( metaBoxes, ( { id } ) => (
+			{ ( metaBoxes ?? [] ).map( ( { id } ) => (
 				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
-			{ isVisible && <MetaBoxesArea location={ location } /> }
+			<MetaBoxesArea location={ location } />
 		</>
 	);
 }
-
-export default withSelect( ( select, { location } ) => {
-	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select(
-		'core/edit-post'
-	);
-
-	return {
-		metaBoxes: getMetaBoxesPerLocation( location ),
-		isVisible: isMetaBoxLocationVisible( location ),
-	};
-} )( MetaBoxes );

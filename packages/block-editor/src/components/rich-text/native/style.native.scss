@@ -1,0 +1,28 @@
+
+.richText {
+	font-family: $default-regular-font;
+	color: $gray-900;
+	text-decoration-color: $blue-500;
+	background-color: transparent;
+}
+
+.richTextDark {
+	color: $white;
+	text-decoration-color: $blue-30;
+}
+
+.richTextPlaceholder {
+	color: $gray-20;
+}
+
+.richTextPlaceholderDark {
+	color: $gray-50;
+}
+
+.rich-text-selection {
+	color: $black;
+}
+
+.rich-text-selection--dark {
+	color: $white;
+}

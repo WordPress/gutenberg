@@ -1,77 +1,73 @@
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Button, PanelRow } from '@wordpress/components';
+import { CheckboxControl, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
-export default function EntityRecordItem( {
-	record,
-	checked,
-	onChange,
-	closePanel,
-} ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { getTemplateInfo } from '../../utils/get-template-info';
+
+export default function EntityRecordItem( { record, checked, onChange } ) {
 	const { name, kind, title, key } = record;
-	const parentBlockId = useSelect( ( select ) => {
-		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
-			kind,
-			name,
-			key
-		);
-		// Get parents of the entity's first block.
-		const parents = select( 'core/block-editor' ).getBlockParents(
-			blocks[ 0 ]?.clientId
-		);
-		// Return closest parent block's clientId.
-		return parents[ parents.length - 1 ];
-	}, [] );
 
-	const isSelected = useSelect(
+	// Handle templates that might use default descriptive titles.
+	const { entityRecordTitle, hasPostMetaChanges } = useSelect(
 		( select ) => {
-			const selectedBlockId = select(
-				'core/block-editor'
-			).getSelectedBlockClientId();
-			return selectedBlockId === parentBlockId;
+			if ( 'postType' !== kind || 'wp_template' !== name ) {
+				return {
+					entityRecordTitle: title,
+					hasPostMetaChanges: unlock(
+						select( editorStore )
+					).hasPostMetaChanges( name, key ),
+				};
+			}
+
+			const template = select( coreStore ).getEditedEntityRecord(
+				kind,
+				name,
+				key
+			);
+
+			const { default_template_types: templateTypes = [] } =
+				select( coreStore ).getCurrentTheme() ?? {};
+
+			return {
+				entityRecordTitle: getTemplateInfo( {
+					template,
+					templateTypes,
+				} ).title,
+				hasPostMetaChanges: unlock(
+					select( editorStore )
+				).hasPostMetaChanges( name, key ),
+			};
 		},
-		[ parentBlockId ]
+		[ name, kind, title, key ]
 	);
-	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
-		parentBlockId,
-	] );
-	const selectAndDismiss = useCallback( () => {
-		selectBlock( parentBlockId );
-		closePanel();
-	}, [ parentBlockId ] );
 
 	return (
-		<PanelRow>
-			<CheckboxControl
-				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
-				checked={ checked }
-				onChange={ onChange }
-			/>
-			{ parentBlockId ? (
-				<>
-					<Button
-						onClick={ selectParentBlock }
-						className="entities-saved-states__find-entity"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-					<Button
-						onClick={ selectAndDismiss }
-						className="entities-saved-states__find-entity-small"
-						disabled={ isSelected }
-					>
-						{ isSelectedText }
-					</Button>
-				</>
-			) : null }
-		</PanelRow>
+		<>
+			<PanelRow>
+				<CheckboxControl
+					label={
+						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
+					}
+					checked={ checked }
+					onChange={ onChange }
+					className="entities-saved-states__change-control"
+				/>
+			</PanelRow>
+			{ hasPostMetaChanges && (
+				<ul className="entities-saved-states__changes">
+					<li>{ __( 'Post Meta.' ) }</li>
+				</ul>
+			) }
+		</>
 	);
 }

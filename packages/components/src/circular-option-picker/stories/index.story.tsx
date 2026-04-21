@@ -1,0 +1,164 @@
+/**
+ * External dependencies
+ */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+/**
+ * WordPress dependencies
+ */
+import { createContext, useContext, useState } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import CircularOptionPicker from '..';
+
+const CircularOptionPickerStoryContext = createContext< {
+	currentColor?: string;
+	setCurrentColor?: ( v: string | undefined ) => void;
+} >( {} );
+
+const meta: Meta< typeof CircularOptionPicker > = {
+	title: 'Components/Selection & Input/Color/CircularOptionPicker',
+	id: 'components-circularoptionpicker',
+	component: CircularOptionPicker,
+	subcomponents: {
+		'CircularOptionPicker.Option': CircularOptionPicker.Option,
+		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
+		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
+		'CircularOptionPicker.DropdownLinkAction':
+			CircularOptionPicker.DropdownLinkAction,
+	},
+	argTypes: {
+		actions: { control: false },
+		options: { control: false },
+		children: { control: { type: 'text' } },
+	},
+	parameters: {
+		controls: { expanded: true },
+		docs: {
+			canvas: { sourceState: 'shown' },
+			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
+		},
+	},
+	decorators: [
+		// Share current color state between main component, `actions` and `options`
+		( Story ) => {
+			const [ currentColor, setCurrentColor ] = useState< string >();
+
+			return (
+				<CircularOptionPickerStoryContext.Provider
+					value={ {
+						currentColor,
+						setCurrentColor,
+					} }
+				>
+					<Story />
+				</CircularOptionPickerStoryContext.Provider>
+			);
+		},
+	],
+};
+export default meta;
+
+const colors = [
+	{ color: '#f00', name: 'Red' },
+	{ color: '#0f0', name: 'Green' },
+	{ color: '#0af', name: 'Blue' },
+];
+
+const DefaultOptions = () => {
+	const { currentColor, setCurrentColor } = useContext(
+		CircularOptionPickerStoryContext
+	);
+
+	return (
+		<>
+			{ colors.map( ( { color, name }, index ) => {
+				return (
+					<CircularOptionPicker.Option
+						key={ `${ color }-${ index }` }
+						tooltipText={ name }
+						style={ { backgroundColor: color, color } }
+						isSelected={ color === currentColor }
+						onClick={ () => {
+							setCurrentColor?.( color );
+						} }
+					/>
+				);
+			} ) }
+		</>
+	);
+};
+
+const DefaultActions = () => {
+	const { setCurrentColor } = useContext( CircularOptionPickerStoryContext );
+
+	return (
+		<CircularOptionPicker.ButtonAction
+			onClick={ () => setCurrentColor?.( undefined ) }
+		>
+			Clear
+		</CircularOptionPicker.ButtonAction>
+	);
+};
+
+const Template: StoryFn< typeof CircularOptionPicker > = ( props ) => (
+	<CircularOptionPicker { ...props } />
+);
+
+export const Default = Template.bind( {} );
+Default.args = {
+	'aria-label': 'Circular Option Picker',
+	options: <DefaultOptions />,
+};
+
+export const AsButtons = Template.bind( {} );
+AsButtons.args = {
+	...Default.args,
+	asButtons: true,
+};
+
+export const WithLoopingDisabled = Template.bind( {} );
+WithLoopingDisabled.args = {
+	...Default.args,
+	loop: false,
+};
+WithLoopingDisabled.parameters = {
+	docs: {
+		source: {
+			code: `<CircularOptionPicker
+  'aria-label': 'Circular Option Picker',
+  loop={false}
+  options={<DefaultOptions />}
+/>`,
+		},
+	},
+};
+
+export const WithButtonAction = Template.bind( {} );
+WithButtonAction.args = {
+	...Default.args,
+	actions: <DefaultActions />,
+};
+WithButtonAction.storyName = 'With ButtonAction';
+
+export const WithDropdownLinkAction = Template.bind( {} );
+WithDropdownLinkAction.args = {
+	...Default.args,
+	actions: (
+		<CircularOptionPicker.DropdownLinkAction
+			dropdownProps={ {
+				popoverProps: { placement: 'top-end' },
+				renderContent: () => (
+					<div>This is an example of a DropdownLinkAction.</div>
+				),
+			} }
+			linkText="Learn More"
+		></CircularOptionPicker.DropdownLinkAction>
+	),
+};
+WithDropdownLinkAction.storyName = 'With DropdownLinkAction';

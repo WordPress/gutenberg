@@ -1,43 +1,28 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-breadcrumb {
 	list-style: none;
 	padding: 0;
 	margin: 0;
 
 	li {
-		display: inline-block;
+		display: inline-flex;
 		margin: 0;
+		white-space: nowrap;
 
-		&:not(:last-child)::after {
-			content: "\2192" #{'/*rtl:"\2190"*/'}; // This becomes → for LTR and ← for RTL.
+		.block-editor-block-breadcrumb__separator {
+			fill: currentColor;
+			margin-left: -$grid-unit-05;
+			margin-right: -$grid-unit-05;
+
+			// Flip for RTL.
+			transform: scaleX(1) #{"/*rtl:scaleX(-1);*/"}; // This points the chevron right for LTR and left for RTL.
 		}
-	}
-}
 
-.block-editor-block-breadcrumb__button.components-button {
-	height: $button-size-small;
-	line-height: $button-size-small;
-	padding: 0;
-	position: relative;
-
-	&:hover:not(:disabled) {
-		text-decoration: underline;
-		box-shadow: none;
-	}
-
-	&:focus {
-		box-shadow: none;
-	}
-
-	&:focus::before {
-		content: "";
-		display: block;
-		position: absolute;
-		border-radius: $radius-block-ui;
-		top: $border-width;
-		right: $border-width;
-		bottom: $border-width;
-		left: $border-width;
-		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		&:last-child .block-editor-block-breadcrumb__separator {
+			display: none;
+		}
 	}
 }
 
@@ -45,7 +30,7 @@
 	cursor: default;
 }
 
-.block-editor-block-breadcrumb__button.components-button,
+.block-editor-block-breadcrumb__button.block-editor-block-breadcrumb__button,
 .block-editor-block-breadcrumb__current {
 	color: $gray-900;
 	padding: 0 $grid-unit-10;

@@ -8,8 +8,10 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { page: 2, per_page: 2 } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 2,
 			perPage: 2,
+			offset: null,
 			stableKey: '',
 			fields: null,
 			include: null,
@@ -17,26 +19,20 @@ describe( 'getQueryParts', () => {
 	} );
 
 	it( 'parses out `include` ID filtering', () => {
+		const first = getQueryParts( { include: '1' } );
+		const second = getQueryParts( { include: 1 } );
 		const parts = getQueryParts( { include: [ 1 ] } );
 
+		expect( first ).toEqual( second );
+		expect( second ).toEqual( parts );
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
-			stableKey: '',
+			offset: null,
+			stableKey: 'include=1',
 			fields: null,
 			include: [ 1 ],
-		} );
-	} );
-
-	it( 'parses out `_fields` property filtering', () => {
-		const parts = getQueryParts( { _fields: 'content', a: 1 } );
-
-		expect( parts ).toEqual( {
-			page: 1,
-			perPage: 10,
-			stableKey: 'a=1',
-			fields: [ 'content' ],
-			include: null,
 		} );
 	} );
 
@@ -46,8 +42,10 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( first ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: '%3F=%26&b=2',
 			fields: null,
 			include: null,
@@ -58,8 +56,10 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { a: [ 1, 2 ] } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: 'a%5B0%5D=1&a%5B1%5D=2',
 			fields: null,
 			include: null,
@@ -72,8 +72,10 @@ describe( 'getQueryParts', () => {
 
 		expect( first ).toEqual( second );
 		expect( first ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: 10,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
@@ -84,11 +86,67 @@ describe( 'getQueryParts', () => {
 		const parts = getQueryParts( { b: 2, page: 1, per_page: -1 } );
 
 		expect( parts ).toEqual( {
+			context: 'default',
 			page: 1,
 			perPage: -1,
+			offset: null,
 			stableKey: 'b=2',
 			fields: null,
 			include: null,
 		} );
+	} );
+
+	it( 'encodes stable string key with fields parameters', () => {
+		const parts = getQueryParts( { _fields: [ 'id', 'title' ] } );
+
+		expect( parts ).toEqual( {
+			context: 'default',
+			page: 1,
+			perPage: 10,
+			offset: null,
+			stableKey: '_fields=id%2Ctitle',
+			fields: [ 'id', 'title' ],
+			include: null,
+		} );
+	} );
+
+	it( 'returns the context as a dedicated query part', () => {
+		const parts = getQueryParts( { context: 'view' } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			offset: null,
+			stableKey: '',
+			include: null,
+			fields: null,
+			context: 'view',
+		} );
+	} );
+
+	it( 'extracts offset and excludes it from stableKey', () => {
+		const parts = getQueryParts( {
+			per_page: 50,
+			offset: 100,
+		} );
+
+		expect( parts ).toEqual( {
+			context: 'default',
+			page: 1,
+			perPage: 50,
+			offset: 100,
+			stableKey: '',
+			fields: null,
+			include: null,
+		} );
+	} );
+
+	it( 'ignores non-numeric offset values', () => {
+		const parts = getQueryParts( {
+			per_page: 10,
+			offset: 'abc',
+		} );
+
+		expect( parts.offset ).toBeNull();
 	} );
 } );

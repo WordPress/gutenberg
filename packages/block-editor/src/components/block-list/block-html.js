@@ -6,25 +6,45 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockAttributes,
 	getBlockContent,
 	getBlockType,
-	isValidBlockContent,
 	getSaveContent,
+	validateBlock,
 } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 function BlockHTML( { clientId } ) {
 	const [ html, setHtml ] = useState( '' );
 	const block = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
-	const { updateBlock } = useDispatch( 'core/block-editor' );
+	const { updateBlock } = useDispatch( blockEditorStore );
+
+	// Derive block content as a primitive string so the effect only fires
+	// when the serialized content genuinely changes, not when the block
+	// object reference changes (which happens on every RESET_BLOCKS during
+	// RTC sync, even for unchanged blocks).
+	const blockContent = useMemo(
+		() => ( block ? getBlockContent( block ) : '' ),
+		[ block ]
+	);
+
 	const onChange = () => {
 		const blockType = getBlockType( block.name );
+
+		if ( ! blockType ) {
+			return;
+		}
+
 		const attributes = getBlockAttributes(
 			blockType,
 			html,
@@ -33,9 +53,13 @@ function BlockHTML( { clientId } ) {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const isValid = html
-			? isValidBlockContent( blockType, attributes, content )
-			: true;
+		const [ isValid ] = html
+			? validateBlock( {
+					...block,
+					attributes,
+					originalContent: content,
+			  } )
+			: [ true ];
 
 		updateBlock( clientId, {
 			attributes,
@@ -43,15 +67,15 @@ function BlockHTML( { clientId } ) {
 			isValid,
 		} );
 
-		// Ensure the state is updated if we reset so it displays the default content
+		// Ensure the state is updated if we reset so it displays the default content.
 		if ( ! html ) {
-			setHtml( { content } );
+			setHtml( content );
 		}
 	};
 
 	useEffect( () => {
-		setHtml( getBlockContent( block ) );
-	}, [ block ] );
+		setHtml( blockContent );
+	}, [ blockContent ] );
 
 	return (
 		<TextareaAutosize

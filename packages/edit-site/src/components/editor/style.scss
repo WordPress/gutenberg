@@ -1,53 +1,86 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-editor__editor-interface {
+	opacity: 1;
+
+	@media not (prefers-reduced-motion) {
+		transition: opacity 0.1s ease-out;
+	}
+
+	&.is-loading {
+		opacity: 0;
+	}
+}
+
 .edit-site-editor__toggle-save-panel {
-	z-index: z-index(".edit-site-editor__toggle-save-panel");
-	position: fixed !important; // Need to override the default relative positioning
-	top: -9999em;
-	bottom: auto;
-	left: auto;
-	right: 0;
+	box-sizing: border-box;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $gray-200;
-	height: auto !important; // Need to override the default sidebar positioning
+	border: $border-width dotted $gray-300;
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
-
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within &,
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within & {
-		top: auto;
-		bottom: 0;
-	}
 }
 
-.edit-site-visual-editor {
-	background-color: $white;
-}
+.edit-site-editor__view-mode-toggle {
+	/* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
+	view-transition-name: toggle;
+	/* stylelint-enable */
+	top: 0;
+	left: 0;
+	height: $header-height;
+	width: $header-height;
+	z-index: 100;
 
-.edit-site-editor__inserter-panel {
-	height: 100%;
-	display: flex;
-	flex-direction: column;
-}
-
-.edit-site-editor__inserter-panel-header {
-	padding-top: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	display: flex;
-	justify-content: flex-end;
-
-	@include break-medium() {
-		display: none;
-	}
-}
-
-.edit-site-editor__inserter-panel-content {
-	// Leave space for the close button
-	height: calc(100% - #{$button-size} - #{$grid-unit-10});
-
-	@include break-medium() {
+	.components-button {
+		color: $white;
 		height: 100%;
+		width: 100%;
+		border-radius: 0;
+		overflow: hidden;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		&:hover,
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.edit-site-editor__view-mode-toggle-icon {
+		svg,
+		img {
+			background: $gray-900;
+			display: block;
+		}
+	}
+}
+
+.edit-site-editor__back-icon {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: $header-height;
+	height: $header-height;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: hsla(0, 0%, 80%);
+	pointer-events: none;
+
+	svg {
+		fill: currentColor;
+	}
+
+	&.has-site-icon {
+		background-color: hsla(0, 0%, 100%, 0.6);
+		-webkit-backdrop-filter: saturate(180%) blur(15px);
+		backdrop-filter: saturate(180%) blur(15px);
 	}
 }

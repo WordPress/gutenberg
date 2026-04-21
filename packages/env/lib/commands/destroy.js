@@ -1,55 +1,65 @@
+'use strict';
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
-const util = require( 'util' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
-const inquirer = require( 'inquirer' );
-
-/**
- * Promisified dependencies
- */
-const rimraf = util.promisify( require( 'rimraf' ) );
-const exec = util.promisify( require( 'child_process' ).exec );
+const { confirm } = require( '@inquirer/prompts' );
 
 /**
  * Internal dependencies
  */
-const { readConfig } = require( '../../lib/config' );
+const { loadConfig } = require( '../config' );
+const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
+const { getRuntime, detectRuntime } = require( '../runtime' );
 
 /**
  * Destroy the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}      options
+ * @param {Object}      options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}     options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.force   If true, skips the confirmation prompt.
+ * @param {boolean}     options.debug   True if debug mode is enabled.
+ * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
  */
-module.exports = async function destroy( { spinner, debug } ) {
-	const configPath = path.resolve( '.wp-env.json' );
-	const { dockerComposeConfigPath, workDirectoryPath } = await readConfig(
-		configPath
-	);
+module.exports = async function destroy( {
+	spinner,
+	scripts,
+	force,
+	debug,
+	config: customConfigPath,
+} ) {
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 
 	try {
-		await fs.readdir( workDirectoryPath );
+		await fs.readdir( config.workDirectoryPath );
 	} catch {
 		spinner.text = 'Could not find any files to remove.';
 		return;
 	}
 
-	spinner.info(
-		'WARNING! This will remove Docker containers, volumes, and networks associated with the WordPress instance.'
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
 	);
 
-	const { yesDelete } = await inquirer.prompt( [
-		{
-			type: 'confirm',
-			name: 'yesDelete',
-			message: 'Are you sure you want to continue?',
-			default: false,
-		},
-	] );
+	spinner.info( runtime.getDestroyWarningMessage() );
+
+	let yesDelete = force;
+	if ( ! force ) {
+		try {
+			yesDelete = await confirm( {
+				message: 'Are you sure you want to continue?',
+				default: false,
+			} );
+		} catch ( error ) {
+			if ( error.name === 'ExitPromptError' ) {
+				console.log( 'Cancelled.' );
+				process.exit( 1 );
+			}
+			throw error;
+		}
+	}
 
 	spinner.start();
 
@@ -58,41 +68,9 @@ module.exports = async function destroy( { spinner, debug } ) {
 		return;
 	}
 
-	spinner.text = 'Removing WordPress docker containers.';
+	await runtime.destroy( config, { spinner, debug } );
 
-	await dockerCompose.rm( {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--stop', '-v' ],
-		log: debug,
-	} );
-
-	const directoryHash = path.basename( workDirectoryPath );
-
-	spinner.text = 'Removing docker networks and volumes.';
-	const getVolumes = `docker volume ls | grep "${ directoryHash }" | awk '/ / { print $2 }'`;
-	const removeVolumes = `docker volume rm $(${ getVolumes })`;
-
-	const getNetworks = `docker network ls | grep "${ directoryHash }" | awk '/ / { print $1 }'`;
-	const removeNetworks = `docker network rm $(${ getNetworks })`;
-
-	const command = `${ removeVolumes } && ${ removeNetworks }`;
-
-	if ( debug ) {
-		spinner.info(
-			`Running command to remove volumes and networks:\n${ command }\n`
-		);
+	if ( scripts ) {
+		await executeLifecycleScript( 'afterDestroy', config, spinner );
 	}
-
-	const { stdout } = await exec( command );
-	if ( debug && stdout ) {
-		// Disable reason: Logging information in debug mode.
-		// eslint-disable-next-line no-console
-		console.log( `Removed volumes and networks:\n${ stdout }` );
-	}
-
-	spinner.text = 'Removing local files.';
-
-	await rimraf( workDirectoryPath );
-
-	spinner.text = 'Removed WordPress environment.';
 };

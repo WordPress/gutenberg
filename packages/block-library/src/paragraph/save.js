@@ -1,27 +1,28 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { isRTL } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
-	const { align, content, dropCap, direction } = attributes;
-
-	const className = classnames( {
-		'has-drop-cap': dropCap,
-		[ `has-text-align-${ align }` ]: align,
+	const { content, dropCap, direction, style } = attributes;
+	const textAlign = style?.typography?.textAlign;
+	const className = clsx( {
+		'has-drop-cap':
+			textAlign === ( isRTL() ? 'left' : 'right' ) ||
+			textAlign === 'center'
+				? false
+				: dropCap,
 	} );
 
 	return (
-		<RichText.Content
-			tagName="p"
-			className={ className ? className : undefined }
-			value={ content }
-			dir={ direction }
-		/>
+		<p { ...useBlockProps.save( { className, dir: direction } ) }>
+			<RichText.Content value={ content } />
+		</p>
 	);
 }

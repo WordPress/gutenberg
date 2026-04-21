@@ -18,6 +18,8 @@ Install the module:
 npm install @wordpress/jest-console --save-dev
 ```
 
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
+
 ### Setup
 
 The simplest setup is to use Jest's `setupFilesAfterEnv` config option:
@@ -42,15 +44,15 @@ weird and why would anything be octopus-flavored? You can do that with this test
 
 ```js
 describe( 'drinkAll', () => {
-  test( 'drinks something lemon-flavored', () => {
-    drinkAll( 'lemon' );
-    expect( console ).not.toHaveErrored();
-  } );
+	test( 'drinks something lemon-flavored', () => {
+		drinkAll( 'lemon' );
+		expect( console ).not.toHaveErrored();
+	} );
 
-  test( 'errors when something is octopus-flavored', () => {
-    drinkAll( 'octopus' );
-    expect( console ).toHaveErrored();
-  } );
+	test( 'errors when something is octopus-flavored', () => {
+		drinkAll( 'octopus' );
+		expect( console ).toHaveErrored();
+	} );
 } );
 ```
 
@@ -65,10 +67,12 @@ You might want to check if function calls `console.error` with a specific messag
 
 ```js
 describe( 'drinkAll', () => {
-  test( 'errors with message when something is octopus-flavored', () => {
-    drinkAll( 'octopus' );
-    expect( console ).toHaveErroredWith( 'Should I really drink something that is octopus-flavored?' );
-  } );
+	test( 'errors with message when something is octopus-flavored', () => {
+		drinkAll( 'octopus' );
+		expect( console ).toHaveErroredWith(
+			'Should I really drink something that is octopus-flavored?'
+		);
+	} );
 } );
 ```
 
@@ -111,4 +115,10 @@ specific arguments.
 
 Almost identical usage as `.toHaveErroredWith()`.
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+## Contributing to this package
+
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
+
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+
+<br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

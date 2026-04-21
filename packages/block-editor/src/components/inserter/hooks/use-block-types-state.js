@@ -1,70 +1,106 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
+import {
+	getBlockType,
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+	parse,
+} from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useCallback, useMemo } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { __, sprintf } from '@wordpress/i18n';
 
-// Copied over from the Columns block. It seems like it should become part of public API.
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+import { isFiltered } from '../../../store/utils';
+import { unlock } from '../../../lock-unlock';
 
 /**
  * Retrieves the block types inserter state.
  *
- * @param {string=}  rootClientId        Insertion's root client ID.
- * @param {Function} onInsert            function called when inserter a list of blocks.
+ * @param {string=}  rootClientId Insertion's root client ID.
+ * @param {Function} onInsert     function called when inserter a list of blocks.
+ * @param {boolean}  isQuick
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
-const useBlockTypesState = ( rootClientId, onInsert ) => {
-	const { categories, collections, items, fetchReusableBlocks } = useSelect(
-		( select ) => {
-			const { getInserterItems, getSettings } = select(
-				'core/block-editor'
-			);
-			const { getCategories, getCollections } = select( 'core/blocks' );
-			const { __experimentalFetchReusableBlocks } = getSettings();
-
-			return {
-				categories: getCategories(),
-				collections: getCollections(),
-				items: getInserterItems( rootClientId ),
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
-			};
-		},
-		[ rootClientId ]
+const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
+	const options = useMemo(
+		() => ( { [ isFiltered ]: !! isQuick } ),
+		[ isQuick ]
 	);
+	const [ items ] = useSelect(
+		( select ) => [
+			select( blockEditorStore ).getInserterItems(
+				rootClientId,
+				options
+			),
+		],
+		[ rootClientId, options ]
+	);
+	const { getClosestAllowedInsertionPoint } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { createErrorNotice } = useDispatch( noticesStore );
 
-	// Fetch resuable blocks on mount
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
+	const [ categories, collections ] = useSelect( ( select ) => {
+		const { getCategories, getCollections } = select( blocksStore );
+		return [ getCategories(), getCollections() ];
 	}, [] );
 
-	const onSelectItem = ( { name, initialAttributes, innerBlocks } ) => {
-		const insertedBlock = createBlock(
-			name,
-			initialAttributes,
-			createBlocksFromInnerBlocksTemplate( innerBlocks )
-		);
+	const onSelectItem = useCallback(
+		(
+			{ name, initialAttributes, innerBlocks, syncStatus, content },
+			shouldFocusBlock
+		) => {
+			const destinationClientId = getClosestAllowedInsertionPoint(
+				name,
+				rootClientId
+			);
+			if ( destinationClientId === null ) {
+				const title = getBlockType( name )?.title ?? name;
+				createErrorNotice(
+					sprintf(
+						/* translators: %s: block pattern title. */
+						__( 'Block "%s" can\'t be inserted.' ),
+						title
+					),
+					{
+						type: 'snackbar',
+						id: 'inserter-notice',
+					}
+				);
+				return;
+			}
 
-		onInsert( insertedBlock );
-	};
+			const insertedBlock =
+				syncStatus === 'unsynced'
+					? parse( content, {
+							__unstableSkipMigrationLogs: true,
+					  } )
+					: createBlock(
+							name,
+							initialAttributes,
+							createBlocksFromInnerBlocksTemplate( innerBlocks )
+					  );
+			onInsert(
+				insertedBlock,
+				undefined,
+				shouldFocusBlock,
+				destinationClientId
+			);
+		},
+		[
+			getClosestAllowedInsertionPoint,
+			rootClientId,
+			onInsert,
+			createErrorNotice,
+		]
+	);
 
 	return [ items, categories, collections, onSelectItem ];
 };

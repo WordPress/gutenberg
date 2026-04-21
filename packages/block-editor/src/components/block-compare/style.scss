@@ -1,15 +1,12 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
 /**
  * Invalid block comparison
  */
-
-// Ensure the modal fits the content, otherwise it could be too big
 .block-editor-block-compare {
-	overflow: auto;
 	height: auto;
-
-	@include break-small() {
-		max-height: 70%;
-	}
 }
 
 .block-editor-block-compare__wrapper {
@@ -23,6 +20,7 @@
 		width: 50%;
 		padding: 0 $grid-unit-20 0 0;
 		min-width: 200px;
+		max-width: $break-small;
 
 		button {
 			float: right;
@@ -60,7 +58,7 @@
 
 	.block-editor-block-compare__preview {
 		padding: 0;
-		padding-top: $block-padding;
+		padding-top: $grid-unit-20;
 
 		p {
 			font-size: 12px;
@@ -69,7 +67,7 @@
 	}
 
 	.block-editor-block-compare__action {
-		margin-top: $block-padding;
+		margin-top: $grid-unit-20;
 	}
 
 	.block-editor-block-compare__heading {

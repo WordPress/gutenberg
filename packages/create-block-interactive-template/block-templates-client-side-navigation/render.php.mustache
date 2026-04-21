@@ -1,0 +1,112 @@
+<?php
+/**
+ * PHP file to use when rendering the block type on the server to show on the front end.
+ *
+ * The following variables are exposed to the file:
+ *     $attributes (array): The block attributes.
+ *     $content (string): The block default content.
+ *     $block (WP_Block): The block instance.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
+ */
+
+$quotes = array(
+	array(
+		'text'   => __( 'The best way to predict the future is to invent it.', '{{textdomain}}' ),
+		'author' => 'Alan Kay',
+	),
+	array(
+		'text'   => __( 'Talk is cheap. Show me the code.', '{{textdomain}}' ),
+		'author' => 'Linus Torvalds',
+	),
+	array(
+		'text'   => __( 'Simplicity is the soul of efficiency.', '{{textdomain}}' ),
+		'author' => 'Austin Freeman',
+	),
+	array(
+		'text'   => __( 'Any fool can write code that a computer can understand. Good programmers write code that humans can understand.', '{{textdomain}}' ),
+		'author' => 'Martin Fowler',
+	),
+	array(
+		'text'   => __( 'First, solve the problem. Then, write the code.', '{{textdomain}}' ),
+		'author' => 'John Johnson',
+	),
+);
+
+$total       = count( $quotes );
+$quote_index = isset( $_GET['quote'] ) ? absint( $_GET['quote'] ) % $total : 0;
+$quote       = $quotes[ $quote_index ];
+$prev_index  = ( $quote_index - 1 + $total ) % $total;
+$next_index  = ( $quote_index + 1 ) % $total;
+
+// Adds the global state.
+wp_interactivity_state(
+	'{{namespace}}',
+	array(
+		'timer'           => '00:00.00',
+		'isNavigating'    => false,
+		'artificialDelay' => false,
+	)
+);
+?>
+
+<div
+	<?php echo get_block_wrapper_attributes(); ?>
+	data-wp-interactive="{{namespace}}"
+>
+	<div class="wp-block-{{namespace}}-{{slug}}__timer" data-wp-init="callbacks.startTimer">
+		<?php esc_html_e( 'Client timer:', '{{textdomain}}' ); ?>
+		<span data-wp-text="state.timer"></span>
+	</div>
+
+	<label class="wp-block-{{namespace}}-{{slug}}__delay">
+		<input
+			type="checkbox"
+			data-wp-bind--checked="state.artificialDelay"
+			data-wp-on--change="actions.toggleDelay"
+		/>
+		<?php esc_html_e( 'Introduce artificial network delay', '{{textdomain}}' ); ?>
+	</label>
+
+	<div
+		class="wp-block-{{namespace}}-{{slug}}__content"
+		data-wp-interactive="{{namespace}}"
+		data-wp-router-region="{{namespace}}/quote"
+	>
+		<figure
+			class="wp-block-{{namespace}}-{{slug}}__quote"
+			data-wp-key="quote-<?php echo esc_attr( $quote_index ); ?>"
+		>
+			<blockquote>
+				<p><?php echo esc_html( $quote['text'] ); ?></p>
+			</blockquote>
+			<figcaption>
+				— <?php echo esc_html( $quote['author'] ); ?>
+			</figcaption>
+		</figure>
+
+		<nav class="wp-block-{{namespace}}-{{slug}}__nav">
+			<a
+				href="<?php echo esc_url( add_query_arg( 'quote', $prev_index ) ); ?>"
+				data-wp-on--click="actions.navigateTo"
+				data-wp-on--mouseenter="actions.prefetchTo"
+			>
+				← <?php esc_html_e( 'Prev', '{{textdomain}}' ); ?>
+			</a>
+			<a
+				href="<?php echo esc_url( add_query_arg( 'quote', $next_index ) ); ?>"
+				data-wp-on--click="actions.navigateTo"
+				data-wp-on--mouseenter="actions.prefetchTo"
+			>
+				<?php esc_html_e( 'Next', '{{textdomain}}' ); ?> →
+			</a>
+		</nav>
+
+		<div
+			class="wp-block-{{namespace}}-{{slug}}__loading"
+			data-wp-bind--hidden="!state.isNavigating"
+		>
+			<?php esc_html_e( 'Loading…', '{{textdomain}}' ); ?>
+		</div>
+	</div>
+</div>

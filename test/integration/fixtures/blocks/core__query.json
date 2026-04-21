@@ -1,0 +1,27 @@
+[
+	{
+		"name": "core/query",
+		"isValid": true,
+		"attributes": {
+			"query": {
+				"perPage": null,
+				"pages": 0,
+				"offset": 0,
+				"postType": "post",
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": "",
+				"inherit": true,
+				"taxQuery": null,
+				"parents": [],
+				"format": []
+			},
+			"tagName": "div",
+			"enhancedPagination": false
+		},
+		"innerBlocks": []
+	}
+]

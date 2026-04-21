@@ -1,7 +1,7 @@
 <?php
 /**
- * Functions to register client-side assets (scripts and stylesheets) for the
- * Gutenberg editor plugin.
+ * Functions to register client-side assets (scripts and stylesheets) specific
+ * for the Gutenberg editor plugin.
  *
  * @package gutenberg
  */
@@ -13,88 +13,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Retrieves the root plugin path.
  *
- * @return string Root path to the gutenberg plugin.
- *
  * @since 0.1.0
+ *
+ * @return string Root path to the gutenberg plugin.
  */
 function gutenberg_dir_path() {
-	return plugin_dir_path( dirname( __FILE__ ) );
+	return plugin_dir_path( __DIR__ );
 }
 
 /**
  * Retrieves a URL to a file in the gutenberg plugin.
  *
+ * @since 0.1.0
+ *
  * @param  string $path Relative path of the desired file.
  *
  * @return string       Fully qualified URL pointing to the desired file.
- *
- * @since 0.1.0
  */
 function gutenberg_url( $path ) {
-	return plugins_url( $path, dirname( __FILE__ ) );
-}
-
-/**
- * Registers a script according to `wp_register_script`. Honors this request by
- * reassigning internal dependency properties of any script handle already
- * registered by that name. It does not deregister the original script, to
- * avoid losing inline scripts which may have been attached.
- *
- * @since 4.1.0
- *
- * @param WP_Scripts       $scripts   WP_Scripts instance.
- * @param string           $handle    Name of the script. Should be unique.
- * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
- * @param array            $deps      Optional. An array of registered script handles this script depends on. Default empty array.
- * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
- *                                    as a query string for cache busting purposes. If version is set to false, a version
- *                                    number is automatically added equal to current installed WordPress version.
- *                                    If set to null, no version is added.
- * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
- *                                    Default 'false'.
- */
-function gutenberg_override_script( $scripts, $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
-	$script = $scripts->query( $handle, 'registered' );
-	if ( $script ) {
-		/*
-		 * In many ways, this is a reimplementation of `wp_register_script` but
-		 * bypassing consideration of whether a script by the given handle had
-		 * already been registered.
-		 */
-
-		// See: `_WP_Dependency::__construct` .
-		$script->src  = $src;
-		$script->deps = $deps;
-		$script->ver  = $ver;
-		$script->args = $in_footer;
-
-		/*
-		 * The script's `group` designation is an indication of whether it is
-		 * to be printed in the header or footer. The behavior here defers to
-		 * the arguments as passed. Specifically, group data is not assigned
-		 * for a script unless it is designated to be printed in the footer.
-		 */
-
-		// See: `wp_register_script` .
-		unset( $script->extra['group'] );
-		if ( $in_footer ) {
-			$script->add_data( 'group', 1 );
-		}
-	} else {
-		$scripts->add( $handle, $src, $deps, $ver, $in_footer );
-	}
-
-	/*
-	 * `WP_Dependencies::set_translations` will fall over on itself if setting
-	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
-	 * as a dependency of itself, exhausting memory. The same applies for the
-	 * polyfill script, which is a dependency _of_ `wp-i18n`.
-	 *
-	 * See: https://core.trac.wordpress.org/ticket/46089
-	 */
-	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
-		$scripts->set_translations( $handle, 'default' );
-	}
+	return plugins_url( $path, __DIR__ );
 }
 
 /**
@@ -115,12 +52,12 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts whose handle does not have the "wp-" prefix.
-	if ( 'wp-' !== substr( $handle, 0, 3 ) ) {
+	if ( ! str_starts_with( $handle, 'wp-' ) ) {
 		return $file;
 	}
 
-	// Ignore scripts that are not found in the expected `build/` location.
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
+	// Ignore scripts that are not found in the expected `build/scripts/` location.
+	$script_path = gutenberg_dir_path() . 'build/scripts/' . substr( $handle, 3 ) . '/index.min.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
@@ -150,48 +87,272 @@ function gutenberg_override_translation_file( $file, $handle ) {
 add_filter( 'load_script_translation_file', 'gutenberg_override_translation_file', 10, 2 );
 
 /**
- * Filters the default labels for common post types to change the case style
- * from capitalized (e.g. "Featured Image") to sentence-style (e.g. "Featured
- * image").
+ * Handle special case dependencies for wp-block-library that depend on runtime conditions.
  *
- * See: https://github.com/WordPress/gutenberg/pull/18758
+ * This adds the 'editor' dependency conditionally based on experiments and classic block requirements.
+ * All other script registrations are handled by the auto-generated build/scripts.php file.
  *
- * @param object $labels Object with all the labels as member variables.
- *
- * @return object Object with all the labels, including overridden ones.
+ * @param WP_Scripts $scripts WP_Scripts instance.
  */
-function gutenberg_override_posttype_labels( $labels ) {
-	$labels->featured_image = __( 'Featured image', 'gutenberg' );
-	return $labels;
+function gutenberg_register_block_library_script_special_case( $scripts ) {
+	$handle = 'wp-block-library';
+	$script = $scripts->query( $handle, 'registered' );
+	if (
+		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
+		! empty( $_GET['requiresTinymce'] ) ||
+		gutenberg_post_being_edited_requires_classic_block()
+	) {
+		if ( ! in_array( 'editor', $script->deps, true ) ) {
+			$script->deps[] = 'editor';
+		}
+	}
 }
-foreach ( array( 'post', 'page' ) as $post_type ) {
-	add_filter( "post_type_labels_{$post_type}", 'gutenberg_override_posttype_labels' );
-}
+add_action( 'wp_default_scripts', 'gutenberg_register_block_library_script_special_case', 11 );
 
 /**
- * Registers a style according to `wp_register_style`. Honors this request by
- * deregistering any style by the same handler before registration.
+ * Registers WordPress package styles with complex requirements.
  *
- * @since 4.1.0
+ * Simple styles (main style.css with inferred dependencies) are auto-registered
+ * via build/styles.php at default priority (10). This function runs at priority 15 to handle:
+ * - Multiple style files per package (content.css, classic.css, etc.)
+ * - Non-WordPress dependencies (dashicons, common, forms)
+ * - Custom handles that don't match wp-{package} pattern
+ * - Conditional dependencies based on theme/settings
+ * - Dynamic filename logic
  *
- * @param WP_Styles        $styles WP_Styles instance.
- * @param string           $handle Name of the stylesheet. Should be unique.
- * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
- * @param array            $deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
- * @param string|bool|null $ver    Optional. String specifying stylesheet version number, if it has one, which is added to the URL
- *                                 as a query string for cache busting purposes. If version is set to false, a version
- *                                 number is automatically added equal to current installed WordPress version.
- *                                 If set to null, no version is added.
- * @param string           $media  Optional. The media for which this stylesheet has been defined.
- *                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
- *                                 '(orientation: portrait)' and '(max-width: 640px)'.
+ * These override calls will replace the auto-registered versions as needed.
+ *
+ * @since 6.7.0
+ *
+ * @global array $editor_styles
+ *
+ * @param WP_Styles $styles WP_Styles instance.
  */
-function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
-	$style = $styles->query( $handle, 'registered' );
-	if ( $style ) {
-		$styles->remove( $handle );
+function gutenberg_register_packages_styles( $styles ) {
+	// When in production, use the plugin's version as the asset version;
+	// else (for development or test) default to use the current time.
+	$version = defined( 'GUTENBERG_VERSION' ) && ! SCRIPT_DEBUG ? GUTENBERG_VERSION : time();
+	$suffix  = SCRIPT_DEBUG ? '' : '.min';
+
+	// wp-components: add dashicons (icon font dependency)
+	$styles->query( 'wp-components', 'registered' )->deps[] = 'dashicons';
+
+	// wp-edit-post: add wp-edit-blocks (custom handle not auto-inferred)
+	$styles->query( 'wp-edit-post', 'registered' )->deps[] = 'wp-edit-blocks';
+
+	// wp-edit-site: add core WP styles and custom handles
+	$edit_site_style         = $styles->query( 'wp-edit-site', 'registered' );
+	$edit_site_style->deps[] = 'common';
+	$edit_site_style->deps[] = 'forms';
+	$edit_site_style->deps[] = 'wp-block-library-editor';
+
+	// wp-edit-widgets: add wp-edit-blocks (custom handle not auto-inferred)
+	$styles->query( 'wp-edit-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+
+	// wp-customize-widgets: add wp-edit-blocks (custom handle not auto-inferred)
+	$styles->query( 'wp-customize-widgets', 'registered' )->deps[] = 'wp-edit-blocks';
+
+	// Register wp-base-styles and add it to the already registered wp-admin stylesheet
+	gutenberg_override_style(
+		$styles,
+		'wp-base-styles',
+		gutenberg_url( 'build/styles/base-styles/admin-schemes' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-base-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-base-styles', 'suffix', $suffix );
+	$styles->add_data( 'wp-base-styles', 'path', gutenberg_dir_path() . 'build/styles/base-styles/admin-schemes' . $suffix . '.css' );
+	$styles->query( 'wp-admin', 'registered' )->deps[] = 'wp-base-styles';
+
+	gutenberg_override_style(
+		$styles,
+		'wp-block-editor-content',
+		gutenberg_url( 'build/styles/block-editor/content' . $suffix . '.css' ),
+		array( 'wp-components' ),
+		$version
+	);
+	$styles->add_data( 'wp-block-editor-content', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-editor-content', 'suffix', $suffix );
+
+	$block_library_filename = wp_should_load_separate_core_block_assets() ? 'common' : 'style';
+	gutenberg_override_style(
+		$styles,
+		'wp-block-library',
+		gutenberg_url( 'build/styles/block-library/' . $block_library_filename . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library', 'suffix', $suffix );
+	$styles->add_data( 'wp-block-library', 'path', gutenberg_dir_path() . 'build/styles/block-library/' . $block_library_filename . $suffix . '.css' );
+
+	// Only add CONTENT styles here that should be enqueued in the iframe!
+	$wp_edit_blocks_dependencies = array(
+		'wp-components',
+		// This need to be added before the block library styles,
+		// The block library styles override the "reset" styles.
+		'wp-reset-editor-styles',
+		'wp-block-library',
+		// Until #37466, we can't specifically add them as editor styles yet,
+		// so we must hard-code it here as a dependency.
+		'wp-block-editor-content',
+		'wp-base-styles',
+	);
+
+	// Only load the default layout and margin styles for themes without theme.json file.
+	if ( ! wp_theme_has_theme_json() ) {
+		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
 	}
-	$styles->add( $handle, $src, $deps, $ver, $media );
+
+	global $editor_styles;
+	if ( current_theme_supports( 'wp-block-styles' ) && ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) ) {
+		// Include opinionated block styles if the theme supports block styles and no $editor_styles are declared, so the editor never appears broken.
+		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
+	}
+
+	gutenberg_override_style(
+		$styles,
+		'wp-reset-editor-styles',
+		gutenberg_url( 'build/styles/block-library/reset' . $suffix . '.css' ),
+		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Admin styles.
+		$version
+	);
+	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-reset-editor-styles', 'suffix', $suffix );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-editor-classic-layout-styles',
+		gutenberg_url( 'build/styles/edit-post/classic' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-editor-classic-layout-styles', 'rtl', 'replace' );
+	$styles->add_data( 'wp-editor-classic-layout-styles', 'suffix', $suffix );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-block-library-editor',
+		gutenberg_url( 'build/styles/block-library/editor' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-library-editor', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library-editor', 'suffix', $suffix );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-edit-blocks',
+		gutenberg_url( 'build/styles/block-library/editor' . $suffix . '.css' ),
+		$wp_edit_blocks_dependencies,
+		$version
+	);
+	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
+	$styles->add_data( 'wp-edit-blocks', 'suffix', $suffix );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-block-library-theme',
+		gutenberg_url( 'build/styles/block-library/theme' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
+	$styles->add_data( 'wp-block-library-theme', 'suffix', $suffix );
+
+	gutenberg_override_style(
+		$styles,
+		'classic-theme-styles',
+		gutenberg_url( 'build/styles/block-library/classic' . $suffix . '.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'classic-theme-styles', 'rtl', 'replace' );
+	$styles->add_data( 'classic-theme-styles', 'suffix', $suffix );
+	$styles->add_data( 'classic-theme-styles', 'path', gutenberg_dir_path() . 'build/styles/block-library/classic' . $suffix . '.css' );
+}
+add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
+
+/**
+ * Fetches, processes and compiles stored core styles, then combines and renders them to the page.
+ * Styles are stored via the Style Engine API.
+ *
+ * This hook also exists, and should be backported to Core in future versions.
+ * However, it is envisaged that Gutenberg will continue to use the Style Engine's `gutenberg_*` functions and `_Gutenberg` classes to aid continuous development.
+ *
+ * @since 6.1
+ *
+ * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ *
+ * @param array $options {
+ *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
+ *
+ *     @type bool $optimize Whether to optimize the CSS output, e.g., combine rules. Default is `false`.
+ *     @type bool $prettify Whether to add new lines and indents to output. Default is the test of whether the global constant `SCRIPT_DEBUG` is defined.
+ * }
+ *
+ * @return void
+ */
+function gutenberg_enqueue_stored_styles( $options = array() ) {
+	$is_block_theme   = wp_is_block_theme();
+	$is_classic_theme = ! $is_block_theme;
+
+	/*
+	 * For block themes, print stored styles in the header.
+	 * For classic themes, in the footer.
+	 */
+	if (
+		( $is_block_theme && doing_action( 'wp_footer' ) ) ||
+		( $is_classic_theme && doing_action( 'wp_enqueue_scripts' ) )
+	) {
+		return;
+	}
+
+	$core_styles_keys         = array( 'block-supports' );
+	$compiled_core_stylesheet = '';
+	$style_tag_id             = 'core';
+	foreach ( $core_styles_keys as $style_key ) {
+		// Adds comment if code is prettified to identify core styles sections in debugging.
+		$should_prettify = isset( $options['prettify'] ) ? true === $options['prettify'] : SCRIPT_DEBUG;
+		if ( $should_prettify ) {
+			$compiled_core_stylesheet .= "/**\n * Core styles: $style_key\n */\n";
+		}
+		// Chains core store ids to signify what the styles contain.
+		$style_tag_id             .= '-' . $style_key;
+		$compiled_core_stylesheet .= gutenberg_style_engine_get_stylesheet_from_context( $style_key, $options );
+	}
+
+	// Combines Core styles.
+	if ( ! empty( $compiled_core_stylesheet ) ) {
+		wp_register_style( $style_tag_id, false, array(), true );
+		wp_add_inline_style( $style_tag_id, $compiled_core_stylesheet );
+		wp_enqueue_style( $style_tag_id );
+	}
+
+	// If there are any other stores registered by themes etc., print them out.
+	$additional_stores = WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_stores();
+
+	/*
+	 * Since the corresponding action hook in Core is removed below,
+	 * this function should still honour any styles stored using the Core Style Engine store.
+	 */
+	if ( class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
+		$additional_stores = array_merge( $additional_stores, WP_Style_Engine_CSS_Rules_Store::get_stores() );
+	}
+
+	foreach ( array_keys( $additional_stores ) as $store_name ) {
+		if ( in_array( $store_name, $core_styles_keys, true ) ) {
+			continue;
+		}
+		$styles = gutenberg_style_engine_get_stylesheet_from_context( $store_name, $options );
+		if ( ! empty( $styles ) ) {
+			$key = "wp-style-engine-$store_name";
+			wp_register_style( $key, false, array(), true );
+			wp_add_inline_style( $key, $styles );
+			wp_enqueue_style( $key );
+		}
+	}
 }
 
 /**
@@ -201,464 +362,102 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
  * This function is called from a script during the plugin build process, so it
  * should not call any WordPress PHP functions.
  *
- * @since 0.1.0
+ * @since 13.0
  *
  * @param WP_Scripts $scripts WP_Scripts instance.
  */
 function gutenberg_register_vendor_scripts( $scripts ) {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	$extension   = SCRIPT_DEBUG ? '.js' : '.min.js';
+	$vendors_dir = gutenberg_dir_path() . 'build/scripts/vendors/';
 
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react',
-		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
-		array( 'wp-polyfill' )
-	);
-	gutenberg_register_vendor_script(
-		$scripts,
-		'react-dom',
-		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
-		array( 'react' )
-	);
+	$vendor_handles = array( 'react', 'react-dom', 'react-jsx-runtime' );
 
-	/*
-	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'lodash',
-		'https://unpkg.com/lodash@4.17.19/lodash.js',
-		array(),
-		'4.17.19',
-		true
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
-
-/**
- * Registers all the WordPress packages scripts that are in the standardized
- * `build/` location.
- *
- * @since 4.5.0
- *
- * @param WP_Scripts $scripts WP_Scripts instance.
- */
-function gutenberg_register_packages_scripts( $scripts ) {
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
-		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
-		$handle = 'wp-' . basename( dirname( $path ) );
-
-		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.
-		$asset_file   = substr( $path, 0, -3 ) . '.asset.php';
-		$asset        = file_exists( $asset_file )
-			? require( $asset_file )
-			: null;
-		$dependencies = isset( $asset['dependencies'] ) ? $asset['dependencies'] : array();
-		$version      = isset( $asset['version'] ) ? $asset['version'] : filemtime( $path );
-
-		// Add dependencies that cannot be detected and generated by build tools.
-		switch ( $handle ) {
-			case 'wp-block-library':
-				array_push( $dependencies, 'editor' );
-				break;
-
-			case 'wp-edit-post':
-				array_push( $dependencies, 'media-models', 'media-views', 'postbox' );
-				break;
-
-			case 'wp-edit-site':
-				array_push( $dependencies, 'wp-dom-ready' );
-				break;
-		}
-
-		// Get the path from Gutenberg directory as expected by `gutenberg_url`.
-		$gutenberg_path = substr( $path, strlen( gutenberg_dir_path() ) );
+	foreach ( $vendor_handles as $handle ) {
+		$asset_file   = $vendors_dir . $handle . '.min.asset.php';
+		$asset        = file_exists( $asset_file ) ? require $asset_file : array();
+		$dependencies = $asset['dependencies'] ?? array();
+		$version      = $asset['version'] ?? '0';
 
 		gutenberg_override_script(
 			$scripts,
 			$handle,
-			gutenberg_url( $gutenberg_path ),
+			gutenberg_url( 'build/scripts/vendors/' . $handle . $extension ),
 			$dependencies,
-			$version,
-			true
+			$version
 		);
 	}
-}
-add_action( 'wp_default_scripts', 'gutenberg_register_packages_scripts' );
 
-/**
- * Registers all the WordPress packages styles that are in the standardized
- * `build/` location.
- *
- * @since 6.7.0
-
- * @param WP_Styles $styles WP_Styles instance.
- */
-function gutenberg_register_packages_styles( $styles ) {
-	// Editor Styles.
-	gutenberg_override_style(
-		$styles,
-		'wp-block-editor',
-		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
-		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
-	);
-	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-editor',
-		gutenberg_url( 'build/editor/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-nux' ),
-		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
-	);
-	$styles->add_data( 'wp-editor', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-post',
-		gutenberg_url( 'build/edit-post/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-editor', 'wp-edit-blocks', 'wp-block-library', 'wp-nux' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-post/style.css' )
-	);
-	$styles->add_data( 'wp-edit-post', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-components',
-		gutenberg_url( 'build/components/style.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
-	);
-	$styles->add_data( 'wp-components', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-block-library',
-		gutenberg_url( 'build/block-library/style.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
-	);
-	$styles->add_data( 'wp-block-library', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-format-library',
-		gutenberg_url( 'build/format-library/style.css' ),
-		array( 'wp-block-editor', 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/format-library/style.css' )
-	);
-	$styles->add_data( 'wp-format-library', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-blocks',
-		gutenberg_url( 'build/block-library/editor.css' ),
-		array(
-			'wp-components',
-			'wp-editor',
-			'wp-block-library',
-			// Always include visual styles so the editor never appears broken.
-			'wp-block-library-theme',
-		),
-		filemtime( gutenberg_dir_path() . 'build/block-library/editor.css' )
-	);
-	$styles->add_data( 'wp-edit-blocks', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-nux',
-		gutenberg_url( 'build/nux/style.css' ),
-		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/nux/style.css' )
-	);
-	$styles->add_data( 'wp-nux', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-block-library-theme',
-		gutenberg_url( 'build/block-library/theme.css' ),
-		array(),
-		filemtime( gutenberg_dir_path() . 'build/block-library/theme.css' )
-	);
-	$styles->add_data( 'wp-block-library-theme', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-list-reusable-blocks',
-		gutenberg_url( 'build/list-reusable-blocks/style.css' ),
-		array( 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/style.css' )
-	);
-	$styles->add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-navigation',
-		gutenberg_url( 'build/edit-navigation/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-navigation/style.css' )
-	);
-	$styles->add_data( 'wp-edit-navigation', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-site',
-		gutenberg_url( 'build/edit-site/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-site/style.css' )
-	);
-	$styles->add_data( 'wp-edit-site', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-edit-widgets',
-		gutenberg_url( 'build/edit-widgets/style.css' ),
-		array( 'wp-components', 'wp-block-editor', 'wp-edit-blocks' ),
-		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
-	);
-	$styles->add_data( 'wp-edit-widgets', 'rtl', 'replace' );
-
-	gutenberg_override_style(
-		$styles,
-		'wp-block-directory',
-		gutenberg_url( 'build/block-directory/style.css' ),
-		array( 'wp-block-editor', 'wp-components' ),
-		filemtime( gutenberg_dir_path() . 'build/block-directory/style.css' )
-	);
-	$styles->add_data( 'wp-block-directory', 'rtl', 'replace' );
-}
-add_action( 'wp_default_styles', 'gutenberg_register_packages_styles' );
-
-/**
- * Registers common scripts and styles to be used as dependencies of the editor
- * and plugins.
- *
- * @since 0.1.0
- */
-function gutenberg_enqueue_block_editor_assets() {
-	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
-		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
-
-		wp_enqueue_script(
-			'gutenberg-live-reload',
-			$live_reload_url
-		);
+	// WordPress Core in `wp_register_development_scripts` sets `wp-react-refresh-entry`
+	// as a dependency to `react` when `SCRIPT_DEBUG` is true. Preserve that here.
+	if ( SCRIPT_DEBUG ) {
+		$react = $scripts->query( 'react', 'registered' );
+		if ( $react && ! in_array( 'wp-react-refresh-entry', $react->deps, true ) ) {
+			$react->deps[] = 'wp-react-refresh-entry';
+		}
 	}
 }
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets' );
+add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
 
 /**
- * Retrieves a unique and reasonably short and human-friendly filename for a
- * vendor script based on a URL and the script handle.
+ * Registers or re-registers Gutenberg Script Modules.
  *
- * @param  string $handle The name of the script.
- * @param  string $src    Full URL of the external script.
+ * Script modules that are registered by Core will be re-registered by Gutenberg.
  *
- * @return string         Script filename suitable for local caching.
- *
- * @since 0.1.0
+ * @since 19.3.0
  */
-function gutenberg_vendor_script_filename( $handle, $src ) {
-	$filename = basename( $src );
-	$match    = preg_match(
-		'/^'
-		. '(?P<ignore>.*?)'
-		. '(?P<suffix>\.min)?'
-		. '(?P<extension>\.js)'
-		. '(?P<extra>.*)'
-		. '$/',
-		$filename,
-		$filename_pieces
-	);
-
-	$prefix = $handle;
-	$suffix = $match ? $filename_pieces['suffix'] : '';
-	$hash   = substr( md5( $src ), 0, 8 );
-
-	return "${prefix}${suffix}.${hash}.js";
-}
-
-/**
- * Registers a vendor script from a URL, preferring a locally cached version if
- * possible, or downloading it if the cached version is unavailable or
- * outdated.
- *
- * @param WP_Scripts       $scripts   WP_Scripts instance.
- * @param string           $handle    Name of the script.
- * @param string           $src       Full URL of the external script.
- * @param array            $deps      Optional. An array of registered script handles this
- *                                    script depends on.
- * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
- *                                    as a query string for cache busting purposes. If version is set to false, a version
- *                                    number is automatically added equal to current installed WordPress version.
- *                                    If set to null, no version is added.
- * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
- *                                    Default 'false'.
- *
- * @since 0.1.0
- */
-function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = array(), $ver = null, $in_footer = false ) {
-	if ( defined( 'GUTENBERG_LOAD_VENDOR_SCRIPTS' ) && ! GUTENBERG_LOAD_VENDOR_SCRIPTS ) {
+function gutenberg_define_interactivity_modules_support() {
+	// Load the auto-generated module registry.
+	$modules_registry_file = gutenberg_dir_path() . 'build/modules/index.php';
+	if ( ! file_exists( $modules_registry_file ) ) {
 		return;
 	}
 
-	$filename = gutenberg_vendor_script_filename( $handle, $src );
+	$modules = require $modules_registry_file;
 
-	if ( defined( 'GUTENBERG_LIST_VENDOR_ASSETS' ) && GUTENBERG_LIST_VENDOR_ASSETS ) {
-		echo "$src|$filename\n";
-		return;
-	}
-
-	$full_path = gutenberg_dir_path() . 'vendor/' . $filename;
-
-	$needs_fetch = (
-		defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && (
-			! file_exists( $full_path ) ||
-			time() - filemtime( $full_path ) >= DAY_IN_SECONDS
-		)
-	);
-
-	if ( $needs_fetch ) {
-		// Determine whether we can write to this file.  If not, don't waste
-		// time doing a network request.
-		// @codingStandardsIgnoreStart
-		$f = @fopen( $full_path, 'a' );
-		// @codingStandardsIgnoreEnd
-		if ( ! $f ) {
-			// Failed to open the file for writing, probably due to server
-			// permissions.  Enqueue the script directly from the URL instead.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
-			return;
-		}
-		fclose( $f );
-		$response = wp_remote_get( $src );
-		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
-			$f = fopen( $full_path, 'w' );
-			fwrite( $f, wp_remote_retrieve_body( $response ) );
-			fclose( $f );
-		} elseif ( ! filesize( $full_path ) ) {
-			// The request failed. If the file is already cached, continue to
-			// use this file. If not, then unlink the 0 byte file, and enqueue
-			// the script directly from the URL.
-			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
-			unlink( $full_path );
-			return;
+	// Add client navigation support to block library modules.
+	foreach ( $modules as $module ) {
+		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+			wp_interactivity()->add_client_navigation_support_to_script_module( $module['id'] );
 		}
 	}
-	gutenberg_override_script(
-		$scripts,
-		$handle,
-		gutenberg_url( 'vendor/' . $filename ),
-		$deps,
-		$ver,
-		$in_footer
-	);
+}
+remove_action( 'wp_default_scripts', 'wp_define_interactivity_modules_support' );
+add_action( 'wp_default_scripts', 'gutenberg_define_interactivity_modules_support' );
+
+/**
+ * Always remove the Core action hook while gutenberg_enqueue_stored_styles() exists to avoid styles being printed twice.
+ * This is also because gutenberg_enqueue_stored_styles uses the Style Engine's `gutenberg_*` functions and `_Gutenberg` classes,
+ * which are in continuous development and generally ahead of Core.
+ */
+remove_action( 'wp_enqueue_scripts', 'wp_enqueue_stored_styles' );
+remove_action( 'wp_footer', 'wp_enqueue_stored_styles', 1 );
+
+// Enqueue stored styles.
+add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_stored_styles' );
+add_action( 'wp_footer', 'gutenberg_enqueue_stored_styles', 1 );
+
+add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_latex_to_mathml_loader' );
+function gutenberg_enqueue_latex_to_mathml_loader() {
+	wp_enqueue_script_module( '@wordpress/latex-to-mathml/loader' );
 }
 
 /**
- * Extends block editor settings to include Gutenberg's `editor-styles.css` as
- * taking precedent those styles shipped with core.
+ * Enqueue the vips loader script module in the block editor.
  *
- * @param array $settings Default editor settings.
+ * This registers @wordpress/vips/worker as a dynamic dependency in the import map,
+ * enabling on-demand loading of the ~3.8MB WASM-based image processing module
+ * when client-side media processing is triggered via @wordpress/upload-media.
  *
- * @return array Filtered editor settings.
+ * @see packages/vips/src/loader.ts
  */
-function gutenberg_extend_block_editor_styles( $settings ) {
-	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
-
-	/*
-	 * If, for whatever reason, the built editor styles do not exist, avoid
-	 * override and fall back to the default.
-	 */
-	if ( ! file_exists( $editor_styles_file ) ) {
-		return $settings;
-	}
-
-	if ( empty( $settings['styles'] ) ) {
-		$settings['styles'] = array();
-	} else {
-		/*
-		 * The styles setting is an array of CSS strings, so there is no direct
-		 * way to find the default styles. To maximize stability, load (again)
-		 * the default styles from disk and find its place in the array.
-		 *
-		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
-		 */
-
-		$default_styles = file_get_contents(
-			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-		);
-
-		/*
-		 * Iterate backwards from the end of the array since the preferred
-		 * insertion point in case not found is prepended as first entry.
-		 */
-		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
-			if ( isset( $settings['styles'][ $i ]['css'] ) &&
-					$default_styles === $settings['styles'][ $i ]['css'] ) {
-				break;
-			}
-		}
-	}
-
-	$editor_styles = array(
-		'css' => file_get_contents( $editor_styles_file ),
-	);
-
-	// Substitute default styles if found. Otherwise, prepend to setting array.
-	if ( isset( $i ) && $i >= 0 ) {
-		$settings['styles'][ $i ] = $editor_styles;
-	} else {
-		array_unshift( $settings['styles'], $editor_styles );
-	}
-
-	return $settings;
+if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+	add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_vips_loader' );
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
-
-/**
- * Extends block editor settings to determine whether to use custom unit controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['enableCustomUnits'] = get_theme_support( 'custom-units' );
-	return $settings;
+function gutenberg_enqueue_vips_loader() {
+	wp_enqueue_script_module( '@wordpress/vips/loader' );
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
 
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_spacing( $settings ) {
-	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
-	return $settings;
+add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_core_abilities' );
+function gutenberg_enqueue_core_abilities() {
+	wp_enqueue_script_module( '@wordpress/core-abilities' );
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
-
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_link_color( $settings ) {
-	$settings['__experimentalEnableLinkColor'] = get_theme_support( 'experimental-link-color' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );

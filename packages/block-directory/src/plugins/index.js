@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { registerPlugin } from '@wordpress/plugins';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -9,8 +10,12 @@ import { registerPlugin } from '@wordpress/plugins';
 import AutoBlockUninstaller from '../components/auto-block-uninstaller';
 import InserterMenuDownloadableBlocksPanel from './inserter-menu-downloadable-blocks-panel';
 import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel';
+import getInstallMissing from './get-install-missing';
 
 registerPlugin( 'block-directory', {
+	// The icon is explicitly set to undefined to prevent PluginPrePublishPanel
+	// from rendering the fallback icon pluginIcon.
+	icon: undefined,
 	render() {
 		return (
 			<>
@@ -21,3 +26,16 @@ registerPlugin( 'block-directory', {
 		);
 	},
 } );
+
+addFilter(
+	'blocks.registerBlockType',
+	'block-directory/fallback',
+	( settings, name ) => {
+		if ( name !== 'core/missing' ) {
+			return settings;
+		}
+		settings.edit = getInstallMissing( settings.edit );
+
+		return settings;
+	}
+);

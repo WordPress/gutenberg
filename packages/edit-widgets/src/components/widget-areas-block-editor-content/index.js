@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
 import {
 	BlockList,
-	BlockEditorKeyboardShortcuts,
+	BlockToolbar,
+	BlockTools,
+	BlockSelectionClearer,
 	WritingFlow,
-	ObserveTyping,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -16,32 +20,39 @@ import { useDispatch } from '@wordpress/data';
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent() {
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+export default function WidgetAreasBlockEditorContent( {
+	blockEditorSettings,
+} ) {
+	const hasThemeStyles = useSelect(
+		( select ) =>
+			!! select( preferencesStore ).get(
+				'core/edit-widgets',
+				'themeStyles'
+			),
+		[]
+	);
+	const isLargeViewport = useViewportMatch( 'medium' );
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? blockEditorSettings.styles : [];
+	}, [ blockEditorSettings, hasThemeStyles ] );
 
 	return (
-		<>
-			<KeyboardShortcuts />
-			<BlockEditorKeyboardShortcuts />
+		<div className="edit-widgets-block-editor">
 			<Notices />
-			<Popover.Slot name="block-toolbar" />
-			<div tabIndex="-1" onFocus={ clearSelectedBlock }>
-				<div
-					className="editor-styles-wrapper"
-					onFocus={ ( event ) => {
-						// Stop propagation of the focus event to avoid the parent
-						// widget layout component catching the event and removing the selected area.
-						event.stopPropagation();
-						event.preventDefault();
-					} }
-				>
+			{ ! isLargeViewport && <BlockToolbar hideDragHandle /> }
+			<BlockTools>
+				<KeyboardShortcuts />
+				<EditorStyles
+					styles={ styles }
+					scope=":where(.editor-styles-wrapper)"
+				/>
+				<BlockSelectionClearer>
 					<WritingFlow>
-						<ObserveTyping>
-							<BlockList className="edit-widgets-main-block-list" />
-						</ObserveTyping>
+						<BlockList className="edit-widgets-main-block-list" />
 					</WritingFlow>
-				</div>
-			</div>
-		</>
+				</BlockSelectionClearer>
+			</BlockTools>
+		</div>
 	);
 }

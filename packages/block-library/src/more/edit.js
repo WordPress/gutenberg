@@ -2,11 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, ToggleControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+	ToggleControl,
+} from '@wordpress/components';
+import {
+	InspectorControls,
+	PlainText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const DEFAULT_TEXT = __( 'Read more' );
 
@@ -15,50 +26,61 @@ export default function MoreEdit( {
 	insertBlocksAfter,
 	setAttributes,
 } ) {
-	const [ placeholder, setPlaceholder ] = useState( DEFAULT_TEXT );
-
-	const onChangeInput = ( event ) => {
-		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
-		setPlaceholder( '' );
-		setAttributes( { customText: event.target.value || undefined } );
-	};
-
-	const onKeyDown = ( { keyCode } ) => {
-		if ( keyCode === ENTER ) {
-			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
-		}
-	};
-
-	const getHideExcerptHelp = ( checked ) =>
-		checked
-			? __( 'The excerpt is hidden.' )
-			: __( 'The excerpt is visible.' );
-
-	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
-	const value = customText ?? placeholder;
-	const style = { width: `${ value.length + 1.2 }em` };
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody>
-					<ToggleControl
-						label={ __(
-							'Hide the excerpt on the full content page'
-						) }
-						checked={ !! noTeaser }
-						onChange={ toggleHideExcerpt }
-						help={ getHideExcerptHelp }
-					/>
-				</PanelBody>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							noTeaser: false,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						label={ __( 'Hide excerpt' ) }
+						isShownByDefault
+						hasValue={ () => noTeaser }
+						onDeselect={ () =>
+							setAttributes( { noTeaser: false } )
+						}
+					>
+						<ToggleControl
+							label={ __(
+								'Hide the excerpt on the full content page'
+							) }
+							checked={ !! noTeaser }
+							onChange={ () =>
+								setAttributes( { noTeaser: ! noTeaser } )
+							}
+							help={ ( checked ) =>
+								checked
+									? __( 'The excerpt is hidden.' )
+									: __( 'The excerpt is visible.' )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
-			<div className="wp-block-more">
-				<input
-					type="text"
-					value={ value }
-					onChange={ onChangeInput }
-					onKeyDown={ onKeyDown }
-					style={ style }
+			<div { ...useBlockProps() }>
+				<PlainText
+					__experimentalVersion={ 2 }
+					tagName="span"
+					aria-label={ __( '"Read more" text' ) }
+					value={ customText }
+					placeholder={ DEFAULT_TEXT }
+					onChange={ ( value ) =>
+						setAttributes( { customText: value } )
+					}
+					disableLineBreaks
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
+					}
 				/>
 			</div>
 		</>

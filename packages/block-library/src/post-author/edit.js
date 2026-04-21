@@ -1,53 +1,181 @@
 /**
  * External dependencies
  */
-import { forEach } from 'lodash';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import {
+	Button,
+	ComboboxControl,
+	SelectControl,
+	ToggleControl,
+	__experimentalText as Text,
+	__experimentalVStack as VStack,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { debounce } from '@wordpress/compose';
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 
-function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
-	const { postType, postId } = context;
+/**
+ * Internal dependencies
+ */
+import { recreateWithRecommendedBlocks } from './utils';
+import {
+	useDefaultAvatar,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 
-	const { authorId, authorDetails, authors } = useSelect(
+const { InspectorControlsLastItem } = unlock( blockEditorPrivateApis );
+
+const AUTHORS_QUERY = {
+	who: 'authors',
+	per_page: 100,
+	_fields: 'id,name',
+	context: 'view',
+};
+
+function AuthorCombobox( { value, onChange } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const { authors, isLoading } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getAuthors } = select(
-				'core'
-			);
-			const _authorId = getEditedEntityRecord(
+			const { getUsers, isResolving } = select( coreStore );
+
+			const query = { ...AUTHORS_QUERY };
+			if ( filterValue ) {
+				query.search = filterValue;
+				query.search_columns = [ 'name' ];
+			}
+
+			return {
+				authors: getUsers( query ),
+				isLoading: isResolving( 'getUsers', [ query ] ),
+			};
+		},
+		[ filterValue ]
+	);
+
+	const authorOptions = useMemo( () => {
+		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
+			return {
+				value: author.id,
+				label: decodeEntities( author.name ),
+			};
+		} );
+
+		// Ensure the current author is included in the list.
+		const foundAuthor = fetchedAuthors.findIndex(
+			( fetchedAuthor ) => value?.id === fetchedAuthor.value
+		);
+
+		let currentAuthor = [];
+		if ( foundAuthor < 0 && value ) {
+			currentAuthor = [
+				{
+					value: value.id,
+					label: decodeEntities( value.name ),
+				},
+			];
+		} else if ( foundAuthor < 0 && ! value ) {
+			currentAuthor = [
+				{
+					value: 0,
+					label: __( '(No author)' ),
+				},
+			];
+		}
+
+		return [ ...currentAuthor, ...fetchedAuthors ];
+	}, [ authors, value ] );
+
+	return (
+		<ComboboxControl
+			__next40pxDefaultSize
+			label={ __( 'Author' ) }
+			options={ authorOptions }
+			value={ value?.id }
+			onFilterValueChange={ debounce( setFilterValue, 300 ) }
+			onChange={ onChange }
+			allowReset={ false }
+			isLoading={ isLoading }
+		/>
+	);
+}
+
+function PostAuthorEdit( {
+	isSelected,
+	context: { postType, postId, queryId },
+	attributes,
+	setAttributes,
+	clientId,
+} ) {
+	const isDescendentOfQueryLoop = Number.isFinite( queryId );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const defaultAvatar = useDefaultAvatar();
+
+	const { authorDetails, canAssignAuthor, supportsAuthor } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getUser, getPostType } =
+				select( coreStore );
+			const currentPost = getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
-			)?.author;
+			);
+			const authorId = currentPost?.author;
 
 			return {
-				authorId: _authorId,
-				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getAuthors(),
+				authorDetails: authorId
+					? getUser( authorId, { context: 'view' } )
+					: null,
+				supportsAuthor:
+					getPostType( postType )?.supports?.author ?? false,
+				canAssignAuthor: currentPost?._links?.[
+					'wp:action-assign-author'
+				]
+					? true
+					: false,
 			};
 		},
 		[ postType, postId ]
 	);
+	const blockTypes = useSelect(
+		( select ) => select( blocksStore ).getBlockTypes(),
+		[]
+	);
+	const { editEntityRecord } = useDispatch( coreStore );
+	const { replaceBlock } = useDispatch( blockEditorStore );
 
-	const { editEntityRecord } = useDispatch( 'core' );
-
-	const { textAlign, showAvatar, showBio, byline } = attributes;
-
+	const {
+		textAlign,
+		showAvatar,
+		showBio,
+		byline,
+		isLink,
+		linkTarget,
+		avatarSize,
+	} = attributes;
 	const avatarSizes = [];
-	if ( authorDetails ) {
-		forEach( authorDetails.avatar_urls, ( url, size ) => {
+	const authorName = authorDetails?.name || __( 'Post Author' );
+	if ( authorDetails?.avatar_urls ) {
+		Object.keys( authorDetails.avatar_urls ).forEach( ( size ) => {
 			avatarSizes.push( {
 				value: size,
 				label: `${ size } x ${ size }`,
@@ -55,56 +183,182 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		} );
 	}
 
+	const blockProps = useBlockProps( {
+		className: clsx( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
+	const handleSelect = ( nextAuthorId ) => {
+		editEntityRecord( 'postType', postType, postId, {
+			author: nextAuthorId,
+		} );
+	};
+
+	const showAuthorControl =
+		!! postId && ! isDescendentOfQueryLoop && canAssignAuthor;
+
+	if ( ! supportsAuthor && postType !== undefined ) {
+		return (
+			<div { ...blockProps }>
+				{ sprintf(
+					// translators: %s: Name of the post type e.g: "post".
+					__( 'This post type (%s) does not support the author.' ),
+					postType
+				) }
+			</div>
+		);
+	}
+
+	function transformBlock() {
+		replaceBlock(
+			clientId,
+			recreateWithRecommendedBlocks( attributes, blockTypes )
+		);
+	}
+
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Author Settings' ) }>
-					<SelectControl
-						label={ __( 'Author' ) }
-						value={ authorId }
-						options={ authors.map( ( { id, name } ) => {
-							return {
-								value: id,
-								label: name,
-							};
-						} ) }
-						onChange={ ( nextAuthorId ) => {
-							editEntityRecord( 'postType', postType, postId, {
-								author: nextAuthorId,
-							} );
-						} }
-					/>
-					<ToggleControl
-						label={ __( 'Show avatar' ) }
-						checked={ showAvatar }
-						onChange={ () =>
-							setAttributes( { showAvatar: ! showAvatar } )
-						}
-					/>
-					{ showAvatar && (
-						<SelectControl
-							label={ __( 'Avatar size' ) }
-							value={ attributes.avatarSize }
-							options={ avatarSizes }
-							onChange={ ( size ) => {
-								setAttributes( {
-									avatarSize: Number( size ),
-								} );
-							} }
-						/>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							avatarSize: 48,
+							showAvatar: true,
+							isLink: false,
+							linkTarget: '_self',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					{ showAuthorControl && (
+						<div style={ { gridColumn: '1 / -1' } }>
+							<AuthorCombobox
+								value={ authorDetails }
+								onChange={ handleSelect }
+							/>
+						</div>
 					) }
-					<ToggleControl
-						label={ __( 'Show bio' ) }
-						checked={ showBio }
-						onChange={ () =>
-							setAttributes( { showBio: ! showBio } )
+					<ToolsPanelItem
+						label={ __( 'Show avatar' ) }
+						isShownByDefault
+						hasValue={ () => ! showAvatar }
+						onDeselect={ () =>
+							setAttributes( { showAvatar: true } )
 						}
-					/>
-				</PanelBody>
+					>
+						<ToggleControl
+							label={ __( 'Show avatar' ) }
+							checked={ showAvatar }
+							onChange={ () =>
+								setAttributes( {
+									showAvatar: ! showAvatar,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+					{ showAvatar && (
+						<ToolsPanelItem
+							label={ __( 'Avatar size' ) }
+							isShownByDefault
+							hasValue={ () => avatarSize !== 48 }
+							onDeselect={ () =>
+								setAttributes( { avatarSize: 48 } )
+							}
+						>
+							<SelectControl
+								__next40pxDefaultSize
+								label={ __( 'Avatar size' ) }
+								value={ avatarSize }
+								options={ avatarSizes }
+								onChange={ ( size ) => {
+									setAttributes( {
+										avatarSize: Number( size ),
+									} );
+								} }
+							/>
+						</ToolsPanelItem>
+					) }
+					<ToolsPanelItem
+						label={ __( 'Show bio' ) }
+						isShownByDefault
+						hasValue={ () => !! showBio }
+						onDeselect={ () =>
+							setAttributes( { showBio: undefined } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Show bio' ) }
+							checked={ !! showBio }
+							onChange={ () =>
+								setAttributes( { showBio: ! showBio } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Link author name to author page' ) }
+						isShownByDefault
+						hasValue={ () => !! isLink }
+						onDeselect={ () => setAttributes( { isLink: false } ) }
+					>
+						<ToggleControl
+							label={ __( 'Link author name to author page' ) }
+							checked={ isLink }
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
+							}
+						/>
+					</ToolsPanelItem>
+					{ isLink && (
+						<ToolsPanelItem
+							label={ __( 'Link target' ) }
+							isShownByDefault
+							hasValue={ () => linkTarget !== '_self' }
+							onDeselect={ () =>
+								setAttributes( { linkTarget: '_self' } )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</ToolsPanelItem>
+					) }
+				</ToolsPanel>
 			</InspectorControls>
+			{ blockTypes.some(
+				( blockType ) => blockType.name === 'core/group'
+			) && (
+				<InspectorControlsLastItem>
+					<VStack
+						className="wp-block-post-author__transform"
+						alignment="left"
+						spacing={ 4 }
+					>
+						<Text as="p">
+							{ __(
+								'This block is no longer supported. Recreate its design with the Avatar, Author Name and Author Biography blocks.'
+							) }
+						</Text>
+						<Button
+							variant="primary"
+							onClick={ transformBlock }
+							__next40pxDefaultSize
+						>
+							{ __( 'Recreate' ) }
+						</Button>
+					</VStack>
+				</InspectorControlsLastItem>
+			) }
 
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );
@@ -112,30 +366,28 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
-				{ showAvatar && authorDetails && (
+			<div { ...blockProps }>
+				{ showAvatar && (
 					<div className="wp-block-post-author__avatar">
 						<img
-							width={ attributes.avatarSize }
+							width={ avatarSize }
 							src={
-								authorDetails.avatar_urls[
-									attributes.avatarSize
-								]
+								authorDetails?.avatar_urls?.[ avatarSize ] ||
+								defaultAvatar
 							}
-							alt={ authorDetails.name }
+							alt={
+								authorDetails?.name || __( 'Default Avatar' )
+							}
 						/>
 					</div>
 				) }
 				<div className="wp-block-post-author__content">
 					{ ( ! RichText.isEmpty( byline ) || isSelected ) && (
 						<RichText
+							identifier="byline"
 							className="wp-block-post-author__byline"
-							multiline={ false }
-							placeholder={ __( 'Write byline …' ) }
+							aria-label={ __( 'Post author byline text' ) }
+							placeholder={ __( 'Write byline…' ) }
 							value={ byline }
 							onChange={ ( value ) =>
 								setAttributes( { byline: value } )
@@ -143,15 +395,27 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						/>
 					) }
 					<p className="wp-block-post-author__name">
-						{ authorDetails?.name || __( 'Post Author' ) }
+						{ isLink ? (
+							<a
+								href="#post-author-pseudo-link"
+								onClick={ ( event ) => event.preventDefault() }
+							>
+								{ authorName }
+							</a>
+						) : (
+							authorName
+						) }
 					</p>
 					{ showBio && (
-						<p className="wp-block-post-author__bio">
-							{ authorDetails?.description }
-						</p>
+						<p
+							className="wp-block-post-author__bio"
+							dangerouslySetInnerHTML={ {
+								__html: authorDetails?.description,
+							} }
+						/>
 					) }
 				</div>
-			</Block.div>
+			</div>
 		</>
 	);
 }

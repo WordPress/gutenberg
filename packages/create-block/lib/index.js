@@ -1,9 +1,9 @@
 /**
  * External dependencies
  */
-const inquirer = require( 'inquirer' );
+const { confirm, select } = require( '@inquirer/prompts' );
+const { capitalCase } = require( 'change-case' );
 const program = require( 'commander' );
-const { pickBy, startCase } = require( 'lodash' );
 
 /**
  * Internal dependencies
@@ -14,33 +14,45 @@ const log = require( './log' );
 const { engines, version } = require( '../package.json' );
 const scaffold = require( './scaffold' );
 const {
-	getBlockTemplate,
 	getDefaultValues,
-	getPrompts,
+	getProjectTemplate,
+	runPrompts,
 } = require( './templates' );
 
 const commandName = `wp-create-block`;
 program
 	.name( commandName )
 	.description(
-		'Generates PHP, JS and CSS code for registering a block for a WordPress plugin.\n\n' +
-			'[slug] is optional. When provided it triggers the quick mode where ' +
+		'Generates PHP, JS and CSS code for registering a WordPress plugin with blocks.\n\n' +
+			'[slug] is optional. When provided, it triggers the quick mode where ' +
 			'it is used as the block slug used for its identification, the output ' +
 			'location for scaffolded files, and the name of the WordPress plugin.' +
 			'The rest of the configuration is set to all default values unless ' +
-			'overridden with some of the options listed below.'
+			'overridden with some options listed below.'
 	)
 	.version( version )
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext"',
-		'esnext'
+		'project template type name; allowed values: "standard", "es5", the name of an external npm package, or the path to a local directory',
+		'standard'
+	)
+	.option( '--variant <variant>', 'the variant of the template to use' )
+	.option( '--no-plugin', 'scaffold only block files' )
+	.option(
+		'--target-dir <directory>',
+		'the directory where the files will be scaffolded, defaults to the slug'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
-	.option( '--title <value>', 'display title for the block' )
+	.option(
+		'--title <value>',
+		'display title for the block and the WordPress plugin'
+	)
 	// The name "description" is used internally so it couldn't be used.
-	.option( '--short-description <value>', 'short description for the block' )
+	.option(
+		'--short-description <value>',
+		'short description for the block and the WordPress plugin'
+	)
 	.option( '--category <name>', 'category name for the block' )
 	.option(
 		'--wp-scripts',
@@ -50,57 +62,149 @@ program
 		'--no-wp-scripts',
 		'disable integration with `@wordpress/scripts` package'
 	)
+	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
+	.option( '--textdomain <value>', 'text domain for internationalization' )
 	.action(
 		async (
 			slug,
 			{
+				plugin,
 				category,
 				namespace,
 				shortDescription: description,
 				template: templateName,
 				title,
 				wpScripts,
+				wpEnv,
+				variant,
+				targetDir,
+				textdomain,
 			}
 		) => {
-			await checkSystemRequirements( engines );
 			try {
-				const blockTemplate = await getBlockTemplate( templateName );
-				const defaultValues = getDefaultValues( blockTemplate );
-				const optionsValues = pickBy(
-					{
+				await checkSystemRequirements( engines );
+
+				const projectTemplate =
+					await getProjectTemplate( templateName );
+				const availableVariants = Object.keys(
+					projectTemplate.variants
+				);
+				if ( variant && ! availableVariants.includes( variant ) ) {
+					if ( ! availableVariants.length ) {
+						throw new CLIError(
+							`"${ variant }" variant was selected. This template does not have any variants!`
+						);
+					}
+					throw new CLIError(
+						`"${ variant }" is not a valid variant for this template. Available variants are: ${ availableVariants.join(
+							', '
+						) }.`
+					);
+				}
+
+				const optionsValues = Object.fromEntries(
+					Object.entries( {
+						plugin,
 						category,
 						description,
 						namespace,
 						title,
 						wpScripts,
-					},
-					( value ) => value !== undefined
+						wpEnv,
+						targetDir,
+						textdomain,
+					} ).filter( ( [ , value ] ) => value !== undefined )
 				);
 
 				if ( slug ) {
+					const defaultValues = getDefaultValues(
+						projectTemplate,
+						variant
+					);
 					const answers = {
 						...defaultValues,
 						slug,
 						// Transforms slug to title as a fallback.
-						title: startCase( slug ),
+						title: capitalCase( slug ),
 						...optionsValues,
+						variant,
 					};
-					await scaffold( blockTemplate, answers );
+					await scaffold( projectTemplate, answers );
 				} else {
-					const prompts = getPrompts( blockTemplate ).filter(
-						( { name } ) =>
-							! Object.keys( optionsValues ).includes( name )
+					log.info( '' );
+					log.info(
+						plugin
+							? "Let's customize your WordPress plugin with blocks:"
+							: "Let's add a new block to your existing WordPress plugin:"
 					);
-					const answers = await inquirer.prompt( prompts );
-					await scaffold( blockTemplate, {
+
+					if ( ! variant && availableVariants.length > 1 ) {
+						variant = await select( {
+							message:
+								'The template variant to use for this block:',
+							choices: availableVariants.map( ( value ) => ( {
+								value,
+							} ) ),
+						} );
+					}
+
+					const defaultValues = getDefaultValues(
+						projectTemplate,
+						variant
+					);
+
+					const blockAnswers = await runPrompts(
+						projectTemplate,
+						[
+							'slug',
+							'namespace',
+							'title',
+							'description',
+							'dashicon',
+							'category',
+							! plugin && ! textdomain && 'textdomain',
+						].filter( Boolean ),
+						variant,
+						optionsValues
+					);
+
+					const pluginAnswers =
+						plugin &&
+						( await confirm( {
+							message:
+								'Do you want to customize the WordPress plugin?',
+							default: false,
+						} ) )
+							? await runPrompts(
+									projectTemplate,
+									[
+										'pluginURI',
+										'version',
+										'author',
+										'license',
+										'licenseURI',
+										'domainPath',
+										'updateURI',
+									],
+									variant,
+									optionsValues
+							  )
+							: {};
+
+					await scaffold( projectTemplate, {
 						...defaultValues,
 						...optionsValues,
-						...answers,
+						variant,
+						...blockAnswers,
+						...pluginAnswers,
 					} );
 				}
 			} catch ( error ) {
 				if ( error instanceof CLIError ) {
 					log.error( error.message );
+					process.exit( 1 );
+				} else if ( error.name === 'ExitPromptError' ) {
+					log.info( 'Cancelled.' );
 					process.exit( 1 );
 				} else {
 					throw error;
@@ -115,6 +219,9 @@ program
 		log.info( `  $ ${ commandName } todo-list` );
 		log.info(
 			`  $ ${ commandName } todo-list --template es5 --title "TODO List"`
+		);
+		log.info(
+			`  $ ${ commandName } todo-list --no-plugin --textdomain=my-plugin`
 		);
 	} )
 	.parse( process.argv );

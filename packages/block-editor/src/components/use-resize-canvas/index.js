@@ -4,11 +4,6 @@
 import { useEffect, useState } from '@wordpress/element';
 
 /**
- * Internal dependencies
- */
-import { default as useSimulatedMediaQuery } from '../../components/use-simulated-media-query';
-
-/**
  * Function to resize the editor window.
  *
  * @param {string} deviceType Used for determining the size of the container (e.g. Desktop, Tablet, Mobile)
@@ -34,12 +29,17 @@ export default function useResizeCanvas( deviceType ) {
 	const getCanvasWidth = ( device ) => {
 		let deviceWidth;
 
+		/*
+		 * Matches the breakpoints in packages/base-styles/_breakpoints.scss,
+		 * and breakpoints in packages/compose/src/hooks/use-viewport-match/index.js.
+		 * minus 1 to trigger the media query for device preview.
+		 */
 		switch ( device ) {
 			case 'Tablet':
-				deviceWidth = 780;
+				deviceWidth = 782 - 1; // preview for useViewportMatch( 'medium', '<' )
 				break;
 			case 'Mobile':
-				deviceWidth = 360;
+				deviceWidth = 480 - 1; // preview for useViewportMatch( 'mobile', '<' )
 				break;
 			default:
 				return null;
@@ -48,31 +48,32 @@ export default function useResizeCanvas( deviceType ) {
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
-
 	const contentInlineStyles = ( device ) => {
 		const height = device === 'Mobile' ? '768px' : '1024px';
+		const marginVertical = '40px';
+		const marginHorizontal = 'auto';
+
 		switch ( device ) {
 			case 'Tablet':
 			case 'Mobile':
 				return {
 					width: getCanvasWidth( device ),
-					margin: marginValue() + 'px auto',
-					flexGrow: 0,
+					// Keeping margin styles separate to avoid warnings
+					// when those props get overridden in the iframe component
+					marginTop: marginVertical,
+					marginBottom: marginVertical,
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
 					height,
-					minHeight: height,
-					maxHeight: height,
 					overflowY: 'auto',
 				};
 			default:
-				return null;
+				return {
+					marginLeft: marginHorizontal,
+					marginRight: marginHorizontal,
+				};
 		}
 	};
-
-	useSimulatedMediaQuery(
-		'resizable-editor-section',
-		getCanvasWidth( deviceType )
-	);
 
 	return contentInlineStyles( deviceType );
 }

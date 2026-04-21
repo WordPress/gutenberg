@@ -1,51 +1,63 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { pullquote as icon } from '@wordpress/icons';
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { SOLID_COLOR_STYLE_NAME } from './shared';
+import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Pullquote' ),
-	description: __(
-		'Give special visual emphasis to a quote from your text.'
-	),
 	icon,
 	example: {
 		attributes: {
 			value:
-				'<p>' +
 				// translators: Quote serving as example for the Pullquote block. Attributed to Matt Mullenweg.
 				__(
 					'One of the hardest things to do in technology is disrupt yourself.'
-				) +
-				'</p>',
+				),
 			citation: __( 'Matt Mullenweg' ),
 		},
 	},
-	styles: [
-		{
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		},
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid color' ) },
-	],
 	transforms,
 	edit,
 	save,
 	deprecated,
 };
+
+if ( window.__experimentalContentOnlyInspectorFields ) {
+	settings[ fieldsKey ] = [
+		{
+			id: 'value',
+			label: __( 'Content' ),
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
+		},
+		{
+			id: 'citation',
+			label: __( 'Citation' ),
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
+		},
+	];
+	settings[ formKey ] = {
+		fields: [ 'value', 'citation' ],
+	};
+}
+
+export const init = () => initBlock( { name, metadata, settings } );

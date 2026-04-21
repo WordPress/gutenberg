@@ -4,28 +4,14 @@
 import deepFreeze from 'deep-freeze';
 
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
-import { getBlockContentSchema, isPlain } from '../utils';
-
-jest.mock( '@wordpress/data', () => {
-	return {
-		select: jest.fn( ( store ) => {
-			switch ( store ) {
-				case 'core/blocks': {
-					return {
-						hasBlockSupport: ( blockName, supports ) => {
-							return (
-								blockName === 'core/paragraph' &&
-								supports === 'anchor'
-							);
-						},
-					};
-				}
-			}
-		} ),
-	};
-} );
+import { getBlockContentSchemaFromTransforms, isPlain } from '../utils';
 
 describe( 'isPlain', () => {
 	it( 'should return true for plain text', () => {
@@ -44,9 +30,53 @@ describe( 'isPlain', () => {
 		expect( isPlain( '<strong>test<br></strong>' ) ).toBe( false );
 		expect( isPlain( 'test<br-custom>test' ) ).toBe( false );
 	} );
+
+	it( 'should return true for single non-semantic wrapper elements with only text', () => {
+		expect( isPlain( '<span>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return true for single wrapper with styled content but no semantic tags', () => {
+		expect( isPlain( '<span style="color: red;">test</span>' ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'should return true for single wrapper with line breaks', () => {
+		expect( isPlain( '<span>test<br>test</span>' ) ).toBe( true );
+	} );
+
+	it( 'should return false for wrapper with semantic child elements', () => {
+		expect( isPlain( '<div><strong>test</strong></div>' ) ).toBe( false );
+		expect( isPlain( '<span><em>test</em></span>' ) ).toBe( false );
+		expect( isPlain( '<p>Some <a href="#">link</a></p>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for multiple wrapper elements', () => {
+		expect( isPlain( '<span>test</span><span>test</span>' ) ).toBe( false );
+	} );
+
+	it( 'should return false for semantic wrapper elements', () => {
+		expect( isPlain( '<h1>test</h1>' ) ).toBe( false );
+		expect( isPlain( '<ul><li>test</li></ul>' ) ).toBe( false );
+		expect( isPlain( '<article>test</article>' ) ).toBe( false );
+	} );
 } );
 
 describe( 'getBlockContentSchema', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/paragraph', {
+			apiVersion: 3,
+			title: 'Paragraph',
+			supports: {
+				anchor: true,
+			},
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'core/paragraph' );
+	} );
+
 	const myContentSchema = {
 		strong: {},
 		em: {},
@@ -72,7 +102,9 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: undefined,
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should handle multiple raw transforms', () => {
@@ -112,7 +144,9 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: preformattedIsMatch,
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should correctly merge the children', () => {
@@ -150,7 +184,9 @@ describe( 'getBlockContentSchema', () => {
 				},
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 
 	it( 'should correctly merge the attributes', () => {
@@ -182,6 +218,8 @@ describe( 'getBlockContentSchema', () => {
 				attributes: [ 'data-chicken', 'data-ribs' ],
 			},
 		};
-		expect( getBlockContentSchema( transforms ) ).toEqual( output );
+		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
+			output
+		);
 	} );
 } );

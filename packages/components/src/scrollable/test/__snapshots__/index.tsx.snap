@@ -1,0 +1,61 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+@media only screen and ( min-device-width: 40em ) {
+  .emotion-0::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+  }
+
+  .emotion-0::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .emotion-0::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+  }
+
+  .emotion-0::-webkit-scrollbar-thumb {
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba( 0, 0, 0, 0 );
+    border-radius: 7px;
+  }
+
+  .emotion-0:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+<div
+  class="components-scrollable emotion-0 emotion-1"
+  data-testid="scrollable"
+  data-wp-c16t="true"
+  data-wp-component="Scrollable"
+>
+  WordPress.org - Code is Poetry
+</div>
+`;
+
+exports[`props should render smoothScroll 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+  Array [
+    Object {
+      "height": "100%",
+      "overflow-x": "hidden",
+      "overflow-y": "auto",
+-     "scroll-behavior": "smooth",
+    },
+  ]
+`;

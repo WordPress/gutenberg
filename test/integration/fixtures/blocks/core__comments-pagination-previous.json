@@ -1,0 +1,16 @@
+[
+	{
+		"name": "core/comments-pagination-previous",
+		"isValid": true,
+		"attributes": {
+			"backgroundColor": "foreground",
+			"fontSize": "medium",
+			"style": {
+				"typography": {
+					"textTransform": "uppercase"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

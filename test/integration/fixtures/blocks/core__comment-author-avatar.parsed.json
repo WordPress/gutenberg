@@ -1,0 +1,21 @@
+[
+	{
+		"blockName": "core/comment-author-avatar",
+		"attrs": {
+			"width": 120,
+			"height": 120,
+			"style": {
+				"border": {
+					"width": "3px",
+					"style": "solid",
+					"radius": "100px"
+				}
+			},
+			"borderColor": "recommended-color-02",
+			"backgroundColor": "text-color"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

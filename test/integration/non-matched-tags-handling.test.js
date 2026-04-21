@@ -6,7 +6,7 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 
 describe( 'Handling of non matched tags in block transforms', () => {
 	beforeAll( () => {
-		// Load all hooks that modify blocks
+		// Load all hooks that modify blocks.
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 	} );
@@ -19,9 +19,9 @@ describe( 'Handling of non matched tags in block transforms', () => {
 
 		expect( simplePreformattedResult ).toHaveLength( 1 );
 		expect( simplePreformattedResult[ 0 ].name ).toBe( 'core/paragraph' );
-		expect( simplePreformattedResult[ 0 ].attributes.content ).toBe(
-			'Pre'
-		);
+		expect(
+			simplePreformattedResult[ 0 ].attributes.content.valueOf()
+		).toBe( 'Pre' );
 
 		const codeResult = pasteHandler( {
 			HTML: '<pre><code>code</code></pre>',
@@ -30,7 +30,7 @@ describe( 'Handling of non matched tags in block transforms', () => {
 
 		expect( codeResult ).toHaveLength( 1 );
 		expect( codeResult[ 0 ].name ).toBe( 'core/code' );
-		expect( codeResult[ 0 ].attributes.content ).toBe( 'code' );
+		expect( codeResult[ 0 ].attributes.content.valueOf() ).toBe( 'code' );
 		expect( console ).toHaveLogged();
 	} );
 } );

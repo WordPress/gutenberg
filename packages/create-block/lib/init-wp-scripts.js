@@ -2,31 +2,30 @@
  * External dependencies
  */
 const { command } = require( 'execa' );
-const { join } = require( 'path' );
 
 /**
  * Internal dependencies
  */
 const { info } = require( './log' );
 
-module.exports = async ( { slug } ) => {
-	const cwd = join( process.cwd(), slug );
-
+module.exports = async ( { rootDirectory } ) => {
 	info( '' );
-	info( 'Installing packages. It might take a couple of minutes.' );
+	info(
+		'Installing `@wordpress/scripts` package. It might take a couple of minutes...'
+	);
 	await command( 'npm install @wordpress/scripts --save-dev', {
-		cwd,
+		cwd: rootDirectory,
 	} );
 
 	info( '' );
 	info( 'Formatting JavaScript files.' );
-	await command( 'npm run format:js', {
-		cwd,
+	await command( 'npm run format', {
+		cwd: rootDirectory,
 	} );
 
 	info( '' );
-	info( 'Compiling block.' );
+	info( 'Compiling block and generating blocks manifest.' );
 	await command( 'npm run build', {
-		cwd,
+		cwd: rootDirectory,
 	} );
 };

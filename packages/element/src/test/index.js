@@ -1,3 +1,5 @@
+/* eslint-disable testing-library/render-result-naming-convention */
+
 /**
  * Internal dependencies
  */
@@ -61,7 +63,7 @@ describe( 'element', () => {
 			);
 
 			expect( result ).toBe(
-				'<a href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;" style="background-color:red">' +
+				'<a href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;" style="background-color:red">' +
 					'&lt;"WordPress" &amp; Friends>' +
 					'</a>'
 			);
@@ -127,3 +129,5 @@ describe( 'element', () => {
 		} );
 	} );
 } );
+
+/* eslint-enable testing-library/render-result-naming-convention */

@@ -1,4 +1,0 @@
-/**
- * Internal dependencies
- */
-import './store';

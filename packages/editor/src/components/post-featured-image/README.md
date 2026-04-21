@@ -1,5 +1,4 @@
-PostFeaturedImage
-===========
+# PostFeaturedImage
 
 `PostFeaturedImage` is a React component used to render the Post Featured Image selection tool.
 
@@ -12,19 +11,19 @@ _Examples:_
 Replace the contents of the panel:
 
 ```js
-function replacePostFeaturedImage() { 
-	return function() { 
-		return wp.element.createElement( 
-			'div', 
-			{}, 
-			'The replacement contents or components.' 
-		); 
-	} 
-} 
+function replacePostFeaturedImage() {
+	return function () {
+		return React.createElement(
+			'div',
+			{},
+			'The replacement contents or components.'
+		);
+	};
+}
 
-wp.hooks.addFilter( 
-	'editor.PostFeaturedImage', 
-	'my-plugin/replace-post-featured-image', 
+wp.hooks.addFilter(
+	'editor.PostFeaturedImage',
+	'my-plugin/replace-post-featured-image',
 	replacePostFeaturedImage
 );
 ```
@@ -32,28 +31,23 @@ wp.hooks.addFilter(
 Prepend and append to the panel contents:
 
 ```js
-var el = wp.element.createElement;
+var el = React.createElement;
 
-function wrapPostFeaturedImage( OriginalComponent ) { 
-	return function( props ) {
-		return (
-			el(
-				wp.element.Fragment,
-				{}, 
-				'Prepend above',
-				el(
-					OriginalComponent,
-					props
-				),
-				'Append below'
-			)
+function wrapPostFeaturedImage( OriginalComponent ) {
+	return function ( props ) {
+		return el(
+			React.Fragment,
+			{},
+			'Prepend above',
+			el( OriginalComponent, props ),
+			'Append below'
 		);
-	} 
-} 
-	
-wp.hooks.addFilter( 
-	'editor.PostFeaturedImage', 
-	'my-plugin/wrap-post-featured-image', 
+	};
+}
+
+wp.hooks.addFilter(
+	'editor.PostFeaturedImage',
+	'my-plugin/wrap-post-featured-image',
 	wrapPostFeaturedImage
 );
 ```

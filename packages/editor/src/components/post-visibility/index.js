@@ -2,171 +2,91 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
-import { withInstanceId, compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import {
+	TextControl,
+	RadioControl,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { visibilityOptions } from './utils';
+import { VISIBILITY_OPTIONS } from './utils';
+import { store as editorStore } from '../../store';
 
-export class PostVisibility extends Component {
-	constructor( props ) {
-		super( ...arguments );
+/**
+ * Allows users to set the visibility of a post.
+ *
+ * @param {Object}   props         The component props.
+ * @param {Function} props.onClose Function to call when the popover is closed.
+ * @return {React.ReactNode} The rendered component.
+ */
+export default function PostVisibility( { onClose } ) {
+	const instanceId = useInstanceId( PostVisibility );
 
-		this.setPublic = this.setPublic.bind( this );
-		this.setPrivate = this.setPrivate.bind( this );
-		this.setPasswordProtected = this.setPasswordProtected.bind( this );
-		this.updatePassword = this.updatePassword.bind( this );
+	const { status, visibility, password } = useSelect( ( select ) => ( {
+		status: select( editorStore ).getEditedPostAttribute( 'status' ),
+		visibility: select( editorStore ).getEditedPostVisibility(),
+		password: select( editorStore ).getEditedPostAttribute( 'password' ),
+	} ) );
 
-		this.state = {
-			hasPassword: !! props.password,
-		};
-	}
+	const { editPost } = useDispatch( editorStore );
 
-	setPublic() {
-		const { visibility, onUpdateVisibility, status } = this.props;
+	const [ hasPassword, setHasPassword ] = useState( !! password );
 
-		onUpdateVisibility( visibility === 'private' ? 'draft' : status );
-		this.setState( { hasPassword: false } );
-	}
-
-	setPrivate() {
-		if (
-			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
-			)
-		) {
-			return;
-		}
-
-		const { onUpdateVisibility, onSave } = this.props;
-
-		onUpdateVisibility( 'private' );
-		this.setState( { hasPassword: false } );
-		onSave();
-	}
-
-	setPasswordProtected() {
-		const { visibility, onUpdateVisibility, status, password } = this.props;
-
-		onUpdateVisibility(
-			visibility === 'private' ? 'draft' : status,
-			password || ''
-		);
-		this.setState( { hasPassword: true } );
-	}
-
-	updatePassword( event ) {
-		const { status, onUpdateVisibility } = this.props;
-		onUpdateVisibility( status, event.target.value );
-	}
-
-	render() {
-		const { visibility, password, instanceId } = this.props;
-
-		const visibilityHandlers = {
+	function updateVisibility( value ) {
+		const nextValues = {
 			public: {
-				onSelect: this.setPublic,
-				checked: visibility === 'public' && ! this.state.hasPassword,
+				status: visibility === 'private' ? 'draft' : status,
+				password: '',
 			},
-			private: {
-				onSelect: this.setPrivate,
-				checked: visibility === 'private',
-			},
+			private: { status: 'private', password: '' },
 			password: {
-				onSelect: this.setPasswordProtected,
-				checked: this.state.hasPassword,
+				status: visibility === 'private' ? 'draft' : status,
+				password: password || '',
 			},
 		};
 
-		return [
-			<fieldset
-				key="visibility-selector"
-				className="editor-post-visibility__dialog-fieldset"
-			>
-				<legend className="editor-post-visibility__dialog-legend">
-					{ __( 'Post Visibility' ) }
-				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div
-						key={ value }
-						className="editor-post-visibility__choice"
-					>
-						<input
-							type="radio"
-							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-							className="editor-post-visibility__dialog-radio"
-						/>
-						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
-							className="editor-post-visibility__dialog-label"
-						>
-							{ label }
-						</label>
-						{
-							<p
-								id={ `editor-post-${ value }-${ instanceId }-description` }
-								className="editor-post-visibility__dialog-info"
-							>
-								{ info }
-							</p>
-						}
-					</div>
-				) ) }
-			</fieldset>,
-			this.state.hasPassword && (
-				<div
-					className="editor-post-visibility__dialog-password"
-					key="password-selector"
-				>
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-					>
-						{ __( 'Create password' ) }
-					</VisuallyHidden>
-					<input
-						className="editor-post-visibility__dialog-password-input"
-						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-						type="text"
-						onChange={ this.updatePassword }
+		editPost( nextValues[ value ] );
+		setHasPassword( value === 'password' );
+	}
+
+	const updatePassword = ( value ) => {
+		editPost( { password: value } );
+	};
+
+	return (
+		<div className="editor-post-visibility">
+			<InspectorPopoverHeader
+				title={ __( 'Visibility' ) }
+				help={ __( 'Control how this post is viewed.' ) }
+				onClose={ onClose }
+			/>
+			<VStack spacing={ 4 }>
+				<RadioControl
+					label={ __( 'Visibility' ) }
+					hideLabelFromVision
+					options={ VISIBILITY_OPTIONS }
+					selected={ hasPassword ? 'password' : visibility }
+					onChange={ updateVisibility }
+				/>
+				{ hasPassword && (
+					<TextControl
+						label={ __( 'Password' ) }
+						onChange={ updatePassword }
 						value={ password }
 						placeholder={ __( 'Use a secure password' ) }
+						type="text"
+						id={ `editor-post-visibility__password-input-${ instanceId }` }
+						__next40pxDefaultSize
+						maxLength={ 255 }
 					/>
-				</div>
-			),
-		];
-	}
+				) }
+			</VStack>
+		</div>
+	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditedPostVisibility } = select(
-			'core/editor'
-		);
-		return {
-			status: getEditedPostAttribute( 'status' ),
-			visibility: getEditedPostVisibility(),
-			password: getEditedPostAttribute( 'password' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { savePost, editPost } = dispatch( 'core/editor' );
-		return {
-			onSave: savePost,
-			onUpdateVisibility( status, password = '' ) {
-				editPost( { status, password } );
-			},
-		};
-	} ),
-	withInstanceId,
-] )( PostVisibility );

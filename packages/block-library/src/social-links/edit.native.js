@@ -5,7 +5,10 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -14,11 +17,6 @@ import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
  * Internal dependencies
  */
 import styles from './editor.scss';
-import variations from '../social-link/variations';
-
-const ALLOWED_BLOCKS = variations.map(
-	( v ) => `core/social-link-${ v.name }`
-);
 
 // Template contains the links that show when start.
 const TEMPLATE = [
@@ -40,6 +38,7 @@ function SocialLinksEdit( {
 	attributes,
 	activeInnerBlocks,
 	getBlock,
+	blockWidth,
 } ) {
 	const [ initialCreation, setInitialCreation ] = useState( true );
 	const shouldRenderFooterAppender = isSelected || isInnerIconSelected;
@@ -53,8 +52,8 @@ function SocialLinksEdit( {
 	}, [ shouldRenderFooterAppender ] );
 
 	const renderFooterAppender = useRef( () => (
-		<View>
-			<InnerBlocks.ButtonBlockAppender isFloating={ true } />
+		<View style={ styles.footerAppenderContainer }>
+			<InnerBlocks.ButtonBlockAppender isFloating />
 		</View>
 	) );
 
@@ -64,11 +63,15 @@ function SocialLinksEdit( {
 	);
 
 	function renderPlaceholder() {
-		return [
-			...new Array( innerBlocks.length || 1 ),
-		].map( ( _, index ) => (
-			<View style={ placeholderStyle } key={ index } />
-		) );
+		return [ ...new Array( innerBlocks.length || 1 ) ].map(
+			( _, index ) => (
+				<View
+					testID="social-links-placeholder"
+					style={ placeholderStyle }
+					key={ index }
+				/>
+			)
+		);
 	}
 
 	function filterInnerBlocks( blockIds ) {
@@ -87,13 +90,12 @@ function SocialLinksEdit( {
 
 	return (
 		<InnerBlocks
-			allowedBlocks={ ALLOWED_BLOCKS }
 			templateLock={ false }
 			template={ initialCreation && TEMPLATE }
 			renderFooterAppender={
 				shouldRenderFooterAppender && renderFooterAppender.current
 			}
-			orientation={ 'horizontal' }
+			orientation="horizontal"
 			onDeleteBlock={ shouldDelete ? onDelete : undefined }
 			marginVertical={ spacing }
 			marginHorizontal={ spacing }
@@ -101,6 +103,7 @@ function SocialLinksEdit( {
 			filterInnerBlocks={
 				! shouldRenderFooterAppender && filterInnerBlocks
 			}
+			blockWidth={ blockWidth }
 		/>
 	);
 }
@@ -113,7 +116,7 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockParents = getBlockParents(
 			selectedBlockClientId,
@@ -133,7 +136,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
+		const { removeBlock } = dispatch( blockEditorStore );
 
 		return {
 			onDelete: () => {

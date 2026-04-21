@@ -1,49 +1,59 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-const ALLOWED_BLOCKS = [
-	'core/post-comment-content',
-	'core/post-comment-author',
+const TEMPLATE = [
+	[ 'core/avatar' ],
+	[ 'core/comment-author-name' ],
+	[ 'core/comment-date' ],
+	[ 'core/comment-content' ],
+	[ 'core/comment-reply-link' ],
+	[ 'core/comment-edit-link' ],
 ];
 
-// TODO: JSDOC types
-export default function Edit( { className, attributes, setAttributes } ) {
-	const { commentId } = attributes;
+export default function Edit( { attributes: { commentId }, setAttributes } ) {
 	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
 
 	if ( ! commentId ) {
 		return (
-			<Placeholder
-				icon={ blockDefault }
-				label={ __( 'Post Comment' ) }
-				instructions={ __( 'Input post comment ID' ) }
-			>
-				<TextControl
-					value={ commentId }
-					onChange={ ( val ) => setCommentIdInput( parseInt( val ) ) }
-				/>
-
-				<Button
-					isPrimary
-					onClick={ () => {
-						setAttributes( { commentId: commentIdInput } );
-					} }
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ blockDefault }
+					label={ _x( 'Post Comment', 'block title' ) }
+					instructions={ __(
+						'To show a comment, input the comment ID.'
+					) }
 				>
-					{ __( 'Save' ) }
-				</Button>
-			</Placeholder>
+					<TextControl
+						__next40pxDefaultSize
+						value={ commentId }
+						onChange={ ( val ) =>
+							setCommentIdInput( parseInt( val ) )
+						}
+					/>
+
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ () => {
+							setAttributes( { commentId: commentIdInput } );
+						} }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</Placeholder>
+			</div>
 		);
 	}
 
-	return (
-		<div className={ className }>
-			<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />
-		</div>
-	);
+	return <div { ...innerBlocksProps } />;
 }

@@ -1,6 +1,2 @@
-/**
- * Internal dependencies
- */
-import './store';
-
 export * from './components';
+export { store } from './store';

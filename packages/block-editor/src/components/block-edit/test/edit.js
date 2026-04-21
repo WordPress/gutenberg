@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
-import { noop } from 'lodash';
+import { render, screen } from '@testing-library/react';
 
 /**
  * WordPress dependencies
@@ -16,8 +15,10 @@ import {
 /**
  * Internal dependencies
  */
-import { Edit } from '../edit';
+import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
+
+const noop = () => {};
 
 describe( 'Edit', () => {
 	afterEach( () => {
@@ -27,43 +28,50 @@ describe( 'Edit', () => {
 	} );
 
 	it( 'should return null if block type not defined', () => {
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		const { container } = render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.type() ).toBe( null );
+		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'should use edit implementation of block', () => {
-		const edit = () => <div />;
+		const edit = () => <div data-testid="foo-bar" />;
+
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: noop,
 			category: 'text',
 			title: 'block title',
 			edit,
 		} );
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.exists( edit ) ).toBe( true );
+		expect( screen.getByTestId( 'foo-bar' ) ).toBeVisible();
 	} );
 
 	it( 'should use save implementation of block as fallback', () => {
-		const save = () => <div />;
+		const save = () => <div data-testid="foo-bar" />;
+
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save,
 			category: 'text',
 			title: 'block title',
 		} );
 
-		const wrapper = shallow( <Edit name="core/test-block" /> );
+		render( <Edit name="core/test-block" /> );
 
-		expect( wrapper.exists( save ) ).toBe( true );
+		expect( screen.getByTestId( 'foo-bar' ) ).toBeVisible();
 	} );
 
 	it( 'should combine the default class name with a custom one', () => {
-		const edit = ( { className } ) => <div className={ className } />;
+		const edit = ( { className } ) => (
+			<div data-testid="foo-bar" className={ className } />
+		);
 		const attributes = {
 			className: 'my-class',
 		};
+
 		registerBlockType( 'core/test-block', {
 			edit,
 			save: noop,
@@ -71,19 +79,24 @@ describe( 'Edit', () => {
 			title: 'block title',
 		} );
 
-		const wrapper = shallow(
-			<Edit name="core/test-block" attributes={ attributes } />
+		render( <Edit name="core/test-block" attributes={ attributes } /> );
+
+		// This test is for API version 1 blocks, so the console warning is intentional.
+		// API version 1 blocks automatically receive the default block class name,
+		// while API version 2+ blocks require useBlockProps() to be used explicitly.
+		expect( console ).toHaveWarnedWith(
+			'Block with API version 2 or lower is deprecated since version 6.9. See: https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/ Note: The block "core/test-block" is registered with API version 1. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the `apiVersion` field to 3 and test the block inside the iframe editor.'
 		);
 
-		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe(
-			true
-		);
-		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
+		const editElement = screen.getByTestId( 'foo-bar' );
+		expect( editElement ).toHaveClass( 'wp-block-test-block' );
+		expect( editElement ).toHaveClass( 'my-class' );
 	} );
 
 	it( 'should assign context', () => {
 		const edit = ( { context } ) => context.value;
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			category: 'text',
 			title: 'block title',
 			usesContext: [ 'value' ],
@@ -91,36 +104,34 @@ describe( 'Edit', () => {
 			save: noop,
 		} );
 
-		const wrapper = mount(
+		const { container } = render(
 			<BlockContextProvider value={ { value: 'Ok' } }>
 				<Edit name="core/test-block" />
 			</BlockContextProvider>
 		);
 
-		expect( wrapper.html() ).toBe( 'Ok' );
+		expect( container ).toHaveTextContent( 'Ok' );
 	} );
 
 	describe( 'light wrapper', () => {
 		it( 'should assign context', () => {
 			const edit = ( { context } ) => context.value;
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'block title',
 				usesContext: [ 'value' ],
-				supports: {
-					lightBlockWrapper: true,
-				},
 				edit,
 				save: noop,
 			} );
 
-			const wrapper = mount(
+			const { container } = render(
 				<BlockContextProvider value={ { value: 'Ok' } }>
 					<Edit name="core/test-block" />
 				</BlockContextProvider>
 			);
 
-			expect( wrapper.html() ).toBe( 'Ok' );
+			expect( container ).toHaveTextContent( 'Ok' );
 		} );
 	} );
 } );
