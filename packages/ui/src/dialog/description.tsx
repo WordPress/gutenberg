@@ -6,19 +6,21 @@ import styles from './style.module.css';
 import type { DescriptionProps } from './types';
 
 /**
- * Renders a paragraph with additional information about the dialog.
+ * Renders an optional paragraph that describes the dialog content.
  *
  * The rendered element is linked to the popup via `aria-describedby`.
  */
 const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
-	function DialogDescription( { className, render, ...props }, ref ) {
+	function DialogDescription( { className, children, ...props }, ref ) {
 		return (
-			<_Dialog.Description
+			<Text
 				ref={ ref }
-				render={ <Text variant="body-md" render={ render ?? <p /> } /> }
+				variant="body-md"
+				render={ <_Dialog.Description { ...props } /> }
 				className={ clsx( styles.description, className ) }
-				{ ...props }
-			/>
+			>
+				{ children }
+			</Text>
 		);
 	}
 );
