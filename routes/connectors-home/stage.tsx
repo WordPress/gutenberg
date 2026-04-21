@@ -4,6 +4,7 @@
 import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
+	Notice,
 	__experimentalHeading as Heading,
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -14,7 +15,7 @@ import {
 } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -22,7 +23,10 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
-import { registerDefaultConnectors } from './default-connectors';
+import {
+	getIsFileModsDisabled,
+	registerDefaultConnectors,
+} from './default-connectors';
 import { unlock } from '../lock-unlock';
 
 const { store } = unlock( connectorsPrivateApis );
@@ -31,6 +35,8 @@ const { store } = unlock( connectorsPrivateApis );
 registerDefaultConnectors();
 
 function ConnectorsPage() {
+	const isFileModsDisabled = getIsFileModsDisabled();
+
 	const { connectors, canInstallPlugins } = useSelect(
 		( select ) => ( {
 			connectors: unlock( select( store ) ).getConnectors(),
@@ -45,6 +51,21 @@ function ConnectorsPage() {
 	const renderableConnectors = connectors.filter(
 		( connector: ConnectorConfig ) => connector.render
 	);
+	const aiProviderPluginSlugs = Array.from(
+		new Set(
+			connectors
+				.filter(
+					( connector: ConnectorConfig ) =>
+						connector.type === 'ai_provider'
+				)
+				.map(
+					( connector: ConnectorConfig ) =>
+						connector.plugin?.file?.split( '/' )[ 0 ]
+				)
+				.filter( ( slug ): slug is string => !! slug )
+		)
+	).sort();
+	const manualInstallPluginSlugs = [ 'ai', ...aiProviderPluginSlugs ];
 	const isEmpty = renderableConnectors.length === 0;
 
 	return (
@@ -59,6 +80,35 @@ function ConnectorsPage() {
 					isEmpty ? ' connectors-page--empty' : ''
 				}` }
 			>
+				{ isFileModsDisabled && (
+					<Notice
+						status="warning"
+						isDismissible={ false }
+						className="connectors-page__file-mods-notice"
+					>
+						<p>
+							{ __(
+								'Plugin installation from wp-admin is disabled because DISALLOW_FILE_MODS is enabled. Install the AI plugin and any AI provider plugins manually using your normal deployment workflow.'
+							) }
+						</p>
+						<p>{ __( 'WP-CLI examples:' ) }</p>
+						<ul>
+							{ manualInstallPluginSlugs.map( ( slug ) => {
+								const command = `wp plugin install ${ slug } --activate`;
+								return (
+									<li key={ slug }>
+										{ sprintf(
+											/* translators: %s: Plugin slug. */
+											__( '%s:' ),
+											slug
+										) }{ ' ' }
+										<code>{ command }</code>
+									</li>
+								);
+							} ) }
+						</ul>
+					</Notice>
+				) }
 				{ isEmpty ? (
 					<VStack
 						alignment="center"
@@ -109,7 +159,7 @@ function ConnectorsPage() {
 						</VStack>
 					</VStack>
 				) }
-				{ canInstallPlugins && (
+				{ canInstallPlugins && ! isFileModsDisabled && (
 					<p>
 						{ createInterpolateElement(
 							__(

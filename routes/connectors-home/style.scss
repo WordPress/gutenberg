@@ -29,6 +29,23 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	&__file-mods-notice {
+		margin: 16px 0;
+
+		p {
+			margin: 0;
+		}
+
+		ul {
+			margin: 8px 0 0;
+			padding-inline-start: 20px;
+		}
+
+		code {
+			font-size: 12px;
+		}
+	}
+
 	&--empty {
 		flex-grow: 1;
 		display: flex;
