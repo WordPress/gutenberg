@@ -1168,6 +1168,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{MENU_SLUG}}': page.menuSlug,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1814,13 +1815,19 @@ async function buildAll( baseUrlExpression ) {
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
+			return {
+				id: page,
+				init: [],
+				title: undefined,
+				menuSlug: `${ page }-wp-admin`,
+			};
 		}
 		return {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
+			menuSlug: page.menuSlug || `${ page.id }-wp-admin`,
 		};
 	} );
 
@@ -1842,6 +1849,7 @@ async function buildAll( baseUrlExpression ) {
 			routes: pageRoutes,
 			initModules: page.init,
 			title: page.title,
+			menuSlug: page.menuSlug,
 		};
 	} );
 
