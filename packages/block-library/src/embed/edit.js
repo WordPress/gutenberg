@@ -9,7 +9,10 @@ import clsx from 'clsx';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 import { getAuthority } from '@wordpress/url';
@@ -20,6 +23,7 @@ import { Caption } from '../utils/caption';
  */
 import {
 	createUpgradedEmbedBlock,
+	findMoreSuitableBlock,
 	getClassNames,
 	removeAspectRatioClasses,
 	fallback,
@@ -58,6 +62,8 @@ const EmbedEdit = ( props ) => {
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const { invalidateResolution } = useDispatch( coreStore );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	const {
 		preview,
@@ -141,7 +147,11 @@ const EmbedEdit = ( props ) => {
 		if ( getAuthority( attributesUrl ) === 'x.com' ) {
 			const newURL = new URL( attributesUrl );
 			newURL.host = 'twitter.com';
-			setAttributes( { url: newURL.toString() } );
+			const newURLString = newURL.toString();
+			setAttributes( {
+				url: newURLString,
+				...findMoreSuitableBlock( newURLString )?.attributes,
+			} );
 			return;
 		}
 
@@ -154,30 +164,38 @@ const EmbedEdit = ( props ) => {
 		}
 	}, [ attributesUrl, cannotEmbed, hasResolved, setAttributes ] );
 
-	// Handle incoming preview.
+	// Apply preview-derived attributes once the preview resolves.
 	useEffect( () => {
-		if ( preview && ! isEditingURL ) {
-			// When obtaining an incoming preview,
-			// we set the attributes derived from the preview data.
-			const mergedAttributes = getMergedAttributes();
-			const hasChanges = Object.keys( mergedAttributes ).some(
-				( key ) => mergedAttributes[ key ] !== attributes[ key ]
+		if ( ! preview || isEditingURL ) {
+			return;
+		}
+
+		const mergedAttributes = getMergedAttributes();
+
+		if ( onReplace ) {
+			const upgradedBlock = createUpgradedEmbedBlock(
+				props,
+				mergedAttributes
 			);
 
-			if ( hasChanges ) {
-				setAttributes( mergedAttributes );
+			if ( upgradedBlock ) {
+				// Mutate via setAttributes; onReplace would remount the
+				// block and clear the URL textbox on undo.
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( upgradedBlock.attributes );
+				return;
 			}
+		}
 
-			if ( onReplace ) {
-				const upgradedBlock = createUpgradedEmbedBlock(
-					props,
-					mergedAttributes
-				);
+		const hasChanges = Object.keys( mergedAttributes ).some(
+			( key ) => mergedAttributes[ key ] !== attributes[ key ]
+		);
 
-				if ( upgradedBlock ) {
-					onReplace( upgradedBlock );
-				}
-			}
+		if ( hasChanges ) {
+			// Merge into the URL-submit undo level so a single undo
+			// reverts both the submit and the preview-driven attributes.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( mergedAttributes );
 		}
 	}, [ preview, isEditingURL ] );
 
@@ -216,7 +234,11 @@ const EmbedEdit = ( props ) => {
 						);
 
 						setIsEditingURL( false );
-						setAttributes( { url, className: blockClass } );
+						setAttributes( {
+							url,
+							...findMoreSuitableBlock( url )?.attributes,
+							className: blockClass,
+						} );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
