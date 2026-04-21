@@ -6,12 +6,12 @@ import {
 	Flex,
 	FlexItem,
 	Modal,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { _x, __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies

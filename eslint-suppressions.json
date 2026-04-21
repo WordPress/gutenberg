@@ -11,7 +11,7 @@
 	},
 	"packages/block-editor/src/components/block-allowed-blocks/modal.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-bindings/attribute-control.js": {
