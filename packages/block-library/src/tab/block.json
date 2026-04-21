@@ -5,7 +5,6 @@
 	"name": "core/tab",
 	"title": "Tab",
 	"description": "Content for a tab in a tabbed interface.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"attributes": {
@@ -46,7 +45,8 @@
 				"__experimentalFontFamily": true
 			}
 		},
-		"renaming": true
+		"renaming": true,
+		"visibility": false
 	},
 	"providesContext": {
 		"core/tab-label": "label"

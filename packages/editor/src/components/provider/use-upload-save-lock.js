@@ -20,7 +20,7 @@ const LOCK_NAME = 'upload-in-progress';
  */
 export default function useUploadSaveLock() {
 	const isClientSideMediaProcessingEnabled =
-		window.__clientSideMediaProcessing;
+		window.__clientSideMediaProcessing || window.__heicUploadSupport;
 
 	const isUploading = useSelect(
 		( select ) => {

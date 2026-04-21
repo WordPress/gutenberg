@@ -6,6 +6,7 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
+import { useScheduleValidation } from '../utils/use-schedule-validation';
 
 /**
  * Whether validation is enabled. This is a build-time constant that allows
@@ -14,7 +15,7 @@ import {
 const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
 type PopoverValidationContextType = {
-	registerTitle: ( element: HTMLElement | null ) => void;
+	registerTitle: ( element: HTMLElement | null ) => () => void;
 };
 
 const PopoverValidationContext = VALIDATION_ENABLED
@@ -47,16 +48,7 @@ function PopoverValidationProviderDev( {
 } ) {
 	const titleElementRef = useRef< HTMLElement | null >( null );
 
-	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
-		titleElementRef.current = element;
-	}, [] );
-
-	const contextValue = useMemo(
-		() => ( { registerTitle } ),
-		[ registerTitle ]
-	);
-
-	useEffect( () => {
+	const scheduleValidation = useScheduleValidation( () => {
 		const titleElement = titleElementRef.current;
 
 		if ( ! titleElement ) {
@@ -74,7 +66,31 @@ function PopoverValidationProviderDev( {
 					'Provide meaningful text content for the popover title.'
 			);
 		}
-	}, [] );
+	} );
+
+	const registerTitle = useCallback(
+		( element: HTMLElement | null ) => {
+			titleElementRef.current = element;
+			scheduleValidation();
+
+			return () => {
+				titleElementRef.current = null;
+				scheduleValidation();
+			};
+		},
+		[ scheduleValidation ]
+	);
+
+	// Schedule an initial validation on mount to catch missing titles
+	// (when no Title component is rendered, registerTitle is never called).
+	useEffect( () => {
+		scheduleValidation();
+	}, [ scheduleValidation ] );
+
+	const contextValue = useMemo(
+		() => ( { registerTitle } ),
+		[ registerTitle ]
+	);
 
 	return (
 		<PopoverValidationContext.Provider value={ contextValue }>

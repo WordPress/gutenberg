@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
+	tags: [ 'manifest' ],
 	component: TextareaControl,
 	title: 'Components/Selection & Input/Common/TextareaControl',
 	id: 'components-textareacontrol',

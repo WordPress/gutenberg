@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { search } from '@wordpress/icons';
-import { Button, EmptyState } from '../..';
+import { Button } from '../../button';
+import * as EmptyState from '../';
 
 const meta: Meta< typeof EmptyState.Root > = {
 	title: 'Design System/Components/EmptyState',

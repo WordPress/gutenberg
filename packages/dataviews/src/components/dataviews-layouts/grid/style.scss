@@ -250,7 +250,7 @@
 }
 
 .dataviews-view-grid__media--clickable {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .dataviews-view-grid__group-header {
