@@ -15,7 +15,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Controls from './controls';
-import useTabMenuSync from './use-tab-menu-sync';
+import useTabListSync from './use-tab-list-sync';
 
 const EMPTY_ARRAY = [];
 
@@ -63,12 +63,12 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { tabs, tabPanelClientId, menuItems, tabsMenuClientId } = useSelect(
+	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			const tabPanels = innerBlocks.find(
+			const tabPanelBlocks = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panels'
 			);
 			const tabList = innerBlocks.find(
@@ -76,16 +76,21 @@ function Edit( { clientId, attributes, setAttributes } ) {
 			);
 
 			return {
-				tabs: tabPanels?.innerBlocks ?? EMPTY_ARRAY,
-				tabPanelClientId: tabPanels?.clientId ?? null,
-				menuItems: tabList?.innerBlocks ?? EMPTY_ARRAY,
-				tabsMenuClientId: tabList?.clientId ?? null,
+				tabPanels: tabPanelBlocks?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanelsClientId: tabPanelBlocks?.clientId ?? null,
+				tabs: tabList?.innerBlocks ?? EMPTY_ARRAY,
+				tabListClientId: tabList?.clientId ?? null,
 			};
 		},
 		[ clientId ]
 	);
 
-	useTabMenuSync( { tabs, menuItems, tabPanelClientId, tabsMenuClientId } );
+	useTabListSync( {
+		tabPanels,
+		tabs,
+		tabPanelsClientId,
+		tabListClientId,
+	} );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
@@ -96,7 +101,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		 * This traverses the tab-panel block to find all tab blocks
 		 * and extracts their label and anchor for the tab-list to consume.
 		 */
-		const tabList = tabs.map( ( tab, index ) => ( {
+		const tabList = tabPanels.map( ( tab, index ) => ( {
 			id: tab.attributes.anchor || `tab-${ index }`,
 			label: tab.attributes.label || '',
 			clientId: tab.clientId,
@@ -109,7 +114,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		};
-	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
+	}, [ tabPanels, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	const blockProps = useBlockProps();
 
