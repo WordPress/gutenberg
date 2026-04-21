@@ -43,20 +43,32 @@ interface ConnectorData {
 	authentication: NonNullable< ConnectorConfig[ 'authentication' ] >;
 }
 
+interface ConnectorScriptModuleData {
+	connectors?: Record< string, ConnectorData >;
+	isFileModsDisabled?: boolean;
+}
+
+function getConnectorScriptModuleData(): ConnectorScriptModuleData {
+	try {
+		return JSON.parse(
+			document.getElementById(
+				'wp-script-module-data-options-connectors-wp-admin'
+			)?.textContent ?? '{}'
+		);
+	} catch {
+		return {};
+	}
+}
+
 /**
  * Reads connector data passed from PHP via the script module data mechanism.
  */
 export function getConnectorData(): Record< string, ConnectorData > {
-	try {
-		const parsed = JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? ''
-		);
-		return parsed?.connectors ?? {};
-	} catch {
-		return {};
-	}
+	return getConnectorScriptModuleData().connectors ?? {};
+}
+
+export function getIsFileModsDisabled(): boolean {
+	return !! getConnectorScriptModuleData().isFileModsDisabled;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
