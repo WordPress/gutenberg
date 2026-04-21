@@ -49,7 +49,9 @@ function LinkControlSearchResults( {
 
 	// If there are no suggestions and we're not currently loading or showing initial suggestions, then we can show the "No results" state.
 	const hasNoResults =
-		suggestions.length === 0 && ! isLoading && ! isInitialSuggestions;
+		suggestions.filter( ( s ) => s.type !== CREATE_TYPE ).length === 0 &&
+		! isLoading &&
+		! isInitialSuggestions;
 
 	const labelText = isInitialSuggestions
 		? __( 'Suggestions' )
@@ -67,11 +69,12 @@ function LinkControlSearchResults( {
 				aria-label={ labelText }
 			>
 				<MenuGroup>
-					{ hasNoResults ? (
+					{ hasNoResults && (
 						<div className="block-editor-link-control__search-no-results">
 							{ __( 'No results found.' ) }
 						</div>
-					) : (
+					) }
+					{ ! hasNoResults &&
 						suggestions.map( ( suggestion, index ) => {
 							if (
 								shouldShowCreateSuggestion &&
@@ -131,8 +134,26 @@ function LinkControlSearchResults( {
 									isBlogHome={ suggestion?.isBlogHome }
 								/>
 							);
-						} )
-					) }
+						} ) }
+					{ hasNoResults &&
+						shouldShowCreateSuggestion &&
+						suggestions
+							.filter( ( s ) => s.type === CREATE_TYPE )
+							.map( ( suggestion, index ) => (
+								<LinkControlSearchCreate
+									key={ suggestion.type }
+									searchTerm={ currentInputValue }
+									buttonText={ createSuggestionButtonText }
+									onClick={ () =>
+										handleSuggestionClick( suggestion )
+									}
+									itemProps={ buildSuggestionItemProps(
+										suggestion,
+										index
+									) }
+									isSelected={ index === selectedSuggestion }
+								/>
+							) ) }
 				</MenuGroup>
 			</div>
 		</div>
