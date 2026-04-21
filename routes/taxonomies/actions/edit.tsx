@@ -58,7 +58,7 @@ function EditTaxonomyModal( {
 
 	const [ data, setData ] = useState< TaxonomyFormData >( initialData );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const slugField = useSlugField( item.slug );
+	const slugField = useSlugField( item.slug, data.slug );
 	const objectTypeField = useObjectTypeField();
 
 	const fields = useMemo< Field< TaxonomyFormData >[] >(
