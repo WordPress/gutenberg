@@ -25,6 +25,7 @@
 		{ "path": "packages/dataviews" },
 		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
+		{ "path": "packages/design-system-mcp" },
 		{ "path": "packages/docgen" },
 		{ "path": "packages/dom" },
 		{ "path": "packages/dom-ready" },

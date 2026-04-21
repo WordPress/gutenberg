@@ -120,6 +120,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Guidelines', 'gutenberg' ),
 					'description' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-content-types',
+					'label'       => __( 'Content types: manage custom taxonomies', 'gutenberg' ),
+					'description' => __( 'Enables a UI for creating and managing custom taxonomies. Custom post types will be explored soon.', 'gutenberg' ),
+				),
 			),
 		),
 	);
