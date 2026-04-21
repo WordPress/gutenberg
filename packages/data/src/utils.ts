@@ -30,13 +30,22 @@ export function waitForTransition(
 	predicate: () => boolean,
 	registry: DataRegistry = defaultRegistry
 ): Promise< void > {
-	return new Promise< void >( ( resolve ) => {
+	return new Promise< void >( ( resolve, reject ) => {
 		// Seed with the current value so an initial `true` state still triggers
 		// resolution on the next transition to `false`.
 		let hasBeenTrue = predicate();
 
 		const unsubscribe = registry.subscribe( () => {
-			const currentValue = predicate();
+			let currentValue;
+			try {
+				currentValue = predicate();
+			} catch ( error ) {
+				// Always unsubscribe on predicate errors to avoid leaking
+				// subscriptions tied to a promise that will never resolve.
+				unsubscribe();
+				reject( error );
+				return;
+			}
 
 			if ( ! hasBeenTrue && currentValue ) {
 				hasBeenTrue = true;

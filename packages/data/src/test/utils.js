@@ -121,6 +121,33 @@ describe( 'waitForTransition', () => {
 		expect( predicate ).toHaveBeenCalledTimes( callCountAfterResolve );
 	} );
 
+	it( 'should reject and unsubscribe when the predicate throws', async () => {
+		const error = new Error( 'predicate failed' );
+		let throwOnNextCall = false;
+		const predicate = jest.fn( () => {
+			if ( throwOnNextCall ) {
+				throw error;
+			}
+			return registry.select( 'test' ).isSaving();
+		} );
+
+		const promise = waitForTransition( predicate, registry );
+
+		// Arrange for the next predicate() invocation (inside the subscribe
+		// listener) to throw.
+		throwOnNextCall = true;
+		registry.dispatch( 'test' ).setSaving( true );
+
+		await expect( promise ).rejects.toBe( error );
+
+		// Further state changes must not invoke the predicate again, which
+		// confirms the subscription was released when the predicate threw.
+		const callCountAfterReject = predicate.mock.calls.length;
+		throwOnNextCall = false;
+		registry.dispatch( 'test' ).setSaving( false );
+		expect( predicate ).toHaveBeenCalledTimes( callCountAfterReject );
+	} );
+
 	it( 'should work with already true initial state', async () => {
 		// Set initial state to true before calling waitForTransition.
 		registry.dispatch( 'test' ).setSaving( true );
