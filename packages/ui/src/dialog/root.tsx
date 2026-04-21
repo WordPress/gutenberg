@@ -18,7 +18,7 @@ import type { RootProps } from './types';
  * actions), omit the close icon and rely on footer action buttons like "Cancel"
  * and "Confirm" instead.
  */
-function Root( { modal, children, ...props }: RootProps ) {
+function Root( { modal = true, children, ...props }: RootProps ) {
 	return (
 		<_Dialog.Root modal={ modal } { ...props }>
 			<DialogModalProvider modal={ modal }>

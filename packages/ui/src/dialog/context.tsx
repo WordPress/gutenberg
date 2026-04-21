@@ -15,10 +15,10 @@ const DialogModalContext =
 	createContext< _Dialog.Root.Props[ 'modal' ] >( true );
 
 export function DialogModalProvider( {
-	modal = true,
+	modal,
 	children,
 }: {
-	modal?: _Dialog.Root.Props[ 'modal' ];
+	modal: _Dialog.Root.Props[ 'modal' ];
 	children: React.ReactNode;
 } ) {
 	return (
