@@ -49,6 +49,8 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 <!-- /wp:form-input -->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__form-input.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/form-input/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

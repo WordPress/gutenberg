@@ -57,6 +57,8 @@ In post content, it is stored as a block comment:
 <!-- wp:query-pagination-numbers {"midSize":2} /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__query-pagination-numbers.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-pagination-numbers/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

@@ -57,6 +57,8 @@ In post content, it is stored as a block comment:
 <!-- wp:query-title {"level":1,"showPrefix":true,"showSearchTerm":true} /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__query-title.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/query-title/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))

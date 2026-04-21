@@ -58,6 +58,8 @@ In post content, it is stored as a block comment:
 <!-- wp:post-excerpt {"showMoreOnNewLine":true,"excerptLength":55} /-->
 ```
 
+_See the [canonical markup fixture](https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/core__post-excerpt.html) for a tested real-world example._
+
 ## Source
 
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-excerpt/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))
