@@ -31,7 +31,7 @@ function Edit( { context, clientId } ) {
 		return editorActiveTabIndex ?? activeTabIndex;
 	}, [ editorActiveTabIndex, activeTabIndex ] );
 
-	const { menuItemIndex, tabsClientId, selectedTabClientId } = useSelect(
+	const { tabIndex, tabsClientId, selectedTabClientId } = useSelect(
 		( select ) => {
 			const {
 				getBlockOrder,
@@ -40,13 +40,13 @@ function Edit( { context, clientId } ) {
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 
-			const _tabsMenuClientId = getBlockRootClientId( clientId );
-			const _tabsClientId = _tabsMenuClientId
-				? getBlockRootClientId( _tabsMenuClientId )
+			const _tabsListClientId = getBlockRootClientId( clientId );
+			const _tabsClientId = _tabsListClientId
+				? getBlockRootClientId( _tabsListClientId )
 				: null;
 
-			const siblings = getBlockOrder( _tabsMenuClientId );
-			const _menuItemIndex = siblings.indexOf( clientId );
+			const siblings = getBlockOrder( _tabsListClientId );
+			const _tabIndex = siblings.indexOf( clientId );
 
 			// Find which tab panel block is currently selected.
 			const selectedIds = getSelectedBlockClientIds();
@@ -62,7 +62,7 @@ function Edit( { context, clientId } ) {
 			}
 
 			return {
-				menuItemIndex: _menuItemIndex,
+				tabIndex: _tabIndex,
 				tabsClientId: _tabsClientId,
 				selectedTabClientId: _selectedTabClientId,
 			};
@@ -70,11 +70,11 @@ function Edit( { context, clientId } ) {
 		[ clientId, tabsList ]
 	);
 
-	const tab = tabsList[ menuItemIndex ] || {};
+	const tab = tabsList[ tabIndex ] || {};
 
 	// tabListIndex is the tab's position in tabsList, used for active-state
 	// checks and click handling.
-	const tabListIndex = tab.index ?? menuItemIndex;
+	const tabListIndex = tab.index ?? tabIndex;
 
 	const tabClientId = tab.clientId || '';
 	const label = tab.label || '';

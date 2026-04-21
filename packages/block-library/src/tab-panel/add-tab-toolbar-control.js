@@ -22,12 +22,12 @@ import { useDispatch, useSelect } from '@wordpress/data';
 export default function AddTabToolbarControl( { tabsClientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 
-	const { tabPanelClientId, tabsMenuClientId } = useSelect(
+	const { tabPanelsClientId, tabsListClientId } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
 				return {
-					tabPanelClientId: null,
-					tabsMenuClientId: null,
+					tabPanelsClientId: null,
+					tabsListClientId: null,
 				};
 			}
 			const { getBlocks } = select( blockEditorStore );
@@ -39,27 +39,27 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 				( block ) => block.name === 'core/tab-list'
 			);
 			return {
-				tabPanelClientId: tabPanels?.clientId || null,
-				tabsMenuClientId: tabList?.clientId || null,
+				tabPanelsClientId: tabPanels?.clientId || null,
+				tabsListClientId: tabList?.clientId || null,
 			};
 		},
 		[ tabsClientId ]
 	);
 
 	const addTab = () => {
-		if ( ! tabPanelClientId ) {
+		if ( ! tabPanelsClientId ) {
 			return;
 		}
 
-		const newTabBlock = createBlock( 'core/tab-panel', {
+		const newTabPanelBlock = createBlock( 'core/tab-panel', {
 			label: __( 'Tab' ),
 		} );
-		insertBlock( newTabBlock, undefined, tabPanelClientId );
+		insertBlock( newTabPanelBlock, undefined, tabPanelsClientId );
 
-		// Insert a corresponding menu item into the tab-list.
-		if ( tabsMenuClientId ) {
-			const newMenuItemBlock = createBlock( 'core/tab', {} );
-			insertBlock( newMenuItemBlock, undefined, tabsMenuClientId );
+		// Insert a corresponding tab into the tab-list.
+		if ( tabsListClientId ) {
+			const newTabBlock = createBlock( 'core/tab', {} );
+			insertBlock( newTabBlock, undefined, tabsListClientId );
 		}
 	};
 

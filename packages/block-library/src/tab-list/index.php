@@ -30,18 +30,18 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 	// Re-render each tab with per-item context (index, id, label).
 	// Match by position so items align with their corresponding tabs.
 	$buttons_html       = '';
-	$menu_item_position = 0;
+	$tab_position = 0;
 
-	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
-		if ( 'core/tab' !== ( $parsed_menu_item['blockName'] ?? '' ) ) {
+	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_tab ) {
+		if ( 'core/tab' !== ( $parsed_tab['blockName'] ?? '' ) ) {
 			continue;
 		}
 
-		$tab       = $tabs_list[ $menu_item_position ] ?? null;
-		$tab_index = $menu_item_position;
-		++$menu_item_position;
+		$tab       = $tabs_list[ $tab_position ] ?? null;
+		$tab_index = $tab_position;
+		++$tab_position;
 
-		// Skip menu items with no matching tab.
+		// Skip tabs with no matching tab panel.
 		if ( null === $tab ) {
 			continue;
 		}
@@ -55,8 +55,8 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 			)
 		);
 
-		$menu_item_block = new WP_Block( $parsed_menu_item, $item_context );
-		$buttons_html   .= $menu_item_block->render();
+		$tab_block = new WP_Block( $parsed_tab, $item_context );
+		$buttons_html   .= $tab_block->render();
 	}
 
 	// Rebuild the wrapper using get_block_wrapper_attributes().
