@@ -107,7 +107,7 @@ export function useSlugField(
 			type: 'text',
 			enableGlobalSearch: true,
 			description: __(
-				'Lower case letters, underscores and dashes only. Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
+				'Lower case letters, numbers, underscores, and dashes only. Maximum length: 32 characters. Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
 			),
 			isValid: {
 				required: true,
