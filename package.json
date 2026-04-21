@@ -40,7 +40,6 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@apidevtools/json-schema-ref-parser": "11.6.4",
 		"@babel/core": "7.25.7",
 		"@emotion/babel-plugin": "11.13.5",
 		"@emotion/is-prop-valid": "1.4.0",
