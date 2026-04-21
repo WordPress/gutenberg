@@ -58,20 +58,12 @@ jobs:
               run: |
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
-            - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-              if: ${{ !cancelled() }}
-              with:
-                  name: failures-artifacts--${{ matrix.part }}
-                  path: test/e2e/artifacts/test-results
-                  if-no-files-found: ignore
-
             - name: Archive blob reports (HTML)
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--${{ matrix.part }}
-                  path: blob-report
+                  path: test/e2e/blob-report
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
@@ -99,16 +91,6 @@ jobs:
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-
-            - name: Merge failures artifacts
-              uses: actions/upload-artifact/merge@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
-              # Don't fail the job if there aren't any artifacts to merge.
-              continue-on-error: true
-              with:
-                  name: failures-artifacts
-                  # Retain the merged artifacts in case of a rerun.
-                  pattern: failures-artifacts*
-                  delete-merged: true
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports

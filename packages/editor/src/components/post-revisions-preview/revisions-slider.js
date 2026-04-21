@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { RangeControl, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -39,6 +38,8 @@ function RevisionsSlider() {
 			const query = {
 				per_page: -1,
 				context: 'edit',
+				orderby: 'date',
+				order: 'asc',
 				_fields: [
 					...new Set( [
 						'id',
@@ -72,28 +73,12 @@ function RevisionsSlider() {
 
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
-	// Template revisions use the template REST API format, which exposes
-	// 'modified' instead of 'date'.
-	const revisionDateField = revisionKey === 'wp_id' ? 'modified' : 'date';
-
-	const sortedRevisions = useMemo( () => {
-		return (
-			revisions
-				?.slice()
-				.sort(
-					( a, b ) =>
-						new Date( a[ revisionDateField ] ) -
-						new Date( b[ revisionDateField ] )
-				) ?? []
-		);
-	}, [ revisions, revisionDateField ] );
-
-	const selectedIndex = sortedRevisions.findIndex(
+	const selectedIndex = revisions?.findIndex(
 		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
 	const handleSliderChange = ( index ) => {
-		const revision = sortedRevisions[ index ];
+		const revision = revisions?.[ index ];
 		if ( revision ) {
 			setCurrentRevisionId( revision[ revisionKey ] );
 		}
@@ -102,21 +87,18 @@ function RevisionsSlider() {
 	// Format date for tooltip.
 	const dateSettings = getDateSettings();
 	const renderTooltipContent = ( index ) => {
-		const revision = sortedRevisions[ index ];
+		const revision = revisions?.[ index ];
 		if ( ! revision ) {
 			return index;
 		}
-		return dateI18n(
-			dateSettings.formats.datetime,
-			revision[ revisionDateField ]
-		);
+		return dateI18n( dateSettings.formats.datetime, revision.date );
 	};
 
 	if ( isLoading ) {
 		return <Spinner />;
 	}
 
-	if ( ! sortedRevisions.length ) {
+	if ( ! revisions?.length ) {
 		return (
 			<span className="editor-revisions-header__no-revisions">
 				{ __( 'No revisions found.' ) }
@@ -124,7 +106,7 @@ function RevisionsSlider() {
 		);
 	}
 
-	if ( sortedRevisions.length === 1 ) {
+	if ( revisions?.length === 1 ) {
 		return (
 			<span className="editor-revisions-header__no-revisions">
 				{ __( 'Only one revision found.' ) }
@@ -138,7 +120,7 @@ function RevisionsSlider() {
 			className="editor-revisions-header__slider"
 			hideLabelFromVision
 			label={ __( 'Revision' ) }
-			max={ sortedRevisions.length - 1 }
+			max={ revisions?.length - 1 }
 			min={ 0 }
 			marks
 			onChange={ handleSliderChange }

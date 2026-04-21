@@ -576,19 +576,6 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
- *
- * @param {number} minHeight
- * @return {Object} Action object.
- */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
-	};
-}
-
-/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
@@ -688,12 +675,7 @@ export const restoreRevision =
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
 				__( 'Restored to revision from %s.' ),
-				dateI18n(
-					getDateSettings().formats.datetime,
-					// Template revisions use the template REST API format, which
-					// exposes 'modified' instead of 'date'.
-					revisionKey === 'wp_id' ? revision.modified : revision.date
-				)
+				dateI18n( getDateSettings().formats.datetime, revision.date )
 			),
 			{
 				type: 'snackbar',

@@ -3,6 +3,7 @@ import { Text } from '../index';
 import { Stack } from '../../stack';
 
 const meta: Meta< typeof Text > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Text',
 	component: Text,
 };
@@ -17,6 +18,10 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * Important: Setting the `variant` prop to a `heading` variant will not automatically render a heading element.
+ * Use the `render` prop to render a heading element with the appropriate level.
+ */
 export const AllVariants: Story = {
 	render: () => (
 		<Stack

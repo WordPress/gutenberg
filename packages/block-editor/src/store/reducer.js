@@ -1829,12 +1829,12 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
- * @param {Object} state  Current state.
+ * @param {Map}    state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export const blockListSettings = ( state = {}, action ) => {
+export const blockListSettings = ( state = new Map(), action ) => {
 	switch ( action.type ) {
 		case 'REPLACE_BLOCKS': {
 			// Collect all clientIds from replacement blocks. If a clientId
@@ -1849,53 +1849,48 @@ export const blockListSettings = ( state = {}, action ) => {
 				replacementIds.add( block.clientId );
 				stack.push( ...block.innerBlocks );
 			}
-			return Object.fromEntries(
-				Object.entries( state ).filter(
-					( [ id ] ) =>
-						! action.clientIds.includes( id ) ||
-						replacementIds.has( id )
-				)
-			);
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				if ( ! replacementIds.has( clientId ) ) {
+					newState.delete( clientId );
+				}
+			}
+			return newState;
 		}
 		case 'REMOVE_BLOCKS': {
-			return Object.fromEntries(
-				Object.entries( state ).filter(
-					( [ id ] ) => ! action.clientIds.includes( id )
-				)
-			);
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				newState.delete( clientId );
+			}
+			return newState;
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const updates =
 				typeof action.clientId === 'string'
-					? { [ action.clientId ]: action.settings }
-					: action.clientId;
+					? [ [ action.clientId, action.settings ] ]
+					: Object.entries( action.clientId );
 
-			// Remove settings that are the same as the current state.
-			for ( const clientId in updates ) {
-				if ( ! updates[ clientId ] ) {
-					if ( ! state[ clientId ] ) {
-						delete updates[ clientId ];
-					}
-				} else if (
-					fastDeepEqual( state[ clientId ], updates[ clientId ] )
-				) {
-					delete updates[ clientId ];
-				}
-			}
+			const relevantUpdates = updates.filter(
+				( [ clientId, nextSettings ] ) =>
+					! nextSettings
+						? state.has( clientId )
+						: ! fastDeepEqual( state.get( clientId ), nextSettings )
+			);
 
-			if ( Object.keys( updates ).length === 0 ) {
+			if ( ! relevantUpdates.length ) {
 				return state;
 			}
 
-			const merged = { ...state, ...updates };
-
-			for ( const clientId in updates ) {
-				if ( ! updates[ clientId ] ) {
-					delete merged[ clientId ];
+			const newState = new Map( state );
+			for ( const [ clientId, nextSettings ] of relevantUpdates ) {
+				if ( ! nextSettings ) {
+					newState.delete( clientId );
+				} else {
+					newState.set( clientId, nextSettings );
 				}
 			}
 
-			return merged;
+			return newState;
 		}
 	}
 	return state;
@@ -2480,11 +2475,10 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			syncedPatternClientIds.push( clientId );
 		}
 	} );
-	const contentOnlyTemplateLockedClientIds = Object.keys(
+	const contentOnlyTemplateLockedClientIds = Array.from(
 		state.blockListSettings
-	).filter(
-		( clientId ) =>
-			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
+	).flatMap( ( [ clientId, listSettings ] ) =>
+		listSettings?.templateLock === 'contentOnly' ? [ clientId ] : []
 	);
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
@@ -2890,15 +2884,15 @@ export function withDerivedBlockEditingModes( reducer ) {
 
 				for ( const clientId in updates ) {
 					const isNewContentOnlyBlock =
-						state.blockListSettings[ clientId ]?.templateLock !==
-							'contentOnly' &&
-						nextState.blockListSettings[ clientId ]
+						state.blockListSettings.get( clientId )
+							?.templateLock !== 'contentOnly' &&
+						nextState.blockListSettings.get( clientId )
 							?.templateLock === 'contentOnly';
 
 					const wasContentOnlyBlock =
-						state.blockListSettings[ clientId ]?.templateLock ===
-							'contentOnly' &&
-						nextState.blockListSettings[ clientId ]
+						state.blockListSettings.get( clientId )
+							?.templateLock === 'contentOnly' &&
+						nextState.blockListSettings.get( clientId )
 							?.templateLock !== 'contentOnly';
 
 					if ( isNewContentOnlyBlock ) {

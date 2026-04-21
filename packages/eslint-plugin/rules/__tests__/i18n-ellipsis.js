@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../i18n-ellipsis';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
