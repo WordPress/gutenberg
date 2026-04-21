@@ -1,10 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { forwardRef } from '@wordpress/element';
-import type { ComponentPropsWithoutRef } from 'react';
-
-export type PortalProps = ComponentPropsWithoutRef<
-	typeof _AlertDialog.Portal
->;
+import type { PortalProps } from './types';
 
 /**
  * Root element that portals `AlertDialog` overlay content. Pass to

@@ -1,8 +1,6 @@
 import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
-import type { ComponentPropsWithoutRef } from 'react';
-
-export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
+import type { PortalProps } from './types';
 
 /**
  * Root element that portals `Tooltip` floating content. Pass to

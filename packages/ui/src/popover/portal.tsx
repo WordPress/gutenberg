@@ -1,8 +1,6 @@
 import { Popover as _Popover } from '@base-ui/react/popover';
 import { forwardRef } from '@wordpress/element';
-import type { ComponentPropsWithoutRef } from 'react';
-
-export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
+import type { PortalProps } from './types';
 
 /**
  * Root element that portals `Popover` floating content. Pass to

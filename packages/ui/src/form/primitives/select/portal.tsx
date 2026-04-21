@@ -1,8 +1,6 @@
 import { Select as _Select } from '@base-ui/react/select';
 import { forwardRef } from '@wordpress/element';
-import type { ComponentPropsWithoutRef } from 'react';
-
-export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
+import type { PortalProps } from './types';
 
 /**
  * Root element that portals `Select` listbox content. Pass to

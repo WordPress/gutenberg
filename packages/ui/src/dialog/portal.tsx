@@ -1,8 +1,6 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import { forwardRef } from '@wordpress/element';
-import type { ComponentPropsWithoutRef } from 'react';
-
-export type PortalProps = ComponentPropsWithoutRef< typeof _Dialog.Portal >;
+import type { PortalProps } from './types';
 
 /**
  * Root element that portals `Dialog` overlay content (`Backdrop`, inner

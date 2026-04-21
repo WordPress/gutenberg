@@ -8,7 +8,7 @@ import { Root } from './root';
 import { Title } from './title';
 import { Trigger } from './trigger';
 
-export type { PortalProps } from './portal';
+export type { PortalProps } from './types';
 export {
 	Action,
 	CloseIcon,
