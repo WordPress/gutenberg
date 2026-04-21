@@ -7,8 +7,8 @@ import {
 	Modal,
 	Spinner,
 	privateApis as componentsPrivateApis,
-	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -158,9 +158,13 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 				id: 'details',
 				title: __( 'Details' ),
 				panel: (
-					<VStack className="media-editor-modal__panel" spacing={ 4 }>
+					<Stack
+						className="media-editor-modal__panel"
+						direction="column"
+						gap="lg"
+					>
 						<MediaForm />
-					</VStack>
+					</Stack>
 				),
 			},
 		],

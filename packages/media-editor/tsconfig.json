@@ -13,6 +13,7 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis" },
+		{ "path": "../ui" }
 	]
 }

@@ -53,6 +53,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/interface": "file:../interface",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"clsx": "^2.1.1",
 		"gl-matrix": "^3.4.3"
 	},
