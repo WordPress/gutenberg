@@ -102,8 +102,4 @@ function TaxonomiesPage() {
 	);
 }
 
-function Stage() {
-	return <TaxonomiesPage />;
-}
-
-export const stage = Stage;
+export const stage = TaxonomiesPage;
