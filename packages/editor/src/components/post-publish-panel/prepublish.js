@@ -21,7 +21,6 @@ import MaybePostFormatPanel from './maybe-post-format-panel';
 import { store as editorStore } from '../../store';
 import MaybeCategoryPanel from './maybe-category-panel';
 import MaybeUploadMedia from './maybe-upload-media';
-import MaybeMissingSizes from './maybe-missing-sizes';
 
 function PostPublishPanelPrepublish( { children } ) {
 	const {
@@ -106,7 +105,6 @@ function PostPublishPanelPrepublish( { children } ) {
 				</div>
 			</div>
 			<MaybeUploadMedia />
-			<MaybeMissingSizes />
 			{ hasPublishAction && (
 				<>
 					<PanelBody
