@@ -17,7 +17,6 @@
 
 ### Internal
 
--   Storybook: add global preview iframe styles on the shared monorepo canvas (`body` positioning and `#storybook-root` isolation) so portaled `@wordpress/ui` overlays stack predictably in local development; does not affect published package assets ([#77451](https://github.com/WordPress/gutenberg/pull/77451)).
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
 
