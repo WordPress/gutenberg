@@ -63,7 +63,7 @@
 		padding: $grid-unit-15 $grid-unit-20;
 		gap: $grid-unit-10;
 		width: 100%;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		transition: background-color 0.2s ease;
 
 		&:hover:not(:disabled) {

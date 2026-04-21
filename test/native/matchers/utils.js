@@ -20,7 +20,7 @@ export class ReactElementTypeError extends Error {
 		let withType = '';
 		try {
 			withType = printWithType( 'Received', received, printReceived );
-		} catch ( e ) {}
+		} catch {}
 		this.message = [
 			matcherHint(
 				`${ context.isNot ? '.not' : '' }.${ matcherFn.name }`,

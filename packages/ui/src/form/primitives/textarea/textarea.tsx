@@ -4,6 +4,7 @@ import { cloneElement, forwardRef } from '@wordpress/element';
 import styles from './style.module.css';
 import type { TextareaProps } from './types';
 import { Input } from '../input';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 
 const wrappedRender = (
 	render: NonNullable< TextareaProps[ 'render' ] >,
@@ -39,7 +40,15 @@ export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
 				style={ style }
 				render={ wrappedRender(
 					render || ( ( props ) => <textarea { ...props } /> ),
-					{ className: styles.textarea, ref, rows, ...restProps }
+					{
+						className: clsx(
+							defenseStyles.textarea,
+							styles.textarea
+						),
+						ref,
+						rows,
+						...restProps,
+					}
 				) }
 				value={ value }
 				defaultValue={ defaultValue }
