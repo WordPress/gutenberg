@@ -1,8 +1,8 @@
-import { Tooltip } from '@base-ui/react/tooltip';
+import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
 import type { ComponentPropsWithoutRef } from 'react';
 
-export type PortalProps = ComponentPropsWithoutRef< typeof Tooltip.Portal >;
+export type PortalProps = ComponentPropsWithoutRef< typeof _Tooltip.Portal >;
 
 /**
  * Root element that portals `Tooltip` floating content. Pass to
@@ -11,7 +11,7 @@ export type PortalProps = ComponentPropsWithoutRef< typeof Tooltip.Portal >;
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function TooltipPortal( props, ref ) {
-		return <Tooltip.Portal ref={ ref } { ...props } />;
+		return <_Tooltip.Portal ref={ ref } { ...props } />;
 	}
 );
 

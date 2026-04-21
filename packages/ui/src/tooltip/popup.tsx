@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Tooltip } from '@base-ui/react/tooltip';
+import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -29,7 +29,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	ref
 ) {
 	const portalChildren = (
-		<Tooltip.Positioner
+		<_Tooltip.Positioner
 			align={ align }
 			side={ side }
 			sideOffset={ sideOffset }
@@ -50,15 +50,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 				  - remove the hardcoded `bg` setting from the `ThemeProvider` below
 					*/ }
 			<ThemeProvider color={ { bg: '#1e1e1e' } }>
-				<Tooltip.Popup
+				<_Tooltip.Popup
 					ref={ ref }
 					className={ styles.popup }
 					{ ...props }
 				>
 					{ children }
-				</Tooltip.Popup>
+				</_Tooltip.Popup>
 			</ThemeProvider>
-		</Tooltip.Positioner>
+		</_Tooltip.Positioner>
 	);
 
 	return renderPortalWithChildren( portal, <Portal />, portalChildren );
