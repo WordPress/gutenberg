@@ -4,11 +4,7 @@
 
 ### Breaking Changes
 
-- Rename Tabs-related blocks:
-  - `Tabs Menu` → `Tab List`
-  - `Tab Menu Item` → `Tab`
-  - `Tab` → `Tab Panel`
-  - `Tab Panel` → `Tab Panels`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 
