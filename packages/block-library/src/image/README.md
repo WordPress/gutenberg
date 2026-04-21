@@ -49,7 +49,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
-- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow):
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 
 ## Context
 

@@ -4,7 +4,8 @@
  * External dependencies
  */
 const fs = require( 'fs' );
-const { join } = require( 'path' );
+const path = require( 'path' );
+const { join } = path;
 const { pascalCase } = require( 'change-case' );
 const glob = require( 'glob' ).sync;
 
@@ -42,7 +43,7 @@ const packagePaths = glob( 'packages/*/package.json' )
  */
 function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
-		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+		const readmePath = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
 		const packageJson = require(
 			join(
@@ -59,7 +60,7 @@ function getPackageManifest( packageFolderNames ) {
 		manifest.push( {
 			title: packageJson.name,
 			slug: `packages-${ folderName }`,
-			markdown_source: path,
+			markdown_source: readmePath,
 			parent: 'packages',
 		} );
 
@@ -109,8 +110,9 @@ function getBlockManifest( jsonPaths, catPaths ) {
 
 	// Add category pages (parent: core-blocks).
 	catPaths.forEach( ( filePath ) => {
-		const fileName = filePath.split( '/' ).pop().replace( '.md', '' );
-		const category = fileName.replace( 'category-', '' );
+		const category = path
+			.basename( filePath, '.md' )
+			.replace( 'category-', '' );
 		const content = fs.readFileSync( filePath, 'utf8' );
 		const titleMatch = content.match( /^#\s(.+)$/m );
 		const title = titleMatch ? titleMatch[ 1 ] : pascalCase( category );
@@ -126,11 +128,11 @@ function getBlockManifest( jsonPaths, catPaths ) {
 	// Block slugs use "core-block-" (singular) to avoid collisions
 	// with category slugs which use "core-blocks-" (plural).
 	jsonPaths.forEach( ( jsonPath ) => {
-		const blockDir = jsonPath.split( '/' )[ 3 ]; // packages/block-library/src/{blockDir}/block.json
+		const blockDir = path.basename( path.dirname( jsonPath ) );
 		const readmePath = `packages/block-library/src/${ blockDir }/README.md`;
 
 		// Only include blocks that have a README.
-		if ( ! fs.existsSync( readmePath ) ) {
+		if ( ! fs.existsSync( join( __dirname, '..', '..', readmePath ) ) ) {
 			return;
 		}
 
