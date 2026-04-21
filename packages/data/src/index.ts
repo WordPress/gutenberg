@@ -35,6 +35,7 @@ export { default as createReduxStore } from './redux-store';
 export { keyedReducer } from './redux-store/keyed-reducer';
 export { dispatch } from './dispatch';
 export { select } from './select';
+export { waitForTransition } from './utils';
 
 export type * from './types';
 

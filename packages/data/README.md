@@ -878,6 +878,29 @@ _Returns_
 
 -   `ReturnType< T >`: Data object returned by the `mapSelect` function.
 
+### waitForTransition
+
+Given a predicate function and an optional registry, returns a Promise that resolves once the predicate has transitioned from `true` to `false`. If the predicate is already `true` when called, the Promise will resolve on the next transition to `false`.
+
+Useful for running code after an asynchronous operation that is tracked in a data store (such as saving a post) has completed.
+
+```js
+import { waitForTransition } from '@wordpress/data';
+
+// Wait for isSavingPost() to transition to true, then back to false.
+await waitForTransition( () => wp.data.select( 'core/editor' ).isSavingPost() );
+console.log( 'Post saved!' );
+```
+
+_Parameters_
+
+-   _predicate_ `() => boolean`: A function that returns a boolean derived from store state.
+-   _registry_ `DataRegistry`: Registry to observe. Defaults to the global registry.
+
+_Returns_
+
+-   `Promise< void >`: A Promise that resolves the next time `predicate` returns `false` after returning `true`.
+
 ### withDispatch
 
 Higher-order component used to add dispatch props using registered action creators.
