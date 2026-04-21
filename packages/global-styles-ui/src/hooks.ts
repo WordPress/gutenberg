@@ -53,6 +53,12 @@ export function useStyle< T = any >(
 	state?: string
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
+	const isPseudoSelectorState = state?.startsWith( ':' );
+	const pseudoSelectorState = isPseudoSelectorState ? state : undefined;
+	const stylePath =
+		state && ! isPseudoSelectorState
+			? [ path, state ].filter( Boolean ).join( '.' )
+			: path;
 
 	let sourceValue = merged;
 	if ( readFrom === 'base' ) {
@@ -61,23 +67,33 @@ export function useStyle< T = any >(
 		sourceValue = user;
 	}
 
-	const styleValue = useMemo( () => {
+	const styleValue = useMemo< T | undefined >( () => {
 		const rawValue = getStyle< T >(
 			sourceValue,
-			path,
+			stylePath,
 			blockName,
 			shouldDecodeEncode
 		);
-		if ( state ) {
-			return ( rawValue as any )?.[ state ] ?? {};
+		if ( pseudoSelectorState ) {
+			return (
+				( rawValue as Record< string, T | undefined > )?.[
+					pseudoSelectorState
+				] ?? ( {} as T )
+			);
 		}
 		return rawValue;
-	}, [ sourceValue, path, blockName, shouldDecodeEncode, state ] );
+	}, [
+		sourceValue,
+		stylePath,
+		blockName,
+		shouldDecodeEncode,
+		pseudoSelectorState,
+	] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
 			let valueToSet: any = newValue;
-			if ( state ) {
+			if ( pseudoSelectorState ) {
 				const fullCurrentValue = getStyle(
 					user,
 					path,
@@ -86,18 +102,18 @@ export function useStyle< T = any >(
 				);
 				valueToSet = {
 					...( fullCurrentValue as object ),
-					[ state ]: newValue,
+					[ pseudoSelectorState ]: newValue,
 				};
 			}
 			const newGlobalStyles = setStyle< any >(
 				user,
-				path,
+				stylePath,
 				valueToSet,
 				blockName
 			);
 			onChange( newGlobalStyles );
 		},
-		[ user, onChange, path, blockName, state ]
+		[ user, onChange, path, stylePath, blockName, pseudoSelectorState ]
 	);
 
 	return [ styleValue, setStyleValue ] as const;
