@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import Shortcut from '../';
 
 const meta: Meta< typeof Shortcut > = {
+	tags: [ 'manifest' ],
 	component: Shortcut,
 	title: 'Components/Utilities/Shortcut',
 	id: 'components-shortcut',

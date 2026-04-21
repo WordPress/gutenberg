@@ -81,6 +81,7 @@
 # UI Components
 /packages/components                            @ajitbohra @WordPress/gutenberg-components
 /packages/compose                               @ajitbohra
+/packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
 /packages/nux                                   @ajitbohra @peterwilsoncc

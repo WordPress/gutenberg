@@ -30,6 +30,23 @@
 	white-space: nowrap;
 }
 
+.admin-ui-page__header-visual {
+	display: grid;
+	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	flex-shrink: 0;
+	// TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm.
+	width: 24px;
+	height: 24px;
+
+	> * {
+		grid-column: 1 / -1;
+		grid-row: 1 / -1;
+		max-width: 100%;
+		max-height: 100%;
+	}
+}
+
 .admin-ui-page__sidebar-toggle-slot:empty {
 	display: none;
 }
@@ -50,25 +67,5 @@
 
 	&.has-padding {
 		padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
-	}
-}
-
-// Show button text labels when preference is enabled.
-.show-icon-labels {
-	.admin-ui-page__header-actions {
-		.components-button.has-icon {
-			width: auto;
-			padding: 0 var(--wpds-dimension-padding-xs);
-
-			// Hide the button icons when labels are set to display...
-			svg {
-				display: none;
-			}
-			// ... and display labels.
-			&::after {
-				content: attr(aria-label);
-				font-size: var(--wpds-typography-font-size-sm);
-			}
-		}
 	}
 }
