@@ -1,4 +1,4 @@
-import { cloneElement, isValidElement } from '@wordpress/element';
+import { cloneElement } from '@wordpress/element';
 import type { ReactElement, ReactNode } from 'react';
 
 /**
@@ -27,13 +27,7 @@ export function renderPortalWithChildren(
 ): ReactElement {
 	const rootPortal = portal ?? defaultPortal;
 
-	if ( isValidElement( rootPortal ) ) {
-		return cloneElement( rootPortal as PortalMountElement, {
-			children,
-		} );
-	}
-
-	return cloneElement( defaultPortal as PortalMountElement, {
+	return cloneElement( rootPortal as PortalMountElement, {
 		children,
 	} );
 }
