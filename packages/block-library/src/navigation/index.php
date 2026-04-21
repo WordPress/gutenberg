@@ -699,6 +699,12 @@ class WP_Navigation_Block_Renderer {
 			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
 			// Render template part blocks directly without navigation container wrapper.
 			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+
+			// Expand shortcodes in the overlay, matching what `render_block_core_template_part()`
+			// does for regular template parts. See https://github.com/WordPress/gutenberg/issues/77510.
+			$overlay_blocks_html = shortcode_unautop( $overlay_blocks_html );
+			$overlay_blocks_html = do_shortcode( $overlay_blocks_html );
+
 			// Check if overlay contains a navigation-overlay-close block (detect in rendered HTML so it works with patterns).
 			$has_custom_overlay_close_block = block_core_navigation_overlay_html_has_close_block( $overlay_blocks_html );
 			// Add Interactivity API directives to the overlay close block if present.
