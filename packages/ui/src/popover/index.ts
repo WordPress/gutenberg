@@ -7,5 +7,4 @@ import { Root } from './root';
 import { Title } from './title';
 import { Trigger } from './trigger';
 
-export type { PortalProps } from './types';
 export { Arrow, Close, Description, Portal, Popup, Root, Title, Trigger };

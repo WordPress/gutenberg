@@ -4,5 +4,4 @@ import { Trigger } from './trigger';
 import { Root } from './root';
 import { Provider } from './provider';
 
-export type { PortalProps } from './types';
 export { Provider, Root, Trigger, Popup, Portal };
