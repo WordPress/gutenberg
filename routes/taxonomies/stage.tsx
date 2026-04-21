@@ -11,7 +11,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AddTaxonomy from './add-taxonomy';
-import { editTaxonomyAction, toggleActiveAction } from './actions';
+import {
+	deleteTaxonomyAction,
+	editTaxonomyAction,
+	toggleActiveAction,
+} from './actions';
 import {
 	titleField,
 	statusField,
@@ -39,7 +43,7 @@ const DEFAULT_VIEW: View = {
 function TaxonomiesPage() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 	const taxonomyActions = useMemo(
-		() => [ editTaxonomyAction, toggleActiveAction ],
+		() => [ editTaxonomyAction, toggleActiveAction, deleteTaxonomyAction ],
 		[]
 	);
 	const slugField = useSlugField();
