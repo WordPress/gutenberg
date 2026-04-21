@@ -1,17 +1,5 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
-/*
- * Temporary workaround for a Base UI tabbability regression with
- * checkVisibility() and display: contents.
- * See: https://github.com/mui/base-ui/issues/4622
- *
- * This must stay outside the CSS layers to override ThemeProvider's
- * unlayered display: contents.
- */
-[data-wpds-theme-provider-id]:has(> .popup) {
-	display: block;
-}
-
 @layer wp-ui-components {
 	.backdrop {
 		position: fixed;
