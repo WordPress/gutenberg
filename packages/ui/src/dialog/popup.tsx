@@ -53,7 +53,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 			 * interactions enabled, so a backdrop would misrepresent that mode.
 			 */ }
 			{ modal === true && (
-				<_Dialog.Backdrop className={ styles.backdrop } />
+				<_Dialog.Backdrop
+					className={ styles.backdrop }
+					data-wp-ui-dialog-backdrop=""
+				/>
 			) }
 			<ThemeProvider>
 				<_Dialog.Popup

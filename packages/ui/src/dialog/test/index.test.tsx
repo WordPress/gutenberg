@@ -122,10 +122,9 @@ describe( 'Dialog', () => {
 	} );
 
 	it( 'renders backdrop only when modal is true', async () => {
-		const getOpenPresentationElements = () =>
-			screen
-				.queryAllByRole( 'presentation', { hidden: true } )
-				.filter( ( element ) => element.hasAttribute( 'data-open' ) );
+		const getBackdrops = () =>
+			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-dialog-backdrop` attribute (mirroring the Dialog close-icon pattern) is more robust than the Base UI role/state it inherits.
+			document.querySelectorAll( '[data-wp-ui-dialog-backdrop]' );
 
 		const view = render(
 			<Dialog.Root open modal>
@@ -136,7 +135,7 @@ describe( 'Dialog', () => {
 		);
 
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect( getOpenPresentationElements() ).toHaveLength( 1 );
+		expect( getBackdrops() ).toHaveLength( 1 );
 
 		view.rerender(
 			<Dialog.Root open modal={ false }>
@@ -146,7 +145,7 @@ describe( 'Dialog', () => {
 			</Dialog.Root>
 		);
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect( getOpenPresentationElements() ).toHaveLength( 0 );
+		expect( getBackdrops() ).toHaveLength( 0 );
 
 		view.rerender(
 			<Dialog.Root open modal="trap-focus">
@@ -156,7 +155,7 @@ describe( 'Dialog', () => {
 			</Dialog.Root>
 		);
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
-		expect( getOpenPresentationElements() ).toHaveLength( 0 );
+		expect( getBackdrops() ).toHaveLength( 0 );
 	} );
 
 	it( 'renders the popup across default and explicit size values', async () => {
