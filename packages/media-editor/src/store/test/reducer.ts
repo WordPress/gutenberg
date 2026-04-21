@@ -9,34 +9,37 @@ describe( 'core/media-editor reducer', () => {
 		expect( state ).toEqual( DEFAULT_STATE );
 	} );
 
-	it( 'opens the modal with id and invocationId', () => {
+	it( 'opens the modal with id and onUpdate', () => {
+		const onUpdate = jest.fn();
 		const state = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
-			invocationId: 1,
+			onUpdate,
 		} );
 		expect( state ).toEqual( {
 			isOpen: true,
 			id: 42,
-			invocationId: 1,
+			onUpdate,
 		} );
 	} );
 
-	it( 'replaces state on a subsequent open (new invocationId)', () => {
+	it( 'replaces state on a subsequent open (new onUpdate)', () => {
+		const firstOnUpdate = jest.fn();
+		const secondOnUpdate = jest.fn();
 		const first = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
-			invocationId: 1,
+			onUpdate: firstOnUpdate,
 		} );
 		const second = reducer( first, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 99,
-			invocationId: 2,
+			onUpdate: secondOnUpdate,
 		} );
 		expect( second ).toEqual( {
 			isOpen: true,
 			id: 99,
-			invocationId: 2,
+			onUpdate: secondOnUpdate,
 		} );
 	} );
 
@@ -44,7 +47,7 @@ describe( 'core/media-editor reducer', () => {
 		const opened = reducer( undefined, {
 			type: 'OPEN_MEDIA_EDITOR_MODAL',
 			id: 42,
-			invocationId: 1,
+			onUpdate: jest.fn(),
 		} );
 		const closed = reducer( opened, {
 			type: 'CLOSE_MEDIA_EDITOR_MODAL',

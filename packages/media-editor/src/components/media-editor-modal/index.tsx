@@ -104,12 +104,12 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 }
 
 export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
-	const { isOpen, id, onUpdate } = useSelect( ( select ) => {
-		const s = select( mediaEditorStore );
+	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
+		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
 		return {
-			isOpen: s.isMediaEditorModalOpen(),
-			id: s.getMediaEditorModalId(),
-			onUpdate: s.getMediaEditorModalOnUpdate(),
+			isModalOpen: isOpen(),
+			id: getId(),
+			onUpdate: getOnUpdate(),
 		};
 	}, [] );
 
@@ -137,7 +137,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		null
 	);
 	useEffect( () => {
-		if ( ! isOpen ) {
+		if ( ! isModalOpen ) {
 			originalFieldValuesRef.current = null;
 			return;
 		}
@@ -150,7 +150,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 			} );
 			originalFieldValuesRef.current = snapshot;
 		}
-	}, [ isOpen, media, fields ] );
+	}, [ isModalOpen, media, fields ] );
 
 	const tabs = useMemo< ModalTab[] >(
 		() => [
@@ -171,7 +171,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		[]
 	);
 
-	if ( ! isOpen || ! id ) {
+	if ( ! isModalOpen || ! id ) {
 		return null;
 	}
 

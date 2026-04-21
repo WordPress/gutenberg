@@ -1,9 +1,4 @@
 /**
- * Internal dependencies
- */
-import { registerCallback, unregisterCallback } from './callback-registry';
-
-/**
  * Shape passed to `onUpdate` after a successful save. Deliberately normalized
  * and minimal: `url` instead of REST's `source_url`, so consumers can drop
  * it straight into block attributes (matches the legacy `ImageEditor`'s
@@ -26,25 +21,13 @@ export function openMediaEditorModal( {
 	id,
 	onUpdate,
 }: OpenMediaEditorModalArgs ) {
-	return ( { select, dispatch }: { select: any; dispatch: any } ) => {
-		const previousInvocationId = select.getMediaEditorModalInvocationId();
-		unregisterCallback( previousInvocationId );
-
-		const invocationId = onUpdate ? registerCallback( onUpdate ) : -1;
-
-		dispatch( {
-			type: 'OPEN_MEDIA_EDITOR_MODAL',
-			id,
-			invocationId,
-		} );
+	return {
+		type: 'OPEN_MEDIA_EDITOR_MODAL' as const,
+		id,
+		onUpdate: onUpdate ?? null,
 	};
 }
 
 export function closeMediaEditorModal() {
-	return ( { select, dispatch }: { select: any; dispatch: any } ) => {
-		const invocationId = select.getMediaEditorModalInvocationId();
-		unregisterCallback( invocationId );
-
-		dispatch( { type: 'CLOSE_MEDIA_EDITOR_MODAL' } );
-	};
+	return { type: 'CLOSE_MEDIA_EDITOR_MODAL' as const };
 }
