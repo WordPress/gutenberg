@@ -155,7 +155,7 @@ add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
  * @param WP_REST_Request $request       The REST request.
  * @return stdClass|WP_Error Filtered post object, or WP_Error to abort.
  */
-function gutenberg_validate_user_taxonomy_slug( $prepared_post, $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+function gutenberg_validate_user_taxonomy_slug( $prepared_post ) {
 	$slug = ! empty( $prepared_post->post_name )
 		? (string) $prepared_post->post_name
 		: '';
@@ -210,4 +210,4 @@ function gutenberg_validate_user_taxonomy_slug( $prepared_post, $request ) { // 
 
 	return $prepared_post;
 }
-add_filter( 'rest_pre_insert_wp_user_taxonomy', 'gutenberg_validate_user_taxonomy_slug', 10, 2 );
+add_filter( 'rest_pre_insert_wp_user_taxonomy', 'gutenberg_validate_user_taxonomy_slug' );
