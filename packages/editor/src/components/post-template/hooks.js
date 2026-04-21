@@ -3,7 +3,8 @@
  */
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
+import { useEntityProp, store as coreStore } from '@wordpress/core-data';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -64,20 +65,75 @@ function useTemplates( postType ) {
 	);
 }
 
-export function useAvailableTemplates( postType ) {
+export function useAvailableTemplates() {
+	const { postType, postId } = useEditedPostContext();
+	const [ postSlug ] = useEntityProp( 'postType', postType, 'slug', postId );
 	const currentTemplateSlug = useCurrentTemplateSlug();
 	const allowSwitchingTemplate = useAllowSwitchingTemplates();
 	const templates = useTemplates( postType );
+	// Add the default template to the available ones. We don't care about
+	// possible assignment to postspage/homepage because it's guarded by
+	// `allowSwitchingTemplate` above.
+	const defaultTemplate = useSelect(
+		( select ) => {
+			// Only append the default template if the experiment is enabled.
+			if ( ! window?.__experimentalDataFormInspector ) {
+				return null;
+			}
+			// If the default template is already assigned, no need
+			// to add it to the available templates.
+			if ( ! currentTemplateSlug ) {
+				return null;
+			}
+			const { getDefaultTemplateId, getEntityRecord } =
+				select( coreStore );
+			let slug;
+			if ( postSlug ) {
+				slug =
+					postType === 'page'
+						? `${ postType }-${ postSlug }`
+						: `single-${ postType }-${ postSlug }`;
+			} else {
+				slug = postType === 'page' ? 'page' : `single-${ postType }`;
+			}
+			const templateId = getDefaultTemplateId( { slug } );
+			if ( ! templateId ) {
+				return null;
+			}
+			return getEntityRecord( 'postType', 'wp_template', templateId );
+		},
+		[ currentTemplateSlug, postSlug, postType ]
+	);
 	return useMemo(
 		() =>
 			allowSwitchingTemplate &&
-			templates?.filter(
-				( template ) =>
-					template.is_custom &&
-					template.slug !== currentTemplateSlug &&
-					!! template.content.raw // Skip empty templates.
-			),
-		[ templates, currentTemplateSlug, allowSwitchingTemplate ]
+			[
+				...( templates || [] ).filter(
+					( template ) =>
+						template.is_custom &&
+						template.slug !== currentTemplateSlug &&
+						!! template.content.raw // Skip empty templates.
+				),
+				defaultTemplate && {
+					...defaultTemplate,
+					title: {
+						rendered: sprintf(
+							// translators: %s: Template name
+							__( '%s (default)' ),
+							defaultTemplate.title.rendered
+						),
+					},
+					// That's extra custom prop in order to update to an empty template
+					// when we select the default template.
+					isDefault: true,
+				},
+			].filter( Boolean ),
+		[
+			templates,
+			defaultTemplate,
+			currentTemplateSlug,
+			allowSwitchingTemplate,
+		]
 	);
 }
 

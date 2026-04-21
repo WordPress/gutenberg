@@ -1,3 +1,8 @@
+// useSelect is a low-level hook that intentionally breaks rules-of-hooks
+// in its internal helpers (_useStaticSelect, _useMappingSelect) where
+// hooks are called inside non-hook functions and conditionally dispatched.
+/* eslint-disable react-hooks/rules-of-hooks, react-compiler/react-compiler */
+
 /**
  * WordPress dependencies
  */
@@ -367,3 +372,4 @@ export function useSuspenseSelect< T extends MapSelect >(
 ): ReturnType< T > {
 	return _useMappingSelect( true, mapSelect, deps ) as ReturnType< T >;
 }
+/* eslint-enable react-hooks/rules-of-hooks, react-compiler/react-compiler */

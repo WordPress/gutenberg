@@ -6,19 +6,38 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	generateThumbnails,
+} from '../private-actions';
 import { OperationType } from '../types';
-import { vipsHasTransparency } from '../utils';
+import { vipsHasTransparency, vipsBatchResizeImage } from '../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
 	createBlobURL: jest.fn( () => 'blob:mock-url' ),
 	revokeBlobURL: jest.fn(),
+	isBlobURL: jest.fn( () => false ),
 } ) );
 
 // Mock vips utilities
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
+	vipsBatchResizeImage: jest.fn( ( _id, _file, outputType, configs ) =>
+		Promise.resolve(
+			configs.map( ( c ) => ( {
+				name: c.name,
+				file: new File(
+					[ 'batch-resized' ],
+					`converted-${ c.resize.width }x${ c.resize.height }.${
+						outputType.split( '/' )[ 1 ]
+					}`,
+					{ type: outputType }
+				),
+			} ) )
+		)
+	),
 } ) );
 
 describe( 'private actions', () => {
@@ -249,6 +268,125 @@ describe( 'private actions', () => {
 			);
 
 			expect( result ).toBeNull();
+		} );
+	} );
+
+	describe( 'generateThumbnails - batch resize with copyMemory()', () => {
+		let addSideloadItem;
+		let finishOperation;
+		let dispatch;
+
+		function makeSelect( {
+			sourceType = 'image/avif',
+			outputMimeType = 'image/jpeg',
+			filename = 'photo.avif',
+		} = {} ) {
+			const sourceFile = new File( [ 'test' ], filename, {
+				type: sourceType,
+			} );
+			return {
+				getItem: () => ( {
+					id: 'item-1',
+					file: sourceFile,
+					sourceFile,
+					attachment: {
+						id: 42,
+						filename,
+						missing_image_sizes: [ 'thumbnail', 'medium' ],
+					},
+				} ),
+				getSettings: () => ( {
+					allImageSizes: {
+						thumbnail: { width: 150, height: 150, crop: true },
+						medium: { width: 300, height: 300, crop: false },
+					},
+					imageOutputFormats: outputMimeType
+						? { [ sourceType ]: outputMimeType }
+						: {},
+					jpegInterlaced: false,
+					pngInterlaced: false,
+					gifInterlaced: false,
+				} ),
+			};
+		}
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			addSideloadItem = jest.fn();
+			finishOperation = jest.fn();
+			dispatch = { addSideloadItem, finishOperation };
+		} );
+
+		it( 'should use batch resize with output format when transcoding', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/avif',
+				outputMimeType: 'image/jpeg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsBatchResizeImage ).toHaveBeenCalledWith(
+				'item-1',
+				expect.any( File ),
+				'image/jpeg',
+				expect.arrayContaining( [
+					expect.objectContaining( { name: 'thumbnail' } ),
+					expect.objectContaining( { name: 'medium' } ),
+				] ),
+				false
+			);
+			// Sideload items should only have Upload operation.
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].operations ).toEqual( [
+				OperationType.Upload,
+			] );
+		} );
+
+		it( 'should use source format for batch resize when no transcoding', async () => {
+			const select = makeSelect( {
+				sourceType: 'image/jpeg',
+				outputMimeType: undefined,
+				filename: 'photo.jpg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( vipsBatchResizeImage ).toHaveBeenCalledWith(
+				'item-1',
+				expect.any( File ),
+				'image/jpeg',
+				expect.any( Array ),
+				false
+			);
+		} );
+
+		it( 'should fall back to per-thumbnail processing when batch resize fails', async () => {
+			vipsBatchResizeImage.mockRejectedValueOnce( new Error( 'OOM' ) );
+			const select = makeSelect( {
+				sourceType: 'image/avif',
+				outputMimeType: 'image/jpeg',
+			} );
+
+			const thunk = generateThumbnails( 'item-1' );
+			await thunk( { select, dispatch } );
+
+			expect( console ).toHaveWarned();
+
+			// Should still create sideload items with ResizeCrop + TranscodeImage operations.
+			const thumbnailCall = addSideloadItem.mock.calls.find(
+				( call ) => call[ 0 ].additionalData?.image_size === 'thumbnail'
+			);
+			expect( thumbnailCall ).toBeDefined();
+			expect( thumbnailCall[ 0 ].operations ).toEqual(
+				expect.arrayContaining( [
+					expect.arrayContaining( [ OperationType.ResizeCrop ] ),
+				] )
+			);
 		} );
 	} );
 

@@ -22,7 +22,7 @@
 .editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
 	display: flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	position: relative;
 	padding: $grid-unit-05;
 	border-radius: $grid-unit-05;

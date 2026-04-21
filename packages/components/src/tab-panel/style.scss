@@ -18,7 +18,7 @@
 	background: transparent;
 	border: none;
 	box-shadow: none;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	padding: 3px $grid-unit-20; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: $font-weight-regular;

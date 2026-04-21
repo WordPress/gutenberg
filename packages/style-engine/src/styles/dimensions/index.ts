@@ -28,6 +28,18 @@ const minHeight = {
 	},
 };
 
+const minWidth = {
+	name: 'minWidth',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'dimensions', 'minWidth' ],
+			'minWidth'
+		);
+	},
+};
+
 const aspectRatio = {
 	name: 'aspectRatio',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -52,4 +64,4 @@ const width = {
 	},
 };
 
-export default [ height, minHeight, aspectRatio, width ];
+export default [ height, minHeight, minWidth, aspectRatio, width ];

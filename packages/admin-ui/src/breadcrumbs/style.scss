@@ -2,10 +2,10 @@
 
 .admin-ui-breadcrumbs__list {
 	// @TODO: use Text component from UI when available.
-	font-family: var(--wpds-font-family-heading);
-	font-size: var(--wpds-font-size-lg);
-	font-weight: var(--wpds-font-weight-medium);
-	line-height: var(--wpds-font-line-height-lg);
+	font-family: var(--wpds-typography-font-family-heading);
+	font-size: var(--wpds-typography-font-size-lg);
+	font-weight: var(--wpds-typography-font-weight-medium);
+	line-height: var(--wpds-typography-line-height-lg);
 	list-style: none;
 	padding: 0;
 	margin: 0;

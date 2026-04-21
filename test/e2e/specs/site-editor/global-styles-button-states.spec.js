@@ -8,10 +8,6 @@ test.describe( 'Global Styles - Button States', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin, requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await admin.visitSiteEditor( {
@@ -19,6 +15,10 @@ test.describe( 'Global Styles - Button States', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'As a user I want to set button hover background color and see it applied on the frontend', async ( {
