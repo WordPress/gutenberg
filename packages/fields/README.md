@@ -26,6 +26,10 @@ Undocumented declaration.
 
 Undocumented declaration.
 
+### commentsField
+
+Comments count field for post types that support comments.
+
 ### commentStatusField
 
 Comment status field for BasePost.

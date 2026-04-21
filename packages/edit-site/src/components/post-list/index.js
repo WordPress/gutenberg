@@ -25,6 +25,9 @@ import {
 	OPERATOR_BEFORE,
 	OPERATOR_AFTER,
 	LAYOUT_LIST,
+	OPERATOR_IS,
+	OPERATOR_GREATER_THAN,
+	OPERATOR_LESS_THAN,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
@@ -36,6 +39,7 @@ import {
 
 import useNotesCount from './use-notes-count';
 import { QuickEditModal } from './quick-edit-modal';
+import useCommentsCount from './use-comments-count';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -43,6 +47,8 @@ const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const EMPTY_ARRAY = [];
 
 const DEFAULT_STATUSES = 'draft,future,pending,private,publish'; // All but 'trash'.
+
+const COMPUTED_SORT_FIELDS = new Set( [ 'author', 'commentsCount' ] );
 
 function getItemId( item ) {
 	return item.id.toString();
@@ -119,6 +125,8 @@ export default function PostList( { postType } ) {
 		postType,
 	} );
 
+	const isComputedSort = COMPUTED_SORT_FIELDS.has( view.sort?.field );
+
 	const queryArgs = useMemo( () => {
 		const filters = {};
 		view.filters?.forEach( ( filter ) => {
@@ -163,12 +171,12 @@ export default function PostList( { postType } ) {
 			page: view.page,
 			_embed: 'author,wp:featuredmedia',
 			order: view.sort?.direction,
-			orderby: view.sort?.field,
+			orderby: isComputedSort ? undefined : view.sort?.field,
 			orderby_hierarchy: !! view.showLevels,
 			search: view.search,
 			...filters,
 		};
-	}, [ view ] );
+	}, [ view, isComputedSort ] );
 	const {
 		records,
 		isResolving: isLoadingData,
@@ -183,28 +191,70 @@ export default function PostList( { postType } ) {
 	);
 	const { notesCount, isLoading: isLoadingNotesCount } =
 		useNotesCount( postIds );
+	const { commentsCount, isLoading: isLoadingCommentsCount } =
+		useCommentsCount( postIds );
 
 	// The REST API sort the authors by ID, but we want to sort them by name.
 	const data = useMemo( () => {
-		let processedRecords = records;
+		const commentsFilters =
+			view.filters?.filter(
+				( filter ) => filter.field === 'commentsCount'
+			) ?? [];
 
-		if ( view?.sort?.field === 'author' ) {
+		if ( ! records ) {
+			return records;
+		}
+
+		let processedRecords = records.map( ( record ) => ( {
+			...record,
+			notesCount: notesCount[ record.id ] ?? 0,
+			commentsCount: commentsCount[ record.id ] ?? 0,
+		} ) );
+
+		if ( commentsFilters.length ) {
+			processedRecords = processedRecords.filter( ( record ) =>
+				commentsFilters.every( ( filter ) => {
+					if ( filter.value === '' || filter.value === null ) {
+						return true;
+					}
+
+					const value = Number( filter.value );
+					const count = Number( record.commentsCount );
+
+					switch ( filter.operator ) {
+						case OPERATOR_IS:
+							return count === value;
+						case OPERATOR_LESS_THAN:
+							return count < value;
+						case OPERATOR_GREATER_THAN:
+							return count > value;
+						default:
+							return true;
+					}
+				} )
+			);
+		}
+
+		if (
+			view?.sort?.field === 'author' ||
+			view?.sort?.field === 'commentsCount'
+		) {
 			processedRecords = filterSortAndPaginate(
-				records,
+				processedRecords,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
 		}
 
-		if ( processedRecords ) {
-			return processedRecords.map( ( record ) => ( {
-				...record,
-				notesCount: notesCount[ record.id ] ?? 0,
-			} ) );
-		}
-
 		return processedRecords;
-	}, [ records, fields, view?.sort, notesCount ] );
+	}, [
+		view.filters,
+		view?.sort,
+		records,
+		notesCount,
+		commentsCount,
+		fields,
+	] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -309,7 +359,10 @@ export default function PostList( { postType } ) {
 				actions={ actions }
 				data={ data || EMPTY_ARRAY }
 				isLoading={
-					isLoadingData || isLoadingNotesCount || ! hasResolved
+					isLoadingData ||
+					isLoadingNotesCount ||
+					isLoadingCommentsCount ||
+					! hasResolved
 				}
 				view={ view }
 				onChangeView={ onChangeView }

@@ -60,3 +60,5 @@ export const OPERATOR_IS_ANY = 'isAny';
 export const OPERATOR_IS_NONE = 'isNone';
 export const OPERATOR_BEFORE = 'before';
 export const OPERATOR_AFTER = 'after';
+export const OPERATOR_GREATER_THAN = 'greaterThan';
+export const OPERATOR_LESS_THAN = 'lessThan';

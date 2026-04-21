@@ -39,6 +39,7 @@ import {
 	scheduledDateField,
 	formatField,
 	postContentInfoField,
+	commentsField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -273,6 +274,7 @@ export const registerPostTypeSchema =
 					excerptField,
 				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
 				postTypeConfig.supports?.comments && commentStatusField,
+				postTypeConfig.supports?.comments && commentsField,
 				postTypeConfig.supports?.trackbacks && pingStatusField,
 				( postTypeConfig.supports?.comments ||
 					postTypeConfig.supports?.trackbacks ) &&
