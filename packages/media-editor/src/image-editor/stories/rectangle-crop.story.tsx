@@ -222,7 +222,16 @@ const WithControlsComponent = () => {
 			if ( value === undefined ) {
 				return;
 			}
-			setRotation( baseAngle + value * visualDir );
+			// Clamp strictly inside [-MAX, MAX). Reaching exactly ±MAX
+			// lands state.rotation on a 90° midpoint, which flips the
+			// computed baseAngle on the next render; subsequent slider
+			// events then spiral because they're added to the NEW base.
+			const EPS = 0.01;
+			const clamped = Math.max(
+				-MAX_ROTATION_OFFSET + EPS,
+				Math.min( MAX_ROTATION_OFFSET - EPS, value )
+			);
+			setRotation( baseAngle + clamped * visualDir );
 		},
 		[ baseAngle, setRotation, visualDir ]
 	);
@@ -661,7 +670,16 @@ const DebugComponent = () => {
 			if ( value === undefined ) {
 				return;
 			}
-			setRotation( baseAngle + value * visualDir );
+			// Clamp strictly inside [-MAX, MAX). Reaching exactly ±MAX
+			// lands state.rotation on a 90° midpoint, which flips the
+			// computed baseAngle on the next render; subsequent slider
+			// events then spiral because they're added to the NEW base.
+			const EPS = 0.01;
+			const clamped = Math.max(
+				-MAX_ROTATION_OFFSET + EPS,
+				Math.min( MAX_ROTATION_OFFSET - EPS, value )
+			);
+			setRotation( baseAngle + clamped * visualDir );
 		},
 		[ baseAngle, setRotation, visualDir ]
 	);
