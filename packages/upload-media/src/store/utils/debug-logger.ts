@@ -2,12 +2,13 @@
  * Debug logger for client-side media processing.
  *
  * Provides performance measurement via the User Timings API.
- * Set DEBUG_ENABLED to true to enable measurements in DevTools.
+ * Measurements are only emitted when SCRIPT_DEBUG is true.
  */
 
-// Set to true to enable debug logging for client-side media processing.
-// Keep disabled by default to avoid test failures from unexpected console output.
-const DEBUG_ENABLED = false;
+function isDebugEnabled(): boolean {
+	// eslint-disable-next-line @wordpress/wp-global-usage
+	return globalThis.SCRIPT_DEBUG === true;
+}
 
 interface MeasureOptions {
 	measureName: string;
@@ -21,7 +22,8 @@ interface MeasureOptions {
  * Records a performance measure visible in DevTools Performance panel.
  *
  * Uses the User Timings API (performance.measure) to create entries
- * under a custom "Upload Media" track in DevTools.
+ * under a custom "Upload Media" track in DevTools. Only emits when
+ * SCRIPT_DEBUG is true, so there's no overhead in production builds.
  *
  * @param options             Measure options.
  * @param options.measureName Name for the performance measure entry.
@@ -31,7 +33,7 @@ interface MeasureOptions {
  * @param options.properties  Key-value pairs shown in DevTools detail view.
  */
 export function measure( options: MeasureOptions ): void {
-	if ( ! DEBUG_ENABLED ) {
+	if ( ! isDebugEnabled() ) {
 		return;
 	}
 
