@@ -128,7 +128,12 @@ function AddTaxonomyModal( {
 						)
 					}
 				/>
-				<Stack direction="row" gap="sm" justify="end">
+				<Stack
+					className="dataviews-action-modal__add-taxonomy-footer"
+					direction="row"
+					gap="sm"
+					justify="end"
+				>
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
