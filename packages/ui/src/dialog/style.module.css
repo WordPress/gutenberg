@@ -45,7 +45,7 @@
 		box-sizing: border-box;
 		min-width: var(--wpds-dimension-surface-width-sm);
 		width: calc(100vw - 2 * var(--viewport-inset));
-		max-height: calc(100vh - 2 * var(--viewport-inset));
+		max-height: calc(100dvh - 2 * var(--viewport-inset));
 		padding: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);
@@ -100,7 +100,7 @@
 			 * Force full height (full width is already in default styles).
 			 * The max-{width,height} properties will make sure some padding is shown.
 			 */
-			height: 100vh;
+			height: 100dvh;
 		}
 	}
 
