@@ -29,7 +29,7 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 
 	// Re-render each tab with per-item context (index, id, label).
 	// Match by position so items align with their corresponding tabs.
-	$buttons_html       = '';
+	$buttons_html = '';
 	$tab_position = 0;
 
 	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_tab ) {
@@ -55,8 +55,8 @@ function block_core_tab_list_render_callback( array $attributes, string $content
 			)
 		);
 
-		$tab_block = new WP_Block( $parsed_tab, $item_context );
-		$buttons_html   .= $tab_block->render();
+		$tab_block     = new WP_Block( $parsed_tab, $item_context );
+		$buttons_html .= $tab_block->render();
 	}
 
 	// Rebuild the wrapper using get_block_wrapper_attributes().
