@@ -25,7 +25,7 @@ const meta: Meta< typeof NumberControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

@@ -7,14 +7,6 @@
 @use "./size-control/style.scss" as *;
 @use "./variations/style.scss" as *;
 
-.global-styles-ui-preview {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	line-height: 1;
-	cursor: var(--wpds-cursor-control);
-}
-
 .global-styles-ui-preview__wrapper {
 	max-width: 100%;
 	display: block;
@@ -24,7 +16,6 @@
 		cursor: var(--wpds-cursor-control);
 	}
 }
-
 
 .global-styles-ui-typography-preview {
 	display: flex;

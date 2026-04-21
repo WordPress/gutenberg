@@ -1,0 +1,27 @@
+{
+	"v": 0,
+	"components": {
+		"ui-badge": {
+			"id": "ui-badge",
+			"name": "Badge",
+			"path": "../packages/ui/src/badge/stories/index.story.tsx",
+			"description": "A badge."
+		},
+		"components-button": {
+			"id": "components-button",
+			"name": "Button",
+			"path": "../packages/components/src/button/stories/index.story.tsx",
+			"description": "A button.",
+			"reactDocgen": {
+				"props": {
+					"variant": {
+						"required": false,
+						"tsType": { "name": "string" },
+						"description": "The variant."
+					}
+				}
+			},
+			"stories": [ { "name": "Default", "snippet": "<Button />" } ]
+		}
+	}
+}

@@ -221,6 +221,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-content-types',
+		__( 'Content types: manage custom taxonomies', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a UI for creating and managing custom taxonomies. Custom post types will be explored soon.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-types',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
