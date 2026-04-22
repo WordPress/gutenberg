@@ -492,3 +492,140 @@ export const EditMode: Story = {
 		);
 	},
 };
+
+/**
+ * Edit mode in uncontrolled usage: no `onChangeLayout` provided, so
+ * the grid keeps the pending layout locally across interactions.
+ * Useful for verifying that a resize followed by a drag preserves the
+ * resize (the two gestures share the same temporary layout).
+ */
+export const EditModeUncontrolled: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 2, height: 1, order: 0 },
+			{ key: 'b', width: 2, height: 1, order: 1 },
+			{ key: 'c', width: 2, height: 1, order: 2 },
+		],
+		columns: 6,
+		rowHeight: 80,
+		editMode: true,
+		children: [
+			<Tile key="a" tone="brand">
+				Resize me, then reorder
+			</Tile>,
+			<Tile key="b" tone="info">
+				Tile B
+			</Tile>,
+			<Tile key="c" tone="success">
+				Tile C
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * Edit mode with `rowHeight: 'auto'`. Row height is driven by tile
+ * content rather than the user, so vertical resize is suppressed: the
+ * resize handle uses an `ew-resize` cursor and the preview overlay
+ * only grows horizontally.
+ */
+export const EditModeAutoRows: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 2, order: 0 },
+			{ key: 'b', width: 2, order: 1 },
+			{ key: 'c', width: 2, order: 2 },
+		],
+		columns: 6,
+		rowHeight: 'auto',
+		editMode: true,
+		children: [
+			<Tile key="a" tone="brand">
+				Short tile
+			</Tile>,
+			<Tile
+				key="b"
+				tone="info"
+				style={ { flexDirection: 'column', gap: 4 } }
+			>
+				<div>Taller tile</div>
+				<div>with multiple</div>
+				<div>lines of content</div>
+			</Tile>,
+			<Tile key="c" tone="success">
+				Short tile
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * Demonstrates that `actionableArea` is a grid-level slot rather than
+ * a prop on the rendered element: consumers may pass a plain `<div>`
+ * as a child and attach `actionableArea` directly without the prop
+ * leaking onto the DOM.
+ */
+export const PlainDivActionable: Story = {
+	args: {
+		layout: [
+			{ key: 'a', width: 3, height: 1, order: 0 },
+			{ key: 'b', width: 3, height: 1, order: 1 },
+		],
+		columns: 6,
+		rowHeight: 80,
+		editMode: true,
+		children: [
+			/*
+			 * `actionableArea` is a grid-level slot, not an HTML attribute.
+			 * It's spread onto the element here rather than written as a
+			 * named prop because HTML types reject unknown props; the grid
+			 * lifts it into its own slot and strips it from the child
+			 * before rendering, so it never reaches the DOM.
+			 */
+			<div
+				key="a"
+				{ ...( {
+					actionableArea: (
+						<div
+							style={ {
+								position: 'absolute',
+								top: 4,
+								right: 4,
+								zIndex: 2,
+							} }
+						>
+							<IconButton
+								size="small"
+								variant="solid"
+								tone="neutral"
+								icon={ close }
+								label="Remove"
+							/>
+						</div>
+					),
+				} as React.HTMLAttributes< HTMLDivElement > ) }
+				style={ {
+					backgroundColor: bgTokens.brand,
+					color: fgTokens.brand,
+					padding: 20,
+					height: '100%',
+					boxSizing: 'border-box',
+				} }
+			>
+				Plain div + actionableArea
+			</div>,
+			<div
+				key="b"
+				style={ {
+					backgroundColor: bgTokens.info,
+					color: fgTokens.info,
+					padding: 20,
+					height: '100%',
+					boxSizing: 'border-box',
+				} }
+			>
+				Plain div, no actionableArea
+			</div>,
+		],
+	},
+};
