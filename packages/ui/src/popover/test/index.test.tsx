@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Popover from '../index';
@@ -748,7 +748,9 @@ describe( 'Popover', () => {
 				expect( screen.getByText( 'Valid Title' ) ).toBeVisible();
 			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -775,7 +777,9 @@ describe( 'Popover', () => {
 			} );
 
 			// Let initial validation settle — no errors expected.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			// Remove the title via rerender.
@@ -825,7 +829,9 @@ describe( 'Popover', () => {
 			rerender( ui( true ) );
 
 			// Wait for deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			// No new errors should have been thrown.
 			expect( errors ).toHaveLength( errorCountAfterInitial );

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Drawer from '../index';
@@ -568,7 +568,9 @@ describe( 'Drawer', () => {
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -636,7 +638,9 @@ describe( 'Drawer', () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			await user.click(
@@ -697,7 +701,9 @@ describe( 'Drawer', () => {
 				screen.getByRole( 'button', { name: 'Toggle Title' } )
 			);
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			expect( errors ).toHaveLength( errorCountAfterInitial );
 
@@ -764,7 +770,9 @@ describe( 'Drawer', () => {
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();

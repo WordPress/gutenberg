@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Dialog from '../index';
@@ -376,7 +376,9 @@ describe( 'Dialog', () => {
 			} );
 
 			// Allow deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -482,7 +484,9 @@ describe( 'Dialog', () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -518,7 +522,9 @@ describe( 'Dialog', () => {
 			} );
 
 			// Let initial validation settle — no errors expected.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			// Remove the title.
@@ -583,7 +589,9 @@ describe( 'Dialog', () => {
 			);
 
 			// Wait for deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			// No new errors should have been thrown.
 			expect( errors ).toHaveLength( errorCountAfterInitial );
