@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 import { useState } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Story demo uses the new DS primitive; Storybook loads the required stylesheet.
+// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { IconButton } from '@wordpress/ui';
 
 /**
@@ -20,10 +20,6 @@ import type { GridLayoutItem } from '../types';
 const meta: Meta< typeof Grid > = {
 	title: 'Design System/Components/Grid',
 	component: Grid,
-	tags: [ 'autodocs' ],
-	parameters: {
-		layout: 'centered',
-	},
 	argTypes: {
 		children: { control: false },
 	},
@@ -209,7 +205,6 @@ export const Default: Story = {
  * `ResizeObserver` recomputes the count on container resize.
  */
 export const Responsive: Story = {
-	parameters: { layout: '' },
 	args: {
 		layout: [
 			{ key: 'a', width: 1, order: 1 },
@@ -316,7 +311,6 @@ export const FullWidth: Story = {
  * each cell can be tuned independently.
  */
 export const RowHeight: Story = {
-	parameters: { layout: '' },
 	args: {
 		layout: [
 			{ key: 'a', width: 2, height: 2, order: 1 },
@@ -354,7 +348,6 @@ export const RowHeight: Story = {
  * an item, Space to grab, arrow keys to move, Space to drop.
  */
 export const EditMode: Story = {
-	parameters: { layout: '' },
 	render: function EditModeStory() {
 		const initialLayout: ( GridLayoutItem & {
 			tone: Tone;
