@@ -36,6 +36,11 @@ jobs:
               id: filter
               if: github.event_name == 'pull_request'
               with:
+                  # `every` is required for the `!`-prefixed exclusion rules below
+                  # to actually exclude. The default `some` quantifier would treat
+                  # each rule as an independent OR predicate, which means `**`
+                  # alone would always match.
+                  predicate-quantifier: 'every'
                   filters: |
                       impactful:
                           - '**'
