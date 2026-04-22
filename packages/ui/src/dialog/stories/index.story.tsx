@@ -166,9 +166,9 @@ export const WithCustomZIndex: Story = {
 						<Dialog.CloseIcon />
 					</Dialog.Header>
 					<Dialog.Description>
-						The backdrop and popup render at `z-index: 9999` via
-						the `--wp-ui-dialog-z-index` CSS custom property, set
-						on `Dialog.Portal` through the `portal` prop.
+						The backdrop and popup render at `z-index: 9999` via the
+						`--wp-ui-dialog-z-index` CSS custom property, set on
+						`Dialog.Portal` through the `portal` prop.
 					</Dialog.Description>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
