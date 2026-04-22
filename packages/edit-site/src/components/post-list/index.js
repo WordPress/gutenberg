@@ -206,7 +206,7 @@ export default function PostList( { postType } ) {
 
 		if ( view?.sort?.field === 'author' ) {
 			processedRecords = filterSortAndPaginate(
-				records,
+				processedRecords,
 				{ sort: { ...view.sort } },
 				fields
 			).data;
