@@ -1,6 +1,7 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { useDialogScrollChrome } from './scroll-chrome-context';
 import styles from './style.module.css';
 import type { FooterProps } from './types';
 
@@ -9,14 +10,23 @@ import type { FooterProps } from './types';
  * action buttons.
  */
 const Footer = forwardRef< HTMLDivElement, FooterProps >( function DialogFooter(
-	{ className, render, ...props },
+	{ className, render, sticky = true, ...props },
 	ref
 ) {
+	const scrollChrome = useDialogScrollChrome();
+
 	const element = useRender( {
 		render,
 		ref,
 		props: mergeProps< 'div' >( props, {
-			className: clsx( styles.footer, className ),
+			className: clsx(
+				styles.footer,
+				sticky && styles.footerSticky,
+				sticky &&
+					scrollChrome?.footerHasContentBelow &&
+					styles.footerHasContentBelow,
+				className
+			),
 		} ),
 	} );
 

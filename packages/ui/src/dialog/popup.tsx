@@ -1,6 +1,12 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import type { UIEvent } from 'react';
+import {
+	forwardRef,
+	useCallback,
+	useLayoutEffect,
+	useState,
+} from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -9,6 +15,10 @@ import {
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { DialogValidationProvider } from './context';
+import {
+	DialogScrollChromeContext,
+	type DialogScrollChromeContextValue,
+} from './scroll-chrome-context';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -28,6 +38,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		initialFocus,
 		finalFocus,
 		children,
+		onScroll,
 		...props
 	},
 	ref
@@ -37,6 +48,49 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+
+	const [ scrollChrome, setScrollChrome ] =
+		useState< DialogScrollChromeContextValue >( {
+			headerScrolledFromTop: false,
+			footerHasContentBelow: false,
+		} );
+
+	const syncScrollChrome = useCallback( () => {
+		const el = popupRef.current;
+		if ( ! el ) {
+			return;
+		}
+		const { scrollTop, scrollHeight, clientHeight } = el;
+		setScrollChrome( {
+			headerScrolledFromTop: scrollTop > 0,
+			footerHasContentBelow: scrollTop + clientHeight < scrollHeight - 1,
+		} );
+	}, [ popupRef ] );
+
+	useLayoutEffect( () => {
+		let resizeObserver: ResizeObserver | undefined;
+		const frameId = requestAnimationFrame( () => {
+			const el = popupRef.current;
+			if ( ! el ) {
+				return;
+			}
+			syncScrollChrome();
+			resizeObserver = new ResizeObserver( syncScrollChrome );
+			resizeObserver.observe( el );
+		} );
+		return () => {
+			cancelAnimationFrame( frameId );
+			resizeObserver?.disconnect();
+		};
+	}, [ syncScrollChrome, popupRef ] );
+
+	const handleScroll = useCallback(
+		( event: UIEvent< HTMLDivElement > ) => {
+			onScroll?.( event );
+			syncScrollChrome();
+		},
+		[ onScroll, syncScrollChrome ]
+	);
 
 	return (
 		<_Dialog.Portal>
@@ -52,10 +106,13 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					{ ...props }
+					onScroll={ handleScroll }
 				>
-					<DialogValidationProvider>
-						{ children }
-					</DialogValidationProvider>
+					<DialogScrollChromeContext.Provider value={ scrollChrome }>
+						<DialogValidationProvider>
+							{ children }
+						</DialogValidationProvider>
+					</DialogScrollChromeContext.Provider>
 				</_Dialog.Popup>
 			</ThemeProvider>
 		</_Dialog.Portal>

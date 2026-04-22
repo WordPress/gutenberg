@@ -61,6 +61,14 @@ export interface FooterProps extends ComponentProps< 'div' > {
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * When `true`, the footer stays pinned to the bottom of the dialog while
+	 * the body scrolls. When `false`, the footer scrolls with the content.
+	 *
+	 * @default true
+	 */
+	sticky?: boolean;
 }
 
 export interface HeaderProps extends ComponentProps< 'div' > {

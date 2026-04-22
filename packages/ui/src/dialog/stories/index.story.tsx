@@ -161,3 +161,41 @@ export const WithCustomZIndex: Story = {
 	..._Default,
 	name: 'With Custom z-index',
 };
+
+const LONG_BODY_COPY = Array( 24 )
+	.fill(
+		'This dialog demonstrates scrollable body content. The header and footer stay pinned while you scroll; a border appears when content passes underneath them, similar to the legacy Modal component. '
+	)
+	.join( '' );
+
+/**
+ * Long body copy so the popup scrolls — use this story to verify sticky
+ * header/footer and scroll-dependent borders.
+ */
+export const ScrollableWithStickyChrome: Story = {
+	name: 'Scrollable (sticky header & footer)',
+	parameters: {
+		docs: {
+			description: {
+				story: 'Use `Dialog.Footer` with `sticky={ false }` when the footer should scroll with the body instead of staying pinned.',
+			},
+		},
+	},
+	args: {
+		children: (
+			<>
+				<Dialog.Trigger>Open scrollable dialog</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Header>
+						<Dialog.Title>Scrollable dialog</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+					<p>{ LONG_BODY_COPY }</p>
+					<Dialog.Footer>
+						<Dialog.Action>Got it</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</>
+		),
+	},
+};

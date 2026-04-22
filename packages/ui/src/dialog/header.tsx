@@ -1,6 +1,7 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
+import { useDialogScrollChrome } from './scroll-chrome-context';
 import styles from './style.module.css';
 import type { HeaderProps } from './types';
 
@@ -12,11 +13,18 @@ const Header = forwardRef< HTMLDivElement, HeaderProps >( function DialogHeader(
 	{ className, render, ...props },
 	ref
 ) {
+	const scrollChrome = useDialogScrollChrome();
+
 	const element = useRender( {
 		render,
 		ref,
 		props: mergeProps< 'div' >( props, {
-			className: clsx( styles.header, className ),
+			className: clsx(
+				styles.header,
+				scrollChrome?.headerScrolledFromTop &&
+					styles.headerHasScrolledContent,
+				className
+			),
 		} ),
 	} );
 

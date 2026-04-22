@@ -12,6 +12,7 @@
 
 ### Enhancements
 
+-   `Dialog`: Sticky `Dialog.Header` and `Dialog.Footer` show a border when content scrolls underneath; add optional `sticky` prop on `Dialog.Footer` (defaults to `true`) ([#77180](https://github.com/WordPress/gutenberg/issues/77180)).
 -   Add defensive styles against global WordPress stylesheets like common.css and forms.css ([#76783](https://github.com/WordPress/gutenberg/pull/76783)).
 
 ## 0.10.0 (2026-04-01)
