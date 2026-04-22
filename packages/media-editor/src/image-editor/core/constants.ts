@@ -39,6 +39,7 @@ export const DEFAULT_STATE: CropperState = {
 	baseRotation: 0,
 	flip: { ...DEFAULT_FLIP },
 	cropRect: { ...DEFAULT_CROP_RECT },
+	isResizing: false,
 };
 
 /**

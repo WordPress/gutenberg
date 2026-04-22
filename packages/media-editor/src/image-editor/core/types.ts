@@ -102,6 +102,11 @@ export interface CropperState {
 	flip: Flip;
 	/** The crop rectangle in normalized coordinates. */
 	cropRect: NormalizedRect;
+	/**
+	 * True while a handle-driven resize drag is in progress.
+	 * Always false in committed state.
+	 */
+	isResizing: boolean;
 }
 
 /**
@@ -136,7 +141,19 @@ export type CropperAction =
 	/** Applies a single pipeline transform via the reducer. */
 	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
-	| { type: 'RESET'; payload?: Partial< CropperState > };
+	| { type: 'RESET'; payload?: Partial< CropperState > }
+	/**
+	 * Begin a handle-driven resize. Sets `isResizing: true` so subsequent
+	 * `SET_CROP_RECT` dispatches can scale zoom below 1. No other state
+	 * changes — pan/zoom/rotation/crop are preserved.
+	 */
+	| { type: 'BEGIN_RESIZE' }
+	/**
+	 * End a handle-driven resize. Clears `isResizing`. Does NOT re-run
+	 * containment or settle — the caller is expected to follow with
+	 * `SETTLE_CROP`, which snaps zoom back to ≥ 1.
+	 */
+	| { type: 'END_RESIZE' };
 
 /**
  * The contract for a pluggable stencil component.
