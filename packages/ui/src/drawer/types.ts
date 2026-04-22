@@ -90,6 +90,14 @@ export interface FooterProps extends ComponentProps< 'footer' > {
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * When `true`, the footer stays pinned to the bottom of the drawer while
+	 * the body scrolls. When `false`, the footer scrolls with the content.
+	 *
+	 * @default true
+	 */
+	sticky?: boolean;
 }
 
 export interface HeaderProps extends ComponentProps< 'header' > {
@@ -97,6 +105,14 @@ export interface HeaderProps extends ComponentProps< 'header' > {
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * When `true`, the header stays pinned to the top of the drawer while the
+	 * body scrolls. When `false`, the header scrolls with the content.
+	 *
+	 * @default true
+	 */
+	sticky?: boolean;
 }
 
 export interface TitleProps extends ComponentProps< 'h2' > {

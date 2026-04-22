@@ -13,7 +13,7 @@ import type { HeaderProps } from './types';
  * landmarks nested in dialogs). Pass `render` to opt out of the default tag.
  */
 const Header = forwardRef< HTMLElement, HeaderProps >( function DrawerHeader(
-	{ className, render, ...props },
+	{ className, render, sticky = true, ...props },
 	ref
 ) {
 	const element = useRender( {
@@ -21,7 +21,11 @@ const Header = forwardRef< HTMLElement, HeaderProps >( function DrawerHeader(
 		render,
 		ref,
 		props: mergeProps< 'header' >( props, {
-			className: clsx( styles.header, className ),
+			className: clsx(
+				styles.header,
+				sticky && styles.headerSticky,
+				className
+			),
 		} ),
 	} );
 

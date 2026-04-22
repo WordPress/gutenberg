@@ -361,3 +361,109 @@ export const SizePlayground: Story = {
 		swipeDirection: { control: false },
 	},
 };
+
+function StickyToggle( {
+	label,
+	value,
+	onChange,
+}: {
+	label: string;
+	value: boolean;
+	onChange: ( value: boolean ) => void;
+} ) {
+	const id = useId();
+	return (
+		<Stack direction="row" gap="sm" align="center">
+			<input
+				id={ id }
+				type="checkbox"
+				checked={ value }
+				onChange={ ( event ) => onChange( event.target.checked ) }
+			/>
+			<label htmlFor={ id }>{ label }</label>
+		</Stack>
+	);
+}
+
+function StickyControls( {
+	isHeaderSticky,
+	setIsHeaderSticky,
+	isFooterSticky,
+	setIsFooterSticky,
+}: {
+	isHeaderSticky: boolean;
+	setIsHeaderSticky: ( value: boolean ) => void;
+	isFooterSticky: boolean;
+	setIsFooterSticky: ( value: boolean ) => void;
+} ) {
+	return (
+		<Stack direction="row" gap="lg" align="center">
+			<StickyToggle
+				label="Sticky header"
+				value={ isHeaderSticky }
+				onChange={ setIsHeaderSticky }
+			/>
+			<StickyToggle
+				label="Sticky footer"
+				value={ isFooterSticky }
+				onChange={ setIsFooterSticky }
+			/>
+		</Stack>
+	);
+}
+
+function ScrollableContent() {
+	const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
+	const [ isFooterSticky, setIsFooterSticky ] = useState( true );
+	const controlProps = {
+		isHeaderSticky,
+		setIsHeaderSticky,
+		isFooterSticky,
+		setIsFooterSticky,
+	};
+	return (
+		<>
+			<Stack direction="column" gap="lg" align="start">
+				<StickyControls { ...controlProps } />
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+			</Stack>
+			<Drawer.Popup>
+				<Drawer.Header sticky={ isHeaderSticky }>
+					<Drawer.Title>Terms of service</Drawer.Title>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
+				<Stack direction="column" gap="lg">
+					<StickyControls { ...controlProps } />
+					{ Array.from( { length: 20 } ).map( ( _, index ) => (
+						<p key={ index } style={ { margin: 0 } }>
+							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
+							consectetur adipiscing elit. Sed do eiusmod tempor
+							incididunt ut labore et dolore magna aliqua. Ut enim
+							ad minim veniam, quis nostrud exercitation ullamco
+							laboris nisi ut aliquip ex ea commodo consequat.
+						</p>
+					) ) }
+				</Stack>
+				<Drawer.Footer sticky={ isFooterSticky }>
+					<Drawer.Action variant="outline">Decline</Drawer.Action>
+					<Drawer.Action>Accept</Drawer.Action>
+				</Drawer.Footer>
+			</Drawer.Popup>
+		</>
+	);
+}
+
+/**
+ * When drawer content overflows the available height, `Drawer.Header` stays
+ * pinned to the top and `Drawer.Footer` stays pinned to the bottom so users
+ * keep sight of the title and primary actions while scrolling. Separator
+ * borders appear only when there is off-screen content above the header or
+ * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
+ * and let it scroll with the content — the toggles in this story drive both
+ * props independently and stay in sync between outside and inside the drawer.
+ */
+export const Scrollable: Story = {
+	args: {
+		children: <ScrollableContent />,
+	},
+};

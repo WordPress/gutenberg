@@ -8,6 +8,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
@@ -27,14 +28,25 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
  * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
-	{ className, portal, children, size, initialFocus, finalFocus, ...props },
+	{
+		className,
+		portal,
+		children,
+		size,
+		initialFocus,
+		finalFocus,
+		onScroll: onScrollProp,
+		...props
+	},
 	ref
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
-	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+	const { ref: scrollStateRef, onScroll } =
+		useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
+	const mergedRef = useMergeRefs( [ ref, popupRef, scrollStateRef ] );
 	const modal = useDrawerModal();
 
 	const portalChildren = (
@@ -75,6 +87,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 						initialFocus={ resolvedInitialFocus }
 						finalFocus={ finalFocus }
 						{ ...props }
+						onScroll={ onScroll }
 					>
 						<_Drawer.Content className={ styles.content }>
 							<DrawerValidationProvider>

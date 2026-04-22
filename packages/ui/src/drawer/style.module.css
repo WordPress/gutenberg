@@ -270,4 +270,143 @@
 		margin-top: var(--wpds-dimension-gap-lg);
 		padding-top: var(--wpds-dimension-padding-lg);
 	}
+
+	/*
+	 * Sticky chrome for Drawer.Header / Drawer.Footer. Unlike Dialog (where
+	 * `Popup` is the padded scroll container), Drawer's `Popup` is an unpadded
+	 * scroll container wrapping `_Drawer.Content` (which carries the padding,
+	 * including per-swipe-direction safe-area overrides). So the "yield block
+	 * padding to sticky chrome" trick is applied on `.content`, not `.popup`,
+	 * and the inline bleed is sized against the Content's base `padding-2xl`.
+	 *
+	 * The sticky rules only add what's strictly needed for pinning, full-width
+	 * bleed, and the scrolled-off separator: the non-sticky case keeps trunk's
+	 * original margin/padding values and thus its original spacing.
+	 *
+	 * The data-attribute driven border (toggled by `.popup` via the shared
+	 * `useOverlayScrollStateAttributes` hook) stays transparent until there is
+	 * off-screen content in that direction. `border` (not `box-shadow`) so the
+	 * separator remains visible in forced-colors / Windows High Contrast mode.
+	 */
+	.headerSticky {
+		position: sticky;
+		top: 0;
+		/*
+		 * The popup already establishes a stacking context, so this only needs
+		 * to clear content inside the drawer. `2` leaves room for consumers to
+		 * stack a single layer of their own content beneath the chrome.
+		 */
+		z-index: 2;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		/*
+		 * Extend across Content's inline padding so the separator spans edge
+		 * to edge. Uses the base `padding-2xl`; the per-side safe-area inset
+		 * overrides on Content (left/right swipe directions) may leave a
+		 * small gap on the physical edge — an acceptable simplification that
+		 * matches Dialog's approach and can be refined if it's ever flagged.
+		 */
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		/*
+		 * Subtract 1px to compensate for the transparent border below so the
+		 * total block-end space matches trunk's `margin-bottom: gap-lg`.
+		 */
+		margin-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
+		border-block-end: 1px solid transparent;
+	}
+
+	.footerSticky {
+		position: sticky;
+		bottom: 0;
+		/* See note on `.headerSticky` above. */
+		z-index: 2;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		/*
+		 * Subtract 1px to compensate for the transparent border above so the
+		 * internal top space matches trunk's `padding-top: padding-lg`. The
+		 * outer `margin-top: gap-lg` from `.footer` stays as-is.
+		 */
+		padding-top: calc(var(--wpds-dimension-padding-lg) - 1px);
+		border-block-start: 1px solid transparent;
+	}
+
+	/*
+	 * When a sticky chrome sits at the start/end of Content, yield Content's
+	 * block padding to it so the chrome's border-box is flush with the Popup
+	 * (the scroll container). The chrome reclaims that space as its own
+	 * block padding below, matching the per-direction safe-area overrides.
+	 */
+	.content:has(> .headerSticky:first-child) {
+		padding-block-start: 0;
+	}
+
+	.content:has(> .footerSticky:last-child) {
+		padding-block-end: 0;
+	}
+
+	.content:has(> .headerSticky:first-child) > .headerSticky {
+		padding-block-start: var(--wpds-dimension-padding-2xl);
+	}
+
+	.content:has(> .footerSticky:last-child) > .footerSticky {
+		padding-block-end: var(--wpds-dimension-padding-2xl);
+	}
+
+	/*
+	 * Block-axis safe-area preservation: up/down drawers carry the safe-area
+	 * inset on Content's top/bottom padding, so the sticky chrome must claim
+	 * the same `max(2xl, env(safe-area-inset-*))` it replaces — otherwise the
+	 * chrome would sit too close to the physical edge on notched devices.
+	 */
+	.popup[data-swipe-direction="up"] .content:has(> .headerSticky:first-child) > .headerSticky {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+	}
+
+	.popup[data-swipe-direction="down"] .content:has(> .footerSticky:last-child) > .footerSticky {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+	}
+
+	/*
+	 * Reserve scroll-padding whenever a sticky chrome exists in the scroll
+	 * container so Tab / scrollIntoView keeps focused descendants clear of
+	 * the pinned chrome. The sticky lives inside Content, so match it as a
+	 * descendant rather than a direct child. 6rem is a pragmatic upper bound
+	 * (see `dialog/style.module.css` for rationale).
+	 *
+	 * Exception: while focus is inside the sticky chrome itself, drop the
+	 * padding so the browser's focus scroll doesn't try to move the already-
+	 * pinned chrome out of the way, which would scroll the content
+	 * unnecessarily.
+	 */
+	.popup:has(.headerSticky) {
+		scroll-padding-block-start: 6rem;
+	}
+
+	.popup:has(.headerSticky:focus-within) {
+		scroll-padding-block-start: 0;
+	}
+
+	.popup:has(.footerSticky) {
+		scroll-padding-block-end: 6rem;
+	}
+
+	.popup:has(.footerSticky:focus-within) {
+		scroll-padding-block-end: 0;
+	}
+
+	/*
+	 * Data attribute driven: the popup's `onScroll` handler toggles
+	 * `data-wp-ui-overlay-scrolled-*` on the DOM directly, avoiding a
+	 * React re-render (and the 1-frame lag that came with it) when the
+	 * separator border needs to appear.
+	 */
+	.popup[data-wp-ui-overlay-scrolled-from-top] .headerSticky {
+		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	.popup[data-wp-ui-overlay-scrolled-from-bottom] .footerSticky {
+		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
+	}
 }
