@@ -1161,18 +1161,14 @@ async function generatePagesPhp( pageData, replacements ) {
 						.join( '\n' )
 				: '\t\t\t// No init modules configured';
 
-		// Full-page mode uses `menuSlug` (defaults to the page id).
-		// WP-Admin mode uses `menuSlugAdmin` (defaults to `{menuSlug}-wp-admin`).
-		// Both templates are always generated and register hooks on every
-		// request, so the two slugs must differ to avoid the full-page
-		// `admin_init` hook intercepting WP-Admin mode requests.
+		// Both templates register hooks on every request, so `menuSlug`
+		// (full-page) and `menuSlugAdmin` (WP-Admin) must differ to avoid
+		// the full-page `admin_init` hook intercepting WP-Admin requests.
 		const menuSlug = page.menuSlug || page.slug;
 		const menuSlugAdmin = page.menuSlugAdmin || `${ menuSlug }-wp-admin`;
 		if ( menuSlug === menuSlugAdmin ) {
 			throw new Error(
-				`Page "${ page.slug }": menuSlug and menuSlugAdmin must differ ` +
-					`(both resolved to "${ menuSlug }"). The full-page and ` +
-					`WP-Admin templates both listen on $_GET['page'] and would collide.`
+				`Page "${ page.slug }": menuSlug and menuSlugAdmin must differ (both resolved to "${ menuSlug }").`
 			);
 		}
 
