@@ -26,11 +26,6 @@ const waitForFocusedMenuItem = ( name: string ) =>
 		expect( screen.getByRole( 'menuitem', { name } ) ).toHaveFocus()
 	);
 
-const waitForFocusedButton = ( name: string ) =>
-	waitFor( () =>
-		expect( screen.getByRole( 'button', { name } ) ).toHaveFocus()
-	);
-
 // Open dropdown => open menu
 // Submenu trigger item => open submenu
 
@@ -217,7 +212,11 @@ describe( 'Menu', () => {
 
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 
-			await waitForFocusedButton( 'Open dropdown' );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'button', { name: 'Open dropdown' } )
+				).toHaveFocus()
+			);
 		} );
 
 		it( 'should close when clicking outside of the content', async () => {
@@ -404,20 +403,32 @@ describe( 'Menu', () => {
 			).toHaveFocus();
 
 			await press.ArrowLeft();
-			await waitForFocusedMenuItem( 'Submenu trigger item' );
+			expect(
+				screen.getByRole( 'menuitem', {
+					name: 'Submenu trigger item',
+				} )
+			).toHaveFocus();
 
 			// Spacebar or enter key can also be used to enter a submenu
 			await press.Enter();
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowLeft();
-			await waitForFocusedMenuItem( 'Submenu trigger item' );
+			expect(
+				screen.getByRole( 'menuitem', {
+					name: 'Submenu trigger item',
+				} )
+			).toHaveFocus();
 
 			await press.Space();
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowLeft();
-			await waitForFocusedMenuItem( 'Submenu trigger item' );
+			expect(
+				screen.getByRole( 'menuitem', {
+					name: 'Submenu trigger item',
+				} )
+			).toHaveFocus();
 		} );
 
 		it( 'should check radio items and keep the menu open when clicking (controlled)', async () => {
@@ -898,16 +909,15 @@ describe( 'Menu', () => {
 
 			// Menu is not modal, therefore the outer button is part of the
 			// accessibility tree and can be found.
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Button outside of dropdown',
-				} )
-			).toBeVisible();
+			const outerButton = screen.getByRole( 'button', {
+				name: 'Button outside of dropdown',
+			} );
+			expect( outerButton ).toBeVisible();
 
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
 			await press.Tab();
-			await waitForFocusedButton( 'Button outside of dropdown' );
+			expect( outerButton ).toBeVisible();
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
 	} );
@@ -1052,7 +1062,9 @@ describe( 'Menu', () => {
 
 			// Type "tw", it should match and focus the item with content "Two"
 			await type( 'tw' );
-			await waitForFocusedMenuItem( 'Two' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Two' } )
+			).toHaveFocus();
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1060,7 +1072,9 @@ describe( 'Menu', () => {
 
 			// Type "on", it should match and focus the item with content "One"
 			await type( 'on' );
-			await waitForFocusedMenuItem( 'One' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'One' } )
+			).toHaveFocus();
 		} );
 
 		it( 'should keep previous focus when no matches are found', async () => {
@@ -1084,7 +1098,7 @@ describe( 'Menu', () => {
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
 			await type( 'abc' );
-			await waitForFocusedMenu();
+			expect( screen.getByRole( 'menu' ) ).toHaveFocus();
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1092,7 +1106,9 @@ describe( 'Menu', () => {
 
 			// Type "on", it should match and focus the item with content "One"
 			await type( 'on' );
-			await waitForFocusedMenuItem( 'One' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'One' } )
+			).toHaveFocus();
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1100,7 +1116,9 @@ describe( 'Menu', () => {
 
 			// Type a string that doesn't match any items. Focus shouldn't move.
 			await type( 'abc' );
-			await waitForFocusedMenuItem( 'One' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'One' } )
+			).toHaveFocus();
 
 			// Wait for the typeahead timer to reset and interpret
 			// the next keystrokes as a new search
@@ -1108,7 +1126,9 @@ describe( 'Menu', () => {
 
 			// Type "tw", it should match and focus the item with content "Two"
 			await type( 'tw' );
-			await waitForFocusedMenuItem( 'Two' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Two' } )
+			).toHaveFocus();
 		} );
 	} );
 } );
