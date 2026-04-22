@@ -23,6 +23,7 @@ import {
 	useMemo,
 	Children,
 	isValidElement,
+	useRef,
 	useState,
 } from '@wordpress/element';
 
@@ -76,6 +77,13 @@ export function DashboardGrid( {
 	const [ temporaryLayout, setTemporaryLayout ] = useState<
 		DashboardGridLayoutItem[] | undefined
 	>();
+	/*
+	 * Mirror of `temporaryLayout` for synchronous reads from
+	 * `persistTemporaryLayout` on drag end: React batches the state
+	 * update queued by `debouncedHandleDragOver.flush()`, so the state
+	 * value would still be stale within the same handler.
+	 */
+	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
 	const activeLayout = temporaryLayout ?? layout;
 
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
@@ -186,6 +194,8 @@ export function DashboardGrid( {
 					order: newOrder,
 				};
 			} );
+			// eslint-disable-next-line react-compiler/react-compiler -- Ref mirrors the next state for synchronous reads on drag end
+			latestLayoutRef.current = updatedLayout;
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		}
@@ -194,14 +204,20 @@ export function DashboardGrid( {
 
 	/*
 	 * Commit temporary changes to parent and clear local state.
-	 * Called when user finishes drag/resize on mouse up.
+	 * Called when user finishes drag/resize on mouse up. Reads from
+	 * `latestLayoutRef` rather than `temporaryLayout` so that a
+	 * just-flushed debounced update is observed synchronously.
 	 */
 	function persistTemporaryLayout() {
-		if ( ! onChangeLayout || ! temporaryLayout ) {
+		const latest = latestLayoutRef.current;
+		// eslint-disable-next-line react-compiler/react-compiler -- Ref reset pairs with the mirrored writes on drag/resize
+		latestLayoutRef.current = undefined;
+
+		if ( ! onChangeLayout || ! latest ) {
 			return;
 		}
 
-		onChangeLayout( temporaryLayout );
+		onChangeLayout( latest );
 		setTemporaryLayout( undefined );
 	}
 
@@ -258,6 +274,8 @@ export function DashboardGrid( {
 				}
 				return item;
 			} );
+			// eslint-disable-next-line react-compiler/react-compiler -- Ref mirrors the next state for synchronous reads on drag end
+			latestLayoutRef.current = updatedLayout;
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
 		}
