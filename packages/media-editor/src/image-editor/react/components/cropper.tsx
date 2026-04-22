@@ -175,7 +175,7 @@ function CropperInner(
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
 	const canvasRef = useRef< HTMLDivElement >( null );
-	const [ containerSize, setContainerSize ] = useState< Size >( {
+	const [ canvasSize, setCanvasSize ] = useState< Size >( {
 		width: 0,
 		height: 0,
 	} );
@@ -188,7 +188,7 @@ function CropperInner(
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setContainerSize( ( prev ) => {
+				setCanvasSize( ( prev ) => {
 					if ( prev.width === width && prev.height === height ) {
 						return prev;
 					}
@@ -216,11 +216,11 @@ function CropperInner(
 	const { elementSize, visualSize } = useMemo(
 		() =>
 			getImageFit(
-				containerSize,
+				canvasSize,
 				{ width: naturalWidth, height: naturalHeight },
 				state.rotation
 			),
-		[ containerSize, naturalWidth, naturalHeight, state.rotation ]
+		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
 	// In fixed-crop mode, auto-size the crop rect to fill the visual area
@@ -276,14 +276,14 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize, containerSize );
-	}, [ state, elementSize, visualSize, containerSize ] );
+		return getCropBounds( state, elementSize, visualSize, canvasSize );
+	}, [ state, elementSize, visualSize, canvasSize ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
 		state,
 		dispatch,
-		containerSize,
+		canvasSize,
 		visualSize,
 		{
 			minZoom,
@@ -381,8 +381,8 @@ function CropperInner(
 		if ( elementSize.width === 0 || elementSize.height === 0 ) {
 			return {};
 		}
-		const centerX = ( containerSize.width - elementSize.width ) / 2;
-		const centerY = ( containerSize.height - elementSize.height ) / 2;
+		const centerX = ( canvasSize.width - elementSize.width ) / 2;
+		const centerY = ( canvasSize.height - elementSize.height ) / 2;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -393,7 +393,7 @@ function CropperInner(
 			transform: transformString,
 			transition: imageTransition,
 		};
-	}, [ containerSize, elementSize, transformString, imageTransition ] );
+	}, [ canvasSize, elementSize, transformString, imageTransition ] );
 
 	// Forward the root element to the consumer's ref.
 	const setContainerRef = useCallback(
@@ -452,7 +452,7 @@ function CropperInner(
 				{ showDimming && (
 					<DimmingOverlay
 						cropRect={ state.cropRect }
-						containerSize={ containerSize }
+						containerSize={ canvasSize }
 						imageSize={ visualSize }
 					/>
 				) }
@@ -460,7 +460,7 @@ function CropperInner(
 				{ /* The stencil (crop area with handles) */ }
 				<StencilComponent
 					cropRect={ state.cropRect }
-					containerSize={ containerSize }
+					containerSize={ canvasSize }
 					imageSize={ visualSize }
 					onCropChange={ handleCropChange }
 					onResizeStart={ onGestureStart }
@@ -475,7 +475,7 @@ function CropperInner(
 				{ showGrid && (
 					<GridOverlay
 						cropRect={ state.cropRect }
-						containerSize={ containerSize }
+						containerSize={ canvasSize }
 						imageSize={ visualSize }
 					/>
 				) }
