@@ -389,6 +389,32 @@ describe( 'Popover', () => {
 				);
 			} );
 		} );
+
+		it( 'merges user `className` on Popover.Title with the internal one', async () => {
+			// Regression test for the shared `useRender` class-name merge
+			// that also covers Popover.Description and its Dialog/Drawer
+			// counterparts.
+			const user = userEvent.setup();
+
+			render(
+				<Popover.Root>
+					<Popover.Trigger>Open</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title className="custom-title">
+							Title
+						</Popover.Title>
+					</Popover.Popup>
+				</Popover.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const heading = await screen.findByRole( 'heading', {
+				name: 'Title',
+			} );
+			expect( heading ).toHaveClass( 'custom-title' );
+			expect( heading.className ).toMatch( /title/ );
+		} );
 	} );
 
 	describe( 'variant', () => {

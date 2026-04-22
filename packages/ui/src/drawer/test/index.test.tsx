@@ -66,6 +66,32 @@ describe( 'Drawer', () => {
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
 	} );
 
+	it( 'renders Drawer.Header and supports render/className props', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				<Drawer.Popup>
+					<Drawer.Header
+						render={ <section data-testid="drawer-header" /> }
+						className="custom-header"
+					>
+						<Drawer.Title>Test Drawer</Drawer.Title>
+					</Drawer.Header>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Drawer' } )
+		);
+
+		const header = await screen.findByTestId( 'drawer-header' );
+		expect( header.tagName ).toBe( 'SECTION' );
+		expect( header ).toHaveClass( 'custom-header' );
+	} );
+
 	it( 'renders Drawer.Footer and supports render/className props', async () => {
 		const user = userEvent.setup();
 
@@ -232,6 +258,94 @@ describe( 'Drawer', () => {
 		expect( closeButton ).toHaveAttribute( 'data-wp-ui-drawer-close-icon' );
 	} );
 
+	it( 'does not move focus when initialFocus is false', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				<Drawer.Popup initialFocus={ false }>
+					<Drawer.Header>
+						<Drawer.Title>Focus test</Drawer.Title>
+						<Drawer.CloseIcon />
+					</Drawer.Header>
+					<button>Content Button</button>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Drawer' } )
+		);
+
+		await waitFor( () => {
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+		} );
+
+		expect(
+			screen.getByRole( 'button', { name: 'Content Button' } )
+		).not.toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Close' } )
+		).not.toHaveFocus();
+	} );
+
+	it( 'uses a custom initialFocus callback as-is', async () => {
+		const user = userEvent.setup();
+		const customFocus = jest.fn( () => false as const );
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				<Drawer.Popup initialFocus={ customFocus }>
+					<Drawer.Header>
+						<Drawer.Title>Focus test</Drawer.Title>
+						<Drawer.CloseIcon />
+					</Drawer.Header>
+					<button>Content Button</button>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Drawer' } )
+		);
+
+		await waitFor( () => {
+			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+		} );
+
+		expect( customFocus ).toHaveBeenCalled();
+	} );
+
+	it( 'closes on Escape and restores focus to the trigger', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Drawer.Root>
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				<Drawer.Popup>
+					<Drawer.Title>Escape test</Drawer.Title>
+					Drawer content
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		const trigger = screen.getByRole( 'button', { name: 'Open Drawer' } );
+
+		await user.click( trigger );
+		expect( await screen.findByText( 'Drawer content' ) ).toBeVisible();
+
+		await user.keyboard( '{Escape}' );
+
+		await waitFor( () => {
+			expect(
+				screen.queryByText( 'Drawer content' )
+			).not.toBeInTheDocument();
+		} );
+		expect( trigger ).toHaveFocus();
+	} );
+
 	it( 'supports default and explicit size values across swipe directions', async () => {
 		const view = render(
 			<Drawer.Root open swipeDirection="left">
@@ -241,7 +355,10 @@ describe( 'Drawer', () => {
 			</Drawer.Root>
 		);
 
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( await screen.findByRole( 'dialog' ) ).toHaveAttribute(
+			'data-swipe-direction',
+			'left'
+		);
 
 		view.rerender(
 			<Drawer.Root open swipeDirection="up">
@@ -250,7 +367,10 @@ describe( 'Drawer', () => {
 				</Drawer.Popup>
 			</Drawer.Root>
 		);
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( await screen.findByRole( 'dialog' ) ).toHaveAttribute(
+			'data-swipe-direction',
+			'up'
+		);
 
 		view.rerender(
 			<Drawer.Root open swipeDirection="right">
@@ -259,16 +379,22 @@ describe( 'Drawer', () => {
 				</Drawer.Popup>
 			</Drawer.Root>
 		);
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( await screen.findByRole( 'dialog' ) ).toHaveAttribute(
+			'data-swipe-direction',
+			'right'
+		);
 
 		view.rerender(
-			<Drawer.Root open swipeDirection="up">
+			<Drawer.Root open swipeDirection="down">
 				<Drawer.Popup size="large">
-					<Drawer.Title>Large drawer</Drawer.Title>
+					<Drawer.Title>Down drawer</Drawer.Title>
 				</Drawer.Popup>
 			</Drawer.Root>
 		);
-		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( await screen.findByRole( 'dialog' ) ).toHaveAttribute(
+			'data-swipe-direction',
+			'down'
+		);
 	} );
 
 	it( 'marks Drawer.Action as disabled when loading is true', async () => {

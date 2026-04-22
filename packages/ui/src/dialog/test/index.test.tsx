@@ -70,6 +70,28 @@ describe( 'Dialog', () => {
 		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
 	} );
 
+	it( 'merges user `className` on Dialog.Title with the internal one', async () => {
+		// Regression test for the shared `useRender` class-name merge
+		// that also covers Popover.Title, Dialog.Description and
+		// Popover.Description.
+		const user = userEvent.setup();
+
+		render(
+			<Dialog.Root>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Title className="custom-title">Title</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		const heading = await screen.findByRole( 'heading', { name: 'Title' } );
+		expect( heading ).toHaveClass( 'custom-title' );
+		expect( heading.className ).toMatch( /title/ );
+	} );
+
 	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
 		const user = userEvent.setup();
 		const popupRef = createRef< HTMLDivElement >();
