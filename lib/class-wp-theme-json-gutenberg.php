@@ -3352,12 +3352,6 @@ class WP_Theme_JSON_Gutenberg {
 					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $style_variation['selector'] );
 				}
 
-				// Store responsive breakpoint CSS for the style variation.
-				$variation_responsive_css = static::process_responsive_selectors( $style_variation_node, $style_variation['selector'], $settings );
-				if ( ! empty( $variation_responsive_css ) ) {
-					$style_variation_responsive_css[ $style_variation['selector'] ] = $variation_responsive_css;
-				}
-
 				// Store variation metadata and node for layout styles generation.
 				// Only store if the variation has blockGap defined.
 				if ( isset( $style_variation_node['spacing']['blockGap'] ) ) {
@@ -3369,9 +3363,41 @@ class WP_Theme_JSON_Gutenberg {
 						'node'     => $style_variation_node,
 					);
 				}
+
+				// Store responsive breakpoint CSS for the style variation.
+				// This includes both base properties and feature-level selectors.
+				$variation_responsive_css = '';
+
+				foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+					if ( ! isset( $style_variation_node[ $breakpoint ] ) ) {
+						continue;
+					}
+
+					$breakpoint_node  = $style_variation_node[ $breakpoint ];
+					$breakpoint_media = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
+
+					// Process feature-level declarations for this breakpoint.
+					$breakpoint_feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $breakpoint_node );
+					$breakpoint_feature_declarations = static::update_paragraph_text_indent_selector( $breakpoint_feature_declarations, $settings, $block_name );
+					$breakpoint_feature_declarations = static::update_button_width_declarations( $breakpoint_feature_declarations, $settings );
+					foreach ( $breakpoint_feature_declarations as $feature_selector => $feature_decl ) {
+						$feature_ruleset           = static::to_ruleset( ':root :where(' . $feature_selector . ')', $feature_decl );
+						$variation_responsive_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
+					}
+
+					// Process base properties for this breakpoint.
+					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
+					if ( ! empty( $breakpoint_declarations ) ) {
+						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
+						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';
+					}
+				}
+
+				if ( ! empty( $variation_responsive_css ) ) {
+					$style_variation_responsive_css[ $style_variation['selector'] ] = $variation_responsive_css;
+				}
 			}
 		}
-
 		/*
 		 * Get a reference to element name from path.
 		 * $block_metadata['path'] = array( 'styles','elements','link' );
@@ -3552,6 +3578,26 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 8. Generate and append responsive breakpoint rules.
 		if ( ! $is_root_selector ) {
+			$responsive_feature_css = '';
+
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+				if ( ! isset( $node[ $breakpoint ] ) ) {
+					continue;
+				}
+
+				$breakpoint_node                 = $node[ $breakpoint ];
+				$breakpoint_media                = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
+				$breakpoint_feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $breakpoint_node );
+				$breakpoint_feature_declarations = static::update_paragraph_text_indent_selector( $breakpoint_feature_declarations, $settings, $block_name );
+				$breakpoint_feature_declarations = static::update_button_width_declarations( $breakpoint_feature_declarations, $settings );
+
+				foreach ( $breakpoint_feature_declarations as $feature_selector => $individual_feature_declarations ) {
+					$feature_ruleset         = static::to_ruleset( ":root :where($feature_selector)", $individual_feature_declarations );
+					$responsive_feature_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
+				}
+			}
+
+			$block_rules .= $responsive_feature_css;
 			$block_rules .= static::process_responsive_selectors( $node, $selector, $settings );
 		}
 
