@@ -9,7 +9,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import type { TaxonomyFormData } from '../utils';
+import type { TaxonomyFormData } from '../types';
 
 const toggleActiveAction: Action< TaxonomyFormData > = {
 	id: 'toggle-active',

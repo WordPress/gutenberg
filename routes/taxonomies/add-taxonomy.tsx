@@ -23,7 +23,8 @@ import {
 	useObjectTypeField,
 	useSlugField,
 } from './fields';
-import { serializeForSave, type TaxonomyFormData } from './utils';
+import { serializeForSave } from './utils';
+import type { TaxonomyFormData } from './types';
 
 const BLANK_RECORD: TaxonomyFormData = {
 	slug: '',

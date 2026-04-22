@@ -20,7 +20,8 @@ import {
 	useSlugField,
 	useObjectTypeField,
 } from './fields';
-import { toFormData, type TaxonomyRecord } from './utils';
+import { toFormData } from './utils';
+import type { TaxonomyRecord } from './types';
 
 const defaultLayouts = {
 	table: {},

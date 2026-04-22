@@ -5,38 +5,10 @@ import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
-export type TaxonomyRecord = {
-	id?: number;
-	slug: string;
-	status: 'publish' | 'draft';
-	title: { raw?: string; rendered: string };
-	content: { raw?: string; rendered: string };
-};
-
-export type StoredConfig = {
-	labels?: { singular_name?: string };
-	object_type?: string[];
-	public?: boolean;
-	hierarchical?: boolean;
-};
-
 /**
- * Normalized in-memory shape used by all three consumers. REST rows are
- * converted to this shape on load via `toFormData`, and back to the save
- * payload via `serializeForSave`, so fields never have to JSON round-trip
- * `content.raw` on every keystroke.
+ * Internal dependencies
  */
-export type TaxonomyFormData = {
-	id?: number;
-	slug: string;
-	status: 'publish' | 'draft';
-	title: { raw: string };
-	config: Required<
-		Pick< StoredConfig, 'object_type' | 'public' | 'hierarchical' >
-	> & {
-		labels: { singular_name: string };
-	};
-};
+import type { StoredConfig, TaxonomyFormData, TaxonomyRecord } from './types';
 
 export function parseConfig( raw?: string ): StoredConfig {
 	if ( ! raw ) {
@@ -51,12 +23,12 @@ export function parseConfig( raw?: string ): StoredConfig {
 }
 
 export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
-	const parsed = parseConfig( row.content?.raw );
+	const parsed = parseConfig( row.content.raw );
 	return {
 		id: row.id,
 		slug: row.slug,
 		status: row.status,
-		title: { raw: row.title.raw ?? '' },
+		title: { raw: row.title.raw },
 		config: {
 			labels: {
 				singular_name: parsed.labels?.singular_name ?? '',

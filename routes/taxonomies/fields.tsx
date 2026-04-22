@@ -10,11 +10,8 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import {
-	usePublicPostTypes,
-	useTakenTaxonomySlugs,
-	type TaxonomyFormData,
-} from './utils';
+import { usePublicPostTypes, useTakenTaxonomySlugs } from './utils';
+import type { TaxonomyFormData } from './types';
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
