@@ -36,6 +36,13 @@
 		}
 
 		@media not (prefers-reduced-motion) {
+			/*
+			 * The duration and easing are intentionally different from
+			 * Dialog's backdrop: they match the popup's slide-in/out so the
+			 * two surfaces transition together. The ending-style duration is
+			 * further scaled by `--drawer-swipe-strength` so the backdrop
+			 * fades in lockstep with a swipe-dismissed popup.
+			 */
 			transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
 
 			&[data-ending-style] {
