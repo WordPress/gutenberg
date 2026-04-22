@@ -60,7 +60,6 @@
 		"build-module/bindings/**"
 	],
 	"dependencies": {
-		"@floating-ui/react-dom": "2.0.8",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",

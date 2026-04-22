@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { Notice } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -97,17 +99,33 @@ export const statusField: Field< TaxonomyFormData > = {
 };
 
 export function useSlugField(
-	currentSlug?: string
+	originalSlug?: string,
+	currentValue?: string
 ): Field< TaxonomyFormData > {
-	const takenSlugs = useTakenTaxonomySlugs( currentSlug );
+	const takenSlugs = useTakenTaxonomySlugs( originalSlug );
+	const showRenameWarning =
+		originalSlug !== undefined && currentValue !== originalSlug;
 	return useMemo< Field< TaxonomyFormData > >(
 		() => ( {
 			id: 'slug',
 			label: __( 'Slug' ),
 			type: 'text',
 			enableGlobalSearch: true,
-			description: __(
-				'Lower case letters, numbers, underscores, and dashes only. Maximum length: 32 characters. Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
+			description: (
+				<Stack direction="column" gap="sm">
+					{ showRenameWarning && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
+							) }
+						</Notice>
+					) }
+					<span>
+						{ __(
+							'Lower case letters, numbers, underscores, and dashes only. Maximum length: 32 characters.'
+						) }
+					</span>
+				</Stack>
 			),
 			isValid: {
 				required: true,
@@ -120,7 +138,7 @@ export function useSlugField(
 			filterBy: false,
 			enableSorting: false,
 		} ),
-		[ takenSlugs ]
+		[ takenSlugs, showRenameWarning ]
 	);
 }
 

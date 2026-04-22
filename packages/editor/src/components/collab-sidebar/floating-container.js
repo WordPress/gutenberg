@@ -19,7 +19,7 @@ export function FloatingContainer( {
 	return (
 		<VStack
 			className={ clsx( className, { 'is-floating': isFloating } ) }
-			ref={ isFloating ? floating.refs.setFloating : undefined }
+			ref={ isFloating ? floating.ref : undefined }
 			style={ isFloating ? { top: floating.y, ...style } : style }
 			{ ...props }
 		>

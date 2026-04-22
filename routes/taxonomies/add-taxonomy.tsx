@@ -110,11 +110,17 @@ function AddTaxonomyModal( {
 			focusOnMount="firstContentElement"
 			size="small"
 		>
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					onSubmit();
-				} }
+			<Stack
+				direction="column"
+				gap="md"
+				render={
+					<form
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							onSubmit();
+						} }
+					/>
+				}
 			>
 				<DataForm< TaxonomyFormData >
 					data={ data }
@@ -146,7 +152,7 @@ function AddTaxonomyModal( {
 						{ __( 'Create' ) }
 					</Button>
 				</Stack>
-			</form>
+			</Stack>
 		</Modal>
 	);
 }
