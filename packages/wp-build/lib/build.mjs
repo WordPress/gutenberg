@@ -1740,13 +1740,10 @@ async function buildWidget( widgetName ) {
 
 	// Build render.js if it exists
 	if ( files.hasRender ) {
-		const renderEntryPoints = await glob(
-			`render.${ SOURCE_EXTENSIONS }`,
-			{
-				cwd: widgetDir,
-				absolute: true,
-			}
-		);
+		const renderEntryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+			cwd: widgetDir,
+			absolute: true,
+		} );
 
 		if ( renderEntryPoints.length > 0 ) {
 			// Build both minified and non-minified versions in parallel
@@ -1793,13 +1790,10 @@ async function buildWidget( widgetName ) {
 
 	// Build widget.js if it exists
 	if ( files.hasWidget ) {
-		const widgetEntryPoints = await glob(
-			`widget.${ SOURCE_EXTENSIONS }`,
-			{
-				cwd: widgetDir,
-				absolute: true,
-			}
-		);
+		const widgetEntryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+			cwd: widgetDir,
+			absolute: true,
+		} );
 
 		if ( widgetEntryPoints.length > 0 ) {
 			// Build both minified and non-minified versions in parallel
@@ -1871,6 +1865,36 @@ async function buildAllWidgets() {
 }
 
 /**
+ * Discover all widgets and collect their registry-facing data.
+ * Widgets without a valid widget.json are skipped.
+ *
+ * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean }>}
+ */
+function collectWidgets() {
+	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
+		const metadata = getWidgetMetadata( ROOT_DIR, widgetName );
+
+		// Skip widgets without a valid widget.json.
+		if ( ! metadata ) {
+			return [];
+		}
+
+		const widgetFiles = getWidgetFiles(
+			path.join( ROOT_DIR, 'widgets', widgetName )
+		);
+
+		return [
+			{
+				name: metadata.name,
+				dirName: widgetName,
+				hasRender: widgetFiles.hasRender,
+				hasWidget: widgetFiles.hasWidget,
+			},
+		];
+	} );
+}
+
+/**
  * Generate global widget registry file.
  * Creates a single registry with all widgets including file availability.
  *
@@ -1883,8 +1907,10 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		return;
 	}
 
-	// Generate PHP array entries with file availability
-	const widgetEntries = widgets
+	// Generate PHP array entries with file availability.
+	// Sort by dirName to keep registry output deterministic across platforms.
+	const widgetEntries = [ ...widgets ]
+		.sort( ( a, b ) => a.dirName.localeCompare( b.dirName ) )
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
@@ -2001,27 +2027,7 @@ async function buildAll( baseUrlExpression ) {
 	await buildAllWidgets();
 
 	// Collect widget data for PHP generation
-	const widgets = getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
-		const metadata = getWidgetMetadata( ROOT_DIR, widgetName );
-
-		// Skip widgets without valid widget.json
-		if ( ! metadata ) {
-			return [];
-		}
-
-		const widgetFiles = getWidgetFiles(
-			path.join( ROOT_DIR, 'widgets', widgetName )
-		);
-
-		return [
-			{
-				name: metadata.name,
-				dirName: widgetName,
-				hasRender: widgetFiles.hasRender,
-				hasWidget: widgetFiles.hasWidget,
-			},
-		];
-	} );
+	const widgets = collectWidgets();
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -2426,9 +2432,7 @@ async function watchMode() {
 
 		const handleWidgetFileChange = async ( filename ) => {
 			// Extract widget dir name from path: widgets/{widgetDirName}/...
-			const widgetMatch = filename.match(
-				/widgets[/\\]([^/\\]+)[/\\]/
-			);
+			const widgetMatch = filename.match( /widgets[/\\]([^/\\]+)[/\\]/ );
 			if ( ! widgetMatch ) {
 				return;
 			}
