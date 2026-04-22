@@ -86,8 +86,13 @@ export function useOverlayScrollStateAttributes<
 			mutationObserver = new MutationObserver( ( records ) => {
 				for ( const record of records ) {
 					for ( const added of Array.from( record.addedNodes ) ) {
-						if ( added instanceof HTMLElement ) {
+						if ( added instanceof Element ) {
 							resizeObserver.observe( added );
+						}
+					}
+					for ( const removed of Array.from( record.removedNodes ) ) {
+						if ( removed instanceof Element ) {
+							resizeObserver.unobserve( removed );
 						}
 					}
 				}

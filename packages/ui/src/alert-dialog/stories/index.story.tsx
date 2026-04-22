@@ -383,7 +383,7 @@ function ScrollableContent() {
  * When the dialog's body overflows the available height, the title/description
  * area stays pinned to the top of the popup and the action buttons stay pinned
  * to the bottom so users keep sight of the context and primary actions while
- * scrolling. Separator borders fade in only when there is off-screen content
+ * scrolling. Separator borders appear only when there is off-screen content
  * above or below. Pass `stickyHeader={ false }` or `stickyFooter={ false }` on
  * `AlertDialog.Popup` to opt out — the toggles in this story drive both props
  * independently.

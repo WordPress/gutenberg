@@ -101,21 +101,34 @@
 		 * When a sticky chrome element sits at the start/end, yield the
 		 * popup's block padding to it (the matching sticky rule below
 		 * claims it as its own padding-block-start/-end) so the chrome's
-		 * border-box is flush with the popup's inner border edge. At the
-		 * same time, reserve `scroll-padding-block-*` so Tab / scrollIntoView
-		 * keeps focused descendants clear of the pinned chrome rather than
-		 * scrolling them behind it. 5rem comfortably covers a single
-		 * heading plus the chrome's padding at the default font size; the
-		 * sticky chrome is typically much shorter than this.
+		 * border-box is flush with the popup's inner border edge.
 		 */
 		&:has(> .headerSticky:first-child) {
 			padding-block-start: 0;
-			scroll-padding-block-start: 5rem;
 		}
 
 		&:has(> .footerSticky:last-child) {
 			padding-block-end: 0;
-			scroll-padding-block-end: 5rem;
+		}
+
+		/*
+		 * Reserve scroll-padding whenever a sticky chrome exists in the
+		 * popup — regardless of whether it's the first/last direct child —
+		 * so Tab / scrollIntoView keeps focused descendants clear of the
+		 * pinned chrome rather than scrolling them behind it. 6rem is a
+		 * pragmatic upper bound that comfortably covers a single heading
+		 * plus the chrome's padding at the default font size; the sticky
+		 * chrome is typically much shorter. A measured approach
+		 * (ResizeObserver → custom property) can replace this if a
+		 * consumer ever runs into an under-cover case — deliberately kept
+		 * simple for now to avoid overengineering.
+		 */
+		&:has(> .headerSticky) {
+			scroll-padding-block-start: 6rem;
+		}
+
+		&:has(> .footerSticky) {
+			scroll-padding-block-end: 6rem;
 		}
 	}
 

@@ -269,7 +269,7 @@ function ScrollableContent() {
  * When dialog content overflows the available height, `Dialog.Header` stays
  * pinned to the top and `Dialog.Footer` stays pinned to the bottom so users
  * keep sight of the title and primary actions while scrolling. Separator
- * borders fade in only when there is off-screen content above the header or
+ * borders appear only when there is off-screen content above the header or
  * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
  * and let it scroll with the content — the toggles in this story drive both
  * props independently and stay in sync between outside and inside the dialog.
