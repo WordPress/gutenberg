@@ -11,12 +11,13 @@ import {
 	useOnPostSave,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
-import { retrySyncConnection } from './sync';
+import { mergePersistedCRDTDocFromServer, retrySyncConnection } from './sync';
 
 export const privateApis = {};
 lock( privateApis, {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	mergePersistedCRDTDocFromServer,
 	retrySyncConnection,
 	useActiveCollaborators,
 	useResolvedSelection,

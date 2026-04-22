@@ -722,6 +722,24 @@ export function collaborationSupported( state = true, action ) {
 }
 
 /**
+ * Reducer returning whether the user has chosen to continue editing while the
+ * sync connection is disconnected. Once true, it stays true for the rest of
+ * the session so subsequent disconnects surface the inline notice without
+ * re-showing the connection error modal.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function isEditingWhileDisconnected( state = false, action ) {
+	switch ( action.type ) {
+		case 'CONFIRM_EDIT_WHILE_DISCONNECTED':
+			return true;
+	}
+	return state;
+}
+
+/**
  * Reducer managing view configs, keyed by `kind/name`.
  *
  * @param {Object} state  Current state.
@@ -764,5 +782,6 @@ export default combineReducers( {
 	editorAssets,
 	syncConnectionStatuses,
 	collaborationSupported,
+	isEditingWhileDisconnected,
 	viewConfigs,
 } );

@@ -22,6 +22,7 @@ import { InlineNotices } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateValidationNotice from '../template-validation-notice';
+import SyncDisconnectedNotice from '../sync-disconnected-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
@@ -52,6 +53,7 @@ const Notices = () => (
 		pinnedNoticesClassName="editor-notices__pinned"
 		dismissibleNoticesClassName="editor-notices__dismissible"
 	>
+		<SyncDisconnectedNotice />
 		<TemplateValidationNotice />
 	</InlineNotices>
 );

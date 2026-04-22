@@ -10,7 +10,10 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	applyFilters,
@@ -30,6 +33,8 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+
+const { mergePersistedCRDTDocFromServer } = unlock( coreDataPrivateApis );
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -214,6 +219,33 @@ export const savePost =
 			);
 		} catch ( err ) {
 			error = err;
+		}
+
+		if ( select.isCollaborationEnabledForCurrentPost() ) {
+			// In RTC, if the user is editing while sync is disconnected and
+			// the post is unpublished, pull the server's persisted CRDT into
+			// the live Y.Doc before serializing for save. This prevents
+			// overwriting edits made by other peers while we were offline.
+			const isEditingWhileDisconnected = unlock(
+				registry.select( coreStore )
+			).isEditingWhileDisconnected();
+			if (
+				! error &&
+				isEditingWhileDisconnected &&
+				! select.isCurrentPostPublished()
+			) {
+				const entityConfig = registry
+					.select( coreStore )
+					.getEntityConfig( 'postType', previousRecord.type );
+				if ( entityConfig?.baseURL ) {
+					await mergePersistedCRDTDocFromServer(
+						'postType',
+						previousRecord.type,
+						previousRecord.id,
+						entityConfig.baseURL
+					);
+				}
+			}
 		}
 
 		if ( ! error ) {

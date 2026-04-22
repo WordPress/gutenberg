@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, select } from '@wordpress/data';
+import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 // @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
@@ -15,6 +15,7 @@ import { privateApis, store as blockEditorStore } from '@wordpress/block-editor'
 import {
 	Button,
 	Modal,
+	__experimentalConfirmDialog as ConfirmDialog,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -47,25 +48,33 @@ export function SyncConnectionErrorModal() {
 	const [ showModal, setShowModal ] = useState( false );
 	const [ isManualRetryAvailable, setIsManualRetryAvailable ] =
 		useState( false );
+	const [ showEditAnywayConfirm, setShowEditAnywayConfirm ] =
+		useState( false );
 
-	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
-		( selectFn ) => {
-			const currentPostType =
-				selectFn( editorStore ).getCurrentPostType();
-			return {
-				connectionStatus:
-					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-				isCollaborationEnabled:
-					selectFn(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
-				postType: currentPostType
-					? selectFn( coreDataStore ).getPostType( currentPostType )
-					: null,
-			};
-		},
-		[]
-	);
+	const {
+		connectionStatus,
+		isCollaborationEnabled,
+		isEditingWhileDisconnected,
+		isPublished,
+		postType,
+	} = useSelect( ( selectFn ) => {
+		const editorSelect = selectFn( editorStore );
+		const coreDataSelect = selectFn( coreDataStore );
+		const currentPostType = editorSelect.getCurrentPostType();
+		return {
+			connectionStatus: coreDataSelect.getSyncConnectionStatus() || null,
+			isCollaborationEnabled:
+				editorSelect.isCollaborationEnabledForCurrentPost(),
+			isEditingWhileDisconnected:
+				unlock( coreDataSelect ).isEditingWhileDisconnected(),
+			isPublished: editorSelect.isCurrentPostPublished(),
+			postType: currentPostType
+				? coreDataSelect.getPostType( currentPostType )
+				: null,
+		};
+	}, [] );
+
+	const coreDataDispatch = useDispatch( coreDataStore );
 
 	const { onManualRetry, secondsRemaining } =
 		useRetryCountdown( connectionStatus );
@@ -125,7 +134,12 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
+	if (
+		! isCollaborationEnabled ||
+		! hasInitialized ||
+		! showModal ||
+		isEditingWhileDisconnected
+	) {
 		return null;
 	}
 
@@ -194,6 +208,14 @@ export function SyncConnectionErrorModal() {
 		editPostHref = `edit.php?post_type=${ postType.slug }`;
 	}
 
+	const editAnywayWarning = isPublished
+		? __(
+				'Your edits will be saved locally and synced when the connection returns. Because this post is published, saving while disconnected may overwrite changes made by other editors in the meantime.'
+		  )
+		: __(
+				'Your edits will be saved locally and synced when the connection returns. If you close this tab before reconnecting, unsaved changes may be lost.'
+		  );
+
 	return (
 		<BlockCanvasCover.Fill>
 			<Modal
@@ -228,9 +250,16 @@ export function SyncConnectionErrorModal() {
 						<Button
 							__next40pxDefaultSize
 							ref={ copyButtonRef }
-							variant={ manualRetry ? 'secondary' : 'primary' }
+							variant="secondary"
 						>
 							{ __( 'Copy Post Content' ) }
+						</Button>
+						<Button
+							__next40pxDefaultSize
+							variant={ manualRetry ? 'secondary' : 'primary' }
+							onClick={ () => setShowEditAnywayConfirm( true ) }
+						>
+							{ __( 'Edit Anyway' ) }
 						</Button>
 						{ manualRetry && (
 							<Button
@@ -248,6 +277,18 @@ export function SyncConnectionErrorModal() {
 					</HStack>
 				</VStack>
 			</Modal>
+			<ConfirmDialog
+				isOpen={ showEditAnywayConfirm }
+				onConfirm={ () => {
+					setShowEditAnywayConfirm( false );
+					unlock( coreDataDispatch ).confirmEditWhileDisconnected();
+				} }
+				onCancel={ () => setShowEditAnywayConfirm( false ) }
+				confirmButtonText={ __( 'Edit Anyway' ) }
+				size="small"
+			>
+				{ editAnywayWarning }
+			</ConfirmDialog>
 		</BlockCanvasCover.Fill>
 	);
 }

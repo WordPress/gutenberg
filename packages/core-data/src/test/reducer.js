@@ -12,6 +12,7 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
+	isEditingWhileDisconnected,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -529,5 +530,28 @@ describe( 'currentUser', () => {
 		);
 
 		expect( state ).toEqual( currentUserData );
+	} );
+} );
+
+describe( 'isEditingWhileDisconnected', () => {
+	it( 'defaults to false', () => {
+		expect( isEditingWhileDisconnected( undefined, {} ) ).toBe( false );
+	} );
+
+	it( 'flips to true on CONFIRM_EDIT_WHILE_DISCONNECTED', () => {
+		expect(
+			isEditingWhileDisconnected( false, {
+				type: 'CONFIRM_EDIT_WHILE_DISCONNECTED',
+			} )
+		).toBe( true );
+	} );
+
+	it( 'stays true once set, regardless of other actions', () => {
+		expect(
+			isEditingWhileDisconnected( true, {
+				type: 'SET_SYNC_CONNECTION_STATUS',
+				status: { status: 'connected' },
+			} )
+		).toBe( true );
 	} );
 } );

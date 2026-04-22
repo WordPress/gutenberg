@@ -662,6 +662,45 @@ export function createSyncManager( debug = false ): SyncManager {
 		return serializeCrdtDoc( entityState.ydoc );
 	}
 
+	/**
+	 * Apply a serialized persisted CRDT document to the live in-memory Y.Doc
+	 * for the given entity. Used before saving while the sync transport is
+	 * disconnected so that concurrent changes on the server can be merged in
+	 * before this client overwrites the persisted doc.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {string}     serialized Serialized CRDT document from the server.
+	 * @return {boolean} True if the merge was applied, false otherwise.
+	 */
+	function mergePersistedCRDTDoc(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	): boolean {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState?.ydoc ) {
+			log( 'mergePersistedCRDTDoc', 'no entity state', entityId );
+			return false;
+		}
+
+		const tempDoc = deserializeCrdtDoc( serialized );
+		if ( ! tempDoc ) {
+			log( 'mergePersistedCRDTDoc', 'deserialize failed', entityId );
+			return false;
+		}
+
+		// IMPORTANT: Do not wrap in a local-origin transaction. Mirrors
+		// `_applyPersistedCrdtDoc` to avoid advancing this client's state
+		// vector in a way that would make Yjs treat us as a different peer.
+		const update = Y.encodeStateAsUpdateV2( tempDoc );
+		Y.applyUpdateV2( entityState.ydoc, update );
+		tempDoc.destroy();
+		return true;
+	}
+
 	// Collect internal functions so that they can be wrapped before calling.
 	const internal = {
 		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
@@ -674,6 +713,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		getAwareness,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
+		mergePersistedCRDTDoc: debugWrap( mergePersistedCRDTDoc ),
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;

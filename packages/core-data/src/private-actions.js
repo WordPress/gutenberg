@@ -175,6 +175,20 @@ export const setCollaborationSupported =
 	};
 
 /**
+ * Record that the user has acknowledged the sync-disconnected warning and
+ * wants to keep editing locally. This choice persists for the rest of the
+ * session so subsequent disconnects show only the inline notice instead of
+ * the connection error modal again.
+ *
+ * @return {Object} Action object.
+ */
+export function confirmEditWhileDisconnected() {
+	return {
+		type: 'CONFIRM_EDIT_WHILE_DISCONNECTED',
+	};
+}
+
+/**
  * Returns an action object used to receive view config.
  *
  * @param {string} kind   Entity kind.

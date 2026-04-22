@@ -325,6 +325,19 @@ export function isCollaborationSupported( state: State ): boolean {
 }
 
 /**
+ * Returns whether the user has opted to continue editing while the sync
+ * connection is disconnected. Once true, it stays true for the rest of the
+ * session so subsequent disconnects surface the inline notice without
+ * re-showing the connection error modal.
+ *
+ * @param state Data state.
+ * @return Whether the user is editing while disconnected.
+ */
+export function isEditingWhileDisconnected( state: State ): boolean {
+	return state.isEditingWhileDisconnected;
+}
+
+/**
  * Returns the view configuration for the given entity type.
  *
  * @param state Data state.
