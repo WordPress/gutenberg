@@ -2,6 +2,7 @@
 const rule = {
 	meta: {
 		type: 'suggestion',
+		hasSuggestions: true,
 		docs: {
 			description:
 				'Enforce configured `as` names for specific named imports and unlocked private APIs.',
@@ -22,6 +23,8 @@ const rule = {
 		messages: {
 			mustUseImportAs:
 				'`{{ importedName }}` from `{{ source }}` must be imported as `{{ localName }}`.',
+			useImportAsSuggestion: 'Import as `{{ localName }}`.',
+			useUnlockAsSuggestion: 'Destructure as `{{ localName }}`.',
 		},
 	},
 	create( context ) {
@@ -75,6 +78,24 @@ const rule = {
 							source,
 							localName,
 						},
+						suggest: [
+							{
+								messageId: 'useImportAsSuggestion',
+								data: {
+									localName,
+								},
+								fix( fixer ) {
+									return fixer.replaceText(
+										specifier,
+										getImportSpecifierSuggestionText(
+											specifier,
+											context.sourceCode,
+											localName
+										)
+									);
+								},
+							},
+						],
 					} );
 				} );
 			},
@@ -143,6 +164,24 @@ const rule = {
 							source,
 							localName,
 						},
+						suggest: [
+							{
+								messageId: 'useUnlockAsSuggestion',
+								data: {
+									localName,
+								},
+								fix( fixer ) {
+									return fixer.replaceText(
+										property,
+										getPropertySuggestionText(
+											property,
+											context.sourceCode,
+											localName
+										)
+									);
+								},
+							},
+						],
 					} );
 				} );
 			},
@@ -158,6 +197,16 @@ function getImportedName( specifier ) {
 	return specifier.imported.type === 'Identifier'
 		? specifier.imported.name
 		: String( specifier.imported.value );
+}
+
+/**
+ * @param {import('estree').ImportSpecifier} specifier
+ * @param {import('eslint').SourceCode}      sourceCode
+ * @param {string}                           localName
+ * @return {string} Suggested replacement text for an import specifier.
+ */
+function getImportSpecifierSuggestionText( specifier, sourceCode, localName ) {
+	return `${ sourceCode.getText( specifier.imported ) } as ${ localName }`;
 }
 
 /**
@@ -204,6 +253,24 @@ function getPropertyName( key ) {
 	}
 
 	return null;
+}
+
+/**
+ * @param {import('estree').Property}   property
+ * @param {import('eslint').SourceCode} sourceCode
+ * @param {string}                      localName
+ * @return {string} Suggested replacement text for a destructuring property.
+ */
+function getPropertySuggestionText( property, sourceCode, localName ) {
+	const keyText = sourceCode.getText( property.key );
+
+	if ( property.value.type === 'AssignmentPattern' ) {
+		return `${ keyText }: ${ localName } = ${ sourceCode.getText(
+			property.value.right
+		) }`;
+	}
+
+	return `${ keyText }: ${ localName }`;
 }
 
 /**

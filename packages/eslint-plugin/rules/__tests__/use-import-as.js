@@ -29,6 +29,16 @@ const options = [
 	},
 ];
 
+const withSuggestions = ( message, output, desc ) => ( {
+	message,
+	suggestions: [
+		{
+			desc,
+			output,
+		},
+	],
+} );
+
 ruleTester.run( 'use-import-as', rule, {
 	valid: [
 		// With no config, the rule is a no-op.
@@ -138,40 +148,44 @@ ruleTester.run( 'use-import-as', rule, {
 			code: "import { VisuallyHidden } from '@wordpress/components';",
 			options,
 			errors: [
-				{
-					message:
-						'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
-				},
+				withSuggestions(
+					'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
+					"import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';",
+					'Import as `WCVisuallyHidden`.'
+				),
 			],
 		},
 		{
 			code: "import { VisuallyHidden as Hidden } from '@wordpress/components';",
 			options,
 			errors: [
-				{
-					message:
-						'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
-				},
+				withSuggestions(
+					'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
+					"import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';",
+					'Import as `WCVisuallyHidden`.'
+				),
 			],
 		},
 		{
 			code: 'import { "VisuallyHidden" as Hidden } from \'@wordpress/components\';',
 			options,
 			errors: [
-				{
-					message:
-						'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
-				},
+				withSuggestions(
+					'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
+					'import { "VisuallyHidden" as WCVisuallyHidden } from \'@wordpress/components\';',
+					'Import as `WCVisuallyHidden`.'
+				),
 			],
 		},
 		{
 			code: "import { Button, VisuallyHidden } from '@wordpress/components';",
 			options,
 			errors: [
-				{
-					message:
-						'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
-				},
+				withSuggestions(
+					'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
+					"import { Button, VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';",
+					'Import as `WCVisuallyHidden`.'
+				),
 			],
 		},
 		{
@@ -183,10 +197,16 @@ ruleTester.run( 'use-import-as', rule, {
 			`,
 			options,
 			errors: [
-				{
-					message:
-						'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
-				},
+				withSuggestions(
+					'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
+					`
+				import { privateApis as componentsPrivateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge: WCBadge } = unlock( componentsPrivateApis );
+			`,
+					'Destructure as `WCBadge`.'
+				),
 			],
 		},
 		{
@@ -198,10 +218,16 @@ ruleTester.run( 'use-import-as', rule, {
 			`,
 			options,
 			errors: [
-				{
-					message:
-						'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
-				},
+				withSuggestions(
+					'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
+					`
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge: WCBadge } = unlock( privateApis );
+			`,
+					'Destructure as `WCBadge`.'
+				),
 			],
 		},
 		{
@@ -213,10 +239,16 @@ ruleTester.run( 'use-import-as', rule, {
 			`,
 			options,
 			errors: [
-				{
-					message:
-						'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
-				},
+				withSuggestions(
+					'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
+					`
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge: WCBadge = fallbackBadge } = unlock( privateApis );
+			`,
+					'Destructure as `WCBadge`.'
+				),
 			],
 		},
 	],
