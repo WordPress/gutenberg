@@ -5,11 +5,9 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import {
-	Button,
-	Modal,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Drawer, VisuallyHidden } from '@wordpress/ui';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
@@ -157,21 +155,31 @@ export function QuickEditModal( {
 	};
 
 	return (
-		<Modal
-			overlayClassName="dataviews-action-modal__quick-edit"
-			__experimentalHideHeader
-			onRequestClose={ closeModal }
-			focusOnMount="firstElement"
+		<Drawer.Root
+			open
+			swipeDirection="right"
+			onOpenChange={ ( open ) => {
+				if ( ! open ) {
+					closeModal?.();
+				}
+			} }
 		>
-			<div className="dataviews-action-modal__quick-edit-header">
+			<Drawer.Popup>
+				<VisuallyHidden
+					render={
+						<Drawer.Title>
+							{ isBulk
+								? __( 'Bulk quick edit' )
+								: __( 'Quick edit' ) }
+						</Drawer.Title>
+					}
+				/>
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
 					onClose={ closeModal }
 					hideActions
 				/>
-			</div>
-			<div className="dataviews-action-modal__quick-edit-content">
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
@@ -180,23 +188,19 @@ export function QuickEditModal( {
 						onChange={ onChange }
 					/>
 				) }
-			</div>
-			<HStack className="dataviews-action-modal__quick-edit-footer">
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ closeModal }
-				>
-					{ __( 'Cancel' ) }
-				</Button>
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					onClick={ onSave }
-				>
-					{ __( 'Done' ) }
-				</Button>
-			</HStack>
-		</Modal>
+				<Drawer.Footer>
+					<Drawer.Action __next40pxDefaultSize variant="secondary">
+						{ __( 'Cancel' ) }
+					</Drawer.Action>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ onSave }
+					>
+						{ __( 'Done' ) }
+					</Button>
+				</Drawer.Footer>
+			</Drawer.Popup>
+		</Drawer.Root>
 	);
 }
