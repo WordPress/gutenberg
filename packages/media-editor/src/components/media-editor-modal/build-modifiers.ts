@@ -56,5 +56,10 @@ export function buildModifiers(
 		} );
 	}
 
+	const angle = ( ( state.rotation % 360 ) + 360 ) % 360;
+	if ( angle !== 0 ) {
+		modifiers.push( { type: 'rotate', args: { angle } } );
+	}
+
 	return modifiers;
 }

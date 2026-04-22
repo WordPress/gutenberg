@@ -83,4 +83,59 @@ describe( 'buildModifiers', () => {
 		);
 		expect( modifiers ).toEqual( [] );
 	} );
+
+	it( 'emits a rotate modifier at 90°', () => {
+		const modifiers = buildModifiers(
+			stateWith( { rotation: 90 } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{ type: 'rotate', args: { angle: 90 } },
+		] );
+	} );
+
+	it( 'emits a rotate modifier at a non-cardinal angle', () => {
+		const modifiers = buildModifiers(
+			stateWith( { rotation: 45 } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{ type: 'rotate', args: { angle: 45 } },
+		] );
+	} );
+
+	it( 'normalizes rotation to [0, 360) and drops 360°', () => {
+		const modifiers = buildModifiers(
+			stateWith( { rotation: 360 } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [] );
+	} );
+
+	it( 'normalizes negative rotation', () => {
+		const modifiers = buildModifiers(
+			stateWith( { rotation: -90 } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{ type: 'rotate', args: { angle: 270 } },
+		] );
+	} );
+
+	it( 'emits flip before rotate when both are set', () => {
+		const modifiers = buildModifiers(
+			stateWith( {
+				flip: { horizontal: true, vertical: false },
+				rotation: 90,
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{
+				type: 'flip',
+				args: { flip: { horizontal: true, vertical: false } },
+			},
+			{ type: 'rotate', args: { angle: 90 } },
+		] );
+	} );
 } );
