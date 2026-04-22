@@ -174,43 +174,109 @@ export const WithCustomZIndex: Story = {
 	},
 };
 
+function StickyToggle( {
+	label,
+	value,
+	onChange,
+}: {
+	label: string;
+	value: boolean;
+	onChange: ( value: boolean ) => void;
+} ) {
+	const id = useId();
+	return (
+		<Stack direction="row" gap="sm" align="center">
+			<input
+				id={ id }
+				type="checkbox"
+				checked={ value }
+				onChange={ ( event ) => onChange( event.target.checked ) }
+			/>
+			<label htmlFor={ id }>{ label }</label>
+		</Stack>
+	);
+}
+
+function StickyControls( {
+	isHeaderSticky,
+	setIsHeaderSticky,
+	isFooterSticky,
+	setIsFooterSticky,
+}: {
+	isHeaderSticky: boolean;
+	setIsHeaderSticky: ( value: boolean ) => void;
+	isFooterSticky: boolean;
+	setIsFooterSticky: ( value: boolean ) => void;
+} ) {
+	return (
+		<Stack direction="row" gap="lg" align="center">
+			<StickyToggle
+				label="Sticky header"
+				value={ isHeaderSticky }
+				onChange={ setIsHeaderSticky }
+			/>
+			<StickyToggle
+				label="Sticky footer"
+				value={ isFooterSticky }
+				onChange={ setIsFooterSticky }
+			/>
+		</Stack>
+	);
+}
+
+function ScrollableContent() {
+	const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
+	const [ isFooterSticky, setIsFooterSticky ] = useState( true );
+	const controlProps = {
+		isHeaderSticky,
+		setIsHeaderSticky,
+		isFooterSticky,
+		setIsFooterSticky,
+	};
+	return (
+		<>
+			<Stack direction="column" gap="lg" align="start">
+				<StickyControls { ...controlProps } />
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+			</Stack>
+			<Dialog.Popup>
+				<Dialog.Header sticky={ isHeaderSticky }>
+					<Dialog.Title>Terms of service</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<Stack direction="column" gap="lg">
+					<StickyControls { ...controlProps } />
+					{ Array.from( { length: 20 } ).map( ( _, index ) => (
+						<p key={ index } style={ { margin: 0 } }>
+							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
+							consectetur adipiscing elit. Sed do eiusmod tempor
+							incididunt ut labore et dolore magna aliqua. Ut enim
+							ad minim veniam, quis nostrud exercitation ullamco
+							laboris nisi ut aliquip ex ea commodo consequat.
+						</p>
+					) ) }
+				</Stack>
+				<Dialog.Footer sticky={ isFooterSticky }>
+					<Dialog.Action variant="outline">Decline</Dialog.Action>
+					<Dialog.Action>Accept</Dialog.Action>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</>
+	);
+}
+
 /**
  * When dialog content overflows the available height, `Dialog.Header` stays
  * pinned to the top and `Dialog.Footer` stays pinned to the bottom so users
  * keep sight of the title and primary actions while scrolling. Separator
  * borders fade in only when there is off-screen content above the header or
  * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
- * and let it scroll with the content.
+ * and let it scroll with the content — the toggles in this story drive both
+ * props independently and stay in sync between outside and inside the dialog.
  */
 export const Scrollable: Story = {
 	args: {
-		children: (
-			<>
-				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-				<Dialog.Popup>
-					<Dialog.Header>
-						<Dialog.Title>Terms of service</Dialog.Title>
-						<Dialog.CloseIcon />
-					</Dialog.Header>
-					<Stack direction="column" gap="lg">
-						{ Array.from( { length: 20 } ).map( ( _, index ) => (
-							<p key={ index } style={ { margin: 0 } }>
-								Paragraph { index + 1 }: Lorem ipsum dolor sit
-								amet, consectetur adipiscing elit. Sed do
-								eiusmod tempor incididunt ut labore et dolore
-								magna aliqua. Ut enim ad minim veniam, quis
-								nostrud exercitation ullamco laboris nisi ut
-								aliquip ex ea commodo consequat.
-							</p>
-						) ) }
-					</Stack>
-					<Dialog.Footer>
-						<Dialog.Action variant="outline">Decline</Dialog.Action>
-						<Dialog.Action>Accept</Dialog.Action>
-					</Dialog.Footer>
-				</Dialog.Popup>
-			</>
-		),
+		children: <ScrollableContent />,
 	},
 };
 
