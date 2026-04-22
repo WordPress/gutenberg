@@ -17,7 +17,7 @@ import {
 import { useCropper } from '../../image-editor';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 
-export interface MediaEditorBottomBarProps {
+export interface MediaEditorToolbarProps {
 	/**
 	 * Extra work to run when the user clicks Reset — e.g. clearing
 	 * aspect-ratio / freeform state that lives outside the cropper
@@ -27,16 +27,16 @@ export interface MediaEditorBottomBarProps {
 }
 
 /**
- * Bottom toolbar for the media editor modal. Hosts the tactile cropper
- * verbs — rotate, flip, fine rotation, reset — within thumb reach on
- * mobile. Aspect-ratio presets and freeform toggle live in the Crop
- * sidebar tab instead.
+ * Toolbar for the media editor modal. Hosts the tactile cropper verbs —
+ * rotate, flip, fine rotation, reset — so they stay within thumb reach
+ * when the toolbar sits at the bottom of the modal. Aspect-ratio presets
+ * and freeform toggle live in the Crop sidebar tab instead.
  * @param props
  * @param props.onReset
  */
-export default function MediaEditorBottomBar( {
+export default function MediaEditorToolbar( {
 	onReset,
-}: MediaEditorBottomBarProps ) {
+}: MediaEditorToolbarProps ) {
 	const { state, setRotation, setFlip, snapRotate90, reset, isDirty } =
 		useCropper();
 
@@ -70,7 +70,7 @@ export default function MediaEditorBottomBar( {
 
 	return (
 		<Stack
-			className="media-editor-bottom-bar"
+			className="media-editor-toolbar"
 			direction="row"
 			align="center"
 			justify="center"
@@ -117,7 +117,7 @@ export default function MediaEditorBottomBar( {
 					} )
 				}
 			/>
-			<div className="media-editor-bottom-bar__rotation-slider">
+			<div className="media-editor-toolbar__rotation-slider">
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom

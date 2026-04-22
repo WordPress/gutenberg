@@ -36,7 +36,7 @@ import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
-import MediaEditorBottomBar from '../media-editor-bottom-bar';
+import MediaEditorToolbar from '../media-editor-toolbar';
 import MediaEditorCropPanel, {
 	resolveAspectRatio,
 } from '../media-editor-crop-panel';
@@ -243,7 +243,7 @@ function ImageModalBody( { media }: { media: Media } ) {
 					</div>
 				}
 				footer={
-					<MediaEditorBottomBar
+					<MediaEditorToolbar
 						onReset={ () => {
 							setAspectRatioValue( '0' );
 							setFreeformCrop( true );
