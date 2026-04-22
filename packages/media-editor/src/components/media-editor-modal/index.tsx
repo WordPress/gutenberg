@@ -113,12 +113,7 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 interface HeaderActionsProps {
 	isSaving: boolean;
 	hasMedia: boolean;
-	/**
-	 * When true, the Save button is also gated on the cropper being
-	 * dirty (in addition to `hasMedia`). Used for image media; for
-	 * non-image media the cropper is never touched.
-	 */
-	requireDirty: boolean;
+	hasEdits: boolean;
 	onCancel: () => void;
 	onSave: () => void;
 }
@@ -126,13 +121,12 @@ interface HeaderActionsProps {
 function HeaderActions( {
 	isSaving,
 	hasMedia,
-	requireDirty,
+	hasEdits,
 	onCancel,
 	onSave,
 }: HeaderActionsProps ) {
 	const { isDirty } = useCropper();
-	const saveDisabled =
-		isSaving || ! hasMedia || ( requireDirty && ! isDirty );
+	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -174,15 +168,26 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		};
 	}, [] );
 
-	const media = useSelect(
-		( select ) =>
-			id
-				? ( select( coreStore ).getEditedEntityRecord(
-						'postType',
-						'attachment',
-						id
-				  ) as Media )
-				: null,
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return { media: null, hasEdits: false };
+			}
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					id
+				),
+			};
+		},
 		[ id ]
 	);
 
@@ -327,6 +332,11 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	// no side effects — so the header actions can read `isDirty` for
 	// images without the JSX forking on media type. React context flows
 	// through `<Modal>`'s portal to the `headerActions` slot.
+	//
+	// The `key` remounts the provider when the edited attachment changes,
+	// discarding the previous cropper state. Today the modal always
+	// closes between edits so this is belt-and-braces, but it guards
+	// against future flows that swap `id` in the store without closing.
 	return (
 		<CropperProvider key={ media?.id ?? 'none' }>
 			<Modal
@@ -338,7 +348,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 					<HeaderActions
 						isSaving={ isSaving }
 						hasMedia={ !! media }
-						requireDirty={ isImage }
+						hasEdits={ hasEdits }
 						onCancel={ handleCancel }
 						onSave={ handleSave }
 					/>
