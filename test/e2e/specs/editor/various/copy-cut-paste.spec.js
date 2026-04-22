@@ -686,6 +686,28 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should undo embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+				},
+			},
+		] );
+	} );
+
 	test( 'should not link selection for non http(s) protocol', async ( {
 		pageUtils,
 		editor,
