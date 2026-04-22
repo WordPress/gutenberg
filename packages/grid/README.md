@@ -1,7 +1,14 @@
 # Grid
 
-CSS-Grid-based layout component with drag-to-reorder and resize handles,
-designed for dashboard-style surfaces where users arrange tiles.
+A collection of grid layout components for arranging tiles in
+dashboard-style surfaces.
+
+This package currently exports a single component, `DashboardGrid`,
+which implements a **2D packed grid**: items have explicit
+`(width, height)` spans in column/row units and can span multiple
+columns **and** multiple rows. It does not implement other grid
+models such as masonry (column-flow) or justified rows (equal-height
+rows).
 
 ## Installation
 
@@ -20,7 +27,7 @@ in your code._
 ## Usage
 
 ```jsx
-import { Grid } from '@wordpress/grid';
+import { DashboardGrid } from '@wordpress/grid';
 
 const layout = [
 	{ key: 'a', width: 2, height: 2 },
@@ -33,7 +40,7 @@ function Dashboard() {
 	const [ current, setCurrent ] = useState( layout );
 
 	return (
-		<Grid
+		<DashboardGrid
 			layout={ current }
 			columns={ 6 }
 			spacing={ 2 }
@@ -44,7 +51,7 @@ function Dashboard() {
 			<div key="b">Tile B</div>
 			<div key="c">Tile C</div>
 			<div key="d">Tile D</div>
-		</Grid>
+		</DashboardGrid>
 	);
 }
 ```
@@ -55,7 +62,7 @@ array. Children without a matching layout entry are ignored.
 ## Layout model
 
 ```ts
-interface GridLayoutItem {
+interface DashboardGridLayoutItem {
 	key: string;      // matches child key
 	width?: number;   // columns to span
 	height?: number;  // rows to span
@@ -72,7 +79,7 @@ resolved per-row against the remaining free space.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `layout` | `GridLayoutItem[]` | — | Required. Positions and sizes keyed by child `key`. |
+| `layout` | `DashboardGridLayoutItem[]` | — | Required. Positions and sizes keyed by child `key`. |
 | `children` | `ReactNode` | — | Required. Each child needs a `key` matching a layout entry. |
 | `columns` | `number` | `6` | Total columns (fixed mode). |
 | `minColumnWidth` | `number` | — | If set, enables responsive mode: columns derived from container width. Mutually exclusive with `columns`. |
@@ -98,9 +105,9 @@ is on:
 ### Fixed columns
 
 ```jsx
-<Grid layout={ layout } columns={ 12 }>
+<DashboardGrid layout={ layout } columns={ 12 }>
 	{ children }
-</Grid>
+</DashboardGrid>
 ```
 
 ### Responsive
@@ -110,9 +117,9 @@ lower bound per column. A `ResizeObserver` recomputes on container
 resize.
 
 ```jsx
-<Grid layout={ layout } minColumnWidth={ 240 }>
+<DashboardGrid layout={ layout } minColumnWidth={ 240 }>
 	{ children }
-</Grid>
+</DashboardGrid>
 ```
 
 In responsive mode, layout items can provide an `order` to control

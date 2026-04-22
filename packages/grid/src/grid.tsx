@@ -31,13 +31,18 @@ import {
  */
 import { GridItem } from './grid-item';
 import { resolveFillWidths } from './resolve-fill-widths';
-import type { GridLayoutItem, GridProps } from './types';
+import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 
 /**
- * CSS-Grid-based layout with drag-to-reorder and resize handles, designed
- * for dashboard-style surfaces where users arrange tiles. Each child
- * must have a `key` prop that matches an entry in the `layout` array;
- * children without a matching entry are rendered outside the grid.
+ * 2D packed dashboard grid with drag-to-reorder and resize handles.
+ * Each item has explicit `(width, height)` spans in column/row units
+ * and can span multiple columns **and** multiple rows, unlike masonry
+ * or justified-row layouts.
+ *
+ * Designed for dashboard-style surfaces where users arrange tiles.
+ * Each child must have a `key` prop that matches an entry in the
+ * `layout` array; children without a matching entry are rendered
+ * outside the grid.
  *
  * @param props                 Component props.
  * @param props.layout          Positions and sizes keyed by child `key`.
@@ -52,7 +57,7 @@ import type { GridLayoutItem, GridProps } from './types';
  * @param props.onChangeLayout  Fired when the user commits a drag or resize.
  * @param props.onPreviewLayout Fired continuously during a drag or resize.
  */
-export function Grid( {
+export function DashboardGrid( {
 	layout,
 	columns = 6,
 	children,
@@ -63,13 +68,13 @@ export function Grid( {
 	editMode = false,
 	onChangeLayout,
 	onPreviewLayout,
-}: GridProps ) {
+}: DashboardGridProps ) {
 	/*
 	 * Temporary layout holds pending changes during drag/resize
 	 * to show preview without triggering parent re-renders.
 	 */
 	const [ temporaryLayout, setTemporaryLayout ] = useState<
-		GridLayoutItem[] | undefined
+		DashboardGridLayoutItem[] | undefined
 	>();
 	const activeLayout = temporaryLayout ?? layout;
 
@@ -92,7 +97,7 @@ export function Grid( {
 	const columnWidth = ( containerWidth - gapPx ) / effectiveColumns;
 
 	const layoutMap = useMemo( () => {
-		const map = new Map< string, GridLayoutItem >();
+		const map = new Map< string, DashboardGridLayoutItem >();
 		activeLayout.forEach( ( item ) => map.set( item.key, item ) );
 		return map;
 	}, [ activeLayout ] );
@@ -118,7 +123,7 @@ export function Grid( {
 		if ( fillWidths.size === 0 ) {
 			return layoutMap;
 		}
-		const map = new Map< string, GridLayoutItem >();
+		const map = new Map< string, DashboardGridLayoutItem >();
 		for ( const [ key, item ] of layoutMap ) {
 			const fillW = fillWidths.get( key );
 			map.set(
@@ -249,7 +254,7 @@ export function Grid( {
 						),
 						fillWidth: undefined,
 						fullWidth: undefined,
-					} as GridLayoutItem;
+					} as DashboardGridLayoutItem;
 				}
 				return item;
 			} );
@@ -287,7 +292,11 @@ export function Grid( {
 					{ items.map( ( id ) => (
 						<GridItem
 							key={ id }
-							item={ resolvedItemMap.get( id ) as GridLayoutItem }
+							item={
+								resolvedItemMap.get(
+									id
+								) as DashboardGridLayoutItem
+							}
 							maxColumns={ effectiveColumns }
 							disabled={ ! editMode }
 							onResize={ ( delta ) => handleResize( id, delta ) }

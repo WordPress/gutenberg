@@ -2,21 +2,23 @@
  * Internal dependencies
  */
 import { resolveFillWidths } from '../resolve-fill-widths';
-import type { GridLayoutItem } from '../types';
+import type { DashboardGridLayoutItem } from '../types';
 
-function makeMap( items: GridLayoutItem[] ): Map< string, GridLayoutItem > {
-	const map = new Map< string, GridLayoutItem >();
+function makeMap(
+	items: DashboardGridLayoutItem[]
+): Map< string, DashboardGridLayoutItem > {
+	const map = new Map< string, DashboardGridLayoutItem >();
 	items.forEach( ( item ) => map.set( item.key, item ) );
 	return map;
 }
 
-function keys( items: GridLayoutItem[] ): string[] {
+function keys( items: DashboardGridLayoutItem[] ): string[] {
 	return items.map( ( item ) => item.key );
 }
 
 describe( 'resolveFillWidths', () => {
 	it( 'returns empty map when no items have fillWidth', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'a', width: 2 },
 			{ key: 'b', width: 4 },
 		];
@@ -25,13 +27,15 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill item takes all columns when alone', () => {
-		const items: GridLayoutItem[] = [ { key: 'fill', fillWidth: true } ];
+		const items: DashboardGridLayoutItem[] = [
+			{ key: 'fill', fillWidth: true },
+		];
 		const result = resolveFillWidths( keys( items ), makeMap( items ), 6 );
 		expect( result.get( 'fill' ) ).toBe( 6 );
 	} );
 
 	it( 'fill item takes remaining columns after fixed items', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'sidebar', width: 1 },
 			{ key: 'fill', fillWidth: true },
 		];
@@ -40,7 +44,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill item reserves space for subsequent fixed items', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'left', width: 1 },
 			{ key: 'fill', fillWidth: true },
 			{ key: 'right', width: 2 },
@@ -50,7 +54,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill after fullWidth starts a new row', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'full', fullWidth: true },
 			{ key: 'fill', fillWidth: true },
 			{ key: 'sidebar', width: 1 },
@@ -60,7 +64,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'consecutive fills each take a full row', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill-1', fillWidth: true },
 			{ key: 'fill-2', fillWidth: true },
 		];
@@ -70,7 +74,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'does not reserve items that overflow the row', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill', fillWidth: true },
 			{ key: 'a', width: 3 },
 			{ key: 'b', width: 4 },
@@ -80,7 +84,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'clamps item widths to maxColumns', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill', fillWidth: true },
 			{ key: 'wide', width: 10 },
 		];
@@ -89,7 +93,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill in the middle of a row', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'a', width: 1 },
 			{ key: 'b', width: 1 },
 			{ key: 'fill', fillWidth: true },
@@ -100,7 +104,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'multiple fills in different rows', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill-1', fillWidth: true },
 			{ key: 'sidebar-1', width: 1 },
 			{ key: 'full', fullWidth: true },
@@ -113,7 +117,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill gets minimum of 1 column when row is almost full', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'a', width: 3 },
 			{ key: 'b', width: 2 },
 			{ key: 'fill', fillWidth: true },
@@ -123,7 +127,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'adapts to different column counts (responsive)', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill', fillWidth: true },
 			{ key: 'sidebar', width: 1 },
 		];
@@ -145,7 +149,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'look-ahead stops at fillWidth boundary', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill-1', fillWidth: true },
 			{ key: 'fill-2', fillWidth: true },
 			{ key: 'sidebar', width: 1 },
@@ -156,7 +160,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'look-ahead stops at fullWidth boundary', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'fill', fillWidth: true },
 			{ key: 'full', fullWidth: true },
 			{ key: 'sidebar', width: 1 },
@@ -166,7 +170,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'every item gets 1 column when maxColumns is 1', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'a', width: 3 },
 			{ key: 'fill', fillWidth: true },
 			{ key: 'b', width: 2 },
@@ -181,7 +185,7 @@ describe( 'resolveFillWidths', () => {
 	} );
 
 	it( 'fill item with explicit width still gets resolved fill span', () => {
-		const items: GridLayoutItem[] = [
+		const items: DashboardGridLayoutItem[] = [
 			{ key: 'sidebar', width: 1 },
 			{ key: 'fill', fillWidth: true, width: 2 },
 		];
