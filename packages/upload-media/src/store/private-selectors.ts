@@ -3,6 +3,7 @@
  */
 import {
 	type BatchId,
+	ItemStatus,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
