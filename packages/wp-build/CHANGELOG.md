@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Update the optional `@wordpress/theme` peer dependency range to match the versions that provide the design token fallback build plugins.
+-   Update the optional `@wordpress/boot`, `@wordpress/route`, and `@wordpress/theme` peer dependency ranges to avoid blocking newer compatible package versions.
 
 ## 0.12.0 (2026-04-15)
 
