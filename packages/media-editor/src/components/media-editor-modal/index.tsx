@@ -18,8 +18,9 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
 	ComplementaryArea,
@@ -44,7 +45,12 @@ import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
+import {
+	CropperProvider,
+	useCropper,
+	type UseCropperStateReturn,
+} from '../../image-editor';
+import { buildModifiers } from './build-modifiers';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -115,7 +121,7 @@ interface HeaderActionsProps {
 	hasMedia: boolean;
 	hasEdits: boolean;
 	onCancel: () => void;
-	onSave: () => void;
+	onSave: ( controller: UseCropperStateReturn ) => void;
 }
 
 function HeaderActions( {
@@ -125,7 +131,8 @@ function HeaderActions( {
 	onCancel,
 	onSave,
 }: HeaderActionsProps ) {
-	const { isDirty } = useCropper();
+	const controller = useCropper();
+	const { isDirty } = controller;
 	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
 	return (
 		<Flex
@@ -147,7 +154,7 @@ function HeaderActions( {
 			<Button
 				size="compact"
 				variant="primary"
-				onClick={ onSave }
+				onClick={ () => onSave( controller ) }
 				isBusy={ isSaving }
 				disabled={ saveDisabled }
 				accessibleWhenDisabled
@@ -193,7 +200,16 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
+	// `editMediaEntity` is a private core-data action; unlock to reach it.
+	const { editMediaEntity } = unlock( useDispatch( coreStore ) ) as {
+		editMediaEntity: (
+			id: number,
+			edits: Record< string, unknown >,
+			options?: { throwOnError?: boolean }
+		) => Promise< Media | undefined >;
+	};
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 
@@ -307,14 +323,36 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		closeMediaEditorModal();
 	};
 
-	const handleSave = async () => {
+	const handleSave = async ( controller: UseCropperStateReturn ) => {
 		setIsSaving( true );
 		try {
-			const saved = ( await saveEditedEntityRecord(
-				'postType',
-				'attachment',
-				id
-			) ) as Media | undefined;
+			let saved: Media | null | undefined;
+
+			const modifiers =
+				controller.isDirty && controller.state.image
+					? buildModifiers( controller.state, {
+							width: controller.state.image.naturalWidth,
+							height: controller.state.image.naturalHeight,
+					  } )
+					: [];
+
+			if ( modifiers.length > 0 ) {
+				saved = await editMediaEntity(
+					id,
+					{ src: media?.source_url, modifiers },
+					{ throwOnError: true }
+				);
+			} else {
+				// `isDirty` can be true while `buildModifiers` returns empty
+				// (e.g. sub-pixel containment nudges, identity rotations).
+				// The REST /edit endpoint rejects an empty modifiers array,
+				// so fall through to the metadata-only save in that case.
+				saved = ( await saveEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) ) as Media | undefined;
+			}
 
 			const next = ( saved ?? media ) as Media | null;
 			if ( next && next.id && onUpdate ) {
@@ -323,6 +361,20 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 				onUpdate( { id: next.id, url: next.source_url } );
 			}
 			closeMediaEditorModal();
+		} catch ( error ) {
+			const message =
+				error instanceof Error
+					? error.message
+					: ( error as { message?: string } )?.message ??
+					  __( 'An unknown error occurred.' );
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Error message. */
+					__( 'Could not save image. %s' ),
+					message
+				),
+				{ type: 'snackbar' }
+			);
 		} finally {
 			setIsSaving( false );
 		}
