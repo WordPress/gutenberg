@@ -252,6 +252,55 @@ function DirectionSelector( {
 }
 
 /**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a drawer renders below another popover when you
+ * want it above.
+ *
+ * The `--wp-ui-drawer-z-index` CSS variable controls the z-index of the
+ * drawer's backdrop, viewport, and popup. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   drawer in the page), or
+ * - **Per instance**, by passing a `Drawer.Portal` with a `style` (or
+ *   `className`) to `Drawer.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it (backdrop,
+ *   viewport, and popup).
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: Story = {
+	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				<Drawer.Popup
+					portal={
+						<Drawer.Portal
+							style={ { '--wp-ui-drawer-z-index': '9999' } }
+						/>
+					}
+				>
+					<Drawer.Header>
+						<Drawer.Title>Custom z-index</Drawer.Title>
+						<Drawer.CloseIcon />
+					</Drawer.Header>
+					<Drawer.Description>
+						The backdrop, viewport, and popup render at `z-index:
+						9999` via the `--wp-ui-drawer-z-index` CSS custom
+						property, set on `Drawer.Portal` through the `portal`
+						prop.
+					</Drawer.Description>
+					<Drawer.Footer>
+						<Drawer.Action>Got it</Drawer.Action>
+					</Drawer.Footer>
+				</Drawer.Popup>
+			</>
+		),
+	},
+};
+
+/**
  * Interactive playground to test the `size` prop across all swipe
  * directions. Size controls the width (left/right) or height (up/down).
  */
