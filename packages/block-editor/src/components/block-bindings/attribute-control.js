@@ -13,11 +13,11 @@ import {
 } from '@wordpress/blocks';
 import {
 	__experimentalItem as Item,
-	__experimentalText as Text,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
