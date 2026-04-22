@@ -8,6 +8,14 @@ test.describe( 'Styles', () => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
 	} );
 
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
@@ -39,6 +47,11 @@ test.describe( 'Styles', () => {
 
 		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
 		// Navigate to Styles -> Blocks -> Heading -> Typography
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		await topBar.getByRole( 'button', { name: 'Styles' } ).click();
 		await page.getByRole( 'button', { name: 'Blocks' } ).click();
 		await page
@@ -47,7 +60,7 @@ test.describe( 'Styles', () => {
 
 		// Find the second padding control and change the padding value
 		await page
-			.getByRole( 'button', { name: 'Set custom size' } )
+			.getByRole( 'button', { name: 'Set custom value' } )
 			.nth( 1 )
 			.click();
 		await page.getByRole( 'spinbutton', { name: 'padding' } ).fill( '35' );

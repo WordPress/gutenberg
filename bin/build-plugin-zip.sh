@@ -70,13 +70,7 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 status "Generating build... 👷‍♀️"
-npm run build
-
-# Temporarily modify `gutenberg.php` with production constants defined. Use a
-# temp file because `bin/generate-gutenberg-php.php` reads from `gutenberg.php`
-# so we need to avoid writing to that file at the same time.
-php bin/generate-gutenberg-php.php > gutenberg.tmp.php
-mv gutenberg.tmp.php gutenberg.php
+npm run build -- --skip-types
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"
@@ -85,14 +79,13 @@ zip --recurse-paths --no-dir-entries \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
+	packages/icons/src/manifest.php \
+	packages/icons/src/library/*.svg \
 	post-content.php \
 	build \
 	build-module \
 	readme.txt \
 	changelog.txt \
 	README.md
-
-# Reset `gutenberg.php`.
-git checkout gutenberg.php
 
 success "Done. You've built Gutenberg! 🎉 "

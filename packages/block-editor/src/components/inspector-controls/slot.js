@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 
@@ -12,13 +13,10 @@ import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
-export default function InspectorControlsSlot( {
-	__experimentalGroup,
-	group = 'default',
-	label,
-	fillProps,
-	...props
-} ) {
+function InspectorControlsSlot(
+	{ __experimentalGroup, group = 'default', label, fillProps, ...props },
+	ref
+) {
 	if ( __experimentalGroup ) {
 		deprecated(
 			'`__experimentalGroup` property in `InspectorControlsSlot`',
@@ -56,5 +54,14 @@ export default function InspectorControlsSlot( {
 		);
 	}
 
-	return <Slot { ...props } fillProps={ fillProps } bubblesVirtually />;
+	return (
+		<Slot
+			{ ...props }
+			ref={ ref }
+			fillProps={ fillProps }
+			bubblesVirtually
+		/>
+	);
 }
+
+export default forwardRef( InspectorControlsSlot );

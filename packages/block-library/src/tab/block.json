@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tab",
+	"title": "Tab",
+	"description": "A single tab button in the tab list.",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tab-list" ],
+	"usesContext": [
+		"core/tabs-list",
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex",
+		"core/tab-index",
+		"core/tab-id",
+		"core/tab-label"
+	],
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"visibility": false,
+		"lock": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"textAlign": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style-index.css"
+}

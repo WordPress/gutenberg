@@ -8,9 +8,8 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import InspectorControlsGroups from '../inspector-controls/groups';
-import useIsListViewTabDisabled from './use-is-list-view-tab-disabled';
 import { InspectorAdvancedControls } from '../inspector-controls';
-import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES } from './utils';
+import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
@@ -29,12 +28,18 @@ function getShowTabs( blockName, tabSettings = {} ) {
 	return true;
 }
 
-export default function useInspectorControlsTabs( blockName ) {
+export default function useInspectorControlsTabs(
+	blockName,
+	contentClientIds,
+	isSectionBlock,
+	hasBlockStyles
+) {
 	const tabs = [];
 	const {
 		bindings: bindingsGroup,
 		border: borderGroup,
 		color: colorGroup,
+		content: contentGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
@@ -45,9 +50,12 @@ export default function useInspectorControlsTabs( blockName ) {
 	} = InspectorControlsGroups;
 
 	// List View Tab: If there are any fills for the list group add that tab.
-	const listViewDisabled = useIsListViewTabDisabled( blockName );
 	const listFills = useSlotFills( listGroup.name );
-	const hasListFills = ! listViewDisabled && !! listFills && listFills.length;
+	const hasListFills = !! listFills && listFills.length;
+
+	// Content Tab: If there are any fills for the content group add that tab.
+	const contentFills = useSlotFills( contentGroup.name );
+	const hasContentFills = !! contentFills && contentFills.length;
 
 	// Styles Tab: Add this tab if there are any fills for block supports
 	// e.g. border, color, spacing, typography, etc.
@@ -76,17 +84,34 @@ export default function useInspectorControlsTabs( blockName ) {
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
+	// When the block fields experiment is active, only rely on `hasContentFills`
+	// to determine whether the content tab to be shown. The tab purely uses slot
+	// fills in this situation.
+	const shouldShowBlockFields =
+		window?.__experimentalContentOnlyInspectorFields;
+	const hasContentTab =
+		hasContentFills ||
+		( ! shouldShowBlockFields && contentClientIds?.length );
+
+	if ( hasContentTab ) {
+		tabs.push( TAB_CONTENT );
+	}
+
 	// Add the tabs in the order that they will default to if available.
-	// List View > Settings > Styles.
+	// List View > Content > Settings > Styles.
 	if ( hasListFills ) {
 		tabs.push( TAB_LIST_VIEW );
 	}
 
-	if ( settingsFills.length ) {
+	if (
+		settingsFills.length ||
+		// Advanced fills show up in settings tab if available or they blend into the default tab, if there's only one tab.
+		( advancedFills.length && ( hasContentTab || hasListFills ) )
+	) {
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( hasStyleFills ) {
+	if ( hasBlockStyles || hasStyleFills ) {
 		tabs.push( TAB_STYLES );
 	}
 

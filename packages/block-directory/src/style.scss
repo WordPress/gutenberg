@@ -1,7 +1,8 @@
-@import "./components/block-ratings/style.scss";
-@import "./components/compact-list/style.scss";
-@import "./components/downloadable-block-icon/style.scss";
-@import "./components/downloadable-block-list-item/style.scss";
-@import "./components/downloadable-block-notice/style.scss";
-@import "./components/downloadable-blocks-panel/style.scss";
-@import "./plugins/installed-blocks-pre-publish-panel/style.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/block-ratings/style.scss" as *;
+@use "./components/compact-list/style.scss" as *;
+@use "./components/downloadable-block-icon/style.scss" as *;
+@use "./components/downloadable-block-list-item/style.scss" as *;
+@use "./components/downloadable-block-notice/style.scss" as *;
+@use "./components/downloadable-blocks-panel/style.scss" as *;
+@use "./plugins/installed-blocks-pre-publish-panel/style.scss" as *;

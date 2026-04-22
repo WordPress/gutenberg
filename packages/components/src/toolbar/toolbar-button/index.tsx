@@ -116,13 +116,13 @@ function UnforwardedToolbarButton(
  *
  * ```jsx
  * import { Toolbar, ToolbarButton } from '@wordpress/components';
- * import { edit } from '@wordpress/icons';
+ * import { pencil } from '@wordpress/icons';
  *
  * function MyToolbar() {
  *   return (
  *		<Toolbar label="Options">
  *			<ToolbarButton
- *				icon={ edit }
+ *				icon={ pencil }
  *				label="Edit"
  *				onClick={ () => alert( 'Editing' ) }
  *			/>
@@ -132,4 +132,5 @@ function UnforwardedToolbarButton(
  * ```
  */
 export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+ToolbarButton.displayName = 'ToolbarButton';
 export default ToolbarButton;

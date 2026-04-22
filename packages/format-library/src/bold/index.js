@@ -18,7 +18,7 @@ export const bold = {
 	title,
 	tagName: 'strong',
 	className: null,
-	edit( { isActive, value, onChange, onFocus } ) {
+	edit( { isActive, value, onChange, onFocus, isVisible = true } ) {
 		function onToggle() {
 			onChange( toggleFormat( value, { type: name, title } ) );
 		}
@@ -35,15 +35,17 @@ export const bold = {
 					character="b"
 					onUse={ onToggle }
 				/>
-				<RichTextToolbarButton
-					name="bold"
-					icon={ formatBold }
-					title={ title }
-					onClick={ onClick }
-					isActive={ isActive }
-					shortcutType="primary"
-					shortcutCharacter="b"
-				/>
+				{ isVisible && (
+					<RichTextToolbarButton
+						name="bold"
+						icon={ formatBold }
+						title={ title }
+						onClick={ onClick }
+						isActive={ isActive }
+						shortcutType="primary"
+						shortcutCharacter="b"
+					/>
+				) }
 				<__unstableRichTextInputEvent
 					inputType="formatBold"
 					onInput={ onToggle }

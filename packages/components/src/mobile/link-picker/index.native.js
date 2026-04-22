@@ -135,7 +135,7 @@ export const LinkPicker = ( {
 					<BottomSheet.LinkSuggestionItemCell
 						accessible
 						accessibilityLabel={ sprintf(
-							/* translators: Copy URL from the clipboard, https://sample.url */
+							/* translators: %s: Copy URL from the clipboard, https://sample.url */
 							__( 'Copy URL from the clipboard, %s' ),
 							clipboardUrl
 						) }

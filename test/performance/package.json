@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/performance-tests",
+	"version": "0.0.0",
+	"description": "Performance tests for WordPress Gutenberg.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"performance",
+		"playwright"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/test/performance/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "test/performance"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.58.2",
+		"@types/node": "^20.17.10",
+		"@wordpress/e2e-test-utils-playwright": "file:../../packages/e2e-test-utils-playwright",
+		"@wordpress/scripts": "file:../../packages/scripts"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"test:performance": "wp-scripts test-playwright --config playwright.config.ts",
+		"test:performance:debug": "wp-scripts test-playwright --config playwright.config.ts --debug"
+	}
+}

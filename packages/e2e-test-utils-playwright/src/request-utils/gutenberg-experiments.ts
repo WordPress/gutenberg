@@ -8,6 +8,7 @@ import type { RequestUtils } from './index';
  *
  * @param this
  * @param experiments Array of experimental flags to enable. Pass in an empty array to disable all experiments.
+ *                    Use 'active_templates' for the template activation feature.
  */
 async function setGutenbergExperiments(
 	this: RequestUtils,
@@ -19,20 +20,40 @@ async function setGutenbergExperiments(
 	const html = await response.text();
 	const nonce = html.match( /name="_wpnonce" value="([^"]+)"/ )![ 1 ];
 
-	await this.request.post( '/wp-admin/options.php', {
-		form: {
-			option_page: 'gutenberg-experiments',
-			action: 'update',
-			_wpnonce: nonce,
-			_wp_http_referer: '/wp-admin/admin.php?page=gutenberg-experiments',
-			...Object.fromEntries(
-				experiments.map( ( experiment ) => [
+	const formData: Record< string, string | number > = {
+		option_page: 'gutenberg-experiments',
+		action: 'update',
+		_wpnonce: nonce,
+		_wp_http_referer: '/wp-admin/admin.php?page=gutenberg-experiments',
+		submit: 'Save Changes',
+	};
+
+	// Separate regular experiments from active_templates.
+	const regularExperiments = experiments.filter(
+		( exp ) => exp !== 'active_templates'
+	);
+	const hasActiveTemplates = experiments.includes( 'active_templates' );
+
+	// Add regular experiments to the gutenberg-experiments array.
+	if ( regularExperiments.length > 0 ) {
+		Object.assign(
+			formData,
+			Object.fromEntries(
+				regularExperiments.map( ( experiment ) => [
 					`gutenberg-experiments[${ experiment }]`,
 					1,
 				] )
-			),
-			submit: 'Save Changes',
-		},
+			)
+		);
+	}
+
+	// Template activation uses the active_templates checkbox field.
+	if ( hasActiveTemplates ) {
+		formData.active_templates = 1;
+	}
+
+	await this.request.post( '/wp-admin/options.php', {
+		form: formData,
 		failOnStatusCode: true,
 	} );
 }

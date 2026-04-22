@@ -19,6 +19,7 @@ const Context = createContext< PluginContext >( {
 	name: null,
 	icon: null,
 } );
+Context.displayName = 'PluginContext';
 
 export const PluginContextProvider = Context.Provider;
 

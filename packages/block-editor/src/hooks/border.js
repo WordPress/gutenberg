@@ -142,12 +142,18 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 
 export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 	const isEnabled = useHasBorderPanel( settings );
-	function selector( select ) {
-		const { style, borderColor } =
-			select( blockEditorStore ).getBlockAttributes( clientId ) || {};
-		return { style, borderColor };
-	}
-	const { style, borderColor } = useSelect( selector, [ clientId ] );
+	const { style, borderColor } = useSelect(
+		( select ) => {
+			// Early return to avoid subscription when disabled
+			if ( ! isEnabled ) {
+				return {};
+			}
+			const { style: _style, borderColor: _borderColor } =
+				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			return { style: _style, borderColor: _borderColor };
+		},
+		[ clientId, isEnabled ]
+	);
 	const value = useMemo( () => {
 		return attributesToStyle( { style, borderColor } );
 	}, [ style, borderColor ] );

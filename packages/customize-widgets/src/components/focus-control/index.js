@@ -16,6 +16,7 @@ import {
 import { settingIdToWidgetId } from '../../utils';
 
 const FocusControlContext = createContext();
+FocusControlContext.displayName = 'FocusControlContext';
 
 export default function FocusControl( { api, sidebarControls, children } ) {
 	const [ focusedWidgetIdRef, setFocusedWidgetIdRef ] = useState( {
