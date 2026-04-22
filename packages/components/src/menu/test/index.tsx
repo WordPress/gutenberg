@@ -359,32 +359,49 @@ describe( 'Menu', () => {
 			// Arrow up/down selects menu items
 			// The selection wraps around from last to first and viceversa
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Menu item 1' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
+			).toHaveFocus();
 
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Menu item 2' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Menu item 2' } )
+			).toHaveFocus();
 
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Submenu trigger item' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
+			).toHaveFocus();
 
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Menu item 3' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
+			).toHaveFocus();
 
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Menu item 1' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Menu item 1' } )
+			).toHaveFocus();
 
 			await press.ArrowUp();
-			await waitForFocusedMenuItem( 'Menu item 3' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Menu item 3' } )
+			).toHaveFocus();
 
 			await press.ArrowUp();
-			await waitForFocusedMenuItem( 'Submenu trigger item' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Submenu trigger item' } )
+			).toHaveFocus();
 
 			// Arrow right/left can be used to enter/leave submenus
+			// (focus crosses menu contexts, so wait for it to settle)
 			await press.ArrowRight();
 			await waitForFocusedMenuItem( 'Submenu item 1' );
 
 			await press.ArrowDown();
-			await waitForFocusedMenuItem( 'Submenu item 2' );
+			expect(
+				screen.getByRole( 'menuitem', { name: 'Submenu item 2' } )
+			).toHaveFocus();
 
 			await press.ArrowLeft();
 			await waitForFocusedMenuItem( 'Submenu trigger item' );
@@ -881,17 +898,17 @@ describe( 'Menu', () => {
 
 			// Menu is not modal, therefore the outer button is part of the
 			// accessibility tree and can be found.
-			const outerButton = screen.getByRole( 'button', {
-				name: 'Button outside of dropdown',
-			} );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Button outside of dropdown',
+				} )
+			).toBeVisible();
 
 			// The outer button can be focused by pressing tab. Doing so will cause
 			// the Menu to close.
 			await press.Tab();
-			await waitFor( () => {
-				expect( outerButton ).toHaveFocus();
-				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-			} );
+			await waitForFocusedButton( 'Button outside of dropdown' );
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
 	} );
 
