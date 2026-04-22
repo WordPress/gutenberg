@@ -7,15 +7,21 @@ import type { HeaderProps } from './types';
 /**
  * Renders the header section of the drawer, typically containing
  * the heading and close button.
+ *
+ * Defaults to a native `<header>` element so the drawer exposes a landmark
+ * that assistive technology can navigate to directly, useful for drawers
+ * that contain many interactive elements before the action buttons in the
+ * footer. Pass `render` to opt out of the default tag.
  */
-const Header = forwardRef< HTMLDivElement, HeaderProps >( function DrawerHeader(
+const Header = forwardRef< HTMLElement, HeaderProps >( function DrawerHeader(
 	{ className, render, ...props },
 	ref
 ) {
 	const element = useRender( {
+		defaultTagName: 'header',
 		render,
 		ref,
-		props: mergeProps< 'div' >( props, {
+		props: mergeProps< 'header' >( props, {
 			className: clsx( styles.header, className ),
 		} ),
 	} );

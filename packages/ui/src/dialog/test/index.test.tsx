@@ -22,11 +22,11 @@ describe( 'Dialog', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const actionRef = createRef< HTMLButtonElement >();
-		const headerRef = createRef< HTMLDivElement >();
+		const headerRef = createRef< HTMLElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
-		const footerRef = createRef< HTMLDivElement >();
+		const footerRef = createRef< HTMLElement >();
 
 		render(
 			<Dialog.Root>
@@ -60,12 +60,14 @@ describe( 'Dialog', () => {
 		} );
 
 		// Now that the dialog is open, verify all inner refs
-		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( headerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
-		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
 	} );
 
 	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {

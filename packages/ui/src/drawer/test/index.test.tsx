@@ -22,8 +22,8 @@ describe( 'Drawer', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const actionRef = createRef< HTMLButtonElement >();
-		const footerRef = createRef< HTMLDivElement >();
-		const headerRef = createRef< HTMLDivElement >();
+		const footerRef = createRef< HTMLElement >();
+		const headerRef = createRef< HTMLElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
@@ -56,11 +56,13 @@ describe( 'Drawer', () => {
 			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
 
-		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( headerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
-		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
 	} );
 
