@@ -1,13 +1,14 @@
 const {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
+	getStaticNodeValue,
+	wpdsTokensRegex,
 } = require( '../utils/ds-token-utils' );
 
 const wpdsDeclarationRegex = new RegExp(
 	`(?:^|[^\\w])--${ DS_TOKEN_PREFIX }[\\w-]+\\s*:`,
 	'i'
 );
-const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 const dynamicDeclarationStartRegex = new RegExp(
 	`--${ DS_TOKEN_PREFIX }[\\w-]*$`
 );
@@ -49,10 +50,14 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			[ dynamicTemplateLiteralAST ]( node ) {
 				for ( let index = 0; index < node.quasis.length; index++ ) {
 					const quasi = node.quasis[ index ];
-					const value = quasi.value.cooked ?? quasi.value.raw;
-					const nextValue =
-						node.quasis[ index + 1 ]?.value.cooked ??
-						node.quasis[ index + 1 ]?.value.raw;
+					const value = getStaticNodeValue( quasi );
+					const nextValue = node.quasis[ index + 1 ]
+						? getStaticNodeValue( node.quasis[ index + 1 ] )
+						: undefined;
+
+					if ( ! value ) {
+						continue;
+					}
 					const hasStaticDeclaration = collectTokenOccurrences(
 						value,
 						DS_TOKEN_PREFIX

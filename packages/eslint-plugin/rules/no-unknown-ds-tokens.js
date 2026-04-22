@@ -5,10 +5,10 @@ const {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
 	getStaticNodeValue,
+	wpdsTokensRegex,
 } = require( '../utils/ds-token-utils' );
 
 const knownTokens = new Set( tokenList );
-const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
 /**
  * @param {Array<{ token: string, bare: boolean, declaration: boolean }>} occurrences

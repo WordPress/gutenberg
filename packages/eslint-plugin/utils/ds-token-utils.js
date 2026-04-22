@@ -1,4 +1,5 @@
 const DS_TOKEN_PREFIX = 'wpds-';
+const wpdsTokensRegex = new RegExp( `(?:^|[^\\w])--${ DS_TOKEN_PREFIX }`, 'i' );
 
 /**
  * Single-pass extraction that finds all `--prefix-*` tokens in a CSS value
@@ -48,4 +49,5 @@ module.exports = {
 	DS_TOKEN_PREFIX,
 	collectTokenOccurrences,
 	getStaticNodeValue,
+	wpdsTokensRegex,
 };
