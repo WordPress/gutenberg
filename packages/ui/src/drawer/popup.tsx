@@ -68,8 +68,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 
 							return clsx(
 								styles.popup,
-								styles[ `is-${ resolvedSize }` ],
-								className
+								className,
+								styles[ `is-${ resolvedSize }` ]
 							);
 						} }
 						initialFocus={ resolvedInitialFocus }
