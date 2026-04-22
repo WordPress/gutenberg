@@ -217,12 +217,20 @@
 		padding: var(--wpds-dimension-padding-2xl);
 	}
 
+	/*
+	 * The popup is anchored to a physical edge regardless of writing direction
+	 * (see `left: 0` / `right: 0` above), so the safe-area padding uses the
+	 * matching physical side. `env(safe-area-inset-*)` is already physical,
+	 * so pairing it with logical `padding-inline-*` would be wrong in RTL.
+	 */
 	.popup[data-swipe-direction="left"] .content {
-		padding-inline-start: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
 	}
 
 	.popup[data-swipe-direction="right"] .content {
-		padding-inline-end: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
 	}
 
 	.popup[data-swipe-direction="down"] .content {
