@@ -25,11 +25,11 @@ describe( 'dom', () => {
 	describe( 'isElementVisible', () => {
 		it( 'returns false for @wordpress/components VisuallyHidden', () => {
 			render(
-				<WCVisuallyHidden data-testid="components-visually-hidden">
+				<WCVisuallyHidden data-testid="wc-visually-hidden">
 					Hidden
 				</WCVisuallyHidden>
 			);
-			const element = screen.getByTestId( 'components-visually-hidden' );
+			const element = screen.getByTestId( 'wc-visually-hidden' );
 			mockVisibleBoundingClientRect( element );
 			expect( isElementVisible( element ) ).toBe( false );
 		} );
