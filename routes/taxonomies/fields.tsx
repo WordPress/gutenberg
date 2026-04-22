@@ -110,7 +110,7 @@ export function useSlugField(
 	return useMemo< Field< TaxonomyFormData > >(
 		() => ( {
 			id: 'slug',
-			label: __( 'Slug' ),
+			label: __( 'Taxonomy key' ),
 			type: 'text',
 			enableGlobalSearch: true,
 			description: (
