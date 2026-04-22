@@ -1,20 +1,6 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
 @layer wp-ui-components {
-	/*
-	 * Row layout for the action buttons inside AlertDialog's footer. The
-	 * surrounding chrome (background, separator, inline bleed, sticky
-	 * positioning) comes from the shared classes in `dialog/style.module.css`,
-	 * applied to the outer Stack so that the error message stays inside the
-	 * sticky area.
-	 */
-	.footer-actions {
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
-	}
-
 	.error-message {
 		align-self: flex-end;
 		color: var(--wpds-color-fg-content-error);

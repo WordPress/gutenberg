@@ -104,10 +104,11 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 								stickyFooter && dialogStyles.footerSticky
 							) }
 						>
-							<div
-								className={
-									alertDialogStyles[ 'footer-actions' ]
-								}
+							<Stack
+								direction="row"
+								gap="sm"
+								justify="flex-end"
+								align="center"
 							>
 								<_AlertDialog.Close
 									render={ <Button variant="minimal" /> }
@@ -123,7 +124,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 								>
 									{ confirmButtonText }
 								</Button>
-							</div>
+							</Stack>
 							{ errorMessage && (
 								<Text
 									variant="body-sm"
