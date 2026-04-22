@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import {
+	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
 	type CacheBlobUrlAction,
@@ -43,6 +44,7 @@ const DEFAULT_STATE: State = {
 };
 
 type Action =
+	| AccumulateSubSizeAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
@@ -267,6 +269,23 @@ function reducer(
 							? {
 									...item,
 									progress: action.progress,
+							  }
+							: item
+				),
+			};
+
+		case Type.AccumulateSubSize:
+			return {
+				...state,
+				queue: state.queue.map(
+					( item ): QueueItem =>
+						item.id === action.id
+							? {
+									...item,
+									subSizes: [
+										...( item.subSizes || [] ),
+										action.subSize,
+									],
 							  }
 							: item
 				),

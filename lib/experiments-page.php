@@ -210,14 +210,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-guidelines',
+		'gutenberg-guidelines',
 		__( 'Guidelines', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
 			'label' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-guidelines',
+			'id'    => 'gutenberg-guidelines',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-types',
+		__( 'Content types: manage custom taxonomies', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a UI for creating and managing custom taxonomies. Custom post types will be explored soon.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-types',
 		)
 	);
 

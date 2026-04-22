@@ -17,18 +17,18 @@ test.describe( 'Dataviews List Layout', () => {
 		} );
 	} );
 
+	test.beforeEach( async ( { admin, page } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Items list is reachable via TAB', async ( { page } ) => {

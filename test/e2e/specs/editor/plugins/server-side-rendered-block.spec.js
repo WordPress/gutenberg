@@ -23,6 +23,7 @@ test.describe( 'Server-side rendered block', () => {
 			'gutenberg-test-server-side-rendered-block'
 		);
 	} );
+
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.createNewPost();
 		await editor.insertBlock( { name: 'test/server-side-rendered-block' } );
@@ -112,14 +113,14 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		);
 	} );
 
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-server-side-rendered-block'
 		);
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
 	} );
 
 	test( 'should register blocks with autoRegister flag', async ( {

@@ -3,7 +3,6 @@
  */
 import {
 	type BatchId,
-	ItemStatus,
 	OperationType,
 	type QueueItem,
 	type QueueItemId,
@@ -49,44 +48,6 @@ export function isBatchUploaded( state: State, batchId: BatchId ): boolean {
 		( item ) => batchId === item.batchId
 	);
 	return batchItems.length === 0;
-}
-
-/**
- * Determines whether an upload is currently in progress given a post or attachment ID.
- *
- * @param state              Upload state.
- * @param postOrAttachmentId Post ID or attachment ID.
- *
- * @return Whether upload is currently in progress for the given post or attachment.
- */
-export function isUploadingToPost(
-	state: State,
-	postOrAttachmentId: number
-): boolean {
-	return state.queue.some(
-		( item ) =>
-			item.currentOperation === OperationType.Upload &&
-			item.additionalData.post === postOrAttachmentId
-	);
-}
-
-/**
- * Returns the next paused upload for a given post or attachment ID.
- *
- * @param state              Upload state.
- * @param postOrAttachmentId Post ID or attachment ID.
- *
- * @return Paused item.
- */
-export function getPausedUploadForPost(
-	state: State,
-	postOrAttachmentId: number
-): QueueItem | undefined {
-	return state.queue.find(
-		( item ) =>
-			item.status === ItemStatus.Paused &&
-			item.additionalData.post === postOrAttachmentId
-	);
 }
 
 /**

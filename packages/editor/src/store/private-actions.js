@@ -576,19 +576,6 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
- *
- * @param {number} minHeight
- * @return {Object} Action object.
- */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
-	};
-}
-
-/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
@@ -627,6 +614,11 @@ export const restoreRevision =
 		const postType = select.getCurrentPostType();
 		const postId = select.getCurrentPostId();
 
+		const entityConfig = registry
+			.select( coreStore )
+			.getEntityConfig( 'postType', postType );
+		const revisionKey = entityConfig?.revisionKey || 'id';
+
 		// Use resolveSelect to ensure the revision is fetched if not yet
 		// in the store. The _fields parameter matches the query used by
 		// getRevisions so the result is served from cache without an
@@ -635,8 +627,19 @@ export const restoreRevision =
 			.resolveSelect( coreStore )
 			.getRevision( 'postType', postType, postId, revisionId, {
 				context: 'edit',
-				_fields:
-					'id,date,author,meta,title.raw,excerpt.raw,content.raw',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						revisionKey,
+					] ),
+				].join(),
 			} );
 
 		if ( ! revision ) {

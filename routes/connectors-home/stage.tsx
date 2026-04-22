@@ -42,7 +42,10 @@ function ConnectorsPage() {
 		[]
 	);
 
-	const isEmpty = connectors.length === 0;
+	const renderableConnectors = connectors.filter(
+		( connector: ConnectorConfig ) => connector.render
+	);
+	const isEmpty = renderableConnectors.length === 0;
 
 	return (
 		<Page
@@ -86,9 +89,14 @@ function ConnectorsPage() {
 									<connector.render
 										key={ connector.slug }
 										slug={ connector.slug }
-										label={ connector.label }
+										name={ connector.name }
 										description={ connector.description }
-										icon={ connector.icon }
+										type={ connector.type }
+										logo={ connector.logo }
+										authentication={
+											connector.authentication
+										}
+										plugin={ connector.plugin }
 									/>
 								);
 							}

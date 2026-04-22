@@ -3,9 +3,9 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../a11y" },
-		{ "path": "../api-fetch" },
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../data" },
@@ -27,6 +27,7 @@
 		{ "path": "../interactivity" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },

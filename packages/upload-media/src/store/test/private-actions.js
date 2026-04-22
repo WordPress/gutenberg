@@ -253,7 +253,45 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'finalizeItem', () => {
-		it( 'should call mediaFinalize with the attachment ID', async () => {
+		const mockSubSizes = [
+			{
+				image_size: 'thumbnail',
+				width: 150,
+				height: 150,
+				file: 'image-150x150.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 5000,
+			},
+			{
+				image_size: 'medium',
+				width: 300,
+				height: 200,
+				file: 'image-300x200.jpg',
+				mime_type: 'image/jpeg',
+				filesize: 15000,
+			},
+		];
+
+		it( 'should call mediaFinalize with the attachment ID and sub-sizes', async () => {
+			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
+			const finishOperation = jest.fn();
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = { finishOperation };
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } );
+
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
+			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+		} );
+
+		it( 'should pass empty array when no sub-sizes accumulated', async () => {
 			const mediaFinalize = jest.fn().mockResolvedValue( undefined );
 			const finishOperation = jest.fn();
 			const select = {
@@ -267,7 +305,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
@@ -316,6 +354,7 @@ describe( 'private actions', () => {
 			const select = {
 				getItem: () => ( {
 					attachment: { id: 42 },
+					subSizes: mockSubSizes,
 				} ),
 				getSettings: () => ( { mediaFinalize } ),
 			};
@@ -324,7 +363,7 @@ describe( 'private actions', () => {
 			const thunk = finalizeItem( 'test-id' );
 			await thunk( { select, dispatch } );
 
-			expect( mediaFinalize ).toHaveBeenCalledWith( 42 );
+			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( warnSpy ).toHaveBeenCalledWith(
 				'Media finalization failed:',
 				expect.any( Error )
