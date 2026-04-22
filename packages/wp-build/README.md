@@ -535,15 +535,27 @@ Widgets provide a file-based discovery system for building self-contained UI com
 ```
 widgets/
   hello-world/
-    widget.json     # Widget metadata (required)
-    render.tsx      # UI component entry point
-    widget.ts       # Widget metadata entry point
+    widget.json     # Static discovery metadata (required)
+    widget.ts       # Runtime schema entry point (optional)
+    render.tsx      # UI component entry point (optional)
     render.scss     # Optional styles (bundled inline)
 ```
 
-### Widget Configuration
+### Why two entries?
 
-In `widgets/{widget-name}/widget.json`:
+Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata between `block.json` and `edit.js`:
+
+| Concern | Lives in | Reason |
+|---|---|---|
+| Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
+| Category, description | `widget.json` | used to filter and list widgets server-side without loading JS |
+| Translated title / labels (`__()`) | `widget.ts` | i18n calls need a JS runtime; JSON can only carry static strings |
+| Attribute schema (types, options) | `widget.ts` | needs TypeScript coupling with `render` props; may include translated `elements`/labels |
+| `example` | `widget.ts` | co-located with the attribute schema it shapes |
+
+Rule of thumb: anything the host needs to filter, list, or register **before** JS loads goes in `widget.json`. Anything that needs types, i18n, or runtime logic goes in `widget.ts`.
+
+### `widget.json` — static discovery metadata
 
 ```json
 {
@@ -556,30 +568,71 @@ In `widgets/{widget-name}/widget.json`:
 
 **Fields:**
 - **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
-- **`title`** (optional): Human-readable title
-- **`description`** (optional): Short description
-- **`category`** (optional): Grouping category
+- **`title`** (optional): Human-readable title, used by server-side contexts that can't run `__()`
+- **`description`** (optional): Short description for listings
+- **`category`** (optional): Grouping category for filtering
 
-### Entry Points
+### `widget.ts` — runtime schema
 
-**render.tsx** — UI component (bundled with CSS support):
+Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
+
+```ts
+import { __ } from '@wordpress/i18n';
+
+type HelloWorldAttributes = {
+	greeting: string;
+	showDate: boolean;
+};
+
+const widget = {
+	name: 'my-plugin/hello-world',
+	title: __( 'Hello World', 'my-plugin' ),
+	attributes: [
+		{
+			id: 'greeting',
+			type: 'text',
+			label: __( 'Greeting', 'my-plugin' ),
+		},
+		{
+			id: 'showDate',
+			type: 'boolean',
+			label: __( 'Show current date', 'my-plugin' ),
+		},
+	],
+	example: {
+		greeting: 'World',
+		showDate: true,
+	},
+};
+
+export default widget;
+```
+
+The same `HelloWorldAttributes` type is consumed by `render.tsx`, giving the author a single source of truth for the data contract.
+
+### `render.tsx` — UI component
+
+The render entry receives `attributes` matching the schema declared in `widget.ts`. It is bundled with CSS support (import `.scss` / `.css` directly).
 
 ```tsx
-export default function HelloWorld() {
-	return <div>Hello World</div>;
+interface HelloWorldRenderProps {
+	attributes: {
+		greeting?: string;
+		showDate?: boolean;
+	};
+}
+
+export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
+	return (
+		<div>
+			Hello, { attributes.greeting ?? 'World' }!
+			{ attributes.showDate && <time>{ new Date().toLocaleDateString() }</time> }
+		</div>
+	);
 }
 ```
 
-**widget.ts** — Widget metadata:
-
-```ts
-export default {
-	title: 'Hello World',
-	category: 'demo',
-};
-```
-
-Both entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`.
+All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`.
 
 ### Build Output
 
