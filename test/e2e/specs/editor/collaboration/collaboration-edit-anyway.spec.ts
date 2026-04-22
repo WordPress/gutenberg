@@ -28,32 +28,35 @@ test.describe( 'Edit Anyway when sync connection fails', () => {
 
 		// After retries exhaust the modal appears. A generic network failure
 		// surfaces the unknown-error title ("Connection lost").
-		const modal = page.getByRole( 'dialog', {
+		const errorModal = page.getByRole( 'dialog', {
 			name: 'Connection lost',
 		} );
-		await expect( modal ).toBeVisible( { timeout: MODAL_TIMEOUT_MS } );
-
-		const editAnywayButton = modal.getByRole( 'button', {
-			name: 'Edit Anyway',
+		await expect( errorModal ).toBeVisible( {
+			timeout: MODAL_TIMEOUT_MS,
 		} );
-		await expect( editAnywayButton ).toBeVisible();
-		await editAnywayButton.click();
 
-		// Secondary confirmation dialog warns about data-loss risk.
+		await errorModal
+			.getByRole( 'button', { name: 'Edit Anyway' } )
+			.click();
+
+		// The same modal swaps into the warning view (no second dialog).
+		const confirmModal = page.getByRole( 'dialog', {
+			name: 'Edit while disconnected?',
+		} );
+		await expect( confirmModal ).toBeVisible();
+		await expect( errorModal ).toBeHidden();
 		await expect(
-			page.getByText(
+			confirmModal.getByText(
 				'Your edits will be saved locally and synced when the connection returns.'
 			)
 		).toBeVisible();
-		// Click the Edit Anyway button in the confirm dialog (distinct from
-		// the one in the modal, which is now hidden behind the dialog).
-		await page
+
+		await confirmModal
 			.getByRole( 'button', { name: 'Edit Anyway' } )
-			.last()
 			.click();
 
-		// Modal dismissed; persistent inline notice appears.
-		await expect( modal ).toBeHidden();
+		// Modal dismissed entirely; persistent inline notice appears.
+		await expect( confirmModal ).toBeHidden();
 		const notice = page.locator( '.editor-sync-disconnected-notice' );
 		await expect( notice ).toBeVisible();
 

@@ -30,8 +30,12 @@ export default function SyncDisconnectedNotice() {
 			return false;
 		}
 
+		// Stay visible through transient 'connecting' status flips between
+		// retries. Hide once we've actually reconnected. The polling manager
+		// emits 'connecting' at the start of every poll cycle, which would
+		// otherwise cause the notice to flicker on each /updates request.
 		const status = coreDataSelect.getSyncConnectionStatus()?.status;
-		return status === 'disconnected';
+		return status !== 'connected';
 	}, [] );
 
 	if ( ! isDisconnected ) {
