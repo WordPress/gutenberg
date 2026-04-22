@@ -39,6 +39,12 @@
 		border-radius: var(--wpds-border-radius-lg);
 		box-shadow: var(--wpds-elevation-lg);
 		overflow: auto;
+		/*
+		 * Keep scroll momentum inside the popup: when the user reaches the
+		 * top or bottom of the dialog content, scrolling stops rather than
+		 * chaining to the page behind the backdrop.
+		 */
+		overscroll-behavior: contain;
 		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 		line-height: var(--wpds-typography-line-height-md);
@@ -90,13 +96,71 @@
 			 */
 			height: 100dvh;
 		}
+
+		/*
+		 * When a sticky chrome element sits at the start/end, yield the
+		 * popup's block padding to it so the chrome's border-box is flush
+		 * with the popup's inner border edge. This avoids the chrome
+		 * "detaching" from the popup edge at the scroll extremes (sticky's
+		 * natural position would otherwise sit 2xl inside the content box).
+		 */
+		&:has(> .headerSticky:first-child) {
+			padding-block-start: 0;
+		}
+
+		&:has(> .footerSticky:last-child) {
+			padding-block-end: 0;
+		}
 	}
 
 	.header {
 		display: flex;
 		align-items: center;
 		gap: var(--wpds-dimension-gap-sm);
-		margin-bottom: var(--wpds-dimension-gap-lg);
+		/*
+		 * Use padding (not margin) so the filled background of the sticky
+		 * header covers content scrolling underneath with no visible gap.
+		 */
+		padding-block-end: var(--wpds-dimension-gap-lg);
+		/*
+		 * Extend the header across the popup's horizontal padding so its
+		 * separator border spans edge-to-edge. The negative `margin-inline`
+		 * claims the popup's side padding; the matching `padding-inline`
+		 * restores the header's content alignment with the body below.
+		 */
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		box-sizing: border-box;
+		border-block-end: 1px solid transparent;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	.headerSticky {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		/*
+		 * Promote the sticky chrome to its own compositor layer up front so
+		 * the browser doesn't re-layer it on the first scroll frame, which
+		 * can otherwise cause a subpixel snap on HiDPI displays.
+		 */
+		will-change: transform;
+		/*
+		 * Absorb the popup's block-start padding (yielded via `:has()` above)
+		 * so the title keeps the same visual distance from the popup's inner
+		 * top edge as when the header isn't sticky.
+		 */
+		padding-block-start: var(--wpds-dimension-padding-2xl);
+	}
+
+	/*
+	 * Data attribute driven: the popup's `onScroll` handler toggles
+	 * `data-wp-ui-dialog-scrolled-from-top` directly on the DOM, avoiding a
+	 * React re-render (and the 1-frame lag that came with it) when the
+	 * separator border needs to appear.
+	 */
+	.popup[data-wp-ui-dialog-scrolled-from-top] .headerSticky {
+		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
 	.title {
@@ -122,7 +186,42 @@
 		justify-content: flex-end;
 		align-items: center;
 		gap: var(--wpds-dimension-gap-sm);
-		margin-top: var(--wpds-dimension-gap-lg);
-		padding-top: var(--wpds-dimension-padding-lg);
+		/*
+		 * Use padding (not margin) so the filled background of the sticky
+		 * footer covers content scrolling underneath with no visible gap.
+		 * No `padding-block-end`: the space below the buttons is provided
+		 * by the popup's own block padding (or reclaimed by `.footerSticky`
+		 * when the popup yields that padding via the `:has()` rule above).
+		 */
+		padding-block-start: var(--wpds-dimension-gap-lg);
+		/*
+		 * Extend the footer across the popup's horizontal padding so its
+		 * separator border spans edge-to-edge. The negative `margin-inline`
+		 * claims the popup's side padding; the matching `padding-inline`
+		 * restores the footer's content alignment with the body above.
+		 */
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		box-sizing: border-box;
+		border-block-start: 1px solid transparent;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	.footerSticky {
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
+		/* See note on `.headerSticky`. */
+		will-change: transform;
+		/*
+		 * Absorb the popup's block-end padding (yielded via `:has()` above)
+		 * so the buttons keep the same visual distance from the popup's
+		 * inner bottom edge as the popup's original block padding.
+		 */
+		padding-block-end: var(--wpds-dimension-padding-2xl);
+	}
+
+	.popup[data-wp-ui-dialog-scrolled-from-bottom] .footerSticky {
+		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
 	}
 }

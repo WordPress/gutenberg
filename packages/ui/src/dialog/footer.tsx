@@ -13,7 +13,7 @@ import type { FooterProps } from './types';
  * dialogs). Pass `render` to opt out of the default tag.
  */
 const Footer = forwardRef< HTMLElement, FooterProps >( function DialogFooter(
-	{ className, render, ...props },
+	{ className, render, sticky = true, ...props },
 	ref
 ) {
 	const element = useRender( {
@@ -21,7 +21,11 @@ const Footer = forwardRef< HTMLElement, FooterProps >( function DialogFooter(
 		render,
 		ref,
 		props: mergeProps< 'footer' >( props, {
-			className: clsx( styles.footer, className ),
+			className: clsx(
+				styles.footer,
+				sticky && styles.footerSticky,
+				className
+			),
 		} ),
 	} );
 

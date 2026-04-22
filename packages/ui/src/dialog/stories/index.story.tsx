@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
+import { Stack } from '../../stack';
 import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
@@ -67,7 +68,7 @@ function SizeSelector( {
 } ) {
 	const selectId = useId();
 	return (
-		<div style={ { display: 'flex', gap: 8, alignItems: 'center' } }>
+		<Stack direction="row" gap="sm" align="center">
 			<label htmlFor={ selectId }>Dialog size preset</label>
 			<select
 				id={ selectId }
@@ -87,7 +88,7 @@ function SizeSelector( {
 					</option>
 				) ) }
 			</select>
-		</div>
+		</Stack>
 	);
 }
 
@@ -96,27 +97,22 @@ function SizePlaygroundContent() {
 		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
 	return (
 		<>
-			<div
-				style={ {
-					display: 'flex',
-					flexDirection: 'column',
-					gap: 16,
-					alignItems: 'start',
-				} }
-			>
+			<Stack direction="column" gap="lg" align="start">
 				<SizeSelector value={ size } onChange={ setSize } />
 				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-			</div>
+			</Stack>
 			<Dialog.Popup size={ size }>
 				<Dialog.Header>
 					<Dialog.Title>Size Playground</Dialog.Title>
 					<Dialog.CloseIcon />
 				</Dialog.Header>
-				<SizeSelector value={ size } onChange={ setSize } />
-				<p>
-					Use the dropdown above (or outside the dialog) to change the
-					popup size. Both controls stay in sync.
-				</p>
+				<Stack direction="column" gap="lg" align="start">
+					<SizeSelector value={ size } onChange={ setSize } />
+					<p style={ { margin: 0 } }>
+						Use the dropdown above (or outside the dialog) to change
+						the popup size. Both controls stay in sync.
+					</p>
+				</Stack>
 				<Dialog.Footer>
 					<Dialog.Action>Got it</Dialog.Action>
 				</Dialog.Footer>
@@ -179,6 +175,46 @@ export const WithCustomZIndex: Story = {
 };
 
 /**
+ * When dialog content overflows the available height, `Dialog.Header` stays
+ * pinned to the top and `Dialog.Footer` stays pinned to the bottom so users
+ * keep sight of the title and primary actions while scrolling. Separator
+ * borders fade in only when there is off-screen content above the header or
+ * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
+ * and let it scroll with the content.
+ */
+export const Scrollable: Story = {
+	args: {
+		children: (
+			<>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Header>
+						<Dialog.Title>Terms of service</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+					<Stack direction="column" gap="lg">
+						{ Array.from( { length: 20 } ).map( ( _, index ) => (
+							<p key={ index } style={ { margin: 0 } }>
+								Paragraph { index + 1 }: Lorem ipsum dolor sit
+								amet, consectetur adipiscing elit. Sed do
+								eiusmod tempor incididunt ut labore et dolore
+								magna aliqua. Ut enim ad minim veniam, quis
+								nostrud exercitation ullamco laboris nisi ut
+								aliquip ex ea commodo consequat.
+							</p>
+						) ) }
+					</Stack>
+					<Dialog.Footer>
+						<Dialog.Action variant="outline">Decline</Dialog.Action>
+						<Dialog.Action>Accept</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</>
+		),
+	},
+};
+
+/**
  * A dialog with a visually hidden title. The title is still present in the
  * DOM for `aria-labelledby`, but is not visible to sighted users.
  *
@@ -197,7 +233,7 @@ export const WithVisuallyHiddenTitle: Story = {
 						</VisuallyHidden>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p>
+					<p style={ { margin: 0 } }>
 						This dialog has a visually hidden title. Inspect the DOM
 						or use a screen reader to verify the heading is present.
 					</p>

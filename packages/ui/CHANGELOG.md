@@ -27,6 +27,7 @@
 
 ### Enhancements
 
+-   `Dialog`: Make `Dialog.Header` and `Dialog.Footer` sticky by default so the title and primary actions stay visible while long dialog content scrolls. Separator borders fade in when content is hidden above/below the viewport. Opt out per sub-component with `sticky={ false }` ([#TBD](https://github.com/WordPress/gutenberg/pull/TBD)).
 -   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, skip the backdrop when `modal` is not `true`, use `100dvh` for viewport-based heights so the popup fits the dynamic viewport on mobile, and forward `className` on `Dialog.Title` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
 -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).

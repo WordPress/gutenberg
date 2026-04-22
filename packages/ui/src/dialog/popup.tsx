@@ -1,6 +1,7 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import type { UIEvent } from 'react';
+import { forwardRef, useCallback, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -18,6 +19,37 @@ const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
 const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
+
+/*
+ * Data attributes that advertise the popup's scroll state to CSS. Sticky
+ * header/footer chrome uses descendant selectors against these attributes to
+ * toggle its separator border without forcing a React re-render on every
+ * scroll frame.
+ *
+ * Once CSS scroll-state container queries are supported across target
+ * browsers, both attributes and the `onScroll` / `ResizeObserver` plumbing
+ * below can be removed in favor of
+ * `@container scroll-state(scrollable: top)` / `(scrollable: bottom)`.
+ * See: https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Conditional_rules/Container_scroll-state_queries
+ */
+const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-dialog-scrolled-from-top';
+const SCROLLED_FROM_BOTTOM_ATTR = 'data-wp-ui-dialog-scrolled-from-bottom';
+
+/**
+ * Allow fractional-pixel rounding when comparing scroll offsets. Browsers can
+ * report `scrollTop + clientHeight` as slightly less than `scrollHeight` even
+ * when fully scrolled to the bottom.
+ */
+const SCROLL_END_EPSILON = 1;
+
+function updateScrollAttributes( el: HTMLElement ) {
+	const { scrollTop, clientHeight, scrollHeight } = el;
+	el.toggleAttribute( SCROLLED_FROM_TOP_ATTR, scrollTop > 0 );
+	el.toggleAttribute(
+		SCROLLED_FROM_BOTTOM_ATTR,
+		scrollTop + clientHeight < scrollHeight - SCROLL_END_EPSILON
+	);
+}
 
 /**
  * Renders the dialog popup element that contains the dialog content.
@@ -45,6 +77,35 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDialogModal();
 
+	const handleScroll = useCallback( ( event: UIEvent< HTMLDivElement > ) => {
+		updateScrollAttributes( event.currentTarget );
+	}, [] );
+
+	// Initialize the scroll-state data attributes and keep them in sync when
+	// the popup or its content resizes (viewport resize, size preset change,
+	// content height changes that don't resize the popup because of max-height).
+	useLayoutEffect( () => {
+		const el = popupRef.current;
+		if ( ! el ) {
+			return;
+		}
+
+		updateScrollAttributes( el );
+
+		const observer = new ResizeObserver( () => {
+			if ( popupRef.current ) {
+				updateScrollAttributes( popupRef.current );
+			}
+		} );
+		observer.observe( el );
+		for ( const child of Array.from( el.children ) ) {
+			observer.observe( child );
+		}
+
+		return () => observer.disconnect();
+		// `popupRef` is a stable ref; listed to satisfy exhaustive-deps.
+	}, [ popupRef ] );
+
 	const portalChildren = (
 		<>
 			{ /*
@@ -69,6 +130,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					{ ...props }
+					onScroll={ handleScroll }
 				>
 					<DialogValidationProvider>
 						{ children }
