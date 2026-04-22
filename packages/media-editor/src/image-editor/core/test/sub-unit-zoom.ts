@@ -106,6 +106,21 @@ describe( 'SET_ZOOM during resize', () => {
 } );
 
 describe( 'SETTLE_CROP after sub-unit zoom', () => {
+	it( 'self-heals isResizing if a caller forgot END_RESIZE', () => {
+		// Defensive: SETTLE_CROP must leave `isResizing` false regardless
+		// of input so `commitBase` can re-snapshot the pose. A caller who
+		// dispatches SETTLE_CROP without first dispatching END_RESIZE
+		// should still land in a coherent state.
+		const state = makeState( {
+			isResizing: true,
+			zoom: 0.8,
+			cropRect: { x: 0.1, y: 0.1, width: 0.8, height: 0.8 },
+		} );
+		const next = cropperReducer( state, { type: 'SETTLE_CROP' } );
+		expect( next.isResizing ).toBe( false );
+		expect( next.baseZoom ).toBe( next.zoom );
+	} );
+
 	it( 'snaps zoom back to >= 1 after settle', () => {
 		// Simulate an in-progress drag that left zoom below 1 with a
 		// crop rect expanded to fill the new, smaller image footprint.

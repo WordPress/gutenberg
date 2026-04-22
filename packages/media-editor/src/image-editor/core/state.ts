@@ -377,6 +377,11 @@ export function cropperReducer(
 			return commitBase(
 				enforceContainment( {
 					...state,
+					// Clear the resize flag so a caller that forgot to
+					// dispatch END_RESIZE first still lands in a coherent
+					// post-drag state — otherwise `commitBase` would leave
+					// `base*` pinned while live fields moved on.
+					isResizing: false,
 					zoom: state.zoom * s,
 					pan: {
 						x: ( state.pan.x - oldCx + 0.5 ) * s,
