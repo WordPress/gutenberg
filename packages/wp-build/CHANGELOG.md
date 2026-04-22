@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update the optional `@wordpress/theme` peer dependency range to match the versions that provide the design token fallback build plugins.
+
 ## 0.12.0 (2026-04-15)
 
 ## 0.11.0 (2026-04-01)
