@@ -58,6 +58,52 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
+		const header = (
+			<Stack
+				direction="column"
+				gap="sm"
+				className={
+					stickyHeader
+						? clsx(
+								dialogStyles.headerChrome,
+								dialogStyles.headerSticky
+						  )
+						: alertDialogStyles.header
+				}
+			>
+				<Text variant="heading-xl" render={ <_AlertDialog.Title /> }>
+					{ title }
+				</Text>
+				{ description && (
+					<Text
+						variant="body-md"
+						render={ <_AlertDialog.Description /> }
+					>
+						{ description }
+					</Text>
+				) }
+			</Stack>
+		);
+
+		const footerButtons = (
+			<>
+				<_AlertDialog.Close
+					render={ <Button variant="minimal" /> }
+					disabled={ buttonsDisabled }
+				>
+					{ cancelButtonText }
+				</_AlertDialog.Close>
+				<Button
+					className={ confirmClassName }
+					onClick={ confirm }
+					loading={ showSpinner || undefined }
+					disabled={ buttonsDisabled }
+				>
+					{ confirmButtonText }
+				</Button>
+			</>
+		);
+
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
@@ -72,58 +118,33 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						{ ...props }
 						onScroll={ onScroll }
 					>
-						<Stack
-							direction="column"
-							gap="sm"
-							className={ clsx(
-								dialogStyles.headerChrome,
-								stickyHeader && dialogStyles.headerSticky
-							) }
-						>
-							<Text
-								variant="heading-xl"
-								render={ <_AlertDialog.Title /> }
-							>
-								{ title }
-							</Text>
-							{ description && (
-								<Text
-									variant="body-md"
-									render={ <_AlertDialog.Description /> }
-								>
-									{ description }
-								</Text>
-							) }
-						</Stack>
+						{ header }
 						{ children }
 						<Stack
 							direction="column"
 							gap="md"
-							className={ clsx(
-								dialogStyles.footerChrome,
-								stickyFooter && dialogStyles.footerSticky
-							) }
+							className={
+								stickyFooter
+									? clsx(
+											dialogStyles.footerChrome,
+											dialogStyles.footerSticky
+									  )
+									: undefined
+							}
 						>
-							<div
-								className={
-									alertDialogStyles[ 'footer-actions' ]
-								}
-							>
-								<_AlertDialog.Close
-									render={ <Button variant="minimal" /> }
-									disabled={ buttonsDisabled }
+							{ stickyFooter ? (
+								<div
+									className={
+										alertDialogStyles[ 'footer-actions' ]
+									}
 								>
-									{ cancelButtonText }
-								</_AlertDialog.Close>
-								<Button
-									className={ confirmClassName }
-									onClick={ confirm }
-									loading={ showSpinner || undefined }
-									disabled={ buttonsDisabled }
-								>
-									{ confirmButtonText }
-								</Button>
-							</div>
+									{ footerButtons }
+								</div>
+							) : (
+								<div className={ dialogStyles.footer }>
+									{ footerButtons }
+								</div>
+							) }
 							{ errorMessage && (
 								<Text
 									variant="body-sm"
