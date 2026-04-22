@@ -57,6 +57,8 @@ const FIXTURES_URL_BASE =
  */
 const ATTRIBUTES_REF =
 	'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/';
+// Note: `source` and `selector` intentionally share the same anchor;
+// both are documented together under the "Value source" heading.
 const ATTRIBUTE_ANCHORS = {
 	type: 'type-validation',
 	default: 'default-value',
