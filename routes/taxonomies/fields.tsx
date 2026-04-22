@@ -102,7 +102,7 @@ export function useSlugField(
 	currentValue?: string
 ): Field< TaxonomyFormData > {
 	const registeredTaxonomies = useSelect(
-		( select ) => select( coreStore ).getTaxonomies( { per_page: -1 } ),
+		( select ) => select( coreStore ).getTaxonomies(),
 		[]
 	);
 	const showRenameWarning =
