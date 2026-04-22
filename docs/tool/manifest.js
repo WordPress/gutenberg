@@ -10,11 +10,16 @@ const { pascalCase } = require( 'change-case' );
 const glob = require( 'glob' ).sync;
 
 const baseRepoUrl = '..';
-const blockJsonPaths = glob( 'packages/block-library/src/*/block.json' );
+const repoRoot = join( __dirname, '..', '..' );
+const blockJsonPaths = glob( 'packages/block-library/src/*/block.json', {
+	cwd: repoRoot,
+} );
 const blockCategoryPaths = glob(
-	'docs/reference-guides/core-blocks/category-*.md'
+	'docs/reference-guides/core-blocks/category-*.md',
+	{ cwd: repoRoot }
 );
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
+	cwd: repoRoot,
 	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
 		'**/src/mobile/**/README.md',
@@ -26,11 +31,10 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/badge/README.md',
 	],
 } );
-const packagePaths = glob( 'packages/*/package.json' )
+const packagePaths = glob( 'packages/*/package.json', { cwd: repoRoot } )
 	.filter(
 		// Ignore private packages.
-		( fileName ) =>
-			! require( join( __dirname, '..', '..', fileName ) ).private
+		( fileName ) => ! require( join( repoRoot, fileName ) ).private
 	)
 	.map( ( fileName ) => fileName.split( '/' )[ 1 ] );
 

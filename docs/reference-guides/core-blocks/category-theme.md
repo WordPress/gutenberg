@@ -15,6 +15,7 @@
 - [Comments Title](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-title/) — `core/comments-title`: Displays a title with the number of comments.
 - [Login/out](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/) — `core/loginout`: Show login & logout links.
 - [Navigation](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/) — `core/navigation`: A collection of blocks that allow visitors to get around your site.
+- [Pattern Placeholder](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-pattern/) — `core/pattern`: Show a block pattern.
 - [Author Biography](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-biography/) — `core/post-author-biography`: The author biography.
 - [Author Name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-name/) — `core/post-author-name`: The author name.
 - [Comments Count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-count/) — `core/post-comments-count`: Display a post's comments count.
