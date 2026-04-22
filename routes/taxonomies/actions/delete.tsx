@@ -122,8 +122,8 @@ const deleteTaxonomyAction: Action< TaxonomyFormData > = {
 	label: __( 'Delete' ),
 	icon: trash,
 	supportsBulk: true,
-	modalHeader: ( items ) =>
-		items.length > 1 ? __( 'Delete taxonomies' ) : __( 'Delete taxonomy' ),
+	hideModalHeader: true,
+	modalFocusOnMount: 'firstContentElement',
 	modalSize: 'small',
 	RenderModal: DeleteTaxonomyModal,
 };
