@@ -109,22 +109,16 @@ function getBlockDirs() {
 }
 
 /**
- * Return false for blocks that should be excluded from the generated docs:
- * deprecated blocks (title contains "(deprecated)") and blocks hidden from
- * the inserter (supports.inserter === false), such as core/missing.
+ * Return false for deprecated blocks, identified by their description starting
+ * with "This block is deprecated." — the consistent convention used across all
+ * deprecated core blocks.
  *
  * @param {string} blockDir Directory name inside block-library/src.
  * @return {boolean} Whether the block should be documented.
  */
 function isDocumentable( blockDir ) {
-	const { title = '', supports = {} } = readBlockJson( blockDir );
-	if ( supports.inserter === false ) {
-		return false;
-	}
-	if ( /\(deprecated\)/i.test( title ) ) {
-		return false;
-	}
-	return true;
+	const { description = '' } = readBlockJson( blockDir );
+	return ! description.startsWith( 'This block is deprecated.' );
 }
 
 /**
