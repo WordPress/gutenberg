@@ -3,9 +3,6 @@
 CSS-Grid-based layout component with drag-to-reorder and resize handles,
 designed for dashboard-style surfaces where users arrange tiles.
 
-Ported from `@automattic/grid` (~400 LOC) and adapted to Gutenberg
-conventions.
-
 ## Installation
 
 Install the module:
@@ -69,9 +66,7 @@ interface GridLayoutItem {
 ```
 
 `fullWidth` and `fillWidth` are mutually exclusive. `fillWidth` is
-resolved per-row against remaining free space — see
-`resolve-fill-widths.ts` for the algorithm and `src/test/` for the
-exhaustive unit tests.
+resolved per-row against the remaining free space.
 
 ## Props
 
@@ -134,13 +129,6 @@ When `editMode` is true:
   live feedback; the committed layout is still emitted via
   `onChangeLayout`.
 
-During an interaction the component uses an internal `temporaryLayout`
-to preview changes without triggering parent re-renders; the final
-state is only emitted once the interaction commits. The underlying
-`SortableContext` is intentionally configured with a no-op strategy —
-visual reordering is driven by `temporaryLayout` + CSS Grid re-render,
-not by dnd-kit's built-in transforms.
-
 ## Accessibility
 
 Edit mode is operable from the keyboard via `@dnd-kit`'s keyboard
@@ -151,60 +139,7 @@ sensor:
 - Arrow keys to move it between positions.
 - `Space` to drop, or `Escape` to cancel.
 
-Resize is currently pointer-only. Improving keyboard and screen-reader
-support for resize is tracked as a follow-up.
-
-## Architecture
-
-```
-Grid                 orchestrator: columns, gap, edit mode, DndContext
- ├─ GridItem         per-cell: drag source + sortable + resize host
- │   └─ ResizeHandle bottom-right corner grab
- └─ resolveFillWidths  computes widths for fillWidth items per row
-```
-
-### Dependencies
-
-- `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` —
-  drag-and-drop primitives
-- `@wordpress/compose` — `useResizeObserver`, `useDebounce`, `useEvent`
-- `@wordpress/element` — React re-exports
-
-### Consumer responsibility
-
-`Grid` is a **layout primitive** and is agnostic about what each
-tile contains — children can be widgets, plain text, blocks, or any
-React node. The consumer owns the layout state (positions, sizes)
-and decides how each tile's content is rendered:
-
-```jsx
-import { Grid } from '@wordpress/grid';
-
-function Surface( { items, layout, onChangeLayout } ) {
-	return (
-		<Grid layout={ layout } editMode onChangeLayout={ onChangeLayout }>
-			{ items.map( ( item ) => (
-				<div key={ item.key }>{ item.content }</div>
-			) ) }
-		</Grid>
-	);
-}
-```
-
-## Follow-ups
-
-This package is a direct port from `@automattic/grid` to unblock
-Radical Speed Month. Two potential follow-ups, with very different
-scope, are worth separating:
-
-- **Swap the custom resize handle for a shared resize primitive**,
-  which would also let us drop the nested drag context currently
-  used inside each handle.
-- **Replace the sortable layer with a Gutenberg-native sortable.**
-  Not a drop-in: drop-zone hooks only provide drop-target detection.
-  A full sortable experience (pick-up, transform, reorder, keyboard
-  nav) would have to be rebuilt on top. Defer until there is a clear
-  reason beyond dependency reduction.
+Resize handles are currently pointer-only.
 
 ## Contributing to this package
 
