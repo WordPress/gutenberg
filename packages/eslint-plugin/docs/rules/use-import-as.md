@@ -2,7 +2,9 @@
 
 Enforces local `as` names for specific named imports based on rule options provided by the consumer.
 
-It also checks destructuring from `unlock( privateApis )` when the `privateApis` identifier can be traced back to a configured `@wordpress/*` package import.
+It also checks direct destructuring from `unlock( privateApis )` when the `privateApis` identifier can be traced back to a configured `@wordpress/*` package import.
+
+The rule only covers named `import` declarations and direct `unlock( privateApis )` destructuring. It does not check `require()`, dynamic `import()`, or re-export syntax.
 
 ## Rule details
 
