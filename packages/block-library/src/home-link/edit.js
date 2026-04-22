@@ -206,7 +206,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 							setAttributes( { label: labelValue } );
 						} }
 						aria-label={ __( 'Home link text' ) }
-						placeholder={ __( 'Add home link' ) }
+						placeholder={ __( 'Add label…' ) }
 						withoutInteractiveFormatting
 					/>
 					{ description && (
