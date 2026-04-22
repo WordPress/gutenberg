@@ -40,6 +40,13 @@ import './cropper.scss';
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
 
+/**
+ * Leaves a small margin around the crop during handle-driven resize
+ * so the handles stay a little inside the container edge — easier to
+ * grab outward than if they sat flush against it.
+ */
+const RESIZE_FIT_MARGIN = 0.95;
+
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
 // rect (1×1) if `aspectRatio` is unset or non-positive.
@@ -336,9 +343,17 @@ function CropperInner(
 	 */
 	const handleCropChange = useCallback(
 		( rect: NormalizedRect ) => {
-			setCropRect( rect );
+			if ( ! state.isResizing || ! freeformCrop ) {
+				setCropRect( rect );
+				return;
+			}
+			const largest = Math.max( rect.width, rect.height );
+			const fit =
+				largest > 0 ? Math.min( 1, RESIZE_FIT_MARGIN / largest ) : 1;
+			dispatch( { type: 'SET_CROP_RECT', payload: rect } );
+			dispatch( { type: 'SET_ZOOM', payload: fit } );
 		},
-		[ setCropRect ]
+		[ state.isResizing, freeformCrop, setCropRect, dispatch ]
 	);
 
 	// Settling animation: brief linear transition after resize end.
@@ -354,17 +369,27 @@ function CropperInner(
 	}, [] );
 
 	/**
+	 * Handle resize start — switch the reducer into resize mode so
+	 * zoom can drop below 1 while the handles are being dragged.
+	 */
+	const handleResizeStart = useCallback( () => {
+		dispatch( { type: 'BEGIN_RESIZE' } );
+		onGestureStart?.();
+	}, [ dispatch, onGestureStart ] );
+
+	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
 		setSettling( true );
+		dispatch( { type: 'END_RESIZE' } );
 		settleCrop();
 		onGestureEnd?.();
 		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
 			setSettling( false );
 		}, 200 );
-	}, [ settleCrop, onGestureEnd ] );
+	}, [ dispatch, settleCrop, onGestureEnd ] );
 
 	const imageTransition =
 		settling || isZooming ? 'transform 150ms linear' : undefined;
@@ -452,7 +477,7 @@ function CropperInner(
 				containerSize={ containerSize }
 				imageSize={ visualSize }
 				onCropChange={ handleCropChange }
-				onResizeStart={ onGestureStart }
+				onResizeStart={ handleResizeStart }
 				onResizeEnd={ handleResizeEnd }
 				aspectRatio={ aspectRatio }
 				freeformCrop={ freeformCrop }

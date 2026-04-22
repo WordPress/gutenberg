@@ -902,11 +902,13 @@ describe( 'useCropperState', () => {
 			// committed pose and are redundant for dirty tracking — if
 			// any base field differs from initial, the corresponding
 			// live field (crop/zoom/rotation) will also differ.
+			// 'isResizing' is a transient UI flag, not a user edit.
 			const excludedFields = [
 				'image',
 				'basePan',
 				'baseZoom',
 				'baseRotation',
+				'isResizing',
 			];
 
 			const stateKeys = flattenKeys(
