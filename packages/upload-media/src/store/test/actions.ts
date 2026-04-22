@@ -1091,6 +1091,90 @@ describe( 'actions', () => {
 			).toHaveLength( 0 );
 		} );
 
+		it( 'removeItem clears any pending retry timer', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Schedule a retry to put a timer in the retryTimers map.
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()[ 0 ]
+					.status
+			).toBe( ItemStatus.PendingRetry );
+
+			// Remove the item directly (not via cancelItem).
+			await unlock( registry.dispatch( uploadStore ) ).removeItem(
+				item.id
+			);
+
+			// Item should be gone.
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+
+			// Advance timers — the old retry timer must NOT re-add or
+			// touch the item.
+			await jest.runAllTimersAsync();
+
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+		} );
+
+		it( 'falls through to cancellation after exhausting max retries', async () => {
+			const onError = jest.fn();
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+				onError,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// First failure with retryable error → schedules retry (count=0).
+			await registry
+				.dispatch( uploadStore )
+				.cancelItem( item.id, new Error( 'Network error' ) );
+
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()[ 0 ]
+					.status
+			).toBe( ItemStatus.PendingRetry );
+
+			// Run through the 3 scheduled retries — each fires the timer,
+			// executes the retry (incrementing retryCount), then we simulate
+			// another failure.
+			for ( let attempt = 1; attempt <= 3; attempt++ ) {
+				await jest.runAllTimersAsync();
+
+				const inProgress = unlock(
+					registry.select( uploadStore )
+				).getAllItems()[ 0 ];
+				expect( inProgress.status ).toBe( ItemStatus.Processing );
+				expect( inProgress.retryCount ).toBe( attempt );
+
+				await registry
+					.dispatch( uploadStore )
+					.cancelItem( item.id, new Error( 'Network error' ) );
+			}
+
+			// After max retries exhausted, the next cancel should remove
+			// the item and surface the error to onError.
+			expect(
+				unlock( registry.select( uploadStore ) ).getAllItems()
+			).toHaveLength( 0 );
+			expect( onError ).toHaveBeenCalledWith(
+				expect.objectContaining( { message: 'Network error' } )
+			);
+		} );
+
 		it( 'does nothing if item is not in PendingRetry status', async () => {
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,

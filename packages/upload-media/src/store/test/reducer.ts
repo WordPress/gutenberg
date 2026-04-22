@@ -501,6 +501,122 @@ describe( 'reducer', () => {
 		} );
 	} );
 
+	describe( `${ Type.PauseQueue }`, () => {
+		it( 'transitions queueStatus from active to paused', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.PauseQueue,
+			} );
+
+			expect( state.queueStatus ).toBe( 'paused' );
+		} );
+
+		it( 'is idempotent when queue is already paused', () => {
+			const initialState: State = {
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.PauseQueue,
+			} );
+
+			expect( state.queueStatus ).toBe( 'paused' );
+		} );
+
+		it( 'preserves other state fields', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: { '1': [ 'blob:foo' ] },
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.PauseQueue,
+			} );
+
+			expect( state.queue ).toEqual( initialState.queue );
+			expect( state.blobUrls ).toEqual( initialState.blobUrls );
+		} );
+	} );
+
+	describe( `${ Type.ResumeQueue }`, () => {
+		it( 'transitions queueStatus from paused to active', () => {
+			const initialState: State = {
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.ResumeQueue,
+			} );
+
+			expect( state.queueStatus ).toBe( 'active' );
+		} );
+
+		it( 'is idempotent when queue is already active', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [],
+			};
+			const state = reducer( initialState, {
+				type: Type.ResumeQueue,
+			} );
+
+			expect( state.queueStatus ).toBe( 'active' );
+		} );
+
+		it( 'preserves item statuses', () => {
+			const initialState: State = {
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.PendingRetry,
+					} as QueueItem,
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.ResumeQueue,
+			} );
+
+			expect( state.queue[ 0 ].status ).toBe( ItemStatus.PendingRetry );
+			expect( state.queue[ 1 ].status ).toBe( ItemStatus.Processing );
+		} );
+	} );
+
 	describe( `${ Type.UpdateProgress }`, () => {
 		it( 'updates the progress of an item', () => {
 			const initialState: State = {
