@@ -99,33 +99,48 @@
 
 		/*
 		 * When a sticky chrome element sits at the start/end, yield the
-		 * popup's block padding to it so the chrome's border-box is flush
-		 * with the popup's inner border edge. This avoids the chrome
-		 * "detaching" from the popup edge at the scroll extremes (sticky's
-		 * natural position would otherwise sit 2xl inside the content box).
+		 * popup's block padding to it (the matching sticky rule below
+		 * claims it as its own padding-block-start/-end) so the chrome's
+		 * border-box is flush with the popup's inner border edge. At the
+		 * same time, reserve `scroll-padding-block-*` so Tab / scrollIntoView
+		 * keeps focused descendants clear of the pinned chrome rather than
+		 * scrolling them behind it. 5rem comfortably covers a single
+		 * heading plus the chrome's padding at the default font size; the
+		 * sticky chrome is typically much shorter than this.
 		 */
 		&:has(> .headerSticky:first-child) {
 			padding-block-start: 0;
+			scroll-padding-block-start: 5rem;
 		}
 
 		&:has(> .footerSticky:last-child) {
 			padding-block-end: 0;
+			scroll-padding-block-end: 5rem;
 		}
 	}
 
 	/*
 	 * Shared "chrome" rules for a header-like area inside a popup: edge-to-edge
-	 * background, block-end padding, and a scroll-state separator rendered as
-	 * an inset box-shadow so it never contributes to layout size. Layout is
-	 * left to the consumer (Dialog.Header composes a flex row below;
-	 * AlertDialog applies this directly to a column Stack).
+	 * background, block-end padding, and a transparent separator border that
+	 * takes color from a `data-wp-ui-overlay-scrolled-*` attribute on the
+	 * popup. Layout is left to the consumer (Dialog.Header composes a flex
+	 * row below; AlertDialog applies this directly to a column Stack).
+	 *
+	 * Also consumed by `../alert-dialog/popup.tsx` via `composes: global`-less
+	 * cross-module lookup (it imports `dialogStyles`). Keep `.headerChrome`,
+	 * `.headerSticky`, `.footerChrome`, `.footerSticky`, `.popup`, and
+	 * `.is-medium` class names stable, or update both modules together.
 	 */
 	.headerChrome {
 		/*
-		 * Use padding (not margin) so the filled background of the sticky
-		 * header covers content scrolling underneath with no visible gap.
+		 * `gap-lg - 1px` compensates for the 1px transparent border below,
+		 * so the total block-end space matches trunk's plain `margin-bottom`
+		 * regardless of whether the separator is colored. A border (not an
+		 * inset box-shadow) is used so the separator remains visible in
+		 * `forced-colors` / Windows High Contrast mode, where box-shadow is
+		 * suppressed but borders are rendered with system colors.
 		 */
-		padding-block-end: var(--wpds-dimension-gap-lg);
+		padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
 		/*
 		 * Extend the header across the popup's horizontal padding so its
 		 * separator spans edge-to-edge. The negative `margin-inline` claims
@@ -135,6 +150,7 @@
 		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
 		padding-inline: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-block-end: 1px solid transparent;
 	}
 
 	.header {
@@ -147,18 +163,22 @@
 	.headerSticky {
 		position: sticky;
 		top: 0;
-		z-index: 1;
 		/*
-		 * Promote the sticky chrome to its own compositor layer up front so
-		 * the browser doesn't re-layer it on the first scroll frame, which
-		 * can otherwise cause a subpixel snap on HiDPI displays.
+		 * The popup already establishes a stacking context via `transform`,
+		 * so this only needs to clear content inside the popup. `2` leaves
+		 * room for consumers to stack a single layer of their own content
+		 * beneath the chrome without it covering the separator.
 		 */
-		will-change: transform;
-		/*
-		 * Absorb the popup's block-start padding (yielded via `:has()` above)
-		 * so the title keeps the same visual distance from the popup's inner
-		 * top edge as when the header isn't sticky.
-		 */
+		z-index: 2;
+	}
+
+	/*
+	 * Claim the popup's block-start padding (yielded by the `:has()` rule on
+	 * `.popup` above) only when this sticky chrome is actually the first
+	 * child — otherwise the popup keeps its own padding and we'd end up
+	 * doubling it.
+	 */
+	.popup:has(> .headerSticky:first-child) > .headerSticky {
 		padding-block-start: var(--wpds-dimension-padding-2xl);
 	}
 
@@ -169,11 +189,7 @@
 	 * separator border needs to appear.
 	 */
 	.popup[data-wp-ui-overlay-scrolled-from-top] .headerSticky {
-		/*
-		 * Inset box-shadow (instead of border) keeps the separator off the
-		 * layout, so spacing matches the non-sticky rhythm exactly.
-		 */
-		box-shadow: inset 0 -1px 0 0 var(--wpds-color-stroke-surface-neutral);
+		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
 	.title {
@@ -200,13 +216,13 @@
 	 */
 	.footerChrome {
 		/*
-		 * Use padding (not margin) so the filled background of the sticky
-		 * footer covers content scrolling underneath with no visible gap.
-		 * No `padding-block-end`: the space below the buttons is provided
-		 * by the popup's own block padding (or reclaimed by `.footerSticky`
-		 * when the popup yields that padding via the `:has()` rule above).
+		 * `gap-lg - 1px` compensates for the 1px transparent border above,
+		 * keeping the total block-start space equal to trunk's plain
+		 * `padding-block-start` regardless of whether the separator is
+		 * colored. A border (not an inset box-shadow) is used so the
+		 * separator remains visible in forced-colors mode.
 		 */
-		padding-block-start: var(--wpds-dimension-gap-lg);
+		padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
 		/*
 		 * Extend the footer across the popup's horizontal padding so its
 		 * separator spans edge-to-edge. The negative `margin-inline` claims
@@ -216,6 +232,7 @@
 		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
 		padding-inline: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-block-start: 1px solid transparent;
 	}
 
 	.footer {
@@ -229,19 +246,20 @@
 	.footerSticky {
 		position: sticky;
 		bottom: 0;
-		z-index: 1;
-		/* See note on `.headerSticky`. */
-		will-change: transform;
-		/*
-		 * Absorb the popup's block-end padding (yielded via `:has()` above)
-		 * so the buttons keep the same visual distance from the popup's
-		 * inner bottom edge as the popup's original block padding.
-		 */
+		/* See note on `.headerSticky` above. */
+		z-index: 2;
+	}
+
+	/*
+	 * Claim the popup's block-end padding (yielded by the `:has()` rule on
+	 * `.popup` above) only when this sticky chrome is actually the last
+	 * child.
+	 */
+	.popup:has(> .footerSticky:last-child) > .footerSticky {
 		padding-block-end: var(--wpds-dimension-padding-2xl);
 	}
 
 	.popup[data-wp-ui-overlay-scrolled-from-bottom] .footerSticky {
-		/* See note on the matching header rule above. */
-		box-shadow: inset 0 1px 0 0 var(--wpds-color-stroke-surface-neutral);
+		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
 	}
 }
