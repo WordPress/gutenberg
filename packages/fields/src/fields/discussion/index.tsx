@@ -28,7 +28,21 @@ const discussionField: Field< BasePost > = {
 		}
 		return __( 'Closed' );
 	},
-	filterBy: false,
+	elements: [
+		{
+			value: 'open',
+			label: __( 'Open' ),
+			description: __( 'Discussion is open.' ),
+		},
+		{
+			value: 'closed',
+			label: __( 'Closed' ),
+			description: __( 'Discussion is closed.' ),
+		},
+	],
+	filterBy: {
+		operators: [ 'is' ],
+	},
 };
 
 /**
