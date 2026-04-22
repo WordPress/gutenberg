@@ -632,10 +632,22 @@ function generateBlockApiSection( blockDir ) {
 		providesContext,
 		styles,
 		selectors,
+		__experimental: experimental,
 	} = blockJson;
 
 	const slug = name.replace( 'core/', '' );
 	const lines = [];
+
+	// Experimental notice.
+	if ( experimental ) {
+		lines.push(
+			'> [!WARNING]'
+		);
+		lines.push(
+			'> **Experimental**: This block is experimental and may change or be removed without notice.'
+		);
+		lines.push( '' );
+	}
 
 	// Metadata.
 	lines.push( `**Name:** \`${ name }\`` );
@@ -759,18 +771,19 @@ function generateBlockApiSection( blockDir ) {
 		);
 	}
 	lines.push( '' );
-	lines.push( '```html' );
-	lines.push( generateBlockCommentExample( slug, attributes, blockType ) );
-	lines.push( '```' );
-	lines.push( '' );
 
 	const fixtureFile = `core__${ blockDir }.html`;
-	if ( fs.existsSync( path.join( FIXTURES_DIR, fixtureFile ) ) ) {
-		lines.push(
-			`_See the [canonical markup fixture](${ FIXTURES_URL_BASE }${ fixtureFile }) for a tested real-world example._`
-		);
-		lines.push( '' );
+	const fixturePath = path.join( FIXTURES_DIR, fixtureFile );
+	if ( fs.existsSync( fixturePath ) ) {
+		lines.push( '```html' );
+		lines.push( fs.readFileSync( fixturePath, 'utf-8' ).trimEnd() );
+		lines.push( '```' );
+	} else {
+		lines.push( '```html' );
+		lines.push( generateBlockCommentExample( slug, attributes, blockType ) );
+		lines.push( '```' );
 	}
+	lines.push( '' );
 
 	// Source files reference.
 	lines.push( '## Source' );
@@ -778,27 +791,9 @@ function generateBlockApiSection( blockDir ) {
 	lines.push(
 		`- [block.json](${ SOURCE_URL_BASE }${ blockDir }/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))`
 	);
-	if ( files.hasEditJs ) {
-		lines.push( `- [edit.js](${ SOURCE_URL_BASE }${ blockDir }/edit.js)` );
-	}
-	if ( files.hasSaveJs ) {
-		lines.push( `- [save.js](${ SOURCE_URL_BASE }${ blockDir }/save.js)` );
-	}
-	if ( files.hasIndexPhp ) {
-		lines.push(
-			`- [index.php](${ SOURCE_URL_BASE }${ blockDir }/index.php)`
-		);
-	}
-	if ( files.hasDeprecated ) {
-		lines.push(
-			`- [deprecated.js](${ SOURCE_URL_BASE }${ blockDir }/deprecated.js)`
-		);
-	}
-	if ( files.hasVariations ) {
-		lines.push(
-			`- [variations.js](${ SOURCE_URL_BASE }${ blockDir }/variations.js)`
-		);
-	}
+	lines.push(
+		`- [Source directory](${ SOURCE_URL_BASE }${ blockDir }/) — browse \`edit.js\`, \`save.js\`, \`index.php\`, and more.`
+	);
 	lines.push( '' );
 
 	return `${ TOKEN_START }\n${ lines.join( '\n' ) }\n${ TOKEN_END }\n`;
