@@ -538,7 +538,7 @@ widgets/
     widget.json     # Static discovery metadata (required)
     widget.ts       # Runtime schema entry point (optional)
     render.tsx      # UI component entry point (optional)
-    render.scss     # Optional styles (bundled inline)
+    render.scss     # Optional styles (bundled inline when imported from render.tsx)
 ```
 
 ### Why two entries?
