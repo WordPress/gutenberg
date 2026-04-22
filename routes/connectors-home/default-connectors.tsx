@@ -195,6 +195,7 @@ function ApiKeyConnector( {
 							onClick={ handleActionClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
+							accessibleWhenDisabled
 						>
 							{ getButtonLabel() }
 						</Button>
