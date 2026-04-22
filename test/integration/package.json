@@ -20,16 +20,10 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "file:../../packages/scripts",
 		"ajv": "^8.17.1",
 		"fast-glob": "^3.2.7"
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"scripts": {
-		"test:integration": "wp-scripts test-unit-js --config jest.config.js",
-		"test:integration:watch": "npm run test:integration -- --watch",
-		"test:integration:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config jest.config.js"
 	}
 }
