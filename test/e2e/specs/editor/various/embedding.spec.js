@@ -286,6 +286,38 @@ test.describe( 'Embedding content', () => {
 				.getByRole( 'textbox', { name: 'Embed URL' } )
 		).toHaveValue( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 	} );
+
+	test.fixme(
+		'should restore the paragraph containing the pasted URL when undoing the embed',
+		async ( { editor, embedUtils, pageUtils } ) => {
+			await embedUtils.interceptRequests( {
+				'https://www.youtube.com/watch?v=lXMskKTw3Bc':
+					MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+			} );
+
+			await editor.canvas
+				.locator( 'role=button[name="Add default block"i]' )
+				.click();
+			pageUtils.setClipboardData( {
+				plainText: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
+				html: 'https://www.youtube.com/watch?v=lXMskKTw3Bc',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: YouTube Embed',
+				} )
+			).toBeVisible();
+
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} )
+			).toHaveValue( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		}
+	);
 } );
 
 class EmbedUtils {
