@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix `autop` inserting `<br />` tags inside `<script>`, `<style>`, `<svg>`, and `<math>` elements ([77542](https://github.com/WordPress/gutenberg/pull/77542)).
+
 ## 4.44.0 (2026-04-15)
 
 ## 4.43.0 (2026-04-01)
