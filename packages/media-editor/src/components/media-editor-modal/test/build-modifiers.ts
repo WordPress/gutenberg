@@ -138,4 +138,71 @@ describe( 'buildModifiers', () => {
 			{ type: 'rotate', args: { angle: 90 } },
 		] );
 	} );
+
+	it( 'emits a crop modifier when the crop rect covers half the image', () => {
+		const modifiers = buildModifiers(
+			stateWith( {
+				cropRect: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toHaveLength( 1 );
+		expect( modifiers[ 0 ].type ).toBe( 'crop' );
+		const args = (
+			modifiers[ 0 ] as {
+				args: {
+					left: number;
+					top: number;
+					width: number;
+					height: number;
+				};
+			}
+		 ).args;
+		expect( args.width ).toBeCloseTo( 50 );
+		expect( args.height ).toBeCloseTo( 50 );
+		expect( args.left ).toBeCloseTo( 25 );
+		expect( args.top ).toBeCloseTo( 25 );
+	} );
+
+	it( 'omits crop when the crop rect is full-frame within tolerance', () => {
+		// 99.95% on each axis is within the 0.1% tolerance.
+		const modifiers = buildModifiers(
+			stateWith( {
+				cropRect: {
+					x: 0.00025,
+					y: 0.00025,
+					width: 0.9995,
+					height: 0.9995,
+				},
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [] );
+	} );
+
+	it( 'emits flip, rotate, and crop in that order', () => {
+		const modifiers = buildModifiers(
+			stateWith( {
+				flip: { horizontal: true, vertical: false },
+				rotation: 90,
+				cropRect: { x: 0.1, y: 0.1, width: 0.5, height: 0.5 },
+			} ),
+			IMAGE
+		);
+		expect( modifiers.map( ( m ) => m.type ) ).toEqual( [
+			'flip',
+			'rotate',
+			'crop',
+		] );
+	} );
+
+	it( 'returns an empty array for a zero-size image', () => {
+		const modifiers = buildModifiers(
+			stateWith( {
+				cropRect: { x: 0, y: 0, width: 0.5, height: 0.5 },
+			} ),
+			{ width: 0, height: 0 }
+		);
+		expect( modifiers ).toEqual( [] );
+	} );
 } );

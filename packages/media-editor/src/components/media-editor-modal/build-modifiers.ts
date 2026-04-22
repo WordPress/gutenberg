@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { CropperState, Size } from '../../image-editor';
+import { getSourceRegionPercent } from '../../image-editor';
 
 /**
  * A single modifier in the REST `/edit` payload. Order is significant; the
@@ -29,6 +30,14 @@ export type Modifier =
 	  };
 
 /**
+ * Tolerance (percent) used to decide whether a crop rect is effectively
+ * full-frame. Sub-pixel / float-ulp deltas below this value are treated
+ * as no crop. Matches the historical threshold used by the legacy
+ * `use-save-image.js` (which compared against `99.9`).
+ */
+const CROP_TOLERANCE = 0.1;
+
+/**
  * Converts the current cropper state into a REST `/edit` modifiers array.
  *
  * Modifier order is `[flip, rotate, crop]` to match the cropper's visual
@@ -36,7 +45,8 @@ export type Modifier =
  * sequential `foreach` apply.
  *
  * Identity operations (no flip, rotation of 0/360, full-frame crop) are
- * dropped so the output is the minimum set the server needs.
+ * dropped so the output is the minimum set the server needs. A zero-size
+ * image yields an empty array.
  *
  * @param state     Current cropper state.
  * @param imageSize Natural dimensions of the source image.
@@ -44,10 +54,13 @@ export type Modifier =
  */
 export function buildModifiers(
 	state: CropperState,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	imageSize: Size
 ): Modifier[] {
 	const modifiers: Modifier[] = [];
+
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return modifiers;
+	}
 
 	if ( state.flip.horizontal || state.flip.vertical ) {
 		modifiers.push( {
@@ -59,6 +72,34 @@ export function buildModifiers(
 	const angle = ( ( state.rotation % 360 ) + 360 ) % 360;
 	if ( angle !== 0 ) {
 		modifiers.push( { type: 'rotate', args: { angle } } );
+	}
+
+	// Detect "no user crop" from the normalized cropRect itself rather than
+	// from the source-region percentages. When the image is rotated, the
+	// default full-frame cropRect already maps to a region whose width and
+	// height in source-image percent space fall outside [0, 100] (because
+	// the rotated bounding box differs from the source), so using the
+	// region values here would spuriously emit crops for rotate-only
+	// states. The cropRect is where the user's intent lives: at defaults
+	// (0, 0, 1, 1) there is no crop to apply.
+	const cropRectPercent = {
+		width: state.cropRect.width * 100,
+		height: state.cropRect.height * 100,
+	};
+	if (
+		cropRectPercent.width < 100 - CROP_TOLERANCE ||
+		cropRectPercent.height < 100 - CROP_TOLERANCE
+	) {
+		const region = getSourceRegionPercent( state, imageSize );
+		modifiers.push( {
+			type: 'crop',
+			args: {
+				left: region.x,
+				top: region.y,
+				width: region.width,
+				height: region.height,
+			},
+		} );
 	}
 
 	return modifiers;
