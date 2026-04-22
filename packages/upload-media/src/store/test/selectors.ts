@@ -10,10 +10,12 @@ import {
 import {
 	getActiveUploadCount,
 	getActiveImageProcessingCount,
+	getActiveVideoProcessingCount,
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
 	getPendingImageProcessing,
+	getPendingVideoProcessing,
 	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
@@ -310,6 +312,134 @@ describe( 'selectors', () => {
 			const pending = getPendingImageProcessing( state );
 			expect( pending ).toHaveLength( 1 );
 			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+	} );
+
+	describe( 'getActiveVideoProcessingCount', () => {
+		it( 'counts only items whose current operation is TranscodeGif', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.TranscodeGif,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+					{
+						id: '3',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.TranscodeGif,
+					},
+					{
+						id: '4',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.ResizeCrop,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getActiveVideoProcessingCount( state ) ).toBe( 2 );
+		} );
+
+		it( 'returns 0 when no items are actively transcoding GIFs', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getActiveVideoProcessingCount( state ) ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'getPendingVideoProcessing', () => {
+		it( 'returns items whose next operation is TranscodeGif', () => {
+			const state: State = {
+				queue: [
+					{
+						id: 'pending-bare',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.TranscodeGif ],
+						currentOperation: undefined,
+					},
+					{
+						id: 'pending-tuple',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.TranscodeGif,
+								{ outputFormat: 'mp4' },
+							],
+							OperationType.Upload,
+						],
+						currentOperation: undefined,
+					},
+					{
+						id: 'already-running',
+						status: ItemStatus.Processing,
+						operations: [
+							[
+								OperationType.TranscodeGif,
+								{ outputFormat: 'mp4' },
+							],
+						],
+						currentOperation: OperationType.TranscodeGif,
+					},
+					{
+						id: 'different-op',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const pending = getPendingVideoProcessing( state );
+			const ids = pending.map( ( item ) => item.id );
+			expect( ids ).toEqual( [ 'pending-bare', 'pending-tuple' ] );
+		} );
+
+		it( 'returns an empty list when no items are pending', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getPendingVideoProcessing( state ) ).toEqual( [] );
 		} );
 	} );
 

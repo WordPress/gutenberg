@@ -31,6 +31,10 @@ module.exports = {
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
+		// Mock @wordpress/ffmpeg/worker similarly — the real worker inlines the
+		// FFmpeg WASM core, which is unavailable in jest.
+		'@wordpress/ffmpeg/worker':
+			'<rootDir>/test/unit/config/ffmpeg-worker-code-stub.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':

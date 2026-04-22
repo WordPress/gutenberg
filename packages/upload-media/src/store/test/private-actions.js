@@ -6,9 +6,17 @@ import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 /**
  * Internal dependencies
  */
-import { getTranscodeImageOperation, finalizeItem } from '../private-actions';
-import { OperationType } from '../types';
+import {
+	getTranscodeImageOperation,
+	finalizeItem,
+	transcodeGifItem,
+	prepareItem,
+} from '../private-actions';
+import { OperationType, Type } from '../types';
 import { vipsHasTransparency } from '../utils';
+import { ffmpegConvertGifToVideo } from '../utils/ffmpeg';
+import { UploadError } from '../../upload-error';
+import { isAnimatedGif } from '../../utils';
 
 // Mock @wordpress/blob
 jest.mock( '@wordpress/blob', () => ( {
@@ -20,6 +28,21 @@ jest.mock( '@wordpress/blob', () => ( {
 jest.mock( '../utils', () => ( {
 	vipsHasTransparency: jest.fn(),
 } ) );
+
+// Mock ffmpeg utilities
+jest.mock( '../utils/ffmpeg', () => ( {
+	ffmpegConvertGifToVideo: jest.fn(),
+} ) );
+
+// Mock isAnimatedGif so prepareItem tests don't depend on real GIF byte
+// patterns. The isAnimatedGif function is exhaustively tested elsewhere.
+jest.mock( '../../utils', () => {
+	const actual = jest.requireActual( '../../utils' );
+	return {
+		...actual,
+		isAnimatedGif: jest.fn(),
+	};
+} );
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
@@ -383,6 +406,320 @@ describe( 'private actions', () => {
 			await thunk( { select, dispatch } );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'transcodeGifItem', () => {
+		const gifFile = new File( [ new Uint8Array( [ 0x47 ] ) ], 'cat.gif', {
+			type: 'image/gif',
+		} );
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+		} );
+
+		it( 'converts to mp4 by default and dispatches CacheBlobUrl + finishOperation', async () => {
+			const videoFile = new File(
+				[ new Uint8Array( [ 0, 1, 2 ] ) ],
+				'cat.mp4',
+				{ type: 'video/mp4' }
+			);
+			ffmpegConvertGifToVideo.mockResolvedValue( videoFile );
+
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.cancelItem = jest.fn();
+
+			const select = {
+				getItem: () => ( { id: 'queue-1', file: gifFile } ),
+			};
+
+			const thunk = transcodeGifItem( 'queue-1' );
+			await thunk( { select, dispatch: dispatchFn } );
+
+			expect( ffmpegConvertGifToVideo ).toHaveBeenCalledWith(
+				'queue-1',
+				gifFile,
+				'video/mp4'
+			);
+			expect( createBlobURL ).toHaveBeenCalledWith( videoFile );
+			expect( dispatchFn ).toHaveBeenCalledWith( {
+				type: Type.CacheBlobUrl,
+				id: 'queue-1',
+				blobUrl: 'blob:mock-url',
+			} );
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
+				'queue-1',
+				{
+					file: videoFile,
+					attachment: { url: 'blob:mock-url' },
+				}
+			);
+			expect( dispatchFn.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'uses webm when outputFormat is webm', async () => {
+			ffmpegConvertGifToVideo.mockResolvedValue(
+				new File( [], 'cat.webm', { type: 'video/webm' } )
+			);
+
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.cancelItem = jest.fn();
+
+			const select = {
+				getItem: () => ( { id: 'queue-2', file: gifFile } ),
+			};
+
+			const thunk = transcodeGifItem( 'queue-2', {
+				outputFormat: 'webm',
+			} );
+			await thunk( { select, dispatch: dispatchFn } );
+
+			expect( ffmpegConvertGifToVideo ).toHaveBeenCalledWith(
+				'queue-2',
+				gifFile,
+				'video/webm'
+			);
+		} );
+
+		it( 'cancels the item with an UploadError when conversion fails', async () => {
+			ffmpegConvertGifToVideo.mockRejectedValue(
+				new Error( 'worker crashed' )
+			);
+
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.cancelItem = jest.fn();
+
+			const select = {
+				getItem: () => ( { id: 'queue-3', file: gifFile } ),
+			};
+
+			const thunk = transcodeGifItem( 'queue-3' );
+			await thunk( { select, dispatch: dispatchFn } );
+
+			expect( dispatchFn.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatchFn.cancelItem ).toHaveBeenCalledTimes( 1 );
+			const [ id, error ] = dispatchFn.cancelItem.mock.calls[ 0 ];
+			expect( id ).toBe( 'queue-3' );
+			expect( error ).toBeInstanceOf( UploadError );
+			expect( error.code ).toBe( 'GIF_TRANSCODING_ERROR' );
+			expect( error.file ).toBe( gifFile );
+			expect( error.cause ).toBeInstanceOf( Error );
+			expect( error.cause.message ).toBe( 'worker crashed' );
+		} );
+
+		it( 'returns early when the queued item is missing', async () => {
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			dispatchFn.cancelItem = jest.fn();
+
+			const select = { getItem: () => undefined };
+
+			const thunk = transcodeGifItem( 'queue-missing' );
+			await thunk( { select, dispatch: dispatchFn } );
+
+			expect( ffmpegConvertGifToVideo ).not.toHaveBeenCalled();
+			expect( dispatchFn.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatchFn.cancelItem ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'prepareItem (animated GIF → video branch)', () => {
+		const originalCrossOriginIsolated = Reflect.getOwnPropertyDescriptor(
+			globalThis,
+			'crossOriginIsolated'
+		);
+
+		function setCrossOriginIsolated( value ) {
+			Object.defineProperty( globalThis, 'crossOriginIsolated', {
+				configurable: true,
+				get: () => value,
+			} );
+		}
+
+		function makeGifItem( id = 'q', additionalData = {} ) {
+			const file = new File(
+				[ new Uint8Array( [ 0x47, 0x49, 0x46, 0x38 ] ) ],
+				'animated.gif',
+				{ type: 'image/gif' }
+			);
+			return { id, file, additionalData };
+		}
+
+		beforeEach( () => {
+			jest.clearAllMocks();
+			setCrossOriginIsolated( true );
+		} );
+
+		afterAll( () => {
+			if ( originalCrossOriginIsolated ) {
+				Object.defineProperty(
+					globalThis,
+					'crossOriginIsolated',
+					originalCrossOriginIsolated
+				);
+			}
+		} );
+
+		function runPrepare( { item, settings, id = 'q' } ) {
+			const dispatchFn = jest.fn();
+			dispatchFn.finishOperation = jest.fn();
+			const select = {
+				getItem: () => item,
+				getSettings: () => settings,
+			};
+			return transcodePrepareAndCapture(
+				{ select, dispatch: dispatchFn },
+				id
+			);
+		}
+
+		async function transcodePrepareAndCapture( args, id ) {
+			const thunk = prepareItem( id );
+			await thunk( args );
+			return args.dispatch;
+		}
+
+		it( 'queues TranscodeGif + Upload for an animated GIF (mp4 by default)', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			const item = makeGifItem( 'q-anim' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-anim',
+			} );
+
+			// Find AddOperations dispatch.
+			const addOpsCall = dispatchFn.mock.calls.find(
+				( [ action ] ) => action?.type === Type.AddOperations
+			);
+			expect( addOpsCall ).toBeDefined();
+			const [ action ] = addOpsCall;
+			expect( action.id ).toBe( 'q-anim' );
+			expect( action.operations ).toEqual( [
+				[ OperationType.TranscodeGif, { outputFormat: 'mp4' } ],
+				OperationType.Upload,
+			] );
+
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
+				'q-anim',
+				{
+					additionalData: {
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				}
+			);
+		} );
+
+		it( 'queues webm output when videoOutputFormat is video/webm', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			const item = makeGifItem( 'q-webm' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: { videoOutputFormat: 'video/webm' },
+				id: 'q-webm',
+			} );
+
+			const addOpsCall = dispatchFn.mock.calls.find(
+				( [ action ] ) => action?.type === Type.AddOperations
+			);
+			expect( addOpsCall[ 0 ].operations[ 0 ] ).toEqual( [
+				OperationType.TranscodeGif,
+				{ outputFormat: 'webm' },
+			] );
+		} );
+
+		it( 'preserves any existing additionalData from the queue item', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			const item = makeGifItem( 'q-additional', {
+				post_id: 7,
+				custom: 'keep-me',
+			} );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-additional',
+			} );
+
+			expect( dispatchFn.finishOperation ).toHaveBeenCalledWith(
+				'q-additional',
+				{
+					additionalData: {
+						post_id: 7,
+						custom: 'keep-me',
+						generate_sub_sizes: true,
+						convert_format: true,
+					},
+				}
+			);
+		} );
+
+		function hasTranscodeGifOperation( dispatchFn ) {
+			return dispatchFn.mock.calls.some( ( [ action ] ) => {
+				if ( action?.type !== Type.AddOperations ) {
+					return false;
+				}
+				return action.operations.some(
+					( op ) =>
+						Array.isArray( op ) &&
+						op[ 0 ] === OperationType.TranscodeGif
+				);
+			} );
+		}
+
+		it( 'skips the GIF branch when settings.gifConvert is false', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			const item = makeGifItem( 'q-off' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: { gifConvert: false },
+				id: 'q-off',
+			} );
+
+			expect( hasTranscodeGifOperation( dispatchFn ) ).toBe( false );
+		} );
+
+		it( 'skips the GIF branch when crossOriginIsolated is false', async () => {
+			isAnimatedGif.mockReturnValue( true );
+			setCrossOriginIsolated( false );
+			const item = makeGifItem( 'q-not-isolated' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-not-isolated',
+			} );
+
+			// isAnimatedGif should never be consulted because the isolation
+			// check short-circuits first.
+			expect( isAnimatedGif ).not.toHaveBeenCalled();
+			expect( hasTranscodeGifOperation( dispatchFn ) ).toBe( false );
+		} );
+
+		it( 'falls through when the GIF is not animated', async () => {
+			isAnimatedGif.mockReturnValue( false );
+			const item = makeGifItem( 'q-static' );
+
+			const dispatchFn = await runPrepare( {
+				item,
+				settings: {},
+				id: 'q-static',
+			} );
+
+			// finishOperation is called at the end of prepareItem for every
+			// item, but never with the GIF-specific generate_sub_sizes flag.
+			const gifFinishCall = dispatchFn.finishOperation.mock.calls.find(
+				( [ , payload ] ) =>
+					payload?.additionalData?.convert_format === true
+			);
+			expect( gifFinishCall ).toBeUndefined();
 		} );
 	} );
 } );
