@@ -8,9 +8,9 @@ import type { FooterProps } from './types';
  * Renders the footer section of the dialog, typically containing
  * action buttons.
  *
- * Defaults to a native `<footer>` element so the dialog exposes a landmark
- * that assistive technology can navigate to directly. Pass `render` to opt
- * out of the default tag.
+ * Defaults to a native `<footer>` element for richer semantics (contentinfo
+ * landmark navigation where screen readers expose landmarks nested in
+ * dialogs). Pass `render` to opt out of the default tag.
  */
 const Footer = forwardRef< HTMLElement, FooterProps >( function DialogFooter(
 	{ className, render, ...props },
