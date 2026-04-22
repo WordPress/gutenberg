@@ -634,6 +634,7 @@ describe( 'Drawer', () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
 
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 			expect( errors ).toHaveLength( 0 );
 
 			await user.click(
@@ -649,6 +650,54 @@ describe( 'Drawer', () => {
 					'For accessibility, every drawer requires a title. ' +
 					'If needed, the title can be visually hidden but must not be omitted.'
 			);
+
+			cleanup();
+		} );
+
+		it( 'should recover when title is added back', async () => {
+			const user = userEvent.setup();
+			const { errors, cleanup } = collectUncaughtErrors();
+
+			function Test() {
+				const [ showTitle, setShowTitle ] = useState( false );
+				return (
+					<Drawer.Root>
+						<Drawer.Trigger>Open</Drawer.Trigger>
+						<Drawer.Popup>
+							{ showTitle && (
+								<Drawer.Title>My Title</Drawer.Title>
+							) }
+							<button
+								onClick={ () => setShowTitle( ( s ) => ! s ) }
+							>
+								Toggle Title
+							</button>
+						</Drawer.Popup>
+					</Drawer.Root>
+				);
+			}
+
+			render( <Test /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			await waitFor( () => {
+				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
+			} );
+
+			await waitFor( () => {
+				expect( errors.length ).toBeGreaterThan( 0 );
+			} );
+
+			const errorCountAfterInitial = errors.length;
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Toggle Title' } )
+			);
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+
+			expect( errors ).toHaveLength( errorCountAfterInitial );
 
 			cleanup();
 		} );
