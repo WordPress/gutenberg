@@ -15,6 +15,9 @@ const hasClassWithName = ( node, name ) =>
 const hasFunctionWithName = ( node, name ) =>
 	node.type === 'FunctionDeclaration' && node.id.name === name;
 
+const hasTSDeclareFunction = ( node, name ) =>
+	node.type === 'TSDeclareFunction' && node.id?.name === name;
+
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
 	node.declarations.some( ( declaration ) => {
@@ -32,6 +35,8 @@ const hasNamedExportWithName = ( node, name ) =>
 	node.type === 'ExportNamedDeclaration' &&
 	( ( node.declaration && hasClassWithName( node.declaration, name ) ) ||
 		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
+		( node.declaration &&
+			hasTSDeclareFunction( node.declaration, name ) ) ||
 		( node.declaration && hasVariableWithName( node.declaration, name ) ) );
 
 const hasImportWithName = ( node, name ) =>
@@ -96,14 +101,18 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 				hasImportWithName( node, entry.localName )
 			);
 		} );
-		if ( candidates.length !== 1 ) {
+		if ( candidates.length === 0 ) {
 			return doc;
 		}
-		const node = candidates[ 0 ];
-		if ( isImportDeclaration( node ) ) {
-			doc = getJSDocFromDependency( node, entry, parseDependency );
-		} else {
-			doc = getJSDocFromToken( node );
+		for ( const node of candidates ) {
+			if ( isImportDeclaration( node ) ) {
+				doc = getJSDocFromDependency( node, entry, parseDependency );
+			} else {
+				doc = getJSDocFromToken( node );
+			}
+			if ( doc !== undefined ) {
+				return doc;
+			}
 		}
 		return doc;
 	}
