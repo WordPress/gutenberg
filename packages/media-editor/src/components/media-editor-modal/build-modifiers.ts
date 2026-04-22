@@ -3,7 +3,20 @@
  */
 import type { CropperState, Size } from '../../image-editor';
 
-/** A single modifier in the REST `/edit` payload. Order is significant. */
+/**
+ * A single modifier in the REST `/edit` payload. Order is significant; the
+ * server applies modifiers sequentially in array order.
+ *
+ * Shape/units (matches `WP_REST_Attachments_Controller::edit_media_item`):
+ *
+ * - `flip`: booleans for each axis. `horizontal` mirrors left/right,
+ *   `vertical` mirrors top/bottom.
+ * - `rotate`: `angle` in degrees, clockwise-positive (matches the legacy
+ *   `use-save-image.js` convention; the server negates it internally for
+ *   `WP_Image_Editor::rotate`, which is counterclockwise-positive).
+ * - `crop`: `left`, `top`, `width`, `height` are percentages `0–100` of the
+ *   source image's natural dimensions — NOT pixels. Origin is top-left.
+ */
 export type Modifier =
 	| {
 			type: 'flip';
