@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { GridLayoutItem } from './types';
+import type { DashboardGridLayoutItem } from './types';
 
 /**
  * Resolves `fillWidth` items by computing how many columns they should span.
@@ -14,13 +14,13 @@ import type { GridLayoutItem } from './types';
  * look-ahead.
  *
  * @param sortedKeys - Item keys in display order.
- * @param layoutMap  - Map of key to GridLayoutItem.
+ * @param layoutMap  - Map of key to DashboardGridLayoutItem.
  * @param maxColumns - Total columns in the grid.
  * @return Map of fillWidth item keys to their resolved column spans.
  */
 export function resolveFillWidths(
 	sortedKeys: string[],
-	layoutMap: Map< string, GridLayoutItem >,
+	layoutMap: Map< string, DashboardGridLayoutItem >,
 	maxColumns: number
 ): Map< string, number > {
 	const resolved = new Map< string, number >();
@@ -28,7 +28,7 @@ export function resolveFillWidths(
 
 	// Pre-extract items into a flat array and pre-compute clamped widths.
 	// This avoids repeated Map.get() and Math.min() calls in the hot loops.
-	const items = new Array< GridLayoutItem | undefined >( n );
+	const items = new Array< DashboardGridLayoutItem | undefined >( n );
 	const widths = new Array< number >( n );
 	let hasFillWidth = false;
 

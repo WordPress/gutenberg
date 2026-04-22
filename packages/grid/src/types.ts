@@ -1,7 +1,7 @@
 /**
- * Base properties shared by all grid layout items.
+ * Base properties shared by all dashboard grid layout items.
  */
-interface GridLayoutItemBase {
+interface DashboardGridLayoutItemBase {
 	/**
 	 * Unique key that matches a child component key.
 	 */
@@ -24,30 +24,30 @@ interface GridLayoutItemBase {
 }
 
 /**
- * Grid layout item definition.
+ * Dashboard grid layout item definition.
  *
  * `fullWidth` and `fillWidth` are mutually exclusive:
  * - `fullWidth` spans all columns (`grid-column: 1 / -1`).
  * - `fillWidth` spans the remaining columns in the current row.
  */
-export type GridLayoutItem =
-	| ( GridLayoutItemBase & {
+export type DashboardGridLayoutItem =
+	| ( DashboardGridLayoutItemBase & {
 			fullWidth?: false | undefined;
 			fillWidth?: boolean;
 	  } )
-	| ( GridLayoutItemBase & {
+	| ( DashboardGridLayoutItemBase & {
 			fullWidth: true;
 			fillWidth?: false | undefined;
 	  } );
 
 /**
- * Props for the Grid component
+ * Props shared by fixed and responsive DashboardGrid variants.
  */
-interface BaseGridProps {
+interface BaseDashboardGridProps {
 	/**
 	 * Array of layout items.
 	 */
-	layout: GridLayoutItem[];
+	layout: DashboardGridLayoutItem[];
 
 	/**
 	 * Grid children.
@@ -83,7 +83,7 @@ interface BaseGridProps {
 	/**
 	 * Callback fired when layout changes due to item dragging.
 	 */
-	onChangeLayout?: ( newLayout: GridLayoutItem[] ) => void;
+	onChangeLayout?: ( newLayout: DashboardGridLayoutItem[] ) => void;
 
 	/**
 	 * Callback fired continuously during a drag or resize interaction
@@ -91,10 +91,10 @@ interface BaseGridProps {
 	 * surface (e.g., displaying the current width/position). The final
 	 * committed layout is still emitted via `onChangeLayout`.
 	 */
-	onPreviewLayout?: ( previewLayout: GridLayoutItem[] ) => void;
+	onPreviewLayout?: ( previewLayout: DashboardGridLayoutItem[] ) => void;
 }
 
-interface StandardGridProps extends BaseGridProps {
+interface FixedDashboardGridProps extends BaseDashboardGridProps {
 	/**
 	 * Total number of columns in the grid.
 	 *
@@ -105,7 +105,7 @@ interface StandardGridProps extends BaseGridProps {
 	minColumnWidth?: never;
 }
 
-interface ResponsiveGridProps extends BaseGridProps {
+interface ResponsiveDashboardGridProps extends BaseDashboardGridProps {
 	/**
 	 * Minimum width in pixels for each column in responsive mode.
 	 * If provided, enables responsive mode which automatically
@@ -116,4 +116,6 @@ interface ResponsiveGridProps extends BaseGridProps {
 	columns?: never;
 }
 
-export type GridProps = StandardGridProps | ResponsiveGridProps;
+export type DashboardGridProps =
+	| FixedDashboardGridProps
+	| ResponsiveDashboardGridProps;

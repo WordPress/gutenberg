@@ -1,2 +1,2 @@
-export { Grid } from './grid';
-export type { GridLayoutItem, GridProps } from './types';
+export { DashboardGrid } from './grid';
+export type { DashboardGridLayoutItem, DashboardGridProps } from './types';

@@ -14,19 +14,19 @@ import { IconButton } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { Grid } from '../grid';
-import type { GridLayoutItem } from '../types';
+import { DashboardGrid } from '../grid';
+import type { DashboardGridLayoutItem } from '../types';
 
-const meta: Meta< typeof Grid > = {
-	title: 'Design System/Components/Grid',
-	component: Grid,
+const meta: Meta< typeof DashboardGrid > = {
+	title: 'Design System/Components/DashboardGrid',
+	component: DashboardGrid,
 	argTypes: {
 		children: { control: false },
 	},
 };
 export default meta;
 
-type Story = StoryObj< typeof Grid >;
+type Story = StoryObj< typeof DashboardGrid >;
 
 type Tone = 'brand' | 'info' | 'success' | 'warning' | 'error' | 'neutral';
 
@@ -139,7 +139,7 @@ function TileActions( {
 	);
 }
 
-function LayoutStatePanel( { layout }: { layout: GridLayoutItem[] } ) {
+function LayoutStatePanel( { layout }: { layout: DashboardGridLayoutItem[] } ) {
 	return (
 		<div
 			style={ {
@@ -349,7 +349,7 @@ export const RowHeight: Story = {
  */
 export const EditMode: Story = {
 	render: function EditModeStory() {
-		const initialLayout: ( GridLayoutItem & {
+		const initialLayout: ( DashboardGridLayoutItem & {
 			tone: Tone;
 			label: string;
 		} )[] = [
@@ -405,11 +405,11 @@ export const EditMode: Story = {
 
 		const [ tiles, setTiles ] = useState( initialLayout );
 
-		const layout: GridLayoutItem[] = tiles.map(
+		const layout: DashboardGridLayoutItem[] = tiles.map(
 			( { tone: _tone, label: _label, ...item } ) => item
 		);
 
-		const onChangeLayout = ( next: GridLayoutItem[] ) => {
+		const onChangeLayout = ( next: DashboardGridLayoutItem[] ) => {
 			setTiles(
 				next.map( ( item ) => {
 					const existing = tiles.find( ( t ) => t.key === item.key );
@@ -456,7 +456,7 @@ export const EditMode: Story = {
 
 		return (
 			<div style={ { width: '800px' } }>
-				<Grid
+				<DashboardGrid
 					layout={ layout }
 					columns={ 6 }
 					rowHeight={ 80 }
@@ -485,7 +485,7 @@ export const EditMode: Story = {
 							{ tile.label }
 						</Tile>
 					) ) }
-				</Grid>
+				</DashboardGrid>
 
 				<LayoutStatePanel layout={ layout } />
 			</div>

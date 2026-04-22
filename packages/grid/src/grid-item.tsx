@@ -13,13 +13,13 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import ResizeHandle from './resize-handle';
-import type { GridLayoutItem } from './types';
+import type { DashboardGridLayoutItem } from './types';
 
 type GridItemProps = {
 	/**
 	 * The layout item containing grid positioning information.
 	 */
-	item: GridLayoutItem;
+	item: DashboardGridLayoutItem;
 
 	/**
 	 * The maximum number of columns in the grid.
