@@ -22,7 +22,8 @@ export default function ArrayControl< Item >( {
 	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { label, placeholder, getValue, setValue, isValid } = field;
+	const { label, placeholder, description, getValue, setValue, isValid } =
+		field;
 	const value = getValue( { item: data } );
 	const disabled = field.isDisabled( { item: data, field } );
 
@@ -73,6 +74,7 @@ export default function ArrayControl< Item >( {
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
 			placeholder={ placeholder }
+			help={ description }
 			suggestions={ elements?.map( ( element ) => element.value ) }
 			disabled={ disabled }
 			__experimentalValidateInput={ ( token: string ) => {
