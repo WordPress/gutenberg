@@ -20,12 +20,63 @@ concurrency:
 permissions: {}
 
 jobs:
+    # Detects whether a PR touches any "impactful" paths. On non-PR events,
+    # always emits should_run=true so push/release/workflow_dispatch keep
+    # their existing behavior.
+    # NOTE: Keep the filter list in sync with .github/workflows/performance.yml.
+    changes:
+        name: Detect impactful changes
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            pull-requests: read
+        outputs:
+            should_run: ${{ steps.filter.outputs.impactful || steps.force-run.outputs.impactful }}
+        steps:
+            - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+              id: filter
+              if: github.event_name == 'pull_request'
+              with:
+                  filters: |
+                      impactful:
+                          - '**'
+                          - '!**/*.md'
+                          - '!docs/**'
+                          - '!**/stories/**'
+                          - '!**/*.story.{js,jsx,ts,tsx}'
+                          - '!**/*.stories.{js,jsx,ts,tsx}'
+                          - '!.storybook/**'
+                          - '!storybook/**'
+                          - '!.github/ISSUE_TEMPLATE/**'
+                          - '!.github/PULL_REQUEST_TEMPLATE.md'
+                          - '!.cursor/**'
+                          - '!.husky/**'
+                          - '!CODEOWNERS'
+                          - '!packages/eslint-plugin/**'
+                          - '!packages/stylelint-config/**'
+                          - '!packages/prettier-config/**'
+                          - '!packages/npm-package-json-lint-config/**'
+                          - '!packages/jest-console/**'
+                          - '!packages/jest-preset-default/**'
+                          - '!packages/jest-puppeteer-axe/**'
+                          - '!packages/docgen/**'
+                          - '!packages/project-management-automation/**'
+                          - '!eslint.config.mjs'
+                          - '!.stylelintrc*'
+                          - '!.prettierrc*'
+                          - '!.editorconfig'
+                          - '!.markdownlint*'
+            - name: Default to run outside pull requests
+              id: force-run
+              if: github.event_name != 'pull_request'
+              run: echo "impactful=true" >> "$GITHUB_OUTPUT"
+
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        needs: changes
+        if: ${{ (github.event_name != 'pull_request' || needs.changes.outputs.should_run == 'true') && (github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request') }}
         strategy:
             fail-fast: false
             matrix:
@@ -76,8 +127,11 @@ jobs:
 
     merge-artifacts:
         name: Merge Artifacts
-        if: ${{ !cancelled() }}
-        needs: [e2e-playwright]
+        # Gate on `changes` as well: GitHub treats a skipped `needs:` as success,
+        # so without this guard merge-artifacts would still run after a fully
+        # skipped matrix and try to merge nonexistent artifacts.
+        if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.should_run == 'true') }}
+        needs: [changes, e2e-playwright]
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
