@@ -7,6 +7,17 @@
 	user-select: none;
 	cursor: grab;
 
+	// Inner gutter for resize handles. Handles use negative offsets and a
+	// 44×44 touch target that extends past the crop edge; the root clips
+	// overflow (required for the dimming overlay's box-shadow trick), so a
+	// flush handle would be clipped. The inner `__canvas` wrapper is inset
+	// by half the touch target, reserving reach room on all sides while
+	// keeping the root as the clipping boundary.
+	&__canvas {
+		position: absolute;
+		inset: 22px;
+	}
+
 	&--dragging {
 		cursor: grabbing;
 	}
