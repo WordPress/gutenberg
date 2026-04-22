@@ -179,7 +179,7 @@ export function DashboardGrid( {
 			const oldIndex = items.indexOf( String( active.id ) );
 			const newIndex = items.indexOf( String( over.id ) );
 			const updatedItems = arrayMove( items, oldIndex, newIndex );
-			const updatedLayout = layout.map( ( item ) => {
+			const updatedLayout = activeLayout.map( ( item ) => {
 				const newOrder = updatedItems.indexOf( item.key );
 				return {
 					...item,
