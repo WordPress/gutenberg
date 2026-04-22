@@ -7,7 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
