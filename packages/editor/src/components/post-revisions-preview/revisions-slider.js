@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { RangeControl, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
@@ -94,6 +94,17 @@ function RevisionsSlider() {
 		return dateI18n( dateSettings.formats.datetime, revision.date );
 	};
 
+	const selectedRevision = revisions?.[ selectedIndex ];
+	const ariaValueText = selectedRevision
+		? sprintf(
+				/* translators: 1: current revision number, 2: total number of revisions, 3: revision date */
+				__( 'Revision %1$s of %2$s: %3$s' ),
+				selectedIndex + 1,
+				revisions.length,
+				dateI18n( dateSettings.formats.datetime, selectedRevision.date )
+		  )
+		: undefined;
+
 	if ( isLoading ) {
 		return <Spinner />;
 	}
@@ -117,6 +128,7 @@ function RevisionsSlider() {
 	return (
 		<RangeControl
 			__next40pxDefaultSize
+			aria-valuetext={ ariaValueText }
 			className="editor-revisions-header__slider"
 			hideLabelFromVision
 			label={ __( 'Revision' ) }
