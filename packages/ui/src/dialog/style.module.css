@@ -115,8 +115,9 @@
 
 	/*
 	 * Shared "chrome" rules for a header-like area inside a popup: edge-to-edge
-	 * border-box, background, block-end padding, transparent bottom border.
-	 * Layout is left to the consumer (Dialog.Header composes a flex row below;
+	 * background, block-end padding, and a scroll-state separator rendered as
+	 * an inset box-shadow so it never contributes to layout size. Layout is
+	 * left to the consumer (Dialog.Header composes a flex row below;
 	 * AlertDialog applies this directly to a column Stack).
 	 */
 	.headerChrome {
@@ -127,14 +128,12 @@
 		padding-block-end: var(--wpds-dimension-gap-lg);
 		/*
 		 * Extend the header across the popup's horizontal padding so its
-		 * separator border spans edge-to-edge. The negative `margin-inline`
-		 * claims the popup's side padding; the matching `padding-inline`
-		 * restores the header's content alignment with the body below.
+		 * separator spans edge-to-edge. The negative `margin-inline` claims
+		 * the popup's side padding; the matching `padding-inline` restores
+		 * the header's content alignment with the body below.
 		 */
 		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
 		padding-inline: var(--wpds-dimension-padding-2xl);
-		box-sizing: border-box;
-		border-block-end: 1px solid transparent;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
@@ -170,7 +169,11 @@
 	 * separator border needs to appear.
 	 */
 	.popup[data-wp-ui-overlay-scrolled-from-top] .headerSticky {
-		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
+		/*
+		 * Inset box-shadow (instead of border) keeps the separator off the
+		 * layout, so spacing matches the non-sticky rhythm exactly.
+		 */
+		box-shadow: inset 0 -1px 0 0 var(--wpds-color-stroke-surface-neutral);
 	}
 
 	.title {
@@ -206,14 +209,12 @@
 		padding-block-start: var(--wpds-dimension-gap-lg);
 		/*
 		 * Extend the footer across the popup's horizontal padding so its
-		 * separator border spans edge-to-edge. The negative `margin-inline`
-		 * claims the popup's side padding; the matching `padding-inline`
-		 * restores the footer's content alignment with the body above.
+		 * separator spans edge-to-edge. The negative `margin-inline` claims
+		 * the popup's side padding; the matching `padding-inline` restores
+		 * the footer's content alignment with the body above.
 		 */
 		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
 		padding-inline: var(--wpds-dimension-padding-2xl);
-		box-sizing: border-box;
-		border-block-start: 1px solid transparent;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
@@ -240,6 +241,7 @@
 	}
 
 	.popup[data-wp-ui-overlay-scrolled-from-bottom] .footerSticky {
-		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
+		/* See note on the matching header rule above. */
+		box-shadow: inset 0 1px 0 0 var(--wpds-color-stroke-surface-neutral);
 	}
 }

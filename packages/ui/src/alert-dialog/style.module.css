@@ -2,18 +2,11 @@
 
 @layer wp-ui-components {
 	/*
-	 * Keep the original non-sticky spacing for AlertDialog heading content.
-	 * Sticky mode uses shared dialog chrome spacing instead.
-	 */
-	.header {
-		margin-bottom: var(--wpds-dimension-gap-lg);
-	}
-
-	/*
 	 * Row layout for the action buttons inside AlertDialog's footer. The
-	 * surrounding chrome (background, border, inline bleed, sticky positioning)
-	 * comes from the shared classes in `dialog/style.module.css`, applied to
-	 * the outer Stack so that the error message stays inside the sticky area.
+	 * surrounding chrome (background, separator, inline bleed, sticky
+	 * positioning) comes from the shared classes in `dialog/style.module.css`,
+	 * applied to the outer Stack so that the error message stays inside the
+	 * sticky area.
 	 */
 	.footer-actions {
 		display: flex;
