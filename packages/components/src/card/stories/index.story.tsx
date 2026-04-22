@@ -1,3 +1,4 @@
+// CI validation: temporary edit to verify the stories-only skip behavior in PR #77533. Do not merge.
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	Card,
