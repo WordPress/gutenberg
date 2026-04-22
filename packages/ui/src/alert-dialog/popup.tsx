@@ -7,12 +7,14 @@ import {
 	privateApis as themePrivateApis,
 } from '@wordpress/theme';
 
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
 import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
 import { Text } from '../text';
 import { AlertDialogContext } from './context';
+import { Portal } from './portal';
 import alertDialogStyles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -23,6 +25,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 	function AlertDialogPopup(
 		{
 			className,
+			portal,
 			intent = 'default',
 			title,
 			description,
@@ -43,8 +46,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
-		return (
-			<_AlertDialog.Portal>
+		const portalChildren = (
+			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup
@@ -64,7 +67,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							<Text
 								variant="heading-xl"
 								render={ <_AlertDialog.Title /> }
-								className={ dialogStyles.title }
 							>
 								{ title }
 							</Text>
@@ -108,8 +110,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						</Stack>
 					</_AlertDialog.Popup>
 				</ThemeProvider>
-			</_AlertDialog.Portal>
+			</>
 		);
+
+		return renderPortalWithChildren( portal, <Portal />, portalChildren );
 	}
 );
 

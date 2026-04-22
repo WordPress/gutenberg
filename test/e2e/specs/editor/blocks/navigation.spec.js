@@ -1890,7 +1890,7 @@ test.describe( 'Navigation block', () => {
 				} );
 				await expect( linkButton ).toBeVisible();
 				await expect( linkButton ).toBeEnabled();
-				await expect( linkButton ).toContainText( 'localhost' );
+				await expect( linkButton ).toContainText( 'Test Page 1' );
 			} );
 
 			await test.step( 'Click LinkPicker button to open dropdown', async () => {

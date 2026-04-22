@@ -76,6 +76,22 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
+	it( 'should return minWidth style', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					minWidth: '200px',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				minWidth: '200px',
+			},
+		} );
+	} );
+
 	it( 'should return all dimension styles when multiple are provided', () => {
 		const attributes = {
 			style: {

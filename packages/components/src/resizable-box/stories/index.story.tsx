@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import ResizableBox from '..';
 
 const meta: Meta< typeof ResizableBox > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Utilities/ResizableBox',
 	id: 'components-resizablebox',
 	component: ResizableBox,

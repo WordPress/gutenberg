@@ -12,8 +12,8 @@ import type { RootProps } from './types';
  *
  * - `Popover.Root` — provides open state and context to all sub-components.
  * - `Popover.Trigger` — the button that toggles the popup.
- * - `Popover.Popup` — the floating container (portal, positioning, collision
- *   avoidance).
+ * - `Popover.Popup` — the floating container (positioning, collision
+ *   avoidance); portals by default or via `portal={ <Popover.Portal /> }`.
  * - `Popover.Arrow` — an optional arrow pointing toward the anchor.
  * - `Popover.Title` — **required** heading that labels the popover for
  *   accessibility (can be visually hidden).

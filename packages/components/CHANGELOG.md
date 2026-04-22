@@ -2,11 +2,41 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
+
+### Breaking Changes
+
+-   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
+
+### Internal
+
+-   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
+
+## 32.6.0 (2026-04-15)
+
+### Documentation
+
+-   Add README.md files for `DatePicker` and `TimePicker` components ([#70365](https://github.com/WordPress/gutenberg/pull/70365)).
+
 ### Bug Fixes
 
+-   `CheckboxControl`: Fix disabled styles [#77132](https://github.com/WordPress/gutenberg/pull/77132).
+-   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
+-   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
+-   `DateCalendar`: Fix disabled selected day having darker background than other disabled controls [#77138](https://github.com/WordPress/gutenberg/pull/77138).
 -   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
 -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
 -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
+-   `Autocomplete`: Skip stale triggers from completed mentions ([#77185](https://github.com/WordPress/gutenberg/pull/77185)).
+
+### Enhancements
+
+-   `Sandbox`: Add `allowSameOrigin` prop to opt in to `allow-same-origin` on the iframe sandbox. The default is now `false`, removing same-origin access for user-controlled content like the Custom HTML block ([#77212](https://github.com/WordPress/gutenberg/pull/77212)).
+-   `FormToggle`: Update disabled styles [#77208](https://github.com/WordPress/gutenberg/pull/77208).
+-   `RadioControl`: Add support for disabled radio group [#77127](https://github.com/WordPress/gutenberg/pull/77127).
+-   `AlignmentMatrixControl`, `Button`, `Calendar`, `CheckboxControl`, `CircularOptionPicker`, `ColorPalette`, `DropdownMenu`, `FormToggle`, `FormTokenField`, `RadioControl`, `Snackbar`, `TabPanel`, `ToggleControl`: Use `--wpds-cursor-control` for interactive cursor styling ([#76786](https://github.com/WordPress/gutenberg/pull/76786)).
 
 ### Internal
 
@@ -15,6 +45,11 @@
 -   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
 -   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
 -   `CustomSelectControl`, `Sandbox`: Rename internal React function names ([#77148](https://github.com/WordPress/gutenberg/pull/77148)).
+
+### Code Quality
+
+-   `Textarea`: remove unnecessary style [#77221](https://github.com/WordPress/gutenberg/pull/77221).
+-   `FormTokenField`: remove unnecessary style [#77263](https://github.com/WordPress/gutenberg/pull/77263).
 
 ## 32.5.0 (2026-04-01)
 

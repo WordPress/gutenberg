@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -324,7 +323,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		<>
 			<ScreenHeader
 				title={
-					variation ? currentBlockStyle?.label : blockType?.title
+					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				states={ validStates }
 				selectedState={ selectedState }
@@ -415,7 +414,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 							__(
 								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
-							blockType?.title
+							blockType?.title!
 						) }
 					/>
 				</PanelBody>

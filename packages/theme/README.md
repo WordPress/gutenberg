@@ -13,6 +13,36 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
+### Using Design Tokens
+
+Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
+
+The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
+
+#### Within WordPress
+
+Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+
+#### Outside WordPress
+
+Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
+
+```
+npm install @wordpress/theme
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
+```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+### Developer Tools
+
+For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+
+If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
+
 ### Architecture
 
 Internally, the design system uses a tiered token architecture:
@@ -52,27 +82,29 @@ Semantic tokens follow a consistent naming pattern:
 
 **Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
 
-| Value       | Description                                                                    |
-| ----------- | ------------------------------------------------------------------------------ |
-| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
-| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
-| `border`    | Border properties like radius and width                                        |
-| `elevation` | Shadow definitions for layering and depth                                      |
-| `font`      | Typography properties like family, size, and line-height                       |
+| Value        | Description                                                                    |
+| ------------ | ------------------------------------------------------------------------------ |
+| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
+| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`     | Border properties like radius and width                                        |
+| `elevation`  | Shadow definitions for layering and depth                                      |
+| `typography` | Typography properties like font family, font size, and line-height             |
 
 **Property** is the specific design property being defined.
 
-| Value     | Description                        |
-| --------- | ---------------------------------- |
-| `bg`      | Background color                   |
-| `fg`      | Foreground color (text and icons)  |
-| `stroke`  | Border and outline color           |
-| `padding` | Internal spacing within an element |
-| `gap`     | Spacing between elements           |
-| `radius`  | Border radius for rounded corners  |
-| `width`   | Border width                       |
-| `size`    | Font size                          |
-| `family`  | Font family                        |
+| Value         | Description                        |
+| ------------- | ---------------------------------- |
+| `bg`          | Background color                   |
+| `fg`          | Foreground color (text and icons)  |
+| `stroke`      | Border and outline color           |
+| `padding`     | Internal spacing within an element |
+| `gap`         | Spacing between elements           |
+| `radius`      | Border radius for rounded corners  |
+| `width`       | Border width                       |
+| `font-size`   | Font size                          |
+| `font-family` | Font family                        |
+| `font-weight` | Font weight                        |
+| `line-height` | Line height                        |
 
 **Target** is the component or element type the token applies to.
 
@@ -136,10 +168,7 @@ import { ThemeProvider } from '@wordpress/theme';
 
 function App() {
 	return (
-		<ThemeProvider
-			color={ { primary: 'blue' } }
-			density="compact"
-		>
+		<ThemeProvider color={ { primary: 'blue' } } density="compact">
 			{ /* Your app content */ }
 		</ThemeProvider>
 	);

@@ -1452,4 +1452,62 @@ describe( 'AlertDialog', () => {
 			consoleSpy.mockRestore();
 		} );
 	} );
+
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<div data-testid="wrapper">
+					<AlertDialog.Root>
+						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<AlertDialog.Popup
+							title="Confirm"
+							portal={
+								<AlertDialog.Portal
+									container={ containerRef }
+								/>
+							}
+						/>
+					</AlertDialog.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const dialog = await screen.findByRole( 'alertdialog' );
+			expect( dialog ).toBeVisible();
+
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				dialog
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="wrapper">
+					<AlertDialog.Root>
+						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+						<AlertDialog.Popup title="Confirm" />
+					</AlertDialog.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			const dialog = await screen.findByRole( 'alertdialog' );
+			expect( dialog ).toBeVisible();
+
+			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
+				dialog
+			);
+		} );
+	} );
 } );

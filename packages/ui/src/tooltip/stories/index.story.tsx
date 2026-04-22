@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { formatBold, formatItalic } from '@wordpress/icons';
-import { Icon, Tooltip } from '../..';
+import { Icon } from '../../icon';
+import * as Tooltip from '../';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
