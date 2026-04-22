@@ -22,12 +22,6 @@ export const DEFAULT_VIEW: View = {
 	mediaField: 'preview',
 };
 
-export const DEFAULT_LAYOUTS = {
-	table: {},
-	grid: {},
-	list: {},
-};
-
 export const DEFAULT_VIEWS: {
 	slug: string;
 	label: string;
