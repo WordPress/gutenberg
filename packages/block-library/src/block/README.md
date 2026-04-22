@@ -29,7 +29,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
-- [`customCSS`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- `customCSS`: `false`
 
 ## Context
 

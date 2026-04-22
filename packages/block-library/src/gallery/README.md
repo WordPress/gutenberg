@@ -43,7 +43,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`units`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#units): `"px"`, `"em"`, `"rem"`, `"vh"`, `"vw"`
+- `units`: `"px"`, `"em"`, `"rem"`, `"vh"`, `"vw"`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
