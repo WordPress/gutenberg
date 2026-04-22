@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import * as Collapsible from '../index';
 
 const meta: Meta< typeof Collapsible.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Collapsible',
 	component: Collapsible.Root,
 	subcomponents: {

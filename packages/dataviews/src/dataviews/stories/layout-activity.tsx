@@ -640,13 +640,11 @@ const LayoutActivityComponent = ( {
 
 	return (
 		<div
-			style={
-				{
-					height: '100%',
-					maxWidth: fullWidth ? undefined : '400px',
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				maxWidth: fullWidth ? undefined : '400px',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
