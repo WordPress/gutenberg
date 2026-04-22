@@ -45,7 +45,7 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 	 * Only populated when a caller explicitly overrides the text domain for a
 	 * module via wp_set_script_module_translations().
 	 *
-	 * @var array<string, array{domain: string, path: string}>
+	 * @var array<string, array{textdomain: string, translations_path: string}>
 	 */
 	global $gutenberg_script_module_translations;
 	$gutenberg_script_module_translations = array();
@@ -74,8 +74,8 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 		}
 
 		$gutenberg_script_module_translations[ $id ] = array(
-			'domain' => $domain,
-			'path'   => $path,
+			'textdomain'        => $domain,
+			'translations_path' => $path,
 		);
 
 		return true;
@@ -111,8 +111,8 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 
 		foreach ( $module_ids as $id ) {
 			if ( isset( $gutenberg_script_module_translations[ $id ] ) ) {
-				$domain = $gutenberg_script_module_translations[ $id ]['domain'];
-				$path   = $gutenberg_script_module_translations[ $id ]['path'];
+				$domain = $gutenberg_script_module_translations[ $id ]['textdomain'];
+				$path   = $gutenberg_script_module_translations[ $id ]['translations_path'];
 			} else {
 				$domain = 'default';
 				$path   = '';
