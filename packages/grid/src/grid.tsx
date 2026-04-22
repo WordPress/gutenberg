@@ -317,6 +317,7 @@ export function DashboardGrid( {
 							}
 							maxColumns={ effectiveColumns }
 							disabled={ ! editMode }
+							verticalResizable={ rowHeight !== 'auto' }
 							onResize={ ( delta ) => handleResize( id, delta ) }
 							onResizeEnd={ persistTemporaryLayout }
 							actionableArea={ actionableAreaMap.get( id ) }
