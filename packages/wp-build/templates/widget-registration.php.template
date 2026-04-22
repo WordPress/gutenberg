@@ -13,9 +13,9 @@
  * Registers each widget's render and metadata as script modules via
  * wp_register_script_module.
  *
- * Module IDs follow core's route pattern:
- *   {{HANDLE_PREFIX}}/widgets/{name}/render
- *   {{HANDLE_PREFIX}}/widgets/{name}/widget
+ * Module IDs follow core's route pattern and use the widget directory name:
+ *   {{HANDLE_PREFIX}}/widgets/{widget-dir-name}/render
+ *   {{HANDLE_PREFIX}}/widgets/{widget-dir-name}/widget
  */
 function {{PREFIX}}_register_widget_modules() {
 	$registry_file = __DIR__ . '/widgets/registry.php';
