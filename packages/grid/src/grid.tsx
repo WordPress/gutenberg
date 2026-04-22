@@ -27,6 +27,7 @@ import {
 import {
 	useMemo,
 	Children,
+	cloneElement,
 	isValidElement,
 	useLayoutEffect,
 	useRef,
@@ -165,8 +166,9 @@ export function DashboardGrid( {
 		return map;
 	}, [ items, layoutMap, effectiveColumns ] );
 
-	const [ childrenMap, remaining ] = useMemo( () => {
-		const map = new Map< string, React.ReactElement >();
+	const [ childrenMap, actionableAreaMap, remaining ] = useMemo( () => {
+		const childMap = new Map< string, React.ReactElement >();
+		const actionableMap = new Map< string, React.ReactNode >();
 		const rest: React.ReactNode[] = [];
 
 		Children.forEach( children, ( child ) => {
@@ -177,24 +179,28 @@ export function DashboardGrid( {
 
 			const key = child.key?.toString();
 			if ( key && layoutMap.has( key ) ) {
-				map.set( key, child );
+				/*
+				 * Extract `actionableArea` as a grid-level slot and strip
+				 * it from the child so the prop does not leak onto DOM
+				 * elements when consumers pass plain tags as children.
+				 */
+				const { actionableArea } = child.props;
+				if ( actionableArea !== undefined ) {
+					actionableMap.set( key, actionableArea );
+					childMap.set(
+						key,
+						cloneElement( child, { actionableArea: undefined } )
+					);
+				} else {
+					childMap.set( key, child );
+				}
 			} else {
 				rest.push( child );
 			}
 		} );
 
-		return [ map, rest ];
+		return [ childMap, actionableMap, rest ];
 	}, [ children, layoutMap ] );
-
-	const actionableAreaMap = useMemo( () => {
-		const map = new Map< string, React.ReactNode >();
-		childrenMap.forEach( ( child, key ) => {
-			if ( child?.props.actionableArea ) {
-				map.set( key, child.props.actionableArea );
-			}
-		} );
-		return map;
-	}, [ childrenMap ] );
 
 	const sensors = useSensors(
 		useSensor( PointerSensor ),
