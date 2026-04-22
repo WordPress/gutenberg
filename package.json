@@ -197,6 +197,9 @@
 		"test:performance:debug": "npm exec --workspace @wordpress/performance-tests -- wp-scripts test-playwright --config playwright.config.ts --debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
+		"test:integration": "npm run --workspace @wordpress/integration-tests test:integration --",
+		"test:integration:debug": "npm run --workspace @wordpress/integration-tests test:integration:debug --",
+		"test:integration:watch": "npm run --workspace @wordpress/integration-tests test:integration:watch --",
 		"test:unit": "npm run --workspace @wordpress/unit-tests test:unit",
 		"test:unit:date": "bash ./bin/unit-test-date.sh",
 		"test:unit:debug": "npm run --workspace @wordpress/unit-tests test:unit:debug",
@@ -254,6 +257,7 @@
 		"test/e2e",
 		"test/performance",
 		"test/storybook-playwright",
+		"test/integration",
 		"test/unit",
 		"tools/api-docs"
 	]
