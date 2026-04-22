@@ -1,0 +1,67 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tab-list",
+	"title": "Tab List",
+	"description": "Display the tab buttons for a tabbed interface.",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/tabs" ],
+	"allowedBlocks": [ "core/tab" ],
+	"usesContext": [ "core/tabs-list" ],
+	"attributes": {},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"visibility": false,
+		"lock": false,
+		"dimensions": {
+			"aspectRatio": false,
+			"height": false,
+			"minHeight": false,
+			"width": false
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
+		"layout": {
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap",
+				"orientation": "horizontal"
+			},
+			"allowSwitching": false,
+			"allowVerticalAlignment": true,
+			"allowJustification": true,
+			"allowOrientation": true
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"blockGap": true,
+			"__experimentalDefaultControls": {
+				"padding": true,
+				"margin": true,
+				"blockGap": true
+			}
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css"
+}

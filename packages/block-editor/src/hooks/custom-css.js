@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -69,6 +70,8 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	);
 }
 
+const CUSTOM_CSS_WARNING_NOTICE_ID = 'custom-css-edit-warning';
+
 function CustomCSSEdit( { clientId, name, setAttributes } ) {
 	const { style, canEditCSS } = useSelect(
 		( select ) => {
@@ -112,6 +115,31 @@ function useBlockProps( { style } ) {
 		typeof customCSS === 'string' &&
 		customCSS.trim().length > 0 &&
 		validateCSS( customCSS );
+
+	const canEditCSS = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().canEditCSS,
+		[]
+	);
+
+	const { createWarningNotice } = useDispatch( noticesStore );
+
+	// Show a warning notice when the user lacks edit_css and a block has
+	// custom CSS. The fixed notice ID ensures only one notice is shown
+	// regardless of how many blocks have CSS.
+	const hasCustomCSS = !! customCSS?.trim();
+	useEffect( () => {
+		if ( ! canEditCSS && hasCustomCSS ) {
+			createWarningNotice(
+				__(
+					'This post contains blocks with custom CSS. You do not have permission to edit CSS. If you save this post, the custom CSS will be removed.'
+				),
+				{
+					id: CUSTOM_CSS_WARNING_NOTICE_ID,
+					isDismissible: true,
+				}
+			);
+		}
+	}, [ canEditCSS, hasCustomCSS, createWarningNotice ] );
 
 	const customCSSIdentifier = useInstanceId(
 		CUSTOM_CSS_INSTANCE_REFERENCE,

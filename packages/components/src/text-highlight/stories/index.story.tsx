@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
+	tags: [ 'manifest' ],
 	component: TextHighlight,
 	title: 'Components/Typography/TextHighlight',
 	id: 'components-texthighlight',

@@ -81,6 +81,11 @@ const CONFIG = [
 		rtl: [ designTokens, componentsRtl, adminUiRtl ],
 	},
 	{
+		componentIdMatcher: /^mediaeditor-/,
+		ltr: [ componentsLtr ],
+		rtl: [ componentsRtl ],
+	},
+	{
 		componentIdMatcher: /^design-system-/,
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],

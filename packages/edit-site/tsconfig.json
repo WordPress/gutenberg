@@ -33,6 +33,7 @@
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences" },
 		{ "path": "../primitives" },
