@@ -164,6 +164,75 @@ describe( 'buildModifiers', () => {
 		expect( args.top ).toBeCloseTo( 25 );
 	} );
 
+	it( 'emits crop args relative to the rotated canvas when rotation is set', () => {
+		// A 50%-wide crop at rotation=90 should yield width=50% of the
+		// post-rotation canvas, NOT 50% of the original source width
+		// (which would be `0.5 * rotW / imageSize.width * 100` = 28.125
+		// for a 1600×900 image). The REST `/edit` endpoint applies
+		// modifiers sequentially, so by the time `crop` runs the image
+		// has been rotated to 900×1600 and percentages are against that
+		// frame.
+		const modifiers = buildModifiers(
+			stateWith( {
+				rotation: 90,
+				cropRect: { x: 0, y: 0, width: 0.5, height: 1 },
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toHaveLength( 2 );
+		expect( modifiers[ 0 ] ).toEqual( {
+			type: 'rotate',
+			args: { angle: 90 },
+		} );
+		expect( modifiers[ 1 ].type ).toBe( 'crop' );
+		const args = (
+			modifiers[ 1 ] as {
+				args: {
+					left: number;
+					top: number;
+					width: number;
+					height: number;
+				};
+			}
+		 ).args;
+		expect( args.width ).toBeCloseTo( 50 );
+		expect( args.height ).toBeCloseTo( 100 );
+		expect( args.left ).toBeCloseTo( 0 );
+		expect( args.top ).toBeCloseTo( 0 );
+	} );
+
+	it( 'emits crop args adjusted for zoom and pan', () => {
+		// At zoom=2 with pan at origin, the image is scaled 2x around
+		// the rotated-canvas center, so a cropRect centered on the
+		// stencil corresponds to a source region half as wide. For
+		// cropRect={0.25, 0.25, 0.5, 0.5}:
+		//   width  = 0.5 * 100 / 2 = 25
+		//   left   = (0.25 + 1 - 0.5 - 0) * 100 / 2 = 37.5
+		const modifiers = buildModifiers(
+			stateWith( {
+				zoom: 2,
+				cropRect: { x: 0.25, y: 0.25, width: 0.5, height: 0.5 },
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toHaveLength( 1 );
+		expect( modifiers[ 0 ].type ).toBe( 'crop' );
+		const args = (
+			modifiers[ 0 ] as {
+				args: {
+					left: number;
+					top: number;
+					width: number;
+					height: number;
+				};
+			}
+		 ).args;
+		expect( args.width ).toBeCloseTo( 25 );
+		expect( args.height ).toBeCloseTo( 25 );
+		expect( args.left ).toBeCloseTo( 37.5 );
+		expect( args.top ).toBeCloseTo( 37.5 );
+	} );
+
 	it( 'omits crop when the crop rect is full-frame within tolerance', () => {
 		// 99.95% on each axis is within the 0.1% tolerance.
 		const modifiers = buildModifiers(

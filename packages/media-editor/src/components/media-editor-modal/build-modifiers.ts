@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import type { CropperState, Size } from '../../image-editor';
-import { getSourceRegionPercent } from '../../image-editor';
 
 /**
  * A single modifier in the REST `/edit` payload. Order is significant; the
@@ -15,8 +14,11 @@ import { getSourceRegionPercent } from '../../image-editor';
  * - `rotate`: `angle` in degrees, clockwise-positive (matches the legacy
  *   `use-save-image.js` convention; the server negates it internally for
  *   `WP_Image_Editor::rotate`, which is counterclockwise-positive).
- * - `crop`: `left`, `top`, `width`, `height` are percentages `0–100` of the
- *   source image's natural dimensions — NOT pixels. Origin is top-left.
+ * - `crop`: `left`, `top`, `width`, `height` are percentages `0–100` of
+ *   the image's dimensions at the point the crop is applied — NOT pixels.
+ *   Because the server applies modifiers sequentially, these are percentages
+ *   of the post-rotation bounding box (not the original source image).
+ *   Origin is top-left.
  */
 export type Modifier =
 	| {
@@ -82,23 +84,45 @@ export function buildModifiers(
 	// region values here would spuriously emit crops for rotate-only
 	// states. The cropRect is where the user's intent lives: at defaults
 	// (0, 0, 1, 1) there is no crop to apply.
-	const cropRectPercent = {
-		width: state.cropRect.width * 100,
-		height: state.cropRect.height * 100,
-	};
 	if (
-		cropRectPercent.width < 100 - CROP_TOLERANCE ||
-		cropRectPercent.height < 100 - CROP_TOLERANCE
+		state.cropRect.width * 100 < 100 - CROP_TOLERANCE ||
+		state.cropRect.height * 100 < 100 - CROP_TOLERANCE
 	) {
-		const region = getSourceRegionPercent( state, imageSize );
+		// The REST `/edit` endpoint applies modifiers sequentially. By the
+		// time `crop` is processed, the image has already been rotated, so
+		// `WP_Image_Editor::get_size()` reports the post-rotation bounding
+		// box. Crop args are percentages of THAT frame, not of the
+		// original source image.
+		//
+		// `cropRect` is expressed in the snap-rotation bbox's normalized
+		// [0, 1] space (matches `createExportCamera` / `renderToCanvas`),
+		// so when `zoom === 1` and `pan` is at the origin the cropRect
+		// maps directly to percentages of the post-rotation canvas.
+		//
+		// Under zoom/pan the stencil still frames the same region of the
+		// post-rotation canvas, but the pixels beneath come from a
+		// zoomed-in slice of the source. The server can't reproduce the
+		// zoom (crop alone cannot upscale), so we emit the equivalent
+		// smaller crop: same source content, smaller pixel output. This
+		// matches the source region the user saw through the stencil —
+		// see `getSourceRegion` in `image-editor/core/source-region.ts`,
+		// which derives the same frame in source-image units.
+		const zoom = state.zoom;
+		const width = ( state.cropRect.width * 100 ) / zoom;
+		const height = ( state.cropRect.height * 100 ) / zoom;
+		// At zoom > 1 the image is scaled up around its center and
+		// shifted by pan (in rotation-bbox units). The cropRect's
+		// top-left, mapped to the unrotated image's normalized coords,
+		// is the offset below — see the derivation in the task notes.
+		const left =
+			( ( state.cropRect.x + zoom / 2 - 0.5 - state.pan.x ) * 100 ) /
+			zoom;
+		const top =
+			( ( state.cropRect.y + zoom / 2 - 0.5 - state.pan.y ) * 100 ) /
+			zoom;
 		modifiers.push( {
 			type: 'crop',
-			args: {
-				left: region.x,
-				top: region.y,
-				width: region.width,
-				height: region.height,
-			},
+			args: { left, top, width, height },
 		} );
 	}
 
