@@ -44,8 +44,6 @@ const FIXTURES_DIR = path.resolve(
 	ROOT_DIR,
 	'test/integration/fixtures/blocks'
 );
-const FIXTURES_URL_BASE =
-	'https://github.com/WordPress/gutenberg/tree/trunk/test/integration/fixtures/blocks/';
 
 /**
  * Reference path and heading anchors for the Block Attributes docs page.
@@ -777,7 +775,9 @@ function generateBlockApiSection( blockDir ) {
 		lines.push( '```' );
 	} else {
 		lines.push( '```html' );
-		lines.push( generateBlockCommentExample( slug, attributes, blockType ) );
+		lines.push(
+			generateBlockCommentExample( slug, attributes, blockType )
+		);
 		lines.push( '```' );
 	}
 	lines.push( '' );
