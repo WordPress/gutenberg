@@ -7,6 +7,16 @@ export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 10;
 
 /**
+ * Minimum zoom while a handle-driven resize is in progress.
+ *
+ * Below 1, the image renders smaller than its classic contain-fit so
+ * the growing crop rect can still frame it. 0.1 is an arbitrary lower
+ * bound — far below anything the UX would reach, but finite to avoid
+ * divide-by-zero in coverage math.
+ */
+export const MIN_ZOOM_RESIZING = 0.1;
+
+/**
  * Maximum free-rotation offset in degrees from the nearest 90° step.
  * The rotation slider allows ±45° around the current cardinal angle.
  */

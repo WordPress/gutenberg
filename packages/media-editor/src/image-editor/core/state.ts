@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { CropperState, CropperAction, TransformOperation } from './types';
-import { DEFAULT_STATE, MAX_ZOOM } from './constants';
+import { DEFAULT_STATE, MAX_ZOOM, MIN_ZOOM_RESIZING } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
 
@@ -128,6 +128,13 @@ export function enforceContainment( state: CropperState ): CropperState {
  * @return The state with base fields synced to current.
  */
 function commitBase( next: CropperState ): CropperState {
+	// Any action dispatched while `isResizing` leaves `base*` pinned —
+	// the user has not yet committed the new pose. The pin is cleared
+	// by `END_RESIZE` followed by `SETTLE_CROP`, which relies on the
+	// pre-drag base to snap back to a coherent post-drag state.
+	if ( next.isResizing ) {
+		return next;
+	}
 	if (
 		next.basePan.x === next.pan.x &&
 		next.basePan.y === next.pan.y &&
@@ -185,7 +192,8 @@ export function cropperReducer(
 			);
 
 		case 'SET_ZOOM': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload ) );
+			const floor = state.isResizing ? MIN_ZOOM_RESIZING : 1;
+			const z = Math.min( MAX_ZOOM, Math.max( floor, action.payload ) );
 			return commitBase(
 				enforceContainment( {
 					...state,
@@ -195,7 +203,11 @@ export function cropperReducer(
 		}
 
 		case 'SET_ZOOM_AT_POINT': {
-			const z = Math.min( MAX_ZOOM, Math.max( 1, action.payload.zoom ) );
+			const floor = state.isResizing ? MIN_ZOOM_RESIZING : 1;
+			const z = Math.min(
+				MAX_ZOOM,
+				Math.max( floor, action.payload.zoom )
+			);
 			return commitBase(
 				enforceContainment( {
 					...state,

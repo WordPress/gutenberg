@@ -297,7 +297,13 @@ export function restrictPanZoom(
 			? imageSize.width / imageSize.height
 			: 1;
 	const minZoom = getMinZoomForCover( state.rotation, aspectRatio, cropRect );
-	const zoom = Math.max( state.zoom, minZoom );
+	// While a handle drag is in progress, the caller is intentionally
+	// shrinking zoom below the cover floor so the image can recede as
+	// the crop grows. Don't fight it — just keep the candidate zoom as-is.
+	// End-of-drag (`END_RESIZE` + `SETTLE_CROP`) restores the invariant.
+	const zoom = state.isResizing
+		? state.zoom
+		: Math.max( state.zoom, minZoom );
 
 	// Step 2: build camera with candidate pan and corrected zoom.
 	const candidateState = { ...state, zoom };
