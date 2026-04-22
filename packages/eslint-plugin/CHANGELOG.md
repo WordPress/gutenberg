@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names.
+
 ## 25.0.0 (2026-04-15)
 
 ### Breaking Changes
