@@ -41,6 +41,14 @@
 		padding: $grid-unit-20;
 		height: 100%;
 
+		// MediaPreview uses `min-height: 100%` so it can grow when needed in
+		// other contexts. Inside the modal canvas we need a definite height
+		// so the image/video's `max-height: 100%` resolves and the preview
+		// is contained vertically.
+		.media-editor-preview {
+			height: 100%;
+		}
+
 		img,
 		video {
 			max-width: 100%;
