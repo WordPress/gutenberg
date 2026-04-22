@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, RangeControl, Flex, FlexItem } from '@wordpress/components';
+import { Button, RangeControl } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
 	rotateLeft,
@@ -68,65 +69,55 @@ export default function MediaEditorBottomBar( {
 	};
 
 	return (
-		<Flex
+		<Stack
 			className="media-editor-bottom-bar"
+			direction="row"
 			align="center"
 			justify="center"
-			gap={ 2 }
-			wrap
+			gap="sm"
+			wrap="wrap"
 		>
-			<FlexItem>
-				<Button
-					size="compact"
-					icon={ rotateLeft }
-					label={ __( 'Rotate 90° counter-clockwise' ) }
-					showTooltip
-					onClick={ () => snapRotate90( -1 ) }
-				/>
-			</FlexItem>
-			<FlexItem>
-				<Button
-					size="compact"
-					icon={ rotateRight }
-					label={ __( 'Rotate 90° clockwise' ) }
-					showTooltip
-					onClick={ () => snapRotate90( 1 ) }
-				/>
-			</FlexItem>
-			<FlexItem>
-				<Button
-					size="compact"
-					icon={ flipHorizontal }
-					label={ __( 'Flip horizontal' ) }
-					showTooltip
-					isPressed={ state.flip.horizontal }
-					onClick={ () =>
-						setFlip( {
-							horizontal: ! state.flip.horizontal,
-							vertical: state.flip.vertical,
-						} )
-					}
-				/>
-			</FlexItem>
-			<FlexItem>
-				<Button
-					size="compact"
-					icon={ flipVertical }
-					label={ __( 'Flip vertical' ) }
-					showTooltip
-					isPressed={ state.flip.vertical }
-					onClick={ () =>
-						setFlip( {
-							horizontal: state.flip.horizontal,
-							vertical: ! state.flip.vertical,
-						} )
-					}
-				/>
-			</FlexItem>
-			<FlexItem
-				isBlock
-				className="media-editor-bottom-bar__rotation-slider"
-			>
+			<Button
+				size="compact"
+				icon={ rotateLeft }
+				label={ __( 'Rotate 90° counter-clockwise' ) }
+				showTooltip
+				onClick={ () => snapRotate90( -1 ) }
+			/>
+			<Button
+				size="compact"
+				icon={ rotateRight }
+				label={ __( 'Rotate 90° clockwise' ) }
+				showTooltip
+				onClick={ () => snapRotate90( 1 ) }
+			/>
+			<Button
+				size="compact"
+				icon={ flipHorizontal }
+				label={ __( 'Flip horizontal' ) }
+				showTooltip
+				isPressed={ state.flip.horizontal }
+				onClick={ () =>
+					setFlip( {
+						horizontal: ! state.flip.horizontal,
+						vertical: state.flip.vertical,
+					} )
+				}
+			/>
+			<Button
+				size="compact"
+				icon={ flipVertical }
+				label={ __( 'Flip vertical' ) }
+				showTooltip
+				isPressed={ state.flip.vertical }
+				onClick={ () =>
+					setFlip( {
+						horizontal: state.flip.horizontal,
+						vertical: ! state.flip.vertical,
+					} )
+				}
+			/>
+			<div className="media-editor-bottom-bar__rotation-slider">
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
@@ -138,18 +129,16 @@ export default function MediaEditorBottomBar( {
 					value={ fineOffset }
 					onChange={ handleRotationSlider }
 				/>
-			</FlexItem>
-			<FlexItem>
-				<Button
-					size="compact"
-					variant="tertiary"
-					disabled={ ! isDirty }
-					accessibleWhenDisabled
-					onClick={ handleReset }
-				>
-					{ __( 'Reset' ) }
-				</Button>
-			</FlexItem>
-		</Flex>
+			</div>
+			<Button
+				size="compact"
+				variant="tertiary"
+				disabled={ ! isDirty }
+				accessibleWhenDisabled
+				onClick={ handleReset }
+			>
+				{ __( 'Reset' ) }
+			</Button>
+		</Stack>
 	);
 }

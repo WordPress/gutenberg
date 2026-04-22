@@ -4,9 +4,11 @@
 	width: 100%;
 	padding: $grid-unit-10 $grid-unit-20;
 
-	// Constrain the rotation slider to a sensible width so it doesn't
-	// dominate the bar on wide viewports.
+	// Let the rotation slider absorb extra horizontal space (so it grows
+	// between the icon buttons and Reset) while capping its width so it
+	// doesn't dominate on wide viewports.
 	.media-editor-bottom-bar__rotation-slider {
+		flex: 1 1 auto;
 		max-width: 240px;
 	}
 }
