@@ -1868,7 +1868,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean }>}
+ * @return {Array<{ name: string, dirName: string, hasRender: boolean, hasWidget: boolean }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
