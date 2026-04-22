@@ -6,6 +6,7 @@
  * `preview-export-parity.ts`. This file covers only the sub-unit path:
  * begin → grow crop past 1.0 → end → settle → back in the normal domain.
  */
+import { createCamera, screenToWorld, worldToScreen } from '../camera';
 import { DEFAULT_STATE } from '../constants';
 import { cropperReducer } from '../state';
 import type { CropperState, Size } from '../types';
@@ -127,5 +128,27 @@ describe( 'SETTLE_CROP after sub-unit zoom', () => {
 		const cy = rect.y + rect.height / 2;
 		expect( cx ).toBeCloseTo( 0.5, 2 );
 		expect( cy ).toBeCloseTo( 0.5, 2 );
+	} );
+} );
+
+/**
+ * Camera math is linear, so `zoom < 1` is mathematically safe — but
+ * this test pins it down explicitly. A world point at the image center
+ * should map to the container center regardless of zoom, and round-trip
+ * through worldToScreen → screenToWorld.
+ */
+describe( 'camera at zoom < 1', () => {
+	it( 'round-trips a world point through createCamera at zoom=0.5', () => {
+		const state = makeState( { isResizing: true, zoom: 0.5 } );
+		const container: Size = { width: 800, height: 600 };
+		const camera = createCamera( state, container, IMAGE );
+		const worldIn = { x: 0.5, y: 0.5 };
+		const screen = worldToScreen( camera, worldIn );
+		const worldOut = screenToWorld( camera, screen );
+		expect( worldOut.x ).toBeCloseTo( worldIn.x, 5 );
+		expect( worldOut.y ).toBeCloseTo( worldIn.y, 5 );
+		// Image center should map to container center.
+		expect( screen.x ).toBeCloseTo( container.width / 2, 1 );
+		expect( screen.y ).toBeCloseTo( container.height / 2, 1 );
 	} );
 } );

@@ -101,6 +101,10 @@ export function getImageFit(
  * are viewport-relative: the image mirrors across the viewport's vertical /
  * horizontal axis regardless of current rotation.
  *
+ * `state.zoom` below 1 is supported — the matrix simply renders the image
+ * smaller than its contain-fit. This is only reachable while `isResizing`
+ * is true; `SETTLE_CROP` restores the invariant.
+ *
  * @param state         The current cropper state (zoom, rotation, flip, crop).
  * @param containerSize The size of the container in pixels.
  * @param imageSize     The natural size of the image in pixels.
