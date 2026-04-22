@@ -12,11 +12,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Button,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

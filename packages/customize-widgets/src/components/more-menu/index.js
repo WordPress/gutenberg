@@ -5,7 +5,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	ToolbarDropdownMenu,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -13,6 +12,7 @@ import { external, moreVertical } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

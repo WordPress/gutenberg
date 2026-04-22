@@ -6,7 +6,6 @@ import {
 	Button,
 	TextControl,
 	ExternalLink,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useEffect, useState, useRef } from '@wordpress/element';
@@ -16,6 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

@@ -6,11 +6,10 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { VisuallyHidden } from '@wordpress/components';
 import { useRef, useContext, useMemo } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

@@ -12,7 +12,6 @@ import {
 	MenuGroup,
 	MenuItem,
 	MenuItemsChoice,
-	VisuallyHidden,
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -22,6 +21,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { ActionItem } from '@wordpress/interface';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
