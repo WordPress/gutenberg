@@ -414,16 +414,11 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		wp_set_post_terms( $template_part_id, array( $current_theme ), 'wp_theme' );
 		wp_set_post_terms( $template_part_id, array( 'navigation-overlay' ), 'wp_template_part_area' );
 
-		try {
-			$output = do_blocks(
-				'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'
-			);
+		$output = do_blocks(
+			'<!-- wp:navigation {"overlay":"' . $slug . '","overlayMenu":"always"} /-->'
+		);
 
-			$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
-			$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
-		} finally {
-			remove_shortcode( 'gb_test_overlay_shortcode' );
-			wp_delete_post( $template_part_id, true );
-		}
+		$this->assertStringContainsString( 'Hello, World!', $output, 'Shortcode inside the navigation overlay should be expanded.' );
+		$this->assertStringNotContainsString( '[gb_test_overlay_shortcode]', $output, 'Raw shortcode token should not appear in the overlay output.' );
 	}
 }
