@@ -118,13 +118,8 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 		JS;
 
 		foreach ( $module_ids as $id ) {
-			if ( isset( $gutenberg_script_module_translations[ $id ] ) ) {
-				$domain = $gutenberg_script_module_translations[ $id ]['textdomain'];
-				$path   = $gutenberg_script_module_translations[ $id ]['path'];
-			} else {
-				$domain = 'default';
-				$path   = '';
-			}
+			$domain = $gutenberg_script_module_translations[ $id ]['textdomain'] ?? 'default';
+			$path   = $gutenberg_script_module_translations[ $id ]['path'] ?? '';
 
 			$json_translations = load_script_module_textdomain( $id, $domain, $path );
 			if ( ! $json_translations ) {
