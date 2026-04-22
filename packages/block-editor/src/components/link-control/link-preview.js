@@ -70,7 +70,9 @@ export default function LinkPreview( {
 
 	const displayTitle =
 		! isEmptyURL &&
-		stripHTML( richData?.title || value?.title || displayURL );
+		stripHTML(
+			value?.entityTitle || richData?.title || value?.title || displayURL
+		);
 
 	let icon;
 

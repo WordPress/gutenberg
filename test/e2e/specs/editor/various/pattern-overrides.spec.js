@@ -7,9 +7,7 @@ test.describe( 'Pattern Overrides', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme( 'emptytheme' ),
-			await requestUtils.activatePlugin(
-				'gutenberg-test-block-bindings'
-			),
+			requestUtils.activatePlugin( 'gutenberg-test-block-bindings' ),
 			requestUtils.deleteAllBlocks(),
 		] );
 	} );
@@ -769,7 +767,7 @@ test.describe( 'Pattern Overrides', () => {
 			title: 'Button with target',
 			content: `<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"metadata":{"name":"${ buttonName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noreferrer noopener nofollow">Button</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="http://wp.org" target="_blank" rel="noopener nofollow">Button</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`,
 			status: 'publish',
@@ -833,10 +831,7 @@ test.describe( 'Pattern Overrides', () => {
 		const buttonLink = previewPage.getByRole( 'link', { name: 'Button' } );
 
 		await expect( buttonLink ).toHaveAttribute( 'target', '_blank' );
-		await expect( buttonLink ).toHaveAttribute(
-			'rel',
-			'noreferrer noopener'
-		);
+		await expect( buttonLink ).toHaveAttribute( 'rel', 'noopener' );
 
 		// Uncheck both checkboxes.
 		await editLinkButton.click();
@@ -925,8 +920,7 @@ test.describe( 'Pattern Overrides', () => {
 		await nonEditableButton.click();
 		const initialText = await nonEditableButton.textContent();
 		await page.keyboard.type( 'Edited' );
-		const finalText = await nonEditableButton.textContent();
-		expect( initialText ).toBe( finalText );
+		await expect( nonEditableButton ).toHaveText( initialText );
 
 		await nonEditableButton.click();
 		await editor.showBlockToolbar();

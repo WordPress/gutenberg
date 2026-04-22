@@ -1226,23 +1226,17 @@ async function transpilePackage( packageName ) {
 		);
 	}
 
-	const srcFiles = await glob(
-		normalizePath(
-			path.join( packageDir, `src/**/*.${ SOURCE_EXTENSIONS }` )
-		),
-		{
-			ignore: IGNORE_PATTERNS,
-		}
-	);
+	const srcFiles = await glob( `src/**/*.${ SOURCE_EXTENSIONS }`, {
+		cwd: packageDir,
+		ignore: IGNORE_PATTERNS,
+		absolute: true,
+	} );
 
-	const assetFiles = await glob(
-		normalizePath(
-			path.join( packageDir, `src/**/*.${ ASSET_EXTENSIONS }` )
-		),
-		{
-			ignore: IGNORE_PATTERNS,
-		}
-	);
+	const assetFiles = await glob( `src/**/*.${ ASSET_EXTENSIONS }`, {
+		cwd: packageDir,
+		ignore: IGNORE_PATTERNS,
+		absolute: true,
+	} );
 
 	const buildDir = path.join( packageDir, 'build' );
 	const buildModuleDir = path.join( packageDir, 'build-module' );

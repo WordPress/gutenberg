@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 import type { __experimentalApiKeySource as ApiKeySource } from '@wordpress/connectors';
 
@@ -155,6 +155,8 @@ export function useConnectorPlugin( {
 		( pluginStatusOverride === 'active' && !! currentApiKey );
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const installPlugin = async () => {
 		if ( ! pluginSlug ) {
@@ -172,21 +174,28 @@ export function useConnectorPlugin( {
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s installed and activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-install-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to install plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-install-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -212,21 +221,28 @@ export function useConnectorPlugin( {
 			// Re-fetch settings since the activated plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
 			setIsExpanded( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Plugin for %s activated successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-plugin-activate-success',
+					type: 'snackbar',
+				}
 			);
 		} catch {
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to activate plugin for %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-plugin-activate-error',
+					type: 'snackbar',
+				}
 			);
 		} finally {
 			setIsBusy( false );
@@ -301,12 +317,16 @@ export function useConnectorPlugin( {
 			}
 
 			setConnectedState( true );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( '%s connected successfully.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-connect-success',
+					type: 'snackbar',
+				}
 			);
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
@@ -327,23 +347,30 @@ export function useConnectorPlugin( {
 			);
 			// Store auto-updates; currentApiKey reactively becomes ''.
 			setConnectedState( false );
-			speak(
+			createSuccessNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( '%s disconnected.' ),
 					connectorName
-				)
+				),
+				{
+					id: 'connector-disconnect-success',
+					type: 'snackbar',
+				}
 			);
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Failed to remove API key:', error );
-			speak(
+			createErrorNotice(
 				sprintf(
 					/* translators: %s: Name of the connector (e.g. "OpenAI"). */
 					__( 'Failed to disconnect %s.' ),
 					connectorName
 				),
-				'assertive'
+				{
+					id: 'connector-disconnect-error',
+					type: 'snackbar',
+				}
 			);
 			throw error;
 		}

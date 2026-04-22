@@ -2,9 +2,6 @@
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card } from '@wordpress/ui';
 
 /**
@@ -59,10 +56,10 @@ const WithCardComponent = ( {
 							( action ) => ! action.supportsBulk
 						) }
 						defaultLayouts={ {
-							[ LAYOUT_TABLE ]: {},
-							[ LAYOUT_GRID ]: {},
-							[ LAYOUT_LIST ]: {},
-							[ LAYOUT_ACTIVITY ]: {},
+							[ LAYOUT_TABLE ]: true,
+							[ LAYOUT_GRID ]: true,
+							[ LAYOUT_LIST ]: true,
+							[ LAYOUT_ACTIVITY ]: true,
 						} }
 					/>
 				</Card.FullBleed>

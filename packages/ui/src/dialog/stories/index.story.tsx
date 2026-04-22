@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
+import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
@@ -11,6 +12,7 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Popup': Dialog.Popup,
 		'Dialog.Header': Dialog.Header,
 		'Dialog.Title': Dialog.Title,
+		'Dialog.Description': Dialog.Description,
 		'Dialog.CloseIcon': Dialog.CloseIcon,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
@@ -19,25 +21,6 @@ const meta: Meta< typeof Dialog.Root > = {
 		modal: {
 			control: 'inline-radio',
 			options: [ true, false, 'trap-focus' ],
-			table: {
-				defaultValue: { summary: 'true' },
-				type: {
-					summary: 'boolean | "trap-focus"',
-				},
-			},
-		},
-	},
-	parameters: {
-		docs: {
-			description: {
-				component: `
-Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
-
-When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
-
-Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
-				`,
-			},
 		},
 	},
 };
@@ -59,11 +42,11 @@ export const _Default: Story = {
 						<Dialog.Title>Welcome</Dialog.Title>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p>
+					<Dialog.Description>
 						This dialog demonstrates best practices for
 						informational dialogs. It includes a close icon because
 						dismissing it is safe and expected.
-					</p>
+					</Dialog.Description>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>
@@ -162,35 +145,29 @@ export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 };
 
-const LONG_BODY_COPY = Array( 24 )
-	.fill(
-		'This dialog demonstrates scrollable body content. The header and footer stay pinned while you scroll; a border appears when content passes underneath them, similar to the legacy Modal component. '
-	)
-	.join( '' );
-
 /**
- * Long body copy so the popup scrolls — use this story to verify sticky
- * header/footer and scroll-dependent borders.
+ * A dialog with a visually hidden title. The title is still present in the
+ * DOM for `aria-labelledby`, but is not visible to sighted users.
+ *
+ * Use `<VisuallyHidden render={ <Dialog.Title /> }>` so that `Dialog.Title`
+ * keeps its `<h2>` element while being visually hidden.
  */
-export const ScrollableWithStickyChrome: Story = {
-	name: 'Scrollable (sticky header & footer)',
-	parameters: {
-		docs: {
-			description: {
-				story: 'Use `Dialog.Footer` with `sticky={ false }` when the footer should scroll with the body instead of staying pinned.',
-			},
-		},
-	},
+export const WithVisuallyHiddenTitle: Story = {
 	args: {
 		children: (
 			<>
-				<Dialog.Trigger>Open scrollable dialog</Dialog.Trigger>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 				<Dialog.Popup>
 					<Dialog.Header>
-						<Dialog.Title>Scrollable dialog</Dialog.Title>
+						<VisuallyHidden render={ <Dialog.Title /> }>
+							Accessible dialog heading
+						</VisuallyHidden>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p>{ LONG_BODY_COPY }</p>
+					<p>
+						This dialog has a visually hidden title. Inspect the DOM
+						or use a screen reader to verify the heading is present.
+					</p>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>

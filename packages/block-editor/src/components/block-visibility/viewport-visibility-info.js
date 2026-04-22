@@ -25,7 +25,7 @@ const { Badge } = unlock( componentsPrivateApis );
 const DEFAULT_VISIBILITY_STATE = {
 	currentBlockVisibility: undefined,
 	hasParentHiddenEverywhere: false,
-	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 };
 
 export default function ViewportVisibilityInfo( { clientId } ) {
@@ -49,7 +49,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 					getBlockAttributes( clientId )?.metadata?.blockVisibility,
 				selectedDeviceType:
 					getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 				hasParentHiddenEverywhere:
 					isBlockParentHiddenEverywhere( clientId ),
 			};
