@@ -110,11 +110,17 @@ function AddTaxonomyModal( {
 			focusOnMount="firstContentElement"
 			size="small"
 		>
-			<form
-				onSubmit={ ( event ) => {
-					event.preventDefault();
-					onSubmit();
-				} }
+			<Stack
+				direction="column"
+				gap="md"
+				render={
+					<form
+						onSubmit={ ( event ) => {
+							event.preventDefault();
+							onSubmit();
+						} }
+					/>
+				}
 			>
 				<DataForm< TaxonomyFormData >
 					data={ data }
@@ -128,12 +134,7 @@ function AddTaxonomyModal( {
 						)
 					}
 				/>
-				<Stack
-					className="dataviews-action-modal__add-taxonomy-footer"
-					direction="row"
-					gap="sm"
-					justify="end"
-				>
+				<Stack direction="row" gap="sm" justify="end">
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -151,7 +152,7 @@ function AddTaxonomyModal( {
 						{ __( 'Create' ) }
 					</Button>
 				</Stack>
-			</form>
+			</Stack>
 		</Modal>
 	);
 }
