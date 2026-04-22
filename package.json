@@ -255,9 +255,9 @@
 		"routes/*",
 		"storybook",
 		"test/e2e",
+		"test/integration",
 		"test/performance",
 		"test/storybook-playwright",
-		"test/integration",
 		"test/unit",
 		"tools/api-docs"
 	]
