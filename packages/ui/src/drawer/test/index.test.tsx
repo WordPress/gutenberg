@@ -167,9 +167,7 @@ describe( 'Drawer', () => {
 	} );
 
 	it( 'renders backdrop only when modal is true', async () => {
-		const getBackdrops = () =>
-			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-drawer-backdrop` attribute (mirroring the Drawer close-icon pattern) is more robust than the Base UI role/state it inherits.
-			document.querySelectorAll( '[data-wp-ui-drawer-backdrop]' );
+		const getBackdrops = () => screen.queryAllByTestId( 'drawer-backdrop' );
 
 		const view = render(
 			<Drawer.Root open modal>

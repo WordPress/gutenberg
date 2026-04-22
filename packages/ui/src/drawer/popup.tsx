@@ -47,7 +47,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 			{ modal === true && (
 				<_Drawer.Backdrop
 					className={ styles.backdrop }
-					data-wp-ui-drawer-backdrop=""
+					data-testid="drawer-backdrop"
 				/>
 			) }
 			<_Drawer.Viewport className={ styles.viewport }>

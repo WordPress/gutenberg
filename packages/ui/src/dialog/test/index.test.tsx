@@ -124,9 +124,7 @@ describe( 'Dialog', () => {
 	} );
 
 	it( 'renders backdrop only when modal is true', async () => {
-		const getBackdrops = () =>
-			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-dialog-backdrop` attribute (mirroring the Dialog close-icon pattern) is more robust than the Base UI role/state it inherits.
-			document.querySelectorAll( '[data-wp-ui-dialog-backdrop]' );
+		const getBackdrops = () => screen.queryAllByTestId( 'dialog-backdrop' );
 
 		const view = render(
 			<Dialog.Root open modal>
