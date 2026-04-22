@@ -627,6 +627,27 @@ describe( 'FormTokenField', () => {
 			).not.toHaveAccessibleDescription();
 		} );
 
+		it( 'should associate the `help` text with the input accessibly', () => {
+			render(
+				<FormTokenFieldWithState
+					__experimentalShowHowTo={ false }
+					help="Help text"
+				/>
+			);
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+		} );
+
+		it( 'should combine the howto and `help` text in the accessible description', () => {
+			render( <FormTokenFieldWithState help="Help text" /> );
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription(
+				'Separate with commas or the Enter key. Help text'
+			);
+		} );
+
 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {
 			const user = userEvent.setup();
 

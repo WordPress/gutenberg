@@ -193,6 +193,14 @@ export interface FormTokenFieldProps
 	 * @default false
 	 */
 	tokenizeOnBlur?: boolean;
+	/**
+	 * Additional description for the control.
+	 *
+	 * Only use for meaningful description or instructions for the control. An
+	 * element containing the description will be programmatically associated to
+	 * the `FormTokenField` via `aria-describedby`.
+	 */
+	help?: ReactNode;
 }
 
 /**

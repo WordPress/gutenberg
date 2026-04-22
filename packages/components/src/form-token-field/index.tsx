@@ -22,6 +22,7 @@ import { TokensAndInputWrapperFlex } from './styles';
 import SuggestionsList from './suggestions-list';
 import type { FormTokenFieldProps, TokenItem } from './types';
 import { FlexItem } from '../flex';
+import { VStack } from '../v-stack';
 import {
 	StyledHelp,
 	StyledLabel,
@@ -74,6 +75,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		tokenizeOnBlur = false,
+		help,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
 	maybeWarnDeprecated36pxSize( {
@@ -655,6 +657,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function renderInput() {
+		const describedByIds = [
+			__experimentalShowHowTo &&
+				`components-form-token-suggestions-howto-${ instanceId }`,
+			help && `components-form-token-input-${ instanceId }__help`,
+		]
+			.filter( Boolean )
+			.join( ' ' );
+
 		const inputProps = {
 			instanceId,
 			autoCapitalize,
@@ -665,6 +675,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			onBlur,
 			isExpanded,
 			selectedSuggestionIndex,
+			'aria-describedby': describedByIds || undefined,
 		};
 
 		return (
@@ -749,17 +760,31 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
-			{ __experimentalShowHowTo && (
-				<StyledHelp
-					id={ `components-form-token-suggestions-howto-${ instanceId }` }
-					className="components-form-token-field__help"
-				>
-					{ tokenizeOnSpace
-						? __(
-								'Separate with commas, spaces, or the Enter key.'
-						  )
-						: __( 'Separate with commas or the Enter key.' ) }
-				</StyledHelp>
+			{ ( __experimentalShowHowTo || help ) && (
+				<VStack spacing={ 0 }>
+					{ __experimentalShowHowTo && (
+						<StyledHelp
+							id={ `components-form-token-suggestions-howto-${ instanceId }` }
+							className="components-form-token-field__help"
+						>
+							{ tokenizeOnSpace
+								? __(
+										'Separate with commas, spaces, or the Enter key.'
+								  )
+								: __(
+										'Separate with commas or the Enter key.'
+								  ) }
+						</StyledHelp>
+					) }
+					{ help && (
+						<StyledHelp
+							id={ `components-form-token-input-${ instanceId }__help` }
+							className="components-form-token-field__help"
+						>
+							{ help }
+						</StyledHelp>
+					) }
+				</VStack>
 			) }
 		</div>
 	);
