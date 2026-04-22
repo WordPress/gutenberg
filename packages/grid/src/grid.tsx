@@ -18,11 +18,17 @@ import type { DragOverEvent } from '@dnd-kit/core';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver, useDebounce, useEvent } from '@wordpress/compose';
+import {
+	useResizeObserver,
+	useDebounce,
+	useEvent,
+	useMergeRefs,
+} from '@wordpress/compose';
 import {
 	useMemo,
 	Children,
 	isValidElement,
+	useLayoutEffect,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -86,10 +92,27 @@ export function DashboardGrid( {
 	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
 	const activeLayout = temporaryLayout ?? layout;
 
+	const rootRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver( ( [ { contentRect } ] ) => {
 		setContainerWidth( contentRect.width );
 	} );
+	const mergedGridRef = useMergeRefs( [ rootRef, resizeObserverRef ] );
+
+	/*
+	 * Measure synchronously before paint so responsive mode does not
+	 * flash a single-column layout on first render: `useResizeObserver`
+	 * delivers its first entry asynchronously after mount, by which
+	 * point the user has already seen the uninitialized width.
+	 */
+	useLayoutEffect( () => {
+		if ( rootRef.current ) {
+			const { width } = rootRef.current.getBoundingClientRect();
+			if ( width > 0 ) {
+				setContainerWidth( width );
+			}
+		}
+	}, [] );
 	const gapPx = spacing * 4;
 	const effectiveColumns = useMemo( () => {
 		if ( ! minColumnWidth ) {
@@ -298,7 +321,7 @@ export function DashboardGrid( {
 			 */ }
 			<SortableContext items={ items } strategy={ () => null }>
 				<div
-					ref={ resizeObserverRef }
+					ref={ mergedGridRef }
 					className={ className }
 					style={ {
 						display: 'grid',
