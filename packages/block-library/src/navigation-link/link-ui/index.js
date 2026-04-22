@@ -218,7 +218,7 @@ function UnforwardedLinkUI( props, ref ) {
 						showInitialSuggestions
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
+						noURLSuggestion={ false }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
 						onInputChange={ ( value ) => {

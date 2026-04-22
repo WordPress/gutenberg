@@ -33,7 +33,8 @@ const handleEntitySearch = async (
 	fetchSearchSuggestions,
 	withCreateSuggestion,
 	pageOnFront,
-	pageForPosts
+	pageForPosts,
+	withURLSuggestion = true
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
@@ -57,6 +58,20 @@ const handleEntitySearch = async (
 		return results;
 	}
 
+	// When a URL-like value is entered and URL suggestions are enabled,
+	// append a URL suggestion to entity results. This allows users to create
+	// custom links from any link variation even when direct entry is disabled.
+	if ( isURLLike( val ) && withURLSuggestion ) {
+		const { url, type } = normalizeUrl( val );
+		results.push( {
+			id: val,
+			title: val,
+			url,
+			type,
+		} );
+		return results;
+	}
+
 	// Here we append a faux suggestion to represent a "CREATE" option. This
 	// is detected in the rendering of the search results and handled as a
 	// special case. This is currently necessary because the suggestions
@@ -71,7 +86,7 @@ const handleEntitySearch = async (
 	// to the text value of the `<input>`. This is because `title` is used
 	// when creating the suggestion. Similarly `url` is used when using keyboard to select
 	// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-	return isURLLike( val ) || ! withCreateSuggestion
+	return ! withCreateSuggestion
 		? results
 		: results.concat( {
 				// the `id` prop is intentionally omitted here because it
@@ -86,7 +101,8 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion
+	withCreateSuggestion,
+	withURLSuggestion = true
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
 		( select ) => {
@@ -108,24 +124,35 @@ export default function useSearchHandler(
 
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {
-			return isURLLike( val )
-				? directEntryHandler( val, { isInitialSuggestions } )
-				: handleEntitySearch(
-						val,
-						{ ...suggestionsQuery, isInitialSuggestions },
-						fetchSearchSuggestions,
-						withCreateSuggestion,
-						pageOnFront,
-						pageForPosts
-				  );
+			// Show URL suggestion when:
+			// 1. Value is URL-like AND
+			// 2. Either direct entry is allowed OR URL suggestions are enabled
+			const shouldShowURLSuggestion =
+				isURLLike( val ) && ( allowDirectEntry || withURLSuggestion );
+
+			if ( shouldShowURLSuggestion && allowDirectEntry ) {
+				return directEntryHandler( val, { isInitialSuggestions } );
+			}
+
+			return handleEntitySearch(
+				val,
+				{ ...suggestionsQuery, isInitialSuggestions },
+				fetchSearchSuggestions,
+				withCreateSuggestion,
+				pageOnFront,
+				pageForPosts,
+				withURLSuggestion
+			);
 		},
 		[
+			allowDirectEntry,
 			directEntryHandler,
 			fetchSearchSuggestions,
 			pageOnFront,
 			pageForPosts,
 			suggestionsQuery,
 			withCreateSuggestion,
+			withURLSuggestion,
 		]
 	);
 }
