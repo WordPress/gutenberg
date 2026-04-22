@@ -23,7 +23,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
 - [`customClassName`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customclassname): `false`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`customCSS`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- `customCSS`: `false`
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 
 ## Block Markup

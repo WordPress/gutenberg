@@ -31,7 +31,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
-- [`customCSS`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#customcss): `false`
+- `customCSS`: `false`
 
 ## Block Markup
 

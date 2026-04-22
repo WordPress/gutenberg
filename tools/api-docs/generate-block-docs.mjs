@@ -276,33 +276,35 @@ function formatAttributesTable( attributes ) {
  */
 const SUPPORTS_BASE =
 	'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/';
-const SUPPORTS_SUB_ANCHORS = new Set( [
-	'color.background',
-	'color.button',
-	'color.enableContrastChecker',
-	'color.__experimentalDuotone',
-	'color.gradients',
-	'color.heading',
-	'color.link',
-	'color.text',
-	'filter.duotone',
-	'layout.default',
-	'layout.allowSwitching',
-	'layout.allowEditing',
-	'layout.allowInheriting',
-	'layout.allowSizingOnChildren',
-	'layout.allowVerticalAlignment',
-	'layout.allowJustification',
-	'layout.allowOrientation',
-	'layout.allowWrap',
-	'layout.allowCustomContentAndWideSize',
-	'typography.fontSize',
-	'typography.lineHeight',
-	'typography.textAlign',
-] );
+/**
+ * All anchors documented in block-supports.md, derived by parsing every
+ * heading at startup so links stay in sync as the handbook evolves.
+ */
+const SUPPORTS_ANCHORS = fs.existsSync( SUPPORTS_DOC_PATH )
+	? new Set(
+			Array.from(
+				fs
+					.readFileSync( SUPPORTS_DOC_PATH, 'utf-8' )
+					.matchAll( /^#{1,6}\s+(.+)$/gm ),
+				( m ) => slugifyHeading( m[ 1 ] )
+			)
+	  )
+	: new Set();
+
+/**
+ * Build a link to the Block Supports reference for a given property.
+ *
+ * Returns null when the property has no matching anchor in block-supports.md
+ * so that callers can render plain code instead of a broken link.
+ *
+ * @param {string} property Top-level or dotted sub-property name.
+ * @return {string|null} Absolute handbook URL with anchor, or null.
+ */
 function supportsLink( property ) {
 	const anchor = property.toLowerCase().replace( /\./g, '-' );
-	return `${ SUPPORTS_BASE }#${ anchor }`;
+	return SUPPORTS_ANCHORS.has( anchor )
+		? `${ SUPPORTS_BASE }#${ anchor }`
+		: null;
 }
 
 /**
@@ -322,7 +324,8 @@ function formatSupports( supports ) {
 		if ( key.startsWith( '__' ) ) {
 			continue; // Skip experimental/unstable top-level keys in detail view.
 		}
-		const keyLink = `[\`${ key }\`](${ supportsLink( key ) })`;
+		const link = supportsLink( key );
+		const keyLink = link ? `[\`${ key }\`](${ link })` : `\`${ key }\``;
 		if ( typeof value === 'boolean' ) {
 			lines.push( `- ${ keyLink }: \`${ value }\`` );
 		} else if ( Array.isArray( value ) ) {
@@ -341,8 +344,9 @@ function formatSupports( supports ) {
 				lines.push( `- ${ keyLink }:` );
 				for ( const [ subKey, subValue ] of subEntries ) {
 					const subProp = `${ key }.${ subKey }`;
-					const subLabel = SUPPORTS_SUB_ANCHORS.has( subProp )
-						? `[\`${ subKey }\`](${ supportsLink( subProp ) })`
+					const subLink = supportsLink( subProp );
+					const subLabel = subLink
+						? `[\`${ subKey }\`](${ subLink })`
 						: `\`${ subKey }\``;
 					if ( typeof subValue === 'object' && subValue !== null ) {
 						lines.push(
@@ -880,17 +884,6 @@ validateDocAnchors(
 	ATTRIBUTES_DOC_PATH,
 	[ ...new Set( Object.values( ATTRIBUTE_ANCHORS ) ) ],
 	'block-attributes.md'
-);
-validateDocAnchors(
-	SUPPORTS_DOC_PATH,
-	[
-		...new Set(
-			[ ...SUPPORTS_SUB_ANCHORS ].map( ( p ) =>
-				p.toLowerCase().replace( /\./g, '-' )
-			)
-		),
-	],
-	'block-supports.md'
 );
 
 const blockDirs = getBlockDirs();
