@@ -164,9 +164,11 @@ describe( 'Drawer', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 		const heading = await screen.findByRole( 'heading', { name: 'Title' } );
+		// The regression this guards against: `useRender` must still forward
+		// the user-supplied className to the underlying DOM node. CSS module
+		// classes are stubbed in the Jest environment, so we can only assert
+		// the user class end-to-end.
 		expect( heading ).toHaveClass( 'custom-title' );
-		// The internal module-scoped class name starts with a hashed prefix; assert both classes coexist.
-		expect( heading.className ).toMatch( /title/ );
 	} );
 
 	it( 'associates Drawer.Description with the popup via aria-describedby', async () => {
