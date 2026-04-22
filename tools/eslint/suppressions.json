@@ -539,11 +539,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-site/src/components/post-list/quick-edit-modal.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/save-hub/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
