@@ -234,6 +234,17 @@ ruleTester.run( 'no-unknown-ds-tokens', rule, {
 			],
 		},
 		{
+			code: `const css = '--wpds-color-fg-content-neutral: red; background: --wpds-color-fg-content-neutral;';`,
+			errors: [
+				{
+					messageId: 'bareToken',
+					data: {
+						tokenNames: "'--wpds-color-fg-content-neutral'",
+					},
+				},
+			],
+		},
+		{
 			code: `const css = '--wpds-other-nonexistent-token: red; color: var(--wpds-nonexistent-token);';`,
 			errors: [
 				{
