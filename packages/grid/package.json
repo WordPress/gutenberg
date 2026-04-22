@@ -40,7 +40,6 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"react-native": "src/index",
 	"wpScript": false,
 	"types": "build-types",
 	"sideEffects": false,
@@ -49,7 +48,9 @@
 		"@dnd-kit/sortable": "^10.0.0",
 		"@dnd-kit/utilities": "^3.2.2",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/element": "file:../element",
+		"@wordpress/element": "file:../element"
+	},
+	"devDependencies": {
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/ui": "file:../ui"
 	},
