@@ -109,6 +109,25 @@ function getBlockDirs() {
 }
 
 /**
+ * Return false for blocks that should be excluded from the generated docs:
+ * deprecated blocks (title contains "(deprecated)") and blocks hidden from
+ * the inserter (supports.inserter === false), such as core/missing.
+ *
+ * @param {string} blockDir Directory name inside block-library/src.
+ * @return {boolean} Whether the block should be documented.
+ */
+function isDocumentable( blockDir ) {
+	const { title = '', supports = {} } = readBlockJson( blockDir );
+	if ( supports.inserter === false ) {
+		return false;
+	}
+	if ( /\(deprecated\)/i.test( title ) ) {
+		return false;
+	}
+	return true;
+}
+
+/**
  * Read and parse a block.json file.
  *
  * @param {string} blockDir Directory name inside block-library/src.
@@ -889,7 +908,7 @@ validateDocAnchors(
 	'block-attributes.md'
 );
 
-const blockDirs = getBlockDirs();
+const blockDirs = getBlockDirs().filter( isDocumentable );
 
 // Group blocks by category.
 const categories = {};

@@ -24,4 +24,3 @@
 - [Tab Panels](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/) — `core/tab-panels`: Container for tab panel content in a tabbed interface.
 - [Table of Contents](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/) — `core/table-of-contents`: Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
 - [Tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/) — `core/tabs`: Display content in a tabbed interface to help users navigate detailed content with ease.
-- [Text Columns (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-text-columns/) — `core/text-columns`: This block is deprecated. Please use the Columns block instead.

@@ -2,7 +2,6 @@
 
 - [Avatar](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-avatar/) — `core/avatar`: Add a user’s avatar.
 - [Breadcrumbs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-breadcrumbs/) — `core/breadcrumbs`: Display a breadcrumb trail showing the path to the current page.
-- [Comment Author Avatar (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-avatar/) — `core/comment-author-avatar`: This block is deprecated. Please use the Avatar block instead.
 - [Comment Author Name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-author-name/) — `core/comment-author-name`: Displays the name of the author of the comment.
 - [Comment Content](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-content/) — `core/comment-content`: Displays the contents of a comment.
 - [Comment Date](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comment-date/) — `core/comment-date`: Displays the date on which the comment was posted.
@@ -16,11 +15,8 @@
 - [Comments Title](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-comments-title/) — `core/comments-title`: Displays a title with the number of comments.
 - [Login/out](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-loginout/) — `core/loginout`: Show login & logout links.
 - [Navigation](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/) — `core/navigation`: A collection of blocks that allow visitors to get around your site.
-- [Pattern Placeholder](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-pattern/) — `core/pattern`: Show a block pattern.
-- [Author (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author/) — `core/post-author`: This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead.
 - [Author Biography](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-biography/) — `core/post-author-biography`: The author biography.
 - [Author Name](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-author-name/) — `core/post-author-name`: The author name.
-- [Comment (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comment/) — `core/post-comment`: This block is deprecated. Please use the Comments block instead.
 - [Comments Count](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-count/) — `core/post-comments-count`: Display a post's comments count.
 - [Comments Form](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-form/) — `core/post-comments-form`: Display a post's comments form.
 - [Comments Link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-comments-link/) — `core/post-comments-link`: Displays the link to the current post comments.
