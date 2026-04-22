@@ -641,10 +641,7 @@ function generateBlockApiSection( blockDir ) {
 	// Experimental notice.
 	if ( experimental ) {
 		lines.push(
-			'> [!WARNING]'
-		);
-		lines.push(
-			'> **Experimental**: This block is experimental and may change or be removed without notice.'
+			'<div class="callout callout-warning">This block is experimental and may change or be removed without notice.</div>'
 		);
 		lines.push( '' );
 	}
