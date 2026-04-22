@@ -109,6 +109,14 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 			$module_ids = $queue;
 		}
 
+		$set_locale_data_js_function = <<<'JS'
+		( domain, translations ) => {
+			const localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+			localeData[""].domain = domain;
+			wp.i18n.setLocaleData( localeData, domain );
+		}
+		JS;
+
 		foreach ( $module_ids as $id ) {
 			if ( isset( $gutenberg_script_module_translations[ $id ] ) ) {
 				$domain = $gutenberg_script_module_translations[ $id ]['textdomain'];
@@ -122,14 +130,6 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 			if ( ! $json_translations ) {
 				continue;
 			}
-
-			$set_locale_data_js_function = <<<JS
-			( domain, translations ) => {
-				const localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
-				localeData[""].domain = domain;
-				wp.i18n.setLocaleData( localeData, domain );
-			}
-			JS;
 
 			$output     = sprintf(
 				'( %s )( %s, %s );',
