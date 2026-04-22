@@ -1,13 +1,14 @@
 /**
  * WordPress dependencies
  */
+import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 
 function Dashboard() {
 	return (
-		<div className="dashboard-widgets">
-			<h1>{ __( 'Dashboard' ) }</h1>
-		</div>
+		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>
+			<div className="dashboard-widgets" />
+		</Page>
 	);
 }
 
