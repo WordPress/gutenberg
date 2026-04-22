@@ -346,6 +346,21 @@ describe( 'Drawer', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
+	it( 'defaults swipeDirection to "left"', async () => {
+		render(
+			<Drawer.Root open>
+				<Drawer.Popup>
+					<Drawer.Title>Default direction</Drawer.Title>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+
+		expect( await screen.findByRole( 'dialog' ) ).toHaveAttribute(
+			'data-swipe-direction',
+			'left'
+		);
+	} );
+
 	it( 'supports default and explicit size values across swipe directions', async () => {
 		const view = render(
 			<Drawer.Root open swipeDirection="left">

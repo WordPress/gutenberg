@@ -19,9 +19,18 @@ import type { RootProps } from './types';
  * destructive actions), omit the close icon and rely on footer action buttons
  * like "Cancel" and "Confirm" instead.
  */
-function Root( { modal = true, children, ...props }: RootProps ) {
+function Root( {
+	modal = true,
+	swipeDirection = 'left',
+	children,
+	...props
+}: RootProps ) {
 	return (
-		<_Drawer.Root modal={ modal } { ...props }>
+		<_Drawer.Root
+			modal={ modal }
+			swipeDirection={ swipeDirection }
+			{ ...props }
+		>
 			<DrawerModalProvider modal={ modal }>
 				{ children }
 			</DrawerModalProvider>
