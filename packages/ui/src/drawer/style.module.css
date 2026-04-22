@@ -57,7 +57,7 @@
 	}
 
 	.popup {
-		--_viewport-inset: var(--wpds-dimension-padding-2xl);
+		--viewport-inset: var(--wpds-dimension-padding-2xl);
 
 		position: fixed;
 		z-index: var(--wp-ui-drawer-z-index, initial);
@@ -127,14 +127,14 @@
 
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 		&[data-swipe-direction="left"] {
-			--stretch-size: calc(100vw - var(--_viewport-inset));
+			--stretch-size: calc(100vw - var(--viewport-inset));
 
 			top: 0;
 			bottom: 0;
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			left: 0;
 			width: var(--popup-size);
-			max-width: calc(100vw - var(--_viewport-inset));
+			max-width: calc(100vw - var(--viewport-inset));
 			border-start-end-radius: var(--wpds-border-radius-lg);
 			border-end-end-radius: var(--wpds-border-radius-lg);
 			transform: translateX(var(--drawer-swipe-movement-x));
@@ -147,14 +147,14 @@
 
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 		&[data-swipe-direction="right"] {
-			--stretch-size: calc(100vw - var(--_viewport-inset));
+			--stretch-size: calc(100vw - var(--viewport-inset));
 
 			top: 0;
 			bottom: 0;
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			right: 0;
 			width: var(--popup-size);
-			max-width: calc(100vw - var(--_viewport-inset));
+			max-width: calc(100vw - var(--viewport-inset));
 			border-start-start-radius: var(--wpds-border-radius-lg);
 			border-end-start-radius: var(--wpds-border-radius-lg);
 			transform: translateX(var(--drawer-swipe-movement-x));
@@ -166,7 +166,7 @@
 		}
 
 		&[data-swipe-direction="down"] {
-			--stretch-size: calc(100dvh - var(--_viewport-inset));
+			--stretch-size: calc(100dvh - var(--viewport-inset));
 
 			bottom: 0;
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
@@ -174,7 +174,7 @@
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			right: 0;
 			height: var(--popup-size);
-			max-height: calc(100dvh - var(--_viewport-inset));
+			max-height: calc(100dvh - var(--viewport-inset));
 			border-start-start-radius: var(--wpds-border-radius-lg);
 			border-start-end-radius: var(--wpds-border-radius-lg);
 			transform: translateY(var(--drawer-swipe-movement-y));
@@ -186,7 +186,7 @@
 		}
 
 		&[data-swipe-direction="up"] {
-			--stretch-size: calc(100dvh - var(--_viewport-inset));
+			--stretch-size: calc(100dvh - var(--viewport-inset));
 
 			top: 0;
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
@@ -194,7 +194,7 @@
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
 			right: 0;
 			height: var(--popup-size);
-			max-height: calc(100dvh - var(--_viewport-inset));
+			max-height: calc(100dvh - var(--viewport-inset));
 			border-end-start-radius: var(--wpds-border-radius-lg);
 			border-end-end-radius: var(--wpds-border-radius-lg);
 			transform: translateY(var(--drawer-swipe-movement-y));
