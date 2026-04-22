@@ -87,6 +87,7 @@ const WIDGET_EXTENSIONS = [ 'tsx', 'ts', 'jsx', 'js', 'mjs' ];
 export function getWidgetFiles( widgetDirectory ) {
 	const entries = readdirSync( widgetDirectory );
 
+	/** @param {string} baseName */
 	const hasEntry = ( baseName ) =>
 		WIDGET_EXTENSIONS.some( ( ext ) =>
 			entries.includes( `${ baseName }.${ ext }` )
