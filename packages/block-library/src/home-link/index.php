@@ -134,28 +134,16 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 		$target = ' target="_blank"';
 	}
 
-	$rel = ' rel="home"';
-	if ( isset( $attributes['rel'] ) && '' !== $attributes['rel'] ) {
-		$rel_values = 'home ' . $attributes['rel'];
-		$rel        = ' rel="' . esc_attr( trim( $rel_values ) ) . '"';
-	}
-	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
-		// Append noreferrer noopener for security when opening in a new tab.
-		$existing_rel = isset( $attributes['rel'] ) && '' !== $attributes['rel'] ? 'home ' . $attributes['rel'] : 'home';
-		$rel          = ' rel="' . esc_attr( trim( $existing_rel . ' noreferrer noopener' ) ) . '"';
-	}
-
 	$description = '';
 	if ( ! empty( $attributes['description'] ) ) {
 		$description = '<span class="wp-block-navigation-item__description">' . wp_kses_post( $attributes['description'] ) . '</span>';
 	}
 
 	return sprintf(
-		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s"%3$s%4$s%5$s>%6$s%7$s</a></li>',
+		'<li %1$s><a class="wp-block-home-link__content wp-block-navigation-item__content" href="%2$s" rel="home" %3$s%4$s>%5$s%6$s</a></li>',
 		block_core_home_link_build_li_wrapper_attributes( $block->context ),
 		esc_url( home_url() ),
 		$target,
-		$rel,
 		$aria_current,
 		wp_kses_post( $attributes['label'] ),
 		$description

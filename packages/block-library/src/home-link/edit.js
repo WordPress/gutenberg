@@ -10,6 +10,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -33,14 +34,44 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 const preventDefault = ( event ) => event.preventDefault();
 
 export default function HomeEdit( { attributes, setAttributes, context } ) {
-	const homeUrl = useSelect( ( select ) => {
+	const {
+		homeUrl,
+		onNavigateToEntityRecord,
+		frontPageId,
+		frontPageTemplateId,
+	} = useSelect( ( select ) => {
+		const { getEntityRecord, getDefaultTemplateId, canUser } =
+			select( coreStore );
+
 		// Site index.
-		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-			?.home;
+		const baseUrl = getEntityRecord( 'root', '__unstableBase' )?.home;
+
+		// Front-page data (only available if the user can read site settings).
+		const canReadSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} );
+		const site = canReadSettings ? getEntityRecord( 'root', 'site' ) : null;
+		const resolvedFrontPageId =
+			site?.show_on_front === 'page' ? site?.page_on_front : null;
+
+		// When no specific front page is set, fall back to the front-page template.
+		const resolvedFrontPageTemplateId = ! resolvedFrontPageId
+			? getDefaultTemplateId( { slug: 'front-page' } )
+			: null;
+
+		return {
+			homeUrl: baseUrl,
+			onNavigateToEntityRecord:
+				select( blockEditorStore ).getSettings()
+					.onNavigateToEntityRecord,
+			frontPageId: resolvedFrontPageId,
+			frontPageTemplateId: resolvedFrontPageTemplateId,
+		};
 	}, [] );
 
 	const { textColor, backgroundColor, style } = context;
-	const { label, opensInNewTab, description, rel } = attributes;
+	const { label, opensInNewTab, description } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const blockProps = useBlockProps( {
@@ -66,7 +97,6 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 							label: '',
 							opensInNewTab: false,
 							description: '',
-							rel: '',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -103,6 +133,29 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 							}
 						/>
 					</ToolsPanelItem>
+					{ onNavigateToEntityRecord &&
+						( frontPageId || frontPageTemplateId ) && (
+							<Button
+								variant="secondary"
+								onClick={ () => {
+									if ( frontPageId ) {
+										onNavigateToEntityRecord( {
+											postId: frontPageId,
+											postType: 'page',
+										} );
+									} else {
+										onNavigateToEntityRecord( {
+											postId: frontPageTemplateId,
+											postType: 'wp_template',
+										} );
+									}
+								} }
+								__next40pxDefaultSize
+								className="navigation-link-to__action-button"
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
 					{ homeUrl && (
 						<Button
 							variant="secondary"
@@ -134,25 +187,6 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 							} }
 							help={ __(
 								'The description will be displayed in the menu if the current theme supports it.'
-							) }
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						hasValue={ () => !! rel }
-						label={ __( 'Rel attribute' ) }
-						onDeselect={ () => setAttributes( { rel: '' } ) }
-						isShownByDefault
-					>
-						<TextControl
-							__next40pxDefaultSize
-							label={ __( 'Rel attribute' ) }
-							value={ rel || '' }
-							onChange={ ( relValue ) => {
-								setAttributes( { rel: relValue } );
-							} }
-							autoComplete="off"
-							help={ __(
-								'The relationship of the linked URL as space-separated link types.'
 							) }
 						/>
 					</ToolsPanelItem>

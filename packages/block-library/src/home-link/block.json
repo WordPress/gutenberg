@@ -18,9 +18,6 @@
 		},
 		"description": {
 			"type": "string"
-		},
-		"rel": {
-			"type": "string"
 		}
 	},
 	"usesContext": [
