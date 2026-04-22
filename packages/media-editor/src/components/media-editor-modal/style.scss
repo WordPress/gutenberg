@@ -16,7 +16,9 @@
 	flex-direction: column;
 
 	// InterfaceSkeleton defaults to position: fixed for full-viewport usage.
-	// Reset it so the skeleton flows inside the modal's content area.
+	// Reset it so the skeleton flows inside the modal's content area. Stack
+	// children vertically (header/body/footer) since the default row layout
+	// assumes an absolutely positioned footer that overlays the bottom.
 	.interface-interface-skeleton {
 		position: relative;
 		top: auto;
@@ -26,10 +28,29 @@
 		height: 100%;
 		max-height: none;
 		flex: 1;
+		flex-direction: column;
 	}
 
 	.interface-interface-skeleton__editor {
 		min-width: 0;
+		flex: 1;
+	}
+
+	// The skeleton's default footer is `position: absolute; bottom: 0` with
+	// a small fixed padding-bottom on the body to compensate. Our bottom
+	// bar is taller than that default, so it would overlap the cropper's
+	// resize handles. Put the footer in flow so it claims its own row and
+	// the canvas (and sidebar) resize to fit above it. The skeleton also
+	// hides the footer below the medium breakpoint by default; force it
+	// visible so the bottom-bar controls remain accessible on narrow
+	// viewports.
+	.interface-interface-skeleton__footer {
+		position: relative;
+		display: flex;
+	}
+
+	.interface-interface-skeleton.has-footer .interface-interface-skeleton__body {
+		padding-bottom: 0;
 	}
 
 	.media-editor-modal__canvas {

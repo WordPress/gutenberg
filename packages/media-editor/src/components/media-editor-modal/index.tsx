@@ -36,10 +36,15 @@ import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
+import MediaEditorBottomBar from '../media-editor-bottom-bar';
+import MediaEditorCropPanel, {
+	resolveAspectRatio,
+} from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
+import { CropperProvider, useCropper } from '../../image-editor';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -105,6 +110,152 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 	);
 }
 
+interface HeaderActionsProps {
+	isSaving: boolean;
+	saveDisabled: boolean;
+	onCancel: () => void;
+	onSave: () => void;
+}
+
+function HeaderActions( {
+	isSaving,
+	saveDisabled,
+	onCancel,
+	onSave,
+}: HeaderActionsProps ) {
+	return (
+		<Flex
+			className="media-editor-modal__header-actions"
+			justify="flex-end"
+			expanded={ false }
+			gap={ 2 }
+		>
+			<PinnedItems.Slot scope="media-editor" />
+			<Button
+				size="compact"
+				variant="tertiary"
+				onClick={ onCancel }
+				disabled={ isSaving }
+				accessibleWhenDisabled
+			>
+				{ __( 'Cancel' ) }
+			</Button>
+			<Button
+				size="compact"
+				variant="primary"
+				onClick={ onSave }
+				isBusy={ isSaving }
+				disabled={ isSaving || saveDisabled }
+				accessibleWhenDisabled
+			>
+				{ __( 'Save' ) }
+			</Button>
+		</Flex>
+	);
+}
+
+// Wrapper that reads `isDirty` from the cropper controller. Must live
+// below `CropperProvider`. React context flows through the Modal's
+// portal, so the `<Modal headerActions>` fill resolves inside the
+// provider subtree.
+function ImageHeaderActions(
+	props: Omit< HeaderActionsProps, 'saveDisabled' >
+) {
+	const { isDirty } = useCropper();
+	return <HeaderActions { ...props } saveDisabled={ ! isDirty } />;
+}
+
+// Body rendered for image media. Owns the aspect-ratio + freeform UI
+// state (which drive the `<Cropper>` props but don't live on the cropper
+// controller itself) and wires the bottom bar + Crop sidebar tab.
+function ImageModalBody( { media }: { media: Media } ) {
+	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	const imageAspectRatio = useMemo( () => {
+		const naturalWidth = Number( media?.media_details?.width );
+		const naturalHeight = Number( media?.media_details?.height );
+		if (
+			Number.isFinite( naturalWidth ) &&
+			Number.isFinite( naturalHeight ) &&
+			naturalHeight > 0
+		) {
+			return naturalWidth / naturalHeight;
+		}
+		return null;
+	}, [ media ] );
+
+	const aspectRatio = resolveAspectRatio(
+		aspectRatioValue,
+		imageAspectRatio
+	);
+
+	const tabs = useMemo< ModalTab[] >(
+		() => [
+			{
+				id: 'crop',
+				title: __( 'Crop' ),
+				panel: (
+					<Stack
+						className="media-editor-modal__panel"
+						direction="column"
+						gap="lg"
+					>
+						<MediaEditorCropPanel
+							aspectRatioValue={ aspectRatioValue }
+							onAspectRatioChange={ setAspectRatioValue }
+							freeformCrop={ freeformCrop }
+							onFreeformChange={ setFreeformCrop }
+						/>
+					</Stack>
+				),
+			},
+			{
+				id: 'details',
+				title: __( 'Details' ),
+				panel: (
+					<Stack
+						className="media-editor-modal__panel"
+						direction="column"
+						gap="lg"
+					>
+						<MediaForm />
+					</Stack>
+				),
+			},
+		],
+		[ aspectRatioValue, freeformCrop ]
+	);
+
+	return (
+		<>
+			<Tabs>
+				<MediaEditorModalSidebar tabs={ tabs } />
+			</Tabs>
+			<InterfaceSkeleton
+				className="media-editor-modal__skeleton"
+				content={
+					<div className="media-editor-modal__canvas">
+						<MediaEditorCanvas
+							aspectRatio={ aspectRatio }
+							freeformCrop={ freeformCrop }
+						/>
+					</div>
+				}
+				footer={
+					<MediaEditorBottomBar
+						onReset={ () => {
+							setAspectRatioValue( '0' );
+							setFreeformCrop( true );
+						} }
+					/>
+				}
+				sidebar={ <ComplementaryArea.Slot scope="media-editor" /> }
+			/>
+		</>
+	);
+}
+
 export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
 		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
@@ -133,12 +284,6 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 
-	// Captured from the cropper via MediaEditorCanvas. Unused in this PR —
-	// a follow-up will wire this to the Save button so save is enabled only
-	// when the cropper has edits.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [ isDirty, setIsDirty ] = useState( false );
-
 	// Snapshot the original values for fields the modal edits, so Cancel can
 	// restore them. Captured once per open.
 	const originalFieldValuesRef = useRef< Record< string, unknown > | null >(
@@ -160,7 +305,7 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		}
 	}, [ isModalOpen, media, fields ] );
 
-	const tabs = useMemo< ModalTab[] >(
+	const detailsOnlyTabs = useMemo< ModalTab[] >(
 		() => [
 			{
 				id: 'details',
@@ -220,75 +365,70 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		}
 	};
 
-	const headerActions = (
-		<Flex
-			className="media-editor-modal__header-actions"
-			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
-		>
-			<PinnedItems.Slot scope="media-editor" />
-			<Button
-				size="compact"
-				variant="tertiary"
-				onClick={ handleCancel }
-				disabled={ isSaving }
-				accessibleWhenDisabled
-			>
-				{ __( 'Cancel' ) }
-			</Button>
-			<Button
-				size="compact"
-				variant="primary"
-				onClick={ handleSave }
-				isBusy={ isSaving }
-				disabled={ isSaving || ! media }
-				accessibleWhenDisabled
-			>
-				{ __( 'Save' ) }
-			</Button>
-		</Flex>
-	);
+	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
+	const isImage = !! media && mediaType === 'image';
 
-	return (
+	// `CropperProvider` wraps the whole Modal for image media so both the
+	// body (canvas, bottom bar, sidebar Crop panel) and the header actions
+	// (Save button, gated on `isDirty`) share one cropper controller.
+	// React context flows through `<Modal>`'s portal.
+	const content = (
 		<Modal
 			className="media-editor-modal"
 			title={ __( 'Edit media' ) }
 			size="fill"
 			onRequestClose={ handleCancel }
-			headerActions={ headerActions }
+			headerActions={
+				isImage ? (
+					<ImageHeaderActions
+						isSaving={ isSaving }
+						onCancel={ handleCancel }
+						onSave={ handleSave }
+					/>
+				) : (
+					<HeaderActions
+						isSaving={ isSaving }
+						saveDisabled={ ! media }
+						onCancel={ handleCancel }
+						onSave={ handleSave }
+					/>
+				)
+			}
 		>
 			<MediaEditorProvider
 				value={ media ?? undefined }
 				onChange={ handleChange }
 				settings={ { fields } }
 			>
-				<Tabs>
-					<MediaEditorModalSidebar tabs={ tabs } />
-				</Tabs>
-				<InterfaceSkeleton
-					className="media-editor-modal__skeleton"
-					content={
-						<div className="media-editor-modal__canvas">
-							{ ! media && <Spinner /> }
-							{ media &&
-								getMediaTypeFromMimeType( media.mime_type )
-									.type === 'image' && (
-									<MediaEditorCanvas
-										key={ media.id }
-										onDirtyChange={ setIsDirty }
-									/>
-								) }
-							{ media &&
-								getMediaTypeFromMimeType( media.mime_type )
-									.type !== 'image' && <MediaPreview /> }
-						</div>
-					}
-					sidebar={ <ComplementaryArea.Slot scope="media-editor" /> }
-				/>
+				{ ! media && <Spinner /> }
+				{ media && isImage && <ImageModalBody media={ media } /> }
+				{ media && ! isImage && (
+					<>
+						<Tabs>
+							<MediaEditorModalSidebar tabs={ detailsOnlyTabs } />
+						</Tabs>
+						<InterfaceSkeleton
+							className="media-editor-modal__skeleton"
+							content={
+								<div className="media-editor-modal__canvas">
+									<MediaPreview />
+								</div>
+							}
+							sidebar={
+								<ComplementaryArea.Slot scope="media-editor" />
+							}
+						/>
+					</>
+				) }
 			</MediaEditorProvider>
 		</Modal>
 	);
+
+	if ( isImage ) {
+		return <CropperProvider key={ media.id }>{ content }</CropperProvider>;
+	}
+
+	return content;
 }
 
 export default MediaEditorModal;
