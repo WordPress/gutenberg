@@ -7,7 +7,6 @@
 - [Latest Comments](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-comments/) — `core/latest-comments`: Display a list of your most recent comments.
 - [Latest Posts](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-latest-posts/) — `core/latest-posts`: Display a list of your most recent posts.
 - [Page List](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/) — `core/page-list`: Display a list of all pages.
-- [Page List Item](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/) — `core/page-list-item`: Displays a page inside a list of all pages.
 - [RSS](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-rss/) — `core/rss`: Display entries from any RSS or Atom feed.
 - [Search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/) — `core/search`: Help visitors find your content.
 - [Shortcode](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-shortcode/) — `core/shortcode`: Insert additional custom elements with a WordPress shortcode.
