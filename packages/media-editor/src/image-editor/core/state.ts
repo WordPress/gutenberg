@@ -390,6 +390,18 @@ export function cropperReducer(
 				operationToAction( state, action.payload )
 			);
 
+		case 'BEGIN_RESIZE':
+			if ( state.isResizing ) {
+				return state;
+			}
+			return { ...state, isResizing: true };
+
+		case 'END_RESIZE':
+			if ( ! state.isResizing ) {
+				return state;
+			}
+			return { ...state, isResizing: false };
+
 		case 'RESET':
 			return commitBase(
 				enforceContainment( {
