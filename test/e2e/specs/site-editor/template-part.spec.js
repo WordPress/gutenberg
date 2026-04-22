@@ -173,7 +173,7 @@ test.describe( 'Template Part', () => {
 		);
 	} );
 
-	test( 'can detach blocks from a template part', async ( {
+	test( 'can disconnect blocks from a template part', async ( {
 		admin,
 		editor,
 	} ) => {
@@ -207,9 +207,9 @@ test.describe( 'Template Part', () => {
 		);
 		await expect( templatePartWithParagraph ).toBeVisible();
 
-		// Detach the paragraph from the header template part.
+		// Disconnect the paragraph from the header template part.
 		await editor.selectBlocks( templatePartWithParagraph );
-		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect' );
 
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();

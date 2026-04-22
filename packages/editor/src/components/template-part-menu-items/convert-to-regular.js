@@ -26,7 +26,7 @@ export default function ConvertToRegularBlocks( { clientId, onClose } ) {
 				onClose();
 			} }
 		>
-			{ __( 'Detach' ) }
+			{ __( 'Disconnect' ) }
 		</MenuItem>
 	);
 }
