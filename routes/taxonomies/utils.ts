@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
@@ -73,25 +73,4 @@ export function usePublicPostTypes() {
 				return a.name.localeCompare( b.name );
 			} );
 	}, [ postTypes ] );
-}
-
-export function useTakenTaxonomySlugs( excludeSlug?: string ): Set< string > {
-	const registered = useSelect(
-		( select ) => select( coreStore ).getTaxonomies(),
-		[]
-	);
-	const { records: drafts } = useEntityRecords< { slug: string } >(
-		'postType',
-		'wp_user_taxonomy',
-		{ per_page: 100, status: 'draft', context: 'edit' }
-	);
-	return useMemo( () => {
-		const set = new Set< string >();
-		( registered ?? [] ).forEach( ( t: any ) => set.add( t.slug ) );
-		( drafts ?? [] ).forEach( ( r ) => set.add( r.slug ) );
-		if ( excludeSlug ) {
-			set.delete( excludeSlug );
-		}
-		return set;
-	}, [ registered, drafts, excludeSlug ] );
 }

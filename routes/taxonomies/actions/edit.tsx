@@ -109,7 +109,7 @@ function EditTaxonomyModal( {
 	}
 
 	if ( ! hasResolved ) {
-		return <></>;
+		return null;
 	}
 
 	return (

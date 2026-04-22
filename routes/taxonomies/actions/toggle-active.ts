@@ -21,7 +21,7 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 		const { saveEntityRecord } = registry.dispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			registry.dispatch( noticesStore );
-		const next = items.every( ( i ) => i.status === 'publish' )
+		const nextStatus = items.every( ( i ) => i.status === 'publish' )
 			? 'draft'
 			: 'publish';
 		try {
@@ -32,12 +32,12 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 				await saveEntityRecord(
 					'postType',
 					'wp_user_taxonomy',
-					{ id: item.id, status: next },
+					{ id: item.id, status: nextStatus },
 					{ throwOnError: true }
 				);
 			}
 			createSuccessNotice(
-				next === 'publish'
+				nextStatus === 'publish'
 					? __( 'Taxonomy activated.' )
 					: __( 'Taxonomy deactivated.' ),
 				{ type: 'snackbar' }
