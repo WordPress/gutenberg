@@ -1,6 +1,7 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
-import { forwardRef, useContext } from '@wordpress/element';
+import { forwardRef, useContext, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -10,6 +11,7 @@ import {
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
+import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
 import { Text } from '../text';
@@ -32,12 +34,18 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			children,
 			confirmButtonText = __( 'OK' ),
 			cancelButtonText = __( 'Cancel' ),
+			stickyHeader = true,
+			stickyFooter = true,
 			...props
 		},
 		ref
 	) {
 		const { phase, showSpinner, errorMessage, confirm } =
 			useContext( AlertDialogContext );
+
+		const popupRef = useRef< HTMLDivElement >( null );
+		const mergedRef = useMergeRefs( [ ref, popupRef ] );
+		const { onScroll } = useOverlayScrollStateAttributes( popupRef );
 
 		const confirmClassName =
 			intent === 'irreversible'
@@ -51,18 +59,22 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup
-						ref={ ref }
+						ref={ mergedRef }
 						className={ clsx(
 							dialogStyles.popup,
 							className,
 							dialogStyles[ 'is-medium' ]
 						) }
 						{ ...props }
+						onScroll={ onScroll }
 					>
 						<Stack
 							direction="column"
 							gap="sm"
-							className={ alertDialogStyles.header }
+							className={ clsx(
+								dialogStyles.headerChrome,
+								stickyHeader && dialogStyles.headerSticky
+							) }
 						>
 							<Text
 								variant="heading-xl"
@@ -80,8 +92,19 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							) }
 						</Stack>
 						{ children }
-						<Stack direction="column" gap="md">
-							<div className={ dialogStyles.footer }>
+						<Stack
+							direction="column"
+							gap="md"
+							className={ clsx(
+								dialogStyles.footerChrome,
+								stickyFooter && dialogStyles.footerSticky
+							) }
+						>
+							<div
+								className={
+									alertDialogStyles[ 'footer-actions' ]
+								}
+							>
 								<_AlertDialog.Close
 									render={ <Button variant="minimal" /> }
 									disabled={ buttonsDisabled }

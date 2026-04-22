@@ -113,10 +113,13 @@
 		}
 	}
 
-	.header {
-		display: flex;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
+	/*
+	 * Shared "chrome" rules for a header-like area inside a popup: edge-to-edge
+	 * border-box, background, block-end padding, transparent bottom border.
+	 * Layout is left to the consumer (Dialog.Header composes a flex row below;
+	 * AlertDialog applies this directly to a column Stack).
+	 */
+	.headerChrome {
 		/*
 		 * Use padding (not margin) so the filled background of the sticky
 		 * header covers content scrolling underneath with no visible gap.
@@ -133,6 +136,13 @@
 		box-sizing: border-box;
 		border-block-end: 1px solid transparent;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
+	}
+
+	.header {
+		composes: headerChrome;
+		display: flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
 	}
 
 	.headerSticky {
@@ -155,11 +165,11 @@
 
 	/*
 	 * Data attribute driven: the popup's `onScroll` handler toggles
-	 * `data-wp-ui-dialog-scrolled-from-top` directly on the DOM, avoiding a
+	 * `data-wp-ui-overlay-scrolled-from-top` directly on the DOM, avoiding a
 	 * React re-render (and the 1-frame lag that came with it) when the
 	 * separator border needs to appear.
 	 */
-	.popup[data-wp-ui-dialog-scrolled-from-top] .headerSticky {
+	.popup[data-wp-ui-overlay-scrolled-from-top] .headerSticky {
 		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
@@ -181,11 +191,11 @@
 		margin-bottom: var(--wpds-dimension-gap-lg);
 	}
 
-	.footer {
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
+	/*
+	 * Shared "chrome" rules for a footer-like area inside a popup. See
+	 * `.headerChrome` above. Layout is left to the consumer.
+	 */
+	.footerChrome {
 		/*
 		 * Use padding (not margin) so the filled background of the sticky
 		 * footer covers content scrolling underneath with no visible gap.
@@ -207,6 +217,14 @@
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 	}
 
+	.footer {
+		composes: footerChrome;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+	}
+
 	.footerSticky {
 		position: sticky;
 		bottom: 0;
@@ -221,7 +239,7 @@
 		padding-block-end: var(--wpds-dimension-padding-2xl);
 	}
 
-	.popup[data-wp-ui-dialog-scrolled-from-bottom] .footerSticky {
+	.popup[data-wp-ui-overlay-scrolled-from-bottom] .footerSticky {
 		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
 	}
 }

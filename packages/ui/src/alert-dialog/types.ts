@@ -126,4 +126,22 @@ export interface PopupProps
 	 * @default 'Cancel'
 	 */
 	cancelButtonText?: string;
+
+	/**
+	 * When `true`, the dialog's title/description area stays pinned to the
+	 * top of the popup as the content scrolls. A bottom border appears once
+	 * the content has scrolled past the top.
+	 *
+	 * @default true
+	 */
+	stickyHeader?: boolean;
+
+	/**
+	 * When `true`, the dialog's action buttons (and error message, if any)
+	 * stay pinned to the bottom of the popup as the content scrolls. A top
+	 * border appears while there is still content to scroll through below.
+	 *
+	 * @default true
+	 */
+	stickyFooter?: boolean;
 }
