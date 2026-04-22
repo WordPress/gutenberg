@@ -35,9 +35,11 @@ import {
 import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
+import MediaEditorCanvas from '../media-editor-canvas';
 import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { getMediaTypeFromMimeType } from '../../utils';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -130,6 +132,12 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
+
+	// Captured from the cropper via MediaEditorCanvas. Unused in this PR —
+	// a follow-up will wire this to the Save button so save is enabled only
+	// when the cropper has edits.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const [ isDirty, setIsDirty ] = useState( false );
 
 	// Snapshot the original values for fields the modal edits, so Cancel can
 	// restore them. Captured once per open.
@@ -262,7 +270,18 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 					className="media-editor-modal__skeleton"
 					content={
 						<div className="media-editor-modal__canvas">
-							{ media ? <MediaPreview /> : <Spinner /> }
+							{ ! media && <Spinner /> }
+							{ media &&
+								getMediaTypeFromMimeType( media.mime_type )
+									.type === 'image' && (
+									<MediaEditorCanvas
+										key={ media.id }
+										onDirtyChange={ setIsDirty }
+									/>
+								) }
+							{ media &&
+								getMediaTypeFromMimeType( media.mime_type )
+									.type !== 'image' && <MediaPreview /> }
 						</div>
 					}
 					sidebar={ <ComplementaryArea.Slot scope="media-editor" /> }
