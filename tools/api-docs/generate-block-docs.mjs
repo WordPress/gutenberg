@@ -815,7 +815,12 @@ function generateBlockApiSection( blockDir ) {
 function writeBlockReadme( blockDir, apiSection ) {
 	const readmePath = path.join( BLOCK_LIBRARY_DIR, blockDir, 'README.md' );
 	const blockJson = readBlockJson( blockDir );
-	const { title } = blockJson;
+	const title =
+		blockJson.title ||
+		blockDir
+			.split( '-' )
+			.map( ( w ) => w[ 0 ].toUpperCase() + w.slice( 1 ) )
+			.join( ' ' );
 
 	if ( ! fs.existsSync( readmePath ) ) {
 		// Case 1: No README — create full file.
