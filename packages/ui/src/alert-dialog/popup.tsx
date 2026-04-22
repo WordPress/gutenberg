@@ -36,6 +36,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			cancelButtonText = __( 'Cancel' ),
 			stickyHeader = true,
 			stickyFooter = true,
+			onScroll: onScrollProp,
 			...props
 		},
 		ref
@@ -45,7 +46,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const popupRef = useRef< HTMLDivElement >( null );
 		const mergedRef = useMergeRefs( [ ref, popupRef ] );
-		const { onScroll } = useOverlayScrollStateAttributes( popupRef );
+		const { onScroll } = useOverlayScrollStateAttributes(
+			popupRef,
+			onScrollProp
+		);
 
 		const confirmClassName =
 			intent === 'irreversible'

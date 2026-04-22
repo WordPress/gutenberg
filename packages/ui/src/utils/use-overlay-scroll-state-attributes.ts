@@ -1,4 +1,4 @@
-import type { RefObject, UIEvent } from 'react';
+import type { RefObject, UIEvent, UIEventHandler } from 'react';
 import { useCallback, useLayoutEffect } from '@wordpress/element';
 
 /*
@@ -45,13 +45,20 @@ function updateScrollAttributes( el: HTMLElement ) {
  *
  * @param scrollContainerRef Ref to the scrollable overlay surface (e.g. dialog
  *                           popup, drawer panel).
+ * @param onScroll           Optional `onScroll` from the parent; invoked after
+ *                           overlay scroll state attributes are updated.
  */
 export function useOverlayScrollStateAttributes(
-	scrollContainerRef: RefObject< HTMLElement | null >
+	scrollContainerRef: RefObject< HTMLElement | null >,
+	onScroll?: UIEventHandler< HTMLElement > | undefined
 ) {
-	const handleScroll = useCallback( ( event: UIEvent< HTMLElement > ) => {
-		updateScrollAttributes( event.currentTarget );
-	}, [] );
+	const handleScroll = useCallback(
+		( event: UIEvent< HTMLElement > ) => {
+			updateScrollAttributes( event.currentTarget );
+			onScroll?.( event );
+		},
+		[ onScroll ]
+	);
 
 	useLayoutEffect( () => {
 		const el = scrollContainerRef.current;
@@ -60,6 +67,10 @@ export function useOverlayScrollStateAttributes(
 		}
 
 		updateScrollAttributes( el );
+
+		if ( typeof ResizeObserver === 'undefined' ) {
+			return;
+		}
 
 		const observer = new ResizeObserver( () => {
 			if ( scrollContainerRef.current ) {
