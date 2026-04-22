@@ -1,0 +1,6 @@
+{
+	"name": "wordpress/hello-world",
+	"title": "Hello World",
+	"description": "A minimal example widget.",
+	"category": "demo"
+}
