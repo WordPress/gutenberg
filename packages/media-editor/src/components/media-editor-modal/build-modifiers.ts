@@ -43,10 +43,18 @@ export type Modifier =
  * @return Ordered modifier array; empty when nothing is server-relevant.
  */
 export function buildModifiers(
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	state: CropperState,
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	imageSize: Size
 ): Modifier[] {
-	return [];
+	const modifiers: Modifier[] = [];
+
+	if ( state.flip.horizontal || state.flip.vertical ) {
+		modifiers.push( {
+			type: 'flip',
+			args: { flip: { ...state.flip } },
+		} );
+	}
+
+	return modifiers;
 }

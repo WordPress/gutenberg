@@ -36,4 +36,51 @@ describe( 'buildModifiers', () => {
 		const modifiers = buildModifiers( stateWith(), IMAGE );
 		expect( modifiers ).toEqual( [] );
 	} );
+
+	it( 'emits a flip modifier when horizontal flip is set', () => {
+		const modifiers = buildModifiers(
+			stateWith( { flip: { horizontal: true, vertical: false } } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{
+				type: 'flip',
+				args: { flip: { horizontal: true, vertical: false } },
+			},
+		] );
+	} );
+
+	it( 'emits a flip modifier when vertical flip is set', () => {
+		const modifiers = buildModifiers(
+			stateWith( { flip: { horizontal: false, vertical: true } } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{
+				type: 'flip',
+				args: { flip: { horizontal: false, vertical: true } },
+			},
+		] );
+	} );
+
+	it( 'emits a flip modifier with both axes', () => {
+		const modifiers = buildModifiers(
+			stateWith( { flip: { horizontal: true, vertical: true } } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [
+			{
+				type: 'flip',
+				args: { flip: { horizontal: true, vertical: true } },
+			},
+		] );
+	} );
+
+	it( 'omits flip when both axes are false', () => {
+		const modifiers = buildModifiers(
+			stateWith( { flip: { horizontal: false, vertical: false } } ),
+			IMAGE
+		);
+		expect( modifiers ).toEqual( [] );
+	} );
 } );
