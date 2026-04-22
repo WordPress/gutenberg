@@ -12,6 +12,7 @@ const rule = {
 				type: 'object',
 				additionalProperties: {
 					type: 'object',
+					minProperties: 1,
 					additionalProperties: {
 						type: 'string',
 					},
