@@ -1,0 +1,12 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-sync-disconnected-indicator {
+	// Keep the indicator at its natural width in the header's flex layout so
+	// the "Offline" text doesn't get truncated or overflow into DocumentBar
+	// on narrow viewports. DocumentBar already handles its own shrink/ellipsis.
+	flex-shrink: 0;
+
+	// Reserve space for the destructive-red focus ring so it doesn't bleed
+	// into DocumentBar when the button is focused (e.g. after clicking).
+	margin-inline: $grid-unit-05;
+}

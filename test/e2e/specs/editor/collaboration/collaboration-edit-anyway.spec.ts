@@ -35,9 +35,7 @@ test.describe( 'Edit Anyway when sync connection fails', () => {
 			timeout: MODAL_TIMEOUT_MS,
 		} );
 
-		await errorModal
-			.getByRole( 'button', { name: 'Edit Anyway' } )
-			.click();
+		await errorModal.getByRole( 'button', { name: 'Edit Anyway' } ).click();
 
 		// The same modal swaps into the warning view (no second dialog).
 		const confirmModal = page.getByRole( 'dialog', {
@@ -55,10 +53,10 @@ test.describe( 'Edit Anyway when sync connection fails', () => {
 			.getByRole( 'button', { name: 'Edit Anyway' } )
 			.click();
 
-		// Modal dismissed entirely; persistent inline notice appears.
+		// Modal dismissed entirely; header indicator appears.
 		await expect( confirmModal ).toBeHidden();
-		const notice = page.locator( '.editor-sync-disconnected-notice' );
-		await expect( notice ).toBeVisible();
+		const indicator = page.locator( '.editor-sync-disconnected-indicator' );
+		await expect( indicator ).toBeVisible();
 
 		// Editing still works locally.
 		const body = page.getByRole( 'document', {
@@ -70,8 +68,8 @@ test.describe( 'Edit Anyway when sync connection fails', () => {
 			page.getByText( 'Offline edit survives.' )
 		).toBeVisible();
 
-		// Unblock the network; notice disappears on reconnect.
+		// Unblock the network; indicator disappears on reconnect.
 		await page.unroute( '**/wp-sync/v1/updates**' );
-		await expect( notice ).toBeHidden( { timeout: 30_000 } );
+		await expect( indicator ).toBeHidden( { timeout: 30_000 } );
 	} );
 } );
