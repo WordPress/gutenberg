@@ -128,6 +128,7 @@ export default function MediaEditorToolbar( {
 					step={ 0.5 }
 					value={ fineOffset }
 					onChange={ handleRotationSlider }
+					showTooltip={ false }
 				/>
 			</div>
 			<Button
