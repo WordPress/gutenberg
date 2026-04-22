@@ -4,4 +4,4 @@
 
 ### New Features
 
--   Initial release: CSS-Grid layout component with drag-to-reorder and resize handles for dashboard-style surfaces. Ported from `@automattic/grid`.
+-   Initial release: CSS-Grid layout component with drag-to-reorder and resize handles for dashboard-style surfaces.
