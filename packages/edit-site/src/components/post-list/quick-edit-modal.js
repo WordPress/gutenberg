@@ -189,10 +189,7 @@ export function QuickEditModal( {
 					/>
 				) }
 				<Drawer.Footer>
-					<Drawer.Action
-						__next40pxDefaultSize
-						variant="secondary"
-					>
+					<Drawer.Action __next40pxDefaultSize variant="secondary">
 						{ __( 'Cancel' ) }
 					</Drawer.Action>
 					<Button
