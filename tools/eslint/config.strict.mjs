@@ -3,7 +3,7 @@
  * This extends the base config and adds additional rules that we want to
  * enforce only on new/modified code.
  */
-import baseConfig from './eslint.config.mjs';
+import baseConfig from './config.mjs';
 
 export default [
 	...baseConfig,

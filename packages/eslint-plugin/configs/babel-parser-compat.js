@@ -1,16 +1,14 @@
-/* eslint-disable jsdoc/check-tag-names -- Package names containing @ are not JSDoc tags */
 /**
  * Wrapper around @babel/eslint-parser that ensures compatibility with
  * ESLint v10+. ESLint v10 expects `scopeManager.addGlobals()` which is
  * available in eslint-scope v9 bundled with ESLint v10, but
- * @babel/eslint-parser v7 uses an older eslint-scope that does not have
+ * `@babel/eslint-parser` v7 uses an older eslint-scope that does not have
  * this method. This wrapper patches the scope manager when needed.
  *
  * TODO: Remove this wrapper when upgrading to @babel/eslint-parser v8+,
  * which adds native ESLint v10 support (requires @babel/core v8).
  * See https://github.com/babel/babel/issues/17791
  */
-/* eslint-enable jsdoc/check-tag-names */
 const babelParser = require( '@babel/eslint-parser' );
 
 module.exports = {

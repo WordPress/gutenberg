@@ -8,16 +8,17 @@ const fs = require( 'node:fs' );
 const STALE_SUPPRESSIONS_TOKEN = '--prune-suppressions';
 
 const PRUNE_HELP_MESSAGE =
-	'👉 Run `npm run lint:js:prune-suppressions` and commit the updated `eslint-suppressions.json`.';
+	'👉 Run `npm run lint:js:prune-suppressions` and commit the updated `tools/eslint/suppressions.json`.';
 
-const SUPPRESSIONS_FILE = path.join(
-	__dirname,
-	'..',
-	'eslint-suppressions.json'
-);
+const SUPPRESSIONS_FILE = path.join( __dirname, 'suppressions.json' );
 
-const args = process.argv.slice( 2 );
-const wpScriptsBin = require.resolve( '../packages/scripts/bin/wp-scripts.js' );
+const userArgs = process.argv.slice( 2 );
+const args = userArgs.some( ( arg ) =>
+	arg.startsWith( '--suppressions-location' )
+)
+	? userArgs
+	: [ '--suppressions-location', SUPPRESSIONS_FILE, ...userArgs ];
+const wpScriptsBin = require.resolve( '@wordpress/scripts/bin/wp-scripts.js' );
 
 // Detect stale suppressions by scanning the child's output for ESLint's
 // own `--prune-suppressions` hint. A small sliding tail buffer is used so
@@ -60,7 +61,7 @@ child.on( 'close', ( code, signal ) => {
 		return;
 	}
 
-	// ESLint writes `eslint-suppressions.json` with two-space indentation
+	// ESLint writes the suppressions file with two-space indentation
 	// when invoked with `--prune-suppressions`. Format it through the
 	// repo's Prettier config so the working-tree diff matches what
 	// lint-staged would produce on commit. Done here (rather than in the

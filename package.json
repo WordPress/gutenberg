@@ -48,10 +48,7 @@
 		"@emotion/native": "11.11.0",
 		"@emotion/react": "11.14.0",
 		"@emotion/styled": "11.14.1",
-		"@eslint-community/eslint-plugin-eslint-comments": "^4.7.0",
-		"@eslint/compat": "^2.0.0",
 		"@eslint/eslintrc": "^3.0.0",
-		"@eslint/js": "^10.0.0",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
 		"@testing-library/jest-dom": "6.9.1",
@@ -63,6 +60,7 @@
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
 		"@wordpress/build": "file:./packages/wp-build",
+		"@wordpress/eslint-tools": "file:./tools/eslint",
 		"@wordpress/vips": "file:./packages/vips",
 		"ajv": "8.17.1",
 		"babel-jest": "29.7.0",
@@ -78,18 +76,9 @@
 		"esbuild": "^0.27.2",
 		"eslint": "^10.0.0",
 		"eslint-formatter-compact": "9.0.1",
-		"eslint-import-resolver-typescript": "4.4.4",
-		"eslint-plugin-import": "2.31.0",
-		"eslint-plugin-jest": "28.11.0",
-		"eslint-plugin-jest-dom": "5.5.0",
-		"eslint-plugin-prettier": "5.5.5",
-		"eslint-plugin-react-compiler": "^19.1.0-rc.2",
-		"eslint-plugin-storybook": "10.2.19",
-		"eslint-plugin-testing-library": "7.16.0",
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
 		"glob": "7.1.2",
-		"globals": "14.0.0",
 		"husky": "7.0.0",
 		"jest": "29.6.2",
 		"jest-junit": "^13.0.0",
@@ -118,7 +107,6 @@
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
-		"typescript-eslint": "8.57.1",
 		"uuid": "9.0.1",
 		"wait-on": "8.0.1"
 	},
@@ -152,7 +140,7 @@
 		"lint": "concurrently \"npm run lint:lockfile\" \"npm run lint:tsconfig\" \"npm run lint:js\" \"npm run lint:pkg-json\" \"npm run lint:css\"",
 		"lint:css": "wp-scripts lint-style \"**/*.scss\" \"**/*.module.css\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
-		"lint:js": "node ./bin/lint-js.js",
+		"lint:js": "node ./tools/eslint/lint-js.cjs",
 		"lint:js:fix": "npm run lint:js -- --fix",
 		"lint:js:prune-suppressions": "npm run lint:js -- --prune-suppressions",
 		"lint:lockfile": "node ./bin/validate-package-lock.js",
@@ -220,7 +208,7 @@
 		],
 		"**/*.{js,ts,tsx,jsx}": [
 			"npm run prelint:js",
-			"node ./bin/lint-js.js --config eslint.config.strict.mjs"
+			"node ./tools/eslint/lint-js.cjs --config eslint.config.strict.cjs"
 		],
 		"*.scss": [
 			"wp-scripts lint-style"
@@ -255,6 +243,6 @@
 		"test/performance",
 		"test/storybook-playwright",
 		"test/unit",
-		"tools/api-docs"
+		"tools/*"
 	]
 }

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { createRequire } from 'module';
-import { join } from 'path';
+import { join, resolve } from 'path';
 import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
@@ -12,9 +12,9 @@ import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
-import reactNativeEditorConfig from './packages/react-native-editor/eslint-overrides.cjs';
-import wpBuildConfig from './packages/wp-build/eslint-overrides.cjs';
-import platformDocsConfig from './platform-docs/eslint-overrides.cjs';
+import reactNativeEditorConfig from '../../packages/react-native-editor/eslint-overrides.cjs';
+import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import platformDocsConfig from '../../platform-docs/eslint-overrides.cjs';
 
 // Wrap plugins that don't yet support ESLint v10's rule context API.
 const jestDomPlugin = {
@@ -27,7 +27,8 @@ const testingLibraryPlugin = {
 };
 
 const require = createRequire( import.meta.url );
-const wpPlugin = require( './packages/eslint-plugin' );
+const rootDir = resolve( import.meta.dirname, '../..' );
+const wpPlugin = require( '@wordpress/eslint-plugin' );
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
@@ -73,10 +74,8 @@ const developmentFiles = [
 
 // All files from packages that have types provided with TypeScript.
 const glob = require( 'glob' ).sync;
-const typedFiles = glob( 'packages/*/package.json' )
-	.filter(
-		( fileName ) => require( join( import.meta.dirname, fileName ) ).types
-	)
+const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
 
 const restrictedImports = [
@@ -233,9 +232,7 @@ export default dedupePlugins( [
 			jsdoc: {
 				mode: 'typescript',
 			},
-			'import/resolver': require.resolve(
-				'./tools/eslint/import-resolver'
-			),
+			'import/resolver': require.resolve( './import-resolver.cjs' ),
 		},
 		rules: {
 			'react/jsx-boolean-value': 'error',
@@ -489,7 +486,7 @@ export default dedupePlugins( [
 		],
 		languageOptions: {
 			parserOptions: {
-				tsconfigRootDir: import.meta.dirname,
+				tsconfigRootDir: rootDir,
 				project: [
 					'./test/e2e/tsconfig.json',
 					'./test/performance/tsconfig.json',
