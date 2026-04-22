@@ -45,7 +45,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			useContext( AlertDialogContext );
 
 		const { ref: scrollStateRef, onScroll } =
-			useOverlayScrollStateAttributes( onScrollProp );
+			useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
 		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
 
 		const confirmClassName =

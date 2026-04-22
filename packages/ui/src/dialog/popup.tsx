@@ -45,7 +45,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
 	const { ref: scrollStateRef, onScroll } =
-		useOverlayScrollStateAttributes( onScrollProp );
+		useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
 	const mergedRef = useMergeRefs( [ ref, popupRef, scrollStateRef ] );
 	const modal = useDialogModal();
 
