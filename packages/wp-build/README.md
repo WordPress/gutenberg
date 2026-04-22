@@ -548,12 +548,12 @@ Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata
 | Concern | Lives in | Reason |
 |---|---|---|
 | Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
-| Category, description | `widget.json` | used to filter and list widgets server-side without loading JS |
+| Static metadata (`title`, `description`, `category`) | `widget.json` | plain JSON the host can read without a JS runtime |
 | Translated title / labels (`__()`) | `widget.ts` | i18n calls need a JS runtime; JSON can only carry static strings |
 | Attribute schema (types, options) | `widget.ts` | needs TypeScript coupling with `render` props; may include translated `elements`/labels |
 | `example` | `widget.ts` | co-located with the attribute schema it shapes |
 
-Rule of thumb: anything the host needs to filter, list, or register **before** JS loads goes in `widget.json`. Anything that needs types, i18n, or runtime logic goes in `widget.ts`.
+Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anything that needs types, i18n, or runtime logic goes in `widget.ts`. The generated `build/widgets/registry.php` currently exposes only `name`, `dir_name`, and which entry files exist; forwarding the rest of `widget.json` to PHP is a follow-up.
 
 ### `widget.json` — static discovery metadata
 
@@ -568,7 +568,7 @@ Rule of thumb: anything the host needs to filter, list, or register **before** J
 
 **Fields:**
 - **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
-- **`title`** (optional): Human-readable title, used by server-side contexts that can't run `__()`
+- **`title`** (optional): Human-readable title
 - **`description`** (optional): Short description for listings
 - **`category`** (optional): Grouping category for filtering
 
@@ -632,7 +632,7 @@ export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
 }
 ```
 
-All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`.
+All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`, `.mjs`.
 
 ### Build Output
 

@@ -50,11 +50,16 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 		return null;
 	}
 
-	const metadata = /** @type {WidgetMetadata} */ (
-		JSON.parse( readFileSync( widgetJsonPath, 'utf8' ) )
-	);
+	let metadata;
+	try {
+		metadata = /** @type {WidgetMetadata} */ (
+			JSON.parse( readFileSync( widgetJsonPath, 'utf8' ) )
+		);
+	} catch {
+		return null;
+	}
 
-	if ( ! metadata.name ) {
+	if ( ! metadata || ! metadata.name ) {
 		return null;
 	}
 
@@ -62,10 +67,15 @@ export function getWidgetMetadata( rootDir, widgetName ) {
 }
 
 /**
+ * Supported source extensions for widget entry files, in priority order.
+ * Must stay aligned with SOURCE_EXTENSIONS in build.mjs.
+ */
+const WIDGET_EXTENSIONS = [ 'tsx', 'ts', 'jsx', 'js', 'mjs' ];
+
+/**
  * @typedef {Object} WidgetFiles
  * @property {boolean} hasRender Whether render entry file exists.
  * @property {boolean} hasWidget Whether widget entry file exists.
- * @property {boolean} hasStyle  Whether style file exists.
  */
 
 /**
@@ -75,27 +85,15 @@ export function getWidgetMetadata( rootDir, widgetName ) {
  * @return {WidgetFiles} Object with boolean flags for widget files.
  */
 export function getWidgetFiles( widgetDirectory ) {
-	const extensions = [ 'tsx', 'ts', 'jsx', 'js' ];
-	const files = {
-		hasRender: false,
-		hasWidget: false,
-		hasStyle: false,
-	};
-
 	const entries = readdirSync( widgetDirectory );
 
-	for ( const ext of extensions ) {
-		if ( entries.includes( `render.${ ext }` ) ) {
-			files.hasRender = true;
-		}
-		if ( entries.includes( `widget.${ ext }` ) ) {
-			files.hasWidget = true;
-		}
-	}
+	const hasEntry = ( baseName ) =>
+		WIDGET_EXTENSIONS.some( ( ext ) =>
+			entries.includes( `${ baseName }.${ ext }` )
+		);
 
-	if ( entries.includes( 'render.scss' ) ) {
-		files.hasStyle = true;
-	}
-
-	return files;
+	return {
+		hasRender: hasEntry( 'render' ),
+		hasWidget: hasEntry( 'widget' ),
+	};
 }
