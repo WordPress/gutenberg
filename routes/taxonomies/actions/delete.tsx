@@ -35,41 +35,84 @@ function DeleteTaxonomyModal( {
 			return;
 		}
 		setIsDeleting( true );
-		try {
-			for ( const item of items ) {
-				if ( item.id === undefined ) {
-					continue;
-				}
-				await deleteEntityRecord(
+		const itemsToDelete = items.filter( ( item ) => item.id !== undefined );
+		const promiseResult = await Promise.allSettled(
+			itemsToDelete.map( ( item ) =>
+				deleteEntityRecord(
 					'postType',
 					'wp_user_taxonomy',
-					item.id,
+					item.id as number,
 					{ force: true },
 					{ throwOnError: true }
-				);
-			}
+				)
+			)
+		);
+		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 			createSuccessNotice(
-				items.length === 1
+				itemsToDelete.length === 1
 					? sprintf(
 							/* translators: %s: taxonomy plural label. */
 							__( '"%s" taxonomy deleted.' ),
-							items[ 0 ].title.raw
+							itemsToDelete[ 0 ].title.raw
 					  )
 					: __( 'Taxonomies deleted.' ),
 				{ type: 'snackbar' }
 			);
-			onActionPerformed?.( items );
-			closeModal?.();
-		} catch ( error: any ) {
-			createErrorNotice(
-				error?.message && error?.code !== 'unknown_error'
-					? error.message
-					: __( 'Failed to delete taxonomy.' ),
-				{ type: 'snackbar' }
-			);
-		} finally {
-			setIsDeleting( false );
+		} else {
+			let errorMessage;
+			if ( promiseResult.length === 1 ) {
+				const typedError = promiseResult[ 0 ] as {
+					reason?: { message?: string; code?: string };
+				};
+				if (
+					typedError.reason?.message &&
+					typedError.reason.code !== 'unknown_error'
+				) {
+					errorMessage = typedError.reason.message;
+				} else {
+					errorMessage = __( 'Failed to delete taxonomy.' );
+				}
+			} else {
+				const errorMessages = new Set< string >();
+				const failedPromises = promiseResult.filter(
+					( { status } ) => status === 'rejected'
+				);
+				for ( const failedPromise of failedPromises ) {
+					const typedError = failedPromise as {
+						reason?: { message?: string; code?: string };
+					};
+					if (
+						typedError.reason?.message &&
+						typedError.reason.code !== 'unknown_error'
+					) {
+						errorMessages.add( typedError.reason.message );
+					}
+				}
+				if ( errorMessages.size === 0 ) {
+					errorMessage = __( 'Failed to delete taxonomies.' );
+				} else if ( errorMessages.size === 1 ) {
+					errorMessage = sprintf(
+						/* translators: %s: an error message */
+						__(
+							'An error occurred while deleting the taxonomy: %s'
+						),
+						[ ...errorMessages ][ 0 ]
+					);
+				} else {
+					errorMessage = sprintf(
+						/* translators: %s: a list of comma separated error messages */
+						__(
+							'Some errors occurred while deleting the taxonomies: %s'
+						),
+						[ ...errorMessages ].join( ',' )
+					);
+				}
+			}
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
+		onActionPerformed?.( itemsToDelete );
+		setIsDeleting( false );
+		closeModal?.();
 	}
 
 	return (
