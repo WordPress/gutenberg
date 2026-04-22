@@ -5,7 +5,6 @@
 	"name": "core/tab",
 	"title": "Tab",
 	"description": "Content for a tab in a tabbed interface.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"attributes": {
@@ -17,7 +16,8 @@
 	"parent": [ "core/tab-panel" ],
 	"usesContext": [
 		"core/tabs-activeTabIndex",
-		"core/tabs-editorActiveTabIndex"
+		"core/tabs-editorActiveTabIndex",
+		"core/tabs-id"
 	],
 	"supports": {
 		"anchor": true,
@@ -45,7 +45,8 @@
 				"__experimentalFontFamily": true
 			}
 		},
-		"renaming": true
+		"renaming": true,
+		"visibility": false
 	},
 	"providesContext": {
 		"core/tab-label": "label"

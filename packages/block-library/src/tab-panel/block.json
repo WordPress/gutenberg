@@ -5,7 +5,6 @@
 	"name": "core/tab-panel",
 	"title": "Tab Panel",
 	"description": "Container for tab panel content in a tabbed interface.",
-	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/tabs" ],
@@ -15,6 +14,7 @@
 		"anchor": false,
 		"html": false,
 		"reusable": false,
+		"visibility": false,
 		"lock": false,
 		"dimensions": {
 			"aspectRatio": false,

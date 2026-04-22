@@ -8,7 +8,7 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 		schema: [],
 		messages: {
 			disallowedSet:
-				'Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*).',
+				'Do not set CSS custom properties using the Design System tokens namespace (i.e. beginning with --wpds-*). Use `ThemeProvider` from `@wordpress/theme` instead.',
 		},
 	},
 	create( context ) {

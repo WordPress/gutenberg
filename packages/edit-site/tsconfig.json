@@ -9,6 +9,7 @@
 		{ "path": "../blob" },
 		{ "path": "../block-library" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
@@ -32,6 +33,7 @@
 		{ "path": "../media-utils" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
+		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences" },
 		{ "path": "../primitives" },
@@ -40,6 +42,7 @@
 		{ "path": "../router" },
 		{ "path": "../style-engine" },
 		{ "path": "../url" },
+		{ "path": "../viewport" },
 		{ "path": "../views" },
 		{ "path": "../wordcount" }
 	],

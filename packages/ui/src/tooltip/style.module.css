@@ -1,5 +1,17 @@
 @layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
 
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
 @layer wp-ui-components {
 	.positioner {
 		z-index: var(--wp-ui-tooltip-z-index, initial);
@@ -11,8 +23,8 @@
 			var(--wpds-dimension-padding-xs)
 			var(--wpds-dimension-padding-sm);
 		border-radius: var(--wpds-border-radius-sm);
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-sm);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: 1.4; /* TODO: use DS token for line height */
 		color: var(--wpds-color-fg-content-neutral);
 		box-shadow: var(--wpds-elevation-sm);

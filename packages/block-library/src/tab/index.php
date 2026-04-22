@@ -11,17 +11,34 @@
  * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content.
+* @param array     $attributes Block attributes.
+* @param string    $content    Block content.
+* @param \WP_Block $block      Block instance.
  *
  * @return string Updated HTML.
  */
-function block_core_tab_render( array $attributes, string $content ): string {
+function block_core_tab_render( array $attributes, string $content, \WP_Block $block ): string {
+	$tabs_id = $block->context['core/tabs-id'] ?? '';
+
+	static $tab_counters = array();
+
+	if ( ! isset( $tab_counters[ $tabs_id ] ) ) {
+		$tab_counters[ $tabs_id ] = 0;
+	}
+
+	$tab_index = $tab_counters[ $tabs_id ];
+	++$tab_counters[ $tabs_id ];
+
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag( array( 'class_name' => 'wp-block-tab' ) );
+
+	// Use the user's custom anchor if present, otherwise fall back to
+	// the generated position-based ID.
 	$tab_id = (string) $tag_processor->get_attribute( 'id' );
-	// If no id, generate a unique one
 	if ( empty( $tab_id ) ) {
-		$tab_id = sanitize_title( $attributes['label'] );
+		$tab_id = ! empty( $tabs_id )
+			? $tabs_id . '-tab-' . $tab_index
+			: 'tab-' . $tab_index;
 		$tag_processor->set_attribute( 'id', $tab_id );
 	}
 
