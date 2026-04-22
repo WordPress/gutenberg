@@ -35,44 +35,22 @@ import type { GridLayoutItem, GridProps } from './types';
 
 /**
  * CSS-Grid-based layout with drag-to-reorder and resize handles, designed
- * for dashboard-style surfaces where users arrange tiles.
+ * for dashboard-style surfaces where users arrange tiles. Each child
+ * must have a `key` prop that matches an entry in the `layout` array;
+ * children without a matching entry are rendered outside the grid.
  *
- * Each child **must** have a `key` prop that matches an entry in the
- * `layout` array. Children without a matching layout entry are rendered
- * outside the grid.
- *
- * @param props                 Grid props.
+ * @param props                 Component props.
  * @param props.layout          Positions and sizes keyed by child `key`.
- * @param props.children        Grid children; each needs a `key`
- *                              matching a layout entry.
  * @param props.columns         Total columns in fixed mode.
+ * @param props.children        Grid children.
  * @param props.className       Extra class on the grid root.
- * @param props.spacing         Gap multiplier (effective gap =
- *                              `spacing * 4px`).
+ * @param props.spacing         Gap multiplier (effective gap = `spacing * 4px`).
  * @param props.rowHeight       Row height in pixels, or `'auto'`.
- * @param props.minColumnWidth  Enables responsive mode: columns are
- *                              derived from container width using this
- *                              as a lower bound per column.
+ * @param props.minColumnWidth  Enables responsive mode using this as the
+ *                              per-column lower bound.
  * @param props.editMode        Enables drag-to-reorder and resize.
- * @param props.onChangeLayout  Fired when the user commits a drag or
- *                              resize with the new layout.
- * @param props.onPreviewLayout Fired continuously during a drag or
- *                              resize with the in-progress layout.
- *
- * @example
- * ```jsx
- * import { Grid } from '@wordpress/grid';
- *
- * const layout = [
- *     { key: 'a', width: 2 },
- *     { key: 'b', width: 4 },
- * ];
- *
- * <Grid layout={ layout } columns={ 6 } editMode onChangeLayout={ save }>
- *     <Tile key="a" />
- *     <Tile key="b" />
- * </Grid>
- * ```
+ * @param props.onChangeLayout  Fired when the user commits a drag or resize.
+ * @param props.onPreviewLayout Fired continuously during a drag or resize.
  */
 export function Grid( {
 	layout,
