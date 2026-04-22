@@ -157,17 +157,19 @@ function slugifyHeading( heading ) {
 }
 
 /**
- * Read a markdown doc file, extract heading anchors, and warn if any
- * expected anchor is missing. Helps catch drift when headings are renamed.
+ * Read a markdown doc file, extract heading anchors, and error if any
+ * expected anchor is missing. Sets process.exitCode = 1 so CI fails when
+ * a handbook heading is renamed and the generator's anchor map drifts.
  *
  * @param {string}   docPath         Absolute path to the markdown file.
  * @param {string[]} expectedAnchors Anchors the generator relies on.
- * @param {string}   label           Short name for warning messages.
+ * @param {string}   label           Short name for error messages.
  */
 function validateDocAnchors( docPath, expectedAnchors, label ) {
 	if ( ! fs.existsSync( docPath ) ) {
 		// eslint-disable-next-line no-console
-		console.warn( `⚠  Cannot validate anchors: ${ docPath } not found.` );
+		console.error( `✖  Cannot validate anchors: ${ docPath } not found.` );
+		process.exitCode = 1;
 		return;
 	}
 
@@ -181,10 +183,11 @@ function validateDocAnchors( docPath, expectedAnchors, label ) {
 	for ( const anchor of expectedAnchors ) {
 		if ( ! anchors.has( anchor ) ) {
 			// eslint-disable-next-line no-console
-			console.warn(
-				`⚠  Anchor "#${ anchor }" not found in ${ label }. ` +
+			console.error(
+				`✖  Anchor "#${ anchor }" not found in ${ label }. ` +
 					`Update the corresponding map in generate-block-docs.mjs.`
 			);
+			process.exitCode = 1;
 		}
 	}
 }
