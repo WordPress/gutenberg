@@ -566,7 +566,14 @@ export function finishOperation(
 	};
 }
 
-const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+const VALID_IMAGE_FORMATS = [
+	'jpeg',
+	'webp',
+	'avif',
+	'png',
+	'gif',
+	'jxl',
+] as const;
 
 /**
  * Checks if a format string is a valid ImageFormat.

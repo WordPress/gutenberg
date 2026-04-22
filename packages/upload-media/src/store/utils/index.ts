@@ -59,7 +59,8 @@ export async function vipsConvertImageFormat(
 		| 'image/png'
 		| 'image/webp'
 		| 'image/avif'
-		| 'image/gif',
+		| 'image/gif'
+		| 'image/jxl',
 	quality: number,
 	interlaced?: boolean
 ) {

@@ -9,6 +9,9 @@ import VipsModule from 'wasm-vips/vips.wasm';
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
 
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
+
 /**
  * Internal dependencies
  */
@@ -41,10 +44,9 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	vipsPromise = Vips( {
-		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
+		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support,
+		// and JXL dynamic module for JPEG XL format support.
+		dynamicLibraries: [ 'vips-heif.wasm', 'vips-jxl.wasm' ],
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
@@ -53,6 +55,8 @@ async function getVips(): Promise< typeof Vips > {
 				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
 				return VipsHeifModule;
+			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
+				return VipsJxlModule;
 			}
 			return fileName;
 		},
@@ -152,6 +156,12 @@ export async function convertImageFormat(
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
+		}
+
+		// JXL default effort of 7 is too slow for interactive use.
+		// Use 3 for a good balance of speed and compression.
+		if ( 'image/jxl' === outputType ) {
+			saveOptions.effort = 3;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -308,6 +318,12 @@ function buildSaveOptions(
 	// See https://github.com/swissspidy/media-experiments/issues/324.
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
+	}
+
+	// JXL default effort of 7 is too slow for interactive use.
+	// Use 3 for a good balance of speed and compression.
+	if ( 'image/jxl' === type ) {
+		saveOptions.effort = 3;
 	}
 
 	return saveOptions;
