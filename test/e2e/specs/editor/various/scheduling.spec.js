@@ -11,6 +11,7 @@ test.describe( 'Scheduling', () => {
 	TIMEZONES.forEach( ( timezone ) => {
 		test.describe( `Timezone ${ timezone }`, () => {
 			let originalTimezone;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				originalTimezone = ( await requestUtils.getSiteSettings() )
 					.timezone;

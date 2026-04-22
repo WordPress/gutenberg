@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight",
 					"type": "boolean",
 					"default": false
 				}
@@ -41,6 +41,11 @@
 						},
 						"backgroundSize": {
 							"description": "Allow users to set values related to the size of a background image, including size, position, and repeat controls.",
+							"type": "boolean",
+							"default": false
+						},
+						"gradient": {
+							"description": "Allow users to set a gradient background.",
 							"type": "boolean",
 							"default": false
 						}
@@ -293,6 +298,11 @@
 						},
 						"minHeight": {
 							"description": "Allow users to set custom minimum height.",
+							"type": "boolean",
+							"default": false
+						},
+						"minWidth": {
+							"description": "Allow users to set custom minimum width.",
 							"type": "boolean",
 							"default": false
 						},
@@ -1552,6 +1562,13 @@
 						},
 						"minHeight": {
 							"description": "Sets the `min-height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"minWidth": {
+							"description": "Sets the `min-width` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }

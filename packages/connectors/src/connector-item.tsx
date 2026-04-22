@@ -142,7 +142,7 @@ export function DefaultConnectorSettings( {
 						sprintf(
 							/* translators: %s: Link to provider settings. */
 							__(
-								'Your API key is stored securely. You can reset it at %s'
+								'Your API key is stored securely. You can manage it at %s'
 							),
 							'<a></a>'
 						),
@@ -190,9 +190,9 @@ export function DefaultConnectorSettings( {
 			className="connector-settings"
 			style={
 				readOnly
-					? ( {
+					? {
 							'--wp-components-color-background': '#f0f0f0',
-					  } as React.CSSProperties )
+					  }
 					: undefined
 			}
 		>

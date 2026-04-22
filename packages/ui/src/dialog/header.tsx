@@ -7,15 +7,20 @@ import type { HeaderProps } from './types';
 /**
  * Renders the header section of the dialog, typically containing
  * the heading and close button.
+ *
+ * Defaults to a native `<header>` element for richer semantics (heading-level
+ * scanning, and banner landmark navigation where screen readers expose
+ * landmarks nested in dialogs). Pass `render` to opt out of the default tag.
  */
-const Header = forwardRef< HTMLDivElement, HeaderProps >( function DialogHeader(
+const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
 	{ className, render, ...props },
 	ref
 ) {
 	const element = useRender( {
+		defaultTagName: 'header',
 		render,
 		ref,
-		props: mergeProps< 'div' >( props, {
+		props: mergeProps< 'header' >( props, {
 			className: clsx( styles.header, className ),
 		} ),
 	} );

@@ -6,11 +6,12 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 /**
  * WordPress dependencies
  */
-// @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	type CRDTDoc,
 	type ObjectData,
+	type ObjectID,
+	type ObjectType,
 	type SyncConfig,
 	Y,
 } from '@wordpress/sync';
@@ -339,17 +340,29 @@ export function getPostChangesFromCRDTDoc(
 				}
 
 				case 'meta': {
+					const currentMeta =
+						( currentValue as PostChanges[ 'meta' ] ) ?? {};
+
 					allowedMetaChanges = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
-							( [ metaKey ] ) =>
-								! disallowedPostMetaKeys.has( metaKey )
+							( [ metaKey ] ) => {
+								if ( disallowedPostMetaKeys.has( metaKey ) ) {
+									return false;
+								}
+
+								// Ignore meta keys that are no longer registered
+								// for this post (absent from the REST response).
+								// Without this, orphaned CRDT meta would mark
+								// the post permanently dirty.
+								return metaKey in currentMeta;
+							}
 						)
 					);
 
 					// Merge the allowed meta changes with the current meta values since
 					// not all meta properties are synced.
 					const mergedValue = {
-						...( currentValue as PostChanges[ 'meta' ] ),
+						...currentMeta,
 						...allowedMetaChanges,
 					};
 
@@ -426,6 +439,19 @@ export const defaultSyncConfig: SyncConfig = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
 	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
+};
+
+/**
+ * This default collection sync config can be used to sync entity collections
+ * (e.g., block comments) where we are not interested in merging changes at the
+ * individual record level, but instead want to replace the entire collection
+ * when changes are detected.
+ */
+export const defaultCollectionSyncConfig: SyncConfig = {
+	applyChangesToCRDTDoc: () => {},
+	getChangesFromCRDTDoc: () => ( {} ),
+	shouldSync: ( _: ObjectType, objectId: ObjectID | null ) =>
+		null === objectId,
 };
 
 /**

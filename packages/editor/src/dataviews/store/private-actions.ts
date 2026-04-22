@@ -39,6 +39,7 @@ import {
 	scheduledDateField,
 	formatField,
 	postContentInfoField,
+	stickyField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -285,6 +286,7 @@ export const registerPostTypeSchema =
 					postTypeConfig.supports?.editor &&
 					postContentInfoField,
 				passwordField,
+				postTypeConfig.slug === 'post' && stickyField,
 				postTypeConfig.supports?.editor &&
 					postTypeConfig.viewable &&
 					postPreviewField,

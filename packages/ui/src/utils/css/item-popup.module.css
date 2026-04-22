@@ -16,8 +16,8 @@
 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
 		line-height: 1.4;
 		color: var(--wpds-color-fg-interactive-neutral);
 	}
