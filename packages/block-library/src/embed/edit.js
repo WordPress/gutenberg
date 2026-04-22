@@ -159,8 +159,8 @@ const EmbedEdit = ( props ) => {
 		const newURL = attributesUrl.replace( /\/$/, '' );
 		if ( newURL !== attributesUrl ) {
 			setURL( newURL );
-			setIsEditingURL( false );
 			setAttributes( { url: newURL } );
+			setIsEditingURL( false );
 		}
 	}, [ attributesUrl, cannotEmbed, hasResolved, setAttributes ] );
 
@@ -233,12 +233,12 @@ const EmbedEdit = ( props ) => {
 							attributes.className
 						);
 
-						setIsEditingURL( false );
 						setAttributes( {
 							url,
 							...findMoreSuitableBlock( url )?.attributes,
 							className: blockClass,
 						} );
+						setIsEditingURL( false );
 					} }
 					value={ url }
 					cannotEmbed={ cannotEmbed }
