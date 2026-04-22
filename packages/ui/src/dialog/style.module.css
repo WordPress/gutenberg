@@ -122,13 +122,29 @@
 		 * (ResizeObserver → custom property) can replace this if a
 		 * consumer ever runs into an under-cover case — deliberately kept
 		 * simple for now to avoid overengineering.
+		 *
+		 * Exception: while focus is inside the sticky chrome itself (e.g.
+		 * initial focus landing on a footer action button, or Tab landing
+		 * on a close icon inside the sticky header), drop the padding so
+		 * the browser's focus scroll doesn't try to move the already-
+		 * pinned chrome out of the way, which would scroll the content
+		 * unnecessarily. When focus leaves into non-sticky content, the
+		 * padding reapplies and protects that focus target as usual.
 		 */
 		&:has(> .headerSticky) {
 			scroll-padding-block-start: 6rem;
 		}
 
+		&:has(> .headerSticky:focus-within) {
+			scroll-padding-block-start: 0;
+		}
+
 		&:has(> .footerSticky) {
 			scroll-padding-block-end: 6rem;
+		}
+
+		&:has(> .footerSticky:focus-within) {
+			scroll-padding-block-end: 0;
 		}
 	}
 
