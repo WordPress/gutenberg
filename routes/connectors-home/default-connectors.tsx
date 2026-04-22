@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -154,16 +154,6 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after the API key form closes,
-	// since the focused element inside the form is removed from the DOM.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
 
 	return (
 		<ConnectorItem
@@ -213,18 +203,14 @@ function ApiKeyConnector( {
 						isExternallyConfigured
 							? undefined
 							: async () => {
-									pendingFocusRef.current = true;
-									try {
-										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
+									await removeApiKey();
+									actionButtonRef.current?.focus();
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
 						setIsExpanded( false );
+						actionButtonRef.current?.focus();
 					} }
 				/>
 			) }
