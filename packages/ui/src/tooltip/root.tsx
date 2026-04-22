@@ -1,4 +1,4 @@
-import { Tooltip } from '@base-ui/react/tooltip';
+import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import type { RootProps } from './types';
 
 /**
@@ -15,7 +15,7 @@ import type { RootProps } from './types';
  * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-iconbutton--docs IconButton}
  */
 function Root( props: RootProps ) {
-	return <Tooltip.Root { ...props } />;
+	return <_Tooltip.Root { ...props } />;
 }
 
 export { Root };

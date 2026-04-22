@@ -10,6 +10,7 @@ import { fn } from 'storybook/test';
 import { ColorPicker } from '../component';
 
 const meta: Meta< typeof ColorPicker > = {
+	tags: [ 'manifest' ],
 	component: ColorPicker,
 	title: 'Components/Selection & Input/Color/ColorPicker',
 	id: 'components-colorpicker',

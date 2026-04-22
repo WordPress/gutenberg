@@ -33,69 +33,63 @@ import { setImmutably } from '../../utils/object';
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
 export function useHasDimensionsPanel( settings ) {
-	const hasContentSize = useHasContentSize( settings );
-	const hasWideSize = useHasWideSize( settings );
-	const hasPadding = useHasPadding( settings );
-	const hasMargin = useHasMargin( settings );
-	const hasGap = useHasGap( settings );
-	const hasHeight = useHasHeight( settings );
-	const hasMinHeight = useHasMinHeight( settings );
-	const hasWidth = useHasWidth( settings );
-	const hasAspectRatio = useHasAspectRatio( settings );
-	const hasChildLayout = useHasChildLayout( settings );
-
 	return (
 		Platform.OS === 'web' &&
-		( hasContentSize ||
-			hasWideSize ||
-			hasPadding ||
-			hasMargin ||
-			hasGap ||
-			hasHeight ||
-			hasMinHeight ||
-			hasWidth ||
-			hasAspectRatio ||
-			hasChildLayout )
+		( hasContentSize( settings ) ||
+			hasWideSize( settings ) ||
+			hasPadding( settings ) ||
+			hasMargin( settings ) ||
+			hasGap( settings ) ||
+			hasHeight( settings ) ||
+			hasMinHeight( settings ) ||
+			hasMinWidth( settings ) ||
+			hasWidth( settings ) ||
+			hasAspectRatio( settings ) ||
+			hasChildLayout( settings ) )
 	);
 }
 
-function useHasContentSize( settings ) {
+function hasContentSize( settings ) {
 	return settings?.layout?.contentSize;
 }
 
-function useHasWideSize( settings ) {
+function hasWideSize( settings ) {
 	return settings?.layout?.wideSize;
 }
 
-function useHasPadding( settings ) {
+function hasPadding( settings ) {
 	return settings?.spacing?.padding;
 }
 
-function useHasMargin( settings ) {
+function hasMargin( settings ) {
 	return settings?.spacing?.margin;
 }
 
-function useHasGap( settings ) {
+function hasGap( settings ) {
 	return settings?.spacing?.blockGap;
 }
 
-function useHasHeight( settings ) {
+function hasHeight( settings ) {
 	return settings?.dimensions?.height;
 }
 
-function useHasMinHeight( settings ) {
+function hasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
 }
 
-function useHasWidth( settings ) {
+function hasMinWidth( settings ) {
+	return settings?.dimensions?.minWidth;
+}
+
+function hasWidth( settings ) {
 	return settings?.dimensions?.width;
 }
 
-function useHasAspectRatio( settings ) {
+function hasAspectRatio( settings ) {
 	return settings?.dimensions?.aspectRatio;
 }
 
-function useHasChildLayout( settings ) {
+function hasChildLayout( settings ) {
 	const {
 		type: parentLayoutType = 'default',
 		default: { type: defaultParentLayoutType = 'default' } = {},
@@ -111,7 +105,7 @@ function useHasChildLayout( settings ) {
 	return !! settings?.layout && support;
 }
 
-function useHasSpacingPresets( settings ) {
+function hasSpacingPresets( settings ) {
 	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
 	return (
 		( defaultSpacingSizes !== false &&
@@ -219,6 +213,7 @@ const DEFAULT_CONTROLS = {
 	blockGap: true,
 	height: true,
 	minHeight: true,
+	minWidth: true,
 	width: true,
 	aspectRatio: true,
 	childLayout: true,
@@ -257,7 +252,7 @@ export default function DimensionsPanel( {
 		);
 	};
 
-	const showSpacingPresetsControl = useHasSpacingPresets( settings );
+	const showSpacingPresetsControl = hasSpacingPresets( settings );
 	const units = useCustomUnits( {
 		availableUnits: settings?.spacing?.units || [
 			'%',
@@ -272,9 +267,40 @@ export default function DimensionsPanel( {
 	const minimumMargin = -Infinity;
 	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
+	const resetAllFilter = useCallback( ( previousValue ) => {
+		return {
+			...previousValue,
+			layout: cleanEmptyObject( {
+				...previousValue?.layout,
+				contentSize: undefined,
+				wideSize: undefined,
+				selfStretch: undefined,
+				flexSize: undefined,
+				columnStart: undefined,
+				rowStart: undefined,
+				columnSpan: undefined,
+				rowSpan: undefined,
+			} ),
+			spacing: {
+				...previousValue?.spacing,
+				padding: undefined,
+				margin: undefined,
+				blockGap: undefined,
+			},
+			dimensions: {
+				...previousValue?.dimensions,
+				height: undefined,
+				minHeight: undefined,
+				minWidth: undefined,
+				aspectRatio: undefined,
+				width: undefined,
+			},
+		};
+	}, [] );
+
 	// Content Width
 	const showContentSizeControl =
-		useHasContentSize( settings ) && includeLayoutControls;
+		hasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
 	const setContentSizeValue = ( newValue ) => {
 		onChange(
@@ -290,7 +316,7 @@ export default function DimensionsPanel( {
 
 	// Wide Width
 	const showWideSizeControl =
-		useHasWideSize( settings ) && includeLayoutControls;
+		hasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
 	const setWideSizeValue = ( newValue ) => {
 		onChange(
@@ -305,7 +331,7 @@ export default function DimensionsPanel( {
 	const resetWideSizeValue = () => setWideSizeValue( undefined );
 
 	// Padding
-	const showPaddingControl = useHasPadding( settings );
+	const showPaddingControl = hasPadding( settings );
 	const rawPadding = decodeValue( inheritedValue?.spacing?.padding );
 	const paddingValues = splitStyleValue( rawPadding );
 	const paddingSides = Array.isArray( settings?.spacing?.padding )
@@ -325,7 +351,7 @@ export default function DimensionsPanel( {
 	const onMouseOverPadding = () => onVisualize( 'padding' );
 
 	// Margin
-	const showMarginControl = useHasMargin( settings );
+	const showMarginControl = hasMargin( settings );
 	const rawMargin = decodeValue( inheritedValue?.spacing?.margin );
 	const marginValues = splitStyleValue( rawMargin );
 	const marginSides = Array.isArray( settings?.spacing?.margin )
@@ -345,7 +371,7 @@ export default function DimensionsPanel( {
 	const onMouseOverMargin = () => onVisualize( 'margin' );
 
 	// Block Gap
-	const showGapControl = useHasGap( settings );
+	const showGapControl = hasGap( settings );
 	const gapSides = Array.isArray( settings?.spacing?.blockGap )
 		? settings?.spacing?.blockGap
 		: settings?.spacing?.blockGap?.sides;
@@ -376,7 +402,7 @@ export default function DimensionsPanel( {
 	const hasGapValue = () => !! value?.spacing?.blockGap;
 
 	// Min Height
-	const showMinHeightControl = useHasMinHeight( settings );
+	const showMinHeightControl = hasMinHeight( settings );
 	const minHeightValue = decodeValue( inheritedValue?.dimensions?.minHeight );
 	const setMinHeightValue = ( newValue ) => {
 		const tempValue = setImmutably(
@@ -399,7 +425,7 @@ export default function DimensionsPanel( {
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
 	// Height
-	const showHeightControl = useHasHeight( settings );
+	const showHeightControl = hasHeight( settings );
 	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
 	const setHeightValue = ( newValue ) => {
 		const tempValue = setImmutably(
@@ -421,8 +447,21 @@ export default function DimensionsPanel( {
 	};
 	const hasHeightValue = () => !! value?.dimensions?.height;
 
+	// Min Width
+	const showMinWidthControl = hasMinWidth( settings );
+	const minWidthValue = decodeValue( inheritedValue?.dimensions?.minWidth );
+	const setMinWidthValue = ( newValue ) => {
+		onChange(
+			setImmutably( value, [ 'dimensions', 'minWidth' ], newValue )
+		);
+	};
+	const resetMinWidthValue = () => {
+		setMinWidthValue( undefined );
+	};
+	const hasMinWidthValue = () => !! value?.dimensions?.minWidth;
+
 	// Width
-	const showWidthControl = useHasWidth( settings );
+	const showWidthControl = hasWidth( settings );
 	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
 	const setWidthValue = ( newValue ) => {
 		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
@@ -433,7 +472,7 @@ export default function DimensionsPanel( {
 	const hasWidthValue = () => !! value?.dimensions?.width;
 
 	// Aspect Ratio
-	const showAspectRatioControl = useHasAspectRatio( settings );
+	const showAspectRatioControl = hasAspectRatio( settings );
 	const aspectRatioValue = decodeValue(
 		inheritedValue?.dimensions?.aspectRatio
 	);
@@ -451,7 +490,7 @@ export default function DimensionsPanel( {
 	const hasAspectRatioValue = () => !! value?.dimensions?.aspectRatio;
 
 	// Child Layout
-	const showChildLayoutControl = useHasChildLayout( settings );
+	const showChildLayoutControl = hasChildLayout( settings );
 	const childLayout = inheritedValue?.layout;
 
 	const setChildLayout = ( newChildLayout ) => {
@@ -462,36 +501,6 @@ export default function DimensionsPanel( {
 			},
 		} );
 	};
-
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			layout: cleanEmptyObject( {
-				...previousValue?.layout,
-				contentSize: undefined,
-				wideSize: undefined,
-				selfStretch: undefined,
-				flexSize: undefined,
-				columnStart: undefined,
-				rowStart: undefined,
-				columnSpan: undefined,
-				rowSpan: undefined,
-			} ),
-			spacing: {
-				...previousValue?.spacing,
-				padding: undefined,
-				margin: undefined,
-				blockGap: undefined,
-			},
-			dimensions: {
-				...previousValue?.dimensions,
-				height: undefined,
-				minHeight: undefined,
-				aspectRatio: undefined,
-				width: undefined,
-			},
-		};
-	}, [] );
 
 	const onMouseLeaveControls = () => onVisualize( false );
 
@@ -735,6 +744,24 @@ export default function DimensionsPanel( {
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+						dimensionSizes={ dimensions?.dimensionSizes }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showMinWidthControl && (
+				<ToolsPanelItem
+					hasValue={ hasMinWidthValue }
+					label={ __( 'Minimum width' ) }
+					onDeselect={ resetMinWidthValue }
+					isShownByDefault={
+						defaultControls.minWidth ?? DEFAULT_CONTROLS.minWidth
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Minimum width' ) }
+						value={ minWidthValue }
+						onChange={ setMinWidthValue }
 						dimensionSizes={ dimensions?.dimensionSizes }
 					/>
 				</ToolsPanelItem>

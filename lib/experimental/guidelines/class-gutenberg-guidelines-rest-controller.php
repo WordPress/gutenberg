@@ -166,9 +166,20 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 			);
 		}
 
+		$content_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
+			Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+			__( 'Content', 'gutenberg' )
+		);
+		if ( is_wp_error( $content_term_id ) ) {
+			return $content_term_id;
+		}
+
 		$prepared             = $this->prepare_item_for_database( $request );
 		$prepared->post_type  = $this->post_type;
 		$prepared->post_title = __( 'Guidelines', 'gutenberg' );
+		$prepared->tax_input  = array(
+			Gutenberg_Guidelines_Post_Type::TAXONOMY => array( $content_term_id ),
+		);
 
 		if ( ! isset( $prepared->post_status ) ) {
 			$prepared->post_status = 'draft';
@@ -520,6 +531,13 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 				'orderby'        => 'date',
 				'order'          => 'DESC',
 				'no_found_rows'  => true,
+				'tax_query'      => array(
+					array(
+						'taxonomy' => Gutenberg_Guidelines_Post_Type::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => Gutenberg_Guidelines_Post_Type::TERM_CONTENT,
+					),
+				),
 			)
 		);
 

@@ -12,6 +12,7 @@ export default function Header( {
 	headingLevel = 2,
 	breadcrumbs,
 	badges,
+	visual,
 	title,
 	subTitle,
 	actions,
@@ -20,6 +21,7 @@ export default function Header( {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
+	visual?: React.ReactNode;
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
@@ -39,6 +41,14 @@ export default function Header( {
 							bubblesVirtually
 							className="admin-ui-page__sidebar-toggle-slot"
 						/>
+					) }
+					{ visual && (
+						<div
+							className="admin-ui-page__header-visual"
+							aria-hidden="true"
+						>
+							{ visual }
+						</div>
 					) }
 					{ title && (
 						<HeadingTag className="admin-ui-page__header-title">

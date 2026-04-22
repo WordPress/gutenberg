@@ -340,17 +340,29 @@ export function getPostChangesFromCRDTDoc(
 				}
 
 				case 'meta': {
+					const currentMeta =
+						( currentValue as PostChanges[ 'meta' ] ) ?? {};
+
 					allowedMetaChanges = Object.fromEntries(
 						Object.entries( newValue ?? {} ).filter(
-							( [ metaKey ] ) =>
-								! disallowedPostMetaKeys.has( metaKey )
+							( [ metaKey ] ) => {
+								if ( disallowedPostMetaKeys.has( metaKey ) ) {
+									return false;
+								}
+
+								// Ignore meta keys that are no longer registered
+								// for this post (absent from the REST response).
+								// Without this, orphaned CRDT meta would mark
+								// the post permanently dirty.
+								return metaKey in currentMeta;
+							}
 						)
 					);
 
 					// Merge the allowed meta changes with the current meta values since
 					// not all meta properties are synced.
 					const mergedValue = {
-						...( currentValue as PostChanges[ 'meta' ] ),
+						...currentMeta,
 						...allowedMetaChanges,
 					};
 
