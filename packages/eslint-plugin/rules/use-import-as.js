@@ -31,6 +31,7 @@ const rule = {
 				? context.options[ 0 ]
 				: {};
 		const privateApisSources = new Map();
+		const trackedUnlockImports = new Set();
 
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
@@ -42,16 +43,20 @@ const rule = {
 				const source = node.source.value;
 				const sourceMap = importAsMap[ source ];
 
-				if ( ! sourceMap ) {
-					return;
-				}
-
 				node.specifiers.forEach( ( specifier ) => {
 					if ( specifier.type !== 'ImportSpecifier' ) {
 						return;
 					}
 
 					const importedName = getImportedName( specifier );
+					if ( importedName === 'unlock' ) {
+						trackedUnlockImports.add( specifier.local.name );
+					}
+
+					if ( ! sourceMap ) {
+						return;
+					}
+
 					if ( importedName === 'privateApis' ) {
 						privateApisSources.set( specifier.local.name, source );
 					}
@@ -78,7 +83,11 @@ const rule = {
 					node.parent.type !== 'VariableDeclaration' ||
 					node.parent.kind !== 'const' ||
 					node.id.type !== 'ObjectPattern' ||
-					! isUnlockCall( node.init )
+					! isUnlockCall(
+						node.init,
+						context.sourceCode,
+						trackedUnlockImports
+					)
 				) {
 					return;
 				}
@@ -152,16 +161,32 @@ function getImportedName( specifier ) {
 
 /**
  * @param {import('estree').CallExpression|import('estree').Expression|null} node
+ * @param {import('eslint').SourceCode}                                      sourceCode
+ * @param {ReadonlySet<string>}                                              trackedUnlockImports
  * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
  */
-function isUnlockCall( node ) {
-	return !! (
+function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
+	if (
 		node &&
 		node.type === 'CallExpression' &&
 		node.callee.type === 'Identifier' &&
-		node.callee.name === 'unlock' &&
 		node.arguments.length === 1
-	);
+	) {
+		if ( ! trackedUnlockImports.has( node.callee.name ) ) {
+			return false;
+		}
+
+		const { references } = sourceCode.getScope( node.callee );
+		const reference = references.find(
+			( currentReference ) => currentReference.identifier === node.callee
+		);
+
+		return !! reference?.resolved?.defs.some(
+			( definition ) => definition.type === 'ImportBinding'
+		);
+	}
+
+	return false;
 }
 
 /**

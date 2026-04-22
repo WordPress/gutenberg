@@ -16,7 +16,7 @@ if ( typeof globalThis.structuredClone !== 'function' ) {
 const ruleTester = new RuleTester( {
 	languageOptions: {
 		sourceType: 'module',
-		ecmaVersion: 6,
+		ecmaVersion: 2022,
 	},
 } );
 
@@ -62,6 +62,10 @@ ruleTester.run( 'use-import-as', rule, {
 			options,
 		},
 		{
+			code: 'import { "VisuallyHidden" as WCVisuallyHidden } from \'@wordpress/components\';',
+			options,
+		},
+		{
 			code: "import { Button, VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';",
 			options,
 		},
@@ -85,10 +89,45 @@ ruleTester.run( 'use-import-as', rule, {
 		},
 		{
 			code: `
+				import { privateApis } from '@wordpress/components';
+				import { unlock as open } from '../../lock-unlock';
+
+				const { Badge: WCBadge = fallbackBadge } = open( privateApis );
+			`,
+			options,
+		},
+		{
+			code: `
 				import { privateApis as uiPrivateApis } from '@wordpress/ui';
 				import { unlock } from '../../lock-unlock';
 
 				const { Badge } = unlock( uiPrivateApis );
+			`,
+			options,
+		},
+		{
+			code: `
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { [ badgeKey ]: Badge } = unlock( privateApis );
+			`,
+			options,
+		},
+		{
+			code: `
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				function test() {
+					function unlock( value ) {
+						return value;
+					}
+
+					const { Badge } = unlock( privateApis );
+
+					return Badge;
+				}
 			`,
 			options,
 		},
@@ -107,6 +146,16 @@ ruleTester.run( 'use-import-as', rule, {
 		},
 		{
 			code: "import { VisuallyHidden as Hidden } from '@wordpress/components';",
+			options,
+			errors: [
+				{
+					message:
+						'`VisuallyHidden` from `@wordpress/components` must be imported as `WCVisuallyHidden`.',
+				},
+			],
+		},
+		{
+			code: 'import { "VisuallyHidden" as Hidden } from \'@wordpress/components\';',
 			options,
 			errors: [
 				{
@@ -146,6 +195,21 @@ ruleTester.run( 'use-import-as', rule, {
 				import { unlock } from '../../lock-unlock';
 
 				const { Badge: HiddenBadge } = unlock( privateApis );
+			`,
+			options,
+			errors: [
+				{
+					message:
+						'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
+				},
+			],
+		},
+		{
+			code: `
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge: HiddenBadge = fallbackBadge } = unlock( privateApis );
 			`,
 			options,
 			errors: [
