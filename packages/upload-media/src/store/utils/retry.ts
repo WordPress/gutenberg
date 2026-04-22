@@ -45,14 +45,14 @@ export interface RetryDelayOptions {
 export function calculateRetryDelay( options: RetryDelayOptions ): number {
 	const { attempt, initialDelay, maxDelay, multiplier, jitter } = options;
 
-	// Calculate base exponential delay: initialDelay * multiplier^(attempt-1)
+	// Calculate base exponential delay: initialDelay * multiplier^(attempt-1).
 	const exponentialDelay = initialDelay * Math.pow( multiplier, attempt - 1 );
 
-	// Cap the delay at maxDelay
+	// Cap the delay at maxDelay.
 	const cappedDelay = Math.min( exponentialDelay, maxDelay );
 
-	// Apply jitter: multiply by a random factor between (1-jitter) and (1+jitter)
-	// This helps prevent multiple failed uploads from retrying at exactly the same time
+	// Apply jitter: multiply by a random factor between (1-jitter) and (1+jitter).
+	// This helps prevent multiple failed uploads from retrying at exactly the same time.
 	const jitterFactor = 1 + ( Math.random() * 2 - 1 ) * jitter;
 
 	return Math.floor( cappedDelay * jitterFactor );
@@ -94,17 +94,17 @@ export function shouldRetryError(
 	retryCount: number,
 	maxRetries: number
 ): boolean {
-	// Don't retry if we've exceeded the maximum attempts
+	// Don't retry if we've exceeded the maximum attempts.
 	if ( retryCount >= maxRetries ) {
 		return false;
 	}
 
-	// UploadError has its own isRetryable classification
+	// UploadError has its own isRetryable classification.
 	if ( error instanceof UploadError ) {
 		return error.isRetryable;
 	}
 
-	// For generic errors, check message patterns
+	// For generic errors, check message patterns.
 	const message = error.message || '';
 	return RETRYABLE_MESSAGE_PATTERNS.some( ( pattern ) =>
 		pattern.test( message )

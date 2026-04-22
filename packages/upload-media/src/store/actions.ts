@@ -312,18 +312,18 @@ export function executeRetry( id: QueueItemId ) {
 		const item = select.getItem( id );
 
 		// Verify item exists and is still pending retry
-		// (user may have manually cancelled or retried)
+		// (user may have manually cancelled or retried).
 		if ( ! item || item.status !== ItemStatus.PendingRetry ) {
 			return;
 		}
 
-		// Reset the item to Processing status and clear the error
+		// Reset the item to Processing status and clear the error.
 		dispatch< RetryItemAction >( {
 			type: Type.RetryItem,
 			id,
 		} );
 
-		// Re-process the item
+		// Re-process the item.
 		dispatch.processItem( id );
 	};
 }
