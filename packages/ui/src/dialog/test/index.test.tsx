@@ -24,6 +24,7 @@ describe( 'Dialog', () => {
 		const actionRef = createRef< HTMLButtonElement >();
 		const headerRef = createRef< HTMLDivElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
+		const descriptionRef = createRef< HTMLParagraphElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
 		const footerRef = createRef< HTMLDivElement >();
 
@@ -37,6 +38,9 @@ describe( 'Dialog', () => {
 						</Dialog.Title>
 						<Dialog.CloseIcon ref={ closeIconRef } />
 					</Dialog.Header>
+					<Dialog.Description ref={ descriptionRef }>
+						A test description
+					</Dialog.Description>
 					<Dialog.Footer ref={ footerRef }>
 						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
 					</Dialog.Footer>
@@ -58,9 +62,187 @@ describe( 'Dialog', () => {
 		// Now that the dialog is open, verify all inner refs
 		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
+		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
+		const user = userEvent.setup();
+		const popupRef = createRef< HTMLDivElement >();
+
+		render(
+			<Dialog.Root>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+				<Dialog.Popup ref={ popupRef }>
+					<Dialog.Title>Title</Dialog.Title>
+					<Dialog.Description>My description</Dialog.Description>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		await waitFor( () => {
+			expect( popupRef.current ).toHaveAccessibleDescription(
+				'My description'
+			);
+		} );
+	} );
+
+	it( 'renders Dialog.Footer and supports render/className props', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<Dialog.Root>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Title>Test Dialog</Dialog.Title>
+					<Dialog.Footer
+						render={ <section data-testid="dialog-footer" /> }
+						className="custom-footer"
+					>
+						<Dialog.Action>Close</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Open Dialog' } )
+		);
+
+		const footer = await screen.findByTestId( 'dialog-footer' );
+		expect( footer.tagName ).toBe( 'SECTION' );
+		expect( footer ).toHaveClass( 'custom-footer' );
+		expect(
+			screen.getByRole( 'button', { name: 'Close' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'renders backdrop only when modal is true', async () => {
+		const getBackdrops = () =>
+			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-dialog-backdrop` attribute (mirroring the Dialog close-icon pattern) is more robust than the Base UI role/state it inherits.
+			document.querySelectorAll( '[data-wp-ui-dialog-backdrop]' );
+
+		const view = render(
+			<Dialog.Root open modal>
+				<Dialog.Popup>
+					<Dialog.Title>Modal dialog</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( getBackdrops() ).toHaveLength( 1 );
+
+		view.rerender(
+			<Dialog.Root open modal={ false }>
+				<Dialog.Popup>
+					<Dialog.Title>Non modal dialog</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( getBackdrops() ).toHaveLength( 0 );
+
+		view.rerender(
+			<Dialog.Root open modal="trap-focus">
+				<Dialog.Popup>
+					<Dialog.Title>Trap focus dialog</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		expect( getBackdrops() ).toHaveLength( 0 );
+	} );
+
+	it( 'renders the popup across default and explicit size values', async () => {
+		const view = render(
+			<Dialog.Root open>
+				<Dialog.Popup>
+					<Dialog.Title>Default size dialog</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+
+		for ( const size of [
+			'small',
+			'medium',
+			'large',
+			'stretch',
+			'full',
+		] as const ) {
+			view.rerender(
+				<Dialog.Root open>
+					<Dialog.Popup size={ size }>
+						<Dialog.Title>{ size } dialog</Dialog.Title>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+			expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
+		}
+	} );
+
+	it( 'marks Dialog.Action as disabled when loading is true', async () => {
+		render(
+			<Dialog.Root open>
+				<Dialog.Popup>
+					<Dialog.Title>Action states</Dialog.Title>
+					<Dialog.Footer>
+						<Dialog.Action loading>Loading action</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		const action = await screen.findByRole( 'button', {
+			name: 'Loading action',
+		} );
+		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'marks Dialog.Action as disabled when disabled is true', async () => {
+		render(
+			<Dialog.Root open>
+				<Dialog.Popup>
+					<Dialog.Title>Action states</Dialog.Title>
+					<Dialog.Footer>
+						<Dialog.Action disabled>Disabled action</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		const action = await screen.findByRole( 'button', {
+			name: 'Disabled action',
+		} );
+		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+	} );
+
+	it( 'lets explicit disabled={ false } override loading on Dialog.Action', async () => {
+		// `Dialog.Action` uses `disabled ?? loading`, so an explicit
+		// `disabled={ false }` wins over an active loading state.
+		render(
+			<Dialog.Root open>
+				<Dialog.Popup>
+					<Dialog.Title>Action states</Dialog.Title>
+					<Dialog.Footer>
+						<Dialog.Action disabled={ false } loading>
+							Explicit not-disabled
+						</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		const action = await screen.findByRole( 'button', {
+			name: 'Explicit not-disabled',
+		} );
+		expect( action ).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
 	describe( 'Development mode validation', () => {
@@ -502,8 +684,8 @@ describe( 'Dialog', () => {
 		} );
 	} );
 
-	describe( 'container', () => {
-		it( 'should render inside the container when provided', async () => {
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
 
@@ -515,7 +697,11 @@ describe( 'Dialog', () => {
 							ref={ containerRef }
 							data-testid="custom-container"
 						/>
-						<Dialog.Popup container={ containerRef }>
+						<Dialog.Popup
+							portal={
+								<Dialog.Portal container={ containerRef } />
+							}
+						>
 							<Dialog.Header>
 								<Dialog.Title>Title</Dialog.Title>
 							</Dialog.Header>

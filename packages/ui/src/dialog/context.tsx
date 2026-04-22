@@ -1,3 +1,4 @@
+import type { Dialog as _Dialog } from '@base-ui/react/dialog';
 import {
 	createContext,
 	useCallback,
@@ -7,6 +8,31 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { useScheduleValidation } from '../utils/use-schedule-validation';
+
+// -- Modal context ----------------------------------------------------------
+
+const DialogModalContext =
+	createContext< _Dialog.Root.Props[ 'modal' ] >( true );
+
+export function DialogModalProvider( {
+	modal,
+	children,
+}: {
+	modal: _Dialog.Root.Props[ 'modal' ];
+	children: React.ReactNode;
+} ) {
+	return (
+		<DialogModalContext.Provider value={ modal }>
+			{ children }
+		</DialogModalContext.Provider>
+	);
+}
+
+export function useDialogModal() {
+	return useContext( DialogModalContext );
+}
+
+// -- Validation context (dev-only) ------------------------------------------
 
 /**
  * Whether validation is enabled. This is a build-time constant that allows
@@ -88,16 +114,16 @@ function DialogValidationProviderDev( {
 		[ scheduleValidation ]
 	);
 
+	const contextValue = useMemo(
+		() => ( { registerTitle } ),
+		[ registerTitle ]
+	);
+
 	// Schedule an initial validation on mount to catch missing titles
 	// (when no Title component is rendered, registerTitle is never called).
 	useEffect( () => {
 		scheduleValidation();
 	}, [ scheduleValidation ] );
-
-	const contextValue = useMemo(
-		() => ( { registerTitle } ),
-		[ registerTitle ]
-	);
 
 	return (
 		<DialogValidationContext.Provider value={ contextValue }>

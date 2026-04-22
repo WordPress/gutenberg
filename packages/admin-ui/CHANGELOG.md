@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add `visual` prop to render a decorative-only icon or image alongside the header title or breadcrumbs. [#76469](https://github.com/WordPress/gutenberg/pull/76469)
+
 ## 1.12.0 (2026-04-15)
 
 ### Enhancements

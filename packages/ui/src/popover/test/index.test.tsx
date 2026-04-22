@@ -434,7 +434,7 @@ describe( 'Popover', () => {
 		} );
 	} );
 
-	describe( 'inline (via container)', () => {
+	describe( 'inline via portal (custom container)', () => {
 		function InlinePopover() {
 			const containerRef = createRef< HTMLSpanElement >();
 			return (
@@ -445,7 +445,11 @@ describe( 'Popover', () => {
 							ref={ containerRef }
 							style={ { display: 'contents' } }
 						/>
-						<Popover.Popup container={ containerRef }>
+						<Popover.Popup
+							portal={
+								<Popover.Portal container={ containerRef } />
+							}
+						>
 							<Popover.Title>Title</Popover.Title>
 							Inline content
 						</Popover.Popup>
@@ -454,7 +458,7 @@ describe( 'Popover', () => {
 			);
 		}
 
-		it( 'should render inside the container when a local ref is used', async () => {
+		it( 'should render inside the portal container when a local ref is used', async () => {
 			const user = userEvent.setup();
 
 			render( <InlinePopover /> );

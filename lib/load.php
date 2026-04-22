@@ -220,3 +220,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/guidelines/load.php';
 	require __DIR__ . '/experimental/guidelines/index.php';
 }
+
+// Content types (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
+	require __DIR__ . '/experimental/content-types/load.php';
+	require __DIR__ . '/experimental/content-types/index.php';
+}

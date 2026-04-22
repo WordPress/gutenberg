@@ -37,6 +37,9 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditor = true', 'before' );
 	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor-modal' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditorModal = true', 'before' );
+	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );

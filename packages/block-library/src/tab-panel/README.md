@@ -4,63 +4,63 @@
 **Name:** `core/tab-panel`
 **Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-**Block Type:** [Static](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (saved in post content)
+**Block Type:** [Hybrid](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (static save + server enhancements)
 
-> Container for tab panel content in a tabbed interface.
+> Content for a tab in a tabbed interface.
 
 ## Block Relationships
 
 **[Parent](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
-- [`core/tabs`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/)
-
-**[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
-- [`core/tab`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/)
+- [`core/tab-panels`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/)
 
 ## Attributes
 
 _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/) property in block.json._
 
-_This block has no custom attributes._
+| Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
+|-----------|------|---------|-------------|
+| `label` | `string` | `""` | — |
 
 ## Supports
 
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
-- [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `false`
+- [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
-- [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
-- [`lock`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#lock): `false`
-- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
-  - `aspectRatio`: `false`
-  - `height`: `false`
-  - `minHeight`: `false`
-  - `width`: `false`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
-  - [`heading`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
-  - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
-  - `blockGap`: `false`
+  - `blockGap`: `true`
   - `padding`: `true`
-  - `margin`: `true`
+  - `margin`: `false`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
-- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
-  - [`default`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-default): `{"type":"flex","flexWrap":"nowrap","justifyContent":"stretch","orientation":"vertical"}`
-  - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `false`
-  - [`allowVerticalAlignment`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowverticalalignment): `false`
-  - [`allowOrientation`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-alloworientation): `false`
-  - [`allowJustification`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowjustification): `true`
-  - [`allowSizingOnChildren`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowsizingonchildren): `false`
+- [`renaming`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#renaming): `true`
+- [`visibility`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#visibility): `false`
+
+## Context
+
+_Defined via the [`usesContext` and `providesContext`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/) properties in block.json._
+
+**Uses context:**
+
+- `core/tabs-activeTabIndex`
+- `core/tabs-editorActiveTabIndex`
+- `core/tabs-id`
+
+**Provides context:**
+
+- `core/tab-label` → attribute `label`
 
 ## Block Markup
 
-This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
+This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
-<!-- wp:tab-panel -->
+<!-- wp:tab-panel {"label":""} -->
 <!-- Content... -->
 <!-- /wp:tab-panel -->
 ```
@@ -70,5 +70,6 @@ This is a [**static block**](https://developer.wordpress.org/block-editor/gettin
 - [block.json](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/block.json) ([reference](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/))
 - [edit.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/edit.js)
 - [save.js](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/save.js)
+- [index.php](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel/index.php)
 
 <!-- END TOKEN(Autogenerated block API docs) -->

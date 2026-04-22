@@ -1134,9 +1134,21 @@
 		"parent": "core-blocks-design"
 	},
 	{
+		"title": "Tab List",
+		"slug": "core-block-tab-list",
+		"markdown_source": "../packages/block-library/src/tab-list/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
 		"title": "Tab Panel",
 		"slug": "core-block-tab-panel",
 		"markdown_source": "../packages/block-library/src/tab-panel/README.md",
+		"parent": "core-blocks-design"
+	},
+	{
+		"title": "Tab Panels",
+		"slug": "core-block-tab-panels",
+		"markdown_source": "../packages/block-library/src/tab-panels/README.md",
 		"parent": "core-blocks-design"
 	},
 	{
@@ -1156,18 +1168,6 @@
 		"slug": "core-block-table",
 		"markdown_source": "../packages/block-library/src/table/README.md",
 		"parent": "core-blocks-text"
-	},
-	{
-		"title": "Tab Menu Item",
-		"slug": "core-block-tabs-menu-item",
-		"markdown_source": "../packages/block-library/src/tabs-menu-item/README.md",
-		"parent": "core-blocks-design"
-	},
-	{
-		"title": "Tabs Menu",
-		"slug": "core-block-tabs-menu",
-		"markdown_source": "../packages/block-library/src/tabs-menu/README.md",
-		"parent": "core-blocks-design"
 	},
 	{
 		"title": "Tabs",
@@ -2439,6 +2439,12 @@
 		"title": "@wordpress/deprecated",
 		"slug": "packages-deprecated",
 		"markdown_source": "../packages/deprecated/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/design-system-mcp",
+		"slug": "packages-design-system-mcp",
+		"markdown_source": "../packages/design-system-mcp/README.md",
 		"parent": "packages"
 	},
 	{

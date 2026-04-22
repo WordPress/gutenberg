@@ -31,8 +31,8 @@ describe( 'Select', () => {
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 
-	describe( 'container', () => {
-		it( 'should render inside the container when provided', async () => {
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
 			const user = userEvent.setup();
 			const containerRef = createRef< HTMLDivElement >();
 
@@ -44,7 +44,11 @@ describe( 'Select', () => {
 							ref={ containerRef }
 							data-testid="custom-container"
 						/>
-						<Select.Popup container={ containerRef }>
+						<Select.Popup
+							portal={
+								<Select.Portal container={ containerRef } />
+							}
+						>
 							<Select.Item value="Item 1" />
 						</Select.Popup>
 					</Select.Root>
