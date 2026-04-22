@@ -3391,6 +3391,12 @@ class WP_Theme_JSON_Gutenberg {
 						$base_ruleset              = static::to_ruleset( ':root :where(' . $style_variation['selector'] . ')', $breakpoint_declarations );
 						$variation_responsive_css .= $breakpoint_media . '{' . $base_ruleset . '}';
 					}
+
+					// Process custom CSS for this breakpoint.
+					if ( isset( $breakpoint_node['css'] ) ) {
+						$breakpoint_custom_css     = static::process_blocks_custom_css( $breakpoint_node['css'], $style_variation['selector'] );
+						$variation_responsive_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
+					}
 				}
 
 				if ( ! empty( $variation_responsive_css ) ) {
@@ -3566,13 +3572,15 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+		// Compute selector for block custom CSS.
+		$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
+		if ( is_array( $css_feature_selector ) ) {
+			$css_feature_selector = $css_feature_selector['root'] ?? null;
+		}
+		$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
+
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {
-			$css_feature_selector = $block_metadata['selectors']['css'] ?? null;
-			if ( is_array( $css_feature_selector ) ) {
-				$css_feature_selector = $css_feature_selector['root'] ?? null;
-			}
-			$css_selector = is_string( $css_feature_selector ) ? $css_feature_selector : $selector;
 			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
 		}
 
@@ -3594,6 +3602,11 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $breakpoint_feature_declarations as $feature_selector => $individual_feature_declarations ) {
 					$feature_ruleset         = static::to_ruleset( ":root :where($feature_selector)", $individual_feature_declarations );
 					$responsive_feature_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
+				}
+
+				if ( isset( $breakpoint_node['css'] ) ) {
+					$breakpoint_custom_css   = static::process_blocks_custom_css( $breakpoint_node['css'], $css_selector );
+					$responsive_feature_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
 				}
 			}
 
@@ -4125,6 +4138,11 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
 				if ( isset( $input[ $breakpoint ] ) ) {
 					$output[ $breakpoint ] = static::remove_insecure_styles( $input[ $breakpoint ] );
+
+					// Responsive custom CSS is allowed for users with 'edit_css' capability.
+					if ( isset( $input[ $breakpoint ]['css'] ) && current_user_can( 'edit_css' ) ) {
+						$output[ $breakpoint ]['css'] = $input[ $breakpoint ]['css'];
+					}
 				}
 			}
 
@@ -4153,6 +4171,11 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
 						if ( isset( $variation_input[ $breakpoint ] ) ) {
 							$variation_output[ $breakpoint ] = static::remove_insecure_styles( $variation_input[ $breakpoint ] );
+
+							// Responsive custom CSS is allowed for users with 'edit_css' capability.
+							if ( isset( $variation_input[ $breakpoint ]['css'] ) && current_user_can( 'edit_css' ) ) {
+								$variation_output[ $breakpoint ]['css'] = $variation_input[ $breakpoint ]['css'];
+							}
 						}
 					}
 
