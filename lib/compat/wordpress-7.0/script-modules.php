@@ -139,6 +139,12 @@ if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
 			);
 			$source_url = rawurlencode( "wp-script-module-translation-data-{$id}" );
 			$output    .= "\n//# sourceURL={$source_url}";
+
+			// Ensure wp-i18n is printed; the inline script below relies on wp.i18n.setLocaleData().
+			if ( ! wp_script_is( 'wp-i18n', 'done' ) ) {
+				wp_scripts()->do_items( array( 'wp-i18n' ) );
+			}
+
 			wp_print_inline_script_tag( $output, array( 'id' => "wp-script-module-translation-data-{$id}" ) );
 		}
 	}
