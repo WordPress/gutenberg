@@ -44,12 +44,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
-	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+	const { ref: scrollStateRef, onScroll } =
+		useOverlayScrollStateAttributes( onScrollProp );
+	const mergedRef = useMergeRefs( [ ref, popupRef, scrollStateRef ] );
 	const modal = useDialogModal();
-	const { onScroll } = useOverlayScrollStateAttributes(
-		popupRef,
-		onScrollProp
-	);
 
 	const portalChildren = (
 		<>

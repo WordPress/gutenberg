@@ -1,5 +1,5 @@
-import type { RefObject, UIEvent, UIEventHandler } from 'react';
-import { useCallback, useLayoutEffect } from '@wordpress/element';
+import type { UIEvent, UIEventHandler } from 'react';
+import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 
 /*
  * Data attributes that advertise an overlay surface's scroll state to CSS (e.g.
@@ -37,21 +37,47 @@ function updateScrollAttributes( el: HTMLElement ) {
  * `data-wp-ui-overlay-scrolled-from-bottom` attributes in sync with the
  * scrollable overlay element's scroll position.
  *
- * The caller is responsible for wiring the returned `onScroll` handler to the
- * scroll container, and for providing a ref to the same element so the hook
- * can initialize the attributes and observe resizes (viewport, size preset
- * changes, content height changes that don't resize the surface because of
- * `max-height`).
+ * Returns a callback `ref` that the caller must attach to the scroll
+ * container, and an `onScroll` handler to wire up to the same element. A
+ * callback ref (not a `RefObject`) is used because overlay libraries like
+ * Base UI mount the popup DOM lazily when the overlay opens, so the
+ * attributes must be initialized the moment the node is attached, not when
+ * this hook's host component first renders.
  *
- * @param scrollContainerRef Ref to the scrollable overlay surface (e.g. dialog
- *                           popup, drawer panel).
- * @param onScroll           Optional `onScroll` from the parent; invoked after
- *                           overlay scroll state attributes are updated.
+ * @param onScroll Optional `onScroll` from the parent; invoked after the
+ *                 overlay scroll-state attributes are updated.
  */
 export function useOverlayScrollStateAttributes(
-	scrollContainerRef: RefObject< HTMLElement | null >,
 	onScroll?: UIEventHandler< HTMLElement > | undefined
 ) {
+	const [ node, setNode ] = useState< HTMLElement | null >( null );
+
+	const ref = useCallback( ( el: HTMLElement | null ) => {
+		setNode( el );
+	}, [] );
+
+	useLayoutEffect( () => {
+		if ( ! node ) {
+			return;
+		}
+
+		updateScrollAttributes( node );
+
+		if ( typeof ResizeObserver === 'undefined' ) {
+			return;
+		}
+
+		const observer = new ResizeObserver( () => {
+			updateScrollAttributes( node );
+		} );
+		observer.observe( node );
+		for ( const child of Array.from( node.children ) ) {
+			observer.observe( child );
+		}
+
+		return () => observer.disconnect();
+	}, [ node ] );
+
 	const handleScroll = useCallback(
 		( event: UIEvent< HTMLElement > ) => {
 			updateScrollAttributes( event.currentTarget );
@@ -60,31 +86,5 @@ export function useOverlayScrollStateAttributes(
 		[ onScroll ]
 	);
 
-	useLayoutEffect( () => {
-		const el = scrollContainerRef.current;
-		if ( ! el ) {
-			return;
-		}
-
-		updateScrollAttributes( el );
-
-		if ( typeof ResizeObserver === 'undefined' ) {
-			return;
-		}
-
-		const observer = new ResizeObserver( () => {
-			if ( scrollContainerRef.current ) {
-				updateScrollAttributes( scrollContainerRef.current );
-			}
-		} );
-		observer.observe( el );
-		for ( const child of Array.from( el.children ) ) {
-			observer.observe( child );
-		}
-
-		return () => observer.disconnect();
-		// `scrollContainerRef` is a stable ref; listed to satisfy exhaustive-deps.
-	}, [ scrollContainerRef ] );
-
-	return { onScroll: handleScroll };
+	return { ref, onScroll: handleScroll };
 }

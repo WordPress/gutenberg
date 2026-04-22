@@ -1,6 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
-import { forwardRef, useContext, useRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
@@ -44,12 +44,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const { phase, showSpinner, errorMessage, confirm } =
 			useContext( AlertDialogContext );
 
-		const popupRef = useRef< HTMLDivElement >( null );
-		const mergedRef = useMergeRefs( [ ref, popupRef ] );
-		const { onScroll } = useOverlayScrollStateAttributes(
-			popupRef,
-			onScrollProp
-		);
+		const { ref: scrollStateRef, onScroll } =
+			useOverlayScrollStateAttributes( onScrollProp );
+		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
 
 		const confirmClassName =
 			intent === 'irreversible'
