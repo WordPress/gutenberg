@@ -48,7 +48,11 @@ export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
 			ref,
 			props: mergeProps< 'div' >(
 				{ className: styles[ 'visually-hidden' ] },
-				restProps
+				restProps,
+				{
+					// @ts-expect-error Arbitrary data-* attributes aren't indexable on the typed div props. Kept hardcoded so consumers can't change or remove it.
+					'data-visually-hidden': '',
+				}
 			),
 		} );
 
