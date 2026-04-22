@@ -27,7 +27,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   padding: 0;
 }
 
-.emotion-12 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -47,7 +47,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   width: 100%;
 }
 
-.emotion-12>* {
+.emotion-10>* {
   min-width: 0;
 }
 
@@ -160,15 +160,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
-              <span
-                class="components-visually-hidden emotion-6 emotion-7"
+              <div
+                as="span"
                 data-visually-hidden=""
-                data-wp-c16t="true"
-                data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
-              </span>
+              </div>
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -200,7 +197,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-12 emotion-7"
+            class="components-flex components-h-stack emotion-10 emotion-11"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
@@ -255,7 +252,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   padding: 0;
 }
 
-.emotion-12 {
+.emotion-10 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -275,7 +272,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   width: 100%;
 }
 
-.emotion-12>* {
+.emotion-10>* {
   min-width: 0;
 }
 
@@ -388,15 +385,12 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
-              <span
-                class="components-visually-hidden emotion-6 emotion-7"
+              <div
+                as="span"
                 data-visually-hidden=""
-                data-wp-c16t="true"
-                data-wp-component="VisuallyHidden"
-                style="border: 0px; clip: rect(1px, 1px, 1px, 1px); clip-path: inset( 50% ); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; width: 1px; word-wrap: normal; word-break: normal;"
               >
                 (opens in a new tab)
-              </span>
+              </div>
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -428,7 +422,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
           class="components-base-control__field emotion-2 emotion-3"
         >
           <div
-            class="components-flex components-h-stack emotion-12 emotion-7"
+            class="components-flex components-h-stack emotion-10 emotion-11"
             data-wp-c16t="true"
             data-wp-component="HStack"
           >
