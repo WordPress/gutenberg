@@ -63,9 +63,9 @@ import {
 	generateContentEntryPoint,
 } from './route-utils.mjs';
 import {
-	discoverWidgets,
-	findWidgetEntry,
 	getAllWidgets,
+	getWidgetMetadata,
+	getWidgetFiles,
 } from './widget-utils.mjs';
 import {
 	generateWorkerPlaceholder,
@@ -1725,174 +1725,179 @@ async function buildAllRoutes() {
 /**
  * Build a single widget's files.
  *
- * @param {{name: string, dirName: string, dir: string, metadata: Object}} widget Widget descriptor.
+ * @param {string} widgetName Widget name.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildWidget( widget ) {
+async function buildWidget( widgetName ) {
 	const startTime = Date.now();
-	const outputDir = path.join( BUILD_DIR, 'widgets', widget.dirName );
+	const widgetDir = path.join( ROOT_DIR, 'widgets', widgetName );
+	const outputDir = path.join( BUILD_DIR, 'widgets', widgetName );
 
+	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
 
-	const target = browserslistToEsbuild();
-	const builds = [];
+	const files = getWidgetFiles( widgetDir );
 
-	// Build render.min.js (UI component — with CSS)
-	const renderEntry = findWidgetEntry( widget.dir, 'render' );
-	if ( renderEntry ) {
-		builds.push(
-			esbuild.build( {
-				entryPoints: [ renderEntry ],
-				outfile: path.join( outputDir, 'render.min.js' ),
-				bundle: true,
-				format: 'esm',
-				target,
-				minify: true,
-				sourcemap: true,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
-				define: getDefine( false ),
-				plugins: [
-					wordpressExternalsPlugin(
-						'render.min',
-						'esm',
-						[],
-						true
-					),
-					...createStyleBundlingPlugins( widget.dir ),
-				],
-			} ),
-			esbuild.build( {
-				entryPoints: [ renderEntry ],
-				outfile: path.join( outputDir, 'render.js' ),
-				bundle: true,
-				format: 'esm',
-				target,
-				minify: false,
-				sourcemap: true,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
-				define: getDefine( true ),
-				plugins: [
-					wordpressExternalsPlugin(
-						'render.min',
-						'esm',
-						[],
-						false
-					),
-					...createStyleBundlingPlugins( widget.dir ),
-				],
-			} )
+	// Build render.js if it exists
+	if ( files.hasRender ) {
+		const renderEntryPoints = await glob(
+			`render.${ SOURCE_EXTENSIONS }`,
+			{
+				cwd: widgetDir,
+				absolute: true,
+			}
 		);
+
+		if ( renderEntryPoints.length > 0 ) {
+			// Build both minified and non-minified versions in parallel
+			await Promise.all( [
+				esbuild.build( {
+					entryPoints: renderEntryPoints,
+					outfile: path.join( outputDir, 'render.min.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: true,
+					define: getDefine( false ),
+					plugins: [
+						wordpressExternalsPlugin(
+							'render.min',
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+						...createStyleBundlingPlugins( widgetDir ),
+					],
+				} ),
+				esbuild.build( {
+					entryPoints: renderEntryPoints,
+					outfile: path.join( outputDir, 'render.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: false,
+					define: getDefine( true ),
+					plugins: [
+						wordpressExternalsPlugin(
+							'render.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+						...createStyleBundlingPlugins( widgetDir ),
+					],
+				} ),
+			] );
+		}
 	}
 
-	// Build widget.min.js (metadata — no CSS)
-	const widgetEntry = findWidgetEntry( widget.dir, 'widget' );
-	if ( widgetEntry ) {
-		builds.push(
-			esbuild.build( {
-				entryPoints: [ widgetEntry ],
-				outfile: path.join( outputDir, 'widget.min.js' ),
-				bundle: true,
-				format: 'esm',
-				target,
-				minify: true,
-				sourcemap: true,
-				define: getDefine( false ),
-				plugins: [
-					wordpressExternalsPlugin(
-						'widget.min',
-						'esm',
-						[],
-						true
-					),
-				],
-			} ),
-			esbuild.build( {
-				entryPoints: [ widgetEntry ],
-				outfile: path.join( outputDir, 'widget.js' ),
-				bundle: true,
-				format: 'esm',
-				target,
-				minify: false,
-				sourcemap: true,
-				define: getDefine( true ),
-				plugins: [
-					wordpressExternalsPlugin(
-						'widget.min',
-						'esm',
-						[],
-						false
-					),
-				],
-			} )
+	// Build widget.js if it exists
+	if ( files.hasWidget ) {
+		const widgetEntryPoints = await glob(
+			`widget.${ SOURCE_EXTENSIONS }`,
+			{
+				cwd: widgetDir,
+				absolute: true,
+			}
 		);
+
+		if ( widgetEntryPoints.length > 0 ) {
+			// Build both minified and non-minified versions in parallel
+			await Promise.all( [
+				esbuild.build( {
+					entryPoints: widgetEntryPoints,
+					outfile: path.join( outputDir, 'widget.min.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: true,
+					define: getDefine( false ),
+					plugins: [
+						wordpressExternalsPlugin(
+							'widget.min',
+							'esm',
+							[],
+							true // Generate asset file for minified build
+						),
+					],
+				} ),
+				esbuild.build( {
+					entryPoints: widgetEntryPoints,
+					outfile: path.join( outputDir, 'widget.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: false,
+					define: getDefine( true ),
+					plugins: [
+						wordpressExternalsPlugin(
+							'widget.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+					],
+				} ),
+			] );
+		}
 	}
 
-	if ( builds.length === 0 ) {
-		console.log(
-			`   ⚠ Widget ${ widget.name }: no render or widget entry found, skipping.`
-		);
-		return 0;
-	}
-
-	await Promise.all( builds );
 	return Date.now() - startTime;
 }
 
 /**
  * Build all discovered widgets.
  *
- * @return {Promise<Array>} Array of built widget descriptors.
+ * @return {Promise<void>}
  */
 async function buildAllWidgets() {
 	console.log( '\n🧩 Phase 4: Building widgets...\n' );
 
-	const widgets = discoverWidgets( ROOT_DIR );
+	const widgets = getAllWidgets( ROOT_DIR );
 
 	if ( widgets.length === 0 ) {
 		console.log( '   No widgets found, skipping.\n' );
-		return [];
+		return;
 	}
 
 	await Promise.all(
-		widgets.map( async ( widget ) => {
-			const buildTime = await buildWidget( widget );
+		widgets.map( async ( widgetName ) => {
+			const buildTime = await buildWidget( widgetName );
 			console.log(
-				`   ✔ Built widget ${ widget.name } (${ buildTime }ms)`
+				`   ✔ Built widget ${ widgetName } (${ buildTime }ms)`
 			);
 		} )
 	);
-
-	return widgets;
 }
 
 /**
  * Generate global widget registry file.
+ * Creates a single registry with all widgets including file availability.
  *
- * @param {Array}                  widgets      Array of widget descriptors.
+ * @param {Array}                  widgets      Array of widget objects.
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateWidgetRegistry( widgets, replacements ) {
 	if ( widgets.length === 0 ) {
+		// No widgets to register, skip generating widgets registry
 		return;
 	}
 
+	// Generate PHP array entries with file availability
 	const widgetEntries = widgets
-		.map( ( w ) => {
-			const hasRender = findWidgetEntry( w.dir, 'render' ) !== null;
-			const hasWidget = findWidgetEntry( w.dir, 'widget' ) !== null;
+		.map( ( widget ) => {
+			const hasRenderStr = widget.hasRender ? 'true' : 'false';
+			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
 			return `\tarray(
-		'name'       => '${ w.name }',
-		'dir_name'   => '${ w.dirName }',
-		'has_render' => ${ hasRender ? 'true' : 'false' },
-		'has_widget' => ${ hasWidget ? 'true' : 'false' },
+		'name'       => '${ widget.name }',
+		'dir_name'   => '${ widget.dirName }',
+		'has_render' => ${ hasRenderStr },
+		'has_widget' => ${ hasWidgetStr },
 	)`;
 		} )
 		.join( ',\n' );
 
+	// Generate single global registry at build/widgets/registry.php
 	await generatePhpFromTemplate(
 		'widget-registry.php.template',
 		path.join( BUILD_DIR, 'widgets', 'registry.php' ),
@@ -1902,16 +1907,16 @@ async function generateWidgetRegistry( widgets, replacements ) {
 
 /**
  * Generate widgets.php file with widget registration logic.
+ * Uses registry pattern with loop-based registration on the init hook.
  *
- * @param {Array}                  widgets      Array of widget descriptors.
+ * @param {Array}                  widgets      Array of widget objects.
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateWidgetsPhp( widgets, replacements ) {
 	if ( widgets.length === 0 ) {
+		// No widgets to register, skip generating widgets.php
 		return;
 	}
-
-	const prefixUnderscore = replacements[ '{{PREFIX}}' ].replace( /-/g, '_' );
 
 	await generatePhpFromTemplate(
 		'widget-registration.php.template',
@@ -1919,7 +1924,6 @@ async function generateWidgetsPhp( widgets, replacements ) {
 		{
 			...replacements,
 			'{{HANDLE_PREFIX}}': HANDLE_PREFIX,
-			'{{PREFIX_UNDERSCORE}}': prefixUnderscore,
 		}
 	);
 }
@@ -1994,7 +1998,30 @@ async function buildAll( baseUrlExpression ) {
 	await buildAllRoutes();
 
 	// Build widgets
-	const widgets = await buildAllWidgets();
+	await buildAllWidgets();
+
+	// Collect widget data for PHP generation
+	const widgets = getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
+		const metadata = getWidgetMetadata( ROOT_DIR, widgetName );
+
+		// Skip widgets without valid widget.json
+		if ( ! metadata ) {
+			return [];
+		}
+
+		const widgetFiles = getWidgetFiles(
+			path.join( ROOT_DIR, 'widgets', widgetName )
+		);
+
+		return [
+			{
+				name: metadata.name,
+				dirName: widgetName,
+				hasRender: widgetFiles.hasRender,
+				hasWidget: widgetFiles.hasWidget,
+			},
+		];
+	} );
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -2128,29 +2155,19 @@ async function watchMode() {
 	const allWidgetDirs = getAllWidgets( ROOT_DIR );
 
 	/**
-	 * Rebuild a single widget.
+	 * Rebuild a widget.
 	 *
-	 * @param {string} widgetDirName Widget directory name.
+	 * @param {string} widgetName Widget to rebuild.
 	 */
-	async function rebuildWidget( widgetDirName ) {
+	async function rebuildWidget( widgetName ) {
 		try {
 			const startTime = Date.now();
-			const widgets = discoverWidgets( ROOT_DIR );
-			const widget = widgets.find( ( w ) => w.dirName === widgetDirName );
-			if ( ! widget ) {
-				console.log(
-					`❌ widgets/${ widgetDirName } - Widget not found`
-				);
-				return;
-			}
-			await buildWidget( widget );
+			await buildWidget( widgetName );
 			const buildTime = Date.now() - startTime;
-			console.log(
-				`✅ widgets/${ widgetDirName } (${ buildTime }ms)`
-			);
+			console.log( `✅ widgets/${ widgetName } (${ buildTime }ms)` );
 		} catch ( error ) {
 			console.log(
-				`❌ widgets/${ widgetDirName } - Error: ${ error.message }`
+				`❌ widgets/${ widgetName } - Error: ${ error.message }`
 			);
 		}
 	}
