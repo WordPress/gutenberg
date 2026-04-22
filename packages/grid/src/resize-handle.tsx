@@ -13,11 +13,16 @@ import { useRef } from '@wordpress/element';
 interface ResizeHandleProps {
 	disabled?: boolean;
 	itemId?: string;
+	verticalResizable?: boolean;
 	onResize?: ( delta: { width: number; height: number } ) => void;
 	onResizeEnd?: () => void;
 }
 
-function ResizeHandle( { disabled = false, itemId }: ResizeHandleProps ) {
+function ResizeHandle( {
+	disabled = false,
+	itemId,
+	verticalResizable = true,
+}: ResizeHandleProps ) {
 	const { attributes, listeners, setNodeRef } = useDraggable( {
 		id: 'draggable',
 		data: { itemId },
@@ -29,7 +34,7 @@ function ResizeHandle( { disabled = false, itemId }: ResizeHandleProps ) {
 		right: '0',
 		width: '0',
 		height: '0',
-		cursor: 'nwse-resize',
+		cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
 		borderStyle: 'solid',
 		borderWidth: '0 0 12px 12px',
 		borderColor:

@@ -34,6 +34,15 @@ type GridItemProps = {
 	disabled?: boolean;
 
 	/**
+	 * Whether the item can be resized vertically. Disabled when the
+	 * grid uses `rowHeight: 'auto'`, where row height is driven by
+	 * content rather than by the user.
+	 *
+	 * @default true
+	 */
+	verticalResizable?: boolean;
+
+	/**
 	 * The content to be displayed within the grid item.
 	 */
 	children: React.ReactNode;
@@ -62,6 +71,7 @@ export function GridItem( {
 	item,
 	maxColumns,
 	disabled = false,
+	verticalResizable = true,
 	children,
 	actionableArea = null,
 	onResize,
@@ -110,8 +120,12 @@ export function GridItem( {
 	};
 
 	const handleResize = ( delta: { width: number; height: number } ) => {
-		setPreviewDelta( delta );
-		onResize( delta );
+		const clamped = {
+			width: delta.width,
+			height: verticalResizable ? delta.height : 0,
+		};
+		setPreviewDelta( clamped );
+		onResize( clamped );
 	};
 
 	const handleResizeEnd = () => {
@@ -146,6 +160,7 @@ export function GridItem( {
 					<ResizeHandle
 						disabled={ disabled }
 						itemId={ item.key }
+						verticalResizable={ verticalResizable }
 						onResize={ handleResize }
 						onResizeEnd={ handleResizeEnd }
 					/>
