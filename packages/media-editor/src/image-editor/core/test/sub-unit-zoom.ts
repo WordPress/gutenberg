@@ -103,3 +103,29 @@ describe( 'SET_ZOOM during resize', () => {
 		expect( next.zoom ).toBeCloseTo( 0.4, 5 );
 	} );
 } );
+
+describe( 'SETTLE_CROP after sub-unit zoom', () => {
+	it( 'snaps zoom back to >= 1 after settle', () => {
+		// Simulate an in-progress drag that left zoom below 1 with a
+		// crop rect expanded to fill the new, smaller image footprint.
+		const state = makeState( {
+			isResizing: true,
+			zoom: 0.7,
+			cropRect: { x: 0.05, y: 0.05, width: 0.9, height: 0.9 },
+		} );
+
+		// End-of-drag: clear flag, then settle.
+		const ended = cropperReducer( state, { type: 'END_RESIZE' } );
+		expect( ended.isResizing ).toBe( false );
+
+		const settled = cropperReducer( ended, { type: 'SETTLE_CROP' } );
+		expect( settled.zoom ).toBeGreaterThanOrEqual( 1 );
+		// Crop should be centered and fill at least one axis.
+		const rect = settled.cropRect;
+		expect( Math.max( rect.width, rect.height ) ).toBeCloseTo( 1, 2 );
+		const cx = rect.x + rect.width / 2;
+		const cy = rect.y + rect.height / 2;
+		expect( cx ).toBeCloseTo( 0.5, 2 );
+		expect( cy ).toBeCloseTo( 0.5, 2 );
+	} );
+} );
