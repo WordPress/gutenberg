@@ -1171,6 +1171,18 @@ async function generatePagesPhp( pageData, replacements ) {
 				`Page "${ page.slug }": menuSlug and menuSlugAdmin must differ (both resolved to "${ menuSlug }").`
 			);
 		}
+		// Match WordPress `sanitize_key()`: lowercase alphanumerics, dashes, underscores.
+		const sanitizeKeyPattern = /^[a-z0-9_-]+$/;
+		for ( const [ key, value ] of [
+			[ 'menuSlug', menuSlug ],
+			[ 'menuSlugAdmin', menuSlugAdmin ],
+		] ) {
+			if ( ! sanitizeKeyPattern.test( value ) ) {
+				throw new Error(
+					`Page "${ page.slug }": ${ key } "${ value }" must only contain lowercase alphanumerics, dashes, and underscores.`
+				);
+			}
+		}
 
 		const templateReplacements = {
 			...replacements,

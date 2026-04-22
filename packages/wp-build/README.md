@@ -280,8 +280,8 @@ Pages can be defined as simple strings or as objects with initialization modules
 - **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "menuSlug": "custom-url" }` - Page with optional init modules and a custom menu slug
   - **`id`** (required): The page identifier. Used for generated PHP function names, action hook names, and generated file paths.
   - **`init`** (optional): Array of script module IDs to execute during page initialization
-  - **`menuSlug`** (optional): The menu slug for full-page mode (`admin.php?page={menuSlug}`). Defaults to `{id}`.
-  - **`menuSlugAdmin`** (optional): The menu slug for WP-Admin mode (`admin.php?page={menuSlugAdmin}`). Defaults to `{menuSlug}-wp-admin`. Set this to use an arbitrary URL (without the `-wp-admin` suffix). `menuSlug` and `menuSlugAdmin` must not resolve to the same value or the build will fail, because both templates listen on `$_GET['page']` and would collide.
+  - **`menuSlug`** (optional): The menu slug for full-page mode (`admin.php?page={menuSlug}`). Defaults to `{id}`. Must only contain lowercase alphanumerics, dashes, and underscores (compatible with WordPress `sanitize_key()`).
+  - **`menuSlugAdmin`** (optional): The menu slug for WP-Admin mode (`admin.php?page={menuSlugAdmin}`). Defaults to `{menuSlug}-wp-admin`. Set this to use an arbitrary URL (without the `-wp-admin` suffix). Same character restrictions as `menuSlug`. `menuSlug` and `menuSlugAdmin` must not resolve to the same value or the build will fail, because both templates listen on `$_GET['page']` and would collide.
 
 **Generated Files:**
 
