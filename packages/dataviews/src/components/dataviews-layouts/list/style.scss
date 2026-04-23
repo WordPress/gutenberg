@@ -181,7 +181,7 @@ div.dataviews-view-list {
 	.dataviews-view-list__fields {
 		display: flex;
 		gap: var(--wpds-dimension-gap-lg);
-		row-gap: var(--wpds-dimension-gap-lg);
+		row-gap: var(--wpds-dimension-gap-xs);
 		flex-wrap: wrap;
 		font-size: 12px;
 

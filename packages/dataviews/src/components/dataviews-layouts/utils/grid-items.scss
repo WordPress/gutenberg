@@ -1,7 +1,7 @@
 .dataviews-view-grid-items {
 	margin-bottom: auto;
 	display: grid;
-	gap: calc(var(--wpds-dimension-base) * 8);
+	gap: var(--wpds-dimension-padding-2xl);
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
 	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);

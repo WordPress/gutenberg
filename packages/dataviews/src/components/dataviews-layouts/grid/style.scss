@@ -8,7 +8,7 @@
 	padding: 0 var(--wpds-dimension-padding-2xl) var(--wpds-dimension-padding-2xl);
 	display: flex;
 	flex-direction: column;
-	gap: calc(var(--wpds-dimension-base) * 8);
+	gap: var(--wpds-dimension-padding-2xl);
 	container-type: inline-size;
 	margin-bottom: auto;
 
@@ -34,7 +34,7 @@
 
 	.dataviews-view-grid__row {
 		display: grid;
-		gap: calc(var(--wpds-dimension-base) * 8);
+		gap: var(--wpds-dimension-padding-2xl);
 
 		.dataviews-view-grid__row__gridcell {
 			border-radius: var(--wpds-border-radius-md);

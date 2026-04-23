@@ -161,18 +161,18 @@
 				padding-right: var(--wpds-dimension-padding-xs);
 
 				.dataviews-view-table-header-button {
-					gap: var(--wpds-dimension-gap-sm);
+					gap: var(--wpds-dimension-gap-xs);
 				}
 			}
 
 			&:has(.dataviews-view-table-header-button):first-child {
 				// Table cell padding minus the header button padding.
-				padding-left: var(--wpds-dimension-gap-2xl);
+				padding-left: var(--wpds-dimension-padding-lg);
 			}
 
 			&:has(.dataviews-view-table-header-button):last-child {
 				// Table cell padding minus the header button padding.
-				padding-right: var(--wpds-dimension-gap-2xl);
+				padding-right: var(--wpds-dimension-padding-lg);
 			}
 		}
 	}
