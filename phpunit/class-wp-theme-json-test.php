@@ -957,6 +957,30 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $focus_style, $theme_json->get_styles_for_block( $focus_node ) );
 	}
 
+	public function test_process_responsive_selectors_outputs_media_wrapped_css() {
+		$node = array(
+			'mobile' => array(
+				'color' => array(
+					'text' => 'red',
+				),
+			),
+			'tablet' => array(
+				'spacing' => array(
+					'margin' => '1rem',
+				),
+			),
+		);
+
+		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'process_responsive_selectors' );
+		$reflection->setAccessible( true );
+
+		$actual = $reflection->invoke( null, $node, '.wp-block-group', array() );
+
+		$expected = '@media (width <= 480px){:root :where(.wp-block-group){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group){margin: 1rem;}}';
+
+		$this->assertSameCSS( $expected, $actual );
+	}
+
 	/**
 	 * Tests that if an element has nothing but pseudo selector styles, they are still output by get_stylesheet.
 	 */
