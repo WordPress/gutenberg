@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-### Internal
+### Breaking Changes
 
--   Remove the shared Button Group z-index entry from the `$z-layers` map ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+-   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
 
 ## 6.20.0 (2026-04-15)
 
