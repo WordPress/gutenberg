@@ -12,6 +12,7 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Popup': Dialog.Popup,
 		'Dialog.Header': Dialog.Header,
 		'Dialog.Title': Dialog.Title,
+		'Dialog.Description': Dialog.Description,
 		'Dialog.CloseIcon': Dialog.CloseIcon,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
@@ -20,25 +21,6 @@ const meta: Meta< typeof Dialog.Root > = {
 		modal: {
 			control: 'inline-radio',
 			options: [ true, false, 'trap-focus' ],
-			table: {
-				defaultValue: { summary: 'true' },
-				type: {
-					summary: 'boolean | "trap-focus"',
-				},
-			},
-		},
-	},
-	parameters: {
-		docs: {
-			description: {
-				component: `
-Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
-
-When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
-
-Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
-				`,
-			},
 		},
 	},
 };
@@ -60,11 +42,11 @@ export const _Default: Story = {
 						<Dialog.Title>Welcome</Dialog.Title>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p>
+					<Dialog.Description>
 						This dialog demonstrates best practices for
 						informational dialogs. It includes a close icon because
 						dismissing it is safe and expected.
-					</p>
+					</Dialog.Description>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>
@@ -150,17 +132,51 @@ export const AllSizes: Story = {
 };
 
 /**
- * Popovers in Gutenberg are managed with explicit z-index values, which can create
- * situations where a dialog renders below another popover, when you want it to be rendered above.
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a dialog renders below another popover when you
+ * want it above.
  *
  * The `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
- * backdrop and the popup. It can be overridden globally by setting the variable
- * on `:root` or `body`. (This story doesn't actually demonstrate the feature
- * because it requires a global CSS rule.)
+ * backdrop and the popup. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   dialog in the page), or
+ * - **Per instance**, by passing a `Dialog.Portal` with a `style` (or
+ *   `className`) to `Dialog.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to the backdrop and the popup, which are both
+ *   rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
-	..._Default,
 	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Popup
+					portal={
+						<Dialog.Portal
+							style={ { '--wp-ui-dialog-z-index': '9999' } }
+						/>
+					}
+				>
+					<Dialog.Header>
+						<Dialog.Title>Custom z-index</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+					<Dialog.Description>
+						The backdrop and popup render at `z-index: 9999` via the
+						`--wp-ui-dialog-z-index` CSS custom property, set on
+						`Dialog.Portal` through the `portal` prop.
+					</Dialog.Description>
+					<Dialog.Footer>
+						<Dialog.Action>Got it</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</>
+		),
+	},
 };
 
 /**

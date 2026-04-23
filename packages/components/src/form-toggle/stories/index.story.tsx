@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import FormToggle from '..';
 
 const meta: Meta< typeof FormToggle > = {
+	tags: [ 'manifest' ],
 	component: FormToggle,
 	title: 'Components/FormToggle',
 	argTypes: {

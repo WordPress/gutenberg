@@ -36,7 +36,7 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getBlockVisibilityLabel } from '../block-visibility';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -136,9 +136,9 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
+						<WCBadge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Badge>
+						</WCBadge>
 					</span>
 				) }
 				{ isSticky && (

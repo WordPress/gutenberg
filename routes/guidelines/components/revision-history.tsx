@@ -6,7 +6,7 @@ import {
 	Modal,
 	Navigator,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -203,9 +203,9 @@ export default function RevisionHistory() {
 				{ __( 'Revision history' ) }
 			</Navigator.BackButton>
 
-			<Text size={ 13 } weight={ 400 } variant="muted">
+			<WCText size={ 13 } weight={ 400 } variant="muted">
 				{ __( 'Use a previous version of your guidelines.' ) }
-			</Text>
+			</WCText>
 
 			<DataViews
 				data={ displayedRevisions }
@@ -233,7 +233,7 @@ export default function RevisionHistory() {
 					size="medium"
 				>
 					<VStack spacing={ 4 }>
-						<Text size={ 13 } weight={ 400 }>
+						<WCText size={ 13 } weight={ 400 }>
 							{ sprintf(
 								/* translators: %s: formatted revision date */
 								__(
@@ -244,12 +244,12 @@ export default function RevisionHistory() {
 									getDate( revisionToRestore.date )
 								)
 							) }
-						</Text>
-						<Text size={ 13 } weight={ 400 }>
+						</WCText>
+						<WCText size={ 13 } weight={ 400 }>
 							{ __(
 								'You can undo this anytime from revision history.'
 							) }
-						</Text>
+						</WCText>
 					</VStack>
 					<HStack
 						justify="flex-end"

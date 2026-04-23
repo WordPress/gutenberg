@@ -79,6 +79,7 @@ jest.mock( '@wordpress/data', () => ( {
 		return newState;
 	} ),
 	register: jest.fn(),
+	keyedReducer: jest.fn( () => ( reducer ) => reducer ),
 } ) );
 
 jest.mock( '../default-connectors', () => ( {

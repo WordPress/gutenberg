@@ -19,7 +19,7 @@ const meta: Meta< typeof ItemGroup > = {
 		as: { control: false },
 		children: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

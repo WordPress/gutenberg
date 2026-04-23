@@ -3,7 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"moduleResolution": "bundler",
-		"types": [ "jest", "style-imports" ]
+		"types": [ "jest", "style-imports", "react-css-custom-properties" ]
 	},
 	"exclude": [],
 	"files": [ "global.d.ts" ],
