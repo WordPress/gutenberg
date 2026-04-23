@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -26,53 +25,9 @@ import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import {
-	useNoteThreads,
-	useNoteActions,
-	useEnableFloatingSidebar,
-} from './hooks';
+import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
-
-function NotesSidebarContent( {
-	styles,
-	notes,
-	sidebarRef,
-	isFloating = false,
-} ) {
-	const { onCreate, onEdit, onDelete } = useNoteActions();
-
-	return (
-		<Stack
-			className="editor-collab-sidebar-panel"
-			style={ styles }
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node ) => {
-				// Sometimes previous sidebar unmounts after the new one mounts.
-				// This ensures we always have the latest reference.
-				if ( node ) {
-					// eslint-disable-next-line react-compiler/react-compiler
-					sidebarRef.current = node;
-				}
-			} }
-			aria-label={
-				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
-			}
-		>
-			<Notes
-				threads={ notes }
-				onEditNote={ onEdit }
-				onAddReply={ onCreate }
-				onDeleteNote={ onDelete }
-				sidebarRef={ sidebarRef }
-				isFloating={ isFloating }
-			/>
-		</Stack>
-	);
-}
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -211,10 +166,7 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<NotesSidebarContent
-						notes={ notes }
-						sidebarRef={ sidebarRef }
-					/>
+					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
@@ -226,12 +178,10 @@ function NotesSidebar( { postId } ) {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<NotesSidebarContent
+					<Notes
 						notes={ unresolvedNotes }
 						sidebarRef={ sidebarRef }
-						styles={ {
-							backgroundColor,
-						} }
+						styles={ { backgroundColor } }
 						isFloating
 					/>
 				</PluginSidebar>

@@ -2,7 +2,9 @@
  * WordPress dependencies
  */
 import { useEffect, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { Stack } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -14,20 +16,18 @@ import {
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
 import { focusNoteThread } from './utils';
-import { useFloatingBoard } from './hooks';
+import { useFloatingBoard, useNoteActions } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function Notes( {
-	threads: noteThreads,
-	onEditNote,
-	onAddReply,
-	onDeleteNote,
-	sidebarRef,
-	isFloating = false,
-} ) {
+export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
+	const {
+		onCreate: onAddReply,
+		onEdit: onEditNote,
+		onDelete,
+	} = useNoteActions();
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -64,38 +64,33 @@ export function Notes( {
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const threads = useMemo( () => {
-		const t = [ ...noteThreads ];
-		const orderedThreads = [];
-		// In floating mode, when the note board is shown, and as long
-		// as the selected block doesn't have an existing note attached -
-		// add a "new note" entry to the threads. This special thread type
-		// gets sorted and floated like regular threads, but shows an AddNote
-		// component instead of a regular note thread.
-		if ( isFloating && selectedNote === 'new' ) {
-			// Insert the new note entry at the correct location for its blockId.
-			const newNoteThread = {
-				id: 'new',
-				blockClientId: selectedBlockClientId,
-				content: { rendered: '' },
-			};
-			// Insert the new note entry at the right order within the threads.
-			orderedBlockIds.forEach( ( blockId ) => {
-				if ( blockId === selectedBlockClientId ) {
-					orderedThreads.push( newNoteThread );
-				} else {
-					const threadForBlock = t.find(
-						( thread ) => thread.blockClientId === blockId
-					);
-					if ( threadForBlock ) {
-						orderedThreads.push( threadForBlock );
-					}
-				}
-			} );
-			return orderedThreads;
+		// In floating mode with a pending new note, splice a placeholder
+		// entry at the selected block's position so the board can float it
+		// alongside regular threads.
+		if ( ! isFloating || selectedNote !== 'new' ) {
+			return notes;
 		}
-		return t;
+		const newNoteThread = {
+			id: 'new',
+			blockClientId: selectedBlockClientId,
+			content: { rendered: '' },
+		};
+		const out = [];
+		orderedBlockIds.forEach( ( blockId ) => {
+			if ( blockId === selectedBlockClientId ) {
+				out.push( newNoteThread );
+			} else {
+				const threadForBlock = notes.find(
+					( t ) => t.blockClientId === blockId
+				);
+				if ( threadForBlock ) {
+					out.push( threadForBlock );
+				}
+			}
+		} );
+		return out;
 	}, [
-		noteThreads,
+		notes,
 		isFloating,
 		selectedNote,
 		selectedBlockClientId,
@@ -107,7 +102,7 @@ export function Notes( {
 		const nextThread = threads[ currentIndex + 1 ];
 		const prevThread = threads[ currentIndex - 1 ];
 
-		await onDeleteNote( note );
+		await onDelete( note );
 
 		if ( note.parent !== 0 ) {
 			// Move focus to the parent thread when a reply was deleted.
@@ -156,16 +151,19 @@ export function Notes( {
 			sidebarRef,
 		} );
 
-	const handleThreadNavigation = ( event, thread, isSelected ) => {
+	const hasThreads = Array.isArray( threads ) && threads.length > 0;
+
+	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
 			return;
 		}
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
+		const isSelfTarget = event.currentTarget === event.target;
 
 		if (
 			( event.key === 'Enter' || event.key === 'ArrowRight' ) &&
-			event.currentTarget === event.target &&
+			isSelfTarget &&
 			! isSelected
 		) {
 			// Expand thread.
@@ -177,7 +175,7 @@ export function Notes( {
 			}
 		} else if (
 			( ( event.key === 'Enter' || event.key === 'ArrowLeft' ) &&
-				event.currentTarget === event.target &&
+				isSelfTarget &&
 				isSelected ) ||
 			event.key === 'Escape'
 		) {
@@ -190,30 +188,24 @@ export function Notes( {
 		} else if (
 			event.key === 'ArrowDown' &&
 			currentIndex < threads.length - 1 &&
-			event.currentTarget === event.target
+			isSelfTarget
 		) {
-			// Move to the next thread.
-			const nextThread = threads[ currentIndex + 1 ];
-			focusNoteThread( nextThread.id, sidebarRef.current );
+			focusNoteThread(
+				threads[ currentIndex + 1 ].id,
+				sidebarRef.current
+			);
 		} else if (
 			event.key === 'ArrowUp' &&
 			currentIndex > 0 &&
-			event.currentTarget === event.target
+			isSelfTarget
 		) {
-			// Move to the previous thread.
-			const prevThread = threads[ currentIndex - 1 ];
-			focusNoteThread( prevThread.id, sidebarRef.current );
-		} else if (
-			event.key === 'Home' &&
-			event.currentTarget === event.target
-		) {
-			// Move to the first thread.
+			focusNoteThread(
+				threads[ currentIndex - 1 ].id,
+				sidebarRef.current
+			);
+		} else if ( event.key === 'Home' && isSelfTarget ) {
 			focusNoteThread( threads[ 0 ].id, sidebarRef.current );
-		} else if (
-			event.key === 'End' &&
-			event.currentTarget === event.target
-		) {
-			// Move to the last thread.
+		} else if ( event.key === 'End' && isSelfTarget ) {
 			focusNoteThread(
 				threads[ threads.length - 1 ].id,
 				sidebarRef.current
@@ -221,44 +213,64 @@ export function Notes( {
 		}
 	};
 
-	const hasThreads = Array.isArray( threads ) && threads.length > 0;
-	// A special case for `template-locked` mode - https://github.com/WordPress/gutenberg/pull/72646.
-	if ( ! hasThreads && ! isFloating ) {
-		return <AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />;
-	}
-
 	return (
-		<>
-			{ ! isFloating && selectedNote === 'new' && (
+		<Stack
+			className="editor-collab-sidebar-panel"
+			style={ styles }
+			role="tree"
+			direction="column"
+			gap="md"
+			justify="flex-start"
+			ref={ ( node ) => {
+				// Sometimes previous sidebar unmounts after the new one mounts.
+				// This ensures we always have the latest reference.
+				if ( node ) {
+					sidebarRef.current = node;
+				}
+			} }
+			aria-label={
+				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
+			}
+		>
+			{ ! hasThreads && ! isFloating ? (
 				<AddNote onSubmit={ onAddReply } sidebarRef={ sidebarRef } />
+			) : (
+				<>
+					{ ! isFloating && selectedNote === 'new' && (
+						<AddNote
+							onSubmit={ onAddReply }
+							sidebarRef={ sidebarRef }
+						/>
+					) }
+					{ threads.map( ( thread ) => (
+						<NoteThread
+							key={ thread.id }
+							note={ thread }
+							onAddReply={ onAddReply }
+							onDeleteNote={ handleDelete }
+							onEditNote={ onEditNote }
+							isSelected={ selectedNote === thread.id }
+							sidebarRef={ sidebarRef }
+							floating={
+								isFloating
+									? {
+											y: notePositions[ thread.id ],
+											registerThread,
+											unregisterThread,
+									  }
+									: undefined
+							}
+							onKeyDown={ ( event ) =>
+								navigate(
+									event,
+									thread,
+									selectedNote === thread.id
+								)
+							}
+						/>
+					) ) }
+				</>
 			) }
-			{ threads.map( ( thread ) => (
-				<NoteThread
-					key={ thread.id }
-					note={ thread }
-					onAddReply={ onAddReply }
-					onDeleteNote={ handleDelete }
-					onEditNote={ onEditNote }
-					isSelected={ selectedNote === thread.id }
-					sidebarRef={ sidebarRef }
-					floating={
-						isFloating
-							? {
-									y: notePositions[ thread.id ],
-									registerThread,
-									unregisterThread,
-							  }
-							: undefined
-					}
-					onKeyDown={ ( event ) =>
-						handleThreadNavigation(
-							event,
-							thread,
-							selectedNote === thread.id
-						)
-					}
-				/>
-			) ) }
-		</>
+		</Stack>
 	);
 }
