@@ -24,6 +24,7 @@ import {
 	vipsRotateImage,
 	vipsConvertImageFormat,
 	vipsHasTransparency,
+	vipsEnsureJxlSupport,
 	terminateVipsWorker,
 } from './utils';
 import type {
@@ -566,7 +567,14 @@ export function finishOperation(
 	};
 }
 
-const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+const VALID_IMAGE_FORMATS = [
+	'jpeg',
+	'webp',
+	'avif',
+	'png',
+	'gif',
+	'jxl',
+] as const;
 
 /**
  * Checks if a format string is a valid ImageFormat.
@@ -696,6 +704,14 @@ export function prepareItem( id: QueueItemId ) {
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
 			const outputMimeType = imageOutputFormats?.[ file.type ];
+
+			// Lazily load the JXL WASM module when the input or output
+			// is JXL. The bundler splits this into a separate chunk so
+			// the ~3 MB module is only downloaded on actual JXL use.
+			if ( file.type === 'image/jxl' || outputMimeType === 'image/jxl' ) {
+				await vipsEnsureJxlSupport();
+			}
+
 			if ( outputMimeType && outputMimeType !== file.type ) {
 				const transcodeOperation = await getTranscodeImageOperation(
 					file,
@@ -1028,7 +1044,8 @@ export function transcodeImageItem(
 			| 'image/png'
 			| 'image/webp'
 			| 'image/avif'
-			| 'image/gif';
+			| 'image/gif'
+			| 'image/jxl';
 		const quality = args.outputQuality ?? DEFAULT_OUTPUT_QUALITY;
 		const interlaced = args.interlaced ?? false;
 

@@ -39,6 +39,10 @@
 			"types": "./build-types/vips-worker.d.ts",
 			"import": "./build-module/vips-worker.mjs"
 		},
+		"./jxl-wasm": {
+			"types": "./build-types/jxl-wasm.d.ts",
+			"import": "./build-module/jxl-wasm.mjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"wpWorkers": {
@@ -51,7 +55,8 @@
 	},
 	"wpScriptModuleExports": {
 		"./worker": "./build-module/vips-worker.mjs",
-		"./loader": "./build-module/loader.mjs"
+		"./loader": "./build-module/loader.mjs",
+		"./jxl-wasm": "./build-module/jxl-wasm.mjs"
 	},
 	"types": "build-types",
 	"dependencies": {

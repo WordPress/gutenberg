@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add on-demand JPEG XL (JXL) support. `setJxlWasmUrl()` lets the main thread feed a lazily loaded `vips-jxl.wasm` URL to the worker, which re-initializes vips with JXL dynamic library support on the next operation. Keeps JXL out of the worker bundle so it is only downloaded when a JXL image is processed.
+
 ## 1.4.0 (2026-04-15)
 
 ## 1.3.0 (2026-04-01)

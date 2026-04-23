@@ -221,6 +221,40 @@ export async function vipsCancelOperations( id: ItemId ): Promise< boolean > {
 }
 
 /**
+ * Cached promise for the lazily loaded vips-jxl.wasm data URL.
+ *
+ * The JXL WASM module is dynamically imported the first time a JXL image
+ * is processed, keeping it out of the worker's static bundle. Subsequent
+ * calls reuse the cached promise.
+ */
+let jxlWasmUrlPromise: Promise< string > | undefined;
+
+/**
+ * Ensures JXL support is available in the vips worker.
+ *
+ * Dynamically imports `wasm-vips/vips-jxl.wasm` on the main thread (which
+ * the bundler splits into a separate chunk so it is only downloaded when
+ * needed) and RPCs the resulting data URL to the worker. The worker
+ * re-initializes vips with the JXL dynamic library on the next operation.
+ *
+ * Safe to call multiple times — the WASM import and RPC are cached.
+ */
+export async function vipsEnsureJxlSupport(): Promise< void > {
+	if ( ! jxlWasmUrlPromise ) {
+		jxlWasmUrlPromise = ( async () => {
+			// Externalized script module — the JXL WASM lives in its own
+			// `@wordpress/vips/jxl-wasm` bundle (~3 MB) that is only
+			// fetched by the browser on this dynamic import.
+			const mod = await import( '@wordpress/vips/jxl-wasm' );
+			return mod.default as string;
+		} )();
+	}
+	const url = await jxlWasmUrlPromise;
+	const api = getWorkerAPI();
+	await api.setJxlWasmUrl( url );
+}
+
+/**
  * Terminates the vips worker if it exists.
  * Call this to free up resources when vips processing is no longer needed.
  */
@@ -234,4 +268,6 @@ export function terminateVipsWorker(): void {
 		URL.revokeObjectURL( workerBlobUrl );
 		workerBlobUrl = undefined;
 	}
+	// Clear cached JXL URL so a new worker re-runs setJxlWasmUrl.
+	jxlWasmUrlPromise = undefined;
 }

@@ -8,10 +8,19 @@
  */
 export function supportsQuality(
 	type: string
-): type is 'image/jpeg' | 'image/png' | 'image/webp' | 'image/avif' {
-	return [ 'image/jpeg', 'image/png', 'image/webp', 'image/avif' ].includes(
-		type
-	);
+): type is
+	| 'image/jpeg'
+	| 'image/png'
+	| 'image/webp'
+	| 'image/avif'
+	| 'image/jxl' {
+	return [
+		'image/jpeg',
+		'image/png',
+		'image/webp',
+		'image/avif',
+		'image/jxl',
+	].includes( type );
 }
 
 /**

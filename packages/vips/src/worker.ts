@@ -22,6 +22,7 @@ import {
 	batchResizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasmUrl,
 } from './index';
 
 /**
@@ -35,6 +36,7 @@ const api = {
 	batchResizeImage,
 	rotateImage,
 	hasTransparency,
+	setJxlWasmUrl,
 };
 
 expose( api );

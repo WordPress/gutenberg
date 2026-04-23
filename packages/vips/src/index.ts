@@ -31,20 +31,66 @@ let cleanup: () => void;
 let vipsPromise: Promise< typeof Vips > | undefined;
 
 /**
+ * URL to the lazily loaded vips-jxl.wasm module.
+ *
+ * JXL support is loaded on demand the first time a JXL image is processed.
+ * The URL is a base64 data URL produced by dynamically importing
+ * `wasm-vips/vips-jxl.wasm` in the main thread and sent here via RPC.
+ * Kept out of the worker bundle so the worker stays small when JXL is unused.
+ */
+let jxlWasmUrl: string | undefined;
+
+/**
+ * Whether the current vips instance was initialized with JXL dynamic library.
+ *
+ * If JXL becomes available after vips was already initialized without it,
+ * the existing instance is discarded so the next call reinitializes with
+ * JXL support included.
+ */
+let vipsInitializedWithJxl = false;
+
+/**
+ * Sets the URL to the vips-jxl.wasm module.
+ *
+ * Call this from the main thread before processing a JXL image. The URL
+ * is expected to be a base64 data URL from the lazily loaded
+ * `wasm-vips/vips-jxl.wasm` module.
+ *
+ * @param url Data URL to the vips-jxl.wasm module.
+ */
+export function setJxlWasmUrl( url: string ): void {
+	jxlWasmUrl = url;
+}
+
+/**
  * Instantiates and returns a new vips instance.
  *
- * Reuses any existing instance.
+ * Reuses any existing instance. If a JXL WASM URL has been set but the
+ * current instance was initialized without it, the instance is discarded
+ * and recreated with JXL dynamic library support.
  */
 async function getVips(): Promise< typeof Vips > {
+	// If JXL is now available but vips was initialized without it, re-initialize.
+	if ( jxlWasmUrl && vipsPromise && ! vipsInitializedWithJxl ) {
+		vipsPromise = undefined;
+	}
+
 	if ( vipsPromise ) {
 		return await vipsPromise;
 	}
 
+	const dynamicLibraries = [ 'vips-heif.wasm' ];
+	if ( jxlWasmUrl ) {
+		dynamicLibraries.push( 'vips-jxl.wasm' );
+		vipsInitializedWithJxl = true;
+	}
+
 	vipsPromise = Vips( {
 		// Load HEIF dynamic module for HEIF/HEIC and AVIF format support.
-		// JXL is omitted as WordPress Core does not currently support it.
-		// It can be re-added when Core adds JXL support.
-		dynamicLibraries: [ 'vips-heif.wasm' ],
+		// JXL is loaded on demand when a JXL image is processed, via
+		// setJxlWasmUrl() which is called from the main thread after the
+		// `wasm-vips/vips-jxl.wasm` module is dynamically imported.
+		dynamicLibraries,
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
@@ -53,6 +99,8 @@ async function getVips(): Promise< typeof Vips > {
 				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
 				return VipsHeifModule;
+			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) && jxlWasmUrl ) {
+				return jxlWasmUrl;
 			}
 			return fileName;
 		},
@@ -152,6 +200,12 @@ export async function convertImageFormat(
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
+		}
+
+		// JXL default effort of 7 is too slow for interactive use.
+		// Use 3 for a good balance of speed and compression.
+		if ( 'image/jxl' === outputType ) {
+			saveOptions.effort = 3;
 		}
 
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
@@ -308,6 +362,12 @@ function buildSaveOptions(
 	// See https://github.com/swissspidy/media-experiments/issues/324.
 	if ( 'image/avif' === type ) {
 		saveOptions.effort = 2;
+	}
+
+	// JXL default effort of 7 is too slow for interactive use.
+	// Use 3 for a good balance of speed and compression.
+	if ( 'image/jxl' === type ) {
+		saveOptions.effort = 3;
 	}
 
 	return saveOptions;
@@ -647,4 +707,5 @@ export {
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	cancelOperations as vipsCancelOperations,
+	setJxlWasmUrl as vipsSetJxlWasmUrl,
 };

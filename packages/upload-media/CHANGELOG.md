@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Add JPEG XL (JXL) as a client-side supported MIME type and output format. The vips-jxl.wasm module is loaded lazily on first use via `vipsEnsureJxlSupport()`, keeping it out of the default bundle.
+
 ### Enhancement
 
 - Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).

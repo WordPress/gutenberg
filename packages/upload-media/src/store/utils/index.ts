@@ -59,7 +59,8 @@ export async function vipsConvertImageFormat(
 		| 'image/png'
 		| 'image/webp'
 		| 'image/avif'
-		| 'image/gif',
+		| 'image/gif'
+		| 'image/jxl',
 	quality: number,
 	interlaced?: boolean
 ) {
@@ -267,6 +268,21 @@ export async function vipsCancelOperations( id: QueueItemId ) {
 		return false;
 	}
 	return vipsModule.vipsCancelOperations( id );
+}
+
+/**
+ * Ensures JXL (JPEG XL) support is available in the vips worker.
+ *
+ * Lazily loads the vips-jxl.wasm module (a separate bundler chunk) and
+ * signals the worker to re-initialize vips with JXL dynamic library
+ * support. Call before processing any image whose input or output type
+ * is `image/jxl`.
+ *
+ * Safe to call multiple times — the underlying import and RPC are cached.
+ */
+export async function vipsEnsureJxlSupport(): Promise< void > {
+	const { vipsEnsureJxlSupport: ensureJxlSupport } = await loadVipsModule();
+	return ensureJxlSupport();
 }
 
 /**
