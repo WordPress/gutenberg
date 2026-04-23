@@ -10,7 +10,7 @@ import {
 	Button,
 	Modal,
 	__experimentalGrid as Grid,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Flex,
 	Icon,
@@ -130,13 +130,13 @@ function TemplateListItem( {
 					alignment="center"
 					spacing={ 0 }
 				>
-					<Text
+					<WCText
 						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
 						{ title }
-					</Text>
+					</WCText>
 					{ children }
 				</VStack>
 			</Flex>
@@ -323,13 +323,13 @@ function NewTemplateModal( { onClose } ) {
 							)
 						}
 					>
-						<Text
+						<WCText
 							lineHeight={ 1.53846153846 } // 20px
 						>
 							{ __(
 								'A custom template can be manually applied to any post or page.'
 							) }
-						</Text>
+						</WCText>
 					</TemplateListItem>
 				</Grid>
 			) }

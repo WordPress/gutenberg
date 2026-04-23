@@ -5,7 +5,7 @@ import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
@@ -70,11 +70,11 @@ function ConnectorsPage() {
 							<Heading level={ 2 } size={ 15 } weight={ 600 }>
 								{ __( 'No connectors yet' ) }
 							</Heading>
-							<Text size={ 12 }>
+							<WCText size={ 12 }>
 								{ __(
 									'Connectors appear here when you install plugins that use external services. Each plugin registers the API keys it needs, and you manage them all in one place.'
 								) }
-							</Text>
+							</WCText>
 						</VStack>
 						<Button variant="secondary" href="plugin-install.php">
 							{ __( 'Learn more' ) }

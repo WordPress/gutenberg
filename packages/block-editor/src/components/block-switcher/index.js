@@ -6,7 +6,7 @@ import {
 	DropdownMenu,
 	ToolbarGroup,
 	ToolbarItem,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	MenuGroup,
 } from '@wordpress/components';
 import {
@@ -184,9 +184,9 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 			) }
 			{ isUsingBindings && (
 				<MenuGroup>
-					<Text className="block-editor-block-switcher__binding-indicator">
+					<WCText className="block-editor-block-switcher__binding-indicator">
 						{ connectedBlockDescription }
-					</Text>
+					</WCText>
 				</MenuGroup>
 			) }
 		</div>
