@@ -8,12 +8,11 @@ import TextareaAutosize from 'react-autosize-textarea';
  */
 import { useState } from '@wordpress/element';
 import {
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Button,
 	VisuallyHidden,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
@@ -40,10 +39,11 @@ function CommentForm( {
 		! sanitizeCommentString( inputComment ).length;
 
 	return (
-		<VStack
+		<Stack
 			className="editor-collab-sidebar-panel__comment-form"
-			spacing="4"
-			as="form"
+			direction="column"
+			gap="lg"
+			render={ <form /> }
 			onSubmit={ ( event ) => {
 				event.preventDefault();
 				onSubmit( inputComment );
@@ -76,7 +76,13 @@ function CommentForm( {
 					}
 				} }
 			/>
-			<HStack spacing="2" justify="flex-end" wrap>
+			<Stack
+				direction="row"
+				align="center"
+				justify="flex-end"
+				gap="sm"
+				wrap="wrap"
+			>
 				<Button size="compact" variant="tertiary" onClick={ onCancel }>
 					<Truncate>{ __( 'Cancel' ) }</Truncate>
 				</Button>
@@ -89,8 +95,8 @@ function CommentForm( {
 				>
 					<Truncate>{ submitButtonText }</Truncate>
 				</Button>
-			</HStack>
-		</VStack>
+			</Stack>
+		</Stack>
 	);
 }
 

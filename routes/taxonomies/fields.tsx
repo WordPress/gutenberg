@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { Notice } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
+import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
@@ -10,11 +12,8 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import {
-	usePublicPostTypes,
-	useTakenTaxonomySlugs,
-	type TaxonomyFormData,
-} from './utils';
+import { usePublicPostTypes } from './utils';
+import type { TaxonomyFormData } from './types';
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
@@ -102,13 +101,16 @@ export function useSlugField(
 	originalSlug?: string,
 	currentValue?: string
 ): Field< TaxonomyFormData > {
-	const takenSlugs = useTakenTaxonomySlugs( originalSlug );
+	const registeredTaxonomies = useSelect(
+		( select ) => select( coreStore ).getTaxonomies(),
+		[]
+	);
 	const showRenameWarning =
 		originalSlug !== undefined && currentValue !== originalSlug;
 	return useMemo< Field< TaxonomyFormData > >(
 		() => ( {
 			id: 'slug',
-			label: __( 'Slug' ),
+			label: __( 'Taxonomy key' ),
 			type: 'text',
 			enableGlobalSearch: true,
 			description: (
@@ -130,15 +132,35 @@ export function useSlugField(
 			isValid: {
 				required: true,
 				pattern: '^[a-z0-9_-]{1,32}$',
-				custom: ( value: TaxonomyFormData ) =>
-					takenSlugs.has( value.slug )
+				custom: async ( value: TaxonomyFormData ) => {
+					const slug = value.slug;
+					if ( originalSlug !== undefined && slug === originalSlug ) {
+						return null;
+					}
+					const slugTaken = ( registeredTaxonomies ?? [] ).some(
+						( t: any ) => t.slug === slug
+					);
+					if ( slugTaken ) {
+						return __( 'This taxonomy key is already in use.' );
+					}
+					// We only need to query for `drafts` because published taxonomies are checked through `registeredTaxonomies` above.
+					const drafts = await resolveSelect(
+						coreStore
+					).getEntityRecords( 'postType', 'wp_user_taxonomy', {
+						slug,
+						status: 'draft',
+						_fields: 'id,name',
+						per_page: 1,
+					} );
+					return !! drafts?.length
 						? __( 'This taxonomy key is already in use.' )
-						: null,
+						: null;
+				},
 			},
 			filterBy: false,
 			enableSorting: false,
 		} ),
-		[ takenSlugs, showRenameWarning ]
+		[ registeredTaxonomies, originalSlug, showRenameWarning ]
 	);
 }
 

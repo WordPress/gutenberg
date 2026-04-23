@@ -171,22 +171,24 @@ function CropperInner(
 		settleCrop,
 		__dispatch: dispatch,
 	} = controller;
-	// Container measurement via ResizeObserver.
-	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerSize, setContainerSize ] = useState< Size >( {
+	// Canvas measurement via ResizeObserver. The canvas is the inner
+	// positioning context for image/stencil/handles — inset from the root
+	// by the handle gutter, so crop math operates on the reduced box.
+	const canvasRef = useRef< HTMLDivElement >( null );
+	const [ canvasSize, setCanvasSize ] = useState< Size >( {
 		width: 0,
 		height: 0,
 	} );
 
 	useEffect( () => {
-		const element = containerRef.current;
+		const element = canvasRef.current;
 		if ( ! element ) {
 			return;
 		}
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setContainerSize( ( prev ) => {
+				setCanvasSize( ( prev ) => {
 					if ( prev.width === width && prev.height === height ) {
 						return prev;
 					}
@@ -214,11 +216,11 @@ function CropperInner(
 	const { elementSize, visualSize } = useMemo(
 		() =>
 			getImageFit(
-				containerSize,
+				canvasSize,
 				{ width: naturalWidth, height: naturalHeight },
 				state.rotation
 			),
-		[ containerSize, naturalWidth, naturalHeight, state.rotation ]
+		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
 	// In fixed-crop mode, auto-size the crop rect to fill the visual area
@@ -274,14 +276,14 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize, containerSize );
-	}, [ state, elementSize, visualSize, containerSize ] );
+		return getCropBounds( state, elementSize, visualSize, canvasSize );
+	}, [ state, elementSize, visualSize, canvasSize ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
 		state,
 		dispatch,
-		containerSize,
+		canvasSize,
 		visualSize,
 		{
 			minZoom,
@@ -292,9 +294,11 @@ function CropperInner(
 	);
 
 	// Register wheel handler natively with { passive: false } so
-	// preventDefault works. React's onWheel registers as passive.
+	// preventDefault works. React's onWheel registers as passive. Bound
+	// to the canvas (not the root) so pointer geometry inside the handler
+	// resolves against the canvas box.
 	useEffect( () => {
-		const el = containerRef.current;
+		const el = canvasRef.current;
 		if ( ! el ) {
 			return;
 		}
@@ -377,8 +381,8 @@ function CropperInner(
 		if ( elementSize.width === 0 || elementSize.height === 0 ) {
 			return {};
 		}
-		const centerX = ( containerSize.width - elementSize.width ) / 2;
-		const centerY = ( containerSize.height - elementSize.height ) / 2;
+		const centerX = ( canvasSize.width - elementSize.width ) / 2;
+		const centerY = ( canvasSize.height - elementSize.height ) / 2;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -389,14 +393,11 @@ function CropperInner(
 			transform: transformString,
 			transition: imageTransition,
 		};
-	}, [ containerSize, elementSize, transformString, imageTransition ] );
+	}, [ canvasSize, elementSize, transformString, imageTransition ] );
 
-	// Merge the forwarded ref with the internal container ref.
+	// Forward the root element to the consumer's ref.
 	const setContainerRef = useCallback(
 		( element: HTMLDivElement | null ) => {
-			(
-				containerRef as React.MutableRefObject< HTMLDivElement | null >
-			 ).current = element;
 			if ( typeof ref === 'function' ) {
 				ref( element );
 			} else if ( ref ) {
@@ -416,77 +417,88 @@ function CropperInner(
 				isDragging && 'wp-media-editor-image-editor--dragging',
 				className
 			) }
-			// The container is focusable so keyboard users can pan/zoom
-			// with arrow keys and +/−. We deliberately do NOT use
-			// role="application" — it disables the screen reader's
-			// normal keyboard interception, which is too heavy-handed
-			// for a single widget in a page. Screen reader users get
-			// the ARIA live region (below) as the announcement channel.
-			tabIndex={ 0 }
-			role="group"
-			aria-label={ __( 'Image editor' ) }
-			{ ...handlers }
 		>
-			{ /* The image layer */ }
-			<img
-				className="wp-media-editor-image-editor__image"
-				src={ src }
-				alt=""
-				onLoad={ handleImageLoad }
-				style={ imageStyle }
-				draggable={ false }
-			/>
-
-			{ /* Dimming overlay outside the crop area */ }
-			{ showDimming && (
-				<DimmingOverlay
-					cropRect={ state.cropRect }
-					containerSize={ containerSize }
-					imageSize={ visualSize }
-				/>
-			) }
-
-			{ /* The stencil (crop area with handles) */ }
-			<StencilComponent
-				cropRect={ state.cropRect }
-				containerSize={ containerSize }
-				imageSize={ visualSize }
-				onCropChange={ handleCropChange }
-				onResizeStart={ onGestureStart }
-				onResizeEnd={ handleResizeEnd }
-				aspectRatio={ aspectRatio }
-				freeformCrop={ freeformCrop }
-				stencilTransition={ settleStencilTransition }
-				cropBounds={ cropBounds }
-			/>
-
-			{ /* Rule-of-thirds grid */ }
-			{ showGrid && (
-				<GridOverlay
-					cropRect={ state.cropRect }
-					containerSize={ containerSize }
-					imageSize={ visualSize }
-				/>
-			) }
-
-			{ /* ARIA live region for screen reader announcements */ }
+			{ /*
+			 * The canvas is the interactive, inset surface. Handles and
+			 * the ARIA role/tabIndex live here so pointer geometry
+			 * (getBoundingClientRect on e.currentTarget) resolves against
+			 * the same box that crop math uses. The root stays as the
+			 * clipping shell for the dimming overlay's box-shadow.
+			 *
+			 * Not role="application" — that disables the screen reader's
+			 * normal keyboard interception, too heavy-handed for a single
+			 * widget. Screen reader users get the ARIA live region below
+			 * as the announcement channel.
+			 */ }
 			<div
-				aria-live="polite"
-				aria-atomic="true"
-				className="wp-media-editor-image-editor__aria-live"
-				style={ {
-					position: 'absolute',
-					width: 1,
-					height: 1,
-					padding: 0,
-					margin: -1,
-					overflow: 'hidden',
-					clip: 'rect(0, 0, 0, 0)',
-					whiteSpace: 'nowrap',
-					border: 0,
-				} }
+				ref={ canvasRef }
+				className="wp-media-editor-image-editor__canvas"
+				tabIndex={ 0 }
+				role="group"
+				aria-label={ __( 'Image editor' ) }
+				{ ...handlers }
 			>
-				{ ariaMessage }
+				{ /* The image layer */ }
+				<img
+					className="wp-media-editor-image-editor__image"
+					src={ src }
+					alt=""
+					onLoad={ handleImageLoad }
+					style={ imageStyle }
+					draggable={ false }
+				/>
+
+				{ /* Dimming overlay outside the crop area */ }
+				{ showDimming && (
+					<DimmingOverlay
+						cropRect={ state.cropRect }
+						containerSize={ canvasSize }
+						imageSize={ visualSize }
+					/>
+				) }
+
+				{ /* The stencil (crop area with handles) */ }
+				<StencilComponent
+					cropRect={ state.cropRect }
+					containerSize={ canvasSize }
+					imageSize={ visualSize }
+					onCropChange={ handleCropChange }
+					onResizeStart={ onGestureStart }
+					onResizeEnd={ handleResizeEnd }
+					aspectRatio={ aspectRatio }
+					freeformCrop={ freeformCrop }
+					stencilTransition={ settleStencilTransition }
+					cropBounds={ cropBounds }
+				/>
+
+				{ /* Rule-of-thirds grid */ }
+				{ showGrid && (
+					<GridOverlay
+						cropRect={ state.cropRect }
+						containerSize={ canvasSize }
+						imageSize={ visualSize }
+					/>
+				) }
+
+				{ /* ARIA live region for screen reader announcements */ }
+				<div
+					aria-live="polite"
+					aria-atomic="true"
+					className="wp-media-editor-image-editor__aria-live"
+					style={ {
+						position: 'absolute',
+						width: 1,
+						height: 1,
+						padding: 0,
+						margin: -1,
+						overflow: 'hidden',
+						clip: 'rect(0, 0, 0, 0)',
+						whiteSpace: 'nowrap',
+						border: 0,
+					} }
+				>
+					{ ariaMessage }
+				</div>
 			</div>
 		</div>
 	);

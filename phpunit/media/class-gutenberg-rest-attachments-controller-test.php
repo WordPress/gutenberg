@@ -893,6 +893,103 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that the sideload route declares `convert_format` as a boolean arg.
+	 *
+	 * Without this declaration, multipart/form-data requests deliver the value as
+	 * a string ("false") which evaluates truthy in PHP, so the sideload handler's
+	 * `if ( ! $request['convert_format'] )` check never fires and the
+	 * `image_editor_output_format` filter is never suppressed — meaning the
+	 * server still performs the format conversion the client opted out of.
+	 *
+	 * @covers ::register_routes
+	 */
+	public function test_sideload_route_declares_convert_format_boolean() {
+		$routes = rest_get_server()->get_routes();
+		$this->assertArrayHasKey( '/wp/v2/media/(?P<id>[\d]+)/sideload', $routes );
+
+		$creatable = null;
+		foreach ( $routes['/wp/v2/media/(?P<id>[\d]+)/sideload'] as $route ) {
+			if ( in_array( WP_REST_Server::CREATABLE, (array) $route['methods'], true ) ||
+				! empty( $route['methods'][ WP_REST_Server::CREATABLE ] ) ) {
+				$creatable = $route;
+				break;
+			}
+		}
+
+		$this->assertNotNull( $creatable, 'The sideload route should register a CREATABLE handler.' );
+		$this->assertArrayHasKey( 'convert_format', $creatable['args'] );
+		$this->assertSame( 'boolean', $creatable['args']['convert_format']['type'] );
+		$this->assertSame( true, $creatable['args']['convert_format']['default'] );
+	}
+
+	/**
+	 * Verifies that sideloading with `convert_format=false` (as a string, matching
+	 * multipart/form-data semantics) suppresses the alt-extension collision check
+	 * inside `wp_unique_filename()`, so a companion file that shares the attachment's
+	 * basename does not get a numeric suffix.
+	 *
+	 * This mirrors the HEIC companion upload flow: the client uploads a JPEG
+	 * derivative via the create endpoint, then sideloads the original HEIC under
+	 * the same stem. Without the arg declared as boolean, "false" coerces truthy
+	 * and the filter is never added, so the HEIC gets bumped to `-1` while the
+	 * JPEG stays at no suffix — and the two companion files drift further apart
+	 * on subsequent uploads.
+	 *
+	 * Uses PNG as a stand-in because a) the test environment may not ship a
+	 * fully decodable HEIC via wp_handle_sideload, and b) WordPress core's
+	 * default `image_editor_output_format` only maps HEIC/HEIF → JPEG. A local
+	 * filter adds a PNG → JPEG mapping so PNG triggers the same alt-ext check
+	 * the HEIC flow does in production.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::register_routes
+	 */
+	public function test_sideload_convert_format_false_suppresses_alt_ext_suffix() {
+		wp_set_current_user( self::$admin_id );
+
+		// Upload a JPEG "parent" attachment the way client-side uploads do.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-companion.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+		$this->assertSame( 201, $response->get_status() );
+
+		// Simulate an alt-ext conversion mapping so an alt-extension companion
+		// (PNG here, HEIC in production) would otherwise get a `-1` suffix.
+		$add_png_mapping = static function ( $formats ) {
+			$formats['image/png'] = 'image/jpeg';
+			return $formats;
+		};
+		add_filter( 'image_editor_output_format', $add_png_mapping, 5 );
+
+		// Sideload a companion sharing the same basename. Pass `convert_format`
+		// as the string "false" to match multipart/form-data request semantics.
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+		$request->set_header( 'Content-Type', 'image/png' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=heic-companion.png' );
+		$request->set_param( 'image_size', 'original-heic' );
+		$request->set_param( 'convert_format', 'false' );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/one-blue-pixel-100x100.png' ) );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'image_editor_output_format', $add_png_mapping, 5 );
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertSame(
+			'heic-companion.png',
+			$data['file'],
+			'Companion file should share the attachment basename without a numeric suffix.'
+		);
+	}
+
+	/**
 	 * Verifies that sideloading with an array of size names returns the array
 	 * preserved in the sub_size response, and that finalize registers the same
 	 * file under every name.

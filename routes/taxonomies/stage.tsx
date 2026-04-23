@@ -11,7 +11,11 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import AddTaxonomy from './add-taxonomy';
-import { editTaxonomyAction, toggleActiveAction } from './actions';
+import {
+	deleteTaxonomyAction,
+	editTaxonomyAction,
+	toggleActiveAction,
+} from './actions';
 import {
 	titleField,
 	statusField,
@@ -20,7 +24,8 @@ import {
 	useSlugField,
 	useObjectTypeField,
 } from './fields';
-import { toFormData, type TaxonomyRecord } from './utils';
+import { toFormData } from './utils';
+import type { TaxonomyRecord } from './types';
 
 const defaultLayouts = {
 	table: {},
@@ -38,7 +43,7 @@ const DEFAULT_VIEW: View = {
 function TaxonomiesPage() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 	const taxonomyActions = useMemo(
-		() => [ editTaxonomyAction, toggleActiveAction ],
+		() => [ editTaxonomyAction, toggleActiveAction, deleteTaxonomyAction ],
 		[]
 	);
 	const slugField = useSlugField();
