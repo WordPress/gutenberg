@@ -66,9 +66,11 @@ export function usePublicPostTypes() {
 		return postTypes
 			?.filter( ( { viewable }: any ) => viewable )
 			.sort( ( a: any, b: any ) => {
-				// Keep the built-in 'post' type at the top; sort the rest alphabetically.
-				if ( a.slug === 'post' || b.slug === 'post' ) {
-					return 0;
+				if ( a.slug === 'post' ) {
+					return -1;
+				}
+				if ( b.slug === 'post' ) {
+					return 1;
 				}
 				return a.name.localeCompare( b.name );
 			} );
