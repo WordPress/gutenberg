@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalVStack as VStack,
-	__experimentalHeading as Heading,
 	__experimentalHStack as HStack,
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
@@ -15,6 +14,7 @@ import {
 } from '@wordpress/components';
 import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 
 /**
  * External dependencies
@@ -35,7 +35,9 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	return (
 		<div className="block-editor-global-styles__shadow-popover-container">
 			<VStack spacing={ 4 }>
-				<Heading level={ 5 }>{ __( 'Drop shadow' ) }</Heading>
+				<Text variant="heading-sm" render={ <h5 /> }>
+					{ __( 'Drop shadow' ) }
+				</Text>
 				<ShadowPresets
 					presets={ shadows }
 					activeShadow={ shadow }

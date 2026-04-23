@@ -121,7 +121,7 @@
 	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/html-element-control/index.js": {
