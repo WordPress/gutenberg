@@ -36,13 +36,6 @@ function CommentForm( {
 	const isDisabled =
 		inputComment === thread?.content?.raw ||
 		! sanitizeCommentString( inputComment ).length;
-	// eslint-disable-next-line jsx-a11y/label-has-associated-control
-	const hiddenLabelElement = <label htmlFor={ inputId } />;
-	const hiddenLabel = (
-		<VisuallyHidden render={ hiddenLabelElement }>
-			{ labelText ?? __( 'Note' ) }
-		</VisuallyHidden>
-	);
 
 	return (
 		<Stack
@@ -56,7 +49,10 @@ function CommentForm( {
 				setInputComment( '' );
 			} }
 		>
-			{ hiddenLabel }
+			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+			<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
+				{ labelText ?? __( 'Note' ) }
+			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }
 				value={ inputComment ?? '' }
