@@ -1,9 +1,13 @@
 # Grid
 
+<div class="callout callout-alert">
+This package is still experimental. "Experimental" means this is an early implementation subject to drastic and breaking changes. The entire API is exposed through <code>@wordpress/private-apis</code> and is not intended for use by themes or plugins; it may change or be removed at any time without a deprecation cycle.
+</div>
+
 A collection of grid layout components for arranging tiles in
 dashboard-style surfaces.
 
-This package currently exports a single component, `DashboardGrid`,
+This package currently exposes a single component, `DashboardGrid`,
 which implements a **2D packed grid**: items have explicit
 `(width, height)` spans in column/row units and can span multiple
 columns **and** multiple rows. It does not implement other grid
@@ -26,8 +30,26 @@ in your code._
 
 ## Usage
 
+The components in this package are distributed through
+[`@wordpress/private-apis`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/private-apis).
+Consuming packages must opt in to the private APIs system and unlock
+the exports:
+
+```js
+// In the consumer package, e.g. packages/your-package/src/lock-unlock.js
+import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
+
+export const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
+	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
+	'@wordpress/your-package'
+);
+```
+
 ```jsx
-import { DashboardGrid } from '@wordpress/grid';
+import { privateApis } from '@wordpress/grid';
+import { unlock } from './lock-unlock';
+
+const { DashboardGrid } = unlock( privateApis );
 
 const layout = [
 	{ key: 'a', width: 2, height: 2 },
