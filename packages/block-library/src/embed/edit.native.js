@@ -15,8 +15,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-import { getAuthority } from '@wordpress/url';
-
 /**
  * Internal dependencies
  */
@@ -24,6 +22,7 @@ import {
 	createUpgradedEmbedBlock,
 	findMoreSuitableBlock,
 	getClassNames,
+	rewriteXToTwitter,
 	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
@@ -153,34 +152,20 @@ const EmbedEdit = ( props ) => {
 		} );
 	};
 
-	// When the preview can't be embedded, try rewriting the URL and resubmit.
+	// When the preview can't be embedded, retry without any trailing slash.
 	useEffect( () => {
 		if ( ! cannotEmbed || fetching || ! url ) {
 			return;
 		}
 
-		let newURL = url;
-
-		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
-		if ( getAuthority( url ) === 'x.com' ) {
-			const rewritten = new URL( url );
-			rewritten.host = 'twitter.com';
-			newURL = rewritten.toString();
-		} else {
-			// Otherwise, try removing any trailing slash.
-			newURL = url.replace( /\/$/, '' );
-		}
-
+		const newURL = url.replace( /\/$/, '' );
 		if ( newURL === url ) {
 			return;
 		}
 
 		setIsEditingURL( false );
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			url: newURL,
-			...findMoreSuitableBlock( newURL )?.attributes,
-		} );
+		setAttributes( { url: newURL } );
 	}, [
 		url,
 		cannotEmbed,
@@ -231,14 +216,15 @@ const EmbedEdit = ( props ) => {
 
 	const onEditURL = useCallback(
 		( value ) => {
-			const urlChanged = attributes.url !== value;
+			const rewrittenURL = rewriteXToTwitter( value );
+			const urlChanged = attributes.url !== rewrittenURL;
 
 			// The order of the following calls is important, we need to update the URL attribute before changing `isEditingURL`,
 			// otherwise the side-effect that potentially replaces the block when updating the local state won't use the new URL
 			// for creating the new block.
 			setAttributes( {
-				url: value,
-				...findMoreSuitableBlock( value )?.attributes,
+				url: rewrittenURL,
+				...findMoreSuitableBlock( rewrittenURL )?.attributes,
 				// If the embed URL was changed, reset the aspect ratio class so it can be recalculated.
 				...( urlChanged && {
 					className: removeAspectRatioClasses( attributes.className ),

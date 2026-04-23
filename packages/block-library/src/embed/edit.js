@@ -15,7 +15,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
-import { getAuthority } from '@wordpress/url';
 import { Caption } from '../utils/caption';
 
 /**
@@ -25,6 +24,7 @@ import {
 	createUpgradedEmbedBlock,
 	findMoreSuitableBlock,
 	getClassNames,
+	rewriteXToTwitter,
 	removeAspectRatioClasses,
 	fallback,
 	getEmbedInfoByProvider,
@@ -137,24 +137,13 @@ const EmbedEdit = ( props ) => {
 		} );
 	}
 
-	// When the preview can't be embedded, try rewriting the URL and resubmit.
+	// When the preview can't be embedded, retry without any trailing slash.
 	useEffect( () => {
 		if ( ! cannotEmbed || ! hasResolved || ! attributesUrl ) {
 			return;
 		}
 
-		let newURL = attributesUrl;
-
-		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
-		if ( getAuthority( attributesUrl ) === 'x.com' ) {
-			const rewritten = new URL( attributesUrl );
-			rewritten.host = 'twitter.com';
-			newURL = rewritten.toString();
-		} else {
-			// Otherwise, try removing any trailing slash.
-			newURL = attributesUrl.replace( /\/$/, '' );
-		}
-
+		const newURL = attributesUrl.replace( /\/$/, '' );
 		if ( newURL === attributesUrl ) {
 			return;
 		}
@@ -162,10 +151,7 @@ const EmbedEdit = ( props ) => {
 		setURL( newURL );
 		setIsEditingURL( false );
 		__unstableMarkNextChangeAsNotPersistent();
-		setAttributes( {
-			url: newURL,
-			...findMoreSuitableBlock( newURL )?.attributes,
-		} );
+		setAttributes( { url: newURL } );
 	}, [
 		attributesUrl,
 		cannotEmbed,
@@ -237,15 +223,16 @@ const EmbedEdit = ( props ) => {
 							event.preventDefault();
 						}
 
-						// If the embed URL was changed, we need to reset the aspect ratio class.
-						// To do this we have to remove the existing ratio class so it can be recalculated.
+						const rewrittenURL = rewriteXToTwitter( url );
 						const blockClass = removeAspectRatioClasses(
 							attributes.className
 						);
 
+						setURL( rewrittenURL );
 						setAttributes( {
-							url,
-							...findMoreSuitableBlock( url )?.attributes,
+							url: rewrittenURL,
+							...findMoreSuitableBlock( rewrittenURL )
+								?.attributes,
 							className: blockClass,
 						} );
 						setIsEditingURL( false );
