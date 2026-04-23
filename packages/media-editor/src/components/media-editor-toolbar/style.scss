@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
 
 .media-editor-toolbar {
 	width: 100%;
@@ -10,5 +11,11 @@
 	.media-editor-toolbar__rotation-slider {
 		flex: 1 1 auto;
 		max-width: 240px;
+
+		// At narrow widths the slider is too cramped to aim precisely;
+		// the 90° rotate buttons cover the essential need.
+		@media (max-width: #{ $break-mobile }) {
+			display: none;
+		}
 	}
 }

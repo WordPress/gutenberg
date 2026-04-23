@@ -1,15 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { SelectControl, ToggleControl } from '@wordpress/components';
+import {
+	RangeControl,
+	SelectControl,
+	ToggleControl,
+} from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { useCropper } from '../../image-editor';
 import {
 	DEFAULT_ASPECT_RATIOS,
+	MAX_ZOOM,
+	MIN_ZOOM,
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
 
@@ -69,8 +76,30 @@ export default function MediaEditorCropPanel( {
 	freeformCrop,
 	onFreeformChange,
 }: MediaEditorCropPanelProps ) {
+	const { state, setZoom } = useCropper();
+
 	return (
 		<Stack direction="column" gap="md">
+			<RangeControl
+				__next40pxDefaultSize
+				__nextHasNoMarginBottom
+				label={ __( 'Zoom' ) }
+				min={ MIN_ZOOM }
+				max={ MAX_ZOOM }
+				step={ 0.1 }
+				value={ state.zoom }
+				onChange={ ( value ) =>
+					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
+				}
+				renderTooltipContent={ ( value ) => {
+					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
+					return sprintf(
+						/* translators: %d: zoom level as a percentage. */
+						__( '%d%%' ),
+						Math.round( zoom * 100 )
+					);
+				} }
+			/>
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
