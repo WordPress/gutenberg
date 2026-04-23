@@ -173,7 +173,7 @@ class Gutenberg_Guidelines_Post_Type {
 			return;
 		}
 
-		$terms = wp_get_object_terms( $post_id, self::TAXONOMY, array( 'fields' => 'ids' ) );
+		$terms = get_the_terms( $post_id, self::TAXONOMY );
 		if ( is_wp_error( $terms ) || ! empty( $terms ) ) {
 			return;
 		}
