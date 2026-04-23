@@ -11,7 +11,7 @@
 	border-block-end-width: 12px;
 	border-inline-start-width: 12px;
 	border-color: transparent;
-	border-block-end-color: var(--wp-admin-theme-color, #0087be);
+	border-block-end-color: var(--wpds-color-fg-interactive-brand);
 }
 
 .is-horizontal-only {
