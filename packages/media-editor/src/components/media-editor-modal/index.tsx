@@ -36,10 +36,15 @@ import { MediaEditorProvider } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import MediaPreview from '../media-preview';
 import MediaEditorCanvas from '../media-editor-canvas';
+import MediaEditorToolbar from '../media-editor-toolbar';
+import MediaEditorCropPanel, {
+	resolveAspectRatio,
+} from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
+import { CropperProvider, useCropper } from '../../image-editor';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -105,6 +110,54 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 	);
 }
 
+interface HeaderActionsProps {
+	isSaving: boolean;
+	hasMedia: boolean;
+	hasEdits: boolean;
+	onCancel: () => void;
+	onSave: () => void;
+}
+
+function HeaderActions( {
+	isSaving,
+	hasMedia,
+	hasEdits,
+	onCancel,
+	onSave,
+}: HeaderActionsProps ) {
+	const { isDirty } = useCropper();
+	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
+	return (
+		<Flex
+			className="media-editor-modal__header-actions"
+			justify="flex-end"
+			expanded={ false }
+			gap={ 2 }
+		>
+			<PinnedItems.Slot scope="media-editor" />
+			<Button
+				size="compact"
+				variant="tertiary"
+				onClick={ onCancel }
+				disabled={ isSaving }
+				accessibleWhenDisabled
+			>
+				{ __( 'Cancel' ) }
+			</Button>
+			<Button
+				size="compact"
+				variant="primary"
+				onClick={ onSave }
+				isBusy={ isSaving }
+				disabled={ saveDisabled }
+				accessibleWhenDisabled
+			>
+				{ __( 'Save' ) }
+			</Button>
+		</Flex>
+	);
+}
+
 export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
 		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
@@ -115,15 +168,26 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		};
 	}, [] );
 
-	const media = useSelect(
-		( select ) =>
-			id
-				? ( select( coreStore ).getEditedEntityRecord(
-						'postType',
-						'attachment',
-						id
-				  ) as Media )
-				: null,
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return { media: null, hasEdits: false };
+			}
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					id
+				),
+			};
+		},
 		[ id ]
 	);
 
@@ -132,12 +196,6 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
-
-	// Captured from the cropper via MediaEditorCanvas. Unused in this PR —
-	// a follow-up will wire this to the Save button so save is enabled only
-	// when the cropper has edits.
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	const [ isDirty, setIsDirty ] = useState( false );
 
 	// Snapshot the original values for fields the modal edits, so Cancel can
 	// restore them. Captured once per open.
@@ -160,24 +218,74 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		}
 	}, [ isModalOpen, media, fields ] );
 
-	const tabs = useMemo< ModalTab[] >(
-		() => [
+	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	// Reset aspect-ratio / freeform state when the media changes, so the
+	// next image starts from the defaults.
+	useEffect( () => {
+		setAspectRatioValue( '0' );
+		setFreeformCrop( true );
+	}, [ id ] );
+
+	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
+	const isImage = !! media && mediaType === 'image';
+
+	const imageAspectRatio = useMemo( () => {
+		if ( ! isImage ) {
+			return null;
+		}
+		const naturalWidth = Number( media?.media_details?.width );
+		const naturalHeight = Number( media?.media_details?.height );
+		if (
+			Number.isFinite( naturalWidth ) &&
+			Number.isFinite( naturalHeight ) &&
+			naturalHeight > 0
+		) {
+			return naturalWidth / naturalHeight;
+		}
+		return null;
+	}, [ isImage, media ] );
+
+	const tabs = useMemo< ModalTab[] >( () => {
+		const detailsTab: ModalTab = {
+			id: 'details',
+			title: __( 'Details' ),
+			panel: (
+				<Stack
+					className="media-editor-modal__panel"
+					direction="column"
+					gap="lg"
+				>
+					<MediaForm />
+				</Stack>
+			),
+		};
+		if ( ! isImage ) {
+			return [ detailsTab ];
+		}
+		return [
 			{
-				id: 'details',
-				title: __( 'Details' ),
+				id: 'crop',
+				title: __( 'Crop' ),
 				panel: (
 					<Stack
 						className="media-editor-modal__panel"
 						direction="column"
 						gap="lg"
 					>
-						<MediaForm />
+						<MediaEditorCropPanel
+							aspectRatioValue={ aspectRatioValue }
+							onAspectRatioChange={ setAspectRatioValue }
+							freeformCrop={ freeformCrop }
+							onFreeformChange={ setFreeformCrop }
+						/>
 					</Stack>
 				),
 			},
-		],
-		[]
-	);
+			detailsTab,
+		];
+	}, [ isImage, aspectRatioValue, freeformCrop ] );
 
 	if ( ! isModalOpen || ! id ) {
 		return null;
@@ -220,74 +328,80 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		}
 	};
 
-	const headerActions = (
-		<Flex
-			className="media-editor-modal__header-actions"
-			justify="flex-end"
-			expanded={ false }
-			gap={ 2 }
-		>
-			<PinnedItems.Slot scope="media-editor" />
-			<Button
-				size="compact"
-				variant="tertiary"
-				onClick={ handleCancel }
-				disabled={ isSaving }
-				accessibleWhenDisabled
-			>
-				{ __( 'Cancel' ) }
-			</Button>
-			<Button
-				size="compact"
-				variant="primary"
-				onClick={ handleSave }
-				isBusy={ isSaving }
-				disabled={ isSaving || ! media }
-				accessibleWhenDisabled
-			>
-				{ __( 'Save' ) }
-			</Button>
-		</Flex>
-	);
-
+	// `CropperProvider` is always mounted — it's just a `useReducer` with
+	// no side effects — so the header actions can read `isDirty` for
+	// images without the JSX forking on media type. React context flows
+	// through `<Modal>`'s portal to the `headerActions` slot.
+	//
+	// The `key` remounts the provider when the edited attachment changes,
+	// discarding the previous cropper state. Today the modal always
+	// closes between edits so this is belt-and-braces, but it guards
+	// against future flows that swap `id` in the store without closing.
 	return (
-		<Modal
-			className="media-editor-modal"
-			title={ __( 'Edit media' ) }
-			size="fill"
-			onRequestClose={ handleCancel }
-			headerActions={ headerActions }
-		>
-			<MediaEditorProvider
-				value={ media ?? undefined }
-				onChange={ handleChange }
-				settings={ { fields } }
+		<CropperProvider key={ media?.id ?? 'none' }>
+			<Modal
+				className="media-editor-modal"
+				title={ __( 'Edit media' ) }
+				size="fill"
+				onRequestClose={ handleCancel }
+				headerActions={
+					<HeaderActions
+						isSaving={ isSaving }
+						hasMedia={ !! media }
+						hasEdits={ hasEdits }
+						onCancel={ handleCancel }
+						onSave={ handleSave }
+					/>
+				}
 			>
-				<Tabs>
-					<MediaEditorModalSidebar tabs={ tabs } />
-				</Tabs>
-				<InterfaceSkeleton
-					className="media-editor-modal__skeleton"
-					content={
-						<div className="media-editor-modal__canvas">
-							{ ! media && <Spinner /> }
-							{ media &&
-								getMediaTypeFromMimeType( media.mime_type )
-									.type === 'image' && (
-									<MediaEditorCanvas
-										key={ media.id }
-										onDirtyChange={ setIsDirty }
-									/>
-								) }
-							{ media &&
-								getMediaTypeFromMimeType( media.mime_type )
-									.type !== 'image' && <MediaPreview /> }
-						</div>
-					}
-					sidebar={ <ComplementaryArea.Slot scope="media-editor" /> }
-				/>
-			</MediaEditorProvider>
-		</Modal>
+				<MediaEditorProvider
+					value={ media ?? undefined }
+					onChange={ handleChange }
+					settings={ { fields } }
+				>
+					{ ! media ? (
+						<Spinner />
+					) : (
+						<>
+							<Tabs>
+								<MediaEditorModalSidebar tabs={ tabs } />
+							</Tabs>
+							<InterfaceSkeleton
+								className="media-editor-modal__skeleton"
+								content={
+									<div className="media-editor-modal__canvas">
+										{ isImage ? (
+											<MediaEditorCanvas
+												aspectRatio={ resolveAspectRatio(
+													aspectRatioValue,
+													imageAspectRatio
+												) }
+												freeformCrop={ freeformCrop }
+											/>
+										) : (
+											<MediaPreview />
+										) }
+									</div>
+								}
+								footer={
+									isImage ? (
+										<MediaEditorToolbar
+											onReset={ () => {
+												setAspectRatioValue( '0' );
+												setFreeformCrop( true );
+											} }
+										/>
+									) : undefined
+								}
+								sidebar={
+									<ComplementaryArea.Slot scope="media-editor" />
+								}
+							/>
+						</>
+					) }
+				</MediaEditorProvider>
+			</Modal>
+		</CropperProvider>
 	);
 }
 

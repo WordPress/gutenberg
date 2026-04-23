@@ -31,3 +31,5 @@ export interface TaxonomyFormData {
 		labels: { singular_name: string };
 	};
 }
+
+export type CoreDataError = { message?: string; code?: string };

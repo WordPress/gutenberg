@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalHStack as HStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -50,7 +50,7 @@ export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 		<FloatingContainer
 			floating={ floating }
 			className="editor-collab-sidebar-panel__thread is-selected"
-			spacing="3"
+			gap="md"
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
 			role="treeitem"
@@ -69,9 +69,9 @@ export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 				selectNote( undefined );
 			} }
 		>
-			<HStack alignment="left" spacing="3">
+			<Stack direction="row" align="center" justify="flex-start" gap="md">
 				<CommentAuthorInfo />
-			</HStack>
+			</Stack>
 			<CommentForm
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );

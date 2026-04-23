@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import type { NormalizedRect, Flip, CropperState } from './types';
@@ -76,13 +81,13 @@ export interface AspectRatioPreset {
 export const ORIGINAL_ASPECT_RATIO = -1;
 
 export const DEFAULT_ASPECT_RATIOS: AspectRatioPreset[] = [
-	{ label: 'Free', value: 0 },
-	{ label: 'Original', value: ORIGINAL_ASPECT_RATIO },
-	{ label: 'Square (1:1)', value: 1 },
-	{ label: 'Landscape (16:9)', value: 16 / 9 },
-	{ label: 'Portrait (9:16)', value: 9 / 16 },
-	{ label: 'Classic (4:3)', value: 4 / 3 },
-	{ label: 'Classic portrait (3:4)', value: 3 / 4 },
-	{ label: 'Photo (3:2)', value: 3 / 2 },
-	{ label: 'Photo portrait (2:3)', value: 2 / 3 },
+	{ label: __( 'Free' ), value: 0 },
+	{ label: __( 'Original' ), value: ORIGINAL_ASPECT_RATIO },
+	{ label: __( 'Square (1:1)' ), value: 1 },
+	{ label: __( 'Landscape (16:9)' ), value: 16 / 9 },
+	{ label: __( 'Portrait (9:16)' ), value: 9 / 16 },
+	{ label: __( 'Classic (4:3)' ), value: 4 / 3 },
+	{ label: __( 'Classic portrait (3:4)' ), value: 3 / 4 },
+	{ label: __( 'Photo (3:2)' ), value: 3 / 2 },
+	{ label: __( 'Photo portrait (2:3)' ), value: 2 / 3 },
 ];
