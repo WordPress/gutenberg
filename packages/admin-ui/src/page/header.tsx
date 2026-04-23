@@ -10,7 +10,7 @@ import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 
 export default function Header( {
-	headingLevel = 2,
+	headingLevel = 1,
 	breadcrumbs,
 	badges,
 	visual,
