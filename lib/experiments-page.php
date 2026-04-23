@@ -247,7 +247,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-dashboard-widgets',
-		__( 'Dashboard: customizable widget home screen', 'gutenberg' ),
+		__( 'New Dashboard experience', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
