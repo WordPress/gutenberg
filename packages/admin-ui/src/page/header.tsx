@@ -9,7 +9,7 @@ import { Stack } from '@wordpress/ui';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 
 export default function Header( {
-	headingLevel = 2,
+	headingLevel = 1,
 	breadcrumbs,
 	badges,
 	visual,
