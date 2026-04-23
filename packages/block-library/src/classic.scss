@@ -69,8 +69,8 @@
 	&:hover,
 	&:focus {
 		// Sometimes styles are applied when the button element is
-		// hovered over or focused. This isn't expected for accordion
-		// toggle buttons, so reset those styles here.
+		// hovered over or focused. This isn't expected for tab
+		// buttons, so reset those styles here.
 		text-decoration: none;
 	}
 
