@@ -45,6 +45,10 @@ jest.mock( '@wordpress/hooks', () => ( {
 jest.mock( '../config', () => ( {
 	...( jest.requireActual( '../config' ) as object ),
 	MAX_UPDATE_SIZE_IN_BYTES: 10,
+	// Shrink the per-request room cap so rotation tests don't need 50+
+	// registered rooms. Existing tests register at most 2 rooms and
+	// stay well under this cap.
+	MAX_ROOMS_PER_REQUEST: 10,
 } ) );
 
 jest.mock( '../utils', () => ( {
@@ -1278,6 +1282,165 @@ describe( 'polling-manager', () => {
 
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+		} );
+	} );
+
+	describe( 'room overflow rotation', () => {
+		// The outer mock sets MAX_ROOMS_PER_REQUEST to 10. Tests in this
+		// block register a primary room plus additional "overflow" rooms
+		// to exercise the rotation behavior. With cap=10 and the primary
+		// pinned, each request carries 9 overflow slots.
+
+		function registerRoom( pollingMgr: PollingManager, room: string ) {
+			pollingMgr.registerRoom( {
+				room,
+				doc: createMockDoc( 1 ),
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange: jest.fn(),
+				onSync: jest.fn(),
+			} );
+		}
+
+		function registerPrimaryAndOverflow(
+			pollingMgr: PollingManager,
+			overflowCount: number
+		): string[] {
+			registerRoom( pollingMgr, 'primary' );
+			const overflowNames: string[] = [];
+			for ( let i = 1; i <= overflowCount; i++ ) {
+				const name = `o${ i }`;
+				overflowNames.push( name );
+				registerRoom( pollingMgr, name );
+			}
+			return overflowNames;
+		}
+
+		function getRoomNames( callIndex: number ): string[] {
+			const payload = mockPostSyncUpdate.mock.calls[ callIndex ][ 0 ] as {
+				rooms: { room: string }[];
+			};
+			return payload.rooms.map( ( r ) => r.room );
+		}
+
+		it( 'sends every room in a single request when the count is at or under the cap', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			// Primary + 9 overflow = 10 rooms, exactly at the cap.
+			const overflow = registerPrimaryAndOverflow( pollingManager, 9 );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+			expect( getRoomNames( 0 ) ).toEqual( [ 'primary', ...overflow ] );
+		} );
+
+		it( 'caps each request at MAX_ROOMS_PER_REQUEST and always includes the primary room', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			// Primary + 11 overflow = 12 rooms, over the cap of 10.
+			registerPrimaryAndOverflow( pollingManager, 11 );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			for ( let i = 0; i < 3; i++ ) {
+				const names = getRoomNames( i );
+				expect( names ).toHaveLength( 10 );
+				expect( names[ 0 ] ).toBe( 'primary' );
+			}
+		} );
+
+		it( 'rotates overflow rooms across successive polls until all are covered', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			// Primary + 15 overflow = 16 rooms. With 9 overflow slots per
+			// request, two polls send 18 slots — enough to cover every
+			// overflow room at least once.
+			const overflow = registerPrimaryAndOverflow( pollingManager, 15 );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			const overflowSeen = new Set< string >();
+			for ( let i = 0; i < 2; i++ ) {
+				for ( const name of getRoomNames( i ) ) {
+					if ( name !== 'primary' ) {
+						overflowSeen.add( name );
+					}
+				}
+			}
+
+			expect( overflowSeen ).toEqual( new Set( overflow ) );
+		} );
+
+		it( 'advances the rotation window so successive polls send different overflow rooms', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			// Primary + 11 overflow rooms, 9 slots per request.
+			registerPrimaryAndOverflow( pollingManager, 11 );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
+
+			const first = getRoomNames( 0 ).slice( 1 );
+			const second = getRoomNames( 1 ).slice( 1 );
+
+			expect( first ).not.toEqual( second );
+			// Two polls of 9 slots against 11 overflow rooms cover the
+			// entire set.
+			expect( new Set( [ ...first, ...second ] ).size ).toBe( 11 );
+		} );
+
+		it( 'advances the rotation window even when a poll fails', async () => {
+			// Primary + 11 overflow rooms, 9 slots per request.
+			registerPrimaryAndOverflow( pollingManager, 11 );
+
+			// First poll fails. It should have sent primary + 9 overflow.
+			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'network' ) );
+			await jest.advanceTimersByTimeAsync( 0 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+
+			const firstSent = getRoomNames( 0 );
+			expect( firstSent ).toHaveLength( 10 );
+			expect( firstSent[ 0 ] ).toBe( 'primary' );
+
+			// Second poll should rotate past the failed window, still
+			// pinning primary but with a different overflow slice.
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+			await jest.advanceTimersByTimeAsync( 2000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			const secondSent = getRoomNames( 1 );
+			expect( secondSent ).toHaveLength( 10 );
+			expect( secondSent[ 0 ] ).toBe( 'primary' );
+			expect( secondSent ).not.toEqual( firstSent );
+		} );
+
+		it( 'chunks the page-hide disconnect beacon so each request stays under the cap', async () => {
+			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
+
+			// 21 rooms at cap=10 => three beacons (10 + 10 + 1).
+			registerPrimaryAndOverflow( pollingManager, 20 );
+
+			// Flush the initial poll so the pagehide test observes
+			// postSyncUpdateNonBlocking calls from the page-hide handler only.
+			await jest.advanceTimersByTimeAsync( 0 );
+			mockPostSyncUpdateNonBlocking.mockClear();
+
+			window.dispatchEvent( new Event( 'pagehide' ) );
+
+			expect( mockPostSyncUpdateNonBlocking ).toHaveBeenCalledTimes( 3 );
+
+			const beaconsSent = mockPostSyncUpdateNonBlocking.mock.calls.map(
+				( call ) =>
+					( call[ 0 ] as { rooms: { room: string }[] } ).rooms.length
+			);
+			expect( beaconsSent.every( ( n ) => n <= 10 ) ).toBe( true );
+			expect( beaconsSent.reduce( ( a, b ) => a + b, 0 ) ).toBe( 21 );
 		} );
 	} );
 } );
