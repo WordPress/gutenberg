@@ -90,7 +90,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(24px + var(--wpds-dimension-padding-sm));
+			padding-inline-end: calc(24px + var(--wpds-dimension-padding-xs));
 		}
 
 		&:hover:not(&.is-not-clickable),

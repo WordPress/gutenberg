@@ -13,6 +13,8 @@
 - DataViews: Restore the original 16px padding on the first/last table header cells (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 4px gap inside table header buttons (had drifted to 8px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 - DataViews: Restore the original 24px gap on the default-density grid (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataForms: Restore the original 24px minimum height on panel-layout fields (trigger, label, control) (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
+- DataViews: Restore the original 28px end-padding on resettable filter chips (had drifted to 32px during the token migration). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 
 ### Code Quality
 
