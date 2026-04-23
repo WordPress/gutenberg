@@ -287,10 +287,6 @@ function gutenberg_get_chromium_major_version(): ?int {
  * and other admin screens (site editor, template operations, pattern
  * editing) remain in the same agent cluster, preserving cross-window
  * communication.
- *
- * Skips setup when a third-party page builder overrides the block
- * editor via a custom `action` query parameter, as DIP would block
- * same-origin iframe access that these editors rely on.
  */
 function gutenberg_set_up_cross_origin_isolation() {
 	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
@@ -316,38 +312,10 @@ function gutenberg_set_up_cross_origin_isolation() {
 }
 
 add_action( 'admin_init', 'gutenberg_set_up_cross_origin_isolation' );
-add_action( 'template_redirect', 'gutenberg_set_up_cross_origin_isolation_for_preview' );
 
 // Remove core's COEP/COOP-based cross-origin isolation in favor of
 // Gutenberg's DIP-based approach, which also skips third-party editors.
 remove_action( 'admin_init', 'wp_set_up_cross_origin_isolation' );
-remove_action( 'template_redirect', 'wp_set_up_cross_origin_isolation_for_preview' );
-
-/**
- * Sets up cross-origin isolation for front-end preview pages.
- *
- * When the block editor sends the Document-Isolation-Policy header and opens
- * a preview popup, the preview page must also send the header to remain in
- * the same agent cluster. Without this, cross-window communication between
- * the editor and preview breaks in Chromium 137+.
- *
- * @since 21.9.0
- */
-function gutenberg_set_up_cross_origin_isolation_for_preview(): void {
-	if ( ! is_preview() ) {
-		return;
-	}
-
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-
-	if ( ! current_user_can( 'upload_files' ) ) {
-		return;
-	}
-
-	gutenberg_start_cross_origin_isolation_output_buffer();
-}
 
 /**
  * Sends the Document-Isolation-Policy header for cross-origin isolation.
