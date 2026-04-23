@@ -6,7 +6,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import type { Action } from '@wordpress/dataviews';
 import { useState } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { Stack, Text } from '@wordpress/ui';
@@ -14,7 +14,7 @@ import { Stack, Text } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import type { TaxonomyFormData } from '../utils';
+import type { CoreDataError, TaxonomyFormData } from '../types';
 
 function DeleteTaxonomyModal( {
 	items,
@@ -51,18 +51,26 @@ function DeleteTaxonomyModal( {
 			createSuccessNotice(
 				itemsToDelete.length === 1
 					? sprintf(
-							/* translators: %s: taxonomy plural label. */
+							/* translators: %s: The taxonomy's plural label. */
 							__( '"%s" taxonomy deleted.' ),
 							itemsToDelete[ 0 ].title.raw
 					  )
-					: __( 'Taxonomies deleted.' ),
+					: sprintf(
+							/* translators: %d: The number of taxonomies. */
+							_n(
+								'%d taxonomy deleted.',
+								'%d taxonomies deleted.',
+								itemsToDelete.length
+							),
+							itemsToDelete.length
+					  ),
 				{ type: 'snackbar' }
 			);
 		} else {
 			let errorMessage;
 			if ( promiseResult.length === 1 ) {
 				const typedError = promiseResult[ 0 ] as {
-					reason?: { message?: string; code?: string };
+					reason?: CoreDataError;
 				};
 				if (
 					typedError.reason?.message &&
@@ -79,7 +87,7 @@ function DeleteTaxonomyModal( {
 				);
 				for ( const failedPromise of failedPromises ) {
 					const typedError = failedPromise as {
-						reason?: { message?: string; code?: string };
+						reason?: CoreDataError;
 					};
 					if (
 						typedError.reason?.message &&
@@ -129,7 +137,7 @@ function DeleteTaxonomyModal( {
 							items.length
 					  )
 					: sprintf(
-							/* translators: %s: taxonomy plural label. */
+							/* translators: %s: The taxonomy's plural label. */
 							__( 'Are you sure you want to delete "%s"?' ),
 							items[ 0 ].title.raw
 					  ) }
@@ -153,7 +161,7 @@ function DeleteTaxonomyModal( {
 					accessibleWhenDisabled
 					onClick={ onDelete }
 				>
-					{ __( 'Delete' ) }
+					{ _x( 'Delete', 'verb' ) }
 				</Button>
 			</Stack>
 		</Stack>
@@ -162,7 +170,7 @@ function DeleteTaxonomyModal( {
 
 const deleteTaxonomyAction: Action< TaxonomyFormData > = {
 	id: 'delete-taxonomy',
-	label: __( 'Delete' ),
+	label: _x( 'Delete', 'verb' ),
 	icon: trash,
 	supportsBulk: true,
 	hideModalHeader: true,
