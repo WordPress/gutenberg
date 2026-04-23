@@ -138,7 +138,11 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
-					tooltipPosition={ direction === 'down' ? 'bottom' : 'top' }
+					tooltipPosition={
+						direction === 'down' && orientation === 'vertical'
+							? 'bottom'
+							: 'top'
+					}
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
