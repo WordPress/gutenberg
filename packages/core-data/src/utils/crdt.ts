@@ -25,6 +25,8 @@ import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
+	type MergeCursorPosition,
+	type RichTextCursorSelection,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -161,8 +163,9 @@ export function applyPostChangesToCRDTDoc(
 
 				// Block changes from typing are bundled with a 'selection' update.
 				// Pass the resulting cursor position to the mergeCrdtBlocks function.
-				const cursorPosition =
-					changes.selection?.selectionStart?.offset ?? null;
+				const cursorPosition = getMergeCursorPosition(
+					changes.selection
+				);
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
@@ -258,6 +261,26 @@ export function applyPostChangesToCRDTDoc(
 			updateSelectionHistory( ydoc, selection );
 		}, 0 );
 	}
+}
+
+function getMergeCursorPosition(
+	selection: WPSelection | undefined
+): MergeCursorPosition {
+	const selectionStart = selection?.selectionStart;
+
+	if (
+		! selectionStart?.clientId ||
+		! selectionStart.attributeKey ||
+		selectionStart.offset === undefined
+	) {
+		return null;
+	}
+
+	return {
+		attributeKey: selectionStart.attributeKey,
+		clientId: selectionStart.clientId,
+		offset: selectionStart.offset,
+	} as RichTextCursorSelection;
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {
