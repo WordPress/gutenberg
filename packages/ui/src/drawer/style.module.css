@@ -262,6 +262,18 @@
 		}
 	}
 
+	/*
+	 * Push the close icon to the inline end even when the title is taken out
+	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+	 * no-op because the title no longer participates in the flex layout, so
+	 * we also anchor the close icon itself.
+	 */
+	.header [data-wp-ui-drawer-close-icon] {
+		margin-inline-start: auto;
+	}
+
+
 	.footer {
 		display: flex;
 		justify-content: flex-end;
