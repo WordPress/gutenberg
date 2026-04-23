@@ -514,41 +514,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/add-comment.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/comment-author-info.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/comment-form.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/comment-indicator-toolbar.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/comments.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/floating-container.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/index.js": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/document-bar/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

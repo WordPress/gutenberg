@@ -30,12 +30,8 @@ import {
 	useObjectTypeField,
 	useSlugField,
 } from '../fields';
-import {
-	serializeForSave,
-	toFormData,
-	type TaxonomyFormData,
-	type TaxonomyRecord,
-} from '../utils';
+import { serializeForSave, toFormData } from '../utils';
+import type { TaxonomyFormData, TaxonomyRecord } from '../types';
 
 function EditTaxonomyModal( {
 	items,
@@ -48,7 +44,7 @@ function EditTaxonomyModal( {
 	const { record, hasResolved } = useEntityRecord< TaxonomyRecord >(
 		'postType',
 		'wp_user_taxonomy',
-		item.id ?? 0
+		item.id as number
 	);
 
 	const initialData = useMemo< TaxonomyFormData >(
@@ -113,7 +109,7 @@ function EditTaxonomyModal( {
 	}
 
 	if ( ! hasResolved ) {
-		return <></>;
+		return null;
 	}
 
 	return (

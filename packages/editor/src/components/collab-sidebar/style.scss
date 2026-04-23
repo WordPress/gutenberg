@@ -120,6 +120,15 @@
 	font-weight: $font-weight-medium;
 }
 
+.editor-collab-sidebar-panel__deleted-block-notice {
+	font-weight: $font-weight-medium;
+	color: $gray-700;
+}
+
+.editor-collab-sidebar-panel__participant-overflow {
+	font-weight: $font-weight-medium;
+}
+
 .editor-collab-sidebar-panel__resolution-text {
 	font-style: italic;
 }

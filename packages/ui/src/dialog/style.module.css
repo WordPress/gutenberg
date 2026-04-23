@@ -22,7 +22,7 @@
 	}
 
 	.popup {
-		--_viewport-inset: var(--wpds-dimension-padding-2xl);
+		--viewport-inset: var(--wpds-dimension-padding-2xl);
 
 		position: fixed;
 		top: 50%;
@@ -32,8 +32,8 @@
 		transform: translate(-50%, -50%);
 		box-sizing: border-box;
 		min-width: var(--wpds-dimension-surface-width-sm);
-		width: calc(100vw - 2 * var(--_viewport-inset));
-		max-height: calc(100dvh - 2 * var(--_viewport-inset));
+		width: calc(100vw - 2 * var(--viewport-inset));
+		max-height: calc(100dvh - 2 * var(--viewport-inset));
 		padding: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);

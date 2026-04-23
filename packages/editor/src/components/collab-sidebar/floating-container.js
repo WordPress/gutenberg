@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 export function FloatingContainer( {
 	floating,
@@ -17,13 +17,14 @@ export function FloatingContainer( {
 } ) {
 	const isFloating = !! floating;
 	return (
-		<VStack
+		<Stack
+			direction="column"
 			className={ clsx( className, { 'is-floating': isFloating } ) }
 			ref={ isFloating ? floating.ref : undefined }
 			style={ isFloating ? { top: floating.y, ...style } : style }
 			{ ...props }
 		>
 			{ children }
-		</VStack>
+		</Stack>
 	);
 }
