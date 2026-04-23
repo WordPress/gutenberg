@@ -1,1 +1,2 @@
-export { privateApis } from './private-apis';
+export { DashboardGrid } from './grid';
+export type { DashboardGridLayoutItem, DashboardGridProps } from './types';
