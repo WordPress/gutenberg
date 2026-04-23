@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -27,6 +22,12 @@ test.describe( 'Page List', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
+	test.beforeEach( async ( { admin, page } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
@@ -34,12 +35,6 @@ test.describe( 'Page List', () => {
 			requestUtils.deleteAllPages(),
 			requestUtils.deleteAllMedia(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Persists filter/search when switching layout', async ( {
@@ -70,14 +65,12 @@ test.describe( 'Page List', () => {
 			featuredImage: {
 				performEdit: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await placeholder.click();
 					const mediaLibrary = page.getByRole( 'dialog' );
-					const TEST_IMAGE_FILE_PATH = path.resolve(
-						__dirname,
-						'../../assets/10x10_e2e_test_image_z9T8jK.png'
-					);
+					const TEST_IMAGE_FILE_PATH =
+						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
 					const fileChooserPromise =
 						page.waitForEvent( 'filechooser' );
@@ -95,16 +88,16 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertInitialState: async ( page ) => {
-					const el = page.getByText( 'Choose file' );
+					const el = page.getByText( 'Set featured image' );
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( el ).toBeVisible();
 					await expect( placeholder ).toBeVisible();
 				},
 				assertEditedState: async ( page ) => {
 					const placeholder = page.getByRole( 'button', {
-						name: 'Choose file',
+						name: 'Set featured image',
 					} );
 					await expect( placeholder ).toBeHidden();
 					const img = page.locator( '.fields__media-edit-thumbnail' );
@@ -370,6 +363,10 @@ test.describe( 'Page List', () => {
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllUsers();
+		} );
+
 		Object.entries( fields ).forEach(
 			( [
 				key,
@@ -480,9 +477,71 @@ test.describe( 'Page List', () => {
 		// 		await expect( status ).toBeVisible();
 		// 	}
 		// } );
+	} );
+
+	test.describe( 'Quick Edit Date Timezone Consistency', () => {
+		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
+		// UTC-5 offset means the displayed time should be 5 hours earlier.
+		const EXPECTED_LOCAL_VALUE = '2026-02-15T12:30';
+		const PAGE_TITLE = 'Timezone Test Page';
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.updateSiteSettings( {
+				timezone: 'Etc/GMT+5',
+			} );
+			await requestUtils.createPage( {
+				title: PAGE_TITLE,
+				status: 'publish',
+				date_gmt: PAGE_DATE_GMT,
+			} );
+		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deleteAllUsers();
+			await requestUtils.updateSiteSettings( {
+				timezone: '',
+			} );
+			await requestUtils.deleteAllPages();
+			await createPages( requestUtils );
+		} );
+
+		test( 'should display and edit dates in the WP timezone', async ( {
+			admin,
+			page,
+		} ) => {
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+			// Open Quick Edit for the timezone test page.
+			const row = page.getByRole( 'row', {
+				name: new RegExp( PAGE_TITLE ),
+			} );
+			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+
+			// Open the date field for editing.
+			const editButton = page.getByRole( 'button', {
+				name: 'Edit Date',
+			} );
+			await editButton.locator( '..' ).hover();
+			await editButton.click();
+
+			const datetimeInput = page.locator(
+				'input[type="datetime-local"]'
+			);
+			await datetimeInput.waitFor( { state: 'visible' } );
+
+			// The input value should reflect the WP timezone (UTC-5),
+			// not the browser/system timezone.
+			await expect( datetimeInput ).toHaveValue( EXPECTED_LOCAL_VALUE );
+
+			// Change only the date via the input, preserving time.
+			await datetimeInput.fill( '2026-03-20T12:30' );
+			await expect( datetimeInput ).toHaveValue( '2026-03-20T12:30' );
+
+			// Change the time portion, verify it updates correctly.
+			await datetimeInput.fill( '2026-03-20T09:45' );
+			await expect( datetimeInput ).toHaveValue( '2026-03-20T09:45' );
 		} );
 	} );
 } );

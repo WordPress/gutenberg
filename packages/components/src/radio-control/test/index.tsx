@@ -56,18 +56,18 @@ describe.each( [
 	const [ , Component ] = modeAndComponent;
 
 	describe( 'semantics and labelling', () => {
-		it( 'should group all radios under a fieldset with an accessible label (legend)', () => {
+		it( 'should render a radiogroup with an accessible label (legend)', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Component { ...defaultProps } onChange={ onChangeSpy } />
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toBeVisible();
 		} );
 
-		it( 'should group all radios under a fieldset with an accessible label even when the label is visually hidden', () => {
+		it( 'should render a radiogroup with an accessible label even when the label is visually hidden', () => {
 			const onChangeSpy = jest.fn();
 			render(
 				<Component
@@ -78,8 +78,18 @@ describe.each( [
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toBeVisible();
+		} );
+
+		it( 'should disable the radio group when `disabled` is true', () => {
+			render(
+				<Component { ...defaultProps } disabled onChange={ () => {} } />
+			);
+
+			expect(
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
+			).toBeDisabled();
 		} );
 
 		it( 'should describe the radio group with the help text', () => {
@@ -93,7 +103,7 @@ describe.each( [
 			);
 
 			expect(
-				screen.getByRole( 'group', { name: defaultProps.label } )
+				screen.getByRole( 'radiogroup', { name: defaultProps.label } )
 			).toHaveAccessibleDescription( 'Test help text' );
 		} );
 

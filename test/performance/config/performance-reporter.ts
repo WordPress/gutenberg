@@ -45,6 +45,9 @@ export interface WPRawPerformanceResults {
 	mediaUploadSingle: number[];
 	mediaUploadLarge: number[];
 	mediaUploadMultiple: number[];
+	mediaProcessingJpeg: number[];
+	mediaProcessingAvif: number[];
+	mediaProcessingJpegToAvif: number[];
 }
 
 type PerformanceStats = {
@@ -84,6 +87,9 @@ export interface WPPerformanceResults {
 	mediaUploadSingle?: PerformanceStats;
 	mediaUploadLarge?: PerformanceStats;
 	mediaUploadMultiple?: PerformanceStats;
+	mediaProcessingJpeg?: PerformanceStats;
+	mediaProcessingAvif?: PerformanceStats;
+	mediaProcessingJpegToAvif?: PerformanceStats;
 }
 
 /**
@@ -125,6 +131,9 @@ export function curateResults(
 		mediaUploadSingle: stats( results.mediaUploadSingle ),
 		mediaUploadLarge: stats( results.mediaUploadLarge ),
 		mediaUploadMultiple: stats( results.mediaUploadMultiple ),
+		mediaProcessingJpeg: stats( results.mediaProcessingJpeg ),
+		mediaProcessingAvif: stats( results.mediaProcessingAvif ),
+		mediaProcessingJpegToAvif: stats( results.mediaProcessingJpegToAvif ),
 	};
 
 	return Object.fromEntries(

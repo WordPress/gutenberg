@@ -217,6 +217,10 @@ function ListItem< Item >( {
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
 
+	const renderDescription = showDescription && descriptionField?.render;
+	// When we have only the media and title fields, we want to center them vertically in the list item.
+	const hasOnlyMediaAndTitle =
+		!! renderedMediaField && ! renderDescription && ! otherFields.length;
 	const usedActions = eligibleActions?.length > 0 && (
 		<Stack
 			direction="row"
@@ -315,7 +319,7 @@ function ListItem< Item >( {
 					direction="row"
 					gap="md"
 					justify="start"
-					align="flex-start"
+					align={ hasOnlyMediaAndTitle ? 'center' : 'flex-start' }
 					style={ { flex: 1, minWidth: 0 } }
 				>
 					{ renderedMediaField }
@@ -333,7 +337,7 @@ function ListItem< Item >( {
 							</div>
 							{ usedActions }
 						</Stack>
-						{ showDescription && descriptionField?.render && (
+						{ renderDescription && (
 							<div className="dataviews-view-list__field">
 								<descriptionField.render
 									item={ item }

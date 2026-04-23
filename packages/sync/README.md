@@ -1,6 +1,10 @@
 # Sync
 
-Sync data between multiple peers and persist in a local database.
+Sync entity data between peers for real-time collaboration using [CRDT](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type) documents.
+
+This package provides the syncing layer for real-time collaboration in the WordPress editor. It is built on [Yjs](https://docs.yjs.dev/), a CRDT implementation that enables multiple users to edit shared data concurrently without conflicts.
+
+See [CODE.md](./CODE.md) for architecture details.
 
 ## Installation
 
@@ -16,7 +20,7 @@ npm install @wordpress/sync --save
 
 ### Awareness
 
-Similar to Yjs, the Awareness protocol should not be considered a public API. It is a third-party library that will experience breaking changes in the future.
+The Awareness protocol should not be considered a public API. It is a third-party library that will experience breaking changes in the future.
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 

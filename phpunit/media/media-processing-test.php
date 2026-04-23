@@ -136,10 +136,10 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$data    = $index->get_data();
 
 		$this->assertArrayHasKey( 'image_size_threshold', $data );
-		$this->assertArrayHasKey( 'image_output_formats', $data );
-		$this->assertArrayHasKey( 'jpeg_interlaced', $data );
-		$this->assertArrayHasKey( 'png_interlaced', $data );
-		$this->assertArrayHasKey( 'gif_interlaced', $data );
+		$this->assertArrayNotHasKey( 'image_output_formats', $data );
+		$this->assertArrayNotHasKey( 'jpeg_interlaced', $data );
+		$this->assertArrayNotHasKey( 'png_interlaced', $data );
+		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
 	}
 
@@ -163,8 +163,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 HTML;
 
 		$expected = <<<HTML
-<img crossorigin="anonymous" src="https://www.someothersite.com/test1.jpg" />
-<img crossorigin="anonymous" src="test2.jpg" />
+<img src="https://www.someothersite.com/test1.jpg" />
+<img src="test2.jpg" />
 <audio crossorigin="anonymous"><source src="https://www.someothersite.com/test1.mp3"></audio>
 <audio crossorigin="anonymous" src="https://www.someothersite.com/test1.mp3"></audio>
 <audio src="/test2.mp3"></audio>

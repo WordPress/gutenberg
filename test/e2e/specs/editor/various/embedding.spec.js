@@ -256,6 +256,36 @@ test.describe( 'Embedding content', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Embed' } )
 		).toBeVisible();
 	} );
+
+	test( 'should undo URL submit and preview-driven upgrade in a single step', async ( {
+		editor,
+		embedUtils,
+		pageUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
+				MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+		} );
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		// Wait for the block to upgrade to the YouTube variant.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: YouTube Embed',
+			} )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Embed' } )
+				.getByRole( 'textbox', { name: 'Embed URL' } )
+		).toHaveValue( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+	} );
 } );
 
 class EmbedUtils {

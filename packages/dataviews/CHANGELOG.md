@@ -2,17 +2,76 @@
 
 ## Unreleased
 
+## 14.1.0 (2026-04-15)
+
+### Enhancements
+
+- DataForm: Add `min`/`max` date range validation support for `date` and `datetime` fields. [#77201](https://github.com/WordPress/gutenberg/pull/77201)
+- DataForm: support `isDisabled` field property. [#77090](https://github.com/WordPress/gutenberg/pull/77090)
+- `DataViews`, `DataForm`: Use `--wpds-cursor-control` for interactive cursor styling. [#77259](https://github.com/WordPress/gutenberg/pull/77259)
+- DataViews/DataViewsPicker: simplify `defaultLayouts` property. [#77232](https://github.com/WordPress/gutenberg/pull/77232)
+- DataForm: Show tooltip in edit button in `panel` layout. [#77024](https://github.com/WordPress/gutenberg/pull/77024)
+- DataViewsPicker: Add `onReset` prop to support view reset functionality. [#77288](https://github.com/WordPress/gutenberg/pull/77288)
+
+### Bug Fixes
+
+- DataForm: Fix disabled state for date(time) control. [#77138](https://github.com/WordPress/gutenberg/pull/77138)
+- DataViews: Fix `compact` density clipping and remove top/bottom padding. [#77054](https://github.com/WordPress/gutenberg/pull/77054)
+- DataForm: Remove `text-transform` from `panel` field labels. [#77196](https://github.com/WordPress/gutenberg/pull/77196)
+
+### Code Quality
+
+- DataViewsPicker: Remove unnecessary ref callbacks in grid and table layouts. [#77179](https://github.com/WordPress/gutenberg/pull/77179)
+
+## 14.0.0 (2026-04-01)
+
+### Breaking Changes
+
+- DataViews: Use intersectionObserver to improve performance by unloading invisible items. Change how infinite scroll is enabled to require only 2 view properties: `infiniteScrollEnabled` and `startPosition`. [#74378](https://github.com/WordPress/gutenberg/pull/74378)
+- DataForm: The card layout now uses `Card` and `CollapsibleCard` from `@wordpress/ui` instead of `Card`, `CardHeader`, and `CardBody` from `@wordpress/components`. This changes the card's visual appearance (spacing, typography, and removal of the header/content separator). Custom CSS targeting `.components-card__body` within DataViews has been removed. Consumers wrapping DataViews or DataForm in a card should migrate to the `Card` and `CollapsibleCard` components from `@wordpress/ui`. [#76282](https://github.com/WordPress/gutenberg/pull/76282)
+
+### Enhancements
+
+- DataForm: Add `compact` configuration option to the `datetime` control. [#76905](https://github.com/WordPress/gutenberg/pull/76905)
+- DataViews: Field's description can accept ReactElements. [#76829](https://github.com/WordPress/gutenberg/pull/76829)
+- DataForm: Use `CollapsibleCard.HeaderDescription` for card layout header descriptions instead of manual `aria-describedby`. [#76867](https://github.com/WordPress/gutenberg/pull/76867)
+
+## 13.1.0 (2026-03-18)
+
+### Enhancements
+
+- DataForm: Reduce panel's dialog min-width. [#76345](https://github.com/WordPress/gutenberg/pull/76345)
+- DataViews: Add border to sticky table headers. [#76396](https://github.com/WordPress/gutenberg/pull/76396)
+- DataViews: Update scrolling so the scrollbar appears on the active layout when DataViews is rendered in a constrained-height container. This may slightly change the UI depending on the container height. [#76453](https://github.com/WordPress/gutenberg/pull/76453)
+- DataViews: Add density option to Grid and PickerGrid layouts. [#75887](https://github.com/WordPress/gutenberg/pull/75887)
+
+### Bug Fixes
+
+- DataViews: Fix last column classname in table layout. [#76133](https://github.com/WordPress/gutenberg/pull/76133)
+- DataViews: Add spinner in DataViewsLayout in initial load of data. [#76486](https://github.com/WordPress/gutenberg/pull/76486)
+- DataForm: Properly handle dates in datetime control. [#76193](https://github.com/WordPress/gutenberg/pull/76193)
+
+### Code Quality
+
+- DataForm: Consolidate `date` and `datetime` input placement. [#76136](https://github.com/WordPress/gutenberg/pull/76136)
+
+## 13.0.0 (2026-03-04)
+
 ### Breaking Changes
 
 - DataViews: Align to end integer and number field types. [#75917](https://github.com/WordPress/gutenberg/pull/75917)
 
 ### Bug Fixes
 
+- DataViews: Fix sort indicator not resetting across column menus. [#76041](https://github.com/WordPress/gutenberg/pull/76041)
 - DataForm: Fix label color of array control. [#75730](https://github.com/WordPress/gutenberg/pull/75730)
+- DataForm: Fix text overflow for long unhyphenated text in panel layout. [#76073](https://github.com/WordPress/gutenberg/pull/76073)
+- DataForm: Fix `card` layout's toggle button screen reader text. [#76039](https://github.com/WordPress/gutenberg/pull/76039)
 - DataViews: Fix focus transfer while searching in `list` layout. [#75999](https://github.com/WordPress/gutenberg/pull/75999)
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
 - DataViews: Avoid flickering while refreshing. [#74572](https://github.com/WordPress/gutenberg/pull/74572)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
+- DataViews: Fix filter toggle flickering when there are locked or primary filters. [#75913](https://github.com/WordPress/gutenberg/pull/75913)
 - DataViews: Fix search input losing characters during debounce when externally synced. [#75810](https://github.com/WordPress/gutenberg/pull/75810)
 - DataForm: Fix vertical alignment of summary fields in card layout. [#75864](https://github.com/WordPress/gutenberg/pull/75864)
 - DataViews: Remove visual divider between quick and regular actions in the actions menu. [#75893](https://github.com/WordPress/gutenberg/pull/75893)
@@ -20,9 +79,15 @@
 
 ### Enhancements
 
+- DataForm: Add `applyLabel` and `cancelLabel` options to `panel` layout's `openAs` modal config for customizing modal button labels. [#76099](https://github.com/WordPress/gutenberg/pull/76099)
 - Documentation: Update README.md. [#75881](https://github.com/WordPress/gutenberg/pull/75881)
+- DataViews: Improve UI in `list` layout when we render only title and/or media fields. [#76042](https://github.com/WordPress/gutenberg/pull/76042)
 - DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
 - DataViews: minimize padding for primary actions. [#75721](https://github.com/WordPress/gutenberg/pull/75721)
+
+### Code Quality
+
+- Remove unused dependencies from `package.json`. [#76075](https://github.com/WordPress/gutenberg/pull/76075)
 
 ## 12.0.0 (2026-02-18)
 

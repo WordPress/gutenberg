@@ -31,7 +31,6 @@ import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
-import InfiniteScrollToggle from './infinite-scroll-toggle';
 import { PropertiesSection } from './properties-section';
 import { unlock } from '../../lock-unlock';
 
@@ -346,7 +345,6 @@ export function DataviewsViewConfigDropdown() {
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
-							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 							<PropertiesSection />
 						</Stack>

@@ -22,7 +22,8 @@ module.exports = {
 	},
 	create( context ) {
 		const mode = context.options[ 0 ] || 'always';
-		const comments = context.getSourceCode().getAllComments();
+		const sourceCode = context.sourceCode;
+		const comments = sourceCode.getAllComments();
 
 		/**
 		 * Locality classification of an import, one of "External",
@@ -194,9 +195,7 @@ module.exports = {
 										return null;
 									}
 
-									const text = context
-										.getSourceCode()
-										.getText();
+									const text = sourceCode.getText();
 
 									// Trim preceding and trailing newlines.
 									let [ start, end ] = comment.range;

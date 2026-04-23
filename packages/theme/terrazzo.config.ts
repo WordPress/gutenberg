@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { defineConfig } from '@terrazzo/cli';
+import { defineConfig, type Config } from '@terrazzo/parser';
 import pluginCSS from '@terrazzo/plugin-css';
 import { makeCSSVar } from '@terrazzo/token-tools/css';
 
@@ -15,7 +15,7 @@ import pluginDsTokenFallbacks from './bin/terrazzo-plugin-ds-token-fallbacks/ind
 import inlineAliasValues from './bin/terrazzo-plugin-inline-alias-values/index';
 import typescriptTypes from './bin/terrazzo-plugin-typescript-types/index';
 
-export default defineConfig( {
+const config: Config = {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
@@ -25,6 +25,11 @@ export default defineConfig( {
 		'./tokens/typography.json',
 	],
 	outDir: './src/prebuilt',
+
+	// Preserve source ordering of tokens in output. This is important because
+	// many of our tokens operate on a size scale (2xs → 2xl) and it's more easy
+	// to understand that size progression in the original order.
+	alphabetize: false,
 
 	plugins: [
 		inlineAliasValues( {
@@ -40,8 +45,6 @@ export default defineConfig( {
 		pluginCSS( {
 			filename: 'css/design-tokens.css',
 			variableName: ( token ) => makeCSSVar( token.id ),
-			// See: https://github.com/terrazzoapp/terrazzo/pull/632
-			// @ts-expect-error - Valid return types excluded from package types.
 			transform( token ) {
 				// This addresses a specific browser issue where Chrome renders
 				// a font-weight of 500 as 600 instead of 400 when the target
@@ -56,30 +59,32 @@ export default defineConfig( {
 				// See: https://issues.chromium.org/issues/40552893
 				// See: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/font-weight#fallback_weights
 				if (
-					token.id.startsWith( 'wpds-font.weight.' ) &&
+					token.id.startsWith( 'wpds-typography.font-weight.' ) &&
 					token.$value === 500
 				) {
 					return '499';
 				}
+
+				return undefined;
 			},
 			baseSelector: ':root',
 			modeSelectors: [
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: 'compact',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
 					],
 				},
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: 'comfortable',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
 					],
 				},
 				{
-					tokens: [ 'wpds-dimension.*' ],
+					tokens: [ 'wpds-dimension.**' ],
 					mode: '.',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='default']",
@@ -115,6 +120,11 @@ export default defineConfig( {
 					name: 'GapSize',
 					description: 'Size scale for gap tokens.',
 					patterns: [ /^wpds-dimension\.gap\.([^.]+)$/ ],
+				},
+				{
+					name: 'SurfaceWidthSize',
+					description: 'Size scale for surface width tokens.',
+					patterns: [ /^wpds-dimension\.surface-width\.([^.]+)$/ ],
 				},
 				{
 					name: 'BorderRadiusSize',
@@ -230,22 +240,22 @@ export default defineConfig( {
 				{
 					name: 'FontFamily',
 					description: 'Font family variants.',
-					patterns: [ /^wpds-font\.family\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-family\.([^.]+)$/ ],
 				},
 				{
 					name: 'FontSize',
 					description: 'Font size scale.',
-					patterns: [ /^wpds-font\.size\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-size\.([^.]+)$/ ],
 				},
 				{
 					name: 'FontWeight',
 					description: 'Font weight variants.',
-					patterns: [ /^wpds-font\.weight\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.font-weight\.([^.]+)$/ ],
 				},
 				{
 					name: 'LineHeight',
 					description: 'Line height scale.',
-					patterns: [ /^wpds-font\.line-height\.([^.]+)$/ ],
+					patterns: [ /^wpds-typography\.line-height\.([^.]+)$/ ],
 				},
 			],
 		} ),
@@ -294,4 +304,8 @@ export default defineConfig( {
 	// 		],
 	// 	},
 	// },
+};
+
+export default defineConfig( config, {
+	cwd: new URL( './', import.meta.url ),
 } );

@@ -28,6 +28,7 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		gradient?: CSSProperties[ 'backgroundImage' ];
 	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
@@ -50,6 +51,7 @@ export interface Style {
 		aspectRatio?: CSSProperties[ 'aspectRatio' ];
 		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
+		minWidth?: CSSProperties[ 'minWidth' ];
 		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {
