@@ -10,8 +10,8 @@ describe( 'postProcessConfig', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should merge relevant root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should merge relevant root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 123,
 			testsPort: 456,
 			coreSource: {
@@ -152,8 +152,8 @@ describe( 'postProcessConfig', () => {
 		} );
 	} );
 
-	it( 'should not merge some root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should not merge some root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 8888,
 			testsPort: 8889,
 			lifecycleScripts: {
@@ -183,8 +183,8 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'appendPortToWPConfigs', () => {
-		it( 'should add port to certain environment config options', () => {
-			const processed = postProcessConfig( {
+		it( 'should add port to certain environment config options', async () => {
+			const processed = await postProcessConfig( {
 				port: 123,
 				config: {
 					WP_TESTS_DOMAIN: 'localhost',
@@ -231,8 +231,8 @@ describe( 'postProcessConfig', () => {
 			} );
 		} );
 
-		it( 'should not overwrite port in WP_HOME', () => {
-			const processed = postProcessConfig( {
+		it( 'should not overwrite port in WP_HOME', async () => {
+			const processed = await postProcessConfig( {
 				env: {
 					development: {
 						port: 123,
@@ -274,11 +274,35 @@ describe( 'postProcessConfig', () => {
 				},
 			} );
 		} );
+
+		it( 'should not append port to URLs when port is null', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				config: {
+					WP_TESTS_DOMAIN: 'localhost',
+					WP_SITEURL: 'http://localhost',
+					WP_HOME: 'http://localhost',
+				},
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			// Null ports should not be appended to URLs.
+			expect( processed.env.development.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+			expect( processed.env.tests.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+		} );
 	} );
 
 	describe( 'validatePortUniqueness', () => {
-		it( 'should fail when two environments have the same port', () => {
-			expect( () => {
+		it( 'should fail when two environments have the same port', async () => {
+			await expect(
 				postProcessConfig( {
 					env: {
 						development: {
@@ -288,16 +312,16 @@ describe( 'postProcessConfig', () => {
 							port: 123,
 						},
 					},
-				} );
-			} ).toThrow(
+				} )
+			).rejects.toThrow(
 				new ValidationError(
 					'The "development" and "tests" environments may not have the same port.'
 				)
 			);
 		} );
 
-		it( 'should skip port validation for disabled tests environment', () => {
-			expect( () => {
+		it( 'should skip port validation for disabled tests environment', async () => {
+			await expect(
 				postProcessConfig( {
 					testsEnvironment: false,
 					port: 123,
@@ -305,14 +329,28 @@ describe( 'postProcessConfig', () => {
 						development: {},
 						tests: {},
 					},
-				} );
-			} ).not.toThrow();
+				} )
+			).resolves.toBeDefined();
+		} );
+
+		it( 'should not fail when both environments have null ports', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			expect( processed.env.development.port ).toEqual( null );
+			expect( processed.env.tests.port ).toEqual( null );
 		} );
 	} );
 
 	describe( 'testsEnvironment', () => {
-		it( 'should ignore env overrides entirely when testsEnvironment is false', () => {
-			const processed = postProcessConfig( {
+		it( 'should ignore env overrides entirely when testsEnvironment is false', async () => {
+			const processed = await postProcessConfig( {
 				testsEnvironment: false,
 				port: 123,
 				testsPort: 456,

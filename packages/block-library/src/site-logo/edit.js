@@ -35,6 +35,7 @@ import {
 	store as blockEditorStore,
 	__experimentalImageEditor as ImageEditor,
 	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -46,9 +47,13 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
+import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const { mediaEditKey, openMediaEditorModalKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const SiteLogo = ( {
 	alt,
@@ -75,7 +80,13 @@ const SiteLogo = ( {
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const { imageEditing, maxWidth, title } = useSelect( ( select ) => {
+	const {
+		imageEditing,
+		maxWidth,
+		title,
+		editMediaEntity,
+		openMediaEditorModal,
+	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		const siteEntities = select( coreStore ).getEntityRecord(
 			'root',
@@ -85,6 +96,8 @@ const SiteLogo = ( {
 			title: siteEntities?.name,
 			imageEditing: settings.imageEditing,
 			maxWidth: settings.maxWidth,
+			editMediaEntity: settings?.[ mediaEditKey ],
+			openMediaEditorModal: settings?.[ openMediaEditorModalKey ],
 		};
 	}, [] );
 
@@ -102,6 +115,12 @@ const SiteLogo = ( {
 			setIsEditingImage( false );
 		}
 	}, [ isSelected ] );
+
+	const handleMediaUpdate = ( { id: newId } ) => {
+		if ( typeof newId === 'number' && newId !== logoId ) {
+			setLogo( newId );
+		}
+	};
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -200,7 +219,11 @@ const SiteLogo = ( {
 	/* eslint-enable no-lonely-if */
 
 	const canEditImage =
-		logoId && naturalWidth && naturalHeight && imageEditing;
+		logoId &&
+		naturalWidth &&
+		naturalHeight &&
+		imageEditing &&
+		!! editMediaEntity;
 
 	// Hide crop and dimensions editing in write mode
 	const shouldShowCropAndDimensions = ! isContentOnlyMode;
@@ -271,11 +294,11 @@ const SiteLogo = ( {
 		),
 		{
 			a: (
-				// eslint-disable-next-line jsx-a11y/anchor-has-content
+				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
 				<a
 					href={ siteIconSettingsUrl }
 					target="_blank"
-					rel="noopener noreferrer"
+					rel="noopener"
 				/>
 			),
 		}
@@ -377,7 +400,15 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								openMediaEditorModal && logoId
+									? () =>
+											openMediaEditorModal( {
+												id: logoId,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>
@@ -620,7 +651,6 @@ export default function LogoEdit( {
 					>
 						<MediaControlPreview
 							url={ mediaItemData?.source_url }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -642,7 +672,6 @@ export default function LogoEdit( {
 						<MediaControl
 							mediaId={ siteLogoId }
 							mediaUrl={ logoUrl }
-							alt={ mediaItemData?.alt_text }
 							filename={
 								mediaItemData?.media_details?.sizes?.full
 									?.file || mediaItemData?.slug
@@ -652,7 +681,7 @@ export default function LogoEdit( {
 							onError={ onUploadError }
 							onReset={ onRemoveLogo }
 							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Choose logo' ) }
+							emptyLabel={ __( 'Logo' ) }
 						/>
 					</ToolsPanelItem>
 				) }

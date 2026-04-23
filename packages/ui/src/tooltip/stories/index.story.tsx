@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Tooltip } from '../..';
+import { formatBold, formatItalic } from '@wordpress/icons';
+import { Icon } from '../../icon';
+import * as Tooltip from '../';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
@@ -8,6 +10,7 @@ const meta: Meta< typeof Tooltip.Root > = {
 		Provider: Tooltip.Provider,
 		Trigger: Tooltip.Trigger,
 		Popup: Tooltip.Popup,
+		Portal: Tooltip.Portal,
 	},
 };
 export default meta;
@@ -16,8 +19,8 @@ export const Default: StoryObj< typeof Tooltip.Root > = {
 	args: {
 		children: (
 			<>
-				<Tooltip.Trigger>Hover me</Tooltip.Trigger>
-				<Tooltip.Popup>Tooltip text</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup>Save</Tooltip.Popup>
 			</>
 		),
 	},
@@ -51,26 +54,62 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 			} }
 		>
 			<Tooltip.Root>
-				<Tooltip.Trigger>Top</Tooltip.Trigger>
-				<Tooltip.Popup side="top">Tooltip on top</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Up">⬆️</Tooltip.Trigger>
+				<Tooltip.Popup side="top">Up</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Right</Tooltip.Trigger>
-				<Tooltip.Popup side="right">Tooltip on right</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Forward">➡️</Tooltip.Trigger>
+				<Tooltip.Popup side="right">Forward</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Bottom</Tooltip.Trigger>
-				<Tooltip.Popup side="bottom">Tooltip on bottom</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Down">⬇️</Tooltip.Trigger>
+				<Tooltip.Popup side="bottom">Down</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger>Left</Tooltip.Trigger>
-				<Tooltip.Popup side="left">Tooltip on left</Tooltip.Popup>
+				<Tooltip.Trigger aria-label="Back">⬅️</Tooltip.Trigger>
+				<Tooltip.Popup side="left">Back</Tooltip.Popup>
 			</Tooltip.Root>
 		</div>
 	),
+};
+
+/**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a tooltip renders below another popover when you
+ * want it above.
+ *
+ * The `--wp-ui-tooltip-z-index` CSS variable is an escape hatch for that
+ * case. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   tooltip in the page), or
+ * - **Per instance**, by passing a `Tooltip.Portal` with a `style` (or
+ *   `className`) to `Tooltip.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to the popup rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
+	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup
+					portal={
+						<Tooltip.Portal
+							style={ { '--wp-ui-tooltip-z-index': '9999' } }
+						/>
+					}
+				>
+					Save
+				</Tooltip.Popup>
+			</>
+		),
+	},
 };
 
 /**
@@ -83,13 +122,17 @@ export const WithProvider: StoryObj< typeof Tooltip.Root > = {
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
 				<Tooltip.Root>
-					<Tooltip.Trigger>First</Tooltip.Trigger>
-					<Tooltip.Popup>First tooltip</Tooltip.Popup>
+					<Tooltip.Trigger aria-label="Bold">
+						<Icon icon={ formatBold } />
+					</Tooltip.Trigger>
+					<Tooltip.Popup>Bold</Tooltip.Popup>
 				</Tooltip.Root>
 
 				<Tooltip.Root>
-					<Tooltip.Trigger>Second</Tooltip.Trigger>
-					<Tooltip.Popup>Second tooltip</Tooltip.Popup>
+					<Tooltip.Trigger aria-label="Italic">
+						<Icon icon={ formatItalic } />
+					</Tooltip.Trigger>
+					<Tooltip.Popup>Italic</Tooltip.Popup>
 				</Tooltip.Root>
 			</div>
 		</Tooltip.Provider>

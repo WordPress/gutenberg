@@ -4,13 +4,12 @@ inputs:
     node-version:
         description: 'Optional. The Node.js version to use. When not specified, the version specified in .nvmrc will be used.'
         required: false
-        type: string
 
 runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+          uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
           with:
               node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
@@ -25,7 +24,7 @@ runs:
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@cdf6c1fa76f9f475f3d7449005a359c84ca0f306 # v5.0.3
+          uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
           with:
               path: '**/node_modules'
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}

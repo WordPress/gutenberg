@@ -240,10 +240,9 @@ test.describe( 'Cover', () => {
 			.click();
 
 		// Ensure there the default value for the minimum height of cover is undefined.
-		const defaultHeightValue = await coverBlockEditorSettings
-			.getByLabel( 'Minimum height' )
-			.inputValue();
-		expect( defaultHeightValue ).toBeFalsy();
+		await expect(
+			coverBlockEditorSettings.getByLabel( 'Minimum height' )
+		).toHaveValue( '' );
 
 		// There is no accessible locator for the draggable block resize edge,
 		// which is he bottom edge of the Cover block.
@@ -374,7 +373,7 @@ test.describe( 'Cover', () => {
 				trial: true,
 				timeout: 1000, // This test will always take 1 second to run.
 			} );
-		} catch ( error ) {
+		} catch {
 			isClickable = false;
 		}
 
@@ -394,6 +393,11 @@ test.describe( 'Cover', () => {
 		await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
+
+		// Wait for the image upload to complete and the image to appear.
+		await expect(
+			coverBlock.locator( 'img.wp-block-cover__image-background' )
+		).toBeVisible();
 
 		await editor.selectBlocks( coverBlock );
 
@@ -562,23 +566,9 @@ class CoverBlockUtils {
 		/** @type {Page} */
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 
-		this.GREEN_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_green.png'
-		);
+		this.GREEN_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_green.png';
 	}
 
 	async upload( locator, imagePath ) {

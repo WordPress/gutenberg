@@ -1,7 +1,9 @@
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
-import styles from './style.module.css';
+import { useRegisterPanel } from './context';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
+import focusStyles from '../utils/css/focus.module.css';
 import type { TabPanelProps } from './types';
 
 /**
@@ -12,10 +14,16 @@ import type { TabPanelProps } from './types';
  */
 export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 	function TabPanel( { className, ...otherProps }, forwardedRef ) {
+		useRegisterPanel();
+
 		return (
 			<_Tabs.Panel
 				ref={ forwardedRef }
-				className={ clsx( styles.tabpanel, className ) }
+				className={ clsx(
+					defenseStyles.div,
+					focusStyles[ 'outset-ring--focus-visible' ],
+					className
+				) }
 				{ ...otherProps }
 			/>
 		);

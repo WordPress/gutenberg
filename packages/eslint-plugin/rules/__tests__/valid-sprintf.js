@@ -9,7 +9,7 @@ import { RuleTester } from 'eslint';
 import rule from '../valid-sprintf';
 
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );

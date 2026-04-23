@@ -345,6 +345,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"minWidth": {
+							"description": "Allow blocks to define a minimum width value.",
+							"type": "boolean",
+							"default": false
+						},
 						"width": {
 							"description": "Allow blocks to define a width value.",
 							"type": "boolean",
@@ -374,6 +379,11 @@
 						},
 						"backgroundSize": {
 							"description": "Allow blocks to define values related to the size of a background image, including size, position, and repeat controls",
+							"type": "boolean",
+							"default": false
+						},
+						"gradient": {
+							"description": "Allow blocks to define gradient values.",
 							"type": "boolean",
 							"default": false
 						}
@@ -756,6 +766,7 @@
 								"aspectRatio": { "type": "string" },
 								"height": { "type": "string" },
 								"minHeight": { "type": "string" },
+								"minWidth": { "type": "string" },
 								"width": { "type": "string" }
 							}
 						}
