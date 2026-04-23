@@ -790,7 +790,7 @@ export const saveEntityRecord =
 						updatedRecord,
 						undefined,
 						true,
-						edits
+						record
 					);
 					if ( entityConfig.syncConfig ) {
 						// Use an untracked origin so that the save
