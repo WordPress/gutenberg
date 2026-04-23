@@ -23,12 +23,6 @@ jest.mock( '../utils', () => ( {
 
 describe( 'private actions', () => {
 	describe( 'getTranscodeImageOperation', () => {
-		const mockSettings = {
-			jpegInterlaced: false,
-			pngInterlaced: false,
-			gifInterlaced: false,
-		};
-
 		beforeEach( () => {
 			jest.clearAllMocks();
 		} );
@@ -41,7 +35,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -62,7 +56,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/unknown',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -78,7 +72,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -96,7 +90,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -123,7 +117,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
@@ -138,7 +132,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/webp',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -161,7 +155,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/jpeg',
-				{ ...mockSettings, jpegInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -182,7 +176,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/png',
-				{ ...mockSettings, pngInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -203,7 +197,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/gif',
-				{ ...mockSettings, gifInterlaced: true }
+				true
 			);
 
 			expect( result ).toEqual( [
@@ -224,7 +218,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/avif',
-				mockSettings
+				false
 			);
 
 			expect( result ).toEqual( [
@@ -245,7 +239,7 @@ describe( 'private actions', () => {
 			const result = await getTranscodeImageOperation(
 				file,
 				'image/',
-				mockSettings
+				false
 			);
 
 			expect( result ).toBeNull();
