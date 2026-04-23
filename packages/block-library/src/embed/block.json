@@ -38,6 +38,10 @@
 			"type": "boolean",
 			"default": true,
 			"role": "content"
+		},
+		"lazyLoad": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

@@ -27,6 +27,14 @@ function getResponsiveHelp( checked ) {
 		  );
 }
 
+function getLazyLoadHelp( checked ) {
+	return checked
+		? __(
+				'The iframe will be loaded only when it is visible in the viewport.'
+		  )
+		: __( 'The iframe will be loaded immediately when the page loads.' );
+}
+
 const EmbedControls = ( {
 	blockSupportsResponsive,
 	showEditButton,
@@ -34,6 +42,8 @@ const EmbedControls = ( {
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
+	lazyLoad,
+	toggleLazyLoad,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -51,21 +61,27 @@ const EmbedControls = ( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ themeSupportsResponsive && blockSupportsResponsive && (
-				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Media settings' ) }
-						resetAll={ () => {
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Media settings' ) }
+					resetAll={ () => {
+						if (
+							themeSupportsResponsive &&
+							blockSupportsResponsive
+						) {
 							toggleResponsive( true );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
+						}
+						toggleLazyLoad( false );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					{ themeSupportsResponsive && blockSupportsResponsive && (
 						<ToolsPanelItem
-							label={ __( 'Media settings' ) }
+							label={ __( 'Resize for smaller devices' ) }
 							isShownByDefault
 							hasValue={ () => ! allowResponsive }
 							onDeselect={ () => {
-								toggleResponsive( ! allowResponsive );
+								toggleResponsive( true );
 							} }
 						>
 							<ToggleControl
@@ -75,9 +91,22 @@ const EmbedControls = ( {
 								onChange={ toggleResponsive }
 							/>
 						</ToolsPanelItem>
-					</ToolsPanel>
-				</InspectorControls>
-			) }
+					) }
+					<ToolsPanelItem
+						label={ __( 'Lazy-load' ) }
+						isShownByDefault
+						hasValue={ () => lazyLoad }
+						onDeselect={ () => toggleLazyLoad( false ) }
+					>
+						<ToggleControl
+							label={ __( 'Lazy-load' ) }
+							checked={ !! lazyLoad }
+							help={ getLazyLoadHelp }
+							onChange={ toggleLazyLoad }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
 		</>
 	);
 };
