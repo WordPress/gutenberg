@@ -143,27 +143,29 @@ const EmbedEdit = ( props ) => {
 			return;
 		}
 
+		let newURL = attributesUrl;
+
 		// Until X provider is supported in WordPress, as a workaround we use Twitter provider.
 		if ( getAuthority( attributesUrl ) === 'x.com' ) {
-			const newURL = new URL( attributesUrl );
-			newURL.host = 'twitter.com';
-			const newURLString = newURL.toString();
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				url: newURLString,
-				...findMoreSuitableBlock( newURLString )?.attributes,
-			} );
+			const rewritten = new URL( attributesUrl );
+			rewritten.host = 'twitter.com';
+			newURL = rewritten.toString();
+		} else {
+			// Otherwise, try removing any trailing slash.
+			newURL = attributesUrl.replace( /\/$/, '' );
+		}
+
+		if ( newURL === attributesUrl ) {
 			return;
 		}
 
-		// Otherwise, try removing any trailing slash.
-		const newURL = attributesUrl.replace( /\/$/, '' );
-		if ( newURL !== attributesUrl ) {
-			setURL( newURL );
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { url: newURL } );
-			setIsEditingURL( false );
-		}
+		setURL( newURL );
+		setIsEditingURL( false );
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			url: newURL,
+			...findMoreSuitableBlock( newURL )?.attributes,
+		} );
 	}, [
 		attributesUrl,
 		cannotEmbed,
