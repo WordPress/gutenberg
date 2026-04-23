@@ -223,7 +223,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 
 // Content types (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
-	require __DIR__ . '/experimental/content-types/load.php';
 	require __DIR__ . '/experimental/content-types/index.php';
 }
 

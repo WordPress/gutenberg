@@ -7,12 +7,32 @@
  * the `register_taxonomy` calls that materialize
  * these records into the live registry come in a follow-up step.
  *
+ * Also bootstraps the Content Types pages (Taxonomies) in wp-admin under
+ * Settings.
+ *
  * @package gutenberg
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+/**
+ * Registers "Taxonomies" submenu items under Settings.
+ */
+function _gutenberg_content_types_add_settings_menu_items() {
+	if ( function_exists( 'gutenberg_taxonomies_wp_admin_render_page' ) ) {
+		add_submenu_page(
+			'options-general.php',
+			__( 'Taxonomies', 'gutenberg' ),
+			__( 'Taxonomies', 'gutenberg' ),
+			'manage_options',
+			'taxonomies-wp-admin',
+			'gutenberg_taxonomies_wp_admin_render_page'
+		);
+	}
+}
+add_action( 'admin_menu', '_gutenberg_content_types_add_settings_menu_items', 11 );
 
 /**
  * Registers the wp_user_taxonomy CPT.
@@ -140,7 +160,16 @@ function gutenberg_register_user_defined_taxonomies() {
 			continue;
 		}
 
-		register_taxonomy( $slug, $object_type, $args );
+		$registered = register_taxonomy( $slug, $object_type, $args );
+		if ( is_wp_error( $registered ) && WP_DEBUG ) {
+			error_log(
+				sprintf(
+					'Gutenberg: failed to register user taxonomy "%s": %s',
+					$slug,
+					$registered->get_error_message()
+				)
+			);
+		}
 	}
 }
 add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
@@ -176,13 +205,12 @@ function gutenberg_validate_user_taxonomy_slug( $prepared_post ) {
 	// Another wp_user_taxonomy post already owns this slug → reject.
 	$other_posts = get_posts(
 		array(
-			'post_type'        => 'wp_user_taxonomy',
-			'post_status'      => 'any',
-			'name'             => $slug,
-			'posts_per_page'   => 1,
-			'no_found_rows'    => true,
-			'suppress_filters' => true,
-			'post__not_in'     => $editing_id > 0 ? array( $editing_id ) : array(),
+			'post_type'      => 'wp_user_taxonomy',
+			'post_status'    => 'any',
+			'name'           => $slug,
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+			'post__not_in'   => $editing_id > 0 ? array( $editing_id ) : array(),
 		)
 	);
 	if ( ! empty( $other_posts ) ) {
