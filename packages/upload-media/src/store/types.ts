@@ -200,14 +200,6 @@ export interface Settings {
 	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
-	// Map of source MIME types to output MIME types for transcoding.
-	imageOutputFormats?: Record< string, string >;
-	// Whether to use progressive/interlaced encoding for JPEG.
-	jpegInterlaced?: boolean;
-	// Whether to use interlaced encoding for PNG.
-	pngInterlaced?: boolean;
-	// Whether to use interlaced encoding for GIF.
-	gifInterlaced?: boolean;
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
@@ -245,6 +237,10 @@ export interface Attachment {
 	 * 8 = Rotated 90° CCW
 	 */
 	exif_orientation?: number;
+	/** Output MIME type for format conversion, or null/undefined if no conversion needed. */
+	image_output_format?: string | null;
+	/** Whether to use progressive/interlaced encoding. */
+	image_save_progressive?: boolean;
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;

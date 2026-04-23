@@ -1,3 +1,8 @@
+// Handle touch target size — used both for the handle ::before hit area and
+// for the inner canvas inset (half the touch target on each side so the full
+// reach extends to the crop edge).
+$handle-touch-target-size: 44px;
+
 .wp-media-editor-image-editor {
 	position: relative;
 	overflow: hidden;
@@ -6,6 +11,17 @@
 	touch-action: none;
 	user-select: none;
 	cursor: grab;
+
+	// Inner gutter for resize handles. Handles use negative offsets and a
+	// touch target that extends past the crop edge; the root clips overflow
+	// (required for the dimming overlay's box-shadow trick), so a flush
+	// handle would be clipped. The inner `__canvas` wrapper is inset by half
+	// the touch target, reserving reach room on all sides while keeping the
+	// root as the clipping boundary.
+	&__canvas {
+		position: absolute;
+		inset: calc($handle-touch-target-size / 2);
+	}
 
 	&--dragging {
 		cursor: grabbing;
@@ -86,14 +102,14 @@
 		box-sizing: border-box;
 		pointer-events: auto;
 
-		// Extend touch target to 44px minimum for accessibility.
+		// Extend touch target to the minimum accessible hit area.
 		&::before {
 			content: "";
 			position: absolute;
 			top: 50%;
 			left: 50%;
-			width: 44px;
-			height: 44px;
+			width: $handle-touch-target-size;
+			height: $handle-touch-target-size;
 			transform: translate(-50%, -50%);
 		}
 

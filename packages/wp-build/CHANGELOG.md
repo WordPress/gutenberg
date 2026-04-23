@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update the optional `@wordpress/boot`, `@wordpress/route`, and `@wordpress/theme` peer dependency ranges to avoid blocking newer compatible package versions ([#77568](https://github.com/WordPress/gutenberg/pull/77568)).
+
 ## 0.12.0 (2026-04-15)
 
 ## 0.11.0 (2026-04-01)

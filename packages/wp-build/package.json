@@ -55,10 +55,10 @@
 		"@types/node": "^20.17.10"
 	},
 	"peerDependencies": {
-		"@wordpress/boot": "^0.3.0",
+		"@wordpress/boot": ">=0.3.0 <1.0.0",
 		"@wordpress/private-apis": "^1.0.0",
-		"@wordpress/route": "^0.2.0",
-		"@wordpress/theme": "^0.3.0"
+		"@wordpress/route": ">=0.2.0 <1.0.0",
+		"@wordpress/theme": ">=0.8.0 <1.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/boot": {

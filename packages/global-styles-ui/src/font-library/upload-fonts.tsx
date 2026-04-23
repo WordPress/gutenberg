@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
@@ -253,11 +253,11 @@ function UploadFonts() {
 						) }
 					/>
 				) }
-				<Text className="font-library__upload-area__text">
+				<WCText className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }
-				</Text>
+				</WCText>
 			</VStack>
 		</div>
 	);
