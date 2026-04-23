@@ -576,11 +576,6 @@ function poll(): void {
 		// cancels a beforeunload dialog.
 		isUnloadPending = false;
 
-		// Emit 'connecting' status.
-		roomStates.forEach( ( state ) => {
-			state.onStatusChange( { status: 'connecting' } );
-		} );
-
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
 		// withhold our own updates until we detect another collaborator using the
@@ -596,13 +591,19 @@ function poll(): void {
 			} ) ),
 		};
 
+		// Emit 'connecting' status only for rooms in this request. Rooms
+		// rotated out of this poll keep their prior status.
+		roomsInRequest.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
+
 		try {
 			const { rooms } = await postSyncUpdate( payload );
 
 			// Emit 'connected' status.
 			consecutiveFailures = 0;
 			isManualRetry = false;
-			roomStates.forEach( ( state ) => {
+			roomsInRequest.forEach( ( state ) => {
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
@@ -768,7 +769,7 @@ function poll(): void {
 					const backgroundRetriesFailed =
 						consecutiveFailures > retrySchedule.length;
 
-					roomStates.forEach( ( state ) => {
+					roomsInRequest.forEach( ( state ) => {
 						state.onStatusChange( {
 							status: 'disconnected',
 							canManuallyRetry: true,
