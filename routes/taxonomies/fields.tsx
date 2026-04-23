@@ -7,7 +7,7 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Notice, Stack } from '@wordpress/ui';
+import { Badge, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -94,6 +94,14 @@ export const statusField: Field< TaxonomyFormData > = {
 		{ value: 'publish', label: __( 'Active' ) },
 		{ value: 'draft', label: __( 'Inactive' ) },
 	],
+	render: ( { item } ) => {
+		const isActive = item.status === 'publish';
+		return (
+			<Badge intent={ isActive ? 'stable' : 'draft' }>
+				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
+			</Badge>
+		);
+	},
 	enableSorting: false,
 };
 
