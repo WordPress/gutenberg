@@ -27,7 +27,7 @@ const meta: Meta< typeof UnitControl > = {
 		prefix: { control: { type: 'text' } },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onChange: fn(),
 		onUnitChange: fn(),

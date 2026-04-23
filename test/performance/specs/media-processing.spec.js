@@ -1,52 +1,181 @@
 /**
  * External dependencies
  */
-const path = require( 'path' );
-const fs = require( 'fs/promises' );
-const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
-
-/**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
-const { PerfUtils } = require( '../fixtures' );
+import { readFileSync } from 'fs';
+import path from 'path';
+import { createRequire } from 'module';
+import { test, expect } from '@playwright/test';
 
 const results = {
-	jpegUploadProcessing: [],
-	pngUploadProcessing: [],
-	largeJpegUploadProcessing: [],
-	multipleImageUploadProcessing: [],
+	mediaProcessingJpeg: [],
+	mediaProcessingAvif: [],
+	mediaProcessingJpegToAvif: [],
 };
 
-const E2E_ASSETS_PATH = path.join( __dirname, '..', '..', 'e2e', 'assets' );
+// WordPress default image sub-sizes (since WP 5.3).
+const IMAGE_SUB_SIZES = [
+	{ width: 150, height: 150, crop: true }, // thumbnail
+	{ width: 300, height: 300 }, // medium
+	{ width: 768, height: 0 }, // medium_large
+	{ width: 1024, height: 1024 }, // large
+	{ width: 1536, height: 1536 }, // 1536x1536
+	{ width: 2048, height: 2048 }, // 2048x2048
+];
+
+const ASSETS_PATH =
+	process.env.ASSETS_PATH || path.join( __dirname, '..', 'assets' );
+
+let vips;
 
 /**
- * Creates a temporary copy of a test image with a unique filename.
- *
- * @param {string} sourceFile Filename in the e2e assets directory.
- * @param {string} ext        File extension (e.g. '.jpeg', '.png').
- * @return {Promise<{tmpFileName: string, tmpDirectory: string}>} Temp file info.
+ * Initializes the wasm-vips instance with HEIF support for AVIF processing.
  */
-async function createTempImage( sourceFile, ext ) {
-	const tmpDirectory = await fs.mkdtemp(
-		path.join( os.tmpdir(), 'gutenberg-perf-media-' )
+async function getVips() {
+	if ( vips ) {
+		return vips;
+	}
+	// Resolve wasm-vips from the @wordpress/vips package where it's installed.
+	const require = createRequire(
+		path.join( __dirname, '..', '..', '..', 'packages', 'vips', 'index.js' )
 	);
-	const tmpFileName = path.join( tmpDirectory, uuid() + ext );
-	await fs.copyFile( path.join( E2E_ASSETS_PATH, sourceFile ), tmpFileName );
-	return { tmpFileName, tmpDirectory };
+	const Vips = require( 'wasm-vips' );
+	vips = await Vips( {
+		dynamicLibraries: [ 'vips-heif.wasm' ],
+		preRun: ( module ) => {
+			module.setAutoDeleteLater( true );
+			module.setDelayFunction( ( fn ) => {
+				cleanup = fn;
+			} );
+		},
+	} );
+	return vips;
+}
+
+let cleanup;
+
+/**
+ * Runs cleanup for vips memory management.
+ */
+function runCleanup() {
+	if ( cleanup ) {
+		cleanup();
+	}
+}
+
+/**
+ * Same-format resize: decode, resize each sub-size, encode back to same format.
+ *
+ * @param {Buffer}   buffer   Image file buffer.
+ * @param {string}   mimeType MIME type of the image.
+ * @param {Object[]} sizes    Array of sub-size specs.
+ * @return {Promise<number>} Elapsed time in milliseconds.
+ */
+async function measureProcessing( buffer, mimeType, sizes ) {
+	const v = await getVips();
+	const ext = mimeType.split( '/' )[ 1 ];
+
+	const saveOptions = { keep: 'icc' };
+	if ( mimeType === 'image/jpeg' || mimeType === 'image/avif' ) {
+		saveOptions.Q = 82;
+	}
+	if ( mimeType === 'image/avif' ) {
+		saveOptions.effort = 2;
+	}
+
+	const start = performance.now();
+	for ( const resize of sizes ) {
+		const thumbnailOptions = { size: 'down' };
+		const height = resize.height || 0;
+		if ( height ) {
+			thumbnailOptions.height = height;
+		}
+		if ( resize.crop === true ) {
+			thumbnailOptions.crop = 'centre';
+		}
+
+		const image = v.Image.thumbnailBuffer(
+			buffer,
+			resize.width,
+			thumbnailOptions
+		);
+		image.writeToBuffer( `.${ ext }`, saveOptions );
+		runCleanup();
+	}
+	return performance.now() - start;
+}
+
+/**
+ * Cross-format processing: resize each sub-size in source format,
+ * then convert each to target format.
+ *
+ * @param {Buffer}   buffer  Image file buffer.
+ * @param {string}   srcType Source MIME type.
+ * @param {string}   dstType Target MIME type.
+ * @param {Object[]} sizes   Array of sub-size specs.
+ * @return {Promise<Object>} Elapsed time and output metadata.
+ */
+async function measureCrossFormatProcessing( buffer, srcType, dstType, sizes ) {
+	const v = await getVips();
+	const srcExt = srcType.split( '/' )[ 1 ];
+	const dstExt = dstType.split( '/' )[ 1 ];
+	const outputs = [];
+
+	const srcSaveOptions = { keep: 'icc', Q: 82 };
+	const dstSaveOptions = { keep: 'icc', Q: 82 };
+	if ( dstType === 'image/avif' ) {
+		dstSaveOptions.effort = 2;
+	}
+
+	const start = performance.now();
+	for ( const resize of sizes ) {
+		const thumbnailOptions = { size: 'down' };
+		const height = resize.height || 0;
+		if ( height ) {
+			thumbnailOptions.height = height;
+		}
+		if ( resize.crop === true ) {
+			thumbnailOptions.crop = 'centre';
+		}
+
+		// Resize in source format.
+		const resized = v.Image.thumbnailBuffer(
+			buffer,
+			resize.width,
+			thumbnailOptions
+		);
+		const resizedBuffer = resized.writeToBuffer(
+			`.${ srcExt }`,
+			srcSaveOptions
+		);
+
+		// Convert to target format.
+		const loaded = v.Image.newFromBuffer( resizedBuffer );
+		const converted = loaded.writeToBuffer(
+			`.${ dstExt }`,
+			dstSaveOptions
+		);
+
+		const header = Array.from( converted.slice( 0, 12 ) );
+		outputs.push( {
+			width: resized.width,
+			height: resized.height,
+			byteLength: converted.byteLength,
+			header,
+		} );
+
+		runCleanup();
+	}
+	return { elapsed: performance.now() - start, outputs };
 }
 
 test.describe( 'Media Processing Performance', () => {
-	test.use( {
-		perfUtils: async ( { page }, use ) => {
-			await use( new PerfUtils( { page } ) );
-		},
-	} );
+	// Read test images once at module level.
+	const jpegBuffer = readFileSync(
+		path.join( ASSETS_PATH, 'test-image-3000x2000.jpeg' )
+	);
+	const avifBuffer = readFileSync(
+		path.join( ASSETS_PATH, 'test-image-3000x2000.avif' )
+	);
 
 	test.afterAll( async ( {}, testInfo ) => {
 		await testInfo.attach( 'results', {
@@ -55,206 +184,58 @@ test.describe( 'Media Processing Performance', () => {
 		} );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
+	test( 'Warm up', async () => {
+		// Initialize vips and warm up the WASM module.
+		await measureProcessing( jpegBuffer, 'image/jpeg', [
+			{ width: 150, height: 150, crop: true },
+		] );
 	} );
 
-	test.describe( 'Single Image Upload', () => {
-		const samples = 10;
-		const throwaway = 1;
-		const iterations = samples + throwaway;
+	const samples = 7;
+	const throwaway = 1;
+	const iterations = samples + throwaway;
 
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `JPEG upload (${ i } of ${ iterations })`, async ( {
-				admin,
-				editor,
-			} ) => {
-				await admin.createNewPost();
+	for ( let i = 1; i <= iterations; i++ ) {
+		test( `Run the test (${ i } of ${ iterations })`, async () => {
+			// JPEG (same-format resize).
+			const jpegElapsed = await measureProcessing(
+				jpegBuffer,
+				'image/jpeg',
+				IMAGE_SUB_SIZES
+			);
 
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'1024x768_e2e_test_image_size.jpeg',
-					'.jpeg'
-				);
+			// AVIF (same-format resize).
+			const avifElapsed = await measureProcessing(
+				avifBuffer,
+				'image/avif',
+				IMAGE_SUB_SIZES
+			);
 
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
+			// JPEG -> AVIF: resize as JPEG, then transcode each sub-size to AVIF.
+			const jpegToAvif = await measureCrossFormatProcessing(
+				jpegBuffer,
+				'image/jpeg',
+				'image/avif',
+				IMAGE_SUB_SIZES
+			);
 
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
+			// Validate that cross-format outputs are actually AVIF.
+			// AVIF files are ISOBMFF containers: bytes 4-7 = "ftyp".
+			for ( const output of jpegToAvif.outputs ) {
+				expect( output.header[ 4 ] ).toBe( 0x66 ); // 'f'
+				expect( output.header[ 5 ] ).toBe( 0x74 ); // 't'
+				expect( output.header[ 6 ] ).toBe( 0x79 ); // 'y'
+				expect( output.header[ 7 ] ).toBe( 0x70 ); // 'p'
+				expect( output.byteLength ).toBeGreaterThan( 0 );
+				expect( output.width ).toBeGreaterThan( 0 );
+				expect( output.height ).toBeGreaterThan( 0 );
+			}
 
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.jpegUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
-			} );
-		}
-
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `PNG upload (${ i } of ${ iterations })`, async ( {
-				admin,
-				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'10x10_e2e_test_image_z9T8jK.png',
-					'.png'
-				);
-
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
-
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.pngUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
-			} );
-		}
-
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `Large JPEG upload (${ i } of ${ iterations })`, async ( {
-				admin,
-				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg',
-					'.jpeg'
-				);
-
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
-
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.largeJpegUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
-			} );
-		}
-	} );
-
-	test.describe( 'Multiple Image Upload', () => {
-		const samples = 5;
-		const throwaway = 1;
-		const iterations = samples + throwaway;
-
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `Batch upload 5 images (${ i } of ${ iterations })`, async ( {
-				admin,
-				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				// Insert a gallery block for batch upload.
-				await editor.insertBlock( { name: 'core/gallery' } );
-
-				const galleryBlock = editor.canvas.locator(
-					'role=document[name="Block: Gallery"i]'
-				);
-				await expect( galleryBlock ).toBeVisible();
-
-				// Create 5 temp copies of the test image.
-				const tmpDirectory = await fs.mkdtemp(
-					path.join( os.tmpdir(), 'gutenberg-perf-media-batch-' )
-				);
-				const tmpFiles = [];
-				for ( let j = 0; j < 5; j++ ) {
-					const tmpFileName = path.join(
-						tmpDirectory,
-						uuid() + '.jpeg'
-					);
-					await fs.copyFile(
-						path.join(
-							E2E_ASSETS_PATH,
-							'1024x768_e2e_test_image_size.jpeg'
-						),
-						tmpFileName
-					);
-					tmpFiles.push( tmpFileName );
-				}
-
-				const startTime = performance.now();
-				await galleryBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFiles );
-
-				// Wait for all 5 images to finish uploading.
-				await expect(
-					editor.canvas.locator( '.wp-block-image img[src^="http"]' )
-				).toHaveCount( 5, { timeout: 120_000 } );
-
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.multipleImageUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
-			} );
-		}
-	} );
+			if ( i > throwaway ) {
+				results.mediaProcessingJpeg.push( jpegElapsed );
+				results.mediaProcessingAvif.push( avifElapsed );
+				results.mediaProcessingJpegToAvif.push( jpegToAvif.elapsed );
+			}
+		} );
+	}
 } );

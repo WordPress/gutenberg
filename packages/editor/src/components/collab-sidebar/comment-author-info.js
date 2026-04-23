@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Tooltip, __experimentalVStack as VStack } from '@wordpress/components';
+import { Tooltip } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
@@ -89,7 +90,7 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 					),
 				} }
 			/>
-			<VStack spacing="0">
+			<Stack direction="column">
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }
 				</span>
@@ -103,7 +104,7 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 						</time>
 					</Tooltip>
 				) }
-			</VStack>
+			</Stack>
 		</>
 	);
 }
