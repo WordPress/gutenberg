@@ -151,7 +151,7 @@ $transition-duration: 0.2s;
 	opacity: 0;
 	margin: 0;
 	padding: 0;
-	z-index: z-index(".components-form-toggle__input");
+	z-index: 1;
 
 	// This overrides a border style that is inherited from parent checkbox styles.
 	border: none;
