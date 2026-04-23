@@ -3700,9 +3700,16 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= static::process_responsive_selectors( $node, $selector, $settings );
 		}
 
-		// 9. When processing a block element node, emit responsive breakpoint overrides for
-		// that element immediately after its default styles. This ensures media queries always
-		// follow the default rules they are meant to override.
+		// 9. When processing a block element node, emit responsive breakpoint overrides
+		// immediately after that node's default styles so media queries always follow the
+		// non-media rules they override.
+		//
+		// Each element has two node passes in the style_nodes list:
+		//   (a) base node  (selector = "a")       → emits base responsive styles only
+		//   (b) pseudo node (selector = "a:hover") → emits that pseudo's responsive styles only
+		//
+		// Splitting the work this way preserves cascade order:
+		//   a {}  →  @media{ a{} }  →  a:hover {}  →  @media{ a:hover{} }
 		$path       = $block_metadata['path'];
 		$path_count = count( $path );
 
@@ -3722,32 +3729,36 @@ class WP_Theme_JSON_Gutenberg {
 					continue;
 				}
 
-				$breakpoint_media     = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
-				$element_declarations = static::compute_style_properties( $responsive_element_node, $settings, null, $this->theme_json );
+				$breakpoint_media = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
 
-				if ( ! empty( $element_declarations ) ) {
-					$element_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $element_declarations );
-					$block_rules    .= $breakpoint_media . '{' . $element_ruleset . '}';
-				}
+				if ( $pseudo_selector ) {
+					// Pseudo-selector node: only emit styles for this specific pseudo-state.
+					if ( ! isset( $responsive_element_node[ $pseudo_selector ] ) ) {
+						continue;
+					}
 
-				if ( isset( $responsive_element_node['css'] ) ) {
-					$element_custom_css = static::process_blocks_custom_css( $responsive_element_node['css'], $selector );
-					$block_rules       .= $breakpoint_media . '{' . $element_custom_css . '}';
-				}
-
-				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
-					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_sel ) {
-						if ( ! isset( $responsive_element_node[ $pseudo_sel ] ) ) {
-							continue;
-						}
-
-						$pseudo_declarations = static::compute_style_properties( $responsive_element_node[ $pseudo_sel ], $settings, null, $this->theme_json );
-						if ( empty( $pseudo_declarations ) ) {
-							continue;
-						}
-
-						$pseudo_ruleset = static::to_ruleset( ':root :where(' . static::append_to_selector( $selector, $pseudo_sel ) . ')', $pseudo_declarations );
+					$pseudo_declarations = static::compute_style_properties( $responsive_element_node[ $pseudo_selector ], $settings, null, $this->theme_json );
+					if ( ! empty( $pseudo_declarations ) ) {
+						$pseudo_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $pseudo_declarations );
 						$block_rules   .= $breakpoint_media . '{' . $pseudo_ruleset . '}';
+					}
+
+					if ( isset( $responsive_element_node[ $pseudo_selector ]['css'] ) ) {
+						$pseudo_css   = static::process_blocks_custom_css( $responsive_element_node[ $pseudo_selector ]['css'], $selector );
+						$block_rules .= $breakpoint_media . '{' . $pseudo_css . '}';
+					}
+				} else {
+					// Base element node: only emit base responsive styles.
+					// Pseudo-selector responsive styles are handled by their own node pass above.
+					$element_declarations = static::compute_style_properties( $responsive_element_node, $settings, null, $this->theme_json );
+					if ( ! empty( $element_declarations ) ) {
+						$element_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $element_declarations );
+						$block_rules    .= $breakpoint_media . '{' . $element_ruleset . '}';
+					}
+
+					if ( isset( $responsive_element_node['css'] ) ) {
+						$element_custom_css = static::process_blocks_custom_css( $responsive_element_node['css'], $selector );
+						$block_rules       .= $breakpoint_media . '{' . $element_custom_css . '}';
 					}
 				}
 			}
