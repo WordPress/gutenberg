@@ -360,7 +360,8 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								onChange={ onInputChange }
 								aria-describedby={
 									help
-										? `components-form-token-input-${ instanceId }__help`
+										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
+										  `components-form-token-input-${ instanceId }__help`
 										: undefined
 								}
 							/>

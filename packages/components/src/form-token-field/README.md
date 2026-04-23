@@ -51,6 +51,7 @@ The `value` property is handled in a manner similar to controlled form component
 -   `maxLength` - If passed, `TokenField` will disable ability to add new tokens once number of tokens is greater than or equal to `maxLength`.
 -   `disabled` - When true, tokens are not able to be added or removed.
 -   `placeholder` - If passed, the `TokenField` input will show a placeholder string if no value tokens are present.
+-   `help` - Additional description for the control. Only use for meaningful description or instructions for the control. An element containing the description will be programmatically associated to the `FormTokenField` via `aria-describedby`.
 -   `messages` - Allows customizing the messages presented by screen readers in different occasions:
     -   `added` - The user added a new token.
     -   `removed` - The user removed an existing token.
