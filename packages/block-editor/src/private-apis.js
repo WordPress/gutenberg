@@ -75,6 +75,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import Pagination from './components/pagination';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -143,4 +144,5 @@ lock( privateApis, {
 	useListViewPanelState,
 	isHashLink,
 	isRelativePath,
+	Pagination,
 } );

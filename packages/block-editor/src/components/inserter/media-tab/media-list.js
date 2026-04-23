@@ -14,6 +14,7 @@ function MediaList( {
 	category,
 	onClick,
 	label = __( 'Media List' ),
+	children,
 } ) {
 	return (
 		<Composite
@@ -29,6 +30,7 @@ function MediaList( {
 					onClick={ onClick }
 				/>
 			) ) }
+			{ children }
 		</Composite>
 	);
 }
