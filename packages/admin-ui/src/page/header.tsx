@@ -45,7 +45,7 @@ export default function Header( {
 					) }
 					{ visual && (
 						<div
-							className="admin-ui-page__header-visual"
+							className={ styles[ 'header-visual' ] }
 							aria-hidden="true"
 						>
 							{ visual }

@@ -35,7 +35,7 @@
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	flex-shrink: 0;
-	// TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm.
+	/* TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm. */
 	width: 24px;
 	height: 24px;
 
