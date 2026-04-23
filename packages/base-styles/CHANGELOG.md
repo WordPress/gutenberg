@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `.components-resizable-box__handle`, `.components-resizable-box__side-handle`, and `.components-resizable-box__corner-handle` from the `z-index()` helper ([#77620](https://github.com/WordPress/gutenberg/pull/77620)).
+
 ## 6.20.0 (2026-04-15)
 
 ## 6.19.0 (2026-04-01)
