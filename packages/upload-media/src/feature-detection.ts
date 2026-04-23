@@ -1,3 +1,13 @@
+interface NavigatorNetworkInformation {
+	saveData: boolean;
+	effectiveType: 'slow-2g' | '2g' | '3g' | '4g';
+}
+
+interface NavigatorExtended extends Navigator {
+	deviceMemory?: number;
+	connection?: NavigatorNetworkInformation;
+}
+
 /**
  * Result of client-side media processing support detection.
  */
@@ -30,8 +40,11 @@ let cachedResult: FeatureDetectionResult | null = null;
  *    by default. Developers can re-enable the feature via the server-side
  *    `client_side_media_processing_enabled` filter if it works for their site.
  * 5. Device memory (disables on devices with ≤2 GB RAM)
- * 6. Network conditions (disables when data saver is on or connection is 2g/slow-2g)
- * 7. Web Worker support (baseline requirement)
+ * 6. Hardware concurrency (disables on devices with fewer than 2 CPU cores)
+ * 7. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
+ * 8. Web Worker support (baseline requirement)
+ *
+ * Item 4 is a planned addition not yet implemented in the checks below.
  *
  * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
  *
@@ -47,7 +60,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	if ( typeof WebAssembly === 'undefined' ) {
 		cachedResult = {
 			supported: false,
-			reason: 'WebAssembly is not supported in this browser',
+			reason: 'WebAssembly is not supported in this browser.',
 		};
 		return cachedResult;
 	}
@@ -61,10 +74,69 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 		return cachedResult;
 	}
 
+	// Check Web Worker support.
+	if ( typeof Worker === 'undefined' ) {
+		cachedResult = {
+			supported: false,
+			reason: 'Web Workers are not supported in this browser.',
+		};
+		return cachedResult;
+	}
+
+	// Check device memory.
+	if (
+		typeof navigator !== 'undefined' &&
+		'deviceMemory' in navigator &&
+		( navigator as NavigatorExtended ).deviceMemory! <= 2
+	) {
+		cachedResult = {
+			supported: false,
+			reason: 'Device has insufficient memory for client-side media processing.',
+		};
+		return cachedResult;
+	}
+
+	// Check hardware concurrency (number of CPU cores).
+	if (
+		typeof navigator !== 'undefined' &&
+		'hardwareConcurrency' in navigator &&
+		navigator.hardwareConcurrency < 2
+	) {
+		cachedResult = {
+			supported: false,
+			reason: 'Device has insufficient CPU cores for client-side media processing.',
+		};
+		return cachedResult;
+	}
+
+	// Check network conditions.
+	if ( typeof navigator !== 'undefined' ) {
+		const connection = ( navigator as NavigatorExtended ).connection;
+		if ( connection ) {
+			if ( connection.saveData ) {
+				cachedResult = {
+					supported: false,
+					reason: 'Data saver mode is enabled.',
+				};
+				return cachedResult;
+			}
+			if (
+				connection.effectiveType === 'slow-2g' ||
+				connection.effectiveType === '2g'
+			) {
+				cachedResult = {
+					supported: false,
+					reason: 'Network connection is too slow for client-side media processing.',
+				};
+				return cachedResult;
+			}
+		}
+	}
+
 	// Check that blob URL workers are allowed by CSP.
 	// Security plugins often set a strict worker-src directive that blocks blob: URLs,
 	// which would prevent creating the WASM processing worker at runtime.
-	if ( typeof window !== 'undefined' && typeof Worker !== 'undefined' ) {
+	if ( typeof window !== 'undefined' ) {
 		try {
 			const testBlob = new Blob( [ '' ], {
 				type: 'application/javascript',
@@ -98,6 +170,23 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
  */
 export function isClientSideMediaSupported(): boolean {
 	return detectClientSideMediaSupport().supported;
+}
+
+/**
+ * Detects whether the browser can decode HEIC images via canvas APIs.
+ *
+ * This checks for createImageBitmap and OffscreenCanvas support,
+ * which are sufficient to convert HEIC to JPEG without VIPS/WASM.
+ * Safari supports both APIs and can natively decode HEIC via
+ * createImageBitmap(), leveraging macOS platform codecs.
+ *
+ * @return Whether HEIC canvas-based processing is supported.
+ */
+export function isHeicCanvasSupported(): boolean {
+	return (
+		typeof createImageBitmap !== 'undefined' &&
+		typeof OffscreenCanvas !== 'undefined'
+	);
 }
 
 /**

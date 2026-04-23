@@ -50,6 +50,11 @@ export const LOCAL_EDITOR_ORIGIN = 'gutenberg';
 export const LOCAL_SYNC_MANAGER_ORIGIN = 'syncManager';
 
 /**
- * WordPress meta key used to persist the CRDT document for an entity.
+ * Origin string for CRDT document changes that should be synced but not
+ * recorded in the undo history (e.g. status changes during publish).
+ *
+ * This origin is intentionally NOT included in the UndoManager's
+ * `trackedOrigins`, so changes made with this origin will be applied to
+ * the CRDT document (and synced to peers) without creating undo levels.
  */
-export const WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE = '_crdt_document';
+export const LOCAL_UNDO_IGNORED_ORIGIN = 'gutenberg-undo-ignored';

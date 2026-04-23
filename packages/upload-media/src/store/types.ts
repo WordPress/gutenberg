@@ -1,3 +1,23 @@
+/**
+ * Sub-size data returned by the sideload endpoint.
+ *
+ * Each sideload returns this lightweight object instead of a full attachment.
+ * The client accumulates these and sends them all to the finalize endpoint.
+ */
+export interface SubSizeData {
+	/**
+	 * Size name, or an array of names when the same sideloaded file is
+	 * registered under multiple sizes that share identical dimensions.
+	 */
+	image_size: string | string[];
+	width?: number;
+	height?: number;
+	file: string;
+	mime_type?: string;
+	filesize?: number;
+	original_image?: string;
+}
+
 export type QueueItemId = string;
 
 export type QueueStatus = 'active' | 'paused';
@@ -8,6 +28,10 @@ export interface QueueItem {
 	id: QueueItemId;
 	sourceFile: File;
 	file: File;
+	// Original HEIC/HEIF file, kept separately so it can be sideloaded
+	// as the attachment's "original_image" after the converted JPEG is
+	// uploaded. Not set for non-HEIC items.
+	originalHeicFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -26,6 +50,7 @@ export interface QueueItem {
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	parentId?: QueueItemId;
+	subSizes?: SubSizeData[];
 }
 
 export interface State {
@@ -52,6 +77,7 @@ export enum Type {
 	CacheBlobUrl = 'CACHE_BLOB_URL',
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
+	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -104,6 +130,10 @@ export type UpdateProgressAction = Action<
 	Type.UpdateProgress,
 	{ id: QueueItemId; progress: number }
 >;
+export type AccumulateSubSizeAction = Action<
+	Type.AccumulateSubSize,
+	{ id: QueueItemId; subSize: SubSizeData }
+>;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
 	{ settings: Partial< Settings > }
@@ -145,8 +175,8 @@ export interface SideloadMediaArgs {
 	additionalData?: AdditionalData;
 	/** Function called when an error happens. */
 	onError?: OnErrorHandler;
-	/** Function called when the file or a temporary representation is available. */
-	onFileChange?: OnChangeHandler;
+	/** Function called when the sideload completes with sub-size data. */
+	onSuccess?: ( subSize: SubSizeData ) => void;
 	/** Abort signal to cancel the sideload operation. */
 	signal?: AbortSignal;
 }
@@ -170,14 +200,11 @@ export interface Settings {
 	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
-	// Map of source MIME types to output MIME types for transcoding.
-	imageOutputFormats?: Record< string, string >;
-	// Whether to use progressive/interlaced encoding for JPEG.
-	jpegInterlaced?: boolean;
-	// Whether to use interlaced encoding for PNG.
-	pngInterlaced?: boolean;
-	// Whether to use interlaced encoding for GIF.
-	gifInterlaced?: boolean;
+	// Default image quality (0-1) for resize/crop operations.
+	// Default is 0.82 if not set.
+	imageQuality?: number;
+	// Function for finalizing an upload after all client-side processing is complete.
+	mediaFinalize?: ( id: number, subSizes: SubSizeData[] ) => Promise< void >;
 }
 
 // Matches the Attachment type from the media-utils package.
@@ -193,7 +220,6 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
-	media_filename?: string;
 	poster?: string;
 	/**
 	 * EXIF orientation value from the original image.
@@ -211,6 +237,10 @@ export interface Attachment {
 	 * 8 = Rotated 90° CCW
 	 */
 	exif_orientation?: number;
+	/** Output MIME type for format conversion, or null/undefined if no conversion needed. */
+	image_output_format?: string | null;
+	/** Whether to use progressive/interlaced encoding. */
+	image_save_progressive?: boolean;
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -233,6 +263,7 @@ export enum OperationType {
 	Rotate = 'ROTATE',
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
+	Finalize = 'FINALIZE',
 }
 
 /**
@@ -298,8 +329,8 @@ export type AdditionalData = Record< string, unknown >;
 export interface SideloadAdditionalData extends AdditionalData {
 	/** The attachment ID to add the image size to. */
 	post: number;
-	/** The name of the image size being generated (e.g., 'thumbnail', 'medium'). */
-	image_size: string;
+	/** The name(s) of the image size being generated (e.g., 'thumbnail', 'medium'). When multiple size names share the same dimensions, an array can be passed to register one file under all names. */
+	image_size: string | string[];
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';

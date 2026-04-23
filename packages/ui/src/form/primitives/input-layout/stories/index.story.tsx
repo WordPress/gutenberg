@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { InputLayout } from '../../../..';
+import { copy } from '@wordpress/icons';
+import { InputLayout } from '../';
+import { IconButton } from '../../../../icon-button';
 
 const meta: Meta< typeof InputLayout > = {
 	title: 'Design System/Components/Form/Primitives/InputLayout',
@@ -47,6 +49,26 @@ export const WithPrefix: Story = {
 export const WithPaddedPrefix: Story = {
 	args: {
 		prefix: <InputLayout.Slot>https://</InputLayout.Slot>,
+	},
+};
+
+/**
+ * The `padding="minimal"` setting on `InputLayout.Slot` will work best when
+ * the slot content is a button or icon.
+ */
+export const WithSuffixControl: Story = {
+	args: {
+		children: <div style={ { flex: 1 } } />,
+		suffix: (
+			<InputLayout.Slot padding="minimal">
+				<IconButton
+					size="small"
+					variant="minimal"
+					icon={ copy }
+					label="Copy"
+				/>
+			</InputLayout.Slot>
+		),
 	},
 };
 

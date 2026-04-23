@@ -220,9 +220,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
--   _text_ `string|Function`: The text to copy.
--   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
+-   _text_ `string | ( () => string )`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -234,12 +234,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
--   _onSuccess_ `Function`: Called when to text is copied.
+-   _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `() => void`: Called when to text is copied.
 
 _Returns_
 
--   `React.Ref<TElementType>`: A ref to assign to the target element.
+-   `RefCallback< T >`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -338,7 +338,7 @@ _Returns_
 
 ### useFocusOnMount
 
-Hook used to focus the first tabbable element on mount.
+Determines focus behavior when the element mounts.
 
 _Usage_
 
@@ -358,11 +358,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement' | 'firstInputElement'`: Focus on mount mode.
+-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
--   `React.RefCallback<HTMLElement>`: Ref callback.
+-   Ref callback.
 
 ### useFocusReturn
 
@@ -431,6 +431,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
+-   _view_ `[Window]`: Window instance, else default to global window
 
 _Returns_
 
@@ -592,6 +593,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
+-   _view_ `[Window]`: Window instance in which to perform viewport matching.
 
 _Returns_
 

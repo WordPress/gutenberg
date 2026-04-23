@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "15.13.0",
+	"version": "15.17.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -33,6 +33,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -40,6 +41,7 @@
 	},
 	"react-native": "src/index",
 	"wpScript": true,
+	"types": "build-types",
 	"sideEffects": [
 		"src/index.js",
 		"src/store/index.js",

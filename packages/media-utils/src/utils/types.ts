@@ -208,9 +208,27 @@ export type AdditionalData = BetterOmit< CreateRestAttachment, 'meta' >;
 export interface CreateSideloadFile {
 	image_size?: string;
 	upload_request?: string;
+	generate_sub_sizes?: boolean;
+	convert_format?: boolean;
 }
 
 export interface SideloadAdditionalData {
 	post: RestAttachment[ 'id' ];
 	image_size?: string;
+}
+
+/**
+ * Sub-size data returned by the sideload endpoint.
+ *
+ * Each sideload returns this lightweight object instead of a full attachment.
+ * The client accumulates these and sends them all to the finalize endpoint.
+ */
+export interface SubSizeData {
+	image_size: string;
+	width?: number;
+	height?: number;
+	file: string;
+	mime_type?: string;
+	filesize?: number;
+	original_image?: string;
 }

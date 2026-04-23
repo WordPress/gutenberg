@@ -24,7 +24,6 @@ let clipboardDataHolder: {
  * Sets the clipboard data that can be pasted with
  * `pressKeys( 'primary+v' )`.
  *
- * @param this
  * @param clipboardData
  * @param clipboardData.plainText
  * @param clipboardData.html

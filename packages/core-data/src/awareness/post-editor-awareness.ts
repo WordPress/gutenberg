@@ -16,12 +16,14 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
+import { htmlIndexToRichTextOffset } from '../utils/crdt-utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
 } from '../utils/crdt-user-selections';
 
+import { SelectionDirection } from '../types';
 import type { SelectionState, WPBlockSelection } from '../types';
 import type { YBlocks } from '../utils/crdt-blocks';
 import type {
@@ -69,6 +71,18 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		let selectionEnd = getSelectionEnd();
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
+		// During rapid selection changes (e.g. undo restoring content and
+		// selection), the debounce discards intermediate events. If we use the
+		// last intermediate state instead of the overall change it can produce
+		// the wrong direction.
+		// Use selectionBeforeDebounce to capture the selection state from
+		// before the debounce window so that direction is computed across the
+		// full window when it fires.
+		let selectionBeforeDebounce: {
+			start: WPBlockSelection;
+			end: WPBlockSelection;
+		} | null = null;
+
 		subscribe( () => {
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
@@ -78,6 +92,15 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				newSelectionEnd === selectionEnd
 			) {
 				return;
+			}
+
+			// On the first change of a debounce window, snapshot the state
+			// we're moving away from.
+			if ( ! selectionBeforeDebounce ) {
+				selectionBeforeDebounce = {
+					start: selectionStart,
+					end: selectionEnd,
+				};
 			}
 
 			selectionStart = newSelectionStart;
@@ -103,10 +126,29 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			}
 
 			localCursorTimeout = setTimeout( () => {
+				// Compute direction across the full debounce window.
+				const selectionStateOptions: {
+					selectionDirection?: SelectionDirection;
+				} = {};
+
+				if ( selectionBeforeDebounce ) {
+					selectionStateOptions.selectionDirection =
+						detectSelectionDirection(
+							selectionBeforeDebounce.start,
+							selectionBeforeDebounce.end,
+							selectionStart,
+							selectionEnd
+						);
+
+					// Reset debounced selection state.
+					selectionBeforeDebounce = null;
+				}
+
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
-					this.doc
+					this.doc,
+					selectionStateOptions
 				);
 
 				this.setThrottledLocalStateField(
@@ -171,6 +213,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			return state1 === state2;
 		}
 
+		if ( ! state1.selection || ! state2.selection ) {
+			return state1.selection === state2.selection;
+		}
+
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
 	}
 
@@ -188,14 +234,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
-	 * @return The text index and block client ID, or nulls if not resolvable.
+	 * @return The rich-text offset and block client ID, or nulls if not resolvable.
 	 */
 	public convertSelectionStateToAbsolute( selection: SelectionState ): {
-		textIndex: number | null;
+		richTextOffset: number | null;
 		localClientId: string | null;
 	} {
 		if ( selection.type === SelectionType.None ) {
-			return { textIndex: null, localClientId: null };
+			return { richTextOffset: null, localClientId: null };
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -218,7 +264,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				}
 			}
 
-			return { textIndex: null, localClientId };
+			return { richTextOffset: null, localClientId };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -233,7 +279,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { textIndex: null, localClientId: null };
+			return { richTextOffset: null, localClientId: null };
 		}
 
 		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
@@ -242,7 +288,13 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
 		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
-		return { textIndex: absolutePosition.index, localClientId };
+		return {
+			richTextOffset: htmlIndexToRichTextOffset(
+				absolutePosition.type.toString(),
+				absolutePosition.index
+			),
+			localClientId,
+		};
 	}
 
 	/**
@@ -324,4 +376,51 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
+}
+
+/**
+ * Detect the direction of a selection change by comparing old and new edges.
+ *
+ * When the user extends a selection backward (e.g. Shift+Left), the
+ * selectionStart edge moves while selectionEnd stays fixed, so the caret
+ * is at the start.  The reverse is true for forward extension.
+ *
+ * @param prevStart - The previous selectionStart.
+ * @param prevEnd   - The previous selectionEnd.
+ * @param newStart  - The new selectionStart.
+ * @param newEnd    - The new selectionEnd.
+ * @return The detected direction, defaulting to Forward when indeterminate.
+ */
+function detectSelectionDirection(
+	prevStart: WPBlockSelection,
+	prevEnd: WPBlockSelection,
+	newStart: WPBlockSelection,
+	newEnd: WPBlockSelection
+): SelectionDirection {
+	const startMoved = ! areBlockSelectionsEqual( prevStart, newStart );
+	const endMoved = ! areBlockSelectionsEqual( prevEnd, newEnd );
+
+	if ( startMoved && ! endMoved ) {
+		return SelectionDirection.Backward;
+	}
+
+	return SelectionDirection.Forward;
+}
+
+/**
+ * Compare two WPBlockSelection objects by value.
+ *
+ * @param a - First selection.
+ * @param b - Second selection.
+ * @return True if all fields are equal.
+ */
+function areBlockSelectionsEqual(
+	a: WPBlockSelection,
+	b: WPBlockSelection
+): boolean {
+	return (
+		a.clientId === b.clientId &&
+		a.attributeKey === b.attributeKey &&
+		a.offset === b.offset
+	);
 }

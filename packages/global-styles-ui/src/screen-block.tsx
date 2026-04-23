@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -33,6 +32,7 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
+import { getValidStates } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -109,13 +109,26 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useStyle(
+	// State selector state
+	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
+	const validStates = useMemo( () => getValidStates( name ), [ name ] );
+
+	const stateParam = selectedState !== 'default' ? selectedState : undefined;
+	const [ style, setStyle ] = useStyle(
+		prefix,
+		name,
+		'user',
+		false,
+		stateParam
+	);
+	const [ inheritedStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
-		false
+		false,
+		stateParam
 	);
+
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
 	const settingsForBlockElement = useSettingsForBlockElement(
@@ -310,10 +323,18 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		<>
 			<ScreenHeader
 				title={
-					variation ? currentBlockStyle?.label : blockType?.title
+					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
+				states={ validStates }
+				selectedState={ selectedState }
+				onChangeState={ setSelectedState }
 			/>
-			<BlockPreviewPanel name={ name } variation={ variation } />
+			<BlockPreviewPanel
+				name={ name }
+				variation={ variation }
+				selectedState={ selectedState }
+				stateStyles={ selectedState !== 'default' ? style : undefined }
+			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
 					<VStack spacing={ 3 }>
@@ -393,7 +414,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 							__(
 								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
 							),
-							blockType?.title
+							blockType?.title!
 						) }
 					/>
 				</PanelBody>

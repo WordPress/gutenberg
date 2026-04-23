@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { RangeControl, Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -20,11 +19,12 @@ import { unlock } from '../../lock-unlock';
  * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
-	const { revisions, isLoading, currentRevisionId } = useSelect(
+	const { revisions, isLoading, currentRevisionId, revisionKey } = useSelect(
 		( select ) => {
 			const { getCurrentPostId, getCurrentPostType } =
 				select( editorStore );
-			const { getRevisions, isResolving } = select( coreStore );
+			const { getRevisions, isResolving, getEntityConfig } =
+				select( coreStore );
 
 			const postId = getCurrentPostId();
 			const postType = getCurrentPostType();
@@ -33,7 +33,27 @@ function RevisionsSlider() {
 				return {};
 			}
 
-			const query = { per_page: -1, context: 'edit' };
+			const entityConfig = getEntityConfig( 'postType', postType );
+			const _revisionKey = entityConfig?.revisionKey || 'id';
+			const query = {
+				per_page: -1,
+				context: 'edit',
+				orderby: 'date',
+				order: 'asc',
+				_fields: [
+					...new Set( [
+						'id',
+						'date',
+						'modified',
+						'author',
+						'meta',
+						'title.raw',
+						'excerpt.raw',
+						'content.raw',
+						_revisionKey,
+					] ),
+				].join(),
+			};
 			return {
 				revisions: getRevisions( 'postType', postType, postId, query ),
 				isLoading: isResolving( 'getRevisions', [
@@ -45,6 +65,7 @@ function RevisionsSlider() {
 				currentRevisionId: unlock(
 					select( editorStore )
 				).getCurrentRevisionId(),
+				revisionKey: _revisionKey,
 			};
 		},
 		[]
@@ -52,30 +73,21 @@ function RevisionsSlider() {
 
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
-	const sortedRevisions = useMemo( () => {
-		return (
-			revisions
-				?.slice()
-				.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) ) ??
-			[]
-		);
-	}, [ revisions ] );
-
-	const selectedIndex = sortedRevisions.findIndex(
-		( r ) => r.id === currentRevisionId
+	const selectedIndex = revisions?.findIndex(
+		( r ) => r[ revisionKey ] === currentRevisionId
 	);
 
 	const handleSliderChange = ( index ) => {
-		const revision = sortedRevisions[ index ];
+		const revision = revisions?.[ index ];
 		if ( revision ) {
-			setCurrentRevisionId( revision.id );
+			setCurrentRevisionId( revision[ revisionKey ] );
 		}
 	};
 
 	// Format date for tooltip.
 	const dateSettings = getDateSettings();
 	const renderTooltipContent = ( index ) => {
-		const revision = sortedRevisions[ index ];
+		const revision = revisions?.[ index ];
 		if ( ! revision ) {
 			return index;
 		}
@@ -86,7 +98,7 @@ function RevisionsSlider() {
 		return <Spinner />;
 	}
 
-	if ( ! sortedRevisions.length ) {
+	if ( ! revisions?.length ) {
 		return (
 			<span className="editor-revisions-header__no-revisions">
 				{ __( 'No revisions found.' ) }
@@ -94,7 +106,7 @@ function RevisionsSlider() {
 		);
 	}
 
-	if ( sortedRevisions.length === 1 ) {
+	if ( revisions?.length === 1 ) {
 		return (
 			<span className="editor-revisions-header__no-revisions">
 				{ __( 'Only one revision found.' ) }
@@ -108,7 +120,7 @@ function RevisionsSlider() {
 			className="editor-revisions-header__slider"
 			hideLabelFromVision
 			label={ __( 'Revision' ) }
-			max={ sortedRevisions.length - 1 }
+			max={ revisions?.length - 1 }
 			min={ 0 }
 			marks
 			onChange={ handleSliderChange }

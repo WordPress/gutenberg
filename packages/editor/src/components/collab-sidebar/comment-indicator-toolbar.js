@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarButton,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -83,7 +80,7 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 				onClick={ () => onClick() }
 				showTooltip
 			>
-				<HStack spacing="1">
+				<Stack direction="row" align="center" gap="xs">
 					{ visibleParticipants.map( ( participant ) => (
 						<img
 							key={ participant.id }
@@ -98,9 +95,11 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 						/>
 					) ) }
 					{ overflowCount > 0 && (
-						<Text weight={ 500 }>{ overflowText }</Text>
+						<span className="editor-collab-sidebar-panel__participant-overflow">
+							{ overflowText }
+						</span>
 					) }
-				</HStack>
+				</Stack>
 			</ToolbarButton>
 		</CommentIconToolbarSlotFill.Fill>
 	);

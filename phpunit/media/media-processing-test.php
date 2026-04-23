@@ -136,10 +136,10 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$data    = $index->get_data();
 
 		$this->assertArrayHasKey( 'image_size_threshold', $data );
-		$this->assertArrayHasKey( 'image_output_formats', $data );
-		$this->assertArrayHasKey( 'jpeg_interlaced', $data );
-		$this->assertArrayHasKey( 'png_interlaced', $data );
-		$this->assertArrayHasKey( 'gif_interlaced', $data );
+		$this->assertArrayNotHasKey( 'image_output_formats', $data );
+		$this->assertArrayNotHasKey( 'jpeg_interlaced', $data );
+		$this->assertArrayNotHasKey( 'png_interlaced', $data );
+		$this->assertArrayNotHasKey( 'gif_interlaced', $data );
 		$this->assertArrayHasKey( 'image_sizes', $data );
 	}
 
@@ -163,8 +163,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 HTML;
 
 		$expected = <<<HTML
-<img crossorigin="anonymous" src="https://www.someothersite.com/test1.jpg" />
-<img crossorigin="anonymous" src="test2.jpg" />
+<img src="https://www.someothersite.com/test1.jpg" />
+<img src="test2.jpg" />
 <audio crossorigin="anonymous"><source src="https://www.someothersite.com/test1.mp3"></audio>
 <audio crossorigin="anonymous" src="https://www.someothersite.com/test1.mp3"></audio>
 <audio src="/test2.mp3"></audio>
@@ -202,31 +202,23 @@ HTML;
 	}
 
 	/**
-	 * Tests that client-side media processing is disabled by default in the Gutenberg plugin.
-	 *
-	 * The core compat layer defaults to true, but the Gutenberg plugin
-	 * adds a filter to disable it by default (lib/compat/plugin/media.php)
-	 * until known issues are resolved.
+	 * Tests that client-side media processing is enabled by default in the Gutenberg plugin.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_disabled_by_default_in_plugin() {
-		// Remove the test bootstrap override to check the plugin's actual default.
-		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
-		$enabled = gutenberg_is_client_side_media_processing_enabled();
-		// Restore the test bootstrap override.
-		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
-
-		$this->assertFalse( $enabled );
+	public function test_client_side_media_processing_enabled_by_default_in_plugin() {
+		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
 	}
 
 	/**
-	 * Tests that client-side media processing can be enabled via filter.
+	 * Tests that client-side media processing can be disabled via filter.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_can_be_enabled() {
-		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
+	public function test_client_side_media_processing_can_be_disabled_via_filter() {
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+		$this->assertFalse( gutenberg_is_client_side_media_processing_enabled() );
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 	}
 
 	/**
@@ -235,14 +227,11 @@ HTML;
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_used_when_filter_disabled() {
-		// Remove the test bootstrap override so the disable filter takes effect.
-		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
-		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 
 		$this->assertSame(
 			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
@@ -256,7 +245,7 @@ HTML;
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_not_used_when_filter_enabled() {
-		// Feature is enabled via test bootstrap filter at priority 20.
+		// Feature is enabled by default (core compat layer).
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		$this->assertSame( array(), $result );
