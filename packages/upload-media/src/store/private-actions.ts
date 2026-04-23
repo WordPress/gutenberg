@@ -171,7 +171,6 @@ export function addItem( {
 					url: blobUrl,
 				},
 				additionalData: {
-					convert_format: false,
 					generate_sub_sizes: false,
 					...additionalData,
 				},
@@ -685,8 +684,10 @@ export function prepareItem( id: QueueItemId ) {
 				] );
 			}
 
-			// Format conversion is now determined per-file from the attachment
-			// response (image_output_format field) and handled in generateThumbnails().
+			// Main-file format conversion is handled server-side via the
+			// image_editor_output_format filter during create_item.
+			// The response carries image_output_format so generateThumbnails
+			// can transcode sub-sizes to the same target format.
 
 			operations.push(
 				OperationType.Upload,
@@ -1133,36 +1134,6 @@ export function generateThumbnails( id: QueueItemId ) {
 						'Failed to rotate image, continuing with thumbnails'
 					);
 				}
-			}
-		}
-
-		// If the server indicates format conversion is needed for the main image,
-		// convert and sideload it as the 'original' image size.
-		// This mirrors the EXIF rotation pattern above.
-		if (
-			attachment.image_output_format &&
-			attachment.id &&
-			! item.parentId
-		) {
-			const mainInterlaced = attachment.image_save_progressive ?? false;
-			const mainTranscodeOp = await getTranscodeImageOperation(
-				item.sourceFile,
-				attachment.image_output_format,
-				mainInterlaced
-			);
-
-			if ( mainTranscodeOp ) {
-				dispatch.addSideloadItem( {
-					file: item.sourceFile,
-					batchId: uuidv4(),
-					parentId: item.id,
-					additionalData: {
-						post: attachment.id,
-						image_size: 'original',
-						convert_format: false,
-					},
-					operations: [ mainTranscodeOp, OperationType.Upload ],
-				} );
 			}
 		}
 

@@ -1365,6 +1365,50 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 201, $response->get_status() );
 		$this->assertArrayHasKey( 'image_output_format', $data );
 		$this->assertSame( 'image/webp', $data['image_output_format'] );
+
+		// The main file on disk should be the converted WebP so
+		// wp_get_attachment_url() returns the WebP. This is what the
+		// client-side editor flow relies on when it lets the server
+		// handle main-file conversion (convert_format default = true).
+		$attached_file = get_attached_file( $data['id'], true );
+		$this->assertStringEndsWith( '.webp', (string) $attached_file );
+	}
+
+	/**
+	 * Verifies that the main file is NOT converted when the client explicitly
+	 * opts out with convert_format=false, and that image_output_format is still
+	 * recomputed accurately in the response so the client can transcode sub-sizes.
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_output_format_recomputed_when_convert_format_false() {
+		wp_set_current_user( self::$admin_id );
+
+		$filter = function ( $formats ) {
+			$formats['image/jpeg'] = 'image/webp';
+			return $formats;
+		};
+		add_filter( 'image_editor_output_format', $filter );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_param( 'convert_format', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'image_editor_output_format', $filter );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'image/webp', $data['image_output_format'] );
+
+		// With convert_format=false the server should leave the JPEG untouched.
+		$attached_file = get_attached_file( $data['id'], true );
+		$this->assertStringEndsWith( '.jpg', (string) $attached_file );
 	}
 
 	/**
