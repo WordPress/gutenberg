@@ -7,16 +7,32 @@ import {
 } from '@wordpress/components';
 import { useCallback, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
+
 /**
  * Internal dependencies
  */
 import BackgroundImageControl from '../background-image-control';
+import { ColorPanelDropdown } from './color-panel';
+import { useGradientsPerOrigin } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
+	gradient: true,
 };
+
+/**
+ * Checks site settings to see if the requested feature's control may be used.
+ *
+ * @param {Object} settings Site settings.
+ * @param {string} feature  Background feature to check.
+ * @return {boolean}        Whether site settings has activated background panel.
+ */
+export function useHasBackgroundControl( settings, feature ) {
+	return Platform.OS === 'web' && settings?.background?.[ feature ];
+}
 
 /**
  * Checks site settings to see if the background panel may be used.
@@ -27,7 +43,8 @@ const DEFAULT_CONTROLS = {
  * @return {boolean}        Whether site settings has activated background panel.
  */
 export function useHasBackgroundPanel( settings ) {
-	return Platform.OS === 'web' && settings?.background?.backgroundImage;
+	const { backgroundImage, gradient } = settings?.background || {};
+	return Platform.OS === 'web' && ( backgroundImage || gradient );
 }
 
 /**
@@ -61,6 +78,20 @@ export function hasBackgroundImageValue( style ) {
 	);
 }
 
+/**
+ * Checks if there is a current value in the background gradient block support
+ * attributes.
+ *
+ * @param {Object} style Style attribute.
+ * @return {boolean}     Whether the block has a background gradient value set.
+ */
+export function hasBackgroundGradientValue( style ) {
+	return (
+		'string' === typeof style?.background?.gradient &&
+		style?.background?.gradient !== ''
+	);
+}
+
 function BackgroundToolsPanel( {
 	resetAllFilter,
 	onChange,
@@ -80,9 +111,15 @@ function BackgroundToolsPanel( {
 			label={ headerLabel }
 			resetAll={ resetAll }
 			panelId={ panelId }
+			hasInnerWrapper
+			className="background-block-support-panel"
+			__experimentalFirstVisibleItemClass="first"
+			__experimentalLastVisibleItemClass="last"
 			dropdownMenuProps={ dropdownMenuProps }
 		>
-			{ children }
+			<div className="background-block-support-panel__inner-wrapper">
+				{ children }
+			</div>
 		</ToolsPanel>
 	);
 }
@@ -98,15 +135,97 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 } ) {
-	const showBackgroundImageControl = useHasBackgroundPanel( settings );
+	const gradients = useGradientsPerOrigin( settings );
+	const areCustomGradientsEnabled = settings?.color?.customGradient;
+	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+
+	const hasBackgroundGradientControl = useHasBackgroundControl(
+		settings,
+		'gradient'
+	);
+	const showBackgroundGradientControl =
+		hasGradientColors && hasBackgroundGradientControl;
+	const showBackgroundImageControl = useHasBackgroundControl(
+		settings,
+		'backgroundImage'
+	);
+
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				background: {},
+				color: hasBackgroundGradientControl
+					? {
+							...previousValue?.color,
+							gradient: undefined,
+					  }
+					: previousValue?.color,
+			};
+		},
+		[ hasBackgroundGradientControl ]
+	);
+
+	if ( ! showBackgroundGradientControl && ! showBackgroundImageControl ) {
+		return null;
+	}
+
+	const decodeValue = ( rawValue ) =>
+		getValueFromVariable( { settings }, '', rawValue );
+	const encodeGradientValue = ( gradientValue ) => {
+		const allGradients = gradients.flatMap(
+			( { gradients: originGradients } ) => originGradients
+		);
+		const gradientObject = allGradients.find(
+			( { gradient } ) => gradient === gradientValue
+		);
+		return gradientObject
+			? 'var:preset|gradient|' + gradientObject.slug
+			: gradientValue;
+	};
+
 	const resetBackground = () =>
-		onChange( setImmutably( value, [ 'background' ], {} ) );
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			background: {},
-		};
-	}, [] );
+		onChange(
+			setImmutably(
+				value,
+				[ 'background', 'backgroundImage' ],
+				undefined
+			)
+		);
+
+	const resetGradient = () => {
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			undefined
+		);
+		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		onChange( newValue );
+	};
+
+	// Get current gradient value, decoding preset slug references.
+	// Fall back to color.gradient for legacy blocks that haven't migrated
+	// to background.gradient yet (mirrors block inspector fallback in
+	// packages/block-editor/src/hooks/background.js).
+	const currentGradient = decodeValue(
+		value?.background?.gradient ?? value?.color?.gradient
+	);
+	const inheritedGradient = decodeValue(
+		inheritedValue?.background?.gradient ?? inheritedValue?.color?.gradient
+	);
+
+	// Set gradient value, encoding preset matches as slug references.
+	// Also clear color.gradient to migrate from the legacy location,
+	// matching the block inspector behavior in hooks/background.js.
+	const setGradient = ( newGradient ) => {
+		let newValue = setImmutably(
+			value,
+			[ 'background', 'gradient' ],
+			encodeGradientValue( newGradient )
+		);
+		newValue = setImmutably( newValue, [ 'color', 'gradient' ], undefined );
+		onChange( newValue );
+	};
 
 	return (
 		<Wrapper
@@ -118,7 +237,8 @@ export default function BackgroundImagePanel( {
 		>
 			{ showBackgroundImageControl && (
 				<ToolsPanelItem
-					hasValue={ () => !! value?.background }
+					className="block-editor-background-panel__item"
+					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
 					isShownByDefault={ defaultControls.backgroundImage }
@@ -133,6 +253,32 @@ export default function BackgroundImagePanel( {
 						defaultValues={ defaultValues }
 					/>
 				</ToolsPanelItem>
+			) }
+			{ showBackgroundGradientControl && (
+				<ColorPanelDropdown
+					className="block-editor-background-panel__item"
+					label={ __( 'Gradient' ) }
+					hasValue={ () => hasBackgroundGradientValue( value ) }
+					resetValue={ resetGradient }
+					isShownByDefault={ defaultControls.gradient }
+					indicators={ [ currentGradient ] }
+					tabs={ [
+						{
+							key: 'gradient',
+							label: __( 'Gradient' ),
+							inheritedValue:
+								currentGradient ?? inheritedGradient,
+							setValue: setGradient,
+							userValue: currentGradient,
+							isGradient: true,
+						},
+					] }
+					colorGradientControlSettings={ {
+						gradients,
+						disableCustomGradients: ! areCustomGradientsEnabled,
+					} }
+					panelId={ panelId }
+				/>
 			) }
 		</Wrapper>
 	);

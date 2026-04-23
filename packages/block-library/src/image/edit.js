@@ -142,8 +142,6 @@ export function ImageEdit( {
 			setAttributes( {
 				width: undefined,
 				height: undefined,
-				aspectRatio: undefined,
-				scale: undefined,
 			} );
 		}
 	}, [ __unstableMarkNextChangeAsNotPersistent, align, setAttributes ] );
@@ -159,12 +157,19 @@ export function ImageEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
+		setTemporaryURL();
 		setAttributes( {
 			src: undefined,
 			id: undefined,
 			url: undefined,
 			blob: undefined,
 		} );
+	}
+
+	function onFilesPreUpload( files ) {
+		if ( files.length === 1 ) {
+			setTemporaryURL( createBlobURL( files[ 0 ] ) );
+		}
 	}
 
 	function onSelectImagesList( images ) {
@@ -348,7 +353,11 @@ export function ImageEdit( {
 
 	const isSideloading = useSelect(
 		( select ) => {
-			if ( ! window.__clientSideMediaProcessing || ! id ) {
+			if (
+				( ! window.__clientSideMediaProcessing &&
+					! window.__heicUploadSupport ) ||
+				! id
+			) {
 				return false;
 			}
 			return select( uploadStore ).isUploadingById( id );
@@ -479,6 +488,7 @@ export function ImageEdit( {
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectImage }
 					onSelectURL={ onSelectURL }
+					onFilesPreUpload={ onFilesPreUpload }
 					onError={ onUploadError }
 					placeholder={ placeholder }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }

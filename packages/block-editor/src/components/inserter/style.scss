@@ -85,7 +85,7 @@ $block-inserter-tabs-height: 44px;
 .block-editor-inserter__toggle.components-button {
 	display: inline-flex;
 	align-items: center;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	border: none;
 	outline: none;
 	padding: 0;
@@ -482,7 +482,7 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__media-list__list-item {
 	position: relative;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 	margin-bottom: $grid-unit-30;
 
 	&.is-placeholder {

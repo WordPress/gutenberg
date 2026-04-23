@@ -329,7 +329,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separator = ! isShort && (
 		<>
 			<Tooltip text={ __( 'Drag to resize' ) }>
-				<button // eslint-disable-line jsx-a11y/role-supports-aria-props
+				<button
 					ref={ separatorRef }
 					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
 					aria-valuenow={ usedAriaValueNow }
@@ -348,7 +348,7 @@ function MetaBoxesMain( { isLegacy } ) {
 
 	return (
 		<NavigableRegion
-			aria-label={ paneLabel }
+			ariaLabel={ paneLabel }
 			ref={ setMainRefs }
 			className={ clsx(
 				'edit-post-meta-boxes-main',

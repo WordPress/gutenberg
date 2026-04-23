@@ -40,6 +40,30 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const COMPACTION_THRESHOLD = 50;
 
 		/**
+		 * Maximum total size (in bytes) of the request body.
+		 *
+		 * @since 7.0.0
+		 * @var int
+		 */
+		const MAX_BODY_SIZE = 16 * MB_IN_BYTES;
+
+		/**
+		 * Maximum number of rooms allowed per request.
+		 *
+		 * @since 7.0.0
+		 * @var int
+		 */
+		const MAX_ROOMS_PER_REQUEST = 50;
+
+		/**
+		 * Maximum length of a single update data string.
+		 *
+		 * @since 7.0.0
+		 * @var int
+		 */
+		const MAX_UPDATE_DATA_SIZE = MB_IN_BYTES;
+
+		/**
 		 * Sync update type: compaction.
 		 *
 		 * @since 7.0.0
@@ -98,8 +122,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			$typed_update_args = array(
 				'properties' => array(
 					'data' => array(
-						'type'     => 'string',
-						'required' => true,
+						'type'      => 'string',
+						'required'  => true,
+						'maxLength' => self::MAX_UPDATE_DATA_SIZE,
 					),
 					'type' => array(
 						'type'     => 'string',
@@ -124,7 +149,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 				'awareness' => array(
 					'required' => true,
-					'type'     => 'object',
+					'type'     => array( 'object', 'null' ),
 				),
 				'client_id' => array(
 					'minimum'  => 1,
@@ -151,12 +176,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'methods'             => array( WP_REST_Server::CREATABLE ),
 					'callback'            => array( $this, 'handle_request' ),
 					'permission_callback' => array( $this, 'check_permissions' ),
+					'validate_callback'   => array( $this, 'validate_request' ),
 					'args'                => array(
 						'rooms' => array(
 							'items'    => array(
 								'properties' => $room_args,
 								'type'       => 'object',
 							),
+							'maxItems' => self::MAX_ROOMS_PER_REQUEST,
 							'required' => true,
 							'type'     => 'array',
 						),
@@ -183,10 +210,25 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				);
 			}
 
-			$rooms = $request['rooms'];
+			$rooms      = $request['rooms'];
+			$wp_user_id = get_current_user_id();
 
 			foreach ( $rooms as $room ) {
-				$room         = $room['room'];
+				$client_id = $room['client_id'];
+				$room      = $room['room'];
+
+				// Check that the client_id is not already owned by another user.
+				$existing_awareness = $this->storage->get_awareness_state( $room );
+				foreach ( $existing_awareness as $entry ) {
+					if ( $client_id === $entry['client_id'] && $wp_user_id !== $entry['wp_user_id'] ) {
+						return new WP_Error(
+							'rest_cannot_edit',
+							__( 'Client ID is already in use by another user.', 'gutenberg' ),
+							array( 'status' => 403 )
+						);
+					}
+				}
+
 				$type_parts   = explode( '/', $room, 2 );
 				$object_parts = explode( ':', $type_parts[1] ?? '', 2 );
 
@@ -205,6 +247,30 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 						array( 'status' => rest_authorization_required_code() )
 					);
 				}
+			}
+
+			return true;
+		}
+
+		/**
+		 * Validates that the request body does not exceed the maximum allowed size.
+		 *
+		 * Runs as the route-level validate_callback, after per-arg schema
+		 * validation has already passed.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param WP_REST_Request $request The REST request.
+		 * @return true|WP_Error True if valid, WP_Error if the body is too large.
+		 */
+		public function validate_request( WP_REST_Request $request ) {
+			$body = $request->get_body();
+			if ( is_string( $body ) && strlen( $body ) > self::MAX_BODY_SIZE ) {
+				return new WP_Error(
+					'rest_sync_body_too_large',
+					__( 'Request body is too large.', 'gutenberg' ),
+					array( 'status' => 413 )
+				);
 			}
 
 			return true;
@@ -265,24 +331,47 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 *
 		 * @param string      $entity_kind The entity kind, e.g. 'postType', 'taxonomy', 'root'.
 		 * @param string      $entity_name The entity name, e.g. 'post', 'category', 'site'.
-		 * @param string|null $object_id   The object ID / entity key for single entities, null for collections.
+		 * @param string|null $object_id   The numeric object ID / entity key for single entities, null for collections.
 		 * @return bool True if user has permission, otherwise false.
 		 */
 		private function can_user_sync_entity_type( string $entity_kind, string $entity_name, ?string $object_id ): bool {
-			// Handle single post type entities with a defined object ID.
-			if ( 'postType' === $entity_kind && is_numeric( $object_id ) ) {
-				return current_user_can( 'edit_post', (int) $object_id );
+			if ( is_string( $object_id ) ) {
+				if ( ! ctype_digit( $object_id ) ) {
+					return false;
+				}
+				$object_id = (int) $object_id;
+			}
+			if ( null !== $object_id && $object_id <= 0 ) {
+				// Object ID must be numeric if provided.
+				return false;
 			}
 
-			// Handle single taxonomy term entities with a defined object ID.
-			if ( 'taxonomy' === $entity_kind && is_numeric( $object_id ) ) {
-				$taxonomy = get_taxonomy( $entity_name );
-				return isset( $taxonomy->cap->assign_terms ) && current_user_can( $taxonomy->cap->assign_terms );
-			}
+			// Validate permissions for the provided object ID.
+			if ( is_int( $object_id ) ) {
+				// Handle single post type entities with a defined object ID.
+				if ( 'postType' === $entity_kind ) {
+					if ( get_post_type( $object_id ) !== $entity_name ) {
+						// Post is not of the specified post type.
+						return false;
+					}
+					return current_user_can( 'edit_post', $object_id );
+				}
 
-			// Handle single comment entities with a defined object ID.
-			if ( 'root' === $entity_kind && 'comment' === $entity_name && is_numeric( $object_id ) ) {
-				return current_user_can( 'edit_comment', (int) $object_id );
+				// Handle single taxonomy term entities with a defined object ID.
+				if ( 'taxonomy' === $entity_kind ) {
+					$term_exists = term_exists( $object_id, $entity_name );
+					if ( ! is_array( $term_exists ) || ! isset( $term_exists['term_id'] ) ) {
+						// Either term doesn't exist OR term is not in specified taxonomy.
+						return false;
+					}
+
+					return current_user_can( 'edit_term', $object_id );
+				}
+
+				// Handle single comment entities with a defined object ID.
+				if ( 'root' === $entity_kind && 'comment' === $entity_name ) {
+					return current_user_can( 'edit_comment', $object_id );
+				}
 			}
 
 			// All the remaining checks are for collections. If an object ID is provided,
@@ -348,6 +437,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					'client_id'  => $client_id,
 					'state'      => $awareness_update,
 					'updated_at' => $current_time,
+					'wp_user_id' => get_current_user_id(),
 				);
 			}
 
@@ -409,7 +499,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 						return $this->add_update( $room, $client_id, $type, $data );
 					}
-					break;
+
+					// Reaching this point means there's a newer compaction, so we can
+					// silently ignore this one.
+					return true;
 
 				case self::UPDATE_TYPE_SYNC_STEP1:
 				case self::UPDATE_TYPE_SYNC_STEP2:

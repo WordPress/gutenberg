@@ -2,9 +2,40 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-04-15)
+
+### Breaking changes
+
+-   Renamed typography tokens from `--wpds-font-*` to `--wpds-typography-*`. Sub-groups that correspond to CSS `font-*` properties retain the `font-` prefix; `line-height` does not. To migrate:
+    -   `--wpds-font-family-*`: use `--wpds-typography-font-family-*` instead.
+    -   `--wpds-font-size-*`: use `--wpds-typography-font-size-*` instead.
+    -   `--wpds-font-weight-*`: use `--wpds-typography-font-weight-*` instead.
+    -   `--wpds-font-line-height-*`: use `--wpds-typography-line-height-*` instead.
+
+### Enhancements
+
+-   The design token fallback build plugins (PostCSS, esbuild, Vite) now throw an error when encountering an unknown `--wpds-*` token, instead of silently skipping it.
+
+## 0.10.0 (2026-04-01)
+
+### Enhancements
+
+-   Change the default value of `--wpds-cursor-control` from `default` to `pointer` ([#76762](https://github.com/WordPress/gutenberg/pull/76762)).
+
+## 0.9.0 (2026-03-18)
+
 ### New Features
 
+-   Add `cursor` prop to `ThemeProvider` for configuring the `--wpds-cursor-control` design token ([#76410](https://github.com/WordPress/gutenberg/pull/76410)).
+-   Added `no-token-fallback-values` stylelint rule that disallows manual fallback values for `--wpds-*` design tokens. Available as `@wordpress/theme/stylelint-plugins/no-token-fallback-values` ([#76415](https://github.com/WordPress/gutenberg/pull/76415)).
+
+## 0.8.0 (2026-03-04)
+
+### New Features
+
+-   Added PostCSS, esbuild, and Vite build plugins that inject fallback values for design system tokens (`--wpds-*`). Available as package exports: `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks`, `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks`, `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks` ([#75589](https://github.com/WordPress/gutenberg/pull/75589)).
 -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+-   Add `--wpds-dimension-surface-width-*` design tokens for component width constraints.
 
 ## 0.7.0 (2026-02-18)
 

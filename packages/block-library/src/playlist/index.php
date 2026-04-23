@@ -58,13 +58,16 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					);
 				}
 
+				// Data is passed to wp_interactivity_state() which JSON-encodes it,
+				// so we use wp_strip_all_tags() instead of esc_html() to prevent
+				// HTML injection without double-encoding. URLs still use esc_url().
 				$tracks_data[ $unique_id ] = array(
 					'url'       => esc_url( $url ),
-					'title'     => esc_html( $title ),
-					'artist'    => esc_html( $artist ),
-					'album'     => esc_html( $album ),
+					'title'     => wp_strip_all_tags( $title ),
+					'artist'    => wp_strip_all_tags( $artist ),
+					'album'     => wp_strip_all_tags( $album ),
 					'image'     => esc_url( $image ),
-					'ariaLabel' => esc_attr( $aria_label ),
+					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 
 				if ( $unique_id === $current_media_id ) {
@@ -96,41 +99,14 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 		)
 	);
 
-	// Create the HTML for the current track which shows above the tracklist.
-	$html = '<div class="wp-block-playlist__current-item">';
-
-	// The alt attribute is intentionally left empty, as the image is decorative.
-	if ( $attributes['showImages'] ?? false ) {
-		$html .=
-		'<img
-			class="wp-block-playlist__item-image"
-			alt=""
-			width="70px"
-			height="70px"
-			data-wp-bind--src="state.currentTrack.image"
-			data-wp-bind--hidden="!state.currentTrack.image"
-		/>';
-	}
-
-	$html .= '
-		<div>
-			<span class="wp-block-playlist__item-title" data-wp-text="state.currentTrack.title"></span>
-			<div class="wp-block-playlist__current-item-artist-album">
-				<span class="wp-block-playlist__item-artist" data-wp-text="state.currentTrack.artist"></span>
-				<span class="wp-block-playlist__item-album" data-wp-text="state.currentTrack.album"></span>
-			</div>
-		</div>
-	</div>
-		<audio
-			controls="controls"
-			data-wp-on--ended="actions.nextSong"
-			data-wp-on--play="actions.isPlaying"
-			data-wp-on--pause="actions.isPaused"
-			data-wp-bind--src="state.currentTrack.url"
-			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
-			data-wp-watch="callbacks.autoPlay"
-		></audio>
-	';
+	// Add waveform player container with translated button labels.
+	$label_play  = esc_attr__( 'Play' );
+	$label_pause = esc_attr__( 'Pause' );
+	$html        = '<div class="wp-block-playlist__waveform-player"
+		data-wp-watch="callbacks.initWaveformPlayer"
+		data-label-play="' . $label_play . '"
+		data-label-pause="' . $label_pause . '"
+	></div>';
 
 	// Add the HTML for the current track inside the figure.
 	$figure = null;
@@ -149,7 +125,6 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'playlistId' => $playlist_id,
 				'currentId'  => $current_unique_id,
 				'tracks'     => $playlist_tracks,
-				'isPlaying'  => false,
 			)
 		)
 	);

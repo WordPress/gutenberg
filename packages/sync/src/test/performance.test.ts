@@ -52,7 +52,7 @@ describe( 'performance utilities', () => {
 
 			expect( consoleSpy ).toHaveBeenCalledTimes( 1 );
 			expect( consoleSpy.mock.calls[ 0 ][ 0 ] ).toMatch(
-				/^myFunction took \d+\.\d{2} ms$/
+				/myFunction took \d+\.\d{2} ms$/
 			);
 		} );
 

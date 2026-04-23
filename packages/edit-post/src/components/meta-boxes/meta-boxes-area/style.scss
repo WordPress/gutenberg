@@ -87,24 +87,6 @@
 	.is-hidden {
 		display: none;
 	}
-
-
-	// Until checkboxes WordPress-wide are updated to match the new style,
-	// checkboxes used in metaboxes have to be slightly unstyled here.
-	// @todo remove this entire rule once checkboxes are the same everywhere.
-	// See: https://github.com/WordPress/gutenberg/issues/18053
-	.metabox-location-side .postbox input[type="checkbox"] {
-		border: $border-width solid $gray-700;
-
-		&:checked {
-			background: $white;
-			border-color: $gray-700;
-		}
-
-		&::before {
-			margin: -3px -4px;
-		}
-	}
 }
 
 .edit-post-meta-boxes-area__clear {

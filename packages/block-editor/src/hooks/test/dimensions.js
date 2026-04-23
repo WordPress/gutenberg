@@ -76,6 +76,22 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
+	it( 'should return minWidth style', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					minWidth: '200px',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				minWidth: '200px',
+			},
+		} );
+	} );
+
 	it( 'should return all dimension styles when multiple are provided', () => {
 		const attributes = {
 			style: {
@@ -90,6 +106,22 @@ describe( 'getDimensionsClassesAndStyles', () => {
 			style: {
 				aspectRatio: '4/3',
 				width: '100%',
+			},
+		} );
+	} );
+
+	it( 'should convert preset width value to CSS var', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					width: 'var:preset|dimension|custom-width',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				width: 'var(--wp--preset--dimension--custom-width)',
 			},
 		} );
 	} );
