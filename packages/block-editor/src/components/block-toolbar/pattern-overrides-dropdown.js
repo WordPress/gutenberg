@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	Popover,
-	ToolbarButton,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { Popover, ToolbarButton } from '@wordpress/components';
+import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
