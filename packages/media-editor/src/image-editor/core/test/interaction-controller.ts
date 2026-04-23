@@ -62,6 +62,7 @@ function createMockElement(): HTMLElement & {
 } {
 	const listeners: Record< string, EventListener[] > = {};
 	return {
+		focus: jest.fn(),
 		setPointerCapture: jest.fn(),
 		releasePointerCapture: jest.fn(),
 		addEventListener: jest.fn( ( type: string, fn: EventListener ) => {
@@ -329,6 +330,16 @@ describe( 'InteractionController', () => {
 			el._fire( 'pointerup', createPointerEvent() );
 
 			expect( onGestureEnd ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'focuses the element on pointerdown', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const el = createMockElement();
+
+			controller.handlePointerDown( createPointerEvent(), el );
+
+			expect( el.focus ).toHaveBeenCalled();
 		} );
 
 		it( 'reports isDragging via onStatusChange', () => {
