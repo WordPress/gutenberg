@@ -14,6 +14,7 @@ $transition-duration: 0.2s;
 
 .components-form-toggle {
 	position: relative;
+	isolation: isolate;
 	display: inline-block;
 	height: $toggle-height;
 
