@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -39,24 +39,23 @@ function NotesSidebarContent( {
 	styles,
 	comments,
 	commentSidebarRef,
-	reflowComments,
-	commentLastUpdated,
 	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } =
-		useBlockCommentsActions( reflowComments );
+	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
-		<VStack
+		<Stack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
 			role="tree"
-			spacing="3"
+			direction="column"
+			gap="md"
 			justify="flex-start"
 			ref={ ( node ) => {
 				// Sometimes previous sidebar unmounts after the new one mounts.
 				// This ensures we always have the latest reference.
 				if ( node ) {
+					// eslint-disable-next-line react-compiler/react-compiler
 					commentSidebarRef.current = node;
 				}
 			} }
@@ -70,11 +69,9 @@ function NotesSidebarContent( {
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
-				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
 			/>
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -113,21 +110,15 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const {
-		resultComments,
-		unresolvedSortedThreads,
-		reflowComments,
-		commentLastUpdated,
-	} = useBlockComments( postId );
+	const { notes, unresolvedNotes } = useBlockComments( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
 	// Fallback to "All notes" sidebar on smaller viewports.
-	const showAllNotesSidebar =
-		resultComments.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = notes.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
+			( unresolvedNotes.length > 0 || selectedNote !== undefined )
 	);
 
 	useShortcut(
@@ -145,14 +136,13 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// Find threads for the selected block.
+	// Find threads for the selected block. Blocks can carry multiple note IDs,
+	// so gather all matching threads and surface the most relevant one
+	// (first unresolved, else first) for UI interactions like avatars.
 	const currentThreads =
 		blockNoteIds.length > 0
-			? resultComments.filter( ( thread ) =>
-					blockNoteIds.includes( thread.id )
-			  )
+			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
 			: [];
-	// Use first unresolved thread, or first thread overall, for UI interactions.
 	const currentThread =
 		currentThreads.find( ( thread ) => thread.status === 'hold' ) ??
 		currentThreads[ 0 ] ??
@@ -218,7 +208,7 @@ function NotesSidebar( { postId } ) {
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NotesSidebarContent
-						comments={ resultComments }
+						comments={ notes }
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				</PluginSidebar>
@@ -233,10 +223,8 @@ function NotesSidebar( { postId } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
-						comments={ unresolvedSortedThreads }
+						comments={ unresolvedNotes }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 						styles={ {
 							backgroundColor,
 						} }

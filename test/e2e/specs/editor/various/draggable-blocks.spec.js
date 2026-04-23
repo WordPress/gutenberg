@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -372,11 +367,7 @@ test.describe( 'Draggable block', () => {
 		);
 
 		const testImageName = '10x10_e2e_test_image_z9T8jK.png';
-		const testImagePath = path.join(
-			__dirname,
-			'../../../assets',
-			testImageName
-		);
+		const testImagePath = `./assets/${ testImageName }`;
 
 		{
 			const { dragOver, drop } =

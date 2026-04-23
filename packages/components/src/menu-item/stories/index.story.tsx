@@ -16,6 +16,7 @@ import MenuItem from '..';
 import Shortcut from '../../shortcut';
 
 const meta: Meta< typeof MenuItem > = {
+	tags: [ 'manifest' ],
 	component: MenuItem,
 	title: 'Components/Actions/MenuItem',
 	id: 'components-menuitem',

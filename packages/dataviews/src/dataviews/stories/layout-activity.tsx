@@ -15,7 +15,7 @@ import {
 	pin,
 	link,
 } from '@wordpress/icons';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -555,7 +555,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 			};
 			return (
 				<Stack direction="column" gap="xl">
-					<Text>{ label }</Text>
+					<WCText>{ label }</WCText>
 					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
@@ -640,13 +640,11 @@ const LayoutActivityComponent = ( {
 
 	return (
 		<div
-			style={
-				{
-					height: '100%',
-					maxWidth: fullWidth ? undefined : '400px',
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				maxWidth: fullWidth ? undefined : '400px',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }

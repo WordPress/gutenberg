@@ -7,22 +7,28 @@ import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
+import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
+	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
+
+const { store: connectorsStore } = unlock( connectorsPrivateApis );
 
 interface ConnectorData {
 	name: string;
@@ -30,7 +36,7 @@ interface ConnectorData {
 	logoUrl?: string;
 	type: string;
 	plugin?: {
-		slug: string;
+		file: string;
 		isInstalled: boolean;
 		isActivated: boolean;
 	};
@@ -57,6 +63,7 @@ const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
+	akismet: AkismetLogo,
 };
 
 function getConnectorLogo(
@@ -102,7 +109,10 @@ function ApiKeyConnector( {
 		authentication?.method === 'api_key' ? authentication : undefined;
 	const settingName = auth?.settingName ?? '';
 	const helpUrl = auth?.credentialsUrl ?? undefined;
-	const pluginSlug = plugin?.slug;
+	const pluginFile = plugin?.file?.replace( /\.php$/, '' );
+	const pluginSlug = pluginFile?.includes( '/' )
+		? pluginFile.split( '/' )[ 0 ]
+		: pluginFile;
 
 	let helpLabel: string | undefined;
 	try {
@@ -128,7 +138,7 @@ function ApiKeyConnector( {
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
-		pluginSlug,
+		file: plugin?.file,
 		settingName,
 		connectorName: name,
 		isInstalled: plugin?.isInstalled,
@@ -234,20 +244,31 @@ export function registerDefaultConnectors() {
 	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
+		// Special case: Hide Akismet unless it is already installed.
+		// See https://core.trac.wordpress.org/ticket/65012
+		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
+			continue;
+		}
+
 		const { authentication } = data;
 
 		const connectorName = sanitize( connectorId );
 		const args: Partial< Omit< ConnectorConfig, 'slug' > > = {
 			name: data.name,
 			description: data.description,
+			type: data.type,
 			logo: getConnectorLogo( connectorId, data.logoUrl ),
 			authentication,
 			plugin: data.plugin,
 		};
-		if (
-			data.type === 'ai_provider' &&
-			authentication.method === 'api_key'
-		) {
+
+		// Preserve a render that was already registered for this slug by
+		// another caller. Omitting `render` from `args` leaves the existing
+		// render in place while the server-side metadata still merges on top.
+		const existing = unlock( select( connectorsStore ) ).getConnector(
+			connectorName
+		);
+		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
 		}
 

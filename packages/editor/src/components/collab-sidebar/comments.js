@@ -10,21 +10,17 @@ import {
 	useState,
 	RawHTML,
 	useEffect,
-	useCallback,
 	useMemo,
 	useRef,
 } from '@wordpress/element';
 import {
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -45,7 +41,8 @@ import {
 	getCommentExcerpt,
 	getNoteIdsFromMetadata,
 } from './utils';
-import { useFloatingThread } from './hooks';
+import { useFloatingBoard } from './hooks';
+import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 
@@ -58,17 +55,9 @@ export function Comments( {
 	onAddReply,
 	onCommentDelete,
 	commentSidebarRef,
-	reflowComments,
 	isFloating = false,
-	commentLastUpdated,
 } ) {
-	const [ heights, setHeights ] = useState( {} );
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
-	const [ blockRefs, setBlockRefs ] = useState( {} );
-
-	const { setCanvasMinHeight, selectNote } = unlock(
-		useDispatch( editorStore )
-	);
+	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -216,151 +205,13 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	// Recalculate floating comment thread offsets whenever the heights change.
-	useEffect( () => {
-		/**
-		 * Calculate the y offsets for all comment threads. Account for potentially
-		 * overlapping threads and adjust their positions accordingly.
-		 */
-		const calculateAllOffsets = () => {
-			const offsets = {};
-
-			if ( ! isFloating ) {
-				return { offsets, minHeight: 0 };
-			}
-
-			// Find the index of the selected thread.
-			const selectedThreadIndex = threads.findIndex(
-				( t ) => t.id === selectedNote
-			);
-
-			const breakIndex =
-				selectedThreadIndex === -1 ? 0 : selectedThreadIndex;
-
-			// If there is a selected thread, push threads above up and threads below down.
-			const selectedThreadData = threads[ breakIndex ];
-
-			if (
-				! selectedThreadData ||
-				! blockRefs[ selectedThreadData.id ]
-			) {
-				return { offsets, minHeight: 0 };
-			}
-
-			let blockElement = blockRefs[ selectedThreadData.id ];
-			let blockRect = blockElement?.getBoundingClientRect();
-			const selectedThreadTop = blockRect?.top || 0;
-			const selectedThreadHeight = heights[ selectedThreadData.id ] || 0;
-
-			offsets[ selectedThreadData.id ] = -16;
-
-			let previousThreadData = {
-				threadTop: selectedThreadTop - 16,
-				threadHeight: selectedThreadHeight,
-			};
-
-			// Process threads after the selected thread, offsetting any overlapping
-			// threads downward.
-			for ( let i = breakIndex + 1; i < threads.length; i++ ) {
-				const thread = threads[ i ];
-				if ( ! blockRefs[ thread.id ] ) {
-					continue;
-				}
-
-				blockElement = blockRefs[ thread.id ];
-				blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
-				const threadHeight = heights[ thread.id ] || 0;
-
-				let additionalOffset = -16;
-
-				// Check if the thread overlaps with the previous one.
-				const previousBottom =
-					previousThreadData.threadTop +
-					previousThreadData.threadHeight;
-				if ( threadTop < previousBottom + 16 ) {
-					// Shift down by the difference plus a margin to avoid overlap.
-					additionalOffset = previousBottom - threadTop + 20;
-				}
-
-				offsets[ thread.id ] = additionalOffset;
-
-				// Update for next iteration.
-				previousThreadData = {
-					threadTop: threadTop + additionalOffset,
-					threadHeight,
-				};
-			}
-
-			// Process threads before the selected thread, offsetting any overlapping
-			// threads upward.
-			let nextThreadData = {
-				threadTop: selectedThreadTop - 16,
-			};
-
-			for ( let i = selectedThreadIndex - 1; i >= 0; i-- ) {
-				const thread = threads[ i ];
-				if ( ! blockRefs[ thread.id ] ) {
-					continue;
-				}
-
-				blockElement = blockRefs[ thread.id ];
-				blockRect = blockElement?.getBoundingClientRect();
-				const threadTop = blockRect?.top || 0;
-				const threadHeight = heights[ thread.id ] || 0;
-
-				let additionalOffset = -16;
-
-				// Calculate the bottom position of this thread with default offset.
-				const threadBottom = threadTop + threadHeight;
-
-				// Check if this thread's bottom would overlap with the next thread's top.
-				if ( threadBottom > nextThreadData.threadTop ) {
-					// Shift up by the difference plus a margin to avoid overlap.
-					additionalOffset =
-						nextThreadData.threadTop -
-						threadTop -
-						threadHeight -
-						20;
-				}
-
-				offsets[ thread.id ] = additionalOffset;
-
-				// Update for next iteration (going upward).
-				nextThreadData = {
-					threadTop: threadTop + additionalOffset,
-				};
-			}
-
-			let editorMinHeight = 0;
-			// Take the calculated top of the final note plus its height as the editor min height.
-			const lastThread = threads[ threads.length - 1 ];
-			if ( blockRefs[ lastThread.id ] ) {
-				const lastBlockElement = blockRefs[ lastThread.id ];
-				const lastBlockRect = lastBlockElement?.getBoundingClientRect();
-				const lastThreadTop = lastBlockRect?.top || 0;
-				const lastThreadHeight = heights[ lastThread.id ] || 0;
-				const lastThreadOffset = offsets[ lastThread.id ] || 0;
-				editorMinHeight =
-					lastThreadTop + lastThreadHeight + lastThreadOffset + 32;
-			}
-
-			return { offsets, minHeight: editorMinHeight };
-		};
-		const { offsets: newOffsets, minHeight } = calculateAllOffsets();
-		if ( Object.keys( newOffsets ).length > 0 ) {
-			setBoardOffsets( newOffsets );
-		}
-		// Ensure the editor has enough height to scroll to all notes.
-		setCanvasMinHeight( minHeight );
-	}, [
-		heights,
-		blockRefs,
-		isFloating,
-		threads,
-		selectedNote,
-		setCanvasMinHeight,
-	] );
+	const { notePositions, registerThread, unregisterThread } =
+		useFloatingBoard( {
+			threads,
+			selectedNoteId: selectedNote,
+			isFloating,
+			commentSidebarRef,
+		} );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -427,10 +278,6 @@ export function Comments( {
 		}
 	};
 
-	const setBlockRef = useCallback( ( id, blockRef ) => {
-		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
-	}, [] );
-
 	const hasThreads = Array.isArray( threads ) && threads.length > 0;
 	// A special case for `template-locked` mode - https://github.com/WordPress/gutenberg/pull/72646.
 	if ( ! hasThreads && ! isFloating ) {
@@ -459,12 +306,15 @@ export function Comments( {
 					onEditComment={ onEditComment }
 					isSelected={ selectedNote === thread.id }
 					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-					isFloating={ isFloating }
-					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-					setHeights={ setHeights }
-					setBlockRef={ setBlockRef }
-					commentLastUpdated={ commentLastUpdated }
+					floating={
+						isFloating
+							? {
+									y: notePositions[ thread.id ],
+									registerThread,
+									unregisterThread,
+							  }
+							: undefined
+					}
 					onKeyDown={ ( event ) =>
 						handleThreadNavigation(
 							event,
@@ -485,36 +335,34 @@ function Thread( {
 	onCommentDelete,
 	isSelected,
 	commentSidebarRef,
-	reflowComments,
-	isFloating,
-	calculatedOffset,
-	setHeights,
-	setBlockRef,
-	commentLastUpdated,
+	floating,
 	onKeyDown,
 } ) {
+	const isFloating = !! floating;
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
 	const relatedBlockElement = useBlockElement( thread.blockClientId );
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
 	);
-	const { y, refs } = useFloatingThread( {
-		thread,
-		calculatedOffset,
-		setHeights,
-		setBlockRef,
-		selectedThread: selectedNote,
-		commentLastUpdated,
-	} );
+	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+
+	const registerThread = floating?.registerThread;
+	const unregisterThread = floating?.unregisterThread;
+
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver and autoUpdate track changes automatically.
+	useEffect( () => {
+		const floatingEl = floatingRef.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, relatedBlockElement, floatingEl );
+		}
+		return () => unregisterThread?.( thread.id );
+	}, [ relatedBlockElement, thread.id, registerThread, unregisterThread ] );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -604,22 +452,21 @@ function Thread( {
 			<AddComment
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
-				reflowComments={ reflowComments }
-				isFloating={ isFloating }
-				y={ y }
-				refs={ refs }
+				floating={ { y: floating.y, ref: floatingRef } }
 			/>
 		);
 	}
 
 	return (
-		<VStack
+		<FloatingContainer
+			floating={
+				isFloating ? { y: floating.y, ref: floatingRef } : undefined
+			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
-				'is-floating': isFloating,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing="3"
+			gap="md"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -641,8 +488,6 @@ function Thread( {
 			role="treeitem"
 			aria-label={ ariaLabel }
 			aria-expanded={ isSelected }
-			ref={ isFloating ? refs.setFloating : undefined }
-			style={ isFloating ? { top: y } : undefined }
 		>
 			<Button
 				className="editor-collab-sidebar-panel__skip-to-comment"
@@ -659,9 +504,9 @@ function Thread( {
 				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
-				<Text as="p" weight={ 500 } variant="muted">
+				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
-				</Text>
+				</p>
 			) }
 			<CommentBoard
 				thread={ thread }
@@ -681,7 +526,6 @@ function Thread( {
 					}
 				} }
 				onDelete={ onCommentDelete }
-				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -692,11 +536,15 @@ function Thread( {
 						isExpanded={ isSelected }
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
-						reflowComments={ reflowComments }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
-				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+				<Stack
+					direction="row"
+					align="center"
+					justify="space-between"
+					className="editor-collab-sidebar-panel__more-reply-separator"
+				>
 					<Button
 						size="compact"
 						variant="tertiary"
@@ -719,7 +567,7 @@ function Thread( {
 							restReplies.length
 						) }
 					</Button>
-				</HStack>
+				</Stack>
 			) }
 			{ ! isSelected && lastReply && (
 				<CommentBoard
@@ -728,15 +576,19 @@ function Thread( {
 					isExpanded={ isSelected }
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
-					reflowComments={ reflowComments }
 				/>
 			) }
 			{ isSelected && (
-				<VStack spacing="2" role="treeitem">
-					<HStack alignment="left" spacing="3" justify="flex-start">
+				<Stack direction="column" gap="sm" role="treeitem">
+					<Stack
+						direction="row"
+						align="center"
+						justify="flex-start"
+						gap="md"
+					>
 						<CommentAuthorInfo />
-					</HStack>
-					<VStack spacing="2">
+					</Stack>
+					<Stack direction="column" gap="sm">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
@@ -775,10 +627,9 @@ function Thread( {
 								thread.id,
 								thread.author_name
 							) }
-							reflowComments={ reflowComments }
 						/>
-					</VStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			) }
 			{ !! thread.blockClientId && (
 				<Button
@@ -793,18 +644,11 @@ function Thread( {
 					{ __( 'Back to block' ) }
 				</Button>
 			) }
-		</VStack>
+		</FloatingContainer>
 	);
 }
 
-const CommentBoard = ( {
-	thread,
-	parent,
-	isExpanded,
-	onEdit,
-	onDelete,
-	reflowComments,
-} ) => {
+const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
 	const actionButtonRef = useRef( null );
@@ -870,11 +714,12 @@ const CommentBoard = ( {
 			: __( 'Are you sure you want to delete this reply?' );
 
 	return (
-		<VStack
-			spacing="2"
+		<Stack
+			direction="column"
+			gap="sm"
 			role={ thread.parent !== 0 ? 'treeitem' : undefined }
 		>
-			<HStack alignment="left" spacing="3" justify="flex-start">
+			<Stack direction="row" align="center" justify="flex-start" gap="md">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
@@ -889,7 +734,7 @@ const CommentBoard = ( {
 							event.stopPropagation();
 						} }
 					>
-						<HStack spacing="0">
+						<Stack direction="row" align="center">
 							{ canResolve && (
 								<Button
 									label={ _x(
@@ -941,10 +786,10 @@ const CommentBoard = ( {
 									) ) }
 								</Menu.Popover>
 							</Menu>
-						</HStack>
+						</Stack>
 					</FlexItem>
 				) }
-			</HStack>
+			</Stack>
 			{ 'edit' === actionState ? (
 				<CommentForm
 					onSubmit={ ( value ) => {
@@ -964,7 +809,6 @@ const CommentBoard = ( {
 						thread.id,
 						thread.author_name
 					) }
-					reflowComments={ reflowComments }
 				/>
 			) : (
 				<RawHTML
@@ -1012,7 +856,7 @@ const CommentBoard = ( {
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</Stack>
 	);
 };
 
