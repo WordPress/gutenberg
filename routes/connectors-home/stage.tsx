@@ -86,7 +86,7 @@ function ConnectorsPage() {
 			>
 				{ isFileModsDisabled && (
 					<Notice
-						status="warning"
+						status="notice"
 						isDismissible={ false }
 						className="connectors-page__file-mods-notice"
 					>
