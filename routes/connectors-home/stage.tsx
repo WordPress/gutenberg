@@ -67,6 +67,10 @@ function ConnectorsPage() {
 	).sort();
 	const manualInstallPluginSlugs = [ 'ai', ...aiProviderPluginSlugs ];
 	const isEmpty = renderableConnectors.length === 0;
+	const searchUrl =
+		canInstallPlugins && ! isFileModsDisabled
+			? 'plugin-install.php?s=connector&tab=search&type=tag'
+			: 'https://wordpress.org/plugins/search/ai-connectors/';
 
 	return (
 		<Page
@@ -159,7 +163,6 @@ function ConnectorsPage() {
 						</VStack>
 					</VStack>
 				) }
-				{ canInstallPlugins && ! isFileModsDisabled && (
 					<p>
 						{ createInterpolateElement(
 							__(
@@ -168,12 +171,11 @@ function ConnectorsPage() {
 							{
 								a: (
 									// eslint-disable-next-line jsx-a11y/anchor-has-content
-									<a href="plugin-install.php?s=connector&tab=search&type=tag" />
+								<a href={ searchUrl } />
 								),
 							}
 						) }
 					</p>
-				) }
 			</div>
 		</Page>
 	);
