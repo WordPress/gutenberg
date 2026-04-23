@@ -34,7 +34,8 @@
 			"font-library",
 			"options-connectors",
 			"guidelines",
-			"taxonomies"
+			"taxonomies",
+			"dashboard"
 		]
 	},
 	"config": {
