@@ -7,6 +7,8 @@ The component reads from two sources so it works for both upload paths:
 -   **`@wordpress/upload-media`** — the client-side media processing (CSM) path. Only counts original user-uploaded files, ignoring generated subsizes and thumbnails (items with a `parentId`).
 -   **Editor-local tracker** — populated by the editor's `mediaUpload` wrapper for the traditional (non-CSM) upload path (e.g. Safari, or when a filter disables CSM).
 
+While uploads are in progress the snackbar shows a spinner to the left of the text. When the last upload finishes, the spinner is replaced with a green checkmark for a brief moment before the snackbar dismisses.
+
 The component renders nothing itself — it is a controller that manages a notice.
 
 ## Usage

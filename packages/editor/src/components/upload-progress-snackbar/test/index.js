@@ -125,16 +125,54 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice.mock.calls[ 0 ][ 1 ] ).toMatch( /a\.jpg/ );
 	} );
 
-	it( 'removes the notice when all tracked uploads finish', () => {
-		mockQueue( [] );
-		act( () => {
-			addFiles( [ 'a.jpg' ] );
-		} );
+	it( 'shows a completion notice and then removes it when uploads finish', () => {
+		jest.useFakeTimers();
+		try {
+			mockQueue( [] );
+			act( () => {
+				addFiles( [ 'a.jpg' ] );
+			} );
+			render( <UploadProgressSnackbar /> );
+			expect( mockCreateNotice ).toHaveBeenCalled();
+			mockCreateNotice.mockClear();
+
+			act( () => {
+				advance( 1 );
+			} );
+
+			// Completion notice replaces the progress notice (same ID).
+			expect( mockCreateNotice ).toHaveBeenCalledWith(
+				'info',
+				'Upload complete',
+				expect.objectContaining( {
+					id: 'upload-progress',
+					type: 'snackbar',
+					icon: expect.anything(),
+				} )
+			);
+			expect( mockRemoveNotice ).not.toHaveBeenCalled();
+
+			act( () => {
+				jest.runAllTimers();
+			} );
+
+			expect( mockRemoveNotice ).toHaveBeenCalledWith(
+				'upload-progress'
+			);
+		} finally {
+			jest.useRealTimers();
+		}
+	} );
+
+	it( 'includes a spinner icon on the in-progress notice', () => {
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
 		render( <UploadProgressSnackbar /> );
-		expect( mockCreateNotice ).toHaveBeenCalled();
-		act( () => {
-			advance( 1 );
-		} );
-		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'info',
+			expect.any( String ),
+			expect.objectContaining( {
+				icon: expect.anything(),
+			} )
+		);
 	} );
 } );

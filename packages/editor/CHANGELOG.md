@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress.
+-   Added `UploadProgressSnackbar` component that shows a persistent snackbar with upload progress while media uploads are in progress. The snackbar shows a spinner during uploads and a green checkmark briefly when all uploads complete.
 
 ## 14.44.0 (2026-04-15)
 

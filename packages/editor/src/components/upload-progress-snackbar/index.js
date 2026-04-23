@@ -15,6 +15,58 @@ import { useTracker } from './tracker';
 
 const NOTICE_ID = 'upload-progress';
 
+// How long the completion checkmark is shown before the snackbar dismisses.
+const COMPLETION_DISPLAY_MS = 1800;
+
+const UPLOAD_SPINNER = (
+	<span
+		className="editor-upload-progress-snackbar__spinner"
+		aria-hidden="true"
+	>
+		<svg
+			width="20"
+			height="20"
+			viewBox="0 0 20 20"
+			xmlns="http://www.w3.org/2000/svg"
+			focusable="false"
+		>
+			<circle
+				cx="10"
+				cy="10"
+				r="8"
+				fill="none"
+				stroke="currentColor"
+				strokeOpacity="0.3"
+				strokeWidth="2"
+			/>
+			<path
+				d="M 10 2 A 8 8 0 0 1 18 10"
+				fill="none"
+				stroke="currentColor"
+				strokeWidth="2"
+				strokeLinecap="round"
+			/>
+		</svg>
+	</span>
+);
+
+const UPLOAD_DONE = (
+	<span className="editor-upload-progress-snackbar__check" aria-hidden="true">
+		<svg
+			width="20"
+			height="20"
+			viewBox="0 0 24 24"
+			xmlns="http://www.w3.org/2000/svg"
+			focusable="false"
+		>
+			<path
+				d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
+				fill="currentColor"
+			/>
+		</svg>
+	</span>
+);
+
 /**
  * Manages a snackbar notice that shows media upload progress while uploads are
  * in progress. It creates/updates a notice via the notices store so that it
@@ -60,18 +112,56 @@ export default function UploadProgressSnackbar() {
 	// Track whether the user has dismissed the notice. If so, don't re-create
 	// it until the current batch finishes and a new one starts.
 	const dismissedRef = useRef( false );
-
 	const wasUploadingRef = useRef( false );
+
+	// Timeout that removes the completion-state (checkmark) notice after a
+	// brief display. Held so a new upload can cancel it.
+	const completionTimeoutRef = useRef( null );
+	useEffect( () => {
+		return () => {
+			if ( completionTimeoutRef.current ) {
+				clearTimeout( completionTimeoutRef.current );
+			}
+		};
+	}, [] );
+
 	useEffect( () => {
 		const isUploading = remaining > 0;
 
 		if ( isUploading && ! wasUploadingRef.current ) {
 			dismissedRef.current = false;
 			speak( __( 'Media upload started' ), 'polite' );
+			// A new batch started during the completion display: cancel the
+			// pending dismissal so the snackbar transitions straight back
+			// into the uploading state.
+			if ( completionTimeoutRef.current ) {
+				clearTimeout( completionTimeoutRef.current );
+				completionTimeoutRef.current = null;
+			}
 		} else if ( ! isUploading && wasUploadingRef.current ) {
 			speak( __( 'Media upload complete' ), 'polite' );
-			removeNotice( NOTICE_ID );
-			peakRef.current = 0;
+
+			if ( ! dismissedRef.current ) {
+				createNotice( 'info', __( 'Upload complete' ), {
+					id: NOTICE_ID,
+					type: 'snackbar',
+					isDismissible: false,
+					explicitDismiss: false,
+					speak: false,
+					icon: UPLOAD_DONE,
+					onDismiss: () => {
+						dismissedRef.current = true;
+					},
+				} );
+
+				completionTimeoutRef.current = setTimeout( () => {
+					removeNotice( NOTICE_ID );
+					completionTimeoutRef.current = null;
+					peakRef.current = 0;
+				}, COMPLETION_DISPLAY_MS );
+			} else {
+				peakRef.current = 0;
+			}
 		}
 
 		wasUploadingRef.current = isUploading;
@@ -111,6 +201,7 @@ export default function UploadProgressSnackbar() {
 			isDismissible: false,
 			explicitDismiss: true,
 			speak: false,
+			icon: UPLOAD_SPINNER,
 			onDismiss: () => {
 				dismissedRef.current = true;
 			},
