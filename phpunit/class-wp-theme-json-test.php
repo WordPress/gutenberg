@@ -957,28 +957,273 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $focus_style, $theme_json->get_styles_for_block( $focus_node ) );
 	}
 
-	public function test_process_responsive_selectors_outputs_media_wrapped_css() {
-		$node = array(
-			'mobile' => array(
-				'color' => array(
-					'text' => 'red',
+	public function test_get_styles_for_block_responsive_feature_selector_not_duplicated_on_base_selector() {
+		register_block_type(
+			'test/responsive-feature',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'  => '.wp-block-test-responsive-feature',
+					'color' => '.wp-block-test-responsive-feature .color-target',
 				),
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'test/responsive-feature' => array(
+							'mobile' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'      => 'test/responsive-feature',
+			'path'      => array( 'styles', 'blocks', 'test/responsive-feature' ),
+			'selector'  => '.wp-block-test-responsive-feature',
+			'selectors' => array(
+				'color' => '.wp-block-test-responsive-feature .color-target',
 			),
-			'tablet' => array(
-				'spacing' => array(
-					'margin' => '1rem',
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+
+		unregister_block_type( 'test/responsive-feature' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-test-responsive-feature .color-target){color: red;}}',
+			$actual_styles
+		);
+		$this->assertStringNotContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-test-responsive-feature){color: red;}}',
+			$actual_styles
+		);
+	}
+
+	public function test_get_styles_for_block_outputs_responsive_block_gap_after_default_gap() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'spacing' => array(
+								'blockGap' => '5rem',
+							),
+							'mobile'  => array(
+								'spacing' => array(
+									'blockGap' => '2rem',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'     => 'core/group',
+			'path'     => array( 'styles', 'blocks', 'core/group' ),
+			'selector' => '.wp-block-group',
+			'css'      => '.wp-block-group',
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+
+		$default_gap = ':root :where(.wp-block-group-is-layout-flex){gap: 5rem;}';
+		$mobile_gap  = ':root :where(.wp-block-group-is-layout-flex){gap: 2rem;}';
+
+		$this->assertStringContainsString( $default_gap, $actual_styles );
+		$this->assertStringContainsString( '@media (width <= 480px)', $actual_styles );
+		$this->assertStringContainsString( $mobile_gap, $actual_styles );
+		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
+	}
+
+	public function test_get_styles_for_block_responsive_element_pseudo_styles_preserve_order_and_do_not_duplicate_pseudo() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color'  => array(
+										'text' => 'blue',
+									),
+									':hover' => array(
+										'color' => array(
+											'text' => 'navy',
+										),
+									),
+								),
+							),
+							'mobile'   => array(
+								'elements' => array(
+									'link' => array(
+										'color'  => array(
+											'text' => 'red',
+										),
+										':hover' => array(
+											'color' => array(
+												'text' => 'darkred',
+											),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$link_node = array(
+			'path'     => array( 'styles', 'blocks', 'core/group', 'elements', 'link' ),
+			'selector' => '.wp-block-group a:where(:not(.wp-element-button))',
+		);
+
+		$hover_node = array(
+			'path'     => array( 'styles', 'blocks', 'core/group', 'elements', 'link' ),
+			'selector' => '.wp-block-group a:where(:not(.wp-element-button)):hover',
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $link_node ) . $theme_json->get_styles_for_block( $hover_node );
+
+		$default_link = ':root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}';
+		$mobile_link  = '@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}';
+		$default_hov  = ':root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: navy;}';
+		$mobile_hov   = '@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: darkred;}}';
+
+		$this->assertStringContainsString( $default_link, $actual_styles );
+		$this->assertStringContainsString( $mobile_link, $actual_styles );
+		$this->assertStringContainsString( $default_hov, $actual_styles );
+		$this->assertStringContainsString( $mobile_hov, $actual_styles );
+
+		$this->assertLessThan( strpos( $actual_styles, $mobile_link ), strpos( $actual_styles, $default_link ) );
+		$this->assertLessThan( strpos( $actual_styles, $default_hov ), strpos( $actual_styles, $mobile_link ) );
+		$this->assertLessThan( strpos( $actual_styles, $mobile_hov ), strpos( $actual_styles, $default_hov ) );
+		$this->assertStringNotContainsString( ':hover:hover', $actual_styles );
+	}
+
+	public function test_get_styles_for_block_with_style_variations_and_responsive_block_gap() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'withGap',
+				'label' => 'With Gap',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'spacing' => array(
+						'blockGap' => true,
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'variations' => array(
+								'withGap' => array(
+									'spacing' => array(
+										'blockGap' => '5rem',
+									),
+									'mobile'  => array(
+										'spacing' => array(
+											'blockGap' => '2rem',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'       => 'core/group',
+			'path'       => array( 'styles', 'blocks', 'core/group' ),
+			'selector'   => '.wp-block-group',
+			'css'        => '.wp-block-group',
+			'variations' => array(
+				array(
+					'path'     => array( 'styles', 'blocks', 'core/group', 'variations', 'withGap' ),
+					'selector' => '.is-style-withGap.wp-block-group',
 				),
 			),
 		);
 
-		$reflection = new ReflectionMethod( WP_Theme_JSON_Gutenberg::class, 'process_responsive_selectors' );
-		$reflection->setAccessible( true );
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
 
-		$actual = $reflection->invoke( null, $node, '.wp-block-group', array() );
+		unregister_block_style( 'core/group', 'withGap' );
 
-		$expected = '@media (width <= 480px){:root :where(.wp-block-group){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group){margin: 1rem;}}';
+		$default_gap = ':root :where(.is-style-withGap.wp-block-group.wp-block-group-is-layout-flex){gap: 5rem;}';
+		$mobile_gap  = ':root :where(.is-style-withGap.wp-block-group.wp-block-group-is-layout-flex){gap: 2rem;}';
 
-		$this->assertSameCSS( $expected, $actual );
+		$this->assertStringContainsString( $default_gap, $actual_styles );
+		$this->assertStringContainsString( '@media (width <= 480px)', $actual_styles );
+		$this->assertStringContainsString( $mobile_gap, $actual_styles );
+		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
+	}
+
+	public function test_get_styles_for_block_outputs_tablet_responsive_styles_only() {
+		register_block_type(
+			'test/tablet-only',
+			array(
+				'api_version' => 3,
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'test/tablet-only' => array(
+							'tablet' => array(
+								'color' => array(
+									'text' => 'purple',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'     => 'test/tablet-only',
+			'path'     => array( 'styles', 'blocks', 'test/tablet-only' ),
+			'selector' => '.wp-block-test-tablet-only',
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+
+		unregister_block_type( 'test/tablet-only' );
+
+		$this->assertStringContainsString(
+			'@media (480px < width <= 782px){:root :where(.wp-block-test-tablet-only){color: purple;}}',
+			$actual_styles
+		);
+		$this->assertStringNotContainsString( '@media (width <= 480px)', $actual_styles );
 	}
 
 	/**
