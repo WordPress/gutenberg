@@ -250,5 +250,4 @@ HTML;
 
 		$this->assertSame( array(), $result );
 	}
-
 }
