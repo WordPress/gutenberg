@@ -11,11 +11,10 @@ import {
 	__experimentalTruncate as Truncate,
 	Button,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
-import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
