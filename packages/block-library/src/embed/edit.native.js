@@ -164,6 +164,7 @@ const EmbedEdit = ( props ) => {
 			const newURL = new URL( url );
 			newURL.host = 'twitter.com';
 			const newURLString = newURL.toString();
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				url: newURLString,
 				...findMoreSuitableBlock( newURLString )?.attributes,
@@ -174,10 +175,17 @@ const EmbedEdit = ( props ) => {
 		// Otherwise, try removing any trailing slash.
 		const newURL = url.replace( /\/$/, '' );
 		if ( newURL !== url ) {
-			setIsEditingURL( false );
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { url: newURL } );
+			setIsEditingURL( false );
 		}
-	}, [ url, cannotEmbed, fetching, setAttributes ] );
+	}, [
+		url,
+		cannotEmbed,
+		fetching,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	// Apply preview-derived attributes once the preview resolves.
 	useEffect( () => {
