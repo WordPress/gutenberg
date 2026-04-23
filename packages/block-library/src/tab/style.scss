@@ -1,23 +1,40 @@
 .wp-block-tab {
-	max-width: 100%;
-	flex-basis: 100%;
-	flex-grow: 1;
 	box-sizing: border-box;
+	color: inherit;
+	display: block;
+	width: max-content;
+	text-decoration: none;
+	cursor: pointer;
+	flex-basis: inherit !important;
+	flex-grow: inherit !important;
+	position: relative;
 
-	& > *:first-child {
-		margin-top: 0;
-	}
-	& > *:last-child {
-		margin-bottom: 0;
-	}
+	// Button reset
+	border: none;
+	background: none;
+	appearance: none;
+	-webkit-appearance: none;
 
-	&[hidden],
-	&:empty {
-		display: none !important;
-	}
-}
+	margin: 0;
+	padding: var(--wp--preset--spacing--20, 0.5em) var(--wp--preset--spacing--30, 1em);
 
-.wp-block-tab.wp-block.has-background,
-.wp-block-tab:not(.wp-block).has-background {
-	padding: var(--wp--preset--spacing--30);
+	// Inherit typography from parent
+	font-size: inherit;
+	font-family: inherit;
+	font-weight: inherit;
+	line-height: inherit;
+	letter-spacing: inherit;
+	text-transform: inherit;
+	text-align: inherit;
+
+	&[aria-selected="true"]::before,
+	&.is-active::before {
+		content: "";
+		position: absolute;
+		border-bottom: 2px solid currentColor;
+		pointer-events: none;
+		left: 0;
+		width: 100%;
+		bottom: 0;
+	}
 }

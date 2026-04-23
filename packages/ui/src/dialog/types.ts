@@ -76,14 +76,14 @@ export interface ActionProps extends ComponentProps< typeof Button > {
 	children?: ReactNode;
 }
 
-export interface FooterProps extends ComponentProps< 'div' > {
+export interface FooterProps extends ComponentProps< 'footer' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 }
 
-export interface HeaderProps extends ComponentProps< 'div' > {
+export interface HeaderProps extends ComponentProps< 'header' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */

@@ -38,13 +38,24 @@
 	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.scss",
+		"src/store/index.ts",
+		"build/store/index.cjs",
+		"build-module/store/index.mjs"
 	],
 	"dependencies": {
 		"@wordpress/components": "file:../components",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
+		"clsx": "^2.1.1",
+		"gl-matrix": "^3.4.3"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"
