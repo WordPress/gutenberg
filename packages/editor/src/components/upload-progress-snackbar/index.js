@@ -17,7 +17,7 @@ import { useTracker } from './tracker';
 const NOTICE_ID = 'upload-progress';
 
 // How long the completion checkmark is shown before the snackbar dismisses.
-const COMPLETION_DISPLAY_MS = 1800;
+const COMPLETION_DISPLAY_MS = 3000;
 
 const UPLOAD_SPINNER = (
 	<span
