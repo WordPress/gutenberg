@@ -151,6 +151,8 @@ class Gutenberg_Guidelines_Post_Type {
 				'show_in_rest'       => true,
 			)
 		);
+
+		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'ensure_default_type_term' ) );
 	}
 
 	/**

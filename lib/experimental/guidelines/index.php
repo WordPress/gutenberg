@@ -20,11 +20,6 @@ add_action( 'init', array( 'Gutenberg_Guidelines_Post_Type', 'register' ) );
 add_action( 'rest_api_init', array( 'Gutenberg_Guidelines_Post_Type', 'register_post_meta' ) );
 
 add_action(
-	'save_post_' . Gutenberg_Guidelines_Post_Type::POST_TYPE,
-	array( 'Gutenberg_Guidelines_Post_Type', 'ensure_default_type_term' )
-);
-
-add_action(
 	'current_screen',
 	function ( $screen ) {
 		if ( Gutenberg_Guidelines_Post_Type::POST_TYPE !== $screen->post_type ) {
