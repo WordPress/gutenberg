@@ -23,6 +23,6 @@
 	inset-inline-start: 0;
 	pointer-events: none;
 	z-index: 1;
-	border: 2px dashed var(--wpds-color-stroke-interactive-brand);
+	border: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
 	background: transparent;
 }
