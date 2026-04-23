@@ -138,6 +138,25 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
+	// Don't render custom links with invalid or missing URLs.
+	$kind = isset( $attributes['kind'] ) ? $attributes['kind'] : '';
+	$url  = isset( $attributes['url'] ) ? trim( $attributes['url'] ) : '';
+
+	if ( 'post-type' !== $kind ) {
+		$is_valid_url =
+			! empty( $url ) && (
+				filter_var( $url, FILTER_VALIDATE_URL ) !== false ||
+				str_starts_with( $url, '/' ) ||
+				str_starts_with( $url, '#' ) ||
+				str_starts_with( $url, 'mailto:' ) ||
+				str_starts_with( $url, 'tel:' )
+			);
+
+		if ( ! $is_valid_url ) {
+			return '';
+		}
+	}
+
 	// The build system prefixes this function with "gutenberg_" to avoid
 	// collisions with the core version. Until this function is backported to
 	// core, we need to guard its use and only call the prefixed name in

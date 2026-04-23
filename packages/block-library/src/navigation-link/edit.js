@@ -160,6 +160,11 @@ export default function NavigationLinkEdit( {
 		[ clientId, maxNestingLevel ]
 	);
 
+	const selectedBlockClientId = useSelect(
+		( select ) => select( blockEditorStore ).getSelectedBlockClientId(),
+		[]
+	);
+
 	const validateLinkStatus = useEnableLinkStatusValidation( clientId );
 	const { getBlocks } = useSelect( blockEditorStore );
 
@@ -176,11 +181,16 @@ export default function NavigationLinkEdit( {
 		setAttributes,
 	} );
 
+	const isEditingContext =
+		isSelected || selectedBlockClientId === parentBlockClientId;
+
 	const [ isInvalid, isDraft ] = useIsInvalidLink(
 		kind,
 		type,
 		id,
-		validateLinkStatus
+		validateLinkStatus,
+		url,
+		isEditingContext
 	);
 
 	/**
@@ -394,6 +404,8 @@ export default function NavigationLinkEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isSelected={ isSelected }
+					isParentOfSelectedBlock={ isParentOfSelectedBlock }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
