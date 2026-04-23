@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
+-   `FormToggle`: Add stacking context isolation ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
 
 ### Breaking Changes
 
