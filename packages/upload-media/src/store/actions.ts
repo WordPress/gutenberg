@@ -24,7 +24,7 @@ import type {
 	RetryItemAction,
 	State,
 } from './types';
-import { Type } from './types';
+import { OperationType, Type } from './types';
 import type {
 	addItem,
 	processItem,
@@ -32,6 +32,7 @@ import type {
 	revokeBlobUrls,
 } from './private-actions';
 import { vipsCancelOperations } from './utils';
+import { UploadError } from '../upload-error';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
@@ -166,12 +167,16 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
-			if ( ! onError && error ) {
-				// TODO: Find better way to surface errors with sideloads etc.
+			if ( ! onError && error && ! item.parentId ) {
+				// Log errors for top-level items without an onError handler.
+				// Child sideload errors are suppressed here because the
+				// parent will be notified and surface the error to the user.
 				// eslint-disable-next-line no-console -- Deliberately log errors here.
 				console.error( 'Upload cancelled', error );
 			}
 		}
+
+		const { currentOperation, parentId, batchId } = item;
 
 		dispatch< CancelAction >( {
 			type: Type.Cancel,
@@ -181,8 +186,55 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// A concurrency slot just freed up. Kick any items that were
+		// waiting in the queue, mirroring finishOperation's behavior.
+		if (
+			currentOperation === OperationType.ResizeCrop ||
+			currentOperation === OperationType.Rotate
+		) {
+			for ( const pending of select.getPendingImageProcessing() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+		if ( currentOperation === OperationType.Upload ) {
+			for ( const pending of select.getPendingUploads() ) {
+				dispatch.processItem( pending.id );
+			}
+		}
+
+		// If this was a child sideload item, handle the parent.
+		if ( parentId ) {
+			const parentItem = select.getItem( parentId );
+			if ( parentItem ) {
+				if ( select.hasPendingItemsByParentId( parentId ) ) {
+					// Other children remain — just notify the parent so
+					// it can re-check the Finalize gate.
+					if (
+						parentItem.operations &&
+						parentItem.operations.length > 0
+					) {
+						dispatch.processItem( parentId );
+					}
+				} else {
+					// No children remain and we got here via cancellation,
+					// meaning no child succeeded. Cancel the parent too so
+					// the block resets rather than showing a partial upload.
+					dispatch.cancelItem(
+						parentId,
+						new UploadError( {
+							code: 'IMAGE_PROCESSING_ERROR',
+							message:
+								'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
+							file: parentItem.file,
+							cause: error instanceof Error ? error : undefined,
+						} )
+					);
+				}
+			}
+		}
+
 		// All items of this batch were cancelled or finished.
-		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
+		if ( batchId && select.isBatchUploaded( batchId ) ) {
 			item.onBatchSuccess?.();
 		}
 	};

@@ -769,9 +769,11 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		// If the file is not processed by vips, tell the server to
-		// generate sub-sizes since they won't be created client-side.
-		let updates: Partial< QueueItem > = {};
+		// Tell the server whether to generate sub-sizes.
+		// When vips handles processing client-side, set generate_sub_sizes
+		// to false so the server skips the image-type support check
+		// (allowing formats like AVIF that the server can't process).
+		let updates: Partial< QueueItem >;
 		if ( isHeic && heicJpeg ) {
 			// HEIC was converted to JPEG client-side. Upload the JPEG
 			// and let the server handle it normally (threshold scaling,
@@ -796,6 +798,13 @@ export function prepareItem( id: QueueItemId ) {
 					...item.additionalData,
 					generate_sub_sizes: true,
 					convert_format: true,
+				},
+			};
+		} else {
+			updates = {
+				additionalData: {
+					...item.additionalData,
+					generate_sub_sizes: false,
 				},
 			};
 		}
