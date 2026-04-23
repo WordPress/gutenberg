@@ -9,6 +9,7 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
+	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
@@ -261,6 +262,35 @@ function ContentOnlyControls( {
 	);
 }
 
+function getAltHelp( {
+	lockAltControls,
+	lockAltControlsMessage,
+	isDecorative,
+} ) {
+	if ( lockAltControls ) {
+		return <>{ lockAltControlsMessage }</>;
+	}
+	if ( isDecorative ) {
+		return __( 'Alternative text is not required for decorative images.' );
+	}
+	return (
+		<>
+			<ExternalLink
+				href={
+					// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+					__(
+						'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+					)
+				}
+			>
+				{ __( 'Describe the purpose of the image.' ) }
+			</ExternalLink>
+			<br />
+			{ __( 'Leave empty if decorative.' ) }
+		</>
+	);
+}
+
 export default function Image( {
 	temporaryURL,
 	isSideloading,
@@ -297,6 +327,7 @@ export default function Image( {
 		sizeSlug,
 		lightbox,
 		metadata,
+		isDecorative,
 	} = attributes;
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
@@ -574,6 +605,13 @@ export default function Image( {
 
 	function updateAlt( newAlt ) {
 		setAttributes( { alt: newAlt } );
+	}
+
+	function updateIsDecorative( value ) {
+		setAttributes( {
+			isDecorative: value || undefined,
+			...( value && { alt: '' } ),
+		} );
 	}
 
 	const imperativeFocalPointPreview = ( value ) => {
@@ -944,7 +982,10 @@ export default function Image( {
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
-						resetAll={ () => onSelectImage( undefined ) }
+						resetAll={ () => {
+							onSelectImage( undefined );
+							setAttributes( { isDecorative: undefined } );
+						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
 						{ ! lockUrlControls && (
@@ -986,33 +1027,34 @@ export default function Image( {
 								label={ __( 'Alternative text' ) }
 								value={ alt || '' }
 								onChange={ updateAlt }
-								readOnly={ lockAltControls }
-								help={
-									lockAltControls ? (
-										<>{ lockAltControlsMessage }</>
-									) : (
-										<>
-											<ExternalLink
-												href={
-													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-													__(
-														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-													)
-												}
-											>
-												{ __(
-													'Describe the purpose of the image.'
-												) }
-											</ExternalLink>
-											<br />
-											{ __(
-												'Leave empty if decorative.'
-											) }
-										</>
-									)
-								}
+								readOnly={ lockAltControls || isDecorative }
+								help={ getAltHelp( {
+									lockAltControls,
+									lockAltControlsMessage,
+									isDecorative,
+								} ) }
 							/>
 						</ToolsPanelItem>
+						{ ! lockAltControls && (
+							<ToolsPanelItem
+								label={ __( 'Mark as decorative' ) }
+								isShownByDefault
+								hasValue={ () => !! isDecorative }
+								onDeselect={ () =>
+									setAttributes( { isDecorative: undefined } )
+								}
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Mark as decorative' ) }
+									checked={ !! isDecorative }
+									onChange={ updateIsDecorative }
+									help={ __(
+										'Enable if this image is purely decorative and should be ignored by assistive technologies.'
+									) }
+								/>
+							</ToolsPanelItem>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }

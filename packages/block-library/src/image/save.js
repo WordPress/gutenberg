@@ -37,6 +37,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		isDecorative,
 		metadata: { bindings = {} } = {},
 	} = attributes;
 
@@ -78,6 +79,7 @@ export default function save( { attributes } ) {
 				height,
 			} }
 			title={ title }
+			role={ isDecorative ? 'none' : undefined }
 		/>
 	);
 

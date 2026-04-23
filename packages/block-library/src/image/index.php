@@ -57,6 +57,10 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
+	if ( ! empty( $attributes['isDecorative'] ) ) {
+		$processor->set_attribute( 'role', 'none' );
+	}
+
 	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
 	// Ensure the `wp-image-id` classname on the image block supports block bindings.
