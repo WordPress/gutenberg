@@ -1998,6 +1998,11 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 		}
+
+		if ( ! empty( $options['media_query'] ) && ! empty( $block_rules ) ) {
+			$block_rules = $options['media_query'] . '{' . $block_rules . '}';
+		}
+
 		return $block_rules;
 	}
 
@@ -3408,6 +3413,19 @@ class WP_Theme_JSON_Gutenberg {
 						$variation_responsive_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
 					}
 
+					// Process blockGap responsive layout styles for this variation.
+					if ( isset( $breakpoint_node['spacing']['blockGap'] ) ) {
+						$variation_layout_metadata             = $style_variation;
+						$variation_layout_metadata['selector'] = $style_variation['selector'] . $block_metadata['css'];
+						$variation_responsive_css             .= $this->get_layout_styles(
+							$variation_layout_metadata,
+							array(
+								'node'        => $breakpoint_node,
+								'media_query' => $breakpoint_media,
+							)
+						);
+					}
+
 					// Process nested element styles for this breakpoint state.
 					if ( isset( $breakpoint_node['elements'] ) && ! empty( $block_elements ) ) {
 						foreach ( $breakpoint_node['elements'] as $element_name => $element_node ) {
@@ -3664,6 +3682,17 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $breakpoint_node['css'] ) ) {
 					$breakpoint_custom_css   = static::process_blocks_custom_css( $breakpoint_node['css'], $css_selector );
 					$responsive_feature_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
+				}
+
+				// Process blockGap responsive layout styles.
+				if ( ! empty( $block_metadata['name'] ) ) {
+					$responsive_feature_css .= $this->get_layout_styles(
+						$block_metadata,
+						array(
+							'node'        => $breakpoint_node,
+							'media_query' => $breakpoint_media,
+						)
+					);
 				}
 			}
 
