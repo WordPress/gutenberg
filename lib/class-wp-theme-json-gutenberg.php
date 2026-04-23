@@ -3679,6 +3679,14 @@ class WP_Theme_JSON_Gutenberg {
 					$responsive_feature_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
 				}
 
+				// Emit base responsive declarations using the already-stripped $breakpoint_node
+				// (get_feature_declarations_for_node removes feature props by reference, so only
+				// non-feature properties remain here, matching non-responsive cascade behaviour).
+				$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, null );
+				if ( ! empty( $breakpoint_declarations ) ) {
+					$responsive_feature_css .= $breakpoint_media . '{' . static::to_ruleset( ":root :where($selector)", $breakpoint_declarations ) . '}';
+				}
+
 				if ( isset( $breakpoint_node['css'] ) ) {
 					$breakpoint_custom_css   = static::process_blocks_custom_css( $breakpoint_node['css'], $css_selector );
 					$responsive_feature_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
@@ -3697,7 +3705,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			$block_rules .= $responsive_feature_css;
-			$block_rules .= static::process_responsive_selectors( $node, $selector, $settings );
 		}
 
 		// 9. When processing a block element node, emit responsive breakpoint overrides
