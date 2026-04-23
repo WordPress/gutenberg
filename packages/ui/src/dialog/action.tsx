@@ -8,11 +8,17 @@ import type { ActionProps } from './types';
  * Accepts all Button component props for styling.
  */
 const Action = forwardRef< HTMLButtonElement, ActionProps >(
-	function DialogAction( { render, ...props }, ref ) {
+	function DialogAction( { render, disabled, loading, ...props }, ref ) {
+		// Resolve `disabled` the same way Button does so that
+		// _Dialog.Close's internal useButton (which controls
+		// aria-disabled) stays in sync with the rendered Button.
+		const resolvedDisabled = disabled ?? loading;
+
 		return (
 			<_Dialog.Close
 				ref={ ref }
-				render={ <Button render={ render } /> }
+				render={ <Button render={ render } loading={ loading } /> }
+				disabled={ resolvedDisabled }
 				{ ...props }
 			/>
 		);

@@ -652,6 +652,106 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should handle block pseudo selectors', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							color: {
+								text: 'red',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button){color: red;}:root :where(.wp-block-button:hover){color: blue;}'
+			);
+		} );
+
+		it( 'should handle style variation pseudo selectors', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								foo: {
+									color: {
+										text: 'green',
+									},
+									':hover': {
+										color: {
+											text: 'yellow',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-button',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-button){color: green;}:root :where(.is-style-foo.wp-block-button:hover){color: yellow;}'
+			);
+		} );
+
 		it( 'should handle duotone filter', () => {
 			const tree = {
 				styles: {
@@ -808,6 +908,53 @@ describe( 'global styles renderer', () => {
 				':root :where(p){color:red;}'
 			);
 		} );
+
+		it( 'should output duotone SVG filters with __unstableType of svgs', () => {
+			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
+			mockSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+
+			const config = {
+				version: 3,
+				settings: {
+					color: {
+						duotone: {
+							theme: [
+								{
+									slug: 'midnight',
+									name: 'Midnight',
+									colors: [ '#263135', '#69a8a7' ],
+								},
+							],
+						},
+					},
+				},
+				styles: {},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/image',
+					selectors: {
+						root: '.wp-block-image',
+						filter: { duotone: '.wp-block-image img' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+
+			const svgStyle = styles.find(
+				( s: any ) => s.__unstableType === 'svgs'
+			);
+
+			expect( svgStyle ).toBeDefined();
+			expect( svgStyle.__unstableType ).toBe( 'svgs' );
+			expect( svgStyle.assets.join( '' ) ).toContain(
+				'wp-duotone-midnight'
+			);
+		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {
@@ -944,7 +1091,7 @@ describe( 'global styles renderer', () => {
 		} );
 
 		it( 'should convert preset percentage width to calc() formula', () => {
-			const tree: GlobalStylesConfig = {
+			const tree = {
 				settings: {
 					blocks: {
 						'core/button': {
@@ -971,7 +1118,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 				},
-			};
+			} as unknown as GlobalStylesConfig;
 
 			const blockSelectors = {
 				'core/button': {

@@ -8,16 +8,16 @@ test.describe( 'Site editor url navigation', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllTemplates( 'wp_template_part' ),
 		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'Redirection after template creation', async ( {

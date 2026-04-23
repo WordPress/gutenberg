@@ -41,6 +41,7 @@ function defaultRequestToExternal( request ) {
 			return 'React';
 
 		case 'react-dom':
+		case 'react-dom/client':
 			return 'ReactDOM';
 
 		case 'react/jsx-runtime':
@@ -122,6 +123,9 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react-dom/client':
+			return 'react-dom';
 
 		case 'react/jsx-runtime':
 			return 'react-jsx-runtime';

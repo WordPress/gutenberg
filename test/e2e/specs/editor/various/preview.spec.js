@@ -364,6 +364,7 @@ class PreviewUtils {
 		}
 
 		await this.page.click( 'role=menuitem[name="Preview in new tab"i]' );
+		// eslint-disable-next-line playwright/no-wait-for-navigation
 		return previewPage.waitForNavigation();
 	}
 
@@ -398,6 +399,7 @@ class PreviewUtils {
 
 		if ( isSaveVisible ) {
 			saveButton.click();
+			// eslint-disable-next-line playwright/no-wait-for-navigation
 			await this.page.waitForNavigation();
 			return;
 		}

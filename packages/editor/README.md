@@ -454,6 +454,14 @@ _Returns_
 
 > **Deprecated** since 5.3, use `wp.blockEditor.InspectorControls` instead.
 
+### linkAutocompleter
+
+A link completer for posts and pages.
+
+_Type_
+
+-   `Object`
+
 ### LocalAutosaveMonitor
 
 Monitors local autosaves of a post in the editor. It uses several hooks and functions to manage autosave behavior:

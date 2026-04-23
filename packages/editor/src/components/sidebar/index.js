@@ -26,12 +26,15 @@ import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
 import PostSummary from './post-summary';
+import PostRevisionSummary from './post-revision-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
+import TemplateActionsPanel from '../template-actions-panel';
 import TemplateContentPanel from '../template-content-panel';
 import TemplatePartContentPanel from '../template-part-content-panel';
 import { MediaMetadataPanel } from '../media';
+import PostRevisionsPanel from '../post-revisions-panel';
 import RevisionBlockDiffPanel from '../revision-block-diff';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
@@ -95,6 +98,41 @@ const SidebarContent = ( {
 		}
 	}, [ tabName ] );
 
+	let tabContent;
+	if ( isAttachment ) {
+		tabContent = (
+			<MediaMetadataPanel onActionPerformed={ onActionPerformed } />
+		);
+	} else if ( isRevisionsMode ) {
+		tabContent = <PostRevisionSummary />;
+	} else {
+		tabContent = (
+			<>
+				<PostSummary onActionPerformed={ onActionPerformed } />
+				<PluginDocumentSettingPanel.Slot />
+				<TemplateContentPanel />
+				{ window?.__experimentalDataFormInspector &&
+					[
+						'post',
+						'page',
+						'wp_template',
+						'wp_template_part',
+						'wp_block',
+					].includes( postType ) && (
+						<>
+							<TemplateActionsPanel />
+							<PostRevisionsPanel />
+						</>
+					) }
+				<TemplatePartContentPanel />
+				<PostTransformPanel />
+				<PostTaxonomiesPanel />
+				<PatternOverridesPanel />
+				{ extraPanels }
+			</>
+		);
+	}
+
 	return (
 		<PluginSidebar
 			identifier={ tabName }
@@ -119,28 +157,7 @@ const SidebarContent = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					{ isAttachment ? (
-						<MediaMetadataPanel
-							onActionPerformed={ onActionPerformed }
-						/>
-					) : (
-						<>
-							<PostSummary
-								onActionPerformed={ onActionPerformed }
-							/>
-							{ ! isRevisionsMode && (
-								<>
-									<PluginDocumentSettingPanel.Slot />
-									<TemplateContentPanel />
-									<TemplatePartContentPanel />
-									<PostTransformPanel />
-									<PostTaxonomiesPanel />
-									<PatternOverridesPanel />
-									{ extraPanels }
-								</>
-							) }
-						</>
-					) }
+					{ tabContent }
 				</Tabs.TabPanel>
 				{ ! isAttachment && (
 					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>

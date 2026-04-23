@@ -174,7 +174,7 @@
 }
 
 .dataviews-view-picker-grid__media--clickable {
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .dataviews-view-picker-grid-group__header {

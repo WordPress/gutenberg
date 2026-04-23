@@ -11,7 +11,7 @@ import {
 	FlexBlock,
 	FlexItem,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -351,7 +351,7 @@ export default function OverlayTemplatePartSelector( {
 				alignment="flex-start"
 				className="wp-block-navigation__overlay-help-text-wrapper"
 			>
-				<Text
+				<WCText
 					variant="muted"
 					isBlock
 					className="wp-block-navigation__overlay-help-text"
@@ -359,7 +359,7 @@ export default function OverlayTemplatePartSelector( {
 					{ __(
 						'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
 					) }
-				</Text>
+				</WCText>
 			</HStack>
 		</div>
 	);
