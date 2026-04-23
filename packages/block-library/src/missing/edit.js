@@ -4,7 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, rawHandler } from '@wordpress/blocks';
+import { autop } from '@wordpress/autop';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	Warning,
@@ -34,7 +35,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const { replaceBlock } = useDispatch( blockEditorStore );
+	const { replaceBlock, replaceBlocks } = useDispatch( blockEditorStore );
 
 	function convertToHTML() {
 		replaceBlock(
@@ -45,15 +46,35 @@ export default function MissingEdit( { attributes, clientId } ) {
 		);
 	}
 
+	function convertToBlocks() {
+		replaceBlocks(
+			clientId,
+			rawHandler( {
+				HTML: autop( originalUndelimitedContent ).trim(),
+			} )
+		);
+	}
+
 	const actions = [];
 	let messageHTML;
+
+	const convertToBlocksButton = (
+		<Button
+			__next40pxDefaultSize
+			key="convert-to-blocks"
+			onClick={ convertToBlocks }
+			variant="primary"
+		>
+			{ __( 'Convert to blocks' ) }
+		</Button>
+	);
 
 	const convertToHtmlButton = (
 		<Button
 			__next40pxDefaultSize
-			key="convert"
+			key="keep-as-html"
 			onClick={ convertToHTML }
-			variant="primary"
+			variant="secondary"
 		>
 			{ __( 'Keep as HTML' ) }
 		</Button>
@@ -64,14 +85,15 @@ export default function MissingEdit( { attributes, clientId } ) {
 		! hasFreeformBlock &&
 		( ! originalName || originalName === 'core/freeform' )
 	) {
+		actions.push( convertToBlocksButton );
 		if ( hasHTMLBlock ) {
 			messageHTML = __(
-				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely. Alternatively, if you have unsaved changes, you can save them and refresh to use the Classic block.'
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to blocks, convert it to a Custom HTML block, or remove it entirely.'
 			);
 			actions.push( convertToHtmlButton );
 		} else {
 			messageHTML = __(
-				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, or remove it entirely. Alternatively, if you have unsaved changes, you can save them and refresh to use the Classic block.'
+				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to blocks, or remove it entirely.'
 			);
 		}
 	} else if ( hasContent && hasHTMLBlock ) {
