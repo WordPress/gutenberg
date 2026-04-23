@@ -35,10 +35,6 @@ function ResizeHandle( {
 		width: '0',
 		height: '0',
 		cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
-		borderStyle: 'solid',
-		borderWidth: '0 0 12px 12px',
-		borderColor:
-			'transparent transparent var(--wp-admin-theme-color, #0087be) transparent',
 		zIndex: 1,
 		display: disabled ? 'none' : 'block',
 	};
@@ -46,6 +42,7 @@ function ResizeHandle( {
 	return (
 		<div
 			ref={ setNodeRef }
+			className="dashboard-grid__resize-handle"
 			style={ resizeHandleStyle }
 			{ ...listeners }
 			{ ...attributes }

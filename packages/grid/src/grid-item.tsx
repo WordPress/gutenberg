@@ -107,15 +107,15 @@ export function GridItem( {
 		zIndex: isDragging ? 2 : undefined,
 	};
 
-	// Inner content style with scaling effect.
-	// The reason we need a separate "content" div is because the scaling
-	// animation impacts the computation done by useSortable if they're
-	// applied to the same div.
+	const itemClassName = isDragging
+		? 'dashboard-grid__item dashboard-grid__item--is-dragging'
+		: 'dashboard-grid__item';
+
+	// The scaling animation lives on a separate "content" div because
+	// applying it to the sortable root would interfere with `useSortable`
+	// transform computations.
 	const contentStyle = {
 		position: 'relative' as const,
-		transition: 'transform 200ms ease, box-shadow 200ms ease',
-		transform: isDragging ? 'scale(1.05)' : undefined,
-		boxShadow: isDragging ? '0 5px 10px rgba(0,0,0,0.15)' : undefined,
 		height: '100%',
 	};
 
@@ -136,14 +136,13 @@ export function GridItem( {
 	// Preview overlay element (rendered directly in the GridItem)
 	const previewOverlay = previewDelta ? (
 		<div
+			className="dashboard-grid__preview-overlay"
 			style={ {
 				position: 'absolute',
 				top: 0,
 				left: 0,
 				right: -previewDelta.width,
 				bottom: -previewDelta.height,
-				border: '2px dashed var(--wpds-color-stroke-interactive-brand, #3858e9)',
-				background: 'transparent',
 				pointerEvents: 'none',
 				zIndex: 1,
 			} }
@@ -151,11 +150,19 @@ export function GridItem( {
 	) : null;
 
 	return (
-		<div ref={ setNodeRef } style={ style } { ...attributes }>
+		<div
+			ref={ setNodeRef }
+			className={ itemClassName }
+			style={ style }
+			{ ...attributes }
+		>
 			{ actionableArea }
 
 			<div { ...listeners } style={ { height: '100%' } }>
-				<div style={ contentStyle }>
+				<div
+					className="dashboard-grid__item-content"
+					style={ contentStyle }
+				>
 					{ children }
 					<ResizeHandle
 						disabled={ disabled }
