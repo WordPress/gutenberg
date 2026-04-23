@@ -179,7 +179,7 @@ export function NoteThread( {
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
-			id={ `comment-thread-${ note.id }` }
+			id={ `note-thread-${ note.id }` }
 			gap="md"
 			onClick={ handleNoteSelect }
 			onMouseEnter={ onMouseEnter }
@@ -204,7 +204,7 @@ export function NoteThread( {
 			aria-expanded={ isSelected }
 		>
 			<Button
-				className="editor-collab-sidebar-panel__skip-to-comment"
+				className="editor-collab-sidebar-panel__skip-to-note"
 				variant="secondary"
 				size="compact"
 				onClick={ () => {

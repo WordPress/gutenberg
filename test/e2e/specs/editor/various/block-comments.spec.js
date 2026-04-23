@@ -86,7 +86,7 @@ test.describe( 'Block Comments', () => {
 		} );
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		const commentText = page
-			.locator( '.editor-collab-sidebar-panel__user-comment' )
+			.locator( '.editor-collab-sidebar-panel__note-content' )
 			.last();
 
 		await commentForm.fill( 'Test reply' );
@@ -119,7 +119,7 @@ test.describe( 'Block Comments', () => {
 			.click();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__user-comment' )
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
 		).toHaveText( 'Test comment after edit.' );
 		await expect(
 			page
@@ -144,7 +144,7 @@ test.describe( 'Block Comments', () => {
 			.click();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__user-comment' )
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
 		).toBeHidden();
 		await expect(
 			page

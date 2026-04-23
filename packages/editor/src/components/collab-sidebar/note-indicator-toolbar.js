@@ -75,7 +75,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 	return (
 		<CommentIconToolbarSlotFill.Fill>
 			<ToolbarButton
-				className="comment-avatar-indicator"
+				className="editor-note-indicator"
 				label={ __( 'View notes' ) }
 				onClick={ () => onClick() }
 				showTooltip
@@ -86,7 +86,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 							key={ participant.id }
 							src={ participant.avatar }
 							alt={ participant.name }
-							className="comment-avatar"
+							className="editor-note-indicator__avatar"
 							style={ {
 								borderColor: getAvatarBorderColor(
 									participant.id
@@ -95,7 +95,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 						/>
 					) ) }
 					{ overflowCount > 0 && (
-						<span className="editor-collab-sidebar-panel__participant-overflow">
+						<span className="editor-note-indicator__overflow">
 							{ overflowText }
 						</span>
 					) }

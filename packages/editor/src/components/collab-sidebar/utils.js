@@ -215,7 +215,7 @@ export function focusNoteThread( noteId, container, additionalSelector ) {
 	// A thread without a noteId is a new note thread.
 	const threadSelector =
 		noteId && noteId !== 'new'
-			? `[role=treeitem][id="comment-thread-${ noteId }"]`
+			? `[role=treeitem][id="note-thread-${ noteId }"]`
 			: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`

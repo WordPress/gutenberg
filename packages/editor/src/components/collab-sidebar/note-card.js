@@ -21,7 +21,7 @@ export function NoteCard( { note, actions, className, children, ...props } ) {
 				/>
 				{ actions && (
 					<FlexItem
-						className="editor-collab-sidebar-panel__comment-status"
+						className="editor-collab-sidebar-panel__note-actions"
 						onClick={ ( event ) => event.stopPropagation() }
 					>
 						<Stack direction="row" align="center">

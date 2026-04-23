@@ -150,7 +150,7 @@ export function Note( {
 		body = (
 			<RawHTML
 				className={ clsx(
-					'editor-collab-sidebar-panel__user-comment',
+					'editor-collab-sidebar-panel__note-content',
 					'editor-collab-sidebar-panel__resolution-text'
 				) }
 			>
@@ -159,7 +159,7 @@ export function Note( {
 		);
 	} else {
 		body = (
-			<RawHTML className="editor-collab-sidebar-panel__user-comment">
+			<RawHTML className="editor-collab-sidebar-panel__note-content">
 				{ note?.content?.rendered }
 			</RawHTML>
 		);

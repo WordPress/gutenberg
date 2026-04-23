@@ -33,7 +33,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 
 	return (
 		<Stack
-			className="editor-collab-sidebar-panel__comment-form"
+			className="editor-collab-sidebar-panel__note-form"
 			direction="column"
 			gap="lg"
 			render={ <form /> }
