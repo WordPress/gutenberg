@@ -8,11 +8,6 @@ import { RuleTester } from 'eslint';
  */
 import rule from '../use-import-as';
 
-if ( typeof globalThis.structuredClone !== 'function' ) {
-	globalThis.structuredClone = ( value ) =>
-		JSON.parse( JSON.stringify( value ) );
-}
-
 const ruleTester = new RuleTester( {
 	languageOptions: {
 		sourceType: 'module',
@@ -236,6 +231,27 @@ ruleTester.run( 'use-import-as', rule, {
 				import { unlock } from '../../lock-unlock';
 
 				const { Badge: HiddenBadge = fallbackBadge } = unlock( privateApis );
+			`,
+			options,
+			errors: [
+				withSuggestions(
+					'`Badge` from `@wordpress/components` must be imported as `WCBadge`.',
+					`
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge: WCBadge = fallbackBadge } = unlock( privateApis );
+			`,
+					'Destructure as `WCBadge`.'
+				),
+			],
+		},
+		{
+			code: `
+				import { privateApis } from '@wordpress/components';
+				import { unlock } from '../../lock-unlock';
+
+				const { Badge = fallbackBadge } = unlock( privateApis );
 			`,
 			options,
 			errors: [
