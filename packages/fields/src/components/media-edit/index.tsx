@@ -914,7 +914,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
