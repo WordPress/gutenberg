@@ -14,7 +14,7 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusCommentThread } from './utils';
+import { focusNoteThread } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -75,7 +75,7 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 							content: inputComment,
 						} );
 						selectNote( id );
-						focusCommentThread( id, sidebarRef.current );
+						focusNoteThread( id, sidebarRef.current );
 					} }
 					onCancel={ unselectNote }
 					labels={ { input: __( 'New note' ) } }

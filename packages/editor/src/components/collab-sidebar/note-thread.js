@@ -26,7 +26,7 @@ import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusCommentThread, getCommentExcerpt } from './utils';
+import { focusNoteThread, getNoteExcerpt } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -136,7 +136,7 @@ export function NoteThread( {
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
-			focusCommentThread( note.id, sidebarRef.current );
+			focusNoteThread( note.id, sidebarRef.current );
 		}
 	};
 
@@ -145,7 +145,7 @@ export function NoteThread( {
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
-	const noteExcerpt = getCommentExcerpt(
+	const noteExcerpt = getNoteExcerpt(
 		stripHTML( note.content?.rendered ),
 		10
 	);
@@ -208,11 +208,7 @@ export function NoteThread( {
 				variant="secondary"
 				size="compact"
 				onClick={ () => {
-					focusCommentThread(
-						note.id,
-						sidebarRef.current,
-						'textarea'
-					);
+					focusNoteThread( note.id, sidebarRef.current, 'textarea' );
 				} }
 			>
 				{ __( 'Add new reply' ) }
@@ -253,7 +249,7 @@ export function NoteThread( {
 						className="editor-collab-sidebar-panel__more-reply-button"
 						onClick={ () => {
 							selectNote( note.id );
-							focusCommentThread( note.id, sidebarRef.current );
+							focusNoteThread( note.id, sidebarRef.current );
 						} }
 					>
 						{ sprintf(
@@ -300,7 +296,7 @@ export function NoteThread( {
 							// Prevent the parent onClick from being triggered.
 							event.stopPropagation();
 							unselectNote();
-							focusCommentThread( note.id, sidebarRef.current );
+							focusNoteThread( note.id, sidebarRef.current );
 						} }
 						labels={ {
 							submit:

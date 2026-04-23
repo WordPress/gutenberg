@@ -13,7 +13,7 @@ import {
  */
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusCommentThread } from './utils';
+import { focusNoteThread } from './utils';
 import { useFloatingBoard } from './hooks';
 import { AddNote } from './add-note';
 import { store as editorStore } from '../../store';
@@ -112,16 +112,16 @@ export function Notes( {
 		if ( note.parent !== 0 ) {
 			// Move focus to the parent thread when a reply was deleted.
 			selectNote( note.parent );
-			focusCommentThread( note.parent, sidebarRef.current );
+			focusNoteThread( note.parent, sidebarRef.current );
 			return;
 		}
 
 		if ( nextThread ) {
 			selectNote( nextThread.id );
-			focusCommentThread( nextThread.id, sidebarRef.current );
+			focusNoteThread( nextThread.id, sidebarRef.current );
 		} else if ( prevThread ) {
 			selectNote( prevThread.id );
-			focusCommentThread( prevThread.id, sidebarRef.current );
+			focusNoteThread( prevThread.id, sidebarRef.current );
 		} else {
 			selectNote( undefined );
 			toggleBlockSpotlight( note.blockClientId, false );
@@ -138,7 +138,7 @@ export function Notes( {
 	// Focus the selected note when requested.
 	useEffect( () => {
 		if ( noteFocused && selectedNote ) {
-			focusCommentThread(
+			focusNoteThread(
 				selectedNote,
 				sidebarRef.current,
 				selectedNote === 'new' ? 'textarea' : undefined
@@ -186,7 +186,7 @@ export function Notes( {
 			if ( thread.blockClientId ) {
 				toggleBlockSpotlight( thread.blockClientId, false );
 			}
-			focusCommentThread( thread.id, sidebarRef.current );
+			focusNoteThread( thread.id, sidebarRef.current );
 		} else if (
 			event.key === 'ArrowDown' &&
 			currentIndex < threads.length - 1 &&
@@ -194,7 +194,7 @@ export function Notes( {
 		) {
 			// Move to the next thread.
 			const nextThread = threads[ currentIndex + 1 ];
-			focusCommentThread( nextThread.id, sidebarRef.current );
+			focusNoteThread( nextThread.id, sidebarRef.current );
 		} else if (
 			event.key === 'ArrowUp' &&
 			currentIndex > 0 &&
@@ -202,19 +202,19 @@ export function Notes( {
 		) {
 			// Move to the previous thread.
 			const prevThread = threads[ currentIndex - 1 ];
-			focusCommentThread( prevThread.id, sidebarRef.current );
+			focusNoteThread( prevThread.id, sidebarRef.current );
 		} else if (
 			event.key === 'Home' &&
 			event.currentTarget === event.target
 		) {
 			// Move to the first thread.
-			focusCommentThread( threads[ 0 ].id, sidebarRef.current );
+			focusNoteThread( threads[ 0 ].id, sidebarRef.current );
 		} else if (
 			event.key === 'End' &&
 			event.currentTarget === event.target
 		) {
 			// Move to the last thread.
-			focusCommentThread(
+			focusNoteThread(
 				threads[ threads.length - 1 ].id,
 				sidebarRef.current
 			);

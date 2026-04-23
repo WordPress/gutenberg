@@ -27,8 +27,8 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import {
-	useBlockComments,
-	useBlockCommentsActions,
+	useNoteThreads,
+	useNoteActions,
 	useEnableFloatingSidebar,
 } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -40,7 +40,7 @@ function NotesSidebarContent( {
 	sidebarRef,
 	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
+	const { onCreate, onEdit, onDelete } = useNoteActions();
 
 	return (
 		<Stack
@@ -115,7 +115,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useBlockComments( postId );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;

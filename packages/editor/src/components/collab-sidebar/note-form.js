@@ -19,7 +19,7 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { sanitizeCommentString } from './utils';
+import { sanitizeNoteContent } from './utils';
 
 export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
@@ -29,7 +29,7 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const isDisabled =
 		inputComment === note?.content?.raw ||
-		! sanitizeCommentString( inputComment ).length;
+		! sanitizeNoteContent( inputComment ).length;
 
 	return (
 		<Stack
