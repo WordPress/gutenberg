@@ -1,0 +1,28 @@
+.item {
+	position: relative;
+}
+
+.is-dragging {
+	z-index: 2;
+}
+
+.item-content {
+	position: relative;
+	height: 100%;
+	transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.is-dragging .item-content {
+	transform: scale(1.05);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.preview-overlay {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	pointer-events: none;
+	z-index: 1;
+	border: 2px dashed var(--wpds-color-stroke-interactive-brand);
+	background: transparent;
+}
