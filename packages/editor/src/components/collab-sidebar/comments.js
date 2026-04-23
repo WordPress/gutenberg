@@ -14,16 +14,13 @@ import {
 	useRef,
 } from '@wordpress/element';
 import {
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -435,7 +432,7 @@ function Thread( {
 				'is-selected': isSelected,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing="3"
+			gap="md"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -473,9 +470,9 @@ function Thread( {
 				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
-				<Text as="p" weight={ 500 } variant="muted">
+				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
-				</Text>
+				</p>
 			) }
 			<CommentBoard
 				thread={ thread }
@@ -508,7 +505,12 @@ function Thread( {
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
-				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+				<Stack
+					direction="row"
+					align="center"
+					justify="space-between"
+					className="editor-collab-sidebar-panel__more-reply-separator"
+				>
 					<Button
 						size="compact"
 						variant="tertiary"
@@ -531,7 +533,7 @@ function Thread( {
 							restReplies.length
 						) }
 					</Button>
-				</HStack>
+				</Stack>
 			) }
 			{ ! isSelected && lastReply && (
 				<CommentBoard
@@ -543,11 +545,16 @@ function Thread( {
 				/>
 			) }
 			{ isSelected && (
-				<VStack spacing="2" role="treeitem">
-					<HStack alignment="left" spacing="3" justify="flex-start">
+				<Stack direction="column" gap="sm" role="treeitem">
+					<Stack
+						direction="row"
+						align="center"
+						justify="flex-start"
+						gap="md"
+					>
 						<CommentAuthorInfo />
-					</HStack>
-					<VStack spacing="2">
+					</Stack>
+					<Stack direction="column" gap="sm">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
@@ -587,8 +594,8 @@ function Thread( {
 								thread.author_name
 							) }
 						/>
-					</VStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			) }
 			{ !! thread.blockClientId && (
 				<Button
@@ -673,11 +680,12 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 			: __( 'Are you sure you want to delete this reply?' );
 
 	return (
-		<VStack
-			spacing="2"
+		<Stack
+			direction="column"
+			gap="sm"
 			role={ thread.parent !== 0 ? 'treeitem' : undefined }
 		>
-			<HStack alignment="left" spacing="3" justify="flex-start">
+			<Stack direction="row" align="center" justify="flex-start" gap="md">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
@@ -692,7 +700,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 							event.stopPropagation();
 						} }
 					>
-						<HStack spacing="0">
+						<Stack direction="row" align="center">
 							{ canResolve && (
 								<Button
 									label={ _x(
@@ -744,10 +752,10 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 									) ) }
 								</Menu.Popover>
 							</Menu>
-						</HStack>
+						</Stack>
 					</FlexItem>
 				) }
-			</HStack>
+			</Stack>
 			{ 'edit' === actionState ? (
 				<CommentForm
 					onSubmit={ ( value ) => {
@@ -814,7 +822,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</Stack>
 	);
 };
 

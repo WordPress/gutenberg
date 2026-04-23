@@ -6,6 +6,10 @@
 
 -   Added [`no-unsafe-render-order`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unsafe-render-order.md) rule to flag unsafe render-prop composition with `VisuallyHidden` and `Link`/`Text` ([#77428](https://github.com/WordPress/gutenberg/pull/77428)).
 
+### Enhancements
+
+-   Improved the Design System token lint rules to recognize CSS declaration strings more accurately, avoiding false bare-token reports for declarations while still flagging invalid token assignments and unknown token names ([#77384](https://github.com/WordPress/gutenberg/pull/77384)).
+
 ## 25.0.0 (2026-04-15)
 
 ### Breaking Changes

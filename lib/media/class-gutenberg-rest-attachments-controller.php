@@ -81,6 +81,11 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 							'type'        => 'boolean',
 							'default'     => false,
 						),
+						'convert_format'     => array(
+							'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => true,
+						),
 					),
 				),
 				'allow_batch' => $this->allow_batch,
