@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.42.0",
+	"version": "14.44.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,6 @@
 		"build-module/bindings/**"
 	],
 	"dependencies": {
-		"@floating-ui/react-dom": "2.0.8",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
@@ -99,8 +98,10 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/upload-media": "file:../upload-media",
 		"@wordpress/url": "file:../url",
+		"@wordpress/views": "file:../views",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",

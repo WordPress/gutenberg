@@ -2,9 +2,22 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Page`: Add `visual` prop to render a decorative-only icon or image alongside the header title or breadcrumbs. [#76469](https://github.com/WordPress/gutenberg/pull/76469)
+
+## 1.12.0 (2026-04-15)
+
+### Enhancements
+
+-   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
+
+## 1.11.0 (2026-04-01)
+
 ### Bug Fixes
 
 -   `Breadcrumbs`: throw a runtime error when non-last items are missing a `to` prop [#76493](https://github.com/WordPress/gutenberg/pull/76493/)
+-   Fix Page Header not rendering when only `actions` prop is provided. [#76695](https://github.com/WordPress/gutenberg/pull/76695)
 
 ## 1.10.0 (2026-03-18)
 

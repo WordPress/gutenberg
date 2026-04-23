@@ -24,6 +24,7 @@ function UnconnectedVisuallyHidden(
 		<View
 			ref={ forwardedRef }
 			{ ...contextProps }
+			data-visually-hidden=""
 			style={ { ...visuallyHidden, ...( styleProp || {} ) } }
 		/>
 	);

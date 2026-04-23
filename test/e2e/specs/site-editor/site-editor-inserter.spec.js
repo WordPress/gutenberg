@@ -13,13 +13,13 @@ test.describe( 'Site Editor Inserter', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin, editor } ) => {
 		await admin.visitSiteEditor();
 		await editor.canvas.locator( 'body' ).click();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test.use( {

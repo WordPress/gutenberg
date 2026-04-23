@@ -5,7 +5,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -92,7 +92,7 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 	return (
 		<form onSubmit={ onSetPageAsHomepage }>
 			<VStack spacing="5">
-				<Text>{ modalText }</Text>
+				<WCText>{ modalText }</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize

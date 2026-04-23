@@ -31,7 +31,7 @@ const meta: Meta< typeof InputControl > = {
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onChange: fn(),
 		onValidate: fn(),

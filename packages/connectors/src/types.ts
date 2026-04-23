@@ -16,7 +16,7 @@ export type ConnectorAuthentication =
 	| { method: 'none' };
 
 export interface ConnectorPlugin {
-	slug: string;
+	file: string;
 	isInstalled: boolean;
 	isActivated: boolean;
 }
@@ -25,6 +25,7 @@ export interface ConnectorRenderProps {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;
@@ -34,6 +35,7 @@ export interface ConnectorConfig {
 	slug: string;
 	name: string;
 	description: string;
+	type?: string;
 	logo?: ReactNode;
 	authentication?: ConnectorAuthentication;
 	plugin?: ConnectorPlugin;

@@ -9,7 +9,7 @@ import { Y } from '@wordpress/sync';
 import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 
 /**
- * Mock getBlockTypes so isRichTextAttribute can identify rich-text attrs.
+ * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
  */
 jest.mock( '@wordpress/blocks', () => {
 	const actual = jest.requireActual( '@wordpress/blocks' ) as Record<
@@ -57,6 +57,7 @@ import { RichTextData } from '@wordpress/rich-text';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type PostChanges,
@@ -81,6 +82,43 @@ const defaultSyncedProperties = new Set< string >( [
 	'tags',
 	'title',
 ] );
+
+describe( 'defaultCollectionSyncConfig', () => {
+	it( 'has no-op applyChangesToCRDTDoc', () => {
+		const doc = new Y.Doc();
+		// Should not throw and return undefined.
+		expect(
+			defaultCollectionSyncConfig.applyChangesToCRDTDoc( doc, {
+				title: 'test',
+			} )
+		).toBeUndefined();
+		doc.destroy();
+	} );
+
+	it( 'has getChangesFromCRDTDoc that returns empty object', () => {
+		const doc = new Y.Doc();
+		const result = defaultCollectionSyncConfig.getChangesFromCRDTDoc( doc, {
+			title: 'test',
+		} );
+		expect( result ).toEqual( {} );
+		doc.destroy();
+	} );
+
+	it( 'shouldSync returns true when objectId is null (collection)', () => {
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', null )
+		).toBe( true );
+	} );
+
+	it( 'shouldSync returns false when objectId is provided (individual record)', () => {
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', '123' )
+		).toBe( false );
+		expect(
+			defaultCollectionSyncConfig.shouldSync?.( 'comment', 'foo' )
+		).toBe( false );
+	} );
+} );
 
 describe( 'crdt', () => {
 	let doc: Y.Doc;
@@ -733,6 +771,30 @@ describe( 'crdt', () => {
 			expect( changes.meta ).toEqual( {
 				public_meta: [ 'value', 'value 2' ], // from CRDT
 			} );
+		} );
+
+		it( 'excludes orphaned meta keys not present on the edited record', () => {
+			// If post meta is registered, saved (landing in a CRDT doc),
+			// then unregistered, it can permanently mark the record dirty.
+			// Orphaned values should not show up as a change.
+			const metaMap = createYMap();
+			metaMap.set( 'registered_meta', 'value' );
+			metaMap.set( 'orphaned_meta', 'stale value' );
+			map.set( 'meta', metaMap );
+
+			const editedRecord = {
+				meta: {
+					registered_meta: 'value',
+				},
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				defaultSyncedProperties
+			);
+
+			expect( changes ).not.toHaveProperty( 'meta' );
 		} );
 
 		it( 'excludes disallowed meta keys in changes', () => {
