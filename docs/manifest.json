@@ -1668,6 +1668,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/design-system-mcp",
+		"slug": "packages-design-system-mcp",
+		"markdown_source": "../packages/design-system-mcp/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/docgen",
 		"slug": "packages-docgen",
 		"markdown_source": "../packages/docgen/README.md",

@@ -8,7 +8,9 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
-import { DialogValidationProvider } from './context';
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
+import { DialogValidationProvider, useDialogModal } from './context';
+import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -20,15 +22,18 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-dialog-close-icon';
 /**
  * Renders the dialog popup element that contains the dialog content.
  * Uses a portal to render outside the DOM hierarchy.
+ *
+ * When `portal` is omitted, defaults to `Dialog.Portal`. Portal merging is
+ * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{
 		className,
-		container,
+		portal,
+		children,
 		size = 'medium',
 		initialFocus,
 		finalFocus,
-		children,
 		...props
 	},
 	ref
@@ -38,10 +43,21 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
+	const modal = useDialogModal();
 
-	return (
-		<_Dialog.Portal container={ container }>
-			<_Dialog.Backdrop className={ styles.backdrop } />
+	const portalChildren = (
+		<>
+			{ /*
+			 * Only render a backdrop for fully modal dialogs. Non-modal dialogs
+			 * should not dim the page, and `trap-focus` keeps outside pointer
+			 * interactions enabled, so a backdrop would misrepresent that mode.
+			 */ }
+			{ modal === true && (
+				<_Dialog.Backdrop
+					className={ styles.backdrop }
+					data-testid="dialog-backdrop"
+				/>
+			) }
 			<ThemeProvider>
 				<_Dialog.Popup
 					ref={ mergedRef }
@@ -59,8 +75,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					</DialogValidationProvider>
 				</_Dialog.Popup>
 			</ThemeProvider>
-		</_Dialog.Portal>
+		</>
 	);
+
+	return renderPortalWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

@@ -227,7 +227,7 @@ export const STYLE_BOOK_IFRAME_STYLES = `
 	.editor-style-book__example {
 	    max-width: 900px;
 		border-radius: 2px;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		display: flex;
 		flex-direction: column;
 		gap: 40px;

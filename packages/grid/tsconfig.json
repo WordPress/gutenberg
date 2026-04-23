@@ -4,5 +4,9 @@
 	"compilerOptions": {
 		"types": [ "jest" ]
 	},
-	"references": [ { "path": "../compose" }, { "path": "../element" } ]
+	"references": [
+		{ "path": "../compose" },
+		{ "path": "../element" },
+		{ "path": "../private-apis" }
+	]
 }
