@@ -263,10 +263,10 @@
 				left: 50%;
 				transform: translate(-50%, -50%);
 				margin: 0;
-				background-color: var(--wpds-color-bg-surface-neutral-strong);
+				background-color: var(--wpds-color-fg-interactive-brand-strong);
 
 				// This border serves as a background color in Windows High Contrast mode.
-				border: 4px solid var(--wpds-color-bg-surface-neutral-strong);
+				border: 4px solid var(--wpds-color-fg-interactive-brand-strong);
 
 				@include break-small() {
 					width: math.div(vars.$radio-input-size, 2);
