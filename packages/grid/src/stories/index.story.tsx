@@ -18,7 +18,7 @@ import { DashboardGrid } from '../grid';
 import type { DashboardGridLayoutItem } from '../types';
 
 const meta: Meta< typeof DashboardGrid > = {
-	title: 'Design System/Components/DashboardGrid',
+	title: 'Grid/DashboardGrid',
 	component: DashboardGrid,
 	argTypes: {
 		children: { control: false },
