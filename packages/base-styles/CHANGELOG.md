@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Remove the shared Button Group z-index entry from the `$z-layers` map ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+
 ## 6.20.0 (2026-04-15)
 
 ## 6.19.0 (2026-04-01)
