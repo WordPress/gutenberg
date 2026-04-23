@@ -329,7 +329,7 @@ export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
 	isFloating,
-	commentSidebarRef,
+	sidebarRef,
 } ) {
 	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
@@ -339,11 +339,11 @@ export function useFloatingBoard( {
 	// Notes are positioned in canvas content-space; CSS inherits
 	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
-		if ( ! isFloating || ! commentSidebarRef?.current ) {
+		if ( ! isFloating || ! sidebarRef?.current ) {
 			return;
 		}
 
-		const panel = commentSidebarRef.current;
+		const panel = sidebarRef.current;
 		const blockEl = store.getFirstBlockElement();
 		// Climb to the block-list root so nested scroll containers
 		// (e.g. a Group with overflow:auto) don't shadow the canvas.
@@ -381,14 +381,7 @@ export function useFloatingBoard( {
 			window.cancelAnimationFrame( rafId );
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
-	}, [
-		commentSidebarRef,
-		heights,
-		isFloating,
-		selectedNoteId,
-		store,
-		threads,
-	] );
+	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
 
 	return {
 		notePositions,

@@ -12,16 +12,16 @@ import {
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
-import CommentAuthorInfo from './comment-author-info';
-import CommentForm from './comment-form';
+import { NoteByline } from './note-byline';
+import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
 import { focusCommentThread } from './utils';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
+export function AddNote( { onSubmit, sidebarRef, floating } ) {
 	const { clientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
 		return {
@@ -36,7 +36,7 @@ export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 
-	const unselectThread = () => {
+	const unselectNote = () => {
 		selectNote( undefined );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
@@ -70,17 +70,16 @@ export function AddComment( { onSubmit, commentSidebarRef, floating } ) {
 			} }
 		>
 			<Stack direction="row" align="center" justify="flex-start" gap="md">
-				<CommentAuthorInfo />
+				<NoteByline />
 			</Stack>
-			<CommentForm
+			<NoteForm
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					selectNote( id );
-					focusCommentThread( id, commentSidebarRef.current );
+					focusCommentThread( id, sidebarRef.current );
 				} }
-				onCancel={ unselectThread }
-				submitButtonText={ __( 'Add note' ) }
-				labelText={ __( 'New note' ) }
+				onCancel={ unselectNote }
+				labels={ { input: __( 'New note' ) } }
 			/>
 		</FloatingContainer>
 	);

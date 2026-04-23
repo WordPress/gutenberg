@@ -21,20 +21,14 @@ import { isKeyboardEvent } from '@wordpress/keycodes';
  */
 import { sanitizeCommentString } from './utils';
 
-function CommentForm( {
-	onSubmit,
-	onCancel,
-	thread,
-	submitButtonText,
-	labelText,
-} ) {
+export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 	const [ inputComment, setInputComment ] = useState(
-		thread?.content?.raw ?? ''
+		note?.content?.raw ?? ''
 	);
 
-	const inputId = useInstanceId( CommentForm, 'comment-input' );
+	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const isDisabled =
-		inputComment === thread?.content?.raw ||
+		inputComment === note?.content?.raw ||
 		! sanitizeCommentString( inputComment ).length;
 
 	return (
@@ -51,7 +45,7 @@ function CommentForm( {
 		>
 			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
 			<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
-				{ labelText ?? __( 'Note' ) }
+				{ labels?.input ?? __( 'Note' ) }
 			</VisuallyHidden>
 			<TextareaAutosize
 				id={ inputId }
@@ -93,11 +87,9 @@ function CommentForm( {
 					type="submit"
 					disabled={ isDisabled }
 				>
-					<Truncate>{ submitButtonText }</Truncate>
+					<Truncate>{ labels?.submit ?? __( 'Add note' ) }</Truncate>
 				</Button>
 			</Stack>
 		</Stack>
 	);
 }
-
-export default CommentForm;

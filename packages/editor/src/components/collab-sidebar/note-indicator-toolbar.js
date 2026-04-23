@@ -15,36 +15,36 @@ import { getAvatarBorderColor } from './utils';
 
 const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
-const CommentAvatarIndicator = ( { onClick, thread } ) => {
+export function NoteAvatarIndicator( { onClick, note } ) {
 	const threadParticipants = useMemo( () => {
-		if ( ! thread ) {
+		if ( ! note ) {
 			return [];
 		}
 
 		const participantsMap = new Map();
-		const allComments = [ thread, ...thread.reply ];
+		const allNotes = [ note, ...note.reply ];
 
 		// Sort by date to show participants in chronological order.
-		allComments.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
+		allNotes.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) );
 
-		allComments.forEach( ( comment ) => {
-			// Track thread participants (original commenter + repliers).
-			if ( comment.author_name && comment.author_avatar_urls ) {
-				if ( ! participantsMap.has( comment.author ) ) {
-					participantsMap.set( comment.author, {
-						name: comment.author_name,
+		allNotes.forEach( ( entry ) => {
+			// Track thread participants (original author + repliers).
+			if ( entry.author_name && entry.author_avatar_urls ) {
+				if ( ! participantsMap.has( entry.author ) ) {
+					participantsMap.set( entry.author, {
+						name: entry.author_name,
 						avatar:
-							comment.author_avatar_urls?.[ '48' ] ||
-							comment.author_avatar_urls?.[ '96' ],
-						id: comment.author,
-						date: comment.date,
+							entry.author_avatar_urls?.[ '48' ] ||
+							entry.author_avatar_urls?.[ '96' ],
+						id: entry.author,
+						date: entry.date,
 					} );
 				}
 			}
 		} );
 
 		return Array.from( participantsMap.values() );
-	}, [ thread ] );
+	}, [ note ] );
 
 	if ( ! threadParticipants.length ) {
 		return null;
@@ -62,7 +62,7 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 	);
 	const threadHasMoreParticipants = threadParticipants.length > 100;
 
-	// If we hit the comment limit, show "100+" instead of exact overflow count.
+	// If we hit the note limit, show "100+" instead of exact overflow count.
 	const overflowText =
 		threadHasMoreParticipants && overflowCount > 0
 			? __( '100+' )
@@ -103,6 +103,4 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 			</ToolbarButton>
 		</CommentIconToolbarSlotFill.Fill>
 	);
-};
-
-export default CommentAvatarIndicator;
+}

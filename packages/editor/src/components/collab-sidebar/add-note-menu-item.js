@@ -18,7 +18,7 @@ import { unlock } from '../../lock-unlock';
 
 const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
 
-const AddCommentMenuItem = ( { clientId, onClick, isDistractionFree } ) => {
+function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 	const block = useSelect(
 		( select ) => {
 			return select( blockEditorStore ).getBlock( clientId );
@@ -61,13 +61,13 @@ const AddCommentMenuItem = ( { clientId, onClick, isDistractionFree } ) => {
 			{ __( 'Add note' ) }
 		</MenuItem>
 	);
-};
+}
 
-const AddCommentMenuItemFill = ( { onClick, isDistractionFree } ) => {
+export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 	return (
 		<CommentIconSlotFill.Fill>
 			{ ( { clientId, onClose } ) => (
-				<AddCommentMenuItem
+				<NoteMenuItem
 					clientId={ clientId }
 					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
@@ -78,6 +78,4 @@ const AddCommentMenuItemFill = ( { onClick, isDistractionFree } ) => {
 			) }
 		</CommentIconSlotFill.Fill>
 	);
-};
-
-export default AddCommentMenuItemFill;
+}

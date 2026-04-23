@@ -21,10 +21,10 @@ import {
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
-import { Comments } from './comments';
+import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import AddCommentMenuItem from './comment-menu-item';
-import CommentAvatarIndicator from './comment-indicator-toolbar';
+import { AddNoteMenuItem } from './add-note-menu-item';
+import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import {
 	useBlockComments,
@@ -36,8 +36,8 @@ import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
 	styles,
-	comments,
-	commentSidebarRef,
+	notes,
+	sidebarRef,
 	isFloating = false,
 } ) {
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
@@ -55,19 +55,19 @@ function NotesSidebarContent( {
 				// This ensures we always have the latest reference.
 				if ( node ) {
 					// eslint-disable-next-line react-compiler/react-compiler
-					commentSidebarRef.current = node;
+					sidebarRef.current = node;
 				}
 			} }
 			aria-label={
 				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
 			}
 		>
-			<Comments
-				threads={ comments }
-				onEditComment={ onEdit }
+			<Notes
+				threads={ notes }
+				onEditNote={ onEdit }
 				onAddReply={ onCreate }
-				onCommentDelete={ onDelete }
-				commentSidebarRef={ commentSidebarRef }
+				onDeleteNote={ onDelete }
+				sidebarRef={ sidebarRef }
 				isFloating={ isFloating }
 			/>
 		</Stack>
@@ -82,7 +82,7 @@ function NotesSidebar( { postId } ) {
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const commentSidebarRef = useRef( null );
+	const sidebarRef = useRef( null );
 
 	const { clientId, blockCommentId, isClassicBlock } = useSelect(
 		( select ) => {
@@ -186,18 +186,18 @@ function NotesSidebar( { postId } ) {
 	}
 
 	if ( isDistractionFree ) {
-		return <AddCommentMenuItem isDistractionFree />;
+		return <AddNoteMenuItem isDistractionFree />;
 	}
 
 	return (
 		<>
 			{ !! currentThread && (
-				<CommentAvatarIndicator
-					thread={ currentThread }
+				<NoteAvatarIndicator
+					note={ currentThread }
 					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openTheSidebar } />
+			<AddNoteMenuItem onClick={ openTheSidebar } />
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
@@ -212,8 +212,8 @@ function NotesSidebar( { postId } ) {
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NotesSidebarContent
-						comments={ notes }
-						commentSidebarRef={ commentSidebarRef }
+						notes={ notes }
+						sidebarRef={ sidebarRef }
 					/>
 				</PluginSidebar>
 			) }
@@ -227,8 +227,8 @@ function NotesSidebar( { postId } ) {
 					backgroundColor={ backgroundColor }
 				>
 					<NotesSidebarContent
-						comments={ unresolvedNotes }
-						commentSidebarRef={ commentSidebarRef }
+						notes={ unresolvedNotes }
+						sidebarRef={ sidebarRef }
 						styles={ {
 							backgroundColor,
 						} }
