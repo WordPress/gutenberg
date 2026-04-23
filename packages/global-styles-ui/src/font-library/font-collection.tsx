@@ -10,7 +10,7 @@ import {
 } from '@wordpress/element';
 import {
 	__experimentalSpacer as Spacer,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	Navigator,
@@ -210,7 +210,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					} )
 				);
 			}
-		} catch ( error ) {
+		} catch {
 			// If any of the fonts fail to download,
 			// show an error notice and stop the request from being sent.
 			setNotice( {
@@ -285,7 +285,6 @@ function FontCollection( { slug }: { slug: string } ) {
 					<ProgressBar />
 				</div>
 			) }
-
 			{ ! isLoading && selectedCollection && (
 				<>
 					<Navigator
@@ -298,9 +297,9 @@ function FontCollection( { slug }: { slug: string } ) {
 									<Heading level={ 2 } size={ 13 }>
 										{ selectedCollection.name }
 									</Heading>
-									<Text>
+									<WCText>
 										{ selectedCollection.description }
-									</Text>
+									</WCText>
 								</VStack>
 								<ActionsComponent />
 							</HStack>
@@ -335,11 +334,11 @@ function FontCollection( { slug }: { slug: string } ) {
 
 							{ !! selectedCollection?.font_families?.length &&
 								! fonts.length && (
-									<Text>
+									<WCText>
 										{ __(
 											'No fonts found. Try with a different search term.'
 										) }
-									</Text>
+									</WCText>
 								) }
 
 							<div className="font-library__fonts-grid__main">
@@ -411,9 +410,9 @@ function FontCollection( { slug }: { slug: string } ) {
 								</>
 							) }
 							<Spacer margin={ 4 } />
-							<Text>
+							<WCText>
 								{ __( 'Select font variants to install.' ) }
-							</Text>
+							</WCText>
 							<Spacer margin={ 4 } />
 							<CheckboxControl
 								className="font-library__select-all"
@@ -508,6 +507,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									),
 									{
 										div: <div aria-hidden />,
+										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
 											<SelectControl
 												aria-label={ __(

@@ -33,7 +33,7 @@ const meta: Meta< typeof Text > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Values are not aligned with the current design system. Use [typography tokens](?path=/docs/tokens-typography--page) from `@wordpress/base-styles` instead.',
+			notes: 'Use `Text` from `@wordpress/ui` instead.',
 		},
 	},
 };

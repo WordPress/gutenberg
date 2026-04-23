@@ -34,6 +34,13 @@ export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
 	 */
 	children?: Field.Label.Props[ 'children' ];
 	/**
+	 * Whether to visually hide the label while keeping it accessible
+	 * to screen readers.
+	 *
+	 * @default false
+	 */
+	hideFromVision?: boolean;
+	/**
 	 * The visual variant of the label.
 	 *
 	 * Use 'plain' for controls like checkboxes and radio buttons.

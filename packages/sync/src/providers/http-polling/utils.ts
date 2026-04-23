@@ -105,26 +105,14 @@ export function createUpdateQueue(
  * @param payload The sync payload including data and after cursor
  * @return The sync server response
  */
-export async function postSyncUpdate(
+export function postSyncUpdate(
 	payload: SyncPayload
 ): Promise< SyncResponse > {
-	const response = await apiFetch< SyncResponse, false >( {
-		body: JSON.stringify( payload ),
-		headers: {
-			'Content-Type': 'application/json',
-		},
+	return apiFetch( {
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
 	} );
-
-	if ( ! response.ok ) {
-		throw new Error(
-			`Sync update failed with status ${ response.status }`
-		);
-	}
-
-	return await response.json();
 }
 
 /**
@@ -139,11 +127,25 @@ export function postSyncUpdateNonBlocking( payload: SyncPayload ): void {
 	}
 
 	apiFetch( {
-		body: JSON.stringify( payload ),
-		headers: { 'Content-Type': 'application/json' },
-		keepalive: true,
 		method: 'POST',
-		parse: false,
 		path: SYNC_API_PATH,
+		data: payload,
+		keepalive: true,
 	} ).catch( () => {} );
+}
+
+/**
+ * Parse an integer from an unknown value, returning a default if parsing fails.
+ *
+ * @param value        The value to parse as an integer.
+ * @param defaultValue The default value to return if parsing fails.
+ * @return The parsed integer or the default value.
+ */
+export function intValueOrDefault(
+	value: unknown,
+	defaultValue: number
+): number {
+	const intValue = parseInt( String( value ), 10 );
+
+	return isNaN( intValue ) ? defaultValue : intValue;
 }

@@ -24,7 +24,7 @@ const meta: Meta< typeof ConfirmDialog > = {
 			control: false,
 		},
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onCancel: fn(),
 		onConfirm: fn(),

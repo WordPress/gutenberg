@@ -6,44 +6,56 @@
  * @package {{PREFIX}}
  */
 
-if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
-	/**
-	 * Register all script modules.
-	 */
-	function {{PREFIX}}_register_script_modules() {
-		// Load build constants
-		$build_constants = require __DIR__ . '/constants.php';
-		$modules_dir     = __DIR__ . '/modules';
-		$modules_file    = $modules_dir . '/registry.php';
+/**
+ * Register all script modules.
+ */
+function {{PREFIX}}_register_script_modules() {
+	// Ensure this only runs once. wp_default_scripts can fire multiple times,
+	// and each wp_deregister_script_module() call also dequeues the module.
+	// If a module was enqueued between calls, repeated deregister/register
+	// cycles would lose the enqueue state.
+	static $already_registered = false;
+	if ( $already_registered ) {
+		return;
+	}
+	$already_registered = true;
 
-		if ( ! file_exists( $modules_file ) ) {
-			return;
-		}
+	// Load build constants
+	$build_constants = require __DIR__ . '/constants.php';
+	$modules_dir     = __DIR__ . '/modules';
+	$modules_file    = $modules_dir . '/registry.php';
 
-		$modules = require $modules_file;
-		$base_url = $build_constants['build_url'] . 'modules/';
-		$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
-
-		foreach ( $modules as $module ) {
-			$asset_path = $modules_dir . '/' . $module['asset'];
-			$asset = file_exists( $asset_path ) ? require $asset_path : array();
-
-			// Deregister first to override any previously registered version
-			// (e.g., Core's default modules when running as a plugin).
-			wp_deregister_script_module( $module['id'] );
-
-			wp_register_script_module(
-				$module['id'],
-				$base_url . $module['path'] . $extension,
-				$asset['module_dependencies'] ?? array(),
-				$asset['version'] ?? false,
-				array(
-					'fetchpriority' => 'low',
-					'in_footer'     => true,
-				)
-			);
-		}
+	if ( ! file_exists( $modules_file ) ) {
+		return;
 	}
 
-	add_action( 'wp_default_scripts', '{{PREFIX}}_register_script_modules' );
+	$modules = require $modules_file;
+	$base_url = $build_constants['build_url'] . 'modules/';
+
+	foreach ( $modules as $module ) {
+		// WASM-only modules (e.g., vips worker) only have .min.js; use it even when SCRIPT_DEBUG is `true`.
+		$extension = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && empty( $module['min_only'] ) )
+			? '.js'
+			: '.min.js';
+
+		$asset_path = $modules_dir . '/' . $module['asset'];
+		$asset = file_exists( $asset_path ) ? require $asset_path : array();
+
+		// Deregister first to override any previously registered version
+		// (e.g., Core's default modules when running as a plugin).
+		wp_deregister_script_module( $module['id'] );
+
+		wp_register_script_module(
+			$module['id'],
+			$base_url . $module['path'] . $extension,
+			$asset['module_dependencies'] ?? array(),
+			$asset['version'] ?? false,
+			array(
+				'fetchpriority' => 'low',
+				'in_footer'     => true,
+			)
+		);
+	}
 }
+
+add_action( 'wp_default_scripts', '{{PREFIX}}_register_script_modules' );

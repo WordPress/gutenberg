@@ -3,7 +3,7 @@
 .boot-site-hub {
 	position: sticky;
 	top: 0;
-	background-color: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+	background-color: var(--wpds-color-bg-surface-neutral-weak);
 	z-index: 1;
 	display: grid;
 	grid-template-columns: 60px 1fr auto;
@@ -45,14 +45,14 @@
 
 	&:focus:not(:active) {
 		outline:
-			var(--wpds-border-width-focus, 2px) solid
-			var(--wpds-color-stroke-focus-brand, #0073aa);
-		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
+			var(--wpds-border-width-focus) solid
+			var(--wpds-color-stroke-focus-brand);
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }
 
 .boot-site-hub__title-text {
-	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	color: var(--wpds-color-fg-content-neutral);
 	font-size: variables.$font-size-medium;
 	font-weight: variables.$font-weight-medium;
 	overflow: hidden;
@@ -61,7 +61,7 @@
 }
 
 .boot-site-hub__url {
-	color: var(--wpds-color-fg-content-neutral-weak, #757575);
+	color: var(--wpds-color-fg-content-neutral-weak);
 	font-size: variables.$font-size-small;
 	overflow: hidden;
 	text-overflow: ellipsis;
