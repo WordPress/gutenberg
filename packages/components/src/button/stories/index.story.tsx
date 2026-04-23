@@ -18,10 +18,10 @@ import {
 /**
  * Internal dependencies
  */
-import './style.css';
 import Button from '..';
 
 const meta: Meta< typeof Button > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Actions/Button',
 	id: 'components-button',
 	component: Button,

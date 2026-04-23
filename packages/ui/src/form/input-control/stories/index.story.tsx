@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { plus, reset, seen, unseen } from '@wordpress/icons';
-import { IconButton, InputControl, InputLayout, Stack } from '../../..';
+import { InputControl } from '../';
+import { IconButton } from '../../../icon-button';
+import { InputLayout } from '../../primitives/input-layout';
+import { Stack } from '../../../stack';
 import {
 	WithPrefix,
 	WithSuffixControl,

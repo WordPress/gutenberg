@@ -94,7 +94,7 @@ export function createPersistenceInterface(
 			} else {
 				try {
 					data = JSON.parse( persisted );
-				} catch ( error ) {
+				} catch {
 					// Similarly, should any error be thrown during parse of
 					// the string (malformed JSON), fall back to empty object.
 					data = {};

@@ -244,7 +244,7 @@ function GridTools( {
 					blockAttributes?.metadata?.blockVisibility,
 				deviceType:
 					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 			};

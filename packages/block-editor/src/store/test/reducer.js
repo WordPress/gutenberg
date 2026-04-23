@@ -37,7 +37,6 @@ import {
 	settings,
 	lastBlockAttributesChange,
 	lastBlockInserted,
-	blockEditingModes,
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
@@ -286,7 +285,8 @@ describe( 'state', () => {
 							'chicken-child': {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -344,7 +344,8 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -386,7 +387,8 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -444,7 +446,8 @@ describe( 'state', () => {
 							chicken: '',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
@@ -515,7 +518,8 @@ describe( 'state', () => {
 						} )
 					),
 					tree: new Map(),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
@@ -609,7 +613,8 @@ describe( 'state', () => {
 							[ newChildBlockId3 ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
@@ -684,7 +689,8 @@ describe( 'state', () => {
 							chicken: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				const newChildBlock = createBlock( 'core/test-block' );
@@ -736,7 +742,8 @@ describe( 'state', () => {
 							[ newChildBlockId ]: 'chicken',
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				} );
 
 				// The block object of the parent should be updated.
@@ -757,7 +764,8 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				tree: new Map(),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
+				blockEditingModes: new Map(),
 			} );
 		} );
 
@@ -1135,52 +1143,6 @@ describe( 'state', () => {
 					content: 'ribs',
 				},
 				isValid: true,
-			} );
-		} );
-
-		it( 'should update the reusable block reference if the temporary id is swapped', () => {
-			const original = blocks( undefined, {
-				type: 'RESET_BLOCKS',
-				blocks: [
-					{
-						clientId: 'chicken',
-						name: 'core/block',
-						attributes: {
-							ref: 'random-clientId',
-						},
-						isValid: false,
-						innerBlocks: [],
-					},
-				],
-			} );
-
-			const state = blocks( deepFreeze( original ), {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id: 'random-clientId',
-				updatedId: 3,
-			} );
-
-			expect( state.byClientId.get( 'chicken' ) ).toEqual( {
-				clientId: 'chicken',
-				name: 'core/block',
-				isValid: false,
-			} );
-
-			expect( state.attributes.get( 'chicken' ) ).toEqual( {
-				ref: 3,
-			} );
-
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
-				state.tree.get( 'chicken' )
-			);
-			expect( state.tree.get( 'chicken' ) ).toEqual( {
-				clientId: 'chicken',
-				name: 'core/block',
-				isValid: false,
-				innerBlocks: [],
-				attributes: {
-					ref: 3,
-				},
 			} );
 		} );
 
@@ -2297,7 +2259,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
 					expect( state.tree.get( 'child' ) ).toBeUndefined();
@@ -2334,9 +2298,7 @@ describe( 'state', () => {
 								'paragraph-id': [],
 							} )
 						),
-						controlledInnerBlocks: {
-							'reusable-id': true,
-						},
+						controlledInnerBlocks: new Set( [ 'reusable-id' ] ),
 						parents: new Map(
 							Object.entries( {
 								'group-id': '',
@@ -2459,9 +2421,9 @@ describe( 'state', () => {
 						clientId: 'chicken',
 						hasControlledInnerBlocks: true,
 					} );
-					expect( withControlled.controlledInnerBlocks.chicken ).toBe(
-						true
-					);
+					expect(
+						withControlled.controlledInnerBlocks.has( 'chicken' )
+					).toBe( true );
 
 					const state = blocks( withControlled, {
 						type: 'RESET_BLOCKS',
@@ -2475,7 +2437,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 				} );
 
 				it( 'should preserve controlledInnerBlocks blocks across RESET_BLOCKS', () => {
@@ -2537,7 +2501,9 @@ describe( 'state', () => {
 						],
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					expect(
 						getBlocks( { blocks: state }, 'chicken' ).map(
 							( b ) => b.clientId
@@ -2694,7 +2660,9 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
 					// The order and byClientId Maps should be the same
 					// reference because the block has no inner blocks to
 					// remove, so REPLACE_INNER_BLOCKS should be skipped.
@@ -3423,7 +3391,7 @@ describe( 'state', () => {
 
 	describe( 'blockListSettings', () => {
 		it( 'should add new settings', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3433,19 +3401,29 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should return same reference if updated as the same', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3459,7 +3437,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return same reference if updated settings not assigned and id not exists', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( new Map() );
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3470,14 +3448,22 @@ describe( 'state', () => {
 		} );
 
 		it( 'should update the settings of a block', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
@@ -3487,40 +3473,61 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/list' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/list' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove existing settings if updated settings not assigned', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'UPDATE_BLOCK_LIST_SETTINGS',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 
 		it( 'should remove the settings of a block when it is replaced', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3528,22 +3535,35 @@ describe( 'state', () => {
 				blocks: [],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
-			const original = deepFreeze( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
@@ -3556,29 +3576,42 @@ describe( 'state', () => {
 				],
 			} );
 
-			expect( state ).toEqual( {
-				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
-					allowedBlocks: [ 'core/paragraph' ],
-				},
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			expect( state ).toEqual(
+				new Map( [
+					[
+						'9db792c6-a25a-495d-adbd-97d56a4c4189',
+						{
+							allowedBlocks: [ 'core/paragraph' ],
+						},
+					],
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 		} );
 
 		it( 'should remove the settings of a block when it is removed', () => {
-			const original = deepFreeze( {
-				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-					allowedBlocks: true,
-				},
-			} );
+			const original = deepFreeze(
+				new Map( [
+					[
+						'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						{
+							allowedBlocks: true,
+						},
+					],
+				] )
+			);
 
 			const state = blockListSettings( original, {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( new Map() );
 		} );
 	} );
 
@@ -3776,17 +3809,18 @@ describe( 'state', () => {
 
 	describe( 'blockEditingModes', () => {
 		it( 'should return an empty map by default', () => {
-			expect( blockEditingModes( undefined, {} ) ).toEqual( new Map() );
+			const state = blocks( undefined, {} );
+			expect( state.blockEditingModes ).toEqual( new Map() );
 		} );
 
 		it( 'should set the editing mode for a block', () => {
-			const state = new Map();
-			const newState = blockEditingModes( state, {
+			const state = blocks( undefined, {} );
+			const newState = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 				mode: 'default',
 			} );
-			expect( newState ).toEqual(
+			expect( newState.blockEditingModes ).toEqual(
 				new Map( [
 					[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
 				] )
@@ -3794,28 +3828,126 @@ describe( 'state', () => {
 		} );
 
 		it( 'should clear the editing mode for a block', () => {
-			const state = new Map( [
-				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
-			] );
-			const newState = blockEditingModes( state, {
+			let state = blocks( undefined, {} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
+				mode: 'default',
+			} );
+			const newState = blocks( state, {
 				type: 'UNSET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
 			} );
-			expect( newState ).toEqual( new Map() );
+			expect( newState.blockEditingModes ).toEqual( new Map() );
 		} );
 
-		it( 'should clear editing modes when blocks are reset', () => {
-			const state = new Map( [
-				[ '', 'disabled' ],
-				[ '14501cc2-90a6-4f52-aa36-ab6e896135d1', 'default' ],
-			] );
-			const newState = blockEditingModes( state, {
+		it( 'should preserve editing modes when blocks are reset', () => {
+			// Add a template with two template parts.
+			let state = blocks( undefined, {} );
+			state = blocks( state, {
 				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-2',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
-			expect( newState ).toEqual(
+
+			// In each of the template parts add a controlled content (a paragraph block).
+			state = blocks( state, {
+				type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+				clientId: 'template-part-1',
+				hasControlledInnerBlocks: true,
+			} );
+			state = blocks( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: 'template-part-1',
+				blocks: [
+					{
+						name: 'core/paragraph',
+						clientId: 'paragraph-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			state = blocks( state, {
+				type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+				clientId: 'template-part-2',
+				hasControlledInnerBlocks: true,
+			} );
+			state = blocks( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: 'template-part-2',
+				blocks: [
+					{
+						name: 'core/paragraph',
+						clientId: 'paragraph-2',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			// Set block editing modes, just like `DisableNonPageContentBlocks` would do:
+			// - the root block to 'disabled'
+			// - the template parts to 'contentOnly'
+			// - the template part children to 'disabled'
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: '',
+				mode: 'disabled',
+			} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'template-part-1',
+				mode: 'contentOnly',
+			} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'template-part-2',
+				mode: 'contentOnly',
+			} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'paragraph-1',
+				mode: 'disabled',
+			} );
+			state = blocks( state, {
+				type: 'SET_BLOCK_EDITING_MODE',
+				clientId: 'paragraph-2',
+				mode: 'disabled',
+			} );
+
+			// Reset the template, keeping only one of the template parts.
+			state = blocks( state, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						name: 'core/template-part',
+						clientId: 'template-part-1',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			// Check that the editing modes for valid blocks are preserved, and the
+			// editing modes for removed blocks are cleared.
+			expect( state.blockEditingModes ).toEqual(
 				new Map( [
-					// Root mode should be maintained.
 					[ '', 'disabled' ],
+					[ 'template-part-1', 'contentOnly' ],
+					[ 'paragraph-1', 'disabled' ],
 				] )
 			);
 		} );
@@ -4001,7 +4133,6 @@ describe( 'state', () => {
 				settings,
 				zoomLevel,
 				blockListSettings,
-				blockEditingModes,
 				editedContentOnlySection,
 			} )
 		);

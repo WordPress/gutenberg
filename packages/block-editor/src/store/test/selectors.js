@@ -321,7 +321,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -347,7 +347,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -404,7 +404,7 @@ describe( 'selectors', () => {
 							23: {},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -452,7 +452,7 @@ describe( 'selectors', () => {
 						'client-id-03': {},
 						'client-id-04': {},
 					},
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 			};
 
@@ -509,7 +509,7 @@ describe( 'selectors', () => {
 					'client-id-04': {},
 					'client-id-05': {},
 				},
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 		it( 'should return parent blocks', () => {
@@ -674,7 +674,7 @@ describe( 'selectors', () => {
 						'uuid-30': 'uuid-28',
 					} )
 				),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 
@@ -1246,7 +1246,7 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 				},
 				selection: {
 					selectionStart: { clientId: '23' },
@@ -2698,10 +2698,10 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
@@ -2713,12 +2713,12 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {
 					allowedBlockTypes: [],
 				},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2732,12 +2732,12 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {
 					allowedBlockTypes: [ 'core/test-block-a' ],
 				},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				true
@@ -2751,12 +2751,12 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {
 					templateLock: 'all',
 				},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2770,14 +2770,14 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(
+						Object.entries( {
+							'': 'disabled',
+						} )
+					),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(
-					Object.entries( {
-						'': 'disabled',
-					} )
-				),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
@@ -2791,10 +2791,10 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlockType( state, 'core/test-block-c' ) ).toBe(
 				false
@@ -2816,10 +2816,10 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2841,12 +2841,14 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2868,12 +2870,14 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -2895,14 +2899,16 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {
-						allowedBlocks: [ 'core/test-block-c' ],
-					},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {
+							allowedBlocks: [ 'core/test-block-c' ],
+						},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
@@ -2924,14 +2930,16 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {
-						allowedBlocks: [ 'core/test-block-b' ],
-					},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {
+							allowedBlocks: [ 'core/test-block-b' ],
+						},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
@@ -2953,14 +2961,14 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(
+						Object.entries( {
+							block1: 'disabled',
+						} )
+					),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(
-					Object.entries( {
-						block1: 'disabled',
-					} )
-				),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
@@ -2982,14 +2990,16 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {
-						allowedBlocks: [],
-					},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {
+							allowedBlocks: [],
+						},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
@@ -3011,10 +3021,10 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/post-content-child', 'block1' )
@@ -3028,10 +3038,10 @@ describe( 'selectors', () => {
 					attributes: new Map(),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/post-content-child' )
@@ -3058,17 +3068,21 @@ describe( 'selectors', () => {
 							block2: 'block1',
 						} )
 					),
-					order: new Map( [
-						[ '', [ 'block1' ] ],
-						[ 'block1', [ 'block2' ] ],
-					] ),
+					order: new Map(
+						Object.entries( {
+							'': [ 'block1' ],
+							block1: [ 'block2' ],
+						} )
+					),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {},
+						block2: {},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3098,12 +3112,14 @@ describe( 'selectors', () => {
 						} )
 					),
 					order: new Map( [ [ '', [ 'block1' ] ] ] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						block1: {},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-a', 'block1' )
@@ -3134,19 +3150,25 @@ describe( 'selectors', () => {
 							child: 'parent',
 						} )
 					),
-					order: new Map( [
-						[ '', [ 'parent' ] ],
-						[ 'parent', [ 'child' ] ],
-					] ),
+					order: new Map(
+						Object.entries( {
+							'': [ 'parent' ],
+							parent: [ 'child' ],
+						} )
+					),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					parent: {},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						parent: {},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
-				derivedBlockEditingModes: new Map( [
-					[ 'parent', 'contentOnly' ],
-				] ),
+				derivedBlockEditingModes: new Map(
+					Object.entries( {
+						parent: 'contentOnly',
+					} )
+				),
 			};
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'parent' )
@@ -3187,15 +3209,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -3245,15 +3267,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -3295,14 +3317,14 @@ describe( 'selectors', () => {
 						[ 'block1', [ 'block2' ] ],
 						[ 'block2', [ 'block3' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {},
-					block3: {},
-				},
+				blockListSettings: new Map( [
+					[ 'block1', {} ],
+					[ 'block2', {} ],
+					[ 'block3', {} ],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3340,14 +3362,14 @@ describe( 'selectors', () => {
 						[ 'block1', [ 'block2' ] ],
 						[ 'block2', [ 'block3' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {},
-					block3: {},
-				},
+				blockListSettings: new Map( [
+					[ 'block1', {} ],
+					[ 'block2', {} ],
+					[ 'block3', {} ],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3385,14 +3407,14 @@ describe( 'selectors', () => {
 						[ 'block1', [ 'block2' ] ],
 						[ 'block2', [ 'block3' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {},
-					block3: {},
-				},
+				blockListSettings: new Map( [
+					[ 'block1', {} ],
+					[ 'block2', {} ],
+					[ 'block3', {} ],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3426,15 +3448,18 @@ describe( 'selectors', () => {
 						[ 'block2', 'block1' ],
 						[ 'block1', '' ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {
-						allowedBlocks: [],
-					},
-				},
+				blockListSettings: new Map( [
+					[ 'block1', {} ],
+					[
+						'block2',
+						{
+							allowedBlocks: [],
+						},
+					],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3469,13 +3494,13 @@ describe( 'selectors', () => {
 						[ '', [ 'block1' ] ],
 						[ 'block1', [ 'block2' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					block1: {},
-					block2: {},
-				},
+				blockListSettings: new Map( [
+					[ 'block1', {} ],
+					[ 'block2', {} ],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect(
 				canInsertBlockType(
@@ -3507,17 +3532,20 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					1: {
-						allowedBlocks: [
-							'core/test-block-b',
-							'core/test-block-c',
-						],
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'1',
+						{
+							allowedBlocks: [
+								'core/test-block-b',
+								'core/test-block-c',
+							],
+						},
+					],
+				] ),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlocks( state, [ '2' ], '1' ) ).toBe( true );
 		} );
@@ -3541,14 +3569,16 @@ describe( 'selectors', () => {
 					),
 					parents: new Map(),
 					order: new Map(),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					1: {
-						allowedBlocks: [ 'core/test-block-c' ],
-					},
-				},
+				blockListSettings: new Map(
+					Object.entries( {
+						1: {
+							allowedBlocks: [ 'core/test-block-c' ],
+						},
+					} )
+				),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
 		} );
@@ -3820,11 +3850,11 @@ describe( 'selectors', () => {
 					order: new Map(),
 					parents: new Map(),
 					cache: {},
+					blockEditingModes: new Map(),
 				},
 				settings: {},
 				preferences: {},
-				blockListSettings: {},
-				blockEditingModes: new Map(),
+				blockListSettings: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -3861,11 +3891,11 @@ describe( 'selectors', () => {
 					order: new Map(),
 					parents: new Map(),
 					cache: {},
+					blockEditingModes: new Map(),
 				},
 				settings: {},
 				preferences: {},
-				blockListSettings: {},
-				blockEditingModes: new Map(),
+				blockListSettings: new Map(),
 			};
 			const block = { name: 'core/with-tranforms-a' };
 			const items = getBlockTransformItems( state, block );
@@ -3894,17 +3924,20 @@ describe( 'selectors', () => {
 						} )
 					),
 					cache: {},
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
+					blockEditingModes: new Map(),
 				},
 				settings: {},
 				preferences: {},
-				blockListSettings: {
-					block1: {
-						allowedBlocks: [ 'core/with-tranforms-c' ],
-					},
-					block2: {},
-				},
-				blockEditingModes: new Map(),
+				blockListSettings: new Map( [
+					[
+						'block1',
+						{
+							allowedBlocks: [ 'core/with-tranforms-c' ],
+						},
+					],
+					[ 'block2', {} ],
+				] ),
 			};
 			const blocks = [
 				{ clientId: 'block2', name: 'core/with-tranforms-a' },
@@ -3944,15 +3977,15 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					controlledInnerBlocks: {},
+					controlledInnerBlocks: new Set(),
 					parents: new Map(),
+					blockEditingModes: new Map(),
 				},
 				preferences: {
 					insertUsage: {},
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-a' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -3978,15 +4011,15 @@ describe( 'selectors', () => {
 					order: new Map(),
 					parents: new Map(),
 					cache: {},
+					blockEditingModes: new Map(),
 				},
 				preferences: {
 					insertUsage: {
 						'core/with-tranforms-a': { count: 10, time: 1000 },
 					},
 				},
-				blockListSettings: {},
+				blockListSettings: new Map(),
 				settings: {},
-				blockEditingModes: new Map(),
 			};
 			const blocks = [ { name: 'core/with-tranforms-c' } ];
 			const items = getBlockTransformItems( state, blocks );
@@ -4041,11 +4074,14 @@ describe( 'selectors', () => {
 		it( 'should return false if the specified clientId was not found', () => {
 			const state = {
 				settings: { templateLock: 'all' },
-				blockListSettings: {
-					chicken: {
-						templateLock: 'insert',
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'chicken',
+						{
+							templateLock: 'insert',
+						},
+					],
+				] ),
 			};
 
 			expect( getTemplateLock( state, 'ribs' ) ).toBe( false );
@@ -4054,11 +4090,14 @@ describe( 'selectors', () => {
 		it( 'should return false if template lock was not set on the specified block', () => {
 			const state = {
 				settings: { templateLock: 'all' },
-				blockListSettings: {
-					chicken: {
-						test: 'tes1t',
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'chicken',
+						{
+							test: 'tes1t',
+						},
+					],
+				] ),
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
@@ -4067,11 +4106,14 @@ describe( 'selectors', () => {
 		it( 'should return the template lock for the specified clientId', () => {
 			const state = {
 				settings: { templateLock: 'all' },
-				blockListSettings: {
-					chicken: {
-						templateLock: 'insert',
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'chicken',
+						{
+							templateLock: 'insert',
+						},
+					],
+				] ),
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
@@ -4080,11 +4122,14 @@ describe( 'selectors', () => {
 		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
 			const state = {
 				editedContentOnlySection: 'chicken',
-				blockListSettings: {
-					chicken: {
-						templateLock: 'contentOnly',
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'chicken',
+						{
+							templateLock: 'contentOnly',
+						},
+					],
+				] ),
 			};
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
@@ -4094,14 +4139,20 @@ describe( 'selectors', () => {
 	describe( 'getBlockListSettings', () => {
 		it( 'should return the settings of a block', () => {
 			const state = {
-				blockListSettings: {
-					chicken: {
-						setting1: false,
-					},
-					ribs: {
-						setting2: true,
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'chicken',
+						{
+							setting1: false,
+						},
+					],
+					[
+						'ribs',
+						{
+							setting2: true,
+						},
+					],
+				] ),
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toEqual( {
@@ -4111,7 +4162,7 @@ describe( 'selectors', () => {
 
 		it( 'should return undefined if settings for the block don’t exist', () => {
 			const state = {
-				blockListSettings: {},
+				blockListSettings: new Map(),
 			};
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe(
@@ -4123,22 +4174,34 @@ describe( 'selectors', () => {
 	describe( '__experimentalGetBlockListSettingsForBlocks', () => {
 		it( 'should return the settings for a set of blocks', () => {
 			const state = {
-				blockListSettings: {
-					'test-1-dummy-clientId': {
-						setting1: false,
-					},
-					'test-2-dummy-clientId': {
-						setting1: true,
-						setting2: false,
-					},
-					'test-3-dummy-clientId': {
-						setting1: true,
-						setting2: false,
-					},
-					'test-4-dummy-clientId': {
-						setting1: true,
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'test-1-dummy-clientId',
+						{
+							setting1: false,
+						},
+					],
+					[
+						'test-2-dummy-clientId',
+						{
+							setting1: true,
+							setting2: false,
+						},
+					],
+					[
+						'test-3-dummy-clientId',
+						{
+							setting1: true,
+							setting2: false,
+						},
+					],
+					[
+						'test-4-dummy-clientId',
+						{
+							setting1: true,
+						},
+					],
+				] ),
 			};
 
 			const targetBlocksClientIds = [
@@ -4165,15 +4228,21 @@ describe( 'selectors', () => {
 		it( 'should return empty object if settings for the blocks don’t exist', () => {
 			// Does not include target Block clientIds.
 			const state = {
-				blockListSettings: {
-					'test-2-dummy-clientId': {
-						setting1: true,
-						setting2: false,
-					},
-					'test-4-dummy-clientId': {
-						setting1: true,
-					},
-				},
+				blockListSettings: new Map( [
+					[
+						'test-2-dummy-clientId',
+						{
+							setting1: true,
+							setting2: false,
+						},
+					],
+					[
+						'test-4-dummy-clientId',
+						{
+							setting1: true,
+						},
+					],
+				] ),
 			};
 
 			const targetBlocksClientIds = [
@@ -4369,7 +4438,7 @@ describe( 'selectors', () => {
 						'client-id-03': [ 'client-id-04', 'client-id-05' ],
 					} )
 				),
-				controlledInnerBlocks: {},
+				controlledInnerBlocks: new Set(),
 			},
 		};
 		it( 'Should return first active matching block (including self) when single block selected', () => {
@@ -4476,12 +4545,10 @@ describe( 'selectors', () => {
 						[ '', [ 'parent' ] ],
 						[ 'parent', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					parent: {},
-				},
+				blockListSettings: new Map( [ [ 'parent', {} ] ] ),
 				settings: {},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'parent', 'contentOnly' ],
 				] ),
@@ -4526,15 +4593,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -4579,15 +4646,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -4641,15 +4708,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [ 'child1', 'child2' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -4688,12 +4755,10 @@ describe( 'selectors', () => {
 						[ '', [ 'parent' ] ],
 						[ 'parent', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					parent: {},
-				},
+				blockListSettings: new Map( [ [ 'parent', {} ] ] ),
 				settings: {},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'parent', 'contentOnly' ],
 				] ),
@@ -4738,15 +4803,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -4791,15 +4856,15 @@ describe( 'selectors', () => {
 						[ 'section', [ 'container' ] ],
 						[ 'container', [ 'child' ] ],
 					] ),
+					blockEditingModes: new Map(),
 				},
-				blockListSettings: {
-					section: {},
-					container: {},
-				},
+				blockListSettings: new Map( [
+					[ 'section', {} ],
+					[ 'container', {} ],
+				] ),
 				settings: {
 					[ sectionRootClientIdKey ]: '',
 				},
-				blockEditingModes: new Map(),
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
@@ -4972,8 +5037,10 @@ describe( '__unstableGetClientIdsTree', () => {
 
 describe( 'getBlockEditingMode', () => {
 	const baseState = {
-		blockEditingModes: new Map( [] ),
-		derivedBlockEditingModes: new Map( [] ),
+		blocks: {
+			blockEditingModes: new Map(),
+		},
+		derivedBlockEditingModes: new Map(),
 	};
 
 	const hasContentRoleAttribute = jest.fn( () => false );
@@ -5001,9 +5068,11 @@ describe( 'getBlockEditingMode', () => {
 	it( 'should return disabled if explicitly set', () => {
 		const state = {
 			...baseState,
-			blockEditingModes: new Map( [
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
-			] ),
+			blocks: {
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
+				] ),
+			},
 		};
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
@@ -5013,9 +5082,11 @@ describe( 'getBlockEditingMode', () => {
 	it( 'should return contentOnly if explicitly set', () => {
 		const state = {
 			...baseState,
-			blockEditingModes: new Map( [
-				[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
-			] ),
+			blocks: {
+				blockEditingModes: new Map( [
+					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
+				] ),
+			},
 		};
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
@@ -5026,9 +5097,14 @@ describe( 'getBlockEditingMode', () => {
 		it( 'should return default if explicitly set', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
-				] ),
+				blocks: {
+					blockEditingModes: new Map( [
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
 				] ),
@@ -5044,9 +5120,14 @@ describe( 'getBlockEditingMode', () => {
 		it( 'should return disabled if explicitly set', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
-				] ),
+				blocks: {
+					blockEditingModes: new Map( [
+						[
+							'b3247f75-fd94-4fef-97f9-5bfd162cc416',
+							'contentOnly',
+						],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
 				] ),
@@ -5062,9 +5143,11 @@ describe( 'getBlockEditingMode', () => {
 		it( 'should return contentOnly if explicitly set', () => {
 			const state = {
 				...baseState,
-				blockEditingModes: new Map( [
-					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
-				] ),
+				blocks: {
+					blockEditingModes: new Map( [
+						[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
+					] ),
+				},
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
 				] ),

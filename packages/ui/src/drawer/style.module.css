@@ -1,0 +1,275 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
+@layer wp-ui-components {
+	.backdrop {
+		--backdrop-opacity: 0.35;
+		position: fixed;
+		inset: 0;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		min-height: 100dvh;
+		background-color: rgb(0, 0, 0);
+		opacity: calc(var(--backdrop-opacity) * (1 - var(--drawer-swipe-progress)));
+
+		/*
+		 * WebKit/iOS Safari workaround: use absolute positioning so the
+		 * backdrop tracks the visible viewport instead of the layout one.
+		 */
+		@supports (-webkit-touch-callout: none) {
+			position: absolute;
+		}
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+		}
+
+		@media not (prefers-reduced-motion) {
+			/*
+			 * The duration and easing are intentionally different from
+			 * Dialog's backdrop: they match the popup's slide-in/out so the
+			 * two surfaces transition together. The ending-style duration is
+			 * further scaled by `--drawer-swipe-strength` so the backdrop
+			 * fades in lockstep with a swipe-dismissed popup.
+			 */
+			transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
+
+			&[data-ending-style] {
+				pointer-events: none;
+				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+			}
+
+			&[data-swiping] {
+				transition-duration: 0ms;
+			}
+		}
+	}
+
+	.viewport {
+		position: fixed;
+		inset: 0;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		pointer-events: none;
+	}
+
+	.popup {
+		--viewport-inset: var(--wpds-dimension-padding-2xl);
+
+		position: fixed;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		box-sizing: border-box;
+		display: block;
+		outline: 0;
+		pointer-events: auto;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		box-shadow: var(--wpds-elevation-lg);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-md);
+		color: var(--wpds-color-fg-content-neutral);
+		/*
+		 * Scroll on the block axis. For left/right drawers, swipe is on the
+		 * inline axis (no conflict). For up/down drawers, swipe dismissal only
+		 * engages once scroll reaches an edge.
+		 */
+		overflow-block: auto;
+		overscroll-behavior: contain;
+		touch-action: auto;
+
+		&[data-open],
+		&[data-swiping] {
+			will-change: transform;
+
+			@media not (prefers-reduced-motion) {
+				transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+
+				&[data-ending-style] {
+					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+				}
+
+				&[data-swiping] {
+					transition-duration: 0ms;
+				}
+			}
+		}
+
+		/*
+		 * TODO: should top/bottom sides use different tokens for the height
+		 * of the popup, compared to the width?
+		 */
+		&.is-small {
+			--popup-size: var(--wpds-dimension-surface-width-sm);
+		}
+
+		&.is-medium {
+			--popup-size: var(--wpds-dimension-surface-width-md);
+		}
+
+		&.is-large {
+			--popup-size: var(--wpds-dimension-surface-width-lg);
+		}
+
+		&.is-stretch {
+			--popup-size: var(--stretch-size);
+		}
+
+		&.is-auto {
+			--popup-size: auto;
+		}
+
+		&[data-swiping] {
+			user-select: none;
+		}
+
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+		&[data-swipe-direction="left"] {
+			--stretch-size: calc(100vw - var(--viewport-inset));
+
+			top: 0;
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			width: var(--popup-size);
+			max-width: calc(100vw - var(--viewport-inset));
+			border-start-end-radius: var(--wpds-border-radius-lg);
+			border-end-end-radius: var(--wpds-border-radius-lg);
+			transform: translateX(var(--drawer-swipe-movement-x));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateX(-100%);
+			}
+		}
+
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+		&[data-swipe-direction="right"] {
+			--stretch-size: calc(100vw - var(--viewport-inset));
+
+			top: 0;
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			width: var(--popup-size);
+			max-width: calc(100vw - var(--viewport-inset));
+			border-start-start-radius: var(--wpds-border-radius-lg);
+			border-end-start-radius: var(--wpds-border-radius-lg);
+			transform: translateX(var(--drawer-swipe-movement-x));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateX(100%);
+			}
+		}
+
+		&[data-swipe-direction="down"] {
+			--stretch-size: calc(100dvh - var(--viewport-inset));
+
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			height: var(--popup-size);
+			max-height: calc(100dvh - var(--viewport-inset));
+			border-start-start-radius: var(--wpds-border-radius-lg);
+			border-start-end-radius: var(--wpds-border-radius-lg);
+			transform: translateY(var(--drawer-swipe-movement-y));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateY(100%);
+			}
+		}
+
+		&[data-swipe-direction="up"] {
+			--stretch-size: calc(100dvh - var(--viewport-inset));
+
+			top: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			height: var(--popup-size);
+			max-height: calc(100dvh - var(--viewport-inset));
+			border-end-start-radius: var(--wpds-border-radius-lg);
+			border-end-end-radius: var(--wpds-border-radius-lg);
+			transform: translateY(var(--drawer-swipe-movement-y));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateY(-100%);
+			}
+		}
+	}
+
+	.content {
+		padding: var(--wpds-dimension-padding-2xl);
+	}
+
+	/*
+	 * The popup is anchored to a physical edge regardless of writing direction
+	 * (see `left: 0` / `right: 0` above), so the safe-area padding uses the
+	 * matching physical side. `env(safe-area-inset-*)` is already physical,
+	 * so pairing it with logical `padding-inline-*` would be wrong in RTL.
+	 */
+	.popup[data-swipe-direction="left"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+	}
+
+	.popup[data-swipe-direction="right"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+	}
+
+	.popup[data-swipe-direction="down"] .content {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+	}
+
+	.popup[data-swipe-direction="up"] .content {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+	}
+
+	.header {
+		display: flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		margin-bottom: var(--wpds-dimension-gap-lg);
+	}
+
+	.title {
+		margin-inline-end: auto;
+
+		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
+		 * Keep both so the layout survives GCD removal. */
+		--_gcd-heading-margin: 0 auto 0 0;
+
+		&:dir(rtl) {
+			--_gcd-heading-margin: 0 0 0 auto;
+		}
+	}
+
+	.description {
+		color: var(--wpds-color-fg-content-neutral-weak);
+	}
+
+	.footer {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		margin-top: var(--wpds-dimension-gap-lg);
+		padding-top: var(--wpds-dimension-padding-lg);
+	}
+}
