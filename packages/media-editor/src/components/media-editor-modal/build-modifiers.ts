@@ -76,18 +76,22 @@ export function buildModifiers(
 		modifiers.push( { type: 'rotate', args: { angle } } );
 	}
 
-	// Detect "no user crop" from the normalized cropRect itself rather than
-	// from the source-region percentages. When the image is rotated, the
-	// default full-frame cropRect already maps to a region whose width and
-	// height in source-image percent space fall outside [0, 100] (because
-	// the rotated bounding box differs from the source), so using the
-	// region values here would spuriously emit crops for rotate-only
-	// states. The cropRect is where the user's intent lives: at defaults
-	// (0, 0, 1, 1) there is no crop to apply.
-	if (
+	// A crop should be emitted whenever the user framed a sub-region of the
+	// source: either by shrinking `cropRect`, or by zooming/panning to frame
+	// a smaller area through the stencil. We avoid comparing the derived
+	// source-region percentages directly because under rotation the default
+	// full-frame cropRect already maps outside [0, 100] (the rotated bbox
+	// differs from the source), which would spuriously emit crops for
+	// rotate-only states. Checking the raw cropper state here keeps
+	// intent-detection separate from the percent math below.
+	const cropRectShrunk =
 		state.cropRect.width * 100 < 100 - CROP_TOLERANCE ||
-		state.cropRect.height * 100 < 100 - CROP_TOLERANCE
-	) {
+		state.cropRect.height * 100 < 100 - CROP_TOLERANCE;
+	const framedByZoomOrPan =
+		state.zoom > 1 + CROP_TOLERANCE / 100 ||
+		state.pan.x !== 0 ||
+		state.pan.y !== 0;
+	if ( cropRectShrunk || framedByZoomOrPan ) {
 		// The REST `/edit` endpoint applies modifiers sequentially. By the
 		// time `crop` is processed, the image has already been rotated, so
 		// `WP_Image_Editor::get_size()` reports the post-rotation bounding

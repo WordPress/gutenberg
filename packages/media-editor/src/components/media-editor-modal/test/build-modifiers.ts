@@ -233,6 +233,22 @@ describe( 'buildModifiers', () => {
 		expect( args.top ).toBeCloseTo( 37.5 );
 	} );
 
+	it( 'emits a crop when the user framed a region via zoom/pan alone', () => {
+		// Full-frame cropRect, but zoom=2 and pan shifted right: the user
+		// zoomed and dragged to frame a sub-region, so Save must persist it
+		// even though the crop handles weren't dragged.
+		const modifiers = buildModifiers(
+			stateWith( {
+				zoom: 2,
+				pan: { x: -0.25, y: 0 },
+				cropRect: { x: 0, y: 0, width: 1, height: 1 },
+			} ),
+			IMAGE
+		);
+		expect( modifiers ).toHaveLength( 1 );
+		expect( modifiers[ 0 ].type ).toBe( 'crop' );
+	} );
+
 	it( 'omits crop when the crop rect is full-frame within tolerance', () => {
 		// 99.95% on each axis is within the 0.1% tolerance.
 		const modifiers = buildModifiers(
