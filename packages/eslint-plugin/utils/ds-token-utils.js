@@ -29,7 +29,12 @@ function collectTokenOccurrences( value, prefix = '' ) {
 }
 
 /**
+ * Returns the static string value for a literal-like node, or `undefined`
+ * when the node does not contain one.
+ *
  * @param {import('estree').Literal | import('estree').TemplateElement} node
+ * @return {string | undefined} The static string value, or `undefined`
+ *                              when the node does not contain one.
  */
 function getStaticNodeValue( node ) {
 	if ( ! node.value ) {
