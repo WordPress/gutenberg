@@ -26,6 +26,7 @@ import {
 } from './fields';
 import { toFormData } from './utils';
 import type { TaxonomyRecord } from './types';
+import './style.scss';
 
 const defaultLayouts = {
 	table: {},
@@ -91,7 +92,12 @@ function TaxonomiesPage() {
 		[ totalItems, totalPages ]
 	);
 	return (
-		<Page title={ __( 'Taxonomies' ) } actions={ <AddTaxonomy /> }>
+		<Page
+			title={ __( 'Taxonomies' ) }
+			className="taxonomies-page"
+			hasPadding={ false }
+			actions={ <AddTaxonomy /> }
+		>
 			<DataViews
 				data={ data }
 				fields={ fields }
