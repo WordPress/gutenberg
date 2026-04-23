@@ -2736,6 +2736,116 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_preserves_responsive_block_element_styles() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'color'  => array(
+										'text' => 'var:preset|color|dark-gray',
+									),
+									'mobile' => array(
+										'color' => array(
+											'text' => 'var:preset|color|dark-pink',
+										),
+									),
+									'tablet' => array(
+										'color' => array(
+											'text' => 'var:preset|color|dark-red',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/group' => array(
+						'elements' => array(
+							'link' => array(
+								'color'  => array(
+									'text' => 'var(--wp--preset--color--dark-gray)',
+								),
+								'mobile' => array(
+									'color' => array(
+										'text' => 'var(--wp--preset--color--dark-pink)',
+									),
+								),
+								'tablet' => array(
+									'color' => array(
+										'text' => 'var(--wp--preset--color--dark-red)',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_preserves_responsive_elements_within_block_state() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'mobile' => array(
+								'elements' => array(
+									'link' => array(
+										'color' => array(
+											'text' => 'var:preset|color|dark-pink',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/group' => array(
+						'mobile' => array(
+							'elements' => array(
+								'link' => array(
+									'color' => array(
+										'text' => 'var(--wp--preset--color--dark-pink)',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_remove_insecure_properties_removes_non_preset_settings() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(

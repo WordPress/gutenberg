@@ -1111,6 +1111,11 @@ class WP_Theme_JSON_Gutenberg {
 					$schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
 				}
 			}
+
+			// Add responsive breakpoint states for elements.
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint_state ) {
+				$schema_styles_elements[ $element ][ $breakpoint_state ] = $styles_non_top_level;
+			}
 		}
 
 		$schema_styles_blocks   = array();
@@ -1133,7 +1138,8 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Add responsive breakpoint states for all blocks.
 			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint_state ) {
-				$schema_styles_blocks[ $block ][ $breakpoint_state ] = $styles_non_top_level;
+				$schema_styles_blocks[ $block ][ $breakpoint_state ]             = $styles_non_top_level;
+				$schema_styles_blocks[ $block ][ $breakpoint_state ]['elements'] = $schema_styles_elements;
 			}
 
 			// Add pseudo-selectors for blocks that support them.
@@ -1184,7 +1190,9 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Add responsive breakpoint states to block style variations.
 					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint_state ) {
-						$variation_schema[ $breakpoint_state ] = $styles_non_top_level;
+						$variation_schema[ $breakpoint_state ]             = $styles_non_top_level;
+						$variation_schema[ $breakpoint_state ]['elements'] = $schema_styles_elements;
+						$variation_schema[ $breakpoint_state ]['blocks']   = $schema_styles_blocks;
 					}
 
 					// Add pseudo-selectors to variations for blocks that support them.
@@ -3292,6 +3300,8 @@ class WP_Theme_JSON_Gutenberg {
 		// Update text indent selector for paragraph blocks based on the textIndent setting.
 		$block_name           = $block_metadata['name'] ?? null;
 		$feature_declarations = static::update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name );
+		$blocks_metadata      = static::get_blocks_metadata();
+		$block_elements       = $block_name && isset( $blocks_metadata[ $block_name ]['elements'] ) ? $blocks_metadata[ $block_name ]['elements'] : array();
 
 		// Update button width declarations for percentage values to use calc() with block gap.
 		$feature_declarations = static::update_button_width_declarations( $feature_declarations, $settings );
@@ -3396,6 +3406,53 @@ class WP_Theme_JSON_Gutenberg {
 					if ( isset( $breakpoint_node['css'] ) ) {
 						$breakpoint_custom_css     = static::process_blocks_custom_css( $breakpoint_node['css'], $style_variation['selector'] );
 						$variation_responsive_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
+					}
+
+					// Process nested element styles for this breakpoint state.
+					if ( isset( $breakpoint_node['elements'] ) && ! empty( $block_elements ) ) {
+						foreach ( $breakpoint_node['elements'] as $element_name => $element_node ) {
+							if ( ! isset( $block_elements[ $element_name ] ) ) {
+								continue;
+							}
+
+							$clean_element_selector     = preg_replace( '/,\s+/', ',', $block_elements[ $element_name ] );
+							$shortened_selector         = str_replace( $block_metadata['selector'], '', $clean_element_selector );
+							$split_selectors            = explode( ',', $shortened_selector );
+							$updated_selectors          = array_map(
+								static function ( $split_selector ) use ( $clean_style_variation_selector ) {
+									return $clean_style_variation_selector . $split_selector;
+								},
+								$split_selectors
+							);
+							$variation_element_selector = implode( ',', $updated_selectors );
+
+							$element_declarations = static::compute_style_properties( $element_node, $settings, null, $this->theme_json );
+							if ( ! empty( $element_declarations ) ) {
+								$element_ruleset           = static::to_ruleset( ':root :where(' . $variation_element_selector . ')', $element_declarations );
+								$variation_responsive_css .= $breakpoint_media . '{' . $element_ruleset . '}';
+							}
+
+							if ( isset( $element_node['css'] ) ) {
+								$element_custom_css        = static::process_blocks_custom_css( $element_node['css'], $variation_element_selector );
+								$variation_responsive_css .= $breakpoint_media . '{' . $element_custom_css . '}';
+							}
+
+							if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
+								foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
+									if ( ! isset( $element_node[ $pseudo_selector ] ) ) {
+										continue;
+									}
+
+									$pseudo_declarations = static::compute_style_properties( $element_node[ $pseudo_selector ], $settings, null, $this->theme_json );
+									if ( empty( $pseudo_declarations ) ) {
+										continue;
+									}
+
+									$pseudo_selector_ruleset   = static::to_ruleset( ':root :where(' . static::append_to_selector( $variation_element_selector, $pseudo_selector ) . ')', $pseudo_declarations );
+									$variation_responsive_css .= $breakpoint_media . '{' . $pseudo_selector_ruleset . '}';
+								}
+							}
+						}
 					}
 				}
 
@@ -3612,6 +3669,59 @@ class WP_Theme_JSON_Gutenberg {
 
 			$block_rules .= $responsive_feature_css;
 			$block_rules .= static::process_responsive_selectors( $node, $selector, $settings );
+		}
+
+		// 9. When processing a block element node, emit responsive breakpoint overrides for
+		// that element immediately after its default styles. This ensures media queries always
+		// follow the default rules they are meant to override.
+		$path       = $block_metadata['path'];
+		$path_count = count( $path );
+
+		$is_block_element_node = $is_processing_element
+			&& $path_count >= 5
+			&& 'elements' === $path[ $path_count - 2 ]
+			&& in_array( 'blocks', $path, true );
+
+		if ( $is_block_element_node ) {
+			$parent_block_path = array_slice( $path, 0, $path_count - 2 );
+
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+				$responsive_element_path = array_merge( $parent_block_path, array( $breakpoint, 'elements', $current_element ) );
+				$responsive_element_node = _wp_array_get( $this->theme_json, $responsive_element_path, null );
+
+				if ( empty( $responsive_element_node ) ) {
+					continue;
+				}
+
+				$breakpoint_media     = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
+				$element_declarations = static::compute_style_properties( $responsive_element_node, $settings, null, $this->theme_json );
+
+				if ( ! empty( $element_declarations ) ) {
+					$element_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $element_declarations );
+					$block_rules    .= $breakpoint_media . '{' . $element_ruleset . '}';
+				}
+
+				if ( isset( $responsive_element_node['css'] ) ) {
+					$element_custom_css = static::process_blocks_custom_css( $responsive_element_node['css'], $selector );
+					$block_rules       .= $breakpoint_media . '{' . $element_custom_css . '}';
+				}
+
+				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
+					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_sel ) {
+						if ( ! isset( $responsive_element_node[ $pseudo_sel ] ) ) {
+							continue;
+						}
+
+						$pseudo_declarations = static::compute_style_properties( $responsive_element_node[ $pseudo_sel ], $settings, null, $this->theme_json );
+						if ( empty( $pseudo_declarations ) ) {
+							continue;
+						}
+
+						$pseudo_ruleset = static::to_ruleset( ':root :where(' . static::append_to_selector( $selector, $pseudo_sel ) . ')', $pseudo_declarations );
+						$block_rules   .= $breakpoint_media . '{' . $pseudo_ruleset . '}';
+					}
+				}
+			}
 		}
 
 		return $block_rules;
@@ -4139,6 +4249,14 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( $input[ $breakpoint ] ) ) {
 					$output[ $breakpoint ] = static::remove_insecure_styles( $input[ $breakpoint ] );
 
+					if ( isset( $input[ $breakpoint ]['elements'] ) ) {
+						$output[ $breakpoint ]['elements'] = static::remove_insecure_element_styles( $input[ $breakpoint ]['elements'] );
+					}
+
+					if ( isset( $input[ $breakpoint ]['blocks'] ) ) {
+						$output[ $breakpoint ]['blocks'] = static::remove_insecure_inner_block_styles( $input[ $breakpoint ]['blocks'] );
+					}
+
 					// Responsive custom CSS is allowed for users with 'edit_css' capability.
 					if ( isset( $input[ $breakpoint ]['css'] ) && current_user_can( 'edit_css' ) ) {
 						$output[ $breakpoint ]['css'] = $input[ $breakpoint ]['css'];
@@ -4171,6 +4289,14 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
 						if ( isset( $variation_input[ $breakpoint ] ) ) {
 							$variation_output[ $breakpoint ] = static::remove_insecure_styles( $variation_input[ $breakpoint ] );
+
+							if ( isset( $variation_input[ $breakpoint ]['elements'] ) ) {
+								$variation_output[ $breakpoint ]['elements'] = static::remove_insecure_element_styles( $variation_input[ $breakpoint ]['elements'] );
+							}
+
+							if ( isset( $variation_input[ $breakpoint ]['blocks'] ) ) {
+								$variation_output[ $breakpoint ]['blocks'] = static::remove_insecure_inner_block_styles( $variation_input[ $breakpoint ]['blocks'] );
+							}
 
 							// Responsive custom CSS is allowed for users with 'edit_css' capability.
 							if ( isset( $variation_input[ $breakpoint ]['css'] ) && current_user_can( 'edit_css' ) ) {
@@ -4239,6 +4365,13 @@ class WP_Theme_JSON_Gutenberg {
 					}
 				}
 
+				// Re-add and process responsive breakpoint styles for elements.
+				foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+					if ( isset( $element_input[ $breakpoint ] ) ) {
+						$element_output[ $breakpoint ] = static::remove_insecure_styles( $element_input[ $breakpoint ] );
+					}
+				}
+
 				$sanitized[ $element_name ] = $element_output;
 			}
 		}
@@ -4260,6 +4393,13 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( isset( $block_input['elements'] ) ) {
 				$block_output['elements'] = static::remove_insecure_element_styles( $block_input['elements'] );
+			}
+
+			// Re-add and process responsive breakpoint styles for inner blocks.
+			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+				if ( isset( $block_input[ $breakpoint ] ) ) {
+					$block_output[ $breakpoint ] = static::remove_insecure_styles( $block_input[ $breakpoint ] );
+				}
 			}
 
 			$sanitized[ $block_type ] = $block_output;
