@@ -17,6 +17,7 @@ import {
 	privateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
 
 /**
  * Internal dependencies
@@ -29,6 +30,8 @@ import { default as mediaFinalize } from '../../utils/media-finalize';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useGlobalStylesContext } from '../global-styles-provider';
+
+const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
@@ -107,6 +110,7 @@ const {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 } = unlock( privateApis );
 
 /**
@@ -269,6 +273,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { openMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	/**
 	 * Creates a Post entity.
@@ -338,6 +343,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			},
 			[ mediaEditKey ]: hasUploadPermissions
 				? editMediaEntity
+				: undefined,
+			[ openMediaEditorModalKey ]: window?.__experimentalMediaEditorModal
+				? ( { id, onUpdate } ) =>
+						openMediaEditorModal( { id, onUpdate } )
 				: undefined,
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			[ mediaUploadOnSuccessKey ]: hasUploadPermissions
@@ -435,6 +444,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
+		openMediaEditorModal,
 		settings.onNavigateToEntityRecord,
 		deviceType,
 		allImageSizes,

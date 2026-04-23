@@ -576,19 +576,6 @@ export function resetStylesNavigation() {
 }
 
 /**
- * Set the minimum height of the canvas.
- *
- * @param {number} minHeight
- * @return {Object} Action object.
- */
-export function setCanvasMinHeight( minHeight ) {
-	return {
-		type: 'SET_CANVAS_MIN_HEIGHT',
-		minHeight,
-	};
-}
-
-/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *

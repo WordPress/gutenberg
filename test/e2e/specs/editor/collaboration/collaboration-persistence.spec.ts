@@ -65,6 +65,7 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 		// wait for the entity record resolver to finish.
 		await page.waitForFunction(
 			() => ( window as any )._wpCollaborationEnabled === true,
+			undefined,
 			{ timeout: 5000 }
 		);
 		await collaborationUtils.waitForEntityReady( page, {

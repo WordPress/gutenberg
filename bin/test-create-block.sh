@@ -74,7 +74,7 @@ module.exports = [
 	{
 		settings: {
 			'import/resolver': require.resolve(
-				'../tools/eslint/import-resolver'
+				'../tools/eslint/import-resolver.cjs'
 			),
 		},
 	},

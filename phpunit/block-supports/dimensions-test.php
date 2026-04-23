@@ -38,6 +38,7 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 					'dimensions' => array(
 						'height'    => true,
 						'minHeight' => true,
+						'minWidth'  => true,
 						'width'     => true,
 					),
 				),
@@ -50,6 +51,7 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 				'dimensions' => array(
 					'height'    => '80vh',
 					'minHeight' => '50vh',
+					'minWidth'  => '200px',
 					'width'     => '1000px',
 				),
 			),
@@ -57,7 +59,7 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 
 		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
 		$expected = array(
-			'style' => 'height:80vh;min-height:50vh;width:1000px;',
+			'style' => 'height:80vh;min-height:50vh;min-width:200px;width:1000px;',
 		);
 
 		$this->assertSame( $expected, $actual );
@@ -276,6 +278,77 @@ class WP_Block_Supports_Dimensions_Test extends WP_UnitTestCase {
 			'style' => array(
 				'dimensions' => array(
 					'height' => '400px',
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
+		$expected = array();
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function test_min_width_style_is_applied() {
+		$this->test_block_name = 'test/min-width-style-is-applied';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'dimensions' => array(
+						'minWidth' => true,
+					),
+				),
+			)
+		);
+		$registry    = WP_Block_Type_Registry::get_instance();
+		$block_type  = $registry->get_registered( $this->test_block_name );
+		$block_attrs = array(
+			'style' => array(
+				'dimensions' => array(
+					'minWidth' => '200px',
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_dimensions_support( $block_type, $block_attrs );
+		$expected = array(
+			'style' => 'min-width:200px;',
+		);
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	public function test_min_width_with_individual_skipped_serialization_block_supports() {
+		$this->test_block_name = 'test/min-width-with-individual-skipped-serialization-block-supports';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'dimensions' => array(
+						'minWidth'                        => true,
+						'__experimentalSkipSerialization' => array( 'minWidth' ),
+					),
+				),
+			)
+		);
+		$registry    = WP_Block_Type_Registry::get_instance();
+		$block_type  = $registry->get_registered( $this->test_block_name );
+		$block_attrs = array(
+			'style' => array(
+				'dimensions' => array(
+					'minWidth' => '200px',
 				),
 			),
 		);
