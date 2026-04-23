@@ -90,7 +90,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(24px + var(--wpds-dimension-padding-xs));
+			padding-inline-end: calc(#{vars.$icon-size} + var(--wpds-dimension-padding-xs));
 		}
 
 		&:hover:not(&.is-not-clickable),
@@ -127,6 +127,7 @@
 	}
 
 	.dataviews-filters__summary-chip-remove {
+		// TODO: use size token when available.
 		width: vars.$icon-size;
 		height: vars.$icon-size;
 		border-radius: var(--wpds-border-radius-md);
@@ -368,7 +369,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: 24px;
+		width: vars.$icon-size;
 
 		&:dir(ltr) {
 			transform: scaleX(-1);
