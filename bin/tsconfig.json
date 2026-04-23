@@ -30,7 +30,6 @@
 		"api-docs/gen-components-docs/markdown/index.mjs",
 		"api-docs/gen-components-docs/markdown/props.mjs",
 		"api-docs/gen-theme-reference.mjs",
-		"api-docs/generate-block-docs.mjs",
 		"build.mjs",
 		"check-licenses.mjs",
 		"check-local-changes.js",
