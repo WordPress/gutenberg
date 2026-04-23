@@ -6,6 +6,7 @@ import {
 	ToolbarButton,
 	ToggleControl,
 	ToolbarGroup,
+	PanelBody,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -83,29 +84,16 @@ const EmbedControls = ( {
 			) }
 			{ providerNameSlug === 'youtube' && (
 				<InspectorControls>
-					<ToolsPanel
-						label={ __( 'Player settings' ) }
-						resetAll={ () => {
-							toggleYouTubeSeek( false );
-						} }
-						dropdownMenuProps={ dropdownMenuProps }
-					>
-						<ToolsPanelItem
+					<PanelBody title={ __( 'Player settings' ) }>
+						<ToggleControl
 							label={ __( 'Enable timestamp seeking' ) }
-							isShownByDefault
-							hasValue={ () => enableYouTubeSeek }
-							onDeselect={ () => toggleYouTubeSeek( false ) }
-						>
-							<ToggleControl
-								label={ __( 'Enable timestamp seeking' ) }
-								checked={ enableYouTubeSeek }
-								help={ __(
-									'Allows links with data-yt-seek="SECONDS" to jump to a timestamp in this video.'
-								) }
-								onChange={ toggleYouTubeSeek }
-							/>
-						</ToolsPanelItem>
-					</ToolsPanel>
+							checked={ !! enableYouTubeSeek }
+							help={ __(
+								'Allows links with data-yt-seek="SECONDS" to jump to a timestamp in this video.'
+							) }
+							onChange={ toggleYouTubeSeek }
+						/>
+					</PanelBody>
 				</InspectorControls>
 			) }
 		</>
