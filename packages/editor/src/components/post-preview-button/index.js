@@ -197,7 +197,7 @@ export default function PostPreviewButton( {
 			{ textContent || (
 				<>
 					{ _x( 'Preview', 'imperative verb' ) }
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{
 							/* translators: accessibility text */
 							__( '(opens in a new tab)' )

@@ -160,12 +160,11 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
-              <div
-                as="span"
+              <span
                 data-visually-hidden=""
               >
                 (opens in a new tab)
-              </div>
+              </span>
               <svg
                 aria-hidden="true"
                 focusable="false"
@@ -385,12 +384,11 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
               href="https://wordpress.local/sample-page/"
               target="_blank"
             >
-              <div
-                as="span"
+              <span
                 data-visually-hidden=""
               >
                 (opens in a new tab)
-              </div>
+              </span>
               <svg
                 aria-hidden="true"
                 focusable="false"

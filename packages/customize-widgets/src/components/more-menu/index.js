@@ -88,7 +88,7 @@ export default function MoreMenu() {
 								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

@@ -164,7 +164,7 @@ export default function PostPublishPanelPostpublish( {
 							target="_blank"
 						>
 							{ viewPostLabel }
-							<VisuallyHidden as="span">
+							<VisuallyHidden render={ <span /> }>
 								{
 									/* translators: accessibility text */
 									__( '(opens in a new tab)' )

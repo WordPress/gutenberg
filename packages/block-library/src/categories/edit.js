@@ -132,6 +132,13 @@ export default function CategoriesEdit( {
 	const renderCategoryDropdown = () => {
 		const parentId = isHierarchicalTaxonomy && showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
+		// eslint-disable-next-line jsx-a11y/label-has-associated-control
+		const hiddenLabelElement = <label htmlFor={ selectId } />;
+		const hiddenLabel = (
+			<VisuallyHidden render={ hiddenLabelElement }>
+				{ label ? label : taxonomy?.name }
+			</VisuallyHidden>
+		);
 		return (
 			<>
 				{ showLabel ? (
@@ -146,9 +153,7 @@ export default function CategoriesEdit( {
 						}
 					/>
 				) : (
-					<VisuallyHidden as="label" htmlFor={ selectId }>
-						{ label ? label : taxonomy?.name }
-					</VisuallyHidden>
+					hiddenLabel
 				) }
 				<select id={ selectId }>
 					<option>

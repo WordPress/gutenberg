@@ -151,7 +151,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 								onClick={ onClose }
 							>
 								{ __( 'View site' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

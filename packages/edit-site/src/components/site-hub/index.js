@@ -81,7 +81,7 @@ const SiteHub = memo(
 								target="_blank"
 							>
 								{ decodeEntities( siteTitle ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )
