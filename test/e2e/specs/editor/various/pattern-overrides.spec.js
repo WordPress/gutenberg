@@ -691,7 +691,7 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -737,7 +737,7 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )

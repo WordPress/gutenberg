@@ -112,7 +112,7 @@ function PatternsManageButton( { clientId, onClose } ) {
 			{ canDetach && (
 				<>
 					<MenuItem onClick={ () => setShowConfirmDialog( true ) }>
-						{ __( 'Detach pattern' ) }
+						{ __( 'Detach' ) }
 					</MenuItem>
 					<ConfirmDialog
 						isOpen={ showConfirmDialog }

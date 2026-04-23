@@ -479,8 +479,8 @@ test.describe( 'Unsynced pattern', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		);
 
-		// Open the block options menu and click "Detach pattern".
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		// Open the block options menu and click "Detach".
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -838,7 +838,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -878,7 +878,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -984,7 +984,7 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
