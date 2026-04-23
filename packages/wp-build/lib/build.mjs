@@ -1161,6 +1161,29 @@ async function generatePagesPhp( pageData, replacements ) {
 						.join( '\n' )
 				: '\t\t\t// No init modules configured';
 
+		// Both templates register hooks on every request, so `menuSlug`
+		// (full-page) and `menuSlugAdmin` (WP-Admin) must differ to avoid
+		// the full-page `admin_init` hook intercepting WP-Admin requests.
+		const menuSlug = page.menuSlug || page.slug;
+		const menuSlugAdmin = page.menuSlugAdmin || `${ menuSlug }-wp-admin`;
+		if ( menuSlug === menuSlugAdmin ) {
+			throw new Error(
+				`Page "${ page.slug }": menuSlug and menuSlugAdmin must differ (both resolved to "${ menuSlug }").`
+			);
+		}
+		// Match WordPress `sanitize_key()`: lowercase alphanumerics, dashes, underscores.
+		const sanitizeKeyPattern = /^[a-z0-9_-]+$/;
+		for ( const [ key, value ] of [
+			[ 'menuSlug', menuSlug ],
+			[ 'menuSlugAdmin', menuSlugAdmin ],
+		] ) {
+			if ( ! sanitizeKeyPattern.test( value ) ) {
+				throw new Error(
+					`Page "${ page.slug }": ${ key } "${ value }" must only contain lowercase alphanumerics, dashes, and underscores.`
+				);
+			}
+		}
+
 		const templateReplacements = {
 			...replacements,
 			'{{PAGE_SLUG}}': page.slug,
@@ -1168,6 +1191,8 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PREFIX}}': prefixUnderscore,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
+			'{{MENU_SLUG}}': menuSlug,
+			'{{MENU_SLUG_ADMIN}}': menuSlugAdmin,
 		};
 
 		// Generate both page.php and page-wp-admin.php
@@ -1814,13 +1839,21 @@ async function buildAll( baseUrlExpression ) {
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
 		if ( typeof page === 'string' ) {
-			return { id: page, init: [], title: undefined };
+			return {
+				id: page,
+				init: [],
+				title: undefined,
+				menuSlug: undefined,
+				menuSlugAdmin: undefined,
+			};
 		}
 		return {
 			id: page.id,
 			init: page.init || [],
 			title: page.title || undefined,
 			experimental: page.experimental || false,
+			menuSlug: page.menuSlug || undefined,
+			menuSlugAdmin: page.menuSlugAdmin || undefined,
 		};
 	} );
 
@@ -1842,6 +1875,8 @@ async function buildAll( baseUrlExpression ) {
 			routes: pageRoutes,
 			initModules: page.init,
 			title: page.title,
+			menuSlug: page.menuSlug,
+			menuSlugAdmin: page.menuSlugAdmin,
 		};
 	} );
 

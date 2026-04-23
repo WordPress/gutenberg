@@ -307,7 +307,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	if ( isset( $_GET['page'] ) && '{{PAGE_SLUG}}' === $_GET['page'] ) {
+	if ( isset( $_GET['page'] ) && '{{MENU_SLUG}}' === $_GET['page'] ) {
 		{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page();
 		exit;
 	}

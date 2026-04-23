@@ -277,9 +277,11 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
-  - **`id`** (required): The page slug used in WordPress admin URLs
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"], "menuSlug": "custom-url" }` - Page with optional init modules and a custom menu slug
+  - **`id`** (required): The page identifier. Used for generated PHP function names, action hook names, and generated file paths.
   - **`init`** (optional): Array of script module IDs to execute during page initialization
+  - **`menuSlug`** (optional): The menu slug for full-page mode (`admin.php?page={menuSlug}`). Defaults to `{id}`. Must only contain lowercase alphanumerics, dashes, and underscores (compatible with WordPress `sanitize_key()`).
+  - **`menuSlugAdmin`** (optional): The menu slug for WP-Admin mode (`admin.php?page={menuSlugAdmin}`). Defaults to `{menuSlug}-wp-admin`. Set this to use an arbitrary URL (without the `-wp-admin` suffix). Same character restrictions as `menuSlug`. `menuSlug` and `menuSlugAdmin` must not resolve to the same value or the build will fail, because both templates listen on `$_GET['page']` and would collide.
 
 **Generated Files:**
 
@@ -307,7 +309,7 @@ add_submenu_page(
 
 Note: The callback function name is prefixed with your plugin name (from `wpPlugin.name` in root `package.json`). For example, if your plugin name is `my-plugin`, the function will be `my_plugin_my_admin_page_wp_admin_render_page`.
 
-The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
+The menu slug defaults to `my-admin-page-wp-admin` (your page `id` + `-wp-admin`) and can be overridden via the `menuSlug` option in `wpPlugin.pages`. WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
 
 **Deep linking with the `p` query parameter:**
 

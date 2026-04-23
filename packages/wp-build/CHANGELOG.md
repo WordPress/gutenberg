@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- Add `menuSlug` and `menuSlugAdmin` options to `wpPlugin.pages` entries, letting admin page URLs be customized independently from the page `id` (including overriding the default `-wp-admin` suffix for WP-Admin mode).
+
 ## 0.12.0 (2026-04-15)
 
 ## 0.11.0 (2026-04-01)
