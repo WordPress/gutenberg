@@ -34,6 +34,9 @@ const EmbedControls = ( {
 	allowResponsive,
 	toggleResponsive,
 	switchBackToURLInput,
+	providerNameSlug,
+	enableYouTubeSeek,
+	toggleYouTubeSeek,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -73,6 +76,33 @@ const EmbedControls = ( {
 								checked={ allowResponsive }
 								help={ getResponsiveHelp }
 								onChange={ toggleResponsive }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+			) }
+			{ providerNameSlug === 'youtube' && (
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Player settings' ) }
+						resetAll={ () => {
+							toggleYouTubeSeek( false );
+						} }
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							label={ __( 'Enable timestamp seeking' ) }
+							isShownByDefault
+							hasValue={ () => enableYouTubeSeek }
+							onDeselect={ () => toggleYouTubeSeek( false ) }
+						>
+							<ToggleControl
+								label={ __( 'Enable timestamp seeking' ) }
+								checked={ enableYouTubeSeek }
+								help={ __(
+									'Allows links with data-yt-seek="SECONDS" to jump to a timestamp in this video.'
+								) }
+								onChange={ toggleYouTubeSeek }
 							/>
 						</ToolsPanelItem>
 					</ToolsPanel>

@@ -13,7 +13,8 @@ import {
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { url, caption, type, providerNameSlug } = attributes;
+	const { url, caption, type, providerNameSlug, enableYouTubeSeek } =
+		attributes;
 
 	if ( ! url ) {
 		return null;
@@ -26,7 +27,12 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<figure { ...useBlockProps.save( { className } ) }>
+		<figure
+			{ ...useBlockProps.save( { className } ) }
+			{ ...( enableYouTubeSeek
+				? { 'data-enable-youtube-seek': '' }
+				: {} ) }
+		>
 			<div className="wp-block-embed__wrapper">
 				{ `\n${ url }\n` /* URL needs to be on its own line. */ }
 			</div>

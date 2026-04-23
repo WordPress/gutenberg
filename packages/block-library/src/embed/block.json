@@ -38,6 +38,10 @@
 			"type": "boolean",
 			"default": true,
 			"role": "content"
+		},
+		"enableYouTubeSeek": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
@@ -51,5 +55,6 @@
 		}
 	},
 	"editorStyle": "wp-block-embed-editor",
-	"style": "wp-block-embed"
+	"style": "wp-block-embed",
+	"viewScriptModule": "@wordpress/block-library/embed/view"
 }

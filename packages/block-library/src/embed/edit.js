@@ -1,19 +1,6 @@
 /**
  * Internal dependencies
  */
-import {
-	createUpgradedEmbedBlock,
-	getClassNames,
-	removeAspectRatioClasses,
-	fallback,
-	getEmbedInfoByProvider,
-	getMergedAttributesWithPreview,
-} from './util';
-import EmbedControls from './embed-controls';
-import { embedContentIcon } from './icons';
-import EmbedLoading from './embed-loading';
-import EmbedPlaceholder from './embed-placeholder';
-import EmbedPreview from './embed-preview';
 
 /**
  * External dependencies
@@ -30,6 +17,19 @@ import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
 import { getAuthority } from '@wordpress/url';
+import EmbedPreview from './embed-preview';
+import EmbedPlaceholder from './embed-placeholder';
+import EmbedLoading from './embed-loading';
+import { embedContentIcon } from './icons';
+import EmbedControls from './embed-controls';
+import {
+	createUpgradedEmbedBlock,
+	getClassNames,
+	removeAspectRatioClasses,
+	fallback,
+	getEmbedInfoByProvider,
+	getMergedAttributesWithPreview,
+} from './util';
 import { Caption } from '../utils/caption';
 
 const EmbedEdit = ( props ) => {
@@ -39,6 +39,7 @@ const EmbedEdit = ( props ) => {
 			previewable,
 			responsive,
 			url: attributesUrl,
+			enableYouTubeSeek,
 		},
 		attributes,
 		isSelected,
@@ -117,6 +118,10 @@ const EmbedEdit = ( props ) => {
 			title,
 			responsive
 		);
+
+	function toggleYouTubeSeek( value ) {
+		setAttributes( { enableYouTubeSeek: value } );
+	}
 
 	function toggleResponsive( newAllowResponsive ) {
 		const { className } = attributes;
@@ -265,6 +270,9 @@ const EmbedEdit = ( props ) => {
 				allowResponsive={ allowResponsive }
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
+				providerNameSlug={ providerNameSlug }
+				enableYouTubeSeek={ enableYouTubeSeek }
+				toggleYouTubeSeek={ toggleYouTubeSeek }
 			/>
 			<figure
 				{ ...blockProps }
