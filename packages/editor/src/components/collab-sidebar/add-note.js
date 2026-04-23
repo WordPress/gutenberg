@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -12,7 +11,7 @@ import {
 /**
  * Internal dependencies
  */
-import { NoteByline } from './note-byline';
+import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
 import { focusCommentThread } from './utils';
@@ -69,18 +68,19 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				selectNote( undefined );
 			} }
 		>
-			<Stack direction="row" align="center" justify="flex-start" gap="md">
-				<NoteByline />
-			</Stack>
-			<NoteForm
-				onSubmit={ async ( inputComment ) => {
-					const { id } = await onSubmit( { content: inputComment } );
-					selectNote( id );
-					focusCommentThread( id, sidebarRef.current );
-				} }
-				onCancel={ unselectNote }
-				labels={ { input: __( 'New note' ) } }
-			/>
+			<NoteCard>
+				<NoteForm
+					onSubmit={ async ( inputComment ) => {
+						const { id } = await onSubmit( {
+							content: inputComment,
+						} );
+						selectNote( id );
+						focusCommentThread( id, sidebarRef.current );
+					} }
+					onCancel={ unselectNote }
+					labels={ { input: __( 'New note' ) } }
+				/>
+			</NoteCard>
 		</FloatingContainer>
 	);
 }

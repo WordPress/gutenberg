@@ -10,7 +10,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
@@ -22,7 +22,7 @@ import {
  * Internal dependencies
  */
 import { AddNote } from './add-note';
-import { NoteByline } from './note-byline';
+import { Note } from './note';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
@@ -130,6 +130,16 @@ export function NoteThread( {
 		toggleBlockSpotlight( note.blockClientId, false );
 	};
 
+	const handleResolve = () => {
+		onEditNote( { id: note.id, status: 'approved' } );
+		unselectNote();
+		if ( isFloating ) {
+			relatedBlockElement?.focus();
+		} else {
+			focusCommentThread( note.id, sidebarRef.current );
+		}
+	};
+
 	const allReplies = note?.reply || [];
 	const lastReply =
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
@@ -212,29 +222,20 @@ export function NoteThread( {
 					{ __( 'Original block deleted.' ) }
 				</p>
 			) }
-			<NoteCard
+			<Note
 				note={ note }
-				isExpanded={ isSelected }
-				onEditNote={ ( params = {} ) => {
-					onEditNote( params );
-					if ( params.status === 'approved' ) {
-						unselectNote();
-						if ( isFloating ) {
-							relatedBlockElement?.focus();
-						} else {
-							focusCommentThread( note.id, sidebarRef.current );
-						}
-					}
-				} }
+				isSelected={ isSelected }
+				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
+				onResolve={ handleResolve }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
-					<NoteCard
+					<Note
 						key={ reply.id }
 						note={ reply }
 						parentNote={ note }
-						isExpanded={ isSelected }
+						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
 					/>
@@ -268,66 +269,53 @@ export function NoteThread( {
 				</Stack>
 			) }
 			{ ! isSelected && lastReply && (
-				<NoteCard
+				<Note
 					note={ lastReply }
 					parentNote={ note }
-					isExpanded={ isSelected }
+					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
 				/>
 			) }
 			{ isSelected && (
-				<Stack direction="column" gap="sm" role="treeitem">
-					<Stack
-						direction="row"
-						align="center"
-						justify="flex-start"
-						gap="md"
-					>
-						<NoteByline />
-					</Stack>
-					<Stack direction="column" gap="sm">
-						<NoteForm
-							onSubmit={ ( inputComment ) => {
-								if ( 'approved' === note.status ) {
-									// For reopening, include the content in the reopen action.
-									onEditNote( {
-										id: note.id,
-										status: 'hold',
-										content: inputComment,
-									} );
-								} else {
-									// For regular replies, add as separate comment.
-									onAddReply( {
-										content: inputComment,
-										parent: note.id,
-									} );
-								}
-							} }
-							onCancel={ ( event ) => {
-								// Prevent the parent onClick from being triggered.
-								event.stopPropagation();
-								unselectNote();
-								focusCommentThread(
-									note.id,
-									sidebarRef.current
-								);
-							} }
-							labels={ {
-								submit:
-									'approved' === note.status
-										? __( 'Reopen & Reply' )
-										: __( 'Reply' ),
-								input: sprintf(
-									// translators: %1$s: note identifier, %2$s: author name
-									__( 'Reply to note %1$s by %2$s' ),
-									note.id,
-									note.author_name
-								),
-							} }
-						/>
-					</Stack>
-				</Stack>
+				<NoteCard role="treeitem">
+					<NoteForm
+						onSubmit={ ( inputComment ) => {
+							if ( 'approved' === note.status ) {
+								// For reopening, include the content in the reopen action.
+								onEditNote( {
+									id: note.id,
+									status: 'hold',
+									content: inputComment,
+								} );
+							} else {
+								// For regular replies, add as separate comment.
+								onAddReply( {
+									content: inputComment,
+									parent: note.id,
+								} );
+							}
+						} }
+						onCancel={ ( event ) => {
+							// Prevent the parent onClick from being triggered.
+							event.stopPropagation();
+							unselectNote();
+							focusCommentThread( note.id, sidebarRef.current );
+						} }
+						labels={ {
+							submit:
+								'approved' === note.status
+									? __( 'Reopen & Reply' )
+									: __( 'Reply' ),
+							input: sprintf(
+								// translators: %1$s: note identifier, %2$s: author name
+								__( 'Reply to note %1$s by %2$s' ),
+								note.id,
+								note.author_name
+							),
+						} }
+					/>
+				</NoteCard>
 			) }
 			{ !! note.blockClientId && (
 				<Button
