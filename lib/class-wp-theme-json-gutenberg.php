@@ -773,37 +773,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns CSS rules for responsive breakpoint states stored in a block node.
-	 * Unlike pseudo-selectors, breakpoint styles are available for all blocks and
-	 * are wrapped in CSS media queries rather than appended to the selector.
-	 *
-	 * @param array  $node          The block's styles node from theme.json.
-	 * @param string $base_selector The base CSS selector for the block.
-	 * @param array  $settings      The theme.json settings.
-	 * @return string CSS rules string with media query wrappers.
-	 */
-	private static function process_responsive_selectors( $node, $base_selector, $settings ) {
-		$responsive_css = '';
-
-		foreach ( static::RESPONSIVE_BREAKPOINTS as $breakpoint_key => $media_query ) {
-			if ( ! isset( $node[ $breakpoint_key ] ) ) {
-				continue;
-			}
-
-			$declarations = static::compute_style_properties( $node[ $breakpoint_key ], $settings, null, null );
-
-			if ( empty( $declarations ) ) {
-				continue;
-			}
-
-			$inner_rule      = static::to_ruleset( ":root :where($base_selector)", $declarations );
-			$responsive_css .= $media_query . '{' . $inner_rule . '}';
-		}
-
-		return $responsive_css;
-	}
-
-	/**
 	 * Returns a class name by an element name.
 	 *
 	 * @since 6.1.0
