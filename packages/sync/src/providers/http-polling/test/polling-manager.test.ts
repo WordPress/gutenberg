@@ -1290,6 +1290,11 @@ describe( 'polling-manager', () => {
 		// block register a primary room plus additional "overflow" rooms
 		// to exercise the rotation behavior. With cap=10 and the primary
 		// pinned, each request carries 9 overflow slots.
+		//
+		// Note: the first registerRoom call triggers poll() synchronously,
+		// so the first poll's payload contains only the primary room.
+		// Overflow rooms registered in the same tick are picked up starting
+		// with the second poll, which is when rotation behavior kicks in.
 
 		function registerRoom( pollingMgr: PollingManager, room: string ) {
 			pollingMgr.registerRoom( {
@@ -1330,9 +1335,16 @@ describe( 'polling-manager', () => {
 			const overflow = registerPrimaryAndOverflow( pollingManager, 9 );
 
 			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 4000 );
 
-			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
-			expect( getRoomNames( 0 ) ).toEqual( [ 'primary', ...overflow ] );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+
+			// First poll fires synchronously with only the primary room.
+			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
+
+			// Second poll includes every registered room in a single
+			// request (fast path since total rooms === cap).
+			expect( getRoomNames( 1 ) ).toEqual( [ 'primary', ...overflow ] );
 		} );
 
 		it( 'caps each request at MAX_ROOMS_PER_REQUEST and always includes the primary room', async () => {
@@ -1347,7 +1359,11 @@ describe( 'polling-manager', () => {
 
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
 
-			for ( let i = 0; i < 3; i++ ) {
+			// First poll: only the primary room was registered yet.
+			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
+
+			// Subsequent polls cap at MAX_ROOMS_PER_REQUEST and pin primary.
+			for ( let i = 1; i < 3; i++ ) {
 				const names = getRoomNames( i );
 				expect( names ).toHaveLength( 10 );
 				expect( names[ 0 ] ).toBe( 'primary' );
@@ -1357,16 +1373,18 @@ describe( 'polling-manager', () => {
 		it( 'rotates overflow rooms across successive polls until all are covered', async () => {
 			mockPostSyncUpdate.mockResolvedValue( { rooms: [] } );
 
-			// Primary + 15 overflow = 16 rooms. With 9 overflow slots per
-			// request, two polls send 18 slots — enough to cover every
-			// overflow room at least once.
+			// Primary + 15 overflow = 16 rooms. Skipping the primary-only
+			// first poll, two subsequent rotation polls send 18 slots —
+			// enough to cover every overflow room at least once.
 			const overflow = registerPrimaryAndOverflow( pollingManager, 15 );
 
 			await jest.advanceTimersByTimeAsync( 0 );
 			await jest.advanceTimersByTimeAsync( 4000 );
+			await jest.advanceTimersByTimeAsync( 4000 );
 
 			const overflowSeen = new Set< string >();
-			for ( let i = 0; i < 2; i++ ) {
+			// Skip poll 0 (primary only); inspect rotation polls.
+			for ( let i = 1; i < 3; i++ ) {
 				for ( const name of getRoomNames( i ) ) {
 					if ( name !== 'primary' ) {
 						overflowSeen.add( name );
@@ -1385,13 +1403,15 @@ describe( 'polling-manager', () => {
 
 			await jest.advanceTimersByTimeAsync( 0 );
 			await jest.advanceTimersByTimeAsync( 4000 );
+			await jest.advanceTimersByTimeAsync( 4000 );
 
-			const first = getRoomNames( 0 ).slice( 1 );
-			const second = getRoomNames( 1 ).slice( 1 );
+			// Compare the two rotation polls (poll 0 is primary-only).
+			const first = getRoomNames( 1 ).slice( 1 );
+			const second = getRoomNames( 2 ).slice( 1 );
 
 			expect( first ).not.toEqual( second );
-			// Two polls of 9 slots against 11 overflow rooms cover the
-			// entire set.
+			// Two rotation polls of 9 slots against 11 overflow rooms
+			// cover the entire set.
 			expect( new Set( [ ...first, ...second ] ).size ).toBe( 11 );
 		} );
 
@@ -1399,25 +1419,32 @@ describe( 'polling-manager', () => {
 			// Primary + 11 overflow rooms, 9 slots per request.
 			registerPrimaryAndOverflow( pollingManager, 11 );
 
-			// First poll fails. It should have sent primary + 9 overflow.
-			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'network' ) );
+			// Poll 1: primary only (fires synchronously at registration).
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
 			await jest.advanceTimersByTimeAsync( 0 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 1 );
+			expect( getRoomNames( 0 ) ).toEqual( [ 'primary' ] );
 
-			const firstSent = getRoomNames( 0 );
-			expect( firstSent ).toHaveLength( 10 );
-			expect( firstSent[ 0 ] ).toBe( 'primary' );
-
-			// Second poll should rotate past the failed window, still
-			// pinning primary but with a different overflow slice.
-			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
-			await jest.advanceTimersByTimeAsync( 2000 );
+			// Poll 2 fails while sending primary + 9 overflow. The
+			// rotation offset should still advance past this window.
+			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'network' ) );
+			await jest.advanceTimersByTimeAsync( 4000 );
 			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
 
-			const secondSent = getRoomNames( 1 );
-			expect( secondSent ).toHaveLength( 10 );
-			expect( secondSent[ 0 ] ).toBe( 'primary' );
-			expect( secondSent ).not.toEqual( firstSent );
+			const failedSent = getRoomNames( 1 );
+			expect( failedSent ).toHaveLength( 10 );
+			expect( failedSent[ 0 ] ).toBe( 'primary' );
+
+			// Poll 3 retries after the failure and should send a different
+			// overflow slice, proving the offset advanced despite the error.
+			mockPostSyncUpdate.mockResolvedValueOnce( { rooms: [] } );
+			await jest.advanceTimersByTimeAsync( 2000 );
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 3 );
+
+			const retrySent = getRoomNames( 2 );
+			expect( retrySent ).toHaveLength( 10 );
+			expect( retrySent[ 0 ] ).toBe( 'primary' );
+			expect( retrySent ).not.toEqual( failedSent );
 		} );
 
 		it( 'chunks the page-hide disconnect beacon so each request stays under the cap', async () => {
