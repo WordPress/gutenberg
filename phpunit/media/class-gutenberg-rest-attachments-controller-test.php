@@ -329,8 +329,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 
 		// Sideload returns sub-size data; verify the file was saved correctly.
-		$this->assertSame( 'medium', $data['image_size'] );
-		$this->assertSame( 'canola-year-month-777x777.jpg', $data['file'] );
+		$this->assertSame( 'thumbnail', $data['image_size'] );
+		$this->assertSame( 'canola-year-month-150x150.jpg', $data['file'] );
 
 		// Verify the sideloaded file was placed in the parent post's year/month folder.
 		$attachment     = get_post( $attachment_id );
@@ -393,7 +393,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 200, $response->get_status() );
 
 		// Sideload returns sub-size data.
-		$this->assertSame( 'medium', $data['image_size'] );
+		$this->assertSame( 'thumbnail', $data['image_size'] );
 
 		// Verify the file is in the current year/month folder (not the page's post date).
 		$attachment     = get_post( $attachment_id );
@@ -1032,7 +1032,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request->set_header( 'Content-Disposition', 'attachment; filename=dedup-array-300x200.jpg' );
 		$request->set_param( 'image_size', array( 'medium', 'duplicate_of_medium' ) );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within medium (300x300) and duplicate_of_medium (300x300).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response      = rest_get_server()->dispatch( $request );
 		$sub_size_data = $response->get_data();
 
@@ -1091,7 +1092,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$request->set_header( 'Content-Disposition', 'attachment; filename=dedup-single-thumb.jpg' );
 		$request->set_param( 'image_size', array( 'thumbnail' ) );
 
-		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		// Use test-image.jpg (50x50) which fits within thumbnail constraints (150x150 max).
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/test-image.jpg' ) );
 		$response      = rest_get_server()->dispatch( $request );
 		$sub_size_data = $response->get_data();
 
