@@ -3,6 +3,7 @@
  */
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -14,6 +15,7 @@ import { useState } from '@wordpress/element';
  */
 import ResizeHandle from './resize-handle';
 import type { DashboardGridLayoutItem } from './types';
+import styles from './grid-item.module.css';
 
 type GridItemProps = {
 	/**
@@ -103,21 +105,12 @@ export function GridItem( {
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 		cursor: disabled ? 'default' : dragCursor,
-		position: 'relative' as const,
-		zIndex: isDragging ? 2 : undefined,
 	};
 
-	const itemClassName = isDragging
-		? 'dashboard-grid__item dashboard-grid__item--is-dragging'
-		: 'dashboard-grid__item';
-
-	// The scaling animation lives on a separate "content" div because
-	// applying it to the sortable root would interfere with `useSortable`
-	// transform computations.
-	const contentStyle = {
-		position: 'relative' as const,
-		height: '100%',
-	};
+	const itemClassName = clsx(
+		styles.item,
+		isDragging && styles[ 'is-dragging' ]
+	);
 
 	const handleResize = ( delta: { width: number; height: number } ) => {
 		const clamped = {
@@ -133,18 +126,12 @@ export function GridItem( {
 		onResizeEnd();
 	};
 
-	// Preview overlay element (rendered directly in the GridItem)
 	const previewOverlay = previewDelta ? (
 		<div
-			className="dashboard-grid__preview-overlay"
+			className={ styles[ 'preview-overlay' ] }
 			style={ {
-				position: 'absolute',
-				top: 0,
-				left: 0,
-				right: -previewDelta.width,
+				insetInlineEnd: -previewDelta.width,
 				bottom: -previewDelta.height,
-				pointerEvents: 'none',
-				zIndex: 1,
 			} }
 		/>
 	) : null;
@@ -159,10 +146,12 @@ export function GridItem( {
 			{ actionableArea }
 
 			<div { ...listeners } style={ { height: '100%' } }>
-				<div
-					className="dashboard-grid__item-content"
-					style={ contentStyle }
-				>
+				{ /*
+				 * The scaling animation lives on a separate "content" div
+				 * because applying it to the sortable root would interfere
+				 * with `useSortable` transform computations.
+				 */ }
+				<div className={ styles[ 'item-content' ] }>
 					{ children }
 					<ResizeHandle
 						disabled={ disabled }

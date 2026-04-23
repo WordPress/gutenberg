@@ -14,6 +14,7 @@ import {
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
 import type { DragOverEvent } from '@dnd-kit/core';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -40,6 +41,7 @@ import {
 import { GridItem } from './grid-item';
 import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
+import styles from './grid.module.css';
 
 /**
  * 2D packed dashboard grid with drag-to-reorder and resize handles.
@@ -328,13 +330,8 @@ export function DashboardGrid( {
 			<SortableContext items={ items } strategy={ () => null }>
 				<div
 					ref={ mergedGridRef }
-					className={
-						className
-							? `dashboard-grid ${ className }`
-							: 'dashboard-grid'
-					}
+					className={ clsx( styles.grid, className ) }
 					style={ {
-						display: 'grid',
 						gridTemplateColumns: `repeat(${ effectiveColumns }, 1fr)`,
 						gridAutoRows: rowHeight,
 						gap: gapPx,

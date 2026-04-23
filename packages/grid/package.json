@@ -27,7 +27,6 @@
 		"src",
 		"build",
 		"build-module",
-		"build-style",
 		"build-types",
 		"*.md"
 	],
@@ -39,14 +38,12 @@
 			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
-		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./package.json": "./package.json"
 	},
 	"wpScript": false,
 	"types": "build-types",
 	"sideEffects": [
-		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.module.css"
 	],
 	"dependencies": {
 		"@dnd-kit/core": "^6.3.1",
@@ -54,7 +51,8 @@
 		"@dnd-kit/utilities": "^3.2.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis"
+		"@wordpress/private-apis": "file:../private-apis",
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"@wordpress/icons": "file:../icons",

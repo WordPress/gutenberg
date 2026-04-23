@@ -3,12 +3,18 @@
  */
 import { DndContext, useDraggable } from '@dnd-kit/core';
 import type { DragMoveEvent } from '@dnd-kit/core';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useThrottle } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import styles from './resize-handle.module.css';
 
 interface ResizeHandleProps {
 	disabled?: boolean;
@@ -28,22 +34,14 @@ function ResizeHandle( {
 		data: { itemId },
 	} );
 
-	const resizeHandleStyle = {
-		position: 'absolute' as const,
-		bottom: '0',
-		right: '0',
-		width: '0',
-		height: '0',
-		cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
-		zIndex: 1,
-		display: disabled ? 'none' : 'block',
-	};
-
 	return (
 		<div
 			ref={ setNodeRef }
-			className="dashboard-grid__resize-handle"
-			style={ resizeHandleStyle }
+			className={ clsx(
+				styles[ 'resize-handle' ],
+				! verticalResizable && styles[ 'is-horizontal-only' ],
+				disabled && styles[ 'is-disabled' ]
+			) }
 			{ ...listeners }
 			{ ...attributes }
 		/>
