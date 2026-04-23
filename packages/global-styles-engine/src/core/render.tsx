@@ -21,7 +21,6 @@ import {
 	ROOT_CSS_PROPERTIES_SELECTOR,
 	scopeSelector,
 	scopeFeatureSelectors,
-	appendToSelector,
 	getBlockStyleVariationSelector,
 	getResolvedValue,
 } from '../utils/common';
@@ -1813,6 +1812,45 @@ function updateConfigWithSeparator(
 	return config;
 }
 
+/**
+ * Splits a CSS string at `&` characters that appear at brace depth 0 only.
+ *
+ * This preserves inner `&` tokens that are
+ * already inside a `{ ... }` block so that nested CSS nesting operators are
+ * not accidentally split off from their containing rule.
+ *
+ * @param {string} css The raw CSS string to split.
+ * @return {string[]} Parts split at top-level `&` characters.
+ */
+function splitCSSAtTopLevelAmpersand( css: string ) {
+	const parts = [];
+	let depth = 0;
+	let current = '';
+
+	for ( let i = 0; i < css.length; i++ ) {
+		const char = css[ i ];
+
+		if ( char === '{' ) {
+			depth++;
+			current += char;
+		} else if ( char === '}' ) {
+			depth--;
+			current += char;
+		} else if ( char === '&' && depth === 0 ) {
+			// Top-level ampersand, start a new part.
+			parts.push( current );
+			current = '';
+		} else {
+			current += char;
+		}
+	}
+
+	// Push whatever remains after the last top-level `&`.
+	parts.push( current );
+
+	return parts;
+}
+
 export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
@@ -1820,8 +1858,11 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 		return processedCSS;
 	}
 
-	// Split CSS nested rules.
-	const parts = css.split( '&' );
+	/*
+	 * Split only on `&` tokens that appear at brace depth 0 so that inner
+	 * `&` tokens inside a nested rule body are NOT split off prematurely.
+	 */
+	const parts = splitCSSAtTopLevelAmpersand( css );
 	parts.forEach( ( part: string ) => {
 		if ( ! part || part.trim() === '' ) {
 			return;
@@ -1832,41 +1873,64 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 			// If the part doesn't contain braces, it applies to the root level.
 			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
-			// If the part contains braces, it's a nested CSS rule.
-			const splitPart = part.replace( '}', '' ).split( '{' );
-			if ( splitPart.length !== 2 ) {
+			/*
+			 * A nested `&` rule.  Locate the first `{` to split the selector
+			 * fragment from the rule body, then find the matching `}` to
+			 * extract the body content.
+			 */
+			const braceIndex = part.indexOf( '{' );
+			if ( braceIndex === -1 ) {
 				return;
 			}
 
-			const [ nestedSelector, cssValue ] = splitPart;
+			const nestedSelector = part.slice( 0, braceIndex ).trim();
 
-			// Handle pseudo elements such as ::before, ::after, etc. Regex will also
-			// capture any leading combinator such as >, +, or ~, as well as spaces.
-			// This allows pseudo elements as descendants e.g. `.parent ::before`.
-			const matches = nestedSelector.match( /([>+~\s]*::[a-zA-Z-]+)/ );
-			const pseudoPart = matches ? matches[ 1 ] : '';
-			const withoutPseudoElement = matches
-				? nestedSelector.replace( pseudoPart, '' ).trim()
-				: nestedSelector.trim();
-
-			let combinedSelector;
-			if ( withoutPseudoElement === '' ) {
-				// Only contained a pseudo element to use the block selector to form
-				// the final `:root :where()` selector.
-				combinedSelector = blockSelector;
-			} else {
-				// If the nested selector is a descendant of the block scope it with the
-				// block selector. Otherwise append it to the block selector.
-				combinedSelector = nestedSelector.startsWith( ' ' )
-					? scopeSelector( blockSelector, withoutPseudoElement )
-					: appendToSelector( blockSelector, withoutPseudoElement );
+			// Body is everything after the first `{` up to the last `}`.
+			let body = part.slice( braceIndex + 1 );
+			const lastBrace = body.lastIndexOf( '}' );
+			if ( lastBrace !== -1 ) {
+				body = body.slice( 0, lastBrace );
 			}
+			body = body.trim();
 
-			// Build final rule, re-adding any pseudo element outside the `:where()`
-			// to maintain valid CSS selector.
-			processedCSS += `:root :where(${ combinedSelector })${ pseudoPart }{${ cssValue.trim() }}`;
+			/*
+			 * Handle pseudo elements such as ::before, ::after, etc.
+			 * The regex also captures leading combinators (>, +, ~) and
+			 * spaces, so descendants like `.parent ::before` are supported.
+			 */
+			const pseudoElementMatch = nestedSelector.match(
+				/([>+~\s]*::[a-zA-Z-]+)/
+			);
+			const pseudoPart = pseudoElementMatch
+				? pseudoElementMatch[ 1 ]
+				: '';
+			const cleanNestedSelector = pseudoPart
+				? nestedSelector.replace( pseudoPart, '' )
+				: nestedSelector;
+
+			// Build the composed selector for this nesting level.
+			const partSelector = cleanNestedSelector.startsWith( ' ' )
+				? `${ blockSelector } ${ cleanNestedSelector.trim() }`
+				: `${ blockSelector }${ cleanNestedSelector.trim() }`;
+
+			if ( body.includes( '&' ) ) {
+				/*
+				 * The rule body contains further `&` nesting recurse so
+				 * that each deeper level is handled correctly, passing the
+				 * composed selector (+ any pseudo element) as the new context.
+				 */
+				processedCSS += processCSSNesting(
+					body,
+					`${ partSelector }${ pseudoPart }`
+				);
+			} else {
+				// No further nesting, emit the final flattened rule.
+				const finalSelector = `:root :where(${ partSelector })${ pseudoPart }`;
+				processedCSS += `${ finalSelector }{${ body }}`;
+			}
 		}
 	} );
+
 	return processedCSS;
 }
 

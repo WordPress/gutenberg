@@ -1524,6 +1524,11 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Processes the CSS, to apply nesting.
 	 *
+	 * Supports arbitrarily deep native CSS nesting using the `&` selector.
+	 * Each `&` rule is flattened into an explicit `:root :where(...)` selector
+	 * so that specificity is controlled correctly. Nested `&` rules are handled
+	 * recursively, so nesting deeper than one level works as expected.
+	 *
 	 * @since 6.2.0
 	 *
 	 * @param string $css      The CSS to process.
@@ -1533,49 +1538,121 @@ class WP_Theme_JSON_Gutenberg {
 	public static function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
-		if ( empty( $css ) ) {
-			return $processed_css;
-		}
+		/*
+		* Split only on `&` tokens that appear at brace-depth 0, i.e. the
+		* top-level nesting operators so that inner `&` tokens inside a
+		* nested rule body are NOT split off prematurely.
+		*/
+		$parts = static::split_css_at_top_level_ampersand( $css );
 
-		// Split CSS nested rules.
-		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
-			if ( empty( $part ) ) {
+			if ( empty( trim( $part ) ) ) {
 				continue;
 			}
-			$is_root_css = ( ! str_contains( $part, '{' ) );
+
+			$is_root_css = ! str_contains( $part, '{' );
 			if ( $is_root_css ) {
 				// If the part doesn't contain braces, it applies to the root level.
 				$processed_css .= ':root :where(' . trim( $selector ) . '){' . trim( $part ) . '}';
 			} else {
 				// If the part contains braces, it's a nested CSS rule.
-				$part = explode( '{', str_replace( '}', '', $part ) );
-				if ( count( $part ) !== 2 ) {
+				$brace_pos = strpos( $part, '{' );
+				if ( false === $brace_pos ) {
 					continue;
 				}
-				$nested_selector = $part[0];
-				$css_value       = $part[1];
+
+				$nested_selector = trim( substr( $part, 0, $brace_pos ) );
+
+				// Find the body: everything after the first `{` up to the last `}`.
+				$body = substr( $part, $brace_pos + 1 );
+				$last_brace = strrpos( $body, '}' );
+				if ( false !== $last_brace ) {
+					$body = substr( $body, 0, $last_brace );
+				}
+				$body = trim( $body );
 
 				/*
-				 * Handle pseudo elements such as ::before, ::after etc. Regex will also
-				 * capture any leading combinator such as >, +, or ~, as well as spaces.
-				 * This allows pseudo elements as descendants e.g. `.parent ::before`.
-				 */
+				* Handle pseudo elements such as ::before, ::after etc.  The regex
+				* also captures any leading combinator (>, +, ~) or whitespace, so
+				* descendant pseudo elements like `.parent ::before` are supported.
+				*/
 				$matches            = array();
 				$has_pseudo_element = preg_match( '/([>+~\s]*::[a-zA-Z-]+)/', $nested_selector, $matches );
 				$pseudo_part        = $has_pseudo_element ? $matches[1] : '';
-				$nested_selector    = $has_pseudo_element ? str_replace( $pseudo_part, '', $nested_selector ) : $nested_selector;
+				$nested_selector    = $has_pseudo_element
+					? str_replace( $pseudo_part, '', $nested_selector )
+					: $nested_selector;
 
-				// Finalize selector and re-append pseudo element if required.
-				$part_selector  = str_starts_with( $nested_selector, ' ' )
+				// Build the composed selector for this nesting level.
+				$part_selector = str_starts_with( $nested_selector, ' ' )
 					? static::scope_selector( $selector, $nested_selector )
 					: static::append_to_selector( $selector, $nested_selector );
-				$final_selector = ":root :where($part_selector)$pseudo_part";
 
-				$processed_css .= $final_selector . '{' . trim( $css_value ) . '}';
+				if ( str_contains( $body, '&' ) ) {
+					/*
+					* The rule body itself contains further `&` nesting.
+					* Recurse so that each deeper level is handled correctly,
+					* passing the composed selector as the new context.
+					* The pseudo element (if any) is appended to the selector
+					* so it is carried through to every descendant rule.
+					*/
+					$processed_css .= static::process_blocks_custom_css(
+						$body,
+						$part_selector . $pseudo_part
+					);
+				} else {
+					// No further nesting, emit the final flattened rule.
+					$final_selector = ':root :where(' . $part_selector . ')' . $pseudo_part;
+					$processed_css .= $final_selector . '{' . trim( $body ) . '}';
+				}
 			}
 		}
+
 		return $processed_css;
+	}
+
+	/**
+	 * Splits a CSS string at `&` characters that appear at brace depth 0.
+	 *
+	 * Unlike a naive `explode( '&', $css )`, this method only splits on `&`
+	 * tokens that are NOT inside a `{ ... }` block, so inner ampersands used
+	 * in nested CSS rules are preserved intact inside their surrounding part.
+	 *
+	 * @since 23.0.0
+	 *
+	 * @param string $css The raw CSS to split.
+	 * @return string[] Parts of the CSS split at top level `&` characters.
+	 *                  The first element is everything before the first `&`,
+	 *                  which may be an empty string.
+	 */
+	private static function split_css_at_top_level_ampersand( $css ) {
+		$parts   = array();
+		$depth   = 0;
+		$current = '';
+		$length  = strlen( $css );
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $css[ $i ];
+
+			if ( '{' === $char ) {
+				++$depth;
+				$current .= $char;
+			} elseif ( '}' === $char ) {
+				--$depth;
+				$current .= $char;
+			} elseif ( '&' === $char && 0 === $depth ) {
+				// Top-level ampersand: start a new part.
+				$parts[] = $current;
+				$current = '';
+			} else {
+				$current .= $char;
+			}
+		}
+
+		// Append whatever remains after the last top level `&`.
+		$parts[] = $current;
+
+		return $parts;
 	}
 
 	/**
