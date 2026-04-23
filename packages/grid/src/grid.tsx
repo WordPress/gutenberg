@@ -328,7 +328,11 @@ export function DashboardGrid( {
 			<SortableContext items={ items } strategy={ () => null }>
 				<div
 					ref={ mergedGridRef }
-					className={ className }
+					className={
+						className
+							? `dashboard-grid ${ className }`
+							: 'dashboard-grid'
+					}
 					style={ {
 						display: 'grid',
 						gridTemplateColumns: `repeat(${ effectiveColumns }, 1fr)`,

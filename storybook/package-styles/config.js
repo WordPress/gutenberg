@@ -19,6 +19,8 @@ import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline'
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
 import adminUiLtr from '../package-styles/admin-ui-ltr.lazy.scss?inline';
 import adminUiRtl from '../package-styles/admin-ui-rtl.lazy.scss?inline';
+import gridLtr from '../package-styles/grid-ltr.lazy.scss?inline';
+import gridRtl from '../package-styles/grid-rtl.lazy.scss?inline';
 import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
 
 /**
@@ -84,6 +86,11 @@ const CONFIG = [
 		componentIdMatcher: /^mediaeditor-/,
 		ltr: [ componentsLtr ],
 		rtl: [ componentsRtl ],
+	},
+	{
+		componentIdMatcher: /^grid-/,
+		ltr: [ designTokens, gridLtr ],
+		rtl: [ designTokens, gridRtl ],
 	},
 	{
 		componentIdMatcher: /^design-system-/,
