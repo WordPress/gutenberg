@@ -662,6 +662,30 @@ describe( 'Intermediate Representation', () => {
 		} );
 	} );
 
+	describe( 'TypeScript function overloads', () => {
+		it( 'extracts JSDoc with tags from first overload signature', () =>
+			expect(
+				parse( `
+					/**
+					 * Registers a new block.
+					 * @param blockNameOrMetadata Block type name or its metadata.
+					 * @param settings Block settings.
+					 * @return The block, if registered; otherwise undefined.
+					 */
+					export function registerBlockType( blockNameOrMetadata: object, settings?: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string, settings: object ): object | undefined;
+					export function registerBlockType( blockNameOrMetadata: string | object, settings?: object ): object | undefined {
+						return undefined;
+					}
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'Registers a new block.',
+					name: 'registerBlockType',
+				} ),
+			] ) );
+	} );
+
 	describe( 'JSDoc in module dependency through import', () => {
 		describe( 'default export', () => {
 			it( 'default import', () =>
