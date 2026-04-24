@@ -66,6 +66,7 @@ export function usePublicPostTypes() {
 		return postTypes
 			?.filter( ( { viewable }: any ) => viewable )
 			.sort( ( a: any, b: any ) => {
+				// Keep the built-in 'post' type at the top; sort the rest alphabetically.
 				if ( a.slug === 'post' ) {
 					return -1;
 				}

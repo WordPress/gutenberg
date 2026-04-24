@@ -161,18 +161,79 @@ function gutenberg_register_user_defined_taxonomies() {
 		}
 
 		$registered = register_taxonomy( $slug, $object_type, $args );
-		if ( is_wp_error( $registered ) && WP_DEBUG ) {
-			error_log(
-				sprintf(
-					'Gutenberg: failed to register user taxonomy "%s": %s',
-					$slug,
-					$registered->get_error_message()
-				)
+		if ( is_wp_error( $registered ) ) {
+			$failures   =& gutenberg_user_taxonomy_registration_failures();
+			$failures[] = array(
+				'slug'    => $slug,
+				'title'   => get_the_title( $record ),
+				'message' => $registered->get_error_message(),
 			);
 		}
 	}
 }
 add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
+
+/**
+ * Module-level static storage for user-taxonomy registration failures
+ * collected during `init`. Returned by reference so the `admin_notices`
+ * callback can read what the `init` callback wrote.
+ *
+ * @return array List of failure entries: slug, title, message.
+ */
+function &gutenberg_user_taxonomy_registration_failures() {
+	static $failures = array();
+	return $failures;
+}
+
+/**
+ * Surfaces any user-taxonomy registration failures collected during `init`
+ * as a dismissible admin notice pointing the admin at the Taxonomies screen.
+ *
+ * Registration runs on every admin page load, so the notice appears wherever
+ * the admin happens to be — they don't need to visit the Taxonomies screen
+ * to discover the problem.
+ */
+function gutenberg_render_user_taxonomy_registration_notices() {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		return;
+	}
+	$failures = gutenberg_user_taxonomy_registration_failures();
+	if ( empty( $failures ) ) {
+		return;
+	}
+
+	$screen_url = admin_url( 'admin.php?page=taxonomies-wp-admin' );
+	?>
+	<div class="notice notice-warning is-dismissible">
+		<p>
+			<strong><?php esc_html_e( 'Some user-defined taxonomies failed to register.', 'gutenberg' ); ?></strong>
+		</p>
+		<ul style="list-style: disc; padding-left: 2em;">
+			<?php foreach ( $failures as $failure ) : ?>
+				<li>
+					<?php
+					echo wp_kses_post(
+						sprintf(
+							/* translators: 1: taxonomy title, 2: taxonomy slug, 3: error message. */
+							__( '%1$s (%2$s): %3$s', 'gutenberg' ),
+							'<strong>' . esc_html( $failure['title'] ) . '</strong>',
+							'<code>' . esc_html( $failure['slug'] ) . '</code>',
+							esc_html( $failure['message'] )
+						)
+					);
+					?>
+				</li>
+			<?php endforeach; ?>
+		</ul>
+		<p>
+			<a href="<?php echo esc_url( $screen_url ); ?>">
+				<?php esc_html_e( 'Review taxonomies', 'gutenberg' ); ?>
+			</a>
+		</p>
+	</div>
+	<?php
+}
+add_action( 'admin_notices', 'gutenberg_render_user_taxonomy_registration_notices' );
 
 /**
  * Rejects a wp_user_taxonomy save when its slug collides with an existing
