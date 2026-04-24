@@ -2,28 +2,20 @@
 	position: relative;
 }
 
-.is-dragging {
-	z-index: 2;
-}
-
 .item-content {
 	position: relative;
 	height: 100%;
-	transition: transform 200ms ease, box-shadow 200ms ease;
 }
 
-.is-dragging .item-content {
-	transform: scale(1.05);
-	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.item-content {
-		transition: none;
-	}
-	.is-dragging .item-content {
-		transform: none;
-	}
+/*
+ * During drag, the original item acts as a placeholder in its grid
+ * cell while `<DragOverlay>` renders a clone that follows the cursor.
+ * Fading the placeholder makes the destination visible without any
+ * scaling or translation on the original element.
+ */
+.is-dragging {
+	opacity: 0.4;
+	pointer-events: none;
 }
 
 .preview-overlay {

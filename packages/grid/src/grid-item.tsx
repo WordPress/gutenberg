@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import clsx from 'clsx';
 
 /**
@@ -83,21 +82,17 @@ export function GridItem( {
 		width: number;
 		height: number;
 	} | null >( null );
-	const {
-		attributes,
-		listeners,
-		setNodeRef,
-		transform,
-		transition,
-		isDragging,
-	} = useSortable( {
+	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
 		id: item.key,
 		disabled,
 	} );
-	const dragCursor = isDragging ? 'grabbing' : 'grab';
+	/*
+	 * With `<DragOverlay>` handling the cursor-following clone, the
+	 * sortable item stays put in its grid cell and acts as a
+	 * placeholder. No `transform` is applied here — applying one
+	 * would double-move the placeholder alongside the overlay.
+	 */
 	const style = {
-		transform: CSS.Translate.toString( transform ),
-		transition,
 		gridColumnEnd: `span ${
 			item.width === 'full'
 				? maxColumns
@@ -107,7 +102,7 @@ export function GridItem( {
 				  )
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
-		cursor: disabled ? 'default' : dragCursor,
+		cursor: disabled ? 'default' : 'grab',
 	};
 
 	const itemClassName = clsx(
@@ -149,11 +144,6 @@ export function GridItem( {
 			{ actionableArea }
 
 			<div { ...listeners } style={ { height: '100%' } }>
-				{ /*
-				 * The scaling animation lives on a separate "content" div
-				 * because applying it to the sortable root would interfere
-				 * with `useSortable` transform computations.
-				 */ }
 				<div className={ styles[ 'item-content' ] }>
 					{ children }
 					<ResizeHandle

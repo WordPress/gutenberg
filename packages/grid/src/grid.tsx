@@ -3,6 +3,7 @@
  */
 import {
 	DndContext,
+	DragOverlay,
 	KeyboardSensor,
 	PointerSensor,
 	useSensor,
@@ -13,7 +14,7 @@ import {
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import type { DragOverEvent } from '@dnd-kit/core';
+import type { DragOverEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
 
 /**
@@ -86,6 +87,13 @@ export function DashboardGrid( {
 	const [ temporaryLayout, setTemporaryLayout ] = useState<
 		DashboardGridLayoutItem[] | undefined
 	>();
+	/*
+	 * Identifies the item currently being dragged. Drives the
+	 * `<DragOverlay>` content: the original tile stays in its grid
+	 * cell as a placeholder (with reduced opacity), while a clone
+	 * inside the overlay follows the cursor.
+	 */
+	const [ activeId, setActiveId ] = useState< string | null >( null );
 	/*
 	 * Mirror of `temporaryLayout` for synchronous reads from
 	 * `persistTemporaryLayout` on drag end: React batches the state
@@ -215,6 +223,16 @@ export function DashboardGrid( {
 		} )
 	);
 
+	const handleDragStart = useEvent( ( event: DragStartEvent ) => {
+		setActiveId( String( event.active.id ) );
+	} );
+
+	const handleDragCancel = useEvent( () => {
+		setActiveId( null );
+		latestLayoutRef.current = undefined;
+		setTemporaryLayout( undefined );
+	} );
+
 	const handleDragOver = useEvent( ( event: DragOverEvent ) => {
 		const { active, over } = event;
 
@@ -318,10 +336,13 @@ export function DashboardGrid( {
 	return (
 		<DndContext
 			sensors={ sensors }
+			onDragStart={ handleDragStart }
+			onDragCancel={ handleDragCancel }
 			onDragOver={ debouncedHandleDragOver }
 			onDragEnd={ () => {
 				debouncedHandleDragOver.flush();
 				persistTemporaryLayout();
+				setActiveId( null );
 			} }
 		>
 			{ /*
@@ -361,6 +382,13 @@ export function DashboardGrid( {
 					{ remaining }
 				</div>
 			</SortableContext>
+			<DragOverlay>
+				{ activeId && childrenMap.get( activeId ) ? (
+					<div className={ styles[ 'drag-preview' ] }>
+						{ childrenMap.get( activeId ) }
+					</div>
+				) : null }
+			</DragOverlay>
 		</DndContext>
 	);
 }
