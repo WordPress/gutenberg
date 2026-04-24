@@ -50,7 +50,7 @@ import {
 	useCropper,
 	type UseCropperStateReturn,
 } from '../../image-editor';
-import { buildModifiers } from './build-modifiers';
+import { buildEditPayload } from './build-edit-payload';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -328,25 +328,27 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		try {
 			let saved: Media | null | undefined;
 
-			const modifiers =
-				controller.isDirty && controller.state.image
-					? buildModifiers( controller.state, {
-							width: controller.state.image.naturalWidth,
-							height: controller.state.image.naturalHeight,
-					  } )
-					: [];
-
-			if ( modifiers.length > 0 ) {
+			if ( controller.isDirty && controller.state.image ) {
+				// Canonical `{ transform, crop }` contract — handled by
+				// `lib/experimental/source-region-edit.php` when the
+				// `gutenberg-media-editor-modal` experiment is enabled.
+				// Requests without that handler fall through to Core's
+				// `edit_media_item`, which will 400 on the unknown key;
+				// that's fine for an experiment-gated feature.
+				const payload = buildEditPayload( controller.state, {
+					width: controller.state.image.naturalWidth,
+					height: controller.state.image.naturalHeight,
+				} );
 				saved = await editMediaEntity(
 					id,
-					{ src: media?.source_url, modifiers },
+					{
+						src: media?.source_url,
+						transform: payload.transform,
+						crop: payload.crop,
+					},
 					{ throwOnError: true }
 				);
 			} else {
-				// `isDirty` can be true while `buildModifiers` returns empty
-				// (e.g. sub-pixel containment nudges, identity rotations).
-				// The REST /edit endpoint rejects an empty modifiers array,
-				// so fall through to the metadata-only save in that case.
 				saved = ( await saveEditedEntityRecord(
 					'postType',
 					'attachment',

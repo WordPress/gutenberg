@@ -96,6 +96,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
+
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor-modal' ) ) {
+		require_once __DIR__ . '/experimental/source-region-edit.php';
+	}
 }
 
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
