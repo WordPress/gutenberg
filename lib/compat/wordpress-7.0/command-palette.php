@@ -79,3 +79,31 @@ CSS;
 	wp_add_inline_style( 'admin-bar', $css );
 }
 add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_styles' );
+
+function gutenberg_add_admin_bar_script() {
+	if ( ! is_admin_bar_showing() ) {
+		return;
+	}
+	$labels = array(
+		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
+		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
+	);
+	$script = <<<JS
+		(( shortCutLabels ) => {
+			let userAgent = '';
+			// Assigning agent may error if the HTTP header is blocked at the browser level.
+			try {
+				userAgent = navigator.userAgent;
+			} catch (error) {}
+			const isAppleOS = /Macintosh|Mac OS X|Mac_PowerPC/i.test( userAgent );
+			const shortcutLabel = isAppleOS ? shortCutLabels.appleOS : shortCutLabels.default;
+			const commandPaletteNode = document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' );
+			if ( commandPaletteNode ) {
+				commandPaletteNode.textContent = shortcutLabel;
+			}
+		})
+JS;
+	$script .= '(' . wp_json_encode( $labels ) . ');';
+	wp_add_inline_script( 'admin-bar', $script );
+}
+add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_script' );
