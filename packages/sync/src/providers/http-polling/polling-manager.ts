@@ -604,6 +604,13 @@ function poll(): void {
 			consecutiveFailures = 0;
 			isManualRetry = false;
 			roomsInRequest.forEach( ( state ) => {
+				// Skip rooms unregistered during the await (e.g. the
+				// size-limit handler in onDocUpdate). Their terminal
+				// status was already set by whatever unregistered them.
+				if ( roomStates.get( state.room ) !== state ) {
+					return;
+				}
+
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
@@ -770,6 +777,12 @@ function poll(): void {
 						consecutiveFailures > retrySchedule.length;
 
 					roomsInRequest.forEach( ( state ) => {
+						// Skip rooms unregistered during the await so
+						// their terminal status isn't overwritten.
+						if ( roomStates.get( state.room ) !== state ) {
+							return;
+						}
+
 						state.onStatusChange( {
 							status: 'disconnected',
 							canManuallyRetry: true,
