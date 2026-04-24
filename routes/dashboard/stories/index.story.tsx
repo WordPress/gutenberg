@@ -240,9 +240,6 @@ const meta: Meta< typeof WidgetDashboard > = {
 		rowHeight: {
 			control: { type: 'number', min: 60, max: 400, step: 10 },
 		},
-		collapseWidth: {
-			control: { type: 'number', min: 320, max: 1200, step: 10 },
-		},
 	},
 	parameters: {
 		layout: 'fullscreen',

@@ -6,8 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useResizeObserver } from '@wordpress/compose';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid } from '@wordpress/grid';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
@@ -48,8 +47,7 @@ function applyGridChange(
 
 /**
  * Iterates `layout`, delegates each entry to `WidgetDashboard.Widget`, and
- * feeds the resulting tree into `@wordpress/grid`. Collapses to a single
- * column when the container narrows below `collapseWidth`.
+ * feeds the resulting tree into `@wordpress/grid`.
  * @param root0
  * @param root0.className
  */
@@ -60,15 +58,9 @@ export function Widgets( { className }: { className?: string } ) {
 		editMode,
 		columns,
 		minColumnWidth,
-		collapseWidth,
 		rowHeight,
 		spacing,
 	} = useDashboardInternalContext();
-
-	const [ isNarrow, setIsNarrow ] = useState( false );
-	const resizeObserverRef = useResizeObserver( ( [ { contentRect } ] ) => {
-		setIsNarrow( contentRect.width < collapseWidth );
-	} );
 
 	const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
 
@@ -91,16 +83,10 @@ export function Widgets( { className }: { className?: string } ) {
 		onChangeLayout: handleLayoutChange,
 	};
 
-	const useFixedColumns = isNarrow || columns !== undefined;
-	const fixedColumns = isNarrow ? 1 : columns ?? 6;
-
 	return (
-		<div
-			ref={ resizeObserverRef }
-			className={ clsx( styles.grid, className ) }
-		>
-			{ useFixedColumns ? (
-				<DashboardGrid { ...sharedProps } columns={ fixedColumns }>
+		<div className={ clsx( styles.grid, className ) }>
+			{ columns !== undefined ? (
+				<DashboardGrid { ...sharedProps } columns={ columns }>
 					{ children }
 				</DashboardGrid>
 			) : (

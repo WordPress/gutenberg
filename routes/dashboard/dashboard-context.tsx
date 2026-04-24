@@ -20,7 +20,6 @@ import type {
 } from './types';
 
 const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_COLLAPSE_WIDTH = 640;
 const DEFAULT_ROW_HEIGHT = 200;
 const DEFAULT_SPACING = 4;
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
@@ -42,7 +41,6 @@ interface InternalDashboardContextValue {
 	resolveWidgetModule: ResolveWidgetModule;
 	columns?: number;
 	minColumnWidth: number;
-	collapseWidth: number;
 	rowHeight: number | 'auto';
 	spacing: number;
 	onWidgetError?: (
@@ -95,7 +93,6 @@ interface ProviderProps {
 	resolveWidgetModule?: ResolveWidgetModule;
 	columns?: number;
 	minColumnWidth?: number;
-	collapseWidth?: number;
 	rowHeight?: number | 'auto';
 	spacing?: number;
 	onWidgetError?: (
@@ -115,7 +112,6 @@ export function WidgetDashboardProvider( {
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
 	columns,
 	minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
-	collapseWidth = DEFAULT_COLLAPSE_WIDTH,
 	rowHeight = DEFAULT_ROW_HEIGHT,
 	spacing = DEFAULT_SPACING,
 	onWidgetError,
@@ -132,7 +128,6 @@ export function WidgetDashboardProvider( {
 			resolveWidgetModule,
 			columns,
 			minColumnWidth,
-			collapseWidth,
 			rowHeight,
 			spacing,
 			onWidgetError,
@@ -147,7 +142,6 @@ export function WidgetDashboardProvider( {
 			resolveWidgetModule,
 			columns,
 			minColumnWidth,
-			collapseWidth,
 			rowHeight,
 			spacing,
 			onWidgetError,

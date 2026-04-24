@@ -345,13 +345,6 @@ export interface WidgetDashboardProps {
 	minColumnWidth?: number;
 
 	/**
-	 * Container width below which the grid collapses to a single column.
-	 *
-	 * @default 640
-	 */
-	collapseWidth?: number;
-
-	/**
 	 * Row height in pixels, or `'auto'`.
 	 *
 	 * @default 200

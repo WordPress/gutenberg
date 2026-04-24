@@ -29,7 +29,6 @@ import type { WidgetDashboardProps } from './types';
  * @param root0.resolveWidgetModule
  * @param root0.columns
  * @param root0.minColumnWidth
- * @param root0.collapseWidth
  * @param root0.rowHeight
  * @param root0.spacing
  * @param root0.onWidgetError
@@ -62,7 +61,6 @@ export function WidgetDashboard( {
 	resolveWidgetModule,
 	columns,
 	minColumnWidth,
-	collapseWidth,
 	rowHeight,
 	spacing,
 	onWidgetError,
@@ -80,7 +78,6 @@ export function WidgetDashboard( {
 			resolveWidgetModule={ resolveWidgetModule }
 			columns={ columns }
 			minColumnWidth={ minColumnWidth }
-			collapseWidth={ collapseWidth }
 			rowHeight={ rowHeight }
 			spacing={ spacing }
 			onWidgetError={ onWidgetError }
