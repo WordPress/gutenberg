@@ -14,18 +14,13 @@ import {
 	SortableContext,
 	sortableKeyboardCoordinates,
 } from '@dnd-kit/sortable';
-import type { DragOverEvent, DragStartEvent } from '@dnd-kit/core';
+import type { DragMoveEvent, DragStartEvent } from '@dnd-kit/core';
 import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import {
-	useResizeObserver,
-	useDebounce,
-	useEvent,
-	useMergeRefs,
-} from '@wordpress/compose';
+import { useResizeObserver, useEvent, useMergeRefs } from '@wordpress/compose';
 import {
 	useMemo,
 	Children,
@@ -96,9 +91,9 @@ export function DashboardGrid( {
 	const [ activeId, setActiveId ] = useState< string | null >( null );
 	/*
 	 * Mirror of `temporaryLayout` for synchronous reads from
-	 * `persistTemporaryLayout` on drag end: React batches the state
-	 * update queued by `debouncedHandleDragOver.flush()`, so the state
-	 * value would still be stale within the same handler.
+	 * `persistTemporaryLayout` on drag end: a state update queued
+	 * inside `handleDragMove` is batched by React and would still
+	 * be stale when read from `persistTemporaryLayout`.
 	 */
 	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
 	const activeLayout = temporaryLayout ?? layout;
@@ -233,27 +228,54 @@ export function DashboardGrid( {
 		setTemporaryLayout( undefined );
 	} );
 
-	const handleDragOver = useEvent( ( event: DragOverEvent ) => {
+	/*
+	 * Decide reorder from the pointer position relative to the over
+	 * tile's center, not just from `over.id` changing. dnd-kit only
+	 * fires `onDragOver` when `over` changes, which misses the
+	 * "swap back" case where the cursor stays over the same tile
+	 * (common after a reorder that resized or moved a wide
+	 * neighbor). `onDragMove` fires on every pointer move, letting
+	 * us re-evaluate the insertion slot continuously.
+	 */
+	const handleDragMove = useEvent( ( event: DragMoveEvent ) => {
 		const { active, over } = event;
-
-		if ( over && active && active.id !== over.id ) {
-			const oldIndex = items.indexOf( String( active.id ) );
-			const newIndex = items.indexOf( String( over.id ) );
-			const updatedItems = arrayMove( items, oldIndex, newIndex );
-			const updatedLayout = activeLayout.map( ( item ) => {
-				const newOrder = updatedItems.indexOf( item.key );
-				return {
-					...item,
-					order: newOrder,
-				};
-			} );
-
-			latestLayoutRef.current = updatedLayout;
-			setTemporaryLayout( updatedLayout );
-			onPreviewLayout?.( updatedLayout );
+		if ( ! over || active.id === over.id ) {
+			return;
 		}
+
+		const activeRect = active.rect.current.translated;
+		if ( ! activeRect ) {
+			return;
+		}
+
+		const overCenterX = over.rect.left + over.rect.width / 2;
+		const activeCenterX = activeRect.left + activeRect.width / 2;
+		const insertAfter = activeCenterX > overCenterX;
+
+		const currentIndex = items.indexOf( String( active.id ) );
+		const overIndex = items.indexOf( String( over.id ) );
+		let newIndex: number;
+		if ( insertAfter ) {
+			newIndex = currentIndex > overIndex ? overIndex + 1 : overIndex;
+		} else {
+			newIndex = currentIndex > overIndex ? overIndex : overIndex - 1;
+		}
+		newIndex = Math.max( 0, Math.min( newIndex, items.length - 1 ) );
+
+		if ( newIndex === currentIndex ) {
+			return;
+		}
+
+		const updatedItems = arrayMove( items, currentIndex, newIndex );
+		const updatedLayout = activeLayout.map( ( item ) => ( {
+			...item,
+			order: updatedItems.indexOf( item.key ),
+		} ) );
+
+		latestLayoutRef.current = updatedLayout;
+		setTemporaryLayout( updatedLayout );
+		onPreviewLayout?.( updatedLayout );
 	} );
-	const debouncedHandleDragOver = useDebounce( handleDragOver, 100 );
 
 	/*
 	 * Commit temporary changes to parent and clear local state.
@@ -338,9 +360,8 @@ export function DashboardGrid( {
 			sensors={ sensors }
 			onDragStart={ handleDragStart }
 			onDragCancel={ handleDragCancel }
-			onDragOver={ debouncedHandleDragOver }
+			onDragMove={ handleDragMove }
 			onDragEnd={ () => {
-				debouncedHandleDragOver.flush();
 				persistTemporaryLayout();
 				setActiveId( null );
 			} }
