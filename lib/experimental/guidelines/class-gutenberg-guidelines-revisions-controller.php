@@ -151,8 +151,7 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 			);
 		}
 
-		$post_type = get_post_type_object( $this->parent_post_type );
-		if ( ! current_user_can( $post_type->cap->edit_posts ) ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return new WP_Error(
 				'rest_cannot_restore',
 				__( 'Sorry, you are not allowed to restore revisions.', 'gutenberg' ),

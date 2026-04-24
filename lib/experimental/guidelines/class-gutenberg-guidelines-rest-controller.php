@@ -120,6 +120,63 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Restricts guideline creation to administrators.
+	 *
+	 * Defers to the parent controller for per-post checks (status validation,
+	 * sticky support, etc.) once the admin gate passes.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_create',
+				__( 'Sorry, you are not allowed to create guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::create_item_permissions_check( $request );
+	}
+
+	/**
+	 * Restricts guideline updates to administrators.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_edit',
+				__( 'Sorry, you are not allowed to edit guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Restricts guideline deletion to administrators.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'Sorry, you are not allowed to delete guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::delete_item_permissions_check( $request );
+	}
+
+	/**
 	 * Gets the singleton guidelines.
 	 *
 	 * Supports query parameters:
