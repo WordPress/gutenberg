@@ -69,18 +69,25 @@ function gutenberg_post_being_edited_requires_classic_block() {
 		return false;
 	}
 
-	// Check if block editor is disabled by "Classic Editor" or another plugin.
-	if (
-		function_exists( 'use_block_editor_for_post_type' ) &&
-		! use_block_editor_for_post_type( $current_post->post_type )
-	) {
+	/**
+	 * Filters whether the Classic block should be enabled site-wide,
+	 * regardless of the post being edited.
+	 *
+	 * @param bool $enabled Whether to enable the Classic block. Default false.
+	 */
+	if ( apply_filters( 'gutenberg_classic_block_enabled', false ) ) {
 		return true;
 	}
 
-	$content = $current_post->post_content;
-	if ( empty( $content ) ) {
-		return false;
-	}
+	// Check if block editor is disabled by "Classic Editor" or another plugin.
+	$requires_classic_block = function_exists( 'use_block_editor_for_post_type' ) &&
+		! use_block_editor_for_post_type( $current_post->post_type );
 
-	return false;
+	/**
+	 * Filters whether the current post being edited requires the Classic block.
+	 *
+	 * @param bool    $requires_classic_block Whether the current post requires the Classic block.
+	 * @param WP_Post $current_post           The post being edited.
+	 */
+	return (bool) apply_filters( 'gutenberg_post_requires_classic_block', $requires_classic_block, $current_post );
 }
