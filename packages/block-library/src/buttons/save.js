@@ -8,7 +8,11 @@ import clsx from 'clsx';
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default function save( { attributes, className } ) {
+export default function save( { attributes, className, innerBlocks } ) {
+	if ( ! innerBlocks || innerBlocks.length === 0 ) {
+		return null;
+	}
+
 	const { fontSize, style } = attributes;
 	const blockProps = useBlockProps.save( {
 		className: clsx( className, {
