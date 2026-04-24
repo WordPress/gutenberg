@@ -20,7 +20,7 @@ import { useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './color-ramps/lib/register-color-spaces';
+import { ensureColorSpacesRegistered } from './color-ramps/lib/register-color-spaces';
 import { ThemeContext } from './context';
 import colorTokens from './prebuilt/ts/color-tokens';
 import {
@@ -94,6 +94,7 @@ const legacyWpComponentsOverridesCSS: Entry[] = [
 ];
 
 function customRgbFormat( color: PlainColorObject ): string {
+	ensureColorSpacesRegistered( sRGB );
 	const rgb = to( color, sRGB );
 	return rgb.coords
 		.map( ( n ) => Math.round( ( n ?? 0 ) * 255 ) )
@@ -101,6 +102,9 @@ function customRgbFormat( color: PlainColorObject ): string {
 }
 
 function legacyWpAdminThemeOverridesCSS( accent: string ): Entry[] {
+	// `to(string, ...)` calls `parse()` internally, which requires sRGB to be
+	// registered (it owns the keyword and hex format parsers).
+	ensureColorSpacesRegistered( sRGB, HSL );
 	const parsedAccent = to( accent, HSL );
 	const parsedL = parsedAccent.coords[ 2 ] ?? 0;
 

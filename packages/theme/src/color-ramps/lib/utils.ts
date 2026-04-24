@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
 import { type ColorTypes } from 'colorjs.io/fn';
-
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
 import {
 	WHITE,
 	BLACK,

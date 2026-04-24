@@ -1,7 +1,3 @@
-/**
- * Internal dependencies
- */
-import '../lib/register-color-spaces';
 import { buildRamp } from '../lib';
 import { getColorString } from '../lib/color-utils';
 import { BG_RAMP_CONFIG, ACCENT_RAMP_CONFIG } from '../lib/ramp-configs';

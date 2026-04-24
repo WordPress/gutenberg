@@ -1,8 +1,8 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
-import { to, get, OKLCH } from 'colorjs.io/fn';
+import { to, get, OKLCH, sRGB } from 'colorjs.io/fn';
 
-import '../../src/color-ramps/lib/register-color-spaces';
+import { ensureColorSpacesRegistered } from '../../src/color-ramps/lib/register-color-spaces';
 import colorTokens from '../../src/prebuilt/ts/color-tokens';
 import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps';
 import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
@@ -22,6 +22,9 @@ function adminColorVar(): string {
 }
 
 function getOKLCHValues( hex: string ) {
+	// `to(string, ...)` calls `parse()` internally, which requires sRGB to be
+	// registered (it owns the keyword and hex format parsers).
+	ensureColorSpacesRegistered( sRGB, OKLCH );
 	const color = to( hex, OKLCH );
 	const l = get( color, [ OKLCH, 'l' ] );
 	const c = get( color, [ OKLCH, 'c' ] );

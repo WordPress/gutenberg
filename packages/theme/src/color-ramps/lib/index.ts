@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	clone,
 	get,
@@ -13,7 +10,6 @@ import {
 /**
  * Internal dependencies
  */
-import './register-color-spaces';
 import { clampToGamut, getContrast, getColorString } from './color-utils';
 import { findColorMeetingRequirements } from './find-color-with-constraints';
 import {
@@ -23,7 +19,6 @@ import {
 	stepsForStep,
 	solveWithBisect,
 } from './utils';
-
 import type {
 	FollowDirection,
 	Ramp,
