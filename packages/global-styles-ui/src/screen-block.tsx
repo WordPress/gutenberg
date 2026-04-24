@@ -393,6 +393,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
+					enableCustomDuotone={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && (
