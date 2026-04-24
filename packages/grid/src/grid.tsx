@@ -352,7 +352,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 					ref={ mergedGridRef }
 					className={ clsx( styles.grid, className ) }
 					style={ {
-						gridTemplateColumns: `repeat(${ effectiveColumns }, 1fr)`,
+						gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 						gridAutoRows: rowHeight,
 						gap: gapPx,
 					} }
