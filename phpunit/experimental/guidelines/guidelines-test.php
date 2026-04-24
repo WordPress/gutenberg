@@ -1,6 +1,11 @@
 <?php
 /**
- * Tests for the wp_guideline_types() function.
+ * Tests for the public guideline functions defined in
+ * lib/experimental/guidelines/guidelines.php.
+ *
+ * Covers the wp_guideline_types() registry and its filter, plus the
+ * _wp_guidelines_maybe_map_term_label() label-mapping filter (both as a
+ * direct unit and end-to-end through wp_set_object_terms()).
  *
  * @package gutenberg
  */
@@ -13,11 +18,8 @@ class Guidelines_Test extends WP_UnitTestCase {
 	public function test_returns_default_guideline_types() {
 		$this->assertSame(
 			array(
-				'artifact'    => array( 'title' => 'Artifact' ),
-				'instruction' => array( 'title' => 'Instruction' ),
-				'memory'      => array( 'title' => 'Memory' ),
-				'plan'        => array( 'title' => 'Plan' ),
-				'skill'       => array( 'title' => 'Skill' ),
+				'artifact' => array( 'title' => 'Artifact' ),
+				'content'  => array( 'title' => 'Content' ),
 			),
 			wp_guideline_types()
 		);
@@ -48,14 +50,14 @@ class Guidelines_Test extends WP_UnitTestCase {
 		add_filter(
 			'wp_guideline_types',
 			static function ( $types ) {
-				unset( $types['memory'] );
+				unset( $types['content'] );
 				return $types;
 			}
 		);
 
 		$types = wp_guideline_types();
 
-		$this->assertArrayNotHasKey( 'memory', $types );
+		$this->assertArrayNotHasKey( 'content', $types );
 	}
 
 	/**
@@ -66,7 +68,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 			'name' => 'artifact',
 			'slug' => 'artifact',
 		);
-		$output = wp_guidelines_maybe_map_term_label( $input, 'category' );
+		$output = _wp_guidelines_maybe_map_term_label( $input, 'category' );
 
 		$this->assertSame( $input, $output );
 	}
@@ -79,7 +81,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 			'name' => 'My Custom Artifact',
 			'slug' => 'artifact',
 		);
-		$output = wp_guidelines_maybe_map_term_label( $input, 'wp_guideline_type' );
+		$output = _wp_guidelines_maybe_map_term_label( $input, 'wp_guideline_type' );
 
 		$this->assertSame( $input, $output );
 	}
@@ -92,7 +94,7 @@ class Guidelines_Test extends WP_UnitTestCase {
 			'name' => 'unknown',
 			'slug' => 'unknown',
 		);
-		$output = wp_guidelines_maybe_map_term_label( $input, 'wp_guideline_type' );
+		$output = _wp_guidelines_maybe_map_term_label( $input, 'wp_guideline_type' );
 
 		$this->assertSame( $input, $output );
 	}

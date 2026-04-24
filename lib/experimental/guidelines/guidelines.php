@@ -44,36 +44,29 @@ if ( ! function_exists( 'wp_guideline_types' ) ) {
 		return apply_filters(
 			'wp_guideline_types',
 			array(
-				'artifact'    => array(
+				'artifact' => array(
 					'title' => __( 'Artifact', 'gutenberg' ),
 				),
-				'instruction' => array(
-					'title' => __( 'Instruction', 'gutenberg' ),
-				),
-				'memory'      => array(
-					'title' => __( 'Memory', 'gutenberg' ),
-				),
-				'plan'        => array(
-					'title' => __( 'Plan', 'gutenberg' ),
-				),
-				'skill'       => array(
-					'title' => __( 'Skill', 'gutenberg' ),
+				'content'  => array(
+					'title' => __( 'Content', 'gutenberg' ),
 				),
 			)
 		);
 	}
 }
 
-if ( ! function_exists( 'wp_guidelines_ensure_default_type_term' ) ) {
+if ( ! function_exists( '_wp_guidelines_ensure_default_type_term' ) ) {
 	/**
-	 * Assigns the `artifact` fallback term when a `wp_guideline` post is saved
-	 * without a type term.
+	 * Hook callback for the `save_post_wp_guideline` action that assigns the
+	 * `artifact` fallback term when a guideline is saved without a type term.
 	 *
 	 * Uses `get_the_terms()` so the check is served by the object term cache.
 	 *
+	 * @access private
+	 *
 	 * @param int $post_id Saved post ID.
 	 */
-	function wp_guidelines_ensure_default_type_term( int $post_id ): void {
+	function _wp_guidelines_ensure_default_type_term( int $post_id ): void {
 		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
@@ -87,22 +80,26 @@ if ( ! function_exists( 'wp_guidelines_ensure_default_type_term' ) ) {
 	}
 }
 
-if ( ! function_exists( 'wp_guidelines_maybe_map_term_label' ) ) {
+if ( ! function_exists( '_wp_guidelines_maybe_map_term_label' ) ) {
 	/**
-	 * Maps a raw guideline-type slug to its human-readable label when
-	 * `wp_insert_term()` is about to create the term.
+	 * Hook callback for the `wp_insert_term_data` filter that swaps a
+	 * raw guideline-type slug for its human-readable label when WordPress
+	 * is about to lazily create the term.
 	 *
-	 * Lazily creates taxonomy terms on first use. When `wp_set_object_terms()`
-	 * assigns a slug that doesn't exist yet, `wp_insert_term()` fires. This
-	 * filter runs after WP has computed both `name` and `slug`, so a `name`
-	 * equal to `slug` indicates a raw slug was passed (e.g. from
-	 * `wp_set_object_terms()`) rather than a user-provided label.
+	 * When `wp_set_object_terms()` is called with a slug that doesn't yet
+	 * exist, `wp_insert_term()` fires and the filter runs after WP has
+	 * computed both `name` and `slug`. A `name` equal to `slug` indicates
+	 * the term was created from a raw slug (e.g. by `wp_set_object_terms()`)
+	 * rather than from a user-provided label, so the label is replaced with
+	 * the title from `wp_guideline_types()`.
+	 *
+	 * @access private
 	 *
 	 * @param array  $data     Term data to be inserted (keyed by column name).
 	 * @param string $taxonomy Taxonomy slug.
 	 * @return array Possibly modified term data.
 	 */
-	function wp_guidelines_maybe_map_term_label( $data, $taxonomy ) {
+	function _wp_guidelines_maybe_map_term_label( $data, $taxonomy ) {
 		if ( 'wp_guideline_type' !== $taxonomy ) {
 			return $data;
 		}

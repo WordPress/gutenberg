@@ -181,8 +181,8 @@ class Gutenberg_Guidelines_Post_Type {
 			)
 		);
 
-		add_action( 'save_post_' . self::POST_TYPE, 'wp_guidelines_ensure_default_type_term' );
-		add_filter( 'wp_insert_term_data', 'wp_guidelines_maybe_map_term_label', 10, 2 );
+		add_action( 'save_post_' . self::POST_TYPE, '_wp_guidelines_ensure_default_type_term' );
+		add_filter( 'wp_insert_term_data', '_wp_guidelines_maybe_map_term_label', 10, 2 );
 	}
 
 	/**

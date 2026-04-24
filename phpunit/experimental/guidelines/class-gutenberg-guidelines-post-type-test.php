@@ -183,7 +183,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 		$this->assertIsInt( $revision_id );
 		$this->assertGreaterThan( 0, $revision_id );
 
-		wp_guidelines_ensure_default_type_term( $revision_id );
+		_wp_guidelines_ensure_default_type_term( $revision_id );
 
 		$terms = wp_get_object_terms( $revision_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
 		$this->assertSame( array(), $terms );
