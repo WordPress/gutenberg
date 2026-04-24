@@ -15,6 +15,10 @@
 		box-sizing: border-box;
 	}
 
+	@at-root .wp-block-group.is-layout-flex & {
+		max-width: 100%;
+	}
+
 	&.alignwide img,
 	&.alignfull img {
 		width: 100%;
