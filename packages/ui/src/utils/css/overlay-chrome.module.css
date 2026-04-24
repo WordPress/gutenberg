@@ -92,6 +92,19 @@
 		overflow-block: auto;
 		overflow-inline: hidden;
 		padding: var(--wpds-dimension-padding-2xl);
+
+		/*
+		 * The shared `outset-ring--focus-visible` utility (composed by
+		 * the Content components) draws the focus ring at `+1px` by
+		 * default — which for this scroll container would hit the
+		 * popup's rounded corners and get clipped by its
+		 * `overflow: hidden`. Inset the ring by the focus width so it
+		 * sits flush inside the content box, fully visible within the
+		 * popup's clipping region.
+		 */
+		&:focus-visible {
+			outline-offset: calc(var(--wpds-border-width-focus) * -1);
+		}
 	}
 
 	/*
