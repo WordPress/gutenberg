@@ -149,12 +149,41 @@ class Gutenberg_Guidelines_Post_Type {
 				'show_admin_column'  => true,
 				'show_in_nav_menus'  => false,
 				'show_in_rest'       => true,
-				'default_term'       => array(
-					'name' => __( 'Artifact', 'gutenberg' ),
-					'slug' => self::TERM_ARTIFACT,
-				),
 			)
 		);
+
+		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'ensure_default_type_term' ) );
+	}
+
+	/**
+	 * Ensures a guideline post always has a type term.
+	 *
+	 * Assigns the `artifact` fallback when the post was saved without one.
+	 * The REST controller sets `content` explicitly for the singleton, so
+	 * this only applies to posts inserted through other paths.
+	 *
+	 * The taxonomy intentionally does not use `default_term` at registration
+	 * time: on multisite installations with many sites, that triggers cache
+	 * clearing work across sites even for taxonomies with zero posts.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public static function ensure_default_type_term( $post_id ) {
+		if ( wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+
+		$terms = get_the_terms( $post_id, self::TAXONOMY );
+		if ( is_wp_error( $terms ) || ! empty( $terms ) ) {
+			return;
+		}
+
+		$term_id = self::get_or_create_term_id( self::TERM_ARTIFACT, __( 'Artifact', 'gutenberg' ) );
+		if ( is_wp_error( $term_id ) ) {
+			return;
+		}
+
+		wp_set_object_terms( $post_id, array( $term_id ), self::TAXONOMY );
 	}
 
 	/**

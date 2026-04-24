@@ -7,7 +7,7 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	FlexItem,
 	Card,
@@ -163,9 +163,9 @@ export default function PreferencesModalTabs( {
 											}
 											label={ __( 'Back' ) }
 										/>
-										<Text size="16">
+										<WCText size="16">
 											{ section.tabLabel }
-										</Text>
+										</WCText>
 									</CardHeader>
 									<CardBody>{ section.content }</CardBody>
 								</Card>

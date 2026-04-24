@@ -11,7 +11,7 @@ import {
 	DropZone,
 	Icon,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -937,12 +937,12 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text
+									<WCText
 										variant="muted"
 										className="fields__media-edit-description"
 									>
 										{ field.description }
-									</Text>
+									</WCText>
 								) }
 							</VStack>
 						);

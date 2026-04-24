@@ -229,6 +229,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			'readonly'    => true,
 		);
 
+		$schema['properties']['image_output_format'] = array(
+			'description' => __( 'The output MIME type this image should be converted to, based on the image_editor_output_format filter. Null if no conversion is needed.', 'gutenberg' ),
+			'type'        => array( 'string', 'null' ),
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		$schema['properties']['image_save_progressive'] = array(
+			'description' => __( 'Whether to use progressive/interlaced encoding when saving this image.', 'gutenberg' ),
+			'type'        => 'boolean',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
 		return $schema;
 	}
 
@@ -270,6 +284,39 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				}
 
 				$data['exif_orientation'] = $orientation;
+			}
+		}
+
+		// Add per-file output format for images.
+		if ( rest_is_field_included( 'image_output_format', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
+				$filename  = get_attached_file( $item->ID );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+
+				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
+				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
+			}
+		}
+
+		// Add progressive/interlaced encoding setting for images.
+		if ( rest_is_field_included( 'image_save_progressive', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+				$data['image_save_progressive'] = (bool) apply_filters(
+					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					false,
+					$mime_type
+				);
 			}
 		}
 
@@ -353,6 +400,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
 		remove_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+
+		// Recompute image_output_format now that __return_empty_array is removed.
+		if ( ! is_wp_error( $response ) ) {
+			$data = $response->get_data();
+			if ( ! empty( $data['id'] ) && wp_attachment_is_image( $data['id'] ) ) {
+				$mime_type = get_post_mime_type( $data['id'] );
+				$filename  = get_attached_file( $data['id'] );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+
+				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
+				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
+
+				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+				$data['image_save_progressive'] = (bool) apply_filters(
+					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					false,
+					$mime_type
+				);
+
+				$response->set_data( $data );
+			}
+		}
 
 		return $response;
 	}

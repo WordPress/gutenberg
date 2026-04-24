@@ -253,6 +253,15 @@ export default dedupePlugins( [
 			'@wordpress/no-unsafe-wp-apis': 'off',
 			'@wordpress/data-no-store-string-literals': 'error',
 			'@wordpress/use-recommended-components': 'error',
+			'@wordpress/use-import-as': [
+				'error',
+				{
+					'@wordpress/components': {
+						__experimentalText: 'WCText',
+						Badge: 'WCBadge',
+					},
+				},
+			],
 			'eslint-comments/no-unused-disable': 'error',
 			'import/default': 'error',
 			'import/named': 'error',

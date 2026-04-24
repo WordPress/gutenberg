@@ -3,7 +3,7 @@
  */
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -43,7 +43,7 @@ export default function ActionItem( {
 				>
 					{ title }
 				</Heading>
-				<Text
+				<WCText
 					id={ descriptionId }
 					size={ 13 }
 					weight={ 400 }
@@ -51,7 +51,7 @@ export default function ActionItem( {
 					className="guidelines__action-description"
 				>
 					{ description }
-				</Text>
+				</WCText>
 			</VStack>
 			<Button
 				size="compact"

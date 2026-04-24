@@ -10,7 +10,7 @@ import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -44,7 +44,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length > 1
 						? sprintf(
 								// translators: %d: number of items to delete.
@@ -62,7 +62,7 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 								),
 								decodeEntities( getItemTitle( items[ 0 ] ) )
 						  ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						variant="tertiary"
