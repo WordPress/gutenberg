@@ -97,6 +97,19 @@
 			 */
 			height: 100dvh;
 		}
+
+		/*
+		 * Forced-colors mode strips `box-shadow` and replaces the popup's
+		 * `background-color` with `Canvas`, which is also the color the UA
+		 * uses for the backdrop — the popup boundary would otherwise
+		 * disappear. A 1px `CanvasText` border restores the edge. The
+		 * popup uses `box-sizing: border-box`, so the border is absorbed
+		 * into the existing box and doesn't shift any layout in non-FC
+		 * mode (where the declaration is inert).
+		 */
+		@media (forced-colors: active) {
+			border: 1px solid CanvasText;
+		}
 	}
 
 	/*
