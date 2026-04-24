@@ -389,12 +389,8 @@ function ScrollableContent() {
  * independently.
  */
 export const Scrollable: Story = {
-	render: function Scrollable( args ) {
-		return (
-			<AlertDialog.Root { ...args }>
-				<ScrollableContent />
-			</AlertDialog.Root>
-		);
+	args: {
+		children: <ScrollableContent />,
 	},
 };
 
