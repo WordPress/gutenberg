@@ -70,7 +70,7 @@ function ConnectorsPage() {
 	const searchUrl =
 		canInstallPlugins && ! isFileModsDisabled
 			? 'plugin-install.php?s=connector&tab=search&type=tag'
-			: 'https://wordpress.org/plugins/search/ai-connectors/';
+			: __( 'https://wordpress.org/plugins/search/ai-connectors/' );
 
 	return (
 		<Page
