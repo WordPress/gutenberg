@@ -8,6 +8,7 @@ import { NavigableToolbar } from '@wordpress/block-editor';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -25,6 +26,7 @@ function DocumentTools() {
 		isListViewOpen,
 		inserterSidebarToggleRef,
 		listViewToggleRef,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		const {
 			isInserterOpened,
@@ -37,6 +39,10 @@ function DocumentTools() {
 			isListViewOpen: isListViewOpened(),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
 		};
 	}, [] );
 	const { setIsInserterOpened, setIsListViewOpened } =
@@ -51,6 +57,13 @@ function DocumentTools() {
 		() => setIsInserterOpened( ! isInserterOpen ),
 		[ setIsInserterOpened, isInserterOpen ]
 	);
+
+	/* translators: Button label text should, if possible, be under 16 characters. */
+	const longLabel = _x(
+		'Block Inserter',
+		'Generic label for block inserter button'
+	);
+	const shortLabel = ! isInserterOpen ? __( 'Add' ) : __( 'Close' );
 
 	return (
 		<NavigableToolbar
@@ -69,18 +82,23 @@ function DocumentTools() {
 				} }
 				onClick={ toggleInserterSidebar }
 				icon={ plus }
-				/* translators: button label text should, if possible, be under 16
-					characters. */
-				label={ _x(
-					'Block Inserter',
-					'Generic label for block inserter button'
-				) }
+				label={ showIconLabels ? shortLabel : longLabel }
 				size="compact"
+				showTooltip={ ! showIconLabels }
+				aria-expanded={ isInserterOpen }
 			/>
 			{ isMediumViewport && (
 				<>
-					<ToolbarItem as={ UndoButton } />
-					<ToolbarItem as={ RedoButton } />
+					<ToolbarItem
+						as={ UndoButton }
+						showTooltip={ ! showIconLabels }
+						variant={ showIconLabels ? 'tertiary' : undefined }
+					/>
+					<ToolbarItem
+						as={ RedoButton }
+						showTooltip={ ! showIconLabels }
+						variant={ showIconLabels ? 'tertiary' : undefined }
+					/>
 					<ToolbarItem
 						as={ Button }
 						className="edit-widgets-header-toolbar__list-view-toggle"
@@ -91,6 +109,8 @@ function DocumentTools() {
 						onClick={ toggleListView }
 						ref={ listViewToggleRef }
 						size="compact"
+						showTooltip={ ! showIconLabels }
+						variant={ showIconLabels ? 'tertiary' : undefined }
 					/>
 				</>
 			) }

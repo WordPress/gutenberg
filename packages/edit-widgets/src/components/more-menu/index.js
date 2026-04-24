@@ -10,10 +10,14 @@ import {
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -36,6 +40,12 @@ export default function MoreMenu() {
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
+
 	return (
 		<>
 			<DropdownMenu
@@ -48,6 +58,8 @@ export default function MoreMenu() {
 				toggleProps={ {
 					tooltipPosition: 'bottom',
 					size: 'compact',
+					showTooltip: ! showIconLabels,
+					...( showIconLabels && { variant: 'tertiary' } ),
 				} }
 			>
 				{ ( onClose ) => (

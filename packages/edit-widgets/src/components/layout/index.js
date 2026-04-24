@@ -1,11 +1,17 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { PluginArea } from '@wordpress/plugins';
 import { store as noticesStore } from '@wordpress/notices';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,14 +38,29 @@ function Layout( { blockEditorSettings } ) {
 		);
 	}
 
+	const { showIconLabels } = useSelect( ( select ) => {
+		return {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+		};
+	} );
+
 	const navigateRegionsProps = useNavigateRegions();
 
 	return (
 		<ErrorBoundary>
 			<div
-				className={ navigateRegionsProps.className }
 				{ ...navigateRegionsProps }
 				ref={ navigateRegionsProps.ref }
+				className={ clsx(
+					'edit-widgets-layout',
+					navigateRegionsProps.className,
+					{
+						'show-icon-labels': showIconLabels,
+					}
+				) }
 			>
 				<WidgetAreasBlockEditorProvider
 					blockEditorSettings={ blockEditorSettings }
