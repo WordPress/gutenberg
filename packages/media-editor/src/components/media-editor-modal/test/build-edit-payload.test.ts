@@ -1,26 +1,49 @@
 /**
  * buildEditPayload ↔ Export-camera parity.
  *
+ * WHAT THIS TEST GUARANTEES
+ *
  * "What the user framed in the stencil is what the server crops from the
- * source." The server receives `{ transform, crop }` and applies rotate
- * → flip → crop. For every (u, v) inside the stencil rect, the source
- * pixel that ends up at the corresponding output pixel must match the
- * source pixel the preview/export pipeline already renders there.
+ * source." The cropper shows the user a live preview via the *export
+ * camera* (`createExportCamera`); the server receives `{ transform, crop }`
+ * from `buildEditPayload` and applies rotate → flip → crop. Both paths
+ * must land on the same source pixel for the same spot in the output,
+ * otherwise the saved image drifts from what the user framed.
  *
- * Test strategy (mirrors the preview↔export parity test next door):
+ * This test asserts that invariant holds for every combination of
+ * rotation, zoom, pan, flip, and crop rect the cropper can produce.
  *
- *   1. Pick a cropper state (rotation, zoom, pan, flip, cropRect).
- *   2. Pick a (u, v) in [0,1]^2 — the normalized position inside the
- *      cropped output.
- *   3. Compute the source pixel the EXPORT camera picks for that (u, v).
- *      This is the ground truth: it's what the cropper draws on screen.
- *   4. Compute the source pixel the SERVER path yields by unwinding
- *      rotate → flip → crop on the same (u, v) point in output coords.
- *   5. Assert they agree.
+ * STRATEGY
  *
- * If buildEditPayload emits the wrong crop rect — wrong center, wrong
- * dims, wrong frame — the two paths drift and the test fails at the
- * offending probe.
+ * For each cropper state and each probe point (u, v) ∈ [0, 1]² inside
+ * the cropped output:
+ *
+ *   1. `exportSourcePixel` — inverts the export-camera matrix to find
+ *      the source pixel the cropper draws at (u, v). Ground truth:
+ *      it's literally what the user sees on screen.
+ *   2. `serverSourcePixel` — simulates the server pipeline (rotate →
+ *      flip → crop) in reverse to find the source pixel the server
+ *      would place at (u, v).
+ *   3. Assert both answers agree to within 1 source pixel (float slop).
+ *
+ * If `buildEditPayload` emits the wrong crop rect — wrong center,
+ * dims, or coordinate frame — the two paths diverge and the test
+ * pinpoints the offending (state, probe) pair.
+ *
+ * MAINTENANCE NOTES
+ *
+ * - If you change `buildEditPayload`, this test is the primary safety
+ *   net. Run it after any edit to that file or to `createExportCamera`.
+ * - If you change the server pipeline's operation order
+ *   (`lib/experimental/source-region-edit.php`), update
+ *   `serverSourcePixel` to match — it mirrors the server exactly.
+ * - Adding a new cropper operation (e.g. skew) means: extend
+ *   `CropperState`, teach `buildEditPayload` to emit it, extend
+ *   `serverSourcePixel` to undo it, and add values to the grid in
+ *   `buildRows`. The probes don't need to change.
+ * - Failures present as huge pixel-diff numbers, not subtle drift.
+ *   Look at the state label in the first failing row to isolate the
+ *   axis (rotation vs. flip vs. frame conversion) before debugging.
  */
 
 /**
@@ -42,6 +65,14 @@ import type { CropperState, Size } from '../../../image-editor/core/types';
 
 const IMAGE: Size = { width: 1600, height: 900 };
 
+/**
+ * Build a CropperState seeded with `DEFAULT_STATE` and a fixed test image,
+ * overlaid with caller-specified overrides. Keeps each parity row focused
+ * on the fields it actually varies (rotation, zoom, pan, flip, cropRect).
+ *
+ * @param overrides Partial CropperState fields that replace defaults.
+ * @return A fully-populated CropperState ready to feed into the cropper.
+ */
 function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	return {
 		...DEFAULT_STATE,
@@ -54,8 +85,23 @@ function makeState( overrides: Partial< CropperState > = {} ): CropperState {
 	};
 }
 
-// Source pixel that the export camera maps to (u, v) in the output
-// canvas. This is ground truth: the cropper renders exactly this.
+/**
+ * Ground-truth half of the parity check: the source pixel the cropper
+ * actually draws at screen position `(u, v)` inside the output canvas.
+ * Inverts the export camera — the same matrix the live preview uses — so
+ * whatever the user sees on-screen is exactly what this returns.
+ *
+ * Maintenance: this function is a thin wrapper over `createExportCamera`.
+ * If the camera's composition order changes (e.g. flip inserted before
+ * rotation), no change is needed here — the matrix carries the new order.
+ *
+ * @param state      Current cropper state (rotation/zoom/pan/flip/cropRect).
+ * @param imageSize  Natural dimensions of the source image.
+ * @param outputSize Dimensions of the output canvas the camera renders into.
+ * @param u          Horizontal probe in [0, 1] across the output.
+ * @param v          Vertical probe in [0, 1] across the output.
+ * @return Source-pixel coordinates for the sampled output point.
+ */
 function exportSourcePixel(
 	state: CropperState,
 	imageSize: Size,
@@ -75,18 +121,30 @@ function exportSourcePixel(
 	return { x: out[ 0 ], y: out[ 1 ] };
 }
 
-// Source pixel that the server produces for (u, v) in the output, given
-// the payload `{ transform, crop }` and `imageSize`. Simulates the server
-// pipeline rotate → flip → crop exactly.
-//
-// Mapping output → source:
-//   1. output point o = (u·cropW, v·cropH).
-//   2. canvas point c = o + (cropX, cropY) — undo crop translation.
-//   3. undo flip about the full-AABB center.
-//   4. undo rotation about the source center.
-//
-// The full-AABB dims come from `getRotatedBBox(imageSize, rotation)` —
-// same thing the server gets from `WP_Image_Editor` after `rotate()`.
+/**
+ * Server-side half of the parity check: the source pixel the PHP pipeline
+ * would land at for output point `(u, v)`, given the payload. Simulates
+ * rotate → flip → crop in reverse to go from output back to source.
+ *
+ * Mapping output → source:
+ *   1. output point o = (u·cropW, v·cropH).
+ *   2. canvas point c = o + (cropX, cropY) — undo crop translation.
+ *   3. undo flip about the full-AABB center.
+ *   4. undo rotation about the source center.
+ *
+ * The full-AABB dims come from `getRotatedBBox(imageSize, rotation)` —
+ * same thing the server gets from `WP_Image_Editor` after `rotate()`.
+ *
+ * Maintenance: this MUST mirror `lib/experimental/source-region-edit.php`.
+ * If the server's operation order changes (e.g. crop-before-flip), update
+ * the inverse order here to match, or the parity test will false-negative.
+ *
+ * @param payload   Canonical `{ transform, crop }` the client sends.
+ * @param imageSize Natural dimensions of the source image.
+ * @param u         Horizontal probe in [0, 1] across the output.
+ * @param v         Vertical probe in [0, 1] across the output.
+ * @return Source-pixel coordinates the server would place at `(u, v)`.
+ */
 function serverSourcePixel(
 	payload: EditPayload,
 	imageSize: Size,
@@ -128,7 +186,7 @@ function serverSourcePixel(
 	return { x: sx, y: sy };
 }
 
-// Five probe points — corners catch offset/scale drift, center catches
+// Seven probe points — corners catch offset/scale drift, center catches
 // uniform bugs, two asymmetric interior points catch cross-axis bugs
 // that a center probe would miss.
 const PROBES: { label: string; u: number; v: number }[] = [
@@ -149,6 +207,20 @@ interface ParityRow {
 	v: number;
 }
 
+/**
+ * Build the full parity grid: every combination of rotation × zoom × pan ×
+ * flip × cropRect, each expanded across the probe set. Produces one row
+ * per `it.each` case. Each row carries a human-readable `label` that names
+ * the exact state and probe, so a failing case points straight at the bug.
+ *
+ * Maintenance: add new values to the arrays below when a new axis needs
+ * coverage. Keep the grid small — the cartesian product grows fast. If you
+ * add a new cropper operation (e.g. skew), extend `CropperState`, teach
+ * `buildEditPayload` to emit it, extend `serverSourcePixel` to undo it,
+ * and add an array here. The probes themselves should not need changes.
+ *
+ * @return One `ParityRow` per (state, probe) combination.
+ */
 function buildRows(): ParityRow[] {
 	const rotations = [ 0, 15, 45, 60, 90, 135, 201, 270 ];
 	const zooms = [ 1, 1.5, 2.5 ];
