@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import type { ComponentProps, ComponentType } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
@@ -117,12 +118,11 @@ function StaticWidget() {
 	);
 }
 
-const MOCK_MODULES: Record< string, { default: React.ComponentType< any > } > =
-	{
-		'mock/hello': { default: HelloWidget },
-		'mock/counter': { default: CounterWidget },
-		'mock/static': { default: StaticWidget },
-	};
+const MOCK_MODULES: Record< string, { default: ComponentType< any > } > = {
+	'mock/hello': { default: HelloWidget },
+	'mock/counter': { default: CounterWidget },
+	'mock/static': { default: StaticWidget },
+};
 
 const resolveWidgetModule: ResolveWidgetModule = ( moduleId ) =>
 	new Promise( ( resolve, reject ) => {
@@ -186,9 +186,7 @@ const defaultLayout: WidgetInstance[] = [
 	},
 ];
 
-function StatefulDashboard(
-	props: React.ComponentProps< typeof WidgetDashboard >
-) {
+function StatefulDashboard( props: ComponentProps< typeof WidgetDashboard > ) {
 	const [ layout, setLayout ] = useState( props.layout );
 
 	return (

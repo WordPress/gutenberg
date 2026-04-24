@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { forwardRef, useCallback, useMemo } from '@wordpress/element';
 import { DashboardGrid } from '@wordpress/grid';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
@@ -45,58 +45,62 @@ function applyGridChange(
 	} );
 }
 
+export interface WidgetsProps {
+	className?: string;
+}
+
 /**
  * Iterates `layout`, delegates each entry to `WidgetDashboard.Widget`, and
  * feeds the resulting tree into `@wordpress/grid`.
- * @param root0
- * @param root0.className
  */
-export function Widgets( { className }: { className?: string } ) {
-	const {
-		layout,
-		onLayoutChange,
-		editMode,
-		columns,
-		minColumnWidth,
-		rowHeight,
-		spacing,
-	} = useDashboardInternalContext();
+export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
+	function Widgets( { className }, ref ) {
+		const {
+			layout,
+			onLayoutChange,
+			editMode,
+			columns,
+			minColumnWidth,
+			rowHeight,
+			spacing,
+		} = useDashboardInternalContext();
 
-	const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
+		const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
 
-	const handleLayoutChange = useCallback(
-		( newGridLayout: DashboardGridLayoutItem[] ) => {
-			onLayoutChange( applyGridChange( layout, newGridLayout ) );
-		},
-		[ layout, onLayoutChange ]
-	);
+		const handleLayoutChange = useCallback(
+			( newGridLayout: DashboardGridLayoutItem[] ) => {
+				onLayoutChange( applyGridChange( layout, newGridLayout ) );
+			},
+			[ layout, onLayoutChange ]
+		);
 
-	const children = layout.map( ( widget, index ) => (
-		<Widget key={ widget.uuid } widget={ widget } index={ index } />
-	) );
+		const children = layout.map( ( widget, index ) => (
+			<Widget key={ widget.uuid } widget={ widget } index={ index } />
+		) );
 
-	const sharedProps = {
-		layout: gridLayout,
-		spacing,
-		rowHeight,
-		editMode,
-		onChangeLayout: handleLayoutChange,
-	};
+		const sharedProps = {
+			layout: gridLayout,
+			spacing,
+			rowHeight,
+			editMode,
+			onChangeLayout: handleLayoutChange,
+		};
 
-	return (
-		<div className={ clsx( styles.grid, className ) }>
-			{ columns !== undefined ? (
-				<DashboardGrid { ...sharedProps } columns={ columns }>
-					{ children }
-				</DashboardGrid>
-			) : (
-				<DashboardGrid
-					{ ...sharedProps }
-					minColumnWidth={ minColumnWidth }
-				>
-					{ children }
-				</DashboardGrid>
-			) }
-		</div>
-	);
-}
+		return (
+			<div ref={ ref } className={ clsx( styles.grid, className ) }>
+				{ columns !== undefined ? (
+					<DashboardGrid { ...sharedProps } columns={ columns }>
+						{ children }
+					</DashboardGrid>
+				) : (
+					<DashboardGrid
+						{ ...sharedProps }
+						minColumnWidth={ minColumnWidth }
+					>
+						{ children }
+					</DashboardGrid>
+				) }
+			</div>
+		);
+	}
+);

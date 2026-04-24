@@ -79,22 +79,7 @@ interface WidgetRenderInternalProps {
 	widgetType: WidgetType;
 }
 
-/**
- * Lazy-loads a widget's render module via the configured resolver and renders
- * it with the minimal `WidgetRenderProps` contract: `attributes` plus
- * `setAttributes`. Wraps the module in a `Suspense` boundary and an error
- * boundary so neighbours stay mounted if one widget fails.
- *
- * Kept internal to the package. Surfaces that want bare widget rendering
- * should compose `WidgetDashboard.Widget` instead.
- * @param root0
- * @param root0.widget
- * @param root0.widgetType
- */
-export function WidgetRender( {
-	widget,
-	widgetType,
-}: WidgetRenderInternalProps ) {
+function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
 
@@ -144,3 +129,14 @@ export function WidgetRender( {
 		</WidgetErrorBoundary>
 	);
 }
+
+/**
+ * Lazy-loads a widget's render module via the configured resolver and renders
+ * it with the minimal `WidgetRenderProps` contract: `attributes` plus
+ * `setAttributes`. Wraps the module in a `Suspense` boundary and an error
+ * boundary so neighbours stay mounted if one widget fails.
+ *
+ * Kept internal to the package. Surfaces that want bare widget rendering
+ * should compose `WidgetDashboard.Widget` instead.
+ */
+export const WidgetRender = WidgetRenderImpl;

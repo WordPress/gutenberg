@@ -20,69 +20,59 @@ import type { WidgetDashboardProps } from './types';
  * specific dashboard. Multiple dashboards can coexist in the same admin and
  * stay independently addressable.
  *
- * @param root0
- * @param root0.id
- * @param root0.layout
- * @param root0.onLayoutChange
- * @param root0.widgetTypes
- * @param root0.editMode
- * @param root0.onEditChange
- * @param root0.resolveWidgetModule
- * @param root0.columns
- * @param root0.minColumnWidth
- * @param root0.rowHeight
- * @param root0.spacing
- * @param root0.children
- * @example
  * ```tsx
  * import { WidgetDashboard } from '@wordpress/dashboard';
  *
  * function MyDashboard() {
- *     const [ layout, setLayout ] = useState( defaultLayout );
- *     return (
- *         <WidgetDashboard
- *             id="core/dashboard"
- *             layout={ layout }
- *             onLayoutChange={ setLayout }
- *             widgetTypes={ widgetTypes }
- *         />
- *     );
+ * 	const [ layout, setLayout ] = useState( defaultLayout );
+ * 	return (
+ * 		<WidgetDashboard
+ * 			id="core/dashboard"
+ * 			layout={ layout }
+ * 			onLayoutChange={ setLayout }
+ * 			widgetTypes={ widgetTypes }
+ * 		>
+ * 			<WidgetDashboard.Empty>
+ * 				<p>No widgets yet.</p>
+ * 			</WidgetDashboard.Empty>
+ * 			<WidgetDashboard.Widgets />
+ * 		</WidgetDashboard>
+ * 	);
  * }
  * ```
  */
-export function WidgetDashboard( {
-	id,
-	layout,
-	onLayoutChange,
-	widgetTypes,
-	editMode,
-	onEditChange,
-	resolveWidgetModule,
-	columns,
-	minColumnWidth,
-	rowHeight,
-	spacing,
-	children,
-}: WidgetDashboardProps ) {
-	return (
-		<WidgetDashboardProvider
-			id={ id }
-			layout={ layout }
-			onLayoutChange={ onLayoutChange }
-			widgetTypes={ widgetTypes }
-			editMode={ editMode }
-			onEditChange={ onEditChange }
-			resolveWidgetModule={ resolveWidgetModule }
-			columns={ columns }
-			minColumnWidth={ minColumnWidth }
-			rowHeight={ rowHeight }
-			spacing={ spacing }
-		>
-			{ children ?? <WidgetDashboard.Widgets /> }
-		</WidgetDashboardProvider>
-	);
-}
-
-WidgetDashboard.Widgets = Widgets;
-WidgetDashboard.Widget = Widget;
-WidgetDashboard.Empty = Empty;
+export const WidgetDashboard = Object.assign(
+	function WidgetDashboard( {
+		id,
+		layout,
+		onLayoutChange,
+		widgetTypes,
+		editMode,
+		onEditChange,
+		resolveWidgetModule,
+		columns,
+		minColumnWidth,
+		rowHeight,
+		spacing,
+		children,
+	}: WidgetDashboardProps ) {
+		return (
+			<WidgetDashboardProvider
+				id={ id }
+				layout={ layout }
+				onLayoutChange={ onLayoutChange }
+				widgetTypes={ widgetTypes }
+				editMode={ editMode }
+				onEditChange={ onEditChange }
+				resolveWidgetModule={ resolveWidgetModule }
+				columns={ columns }
+				minColumnWidth={ minColumnWidth }
+				rowHeight={ rowHeight }
+				spacing={ spacing }
+			>
+				{ children ?? <Widgets /> }
+			</WidgetDashboardProvider>
+		);
+	},
+	{ Widgets, Widget, Empty }
+);

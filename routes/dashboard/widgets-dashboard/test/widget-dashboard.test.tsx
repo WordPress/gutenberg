@@ -1,6 +1,8 @@
 /**
  * External dependencies
  */
+import '@testing-library/jest-dom';
+import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -51,7 +53,11 @@ const widgetTypes: WidgetType[] = [
 
 const resolveWidgetModule: ResolveWidgetModule = async ( id ) => {
 	if ( id === 'test-greet-module' ) {
-		return { default: TestWidget };
+		return {
+			default: TestWidget as ComponentType<
+				WidgetRenderProps< unknown >
+			>,
+		};
 	}
 	throw new Error( `Unknown module: ${ id }` );
 };
