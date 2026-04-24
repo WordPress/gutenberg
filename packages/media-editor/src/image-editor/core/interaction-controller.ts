@@ -247,11 +247,17 @@ export class InteractionController {
 		}
 		e.preventDefault();
 
-		// Blur any focused handle so its focus ring doesn't linger.
+		// Blur any focused handle so its focus ring doesn't linger,
+		// but leave the canvas itself alone so keyboard control works after drag.
 		const ownerDoc = el.ownerDocument;
-		if ( ownerDoc?.activeElement instanceof HTMLElement ) {
+		if (
+			ownerDoc?.activeElement instanceof HTMLElement &&
+			ownerDoc.activeElement !== el
+		) {
 			ownerDoc.activeElement.blur();
 		}
+
+		el.focus();
 
 		// Capture pointer so drag works across iframe boundaries.
 		el.setPointerCapture( e.pointerId );
