@@ -94,7 +94,10 @@ function gutenberg_add_admin_bar_script() {
 			// Assigning agent may error if the HTTP header is blocked at the browser level.
 			try {
 				userAgent = navigator.userAgent;
-			} catch (error) {}
+			} catch (error) {
+				// Make no change to the default shortcut label.
+				return;
+			}
 			const isAppleOS = /Macintosh|Mac OS X|Mac_PowerPC/i.test( userAgent );
 			const shortcutLabel = isAppleOS ? shortCutLabels.appleOS : shortCutLabels.default;
 			const commandPaletteNode = document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' );
