@@ -25,6 +25,12 @@ export type AutocompleteInputProps = Omit<
 	'size'
 >;
 
+export type AutocompleteInputGroupProps = ComponentProps<
+	typeof _Autocomplete.InputGroup
+> & {
+	children?: React.ReactNode;
+};
+
 export type AutocompleteItemProps = ComponentProps<
 	typeof _Autocomplete.Item
 > & {

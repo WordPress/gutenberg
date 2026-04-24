@@ -14,6 +14,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	subcomponents: {
 		Popup: Autocomplete.Popup,
 		Input: Autocomplete.Input,
+		InputGroup: Autocomplete.InputGroup,
 		List: Autocomplete.List,
 		ListBody: Autocomplete.ListBody,
 		Collection: Autocomplete.Collection,
@@ -209,24 +210,26 @@ export const WithSearchIconAndClearButton: Story = {
 		items: URLS,
 		children: (
 			<>
-				<Autocomplete.Input
-					placeholder="Search URLs"
-					type="url"
-					render={
-						<Input
-							prefix={
-								<InputLayout.Slot padding="minimal">
-									<Icon icon={ search } />
-								</InputLayout.Slot>
-							}
-							suffix={
-								<InputLayout.Slot padding="minimal">
-									<Autocomplete.Clear />
-								</InputLayout.Slot>
-							}
-						/>
-					}
-				/>
+				<Autocomplete.InputGroup>
+					<Autocomplete.Input
+						placeholder="Search URLs"
+						type="url"
+						render={
+							<Input
+								prefix={
+									<InputLayout.Slot padding="minimal">
+										<Icon icon={ search } />
+									</InputLayout.Slot>
+								}
+								suffix={
+									<InputLayout.Slot padding="minimal">
+										<Autocomplete.Clear />
+									</InputLayout.Slot>
+								}
+							/>
+						}
+					/>
+				</Autocomplete.InputGroup>
 				<Autocomplete.Popup>
 					<Autocomplete.Empty>No matching items.</Autocomplete.Empty>
 					<Autocomplete.List>

@@ -12,6 +12,7 @@ const ITEMS = [
 describe( 'Autocomplete', () => {
 	it( 'forwards ref', async () => {
 		const user = userEvent.setup();
+		const inputGroupRef = createRef< HTMLDivElement >();
 		const inputRef = createRef< HTMLInputElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const listRef = createRef< HTMLDivElement >();
@@ -22,7 +23,9 @@ describe( 'Autocomplete', () => {
 
 		render(
 			<Autocomplete.Root items={ ITEMS }>
-				<Autocomplete.Input ref={ inputRef } placeholder="Search" />
+				<Autocomplete.InputGroup ref={ inputGroupRef }>
+					<Autocomplete.Input ref={ inputRef } placeholder="Search" />
+				</Autocomplete.InputGroup>
 				<Autocomplete.Popup ref={ popupRef }>
 					<Autocomplete.Empty ref={ emptyRef }>
 						No results found.
@@ -51,6 +54,7 @@ describe( 'Autocomplete', () => {
 			</Autocomplete.Root>
 		);
 
+		expect( inputGroupRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( inputRef.current ).toBeInstanceOf( HTMLInputElement );
 
 		await user.type( inputRef.current!, 'Item' );
