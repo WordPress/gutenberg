@@ -92,7 +92,7 @@ function ConnectorsPage() {
 					>
 						<p>
 							{ __(
-								'Plugin installation from wp-admin is disabled because DISALLOW_FILE_MODS is enabled. Install the AI plugin and any AI provider plugins manually using your normal deployment workflow.'
+								'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
 							) }
 						</p>
 						<p>{ __( 'WP-CLI examples:' ) }</p>
