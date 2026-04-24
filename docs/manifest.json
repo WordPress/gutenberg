@@ -458,7 +458,7 @@
 	{
 		"title": "Core Blocks Reference",
 		"slug": "core-blocks",
-		"markdown_source": "../docs/reference-guides/core-blocks.md",
+		"markdown_source": "../docs/reference-guides/core-blocks/README.md",
 		"parent": "reference-guides"
 	},
 	{

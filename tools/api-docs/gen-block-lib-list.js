@@ -1,7 +1,7 @@
 /**
  * Generates core block documentation using block.json files.
  * Reads from  : packages/block-library/src
- * Publishes to: docs/reference-guides/core-blocks.md
+ * Publishes to: docs/reference-guides/core-blocks/README.md
  */
 
 /**
@@ -34,7 +34,7 @@ const BLOCK_LIBRARY_DIR = path.resolve(
  */
 const BLOCK_LIBRARY_DOCS_FILE = path.resolve(
 	ROOT_DIR,
-	'docs/reference-guides/core-blocks.md'
+	'docs/reference-guides/core-blocks/README.md'
 );
 
 /**
