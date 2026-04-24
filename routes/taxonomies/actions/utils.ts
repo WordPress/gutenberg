@@ -37,9 +37,7 @@ export function createStatusAction(
 		supportsBulk: true,
 		isEligible,
 		async callback( items, { registry } ) {
-			const itemsToUpdate = items.filter(
-				( item ) => item.id !== undefined && isEligible( item )
-			);
+			const itemsToUpdate = items.filter( isEligible );
 			if ( itemsToUpdate.length === 0 ) {
 				return;
 			}
