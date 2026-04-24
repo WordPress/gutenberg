@@ -27,8 +27,8 @@
 	 * case (where a separator is needed) adds a `border-block-*: 1px
 	 * solid transparent` on the inner side and subtracts 1px from that
 	 * same padding so the chrome's overall border-box height stays
-	 * identical to the non-pinned case. See the `:has(+ .content)` /
-	 * `.content +` rules below.
+	 * identical to the non-pinned case. See the `:has(~ .content)` /
+	 * `.content ~` rules below.
 	 *
 	 * `min-height` on `.header` keeps the header footprint stable whether
 	 * or not a close icon is rendered (notably the AlertDialog case, which
@@ -96,43 +96,59 @@
 	 * `.content` then drops its matching block-axis padding on that
 	 * edge, because the chrome already supplies the popup-edge
 	 * `padding-2xl` + inner `gap-lg`.
+	 *
+	 * Sibling relationships intentionally use the general-sibling
+	 * combinator (`~`) and `:has(~ …)` instead of the adjacent
+	 * combinator, so an extra element between header / content / footer
+	 * (custom wrappers, an a11y live region, etc.) doesn't silently
+	 * break the pinned layout. The expected DOM shape is still
+	 * header → content → footer; additional siblings in between are
+	 * tolerated.
 	 */
-	.header:has(+ .content) {
+	.header:has(~ .content) {
 		padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
 		border-block-end: 1px solid transparent;
 	}
 
-	.header + .content {
+	.header ~ .content {
 		padding-block-start: 0;
 	}
 
-	.content + .footer {
+	.content ~ .footer {
 		padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
 		border-block-start: 1px solid transparent;
 	}
 
-	.content:has(+ .footer) {
+	.content:has(~ .footer) {
 		padding-block-end: 0;
 	}
 
 	/*
 	 * Non-pinned case: when `.header` / `.footer` live inside `.content`
-	 * (scrolls with body), the scroll container already supplies all
-	 * popup-edge padding (block-start/block-end on the outer side, plus
-	 * both inline sides), so the chrome's own padding collapses on those
-	 * three edges to avoid stacking on top of `.content`'s padding. The
-	 * inner block side (toward the body) keeps the full `gap-lg` from the
-	 * base `.header` / `.footer` rule. No border — the separator is
-	 * specific to the pinned case.
+	 * (scrolls with body). The scroll container already supplies the
+	 * inline popup-edge padding, so nested chrome always collapses its
+	 * own `padding-inline` regardless of its position inside `.content`
+	 * (no `:first-child` / `:last-child` guard). Block-axis padding is
+	 * only collapsed at the scroll edges — the `:first-child` /
+	 * `:last-child` rules keep the body's `gap-lg` visual separation
+	 * between the chrome and any preceding / following siblings inside
+	 * `.content`. No border — the separator is specific to the pinned
+	 * case.
 	 */
+	.content > .header {
+		padding-inline: 0;
+	}
+
 	.content > .header:first-child {
 		padding-block-start: 0;
+	}
+
+	.content > .footer {
 		padding-inline: 0;
 	}
 
 	.content > .footer:last-child {
 		padding-block-end: 0;
-		padding-inline: 0;
 	}
 
 	/*
@@ -144,12 +160,19 @@
 	 * `useOverlayScrollStateAttributes` owns the
 	 * `data-wp-ui-overlay-scrolled-from-*` toggles, so CSS handles the
 	 * visual state without React re-rendering on scroll.
+	 *
+	 * Forced-colors note: `border-color: transparent` is preserved as-is
+	 * in forced-colors mode per spec, so the default (non-scrolled)
+	 * state stays invisible. When the color toggles to a token value
+	 * below, the UA substitutes a system color (typically `CanvasText`),
+	 * so the separator remains visible in forced-colors mode without
+	 * any additional rules.
 	 */
-	.header:has(+ [data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top]) {
+	.header:has(~ [data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top]) {
 		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
-	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] + .footer {
+	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] ~ .footer {
 		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
 	}
 
