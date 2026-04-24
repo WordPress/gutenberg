@@ -69,12 +69,12 @@ export default function MissingEdit( { attributes, clientId } ) {
 		</Button>
 	);
 
-	const convertToHtmlButton = (
+	const getConvertToHtmlButton = ( variant ) => (
 		<Button
 			__next40pxDefaultSize
 			key="keep-as-html"
 			onClick={ convertToHTML }
-			variant="secondary"
+			variant={ variant }
 		>
 			{ __( 'Keep as HTML' ) }
 		</Button>
@@ -90,7 +90,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 			messageHTML = __(
 				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to blocks, convert it to a Custom HTML block, or remove it entirely.'
 			);
-			actions.push( convertToHtmlButton );
+			actions.push( getConvertToHtmlButton( 'secondary' ) );
 		} else {
 			messageHTML = __(
 				'It appears you are trying to use the deprecated Classic block. You can leave this block intact, convert its content to blocks, or remove it entirely.'
@@ -104,7 +104,7 @@ export default function MissingEdit( { attributes, clientId } ) {
 			),
 			originalName
 		);
-		actions.push( convertToHtmlButton );
+		actions.push( getConvertToHtmlButton( 'primary' ) );
 	} else {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
