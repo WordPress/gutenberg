@@ -883,6 +883,9 @@ export class InteractionController {
 			}
 			case 'r':
 			case 'R': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
 				e.preventDefault();
 				this.options.dispatch( {
 					type: 'SNAP_ROTATE_90',

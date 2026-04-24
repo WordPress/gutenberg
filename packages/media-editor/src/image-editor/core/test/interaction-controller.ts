@@ -621,6 +621,20 @@ describe( 'InteractionController', () => {
 			} );
 		} );
 
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not rotate when %s is held with r',
+			( modifier ) => {
+				const state = makeState( { rotation: 0 } );
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'r', { [ modifier ]: true } )
+				);
+
+				expect( dispatchMock ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'respects custom keyboardStep (read lazily)', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller, opts } = createController( state, {
