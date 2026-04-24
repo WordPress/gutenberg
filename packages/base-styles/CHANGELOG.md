@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+
 ## 6.20.0 (2026-04-15)
 
 ## 6.19.0 (2026-04-01)

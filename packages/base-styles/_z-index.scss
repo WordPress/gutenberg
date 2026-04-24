@@ -50,9 +50,6 @@ $z-layers: (
 	".has-child .wp-block-navigation__submenu-container": 28,
 	".has-child:hover .wp-block-navigation__submenu-container": 29,
 
-	// Active pill button
-	".components-button {:focus or .is-primary}": 1,
-
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
