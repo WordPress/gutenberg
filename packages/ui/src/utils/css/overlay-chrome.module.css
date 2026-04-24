@@ -172,4 +172,22 @@
 	[data-wp-ui-overlay-scroll-container]:has(.footer-sticky:focus-within) {
 		scroll-padding-block-end: 0;
 	}
+
+	/*
+	 * `overscroll-behavior: contain` stops scroll chaining from the overlay
+	 * to whatever sits behind it. We only want that when the overlay is
+	 * modal: a non-modal overlay lets the page underneath remain
+	 * interactive, and chaining scroll to the page there is the intuitive
+	 * behavior.
+	 *
+	 * `data-wp-ui-overlay-modal` is toggled on the popup by each component
+	 * (Dialog / Drawer mirror their `modal` prop; AlertDialog is always
+	 * modal). The first selector covers Dialog/AlertDialog where the popup
+	 * is itself the scroll container; the second covers Drawer, where the
+	 * scroll container lives inside the popup (`_Drawer.Content`).
+	 */
+	[data-wp-ui-overlay-modal][data-wp-ui-overlay-scroll-container],
+	[data-wp-ui-overlay-modal] [data-wp-ui-overlay-scroll-container] {
+		overscroll-behavior: contain;
+	}
 }

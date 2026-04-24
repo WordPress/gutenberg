@@ -39,12 +39,6 @@
 		border-radius: var(--wpds-border-radius-lg);
 		box-shadow: var(--wpds-elevation-lg);
 		overflow: auto;
-		/*
-		 * Keep scroll momentum inside the popup: when the user reaches the
-		 * top or bottom of the dialog content, scrolling stops rather than
-		 * chaining to the page behind the backdrop.
-		 */
-		overscroll-behavior: contain;
 		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wpds-typography-font-size-md);
 		line-height: var(--wpds-typography-line-height-md);

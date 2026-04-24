@@ -73,6 +73,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					{ ...props }
+					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
 					onScroll={ onScroll }
 				>
 					<DialogValidationProvider>

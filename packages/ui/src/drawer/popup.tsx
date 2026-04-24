@@ -96,6 +96,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 						initialFocus={ resolvedInitialFocus }
 						finalFocus={ finalFocus }
 						{ ...props }
+						data-wp-ui-overlay-modal={
+							modal === true ? '' : undefined
+						}
 					>
 						<_Drawer.Content
 							ref={ scrollStateRef }

@@ -68,6 +68,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							dialogStyles[ 'is-medium' ]
 						) }
 						{ ...props }
+						data-wp-ui-overlay-modal=""
 						onScroll={ onScroll }
 					>
 						<div

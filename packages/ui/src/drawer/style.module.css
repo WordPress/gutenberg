@@ -239,7 +239,6 @@
 		block-size: 100%;
 		padding: var(--wpds-dimension-padding-2xl);
 		overflow-block: auto;
-		overscroll-behavior: contain;
 	}
 
 	.popup[data-swipe-direction="up"] .content,
