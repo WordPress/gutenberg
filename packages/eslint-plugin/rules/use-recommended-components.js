@@ -8,7 +8,14 @@
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
-		allowed: [ 'Badge', 'Stack', 'Text' ],
+		allowed: [
+			'Badge',
+			'Card',
+			'Collapsible',
+			'CollapsibleCard',
+			'Stack',
+			'Text',
+		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
@@ -30,6 +37,13 @@ const DENYLIST = {
 		__experimentalVStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalZStack:
 			'{{ name }} is planned for deprecation. Write your own CSS instead.',
+		Card: 'Use `Card.Root` from `@wordpress/ui` instead.',
+		CardBody: 'Use `Card.Content` from `@wordpress/ui` instead.',
+		CardDivider: 'A divider is no longer a standard pattern for cards.',
+		CardFooter: 'A footer is no longer a standard pattern for cards.',
+		CardHeader:
+			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
+		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 	},
 };
 

@@ -48,7 +48,17 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-media-editor',
 					'label'       => __( 'Media Editor', 'gutenberg' ),
-					'description' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
+					'description' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-media-editor-modal',
+					'label'       => __( 'Media Editor Modal', 'gutenberg' ),
+					'description' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-dataviews-media-modal',
+					'label'       => __( 'Media Upload Modal', 'gutenberg' ),
+					'description' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
 				),
 			),
 		),
@@ -56,11 +66,6 @@ function gutenberg_initialize_experiments_settings() {
 			'slug'  => 'data-views',
 			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
 			'items' => array(
-				array(
-					'id'          => 'gutenberg-dataviews-media-modal',
-					'label'       => __( 'New media modal', 'gutenberg' ),
-					'description' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
-				),
 				array(
 					'id'          => 'gutenberg-content-only-inspector-fields',
 					'label'       => __( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
@@ -124,6 +129,11 @@ function gutenberg_initialize_experiments_settings() {
 					'id'          => 'gutenberg-content-types',
 					'label'       => __( 'Content types', 'gutenberg' ),
 					'description' => __( 'Enables a UI for creating and managing custom taxonomies under Settings. Custom post types will be explored soon.', 'gutenberg' ),
+				),
+				array(
+					'id'          => 'gutenberg-dashboard-widgets',
+					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
+					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
 				),
 			),
 		),

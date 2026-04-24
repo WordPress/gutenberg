@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -43,11 +43,12 @@ function NotesSidebarContent( {
 	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
 
 	return (
-		<VStack
+		<Stack
 			className="editor-collab-sidebar-panel"
 			style={ styles }
 			role="tree"
-			spacing="3"
+			direction="column"
+			gap="md"
 			justify="flex-start"
 			ref={ ( node ) => {
 				// Sometimes previous sidebar unmounts after the new one mounts.
@@ -69,7 +70,7 @@ function NotesSidebarContent( {
 				commentSidebarRef={ commentSidebarRef }
 				isFloating={ isFloating }
 			/>
-		</VStack>
+		</Stack>
 	);
 }
 

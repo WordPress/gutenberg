@@ -14,16 +14,13 @@ import {
 	useRef,
 } from '@wordpress/element';
 import {
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 	FlexItem,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useDebounce } from '@wordpress/compose';
-
 import { published, moreVertical } from '@wordpress/icons';
 import { __, _x, sprintf, _n } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -40,7 +37,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingBoard, useFloatingThread } from './hooks';
+import { useFloatingBoard } from './hooks';
 import { FloatingContainer } from './floating-container';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -174,13 +171,13 @@ export function Comments( {
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
-	const { boardOffsets, registerThread, unregisterThread } = useFloatingBoard(
-		{
+	const { notePositions, registerThread, unregisterThread } =
+		useFloatingBoard( {
 			threads,
 			selectedNoteId: selectedNote,
 			isFloating,
-		}
-	);
+			commentSidebarRef,
+		} );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {
@@ -278,8 +275,7 @@ export function Comments( {
 					floating={
 						isFloating
 							? {
-									calculatedOffset:
-										boardOffsets[ thread.id ] ?? 0,
+									y: notePositions[ thread.id ],
 									registerThread,
 									unregisterThread,
 							  }
@@ -318,13 +314,21 @@ function Thread( {
 		toggleBlockHighlight,
 		50
 	);
-	const { y, refs } = useFloatingThread( {
-		thread,
-		calculatedOffset: floating?.calculatedOffset ?? 0,
-		registerThread: floating?.registerThread,
-		unregisterThread: floating?.unregisterThread,
-	} );
+	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
+
+	const registerThread = floating?.registerThread;
+	const unregisterThread = floating?.unregisterThread;
+
+	// Register block + floating elements with the board.
+	// The board's ResizeObserver and autoUpdate track changes automatically.
+	useEffect( () => {
+		const floatingEl = floatingRef.current;
+		if ( floatingEl && registerThread ) {
+			registerThread( thread.id, relatedBlockElement, floatingEl );
+		}
+		return () => unregisterThread?.( thread.id );
+	}, [ relatedBlockElement, thread.id, registerThread, unregisterThread ] );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
@@ -414,19 +418,21 @@ function Thread( {
 			<AddComment
 				onSubmit={ onAddReply }
 				commentSidebarRef={ commentSidebarRef }
-				floating={ { y, refs } }
+				floating={ { y: floating.y, ref: floatingRef } }
 			/>
 		);
 	}
 
 	return (
 		<FloatingContainer
-			floating={ isFloating ? { y, refs } : undefined }
+			floating={
+				isFloating ? { y: floating.y, ref: floatingRef } : undefined
+			}
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
-			spacing="3"
+			gap="md"
 			onClick={ handleCommentSelect }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
@@ -464,9 +470,9 @@ function Thread( {
 				{ __( 'Add new reply' ) }
 			</Button>
 			{ ! thread.blockClientId && (
-				<Text as="p" weight={ 500 } variant="muted">
+				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
-				</Text>
+				</p>
 			) }
 			<CommentBoard
 				thread={ thread }
@@ -499,7 +505,12 @@ function Thread( {
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
-				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
+				<Stack
+					direction="row"
+					align="center"
+					justify="space-between"
+					className="editor-collab-sidebar-panel__more-reply-separator"
+				>
 					<Button
 						size="compact"
 						variant="tertiary"
@@ -522,7 +533,7 @@ function Thread( {
 							restReplies.length
 						) }
 					</Button>
-				</HStack>
+				</Stack>
 			) }
 			{ ! isSelected && lastReply && (
 				<CommentBoard
@@ -534,11 +545,16 @@ function Thread( {
 				/>
 			) }
 			{ isSelected && (
-				<VStack spacing="2" role="treeitem">
-					<HStack alignment="left" spacing="3" justify="flex-start">
+				<Stack direction="column" gap="sm" role="treeitem">
+					<Stack
+						direction="row"
+						align="center"
+						justify="flex-start"
+						gap="md"
+					>
 						<CommentAuthorInfo />
-					</HStack>
-					<VStack spacing="2">
+					</Stack>
+					<Stack direction="column" gap="sm">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
 								if ( 'approved' === thread.status ) {
@@ -578,8 +594,8 @@ function Thread( {
 								thread.author_name
 							) }
 						/>
-					</VStack>
-				</VStack>
+					</Stack>
+				</Stack>
 			) }
 			{ !! thread.blockClientId && (
 				<Button
@@ -664,11 +680,12 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 			: __( 'Are you sure you want to delete this reply?' );
 
 	return (
-		<VStack
-			spacing="2"
+		<Stack
+			direction="column"
+			gap="sm"
 			role={ thread.parent !== 0 ? 'treeitem' : undefined }
 		>
-			<HStack alignment="left" spacing="3" justify="flex-start">
+			<Stack direction="row" align="center" justify="flex-start" gap="md">
 				<CommentAuthorInfo
 					avatar={ thread?.author_avatar_urls?.[ 48 ] }
 					name={ thread?.author_name }
@@ -683,7 +700,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 							event.stopPropagation();
 						} }
 					>
-						<HStack spacing="0">
+						<Stack direction="row" align="center">
 							{ canResolve && (
 								<Button
 									label={ _x(
@@ -735,10 +752,10 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 									) ) }
 								</Menu.Popover>
 							</Menu>
-						</HStack>
+						</Stack>
 					</FlexItem>
 				) }
-			</HStack>
+			</Stack>
 			{ 'edit' === actionState ? (
 				<CommentForm
 					onSubmit={ ( value ) => {
@@ -805,7 +822,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</Stack>
 	);
 };
 

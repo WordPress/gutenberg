@@ -16,7 +16,6 @@ export function sanitizeCommentString( str ) {
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;
-const BOARD_BOTTOM_PADDING = 32;
 
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
@@ -92,22 +91,24 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Calculate y offsets for all floating comment threads. Adjusts positions
- * to prevent overlapping by pushing threads above the selected one upward
- * and threads below it downward.
+ * Calculate final top positions for all floating comment threads in the
+ * editor's content coordinate space. Adjusts positions to prevent overlapping
+ * by pushing threads above the selected one upward and threads below it downward.
  *
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
  * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
- * @return {{ offsets: Object<string,number>, minHeight: number }} Computed offsets and minimum editor height.
+ * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
+ * @return {{ positions: Object<string,number> }} Computed top positions.
  */
-export function calculateAllOffsets( {
+export function calculateNotePositions( {
 	threads,
 	selectedNoteId,
 	blockRects,
 	heights,
+	scrollTop = 0,
 } ) {
 	const offsets = {};
 
@@ -119,7 +120,7 @@ export function calculateAllOffsets( {
 	const anchorThread = threads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { offsets, minHeight: 0 };
+		return { positions: {} };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -182,21 +183,18 @@ export function calculateAllOffsets( {
 		belowAdjustedTop = threadTop + offset;
 	}
 
-	let editorMinHeight = 0;
-	const lastThread = threads[ threads.length - 1 ];
-	const lastBlockRect = blockRects[ lastThread.id ];
-	if ( lastBlockRect ) {
-		const lastThreadTop = lastBlockRect.top || 0;
-		const lastThreadHeight = heights[ lastThread.id ] || 0;
-		const lastThreadOffset = offsets[ lastThread.id ] || 0;
-		editorMinHeight =
-			lastThreadTop +
-			lastThreadHeight +
-			lastThreadOffset +
-			BOARD_BOTTOM_PADDING;
+	// blockRect.top + scrollTop is the block's absolute y within the editor's
+	// scroll content; CSS translates each thread by -scrollTop at render time.
+	const positions = {};
+	for ( const thread of threads ) {
+		const blockRect = blockRects[ thread.id ];
+		if ( blockRect && offsets[ thread.id ] !== undefined ) {
+			positions[ thread.id ] =
+				blockRect.top + scrollTop + offsets[ thread.id ];
+		}
 	}
 
-	return { offsets, minHeight: editorMinHeight };
+	return { positions };
 }
 
 /**

@@ -12,6 +12,7 @@ export interface RootProps
 		_Dialog.Root.Props,
 		| 'open'
 		| 'onOpenChange'
+		| 'onOpenChangeComplete'
 		| 'defaultOpen'
 		| 'modal'
 		| 'disablePointerDismissal'
@@ -43,7 +44,8 @@ export interface PopupProps
 	 * rendered as this portal's children (do not pass `children` on the portal
 	 * element; they would be ignored).
 	 *
-	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props.
+	 * When omitted, `Dialog.Popup` uses `Dialog.Portal` with default props,
+	 * rendering the portal in the current document's `<body>`.
 	 */
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
@@ -51,10 +53,15 @@ export interface PopupProps
 	 * Renders the dialog at a preset width (excluding additional padding from
 	 * the viewport edges).
 	 *
+	 * Height is not directly controlled by `size`: for every value except
+	 * `'full'`, the dialog fits its content up to the viewport height
+	 * (minus the viewport inset) and scrolls internally when it overflows.
+	 * `'full'` stretches the dialog to the available viewport height.
+	 *
 	 * - `'small'` — narrow max-width.
 	 * - `'medium'` — moderate max-width.
 	 * - `'large'` — wide max-width.
-	 * - `'stretch'` — no max-width, stretches to fill available space.
+	 * - `'stretch'` — no max-width, stretches to fill available width.
 	 * - `'full'` — stretches to fill available width and height.
 	 *
 	 * @default 'medium'
@@ -69,14 +76,14 @@ export interface ActionProps extends ComponentProps< typeof Button > {
 	children?: ReactNode;
 }
 
-export interface FooterProps extends ComponentProps< 'div' > {
+export interface FooterProps extends ComponentProps< 'footer' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 }
 
-export interface HeaderProps extends ComponentProps< 'div' > {
+export interface HeaderProps extends ComponentProps< 'header' > {
 	/**
 	 * The content to be rendered inside the component.
 	 */
@@ -90,6 +97,13 @@ export interface TitleProps extends ComponentProps< 'h2' > {
 	 *
 	 * When `Dialog.Title` is passed as a render element (e.g. to
 	 * `VisuallyHidden`), children can be provided by the wrapper instead.
+	 */
+	children?: ReactNode;
+}
+
+export interface DescriptionProps extends ComponentProps< 'p' > {
+	/**
+	 * The description content to be rendered inside the component.
 	 */
 	children?: ReactNode;
 }
