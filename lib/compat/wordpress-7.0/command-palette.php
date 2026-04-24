@@ -89,7 +89,7 @@ function gutenberg_add_admin_bar_script() {
 		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
 	);
 	$script  = <<<'JS'
-		(( shortCutLabels ) => {
+		(( shortcutLabels ) => {
 			let userAgent = '';
 			// Assigning agent may error if the HTTP header is blocked at the browser level.
 			try {
@@ -99,7 +99,7 @@ function gutenberg_add_admin_bar_script() {
 				return;
 			}
 			const isAppleOS = /Macintosh|Mac OS X|Mac_PowerPC/i.test( userAgent );
-			const shortcutLabel = isAppleOS ? shortCutLabels.appleOS : shortCutLabels.default;
+			const shortcutLabel = isAppleOS ? shortcutLabels.appleOS : shortcutLabels.default;
 			const commandPaletteNode = document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' );
 			if ( commandPaletteNode ) {
 				commandPaletteNode.textContent = shortcutLabel;
