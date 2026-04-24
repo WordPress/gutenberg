@@ -12,13 +12,9 @@ import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import {
-	VisuallyHidden,
-	Icon,
-	Composite,
-	Spinner,
-} from '@wordpress/components';
+import { Icon, Composite, Spinner } from '@wordpress/components';
 import { search, check } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -267,15 +263,9 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 			setValue={ setSearchValue }
 		>
 			<div className="dataviews-filters__search-widget-filter-combobox__wrapper">
-				<Ariakit.ComboboxLabel
-					render={
-						<VisuallyHidden>
-							{ __( 'Search items' ) }
-						</VisuallyHidden>
-					}
-				>
+				<VisuallyHidden render={ <Ariakit.ComboboxLabel /> }>
 					{ __( 'Search items' ) }
-				</Ariakit.ComboboxLabel>
+				</VisuallyHidden>
 				<Ariakit.Combobox
 					autoSelect="always"
 					placeholder={ __( 'Search' ) }

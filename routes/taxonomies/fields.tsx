@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Notice } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
+import { Badge, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -94,6 +94,14 @@ export const statusField: Field< TaxonomyFormData > = {
 		{ value: 'publish', label: __( 'Active' ) },
 		{ value: 'draft', label: __( 'Inactive' ) },
 	],
+	render: ( { item } ) => {
+		const isActive = item.status === 'publish';
+		return (
+			<Badge intent={ isActive ? 'stable' : 'draft' }>
+				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
+			</Badge>
+		);
+	},
 	enableSorting: false,
 };
 
@@ -114,13 +122,15 @@ export function useSlugField(
 			type: 'text',
 			enableGlobalSearch: true,
 			description: (
-				<Stack direction="column" gap="sm">
+				<Stack direction="column" gap="sm" render={ <span /> }>
 					{ showRenameWarning && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
-							) }
-						</Notice>
+						<Notice.Root intent="warning" render={ <span /> }>
+							<Notice.Description>
+								{ __(
+									'Changing the key renames the taxonomy — existing terms may become inaccessible until a migration updates the database.'
+								) }
+							</Notice.Description>
+						</Notice.Root>
 					) }
 					<span>
 						{ __(
@@ -131,7 +141,7 @@ export function useSlugField(
 			),
 			isValid: {
 				required: true,
-				pattern: '^[a-z0-9_-]{1,32}$',
+				pattern: '^[a-z0-9_\\-]{1,32}$',
 				custom: async ( value: TaxonomyFormData ) => {
 					const slug = value.slug;
 					if ( originalSlug !== undefined && slug === originalSlug ) {

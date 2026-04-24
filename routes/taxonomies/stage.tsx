@@ -12,9 +12,10 @@ import { __ } from '@wordpress/i18n';
  */
 import AddTaxonomy from './add-taxonomy';
 import {
+	activateAction,
+	deactivateAction,
 	deleteTaxonomyAction,
 	editTaxonomyAction,
-	toggleActiveAction,
 } from './actions';
 import {
 	titleField,
@@ -26,6 +27,7 @@ import {
 } from './fields';
 import { toFormData } from './utils';
 import type { TaxonomyRecord } from './types';
+import './style.scss';
 
 const defaultLayouts = {
 	table: {},
@@ -43,7 +45,12 @@ const DEFAULT_VIEW: View = {
 function TaxonomiesPage() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 	const taxonomyActions = useMemo(
-		() => [ editTaxonomyAction, toggleActiveAction, deleteTaxonomyAction ],
+		() => [
+			editTaxonomyAction,
+			activateAction,
+			deactivateAction,
+			deleteTaxonomyAction,
+		],
 		[]
 	);
 	const slugField = useSlugField();
@@ -91,7 +98,12 @@ function TaxonomiesPage() {
 		[ totalItems, totalPages ]
 	);
 	return (
-		<Page title={ __( 'Taxonomies' ) } actions={ <AddTaxonomy /> }>
+		<Page
+			title={ __( 'Taxonomies' ) }
+			className="taxonomies-page"
+			hasPadding={ false }
+			actions={ <AddTaxonomy /> }
+		>
 			<DataViews
 				data={ data }
 				fields={ fields }
