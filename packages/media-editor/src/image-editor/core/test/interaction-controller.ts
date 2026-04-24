@@ -520,10 +520,10 @@ describe( 'InteractionController', () => {
 			const call = dispatchMock.mock.calls.find(
 				( c ) => c[ 0 ].type === 'SET_PAN'
 			);
-			// ArrowUp decreases y by keyboardStep (0.05 default).
+			// ArrowUp scrolls the viewport up — image moves down, so y increases.
 			expect(
 				( call![ 0 ].payload as { y: number } ).y
-			).toBeLessThanOrEqual( 0 );
+			).toBeGreaterThanOrEqual( 0 );
 		} );
 
 		it( 'dispatches SET_CROP on ArrowDown', () => {
@@ -550,10 +550,10 @@ describe( 'InteractionController', () => {
 			const call = dispatchMock.mock.calls.find(
 				( c ) => c[ 0 ].type === 'SET_PAN'
 			);
-			// ArrowLeft decreases x by keyboardStep.
+			// ArrowLeft scrolls the viewport left — image moves right, so x increases.
 			expect(
 				( call![ 0 ].payload as { x: number } ).x
-			).toBeLessThanOrEqual( 0 );
+			).toBeGreaterThanOrEqual( 0 );
 		} );
 
 		it( 'dispatches SET_CROP on ArrowRight', () => {
@@ -621,6 +621,20 @@ describe( 'InteractionController', () => {
 			} );
 		} );
 
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not rotate when %s is held with r',
+			( modifier ) => {
+				const state = makeState( { rotation: 0 } );
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'r', { [ modifier ]: true } )
+				);
+
+				expect( dispatchMock ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'respects custom keyboardStep (read lazily)', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller, opts } = createController( state, {
@@ -635,10 +649,10 @@ describe( 'InteractionController', () => {
 			const call = dispatchMock.mock.calls.find(
 				( c ) => c[ 0 ].type === 'SET_PAN'
 			);
-			// At zoom=2 with full crop rect, maxX = 0.25.
-			// 0 + 0.1 = 0.1, within bounds.
+			// ArrowRight scrolls the viewport right — image moves left, so x decreases.
+			// 0 - 0.1 = -0.1, within bounds.
 			expect( ( call![ 0 ].payload as { x: number } ).x ).toBeCloseTo(
-				0.1
+				-0.1
 			);
 		} );
 

@@ -786,7 +786,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y - this.keyboardStep,
+							y: currentState.pan.y + this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -805,7 +805,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y + this.keyboardStep,
+							y: currentState.pan.y - this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -823,7 +823,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x - this.keyboardStep,
+							x: currentState.pan.x + this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -842,7 +842,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x + this.keyboardStep,
+							x: currentState.pan.x - this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -883,6 +883,9 @@ export class InteractionController {
 			}
 			case 'r':
 			case 'R': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
 				e.preventDefault();
 				this.options.dispatch( {
 					type: 'SNAP_ROTATE_90',
