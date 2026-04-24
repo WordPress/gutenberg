@@ -54,15 +54,18 @@ import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { buildModifiers } from './build-modifiers';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
-// These are the same fields Core's `edit_media_item` reads from the
-// request body via `prepare_item_for_database` / `alt_text` — forwarding
-// them preserves any staged changes across the attachment-duplicating
-// save.
+// Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
+// — that endpoint's arg schema explicitly whitelists only these fields
+// (title / caption / description / alt_text / post), so forwarding any
+// others would fail REST validation with `rest_invalid_param`. Staged
+// edits to fields outside this list are not forwarded; a follow-up could
+// persist them via a separate `saveEditedEntityRecord` call.
 const METADATA_EDIT_KEYS = [
 	'title',
 	'caption',
 	'description',
 	'alt_text',
+	'post',
 ] as const;
 
 const { Tabs } = unlock( componentsPrivateApis );
