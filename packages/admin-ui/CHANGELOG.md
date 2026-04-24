@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Change default `headingLevel` for the `Page` component's header from `2` to `1`, meaning from `h2` to `h1`. If you need to keep previous behaviour, use `<Page title="Example" headingLevel={ 2 }>`
+-   Change default `headingLevel` for the `Page` component's header from `2` to `1`, meaning from `h2` to `h1`. If you need to keep previous behaviour, use `<Page title="Example" headingLevel={ 2 }>` [#77617](https://github.com/WordPress/gutenberg/pull/77617)
 
 ### New Features
 
