@@ -50,10 +50,7 @@ export const WidgetDashboard = Object.assign(
 		editMode,
 		onEditChange,
 		resolveWidgetModule,
-		columns,
-		minColumnWidth,
-		rowHeight,
-		spacing,
+		grid,
 		children,
 	}: WidgetDashboardProps ) {
 		return (
@@ -65,10 +62,7 @@ export const WidgetDashboard = Object.assign(
 				editMode={ editMode }
 				onEditChange={ onEditChange }
 				resolveWidgetModule={ resolveWidgetModule }
-				columns={ columns }
-				minColumnWidth={ minColumnWidth }
-				rowHeight={ rowHeight }
-				spacing={ spacing }
+				grid={ grid }
 			>
 				{ children ?? <Widgets /> }
 			</WidgetDashboardProvider>

@@ -14,13 +14,22 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetDashboardContextValue,
+	WidgetGridSettings,
 	WidgetInstance,
 	WidgetType,
 } from './types';
 
-const DEFAULT_MIN_COLUMN_WIDTH = 350;
-const DEFAULT_ROW_HEIGHT = 200;
-const DEFAULT_SPACING = 4;
+/*
+ * Defaults for the active grid model. Applied when the consumer omits
+ * `grid` entirely; if `grid` is provided, the consumer's shape passes
+ * through untouched and missing fields fall back to whatever defaults
+ * the grid model itself supplies.
+ */
+const DEFAULT_GRID: WidgetGridSettings = {
+	minColumnWidth: 350,
+	rowHeight: 200,
+	spacing: 4,
+};
 const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 	import( /* webpackIgnore: true */ moduleId );
 
@@ -38,10 +47,7 @@ interface InternalDashboardContextValue {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
-	columns?: number;
-	minColumnWidth: number;
-	rowHeight: number | 'auto';
-	spacing: number;
+	grid: WidgetGridSettings;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -86,10 +92,7 @@ interface ProviderProps {
 	editMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule?: ResolveWidgetModule;
-	columns?: number;
-	minColumnWidth?: number;
-	rowHeight?: number | 'auto';
-	spacing?: number;
+	grid?: WidgetGridSettings;
 	children: ReactNode;
 }
 
@@ -101,10 +104,7 @@ export function WidgetDashboardProvider( {
 	editMode = false,
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
-	columns,
-	minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
-	rowHeight = DEFAULT_ROW_HEIGHT,
-	spacing = DEFAULT_SPACING,
+	grid = DEFAULT_GRID,
 	children,
 }: ProviderProps ) {
 	const value = useMemo< InternalDashboardContextValue >(
@@ -116,10 +116,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
-			columns,
-			minColumnWidth,
-			rowHeight,
-			spacing,
+			grid,
 		} ),
 		[
 			id,
@@ -129,10 +126,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
-			columns,
-			minColumnWidth,
-			rowHeight,
-			spacing,
+			grid,
 		]
 	);
 

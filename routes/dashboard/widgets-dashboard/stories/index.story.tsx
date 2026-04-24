@@ -212,32 +212,17 @@ const meta: Meta< typeof WidgetDashboard > = {
 		widgetTypes,
 		resolveWidgetModule,
 		editMode: false,
-		columns: 6,
-		spacing: 2,
-		rowHeight: 120,
+		grid: { columns: 6, spacing: 2, rowHeight: 120 },
 	},
 	argTypes: {
 		children: { control: false },
 		layout: { control: false },
 		widgetTypes: { control: false },
 		resolveWidgetModule: { control: false },
+		grid: { control: false },
 		onLayoutChange: { action: 'onLayoutChange' },
 		onEditChange: { action: 'onEditChange' },
 		editMode: { control: { type: 'boolean' } },
-		columns: {
-			control: { type: 'number', min: 1, max: 12, step: 1 },
-			description: 'Total columns in fixed mode.',
-		},
-		minColumnWidth: {
-			control: { type: 'number', min: 120, max: 600, step: 10 },
-			description: 'Enables responsive mode when set.',
-		},
-		spacing: {
-			control: { type: 'number', min: 0, max: 8, step: 1 },
-		},
-		rowHeight: {
-			control: { type: 'number', min: 60, max: 400, step: 10 },
-		},
 	},
 	parameters: {
 		layout: 'fullscreen',
@@ -285,7 +270,6 @@ export const Empty: Story = {
 export const Responsive: Story = {
 	args: {
 		layout: defaultLayout,
-		columns: undefined,
-		minColumnWidth: 220,
+		grid: { minColumnWidth: 220, spacing: 2, rowHeight: 120 },
 	},
 };

@@ -55,15 +55,8 @@ export interface WidgetsProps {
  */
 export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 	function Widgets( { className }, ref ) {
-		const {
-			layout,
-			onLayoutChange,
-			editMode,
-			columns,
-			minColumnWidth,
-			rowHeight,
-			spacing,
-		} = useDashboardInternalContext();
+		const { layout, onLayoutChange, editMode, grid } =
+			useDashboardInternalContext();
 
 		const gridLayout = useMemo( () => toGridLayout( layout ), [ layout ] );
 
@@ -80,22 +73,22 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 
 		const sharedProps = {
 			layout: gridLayout,
-			spacing,
-			rowHeight,
+			spacing: grid.spacing,
+			rowHeight: grid.rowHeight,
 			editMode,
 			onChangeLayout: handleLayoutChange,
 		};
 
 		return (
 			<div ref={ ref } className={ clsx( styles.grid, className ) }>
-				{ columns !== undefined ? (
-					<DashboardGrid { ...sharedProps } columns={ columns }>
+				{ grid.columns !== undefined ? (
+					<DashboardGrid { ...sharedProps } columns={ grid.columns }>
 						{ children }
 					</DashboardGrid>
 				) : (
 					<DashboardGrid
 						{ ...sharedProps }
-						minColumnWidth={ minColumnWidth }
+						minColumnWidth={ grid.minColumnWidth }
 					>
 						{ children }
 					</DashboardGrid>

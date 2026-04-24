@@ -20,7 +20,10 @@ import type { ComponentType, ReactNode } from 'react';
  * WordPress dependencies
  */
 import type { Field } from '@wordpress/dataviews';
-import type { DashboardGridLayoutItem } from '@wordpress/grid';
+import type {
+	DashboardGridLayoutItem,
+	DashboardGridProps,
+} from '@wordpress/grid';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -244,6 +247,22 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
+ * Grid-model-derived configuration: column sizing, row sizing and gap. The
+ * shape (including the `columns` ↔ `minColumnWidth` discriminated union) is
+ * inferred from the active grid model — `@wordpress/grid` today, swappable
+ * when alternative models land.
+ *
+ * When alternative grid models (masonry, stack, ...) ship, the type passed
+ * to `WidgetDashboard.grid` becomes a discriminated union keyed by the
+ * model identifier; per-model settings are inferred from the model's own
+ * props.
+ */
+export type WidgetGridSettings = Pick<
+	DashboardGridProps,
+	'columns' | 'minColumnWidth' | 'rowHeight' | 'spacing'
+>;
+
+/**
  * Props for `WidgetDashboard`.
  *
  * Follows the DataViews stateless pattern: the consumer owns layout state,
@@ -291,30 +310,12 @@ export interface WidgetDashboardProps {
 	resolveWidgetModule?: ResolveWidgetModule;
 
 	/**
-	 * Fixed column count. Mutually exclusive with `minColumnWidth`.
+	 * Grid model configuration. Today the engine targets a single packed
+	 * 2D grid model and `grid` follows the shape inferred from
+	 * `DashboardGridProps`. When alternative grid models land, this prop
+	 * becomes a discriminated union keyed by the chosen model.
 	 */
-	columns?: number;
-
-	/**
-	 * Responsive minimum column width in pixels.
-	 *
-	 * @default 350
-	 */
-	minColumnWidth?: number;
-
-	/**
-	 * Row height in pixels, or `'auto'`.
-	 *
-	 * @default 200
-	 */
-	rowHeight?: number | 'auto';
-
-	/**
-	 * Grid gap multiplier (multiplied by 4px).
-	 *
-	 * @default 4
-	 */
-	spacing?: number;
+	grid?: WidgetGridSettings;
 
 	children?: ReactNode;
 }
