@@ -2,8 +2,9 @@
 /**
  * Unit tests for the experimental `{ transform, crop }` edit path.
  *
- * Focuses on the pure validation helper; the full REST pipeline is
- * exercised by manual testing and future integration tests.
+ * Covers the pure validation helper plus a small set of integration checks
+ * that exercise `gutenberg_source_region_process` end-to-end via the REST
+ * dispatcher. Full pipeline coverage is handled by manual testing.
  *
  * @package gutenberg
  */
@@ -12,6 +13,7 @@ require_once __DIR__ . '/../../lib/experimental/source-region-edit.php';
 
 /**
  * @covers ::gutenberg_source_region_validate
+ * @covers ::gutenberg_source_region_process
  */
 class Gutenberg_Source_Region_Edit_Test extends WP_UnitTestCase {
 	public function test_validate_accepts_transform_only() {
@@ -128,6 +130,47 @@ class Gutenberg_Source_Region_Edit_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertWPError( $result );
+	}
+
+	/**
+	 * A payload that represents no change (rotation 0, no flips, crop
+	 * matching the full canvas, or neither transform nor crop) should
+	 * short-circuit with `rest_image_not_edited` instead of writing a
+	 * new file and attachment row.
+	 */
+	public function test_process_rejects_noop_payload() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
+		$test_file  = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment = self::factory()->attachment->create_upload_object( $test_file );
+		$src        = wp_get_attachment_image_url( $attachment, 'full' );
+		$meta       = wp_get_attachment_metadata( $attachment );
+
+		$request = new WP_REST_Request( 'POST', "/wp/v2/media/{$attachment}/edit" );
+		$request->set_header( 'content-type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'src'       => $src,
+					'transform' => array(
+						'rotation' => 0,
+						'flip'     => array(
+							'horizontal' => false,
+							'vertical'   => false,
+						),
+					),
+					'crop'      => array(
+						'x'      => 0,
+						'y'      => 0,
+						'width'  => $meta['width'],
+						'height' => $meta['height'],
+					),
+				)
+			)
+		);
+
+		$response = rest_do_request( $request );
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_image_not_edited', $response->get_data()['code'] );
 	}
 
 	public function test_validate_rejects_bad_output() {

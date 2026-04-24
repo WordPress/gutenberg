@@ -263,7 +263,32 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 	// Normalize to [0, 360) so snap-rotation comparisons and the sign flip
 	// below behave for negative or > 360° inputs.
 	$angle = fmod( fmod( $transform['rotation'], 360 ) + 360, 360 );
-	if ( 0.0 !== $angle ) {
+
+	// No-op guard: no rotation, no flips, and either no crop or a crop that
+	// covers the full source canvas. Mirrors Core's `rest_image_not_edited`
+	// so a save with nothing to apply doesn't spawn a duplicate file and
+	// attachment row. Only checked when rotation is 0° — a non-zero angle
+	// is already a real edit regardless of the crop rect.
+	$has_rotation = 0.0 !== $angle;
+	$has_flip     = $transform['flip']['horizontal'] || $transform['flip']['vertical'];
+	$has_crop     = false;
+	if ( null !== $crop ) {
+		$src_size = $image_editor->get_size();
+		$has_crop = 0 !== $crop['x']
+			|| 0 !== $crop['y']
+			|| $crop['width'] !== (int) $src_size['width']
+			|| $crop['height'] !== (int) $src_size['height'];
+	}
+
+	if ( ! $has_rotation && ! $has_flip && ! $has_crop ) {
+		return new WP_Error(
+			'rest_image_not_edited',
+			__( 'The image was not edited. Edit the image before applying the changes.', 'default' ),
+			array( 'status' => 400 )
+		);
+	}
+
+	if ( $has_rotation ) {
 		// Core's WP_Image_Editor::rotate is counterclockwise-positive;
 		// the wire contract is clockwise-positive (screen convention).
 		$result = $image_editor->rotate( 0 - $angle );
@@ -276,7 +301,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 		}
 	}
 
-	if ( $transform['flip']['horizontal'] || $transform['flip']['vertical'] ) {
+	if ( $has_flip ) {
 		// WP_Image_Editor::flip( $vertical, $horizontal ) — first arg
 		// flips along the horizontal axis (top/bottom), second along
 		// the vertical axis (left/right).
