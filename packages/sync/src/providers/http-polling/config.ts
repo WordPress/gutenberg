@@ -24,7 +24,13 @@ export const DISCONNECT_DIALOG_RETRY_MS = 30000;
 // until the next automatic retry attempt.
 export const MANUAL_RETRY_INTERVAL_MS = 15000;
 
-export const MAX_UPDATE_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
+const MAX_ENCODED_UPDATE_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
+
+// The server validates the base64-encoded `data` string against a 1 MB
+// maxLength. Base64 encodes three raw bytes as four characters, so cap the raw
+// Yjs update size to the largest value that cannot exceed the server limit.
+export const MAX_UPDATE_SIZE_IN_BYTES =
+	Math.floor( MAX_ENCODED_UPDATE_SIZE_IN_BYTES / 4 ) * 3;
 
 // Corresponds with server-side
 // WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST.
