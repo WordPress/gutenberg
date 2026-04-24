@@ -11,6 +11,7 @@ import {
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
+import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
 import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
@@ -71,13 +72,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 					>
 						<div
 							className={ clsx(
-								dialogStyles.header,
-								stickyHeader && dialogStyles.headerSticky
+								overlayChromeStyles.header,
+								stickyHeader &&
+									overlayChromeStyles[ 'header-sticky' ]
 							) }
 						>
 							<Text
 								variant="heading-xl"
 								render={ <_AlertDialog.Title /> }
+								className={ overlayChromeStyles.title }
 							>
 								{ title }
 							</Text>
@@ -95,8 +98,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							direction="column"
 							gap="md"
 							className={ clsx(
-								dialogStyles.footerChrome,
-								stickyFooter && dialogStyles.footerSticky
+								overlayChromeStyles[ 'footer-chrome' ],
+								stickyFooter &&
+									overlayChromeStyles[ 'footer-sticky' ]
 							) }
 						>
 							<Stack

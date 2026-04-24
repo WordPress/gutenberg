@@ -23,7 +23,7 @@ const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
 		props: mergeProps< 'header' >( props, {
 			className: clsx(
 				styles.header,
-				sticky && styles.headerSticky,
+				sticky && styles[ 'header-sticky' ],
 				className
 			),
 		} ),

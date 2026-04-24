@@ -1,0 +1,175 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	/*
+	 * Shared "chrome" primitives for overlay popups (Dialog, AlertDialog,
+	 * Drawer). A chrome paints a full-width background strip and a 1px
+	 * transparent separator border that colors in when the scroll container
+	 * reports overflow in that direction via `data-wp-ui-overlay-scrolled-*`.
+	 *
+	 * Horizontal bleed: chromes extend across the scroll container's
+	 * `padding-inline` (`padding-2xl`) so the separator spans edge-to-edge.
+	 * The negative `margin-inline` claims that padding; matching
+	 * `padding-inline` restores content alignment with non-chrome siblings.
+	 *
+	 * A border (not `box-shadow`) is used so the separator stays visible in
+	 * `forced-colors` / Windows High Contrast mode, where box-shadow is
+	 * suppressed but borders render in system colors. `gap-lg - 1px`
+	 * compensates for the border so the total block space around each
+	 * chrome matches the tokenized `gap-lg` regardless of whether the
+	 * separator is colored.
+	 */
+
+	.header-chrome {
+		padding-block-end: calc(var(--wpds-dimension-gap-lg) - 1px);
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-block-end: 1px solid transparent;
+	}
+
+	.footer-chrome {
+		padding-block-start: calc(var(--wpds-dimension-gap-lg) - 1px);
+		margin-inline: calc(-1 * var(--wpds-dimension-padding-2xl));
+		padding-inline: var(--wpds-dimension-padding-2xl);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-block-start: 1px solid transparent;
+	}
+
+	/*
+	 * `.header` / `.footer` add the default flex-row layout on top of the
+	 * chrome. `min-height` on `.header` keeps the header footprint stable
+	 * whether or not a close icon is rendered (notably the AlertDialog
+	 * case, which has no close button).
+	 */
+	.header {
+		composes: header-chrome;
+		display: flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		/* TODO: refactor to a DS element size token when available. */
+		min-height: 32px;
+	}
+
+	.footer {
+		composes: footer-chrome;
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+	}
+
+	/*
+	 * `.header-sticky` / `.footer-sticky` are opt-in. They pin the chrome to
+	 * the start/end of the scroll container and raise its stacking so it
+	 * covers scrolling content beneath. The scroll-container rules below
+	 * handle padding-yield and separator coloring.
+	 *
+	 * `z-index: 2` leaves room for a single consumer layer to stack beneath
+	 * the chrome without covering the separator border.
+	 */
+	.header-sticky {
+		position: sticky;
+		top: 0;
+		z-index: 2;
+	}
+
+	.footer-sticky {
+		position: sticky;
+		bottom: 0;
+		z-index: 2;
+	}
+
+	/*
+	 * Overlay heading defaults: anchor the title to the inline start and
+	 * set the neutral text color explicitly. `--_gcd-heading-color` and
+	 * `--_gcd-heading-margin` defend against the heading-reset rules in
+	 * `global-css-defense.module.css`, which would otherwise take over a
+	 * `<h2>` rendered via `Text`.
+	 */
+	.title {
+		color: var(--wpds-color-fg-content-neutral);
+		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
+
+		margin-inline-end: auto;
+		--_gcd-heading-margin: 0 auto 0 0;
+
+		&:dir(rtl) {
+			--_gcd-heading-margin: 0 0 0 auto;
+		}
+	}
+
+	/*
+	 * Scroll-container rules. The `data-wp-ui-overlay-scroll-container`
+	 * attribute is set by `useOverlayScrollStateAttributes` on whichever
+	 * element it attaches to (Dialog/AlertDialog's `.popup`, Drawer's
+	 * `.content`). All behavior below — padding-yield, separator coloring,
+	 * scroll-padding — is keyed off this attribute rather than a specific
+	 * class, so it works uniformly regardless of which element scrolls.
+	 */
+
+	/*
+	 * Yield-and-reclaim: when sticky chrome is the first/last child of the
+	 * scroll container, clear that side's block padding on the container so
+	 * the chrome's border-box sits flush with the container's inner edge.
+	 * The chrome reclaims the same amount as its own inner padding below,
+	 * so its content stays aligned with non-sticky siblings.
+	 */
+	[data-wp-ui-overlay-scroll-container]:has(.header-sticky:first-child) {
+		padding-block-start: 0;
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.footer-sticky:last-child) {
+		padding-block-end: 0;
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.header-sticky:first-child) .header-sticky {
+		padding-block-start: var(--wpds-dimension-padding-2xl);
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.footer-sticky:last-child) .footer-sticky {
+		padding-block-end: var(--wpds-dimension-padding-2xl);
+	}
+
+	/*
+	 * Data-attribute driven separator color: the hook toggles
+	 * `data-wp-ui-overlay-scrolled-from-top` / `-from-bottom` on the scroll
+	 * container as the user scrolls, avoiding a React re-render on every
+	 * scroll frame.
+	 */
+	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-top] .header-sticky {
+		border-block-end-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	[data-wp-ui-overlay-scroll-container][data-wp-ui-overlay-scrolled-from-bottom] .footer-sticky {
+		border-block-start-color: var(--wpds-color-stroke-surface-neutral);
+	}
+
+	/*
+	 * Reserve scroll-padding so Tab / `scrollIntoView` keeps focused
+	 * descendants clear of pinned chrome. `6rem` is a pragmatic upper bound
+	 * that comfortably covers a single heading plus chrome padding at the
+	 * default font size; a measured approach can replace this if a consumer
+	 * ever runs into an under-cover case.
+	 *
+	 * Exception: while focus is inside the sticky chrome itself, drop the
+	 * padding so the browser's focus-scroll doesn't try to move the already-
+	 * pinned chrome out of the way, which would scroll the content
+	 * unnecessarily.
+	 */
+	[data-wp-ui-overlay-scroll-container]:has(.header-sticky) {
+		scroll-padding-block-start: 6rem;
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.header-sticky:focus-within) {
+		scroll-padding-block-start: 0;
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.footer-sticky) {
+		scroll-padding-block-end: 6rem;
+	}
+
+	[data-wp-ui-overlay-scroll-container]:has(.footer-sticky:focus-within) {
+		scroll-padding-block-end: 0;
+	}
+}

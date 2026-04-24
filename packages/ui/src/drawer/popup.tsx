@@ -44,9 +44,18 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
+	/*
+	 * Scroll ownership lives on `_Drawer.Content`, not `_Drawer.Popup`:
+	 * the content element carries the inner padding and safe-area insets,
+	 * so hosting the scroll there lets the shared overlay-chrome CSS
+	 * target a single element for sticky-chrome yield/reclaim and
+	 * separator coloring. Base UI's swipe-dismiss-on-scroll-edge logic
+	 * auto-discovers the scrollable element from the touch target's
+	 * ancestors, so this move is transparent to it.
+	 */
 	const { ref: scrollStateRef, onScroll } =
 		useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
-	const mergedRef = useMergeRefs( [ ref, popupRef, scrollStateRef ] );
+	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDrawerModal();
 
 	const portalChildren = (
@@ -87,9 +96,12 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 						initialFocus={ resolvedInitialFocus }
 						finalFocus={ finalFocus }
 						{ ...props }
-						onScroll={ onScroll }
 					>
-						<_Drawer.Content className={ styles.content }>
+						<_Drawer.Content
+							ref={ scrollStateRef }
+							className={ styles.content }
+							onScroll={ onScroll }
+						>
 							<DrawerValidationProvider>
 								{ children }
 							</DrawerValidationProvider>

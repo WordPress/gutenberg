@@ -23,7 +23,7 @@ const Footer = forwardRef< HTMLElement, FooterProps >( function DrawerFooter(
 		props: mergeProps< 'footer' >( props, {
 			className: clsx(
 				styles.footer,
-				sticky && styles.footerSticky,
+				sticky && styles[ 'footer-sticky' ],
 				className
 			),
 		} ),

@@ -1,6 +1,7 @@
 import type { UIEvent, UIEventHandler } from 'react';
 import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 
+const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
 const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-overlay-scrolled-from-top';
 const SCROLLED_FROM_BOTTOM_ATTR = 'data-wp-ui-overlay-scrolled-from-bottom';
 
@@ -23,9 +24,12 @@ function updateScrollAttributes( el: HTMLElement ) {
 /**
  * Keeps `data-wp-ui-overlay-scrolled-from-top` and
  * `data-wp-ui-overlay-scrolled-from-bottom` attributes in sync with a
- * scrollable overlay element's scroll position. CSS descendant selectors
- * (e.g. sticky header/footer chrome) read these attributes to toggle their
- * separator border without forcing a React re-render on every scroll frame.
+ * scrollable overlay element's scroll position, and marks the element with
+ * `data-wp-ui-overlay-scroll-container` so shared CSS (see
+ * `overlay-chrome.module.css`) can target it without coupling to a specific
+ * class name. Descendant selectors (e.g. sticky header/footer chrome) read
+ * these attributes to toggle their separator border without forcing a React
+ * re-render on every scroll frame.
  *
  * Returns a callback `ref` that the caller must attach to the scroll
  * container, and an `onScroll` handler to wire up to the same element. A
@@ -67,10 +71,13 @@ export function useOverlayScrollStateAttributes<
 			return;
 		}
 
+		node.setAttribute( SCROLL_CONTAINER_ATTR, '' );
 		updateScrollAttributes( node );
 
 		if ( typeof ResizeObserver === 'undefined' ) {
-			return;
+			return () => {
+				node.removeAttribute( SCROLL_CONTAINER_ATTR );
+			};
 		}
 
 		const resizeObserver = new ResizeObserver( () => {
@@ -104,6 +111,7 @@ export function useOverlayScrollStateAttributes<
 		return () => {
 			resizeObserver.disconnect();
 			mutationObserver?.disconnect();
+			node.removeAttribute( SCROLL_CONTAINER_ATTR );
 		};
 	}, [ node ] );
 
