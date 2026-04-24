@@ -17,6 +17,15 @@
 	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
+@media (prefers-reduced-motion: reduce) {
+	.item-content {
+		transition: none;
+	}
+	.is-dragging .item-content {
+		transform: none;
+	}
+}
+
 .preview-overlay {
 	position: absolute;
 	top: 0;
@@ -25,4 +34,10 @@
 	z-index: 1;
 	border: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
 	background: transparent;
+}
+
+@media (forced-colors: active) {
+	.preview-overlay {
+		border-color: Highlight;
+	}
 }
