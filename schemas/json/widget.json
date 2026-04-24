@@ -1,0 +1,196 @@
+{
+	"title": "JSON schema for WordPress widgets",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"definitions": {
+		"//": {
+			"reference": "https://developer.wordpress.org/block-editor/reference-guides/widgets/"
+		},
+		"field": {
+			"description": "A declarative field used by the widget. The dashboard renders a control for each field automatically.",
+			"type": "object",
+			"properties": {
+				"name": {
+					"description": "The unique machine-readable identifier for the field. Used as the key when reading and writing the widget's saved data.",
+					"type": "string",
+					"pattern": "^[a-zA-Z][a-zA-Z0-9_]*$"
+				},
+				"type": {
+					"description": "The field type, which determines what control is rendered in the widget form.",
+					"type": "string",
+					"enum": [
+						"text",
+						"textarea",
+						"number",
+						"boolean",
+						"url",
+						"email",
+						"color",
+						"range",
+						"select",
+						"radio",
+						"media"
+					]
+				},
+				"label": {
+					"description": "A human-readable label shown above the control.",
+					"type": "string"
+				},
+				"description": {
+					"description": "Optional help text shown below the control.",
+					"type": "string"
+				},
+				"default": {
+					"description": "The default value for the field used when no saved value is present."
+				},
+				"options": {
+					"description": "An array of choices for `select` and `radio` field types.",
+					"type": "array",
+					"items": {
+						"type": "object",
+						"properties": {
+							"label": {
+								"description": "The human-readable text shown for this option.",
+								"type": "string"
+							},
+							"value": {
+								"description": "The value stored when this option is selected.",
+								"oneOf": [
+									{ "type": "string" },
+									{ "type": "number" },
+									{ "type": "boolean" }
+								]
+							}
+						},
+						"required": [ "label", "value" ],
+						"additionalProperties": false
+					}
+				},
+				"multiple": {
+					"description": "Whether more than one option may be chosen at once. Applicable to the `select` type only.",
+					"type": "boolean",
+					"default": false
+				},
+				"min": {
+					"description": "The minimum allowed value. Applicable to `number` and `range` types.",
+					"type": "number"
+				},
+				"max": {
+					"description": "The maximum allowed value. Applicable to `number` and `range` types.",
+					"type": "number"
+				},
+				"step": {
+					"description": "The increment step between valid values. Applicable to `number` and `range` types.",
+					"type": "number"
+				}
+			},
+			"required": [ "name", "type", "label" ],
+			"additionalProperties": false
+		}
+	},
+	"type": "object",
+	"properties": {
+		"$schema": {
+			"type": "string"
+		},
+		"apiVersion": {
+			"description": "The version of the Widget API used by the widget.",
+			"type": "integer"
+		},
+		"name": {
+			"description": "A unique string that identifies the widget type. Names must be structured as `namespace/widget-name`, where namespace is the name of your plugin or theme.",
+			"type": "string",
+			"pattern": "^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$"
+		},
+		"__experimental": {
+			"description": "The name of the experiment this widget is a part of, or boolean true if there is no specific experiment name.",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "boolean"
+				}
+			]
+		},
+		"title": {
+			"description": "The display title for your widget, which can be translated with our translation functions. The widget inserter will show this name.",
+			"type": "string"
+		},
+		"category": {
+			"description": "Widgets are grouped into categories to help users browse and discover them.\nCore provided categories are: dashboard\n\nPlugins and Themes can also register custom widget categories.",
+			"anyOf": [
+				{
+					"type": "string"
+				},
+				{
+					"type": "string",
+					"enum": [ "dashboard" ]
+				}
+			]
+		},
+		"icon": {
+			"description": "An icon property should be specified to make it easier to identify a widget. These can be any of WordPress' Dashicons (slug serving also as a fallback in non-js contexts).",
+			"type": "string"
+		},
+		"description": {
+			"description": "A short description for your widget, which can be translated with our translation functions. This will be shown in the widget inspector.",
+			"type": "string"
+		},
+		"keywords": {
+			"description": "Optional aliases that help users discover the widget while searching. For example, a widget could also want to be discovered by an alternative term. You can do so by providing an array of terms (which are translated).",
+			"type": "array",
+			"items": {
+				"type": "string"
+			}
+		},
+		"version": {
+			"description": "The current version number of the widget, such as 1.0 or 1.0.3. It's similar to how plugins are versioned. This field might be used with widget assets to control cache invalidation.",
+			"type": "string"
+		},
+		"textdomain": {
+			"description": "The gettext text domain of the plugin/widget. More information can be found in the Text Domain section of the How to Internationalize your Plugin page.\n\nhttps://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/",
+			"type": "string"
+		},
+		"attributes": {
+			"description": "A declarative list of fields used by the widget. The dashboard renders controls for each field automatically, without each widget needing to wire its own form.\n\nThis is distinct from block attributes: widget attributes are an ordered array of Field descriptors, not a keyed object of block-attribute sources.",
+			"type": "array",
+			"items": {
+				"$ref": "#/definitions/field"
+			}
+		},
+		"styles": {
+			"description": "Widget styles can be used to provide alternative visual styles to a widget. It works by adding a class name to the widget's wrapper. Using CSS, a theme developer can target the class name for the widget style if it is selected.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"label": {
+						"type": "string"
+					},
+					"isDefault": {
+						"type": "boolean",
+						"default": false
+					}
+				},
+				"required": [ "name", "label" ],
+				"additionalProperties": false
+			}
+		},
+		"example": {
+			"description": "Provides structured example data for the widget. This data is used to construct a preview for the widget to be shown in the Inspector Help Panel.",
+			"type": "object",
+			"properties": {
+				"attributes": {
+					"description": "Set the attribute values for the widget example.",
+					"type": "object"
+				}
+			},
+			"additionalProperties": false
+		}
+	},
+	"required": [ "apiVersion", "name", "title" ],
+	"additionalProperties": false
+}

@@ -1,6 +1,6 @@
 # Schemas
 
-The collection of schemas used in WordPress, including the `theme.json`, `block.json`, `font-collection.json`, and `wp-env.json` schemas.
+The collection of schemas used in WordPress, including the `theme.json`, `block.json`, `font-collection.json`, `wp-env.json`, and `widget.json` schemas.
 
 JSON schemas are used by code editors to offer tooltips, autocomplete, and validation.
 
@@ -37,6 +37,14 @@ Or in your `.wp-env.json`:
 ```json
 {
 	"$schema": "https://schemas.wp.org/trunk/wp-env.json"
+}
+```
+
+Or in your `widget.json`:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/widget.json"
 }
 ```
 
@@ -77,6 +85,14 @@ To allow this you will need to:
 ```json
 {
 	"$schema": "file://{{FULL_FILE_PATH}}/schemas/json/font-collection.json"
+}
+```
+
+-   update your widget's `widget.json` to include:
+
+```json
+{
+	"$schema": "file://{{FULL_FILE_PATH}}/schemas/json/widget.json"
 }
 ```
 
