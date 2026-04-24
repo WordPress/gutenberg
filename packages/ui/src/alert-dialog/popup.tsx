@@ -10,6 +10,7 @@ import {
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
+import focusStyles from '../utils/css/focus.module.css';
 import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
 import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import { unlock } from '../lock-unlock';
@@ -129,7 +130,10 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						{ stickyHeader && headerElement }
 						<div
 							ref={ scrollStateRef }
-							className={ overlayChromeStyles.content }
+							className={ clsx(
+								overlayChromeStyles.content,
+								focusStyles[ 'outset-ring--focus-visible' ]
+							) }
 							onScroll={ onScroll }
 						>
 							{ ! stickyHeader && headerElement }

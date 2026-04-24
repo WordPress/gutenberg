@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
+import focusStyles from '../utils/css/focus.module.css';
 import styles from './style.module.css';
 import type { ContentProps } from './types';
 
@@ -30,7 +31,11 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 			render,
 			ref: mergedRef,
 			props: mergeProps< 'div' >( props, {
-				className: clsx( styles.content, className ),
+				className: clsx(
+					styles.content,
+					focusStyles[ 'outset-ring--focus-visible' ],
+					className
+				),
 				onScroll: scrollStateOnScroll,
 			} ),
 		} );
