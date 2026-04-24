@@ -270,17 +270,17 @@ export const Responsive: Story = {
 };
 
 /**
- * A `fillWidth` item expands to cover the remaining columns in its
- * row. Mix `fillWidth` with fixed-width items on either side to
- * build sidebar-like layouts that adapt to the column count.
+ * A `width: 'fill'` item expands to cover the remaining columns in
+ * its row. Mix it with fixed-width items on either side to build
+ * sidebar-like layouts that adapt to the column count.
  */
 export const FillWidth: Story = {
 	args: {
 		layout: [
 			{ key: 'left', width: 1 },
-			{ key: 'fill', fillWidth: true },
+			{ key: 'fill', width: 'fill' },
 			{ key: 'right', width: 2 },
-			{ key: 'solo', fillWidth: true },
+			{ key: 'solo', width: 'fill' },
 		],
 		columns: 6,
 		children: [
@@ -288,20 +288,20 @@ export const FillWidth: Story = {
 				width: 1
 			</Tile>,
 			<Tile key="fill" tone="info">
-				fillWidth
+				width: &quot;fill&quot;
 			</Tile>,
 			<Tile key="right" tone="success">
 				width: 2
 			</Tile>,
 			<Tile key="solo" tone="warning">
-				fillWidth (alone in row)
+				width: &quot;fill&quot; (alone in row)
 			</Tile>,
 		],
 	},
 };
 
 /**
- * A `fullWidth` item spans every column (`grid-column: 1 / -1`),
+ * A `width: 'full'` item spans every column (`grid-column: 1 / -1`),
  * forcing a row break around it. Useful for dividers, hero banners,
  * or embedded content that should always take the full width.
  */
@@ -310,7 +310,7 @@ export const FullWidth: Story = {
 		layout: [
 			{ key: 'a', width: 2 },
 			{ key: 'b', width: 4 },
-			{ key: 'hero', fullWidth: true, height: 1 },
+			{ key: 'hero', width: 'full', height: 1 },
 			{ key: 'c', width: 3 },
 			{ key: 'd', width: 3 },
 		],
@@ -323,7 +323,7 @@ export const FullWidth: Story = {
 				width: 4
 			</Tile>,
 			<Tile key="hero" tone="success">
-				fullWidth
+				width: &quot;full&quot;
 			</Tile>,
 			<Tile key="c" tone="warning">
 				width: 3
@@ -391,20 +391,20 @@ export const EditMode: Story = {
 			label: string;
 		} )[] = [
 			{
-				key: 'fill',
-				fillWidth: true,
-				height: 1,
-				order: 1,
-				tone: 'info',
-				label: 'fillWidth — resize me',
-			},
-			{
 				key: 'fixed-1',
 				width: 1,
 				height: 1,
-				order: 2,
+				order: 1,
 				tone: 'success',
 				label: 'width: 1',
+			},
+			{
+				key: 'fill',
+				width: 'fill',
+				height: 1,
+				order: 2,
+				tone: 'info',
+				label: 'width: "fill" — resize me',
 			},
 			{
 				key: 'fixed-2',
@@ -416,11 +416,11 @@ export const EditMode: Story = {
 			},
 			{
 				key: 'full',
-				fullWidth: true,
+				width: 'full',
 				height: 1,
 				order: 4,
 				tone: 'neutral',
-				label: 'fullWidth — resize me',
+				label: 'width: "full" — resize me',
 			},
 			{
 				key: 'fixed-3',
@@ -469,8 +469,8 @@ export const EditMode: Story = {
 					tile.key === key
 						? {
 								...tile,
-								fillWidth: tile.fillWidth ? undefined : true,
-								fullWidth: undefined,
+								width:
+									tile.width === 'fill' ? undefined : 'fill',
 						  }
 						: tile
 				)
@@ -483,8 +483,8 @@ export const EditMode: Story = {
 					tile.key === key
 						? {
 								...tile,
-								fullWidth: tile.fullWidth ? undefined : true,
-								fillWidth: undefined,
+								width:
+									tile.width === 'full' ? undefined : 'full',
 						  }
 						: tile
 				)
@@ -504,8 +504,8 @@ export const EditMode: Story = {
 							tone={ tile.tone }
 							actionableArea={
 								<TileActions
-									isFill={ !! tile.fillWidth }
-									isFull={ !! tile.fullWidth }
+									isFill={ tile.width === 'fill' }
+									isFull={ tile.width === 'full' }
 									onToggleFill={ () =>
 										toggleFill( tile.key )
 									}

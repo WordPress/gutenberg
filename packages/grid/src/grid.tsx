@@ -151,7 +151,7 @@ export function DashboardGrid( {
 		[ activeLayout ]
 	);
 
-	// Resolve fillWidth items to concrete column spans.
+	// Resolve `width: 'fill'` items to concrete column spans.
 	const resolvedItemMap = useMemo( () => {
 		const fillWidths = resolveFillWidths(
 			items,
@@ -276,16 +276,18 @@ export function DashboardGrid( {
 				if ( item.key === id ) {
 					const resolvedItem = resolvedItemMap.get( id );
 					/*
-					 * When the tile uses `fillWidth` or `fullWidth`, the
-					 * resize starts from the currently rendered column
-					 * span and drops the flag, converting to a concrete
-					 * width.
+					 * When the tile uses `'fill'` or `'full'`, resize
+					 * starts from the currently rendered column span
+					 * and converts to a concrete numeric width.
 					 */
 					let baseWidth: number;
-					if ( item.fullWidth ) {
+					if ( item.width === 'full' ) {
 						baseWidth = effectiveColumns;
-					} else if ( item.fillWidth ) {
-						baseWidth = resolvedItem?.width ?? item.width ?? 1;
+					} else if ( item.width === 'fill' ) {
+						baseWidth =
+							typeof resolvedItem?.width === 'number'
+								? resolvedItem.width
+								: 1;
 					} else {
 						baseWidth = item.width ?? 1;
 					}
@@ -302,9 +304,7 @@ export function DashboardGrid( {
 							1,
 							( item.height ?? 1 ) + relativeDelta.height
 						),
-						fillWidth: undefined,
-						fullWidth: undefined,
-					} as DashboardGridLayoutItem;
+					};
 				}
 				return item;
 			} );
@@ -328,7 +328,7 @@ export function DashboardGrid( {
 			 * Strategy is intentionally a no-op: the visual reorder is
 			 * driven by `temporaryLayout` + CSS Grid re-render, not by
 			 * dnd-kit's built-in transforms. This keeps resize, reorder,
-			 * and fillWidth resolution on a single code path.
+			 * and fill resolution on a single code path.
 			 */ }
 			<SortableContext items={ items } strategy={ () => null }>
 				<div

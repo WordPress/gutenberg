@@ -4,19 +4,18 @@
 import type { DashboardGridLayoutItem } from './types';
 
 /**
- * Resolves `fillWidth` items by computing how many columns they should span.
- * Simulates CSS Grid row packing to determine remaining space in each row,
- * then assigns that space to `fillWidth` items.
+ * Resolves items with `width: 'fill'` by computing how many columns they
+ * should span. Simulates CSS Grid row packing to determine remaining space
+ * in each row, then assigns that space to fill items.
  *
- * Complexity: O(n). The inner look-ahead breaks at the next `fillWidth`
- * or `fullWidth` item, so the fixed items between two fills are scanned
- * exactly once — each fixed item is visited by at most one fill's
- * look-ahead.
+ * Complexity: O(n). The inner look-ahead breaks at the next fill or full
+ * item, so the fixed items between two fills are scanned exactly once —
+ * each fixed item is visited by at most one fill's look-ahead.
  *
  * @param sortedKeys - Item keys in display order.
  * @param layoutMap  - Map of key to DashboardGridLayoutItem.
  * @param maxColumns - Total columns in the grid.
- * @return Map of fillWidth item keys to their resolved column spans.
+ * @return Map of fill item keys to their resolved column spans.
  */
 export function resolveFillWidths(
 	sortedKeys: string[],
@@ -30,18 +29,21 @@ export function resolveFillWidths(
 	// This avoids repeated Map.get() and Math.min() calls in the hot loops.
 	const items = new Array< DashboardGridLayoutItem | undefined >( n );
 	const widths = new Array< number >( n );
-	let hasFillWidth = false;
+	let hasFill = false;
 
 	for ( let i = 0; i < n; i++ ) {
 		const item = layoutMap.get( sortedKeys[ i ] );
 		items[ i ] = item;
-		widths[ i ] = item ? Math.min( item.width ?? 1, maxColumns ) : 1;
-		if ( item?.fillWidth ) {
-			hasFillWidth = true;
+		widths[ i ] =
+			item && typeof item.width === 'number'
+				? Math.min( item.width, maxColumns )
+				: 1;
+		if ( item?.width === 'fill' ) {
+			hasFill = true;
 		}
 	}
 
-	if ( ! hasFillWidth ) {
+	if ( ! hasFill ) {
 		return resolved;
 	}
 
@@ -53,18 +55,22 @@ export function resolveFillWidths(
 			continue;
 		}
 
-		if ( item.fullWidth ) {
+		if ( item.width === 'full' ) {
 			currentCol = 0;
 			continue;
 		}
 
-		if ( item.fillWidth ) {
+		if ( item.width === 'fill' ) {
 			// Look ahead: reserve columns for subsequent
 			// non-fill items that fit in this row.
 			let reserved = 0;
 			for ( let j = i + 1; j < n; j++ ) {
 				const next = items[ j ];
-				if ( ! next || next.fullWidth || next.fillWidth ) {
+				if (
+					! next ||
+					next.width === 'full' ||
+					next.width === 'fill'
+				) {
 					break;
 				}
 				const nextW = widths[ j ];

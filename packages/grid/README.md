@@ -51,8 +51,8 @@ import { DashboardGrid } from '@wordpress/grid';
 const layout = [
 	{ key: 'a', width: 2, height: 2 },
 	{ key: 'b', width: 4, height: 1 },
-	{ key: 'c', fillWidth: true, height: 1 },
-	{ key: 'd', fullWidth: true, height: 1 },
+	{ key: 'c', width: 'fill', height: 1 },
+	{ key: 'd', width: 'full', height: 1 },
 ];
 
 function Dashboard() {
@@ -82,17 +82,20 @@ array. Children without a matching layout entry are ignored.
 
 ```ts
 interface DashboardGridLayoutItem {
-	key: string;      // matches child key
-	width?: number;   // columns to span
-	height?: number;  // rows to span
-	order?: number;   // lower values render first (responsive mode)
-	fullWidth?: boolean; // spans all columns (grid-column: 1 / -1)
-	fillWidth?: boolean; // fills remaining columns in the row
+	key: string;                       // matches child key
+	width?: number | 'fill' | 'full';  // column span (see below)
+	height?: number;                   // rows to span
+	order?: number;                    // lower values render first (responsive mode)
 }
 ```
 
-`fullWidth` and `fillWidth` are mutually exclusive. `fillWidth` is
-resolved per-row against the remaining free space.
+`width` is a discriminated value:
+
+- `number` — span that many columns (clamped to the grid's column count).
+- `'fill'` — fill the remaining columns in the current row.
+- `'full'` — span every column (`grid-column: 1 / -1`), forcing a row break.
+
+`'fill'` is resolved per-row against the remaining free space.
 
 ## Props
 

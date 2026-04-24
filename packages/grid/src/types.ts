@@ -1,16 +1,22 @@
 /**
- * Base properties shared by all dashboard grid layout items.
+ * Dashboard grid layout item definition.
+ *
+ * `width` accepts either a numeric column span or a discriminated string:
+ * - `number` spans that many columns (clamped to the grid's column count).
+ * - `'fill'` spans the remaining columns in the current row.
+ * - `'full'` spans all columns (`grid-column: 1 / -1`).
  */
-interface DashboardGridLayoutItemBase {
+export type DashboardGridLayoutItem = {
 	/**
 	 * Unique key that matches a child component key.
 	 */
 	key: string;
 
 	/**
-	 * Number of columns this item spans.
+	 * Number of columns this item spans, or a string discriminator
+	 * (`'fill'` or `'full'`).
 	 */
-	width?: number;
+	width?: number | 'fill' | 'full';
 
 	/**
 	 * Number of rows this item spans.
@@ -21,24 +27,7 @@ interface DashboardGridLayoutItemBase {
 	 * Optional order value for responsive mode (lower values displayed first)
 	 */
 	order?: number;
-}
-
-/**
- * Dashboard grid layout item definition.
- *
- * `fullWidth` and `fillWidth` are mutually exclusive:
- * - `fullWidth` spans all columns (`grid-column: 1 / -1`).
- * - `fillWidth` spans the remaining columns in the current row.
- */
-export type DashboardGridLayoutItem =
-	| ( DashboardGridLayoutItemBase & {
-			fullWidth?: false | undefined;
-			fillWidth?: boolean;
-	  } )
-	| ( DashboardGridLayoutItemBase & {
-			fullWidth: true;
-			fillWidth?: false | undefined;
-	  } );
+};
 
 /**
  * Props shared by fixed and responsive DashboardGrid variants.

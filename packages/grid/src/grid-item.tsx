@@ -99,9 +99,12 @@ export function GridItem( {
 		transform: CSS.Translate.toString( transform ),
 		transition,
 		gridColumnEnd: `span ${
-			item.fullWidth
+			item.width === 'full'
 				? maxColumns
-				: Math.min( item.width ?? 1, maxColumns )
+				: Math.min(
+						typeof item.width === 'number' ? item.width : 1,
+						maxColumns
+				  )
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
 		cursor: disabled ? 'default' : dragCursor,
