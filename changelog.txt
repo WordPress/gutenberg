@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 23.0.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Guidelines
+- Drop default_term from wp_guideline_type taxonomy. ([77592](https://github.com/WordPress/gutenberg/pull/77592))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@gziolo
+
+
 = 23.0.0 =
 
 ## Changelog
