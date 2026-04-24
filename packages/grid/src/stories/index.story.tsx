@@ -20,8 +20,38 @@ import type { DashboardGridLayoutItem } from '../types';
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
 	component: DashboardGrid,
+	args: {
+		columns: 6,
+		spacing: 2,
+		rowHeight: 80,
+		editMode: false,
+	},
 	argTypes: {
 		children: { control: false },
+		columns: {
+			control: { type: 'number', min: 1, max: 24, step: 1 },
+			description: 'Total columns in fixed mode.',
+		},
+		minColumnWidth: {
+			control: { type: 'number', min: 80, max: 600, step: 8 },
+			description:
+				'Enables responsive mode. Per-column lower bound in pixels.',
+		},
+		spacing: {
+			control: { type: 'number', min: 0, max: 16, step: 1 },
+			description: 'Gap multiplier (effective gap = spacing × 4px).',
+		},
+		rowHeight: {
+			control: { type: 'number', min: 24, max: 400, step: 4 },
+			description: 'Row height in pixels, or `auto`.',
+		},
+		editMode: {
+			control: { type: 'boolean' },
+			description: 'Enables drag-to-reorder and resize.',
+		},
+		className: { control: { type: 'text' } },
+		onChangeLayout: { action: 'onChangeLayout' },
+		onPreviewLayout: { action: 'onPreviewLayout' },
 	},
 };
 export default meta;
@@ -348,7 +378,14 @@ export const RowHeight: Story = {
  * an item, Space to grab, arrow keys to move, Space to drop.
  */
 export const EditMode: Story = {
-	render: function EditModeStory() {
+	args: {
+		columns: 12,
+		spacing: 4,
+		rowHeight: 80,
+		editMode: true,
+	},
+
+	render: function EditModeStory( args ) {
 		const initialLayout: ( DashboardGridLayoutItem & {
 			tone: Tone;
 			label: string;
@@ -457,11 +494,8 @@ export const EditMode: Story = {
 		return (
 			<div style={ { width: '800px' } }>
 				<DashboardGrid
+					{ ...args }
 					layout={ layout }
-					columns={ 6 }
-					rowHeight={ 80 }
-					spacing={ 2 }
-					editMode
 					onChangeLayout={ onChangeLayout }
 				>
 					{ tiles.map( ( tile ) => (
