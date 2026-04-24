@@ -88,7 +88,7 @@ function gutenberg_add_admin_bar_script() {
 		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
 		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
 	);
-	$script  = <<<JS
+	$script  = <<<'JS'
 		(( shortCutLabels ) => {
 			let userAgent = '';
 			// Assigning agent may error if the HTTP header is blocked at the browser level.
@@ -105,7 +105,7 @@ function gutenberg_add_admin_bar_script() {
 				commandPaletteNode.textContent = shortcutLabel;
 			}
 		})
-JS;
+	JS;
 	$script .= '(' . wp_json_encode( $labels ) . ');';
 	wp_add_inline_script( 'admin-bar', $script );
 }
