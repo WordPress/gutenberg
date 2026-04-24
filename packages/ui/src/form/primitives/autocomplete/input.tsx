@@ -10,11 +10,13 @@ const DEFAULT_RENDER = ( props: AutocompleteInputProps ) => (
 export const Input = forwardRef< HTMLInputElement, AutocompleteInputProps >(
 	function Input( { render = DEFAULT_RENDER, ...restProps }, ref ) {
 		return (
-			<_Autocomplete.Input
-				ref={ ref }
-				render={ render }
-				{ ...restProps }
-			/>
+			<_Autocomplete.InputGroup>
+				<_Autocomplete.Input
+					ref={ ref }
+					render={ render }
+					{ ...restProps }
+				/>
+			</_Autocomplete.InputGroup>
 		);
 	}
 );
