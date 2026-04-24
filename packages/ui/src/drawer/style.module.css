@@ -64,12 +64,12 @@
 	}
 
 	/*
-	 * The popup owns positioning, swipe transforms, and viewport-derived
-	 * sizing, but **not** scrolling. Scrolling lives on `.content` below so
-	 * chrome padding, safe-area insets, and sticky-chrome yield/reclaim all
-	 * live on the same element that scrolls. Base UI's swipe-dismiss-on-
-	 * scroll-edge logic auto-discovers the actual scrollable element by
-	 * traversing from the touch target, so no prop wiring is needed.
+	 * The popup is a flex column laying out three regions — header, content,
+	 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
+	 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
+	 * content to the rounded border; transform-based swipe animations are
+	 * unaffected by it. See `overlay-chrome.module.css` for the shared
+	 * chrome/content primitives.
 	 */
 	.popup {
 		--viewport-inset: var(--wpds-dimension-padding-2xl);
@@ -77,8 +77,10 @@
 		position: fixed;
 		z-index: var(--wp-ui-drawer-z-index, initial);
 		box-sizing: border-box;
-		display: block;
+		display: flex;
+		flex-direction: column;
 		outline: 0;
+		overflow: hidden;
 		pointer-events: auto;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		box-shadow: var(--wpds-elevation-lg);
@@ -215,86 +217,32 @@
 	}
 
 	/*
-	 * Content is the scroll container for the drawer (see note on `.popup`
-	 * above) and owns the inner padding plus per-direction safe-area
-	 * overrides. The shared `overlay-chrome.module.css` rules — sticky-
-	 * chrome yield/reclaim, separator coloring, scroll-padding — fire on
-	 * this element via the `data-wp-ui-overlay-scroll-container` attribute
-	 * set by `useOverlayScrollStateAttributes`.
+	 * Chrome + content primitives are centralized in
+	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
+	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+	 * overscroll rule live there too, keyed off the
+	 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
+	 * `useOverlayScrollStateAttributes`.
 	 *
-	 * Scrolling on the block axis only: for left/right drawers, swipe is on
-	 * the inline axis (no conflict). For up/down drawers, swipe dismissal
-	 * only engages once scroll reaches an edge, which Base UI detects by
-	 * locating the actual scrollable ancestor (i.e. this element).
-	 *
-	 * `block-size: 100%` fills the popup's block dimension so short content
-	 * still takes full height (important for sticky chrome alignment). For
-	 * up/down drawers we additionally cap content with the same viewport-
-	 * minus-inset value the popup uses — this is required for `is-auto`,
-	 * where the popup has indefinite block-size and `100%` alone would not
-	 * establish a scrollable box.
-	 */
-	.content {
-		box-sizing: border-box;
-		block-size: 100%;
-		padding: var(--wpds-dimension-padding-2xl);
-		overflow-block: auto;
-	}
-
-	.popup[data-swipe-direction="up"] .content,
-	.popup[data-swipe-direction="down"] .content {
-		max-block-size: calc(100dvh - var(--viewport-inset));
-	}
-
-	/*
-	 * The popup is anchored to a physical edge regardless of writing direction
-	 * (see `left: 0` / `right: 0` above), so the safe-area padding uses the
-	 * matching physical side. `env(safe-area-inset-*)` is already physical,
-	 * so pairing it with logical `padding-inline-*` would be wrong in RTL.
-	 */
-	.popup[data-swipe-direction="left"] .content {
-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
-		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
-	}
-
-	.popup[data-swipe-direction="right"] .content {
-		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
-		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
-	}
-
-	.popup[data-swipe-direction="down"] .content {
-		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
-	}
-
-	.popup[data-swipe-direction="up"] .content {
-		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
-	}
-
-	/*
-	 * Chrome primitives are centralized in `overlay-chrome.module.css`. All
-	 * the yield-and-reclaim, scroll-state separator coloring, and scroll-
-	 * padding logic lives there too, targeting the
-	 * `data-wp-ui-overlay-scroll-container` attribute — which the hook sets
-	 * on `.content` in this module.
+	 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
+	 * discovers the scrollable element by walking up from the touch target,
+	 * so moving scroll ownership from the popup onto `.content` remains
+	 * transparent to the gesture handling.
 	 */
 	.header {
 		composes: header from "../utils/css/overlay-chrome.module.css";
-	}
-
-	.header-sticky {
-		composes: header-sticky from "../utils/css/overlay-chrome.module.css";
 	}
 
 	.footer {
 		composes: footer from "../utils/css/overlay-chrome.module.css";
 	}
 
-	.footer-sticky {
-		composes: footer-sticky from "../utils/css/overlay-chrome.module.css";
-	}
-
 	.title {
 		composes: title from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.content {
+		composes: content from "../utils/css/overlay-chrome.module.css";
 	}
 
 	/*
@@ -309,17 +257,39 @@
 	}
 
 	/*
-	 * Safe-area yield for up/down drawers: the shared rule makes sticky
-	 * chrome reclaim `padding-2xl` on its pinned edge, but `.content` on
-	 * up/down carries `max(padding-2xl, env(safe-area-inset-*))`. Mirror
-	 * that same clamp here so the chrome stays clear of the notch on
-	 * devices that have one.
+	 * Safe-area insets. The popup is anchored to a physical edge regardless
+	 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
+	 * so `env(safe-area-inset-*)` — which is already physical — is paired
+	 * with matching physical padding properties.
+	 *
+	 * For left/right drawers the inset lives on the scroll container itself.
+	 * For up/down drawers it lives on the chrome that occupies the popup's
+	 * anchored edge (pinned case); when that edge has no chrome sibling,
+	 * the scroll container carries the padding instead.
 	 */
-	.popup[data-swipe-direction="up"] .content:has(.header-sticky:first-child) .header-sticky {
+	.popup[data-swipe-direction="left"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+	}
+
+	.popup[data-swipe-direction="right"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+	}
+
+	.popup[data-swipe-direction="up"] > .header {
 		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
 	}
 
-	.popup[data-swipe-direction="down"] .content:has(.footer-sticky:last-child) .footer-sticky {
+	.popup[data-swipe-direction="down"] > .footer {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+	}
+
+	.popup[data-swipe-direction="up"] > .content:first-child {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+	}
+
+	.popup[data-swipe-direction="down"] > .content:last-child {
 		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
 	}
 }

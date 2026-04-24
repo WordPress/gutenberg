@@ -14,6 +14,7 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Header': Dialog.Header,
 		'Dialog.Title': Dialog.Title,
 		'Dialog.Description': Dialog.Description,
+		'Dialog.Content': Dialog.Content,
 		'Dialog.CloseIcon': Dialog.CloseIcon,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
@@ -43,11 +44,13 @@ export const _Default: Story = {
 						<Dialog.Title>Welcome</Dialog.Title>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<Dialog.Description>
-						This dialog demonstrates best practices for
-						informational dialogs. It includes a close icon because
-						dismissing it is safe and expected.
-					</Dialog.Description>
+					<Dialog.Content>
+						<Dialog.Description>
+							This dialog demonstrates best practices for
+							informational dialogs. It includes a close icon
+							because dismissing it is safe and expected.
+						</Dialog.Description>
+					</Dialog.Content>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>
@@ -106,13 +109,15 @@ function SizePlaygroundContent() {
 					<Dialog.Title>Size Playground</Dialog.Title>
 					<Dialog.CloseIcon />
 				</Dialog.Header>
-				<Stack direction="column" gap="lg" align="start">
-					<SizeSelector value={ size } onChange={ setSize } />
-					<p style={ { margin: 0 } }>
-						Use the dropdown above (or outside the dialog) to change
-						the popup size. Both controls stay in sync.
-					</p>
-				</Stack>
+				<Dialog.Content>
+					<Stack direction="column" gap="lg" align="start">
+						<SizeSelector value={ size } onChange={ setSize } />
+						<p style={ { margin: 0 } }>
+							Use the dropdown above (or outside the dialog) to
+							change the popup size. Both controls stay in sync.
+						</p>
+					</Stack>
+				</Dialog.Content>
 				<Dialog.Footer>
 					<Dialog.Action>Got it</Dialog.Action>
 				</Dialog.Footer>
@@ -160,11 +165,13 @@ export const WithCustomZIndex: Story = {
 						<Dialog.Title>Custom z-index</Dialog.Title>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<Dialog.Description>
-						The backdrop and popup render at `z-index: 9999` via the
-						`--wp-ui-dialog-z-index` CSS custom property, set on
-						`Dialog.Portal` through the `portal` prop.
-					</Dialog.Description>
+					<Dialog.Content>
+						<Dialog.Description>
+							The backdrop and popup render at `z-index: 9999` via
+							the `--wp-ui-dialog-z-index` CSS custom property,
+							set on `Dialog.Portal` through the `portal` prop.
+						</Dialog.Description>
+					</Dialog.Content>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>
@@ -175,58 +182,42 @@ export const WithCustomZIndex: Story = {
 };
 
 function StickyToggle( {
-	label,
-	value,
-	onChange,
+	stickyHeader,
+	stickyFooter,
+	onStickyHeaderChange,
+	onStickyFooterChange,
 }: {
-	label: string;
-	value: boolean;
-	onChange: ( value: boolean ) => void;
+	stickyHeader: boolean;
+	stickyFooter: boolean;
+	onStickyHeaderChange: ( value: boolean ) => void;
+	onStickyFooterChange: ( value: boolean ) => void;
 } ) {
-	const id = useId();
+	const headerId = useId();
+	const footerId = useId();
 	return (
-		<Stack direction="row" gap="sm" align="center">
-			<input
-				id={ id }
-				type="checkbox"
-				checked={ value }
-				onChange={ ( event ) => onChange( event.target.checked ) }
-			/>
-			<label htmlFor={ id }>{ label }</label>
-		</Stack>
-	);
-}
-
-type ScrollableControlProps = {
-	size: ComponentProps< typeof Dialog.Popup >[ 'size' ];
-	setSize: ( size: ComponentProps< typeof Dialog.Popup >[ 'size' ] ) => void;
-	isHeaderSticky: boolean;
-	setIsHeaderSticky: ( value: boolean ) => void;
-	isFooterSticky: boolean;
-	setIsFooterSticky: ( value: boolean ) => void;
-};
-
-function ScrollableControls( {
-	size,
-	setSize,
-	isHeaderSticky,
-	setIsHeaderSticky,
-	isFooterSticky,
-	setIsFooterSticky,
-}: ScrollableControlProps ) {
-	return (
-		<Stack direction="row" gap="lg" align="center">
-			<SizeSelector value={ size } onChange={ setSize } />
-			<StickyToggle
-				label="Sticky header"
-				value={ isHeaderSticky }
-				onChange={ setIsHeaderSticky }
-			/>
-			<StickyToggle
-				label="Sticky footer"
-				value={ isFooterSticky }
-				onChange={ setIsFooterSticky }
-			/>
+		<Stack direction="row" gap="md" align="center">
+			<Stack direction="row" gap="xs" align="center">
+				<input
+					id={ headerId }
+					type="checkbox"
+					checked={ stickyHeader }
+					onChange={ ( e ) =>
+						onStickyHeaderChange( e.target.checked )
+					}
+				/>
+				<label htmlFor={ headerId }>Sticky header</label>
+			</Stack>
+			<Stack direction="row" gap="xs" align="center">
+				<input
+					id={ footerId }
+					type="checkbox"
+					checked={ stickyFooter }
+					onChange={ ( e ) =>
+						onStickyFooterChange( e.target.checked )
+					}
+				/>
+				<label htmlFor={ footerId }>Sticky footer</label>
+			</Stack>
 		</Stack>
 	);
 }
@@ -234,59 +225,78 @@ function ScrollableControls( {
 function ScrollableContent() {
 	const [ size, setSize ] =
 		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
-	const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
-	const [ isFooterSticky, setIsFooterSticky ] = useState( true );
-	const controlProps: ScrollableControlProps = {
-		size,
-		setSize,
-		isHeaderSticky,
-		setIsHeaderSticky,
-		isFooterSticky,
-		setIsFooterSticky,
-	};
+	const [ stickyHeader, setStickyHeader ] = useState( true );
+	const [ stickyFooter, setStickyFooter ] = useState( true );
+
+	const header = (
+		<Dialog.Header>
+			<Dialog.Title>Terms of service</Dialog.Title>
+			<Dialog.CloseIcon />
+		</Dialog.Header>
+	);
+	const footer = (
+		<Dialog.Footer>
+			<Dialog.Action variant="outline">Decline</Dialog.Action>
+			<Dialog.Action>Accept</Dialog.Action>
+		</Dialog.Footer>
+	);
+	const controls = (
+		<Stack direction="column" gap="sm" align="start">
+			<SizeSelector value={ size } onChange={ setSize } />
+			<StickyToggle
+				stickyHeader={ stickyHeader }
+				stickyFooter={ stickyFooter }
+				onStickyHeaderChange={ setStickyHeader }
+				onStickyFooterChange={ setStickyFooter }
+			/>
+		</Stack>
+	);
+
 	return (
 		<>
 			<Stack direction="column" gap="lg" align="start">
-				<ScrollableControls { ...controlProps } />
+				{ controls }
 				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 			</Stack>
 			<Dialog.Popup size={ size }>
-				<Dialog.Header sticky={ isHeaderSticky }>
-					<Dialog.Title>Terms of service</Dialog.Title>
-					<Dialog.CloseIcon />
-				</Dialog.Header>
-				<Stack direction="column" gap="lg">
-					<ScrollableControls { ...controlProps } />
-					{ Array.from( { length: 20 } ).map( ( _, index ) => (
-						<p key={ index } style={ { margin: 0 } }>
-							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
-							consectetur adipiscing elit. Sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut enim
-							ad minim veniam, quis nostrud exercitation ullamco
-							laboris nisi ut aliquip ex ea commodo consequat.
-						</p>
-					) ) }
-				</Stack>
-				<Dialog.Footer sticky={ isFooterSticky }>
-					<Dialog.Action variant="outline">Decline</Dialog.Action>
-					<Dialog.Action>Accept</Dialog.Action>
-				</Dialog.Footer>
+				{ stickyHeader && header }
+				<Dialog.Content>
+					{ ! stickyHeader && header }
+					<Stack direction="column" gap="lg">
+						{ controls }
+						{ Array.from( { length: 20 } ).map( ( _, index ) => (
+							<p key={ index } style={ { margin: 0 } }>
+								Paragraph { index + 1 }: Lorem ipsum dolor sit
+								amet, consectetur adipiscing elit. Sed do
+								eiusmod tempor incididunt ut labore et dolore
+								magna aliqua. Ut enim ad minim veniam, quis
+								nostrud exercitation ullamco laboris nisi ut
+								aliquip ex ea commodo consequat.
+							</p>
+						) ) }
+					</Stack>
+					{ ! stickyFooter && footer }
+				</Dialog.Content>
+				{ stickyFooter && footer }
 			</Dialog.Popup>
 		</>
 	);
 }
 
 /**
- * When dialog content overflows the available height, `Dialog.Header` stays
- * pinned to the top and `Dialog.Footer` stays pinned to the bottom so users
- * keep sight of the title and primary actions while scrolling. Separator
- * borders appear only when there is off-screen content above the header or
- * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
- * and let it scroll with the content.
+ * When dialog content overflows the available height, `Dialog.Content`
+ * scrolls while `Dialog.Header` and `Dialog.Footer` stay pinned to the
+ * popup's top and bottom edges. Separator lines appear only when there
+ * is off-screen content above the header or below the footer.
  *
- * Use the inline controls to change the popup `size` and toggle each
- * sticky prop independently. The same controls render both outside and
- * inside the dialog and stay in sync.
+ * To let the header or footer scroll with the body instead of staying
+ * pinned, render it *inside* `Dialog.Content` rather than as a sibling.
+ * The inline "Sticky header / Sticky footer" checkboxes toggle exactly
+ * that placement at runtime.
+ *
+ * Use the inline controls to change the popup `size` and the sticky
+ * placement. The same controls render both outside and inside the
+ * dialog and stay in sync.
  */
 export const Scrollable: Story = {
 	args: {
@@ -313,10 +323,13 @@ export const WithVisuallyHiddenTitle: Story = {
 						</VisuallyHidden>
 						<Dialog.CloseIcon />
 					</Dialog.Header>
-					<p style={ { margin: 0 } }>
-						This dialog has a visually hidden title. Inspect the DOM
-						or use a screen reader to verify the heading is present.
-					</p>
+					<Dialog.Content>
+						<p style={ { margin: 0 } }>
+							This dialog has a visually hidden title. Inspect the
+							DOM or use a screen reader to verify the heading is
+							present.
+						</p>
+					</Dialog.Content>
 					<Dialog.Footer>
 						<Dialog.Action>Got it</Dialog.Action>
 					</Dialog.Footer>

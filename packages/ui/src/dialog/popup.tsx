@@ -12,7 +12,6 @@ import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DialogValidationProvider, useDialogModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
-import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import type { PopupProps } from './types';
 
 const ThemeProvider: typeof ThemeProviderType =
@@ -35,7 +34,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		size = 'medium',
 		initialFocus,
 		finalFocus,
-		onScroll: onScrollProp,
 		...props
 	},
 	ref
@@ -44,9 +42,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
-	const { ref: scrollStateRef, onScroll } =
-		useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
-	const mergedRef = useMergeRefs( [ ref, popupRef, scrollStateRef ] );
+	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDialogModal();
 
 	const portalChildren = (
@@ -74,7 +70,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					finalFocus={ finalFocus }
 					{ ...props }
 					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
-					onScroll={ onScroll }
 				>
 					<DialogValidationProvider>
 						{ children }

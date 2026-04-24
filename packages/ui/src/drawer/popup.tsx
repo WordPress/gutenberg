@@ -8,7 +8,6 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
-import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
@@ -26,35 +25,20 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
  *
  * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
  * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+ *
+ * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
+ * which children are expected to render. Without it, long body content will
+ * clip instead of scrolling and Base UI's swipe-dismiss-on-scroll-edge
+ * logic on up/down drawers cannot engage.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
-	{
-		className,
-		portal,
-		children,
-		size,
-		initialFocus,
-		finalFocus,
-		onScroll: onScrollProp,
-		...props
-	},
+	{ className, portal, children, size, initialFocus, finalFocus, ...props },
 	ref
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
 		deprioritizedAttribute: CLOSE_ICON_ATTR,
 	} );
-	/*
-	 * Scroll ownership lives on `_Drawer.Content`, not `_Drawer.Popup`:
-	 * the content element carries the inner padding and safe-area insets,
-	 * so hosting the scroll there lets the shared overlay-chrome CSS
-	 * target a single element for sticky-chrome yield/reclaim and
-	 * separator coloring. Base UI's swipe-dismiss-on-scroll-edge logic
-	 * auto-discovers the scrollable element from the touch target's
-	 * ancestors, so this move is transparent to it.
-	 */
-	const { ref: scrollStateRef, onScroll } =
-		useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDrawerModal();
 
@@ -100,15 +84,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 							modal === true ? '' : undefined
 						}
 					>
-						<_Drawer.Content
-							ref={ scrollStateRef }
-							className={ styles.content }
-							onScroll={ onScroll }
-						>
-							<DrawerValidationProvider>
-								{ children }
-							</DrawerValidationProvider>
-						</_Drawer.Content>
+						<DrawerValidationProvider>
+							{ children }
+						</DrawerValidationProvider>
 					</_Drawer.Popup>
 				</ThemeProvider>
 			</_Drawer.Viewport>

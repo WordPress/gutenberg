@@ -11,9 +11,12 @@ import type { HeaderProps } from './types';
  * Defaults to a native `<header>` element for richer semantics (heading-level
  * scanning, and banner landmark navigation where screen readers expose
  * landmarks nested in dialogs). Pass `render` to opt out of the default tag.
+ *
+ * The header is pinned to the top of the popup by default. To let it scroll
+ * with the body instead, render it *inside* `Dialog.Content`.
  */
 const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
-	{ className, render, sticky = true, ...props },
+	{ className, render, ...props },
 	ref
 ) {
 	const element = useRender( {
@@ -21,11 +24,7 @@ const Header = forwardRef< HTMLElement, HeaderProps >( function DialogHeader(
 		render,
 		ref,
 		props: mergeProps< 'header' >( props, {
-			className: clsx(
-				styles.header,
-				sticky && styles[ 'header-sticky' ],
-				className
-			),
+			className: clsx( styles.header, className ),
 		} ),
 	} );
 

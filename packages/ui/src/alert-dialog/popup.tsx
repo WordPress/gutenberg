@@ -1,7 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -37,7 +36,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			cancelButtonText = __( 'Cancel' ),
 			stickyHeader = true,
 			stickyFooter = true,
-			onScroll: onScrollProp,
 			...props
 		},
 		ref
@@ -45,9 +43,16 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		const { phase, showSpinner, errorMessage, confirm } =
 			useContext( AlertDialogContext );
 
+		/*
+		 * Scroll ownership lives on an internal scroll container so the
+		 * shared chrome CSS can target `[data-wp-ui-overlay-scroll-container]`
+		 * here the same way it does on Dialog.Content / Drawer.Content.
+		 * `stickyHeader` / `stickyFooter` control whether the chrome renders
+		 * as a sibling of the scroller (pinned) or inside it (scrolls with
+		 * the body).
+		 */
 		const { ref: scrollStateRef, onScroll } =
-			useOverlayScrollStateAttributes< HTMLDivElement >( onScrollProp );
-		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
+			useOverlayScrollStateAttributes< HTMLDivElement >();
 
 		const confirmClassName =
 			intent === 'irreversible'
@@ -56,12 +61,63 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 
 		const buttonsDisabled = phase !== 'idle' || undefined;
 
+		const headerElement = (
+			<div className={ overlayChromeStyles.header }>
+				<Text
+					variant="heading-xl"
+					render={ <_AlertDialog.Title /> }
+					className={ overlayChromeStyles.title }
+				>
+					{ title }
+				</Text>
+			</div>
+		);
+
+		const footerElement = (
+			<div
+				className={ clsx(
+					overlayChromeStyles.footer,
+					alertDialogStyles[ 'footer-column' ]
+				) }
+			>
+				<Stack
+					direction="row"
+					gap="sm"
+					justify="flex-end"
+					align="center"
+				>
+					<_AlertDialog.Close
+						render={ <Button variant="minimal" /> }
+						disabled={ buttonsDisabled }
+					>
+						{ cancelButtonText }
+					</_AlertDialog.Close>
+					<Button
+						className={ confirmClassName }
+						onClick={ confirm }
+						loading={ showSpinner || undefined }
+						disabled={ buttonsDisabled }
+					>
+						{ confirmButtonText }
+					</Button>
+				</Stack>
+				{ errorMessage && (
+					<Text
+						variant="body-sm"
+						className={ alertDialogStyles[ 'error-message' ] }
+					>
+						{ errorMessage }
+					</Text>
+				) }
+			</div>
+		);
+
 		const portalChildren = (
 			<>
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup
-						ref={ mergedRef }
+						ref={ ref }
 						className={ clsx(
 							dialogStyles.popup,
 							className,
@@ -69,73 +125,26 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						) }
 						{ ...props }
 						data-wp-ui-overlay-modal=""
-						onScroll={ onScroll }
 					>
+						{ stickyHeader && headerElement }
 						<div
-							className={ clsx(
-								overlayChromeStyles.header,
-								stickyHeader &&
-									overlayChromeStyles[ 'header-sticky' ]
-							) }
+							ref={ scrollStateRef }
+							className={ overlayChromeStyles.content }
+							onScroll={ onScroll }
 						>
-							<Text
-								variant="heading-xl"
-								render={ <_AlertDialog.Title /> }
-								className={ overlayChromeStyles.title }
-							>
-								{ title }
-							</Text>
-						</div>
-						{ description && (
-							<Text
-								variant="body-md"
-								render={ <_AlertDialog.Description /> }
-							>
-								{ description }
-							</Text>
-						) }
-						{ children }
-						<Stack
-							direction="column"
-							gap="md"
-							className={ clsx(
-								overlayChromeStyles[ 'footer-chrome' ],
-								stickyFooter &&
-									overlayChromeStyles[ 'footer-sticky' ]
-							) }
-						>
-							<Stack
-								direction="row"
-								gap="sm"
-								justify="flex-end"
-								align="center"
-							>
-								<_AlertDialog.Close
-									render={ <Button variant="minimal" /> }
-									disabled={ buttonsDisabled }
-								>
-									{ cancelButtonText }
-								</_AlertDialog.Close>
-								<Button
-									className={ confirmClassName }
-									onClick={ confirm }
-									loading={ showSpinner || undefined }
-									disabled={ buttonsDisabled }
-								>
-									{ confirmButtonText }
-								</Button>
-							</Stack>
-							{ errorMessage && (
+							{ ! stickyHeader && headerElement }
+							{ description && (
 								<Text
-									variant="body-sm"
-									className={
-										alertDialogStyles[ 'error-message' ]
-									}
+									variant="body-md"
+									render={ <_AlertDialog.Description /> }
 								>
-									{ errorMessage }
+									{ description }
 								</Text>
 							) }
-						</Stack>
+							{ children }
+							{ ! stickyFooter && footerElement }
+						</div>
+						{ stickyFooter && footerElement }
 					</_AlertDialog.Popup>
 				</ThemeProvider>
 			</>
