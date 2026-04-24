@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
 -   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
 
 ## 6.20.0 (2026-04-15)
