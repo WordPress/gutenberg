@@ -1,0 +1,150 @@
+/**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { WidgetDashboard } from '../widget-dashboard';
+import type {
+	ResolveWidgetModule,
+	WidgetInstance,
+	WidgetRenderProps,
+	WidgetType,
+} from '../types';
+
+const DASHBOARD_ID = 'core/dashboard';
+
+type Attrs = { greeting: string };
+
+function TestWidget( {
+	attributes,
+	setAttributes,
+}: WidgetRenderProps< Attrs > ) {
+	return (
+		<div>
+			<p data-testid="greeting">{ attributes.greeting }</p>
+			<button
+				onClick={ () => setAttributes?.( { greeting: 'updated' } ) }
+			>
+				Update
+			</button>
+		</div>
+	);
+}
+
+const widgetTypes: WidgetType[] = [
+	{
+		name: 'test/greet',
+		title: 'Greet',
+		render_module: 'test-greet-module',
+	},
+];
+
+const resolveWidgetModule: ResolveWidgetModule = async ( id ) => {
+	if ( id === 'test-greet-module' ) {
+		return { default: TestWidget };
+	}
+	throw new Error( `Unknown module: ${ id }` );
+};
+
+const initialLayout: WidgetInstance< Attrs >[] = [
+	{
+		uid: 'w1',
+		type: 'test/greet',
+		attributes: { greeting: 'hello' },
+		width: 2,
+		height: 2,
+	},
+];
+
+function Harness( {
+	onLayoutChange,
+}: {
+	onLayoutChange?: ( layout: WidgetInstance[] ) => void;
+} ) {
+	const [ layout, setLayout ] = useState( initialLayout );
+
+	return (
+		<WidgetDashboard
+			id={ DASHBOARD_ID }
+			layout={ layout }
+			onLayoutChange={ ( next ) => {
+				setLayout( next as WidgetInstance< Attrs >[] );
+				onLayoutChange?.( next );
+			} }
+			widgetTypes={ widgetTypes }
+			resolveWidgetModule={ resolveWidgetModule }
+		/>
+	);
+}
+
+describe( 'WidgetDashboard', () => {
+	it( 'resolves the widget module and renders attributes', async () => {
+		render( <Harness /> );
+
+		expect( await screen.findByTestId( 'greeting' ) ).toHaveTextContent(
+			'hello'
+		);
+	} );
+
+	it( 'threads setAttributes into onLayoutChange with merged attributes', async () => {
+		const onChange = jest.fn();
+		render( <Harness onLayoutChange={ onChange } /> );
+
+		const button = await screen.findByRole( 'button', {
+			name: 'Update',
+		} );
+		await userEvent.click( button );
+
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		const [ updated ] = onChange.mock.calls[ 0 ];
+		expect( updated ).toHaveLength( 1 );
+		expect( updated[ 0 ] ).toMatchObject( {
+			uid: 'w1',
+			type: 'test/greet',
+			attributes: { greeting: 'updated' },
+		} );
+	} );
+
+	it( 'renders nothing for an unknown widget type (no crash)', () => {
+		render(
+			<WidgetDashboard
+				id={ DASHBOARD_ID }
+				layout={ [
+					{
+						uid: 'w1',
+						type: 'does-not-exist',
+						width: 1,
+						height: 1,
+					},
+				] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ widgetTypes }
+				resolveWidgetModule={ resolveWidgetModule }
+			/>
+		);
+		expect( screen.queryByTestId( 'greeting' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'renders the empty slot when layout is empty and empty prop is provided', () => {
+		render(
+			<WidgetDashboard
+				id={ DASHBOARD_ID }
+				layout={ [] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ widgetTypes }
+				resolveWidgetModule={ resolveWidgetModule }
+				empty={ <p>Nothing here yet</p> }
+			/>
+		);
+		expect( screen.getByText( 'Nothing here yet' ) ).toBeInTheDocument();
+	} );
+} );

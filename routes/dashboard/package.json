@@ -11,7 +11,10 @@
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
 		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/element": "file:../../packages/element",
-		"@wordpress/i18n": "file:../../packages/i18n"
+		"@wordpress/grid": "file:../../packages/grid",
+		"@wordpress/i18n": "file:../../packages/i18n",
+		"clsx": "^2.1.1"
 	}
 }
