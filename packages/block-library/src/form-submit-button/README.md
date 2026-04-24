@@ -4,7 +4,7 @@
 <div class="callout callout-warning">This block is <strong>experimental</strong> and may change or be removed without notice.</div>
 
 **Name:** `core/form-submit-button`
-**Category:** [common](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/)
+**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
 **Block Type:** [Static](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (saved in post content)
 
@@ -15,7 +15,7 @@
 ## Block Relationships
 
 **[Ancestor](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#ancestor) blocks:**
-- [`core/form`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form/)
+- [`core/form`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form/)
 
 **[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/buttons`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-buttons/)

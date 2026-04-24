@@ -4,7 +4,7 @@
 <div class="callout callout-warning">This block is <strong>experimental</strong> and may change or be removed without notice.</div>
 
 **Name:** `core/form`
-**Category:** [common](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/)
+**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
 **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
 **Block Type:** [Hybrid](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (static save + server enhancements)
 
@@ -17,9 +17,9 @@
 **[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/paragraph`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/)
 - [`core/heading`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-heading/)
-- [`core/form-input`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-input/)
-- [`core/form-submit-button`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submit-button/)
-- [`core/form-submission-notification`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-common/core-block-form-submission-notification/)
+- [`core/form-input`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form-input/)
+- [`core/form-submit-button`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form-submit-button/)
+- [`core/form-submission-notification`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-form-submission-notification/)
 - [`core/group`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-group/)
 - [`core/columns`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-columns/)
 

@@ -18,10 +18,9 @@
 - [Page Break](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-nextpage/) — `core/nextpage`: Separate your content into a multi-page experience.
 - [Separator](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-separator/) — `core/separator`: Create a break between ideas or sections with a horizontal separator.
 - [Spacer](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/) — `core/spacer`: Add white space between blocks and customize its height.
-- [Tab](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/) — `core/tab`: Content for a tab in a tabbed interface.
-- [Tab Panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/) — `core/tab-panel`: Container for tab panel content in a tabbed interface.
+- [Tab](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab/) — `core/tab`: A single tab button in the tab list.
+- [Tab List](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/) — `core/tab-list`: Display the tab buttons for a tabbed interface.
+- [Tab Panel](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/) — `core/tab-panel`: Content for a tab in a tabbed interface.
+- [Tab Panels](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/) — `core/tab-panels`: Container for tab panel content in a tabbed interface.
 - [Table of Contents](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/) — `core/table-of-contents`: Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
 - [Tabs](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs/) — `core/tabs`: Display content in a tabbed interface to help users navigate detailed content with ease.
-- [Tabs Menu](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/) — `core/tabs-menu`: Display the tab buttons for a tabbed interface.
-- [Tab Menu Item](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu-item/) — `core/tabs-menu-item`: A single tab button in the tabs menu.
-- [Text Columns (deprecated)](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-text-columns/) — `core/text-columns`: This block is deprecated. Please use the Columns block instead.

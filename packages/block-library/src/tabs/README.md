@@ -13,8 +13,8 @@
 ## Block Relationships
 
 **[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
-- [`core/tabs-menu`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tabs-menu/)
-- [`core/tab-panel`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panel/)
+- [`core/tab-list`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-list/)
+- [`core/tab-panels`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-tab-panels/)
 
 ## Attributes
 
