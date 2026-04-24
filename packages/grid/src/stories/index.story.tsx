@@ -169,6 +169,19 @@ function TileActions( {
 	);
 }
 
+function formatTileLabel( item: DashboardGridLayoutItem ): string {
+	let width: string;
+	if ( item.width === 'fill' ) {
+		width = 'width: "fill"';
+	} else if ( item.width === 'full' ) {
+		width = 'width: "full"';
+	} else {
+		width = `width: ${ item.width ?? 1 }`;
+	}
+	const height = ( item.height ?? 1 ) > 1 ? `, height: ${ item.height }` : '';
+	return width + height;
+}
+
 function LayoutStatePanel( { layout }: { layout: DashboardGridLayoutItem[] } ) {
 	return (
 		<div
@@ -388,7 +401,6 @@ export const EditMode: Story = {
 	render: function EditModeStory( args ) {
 		const initialLayout: ( DashboardGridLayoutItem & {
 			tone: Tone;
-			label: string;
 		} )[] = [
 			{
 				key: 'fixed-1',
@@ -396,7 +408,6 @@ export const EditMode: Story = {
 				height: 1,
 				order: 1,
 				tone: 'success',
-				label: 'width: 1',
 			},
 			{
 				key: 'fill',
@@ -404,7 +415,6 @@ export const EditMode: Story = {
 				height: 1,
 				order: 2,
 				tone: 'info',
-				label: 'width: "fill" — resize me',
 			},
 			{
 				key: 'fixed-2',
@@ -412,7 +422,6 @@ export const EditMode: Story = {
 				height: 1,
 				order: 3,
 				tone: 'brand',
-				label: 'width: 5',
 			},
 			{
 				key: 'full',
@@ -420,7 +429,6 @@ export const EditMode: Story = {
 				height: 1,
 				order: 4,
 				tone: 'neutral',
-				label: 'width: "full" — resize me',
 			},
 			{
 				key: 'fixed-3',
@@ -428,7 +436,6 @@ export const EditMode: Story = {
 				height: 1,
 				order: 5,
 				tone: 'warning',
-				label: 'width: 2',
 			},
 			{
 				key: 'fixed-4',
@@ -436,14 +443,13 @@ export const EditMode: Story = {
 				height: 1,
 				order: 6,
 				tone: 'error',
-				label: 'width: 2',
 			},
 		];
 
 		const [ tiles, setTiles ] = useState( initialLayout );
 
 		const layout: DashboardGridLayoutItem[] = tiles.map(
-			( { tone: _tone, label: _label, ...item } ) => item
+			( { tone: _tone, ...item } ) => item
 		);
 
 		const onChangeLayout = ( next: DashboardGridLayoutItem[] ) => {
@@ -453,7 +459,6 @@ export const EditMode: Story = {
 					return {
 						...item,
 						tone: existing?.tone ?? 'neutral',
-						label: existing?.label ?? '',
 					};
 				} )
 			);
@@ -516,7 +521,7 @@ export const EditMode: Story = {
 								/>
 							}
 						>
-							{ tile.label }
+							{ formatTileLabel( tile ) }
 						</Tile>
 					) ) }
 				</DashboardGrid>
