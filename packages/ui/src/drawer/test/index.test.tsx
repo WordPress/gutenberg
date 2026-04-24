@@ -894,6 +894,15 @@ describe( 'Drawer', () => {
 			expect( contentRef.current ).not.toContainElement(
 				headerRef.current
 			);
+			// And it sits *before* the scroll container — the CSS
+			// sticky-separator selectors rely on that DOM order.
+			const position = headerRef.current!.compareDocumentPosition(
+				contentRef.current!
+			);
+			expect(
+				// eslint-disable-next-line no-bitwise
+				position & Node.DOCUMENT_POSITION_FOLLOWING
+			).toBeTruthy();
 		} );
 
 		it( 'scrolls Drawer.Header with the body when nested inside Drawer.Content', async () => {
@@ -1012,6 +1021,77 @@ describe( 'Drawer', () => {
 			} );
 
 			expect( content ).not.toHaveAttribute( 'tabindex' );
+		} );
+
+		it( 'toggles data-wp-ui-overlay-scrolled-from-* based on scroll position', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Drawer.Root>
+					<Drawer.Trigger>Open</Drawer.Trigger>
+					<Drawer.Popup>
+						<Drawer.Title>Title</Drawer.Title>
+						<Drawer.Content ref={ contentRef }>
+							<p>Body</p>
+						</Drawer.Content>
+					</Drawer.Popup>
+				</Drawer.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			// JSDOM doesn't lay out elements, so we simulate an
+			// overflowing scroll container by stubbing layout metrics
+			// per scenario and dispatching a scroll event.
+			const content = contentRef.current!;
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( content, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			const setScrollTop = ( value: number ) => {
+				Object.defineProperty( content, 'scrollTop', {
+					configurable: true,
+					value,
+				} );
+				act( () => {
+					content.dispatchEvent(
+						new Event( 'scroll', { bubbles: true } )
+					);
+				} );
+			};
+
+			setScrollTop( 0 );
+			expect( content ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 200 );
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 400 );
+			expect( content ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( content ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
 		} );
 	} );
 } );

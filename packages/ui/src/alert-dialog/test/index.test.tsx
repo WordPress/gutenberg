@@ -1682,5 +1682,71 @@ describe( 'AlertDialog', () => {
 
 			expect( scroller ).not.toHaveAttribute( 'tabindex' );
 		} );
+
+		it( 'toggles data-wp-ui-overlay-scrolled-from-* on the scroller based on scroll position', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			// JSDOM doesn't lay out elements, so we simulate an
+			// overflowing scroll container by stubbing layout metrics
+			// per scenario and dispatching a scroll event.
+			const scroller = findScroller( popupRef.current );
+			Object.defineProperty( scroller, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( scroller, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			const setScrollTop = ( value: number ) => {
+				Object.defineProperty( scroller, 'scrollTop', {
+					configurable: true,
+					value,
+				} );
+				act( () => {
+					scroller.dispatchEvent(
+						new Event( 'scroll', { bubbles: true } )
+					);
+				} );
+			};
+
+			setScrollTop( 0 );
+			expect( scroller ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 200 );
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 400 );
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+		} );
 	} );
 } );
