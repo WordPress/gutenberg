@@ -197,19 +197,26 @@ function StickyToggle( {
 	);
 }
 
-function StickyControls( {
-	isHeaderSticky,
-	setIsHeaderSticky,
-	isFooterSticky,
-	setIsFooterSticky,
-}: {
+type ScrollableControlProps = {
+	size: ComponentProps< typeof Dialog.Popup >[ 'size' ];
+	setSize: ( size: ComponentProps< typeof Dialog.Popup >[ 'size' ] ) => void;
 	isHeaderSticky: boolean;
 	setIsHeaderSticky: ( value: boolean ) => void;
 	isFooterSticky: boolean;
 	setIsFooterSticky: ( value: boolean ) => void;
-} ) {
+};
+
+function ScrollableControls( {
+	size,
+	setSize,
+	isHeaderSticky,
+	setIsHeaderSticky,
+	isFooterSticky,
+	setIsFooterSticky,
+}: ScrollableControlProps ) {
 	return (
 		<Stack direction="row" gap="lg" align="center">
+			<SizeSelector value={ size } onChange={ setSize } />
 			<StickyToggle
 				label="Sticky header"
 				value={ isHeaderSticky }
@@ -225,9 +232,13 @@ function StickyControls( {
 }
 
 function ScrollableContent() {
+	const [ size, setSize ] =
+		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
 	const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
 	const [ isFooterSticky, setIsFooterSticky ] = useState( true );
-	const controlProps = {
+	const controlProps: ScrollableControlProps = {
+		size,
+		setSize,
 		isHeaderSticky,
 		setIsHeaderSticky,
 		isFooterSticky,
@@ -236,16 +247,16 @@ function ScrollableContent() {
 	return (
 		<>
 			<Stack direction="column" gap="lg" align="start">
-				<StickyControls { ...controlProps } />
+				<ScrollableControls { ...controlProps } />
 				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 			</Stack>
-			<Dialog.Popup>
+			<Dialog.Popup size={ size }>
 				<Dialog.Header sticky={ isHeaderSticky }>
 					<Dialog.Title>Terms of service</Dialog.Title>
 					<Dialog.CloseIcon />
 				</Dialog.Header>
 				<Stack direction="column" gap="lg">
-					<StickyControls { ...controlProps } />
+					<ScrollableControls { ...controlProps } />
 					{ Array.from( { length: 20 } ).map( ( _, index ) => (
 						<p key={ index } style={ { margin: 0 } }>
 							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
@@ -271,8 +282,11 @@ function ScrollableContent() {
  * keep sight of the title and primary actions while scrolling. Separator
  * borders appear only when there is off-screen content above the header or
  * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
- * and let it scroll with the content — the toggles in this story drive both
- * props independently and stay in sync between outside and inside the dialog.
+ * and let it scroll with the content.
+ *
+ * Use the inline controls to change the popup `size` and toggle each
+ * sticky prop independently. The same controls render both outside and
+ * inside the dialog and stay in sync.
  */
 export const Scrollable: Story = {
 	args: {

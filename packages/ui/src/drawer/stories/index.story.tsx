@@ -385,19 +385,33 @@ function StickyToggle( {
 	);
 }
 
-function StickyControls( {
-	isHeaderSticky,
-	setIsHeaderSticky,
-	isFooterSticky,
-	setIsFooterSticky,
-}: {
+type ScrollableControlProps = {
+	size: ComponentProps< typeof Drawer.Popup >[ 'size' ];
+	setSize: ( size: ComponentProps< typeof Drawer.Popup >[ 'size' ] ) => void;
+	direction: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ];
+	setDirection: (
+		dir: ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
+	) => void;
 	isHeaderSticky: boolean;
 	setIsHeaderSticky: ( value: boolean ) => void;
 	isFooterSticky: boolean;
 	setIsFooterSticky: ( value: boolean ) => void;
-} ) {
+};
+
+function ScrollableControls( {
+	size,
+	setSize,
+	direction,
+	setDirection,
+	isHeaderSticky,
+	setIsHeaderSticky,
+	isFooterSticky,
+	setIsFooterSticky,
+}: ScrollableControlProps ) {
 	return (
 		<Stack direction="row" gap="lg" align="center">
+			<SizeSelector value={ size } onChange={ setSize } />
+			<DirectionSelector value={ direction } onChange={ setDirection } />
 			<StickyToggle
 				label="Sticky header"
 				value={ isHeaderSticky }
@@ -412,58 +426,70 @@ function StickyControls( {
 	);
 }
 
-function ScrollableContent() {
-	const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
-	const [ isFooterSticky, setIsFooterSticky ] = useState( true );
-	const controlProps = {
-		isHeaderSticky,
-		setIsHeaderSticky,
-		isFooterSticky,
-		setIsFooterSticky,
-	};
-	return (
-		<>
-			<Stack direction="column" gap="lg" align="start">
-				<StickyControls { ...controlProps } />
-				<Drawer.Trigger>Open Drawer</Drawer.Trigger>
-			</Stack>
-			<Drawer.Popup>
-				<Drawer.Header sticky={ isHeaderSticky }>
-					<Drawer.Title>Terms of service</Drawer.Title>
-					<Drawer.CloseIcon />
-				</Drawer.Header>
-				<Stack direction="column" gap="lg">
-					<StickyControls { ...controlProps } />
-					{ Array.from( { length: 20 } ).map( ( _, index ) => (
-						<p key={ index } style={ { margin: 0 } }>
-							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
-							consectetur adipiscing elit. Sed do eiusmod tempor
-							incididunt ut labore et dolore magna aliqua. Ut enim
-							ad minim veniam, quis nostrud exercitation ullamco
-							laboris nisi ut aliquip ex ea commodo consequat.
-						</p>
-					) ) }
-				</Stack>
-				<Drawer.Footer sticky={ isFooterSticky }>
-					<Drawer.Action variant="outline">Decline</Drawer.Action>
-					<Drawer.Action>Accept</Drawer.Action>
-				</Drawer.Footer>
-			</Drawer.Popup>
-		</>
-	);
-}
-
 /**
  * When drawer content overflows the available height, `Drawer.Header` stays
  * pinned to the top and `Drawer.Footer` stays pinned to the bottom so users
  * keep sight of the title and primary actions while scrolling. Separator
  * borders appear only when there is off-screen content above the header or
  * below the footer. Pass `sticky={ false }` on either subcomponent to opt out
- * and let it scroll with the content — the toggles in this story drive both
- * props independently and stay in sync between outside and inside the drawer.
+ * and let it scroll with the content.
+ *
+ * Use the inline controls to change the popup `size`, `swipeDirection`,
+ * and toggle each sticky prop independently. The same controls render
+ * both outside and inside the drawer and stay in sync.
  */
 export const Scrollable: Story = {
-	args: {
-		children: <ScrollableContent />,
+	render: function ScrollableRender( args ) {
+		const [ size, setSize ] =
+			useState< ComponentProps< typeof Drawer.Popup >[ 'size' ] >();
+		const [ direction, setDirection ] = useState<
+			ComponentProps< typeof Drawer.Root >[ 'swipeDirection' ]
+		>( args.swipeDirection ?? 'left' );
+		const [ isHeaderSticky, setIsHeaderSticky ] = useState( true );
+		const [ isFooterSticky, setIsFooterSticky ] = useState( true );
+		const controlProps: ScrollableControlProps = {
+			size,
+			setSize,
+			direction,
+			setDirection,
+			isHeaderSticky,
+			setIsHeaderSticky,
+			isFooterSticky,
+			setIsFooterSticky,
+		};
+		return (
+			<Drawer.Root { ...args } swipeDirection={ direction }>
+				<Stack direction="column" gap="lg" align="start">
+					<ScrollableControls { ...controlProps } />
+					<Drawer.Trigger>Open Drawer</Drawer.Trigger>
+				</Stack>
+				<Drawer.Popup size={ size }>
+					<Drawer.Header sticky={ isHeaderSticky }>
+						<Drawer.Title>Terms of service</Drawer.Title>
+						<Drawer.CloseIcon />
+					</Drawer.Header>
+					<Stack direction="column" gap="lg">
+						<ScrollableControls { ...controlProps } />
+						{ Array.from( { length: 20 } ).map( ( _, index ) => (
+							<p key={ index } style={ { margin: 0 } }>
+								Paragraph { index + 1 }: Lorem ipsum dolor sit
+								amet, consectetur adipiscing elit. Sed do
+								eiusmod tempor incididunt ut labore et dolore
+								magna aliqua. Ut enim ad minim veniam, quis
+								nostrud exercitation ullamco laboris nisi ut
+								aliquip ex ea commodo consequat.
+							</p>
+						) ) }
+					</Stack>
+					<Drawer.Footer sticky={ isFooterSticky }>
+						<Drawer.Action variant="outline">Decline</Drawer.Action>
+						<Drawer.Action>Accept</Drawer.Action>
+					</Drawer.Footer>
+				</Drawer.Popup>
+			</Drawer.Root>
+		);
+	},
+	argTypes: {
+		swipeDirection: { control: false },
 	},
 };
