@@ -1001,6 +1001,8 @@ function appendPseudoSelectorStyles(
  * @param featureSelectors       Optional feature-level selectors for the block.
  * @param treeSettings           Global styles settings tree.
  * @param styleVariationSelector Optional style variation selector.
+ * @param blockRootSelector      Optional block root selector used to detect block-level feature selectors.
+ * @param styleVariationName     Optional variation name used when applying variation class to block-level feature selectors.
  * @return Updated ruleset string with responsive CSS rules appended.
  */
 function appendResponsiveStyles(
@@ -1012,7 +1014,9 @@ function appendResponsiveStyles(
 		| Record< string, string | Record< string, string > >
 		| undefined,
 	treeSettings: Record< string, any > | undefined,
-	styleVariationSelector?: string
+	styleVariationSelector?: string,
+	blockRootSelector?: string,
+	styleVariationName?: string
 ): string {
 	const responsiveStyles = Object.entries( styles ).filter( ( [ key ] ) =>
 		Object.prototype.hasOwnProperty.call( RESPONSIVE_BREAKPOINTS, key )
@@ -1054,12 +1058,28 @@ function appendResponsiveStyles(
 					if ( ! declarations.length ) {
 						return;
 					}
-					const cssSelector = styleVariationSelector
-						? concatFeatureVariationSelectorString(
-								baseSelector,
-								styleVariationSelector
-						  )
-						: baseSelector;
+					let cssSelector: string;
+					if ( ! styleVariationSelector ) {
+						cssSelector = baseSelector;
+					} else if (
+						blockRootSelector &&
+						styleVariationName &&
+						! baseSelector.includes( blockRootSelector )
+					) {
+						/*
+						 * Feature selector is block-level (e.g. `.wp-block-button` for
+						 * dimensions/width) — apply the variation class directly to it.
+						 */
+						cssSelector = getBlockStyleVariationSelector(
+							styleVariationName,
+							baseSelector
+						);
+					} else {
+						cssSelector = concatFeatureVariationSelectorString(
+							baseSelector,
+							styleVariationSelector
+						);
+					}
 					const rules = declarations.join( ';' );
 					ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ rules };}}`;
 				}
@@ -1754,11 +1774,26 @@ export const transformToStyles = (
 											string[],
 										] ) => {
 											if ( declarations.length ) {
+												/*
+												 * If the feature selector does not include the block's
+												 * root selector (e.g. core/button dimensions width uses
+												 * `.wp-block-button` while root is
+												 * `.wp-block-button .wp-block-button__link`), apply the
+												 * variation class directly to the feature selector.
+												 */
 												const cssSelector =
-													concatFeatureVariationSelectorString(
-														baseSelector,
-														styleVariationSelector as string
-													);
+													! selector ||
+													baseSelector.includes(
+														selector
+													)
+														? concatFeatureVariationSelectorString(
+																baseSelector,
+																styleVariationSelector as string
+														  )
+														: getBlockStyleVariationSelector(
+																styleVariationName,
+																baseSelector
+														  );
 												const rules =
 													declarations.join( ';' );
 												ruleset += `:root :where(${ cssSelector }){${ rules };}`;
@@ -1803,7 +1838,9 @@ export const transformToStyles = (
 									ruleset,
 									featureSelectors,
 									tree.settings,
-									styleVariationSelector as string
+									styleVariationSelector as string,
+									selector,
+									styleVariationName
 								);
 
 								// Generate layout styles for the variation if it supports layout and has blockGap defined.

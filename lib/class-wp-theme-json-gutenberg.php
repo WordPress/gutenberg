@@ -3313,15 +3313,24 @@ class WP_Theme_JSON_Gutenberg {
 					$clean_current_selector = preg_replace( '/,\s+/', ',', $current_selector );
 					$shortened_selector     = str_replace( $block_metadata['selector'], '', $clean_current_selector );
 
-					// Prepend the variation selector to the current selector.
-					$split_selectors    = explode( ',', $shortened_selector );
-					$updated_selectors  = array_map(
-						static function ( $split_selector ) use ( $clean_style_variation_selector ) {
-							return $clean_style_variation_selector . $split_selector;
-						},
-						$split_selectors
-					);
-					$combined_selectors = implode( ',', $updated_selectors );
+					if ( $block_metadata['selector'] && ! str_contains( $clean_current_selector, $block_metadata['selector'] ) ) {
+						/*
+						 * Feature selector is block-level (e.g. `.wp-block-button` for
+						 * dimensions/width) — apply the variation class directly to it.
+						 */
+						$feature_element_selector = str_replace( $shortened_selector, '', $clean_style_variation_selector );
+						$combined_selectors       = str_replace( $feature_element_selector, '', $clean_style_variation_selector );
+					} else {
+						// Prepend the variation selector to the current selector.
+						$split_selectors    = explode( ',', $shortened_selector );
+						$updated_selectors  = array_map(
+							static function ( $split_selector ) use ( $clean_style_variation_selector ) {
+								return $clean_style_variation_selector . $split_selector;
+							},
+							$split_selectors
+						);
+						$combined_selectors = implode( ',', $updated_selectors );
+					}
 
 					// Add the new declarations to the overall results under the modified selector.
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
@@ -3362,13 +3371,34 @@ class WP_Theme_JSON_Gutenberg {
 
 					$breakpoint_node  = $style_variation_node[ $breakpoint ];
 					$breakpoint_media = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
-
 					// Process feature-level declarations for this breakpoint.
 					$breakpoint_feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $breakpoint_node );
 					$breakpoint_feature_declarations = static::update_paragraph_text_indent_selector( $breakpoint_feature_declarations, $settings, $block_name );
 					$breakpoint_feature_declarations = static::update_button_width_declarations( $breakpoint_feature_declarations, $settings );
 					foreach ( $breakpoint_feature_declarations as $feature_selector => $feature_decl ) {
-						$feature_ruleset           = static::to_ruleset( ':root :where(' . $feature_selector . ')', $feature_decl );
+						$clean_feature_selector = preg_replace( '/,\s+/', ',', $feature_selector );
+						$shortened_selector     = str_replace( $block_metadata['selector'], '', $clean_feature_selector );
+
+						if ( $block_metadata['selector'] && ! str_contains( $clean_feature_selector, $block_metadata['selector'] ) ) {
+							/*
+							 * Feature selector is block-level (e.g. `.wp-block-button` for
+							 * dimensions/width) — apply the variation class directly to it.
+							 */
+							$feature_element_selector = str_replace( $shortened_selector, '', $clean_style_variation_selector );
+							$combined_selectors       = str_replace( $feature_element_selector, '', $clean_style_variation_selector );
+						} else {
+							// Prepend the variation selector to the current selector.
+							$split_selectors    = explode( ',', $shortened_selector );
+							$updated_selectors  = array_map(
+								static function ( $split_selector ) use ( $clean_style_variation_selector ) {
+									return $clean_style_variation_selector . $split_selector;
+								},
+								$split_selectors
+							);
+							$combined_selectors = implode( ',', $updated_selectors );
+						}
+
+						$feature_ruleset           = static::to_ruleset( ':root :where(' . $combined_selectors . ')', $feature_decl );
 						$variation_responsive_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
 					}
 
