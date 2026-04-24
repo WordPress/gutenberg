@@ -59,26 +59,14 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		onChangeLayout,
 		onPreviewLayout,
 	} = props;
-	/*
-	 * Temporary layout holds pending changes during drag/resize
-	 * to show preview without triggering parent re-renders.
-	 */
+	// Preview layout applied during drag/resize before committing.
 	const [ temporaryLayout, setTemporaryLayout ] = useState<
 		DashboardGridLayoutItem[] | undefined
 	>();
-	/*
-	 * Identifies the item currently being dragged. Drives the
-	 * `<DragOverlay>` content: the original tile stays in its grid
-	 * cell as a placeholder (with reduced opacity), while a clone
-	 * inside the overlay follows the cursor.
-	 */
+	// Drives `<DragOverlay>` content while a drag is in progress.
 	const [ activeId, setActiveId ] = useState< string | null >( null );
-	/*
-	 * Mirror of `temporaryLayout` for synchronous reads from
-	 * `persistTemporaryLayout` on drag end: a state update queued
-	 * inside `handleDragMove` is batched by React and would still
-	 * be stale when read from `persistTemporaryLayout`.
-	 */
+	// Mirror of `temporaryLayout` read synchronously on drag end —
+	// the state update from `handleDragMove` may still be batched.
 	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
 	const activeLayout = temporaryLayout ?? layout;
 
@@ -89,12 +77,8 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	} );
 	const mergedGridRef = useMergeRefs( [ rootRef, resizeObserverRef ] );
 
-	/*
-	 * Measure synchronously before paint so responsive mode does not
-	 * flash a single-column layout on first render: `useResizeObserver`
-	 * delivers its first entry asynchronously after mount, by which
-	 * point the user has already seen the uninitialized width.
-	 */
+	// Measure before paint to avoid a single-column flash in
+	// responsive mode; `useResizeObserver` delivers async.
 	useLayoutEffect( () => {
 		if ( rootRef.current ) {
 			const { width } = rootRef.current.getBoundingClientRect();
@@ -172,11 +156,8 @@ export function DashboardGrid( props: DashboardGridProps ) {
 
 			const key = child.key?.toString();
 			if ( key && layoutMap.has( key ) ) {
-				/*
-				 * Extract `actionableArea` as a grid-level slot and strip
-				 * it from the child so the prop does not leak onto DOM
-				 * elements when consumers pass plain tags as children.
-				 */
+				// Lift `actionableArea` to a grid slot; strip it
+				// from the child so it does not leak to the DOM.
 				const { actionableArea } = child.props;
 				if ( actionableArea !== undefined ) {
 					actionableMap.set( key, actionableArea );
@@ -212,15 +193,9 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		setTemporaryLayout( undefined );
 	} );
 
-	/*
-	 * Decide reorder from the pointer position relative to the over
-	 * tile's center, not just from `over.id` changing. dnd-kit only
-	 * fires `onDragOver` when `over` changes, which misses the
-	 * "swap back" case where the cursor stays over the same tile
-	 * (common after a reorder that resized or moved a wide
-	 * neighbor). `onDragMove` fires on every pointer move, letting
-	 * us re-evaluate the insertion slot continuously.
-	 */
+	// Re-evaluate the insertion slot on every pointer move, not
+	// just when `over.id` changes — otherwise a "swap back" with
+	// the cursor still on the same tile would never fire.
 	const handleDragMove = useEvent( ( event: DragMoveEvent ) => {
 		const { active, over } = event;
 		if ( ! over || active.id === over.id ) {
@@ -261,12 +236,8 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		onPreviewLayout?.( updatedLayout );
 	} );
 
-	/*
-	 * Commit temporary changes to parent and clear local state.
-	 * Called when user finishes drag/resize on mouse up. Reads from
-	 * `latestLayoutRef` rather than `temporaryLayout` so that a
-	 * just-flushed debounced update is observed synchronously.
-	 */
+	// Commit the latest temporary layout and clear local state.
+	// Reads from the ref to bypass React's state batching.
 	function persistTemporaryLayout() {
 		const latest = latestLayoutRef.current;
 		latestLayoutRef.current = undefined;
@@ -299,11 +270,8 @@ export function DashboardGrid( props: DashboardGridProps ) {
 			const updatedLayout = activeLayout.map( ( item ) => {
 				if ( item.key === id ) {
 					const resolvedItem = resolvedItemMap.get( id );
-					/*
-					 * When the tile uses `'fill'` or `'full'`, resize
-					 * starts from the currently rendered column span
-					 * and converts to a concrete numeric width.
-					 */
+					// `'fill'`/`'full'` resize from the rendered span
+					// and convert to a numeric width.
 					let baseWidth: number;
 					if ( item.width === 'full' ) {
 						baseWidth = effectiveColumns;
@@ -350,12 +318,8 @@ export function DashboardGrid( props: DashboardGridProps ) {
 				setActiveId( null );
 			} }
 		>
-			{ /*
-			 * Strategy is intentionally a no-op: the visual reorder is
-			 * driven by `temporaryLayout` + CSS Grid re-render, not by
-			 * dnd-kit's built-in transforms. This keeps resize, reorder,
-			 * and fill resolution on a single code path.
-			 */ }
+			{ /* No-op strategy: reorder comes from `temporaryLayout`
+				 + CSS Grid, not dnd-kit transforms. */ }
 			<SortableContext items={ items } strategy={ () => null }>
 				<div
 					ref={ mergedGridRef }
