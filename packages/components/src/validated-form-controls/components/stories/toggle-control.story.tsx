@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -30,32 +30,23 @@ export default meta;
 export const Default: StoryObj< typeof ValidatedToggleControl > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ checked, setChecked ] = useState( false );
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedToggleControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedToggleControl
 				{ ...args }
 				checked={ checked }
-				onChange={ ( value ) => {
-					setChecked( value );
-					onChange?.( value );
+				onChange={ ( newValue ) => {
+					setChecked( newValue );
+					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'This toggle may not be enabled.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					checked
+						? {
+								type: 'invalid',
+								message: 'This toggle may not be enabled.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

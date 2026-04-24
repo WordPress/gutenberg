@@ -16,14 +16,14 @@ import { useSelect } from '@wordpress/data';
 
 export default function Edit( props ) {
 	const { clientId } = props;
-	const { innerBlocks } = useSelect(
-		( select ) => select( blockEditorStore ).getBlock( clientId ),
+	const hasInnerBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ) > 0,
 		[ clientId ]
 	);
 
 	return (
 		<div { ...useBlockProps( { className: 'widget' } ) }>
-			{ innerBlocks.length === 0 ? (
+			{ ! hasInnerBlocks ? (
 				<PlaceholderContent { ...props } />
 			) : (
 				<PreviewContent { ...props } />

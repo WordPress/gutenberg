@@ -14,6 +14,30 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
+## Setup
+
+This package requires CSS from this package and from multiple dependency packages.
+
+### Within WordPress
+
+To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+### Outside WordPress
+
+Install and load these stylesheets in your application:
+
+```bash
+npm install @wordpress/dataviews @wordpress/theme @wordpress/components
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/build-style/style.css';
+import '@wordpress/dataviews/build-style/style.css';
+```
+
+RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
+
 ## `DataViews`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
@@ -194,7 +218,7 @@ const view = {
 
 Properties:
 
--   `type`: view type, one of `table`, `grid`, `list`. See "Layout types".
+-   `type`: view type, one of `table`, `grid`, `list`, `activity`, `pickerTable`, `pickerGrid`. See "Layout types".
 -   `search`: the text search applied to the dataset.
 -   `filters`: the filters applied to the dataset. Each item describes:
     -   `field`: which field this filter is bound to.
@@ -203,6 +227,7 @@ Properties:
     -   `isLocked`: whether the filter is locked (cannot be edited by the user).
 -   `perPage`: number of records to show per page.
 -   `page`: the page that is visible.
+-   `startPosition`: the first item to load when infinite scroll is enabled. Used instead of `page`.
 -   `sort`:
     -   `field`: the field used for sorting the dataset.
     -   `direction`: the direction to use for sorting, one of `asc` or `desc`.
@@ -217,7 +242,9 @@ Properties:
 
     -   `field`: the field used for grouping the dataset.
     -   `direction`: the direction to use for sorting the groups, one of `asc` or `desc`. Default `asc`.
+    -   `showLabel`: whether to show the field label in the group header. `true` by default.
 
+-   `infiniteScrollEnabled`: whether infinite scroll is enabled. `false` by default.
 -   `fields`: a list of remaining field `id` that are visible in the UI and the specific order in which they are displayed.
 -   `layout`: config that is specific to a particular layout type.
 
@@ -225,34 +252,34 @@ Properties:
 
 | Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
 | -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             |        |	             |        | ✓          |
-| `enableMoving` | ✓       | ✓             |        |	             |        |            |
-| `styles`       | ✓       | ✓             |        |	             |        |            |
+| `density`      | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
+| `enableMoving` | ✓       | ✓             |        |              |        |            |
+| `styles`       | ✓       | ✓             |        |              |        |            |
 | `badgeFields`  |         |               | ✓      | ✓            |        |            |
 | `previewSize`  |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-- `enableMoving`: whether the table columns should display moving controls.
-- `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
+-   `enableMoving`: whether the table columns should display moving controls.
+-   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
 
 **For column alignment (`align` property), follow these guidelines:**
-Right-align whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment for all other types (text, codes, labels, dates).
+Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
 
 `grid` and `pickerGrid` layout:
 
-- `badgeFields`: a list of field's `id` to render without label and styled as badges.
-- `previewSize`: a `number` representing the size of the preview.
+-   `badgeFields`: a list of field's `id` to render without label and styled as badges.
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the gap between items in the grid.
+-   `previewSize`: a `number` representing the size of the preview.
 
 `list` layout:
 
-- None
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 `activity` layout:
 
-- `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
-
+-   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 
 #### `onChangeView`: `function`
 
@@ -374,7 +401,6 @@ const actions = [
 
 -   `totalItems`: the total number of items in the datasets.
 -   `totalPages`: the total number of pages, taking into account the total items in the dataset and the number of items per page provided by the user.
--   `infiniteScrollHandler`: a function that handles infinite scrolling. This function should be called when the user scrolls to the bottom of the page. See [example in storybook](https://wordpress.github.io/gutenberg/?path=/story/dataviews-dataviews--infinite-scroll).
 
 #### `search`: `boolean`
 
@@ -388,7 +414,7 @@ What text to show in the search input. "Search" by default.
 
 Whether the data is loading. `false` by default.
 
-#### `defaultLayouts`: `Record< string, view >`
+#### `defaultLayouts`: `Object`
 
 This property limits the available layout and provides layout information about active view types. If empty, this enables all layout types (see "Layout Types") with empty layout data.
 
@@ -405,7 +431,7 @@ const defaultLayouts = {
 };
 ```
 
-The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, and `activity`. These properties are applied to the view object each time the user switches to the corresponding layout.
+The `defaultLayouts` property should be an object that includes properties named `table`, `grid`, `list`, `activity`, `pickerTable`, and `pickerGrid`. These properties are applied to the view object each time the user switches to the corresponding layout.
 
 #### `selection`: `string[]`
 
@@ -465,6 +491,33 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 #### `empty`: React node
 
 An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
+
+#### `onReset`: `( () => void ) | false`
+
+Callback function to reset the view to its default state, or `false` to indicate the view is not modified.
+
+-   Type: `function` or `false`
+-   Optional
+
+This prop controls the "Reset view" button in the view configuration dropdown:
+
+-   When `undefined` (not provided): No reset functionality is shown. Use this when view persistence is not supported.
+-   When `false`: The "Reset view" button is shown but disabled. Use this when view persistence is supported but the current view matches the default (not modified).
+-   When a function: The "Reset view" button is shown and enabled. A blue dot indicator appears on the view options button to signal that the view has been modified. The function is called when the user clicks the reset button.
+
+Example:
+
+```jsx
+const { view, setView, isModified, resetToDefault } = useView( 'my-view-key' );
+
+<DataViews
+	data={ data }
+	view={ view }
+	onChangeView={ setView }
+	onReset={ isModified ? resetToDefault : false }
+	// ...other props
+/>
+```
 
 ### Styling
 
@@ -648,7 +701,7 @@ A list of actions that can be performed on the dataset. See "Actions API" for mo
 
 #### `paginationInfo`: `Object`
 
-Same as `DataViews`. Contains `totalItems` and `totalPages` properties, and optionally `infiniteScrollHandler`.
+Same as `DataViews`. Contains `totalItems` and `totalPages` properties.
 
 #### `search`: `boolean`
 
@@ -784,7 +837,7 @@ const fields = [
 ];
 ```
 
-#### `form`: `Object[]`
+#### `form`: `Object`
 
 -   `layout`: an object describing the layout used to render the top-level fields present in `fields`. See `layout` prop in "Form Field API".
 -   `fields`: a list of fields ids that should be rendered. Field ids can also be defined as an object and allow you to define a `layout`, `labelPosition` or `children` if displaying combined fields. See "Form Field API" for a description of every property.
@@ -854,35 +907,63 @@ return (
 
 Object that determines the validation status of each field. There's a `useFormValidity` hook that can be used to create the validity object — see the utility below. This section documents the `validity` object in case you want to create it via other means.
 
-The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+The top-level props of the `validity` object are the field IDs. Fields declare their validity status for each of the validation rules supported: `required`, `elements`, `pattern`, `minLength`, `maxLength`, `min`, `max`, `custom`. If a rule is valid, it should not be present in the object; if a field is valid for all the rules, it should not be present in the object either.
+
+A field's validity can also contain a `children` property (`Record<string, FieldValidity>`) for nested field validity when using combined fields.
 
 For example:
 
 ```json
 {
-  "title": {
-    "required": {
-      "type": "invalid"
-    }
-  },
-  "author": {
-    "elements": {
-      "type": "invalid",
-      "message": "Value must be one of the elements."
-    }
-  },
-  "publisher": {
-    "custom": {
-      "type": "validating",
-      "message": "Validating..."
-    }
-  },
-  "isbn": {
-    "custom": {
-      "type": "valid",
-      "message": "Valid."
-    }
-  }
+	"title": {
+		"required": {
+			"type": "invalid"
+		}
+	},
+	"author": {
+		"elements": {
+			"type": "invalid",
+			"message": "Value must be one of the elements."
+		}
+	},
+	"slug": {
+		"pattern": {
+			"type": "invalid",
+			"message": "Must match the required pattern."
+		}
+	},
+	"description": {
+		"minLength": {
+			"type": "invalid",
+			"message": "Must be at least 10 characters."
+		},
+		"maxLength": {
+			"type": "invalid",
+			"message": "Must be at most 200 characters."
+		}
+	},
+	"price": {
+		"min": {
+			"type": "invalid",
+			"message": "Must be at least 0."
+		},
+		"max": {
+			"type": "invalid",
+			"message": "Must be at most 9999."
+		}
+	},
+	"publisher": {
+		"custom": {
+			"type": "validating",
+			"message": "Validating..."
+		}
+	},
+	"isbn": {
+		"custom": {
+			"type": "valid",
+			"message": "Valid."
+		}
+	}
 }
 ```
 
@@ -892,11 +973,11 @@ The `message` is the text to be displayed in the UI controls. The message for th
 
 The `type` can be:
 
-- `validating`: when the value is being validated (e.g., custom async rule)
-- `invalid`: when the value is invalid according to the rule
-- `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
+-   `validating`: when the value is being validated (e.g., custom async rule)
+-   `invalid`: when the value is invalid according to the rule
+-   `valid`: when the value _became_ valid after having been invalid (e.g., custom async rule)
 
-Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid.  The `useFormValidity` hook implements this only for the custom async validation.
+Note the `valid` status. This is useful for displaying a "Valid." message when the field transitions from invalid to valid. The `useFormValidity` hook implements this only for the custom async validation.
 
 ## Utilities
 
@@ -943,6 +1024,26 @@ Returns an object containing:
 			type: 'invalid',
 			message: 'Value must be one of the elements.' // Optional
 		},
+		pattern: {
+			type: 'invalid',
+			message: 'Must match the required pattern.'
+		},
+		minLength: {
+			type: 'invalid',
+			message: 'Must be at least 10 characters.'
+		},
+		maxLength: {
+			type: 'invalid',
+			message: 'Must be at most 200 characters.'
+		},
+		min: {
+			type: 'invalid',
+			message: 'Must be at least 0.'
+		},
+		max: {
+			type: 'invalid',
+			message: 'Must be at most 9999.'
+		},
 		custom: {
 			type: 'validating',
 			message: 'Validating...'
@@ -971,7 +1072,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: Trash
+	label: 'Trash'
 }
 ```
 
@@ -1045,7 +1146,7 @@ Function that performs the required action.
 
 ```js
 {
-	callback: ( items, { onActionPerformed } ) => {
+	callback: ( items, { registry, onActionPerformed } ) => {
 		// Perform action.
 		onActionPerformed?.( items );
 	};
@@ -1072,14 +1173,14 @@ Component to render UI in a modal for the action.
 		return (
 			<form onSubmit={ onSubmit }>
 				<p>Modal UI</p>
-				<HStack>
+				<Stack direction="row">
 					<Button variant="tertiary" onClick={ closeModal }>
 						Cancel
 					</Button>
 					<Button variant="primary" type="submit">
 						Submit
 					</Button>
-				</HStack>
+				</Stack>
 			</form>
 		);
 	};
@@ -1192,7 +1293,7 @@ Example:
 
 React element used by some layouts (table, grid) to display the field name — useful to add icons, etc.
 
--   Type: React element.
+-   Type: `string` | React element.
 -   Optional.
 -   Defaults to the `label` value.
 
@@ -1203,10 +1304,10 @@ Example:
 	id: 'title',
 	type: 'text',
 	header: (
-		<HStack spacing={ 1 } justify="start">
+		<Stack direction="row" gap="xs" justify="start">
 			<Icon icon={ icon } />
 			<span>Title</span>
-		</HStack>
+		</Stack>
 	),
 }
 ```
@@ -1345,13 +1446,70 @@ const item = {
 }
 ```
 
+### `getValueFormatted`
+
+Function that formats the field value for display by computing it from the field's `format` configuration. The formatted value is used for consistent value presentation across different contexts. For example, by the default `render` implementation provided by the field types and by the filter components that display values.
+
+-   Type: `function`.
+-   Optional.
+-   Each field `type` provides a default implementation that formats values appropriately (e.g., considers weekStartsOn for date, thousand separators for number, etc.).
+-   Args:
+    -   `item`: the data item containing the value.
+    -   `field`: the normalized field configuration.
+-   Returns the formatted value for display (typically a string).
+
+Example of some custom `getValueFormatted` functions:
+
+```js
+// Format a number as currency
+{
+	id: 'price',
+	type: 'number',
+	label: 'Price',
+	getValueFormatted: ( { item, field } ) => {
+		const value = field.getValue( { item } );
+		if ( value === null || value === undefined ) {
+			return '';
+		}
+
+		return `$${ value.toFixed( field.format.decimals ) }`;
+	}
+}
+```
+
+```js
+// Format a date with custom logic
+{
+	id: 'publishDate',
+	type: 'date',
+	label: 'Published',
+	getValueFormatted: ( { item, field } ) => {
+		const value = field.getValue( { item } );
+		if ( ! value ) {
+			return 'Not published';
+		}
+
+		const date = new Date( value );
+		const now = new Date();
+		const diffDays = Math.floor( ( now - date ) / ( 1000 * 60 * 60 * 24 ) );
+		if ( diffDays === 0 ) {
+			return 'Today';
+		}
+		if ( diffDays === 1 ) {
+			return 'Yesterday';
+		}
+		return `${ diffDays } days ago`;
+	}
+}
+```
+
 ### `render`
 
 React component that renders the field.
 
 -   Type: React component.
 -   Optional.
--   The field `type` provides a default render based on `getValue` and `elements` (if provided).
+-   The field `type` provides a default render that uses `getValueFormatted` for value display and `elements` for label lookup (if provided).
 -   Props
     -   `item` value to be processed.
     -   `field` the own field config. Useful to access `getValue`, `elements`, etc.
@@ -1402,7 +1560,7 @@ Field authors can override the default Edit control by providing a string that m
 
 Additionally, some of the bundled Edit controls are configurable via a config object:
 
-- `textarea` configuration:
+-   `textarea` configuration:
 
 ```js
 {
@@ -1416,7 +1574,7 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
-- `text` configuration:
+-   `text` configuration:
 
 ```js
 {
@@ -1431,17 +1589,34 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 }
 ```
 
+-   `datetime` configuration:
+
+```js
+{
+	id: 'date',
+	type: 'datetime',
+	label: 'Date',
+	Edit: {
+		control: 'datetime',
+		compact: true
+	}
+}
+```
+
 Finally, the field author can always provide its own custom `Edit` control. It receives the following props:
 
 -   `data`: the item to be processed
 -   `field`: the field definition
 -   `onChange`: the callback with the updates
 -   `hideLabelFromVision`: boolean representing if the label should be hidden
+-   `markWhenOptional`: boolean indicating whether to label the control as "optional" when the field is not required, instead of showing "required"
+-   `operator`: the currently selected filter operator for this field. Used by DataViews filters to determine which control to render based on the operator type
 -   `validity`: object representing the validity of the field's value (see validity section)
 -   `config`: object representing extra config for the component:
     -   `prefix`: a React component to be rendered as a prefix
     -   `suffix`: a React component to be rendered as a suffix
     -   `rows`: the number of rows to display (e.g., in the text area component)
+    -   `compact`: whether to render a compact version without the calendar widget (datetime control)
 
 ```js
 {
@@ -1496,9 +1671,9 @@ When the field declares a type, it gets a default sort function:
 
 The default sorting can be overriden by providing a custom sort function. It takes the following arguments:
 
-  -   `a`: the first item to compare
-  -   `b`: the second item to compare
-  -   `direction`: either `asc` (ascending) or `desc` (descending)
+-   `a`: the first item to compare
+-   `b`: the second item to compare
+-   `direction`: either `asc` (ascending) or `desc` (descending)
 
 It should return a number where:
 
@@ -1525,6 +1700,11 @@ Object that contains the validation rules for the field. If a rule is not met, t
 
 -   `required`: boolean indicating whether the field is required or not. Disabled by default.
 -   `elements`: boolean restricting selection to the provided list of elements only. Enabled by default. The `array` Edit control uses it to restrict the input values.
+-   `pattern`: a regex pattern string that the field value must match.
+-   `minLength`: minimum string length for the field value.
+-   `maxLength`: maximum string length for the field value.
+-   `min`: minimum numeric value for the field.
+-   `max`: maximum numeric value for the field.
 -   `custom`: a function that validates a field's value. If the value is invalid, the function should return a string explaining why the value is invalid. Otherwise, the function must return null.
 
 Fields that define a type come with default validation for the type. For example, the `integer` type ensures that the value is a valid integer:
@@ -1712,7 +1892,7 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 
 ### `filterBy`
 
-Configuration of the filters.  Set to `false` to opt the field out of filtering entirely.
+Configuration of the filters. Set to `false` to opt the field out of filtering entirely.
 
 -   Type: `object` | `boolean`.
 -   Optional.
@@ -1804,63 +1984,83 @@ Or multi-selection operators:
 		{ value: 'd', label: 'Product D' },
 	],
 	filterBy: {
-		operators: [ `isAny`, `isNone`, `isAll`, `isNotAll` ];
+		operators: [ `isAny`, `isNone`, `isAll` ];
 	}
 }
 ```
 
 The next table lists all available operators:
 
-| Operator             | Description                                                                                          | Example                                            |
-| -------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| `after`              | `AFTER`. The item's field is after a given date.                                                     | Date is after: 2024-01-01                          |
-| `afterInc`           | `AFTER (Inc)`. The item's field is after a given date, including the date.                           | Date is on or after: 2024-01-01                    |
-| `before`             | `BEFORE`. The item's field is before a given date.                                                   | Date is before: 2024-01-01                         |
-| `beforeInc`          | `BEFORE (Inc)`. The item's field is before a given date, including the date.                         | Date is on or before: 2024-01-01                   |
-| `between`            | `BETWEEN`. The item's field is between two values.                                                   | Count between (inc): 10 and 180                    |
-| `contains`           | `CONTAINS`. The item's field contains the given substring.                                           | Title contains: Mars                               |
-| `greaterThan`        | `GREATER THAN`. The item's field is numerically greater than a single value.                         | Age is greater than: 65                            |
-| `greaterThanOrEqual` | `GREATER THAN OR EQUAL TO`. The item's field is numerically greater than or equal to a single value. | Age is greater than or equal to: 65                |
-| `inThePast`          | `IN THE PAST`. The item's field is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                         |
-| `isAll`              | `AND`. The item's field has all of the values in the list.                                           | Category is all: Book, Review, Science Fiction     |
-| `isAny`              | `OR`. The item's field is present in a list of values.                                               | Author is any: Admin, Editor                       |
-| `isNone`             | `NOT OR`. The item's field is not present in a list of values.                                       | Author is none: Admin, Editor                      |
-| `isNot`              | `NOT EQUAL TO`. The item's field is not equal to a single value.                                     | Author is not Admin                                |
-| `isNotAll`           | `NOT AND`. The item's field doesn't have all of the values in the list.                              | Category is not all: Book, Review, Science Fiction |
-| `is`                 | `EQUAL TO`. The item's field is equal to a single value.                                             | Author is: Admin                                   |
-| `lessThan`           | `LESS THAN`. The item's field is numerically less than a single value.                               | Age is less than: 18                               |
-| `lessThanOrEqual`    | `LESS THAN OR EQUAL TO`. The item's field is numerically less than or equal to a single value.       | Age is less than or equal to: 18                   |
-| `notContains`        | `NOT CONTAINS`. The item's field does not contain the given substring.                               | Description doesn't contain: photo                 |
-| `notOn`              | `NOT ON`. The item's field is not on a given date (date inequality using proper date parsing).       | Date is not: 2024-01-01                            |
-| `on`                 | `ON`. The item's field is on a given date (date equality using proper date parsing).                 | Date is: 2024-01-01                                |
-| `over`               | `OVER`. The item's field is older than N units (days, weeks, months, or years) from now.             | Orders over: 7 days ago                            |
-| `startsWith`         | `STARTS WITH`. The item's field starts with the given substring.                                     | Title starts with: Mar                             |
+| Operator             | Description                                                                     | Example                                              |
+| -------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `after`              | The result is after a given date.                                               | Date is after: 2024-01-01                            |
+| `afterInc`           | The result is after a given date, including the date.                           | Date is on or after: 2024-01-01                      |
+| `before`             | The result is before a given date.                                              | Date is before: 2024-01-01                           |
+| `beforeInc`          | The result is before a given date, including the date.                          | Date is on or before: 2024-01-01                     |
+| `between`            | The result is between two values.                                               | Count between (inc): 10 and 180                      |
+| `contains`           | The result contains the given substring.                                        | Title contains: Mars                                 |
+| `greaterThan`        | The result is numerically greater than a single value.                          | Age is greater than: 65                              |
+| `greaterThanOrEqual` | The result is numerically greater than or equal to a single value.              | Age is greater than or equal to: 65                  |
+| `inThePast`          | The result is within the last N units (days, weeks, months, or years) from now. | Orders in the past: 7 days                           |
+| `isAll`              | The result includes all values in the list.                                     | Category includes all: Book, Review, Science Fiction |
+| `isAny`              | The result includes some values in the list.                                    | Author includes: Admin, Editor                       |
+| `isNone`             | The result does not include some values in the list.                            | Author excludes: Admin, Editor                       |
+| `is`                 | The result is equal to a single value.                                          | Author is: Admin                                     |
+| `isNot`              | The result is not equal to a single value.                                      | Author is not: Admin                                 |
+| `lessThan`           | The result is numerically less than a single value.                             | Age is less than: 18                                 |
+| `lessThanOrEqual`    | The result is numerically less than or equal to a single value.                 | Age is less than or equal to: 18                     |
+| `notContains`        | The result does not contain the given substring.                                | Description doesn't contain: photo                   |
+| `notOn`              | The result is not on a given date (date inequality using proper date parsing).  | Date is not: 2024-01-01                              |
+| `on`                 | The result is on a given date (date equality using proper date parsing).        | Date is: 2024-01-01                                  |
+| `over`               | The result is older than N units (days, weeks, months, or years) from now.      | Orders over: 7 days ago                              |
+| `startsWith`         | The result starts with the given substring.                                     | Title starts with: Mar                               |
 
-Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`, and `isNotAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
+Some operators are single-selection: `is`, `isNot`, `on`, `notOn`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `before`, `after`, `beforeInc`, `afterInc`, `contains`, `notContains`, and `startsWith`. Others are multi-selection: `isAny`, `isNone`, `isAll`. A filter cannot mix single-selection & multi-selection operators; if a single-selection operator is present in the list of valid operators, the multi-selection ones will be discarded, and the filter won't allow selecting more than one item.
 
 Valid operators per field type:
 
-- array: `isAny`, `isNone`, `isAll`, `isNotAll`.
-- boolean: `is`, `isNot`.
-- color: `is`, `isNot`, `isAny`, `isNone`.
-- date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
-- datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
-- email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- media: none.
-- number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- password: none.
-- email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`, `isNotAll`.
-- fields with no type: any operator.
+-   array: `isAny`, `isNone`, `isAll`.
+-   boolean: `is`, `isNot`.
+-   color: `is`, `isNot`, `isAny`, `isNone`.
+-   date: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`, `between`.
+-   datetime: `on`, `notOn`, `before`, `beforeInc`, `after`, `afterInc`, `inThePast`, `over`.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   integer: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   media: none.
+-   number: `is`, `isNot`, `lessThan`, `greaterThan`, `lessThanOrEqual`, `greaterThanOrEqual`, `between`, `isAny`, `isNone`, `isAll`.
+-   password: none.
+-   email: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   text: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   url: `is`, `isNot`, `contains`, `notContains`, `startsWith`, `isAny`, `isNone`, `isAll`.
+-   fields with no type: any operator.
 
 ### `format`
 
-Display format configuration for fields. Currently supported for date fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
+Display format configuration for fields. Supported for `datetime`, `date`, `number`, and `integer` fields. This configuration affects how the field is displayed in the `render` method, the `Edit` control, and filter controls.
 
 -   Type: `object`.
 -   Optional.
+
+For `datetime` fields:
+-   Properties:
+    -   `datetime`: The format string using PHP date format (e.g., `'M j, Y g:i a'` for `'Jan 1, 2021 2:30 pm'`). Optional, defaults to WordPress date format settings.
+    -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
+
+Example:
+
+```js
+{
+	id: 'createdAt',
+	type: 'datetime',
+	label: 'Created At',
+	format: {
+		datetime: 'M j, Y g:i a',
+		weekStartsOn: 1,
+	},
+}
+```
+
+For `date` fields:
 -   Properties:
     -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
@@ -1875,6 +2075,46 @@ Example:
 	format: {
 		date: 'F j, Y',
 		weekStartsOn: 1,
+	},
+}
+```
+
+For `number` fields:
+
+-   Properties:
+    -   `separatorThousand`: The character used as thousand separator (e.g., ',' for '1,234'). Optional, defaults to ','.
+    -   `separatorDecimal`: The character used as decimal separator (e.g., '.' for '1.23'). Optional, defaults to '.'.
+    -   `decimals`: Number of decimal places to display (0-100). Optional, defaults to 2.
+
+Example:
+
+```js
+{
+	id: 'price',
+	type: 'number',
+	label: 'Price',
+	format: {
+		separatorThousand: ',',
+		separatorDecimal: '.',
+		decimals: 2,
+	},
+}
+```
+
+For `integer` fields:
+
+-   Properties:
+    -   `separatorThousand`: The character used as thousand separator (e.g., ',' for '1,234'). Optional, defaults to ','.
+
+Example:
+
+```js
+{
+	id: 'quantity',
+	type: 'integer',
+	label: 'Quantity',
+	format: {
+		separatorThousand: ',',
 	},
 }
 ```
@@ -1898,7 +2138,7 @@ Example:
 
 ### `layout`
 
-Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, or Row. This prop is the same as the `form.layout` prop.
+Represents the type of layout used to render the field. It'll be one of Regular, Panel, Card, Row, or Details. This prop is the same as the `form.layout` prop.
 
 #### Regular
 
@@ -1919,11 +2159,13 @@ For example:
 
 #### Panel
 
-- `type`: `panel`. Required.
-- `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
-- `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
-   	- A string (single field ID)
-    - An array of strings (multiple field IDs)
+-   `type`: `panel`. Required.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
+-   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
+-   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
+    -   A string (single field ID)
+    -   An array of strings (multiple field IDs)
 
 When no summary fields are explicitly configured, the panel automatically determines which fields to display using this priority:
 
@@ -1977,6 +2219,7 @@ For example:
 
 -   `type`: `row`. Required.
 -   `alignment`: one of `start`, `center`, or `end`. Optional. `center` by default.
+-   `styles`: an object mapping field IDs to style objects. Each style object supports a `flex` property (any valid CSS `flex` value) to control how the field sizes within the row. Optional.
 
 The Row layout displays fields horizontally in a single row. It's particularly useful for grouping related fields that should be displayed side by side. This layout can be used both as a top-level form layout and for individual field groups.
 
@@ -1987,7 +2230,30 @@ For example:
 	id: 'field_id',
 	layout: {
 		type: 'row',
-		alignment: 'start'
+		alignment: 'start',
+		styles: {
+			field1: { flex: '1 1 auto' },
+			field2: { flex: '0 0 200px' },
+		},
+	},
+}
+```
+
+#### Details
+
+-   `type`: `details`. Required.
+-   `summary`: Summary field configuration. Optional. Specifies which field to display in the details summary. A string (single field ID)
+
+The Details layout renders the field inside a collapsible `<details>` HTML element. The `summary` property controls the text shown in the disclosure summary.
+
+For example:
+
+```js
+{
+	id: 'field_id',
+	layout: {
+		type: 'details',
+		summary: 'summaryFieldId'
 	},
 }
 ```
@@ -2005,6 +2271,24 @@ Example:
 	id: 'field_id',
 	label: 'Combined Field',
 	children: [ 'field1', 'field2' ]
+}
+```
+
+### `description`
+
+A string describing the form field's purpose or usage. Used to provide additional context.
+
+-   Type: `string`.
+-   Optional.
+
+Example:
+
+```js
+{
+	id: 'field_id',
+	label: 'Status & Visibility',
+	description: 'Control the publish status and visibility of the post.',
+	children: [ 'status', 'password' ],
 }
 ```
 

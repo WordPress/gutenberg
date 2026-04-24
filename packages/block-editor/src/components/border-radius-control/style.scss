@@ -17,13 +17,6 @@
 		margin-bottom: 0;
 	}
 
-	.components-border-radius-control__input-controls-wrapper {
-		display: grid;
-		gap: $grid-unit-20;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		margin-right: $grid-unit-15;
-	}
-
 	.components-border-radius-control__linked-button {
 		display: flex;
 		justify-content: center;
@@ -32,13 +25,4 @@
 			margin-right: 0;
 		}
 	}
-}
-
-.components-border-radius-control__custom-select-control,
-.components-border-radius-control__range-control {
-	flex: 1;
-}
-
-.components-border-radius-control__icon {
-	flex: 0 0 auto;
 }

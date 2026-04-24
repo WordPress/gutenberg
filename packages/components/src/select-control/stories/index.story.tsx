@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import SelectControl from '../';
 import { InputControlPrefixWrapper } from '../../input-control/input-prefix-wrapper';
 
 const meta: Meta< typeof SelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/SelectControl',
 	id: 'components-selectcontrol',
 	component: SelectControl,
@@ -32,6 +33,11 @@ const meta: Meta< typeof SelectControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -42,6 +48,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 	if ( props.multiple ) {
 		return (
 			<SelectControl
+				__next40pxDefaultSize
 				{ ...props }
 				multiple
 				value={ selection }
@@ -55,6 +62,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			multiple={ false }
 			value={ selection?.[ 0 ] }
@@ -69,7 +77,6 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 export const Default = SelectControlWithState.bind( {} );
 Default.args = {
 	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	options: [
 		{ value: '', label: 'Select an Option', disabled: true },
@@ -92,7 +99,6 @@ WithLabelAndHelpText.args = {
 export const WithCustomChildren = SelectControlWithState.bind( {} );
 WithCustomChildren.args = {
 	__next40pxDefaultSize: true,
-	__nextHasNoMarginBottom: true,
 	label: 'Label',
 	children: (
 		<>

@@ -21,7 +21,7 @@ import { speak } from '@wordpress/a11y';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
@@ -79,7 +79,6 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 					<div style={ { padding: '4px', minWidth: '300px' } }>
 						<VStack spacing={ 1 }>
 							<TextareaControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'LaTeX math syntax' ) }
 								hideLabelFromVision
@@ -117,7 +116,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 							/>
 							{ error && (
 								<>
-									<Badge
+									<WCBadge
 										intent="error"
 										className="wp-block-math__error"
 									>
@@ -126,7 +125,7 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 											__( 'Error: %s' ),
 											error
 										) }
-									</Badge>
+									</WCBadge>
 									<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 								</>
 							) }

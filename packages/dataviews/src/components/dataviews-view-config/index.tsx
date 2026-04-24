@@ -14,11 +14,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
-	__experimentalGrid as Grid,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -26,15 +22,15 @@ import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
-import { VIEW_LAYOUTS } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
-import InfiniteScrollToggle from './infinite-scroll-toggle';
 import { PropertiesSection } from './properties-section';
 import { unlock } from '../../lock-unlock';
 
@@ -128,7 +124,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
@@ -164,7 +159,6 @@ function SortDirectionControl() {
 	return (
 		<ToggleGroupControl
 			className="dataviews-view-config__sort-direction"
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Order' ) }
@@ -219,7 +213,6 @@ function ItemsPerPageControl() {
 
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			isBlock
 			label={ __( 'Items per page' ) }
@@ -251,46 +244,36 @@ function ItemsPerPageControl() {
 	);
 }
 
-function SettingsSection( {
-	title,
-	description,
-	children,
-}: {
-	title: string;
-	description?: string;
-	children: React.ReactNode;
-} ) {
+function ResetViewButton() {
+	const { onReset } = useContext( DataViewsContext );
+
+	// Don't render if no persistence support (onReset is undefined)
+	if ( onReset === undefined ) {
+		return null;
+	}
+
+	const isDisabled = onReset === false;
+
 	return (
-		<Grid columns={ 12 } className="dataviews-settings-section" gap={ 4 }>
-			<div className="dataviews-settings-section__sidebar">
-				<Heading
-					level={ 2 }
-					className="dataviews-settings-section__title"
-				>
-					{ title }
-				</Heading>
-				{ description && (
-					<Text
-						variant="muted"
-						className="dataviews-settings-section__description"
-					>
-						{ description }
-					</Text>
-				) }
-			</div>
-			<Grid
-				columns={ 8 }
-				gap={ 4 }
-				className="dataviews-settings-section__content"
-			>
-				{ children }
-			</Grid>
-		</Grid>
+		<Button
+			variant="tertiary"
+			size="compact"
+			disabled={ isDisabled }
+			accessibleWhenDisabled
+			className="dataviews-view-config__reset-button"
+			onClick={ () => {
+				if ( typeof onReset === 'function' ) {
+					onReset();
+				}
+			} }
+		>
+			{ __( 'Reset view' ) }
+		</Button>
 	);
 }
 
 export function DataviewsViewConfigDropdown() {
-	const { view } = useContext( DataViewsContext );
+	const { view, onReset } = useContext( DataViewsContext );
 	const popoverId = useInstanceId(
 		_DataViewsViewConfig,
 		'dataviews-view-config-dropdown'
@@ -298,6 +281,7 @@ export function DataviewsViewConfigDropdown() {
 	const activeLayout = VIEW_LAYOUTS.find(
 		( layout ) => layout.type === view.type
 	);
+	const isModified = typeof onReset === 'function';
 	return (
 		<Dropdown
 			expandOnMobile
@@ -307,14 +291,22 @@ export function DataviewsViewConfigDropdown() {
 			} }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				return (
-					<Button
-						size="compact"
-						icon={ cog }
-						label={ _x( 'View options', 'View is used as a noun' ) }
-						onClick={ onToggle }
-						aria-expanded={ isOpen ? 'true' : 'false' }
-						aria-controls={ popoverId }
-					/>
+					<div className="dataviews-view-config__toggle-wrapper">
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+							onClick={ onToggle }
+							aria-expanded={ isOpen ? 'true' : 'false' }
+							aria-controls={ popoverId }
+						/>
+						{ isModified && (
+							<span className="dataviews-view-config__modified-indicator" />
+						) }
+					</div>
 				);
 			} }
 			renderContent={ () => (
@@ -322,20 +314,41 @@ export function DataviewsViewConfigDropdown() {
 					paddingSize="medium"
 					className="dataviews-config__popover-content-wrapper"
 				>
-					<VStack className="dataviews-view-config" spacing={ 6 }>
-						<SettingsSection title={ __( 'Appearance' ) }>
-							<HStack expanded className="is-divided-in-two">
+					<Stack
+						direction="column"
+						className="dataviews-view-config"
+						gap="xl"
+					>
+						<Stack
+							direction="row"
+							justify="space-between"
+							align="center"
+							className="dataviews-view-config__header"
+						>
+							<Heading
+								level={ 2 }
+								className="dataviews-settings-section__title"
+							>
+								{ __( 'Appearance' ) }
+							</Heading>
+							<ResetViewButton />
+						</Stack>
+						<Stack direction="column" gap="lg">
+							<Stack
+								direction="row"
+								gap="sm"
+								className="dataviews-view-config__sort-controls"
+							>
 								<SortFieldControl />
 								<SortDirectionControl />
-							</HStack>
+							</Stack>
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
-							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 							<PropertiesSection />
-						</SettingsSection>
-					</VStack>
+						</Stack>
+					</Stack>
 				</DropdownContentWrapper>
 			) }
 		/>

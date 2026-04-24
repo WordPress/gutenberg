@@ -1,7 +1,10 @@
 {
+	"name": "@wordpress/navigation-route",
+	"version": "1.0.0",
+	"private": true,
 	"route": {
 		"path": "/navigation",
-		"page": "gutenberg-boot"
+		"page": "site-editor-v2"
 	},
 	"dependencies": {
 		"@wordpress/route": "file:../../packages/route"

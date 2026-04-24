@@ -9,7 +9,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
 import {
 	Button,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -23,7 +23,7 @@ import type { CoreDataError, PostWithPermissions } from '../types';
 
 const trashPost: Action< PostWithPermissions > = {
 	id: 'move-to-trash',
-	label: __( 'Trash' ),
+	label: _x( 'Trash', 'verb' ),
 	isPrimary: true,
 	icon: trash,
 	isEligible( item ) {
@@ -52,7 +52,7 @@ const trashPost: Action< PostWithPermissions > = {
 		const { deleteEntityRecord } = useDispatch( coreStore );
 		return (
 			<VStack spacing="5">
-				<Text>
+				<WCText>
 					{ items.length === 1
 						? sprintf(
 								// translators: %s: The item's title.
@@ -70,7 +70,7 @@ const trashPost: Action< PostWithPermissions > = {
 								),
 								items.length
 						  ) }
-				</Text>
+				</WCText>
 				<HStack justify="right">
 					<Button
 						__next40pxDefaultSize

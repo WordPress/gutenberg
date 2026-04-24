@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ import {
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
-import { sectionRootClientIdKey } from './private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
@@ -213,7 +213,7 @@ function updateParentInnerBlocksInTree(
 			? clientId
 			: state.parents.get( clientId );
 		do {
-			if ( state.controlledInnerBlocks[ current ] ) {
+			if ( state.controlledInnerBlocks.has( current ) ) {
 				// Should stop on controlled blocks.
 				// If we reach a controlled parent, break out of the loop.
 				controlledParents.add( current );
@@ -403,31 +403,6 @@ const withBlockTree =
 				);
 				break;
 			}
-			case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
-				const updatedBlockUids = [];
-				newState.attributes.forEach( ( attributes, clientId ) => {
-					if (
-						newState.byClientId.get( clientId ).name ===
-							'core/block' &&
-						attributes.ref === action.updatedId
-					) {
-						updatedBlockUids.push( clientId );
-					}
-				} );
-				newState.tree = new Map( newState.tree );
-				updatedBlockUids.forEach( ( clientId ) => {
-					newState.tree.set( clientId, {
-						...newState.byClientId.get( clientId ),
-						attributes: newState.attributes.get( clientId ),
-						innerBlocks: newState.tree.get( clientId ).innerBlocks,
-					} );
-				} );
-				updateParentInnerBlocksInTree(
-					newState,
-					updatedBlockUids,
-					false
-				);
-			}
 		}
 
 		return newState;
@@ -599,24 +574,102 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
-		const newState = {
-			...state,
-			byClientId: new Map(
-				getFlattenedBlocksWithoutAttributes( action.blocks )
-			),
-			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
-			order: mapBlockOrder( action.blocks ),
-			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: {},
-		};
-
-		newState.tree = new Map( state?.tree );
-		updateBlockTreeForBlocks( newState, action.blocks );
-		newState.tree.set( '', {
-			innerBlocks: action.blocks.map( ( subBlock ) =>
-				newState.tree.get( subBlock.clientId )
-			),
+		/**
+		 * Preserve controlled inner block flags across RESET_BLOCKS.
+		 * If there are old and new blocks that:
+		 * - have the same `clientId`
+		 * - have the `controlledInnerBlocks` flag
+		 * - don't have any own, uncontrolled children
+		 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
+		 * Nested controllers (e.g., `post-content`, patterns) don't lose their
+		 * controlled status and don't unnecessarily re-clone blocks.
+		 */
+		const newState = reducer( undefined, {
+			type: 'INSERT_BLOCKS',
+			rootClientId: '',
+			blocks: action.blocks,
 		} );
+
+		const preservedControlledInnerBlocks =
+			state?.controlledInnerBlocks ?? new Set();
+
+		// Preserve controlled inner blocks data from the old state.
+		// The maps above are rebuilt solely from action.blocks, but
+		// controlled inner blocks live under cloned IDs that aren't
+		// present in action.blocks. Re-inject them so the state
+		// remains consistent with the preserved flags.
+		if ( state?.order ) {
+			for ( const clientId of preservedControlledInnerBlocks ) {
+				// Only preserve if the parent block still exists.
+				if ( ! newState.byClientId.has( clientId ) ) {
+					continue;
+				}
+				newState.controlledInnerBlocks.add( clientId );
+				const oldOrder = state.order.get( clientId );
+				if ( ! oldOrder?.length ) {
+					continue;
+				}
+				newState.order.set( clientId, oldOrder );
+				const preserveBlock = ( blockId, parentId ) => {
+					const blockData = state.byClientId.get( blockId );
+					if ( ! blockData ) {
+						return;
+					}
+					newState.byClientId.set( blockId, blockData );
+					newState.attributes.set(
+						blockId,
+						state.attributes.get( blockId )
+					);
+					newState.parents.set( blockId, parentId );
+					const childOrder = state.order.get( blockId ) || [];
+					newState.order.set( blockId, childOrder );
+					childOrder.forEach( ( childId ) =>
+						preserveBlock( childId, blockId )
+					);
+				};
+				oldOrder.forEach( ( id ) => preserveBlock( id, clientId ) );
+			}
+		}
+
+		// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
+		// built tree entries using action.blocks' inner block structure
+		// (entity-level IDs), but we need them to reference the preserved
+		// cloned inner blocks instead. Mutating the existing object
+		// preserves references held by ancestor tree entries.
+		for ( const clientId of newState.controlledInnerBlocks ) {
+			const controlledOrder = newState.order.get( clientId );
+			if ( ! controlledOrder?.length ) {
+				continue;
+			}
+			const innerBlocks = controlledOrder.map( ( id ) =>
+				state.tree.get( id )
+			);
+			const existingEntry = newState.tree.get( clientId );
+			if ( existingEntry ) {
+				existingEntry.innerBlocks = innerBlocks;
+			}
+			newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+			const preserveTreeEntry = ( blockId ) => {
+				const treeEntry = state.tree.get( blockId );
+				if ( ! treeEntry ) {
+					return;
+				}
+				newState.tree.set( blockId, treeEntry );
+				const childOrder = newState.order.get( blockId ) || [];
+				childOrder.forEach( preserveTreeEntry );
+			};
+			controlledOrder.forEach( preserveTreeEntry );
+		}
+
+		// Preserve block editing modes for blocks that are not removed.
+		const preservedBlockEditingModes =
+			state?.blockEditingModes ?? new Map();
+		for ( const [ clientId, mode ] of preservedBlockEditingModes ) {
+			if ( ! newState.tree.has( clientId ) ) {
+				continue;
+			}
+			newState.blockEditingModes.set( clientId, mode );
+		}
 
 		return newState;
 	}
@@ -647,12 +700,12 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 	// inner blocks from the block state because its inner blocks will not be
 	// attached to the block in the action.
 	const nestedControllers = {};
-	if ( Object.keys( state.controlledInnerBlocks ).length ) {
+	if ( state.controlledInnerBlocks.size ) {
 		const stack = [ ...action.blocks ];
 		while ( stack.length ) {
 			const { innerBlocks, ...block } = stack.shift();
 			stack.push( ...innerBlocks );
-			if ( !! state.controlledInnerBlocks[ block.clientId ] ) {
+			if ( state.controlledInnerBlocks.has( block.clientId ) ) {
 				nestedControllers[ block.clientId ] = true;
 			}
 		}
@@ -699,40 +752,6 @@ const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Higher-order reducer which targets the combined blocks reducer and handles
- * the `SAVE_REUSABLE_BLOCK_SUCCESS` action. This action can't be handled by
- * regular reducers and needs a higher-order reducer since it needs access to
- * both `byClientId` and `attributes` simultaneously.
- *
- * @param {Function} reducer Original reducer function.
- *
- * @return {Function} Enhanced reducer function.
- */
-const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
-	if ( state && action.type === 'SAVE_REUSABLE_BLOCK_SUCCESS' ) {
-		const { id, updatedId } = action;
-
-		// If a temporary reusable block is saved, we swap the temporary id with the final one.
-		if ( id === updatedId ) {
-			return state;
-		}
-
-		state = { ...state };
-		state.attributes = new Map( state.attributes );
-		state.attributes.forEach( ( attributes, clientId ) => {
-			const { name } = state.byClientId.get( clientId );
-			if ( name === 'core/block' && attributes.ref === id ) {
-				state.attributes.set( clientId, {
-					...attributes,
-					ref: updatedId,
-				} );
-			}
-		} );
-	}
-
-	return reducer( state, action );
-};
-/**
  * Higher-order reducer which removes blocks from state when switching parent block controlled state.
  *
  * @param {Function} reducer Original reducer function.
@@ -741,14 +760,22 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  */
 const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-		// when switching a block from controlled to uncontrolled or inverse,
-		// we need to remove its content first.
-		const tempState = reducer( state, {
-			type: 'REPLACE_INNER_BLOCKS',
-			rootClientId: action.clientId,
-			blocks: [],
-		} );
-		return reducer( tempState, action );
+		// When switching a block from controlled to uncontrolled or inverse,
+		// we need to remove its content first — but only if there are inner
+		// blocks to remove. Skipping the no-op dispatch is important because
+		// REPLACE_INNER_BLOCKS creates new state references even when empty,
+		// which propagates tree changes up to the root and triggers false-
+		// positive change detection in parent subscriptions.
+		const innerBlockOrder = state.order.get( action.clientId );
+		if ( innerBlockOrder?.length ) {
+			const tempState = reducer( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: action.clientId,
+				blocks: [],
+			} );
+			return reducer( tempState, action );
+		}
+		return reducer( state, action );
 	}
 
 	return reducer( state, action );
@@ -764,7 +791,6 @@ const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
  */
 export const blocks = pipe(
 	combineReducers,
-	withSaveReusableBlock, // Needs to be before withBlockCache.
 	withBlockTree, // Needs to be before withInnerBlocksRemoveCascade.
 	withInnerBlocksRemoveCascade,
 	withReplaceInnerBlocks, // Needs to be after withInnerBlocksRemoveCascade.
@@ -993,6 +1019,9 @@ export const blocks = pipe(
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state.get( toRootClientId );
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
+					if ( fromIndex === -1 ) {
+						return state;
+					}
 					const newState = new Map( state );
 					newState.set(
 						toRootClientId,
@@ -1186,14 +1215,41 @@ export const blocks = pipe(
 	},
 
 	controlledInnerBlocks(
-		state = {},
+		state = new Set(),
 		{ type, clientId, hasControlledInnerBlocks }
 	) {
 		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-			return {
-				...state,
-				[ clientId ]: hasControlledInnerBlocks,
-			};
+			if ( hasControlledInnerBlocks ) {
+				if ( state.has( clientId ) ) {
+					return state;
+				}
+				return new Set( state ).add( clientId );
+			}
+			if ( ! state.has( clientId ) ) {
+				return state;
+			}
+			const newState = new Set( state );
+			newState.delete( clientId );
+			return newState;
+		}
+		return state;
+	},
+
+	blockEditingModes( state = new Map(), action ) {
+		switch ( action.type ) {
+			case 'SET_BLOCK_EDITING_MODE':
+				if ( state.get( action.clientId ) === action.mode ) {
+					return state;
+				}
+				return new Map( state ).set( action.clientId, action.mode );
+			case 'UNSET_BLOCK_EDITING_MODE': {
+				if ( ! state.has( action.clientId ) ) {
+					return state;
+				}
+				const newState = new Map( state );
+				newState.delete( action.clientId );
+				return newState;
+			}
 		}
 		return state;
 	},
@@ -1503,6 +1559,25 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the client IDs for the viewport modal,
+ * or null if the modal is not open.
+ *
+ * @param {string[]|null} state  Current state.
+ * @param {Object}        action Dispatched action.
+ *
+ * @return {string[]|null} Client IDs for the viewport modal.
+ */
+export function viewportModalClientIds( state = null, action ) {
+	switch ( action.type ) {
+		case 'SHOW_VIEWPORT_MODAL':
+			return action.clientIds;
+		case 'HIDE_VIEWPORT_MODAL':
+			return null;
+	}
+	return state;
+}
+
+/**
  * Reducer returning the data needed to display a prompt when certain blocks
  * are removed, or `false` if no such prompt is requested.
  *
@@ -1754,55 +1829,68 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
- * @param {Object} state  Current state.
+ * @param {Map}    state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export const blockListSettings = ( state = {}, action ) => {
+export const blockListSettings = ( state = new Map(), action ) => {
 	switch ( action.type ) {
-		// Even if the replaced blocks have the same client ID, our logic
-		// should correct the state.
-		case 'REPLACE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			// Collect all clientIds from replacement blocks. If a clientId
+			// is reused, preserve its settings — the block instance (and
+			// its InnerBlocks config) survived the replace. Settings for
+			// clientIds that are truly removed get cleaned up so stale
+			// config from old block types doesn't linger.
+			const replacementIds = new Set();
+			const stack = [ ...action.blocks ];
+			while ( stack.length ) {
+				const block = stack.shift();
+				replacementIds.add( block.clientId );
+				stack.push( ...block.innerBlocks );
+			}
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				if ( ! replacementIds.has( clientId ) ) {
+					newState.delete( clientId );
+				}
+			}
+			return newState;
+		}
 		case 'REMOVE_BLOCKS': {
-			return Object.fromEntries(
-				Object.entries( state ).filter(
-					( [ id ] ) => ! action.clientIds.includes( id )
-				)
-			);
+			const newState = new Map( state );
+			for ( const clientId of action.clientIds ) {
+				newState.delete( clientId );
+			}
+			return newState;
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
 			const updates =
 				typeof action.clientId === 'string'
-					? { [ action.clientId ]: action.settings }
-					: action.clientId;
+					? [ [ action.clientId, action.settings ] ]
+					: Object.entries( action.clientId );
 
-			// Remove settings that are the same as the current state.
-			for ( const clientId in updates ) {
-				if ( ! updates[ clientId ] ) {
-					if ( ! state[ clientId ] ) {
-						delete updates[ clientId ];
-					}
-				} else if (
-					fastDeepEqual( state[ clientId ], updates[ clientId ] )
-				) {
-					delete updates[ clientId ];
-				}
-			}
+			const relevantUpdates = updates.filter(
+				( [ clientId, nextSettings ] ) =>
+					! nextSettings
+						? state.has( clientId )
+						: ! fastDeepEqual( state.get( clientId ), nextSettings )
+			);
 
-			if ( Object.keys( updates ).length === 0 ) {
+			if ( ! relevantUpdates.length ) {
 				return state;
 			}
 
-			const merged = { ...state, ...updates };
-
-			for ( const clientId in updates ) {
-				if ( ! updates[ clientId ] ) {
-					delete merged[ clientId ];
+			const newState = new Map( state );
+			for ( const [ clientId, nextSettings ] of relevantUpdates ) {
+				if ( ! nextSettings ) {
+					newState.delete( clientId );
+				} else {
+					newState.set( clientId, nextSettings );
 				}
 			}
 
-			return merged;
+			return newState;
 		}
 	}
 	return state;
@@ -1974,53 +2062,33 @@ export function editedContentOnlySection( state, action ) {
 	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
 		return action.clientId;
 	}
-	return state;
-}
 
-/**
- * Reducer returning a map of block client IDs to block editing modes.
- *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Map} Updated state.
- */
-export function blockEditingModes( state = new Map(), action ) {
+	// Early return if there's no section being edited.
+	if ( ! state ) {
+		return state;
+	}
+
 	switch ( action.type ) {
-		case 'SET_BLOCK_EDITING_MODE':
-			if ( state.get( action.clientId ) === action.mode ) {
-				return state;
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			// Clear if the edited section is directly among the removed/replaced blocks.
+			// Note: this doesn't catch the case where a parent of the edited section
+			// is removed, since action.clientIds only contains the top-level IDs.
+			// That edge case is handled by the StopEditingContentOnlySectionOnOutsideSelect
+			// component in block-list/index.js.
+			if ( action.clientIds.includes( state ) ) {
+				return undefined;
 			}
-			return new Map( state ).set( action.clientId, action.mode );
-		case 'UNSET_BLOCK_EDITING_MODE': {
-			if ( ! state.has( action.clientId ) ) {
-				return state;
+			break;
+		case 'RESET_BLOCKS':
+			// When all blocks are reset (e.g. navigating to a different post),
+			// check whether the edited section still exists in the new block tree.
+			if ( ! getFlattenedClientIds( action.blocks )[ state ] ) {
+				return undefined;
 			}
-			const newState = new Map( state );
-			newState.delete( action.clientId );
-			return newState;
-		}
-		case 'RESET_BLOCKS': {
-			return state.has( '' )
-				? new Map().set( '', state.get( '' ) )
-				: state;
-		}
+			break;
 	}
-	return state;
-}
 
-/**
- * Reducer returning the clientId of the block settings menu that is currently open.
- *
- * @param {string|null} state  Current state.
- * @param {Object}      action Dispatched action.
- *
- * @return {string|null} Updated state.
- */
-export function openedBlockSettingsMenu( state = null, action ) {
-	if ( 'SET_OPENED_BLOCK_SETTINGS_MENU' === action.type ) {
-		return action?.clientId ?? null;
-	}
 	return state;
 }
 
@@ -2117,6 +2185,124 @@ export function insertionPoint( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the opened List View panels state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+function openedListViewPanels(
+	state = { allOpen: false, panels: {} },
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_OPEN_LIST_VIEW_PANEL':
+			// Open only the specified panel, close all others
+			return {
+				allOpen: false,
+				panels: action.clientId ? { [ action.clientId ]: true } : {},
+			};
+		case 'SET_ALL_LIST_VIEW_PANELS_OPEN':
+			// Set flag to open all panels
+			return { allOpen: true, panels: {} };
+		case 'TOGGLE_LIST_VIEW_PANEL':
+			// If we're in "all open" mode, exit it when user manually toggles
+			return {
+				allOpen: false,
+				panels: {
+					...state.panels,
+					[ action.clientId ]: action.isOpen,
+				},
+			};
+		case 'REPLACE_BLOCKS':
+		case 'REMOVE_BLOCKS': {
+			// Clean up stale entries when blocks are removed or replaced
+			if ( ! action.clientIds || action.clientIds.length === 0 ) {
+				return state;
+			}
+			const newPanels = { ...state.panels };
+			let hasChanges = false;
+			action.clientIds.forEach( ( clientId ) => {
+				if ( clientId in newPanels ) {
+					delete newPanels[ clientId ];
+					hasChanges = true;
+				}
+			} );
+			return hasChanges ? { ...state, panels: newPanels } : state;
+		}
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the List View expand revision.
+ *
+ * This is a counter used to force ListView components to remount. When incremented,
+ * the ListView key changes, causing the component to remount with a fresh
+ * isExpanded=true state.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {number} Updated state.
+ */
+function listViewExpandRevision( state = 0, action ) {
+	switch ( action.type ) {
+		case 'INCREMENT_LIST_VIEW_EXPAND_REVISION':
+			return state + 1;
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether the list view content panel popover is open.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function listViewContentPanelOpen( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_LIST_VIEW_CONTENT_PANEL':
+			return true;
+
+		case 'CLOSE_LIST_VIEW_CONTENT_PANEL':
+			return false;
+
+		// Close when selection is cleared
+		case 'CLEAR_SELECTED_BLOCK':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the requested inspector tab state.
+ * Stores a request to open a specific inspector tab with optional configuration.
+ *
+ * @param {Object|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function requestedInspectorTab( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_INSPECTOR_TAB':
+			return {
+				tabName: action.tabName,
+				options: action.options,
+			};
+		case 'CLEAR_REQUESTED_INSPECTOR_TAB':
+			return null;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2141,14 +2327,17 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,
-	blockEditingModes,
+	viewportModalClientIds,
 	styleOverrides,
 	removalPromptData,
 	blockRemovalRules,
-	openedBlockSettingsMenu,
 	registeredInserterMediaCategories,
 	zoomLevel,
 	hasBlockSpotlight,
+	openedListViewPanels,
+	listViewExpandRevision,
+	listViewContentPanelOpen,
+	requestedInspectorTab,
 } );
 
 /**
@@ -2176,7 +2365,7 @@ function getBlockTreeBlock( state, clientId ) {
 		};
 	}
 
-	if ( ! state.blocks.controlledInnerBlocks[ clientId ] ) {
+	if ( ! state.blocks.controlledInnerBlocks.has( clientId ) ) {
 		return state.blocks.tree.get( clientId );
 	}
 
@@ -2269,13 +2458,13 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// so the default block editing mode is set to disabled.
 	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
 	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
-	const hasDisabledBlocks = Array.from( state.blockEditingModes ).some(
+	const hasDisabledBlocks = Array.from( state.blocks.blockEditingModes ).some(
 		( [ , mode ] ) => mode === 'disabled'
 	);
 	const templatePartClientIds = [];
 	const syncedPatternClientIds = [];
 
-	Object.keys( state.blocks.controlledInnerBlocks ).forEach( ( clientId ) => {
+	state.blocks.controlledInnerBlocks.forEach( ( clientId ) => {
 		const block = state.blocks.byClientId?.get( clientId );
 
 		if ( block?.name === 'core/template-part' ) {
@@ -2286,54 +2475,57 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			syncedPatternClientIds.push( clientId );
 		}
 	} );
-	const contentOnlyTemplateLockedClientIds = Object.keys(
+	const contentOnlyTemplateLockedClientIds = Array.from(
 		state.blockListSettings
-	).filter(
-		( clientId ) =>
-			state.blockListSettings[ clientId ]?.templateLock === 'contentOnly'
+	).flatMap( ( [ clientId, listSettings ] ) =>
+		listSettings?.templateLock === 'contentOnly' ? [ clientId ] : []
 	);
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't apply contentOnly mode to nested unsynced patterns or template parts.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
 	const unsyncedPatternClientIds =
-		!! window?.__experimentalContentOnlyPatternInsertion
-			? Array.from( state.blocks.attributes.keys() ).filter(
+		isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
+			? []
+			: Array.from( state.blocks.attributes.keys() ).filter(
 					( clientId ) =>
 						state.blocks.attributes.get( clientId )?.metadata
 							?.patternName
-			  )
-			: [];
+			  );
+	const disableContentOnlyForTemplateParts =
+		state.settings?.disableContentOnlyForTemplateParts;
+
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
-		...( window?.__experimentalContentOnlyPatternInsertion
-			? templatePartClientIds
-			: [] ),
+		...( isIsolatedEditor || disableContentOnlyForTemplateParts
+			? []
+			: templatePartClientIds ),
 	];
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
 
-		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
-		if ( state.editedContentOnlySection ) {
-			// If this is the edited section, use the default mode.
-			if ( state.editedContentOnlySection === clientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
+		const hasEditedContentOnlySection = !! state.editedContentOnlySection;
+		let isWithinEditedContentOnlySection = false;
+		if ( hasEditedContentOnlySection ) {
+			isWithinEditedContentOnlySection =
+				clientId === state.editedContentOnlySection ||
+				!! findParentInClientIdsList( state, clientId, [
+					state.editedContentOnlySection,
+				] );
 
-			// If the block is within the edited section also use the default mode.
-			const parentTempEditedClientId = findParentInClientIdsList(
-				state,
-				clientId,
-				[ state.editedContentOnlySection ]
-			);
-			if ( parentTempEditedClientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// For the content only pattern experiment, disable blocks that are outside of the edited section.
-			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+			// When a contentOnly section is being edited, all blocks outside
+			// the section are disabled. This should never be overridable by any
+			// other block editing modes, it helps to constrain keyboard navigation
+			// to within the edited section.
+			if ( ! isWithinEditedContentOnlySection ) {
 				derivedBlockEditingModes.set( clientId, 'disabled' );
 				return;
 			}
@@ -2341,7 +2533,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
-		if ( state.blockEditingModes.has( clientId ) ) {
+		if ( state.blocks.blockEditingModes.has( clientId ) ) {
 			return;
 		}
 
@@ -2352,12 +2544,12 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
 			while ( parent !== undefined ) {
-				if ( state.blockEditingModes.has( parent ) ) {
+				if ( state.blocks.blockEditingModes.has( parent ) ) {
 					// Checking the explicit block editing mode will be slower,
 					// as the block editing mode is more likely to be set on a
 					// distant ancestor.
 					ancestorBlockEditingMode =
-						state.blockEditingModes.get( parent );
+						state.blocks.blockEditingModes.get( parent );
 				}
 				if ( ancestorBlockEditingMode ) {
 					break;
@@ -2399,7 +2591,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		if ( syncedPatternClientIds.length ) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+				// This is a synced pattern nested in another synced pattern,
+				// disable the core/block itself.
 				if (
 					findParentInClientIdsList(
 						state,
@@ -2416,17 +2609,18 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			}
 
 			// Inner blocks of synced patterns.
-			const parentPatternClientId = findParentInClientIdsList(
+			const parentSyncedPatternClientId = findParentInClientIdsList(
 				state,
 				clientId,
 				syncedPatternClientIds
 			);
-			if ( parentPatternClientId ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+			if ( parentSyncedPatternClientId ) {
+				// This is an inner block of a synced pattern that's nested in another synced pattern,
+				// disable its contents.
 				if (
 					findParentInClientIdsList(
 						state,
-						parentPatternClientId,
+						parentSyncedPatternClientId,
 						syncedPatternClientIds
 					)
 				) {
@@ -2443,7 +2637,16 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				// from the instance, the user has to edit the pattern source,
 				// so return 'disabled'.
 				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
 			}
+		}
+
+		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
+		if ( hasEditedContentOnlySection && isWithinEditedContentOnlySection ) {
+			derivedBlockEditingModes.set( clientId, 'default' );
+			// When there's an editedContentOnlySection, it overrides any modes that are usually
+			// set for `contentOnlyParents`, return early to prevent continuing to code below.
+			return;
 		}
 
 		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
@@ -2601,6 +2804,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
+				const disableContentOnlyForUnsyncedPatterns =
+					nextState.settings?.disableContentOnlyForUnsyncedPatterns;
+
+				if ( disableContentOnlyForUnsyncedPatterns ) {
+					break;
+				}
+
 				const addedBlocks = [];
 				const removedClientIds = [];
 
@@ -2674,15 +2884,15 @@ export function withDerivedBlockEditingModes( reducer ) {
 
 				for ( const clientId in updates ) {
 					const isNewContentOnlyBlock =
-						state.blockListSettings[ clientId ]?.templateLock !==
-							'contentOnly' &&
-						nextState.blockListSettings[ clientId ]
+						state.blockListSettings.get( clientId )
+							?.templateLock !== 'contentOnly' &&
+						nextState.blockListSettings.get( clientId )
 							?.templateLock === 'contentOnly';
 
 					const wasContentOnlyBlock =
-						state.blockListSettings[ clientId ]?.templateLock ===
-							'contentOnly' &&
-						nextState.blockListSettings[ clientId ]
+						state.blockListSettings.get( clientId )
+							?.templateLock === 'contentOnly' &&
+						nextState.blockListSettings.get( clientId )
 							?.templateLock !== 'contentOnly';
 
 					if ( isNewContentOnlyBlock ) {
@@ -2813,10 +3023,23 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root changes.
+				// Recompute the entire tree if the section root,
+				// the effective disableContentOnlyForUnsyncedPatterns value,
+				// the isIsolatedEditor value, or the
+				// disableContentOnlyForTemplateParts value changes.
+				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
-					nextState?.settings?.[ sectionRootClientIdKey ]
+						nextState?.settings?.[ sectionRootClientIdKey ] ||
+					!! state?.settings
+						?.disableContentOnlyForUnsyncedPatterns !==
+						!! nextState?.settings
+							?.disableContentOnlyForUnsyncedPatterns ||
+					!! state?.settings?.[ isIsolatedEditorKey ] !==
+						!! nextState?.settings?.[ isIsolatedEditorKey ] ||
+					!! state?.settings?.disableContentOnlyForTemplateParts !==
+						!! nextState?.settings
+							?.disableContentOnlyForTemplateParts
 				) {
 					return {
 						...nextState,

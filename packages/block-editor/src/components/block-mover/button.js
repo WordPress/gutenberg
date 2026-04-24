@@ -8,10 +8,11 @@ import clsx from 'clsx';
  */
 import { getBlockType } from '@wordpress/blocks';
 import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -65,7 +66,7 @@ const BlockMoverButton = forwardRef(
 			? clientIds
 			: [ clientIds ];
 		const blocksCount = normalizedClientIds.length;
-		const { disabled } = props;
+		const isMobileViewport = useViewportMatch( 'small', '<' );
 
 		const {
 			blockType,
@@ -99,9 +100,7 @@ const BlockMoverButton = forwardRef(
 
 				return {
 					blockType: block ? getBlockType( block.name ) : null,
-					isDisabled:
-						disabled ||
-						( direction === 'up' ? isFirstBlock : isLastBlock ),
+					isDisabled: direction === 'up' ? isFirstBlock : isLastBlock,
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
@@ -140,11 +139,23 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
+					tooltipPosition={
+						! isMobileViewport &&
+						direction === 'down' &&
+						orientation === 'vertical'
+							? 'bottom'
+							: 'top'
+					}
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
 					accessibleWhenDisabled
+					shortcut={
+						direction === 'up'
+							? displayShortcut.secondary( 't' )
+							: displayShortcut.secondary( 'y' )
+					}
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(

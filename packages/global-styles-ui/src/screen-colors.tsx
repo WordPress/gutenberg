@@ -14,6 +14,7 @@ import type {
  * Internal dependencies
  */
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import Palette from './palette';
 import { useStyle, useSetting } from './hooks';
 import { unlock } from './lock-unlock';
@@ -49,17 +50,17 @@ function ScreenColors() {
 					'Palette colors and the application of those colors on site elements.'
 				) }
 			/>
-			<div className="global-styles-ui-screen">
+			<ScreenBody>
 				<VStack spacing={ 7 }>
 					<Palette />
-					<StylesColorPanel
-						inheritedValue={ inheritedStyle }
-						value={ style }
-						onChange={ setStyle }
-						settings={ settings }
-					/>
 				</VStack>
-			</div>
+			</ScreenBody>
+			<StylesColorPanel
+				inheritedValue={ inheritedStyle }
+				value={ style }
+				onChange={ setStyle }
+				settings={ settings }
+			/>
 		</>
 	);
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
@@ -55,6 +60,7 @@ const MediaReplaceFlow = ( {
 	multiple = false,
 	addToGallery,
 	handleUpload = true,
+	variant,
 	popoverProps,
 	renderToggle,
 	className,
@@ -148,11 +154,19 @@ const MediaReplaceFlow = ( {
 
 	const gallery = multiple && onlyAllowsImages();
 
+	const mergedPopoverProps = {
+		...popoverProps,
+		variant,
+	};
+
 	return (
 		<Dropdown
-			popoverProps={ popoverProps }
+			popoverProps={ mergedPopoverProps }
 			className={ className }
-			contentClassName="block-editor-media-replace-flow__options"
+			contentClassName={ clsx(
+				'block-editor-media-replace-flow__options',
+				variant && `is-variant-${ variant }`
+			) }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				if ( renderToggle ) {
 					return renderToggle( {
@@ -225,6 +239,9 @@ const MediaReplaceFlow = ( {
 								{ __( 'Use featured image' ) }
 							</MenuItem>
 						) }
+						{ typeof children === 'function'
+							? children( { onClose } )
+							: children }
 						{ mediaURL && onReset && (
 							<MenuItem
 								onClick={ () => {
@@ -235,9 +252,6 @@ const MediaReplaceFlow = ( {
 								{ __( 'Reset' ) }
 							</MenuItem>
 						) }
-						{ typeof children === 'function'
-							? children( { onClose } )
-							: children }
 					</NavigableMenu>
 					{ onSelectURL && (
 						<form className="block-editor-media-flow__url-input">

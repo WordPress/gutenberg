@@ -11,13 +11,11 @@ import { forwardRef, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import BaseFill from './fill';
+import Fill from './fill';
 import BaseSlot from './slot';
-import BubblesVirtuallyFill from './bubbles-virtually/fill';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';
-import BubblesVirtuallySlotFillProvider from './bubbles-virtually/slot-fill-provider';
 import SlotFillProvider from './provider';
-import SlotFillContext from './bubbles-virtually/slot-fill-context';
+import SlotFillContext from './context';
 import type { WordPressComponentProps } from '../context';
 
 export { default as useSlot } from './bubbles-virtually/use-slot';
@@ -30,30 +28,22 @@ import type {
 	SlotKey,
 } from './types';
 
-export function Fill( props: FillComponentProps ) {
-	// We're adding both Fills here so they can register themselves before
-	// their respective slot has been registered. Only the Fill that has a slot
-	// will render. The other one will return null.
-	return (
-		<>
-			<BaseFill { ...props } />
-			<BubblesVirtuallyFill { ...props } />
-		</>
-	);
-}
+export { Fill };
 
-export function UnforwardedSlot(
-	props: SlotComponentProps &
-		Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
-	ref: ForwardedRef< any >
-) {
-	const { bubblesVirtually, ...restProps } = props;
-	if ( bubblesVirtually ) {
-		return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
+export const Slot = forwardRef(
+	(
+		props: SlotComponentProps &
+			Omit< WordPressComponentProps< {}, 'div' >, 'className' >,
+		ref: ForwardedRef< any >
+	) => {
+		const { bubblesVirtually, ...restProps } = props;
+		if ( bubblesVirtually ) {
+			return <BubblesVirtuallySlot { ...restProps } ref={ ref } />;
+		}
+		return <BaseSlot { ...restProps } />;
 	}
-	return <BaseSlot { ...restProps } />;
-}
-export const Slot = forwardRef( UnforwardedSlot );
+);
+Slot.displayName = 'Slot';
 
 export function Provider( {
 	children,
@@ -63,13 +53,7 @@ export function Provider( {
 	if ( ! parent.isDefault && passthrough ) {
 		return <>{ children }</>;
 	}
-	return (
-		<SlotFillProvider>
-			<BubblesVirtuallySlotFillProvider>
-				{ children }
-			</BubblesVirtuallySlotFillProvider>
-		</SlotFillProvider>
-	);
+	return <SlotFillProvider>{ children }</SlotFillProvider>;
 }
 Provider.displayName = 'SlotFillProvider';
 
@@ -80,9 +64,18 @@ export function createSlotFill( key: SlotKey ) {
 	);
 	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = (
-		props: DistributiveOmit< SlotComponentProps, 'name' >
-	) => <Slot name={ key } { ...props } />;
+	// Wrap SlotComponent with forwardRef to support ref forwarding
+	const SlotComponent = forwardRef(
+		(
+			props: DistributiveOmit< SlotComponentProps, 'name' >,
+			ref: ForwardedRef< any >
+		) => <Slot name={ key } ref={ ref } { ...props } />
+	) as React.ForwardRefExoticComponent<
+		DistributiveOmit< SlotComponentProps, 'name' > &
+			React.RefAttributes< any >
+	> & {
+		__unstableName: SlotKey;
+	};
 	SlotComponent.displayName = `${ baseName }Slot`;
 	/**
 	 * @deprecated 6.8.0

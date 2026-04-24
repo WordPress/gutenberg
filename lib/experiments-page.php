@@ -114,30 +114,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-media-processing',
-		__( 'Client-side media processing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables client-side media processing to leverage the browser\'s capabilities to handle tasks like image resizing and compression.', 'gutenberg' ),
-			'id'    => 'gutenberg-media-processing',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-sync-collaboration',
-		__( 'Collaboration: add real time editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -146,42 +122,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-new-posts-dashboard',
-		__( 'Data Views: enable for Posts', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-			'id'    => 'gutenberg-new-posts-dashboard',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-quick-edit-dataviews',
-		__( 'Data Views: add Quick Edit', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-quick-edit-dataviews',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-dataviews-media-modal',
-		__( 'Data Views: new media modal', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a new media modal experience powered by Data Views for improved media library management.', 'gutenberg' ),
-			'id'    => 'gutenberg-dataviews-media-modal',
 		)
 	);
 
@@ -198,14 +138,26 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-only-pattern-insertion',
-		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+		'gutenberg-content-only-inspector-fields',
+		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-only-pattern-insertion',
+			'label' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-inspector-fields',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-dataform-inspector',
+		__( 'Editor Inspector: Use DataForm', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataform-inspector',
 		)
 	);
 
@@ -222,14 +174,86 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-customizable-navigation-overlays',
-		__( 'Customizable Navigation Overlays', 'gutenberg' ),
+		'gutenberg-extensible-site-editor',
+		__( 'Extensible Site Editor', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
-			'id'    => 'gutenberg-customizable-navigation-overlays',
+			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+			'id'    => 'gutenberg-extensible-site-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-editor',
+		__( 'Media Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Adds an "Edit media" action on image blocks for editing the attached media item (metadata and content) in the editor.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-editor-modal',
+		__( 'Media Editor Modal', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables an in-place modal for image editing — cropping, adjustments, and metadata — opened from blocks like the image block without navigating away from the current post.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor-modal',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-dataviews-media-modal',
+		__( 'Media Upload Modal', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Replaces the existing WordPress media modal with a new modal powered by Data Views, supporting browsing, selecting, and uploading media.', 'gutenberg' ),
+			'id'    => 'gutenberg-dataviews-media-modal',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-guidelines',
+		__( 'Guidelines', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables guidelines feature for managing editorial voice and tone guidelines under Settings.', 'gutenberg' ),
+			'id'    => 'gutenberg-guidelines',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-content-types',
+		__( 'Content types: manage custom taxonomies', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a UI for creating and managing custom taxonomies. Custom post types will be explored soon.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-types',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-dashboard-widgets',
+		__( 'New Dashboard experience', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
+			'id'    => 'gutenberg-dashboard-widgets',
 		)
 	);
 

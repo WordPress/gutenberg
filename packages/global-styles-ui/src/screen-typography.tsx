@@ -9,6 +9,7 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import TypographyElements from './typography-elements';
 import TypographyVariations from './variations/variations-typography';
 import FontFamilies from './font-families';
@@ -26,14 +27,14 @@ function ScreenTypography() {
 					'Available fonts, typographic styles, and the application of those styles.'
 				) }
 			/>
-			<div className="global-styles-ui-screen">
+			<ScreenBody>
 				<VStack spacing={ 7 }>
 					<TypographyVariations title={ __( 'Typesets' ) } />
 					{ fontLibraryEnabled && <FontFamilies /> }
 					<TypographyElements />
 					<FontSizesCount />
 				</VStack>
-			</div>
+			</ScreenBody>
 		</>
 	);
 }

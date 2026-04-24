@@ -40,17 +40,17 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 	const maxSizeBuffer = Math.floor( maxSize * 2.5 );
-	const { avatarURL } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
+	const avatarURL = useSelect( ( select ) => {
+		const { __experimentalDiscussionSettings } =
+			select( blockEditorStore ).getSettings();
+
+		return __experimentalDiscussionSettings?.avatarURL;
+	}, [] );
 
 	const inspectorControls = (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<RangeControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Image size' ) }
 					onChange={ ( newWidth ) =>

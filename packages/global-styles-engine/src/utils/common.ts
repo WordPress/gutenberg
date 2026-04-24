@@ -92,6 +92,12 @@ export const PRESET_METADATA = [
 		cssVarInfix: 'border-radius',
 		classes: [],
 	},
+	{
+		path: [ 'dimensions', 'dimensionSizes' ],
+		valueKey: 'size',
+		cssVarInfix: 'dimension',
+		classes: [],
+	},
 ];
 
 export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {

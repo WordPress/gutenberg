@@ -21,10 +21,10 @@ import {
 	footer as footerIcon,
 	header as headerIcon,
 	sidebar as sidebarIcon,
+	navigationOverlay as navigationOverlayIcon,
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error serialize is not typed
 import { serialize } from '@wordpress/blocks';
 
 /**
@@ -84,13 +84,22 @@ export default function CreateTemplatePartModal( {
 	);
 }
 
-const getTemplatePartIcon = ( iconName: string ) => {
-	if ( 'header' === iconName ) {
+/**
+ * Helper function to retrieve the corresponding icon by area name.
+ *
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
+ *
+ * @return {Object} The corresponding icon.
+ */
+const getTemplatePartIcon = ( areaOrIconName: string ) => {
+	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
-	} else if ( 'footer' === iconName ) {
+	} else if ( 'footer' === areaOrIconName ) {
 		return footerIcon;
-	} else if ( 'sidebar' === iconName ) {
+	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
+	} else if ( 'navigation-overlay' === areaOrIconName ) {
+		return navigationOverlayIcon;
 	}
 	return symbolFilledIcon;
 };
@@ -187,7 +196,6 @@ export function CreateTemplatePartModalContents( {
 			<VStack spacing="4">
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }

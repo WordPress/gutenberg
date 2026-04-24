@@ -37,7 +37,6 @@ const TestURLPopover = () => {
 					onClose={ close }
 					renderSettings={ () => (
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ setTarget }
 						/>

@@ -39,17 +39,8 @@ import {
 	useAlternativeTemplateParts,
 	useTemplatePartArea,
 } from './utils/hooks';
-import { unlock } from '../../lock-unlock';
 
-function getTemplatePartEditButtonTitle( clientId, editedContentOnlySection ) {
-	if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
-		return __( 'Edit' );
-	}
-
-	return editedContentOnlySection === clientId
-		? __( 'Exit section' )
-		: __( 'Edit section' );
-}
+const SUPPORTED_AREAS = [ 'header', 'footer', 'navigation-overlay' ];
 
 function ReplaceButton( {
 	isEntityAvailable,
@@ -68,7 +59,7 @@ function ReplaceButton( {
 	const canReplace =
 		isEntityAvailable &&
 		hasReplacements &&
-		( area === 'header' || area === 'footer' );
+		SUPPORTED_AREAS.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -94,7 +85,7 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		( area === 'header' || area === 'footer' );
+		SUPPORTED_AREAS.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -119,18 +110,8 @@ export default function TemplatePartEdit( {
 } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
-	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
-		useDispatch( blockEditorStore )
-	);
-	const { currentTheme, editedContentOnlySection } = useSelect(
-		( select ) => {
-			return {
-				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
-				editedContentOnlySection: unlock(
-					select( blockEditorStore )
-				).getEditedContentOnlySection(),
-			};
-		},
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
 		[]
 	);
 	const { slug, theme = currentTheme, tagName, layout = {} } = attributes;
@@ -147,11 +128,13 @@ export default function TemplatePartEdit( {
 		onNavigateToEntityRecord,
 		title,
 		canUserEdit,
+		canUserEditBlock,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } =
 				select( coreStore );
-			const { getBlockCount, getSettings } = select( blockEditorStore );
+			const { getBlockCount, getSettings, canEditBlock } =
+				select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -189,6 +172,7 @@ export default function TemplatePartEdit( {
 					getSettings().onNavigateToEntityRecord,
 				title: entityRecord?.title,
 				canUserEdit: !! _canUserEdit,
+				canUserEditBlock: canEditBlock( clientId ),
 			};
 		},
 		[ templatePartId, attributes.area, clientId ]
@@ -262,30 +246,13 @@ export default function TemplatePartEdit( {
 						<BlockControls group="other">
 							<ToolbarButton
 								onClick={ () => {
-									if (
-										window?.__experimentalContentOnlyPatternInsertion
-									) {
-										if (
-											editedContentOnlySection !==
-											clientId
-										) {
-											editContentOnlySection( clientId );
-										} else {
-											stopEditingContentOnlySection();
-										}
-										return;
-									}
-
 									onNavigateToEntityRecord( {
 										postId: templatePartId,
 										postType: 'wp_template_part',
 									} );
 								} }
 							>
-								{ getTemplatePartEditButtonTitle(
-									clientId,
-									editedContentOnlySection
-								) }
+								{ __( 'Edit original' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }
@@ -320,6 +287,7 @@ export default function TemplatePartEdit( {
 						// Only enable for single selection that matches the current block.
 						// Ensures menu item doesn't render multiple times.
 						if (
+							! canUserEditBlock ||
 							! (
 								selectedClientIds.length === 1 &&
 								clientId === selectedClientIds[ 0 ]
@@ -343,7 +311,7 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				<InspectorControls>
+				<InspectorControls group="settings">
 					<TemplatesList
 						area={ area }
 						clientId={ clientId }

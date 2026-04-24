@@ -76,7 +76,7 @@
 	.dataviews-filters__summary-chip {
 		border-radius: $grid-unit-20;
 		border: $border-width solid transparent;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		padding: $grid-unit-05 $grid-unit-15;
 		min-height: $grid-unit-40;
 		background: $gray-100;
@@ -137,7 +137,7 @@
 		align-items: center;
 		justify-content: center;
 		background: transparent;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 
 		svg {
 			fill: $gray-700;
@@ -231,6 +231,13 @@
 		}
 	}
 
+	.dataviews-filters__search-widget-listitem-value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
+
 	.dataviews-filters__search-widget-listitem-description {
 		display: block;
 		overflow: hidden;
@@ -275,6 +282,7 @@
 
 	.dataviews-filters__search-widget-listitem-multi-selection {
 		--checkbox-size: 24px; // Width & height for small viewports.
+		flex-shrink: 0;
 
 		@include checkbox-control;
 		position: relative;

@@ -50,7 +50,6 @@ export type {
 	Ability,
 	AbilityCategory,
 	AbilityCategoryArgs,
-	AbilitiesState,
 	AbilitiesQueryArgs,
 	AbilityCallback,
 	PermissionCallback,

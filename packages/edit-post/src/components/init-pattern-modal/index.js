@@ -59,11 +59,9 @@ export default function InitPatternModal() {
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 								className="patterns-create-modal__name-input"
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 							/>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'

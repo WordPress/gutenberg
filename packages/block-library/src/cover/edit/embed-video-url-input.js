@@ -15,8 +15,12 @@ import { __ } from '@wordpress/i18n';
  */
 import { isValidVideoEmbedUrl } from '../embed-video-utils';
 
-export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
-	const [ url, setUrl ] = useState( '' );
+export default function EmbedVideoUrlInput( {
+	onSubmit,
+	onClose,
+	initialUrl = '',
+} ) {
+	const [ url, setUrl ] = useState( initialUrl );
 	const [ error, setError ] = useState( '' );
 
 	const handleConfirm = () => {
@@ -53,6 +57,7 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 					</Notice>
 				) }
 				<TextControl
+					type="url"
 					__next40pxDefaultSize
 					label={ __( 'Video URL' ) }
 					value={ url }
@@ -63,7 +68,6 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 					placeholder={ __(
 						'Enter YouTube, Vimeo, or other video URL'
 					) }
-					__nextHasNoMarginBottom
 					help={ __(
 						'Add a background video to the cover block that will autoplay in a loop.'
 					) }

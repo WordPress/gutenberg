@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -13,53 +9,68 @@ import {
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
 
 export default function Header( {
+	headingLevel = 2,
 	breadcrumbs,
 	badges,
+	visual,
 	title,
 	subTitle,
 	actions,
 	showSidebarToggle = true,
 }: {
+	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
+	visual?: React.ReactNode;
 	title?: React.ReactNode;
 	subTitle: React.ReactNode;
 	actions?: React.ReactNode;
 	showSidebarToggle?: boolean;
 } ) {
+	const HeadingTag = `h${ headingLevel }` as const;
 	return (
-		<VStack className="admin-ui-page__header" as="header">
-			<HStack
-				className="admin-ui-page__header-title"
-				justify="space-between"
-				spacing={ 2 }
-			>
-				<HStack spacing={ 2 } justify="flex-start">
+		<Stack
+			direction="column"
+			className="admin-ui-page__header"
+			render={ <header /> }
+		>
+			<Stack direction="row" justify="space-between" gap="sm">
+				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
 							bubblesVirtually
 							className="admin-ui-page__sidebar-toggle-slot"
 						/>
 					) }
+					{ visual && (
+						<div
+							className="admin-ui-page__header-visual"
+							aria-hidden="true"
+						>
+							{ visual }
+						</div>
+					) }
 					{ title && (
-						<Heading as="h2" level={ 3 } weight={ 500 } truncate>
+						<HeadingTag className="admin-ui-page__header-title">
 							{ title }
-						</Heading>
+						</HeadingTag>
 					) }
 					{ breadcrumbs }
 					{ badges }
-				</HStack>
-				<HStack
+				</Stack>
+				<Stack
+					direction="row"
+					gap="sm"
 					style={ { width: 'auto', flexShrink: 0 } }
-					spacing={ 2 }
 					className="admin-ui-page__header-actions"
+					align="center"
 				>
 					{ actions }
-				</HStack>
-			</HStack>
+				</Stack>
+			</Stack>
 			{ subTitle && (
 				<p className="admin-ui-page__header-subtitle">{ subTitle }</p>
 			) }
-		</VStack>
+		</Stack>
 	);
 }

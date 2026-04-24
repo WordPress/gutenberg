@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { VisuallyHidden } from '..';
 
 const meta: Meta< typeof VisuallyHidden > = {
+	tags: [ 'manifest' ],
 	component: VisuallyHidden,
 	title: 'Components/Typography/VisuallyHidden',
 	id: 'components-visuallyhidden',
@@ -21,6 +22,10 @@ const meta: Meta< typeof VisuallyHidden > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

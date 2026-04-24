@@ -71,7 +71,7 @@ export default function pluginDsTokenDocs( {
 					'Do not edit directly.',
 					'-->',
 					'',
-					'# DS Tokens reference',
+					'# Design System Tokens reference',
 					'',
 					'## Semantic tokens',
 					'',

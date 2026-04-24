@@ -11,6 +11,7 @@
 		{ "path": "../compose" },
 		{ "path": "../core-data" },
 		{ "path": "../block-editor" },
+		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../dataviews" },
 		{ "path": "../date" },
@@ -26,6 +27,7 @@
 		{ "path": "../router" },
 		{ "path": "../url" },
 		{ "path": "../block-editor" },
-		{ "path": "../warning" }
+		{ "path": "../warning" },
+		{ "path": "../wordcount" }
 	]
 }

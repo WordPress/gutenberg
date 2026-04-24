@@ -1,0 +1,166 @@
+/**
+ * External dependencies
+ */
+import { mat2d, vec2 } from 'gl-matrix';
+
+/**
+ * Internal dependencies
+ */
+import type { CropperState, Size } from './types';
+import { createCamera, getRotatedBBox, getVisibleBounds } from './camera';
+
+/**
+ * The selected image region in source-pixel coordinates.
+ */
+export interface SourceRegion {
+	/** X offset in source pixels. */
+	x: number;
+	/** Y offset in source pixels. */
+	y: number;
+	/** Width in source pixels. */
+	width: number;
+	/** Height in source pixels. */
+	height: number;
+	/** Rotation in degrees (0-360). */
+	rotation: number;
+	/** Flip state. */
+	flip: { horizontal: boolean; vertical: boolean };
+	/** Zoom factor applied. */
+	zoom: number;
+}
+
+/**
+ * Get the selected image region in source-pixel coordinates.
+ *
+ * Converts the current crop state (normalized visual space) to the actual
+ * region of the original image that's selected. This is the bridge between
+ * the cropper's internal coordinate system and external tools (image
+ * processing libraries, AI APIs, server-side processing) that work in
+ * source-pixel coordinates.
+ *
+ * The returned rectangle accounts for pan, zoom, and the crop rect position,
+ * but expresses the crop in the unrotated image's coordinate space. Rotation
+ * and flip are included as separate fields since they represent transforms,
+ * not a region.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @return The selected region in source pixels plus rotation/flip metadata.
+ */
+export function getSourceRegion(
+	state: CropperState,
+	imageSize: Size
+): SourceRegion {
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return {
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0,
+			rotation: state.rotation,
+			flip: { ...state.flip },
+			zoom: state.zoom,
+		};
+	}
+
+	// Use a synthetic 1:1 container so the camera maps normalized coords
+	// to a known pixel space. The container size cancels out.
+	const syntheticContainer: Size = { width: 1000, height: 1000 };
+	const camera = createCamera( state, syntheticContainer, imageSize );
+
+	// Inverse camera maps screen pixels back to normalized [0,1] world coords.
+	const inv = mat2d.create();
+	mat2d.invert( inv, camera );
+
+	// The crop rect center in screen space. We need the base camera
+	// (zoom=1, no pan) to locate the visual bounds, then place the
+	// crop rect within them.
+	const baseCamera = createCamera(
+		{ ...state, pan: { x: 0, y: 0 }, zoom: 1 },
+		syntheticContainer,
+		imageSize
+	);
+	const visibleBounds = getVisibleBounds( baseCamera );
+
+	const cropRect = state.cropRect;
+	const cropCenterScreenX =
+		visibleBounds.left +
+		( cropRect.x + cropRect.width / 2 ) * visibleBounds.width;
+	const cropCenterScreenY =
+		visibleBounds.top +
+		( cropRect.y + cropRect.height / 2 ) * visibleBounds.height;
+
+	// Transform crop center through inverse camera to get source position.
+	const srcCenter = vec2.create();
+	vec2.transformMat2d(
+		srcCenter,
+		[ cropCenterScreenX, cropCenterScreenY ],
+		inv
+	);
+
+	// Crop rect size in the snap-rotation visual space, divided by zoom
+	// for source-pixel dimensions. Matches the stencil's reference frame.
+	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const { width: rotW, height: rotH } = getRotatedBBox(
+		imageSize.width,
+		imageSize.height,
+		snapRotation
+	);
+	const sourceW = ( cropRect.width * rotW ) / state.zoom;
+	const sourceH = ( cropRect.height * rotH ) / state.zoom;
+
+	return {
+		x: srcCenter[ 0 ] * imageSize.width - sourceW / 2,
+		y: srcCenter[ 1 ] * imageSize.height - sourceH / 2,
+		width: sourceW,
+		height: sourceH,
+		rotation: state.rotation,
+		flip: { ...state.flip },
+		zoom: state.zoom,
+	};
+}
+
+/**
+ * The selected crop region expressed as percentages of the source image.
+ */
+export interface SourceRegionPercent {
+	/** X offset as a percentage (0–100) of the source image width. */
+	x: number;
+	/** Y offset as a percentage (0–100) of the source image height. */
+	y: number;
+	/** Width as a percentage (0–100) of the source image width. */
+	width: number;
+	/** Height as a percentage (0–100) of the source image height. */
+	height: number;
+}
+
+/**
+ * Get the selected image region as percentages of the source image dimensions.
+ *
+ * Returns `{ x, y, width, height }` where each value is a percentage (0–100)
+ * of the source image's natural width or height. This format is compatible
+ * with the WordPress REST API attachments `/edit` endpoint and CSS-based
+ * crop workflows.
+ *
+ * Internally delegates to `getSourceRegion` and divides by the image
+ * dimensions, so accuracy is identical.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize The natural dimensions of the source image.
+ * @return The crop region as percentages (0–100).
+ */
+export function getSourceRegionPercent(
+	state: CropperState,
+	imageSize: Size
+): SourceRegionPercent {
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return { x: 0, y: 0, width: 0, height: 0 };
+	}
+	const region = getSourceRegion( state, imageSize );
+	return {
+		x: ( region.x / imageSize.width ) * 100,
+		y: ( region.y / imageSize.height ) * 100,
+		width: ( region.width / imageSize.width ) * 100,
+		height: ( region.height / imageSize.height ) * 100,
+	};
+}

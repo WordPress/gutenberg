@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
 
@@ -11,16 +12,7 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 	z-index: 1;
 
 	&.has-gradient {
-		// The background image creates a checkerboard pattern. Ignore rtlcss to
-		// make it work both in LTR and RTL.
-		// See https://github.com/WordPress/gutenberg/pull/42510
-		/*rtl:begin:ignore*/
-		background-image:
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
-		background-position: 0 0, 12px 12px;
-		/*rtl:end:ignore*/
-		background-size: calc(2 * 12px) calc(2 * 12px);
+		@include checkerboard-background( 12px );
 	}
 
 	.components-custom-gradient-picker__gradient-bar-background {

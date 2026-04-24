@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import defaultRegistryUntyped from './default-registry';
+import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 import { combineReducers as combineReducersModule } from './redux-store';
 
@@ -9,13 +9,9 @@ import type {
 	StoreDescriptor,
 	ReduxStoreConfig,
 	combineReducers as CombineReducers,
+	AnyConfig,
+	CurriedSelectorsResolveOf,
 } from './types';
-
-// The runtime registry is created from the JavaScript implementation in `registry.js`.
-// Its JSDoc type (`WPDataRegistry`) doesn't include some newer methods like
-// `resolveSelect` or `suspendSelect`, so we widen the type here for the typed
-// exports in this module.
-const defaultRegistry: any = defaultRegistryUntyped;
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
@@ -36,10 +32,11 @@ export { createRegistrySelector, createRegistryControl } from './factory';
 export { createSelector } from './create-selector';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+export { keyedReducer } from './redux-store/keyed-reducer';
 export { dispatch } from './dispatch';
 export { select } from './select';
 
-export * from './types';
+export type * from './types';
 
 /**
  * Object of available plugins to use with a registry.
@@ -108,13 +105,15 @@ export const combineReducers =
  * resolveSelect( myCustomStore ).getPrice( 'hammer' ).then(console.log)
  * ```
  *
- * @return {Object} Object containing the store's promise-wrapped selectors.
+ * @return Object containing the store's promise-wrapped selectors.
  */
-export const resolveSelect = (
-	storeNameOrDescriptor:
-		| string
-		| StoreDescriptor< ReduxStoreConfig< any, any, any > >
-): any => defaultRegistry.resolveSelect( storeNameOrDescriptor );
+export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
+	storeNameOrDescriptor: T | string
+): CurriedSelectorsResolveOf< T > {
+	return defaultRegistry.resolveSelect(
+		storeNameOrDescriptor
+	) as CurriedSelectorsResolveOf< T >;
+}
 
 /**
  * Given a store descriptor, returns an object containing the store's selectors pre-bound to state

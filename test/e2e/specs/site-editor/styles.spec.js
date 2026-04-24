@@ -8,16 +8,16 @@ test.describe( 'Styles', () => {
 		await requestUtils.activateTheme( 'twentytwentythree' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { page } ) => {
 		await page.evaluate( async () => {
 			window.wp.data
 				.dispatch( 'core/editor' )
 				.setRenderingMode( 'post-only' );
 		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should override reset styles and library styles', async ( {
@@ -60,7 +60,7 @@ test.describe( 'Styles', () => {
 
 		// Find the second padding control and change the padding value
 		await page
-			.getByRole( 'button', { name: 'Set custom size' } )
+			.getByRole( 'button', { name: 'Set custom value' } )
 			.nth( 1 )
 			.click();
 		await page.getByRole( 'spinbutton', { name: 'padding' } ).fill( '35' );

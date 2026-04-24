@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
@@ -21,13 +21,9 @@ const meta: Meta< typeof CircularOptionPicker > = {
 	id: 'components-circularoptionpicker',
 	component: CircularOptionPicker,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.Option': CircularOptionPicker.Option,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.OptionGroup': CircularOptionPicker.OptionGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.ButtonAction': CircularOptionPicker.ButtonAction,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'CircularOptionPicker.DropdownLinkAction':
 			CircularOptionPicker.DropdownLinkAction,
 	},
@@ -41,6 +37,11 @@ const meta: Meta< typeof CircularOptionPicker > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Mostly intended for internal use.',
 		},
 	},
 	decorators: [

@@ -25,10 +25,10 @@ const { getAbilities, getAbility, executeAbility } = wp.abilities;
 // or import { getAbilities, getAbility, executeAbility } from '@wordpress/abilities'; depending on your setup
 
 // Get all abilities
-const abilities = await getAbilities();
+const abilities = getAbilities();
 
 // Get a specific ability
-const ability = await getAbility( 'my-plugin/my-ability' );
+const ability = getAbility( 'my-plugin/my-ability' );
 
 // Execute an ability
 const result = await executeAbility( 'my-plugin/my-ability', {
@@ -77,37 +77,37 @@ function MyComponent() {
 
 ### Functions
 
-#### `getAbilities( args: AbilitiesQueryArgs = {} ): Promise<Ability[]>`
+#### `getAbilities( args: AbilitiesQueryArgs = {} ): Ability[]`
 
-Returns all registered abilities. Optionally filter by category slug. Automatically handles pagination to fetch all abilities across multiple pages if needed.
+Returns all registered abilities. Optionally filter by category slug.
 
 ```javascript
 // Get all abilities
-const abilities = await getAbilities();
+const abilities = getAbilities();
 console.log( `Found ${ abilities.length } abilities` );
 
 // Get abilities in a specific category
-const dataAbilities = await getAbilities( { category: 'data-retrieval' } );
+const dataAbilities = getAbilities( { category: 'data-retrieval' } );
 console.log( `Found ${ dataAbilities.length } data retrieval abilities` );
 ```
 
-#### `getAbility( name: string ): Promise<Ability | null>`
+#### `getAbility( name: string ): Ability | undefined`
 
-Returns a specific ability by name, or null if not found.
+Returns a specific ability by name, or undefined if not found.
 
 ```javascript
-const ability = await getAbility( 'my-plugin/create-post' );
+const ability = getAbility( 'my-plugin/create-post' );
 if ( ability ) {
 	console.log( `Found ability: ${ ability.label }` );
 }
 ```
 
-#### `getAbilityCategories(): Promise<AbilityCategory[]>`
+#### `getAbilityCategories(): AbilityCategory[]`
 
 Returns all registered ability categories. Categories are used to organize abilities into logical groups.
 
 ```javascript
-const categories = await getAbilityCategories();
+const categories = getAbilityCategories();
 console.log( `Found ${ categories.length } categories` );
 
 categories.forEach( ( category ) => {
@@ -115,26 +115,26 @@ categories.forEach( ( category ) => {
 } );
 ```
 
-#### `getAbilityCategory( slug: string ): Promise<AbilityCategory | null>`
+#### `getAbilityCategory( slug: string ): AbilityCategory | undefined`
 
-Returns a specific ability category by slug, or null if not found.
+Returns a specific ability category by slug, or undefined if not found.
 
 ```javascript
-const category = await getAbilityCategory( 'data-retrieval' );
+const category = getAbilityCategory( 'data-retrieval' );
 if ( category ) {
 	console.log( `Found category: ${ category.label }` );
 	console.log( `Description: ${ category.description }` );
 }
 ```
 
-#### `registerAbility( ability: Ability ): Promise<void>`
+#### `registerAbility( ability: Ability ): void`
 
 Registers a client-side ability. Client abilities are executed locally in the browser and must include a callback function and a valid category.
 
 ```javascript
 import { registerAbility } from '@wordpress/abilities';
 
-await registerAbility( {
+registerAbility( {
 	name: 'my-plugin/navigate',
 	label: 'Navigate to URL',
 	description: 'Navigates to a URL within WordPress admin',
@@ -153,17 +153,7 @@ await registerAbility( {
 } );
 ```
 
-#### `unregisterAbility( name: string ): void`
-
-Unregisters a client-side ability from the store.
-
-```javascript
-import { unregisterAbility } from '@wordpress/abilities';
-
-unregisterAbility( 'my-plugin/navigate' );
-```
-
-#### `registerAbilityCategory( slug: string, args: AbilityCategoryArgs ): Promise<void>`
+#### `registerAbilityCategory( slug: string, args: AbilityCategoryArgs ): void`
 
 Registers a client-side ability category. This is useful when registering client-side abilities that introduce new categories not defined by the server.
 
@@ -171,13 +161,13 @@ Registers a client-side ability category. This is useful when registering client
 import { registerAbilityCategory } from '@wordpress/abilities';
 
 // Register a new category
-await registerAbilityCategory( 'block-editor', {
+registerAbilityCategory( 'block-editor', {
 	label: 'Block Editor',
 	description: 'Abilities for interacting with the WordPress block editor',
 } );
 
 // Register a category with optional metadata
-await registerAbilityCategory( 'custom-category', {
+registerAbilityCategory( 'custom-category', {
 	label: 'Custom Category',
 	description: 'A category for custom abilities',
 	meta: {
@@ -186,7 +176,7 @@ await registerAbilityCategory( 'custom-category', {
 } );
 
 // Then register abilities using the new category
-await registerAbility( {
+registerAbility( {
 	name: 'my-plugin/insert-block',
 	label: 'Insert Block',
 	description: 'Inserts a block into the editor',
@@ -208,20 +198,22 @@ import { unregisterAbilityCategory } from '@wordpress/abilities';
 unregisterAbilityCategory( 'block-editor' );
 ```
 
-#### `executeAbility( name: string, input?: Record<string, any> ): Promise<any>`
+#### `unregisterAbility( name: string ): void`
 
-Executes an ability with optional input parameters. The HTTP method is automatically determined based on the ability's annotations:
-
--   `readonly` abilities use GET (read-only operations)
--   regular abilities use POST (write operations)
+Unregisters a client-side ability from the store.
 
 ```javascript
-// Execute a read-only ability (GET)
-const data = await executeAbility( 'my-plugin/get-data', {
-	id: 123,
-} );
+import { unregisterAbility } from '@wordpress/abilities';
 
-// Execute a regular ability (POST)
+unregisterAbility( 'my-plugin/navigate' );
+```
+
+#### `executeAbility( name: string, input?: Record<string, any> ): Promise<any>`
+
+Executes an ability with optional input parameters.
+
+```javascript
+// Execute an ability
 const result = await executeAbility( 'my-plugin/create-item', {
 	title: 'New Item',
 	content: 'Item content',

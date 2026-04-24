@@ -73,6 +73,18 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'background', 'backgroundAttachment' ),
 				),
+				'gradient'             => array(
+					'property_keys' => array(
+						'default' => 'background-image',
+					),
+					'css_vars'      => array(
+						'gradient' => '--wp--preset--gradient--$slug',
+					),
+					'path'          => array( 'background', 'gradient' ),
+					'classnames'    => array(
+						'has-background' => true,
+					),
+				),
 			),
 			'color'      => array(
 				'text'       => array(
@@ -201,13 +213,28 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'has-aspect-ratio' => true,
 					),
 				),
+				'height'      => array(
+					'property_keys' => array(
+						'default' => 'height',
+					),
+					'path'          => array( 'dimensions', 'height' ),
+				),
 				'minHeight'   => array(
 					'property_keys' => array(
 						'default' => 'min-height',
 					),
 					'path'          => array( 'dimensions', 'minHeight' ),
 					'css_vars'      => array(
-						'spacing' => '--wp--preset--spacing--$slug',
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
+				),
+				'minWidth'    => array(
+					'property_keys' => array(
+						'default' => 'min-width',
+					),
+					'path'          => array( 'dimensions', 'minWidth' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
 					),
 				),
 				'width'       => array(
@@ -215,6 +242,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'width',
 					),
 					'path'          => array( 'dimensions', 'width' ),
+					'css_vars'      => array(
+						'dimension' => '--wp--preset--dimension--$slug',
+					),
 				),
 			),
 			'spacing'    => array(
@@ -293,6 +323,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'text-decoration',
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
+				),
+				'textIndent'     => array(
+					'property_keys' => array(
+						'default' => 'text-indent',
+					),
+					'path'          => array( 'typography', 'textIndent' ),
 				),
 				'textTransform'  => array(
 					'property_keys' => array(
@@ -440,6 +476,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					$css_declarations = static::get_css_declarations( $style_value, $style_definition, $options );
 					if ( ! empty( $css_declarations ) ) {
+						/*
+						 * Combine background gradient and background image into a single
+						 * comma-separated background-image value, matching the JS style engine.
+						 */
+						if ( isset( $css_declarations['background-image'] ) && isset( $parsed_styles['declarations']['background-image'] ) ) {
+							$css_declarations['background-image'] = $css_declarations['background-image'] . ', ' . $parsed_styles['declarations']['background-image'];
+						}
 						$parsed_styles['declarations'] = array_merge( $parsed_styles['declarations'], $css_declarations );
 					}
 				}

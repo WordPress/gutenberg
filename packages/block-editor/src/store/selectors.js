@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -1681,6 +1682,11 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
+	// Disable insertion in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! isBlockVisibleInTheInserter( state, blockName, rootClientId ) ) {
 		return false;
 	}
@@ -1699,7 +1705,22 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if ( blockEditingMode === 'disabled' ) {
+
+	// Compute section context early so the disabled check below can use it.
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+
+	// Disabled containers reject all blocks, with one exception: within a
+	// section, the default block (paragraph) is allowed through so it can
+	// reach the content-insertion logic further down (lines 1748-1772)
+	// which conditionally permits it where a sibling paragraph exists.
+	if (
+		blockEditingMode === 'disabled' &&
+		( ! isWithinSection || blockName !== getDefaultBlockName() )
+	) {
 		return false;
 	}
 
@@ -1714,28 +1735,59 @@ const canInsertBlockTypeUnmemoized = (
 	// It shouldn't be possible to insert inside a section block unless in
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const isBlockWithinSection = !! getParentSectionBlock(
-		state,
-		rootClientId
-	);
+	if ( isWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// Don't allow insertion into synced patterns.
 	if (
-		( isParentSectionBlock || isBlockWithinSection ) &&
-		! isContentRoleBlock
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
 
-	// In content only mode, check if this container allows insertion.
+	/*
+	 * In content only mode, check if this container allows insertion.
+	 * We need the `isParentSectionBlock` check because section blocks
+	 * (synced patterns, contentOnly groups) have a `getBlockEditingMode`
+	 * of 'default', not 'contentOnly' — the 'contentOnly' mode is only
+	 * set on their *children*.
+	 *
+	 * Also include `disabled` alongside `contentOnly`: structural inner blocks
+	 * (e.g. Column) inside a content-only section use `disabled` mode, and they
+	 * need the same default-block sibling rules so insertion stays aligned with
+	 * `canRemoveBlock`.
+	 */
 	if (
-		( isParentSectionBlock || blockEditingMode === 'contentOnly' ) &&
+		isWithinSection &&
+		( isParentSectionBlock ||
+			blockEditingMode === 'contentOnly' ||
+			blockEditingMode === 'disabled' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			blockName,
 			rootClientId
 		)
 	) {
-		return false;
+		const defaultBlockName = getDefaultBlockName();
+		/*
+		 * Allow inserting the default block anywhere that another default block already exists
+		 * when in contentOnly mode. The same sibling rule applies when the parent is `disabled`
+		 * within a content-only section (see the condition above).
+		 */
+		if ( blockName === defaultBlockName ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const hasDefaultBlock = existingBlocks.some(
+				( clientId ) =>
+					getBlockName( state, clientId ) === defaultBlockName
+			);
+			if ( ! hasDefaultBlock ) {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	const parentName = getBlockName( state, rootClientId );
@@ -1868,6 +1920,11 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId ) {
+	// Disable removal in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1884,25 +1941,59 @@ export function canRemoveBlock( state, clientId ) {
 
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
-	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
-	// Check if the parent container allows insertion/removal in contentOnly mode
+	// Disallow removal from synced patterns.
 	if (
-		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
+	) {
+		return false;
+	}
+
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	const blockName = getBlockName( state, clientId );
+	const defaultBlockName = getDefaultBlockName();
+
+	// Check if the parent container allows insertion/removal in contentOnly
+	// mode. We need the `isParentSectionBlock` check because section blocks
+	// (synced patterns, contentOnly groups) have a `getBlockEditingMode` of
+	// 'default', not 'contentOnly' — the 'contentOnly' mode is only set on
+	// their *children*.
+	if (
+		isWithinSection &&
+		( isParentSectionBlock ||
+			blockName === defaultBlockName ||
+			rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
+		// Allow removing the default block when other default blocks exist
+		// in contentOnly mode.
+		if ( blockName === defaultBlockName ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const defaultBlocks = existingBlocks.filter(
+				( id ) => getBlockName( state, id ) === defaultBlockName
+			);
+			// Allow removal if there are other default blocks besides this one
+			if ( defaultBlocks.length > 1 ) {
+				return true;
+			}
+			return false;
+		}
 		return false;
 	}
 
@@ -1930,6 +2021,11 @@ export function canRemoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
+	// Disable moving in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1952,11 +2048,16 @@ export function canMoveBlock( state, clientId ) {
 		return false;
 	}
 
-	// If the parent is a section or is `contentOnly`, then check is the inner block
-	// should be allowed to move.
+	// If the block is within a section and the parent is either a section
+	// block itself or has contentOnly editing mode, check whether the inner
+	// block should be allowed to move. We need the `isParentSectionBlock`
+	// check because section blocks (synced patterns, contentOnly groups)
+	// have a `getBlockEditingMode` of 'default', not 'contentOnly' — the
+	// 'contentOnly' mode is only set on their *children*.
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	if (
+		isBlockWithinSection &&
 		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
@@ -1991,6 +2092,11 @@ export function canMoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be edited.
  */
 export function canEditBlock( state, clientId ) {
+	// Disable editing in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -2011,6 +2117,11 @@ export function canEditBlock( state, clientId ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
+	// Disable locking in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
@@ -2078,6 +2189,8 @@ const getItemFromVariation = ( state, item ) => ( variation ) => {
 		innerBlocks: variation.innerBlocks,
 		keywords: variation.keywords || item.keywords,
 		frecency: calculateFrecency( time, count ),
+		// Pass through search-only flag for block-scope variations.
+		isSearchOnly: variation.isSearchOnly,
 	};
 };
 
@@ -2151,6 +2264,25 @@ const buildBlockTypeItem =
 			blockType.name,
 			'inserter'
 		);
+		const blockVariations = getBlockVariations( blockType.name, 'block' );
+		const allVariations = [
+			...inserterVariations,
+			// Built-in heading level variations have block scope but allow
+			// insertion via slash inserter.
+			// See https://github.com/WordPress/gutenberg/issues/74233.
+			...blockVariations
+				.filter(
+					( variation ) =>
+						blockType.name === 'core/heading' &&
+						[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+							variation.name
+						)
+				)
+				.map( ( variation ) => ( {
+					...variation,
+					isSearchOnly: true,
+				} ) ),
+		];
 		return {
 			...blockItemBase,
 			initialAttributes: {},
@@ -2159,7 +2291,7 @@ const buildBlockTypeItem =
 			keywords: blockType.keywords,
 			parent: blockType.parent,
 			ancestor: blockType.ancestor,
-			variations: inserterVariations,
+			variations: allVariations,
 			example: blockType.example,
 			utility: 1, // Deprecated.
 		};
@@ -2258,13 +2390,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
+				const { getClosestAllowedInsertionPoint } = unlock(
+					select( STORE_NAME )
+				);
 				blockTypeInserterItems = blockTypeInserterItems
-					.filter( ( blockType ) =>
-						isBlockVisibleInTheInserter(
-							state,
-							blockType,
-							rootClientId
-						)
+					.filter(
+						( blockType ) =>
+							isBlockVisibleInTheInserter(
+								state,
+								blockType,
+								rootClientId
+							) &&
+							getClosestAllowedInsertionPoint(
+								blockType.name,
+								rootClientId
+							) !== null
 					)
 					.map( ( blockType ) => ( {
 						...blockType,
@@ -2276,8 +2416,6 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
-			// Hardcode: Collect stretch variations separately to add at the end
-			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2290,26 +2428,14 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						variations
-							.map( variationMapper )
-							.forEach( ( variation ) => {
-								if (
-									variation.id ===
-										'core/paragraph/stretchy-paragraph' ||
-									variation.id ===
-										'core/heading/stretchy-heading'
-								) {
-									stretchVariations.push( variation );
-								} else {
-									accumulator.push( variation );
-								}
-							} );
+						accumulator.push(
+							...variations.map( variationMapper )
+						);
 					}
 					return accumulator;
 				},
 				[]
 			);
-			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than
@@ -2510,7 +2636,7 @@ export function getDirectInsertBlock( state, rootClientId = null ) {
 		return;
 	}
 	const { defaultBlock, directInsert } =
-		state.blockListSettings[ rootClientId ] ?? {};
+		state.blockListSettings.get( rootClientId ) ?? {};
 	if ( ! defaultBlock || ! directInsert ) {
 		return;
 	}
@@ -2743,7 +2869,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
  * @return {?Object} Block settings of the block if set.
  */
 export function getBlockListSettings( state, clientId ) {
-	return state.blockListSettings[ clientId ];
+	return state.blockListSettings.get( clientId );
 }
 
 /**
@@ -2781,16 +2907,14 @@ export function isLastBlockChangePersistent( state ) {
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 	( state, clientIds = [] ) => {
-		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
-			if ( ! state.blockListSettings[ clientId ] ) {
-				return blockListSettingsForBlocks;
+		const blockListSettingsForBlocks = {};
+		for ( const clientId of clientIds ) {
+			const settings = getBlockListSettings( state, clientId );
+			if ( settings ) {
+				blockListSettingsForBlocks[ clientId ] = settings;
 			}
-
-			return {
-				...blockListSettingsForBlocks,
-				[ clientId ]: state.blockListSettings[ clientId ],
-			};
-		}, {} );
+		}
+		return blockListSettingsForBlocks;
 	},
 	( state ) => [ state.blockListSettings ]
 );
@@ -2907,7 +3031,7 @@ export function isBlockHighlighted( state, clientId ) {
  * @return {boolean} True if the block has controlled inner blocks.
  */
 export function areInnerBlocksControlled( state, clientId ) {
-	return !! state.blocks.controlledInnerBlocks[ clientId ];
+	return state.blocks.controlledInnerBlocks.has( clientId );
 }
 
 /**
@@ -3128,8 +3252,8 @@ export function getBlockEditingMode( state, clientId = '' ) {
 	}
 
 	// In normal mode, consider that an explicitly set editing mode takes over.
-	if ( state.blockEditingModes.has( clientId ) ) {
-		return state.blockEditingModes.get( clientId );
+	if ( state.blocks.blockEditingModes.has( clientId ) ) {
+		return state.blocks.blockEditingModes.get( clientId );
 	}
 
 	return 'default';

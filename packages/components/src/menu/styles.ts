@@ -8,24 +8,14 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { COLORS, font, rtl, CONFIG } from '../utils';
+import { COLORS, font, rtl, CONFIG, DROPDOWN_MOTION_CSS } from '../utils';
 import { space } from '../utils/space';
 import Icon from '../icon';
 import { Truncate } from '../truncate';
 import type { ContextProps } from './types';
 
-const ANIMATION_PARAMS = {
-	SCALE_AMOUNT_OUTER: 0.82,
-	SCALE_AMOUNT_CONTENT: 0.9,
-	DURATION: {
-		IN: '400ms',
-		OUT: '200ms',
-	},
-	EASING: 'cubic-bezier(0.33, 0, 0, 1)',
-};
-
 const CONTENT_WRAPPER_PADDING = space( 1 );
-const ITEM_PADDING_BLOCK = space( 2 );
+const ITEM_PADDING_BLOCK = space( 1 );
 const ITEM_PADDING_INLINE = space( 3 );
 
 // TODO:
@@ -42,65 +32,17 @@ const TOOLBAR_VARIANT_BOX_SHADOW = `0 0 0 ${ CONFIG.borderWidth } ${ TOOLBAR_VAR
 
 const GRID_TEMPLATE_COLS = 'minmax( 0, max-content ) 1fr';
 
-export const PopoverOuterWrapper = styled.div<
-	Pick< ContextProps, 'variant' >
->`
-	position: relative;
-
-	background-color: ${ COLORS.ui.background };
-	border-radius: ${ CONFIG.radiusMedium };
-	${ ( props ) => css`
-		box-shadow: ${ props.variant === 'toolbar'
-			? TOOLBAR_VARIANT_BOX_SHADOW
-			: DEFAULT_BOX_SHADOW };
-	` }
-
-	overflow: hidden;
-
-	/* Open/close animation (outer wrapper) */
-	@media not ( prefers-reduced-motion ) {
-		transition-property: transform, opacity;
-		transition-timing-function: ${ ANIMATION_PARAMS.EASING };
-		transition-duration: ${ ANIMATION_PARAMS.DURATION.IN };
-		will-change: transform, opacity;
-
-		/* Regardless of the side, fade in and out. */
-		opacity: 0;
-		&:has( [data-enter] ) {
-			opacity: 1;
-		}
-
-		&:has( [data-leave] ) {
-			transition-duration: ${ ANIMATION_PARAMS.DURATION.OUT };
-		}
-
-		/* For menus opening on top and bottom side, animate the scale Y too. */
-		&:has( [data-side='bottom'] ),
-		&:has( [data-side='top'] ) {
-			transform: scaleY( ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } );
-		}
-		&:has( [data-side='bottom'] ) {
-			transform-origin: top;
-		}
-		&:has( [data-side='top'] ) {
-			transform-origin: bottom;
-		}
-		&:has( [data-enter][data-side='bottom'] ),
-		&:has( [data-enter][data-side='top'] ),
-		/* Do not animate the scaleY when closing the menu */
-		&:has( [data-leave][data-side='bottom'] ),
-		&:has( [data-leave][data-side='top'] ) {
-			transform: scaleY( 1 );
-		}
-	}
-`;
-
-export const PopoverInnerWrapper = styled.div`
+export const Menu = styled( Ariakit.Menu )`
 	position: relative;
 	/* Same as popover component */
 	/* TODO: is there a way to read the sass variable? */
 	z-index: 1000000;
 
+	/* Only visible in Windows High Contrast mode */
+	outline: 2px solid transparent !important;
+`;
+
+export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 	display: grid;
 	grid-template-columns: ${ GRID_TEMPLATE_COLS };
 	grid-template-rows: auto;
@@ -115,44 +57,77 @@ export const PopoverInnerWrapper = styled.div`
 	overscroll-behavior: contain;
 	overflow: auto;
 
-	/* Only visible in Windows High Contrast mode */
-	outline: 2px solid transparent !important;
+	background-color: ${ COLORS.ui.background };
+	border-radius: ${ CONFIG.radiusMedium };
+	${ ( props ) => css`
+		box-shadow: ${ props.variant === 'toolbar'
+			? TOOLBAR_VARIANT_BOX_SHADOW
+			: DEFAULT_BOX_SHADOW };
+	` }
+`;
 
-	/* Open/close animation (inner content wrapper) */
+/**
+ * Outer wrapper for menu motion. `Menu.Popover` uses Ariakit’s `render` prop so
+ * this element wraps the inner surface that receives all merged menu props
+ * (ref, role, `data-*`, children). Transitions mirror the pre-refactor `Menu`
+ * styles from `trunk`, driven by `data-enter` / `data-side` on the inner
+ * surface via `:has(> …)`.
+ */
+export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
-		transition: inherit;
-		transform-origin: inherit;
+		transition-property: transform, opacity;
+		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
+		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+			${ DROPDOWN_MOTION_CSS.FADE_EASING };
+		will-change: transform, opacity;
 
-		/*
-		 * For menus opening on top and bottom side, animate the scale Y too.
-		 * The content scales at a different rate than the outer container:
-		 * - first, counter the outer scale factor by doing "1 / scaleAmountOuter"
-		 * - then, apply the content scale factor.
-		 */
-		&[data-side='bottom'],
-		&[data-side='top'] {
-			transform: scaleY(
-				calc(
-					1 / ${ ANIMATION_PARAMS.SCALE_AMOUNT_OUTER } *
-						${ ANIMATION_PARAMS.SCALE_AMOUNT_CONTENT }
-				)
-			);
-		}
-		&[data-enter][data-side='bottom'],
-		&[data-enter][data-side='top'],
-		/* Do not animate the scaleY when closing the menu */
-		&[data-leave][data-side='bottom'],
-		&[data-leave][data-side='top'] {
-			transform: scaleY( 1 );
+		&:not( :has( > ${ MenuSurface }[data-submenu] ) ) {
+			/* Regardless of the side, fade in and out. */
+			opacity: 0;
+			&:has( > ${ MenuSurface }[data-enter] ) {
+				opacity: 1;
+			}
+
+			/* Slide in the direction the menu is opening. */
+			&:has( > ${ MenuSurface }[data-side='bottom'] ) {
+				transform: translateY(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='top'] ) {
+				transform: translateY(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='left'] ) {
+				transform: translateX(
+					${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-side='right'] ) {
+				transform: translateX(
+					-${ DROPDOWN_MOTION_CSS.SLIDE_DISTANCE }
+				);
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='bottom'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='top'] ) {
+				transform: translateY( 0 );
+			}
+			&:has( > ${ MenuSurface }[data-enter][data-side='left'] ),
+			&:has( > ${ MenuSurface }[data-enter][data-side='right'] ) {
+				transform: translateX( 0 );
+			}
 		}
 	}
 `;
 
 const baseItem = css`
 	all: unset;
+	cursor: pointer;
 
 	position: relative;
-	min-height: ${ space( 10 ) };
+	min-height: ${ space( 8 ) };
 	box-sizing: border-box;
 
 	/* Occupy the width of all grid columns (ie. full width) */
@@ -193,7 +168,6 @@ const baseItem = css`
 
 	&[aria-disabled='true'] {
 		color: ${ COLORS.ui.textDisabled };
-		cursor: not-allowed;
 	}
 
 	/* Active item (including hover) */
@@ -219,7 +193,7 @@ const baseItem = css`
 	}
 
 	/* When the item is the trigger of an open submenu */
-	${ PopoverInnerWrapper }:not(:focus) &:not(:focus)[aria-expanded="true"] {
+	${ Menu }:not(:focus) &:not(:focus)[aria-expanded="true"] {
 		background-color: ${ LIGHT_BACKGROUND_COLOR };
 		color: ${ COLORS.theme.foreground };
 	}
@@ -317,9 +291,9 @@ export const ItemSuffixWrapper = styled.span`
 	 * When the parent menu item is active, except when it's a non-focused/hovered
 	 * submenu trigger (in that case, color should not be inherited)
 	 */
-	[data-active-item]:not( [data-focus-visible] ) *:not(${ PopoverInnerWrapper }) &,
+	[data-active-item]:not( [data-focus-visible] ) *:not(${ Menu }) &,
 	/* When the parent menu item is disabled */
-	[aria-disabled='true'] *:not(${ PopoverInnerWrapper }) & {
+	[aria-disabled='true'] *:not(${ Menu }) & {
 		color: inherit;
 	}
 `;
@@ -382,10 +356,8 @@ export const ItemHelpText = styled( Truncate )`
 	color: ${ LIGHTER_TEXT_COLOR };
 	overflow-wrap: anywhere;
 
-	[data-active-item]:not( [data-focus-visible] )
-		*:not( ${ PopoverInnerWrapper } )
-		&,
-	[aria-disabled='true'] *:not( ${ PopoverInnerWrapper } ) & {
+	[data-active-item]:not( [data-focus-visible] ) *:not( ${ Menu } ) &,
+	[aria-disabled='true'] *:not( ${ Menu } ) & {
 		color: inherit;
 	}
 `;
