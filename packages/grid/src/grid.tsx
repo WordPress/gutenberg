@@ -75,6 +75,14 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		x: number;
 		y: number;
 	} | null >( null );
+	// Width/height snapshot at the start of a resize session. The
+	// resize handle reports `delta` absolute from the gesture start,
+	// so the baseline must stay frozen — reading from the already
+	// mutated `activeLayout` would compound the delta each frame.
+	const resizeBaselineRef = useRef< {
+		width: number;
+		height: number;
+	} | null >( null );
 	const activeLayout = temporaryLayout ?? layout;
 
 	const rootRef = useRef< HTMLDivElement >( null );
@@ -199,6 +207,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		setActiveId( null );
 		latestLayoutRef.current = undefined;
 		lastReorderCursorRef.current = null;
+		resizeBaselineRef.current = null;
 		setTemporaryLayout( undefined );
 	} );
 
@@ -267,6 +276,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	function persistTemporaryLayout() {
 		const latest = latestLayoutRef.current;
 		latestLayoutRef.current = undefined;
+		resizeBaselineRef.current = null;
 
 		if ( ! onChangeLayout || ! latest ) {
 			return;
@@ -293,34 +303,49 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		};
 
 		if ( relativeDelta.width !== 0 || relativeDelta.height !== 0 ) {
+			// Snapshot baseline on the first meaningful frame and read
+			// from it on every frame after — `delta` is absolute from
+			// the gesture start, so summing it with the live (already
+			// mutated) `activeLayout` width compounds and oscillates,
+			// which thrashes any adjacent `fill` tile.
+			if ( ! resizeBaselineRef.current ) {
+				const baseItem = activeLayout.find(
+					( item ) => item.key === id
+				);
+				const resolvedItem = resolvedItemMap.get( id );
+				// `'fill'`/`'full'` resize from the rendered span
+				// and convert to a numeric width.
+				let baseWidth: number;
+				if ( baseItem?.width === 'full' ) {
+					baseWidth = effectiveColumns;
+				} else if ( baseItem?.width === 'fill' ) {
+					baseWidth =
+						typeof resolvedItem?.width === 'number'
+							? resolvedItem.width
+							: 1;
+				} else {
+					baseWidth = baseItem?.width ?? 1;
+				}
+				resizeBaselineRef.current = {
+					width: baseWidth,
+					height: baseItem?.height ?? 1,
+				};
+			}
+			const baseline = resizeBaselineRef.current;
 			const updatedLayout = activeLayout.map( ( item ) => {
 				if ( item.key === id ) {
-					const resolvedItem = resolvedItemMap.get( id );
-					// `'fill'`/`'full'` resize from the rendered span
-					// and convert to a numeric width.
-					let baseWidth: number;
-					if ( item.width === 'full' ) {
-						baseWidth = effectiveColumns;
-					} else if ( item.width === 'fill' ) {
-						baseWidth =
-							typeof resolvedItem?.width === 'number'
-								? resolvedItem.width
-								: 1;
-					} else {
-						baseWidth = item.width ?? 1;
-					}
 					return {
 						...item,
 						width: Math.max(
 							1,
 							Math.min(
-								baseWidth + relativeDelta.width,
+								baseline.width + relativeDelta.width,
 								effectiveColumns
 							)
 						),
 						height: Math.max(
 							1,
-							( item.height ?? 1 ) + relativeDelta.height
+							baseline.height + relativeDelta.height
 						),
 					};
 				}

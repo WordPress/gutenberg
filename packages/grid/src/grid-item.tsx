@@ -7,7 +7,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -82,10 +83,18 @@ export function GridItem( {
 		width: number;
 		height: number;
 	} | null >( null );
+	const itemRef = useRef< HTMLDivElement >( null );
+	// Tile bounding rect at the first resize frame. The cursor `delta`
+	// from the handle is anchored to the gesture start, but the
+	// overlay needs to track the cursor against the *current* tile
+	// edge — which has shifted whenever the width/height stepped a
+	// column/row. Re-anchor locally by subtracting the tile growth.
+	const initialResizeRectRef = useRef< DOMRect | null >( null );
 	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
 		id: item.key,
 		disabled,
 	} );
+	const mergedRef = useMergeRefs( [ itemRef, setNodeRef ] );
 	/*
 	 * With `<DragOverlay>` handling the cursor-following clone, the
 	 * sortable item stays put in its grid cell and acts as a
@@ -115,12 +124,28 @@ export function GridItem( {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		setPreviewDelta( clamped );
 		onResize( clamped );
+
+		const node = itemRef.current;
+		if ( ! node ) {
+			return;
+		}
+		if ( ! initialResizeRectRef.current ) {
+			initialResizeRectRef.current = node.getBoundingClientRect();
+		}
+		const currentRect = node.getBoundingClientRect();
+		const offsetX = currentRect.right - initialResizeRectRef.current.right;
+		const offsetY =
+			currentRect.bottom - initialResizeRectRef.current.bottom;
+		setPreviewDelta( {
+			width: clamped.width - offsetX,
+			height: clamped.height - ( verticalResizable ? offsetY : 0 ),
+		} );
 	};
 
 	const handleResizeEnd = () => {
 		setPreviewDelta( null );
+		initialResizeRectRef.current = null;
 		onResizeEnd();
 	};
 
@@ -136,7 +161,7 @@ export function GridItem( {
 
 	return (
 		<div
-			ref={ setNodeRef }
+			ref={ mergedRef }
 			className={ itemClassName }
 			style={ style }
 			{ ...attributes }

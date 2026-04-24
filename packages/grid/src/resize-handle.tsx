@@ -9,7 +9,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useThrottle } from '@wordpress/compose';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,8 +48,6 @@ function ResizeHandle( {
 }
 
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
-	const initialAnchorPosition = useRef< DOMRect | null >( null );
-
 	const throttleDelay = 60;
 	const throttledResize = useThrottle(
 		( delta: { width: number; height: number } ) => {
@@ -61,49 +58,29 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 		throttleDelay
 	);
 
-	const handleDragStart = ( event: DragMoveEvent ) => {
-		const target = event.activatorEvent.target as Element;
-		// eslint-disable-next-line react-compiler/react-compiler -- Ref mutation during drag is intentional
-		initialAnchorPosition.current = target.getBoundingClientRect();
-	};
-
+	// `event.delta` is the cursor offset from the gesture start —
+	// not from the handle's current position — so it stays stable
+	// even when the tile (and therefore the handle) jumps a column.
+	// The grid's resize logic snapshots the start width and adds
+	// `delta`, so the two must share the same frame of reference.
 	const handleDragMove = ( event: DragMoveEvent ) => {
-		if ( ! initialAnchorPosition.current ) {
+		if ( event.active.id !== 'draggable' ) {
 			return;
 		}
-		const target = event.activatorEvent.target as Element;
-		const currentPosition = target.getBoundingClientRect();
-		const deltaX = currentPosition.x - initialAnchorPosition.current.x;
-		const deltaY = currentPosition.y - initialAnchorPosition.current.y;
-		const anchorDelta = {
-			width: deltaX,
-			height: deltaY,
-		};
-
-		if ( event.active.id === 'draggable' ) {
-			const delta = {
-				width: event.delta.x - anchorDelta.width,
-				height: event.delta.y - anchorDelta.height,
-			};
-
-			throttledResize( delta );
-		}
+		throttledResize( {
+			width: event.delta.x,
+			height: event.delta.y,
+		} );
 	};
 
 	const handleDragEnd = () => {
-		initialAnchorPosition.current = null;
-
 		if ( props.onResizeEnd ) {
 			props.onResizeEnd();
 		}
 	};
 
 	return (
-		<DndContext
-			onDragStart={ handleDragStart }
-			onDragMove={ handleDragMove }
-			onDragEnd={ handleDragEnd }
-		>
+		<DndContext onDragMove={ handleDragMove } onDragEnd={ handleDragEnd }>
 			<ResizeHandle { ...props } />
 		</DndContext>
 	);
