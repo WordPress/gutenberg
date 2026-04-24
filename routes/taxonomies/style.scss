@@ -45,38 +45,28 @@
 	}
 
 	.components-modal__content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
 		padding: 0;
+		overflow-y: auto;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-header {
-		flex: 0 0 auto;
-		padding: $grid-unit-15 $grid-unit-20 $grid-unit-15 $grid-unit-30;
-		border-bottom: 1px solid $gray-200;
-		background: #fff;
-	}
-
-	.dataviews-action-modal__edit-taxonomy-title {
-		margin: 0;
-		font-size: 13px;
-		font-weight: 600;
-		line-height: 1.4;
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: $white;
+		padding: $grid-unit-20 $grid-unit-30;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-content {
-		flex: 1 1 auto;
-		min-height: 0;
-		overflow-y: auto;
-		padding: $grid-unit-20 $grid-unit-30;
+		padding: 0 $grid-unit-30;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-footer {
-		flex: 0 0 auto;
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
+		background: $white;
 		padding: $grid-unit-20 $grid-unit-30;
-		border-top: 1px solid $gray-200;
-		background: #fff;
 
 		.components-button {
 			flex: 1;
