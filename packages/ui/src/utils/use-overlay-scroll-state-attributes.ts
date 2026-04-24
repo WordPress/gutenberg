@@ -33,6 +33,13 @@ function updateScrollAttributes( el: HTMLElement ) {
 	// anti-pattern. Toggle `tabindex="0"` only while the element actually
 	// overflows. The flag attribute guards against clobbering a
 	// consumer-supplied tabindex: we only touch attributes we installed.
+	//
+	// Edge case: a consumer who sets `tabindex` before first overflow is
+	// detected — including `tabindex="-1"` to intentionally hide the
+	// region from Tab order — keeps their value because the flag is never
+	// installed. If the consumer later *removes* their tabindex, the hook
+	// will install its own on the next overflow tick; there's no way to
+	// distinguish a prior explicit opt-out from an unconfigured state.
 	if ( overflows ) {
 		if (
 			! el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
@@ -51,6 +58,9 @@ function cleanupScrollAttributes( el: HTMLElement ) {
 	el.removeAttribute( SCROLL_CONTAINER_ATTR );
 	el.removeAttribute( SCROLLED_FROM_TOP_ATTR );
 	el.removeAttribute( SCROLLED_FROM_BOTTOM_ATTR );
+	// The flag is the only signal that the current tabindex is ours. If
+	// it isn't set, the tabindex either was supplied by the consumer or
+	// doesn't exist at all — either way, leaving it alone is correct.
 	if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
 		el.removeAttribute( 'tabindex' );
 		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );

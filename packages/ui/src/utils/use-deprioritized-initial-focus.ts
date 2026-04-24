@@ -48,15 +48,16 @@ export function useDeprioritizedInitialFocus( {
 	deprioritizedAttributes,
 }: {
 	initialFocus: InitialFocus;
-	deprioritizedAttributes: readonly string[];
+	deprioritizedAttributes: string[];
 } ) {
 	const popupRef = useRef< HTMLDivElement >( null );
 
-	// The returned `initialFocus` callback only runs once per popup open,
-	// so there's no meaningful benefit to memoizing it; skipping the memo
-	// also avoids either forcing callers to memoize their attributes array
-	// or introducing a stringified dep key that would fight the React
-	// Compiler's exhaustive-deps linting.
+	// Returning a fresh callback on every render is intentional. Base UI
+	// stores `initialFocus` via `useValueAsRef` (see its FloatingFocusManager
+	// source) and reads it through `ref.current` only at open time, so
+	// reference identity doesn't affect behavior. Skipping `useMemo` also
+	// avoids either forcing callers to memoize their attributes array or
+	// fighting the React Compiler with a stringified dep key.
 	let resolvedInitialFocus: InitialFocus = initialFocus;
 	if ( initialFocus === undefined || initialFocus === true ) {
 		resolvedInitialFocus = ( interactionType ) => {

@@ -1517,12 +1517,19 @@ describe( 'AlertDialog', () => {
 		// it from a test. The Testing Library rule is disabled for this
 		// helper because that's exactly what it's flagging.
 		const findScroller = ( popup: HTMLElement | null ): HTMLDivElement => {
+			if ( ! popup ) {
+				throw new Error(
+					'Popup ref not attached — did AlertDialog.Popup render?'
+				);
+			}
 			// eslint-disable-next-line testing-library/no-node-access
-			const el = popup?.querySelector(
+			const el = popup.querySelector(
 				'[data-wp-ui-overlay-scroll-container]'
 			);
 			if ( ! ( el instanceof HTMLDivElement ) ) {
-				throw new Error( 'Scroll container not found' );
+				throw new Error(
+					'Scroll container not found inside AlertDialog popup'
+				);
 			}
 			return el;
 		};

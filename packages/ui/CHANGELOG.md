@@ -6,7 +6,7 @@
 
 -   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: **`Popup` portal API** ([#77452](https://github.com/WordPress/gutenberg/pull/77452)). Add `Portal` subcomponents and an optional `portal` prop on `Popup` (when omitted, the default `Portal` is used). Remove `container` from every `Popup` and `portalClassName` from `Dialog.Popup` / `AlertDialog.Popup`; pass `portal={ <Matching.Portal … /> }` for `container`, `className`, `style`, and other portal options.
 -   `Popover`, `Tooltip`, `Select`: `style` and `className` on `Popup` are now forwarded to the inner Base UI `Popup` element instead of the outer `Positioner`. To override the per-instance z-index, pass `portal={ <Overlay.Portal style={ { '--wp-ui-<overlay>-z-index': '9999' } } /> }` (or set the variable globally on a wrapping element); inline `style={ { zIndex: … } }` on `Popup` no longer reaches the positioned element.
--   `Dialog`, `Drawer`: **Scrolling now requires the new `Dialog.Content` / `Drawer.Content` subcomponent** ([#77559](https://github.com/WordPress/gutenberg/pull/77559)). The popup itself no longer scrolls; body content that overflows the popup height will clip unless wrapped in `Dialog.Content` / `Drawer.Content`. Rendering `Header` / `Footer` as siblings of `Content` pins them to the popup edges (the common case); nesting them inside `Content` opts out of pinning so they scroll with the body. `AlertDialog.Popup` gains `stickyHeader` / `stickyFooter` props (default `true`) for the equivalent choice on its internal, non-composable chrome.
+-   `Dialog`, `Drawer`: Scrolling now requires the new `Dialog.Content` / `Drawer.Content` subcomponent; the popup itself no longer scrolls. Rendering `Header` / `Footer` as siblings of `Content` pins them to the popup edges; nesting them inside `Content` opts out of pinning. `AlertDialog.Popup` adds `stickyHeader` / `stickyFooter` props (default `true`) for the same choice on its internal chrome ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
 
 ### New Features
 
@@ -28,7 +28,7 @@
 
 ### Enhancements
 
--   `Dialog` / `AlertDialog` / `Drawer`: Pin header and footer chrome to the popup edges when the body overflows, and show separator borders only while there is off-screen content in that direction. See the Breaking Changes entry above for the `Content` / `stickyHeader` API ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
+-   `Dialog` / `AlertDialog` / `Drawer`: Pin header / footer chrome to the popup edges when the body overflows, and show separator borders only while there is off-screen content in that direction ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
 -   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, skip the backdrop when `modal` is not `true`, use `100dvh` for viewport-based heights so the popup fits the dynamic viewport on mobile, and forward `className` on `Dialog.Title` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
 -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
