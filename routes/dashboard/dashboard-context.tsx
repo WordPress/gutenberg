@@ -46,7 +46,7 @@ interface InternalDashboardContextValue {
 	rowHeight: number | 'auto';
 	spacing: number;
 	onWidgetError?: (
-		uid: string,
+		uuid: string,
 		error: WidgetErrorConfig | true | null
 	) => void;
 }
@@ -99,7 +99,7 @@ interface ProviderProps {
 	rowHeight?: number | 'auto';
 	spacing?: number;
 	onWidgetError?: (
-		uid: string,
+		uuid: string,
 		error: WidgetErrorConfig | true | null
 	) => void;
 	children: ReactNode;

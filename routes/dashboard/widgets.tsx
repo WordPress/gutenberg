@@ -17,14 +17,12 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
 import { useDashboardInternalContext } from './dashboard-context';
 import { Widget } from './widget';
 import styles from './widget-dashboard.module.css';
-import type { WidgetInstance } from './types';
+import type { WidgetInstance, WidgetName } from './types';
 
 function toGridLayout( widgets: WidgetInstance[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
-		key: w.uid,
-		width: w.width,
-		height: w.height,
-		order: w.order,
+		key: w.uuid,
+		...w.placement,
 	} ) );
 }
 
@@ -32,22 +30,18 @@ function applyGridChange(
 	widgets: WidgetInstance[],
 	gridLayout: DashboardGridLayoutItem[]
 ): WidgetInstance[] {
-	return gridLayout.map( ( item ) => {
-		const existing = widgets.find( ( w ) => w.uid === item.key );
+	return gridLayout.map( ( { key, ...placement } ) => {
+		const existing = widgets.find( ( w ) => w.uuid === key );
 		if ( ! existing ) {
 			return {
-				uid: item.key,
-				type: '',
-				width: item.width,
-				height: item.height,
-				order: item.order,
+				uuid: key,
+				type: '' as WidgetName,
+				placement,
 			};
 		}
 		return {
 			...existing,
-			width: item.width,
-			height: item.height,
-			order: item.order,
+			placement,
 		};
 	} );
 }
@@ -86,7 +80,7 @@ export function Widgets( { className }: { className?: string } ) {
 	);
 
 	const children = layout.map( ( widget, index ) => (
-		<Widget key={ widget.uid } widget={ widget } index={ index } />
+		<Widget key={ widget.uuid } widget={ widget } index={ index } />
 	) );
 
 	const sharedProps = {

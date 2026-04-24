@@ -10,8 +10,9 @@ const DEFAULT_ORDER = 0;
 /**
  * Create a new widget instance from a widget type.
  *
- * Generates a unique id and applies layout defaults. If no initial
- * attributes are provided, falls back to the type's `example`.
+ * Generates a unique id and applies default placement. If no initial
+ * attributes are provided, falls back to the type's `example.attributes`
+ * (matching the `widget.json` schema).
  * @param widgetType
  * @param initialAttributes
  */
@@ -20,11 +21,14 @@ export function createWidgetInstance< T >(
 	initialAttributes?: T
 ): WidgetInstance< T > {
 	return {
-		uid: crypto.randomUUID(),
+		uuid: crypto.randomUUID(),
 		type: widgetType.name,
-		attributes: initialAttributes ?? ( widgetType.example as T ),
-		width: DEFAULT_WIDTH,
-		height: DEFAULT_HEIGHT,
-		order: DEFAULT_ORDER,
+		attributes:
+			initialAttributes ?? ( widgetType.example?.attributes as T ),
+		placement: {
+			width: DEFAULT_WIDTH,
+			height: DEFAULT_HEIGHT,
+			order: DEFAULT_ORDER,
+		},
 	};
 }

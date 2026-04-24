@@ -138,21 +138,24 @@ const resolveWidgetModule: ResolveWidgetModule = ( moduleId ) =>
 
 const widgetTypes: WidgetType[] = [
 	{
+		apiVersion: 1,
 		name: 'mock/hello',
 		title: 'Hello',
-		render_module: 'mock/hello',
-		example: { greeting: 'Hi there' },
+		renderModule: 'mock/hello',
+		example: { attributes: { greeting: 'Hi there' } },
 	},
 	{
+		apiVersion: 1,
 		name: 'mock/counter',
 		title: 'Counter',
-		render_module: 'mock/counter',
-		example: { count: 0 },
+		renderModule: 'mock/counter',
+		example: { attributes: { count: 0 } },
 	},
 	{
+		apiVersion: 1,
 		name: 'mock/static',
 		title: 'Static',
-		render_module: 'mock/static',
+		renderModule: 'mock/static',
 	},
 ];
 
@@ -160,30 +163,26 @@ const DASHBOARD_ID = 'stories/dashboard';
 
 const defaultLayout: WidgetInstance[] = [
 	{
-		uid: 'w1',
+		uuid: 'w1',
 		type: 'mock/hello',
 		attributes: { greeting: 'Good morning' },
-		width: 2,
-		height: 2,
+		placement: { width: 2, height: 2 },
 	},
 	{
-		uid: 'w2',
+		uuid: 'w2',
 		type: 'mock/counter',
 		attributes: { count: 3 },
-		width: 2,
-		height: 2,
+		placement: { width: 2, height: 2 },
 	},
 	{
-		uid: 'w3',
+		uuid: 'w3',
 		type: 'mock/static',
-		width: 'fill',
-		height: 2,
+		placement: { width: 'fill', height: 2 },
 	},
 	{
-		uid: 'w4',
+		uuid: 'w4',
 		type: 'mock/static',
-		width: 'full',
-		height: 1,
+		placement: { width: 'full', height: 1 },
 	},
 ];
 

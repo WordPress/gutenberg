@@ -41,6 +41,9 @@ export type {
 	WidgetErrorConfig,
 	WidgetInstance,
 	WidgetModule,
+	WidgetName,
 	WidgetRenderProps,
+	WidgetStyleVariation,
 	WidgetType,
+	WidgetTypeMetadata,
 } from './types';

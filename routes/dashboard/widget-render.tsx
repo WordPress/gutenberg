@@ -107,23 +107,23 @@ export function WidgetRender( {
 		() =>
 			lazy< ComponentType< WidgetRenderProps< unknown > > >( async () => {
 				const module: unknown = await resolveWidgetModule(
-					widgetType.render_module
+					widgetType.renderModule
 				);
 				if ( ! isValidWidgetModule( module ) ) {
 					throw new Error(
-						`Invalid widget module: ${ widgetType.render_module }`
+						`Invalid widget module: ${ widgetType.renderModule }`
 					);
 				}
 				return module;
 			} ),
-		[ widgetType.render_module, resolveWidgetModule ]
+		[ widgetType.renderModule, resolveWidgetModule ]
 	);
 
 	const setAttributes = useCallback(
 		( next: Partial< unknown > ) => {
 			onLayoutChange(
 				layout.map( ( w ) =>
-					w.uid === widget.uid
+					w.uuid === widget.uuid
 						? {
 								...w,
 								attributes: {
@@ -135,16 +135,16 @@ export function WidgetRender( {
 				)
 			);
 		},
-		[ widget.uid, layout, onLayoutChange ]
+		[ widget.uuid, layout, onLayoutChange ]
 	);
 
 	const handleError = useCallback(
 		( error: Error ) => {
-			onWidgetError?.( widget.uid, {
+			onWidgetError?.( widget.uuid, {
 				message: error.message,
 			} );
 		},
-		[ widget.uid, onWidgetError ]
+		[ widget.uuid, onWidgetError ]
 	);
 
 	return (

@@ -32,11 +32,11 @@ export function Widget( { widget, index }: WidgetProps ) {
 
 	const contextValue = useMemo(
 		() => ( {
-			uid: widget.uid,
+			uuid: widget.uuid,
 			name: widget.type,
 			position: index,
 		} ),
-		[ widget.uid, widget.type, index ]
+		[ widget.uuid, widget.type, index ]
 	);
 
 	if ( ! widgetType ) {

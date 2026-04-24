@@ -1,4 +1,17 @@
 /**
+ * Widget type definitions.
+ *
+ * The widget-related exports in this file (`WidgetName`,
+ * `WidgetStyleVariation`, `WidgetTypeMetadata`, `WidgetType`) are defined
+ * locally so the engine stays self-contained while its surface stabilises.
+ * The canonical home for them is `@wordpress/widget-types` — once that
+ * package publishes the matching exports, swap these definitions for
+ * re-exports and keep the rest of the engine untouched. Until then, treat
+ * any change here as something to sync with `@wordpress/widget-types`
+ * when it catches up.
+ */
+
+/**
  * External dependencies
  */
 import type { ComponentType, ReactNode } from 'react';
@@ -6,42 +19,137 @@ import type { ComponentType, ReactNode } from 'react';
 /**
  * WordPress dependencies
  */
+import type { Field } from '@wordpress/dataviews';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
 /**
- * Metadata for a widget type.
- *
- * This shape is a minimal local mirror of what `@wordpress/widget-types` will
- * expose once that package is scaffolded. Surfaces consume `WidgetType[]` via
- * the `widgetTypes` prop; the dashboard package never reads the widget-types
- * store directly.
+ * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
+ * Both segments are lowercase, kebab-case; the full character pattern is
+ * enforced by the `widget.json` schema at authoring time.
  */
-export interface WidgetType {
-	/**
-	 * Stable type identifier (namespaced, e.g. `core/activity`).
-	 */
+export type WidgetName = `${ string }/${ string }`;
+
+/**
+ * Style variation entry — one per item in `WidgetTypeMetadata.styles`.
+ * Mirrors the `widget.json` `styles[]` shape.
+ */
+export interface WidgetStyleVariation {
 	name: string;
+	label: string;
+	isDefault?: boolean;
+}
+
+/**
+ * Literal contents of a widget's `widget.json` metadata file.
+ *
+ * Captures the *authoring* shape only — module entry points and style
+ * assets are discovered by convention from the widget directory
+ * (`render.*`, `widget.*`, `render.scss`), not declared here.
+ *
+ * Consumed by tooling (IDE autocomplete, validation, the build pipeline).
+ * The dashboard engine consumes the richer `WidgetType` below, which
+ * extends this shape with runtime-only fields produced by the build
+ * manifest.
+ *
+ * This is a local mirror. Once `@wordpress/widget-types` publishes the
+ * canonical type, replace this with a re-export.
+ */
+export interface WidgetTypeMetadata {
+	/**
+	 * Version of the Widget API used by the widget.
+	 */
+	apiVersion: number;
 
 	/**
-	 * Human-readable title shown in chrome and pickers.
+	 * Stable type identifier. See `WidgetName` for the shape.
+	 */
+	name: WidgetName;
+
+	/**
+	 * Display title; shown in the inserter.
 	 */
 	title: string;
 
 	/**
-	 * Description shown in the inserter.
+	 * Short description shown in the widget inspector.
 	 */
 	description?: string;
 
 	/**
-	 * Script-module identifier resolved to a React component at render time.
+	 * Dashicon slug used as the visual identifier.
 	 */
-	render_module: string;
+	icon?: string;
 
 	/**
-	 * Default attributes used by `createWidgetInstance` when no initial
-	 * attributes are supplied.
+	 * Grouping category. Core provides `dashboard`; plugins and themes may
+	 * register custom categories.
 	 */
-	example?: unknown;
+	category?: string;
+
+	/**
+	 * Search aliases used to surface the widget from the inserter.
+	 */
+	keywords?: string[];
+
+	/**
+	 * Widget version — used for asset cache invalidation.
+	 */
+	version?: string;
+
+	/**
+	 * Gettext text domain for translations.
+	 */
+	textdomain?: string;
+
+	/**
+	 * Experiment gate — boolean `true`, or a specific experiment name.
+	 */
+	__experimental?: string | boolean;
+
+	/**
+	 * Declarative attribute schema, reusing the DataViews `Field` shape so
+	 * the dashboard can render forms via `DataForm` without per-widget
+	 * form wiring. `Field< any >` is used here because the array is
+	 * heterogeneous — each widget narrows `Item` to its own attribute
+	 * type at the point of registration.
+	 */
+	attributes?: Field< any >[];
+
+	/**
+	 * Visual style variations. Each entry adds a class name to the widget
+	 * wrapper that themes can target via CSS.
+	 */
+	styles?: WidgetStyleVariation[];
+
+	/**
+	 * Structured example data for the Inspector Help Panel preview, and
+	 * the default attributes applied by `createWidgetInstance` when no
+	 * initial attributes are supplied.
+	 */
+	example?: {
+		attributes?: Record< string, unknown >;
+	};
+}
+
+/**
+ * Runtime widget type consumed by the dashboard engine.
+ *
+ * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
+ * runtime-only fields produced by the build pipeline — notably
+ * `renderModule`, which maps each widget to its discovered script-module
+ * entry point.
+ *
+ * Surfaces consume `WidgetType[]` via the `widgetTypes` prop; the
+ * dashboard never reads the widget-types store directly.
+ */
+export interface WidgetType extends WidgetTypeMetadata {
+	/**
+	 * Script-module identifier resolved to a React component at render
+	 * time by `ResolveWidgetModule`. Produced by the build pipeline from
+	 * the conventional `render.*` / `widget.*` entry points; not declared
+	 * in `widget.json`.
+	 */
+	renderModule: string;
 }
 
 /**
@@ -49,23 +157,26 @@ export interface WidgetType {
  *
  * A `WidgetType` describes the blueprint. A `WidgetInstance` is a concrete
  * placement of that type on a specific dashboard: its unique id, the type it
- * references, user-configured attributes, and layout position.
+ * references, user-configured attributes, and its `placement` in the grid.
  *
- * Layout fields (`width`, `height`, `order`) mirror `DashboardGridLayoutItem`
- * from `@wordpress/grid` so that the grid bridge stays trivial — `width`
- * accepts either a numeric column span, `'fill'` (remaining columns in the
- * row), or `'full'` (every column).
+ * The `Placement` generic defaults to the packed grid's item shape
+ * (`DashboardGridLayoutItem` minus `key`, which the engine derives from
+ * `uuid`). A different grid model — masonry, stack, absolute — would use a
+ * different `Placement` shape; the widget identity stays unchanged.
  */
-export interface WidgetInstance< Item = unknown > {
+export interface WidgetInstance<
+	Item = unknown,
+	Placement = Omit< DashboardGridLayoutItem, 'key' >,
+> {
 	/**
 	 * Unique instance identifier.
 	 */
-	uid: string;
+	uuid: string;
 
 	/**
 	 * Widget type name — must match a `WidgetType.name` in `widgetTypes`.
 	 */
-	type: string;
+	type: WidgetName;
 
 	/**
 	 * User-configured attributes for this instance.
@@ -73,19 +184,9 @@ export interface WidgetInstance< Item = unknown > {
 	attributes?: Item;
 
 	/**
-	 * Column span, or `'fill'` / `'full'` discriminator.
+	 * Grid-model-specific placement (column/row spans, ordering, etc.).
 	 */
-	width?: DashboardGridLayoutItem[ 'width' ];
-
-	/**
-	 * Row span.
-	 */
-	height?: DashboardGridLayoutItem[ 'height' ];
-
-	/**
-	 * Display order within the grid.
-	 */
-	order?: DashboardGridLayoutItem[ 'order' ];
+	placement?: Placement;
 }
 
 /**
@@ -143,12 +244,12 @@ export interface WidgetContextValue {
 	/**
 	 * Widget instance id.
 	 */
-	uid: string;
+	uuid: string;
 
 	/**
 	 * Widget type name.
 	 */
-	name: string;
+	name: WidgetName;
 
 	/**
 	 * Index of the instance in the `layout` array.
@@ -176,7 +277,7 @@ export interface WidgetModule {
 }
 
 /**
- * Resolver hook: maps a `WidgetType.render_module` id to a React component.
+ * Resolver hook: maps a `WidgetType.renderModule` id to a React component.
  * Defaults to a dynamic `import()`; override for tests, Storybook, or to load
  * from a non-URL source.
  */
@@ -226,7 +327,7 @@ export interface WidgetDashboardProps {
 
 	/**
 	 * Overrides the default `import()` resolution of
-	 * `WidgetType.render_module`. Useful for tests, Storybook, or future
+	 * `WidgetType.renderModule`. Useful for tests, Storybook, or future
 	 * remote-URL loading.
 	 */
 	resolveWidgetModule?: ResolveWidgetModule;
@@ -268,7 +369,7 @@ export interface WidgetDashboardProps {
 	 * Called when a widget reports an error via chrome.
 	 */
 	onWidgetError?: (
-		uid: string,
+		uuid: string,
 		error: WidgetErrorConfig | true | null
 	) => void;
 

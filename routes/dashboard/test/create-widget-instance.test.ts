@@ -5,27 +5,30 @@ import { createWidgetInstance } from '../create-widget-instance';
 import type { WidgetType } from '../types';
 
 const baseType: WidgetType = {
+	apiVersion: 1,
 	name: 'core/example',
 	title: 'Example',
-	render_module: 'https://example.test/widget.js',
+	renderModule: 'https://example.test/widget.js',
 };
 
 describe( 'createWidgetInstance', () => {
-	it( 'stamps the type name and a unique uid', () => {
+	it( 'stamps the type name and a unique uuid', () => {
 		const a = createWidgetInstance( baseType );
 		const b = createWidgetInstance( baseType );
 
 		expect( a.type ).toBe( 'core/example' );
 		expect( b.type ).toBe( 'core/example' );
-		expect( a.uid ).not.toBe( b.uid );
-		expect( a.uid ).toMatch( /^[0-9a-f-]{36}$/ );
+		expect( a.uuid ).not.toBe( b.uuid );
+		expect( a.uuid ).toMatch( /^[0-9a-f-]{36}$/ );
 	} );
 
-	it( 'applies default layout values', () => {
+	it( 'applies default placement values', () => {
 		const instance = createWidgetInstance( baseType );
-		expect( instance.width ).toBe( 1 );
-		expect( instance.height ).toBe( 2 );
-		expect( instance.order ).toBe( 0 );
+		expect( instance.placement ).toEqual( {
+			width: 1,
+			height: 2,
+			order: 0,
+		} );
 	} );
 
 	it( 'uses initialAttributes when provided', () => {
@@ -36,10 +39,10 @@ describe( 'createWidgetInstance', () => {
 		expect( instance.attributes ).toEqual( { greeting: 'hi' } );
 	} );
 
-	it( 'falls back to the type example when no attributes are supplied', () => {
+	it( 'falls back to the type example attributes when no attributes are supplied', () => {
 		const typeWithExample: WidgetType = {
 			...baseType,
-			example: { greeting: 'default' },
+			example: { attributes: { greeting: 'default' } },
 		};
 		const instance = createWidgetInstance( typeWithExample );
 		expect( instance.attributes ).toEqual( { greeting: 'default' } );

@@ -42,9 +42,10 @@ function TestWidget( {
 
 const widgetTypes: WidgetType[] = [
 	{
+		apiVersion: 1,
 		name: 'test/greet',
 		title: 'Greet',
-		render_module: 'test-greet-module',
+		renderModule: 'test-greet-module',
 	},
 ];
 
@@ -57,11 +58,10 @@ const resolveWidgetModule: ResolveWidgetModule = async ( id ) => {
 
 const initialLayout: WidgetInstance< Attrs >[] = [
 	{
-		uid: 'w1',
+		uuid: 'w1',
 		type: 'test/greet',
 		attributes: { greeting: 'hello' },
-		width: 2,
-		height: 2,
+		placement: { width: 2, height: 2 },
 	},
 ];
 
@@ -108,7 +108,7 @@ describe( 'WidgetDashboard', () => {
 		const [ updated ] = onChange.mock.calls[ 0 ];
 		expect( updated ).toHaveLength( 1 );
 		expect( updated[ 0 ] ).toMatchObject( {
-			uid: 'w1',
+			uuid: 'w1',
 			type: 'test/greet',
 			attributes: { greeting: 'updated' },
 		} );
@@ -120,10 +120,9 @@ describe( 'WidgetDashboard', () => {
 				id={ DASHBOARD_ID }
 				layout={ [
 					{
-						uid: 'w1',
-						type: 'does-not-exist',
-						width: 1,
-						height: 1,
+						uuid: 'w1',
+						type: 'does/not-exist',
+						placement: { width: 1, height: 1 },
 					},
 				] }
 				onLayoutChange={ () => {} }
