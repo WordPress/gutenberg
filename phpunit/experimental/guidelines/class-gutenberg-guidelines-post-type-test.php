@@ -65,12 +65,11 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Regression test: the taxonomy must not be registered with `default_term`.
-	 *
-	 * Using `default_term` triggers cross-site `clean_term_cache` work on
-	 * multisite installs and is the root cause this fix addresses.
+	 * The taxonomy is intentionally registered without `default_term`.
+	 * Fallback is assigned in save_post. See
+	 * https://github.com/WordPress/gutenberg/pull/77592.
 	 */
-	public function test_taxonomy_does_not_use_default_term() {
+	public function test_taxonomy_registered_without_default_term() {
 		$taxonomy = get_taxonomy( Gutenberg_Guidelines_Post_Type::TAXONOMY );
 
 		$this->assertNotFalse( $taxonomy );
@@ -78,9 +77,10 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A post inserted without an explicit type gets the artifact fallback.
+	 * A guideline saved without a type term should get 'artifact' assigned by
+	 * the save_post hook (replacement for default_term).
 	 */
-	public function test_artifact_assigned_when_no_term_set() {
+	public function test_save_post_assigns_artifact_fallback() {
 		$post_id = wp_insert_post(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
@@ -92,9 +92,12 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 		$this->assertIsInt( $post_id );
 		$this->assertGreaterThan( 0, $post_id );
 
-		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
-
-		$this->assertSame( array( 'artifact' ), $terms );
+		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$this->assertCount( 1, $terms );
+		$this->assertSame( 'artifact', $terms[0]->slug );
+		// The wp_insert_term_data filter should have mapped the raw slug to
+		// the localized label when the term was created on first use.
+		$this->assertSame( 'Artifact', $terms[0]->name );
 	}
 
 	/**

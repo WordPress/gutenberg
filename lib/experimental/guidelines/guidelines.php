@@ -76,7 +76,19 @@ if ( ! function_exists( '_wp_guidelines_ensure_default_type_term' ) ) {
 			return;
 		}
 
-		wp_set_object_terms( $post_id, 'artifact', 'wp_guideline_type' );
+		// wp_set_object_terms() expects term IDs for hierarchical taxonomies —
+		// strings are interpreted as term names, not slugs. Resolve 'artifact'
+		// to an ID up front (creating the term on first use) so we assign the
+		// exact term we mean instead of relying on name-based lookup.
+		$term = term_exists( 'artifact', 'wp_guideline_type' );
+		if ( ! $term ) {
+			$term = wp_insert_term( 'artifact', 'wp_guideline_type' );
+			if ( is_wp_error( $term ) ) {
+				return;
+			}
+		}
+
+		wp_set_object_terms( $post_id, (int) $term['term_id'], 'wp_guideline_type' );
 	}
 }
 
