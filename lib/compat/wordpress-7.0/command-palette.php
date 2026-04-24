@@ -84,11 +84,11 @@ function gutenberg_add_admin_bar_script() {
 	if ( ! is_admin_bar_showing() ) {
 		return;
 	}
-	$labels = array(
+	$labels  = array(
 		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
 		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
 	);
-	$script = <<<JS
+	$script  = <<<JS
 		(( shortCutLabels ) => {
 			let userAgent = '';
 			// Assigning agent may error if the HTTP header is blocked at the browser level.
