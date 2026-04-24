@@ -117,15 +117,14 @@ export const WithCustomContent: Story = {
  * you want it above.
  *
  * `AlertDialog` reuses `Dialog`'s styles, so the same
- * `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
- * backdrop and the popup. Override it either:
+ * `--wp-ui-dialog-z-index` CSS variable controls the z-index of the alert
+ * dialog's backdrop and popup. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   dialog and alert dialog in the page), or
  * - **Per instance**, by passing an `AlertDialog.Portal` with a `style` (or
  *   `className`) to `AlertDialog.Popup`'s `portal` prop. The variable
- *   cascades from the portal wrapper to the backdrop and the popup, which
- *   are both rendered inside it.
+ *   cascades from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */

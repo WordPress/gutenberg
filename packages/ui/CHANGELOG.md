@@ -13,6 +13,7 @@
 ### Documentation
 
 -   Restructure setup docs into "Within standard WordPress editor screens" and "Elsewhere" for clarity ([#77338](https://github.com/WordPress/gutenberg/pull/77338)).
+-   `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `Tooltip`, `Select`: Align `WithCustomZIndex` Storybook examples so every overlay demonstrates the portal-based per-instance override with consistent copy and z-index value.
 
 ### Bug Fixes
 
