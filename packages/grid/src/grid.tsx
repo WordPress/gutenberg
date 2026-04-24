@@ -41,40 +41,24 @@ import styles from './grid.module.css';
 
 /**
  * 2D packed dashboard grid with drag-to-reorder and resize handles.
- * Each item has explicit `(width, height)` spans in column/row units
- * and can span multiple columns **and** multiple rows, unlike masonry
- * or justified-row layouts.
+ * Each child's `key` must match an entry in the `layout` array;
+ * children without a match are rendered outside the grid.
  *
- * Designed for dashboard-style surfaces where users arrange tiles.
- * Each child must have a `key` prop that matches an entry in the
- * `layout` array; children without a matching entry are rendered
- * outside the grid.
- *
- * @param props                 Component props.
- * @param props.layout          Positions and sizes keyed by child `key`.
- * @param props.columns         Total columns in fixed mode.
- * @param props.children        Grid children.
- * @param props.className       Extra class on the grid root.
- * @param props.spacing         Gap multiplier (effective gap = `spacing * 4px`).
- * @param props.rowHeight       Row height in pixels, or `'auto'`.
- * @param props.minColumnWidth  Enables responsive mode using this as the
- *                              per-column lower bound.
- * @param props.editMode        Enables drag-to-reorder and resize.
- * @param props.onChangeLayout  Fired when the user commits a drag or resize.
- * @param props.onPreviewLayout Fired continuously during a drag or resize.
+ * @param props Component props.
  */
-export function DashboardGrid( {
-	layout,
-	columns = 6,
-	children,
-	className,
-	spacing = 2,
-	rowHeight = 'auto',
-	minColumnWidth,
-	editMode = false,
-	onChangeLayout,
-	onPreviewLayout,
-}: DashboardGridProps ) {
+export function DashboardGrid( props: DashboardGridProps ) {
+	const {
+		layout,
+		columns = 6,
+		children,
+		className,
+		spacing = 2,
+		rowHeight = 'auto',
+		minColumnWidth,
+		editMode = false,
+		onChangeLayout,
+		onPreviewLayout,
+	} = props;
 	/*
 	 * Temporary layout holds pending changes during drag/resize
 	 * to show preview without triggering parent re-renders.
