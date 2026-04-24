@@ -80,11 +80,20 @@ export const Indicator = styled.div< {
 						animationIterationCount: 'infinite',
 						animationName: animateProgressBar( isRTL() ),
 					},
+					'@media ( prefers-reduced-motion: reduce )': {
+						animationDuration: '3s',
+						animationTimingFunction: 'steps( 6, end )',
+						animationIterationCount: 'infinite',
+						animationName: animateProgressBar( isRTL() ),
+					},
 			  } )
 			: css( {
 					width: 'var(--indicator-width)',
 					'@media not ( prefers-reduced-motion )': {
 						transition: 'width 0.4s ease-in-out',
+					},
+					'@media ( prefers-reduced-motion: reduce )': {
+						transition: 'width 0.8s steps(6, end)',
 					},
 			  } ) };
 `;
