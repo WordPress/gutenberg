@@ -169,7 +169,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param int $post_id Post ID.
 	 */
 	public static function ensure_default_type_term( $post_id ) {
-		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+		if ( wp_is_post_revision( $post_id ) ) {
 			return;
 		}
 

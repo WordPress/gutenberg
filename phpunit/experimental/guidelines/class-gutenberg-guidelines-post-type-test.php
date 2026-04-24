@@ -165,18 +165,27 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The hook does not fire for other post types.
+	 * The fallback is skipped for revisions (including autosaves, which are
+	 * stored as revisions).
 	 */
-	public function test_other_post_types_are_unaffected() {
-		$post_id = self::factory()->post->create(
+	public function test_revision_is_ignored() {
+		wp_set_current_user( self::$admin_id );
+
+		$post_id = wp_insert_post(
 			array(
-				'post_type'   => 'post',
+				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
 				'post_status' => 'draft',
+				'post_title'  => 'Guideline with revision',
 			)
 		);
 
-		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$revision_id = wp_save_post_revision( $post_id );
+		$this->assertIsInt( $revision_id );
+		$this->assertGreaterThan( 0, $revision_id );
 
+		Gutenberg_Guidelines_Post_Type::ensure_default_type_term( $revision_id );
+
+		$terms = wp_get_object_terms( $revision_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
 		$this->assertSame( array(), $terms );
 	}
 }
