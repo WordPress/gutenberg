@@ -19,6 +19,7 @@ import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { unlock } from '../../lock-unlock';
+export { useInnerBlockItems } from './use-inner-block-items';
 
 const EMPTY_OBJECT = {};
 

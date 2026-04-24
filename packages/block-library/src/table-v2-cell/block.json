@@ -1,0 +1,56 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/table-v2-cell",
+	"title": "Table Cell",
+	"category": "text",
+	"parent": [ "core/table-v2" ],
+	"description": "A single cell within a table.",
+	"textdomain": "default",
+	"attributes": {
+		"content": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"role": "content"
+		},
+		"section": {
+			"type": "string",
+			"default": "body"
+		},
+		"row": {
+			"type": "integer"
+		},
+		"column": {
+			"type": "integer"
+		},
+		"rowSpan": {
+			"type": "integer",
+			"default": 1
+		},
+		"colSpan": {
+			"type": "integer",
+			"default": 1
+		},
+		"tag": {
+			"type": "string",
+			"default": "td"
+		},
+		"scope": {
+			"type": "string"
+		},
+		"align": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"inserter": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"style": "wp-block-table-v2-cell",
+	"editorStyle": "wp-block-table-v2-cell-editor"
+}

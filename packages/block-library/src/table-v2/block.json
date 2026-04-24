@@ -1,0 +1,69 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "core/table-v2",
+	"title": "Table v2",
+	"category": "text",
+	"description": "Create structured content in rows and columns to display information.",
+	"textdomain": "default",
+	"allowedBlocks": [ "core/table-v2-cell" ],
+	"attributes": {
+		"hasFixedLayout": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"typography": {
+			"fontSize": true,
+			"lineHeight": true,
+			"__experimentalFontFamily": true,
+			"__experimentalFontStyle": true,
+			"__experimentalFontWeight": true,
+			"__experimentalLetterSpacing": true,
+			"__experimentalTextTransform": true,
+			"__experimentalTextDecoration": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"__experimentalBorder": {
+			"__experimentalSkipSerialization": true,
+			"color": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"style": true,
+				"width": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"root": ".wp-block-table-v2 > table",
+		"spacing": ".wp-block-table-v2"
+	},
+	"editorStyle": "wp-block-table-v2-editor",
+	"style": "wp-block-table-v2"
+}

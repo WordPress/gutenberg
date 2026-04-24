@@ -1,0 +1,19 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-table-v2-cell {
+	border: $border-width solid;
+	padding: 0.5em;
+	word-break: break-word;
+
+	&.has-text-align-left {
+		text-align: left;
+	}
+
+	&.has-text-align-center {
+		text-align: center;
+	}
+
+	&.has-text-align-right {
+		text-align: right;
+	}
+}

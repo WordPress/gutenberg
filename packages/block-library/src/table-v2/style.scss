@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-table-v2 {
+	overflow-x: auto;
+
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	thead {
+		border-bottom: 3px solid;
+	}
+
+	tfoot {
+		border-top: 3px solid;
+	}
+
+	.has-fixed-layout {
+		table-layout: fixed;
+		width: 100%;
+	}
+}

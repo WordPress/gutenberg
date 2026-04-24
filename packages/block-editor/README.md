@@ -1157,6 +1157,18 @@ _Returns_
 
 -   `boolean`: A boolean describing whether the provided id has already been rendered.
 
+### useInnerBlockItems
+
+Hook that returns inner blocks as an array of renderable items.
+
+Unlike `useInnerBlocksProps` which returns an opaque `children` prop, this hook returns individual block elements that the parent can place anywhere in its JSX tree. This enables custom DOM structures like `<table><tr><td>` where child blocks need to be rendered inside intermediary elements.
+
+Should be used alongside `useInnerBlocksProps` which handles infrastructure setup (drop zones, nested settings, template sync, layout classes).
+
+_Returns_
+
+-   `Array`: Array of React elements, one per inner block.
+
 ### useInnerBlocksProps
 
 This hook is used to lightly mark an element as an inner blocks wrapper element. Call this hook and pass the returned props to the element to mark as an inner blocks wrapper, automatically rendering inner blocks as children. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
