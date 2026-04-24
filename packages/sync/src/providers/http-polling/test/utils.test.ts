@@ -18,6 +18,7 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import { SyncUpdateType } from '../types';
+import { MAX_UPDATE_SIZE_IN_BYTES } from '../config';
 import {
 	base64ToUint8Array,
 	createSyncUpdate,
@@ -29,6 +30,7 @@ import {
 } from '../utils';
 
 const mockApiFetch = jest.mocked( apiFetch );
+const SERVER_MAX_UPDATE_DATA_SIZE_IN_BYTES = 1024 * 1024;
 
 describe( 'http-polling utils', () => {
 	describe( 'SyncUpdateType', () => {
@@ -136,6 +138,17 @@ describe( 'http-polling utils', () => {
 	} );
 
 	describe( 'createSyncUpdate', () => {
+		it( 'keeps the largest allowed raw update within the server encoded update limit', () => {
+			const result = createSyncUpdate(
+				new Uint8Array( MAX_UPDATE_SIZE_IN_BYTES ),
+				SyncUpdateType.UPDATE
+			);
+
+			expect( result.data.length ).toBeLessThanOrEqual(
+				SERVER_MAX_UPDATE_DATA_SIZE_IN_BYTES
+			);
+		} );
+
 		it( 'creates a typed update with UPDATE type', () => {
 			const data = new Uint8Array( [ 1, 2, 3 ] );
 			const result = createSyncUpdate( data, SyncUpdateType.UPDATE );
