@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/postcss-plugins-preset --save
 ```
 
-**Note**: This package requires Node.js 14.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## Contributing to this package
 

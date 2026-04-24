@@ -40,7 +40,7 @@ test.describe( 'new editor state', () => {
 		// Should display the Post Formats UI.
 		await editor.openDocumentSettingsSidebar();
 		await expect(
-			page.locator( 'role=combobox[name="Post Format"i]' )
+			page.locator( 'role=button[name="Change Format: Standard"i]' )
 		).toBeVisible();
 	} );
 

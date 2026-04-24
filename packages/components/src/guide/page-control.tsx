@@ -27,6 +27,7 @@ export default function PageControl( {
 					aria-current={ page === currentPage ? 'step' : undefined }
 				>
 					<Button
+						size="small"
 						key={ page }
 						icon={ <PageControlIcon /> }
 						aria-label={ sprintf(

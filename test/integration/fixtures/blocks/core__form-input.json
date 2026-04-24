@@ -11,5 +11,57 @@
 			"visibilityPermissions": "all"
 		},
 		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "email",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "number",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "tel",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/form-input",
+		"isValid": true,
+		"attributes": {
+			"type": "url",
+			"label": "Label",
+			"inlineLabel": false,
+			"required": false,
+			"value": "",
+			"visibilityPermissions": "all"
+		},
+		"innerBlocks": []
 	}
 ]

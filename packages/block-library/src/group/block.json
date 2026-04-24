@@ -15,9 +15,6 @@
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
-		},
-		"allowedBlocks": {
-			"type": "array"
 		}
 	},
 	"supports": {
@@ -31,8 +28,10 @@
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
-				"backgroundImage": true
+				"backgroundImage": true,
+				"gradient": true
 			}
 		},
 		"color": {
@@ -45,6 +44,7 @@
 				"text": true
 			}
 		},
+		"shadow": true,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,
@@ -55,7 +55,8 @@
 			}
 		},
 		"dimensions": {
-			"minHeight": true
+			"minHeight": true,
+			"minWidth": true
 		},
 		"__experimentalBorder": {
 			"color": true,
@@ -90,7 +91,8 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"allowedBlocks": true
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

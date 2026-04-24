@@ -1,0 +1,97 @@
+/**
+ * WordPress dependencies
+ */
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { __ } from '@wordpress/i18n';
+import { resolveSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { loadView } from '@wordpress/views';
+
+/**
+ * Internal dependencies
+ */
+import Editor from '../editor';
+import SidebarNavigationScreen from '../sidebar-navigation-screen';
+import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
+import DataViewsSidebarContent from '../sidebar-dataviews';
+import PostList from '../post-list';
+import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
+
+const { useLocation } = unlock( routerPrivateApis );
+
+async function isListView( query ) {
+	const { activeView = 'all' } = query;
+	const config = await unlock( resolveSelect( coreStore ) ).getViewConfig(
+		'postType',
+		'page'
+	);
+	const defaultView = config?.default_view;
+	const defaultLayouts = config?.default_layouts;
+	const viewEntry = config?.view_list?.find( ( v ) => v.slug === activeView );
+	const view = await loadView( {
+		kind: 'postType',
+		name: 'page',
+		slug: 'default',
+		defaultView,
+		defaultLayouts,
+		activeViewOverrides: viewEntry?.view ?? {},
+	} );
+	return view.type === 'list';
+}
+
+function MobilePagesView() {
+	const { query = {} } = useLocation();
+	const { canvas = 'view' } = query;
+
+	return canvas === 'edit' ? <Editor /> : <PostList postType="page" />;
+}
+
+export const pagesRoute = {
+	name: 'pages',
+	path: '/page',
+	areas: {
+		sidebar( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<SidebarNavigationScreen
+					title={ __( 'Pages' ) }
+					backPath="/"
+					content={ <DataViewsSidebarContent postType="page" /> }
+				/>
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+		content( { siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			return isBlockTheme ? <PostList postType="page" /> : undefined;
+		},
+		async preview( { query, siteData } ) {
+			const isBlockTheme = siteData.currentTheme?.is_block_theme;
+			if ( ! isBlockTheme ) {
+				return undefined;
+			}
+			const isList = await isListView( query );
+			return isList ? <Editor /> : undefined;
+		},
+		mobile( { siteData } ) {
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			return siteData.currentTheme.is_block_theme ? (
+				<MobilePagesView />
+			) : (
+				<SidebarNavigationScreenUnsupported />
+			);
+		},
+	},
+	widths: {
+		async content( { query } ) {
+			const isList = await isListView( query );
+			return isList ? 380 : undefined;
+		},
+	},
+};

@@ -12,8 +12,12 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import UnitControl from '..';
+import _UnitControl from '..';
 import { CSS_UNITS, parseQuantityAndUnitFromRawValue } from '../utils';
+
+const UnitControl = ( props: React.ComponentProps< typeof _UnitControl > ) => (
+	<_UnitControl __next40pxDefaultSize { ...props } />
+);
 
 const getInput = ( {
 	isInputTypeText = false,
@@ -138,7 +142,7 @@ describe( 'UnitControl', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render( <UnitControl value={ '50px' } onChange={ onChangeSpy } /> );
+			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
 			const input = getInput();
 			await user.clear( input );
@@ -159,7 +163,7 @@ describe( 'UnitControl', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render( <UnitControl value={ '50px' } onChange={ onChangeSpy } /> );
+			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
 			const input = getInput();
 			await user.type( input, '{ArrowUp}' );
@@ -175,7 +179,7 @@ describe( 'UnitControl', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render( <UnitControl value={ '50px' } onChange={ onChangeSpy } /> );
+			render( <UnitControl value="50px" onChange={ onChangeSpy } /> );
 
 			const input = getInput();
 			await user.type( input, '{Shift>}{ArrowUp}{/Shift}' );
@@ -253,7 +257,7 @@ describe( 'UnitControl', () => {
 
 			render(
 				<UnitControl
-					value={ '33%' }
+					value="33%"
 					onChange={ onChangeSpy }
 					onBlur={ onBlurSpy }
 				/>
@@ -282,7 +286,7 @@ describe( 'UnitControl', () => {
 
 			render(
 				<UnitControl
-					value={ '15px' }
+					value="15px"
 					onChange={ onChangeSpy }
 					isPressEnterToChange
 				/>
@@ -348,7 +352,7 @@ describe( 'UnitControl', () => {
 
 			render(
 				<UnitControl
-					value={ '14rem' }
+					value="14rem"
 					onChange={ onChangeSpy }
 					onUnitChange={ onUnitChangeSpy }
 				/>
@@ -468,7 +472,7 @@ describe( 'UnitControl', () => {
 
 			render(
 				<UnitControl
-					value={ '50%' }
+					value="50%"
 					units={ [ { value: '%', label: '%' } ] }
 					onChange={ onChangeSpy }
 				/>
@@ -570,19 +574,19 @@ describe( 'UnitControl', () => {
 
 	describe( 'Unit Parser', () => {
 		it( 'should update unit after initial render and with new unit prop', async () => {
-			const { rerender } = render( <UnitControl value={ '10%' } /> );
+			const { rerender } = render( <UnitControl value="10%" /> );
 
 			const select = getSelect();
 
 			expect( select.value ).toBe( '%' );
 
-			rerender( <UnitControl value={ '20vh' } /> );
+			rerender( <UnitControl value="20vh" /> );
 
 			expect( select.value ).toBe( 'vh' );
 		} );
 
 		it( 'should fallback to default unit if parsed unit is invalid', () => {
-			render( <UnitControl value={ '10null' } /> );
+			render( <UnitControl value="10null" /> );
 
 			expect( getSelect().value ).toBe( 'px' );
 		} );
@@ -590,7 +594,7 @@ describe( 'UnitControl', () => {
 		it( 'should display valid CSS unit when not explicitly included in units list', () => {
 			render(
 				<UnitControl
-					value={ '10%' }
+					value="10%"
 					units={ [
 						{ value: 'px', label: 'px' },
 						{ value: 'em', label: 'em' },
@@ -616,7 +620,7 @@ describe( 'UnitControl', () => {
 
 				render(
 					<UnitControl
-						value={ '10%' }
+						value="10%"
 						onChange={ onChangeSpy }
 						onUnitChange={ onUnitChangeSpy }
 					/>

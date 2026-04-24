@@ -11,42 +11,22 @@ import {
 	ToggleControl,
 	TextControl,
 } from '@wordpress/components';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-
-import { unlock } from '../../lock-unlock';
-
-const { ReusableBlocksRenameHint } = unlock( blockEditorPrivateApis );
 
 export default function InitPatternModal() {
 	const { editPost } = useDispatch( editorStore );
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ title, setTitle ] = useState( '' );
 
-	const { postType, isNewPost } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, isCleanNewPost } =
-			select( editorStore );
-		return {
-			postType: getEditedPostAttribute( 'type' ),
-			isNewPost: isCleanNewPost(),
-		};
-	}, [] );
+	const isNewPost = useSelect(
+		( select ) => select( editorStore ).isCleanNewPost(),
+		[]
+	);
 
-	useEffect( () => {
-		if ( isNewPost && postType === 'wp_block' ) {
-			setIsModalOpen( true );
-		}
-		// We only want the modal to open when the page is first loaded.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
+	const [ isModalOpen, setIsModalOpen ] = useState( () => isNewPost );
 
-	if ( postType !== 'wp_block' || ! isNewPost ) {
+	if ( ! isNewPost ) {
 		return null;
 	}
 
@@ -79,15 +59,10 @@ export default function InitPatternModal() {
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 								className="patterns-create-modal__name-input"
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 							/>
-							<ReusableBlocksRenameHint />
 							<ToggleControl
-								label={ _x(
-									'Synced',
-									'Option that makes an individual pattern synchronized'
-								) }
+								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
 								) }
@@ -100,10 +75,11 @@ export default function InitPatternModal() {
 							/>
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="primary"
 									type="submit"
 									disabled={ ! title }
-									__experimentalIsFocusable
+									accessibleWhenDisabled
 								>
 									{ __( 'Create' ) }
 								</Button>

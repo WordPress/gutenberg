@@ -88,14 +88,14 @@ test.describe( 'Directives (w/ priority)', () => {
 		const nonExistentDirectives = page.getByTestId(
 			'non-existent-directives'
 		);
+		// The element type should not be a component.
 		expect(
-			await nonExistentDirectives.evaluate(
-				// This returns undefined if type is a component.
-				( node ) => {
-					return ( node as any ).__k.__k.__k[ 0 ].__k[ 0 ].__k[ 0 ]
-						.type;
-				}
-			)
-		).toBe( 'div' );
+			await nonExistentDirectives.evaluate( ( node ) => {
+				return ( node as any ).__k.__k.__k[ 0 ].__k[ 0 ];
+			} )
+		).toMatchObject( {
+			type: 'div',
+			props: { 'data-wp-non-existent-directive': '' },
+		} );
 	} );
 } );

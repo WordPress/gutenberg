@@ -54,11 +54,9 @@ export function useToolsPanelItem(
 
 	// hasValue is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const hasValueCallback = useCallback( hasValue, [ panelId ] );
 	// resetAllFilter is a new function on every render, so do not add it as a
 	// dependency to the useCallback hook! If needed, we should use a ref.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const resetAllFilterCallback = useCallback( resetAllFilter, [ panelId ] );
 	const previousPanelId = usePrevious( currentPanelId );
 

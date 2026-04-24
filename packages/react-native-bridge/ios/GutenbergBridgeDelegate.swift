@@ -89,7 +89,7 @@ public typealias MediaPickerDidPickMediaCallback = (_ media: [MediaInfo]?) -> Vo
 public typealias MediaImportCallback = (_ media: MediaInfo?) -> Void
 
 /// Declare internal Media Sources.
-/// Label and Type are not relevant since they are delcared on the JS side.
+/// Label and Type are not relevant since they are declared on the JS side.
 /// Hopefully soon, this will need to be declared on the client side.
 extension Gutenberg.MediaSource {
     public static let mediaLibrary = Gutenberg.MediaSource(id: "SITE_MEDIA_LIBRARY", label: "", types: [.image, .video])

@@ -755,6 +755,28 @@ describe( 'createRegistry', () => {
 			} );
 			expect( listener ).toHaveBeenCalledTimes( 1 );
 		} );
+
+		it( 'should handle errors', () => {
+			const store = registry.registerStore( 'myAwesomeReducer', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = jest.fn();
+			const error = new Error( 'Whoops' );
+			subscribeWithUnsubscribe( listener );
+
+			expect( () => {
+				registry.batch( () => {
+					throw error;
+				} );
+			} ).toThrow( error );
+			expect( listener ).not.toHaveBeenCalled();
+
+			registry.batch( () => {
+				store.dispatch( { type: 'dummy' } );
+				store.dispatch( { type: 'dummy' } );
+			} );
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'use', () => {

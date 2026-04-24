@@ -19,21 +19,23 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useCallback } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { useCallback, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import { reset as resetIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import ColorGradientControl from '../colors-gradients/control';
 import { useColorsPerOrigin, useGradientsPerOrigin } from './hooks';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { unlock } from '../../lock-unlock';
 
 export function useHasColorPanel( settings ) {
 	const hasTextPanel = useHasTextPanel( settings );
-	const hasBackgroundPanel = useHasBackgroundPanel( settings );
+	const hasBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
@@ -97,7 +99,7 @@ export function useHasButtonPanel( settings ) {
 	);
 }
 
-export function useHasBackgroundPanel( settings ) {
+export function useHasBackgroundColorPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -109,13 +111,15 @@ export function useHasBackgroundPanel( settings ) {
 	);
 }
 
-function ColorToolsPanel( {
+export function ColorToolsPanel( {
 	resetAllFilter,
 	onChange,
 	value,
 	panelId,
 	children,
+	label,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -123,7 +127,7 @@ function ColorToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Elements' ) }
+			label={ label || __( 'Elements' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
@@ -131,7 +135,7 @@ function ColorToolsPanel( {
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			<div className="color-block-support-panel__inner-wrapper">
 				{ children }
@@ -166,10 +170,7 @@ const LabeledColorIndicators = ( { indicators, label } ) => (
 				</Flex>
 			) ) }
 		</ZStack>
-		<FlexItem
-			className="block-editor-panel-color-gradient-settings__color-name"
-			title={ label }
-		>
+		<FlexItem className="block-editor-panel-color-gradient-settings__color-name">
 			{ label }
 		</FlexItem>
 	</HStack>
@@ -198,7 +199,7 @@ function ColorPanelTab( {
 	);
 }
 
-function ColorPanelDropdown( {
+export function ColorPanelDropdown( {
 	label,
 	hasValue,
 	resetValue,
@@ -207,12 +208,14 @@ function ColorPanelDropdown( {
 	tabs,
 	colorGradientControlSettings,
 	panelId,
+	className = 'block-editor-tools-panel-color-gradient-settings__item',
 } ) {
 	const currentTab = tabs.find( ( tab ) => tab.userValue !== undefined );
-
+	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
+	const colorGradientDropdownButtonRef = useRef( undefined );
 	return (
 		<ToolsPanelItem
-			className="block-editor-tools-panel-color-gradient-settings__item"
+			className={ className }
 			hasValue={ hasValue }
 			label={ label }
 			onDeselect={ resetValue }
@@ -230,20 +233,35 @@ function ColorPanelDropdown( {
 							{ 'is-open': isOpen }
 						),
 						'aria-expanded': isOpen,
-						'aria-label': sprintf(
-							/* translators: %s is the type of color property, e.g., "background" */
-							__( 'Color %s styles' ),
-							label
-						),
+						ref: colorGradientDropdownButtonRef,
 					};
 
 					return (
-						<Button { ...toggleProps }>
-							<LabeledColorIndicators
-								indicators={ indicators }
-								label={ label }
-							/>
-						</Button>
+						<>
+							<Button { ...toggleProps } __next40pxDefaultSize>
+								<LabeledColorIndicators
+									indicators={ indicators }
+									label={ label }
+								/>
+							</Button>
+							{ hasValue() && (
+								<Button
+									__next40pxDefaultSize
+									label={ __( 'Reset' ) }
+									className="block-editor-panel-color-gradient-settings__reset"
+									size="small"
+									icon={ resetIcon }
+									onClick={ () => {
+										resetValue();
+										if ( isOpen ) {
+											onToggle();
+										}
+										// Return focus to parent button
+										colorGradientDropdownButtonRef.current?.focus();
+									} }
+								/>
+							) }
+						</>
 					);
 				} }
 				renderContent={ () => (
@@ -251,7 +269,8 @@ function ColorPanelDropdown( {
 						<div className="block-editor-panel-color-gradient-settings__dropdown-content">
 							{ tabs.length === 1 && (
 								<ColorPanelTab
-									{ ...tabs[ 0 ] }
+									key={ firstTabKey }
+									{ ...firstTab }
 									colorGradientControlSettings={
 										colorGradientControlSettings
 									}
@@ -271,14 +290,17 @@ function ColorPanelDropdown( {
 									</Tabs.TabList>
 
 									{ tabs.map( ( tab ) => {
+										const { key: tabKey, ...restTabProps } =
+											tab;
 										return (
 											<Tabs.TabPanel
-												key={ tab.key }
-												tabId={ tab.key }
+												key={ tabKey }
+												tabId={ tabKey }
 												focusable={ false }
 											>
 												<ColorPanelTab
-													{ ...tab }
+													key={ tabKey }
+													{ ...restTabProps }
 													colorGradientControlSettings={
 														colorGradientControlSettings
 													}
@@ -304,6 +326,7 @@ export default function ColorPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	label,
 	children,
 } ) {
 	const colors = useColorsPerOrigin( settings );
@@ -312,6 +335,12 @@ export default function ColorPanel( {
 	const areCustomGradientsEnabled = settings?.color?.customGradient;
 	const hasSolidColors = colors.length > 0 || areCustomSolidsEnabled;
 	const hasGradientColors = gradients.length > 0 || areCustomGradientsEnabled;
+	// When a block opts into background.gradient support, the gradient
+	// picker moves to the Background panel. Hide it here to avoid
+	// showing duplicate gradient controls.
+	const hasBackgroundGradientSupport = !! settings?.background?.gradient;
+	const showGradientColors =
+		hasGradientColors && ! hasBackgroundGradientSupport;
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	const encodeColorValue = ( colorValue ) => {
@@ -338,19 +367,23 @@ export default function ColorPanel( {
 	};
 
 	// BackgroundColor
-	const showBackgroundPanel = useHasBackgroundPanel( settings );
+	const showBackgroundPanel = useHasBackgroundColorPanel( settings );
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
 	const gradient = decodeValue( inheritedValue?.color?.gradient );
 	const userGradient = decodeValue( value?.color?.gradient );
-	const hasBackground = () => !! userBackgroundColor || !! userGradient;
+	const hasBackground = () =>
+		!! userBackgroundColor ||
+		( ! hasBackgroundGradientSupport && !! userGradient );
 	const setBackgroundColor = ( newColor ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
 			encodeColorValue( newColor )
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 	const setGradient = ( newGradient ) => {
@@ -368,7 +401,9 @@ export default function ColorPanel( {
 			[ 'color', 'background' ],
 			undefined
 		);
-		newValue.color.gradient = undefined;
+		if ( ! hasBackgroundGradientSupport ) {
+			newValue.color.gradient = undefined;
+		}
 		onChange( newValue );
 	};
 
@@ -489,31 +524,34 @@ export default function ColorPanel( {
 		},
 	];
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			color: undefined,
-			elements: {
-				...previousValue?.elements,
-				link: {
-					...previousValue?.elements?.link,
-					color: undefined,
-					':hover': {
+	const resetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				color: undefined,
+				elements: {
+					...previousValue?.elements,
+					link: {
+						...previousValue?.elements?.link,
 						color: undefined,
-					},
-				},
-				...elements.reduce( ( acc, element ) => {
-					return {
-						...acc,
-						[ element.name ]: {
-							...previousValue?.elements?.[ element.name ],
+						':hover': {
 							color: undefined,
 						},
-					};
-				}, {} ),
-			},
-		};
-	}, [] );
+					},
+					...elements.reduce( ( acc, element ) => {
+						return {
+							...acc,
+							[ element.name ]: {
+								...previousValue?.elements?.[ element.name ],
+								color: undefined,
+							},
+						};
+					}, {} ),
+				},
+			};
+		},
+		[ elements ]
+	);
 
 	const items = [
 		showTextPanel && {
@@ -539,7 +577,10 @@ export default function ColorPanel( {
 			hasValue: hasBackground,
 			resetValue: resetBackground,
 			isShownByDefault: defaultControls.background,
-			indicators: [ gradient ?? backgroundColor ],
+			indicators: [
+				( showGradientColors ? gradient : undefined ) ??
+					backgroundColor,
+			],
 			tabs: [
 				hasSolidColors && {
 					key: 'background',
@@ -548,7 +589,7 @@ export default function ColorPanel( {
 					setValue: setBackgroundColor,
 					userValue: userBackgroundColor,
 				},
-				hasGradientColors && {
+				showGradientColors && {
 					key: 'gradient',
 					label: __( 'Gradient' ),
 					inheritedValue: gradient,
@@ -584,7 +625,7 @@ export default function ColorPanel( {
 		},
 	].filter( Boolean );
 
-	elements.forEach( ( { name, label, showPanel } ) => {
+	elements.forEach( ( { name, label: elementLabel, showPanel } ) => {
 		if ( ! showPanel ) {
 			return;
 		}
@@ -658,7 +699,7 @@ export default function ColorPanel( {
 
 		items.push( {
 			key: name,
-			label,
+			label: elementLabel,
 			hasValue: hasElement,
 			resetValue: resetElement,
 			isShownByDefault: defaultControls[ name ],
@@ -709,6 +750,7 @@ export default function ColorPanel( {
 			value={ value }
 			onChange={ onChange }
 			panelId={ panelId }
+			label={ label }
 		>
 			{ items.map( ( item ) => {
 				const { key, ...restItem } = item;

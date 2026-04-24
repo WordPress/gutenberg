@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
-import { withPluginContext } from '@wordpress/plugins';
+import { usePluginContext } from '@wordpress/plugins';
 import { ActionItem } from '@wordpress/interface';
 
 /**
@@ -11,6 +10,7 @@ import { ActionItem } from '@wordpress/interface';
  * The text within the component appears as the menu item label.
  *
  * @param {Object}                props                                 Component properties.
+ * @param {React.ReactNode}       [props.children]                      Children to be rendered.
  * @param {string}                [props.href]                          When `href` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
  * @param {Function}              [props.onClick=noop]                  The callback function to be executed when the user clicks the menu item.
@@ -60,14 +60,16 @@ import { ActionItem } from '@wordpress/interface';
  * );
  * ```
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
-export default compose(
-	withPluginContext( ( context, ownProps ) => {
-		return {
-			as: ownProps.as ?? MenuItem,
-			icon: ownProps.icon || context.icon,
-			name: 'core/plugin-more-menu',
-		};
-	} )
-)( ActionItem );
+export default function PluginMoreMenuItem( props ) {
+	const context = usePluginContext();
+	return (
+		<ActionItem
+			name="core/plugin-more-menu"
+			as={ props.as ?? MenuItem }
+			icon={ props.icon || context.icon }
+			{ ...props }
+		/>
+	);
+}

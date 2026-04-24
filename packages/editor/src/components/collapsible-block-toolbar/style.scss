@@ -1,3 +1,8 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-collapsible-block-toolbar {
 	overflow: hidden;
 	display: flex;
@@ -7,13 +12,14 @@
 	.block-editor-block-contextual-toolbar {
 		border-bottom: 0;
 		height: 100%;
+		background: transparent;
 	}
 
 	// These rules ensure that icons are always positioned in a way that lines up with the rest of the icons in the toolbar.
 	.block-editor-block-toolbar {
 		height: 100%;
 		// Push down so that buttons are centered vertically.
-		// It should be 14px (60px header height - 32px compact button height = 28 / 2),
+		// It should be 16px (64px header height - 32px compact button height = 32 / 2),
 		// but there is a -1px top-margin down the stack that affects this.
 		padding-top: math.div($header-height - $button-size-compact, 2) + 1;
 
@@ -61,11 +67,13 @@
 			overflow: visible;
 		}
 
-		// Move up a little to prevent the toolbar shift when focus is on the vertical movers.
+		// Reduce height and move up a little to prevent the toolbar
+		// shift when focus is on the vertical movers.
 		@include break-small() {
 			&:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				height: $grid-unit-50;
 				position: relative;
-				top: -10px;
+				top: #{$grid-unit-05 * -1};
 			}
 		}
 	}
@@ -73,8 +81,4 @@
 	&.is-collapsed {
 		display: none;
 	}
-}
-
-.editor-collapsible-block-toolbar__toggle {
-	margin-left: 2px; // Allow focus ring to be fully visible
 }

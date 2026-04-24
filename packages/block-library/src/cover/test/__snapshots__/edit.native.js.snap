@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`color settings clears the selected overlay color and mantains the inner blocks 1`] = `
+exports[`color settings clears the selected overlay color and maintains the inner blocks 1`] = `
 "<!-- wp:cover {"isUserOverlayColor":true,"isDark":false} -->
 <div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
@@ -34,7 +34,7 @@ exports[`color settings toggles between solid colors and gradients 1`] = `
 
 exports[`minimum height settings changes the height value between units 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":50,"minHeightUnit":"px","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:50px"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:50px"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -42,7 +42,7 @@ exports[`minimum height settings changes the height value between units 1`] = `
 
 exports[`minimum height settings changes the height value to 20(vw) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":20,"minHeightUnit":"vw","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -50,7 +50,7 @@ exports[`minimum height settings changes the height value to 20(vw) 1`] = `
 
 exports[`minimum height settings disables the decrease button when reaching the minimum value for Pixels (px) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":50,"minHeightUnit":"px","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:50px"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:50px"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -58,7 +58,7 @@ exports[`minimum height settings disables the decrease button when reaching the 
 
 exports[`minimum height settings disables the decrease button when reaching the minimum value for Relative to parent font size (em) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":1,"minHeightUnit":"em","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:1em"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:1em"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -66,7 +66,7 @@ exports[`minimum height settings disables the decrease button when reaching the 
 
 exports[`minimum height settings disables the decrease button when reaching the minimum value for Relative to root font size (rem) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":1,"minHeightUnit":"rem","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:1rem"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:1rem"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -74,7 +74,7 @@ exports[`minimum height settings disables the decrease button when reaching the 
 
 exports[`minimum height settings disables the decrease button when reaching the minimum value for Viewport height (vh) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":1,"minHeightUnit":"vh","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:1vh"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:1vh"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -82,7 +82,7 @@ exports[`minimum height settings disables the decrease button when reaching the 
 
 exports[`minimum height settings disables the decrease button when reaching the minimum value for Viewport width (vw) 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":1,"minHeightUnit":"vw","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:1vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light" style="min-height:1vw"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -90,7 +90,7 @@ exports[`minimum height settings disables the decrease button when reaching the 
 
 exports[`when an image is attached updates background opacity 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":15,"overlayColor":"foreground","isUserOverlayColor":true,"isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim-20 has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+<div class="wp-block-cover is-light"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim-20 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"
@@ -98,7 +98,7 @@ exports[`when an image is attached updates background opacity 1`] = `
 
 exports[`when no media is attached and overlay color is set adds image 1`] = `
 "<!-- wp:cover {"url":"https://test.files.wordpress.com/local-image-1.mp4","id":2000,"dimRatio":50,"overlayColor":"cyan-bluish-gray","isUserOverlayColor":true} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-2000" src="https://test.files.wordpress.com/local-image-1.mp4" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<div class="wp-block-cover is-light"><img class="wp-block-cover__image-background wp-image-2000" src="https://test.files.wordpress.com/local-image-1.mp4" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-cyan-bluish-gray-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"

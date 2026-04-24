@@ -1,6 +1,6 @@
 # Compose
 
-The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
+The `compose` package is a collection of handy [Hooks](https://react.dev/reference/react/hooks) and [Higher Order Components](https://legacy.reactjs.org/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 The `compose` function is inspired by [flowRight](https://lodash.com/docs/#flowRight) from Lodash and works the same way. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
@@ -69,7 +69,7 @@ This is inspired by `lodash`'s `flowRight` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow-right/>
+-   <https://lodash.com/docs/4#flow-right>
 
 ### createHigherOrderComponent
 
@@ -145,7 +145,7 @@ This is inspired by `lodash`'s `flow` function.
 
 _Related_
 
--   <https://docs-lodash.com/v4/flow/>
+-   <https://lodash.com/docs/4#flow>
 
 ### pure
 
@@ -210,7 +210,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `import('react').RefCallback<Element>`: Element Ref.
+-   `React.RefCallback<Element>`: Element Ref.
 
 ### useCopyOnClick
 
@@ -220,9 +220,9 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
--   _text_ `string|Function`: The text to copy.
--   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
+-   _ref_ `RefObject< string | Element | NodeListOf< Element > >`: Reference with the element.
+-   _text_ `string | ( () => string )`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
 
@@ -234,12 +234,12 @@ Copies the given text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _text_ `string | (() => string)`: The text to copy. Use a function if not already available and expensive to compute.
--   _onSuccess_ `Function`: Called when to text is copied.
+-   _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `() => void`: Called when to text is copied.
 
 _Returns_
 
--   `import('react').Ref<TElementType>`: A ref to assign to the target element.
+-   `RefCallback< T >`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -247,7 +247,7 @@ Debounces a function similar to Lodash's `debounce`. A new debounced function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/debounce/>
+-   <https://lodash.com/docs/4#debounce>
 
 _Parameters_
 
@@ -265,11 +265,11 @@ Helper hook for input fields that need to debounce the value before using it.
 
 _Parameters_
 
--   _defaultValue_ `any`: The default value to use.
+-   _defaultValue_ The default value to use.
 
 _Returns_
 
--   `[string, Function, string]`: The input value, the setter and the debounced input value.
+-   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
 ### useDisabled
 
@@ -303,7 +303,30 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
+
+### useEvent
+
+Creates a stable callback function that has access to the latest state and can be used within event handlers and effect callbacks. Throws when used in the render phase.
+
+_Usage_
+
+```tsx
+function Component( props ) {
+	const onClick = useEvent( props.onClick );
+	useEffect( () => {
+		onClick();
+		// Won't trigger the effect again when props.onClick is updated.
+	}, [ onClick ] );
+	// Won't re-render Button when props.onClick is updated (if `Button` is
+	// wrapped in `React.memo`).
+	return <Button onClick={ onClick } />;
+}
+```
+
+_Parameters_
+
+-   _callback_ `T`: The callback function to wrap.
 
 ### useFocusableIframe
 
@@ -315,7 +338,7 @@ _Returns_
 
 ### useFocusOnMount
 
-Hook used to focus the first tabbable element on mount.
+Determines focus behavior when the element mounts.
 
 _Usage_
 
@@ -335,11 +358,11 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement'`: Focus on mount mode.
+-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Ref callback.
+-   Ref callback.
 
 ### useFocusReturn
 
@@ -367,7 +390,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useInstanceId
 
@@ -398,7 +421,7 @@ _Related_
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
+-   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 ### useMediaQuery
@@ -408,6 +431,7 @@ Runs a media query and returns its value when it changes.
 _Parameters_
 
 -   _query_ `[string]`: Media Query.
+-   _view_ `[Window]`: Window instance, else default to global window
 
 _Returns_
 
@@ -444,11 +468,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<TRef>`: The refs to be merged.
+-   _refs_ `Ref< T >[]`: The refs to be merged.
 
 _Returns_
 
--   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+-   `RefCallback< T >`: The merged ref callback.
 
 ### useObservableValue
 
@@ -500,22 +524,29 @@ _Returns_
 
 ### useResizeObserver
 
-Hook which allows to listen the resize event of any target element when it changes sizes. \_Note: `useResizeObserver` will report `null` until after first render.
+Sets up a [`ResizeObserver`](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API) for an HTML or SVG element.
+
+Pass the returned setter as a callback ref to the React element you want to observe, or use it in layout effects for advanced use cases.
 
 _Usage_
 
-```js
-const App = () => {
-	const [ resizeListener, sizes ] = useResizeObserver();
+```tsx
+const setElement = useResizeObserver(
+	( resizeObserverEntries ) => console.log( resizeObserverEntries ),
+	{ box: 'border-box' }
+);
+<div ref={ setElement } />;
 
-	return (
-		<div>
-			{ resizeListener }
-			Your content here
-		</div>
-	);
-};
+// The setter can be used in other ways, for example:
+useLayoutEffect( () => {
+	setElement( document.querySelector( `data-element-id="${ elementId }"` ) );
+}, [ elementId ] );
 ```
+
+_Parameters_
+
+-   _callback_ `ResizeObserverCallback`: The `ResizeObserver` callback - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/ResizeObserver#callback).
+-   _options_ `ResizeObserverOptions`: Options passed to `ResizeObserver.observe` when called - [MDN docs](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver/observe#options). Changes will be ignored.
 
 ### useStateWithHistory
 
@@ -535,7 +566,7 @@ Throttles a function similar to Lodash's `throttle`. A new throttled function wi
 
 _Related_
 
--   <https://docs-lodash.com/v4/throttle/>
+-   <https://lodash.com/docs/4#throttle>
 
 _Parameters_
 
@@ -562,6 +593,7 @@ _Parameters_
 
 -   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
 -   _operator_ `[WPViewportOperator]`: Viewport operator.
+-   _view_ `[Window]`: Window instance in which to perform viewport matching.
 
 _Returns_
 
@@ -602,7 +634,7 @@ _Returns_
 
 ### withInstanceId
 
-A Higher Order Component used to be provide a unique instance ID by component.
+A Higher Order Component used to provide a unique instance ID by component.
 
 ### withSafeTimeout
 

@@ -14,13 +14,13 @@ export function useHeading(
 	const {
 		as: asProp,
 		level = 2,
-		color = COLORS.gray[ 900 ],
+		color = COLORS.theme.foreground,
 		isBlock = true,
-		weight = CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
+		weight = CONFIG.fontWeightHeading as React.CSSProperties[ 'fontWeight' ],
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 
-	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
+	const as = ( asProp || `h${ level }` ) as keyof React.JSX.IntrinsicElements;
 
 	const a11yProps: {
 		role?: string;

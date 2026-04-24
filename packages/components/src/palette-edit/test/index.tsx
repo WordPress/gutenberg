@@ -7,7 +7,10 @@ import { click, type, press } from '@ariakit/test';
 /**
  * Internal dependencies
  */
-import PaletteEdit, { getNameAndSlugForPosition } from '..';
+import PaletteEdit, {
+	getNameAndSlugForPosition,
+	deduplicateElementSlugs,
+} from '..';
 import type { PaletteElement } from '../types';
 
 const noop = () => {};
@@ -16,6 +19,7 @@ async function clearInput( input: HTMLInputElement ) {
 	await click( input );
 
 	// Press backspace as many times as the input's current value
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	for ( const _ of Array( input.value.length ) ) {
 		await press.Backspace();
 	}
@@ -96,6 +100,52 @@ describe( 'getNameAndSlugForPosition', () => {
 	} );
 } );
 
+describe( 'deduplicateElementSlugs', () => {
+	it( 'should not change the slugs if they are unique', () => {
+		const elements: PaletteElement[] = [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-2',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		];
+
+		expect( deduplicateElementSlugs( elements ) ).toEqual( elements );
+	} );
+	it( 'should change the slugs if they are not unique', () => {
+		const elements: PaletteElement[] = [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-1',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		];
+
+		expect( deduplicateElementSlugs( elements ) ).toEqual( [
+			{
+				slug: 'test-color-1',
+				color: '#ffffff',
+				name: 'Test Color 1',
+			},
+			{
+				slug: 'test-color-1-1',
+				color: '#1a4548',
+				name: 'Test Color 2',
+			},
+		] );
+	} );
+} );
+
 describe( 'PaletteEdit', () => {
 	const defaultProps = {
 		paletteLabel: 'Test label',
@@ -154,7 +204,7 @@ describe( 'PaletteEdit', () => {
 		render(
 			<PaletteEdit
 				{ ...defaultProps }
-				emptyMessage={ 'Test empty message' }
+				emptyMessage="Test empty message"
 			/>
 		);
 
@@ -306,7 +356,7 @@ describe( 'PaletteEdit', () => {
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
 		await click(
 			screen.getByRole( 'button', {
-				name: 'Remove color',
+				name: 'Remove color: Primary',
 			} )
 		);
 
@@ -337,9 +387,7 @@ describe( 'PaletteEdit', () => {
 			} )
 		);
 		await click( screen.getByRole( 'button', { name: 'Edit: Primary' } ) );
-		const nameInput = screen.getByRole( 'textbox', {
-			name: 'Color name',
-		} );
+		const nameInput = screen.getByDisplayValue( 'Primary' );
 
 		await clearInput( nameInput as HTMLInputElement );
 
@@ -368,7 +416,7 @@ describe( 'PaletteEdit', () => {
 			/>
 		);
 
-		await click( screen.getByLabelText( 'Color: Primary' ) );
+		await click( screen.getByLabelText( 'Primary' ) );
 		const hexInput = screen.getByRole( 'textbox', {
 			name: 'Hex color',
 		} );

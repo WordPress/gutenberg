@@ -2,10 +2,10 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/verse",
-	"title": "Verse",
+	"title": "Poetry",
 	"category": "text",
 	"description": "Insert poetry. Use special spacing formats. Or quote song lyrics.",
-	"keywords": [ "poetry", "poem" ],
+	"keywords": [ "poetry", "poem", "verse", "stanza", "song", "lyrics" ],
 	"textdomain": "default",
 	"attributes": {
 		"content": {
@@ -13,14 +13,18 @@
 			"source": "rich-text",
 			"selector": "pre",
 			"__unstablePreserveWhiteSpace": true,
-			"__experimentalRole": "content"
-		},
-		"textAlign": {
-			"type": "string"
+			"role": "content"
 		}
 	},
 	"supports": {
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -29,15 +33,23 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": false
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

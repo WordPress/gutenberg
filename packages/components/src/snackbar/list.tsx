@@ -66,7 +66,7 @@ export function SnackbarList( {
 	children,
 	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
-	const listRef = useRef< HTMLDivElement | null >( null );
+	const listRef = useRef< HTMLDivElement >( null );
 	const isReducedMotion = useReducedMotion();
 	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
@@ -86,10 +86,15 @@ export function SnackbarList( {
 
 					return (
 						<motion.div
-							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
-							initial={ 'init' }
-							animate={ 'open' }
-							exit={ 'exit' }
+							layout={ isReducedMotion ? false : 'position' } // See https://www.framer.com/docs/animation/#layout-animations
+							// Ensures a stable full-width bounding box so that
+							// `layout="position"` only ever detects vertical
+							// shifts, preventing horizontal animation when
+							// notice text changes in place.
+							style={ { width: '100%' } }
+							initial="init"
+							animate="open"
+							exit="exit"
 							key={ notice.id }
 							variants={
 								isReducedMotion ? undefined : SNACKBAR_VARIANTS

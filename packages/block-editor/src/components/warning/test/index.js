@@ -18,7 +18,9 @@ describe( 'Warning', () => {
 
 	it( 'should show primary actions', () => {
 		render(
-			<Warning actions={ <button>Click me</button> }>Message</Warning>
+			<Warning actions={ [ <button key="test">Click me</button> ] }>
+				Message
+			</Warning>
 		);
 
 		expect(

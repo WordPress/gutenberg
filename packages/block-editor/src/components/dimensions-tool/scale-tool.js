@@ -76,7 +76,7 @@ const DEFAULT_SCALE_OPTIONS = [
  *
  * @param {ScaleToolProps} props
  *
- * @return {import('react').ReactElement} The scale tool.
+ * @return {React.ReactElement} The scale tool.
  */
 export default function ScaleTool( {
 	panelId,
@@ -110,7 +110,7 @@ export default function ScaleTool( {
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
 				onChange={ onChange }
-				size={ '__unstable-large' }
+				size="__unstable-large"
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

@@ -106,7 +106,7 @@ module.exports = ( sourceFile, options ) => {
 	}
 	sourceFile = path.join( processDir, sourceFile );
 
-	const debugMode = options.debug ? true : false;
+	const debugMode = options.debug;
 
 	const inputBase = path.join(
 		path.dirname( sourceFile ),
@@ -133,7 +133,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput.
+	// Output.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

@@ -65,8 +65,13 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// Autosave draft as same user should do full save, i.e. not dirty.
-		expect( await changeDetectionUtils.getIsDirty() ).toBe( false );
+		// With RTC enabled, all autosaves target an autosave revision. Vary our
+		// expectation accordingly.
+		const isRTCEnabled = Boolean(
+			await page.evaluate( () => window._wpCollaborationEnabled )
+		);
+
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( isRTCEnabled );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async ( {
@@ -80,9 +85,7 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		await page
-			.getByRole( 'button', { name: 'Change post status:' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
 		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -245,16 +248,19 @@ test.describe( 'Change detection', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Updating failed. You are probably offline.' )
+				.getByText(
+					'Updating failed because you were offline. Please verify your connection and try again.'
+				)
 		).toBeVisible();
+
+		// Need to disable offline to allow reload and allow reconnect to sync provider.
+		await context.setOffline( false );
+
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
-
-		// Need to disable offline to allow reload.
-		await context.setOffline( false );
 
 		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
 	} );
@@ -416,11 +422,11 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu' )
-			.getByRole( 'menuitem', { name: 'Move to Trash' } )
+			.getByRole( 'menuitem', { name: 'Trash' } )
 			.click();
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Delete' } )
+			.getByRole( 'button', { name: 'Trash' } )
 			.click();
 
 		await expect( page ).toHaveURL( '/wp-admin/edit.php?post_type=post' );
@@ -494,6 +500,40 @@ test.describe( 'Change detection', () => {
 				.getByRole( 'region', { name: 'Editor top bar' } )
 				.getByRole( 'button', { name: 'Save draft' } )
 		).toBeEnabled();
+	} );
+
+	// See: https://github.com/WordPress/gutenberg/issues/76143.
+	test( 'should not be dirty after autosaving content changes for draft post', async ( {
+		page,
+		editor,
+		changeDetectionUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello World' );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Paragraph' );
+
+		// Force autosave to occur immediately.
+		await Promise.all( [
+			page.evaluate( () =>
+				window.wp.data.dispatch( 'core/editor' ).autosave()
+			),
+			expect(
+				page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'saved' } )
+			).toBeDisabled(),
+		] );
+
+		// With RTC enabled, all autosaves target an autosave revision. Vary our
+		// expectation accordingly.
+		const isRTCEnabled = Boolean(
+			await page.evaluate( () => window._wpCollaborationEnabled )
+		);
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( isRTCEnabled );
 	} );
 } );
 

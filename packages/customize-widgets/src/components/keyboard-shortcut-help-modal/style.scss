@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .customize-widgets-keyboard-shortcut-help-modal {
 	&__section {
 		margin: 0 0 2rem 0;
@@ -33,9 +35,6 @@
 	&__shortcut-description {
 		flex: 1;
 		margin: 0;
-
-		// IE 11 flex item fix - ensure the item does not collapse.
-		flex-basis: auto;
 	}
 
 	&__shortcut-key-combination {

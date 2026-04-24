@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
-import { forwardRef, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getAppenderLabel } from './get-appender-label';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -28,8 +29,8 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
+	appenderLabel,
 	toggleProps = {},
-	prioritizePatterns,
 } ) => {
 	const {
 		as: Wrapper = Button,
@@ -39,14 +40,15 @@ const defaultRenderToggle = ( {
 	} = toggleProps;
 
 	let label = labelProp;
-	if ( ! label && hasSingleBlockType ) {
+	if ( ! label && appenderLabel ) {
+		// Block returns the full label; use directly (consistent with getBlockLabel).
+		label = appenderLabel;
+	} else if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
-			blockTitle
+			blockTitle.toLowerCase()
 		);
-	} else if ( ! label && prioritizePatterns ) {
-		label = __( 'Add pattern' );
 	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
@@ -63,6 +65,7 @@ const defaultRenderToggle = ( {
 
 	return (
 		<Wrapper
+			__next40pxDefaultSize={ toggleProps.as ? undefined : true }
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
@@ -76,7 +79,7 @@ const defaultRenderToggle = ( {
 	);
 };
 
-class PrivateInserter extends Component {
+class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -109,11 +112,10 @@ class PrivateInserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
+			appenderLabel,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
-			prioritizePatterns,
 		} = this.props;
 
 		return renderToggle( {
@@ -122,9 +124,8 @@ class PrivateInserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
+			appenderLabel,
 			toggleProps,
-			prioritizePatterns,
 		} );
 	}
 
@@ -147,7 +148,6 @@ class PrivateInserter extends Component {
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
-			prioritizePatterns,
 			onSelectOrClose,
 			selectBlockOnInsert,
 		} = this.props;
@@ -171,7 +171,6 @@ class PrivateInserter extends Component {
 					rootClientId={ rootClientId }
 					clientId={ clientId }
 					isAppender={ isAppender }
-					prioritizePatterns={ prioritizePatterns }
 					selectBlockOnInsert={ selectBlockOnInsert }
 				/>
 			);
@@ -182,6 +181,7 @@ class PrivateInserter extends Component {
 				onSelect={ () => {
 					onClose();
 				} }
+				onClose={ onClose }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }
@@ -222,7 +222,7 @@ class PrivateInserter extends Component {
 	}
 }
 
-export const ComposedPrivateInserter = compose( [
+export default compose( [
 	withSelect(
 		( select, { clientId, rootClientId, shouldDirectInsert = true } ) => {
 			const {
@@ -230,10 +230,9 @@ export const ComposedPrivateInserter = compose( [
 				hasInserterItems,
 				getAllowedBlocks,
 				getDirectInsertBlock,
-				getSettings,
 			} = select( blockEditorStore );
 
-			const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
@@ -242,8 +241,6 @@ export const ComposedPrivateInserter = compose( [
 
 			const directInsertBlock =
 				shouldDirectInsert && getDirectInsertBlock( rootClientId );
-
-			const settings = getSettings();
 
 			const hasSingleBlockType =
 				allowedBlocks?.length === 1 &&
@@ -255,16 +252,22 @@ export const ComposedPrivateInserter = compose( [
 				allowedBlockType = allowedBlocks[ 0 ];
 			}
 
+			const defaultBlockType = directInsertBlock
+				? getBlockType( directInsertBlock.name )
+				: null;
+			const appenderLabel = getAppenderLabel(
+				directInsertBlock,
+				defaultBlockType
+			);
+
 			return {
 				hasItems: hasInserterItems( rootClientId ),
 				hasSingleBlockType,
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
 				directInsertBlock,
+				appenderLabel,
 				rootClientId,
-				prioritizePatterns:
-					settings.__experimentalPreferPatternsOnRoot &&
-					! rootClientId,
 			};
 		}
 	),
@@ -398,9 +401,7 @@ export const ComposedPrivateInserter = compose( [
 				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose( {
-						clientId: blockToInsert?.clientId,
-					} );
+					onSelectOrClose( blockToInsert );
 				}
 
 				const message = sprintf(
@@ -418,10 +419,4 @@ export const ComposedPrivateInserter = compose( [
 		( { hasItems, isAppender, rootClientId, clientId } ) =>
 			hasItems || ( ! isAppender && ! rootClientId && ! clientId )
 	),
-] )( PrivateInserter );
-
-const Inserter = forwardRef( ( props, ref ) => {
-	return <ComposedPrivateInserter ref={ ref } { ...props } />;
-} );
-
-export default Inserter;
+] )( Inserter );

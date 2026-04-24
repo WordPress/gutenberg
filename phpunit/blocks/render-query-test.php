@@ -15,8 +15,6 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 	private $original_wp_interactivity;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
-		self::$posts = $factory->post->create_many( 3 );
-
 		register_block_type(
 			'test/plugin-block',
 			array(
@@ -25,9 +23,41 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 				},
 			)
 		);
+
+		self::$posts[] = $factory->post->create(
+			array(
+				'post_type'   => 'post',
+				'post_status' => 'publish',
+				'post_name'   => 'empty_post',
+				'post_title'  => 'Empty post',
+			)
+		);
+
+		self::$posts[] = $factory->post->create(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_name'    => 'compatible_post',
+				'post_title'   => 'Compatible post',
+				'post_content' => '<!-- wp:paragraph --><p>Compatible</p><!-- /wp:paragraph -->',
+			)
+		);
+
+		self::$posts[] = $factory->post->create(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_name'    => 'incompatible_post',
+				'post_title'   => 'Incompatible post',
+				'post_content' => '<!-- wp:test/plugin-block /-->',
+			)
+		);
 	}
 
 	public static function wpTearDownAfterClass() {
+		foreach ( self::$posts as $post_to_delete ) {
+			wp_delete_post( $post_to_delete, true );
+		}
 		unregister_block_type( 'test/plugin-block' );
 	}
 
@@ -146,43 +176,6 @@ HTML;
 	}
 
 	/**
-	 * Tests that the `core/query` block sets the option
-	 * `clientNavigationDisabled` to `true` in the `core/router` store config
-	 * when a post content block is found inside.
-	 */
-	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_post_content_block_is_found() {
-		global $wp_query, $wp_the_query;
-
-		$content = <<<HTML
-		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
-		<div class="wp-block-query">
-			<!-- wp:post-template {"align":"wide"} -->
-				<!-- wp:post-content /-->
-			<!-- /wp:post-template -->
-		</div>
-		<!-- /wp:query -->
-HTML;
-
-		// Set main query to single post.
-		$wp_query = new WP_Query(
-			array(
-				'posts_per_page' => 1,
-			)
-		);
-
-		$wp_the_query = $wp_query;
-
-		$output = do_blocks( $content );
-
-		$p = new WP_HTML_Tag_Processor( $output );
-
-		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
-		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
-		$router_config = wp_interactivity_config( 'core/router' );
-		$this->assertTrue( $router_config['clientNavigationDisabled'] );
-	}
-
-	/**
 	 * Tests that, whenever a `core/query` contains a descendant that is not
 	 * supported (i.e., a plugin block), the option `clientNavigationDisabled`
 	 * is set to `true` in the `core/router` store config.
@@ -242,38 +235,72 @@ HTML;
 	}
 
 	/**
-	 * Tests that the `core/query` block sets the option
-	 * `clientNavigationDisabled` to `true` in the `core/router` store config
-	 * when a plugin that does not define clientNavigation is found inside.
+	 * Tests that `clientNavigationDisabled` is enabled when
+	 * there is an incompatible block in post content.
 	 */
-	public function test_rendering_query_with_enhanced_pagination_auto_disabled_when_there_is_a_non_compatible_block() {
+	public function test_rendering_query_with_enhanced_pagination_is_disabled_with_incompatible_block_inside_post_content() {
 		global $wp_query, $wp_the_query;
 
-		$content = <<<HTML
+		$content      = <<<HTML
 		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
 		<div class="wp-block-query">
-			<!-- wp:post-content {"align":"wide"} --><!-- /wp:post-content -->
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:post-content /-->
+			<!-- /wp:post-template -->
 		</div>
 		<!-- /wp:query -->
 HTML;
-
-		// Set main query to single post.
-		$wp_query = new WP_Query(
+		$wp_query     = new WP_Query(
 			array(
 				'posts_per_page' => 1,
+				'paged'          => 1,
 			)
 		);
-
 		$wp_the_query = $wp_query;
 
 		$output = do_blocks( $content );
 
 		$p = new WP_HTML_Tag_Processor( $output );
-
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
 		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
-
 		$router_config = wp_interactivity_config( 'core/router' );
 		$this->assertTrue( $router_config['clientNavigationDisabled'] );
+	}
+
+	/**
+	 * Tests that `clientNavigationDisabled` doesn't exist when
+	 * there all blocks inside post content are compatible.
+	 */
+	public function test_rendering_query_with_enhanced_pagination_with_compatible_blocks_inside_post_content() {
+		global $wp_query, $wp_the_query, $paged;
+
+		$content      = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:post-content /-->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+HTML;
+		$wp_query     = new WP_Query(
+			array(
+				'posts_per_page' => 1,
+				'paged'          => 2,
+			)
+		);
+		$prev_paged   = $paged;
+		$paged        = 2;
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
+
+		$paged = $prev_paged;
+
+		$p = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
+		$router_config = wp_interactivity_config( 'core/router' );
+		$this->assertArrayNotHasKey( 'clientNavigationDisabled', $router_config );
 	}
 }

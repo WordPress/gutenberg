@@ -28,8 +28,8 @@ export default ( props ) => ( element ) => {
 		} = props.current;
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( event.target !== element ) {
+		// the target is the element or inside the element.
+		if ( ! element.contains( event.target ) ) {
 			return;
 		}
 
@@ -42,8 +42,10 @@ export default ( props ) => ( element ) => {
 		event.preventDefault();
 
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
+		// `pasteHandler` also logs this, but we're not using `pasteHandler` in
+		// every case.
+		window.console.log( 'Received HTML (RichText):\n\n', html );
+		window.console.log( 'Received plain text (RichText):\n\n', plainText );
 
 		if ( disableFormats ) {
 			onChange( insert( value, plainText ) );

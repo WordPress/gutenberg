@@ -6,11 +6,6 @@ import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
-
 export default function WelcomeGuidePage() {
 	const { toggle } = useDispatch( preferencesStore );
 
@@ -23,8 +18,7 @@ export default function WelcomeGuidePage() {
 			'core/edit-site',
 			'welcomeGuide'
 		);
-		const { isPage } = select( editSiteStore );
-		return isPageActive && ! isEditorActive && isPage();
+		return isPageActive && ! isEditorActive;
 	}, [] );
 
 	if ( ! isVisible ) {
@@ -63,6 +57,7 @@ export default function WelcomeGuidePage() {
 							</h1>
 							<p className="edit-site-welcome-guide__text">
 								{ __(
+									// eslint-disable-next-line no-restricted-syntax -- 'sidebar' is a common web design term for layouts
 									'It’s now possible to edit page content in the site editor. To customise other parts of the page like the header and footer switch to editing the template using the settings sidebar.'
 								) }
 							</p>

@@ -164,7 +164,7 @@ function MediaPlaceholder( props ) {
 						activeOpacity={ 0.5 }
 						accessibilityLabel={ accessibilityLabel }
 						style={ buttonStyles }
-						accessibilityRole={ 'button' }
+						accessibilityRole="button"
 						accessibilityHint={ accessibilityHint }
 						hitSlop={ hitSlop }
 						onPress={ onButtonPress( open ) }
@@ -181,7 +181,7 @@ function MediaPlaceholder( props ) {
 					activeOpacity={ 0.5 }
 					accessibilityLabel={ accessibilityLabel }
 					style={ styles[ 'media-placeholder__appender' ] }
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityHint={ accessibilityHint }
 					hitSlop={ hitSlop }
 					onPress={ onButtonPress( open ) }

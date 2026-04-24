@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,11 +10,17 @@ import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Animate',
+	title: 'Components/Utilities/Animate',
+	id: 'components-animate',
 	component: Animate,
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;
@@ -27,7 +33,12 @@ export const Default = Template.bind( {} );
 Default.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
-			<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
+			<p>
+				{ /* eslint-disable react/no-unescaped-entities */ }
+				No default animation. Use one of type = "appear", "slide-in", or
+				"loading".
+				{ /* eslint-enable react/no-unescaped-entities */ }
+			</p>
 		</Notice>
 	),
 };

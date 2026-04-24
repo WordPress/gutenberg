@@ -10,7 +10,6 @@ import { Text } from 'react-native';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { help, plugins } from '@wordpress/icons';
 import { storeConfig } from '@wordpress/block-editor';
-jest.mock( '@wordpress/blocks' );
 jest.mock( '@wordpress/block-editor/src/store/selectors' );
 
 /**

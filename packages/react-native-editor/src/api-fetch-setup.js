@@ -8,8 +8,14 @@ import { applyFilters } from '@wordpress/hooks';
 const SUPPORTED_METHODS = [ 'GET', 'POST' ];
 // Please add only wp.org API paths here!
 const SUPPORTED_ENDPOINTS = {
+	// Temporarily disabling themes endpoint calls within the editor.
+	// Issue: https://github.com/wordpress-mobile/WordPress-Android/issues/21034
+	// The editor's GET requests to the themes endpoint are not functioning as expected.
+	// This is likely due to the method used for performing GET requests within the host Android app.
+	// TODO: Investigate and resolve the issue with GET requests from the editor.
+	// Until then, themes endpoint calls are disabled to prevent unexpected behavior.
 	GET: [
-		/wp\/v2\/(media|categories|blocks|themes)\/?\d*?.*/i,
+		/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 		/wp\/v2\/search\?.*/i,
 		/oembed\/1\.0\/proxy\?.*/i,
 	],
@@ -26,7 +32,7 @@ const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
 const fetchHandler = (
-	{ path, method = 'GET', data },
+	{ path, method = 'GET', data, parse },
 	retries = 20,
 	retryCount = 1
 ) => {
@@ -51,7 +57,23 @@ const fetchHandler = (
 	}
 
 	const parseResponse = ( response ) => {
-		if ( typeof response === 'string' ) {
+		const isStringResponse = typeof response === 'string';
+
+		// If the 'parse' parameter is false, return the response as a new Response object
+		// with the JSON string. This is necessary because one of the middlewares in the API
+		// fetch library expects the response to be a JavaScript Response object with JSON
+		// functionality. By doing this, we ensure that the response is handled correctly
+		// by fetch-all-middleware.
+		if ( parse === false ) {
+			const body = isStringResponse
+				? response
+				: JSON.stringify( response );
+			return new Response( body, {
+				headers: { 'Content-Type': 'application/json' },
+			} );
+		}
+
+		if ( isStringResponse ) {
 			response = JSON.parse( response );
 		}
 		return response;

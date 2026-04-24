@@ -14,36 +14,24 @@ export default function EnhancedPaginationControl( {
 	setAttributes,
 	clientId,
 } ) {
-	const { hasUnsupportedBlocks } = useUnsupportedBlocks( clientId );
-	const fullPageClientSideNavigation =
-		window.__experimentalFullPageClientSideNavigation;
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
 
-	let help = __( 'Browsing between pages requires a full page reload.' );
-	if ( fullPageClientSideNavigation ) {
+	let help = __(
+		'Reload the full page—instead of just the posts list—when visitors navigate between pages.'
+	);
+	if ( hasUnsupportedBlocks ) {
 		help = __(
-			'Experimental full-page client-side navigation setting enabled.'
-		);
-	} else if ( enhancedPagination ) {
-		help = __(
-			"Browsing between pages won't require a full page reload, unless non-compatible blocks are detected."
-		);
-	} else if ( hasUnsupportedBlocks ) {
-		help = __(
-			"Force page reload can't be disabled because there are non-compatible blocks inside the Query block."
+			'Enhancement disabled because there are non-compatible blocks inside the Query block.'
 		);
 	}
 
 	return (
 		<>
 			<ToggleControl
-				label={ __( 'Force page reload' ) }
+				label={ __( 'Reload full page' ) }
 				help={ help }
-				checked={
-					! enhancedPagination && ! fullPageClientSideNavigation
-				}
-				disabled={
-					hasUnsupportedBlocks || fullPageClientSideNavigation
-				}
+				checked={ ! enhancedPagination }
+				disabled={ hasUnsupportedBlocks }
 				onChange={ ( value ) => {
 					setAttributes( {
 						enhancedPagination: ! value,

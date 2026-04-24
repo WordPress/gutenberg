@@ -4,18 +4,16 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
 import { BaseControl } from '../base-control';
-import AllInputControl from './all-input-control';
-import InputControls from './input-controls';
-import AxialInputControls from './axial-input-controls';
+import InputControl from './input-control';
 import LinkedButton from './linked-button';
 import { Grid } from '../grid';
 import {
-	FlexedBoxControlIcon,
 	InputWrapper,
 	ResetButton,
 	LinkedButtonWrapper,
@@ -23,16 +21,13 @@ import {
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	DEFAULT_VALUES,
-	getInitialSide,
-	isValuesMixed,
+	isValueMixed,
 	isValuesDefined,
+	getAllowedSides,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
-import type {
-	BoxControlIconProps,
-	BoxControlProps,
-	BoxControlValue,
-} from './types';
+import type { BoxControlProps, BoxControlValue } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const defaultInputProps = {
 	min: 0,
@@ -47,27 +42,28 @@ function useUniqueId( idProp?: string ) {
 }
 
 /**
- * BoxControl components let users set values for Top, Right, Bottom, and Left.
- * This can be used as an input control for values like `padding` or `margin`.
+ * A control that lets users set values for top, right, bottom, and left. Can be
+ * used as an input control for values like `padding` or `margin`.
  *
  * ```jsx
- * import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
- * import { useState } from '@wordpress/element';
+ * import { useState } from 'react';
+ * import { BoxControl } from '@wordpress/components';
  *
- * const Example = () => {
- * 	const [ values, setValues ] = useState( {
- * 		top: '50px',
- * 		left: '10%',
- * 		right: '10%',
- * 		bottom: '50px',
- * 	} );
+ * function Example() {
+ *   const [ values, setValues ] = useState( {
+ *     top: '50px',
+ *     left: '10%',
+ *     right: '10%',
+ *     bottom: '50px',
+ *   } );
  *
- * 	return (
- * 		<BoxControl
- * 			values={ values }
- * 			onChange={ ( nextValues ) => setValues( nextValues ) }
- * 		/>
- * 	);
+ *   return (
+ *     <BoxControl
+ *       __next40pxDefaultSize
+ *       values={ values }
+ *       onChange={ setValues }
+ *     />
+ *   );
  * };
  * ```
  */
@@ -83,6 +79,8 @@ function BoxControl( {
 	splitOnAxis = false,
 	allowReset = true,
 	resetValues = DEFAULT_VALUES,
+	presets,
+	presetKey,
 	onMouseOver,
 	onMouseOut,
 }: BoxControlProps ) {
@@ -95,11 +93,7 @@ function BoxControl( {
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
-	);
-
-	const [ side, setSide ] = useState< BoxControlIconProps[ 'side' ] >(
-		getInitialSide( isLinked, splitOnAxis )
+		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
 	);
 
 	// Tracking selected units via internal state allows filtering of CSS unit
@@ -117,14 +111,6 @@ function BoxControl( {
 
 	const toggleLinked = () => {
 		setIsLinked( ! isLinked );
-		setSide( getInitialSide( ! isLinked, splitOnAxis ) );
-	};
-
-	const handleOnFocus = (
-		_event: React.FocusEvent< HTMLInputElement >,
-		{ side: nextSide }: { side: typeof side }
-	) => {
-		setSide( nextSide );
 	};
 
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
@@ -141,19 +127,35 @@ function BoxControl( {
 	};
 
 	const inputControlProps = {
+		onMouseOver,
+		onMouseOut,
 		...inputProps,
 		onChange: handleOnChange,
-		onFocus: handleOnFocus,
 		isLinked,
 		units,
 		selectedUnits,
 		setSelectedUnits,
 		sides,
 		values: inputValues,
-		onMouseOver,
-		onMouseOut,
 		__next40pxDefaultSize,
+		presets,
+		presetKey,
 	};
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'BoxControl',
+		__next40pxDefaultSize,
+		size: undefined,
+	} );
+	const sidesToRender = getAllowedSides( sides );
+
+	if ( ( presets && ! presetKey ) || ( ! presets && presetKey ) ) {
+		const definedProp = presets ? 'presets' : 'presetKey';
+		const missingProp = presets ? 'presetKey' : 'presets';
+		warning(
+			`wp.components.BoxControl: the '${ missingProp }' prop is required when the '${ definedProp }' prop is defined.`
+		);
+	}
 
 	return (
 		<Grid
@@ -168,8 +170,9 @@ function BoxControl( {
 			</BaseControl.VisualLabel>
 			{ isLinked && (
 				<InputWrapper>
-					<FlexedBoxControlIcon side={ side } sides={ sides } />
-					<AllInputControl { ...inputControlProps } />
+					{ /* Disable reason: the parent component is handling the __next40pxDefaultSize prop */ }
+					{ /* eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop */ }
+					<InputControl side="all" { ...inputControlProps } />
 				</InputWrapper>
 			) }
 			{ ! hasOneSide && (
@@ -181,12 +184,28 @@ function BoxControl( {
 				</LinkedButtonWrapper>
 			) }
 
-			{ ! isLinked && splitOnAxis && (
-				<AxialInputControls { ...inputControlProps } />
-			) }
-			{ ! isLinked && ! splitOnAxis && (
-				<InputControls { ...inputControlProps } />
-			) }
+			{ ! isLinked &&
+				splitOnAxis &&
+				[ 'vertical', 'horizontal' ].map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					<InputControl
+						key={ axis }
+						side={ axis as 'horizontal' | 'vertical' }
+						{ ...inputControlProps }
+					/>
+				) ) }
+			{ ! isLinked &&
+				! splitOnAxis &&
+				Array.from( sidesToRender ).map( ( axis ) => (
+					// Disable reason: the parent component is handling the __next40pxDefaultSize prop
+					// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
+					<InputControl
+						key={ axis }
+						side={ axis }
+						{ ...inputControlProps }
+					/>
+				) ) }
 			{ allowReset && (
 				<ResetButton
 					className="component-box-control__reset-button"

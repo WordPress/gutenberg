@@ -40,6 +40,9 @@ function UnforwardedToolbar(
 			Dropdown: {
 				variant: 'toolbar',
 			},
+			Menu: {
+				variant: 'toolbar',
+			},
 		};
 	}, [ isVariantDefined ] );
 
@@ -99,4 +102,5 @@ function UnforwardedToolbar(
  * ```
  */
 export const Toolbar = forwardRef( UnforwardedToolbar );
+Toolbar.displayName = 'Toolbar';
 export default Toolbar;

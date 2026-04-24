@@ -4,72 +4,113 @@
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
 
-const CONTENT_ONLY_BLOCKS = applyFilters( 'editor.postContentBlockTypes', [
-	'core/post-title',
-	'core/post-featured-image',
-	'core/post-content',
-	'core/template-part',
-] );
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import usePostContentBlockTypes from './use-post-content-block-types';
 
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  */
 export default function DisableNonPageContentBlocks() {
-	// Note that there are two separate subscription because the result for each
-	// returns a new array.
-	const contentOnlyIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockParents, getBlockName } =
-			select( blockEditorStore );
-		return getBlocksByName( CONTENT_ONLY_BLOCKS ).filter( ( clientId ) =>
-			getBlockParents( clientId ).every( ( parentClientId ) => {
-				const parentBlockName = getBlockName( parentClientId );
-				return (
-					// Ignore descendents of the query block.
-					parentBlockName !== 'core/query' &&
-					// Enable only the top-most block.
-					! CONTENT_ONLY_BLOCKS.includes( parentBlockName )
-				);
-			} )
-		);
-	}, [] );
-	const disabledIds = useSelect( ( select ) => {
-		const { getBlocksByName, getBlockOrder } = select( blockEditorStore );
-		return getBlocksByName( [ 'core/template-part' ] ).flatMap(
-			( clientId ) => getBlockOrder( clientId )
-		);
-	}, [] );
+	const postContentBlockTypes = usePostContentBlockTypes();
+	const { contentOnlyIds, templateParts } = useSelect(
+		( select ) => {
+			const { getPostBlocksByName } = unlock( select( editorStore ) );
+			const { getBlocksByName } = select( blockEditorStore );
+			return {
+				contentOnlyIds: getPostBlocksByName( postContentBlockTypes ),
+				templateParts: getBlocksByName( 'core/template-part' ),
+			};
+		},
+		[ postContentBlockTypes ]
+	);
+	// This is a separate `useSelect` because `templatePartChildren` is
+	// derived via flatMap, which always produces a new array. Combining it
+	// with the above subscription causes an infinite render loop: the new
+	// array fails useSelect's shallow equality check → re-render → effect
+	// fires setBlockEditingMode → store changes → useSelect re-runs → …
+	const templatePartChildren = useSelect(
+		( select ) => {
+			const { getBlockOrder } = select( blockEditorStore );
+			return templateParts.flatMap( ( clientId ) =>
+				getBlockOrder( clientId )
+			);
+		},
+		[ templateParts ]
+	);
 
 	const registry = useRegistry();
+
+	// The effects below are split so that changes to one group of blocks
+	// don't cause unnecessary set/unset cycles for the others. For example,
+	// the root block ('') editing mode only needs to be set once.
+	// Child blocks of templates and templateParts are also loaded separately,
+	// so these are kept in separate effects.
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		setBlockEditingMode( '', 'disabled' );
+
+		return () => {
+			unsetBlockEditingMode( '' );
+		};
+	}, [ registry ] );
 
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
 
 		registry.batch( () => {
-			setBlockEditingMode( '', 'disabled' );
-			for ( const clientId of contentOnlyIds ) {
+			for ( const clientId of templateParts ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
-			}
-			for ( const clientId of disabledIds ) {
-				setBlockEditingMode( clientId, 'disabled' );
 			}
 		} );
 
 		return () => {
 			registry.batch( () => {
-				unsetBlockEditingMode( '' );
-				for ( const clientId of contentOnlyIds ) {
-					unsetBlockEditingMode( clientId );
-				}
-				for ( const clientId of disabledIds ) {
+				for ( const clientId of templateParts ) {
 					unsetBlockEditingMode( clientId );
 				}
 			} );
 		};
-	}, [ contentOnlyIds, disabledIds, registry ] );
+	}, [ templateParts, registry ] );
+
+	useEffect( () => {
+		const { setBlockEditingMode, unsetBlockEditingMode } =
+			registry.dispatch( blockEditorStore );
+
+		const contentOnlySet = new Set( contentOnlyIds );
+
+		registry.batch( () => {
+			for ( const clientId of contentOnlyIds ) {
+				setBlockEditingMode( clientId, 'contentOnly' );
+			}
+			for ( const clientId of templatePartChildren ) {
+				if ( ! contentOnlySet.has( clientId ) ) {
+					setBlockEditingMode( clientId, 'disabled' );
+				}
+			}
+		} );
+
+		return () => {
+			registry.batch( () => {
+				for ( const clientId of contentOnlyIds ) {
+					unsetBlockEditingMode( clientId );
+				}
+				for ( const clientId of templatePartChildren ) {
+					if ( ! contentOnlySet.has( clientId ) ) {
+						unsetBlockEditingMode( clientId );
+					}
+				}
+			} );
+		};
+	}, [ contentOnlyIds, templatePartChildren, registry ] );
 
 	return null;
 }

@@ -62,9 +62,7 @@ const useKeyboardVisibility = () => {
 			showListener.remove();
 			hideListener.remove();
 		};
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	return keyboardVisible;
@@ -105,9 +103,7 @@ const Tooltip = ( {
 			} );
 		}
 		return () => onHandleScreenTouch( null );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ visible ] );
 
 	// Manage visibility animation.
@@ -121,9 +117,7 @@ const Tooltip = ( {
 			setAnimating( true );
 			startAnimation();
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ visible ] );
 
 	// Manage tooltip visibility and position in relation to keyboard.
@@ -142,9 +136,7 @@ const Tooltip = ( {
 			setAnimating( true );
 			setVisible( false );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ visible, keyboardVisible ] );
 
 	// Manage tooltip position during keyboard frame changes.
@@ -273,9 +265,7 @@ const TooltipSlot = ( { children, ...rest } ) => {
 		setHandleScreenTouch( null );
 	};
 	// Memoize context value to avoid unnecessary rerenders of the Provider's children
-	// Disable reason: deferring this refactor to the native team.
-	// see https://github.com/WordPress/gutenberg/pull/41166
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+	// See https://github.com/WordPress/gutenberg/pull/41166
 	const value = useMemo( () => ( { onHandleScreenTouch } ) );
 
 	return (

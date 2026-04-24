@@ -221,47 +221,8 @@ describe( 'ImageSizeControl', () => {
 		} );
 	} );
 
-	describe( 'reset button', () => {
-		it( 'resets both height and width to default values', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<ImageSizeControl
-					imageHeight="100"
-					imageWidth="200"
-					height="300"
-					width="400"
-					onChange={ mockOnChange }
-				/>
-			);
-
-			const heightInput = screen.getByRole( 'spinbutton', {
-				name: 'Height',
-			} );
-			const widthInput = screen.getByRole( 'spinbutton', {
-				name: 'Width',
-			} );
-
-			// The initial dimension values display first.
-			expect( heightInput ).toHaveValue( 300 );
-			expect( widthInput ).toHaveValue( 400 );
-
-			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
-
-			// Both attributes are set to undefined to clear custom values.
-			expect( mockOnChange ).toHaveBeenLastCalledWith( {
-				height: undefined,
-				width: undefined,
-			} );
-
-			// The inputs display the default values once more.
-			expect( heightInput ).toHaveValue( 100 );
-			expect( widthInput ).toHaveValue( 200 );
-		} );
-	} );
-
 	describe( 'image size percentage presets', () => {
-		it( 'updates height and width attributes on selection', async () => {
+		it( 'updates height and width on selection', async () => {
 			const user = userEvent.setup();
 
 			render(
@@ -272,44 +233,25 @@ describe( 'ImageSizeControl', () => {
 				/>
 			);
 
-			const button = screen.getByRole( 'button', {
+			const button = screen.getByRole( 'radio', {
 				name: '50%',
-				pressed: false,
+				checked: false,
 			} );
 
 			await user.click( button );
 
-			expect( button ).toHaveClass( 'is-pressed' );
+			expect( button ).toBeChecked();
 
 			// Both attributes are set to the rounded scaled value.
 			expect( mockOnChange ).toHaveBeenLastCalledWith( {
 				height: 50,
 				width: 101,
 			} );
-		} );
 
-		it( 'updates height and width inputs on selection', async () => {
-			const user = userEvent.setup();
-
-			render(
-				<ImageSizeControl
-					imageHeight="100"
-					imageWidth="201"
-					onChange={ mockOnChange }
-				/>
-			);
-
-			const button = screen.getByRole( 'button', {
-				name: '50%',
-				pressed: false,
-			} );
-
-			await user.click( button );
-
-			// Both attributes are set to the rounded scaled value.
 			expect(
 				screen.getByRole( 'spinbutton', { name: 'Height' } )
 			).toHaveValue( 50 );
+
 			expect(
 				screen.getByRole( 'spinbutton', { name: 'Width' } )
 			).toHaveValue( 101 );

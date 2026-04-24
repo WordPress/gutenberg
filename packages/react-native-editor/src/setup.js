@@ -70,7 +70,6 @@ const setupInitHooks = () => {
 				featuredImageId,
 				rawStyles,
 				rawFeatures,
-				galleryWithImageBlocks,
 				locale,
 			} = props;
 
@@ -94,7 +93,6 @@ const setupInitHooks = () => {
 				capabilities,
 				rawStyles,
 				rawFeatures,
-				galleryWithImageBlocks,
 				locale,
 			};
 		}

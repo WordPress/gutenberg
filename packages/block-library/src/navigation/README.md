@@ -10,4 +10,5 @@ The structural CSS for the navigation block targets generic classnames across me
 -   `.wp-block-navigation-item` is applied to every menu item.
 -   `.wp-block-navigation-item__content` is applied to the link inside a menu item.
 -   `.wp-block-navigation-item__label` is applied to the innermost container around the menu item text label.
+-   `.wp-block-navigation-item__description` is applied to the innermost container around the menu item description.
 -   `.wp-block-navigation__submenu-icon` is applied to the submenu indicator (chevron).

@@ -10,6 +10,7 @@ import {
 	initializeEditor,
 	triggerBlockListLayout,
 	typeInRichText,
+	screen,
 	openBlockSettings,
 	waitFor,
 } from 'test/helpers';
@@ -21,7 +22,9 @@ import { getBlockTypes, unregisterBlockType } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 const BUTTONS_HTML = `<!-- wp:buttons -->
-<div class="wp-block-buttons"><!-- wp:button /--></div>
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button"></a></div>
+<!-- /wp:button --></div>
 <!-- /wp:buttons -->`;
 
 beforeAll( () => {
@@ -90,7 +93,7 @@ describe( 'Buttons block', () => {
 		} );
 
 		it( 'adds another button using the inline appender', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: BUTTONS_HTML,
 			} );
 
@@ -141,7 +144,7 @@ describe( 'Buttons block', () => {
 		} );
 
 		it( 'adds another button using the inserter', async () => {
-			const screen = await initializeEditor( {
+			await initializeEditor( {
 				initialHtml: BUTTONS_HTML,
 			} );
 
@@ -200,9 +203,48 @@ describe( 'Buttons block', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
+		it( 'shows only the button block when using the inserter', async () => {
+			await initializeEditor();
+
+			// Add block
+			await addBlock( screen, 'Buttons' );
+
+			// Get block
+			const buttonsBlock = await getBlock( screen, 'Buttons' );
+			fireEvent.press( buttonsBlock );
+			await triggerBlockListLayout( buttonsBlock );
+
+			// Get inner button block
+			const buttonBlock = await getBlock( screen, 'Button' );
+			fireEvent.press( buttonBlock );
+
+			// Open the block inserter
+			fireEvent.press( screen.getByLabelText( 'Add block' ) );
+
+			const inserterList = screen.getByTestId( 'InserterUI-Blocks' );
+			// onScroll event used to force the FlatList to render all items
+			fireEvent.scroll( inserterList, {
+				nativeEvent: {
+					contentOffset: { y: 0, x: 0 },
+					contentSize: { width: 100, height: 100 },
+					layoutMeasurement: { width: 100, height: 100 },
+				},
+			} );
+
+			// Check the Button block is in the list
+			const buttonInserterBlock =
+				await within( inserterList ).findByText( 'Button' );
+			expect( buttonInserterBlock ).toBeVisible();
+
+			// Check the Paragraph core block is not in the list
+			expect(
+				within( inserterList ).queryByLabelText( 'Paragraph block' )
+			).toBeNull();
+		} );
+
 		describe( 'removing button along with buttons block', () => {
 			it( 'removes the button and buttons block when deleting the block using the block delete action', async () => {
-				const screen = await initializeEditor( {
+				await initializeEditor( {
 					initialHtml: BUTTONS_HTML,
 				} );
 
@@ -248,10 +290,9 @@ describe( 'Buttons block', () => {
 			'Justify items right',
 		].forEach( ( justificationOption ) =>
 			it( `sets ${ justificationOption } option`, async () => {
-				const initialHtml = `<!-- wp:buttons -->
-				<div class="wp-block-buttons"><!-- wp:button /--></div>
-				<!-- /wp:buttons -->`;
-				const screen = await initializeEditor( { initialHtml } );
+				await initializeEditor( {
+					initialHtml: BUTTONS_HTML,
+				} );
 
 				const [ block ] = await screen.findAllByLabelText(
 					/Buttons Block\. Row 1/
@@ -275,7 +316,7 @@ describe( 'Buttons block', () => {
 	describe( 'color customization', () => {
 		it( 'sets a text color', async () => {
 			// Arrange
-			const screen = await initializeEditor();
+			await initializeEditor();
 			await addBlock( screen, 'Buttons' );
 
 			// Act
@@ -316,7 +357,7 @@ describe( 'Buttons block', () => {
 
 		it( 'sets a background color', async () => {
 			// Arrange
-			const screen = await initializeEditor();
+			await initializeEditor();
 			await addBlock( screen, 'Buttons' );
 
 			// Act
@@ -353,7 +394,7 @@ describe( 'Buttons block', () => {
 
 		it( 'sets a gradient background color', async () => {
 			// Arrange
-			const screen = await initializeEditor();
+			await initializeEditor();
 			await addBlock( screen, 'Buttons' );
 
 			// Act
@@ -395,7 +436,7 @@ describe( 'Buttons block', () => {
 
 		it( 'sets a custom gradient background color', async () => {
 			// Arrange
-			const screen = await initializeEditor();
+			await initializeEditor();
 			await addBlock( screen, 'Buttons' );
 
 			// Act

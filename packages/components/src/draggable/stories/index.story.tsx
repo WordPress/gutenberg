@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { DragEvent } from 'react';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -18,15 +19,25 @@ import Draggable from '..';
 
 const meta: Meta< typeof Draggable > = {
 	component: Draggable,
-	title: 'Components/Draggable',
+	title: 'Components/Utilities/Draggable',
+	id: 'components-draggable',
 	argTypes: {
-		elementId: { control: { type: null } },
-		__experimentalDragComponent: { control: { type: null } },
+		elementId: { control: false },
+		__experimentalDragComponent: { control: false },
+	},
+	args: {
+		onDragStart: fn(),
+		onDragEnd: fn(),
+		onDragOver: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { source: { code: '' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'May be deprecated.',
+		},
 	},
 };
 export default meta;

@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-block-draggable-chip-wrapper {
 	position: absolute;
 	// Offset position so that cursor is centered over the drag handle.
@@ -7,8 +10,8 @@
 
 .block-editor-block-draggable-chip {
 	background-color: $gray-900;
-	border-radius: $radius-block-ui;
-	box-shadow: 0 6px 8px rgba($black, 0.3);
+	border-radius: $radius-small;
+	box-shadow: $elevation-small;
 	color: $white;
 	cursor: grabbing;
 	display: inline-flex;
@@ -59,7 +62,9 @@
 	justify-content: center;
 	align-items: center;
 	background-color: transparent;
-	transition: all 0.1s linear 0.1s;
+	@media not ( prefers-reduced-motion ) {
+		transition: all 0.1s linear 0.1s;
+	}
 
 	.block-editor-block-draggable-chip__disabled-icon {
 		width: $grid-unit-50 * 0.5;
@@ -77,6 +82,6 @@
 	.block-editor-block-draggable-chip__disabled.block-editor-block-draggable-chip__disabled {
 		background-color: $gray-700;
 		opacity: 1;
-		box-shadow: 0 4px 8px rgba($black, 0.2);
+		box-shadow: $elevation-small;
 	}
 }

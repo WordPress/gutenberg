@@ -8,7 +8,7 @@ The following props are used to control the behavior of the component.
 
 ### record
 
-The rich text value object the autocomleter is being applied to.
+The rich text value object the autocompleter is being applied to.
 
 -   Required: Yes
 -   Type: `RichTextValue`
@@ -50,7 +50,7 @@ A function that returns nodes to be rendered within the Autocomplete.
 
 ### isSelected
 
-Whether or not the Autocomplte componenet is selected, and if its `Popover` should be displayed.
+Whether or not the Autocomplete component is selected, and if its `Popover` should be displayed.
 
 - Required: Yes
 - Type: `Boolean`
@@ -78,7 +78,7 @@ In addition, a completer may optionally declare:
 
 #### name
 
-The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks.
+The name of the completer. Useful for identifying a specific completer to be overridden via extensibility hooks. Each completer should have a unique name.
 
 -   Type: `String`
 -   Required: Yes
@@ -145,7 +145,7 @@ A class name to apply to the autocompletion popup menu.
 
 #### isDebounced
 
-Whether to apply debouncing for the autocompleter. Set to true to enable debouncing.
+Whether to debounce the autocompleter. This setting only affects the `options` argument; it is ignored by the `useItems`.
 
 -   Type: `Boolean`
 -   Required: No

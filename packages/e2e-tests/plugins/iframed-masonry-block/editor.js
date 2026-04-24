@@ -6,18 +6,24 @@
 
 	const content = [
 		el( 'div', { className: 'grid-item' } ),
-		el( 'div', { className: 'grid-item grid-item--width2 grid-item--height2' } ),
+		el( 'div', {
+			className: 'grid-item grid-item--width2 grid-item--height2',
+		} ),
 		el( 'div', { className: 'grid-item grid-item--height3' } ),
 		el( 'div', { className: 'grid-item grid-item--height2' } ),
 		el( 'div', { className: 'grid-item grid-item--width3' } ),
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item grid-item--height2' } ),
-		el( 'div', { className: 'grid-item grid-item--width2 grid-item--height3' } ),
+		el( 'div', {
+			className: 'grid-item grid-item--width2 grid-item--height3',
+		} ),
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item grid-item--height2' } ),
 		el( 'div', { className: 'grid-item' } ),
-		el( 'div', { className: 'grid-item grid-item--width2 grid-item--height2' } ),
+		el( 'div', {
+			className: 'grid-item grid-item--width2 grid-item--height2',
+		} ),
 		el( 'div', { className: 'grid-item grid-item--width2' } ),
 		el( 'div', { className: 'grid-item' } ),
 		el( 'div', { className: 'grid-item grid-item--height2' } ),

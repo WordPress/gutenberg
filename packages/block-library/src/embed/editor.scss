@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 .wp-block-embed {
 	// Remove the left and right margin the figure is born with.
 	margin-left: 0;
@@ -10,6 +12,10 @@
 	&.is-loading {
 		display: flex;
 		justify-content: center;
+	}
+
+	.wp-block-embed__placeholder-input {
+		flex: 1 1 auto;
 	}
 
 	// Stops long URLs from breaking out of the no preview available screen

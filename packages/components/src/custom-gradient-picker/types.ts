@@ -27,6 +27,12 @@ export type CustomGradientPickerProps = {
 	 */
 	onChange: ( currentGradient: string ) => void;
 	/**
+	 * Whether to enable alpha transparency options in the picker.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
+	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
@@ -94,7 +100,7 @@ export type ControlPointButtonProps = {
 export type ControlPointsProps = {
 	disableRemove: boolean;
 	disableAlpha: boolean;
-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
 	onChange: ( controlPoints: ControlPoint[] ) => void;

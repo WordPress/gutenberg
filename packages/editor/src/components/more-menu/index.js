@@ -26,7 +26,7 @@ import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
 
-export default function MoreMenu() {
+export default function MoreMenu( { disabled = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
@@ -35,6 +35,7 @@ export default function MoreMenu() {
 			select( preferencesStore ).get( 'core', 'showIconLabels' ),
 		[]
 	);
+
 	const turnOffDistractionFree = () => {
 		setPreference( 'core', 'distractionFree', false );
 	};
@@ -53,6 +54,7 @@ export default function MoreMenu() {
 					...( showIconLabels && { variant: 'tertiary' } ),
 					tooltipPosition: 'bottom',
 					size: 'compact',
+					disabled,
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -67,10 +69,10 @@ export default function MoreMenu() {
 									'Access all block and document tools in a single place'
 								) }
 								messageActivated={ __(
-									'Top toolbar activated'
+									'Top toolbar activated.'
 								) }
 								messageDeactivated={ __(
-									'Top toolbar deactivated'
+									'Top toolbar deactivated.'
 								) }
 							/>
 							<PreferenceToggleMenuItem
@@ -79,12 +81,16 @@ export default function MoreMenu() {
 								label={ __( 'Distraction free' ) }
 								info={ __( 'Write with calmness' ) }
 								handleToggling={ false }
-								onToggle={ toggleDistractionFree }
+								onToggle={ () =>
+									toggleDistractionFree( {
+										createNotice: false,
+									} )
+								}
 								messageActivated={ __(
-									'Distraction free mode activated'
+									'Distraction free mode activated.'
 								) }
 								messageDeactivated={ __(
-									'Distraction free mode deactivated'
+									'Distraction free mode deactivated.'
 								) }
 								shortcut={ displayShortcut.primaryShift(
 									'\\'
@@ -96,10 +102,10 @@ export default function MoreMenu() {
 								label={ __( 'Spotlight mode' ) }
 								info={ __( 'Focus on one block at a time' ) }
 								messageActivated={ __(
-									'Spotlight mode activated'
+									'Spotlight mode activated.'
 								) }
 								messageDeactivated={ __(
-									'Spotlight mode deactivated'
+									'Spotlight mode deactivated.'
 								) }
 							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
@@ -107,8 +113,7 @@ export default function MoreMenu() {
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
-							label={ __( 'Plugins' ) }
-							as={ MenuGroup }
+							label={ __( 'Panels' ) }
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>
@@ -127,7 +132,7 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/wordpress-block-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
 								<VisuallyHidden as="span">

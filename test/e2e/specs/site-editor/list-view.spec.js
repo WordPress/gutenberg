@@ -8,10 +8,6 @@ test.describe( 'Site Editor List View', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		// Select a template part with a few blocks.
 		await admin.visitSiteEditor( {
@@ -21,12 +17,16 @@ test.describe( 'Site Editor List View', () => {
 		} );
 	} );
 
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
 	test( 'should open by default when preference is enabled', async ( {
 		page,
 		editor,
 	} ) => {
 		await expect(
-			page.locator( 'role=region[name="List View"i]' )
+			page.locator( 'role=region[name="Document Overview"i]' )
 		).toBeHidden();
 
 		// Turn on block list view by default.
@@ -37,7 +37,7 @@ test.describe( 'Site Editor List View', () => {
 		await page.reload();
 
 		await expect(
-			page.locator( 'role=region[name="List View"i]' )
+			page.locator( 'role=region[name="Document Overview"i]' )
 		).toBeVisible();
 
 		// The preferences cleanup.
@@ -121,7 +121,7 @@ test.describe( 'Site Editor List View', () => {
 		await pageUtils.pressKeys( 'shift+Tab' );
 		await expect(
 			page
-				.getByRole( 'region', { name: 'List View' } )
+				.getByRole( 'region', { name: 'Document Overview' } )
 				.getByRole( 'button', {
 					name: 'Close',
 				} )

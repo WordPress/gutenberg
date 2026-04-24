@@ -18,8 +18,9 @@ import {
 /**
  * Internal dependencies
  */
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import { rectUnion, getElementBounds } from '../../utils/dom';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -87,42 +88,20 @@ function BlockPopover(
 
 		return {
 			getBoundingClientRect() {
-				const selectedBCR = selectedElement.getBoundingClientRect();
-				const lastSelectedBCR =
-					lastSelectedElement?.getBoundingClientRect();
-
-				// Get the biggest rectangle that encompasses completely the currently
-				// selected element and the last selected element:
-				// - for top/left coordinates, use the smaller numbers
-				// - for the bottom/right coordinates, use the largest numbers
-				const left = Math.min(
-					selectedBCR.left,
-					lastSelectedBCR?.left ?? Infinity
-				);
-				const top = Math.min(
-					selectedBCR.top,
-					lastSelectedBCR?.top ?? Infinity
-				);
-				const right = Math.max(
-					selectedBCR.right,
-					lastSelectedBCR.right ?? -Infinity
-				);
-				const bottom = Math.max(
-					selectedBCR.bottom,
-					lastSelectedBCR.bottom ?? -Infinity
-				);
-				const width = right - left;
-				const height = bottom - top;
-
-				return new window.DOMRect( left, top, width, height );
+				return lastSelectedElement
+					? rectUnion(
+							getElementBounds( selectedElement ),
+							getElementBounds( lastSelectedElement )
+					  )
+					: getElementBounds( selectedElement );
 			},
 			contextElement: selectedElement,
 		};
 	}, [
+		popoverDimensionsRecomputeCounter,
+		selectedElement,
 		bottomClientId,
 		lastSelectedElement,
-		selectedElement,
-		popoverDimensionsRecomputeCounter,
 	] );
 
 	if ( ! selectedElement || ( bottomClientId && ! lastSelectedElement ) ) {

@@ -4,17 +4,16 @@ sidebar_position: 1
 
 # Getting Started
 
-Let's discover how to use the **Gutenberg Block Editor** to build your own block editor in less than 10 minutes**.
-
+Let's discover how to use the **Gutenberg Block Editor** to build your own block editor in less than 10 minutes.
 
 ## What you'll need
 
 - [Node.js](https://nodejs.org/en/download/) version 20.10 or above.
-- We're going to be using "vite" to setup our single page application (SPA) that contains a block editor. You can use your own setup, and your own application for this.
+- We're going to be using "Vite" to setup our single page application (SPA) that contains a block editor. You can use your own setup, and your own application for this.
 
 ## Preparing the SPA powered by Vite.
 
-First bootstrap a vite project using `npm create vite@latest` and pick `Vanilla` variant and `JavaScript` as a language.
+First bootstrap a Vite project using `npm create vite@latest` and pick `React` variant and `JavaScript` as a language.
 
 Once done, you can navigate to your application folder and run it locally using `npm run dev`. Open the displayed local URL in a browser.
 
@@ -28,58 +27,72 @@ To build a block editor, you need to install the following dependencies:
 
 ## JSX
 
-We're going to be using JSX to write our UI and components. So one of the first steps we need to do is to configure our build tooling, By default vite supports JSX and and outputs the result as a React pragma. The Block editor uses React so there's no need to configure anything here but if you're using a different bundler/build tool, make sure the JSX transpilation is setup properly.
+We're going to be using JSX to write our UI and components as the block editor is built with React. Using the Vite bootstrap described above there’s no need to configure anything as it outputs the result as a React pragma. If you're using a different bundler/build tool, you may need to configure the JSX transpilation to do the same.
 
 ## Bootstrap your block editor
 
-It's time to render our first block editor.
+It's time to render our first block editor. We’ll do this with changes to three files – `index.html`, `src/main.jsx`, and `src/App.jsx`.
 
- - Update your `index.jsx` file with the following code:
+First, we’ll add the base styles are for the editor UI. In `index.html` add these styles in the `<head>`:
+```html
+<link href="node_modules/@wordpress/components/build-style/style.css" rel="stylesheet" vite-ignore/>
+<link href="node_modules/@wordpress/block-editor/build-style/style.css" rel="stylesheet" vite-ignore/>
+```
+:::note
+
+There are more styles needed but can’t be added here because they are for the editor’s content which is in a separate document within an `<iframe>`. We’ll add those styles via the `BlockCanvas` component in a later step.
+
+:::
+
+Next, we’ll add blocks for the editor to work with. In `src/main.jsx` import and call `registerCoreBlocks`:
+```js
+import { registerCoreBlocks } from '@wordpress/block-library'
+registerCoreBlocks();
+```
+
+Finally, we’ll put our editor together. In `src/App.jsx` replace the contents with the following code:
+
 ```jsx
-import { createElement, useState } from "react";
-import { createRoot } from 'react-dom/client';
+import { useState } from "react";
 import {
   BlockEditorProvider,
   BlockCanvas,
 } from "@wordpress/block-editor";
-import { registerCoreBlocks } from "@wordpress/block-library";
 
-// Default styles that are needed for the editor.
-import "@wordpress/components/build-style/style.css";
-import "@wordpress/block-editor/build-style/style.css";
+// Base styles for the content within the block canvas iframe.
+import componentsStyles from "@wordpress/components/build-style/style.css?raw";
+import blockEditorContentStyles from "@wordpress/block-editor/build-style/content.css?raw";
+import blocksStyles from "@wordpress/block-library/build-style/style.css?raw";
+import blocksEditorStyles from "@wordpress/block-library/build-style/editor.css?raw";
 
-// Default styles that are needed for the core blocks.
-import "@wordpress/block-library/build-style/common.css";
-import "@wordpress/block-library/build-style/style.css";
-import "@wordpress/block-library/build-style/editor.css";
+const contentStyles = [
+  { css: componentsStyles },
+  { css: blockEditorContentStyles },
+  { css: blocksStyles },
+  { css: blocksEditorStyles },
+];
 
-// Register the default core block types.
-registerCoreBlocks();
-
-function Editor() {
-  const [blocks, setBlocks] = useState([]);
+export default function Editor() {
+  const [ blocks, setBlocks ] = useState( [] );
   return (
     /*
       The BlockEditorProvider is the wrapper of the block editor's state.
       All the UI elements of the block editor need to be rendered within this provider.
     */
     <BlockEditorProvider
-      value={blocks}
-      onChange={setBlocks}
-      onInput={setBlocks}
+      value={ blocks }
+      onChange={ setBlocks }
+      onInput={ setBlocks }
     >
-      {/*
-          The BlockCanvas component renders the block list within an iframe
-          and wire up all the necessary events to make the block editor work.
-        */}
-      <BlockCanvas height="500px" />
+      { /*
+        The BlockCanvas component renders the block list within an iframe
+        and wires up all the necessary events to make the block editor work.
+      */ }
+      <BlockCanvas height="500px" styles={ contentStyles } />
     </BlockEditorProvider>
   );
 }
 
-// Render your React component instead
-const root = createRoot(document.getElementById("app"));
-root.render(<Editor />);
 ```
 
 That's it! You now have a very basic block editor with several block types included by default: paragraphs, headings, lists, quotes, images...

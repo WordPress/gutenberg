@@ -26,17 +26,15 @@ import usePostTitle from './use-post-title';
  * @param {Object}  _            Unused parameter.
  * @param {Element} forwardedRef Reference to the component's DOM node.
  *
- * @return {Component} The rendered component.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostTitleRaw( _, forwardedRef ) {
-	const { placeholder, hasFixedToolbar } = useSelect( ( select ) => {
+	const { placeholder } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { titlePlaceholder, hasFixedToolbar: _hasFixedToolbar } =
-			getSettings();
+		const { titlePlaceholder } = getSettings();
 
 		return {
 			placeholder: titlePlaceholder,
-			hasFixedToolbar: _hasFixedToolbar,
 		};
 	}, [] );
 
@@ -61,7 +59,6 @@ function PostTitleRaw( _, forwardedRef ) {
 	// This same block is used in both the visual and the code editor.
 	const className = clsx( DEFAULT_CLASSNAMES, {
 		'is-selected': isSelected,
-		'has-fixed-toolbar': hasFixedToolbar,
 		'is-raw-text': true,
 	} );
 
@@ -82,7 +79,6 @@ function PostTitleRaw( _, forwardedRef ) {
 			autoComplete="off"
 			dir="auto"
 			rows={ 1 }
-			__nextHasNoMarginBottom
 		/>
 	);
 }

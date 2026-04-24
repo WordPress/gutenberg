@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { reduceMotion } from '../../utils';
+import { CONFIG } from '../../utils';
 
 export const PointerCircle = styled.div`
 	background-color: transparent;
@@ -20,12 +20,13 @@ export const PointerCircle = styled.div`
 	z-index: 10000;
 	background: rgba( 255, 255, 255, 0.4 );
 	border: 1px solid rgba( 255, 255, 255, 0.4 );
-	border-radius: 50%;
+	border-radius: ${ CONFIG.radiusRound };
 	backdrop-filter: blur( 16px ) saturate( 180% );
 	box-shadow: rgb( 0 0 0 / 10% ) 0px 0px 8px;
-	transition: transform 100ms linear;
 
-	${ reduceMotion( 'transition' ) }
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 100ms linear;
+	}
 
 	${ ( { isDragging }: { isDragging: boolean } ) =>
 		isDragging &&

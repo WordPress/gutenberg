@@ -62,7 +62,7 @@ export default class Picker extends Component {
 					icon={ option.icon }
 					leftAlign={ leftAlign }
 					label={ option.label }
-					separatorType={ 'none' }
+					separatorType="none"
 					onPress={ () => this.onCellPress( option.value ) }
 					disabled={ option.disabled }
 					style={
@@ -94,7 +94,7 @@ export default class Picker extends Component {
 						<TextControl
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }
-							separatorType={ 'none' }
+							separatorType="none"
 						/>
 					) }
 				</PanelBody>

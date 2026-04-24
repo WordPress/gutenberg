@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -9,7 +9,7 @@ import {
 	Dropdown,
 	RadioControl,
 	__experimentalVStack as VStack,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 } from '@wordpress/components';
 import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -23,29 +23,17 @@ import { store as editorStore } from '../../store';
 
 const COMMENT_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Open' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visitors can add new comments and replies.' ) }
-				</Text>
-			</>
-		),
+		label: _x( 'Open', 'Adjective: e.g. "Comments are open"' ),
 		value: 'open',
+		description: __( 'Visitors can add new comments and replies.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Closed' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visitors cannot add new comments or replies.' ) }
-				</Text>
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Existing comments remain visible.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Closed' ),
 		value: '',
+		description: [
+			__( 'Visitors cannot add new comments or replies.' ),
+			__( 'Existing comments remain visible.' ),
+		].join( ' ' ),
 	},
 ];
 
@@ -55,8 +43,13 @@ export default function SiteDiscussion() {
 		( select ) => {
 			const { getEditedPostAttribute, getCurrentPostType } =
 				select( editorStore );
-			const { getEditedEntityRecord } = select( coreStore );
-			const siteSettings = getEditedEntityRecord( 'root', 'site' );
+			const { getEditedEntityRecord, canUser } = select( coreStore );
+			const siteSettings = canUser( 'read', {
+				kind: 'root',
+				name: 'site',
+			} )
+				? getEditedEntityRecord( 'root', 'site' )
+				: undefined;
 			return {
 				isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
 				postSlug: getEditedPostAttribute( 'slug' ),
@@ -116,11 +109,11 @@ export default function SiteDiscussion() {
 							onClose={ onClose }
 						/>
 						<VStack spacing={ 3 }>
-							<Text>
+							<WCText>
 								{ __(
 									'Changes will apply to new posts only. Individual posts may override these settings.'
 								) }
-							</Text>
+							</WCText>
 							<RadioControl
 								className="editor-site-discussion__options"
 								hideLabelFromVision

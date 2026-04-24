@@ -25,7 +25,6 @@ function PostPingbacks() {
 
 	return (
 		<CheckboxControl
-			__nextHasNoMarginBottom
 			label={ __( 'Enable pingbacks & trackbacks' ) }
 			checked={ pingStatus === 'open' }
 			onChange={ onTogglePingback }
@@ -42,4 +41,10 @@ function PostPingbacks() {
 	);
 }
 
+/**
+ * Renders a control for enabling or disabling pingbacks and trackbacks
+ * in a WordPress post.
+ *
+ * @module PostPingbacks
+ */
 export default PostPingbacks;

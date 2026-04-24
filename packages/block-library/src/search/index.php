@@ -10,9 +10,7 @@
  *
  * @since 6.3.0 Using block.json `viewScript` to register script, and update `view_script_handles()` only when needed.
  *
- * @param array    $attributes The block attributes.
- * @param string   $content    The saved content.
- * @param WP_Block $block      The parsed block.
+ * @param array $attributes The block attributes.
  *
  * @return string The search block markup.
  */
@@ -31,8 +29,8 @@ function render_block_core_search( $attributes ) {
 
 	$input_id            = wp_unique_id( 'wp-block-search__input-' );
 	$classnames          = classnames_for_block_core_search( $attributes );
-	$show_label          = ( ! empty( $attributes['showLabel'] ) ) ? true : false;
-	$use_icon_button     = ( ! empty( $attributes['buttonUseIcon'] ) ) ? true : false;
+	$show_label          = ! empty( $attributes['showLabel'] );
+	$use_icon_button     = ! empty( $attributes['buttonUseIcon'] );
 	$show_button         = ( ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'] ) ? false : true;
 	$button_position     = $show_button ? $attributes['buttonPosition'] : null;
 	$query_params        = ( ! empty( $attributes['query'] ) ) ? $attributes['query'] : array();
@@ -71,27 +69,19 @@ function render_block_core_search( $attributes ) {
 	if ( ! empty( $typography_classes ) ) {
 		$input_classes[] = $typography_classes;
 	}
+	if ( ! $show_button && ! empty( $color_classes ) ) {
+		$input_classes[] = $color_classes;
+	}
 	if ( $input->next_tag() ) {
 		$input->add_class( implode( ' ', $input_classes ) );
 		$input->set_attribute( 'id', $input_id );
-		$input->set_attribute( 'value', get_search_query() );
+		$input->set_attribute( 'value', get_search_query( false ) );
 		$input->set_attribute( 'placeholder', $attributes['placeholder'] );
 
 		// If it's interactive, enqueue the script module and add the directives.
 		$is_expandable_searchfield = 'button-only' === $button_position;
 		if ( $is_expandable_searchfield ) {
-			$suffix = wp_scripts_get_suffix();
-			if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
-				$module_url = gutenberg_url( '/build/interactivity/search.min.js' );
-			}
-
-			wp_register_script_module(
-				'@wordpress/block-library/search',
-				isset( $module_url ) ? $module_url : includes_url( "blocks/search/view{$suffix}.js" ),
-				array( '@wordpress/interactivity' ),
-				defined( 'GUTENBERG_VERSION' ) ? GUTENBERG_VERSION : get_bloginfo( 'version' )
-			);
-			wp_enqueue_script_module( '@wordpress/block-library/search' );
+			wp_enqueue_script_module( '@wordpress/block-library/search/view' );
 
 			$input->set_attribute( 'data-wp-bind--aria-hidden', '!context.isSearchInputVisible' );
 			$input->set_attribute( 'data-wp-bind--tabindex', 'state.tabindex' );
@@ -163,17 +153,22 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
-	$field_markup_classes = $is_button_inside ? $border_color_classes : '';
-	$field_markup         = sprintf(
-		'<div class="wp-block-search__inside-wrapper %s" %s>%s</div>',
-		esc_attr( $field_markup_classes ),
+	$field_markup_classes = array(
+		'wp-block-search__inside-wrapper',
+	);
+	if ( $is_button_inside && ! empty( $border_color_classes ) ) {
+		$field_markup_classes[] = $border_color_classes;
+	}
+	$field_markup       = sprintf(
+		'<div class="%s" %s>%s</div>',
+		esc_attr( implode( ' ', $field_markup_classes ) ),
 		$inline_styles['wrapper'],
 		$input . $query_params_markup . $button
 	);
-	$wrapper_attributes   = get_block_wrapper_attributes(
+	$wrapper_attributes = get_block_wrapper_attributes(
 		array( 'class' => $classnames )
 	);
-	$form_directives      = '';
+	$form_directives    = '';
 
 	// If it's interactive, add the directives.
 	if ( $is_expandable_searchfield ) {
@@ -188,9 +183,9 @@ function render_block_core_search( $attributes ) {
 			)
 		);
 		$form_directives      = '
-		 data-wp-interactive="core/search"'
-		. $form_context .
-		'data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
+		 data-wp-interactive="core/search"
+		 ' . $form_context . '
+		 data-wp-class--wp-block-search__searchfield-hidden="!context.isSearchInputVisible"
 		 data-wp-on--keydown="actions.handleSearchKeydown"
 		 data-wp-on--focusout="actions.handleSearchFocusout"
 		';
@@ -380,6 +375,13 @@ function styles_for_block_core_search( $attributes ) {
 		if ( is_array( $border_radius ) ) {
 			// Apply styles for individual corner border radii.
 			foreach ( $border_radius as $key => $value ) {
+				// Get border-radius CSS variable from preset value if provided.
+				if ( is_string( $value ) && str_contains( $value, 'var:preset|border-radius|' ) ) {
+					$index_to_splice = strrpos( $value, '|' ) + 1;
+					$slug            = _wp_to_kebab_case( substr( $value, $index_to_splice ) );
+					$value           = "var(--wp--preset--border-radius--$slug)";
+				}
+
 				if ( null !== $value ) {
 					// Convert camelCase key to kebab-case.
 					$name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
@@ -395,7 +397,7 @@ function styles_for_block_core_search( $attributes ) {
 
 					// Add adjusted border radius styles for the wrapper element
 					// if button is positioned inside.
-					if ( $is_button_inside && intval( $value ) !== 0 ) {
+					if ( $is_button_inside && ( intval( $value ) !== 0 || str_contains( $value, 'var(--wp--preset--border-radius--' ) ) ) {
 						$wrapper_styles[] = sprintf(
 							'border-%s-radius: calc(%s + %s);',
 							esc_attr( $name ),
@@ -407,7 +409,14 @@ function styles_for_block_core_search( $attributes ) {
 			}
 		} else {
 			// Numeric check is for backwards compatibility purposes.
-			$border_radius   = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
+			$border_radius = is_numeric( $border_radius ) ? $border_radius . 'px' : $border_radius;
+			// Get border-radius CSS variable from preset value if provided.
+			if ( is_string( $border_radius ) && str_contains( $border_radius, 'var:preset|border-radius|' ) ) {
+				$index_to_splice = strrpos( $border_radius, '|' ) + 1;
+				$slug            = _wp_to_kebab_case( substr( $border_radius, $index_to_splice ) );
+				$border_radius   = "var(--wp--preset--border-radius--$slug)";
+			}
+
 			$border_style    = sprintf( 'border-radius: %s;', esc_attr( $border_radius ) );
 			$input_styles[]  = $border_style;
 			$button_styles[] = $border_style;
@@ -424,20 +433,37 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	$use_input_for_colors = ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'];
+
 	// Add color styles.
 	$has_text_color = ! empty( $attributes['style']['color']['text'] );
 	if ( $has_text_color ) {
-		$button_styles[] = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+		$text_color_style = sprintf( 'color: %s;', $attributes['style']['color']['text'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $text_color_style;
+		} else {
+			$button_styles[] = $text_color_style;
+		}
 	}
 
 	$has_background_color = ! empty( $attributes['style']['color']['background'] );
 	if ( $has_background_color ) {
-		$button_styles[] = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+		$background_color_style = sprintf( 'background-color: %s;', $attributes['style']['color']['background'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $background_color_style;
+		} else {
+			$button_styles[] = $background_color_style;
+		}
 	}
 
 	$has_custom_gradient = ! empty( $attributes['style']['color']['gradient'] );
 	if ( $has_custom_gradient ) {
-		$button_styles[] = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+		$custom_gradient_style = sprintf( 'background: %s;', $attributes['style']['color']['gradient'] );
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $custom_gradient_style;
+		} else {
+			$button_styles[] = $custom_gradient_style;
+		}
 	}
 
 	// Get typography styles to be shared across inner elements.

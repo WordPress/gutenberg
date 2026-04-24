@@ -8,8 +8,6 @@ import Textarea from 'react-autosize-textarea';
  */
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
-import { __unstableSerializeAndClean } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
@@ -19,35 +17,23 @@ import { VisuallyHidden } from '@wordpress/components';
  */
 import { store as editorStore } from '../../store';
 
+/**
+ * Displays the Post Text Editor along with content in Visual and Text mode.
+ *
+ * @return {React.ReactNode} The rendered PostTextEditor component.
+ */
 export default function PostTextEditor() {
 	const instanceId = useInstanceId( PostTextEditor );
-	const { content, blocks, type, id } = useSelect( ( select ) => {
-		const { getEditedEntityRecord } = select( coreStore );
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const _type = getCurrentPostType();
-		const _id = getCurrentPostId();
-		const editedRecord = getEditedEntityRecord( 'postType', _type, _id );
-
+	const { value, type, id } = useSelect( ( select ) => {
+		const { getCurrentPostType, getCurrentPostId, getEditedPostContent } =
+			select( editorStore );
 		return {
-			content: editedRecord?.content,
-			blocks: editedRecord?.blocks,
-			type: _type,
-			id: _id,
+			value: getEditedPostContent(),
+			type: getCurrentPostType(),
+			id: getCurrentPostId(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( coreStore );
-	// Replicates the logic found in getEditedPostContent().
-	const value = useMemo( () => {
-		if ( content instanceof Function ) {
-			return content( { blocks } );
-		} else if ( blocks ) {
-			// If we have parsed blocks already, they should be our source of truth.
-			// Parsing applies block deprecations and legacy block conversions that
-			// unparsed content will not have.
-			return __unstableSerializeAndClean( blocks );
-		}
-		return content;
-	}, [ content, blocks ] );
 
 	return (
 		<>

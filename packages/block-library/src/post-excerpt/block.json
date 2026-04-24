@@ -7,11 +7,9 @@
 	"description": "Display the excerpt.",
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"moreText": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showMoreOnNewLine": {
 			"type": "boolean",
@@ -23,7 +21,11 @@
 		}
 	},
 	"usesContext": [ "postId", "postType", "queryId" ],
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"color": {
 			"gradients": true,
@@ -41,6 +43,8 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
+			"textColumns": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -53,6 +57,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
 	"editorStyle": "wp-block-post-excerpt-editor",

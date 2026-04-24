@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalUseSlotFills as useSlotFills,
-	__unstableMotionContext as MotionContext,
-} from '@wordpress/components';
-import { useContext, useMemo } from '@wordpress/element';
+import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
+import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import deprecated from '@wordpress/deprecated';
 
@@ -16,13 +13,10 @@ import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
 
-export default function InspectorControlsSlot( {
-	__experimentalGroup,
-	group = 'default',
-	label,
-	fillProps,
-	...props
-} ) {
+function InspectorControlsSlot(
+	{ __experimentalGroup, group = 'default', label, fillProps, ...props },
+	ref
+) {
 	if ( __experimentalGroup ) {
 		deprecated(
 			'`__experimentalGroup` property in `InspectorControlsSlot`',
@@ -34,23 +28,10 @@ export default function InspectorControlsSlot( {
 		);
 		group = __experimentalGroup;
 	}
-	const Slot = groups[ group ]?.Slot;
-	const fills = useSlotFills( Slot?.__unstableName );
+	const slotFill = groups[ group ];
+	const fills = useSlotFills( slotFill?.name );
 
-	const motionContextValue = useContext( MotionContext );
-
-	const computedFillProps = useMemo(
-		() => ( {
-			...( fillProps ?? {} ),
-			forwardedContext: [
-				...( fillProps?.forwardedContext ?? [] ),
-				[ MotionContext.Provider, { value: motionContextValue } ],
-			],
-		} ),
-		[ motionContextValue, fillProps ]
-	);
-
-	if ( ! Slot ) {
+	if ( ! slotFill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
@@ -59,12 +40,14 @@ export default function InspectorControlsSlot( {
 		return null;
 	}
 
+	const { Slot } = slotFill;
+
 	if ( label ) {
 		return (
 			<BlockSupportToolsPanel group={ group } label={ label }>
 				<BlockSupportSlotContainer
 					{ ...props }
-					fillProps={ computedFillProps }
+					fillProps={ fillProps }
 					Slot={ Slot }
 				/>
 			</BlockSupportToolsPanel>
@@ -72,6 +55,13 @@ export default function InspectorControlsSlot( {
 	}
 
 	return (
-		<Slot { ...props } fillProps={ computedFillProps } bubblesVirtually />
+		<Slot
+			{ ...props }
+			ref={ ref }
+			fillProps={ fillProps }
+			bubblesVirtually
+		/>
 	);
 }
+
+export default forwardRef( InspectorControlsSlot );

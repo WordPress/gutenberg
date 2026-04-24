@@ -58,7 +58,7 @@ import {
 	useCallback,
 	useMemo,
 } from '@wordpress/element';
-import { cover as icon, replace, image, warning } from '@wordpress/icons';
+import { cover as icon, replace, image, cautionFilled } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 // eslint-disable-next-line no-restricted-imports
 import { store as editPostStore } from '@wordpress/edit-post';
@@ -512,7 +512,7 @@ const Cover = ( {
 						muted
 						disableFocus
 						repeat
-						resizeMode={ 'cover' }
+						resizeMode="cover"
 						source={ { uri: url } }
 						onLoad={ onVideoLoad }
 						onLoadStart={ onVideoLoadStart }
@@ -665,7 +665,10 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
+						<Icon
+							icon={ cautionFilled }
+							{ ...styles.uploadFailedIcon }
+						/>
 					</View>
 				</View>
 			) }

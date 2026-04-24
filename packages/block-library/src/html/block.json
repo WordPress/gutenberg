@@ -10,7 +10,8 @@
 	"attributes": {
 		"content": {
 			"type": "string",
-			"source": "raw"
+			"source": "raw",
+			"role": "content"
 		}
 	},
 	"supports": {
@@ -19,7 +20,9 @@
 		"html": false,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"customCSS": false,
+		"visibility": false
 	},
 	"editorStyle": "wp-block-html-editor"
 }

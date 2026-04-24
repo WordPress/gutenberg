@@ -327,6 +327,8 @@ function URLInput( props ) {
 		>
 			<PanelBody style={ styles[ 'media-upload__link-input' ] }>
 				<TextControl
+					// TODO: Switch to `true` (40px size) if possible
+					__next40pxDefaultSize={ false }
 					// eslint-disable-next-line jsx-a11y/no-autofocus
 					autoFocus
 					autoCapitalize="none"

@@ -30,7 +30,6 @@ describe( 'pipe', () => {
 		const c = ( value ) => ( value += 'c' );
 		const d = ( value ) => ( value += 'd' );
 		const e = ( value ) => ( value += 'e' );
-		const f = ( value ) => ( value += 'f' );
 
 		expect( pipe( [ a, b ], c, [ d ], e )( 'test' ) ).toBe( 'testabcde' );
 	} );

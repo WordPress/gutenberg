@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -26,7 +26,7 @@ export default (
 	) => { [ key: string ]: any }
 ) =>
 	createHigherOrderComponent( ( WrappedComponent ) => {
-		return class extends Component< Props, State > {
+		return class WithFallbackStyles extends Component< Props, State > {
 			nodeRef?: HTMLElement;
 
 			constructor( props: Props ) {

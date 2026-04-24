@@ -12,6 +12,7 @@ import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-reco
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface Settings< C extends Context > {
 			/**
 			 * What to show on the front page
@@ -21,6 +22,10 @@ declare module './base-entity-records' {
 			 * The ID of the page that should be displayed on the front page
 			 */
 			page_on_front: number;
+			/**
+			 * The ID of the page that should display the latest posts
+			 */
+			page_for_posts: number;
 			/**
 			 * Site title.
 			 */

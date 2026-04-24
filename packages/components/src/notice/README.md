@@ -19,7 +19,7 @@ Notices are color-coded to indicate the type of message being communicated:
 - **Informational** notices are **blue** by default.
 - If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
 - **Success** notices are **green.**
-- **Warning** notices are **yellow\*\***.\*\*
+- **Warning** notices are **yellow.**
 - **Error** notices are **red.**
 
 If an icon is included in the Notice, it should be color-coded to match the Notice state.
@@ -61,7 +61,7 @@ If an icon is included in the Notice, it should be color-coded to match the Noti
 To display a plain notice, pass `Notice` a string:
 
 ```jsx
-import { Notice } from `@wordpress/components`;
+import { Notice } from '@wordpress/components';
 
 const MyNotice = () => (
 	<Notice status="error">An unknown error occurred.</Notice>
@@ -71,7 +71,7 @@ const MyNotice = () => (
 For more complex markup, you can pass any JSX element:
 
 ```jsx
-import { Notice } from `@wordpress/components`;
+import { Notice } from '@wordpress/components';
 
 const MyNotice = () => (
 	<Notice status="error">
@@ -134,9 +134,9 @@ Whether the notice should be dismissible or not
 
 #### `onDismiss` : `() => void`
 
-A deprecated alternative to `onRemove`. This prop is kept for compatibilty reasons but should be avoided.
+A deprecated alternative to `onRemove`. This prop is kept for compatibility reasons but should be avoided.
 
-- Requiered: No
+- Required: No
 - Default: `noop`
 
 #### `actions`: `Array<NoticeAction>`.
@@ -144,14 +144,16 @@ A deprecated alternative to `onRemove`. This prop is kept for compatibilty reaso
 An array of notice actions. Each member object should contain:
 
 - `label`: `string` containing the text of the button/link
-- `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify what the action does.
+- `url`: `string` (optional) The href URL for the action button. If provided, the action will render as an anchor tag.
+- `onClick`: `( event: SyntheticEvent ) => void` (optional) Function to call when clicked. Can be used alongside `url`.
+- `disabled`: `boolean` (optional) Whether the action button is disabled.
 - `className`: `string` (optional) to add custom classes to the button styles.
 - `noDefaultClasses`: `boolean` (optional) A value of `true` will remove all default styling.
 - `variant`: `'primary' | 'secondary' | 'link'` (optional) You can denote a primary button action for a notice by passing a value of `primary`.
 
-The default appearance of an action button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. If both props are provided, `url` takes precedence, and the action button will render as an anchor tag.
+The default `variant` of an action button is `'secondary'` if only `onClick` is provided, or `'link'` if `url` is provided.
 
 ## Related components
 
 - To create a more prominent message that requires action, use a Modal.
-- For low priority, non-interruptive messsages, use Snackbar.
+- For low priority, non-interruptive messages, use Snackbar.

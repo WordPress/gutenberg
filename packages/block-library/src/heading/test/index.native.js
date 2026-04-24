@@ -189,4 +189,69 @@ describe( 'Heading block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
+
+	it( 'should transform to a paragraph block when pressing backspace at the beginning of the first heading block', async () => {
+		// Arrange
+		await initializeEditor();
+
+		// Act
+		await addBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading' );
+		fireEvent.press( headingBlock );
+
+		const headingTextInput =
+			within( headingBlock ).getByPlaceholderText( 'Heading' );
+		typeInRichText(
+			headingTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( headingTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
+
+	it( 'should keep the heading when there is an empty paragraph block before and backspace is pressed at the start', async () => {
+		// Arrange
+		await initializeEditor();
+		await addBlock( screen, 'Paragraph' );
+
+		// Act
+		const paragraphBlock = getBlock( screen, 'Paragraph' );
+		fireEvent.press( paragraphBlock );
+		const paragraphTextInput =
+			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
+		fireEvent( paragraphTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: ENTER,
+		} );
+
+		await addBlock( screen, 'Heading' );
+		const headingBlock = getBlock( screen, 'Heading', { rowIndex: 2 } );
+		fireEvent.press( headingBlock );
+
+		const headingTextInput =
+			within( headingBlock ).getByPlaceholderText( 'Heading' );
+		typeInRichText(
+			headingTextInput,
+			'A quick brown fox jumps over the lazy dog.',
+			{ finalSelectionStart: 0, finalSelectionEnd: 0 }
+		);
+
+		fireEvent( headingTextInput, 'onKeyDown', {
+			nativeEvent: {},
+			preventDefault() {},
+			keyCode: BACKSPACE,
+		} );
+
+		// Assert
+		expect( getEditorHtml() ).toMatchSnapshot();
+	} );
 } );

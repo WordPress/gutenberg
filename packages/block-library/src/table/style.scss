@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-table {
 	$subtle-light-gray: #f3f4f5;
 	$subtle-pale-green: #e9fbe5;
@@ -71,6 +74,9 @@
 	}
 
 	// "Stripes" style variation.
+	// This block style selector does not have 0-1-0 specificity, as per those
+	// generated via global styles, to maintain current styling. Global styles
+	// support for table borders also only applies to the outer `table` element.
 	&.is-style-stripes {
 		border-spacing: 0;
 		border-collapse: inherit;

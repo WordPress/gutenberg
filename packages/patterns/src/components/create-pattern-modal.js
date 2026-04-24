@@ -44,6 +44,8 @@ export default function CreatePatternModal( {
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.onClose }
 			overlayClassName={ className }
+			focusOnMount="firstContentElement"
+			size="small"
 		>
 			<CreatePatternModalContents { ...restProps } />
 		</Modal>
@@ -120,7 +122,6 @@ export function CreatePatternModalContents( {
 					onChange={ setTitle }
 					placeholder={ __( 'My pattern' ) }
 					className="patterns-create-modal__name-input"
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
 				<CategorySelector
@@ -129,10 +130,7 @@ export function CreatePatternModalContents( {
 					categoryMap={ categoryMap }
 				/>
 				<ToggleControl
-					label={ _x(
-						'Synced',
-						'Option that makes an individual pattern synchronized'
-					) }
+					label={ _x( 'Synced', 'pattern (singular)' ) }
 					help={ __(
 						'Sync this pattern across multiple locations.'
 					) }

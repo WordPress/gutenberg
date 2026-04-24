@@ -510,7 +510,7 @@ When a block that opts in to layout support is rendered, two things are processe
 
 There are currently four layout types in use:
 
--   Default/Flow: Items are stacked vertically. The parent container block is set to `display: flow` and the spacing between children is handled via vertical margins.
+-   Default/Flow: Items are stacked vertically. The parent container block's display value isn't specified, so that it may use the default value for that HTML element. For most elements that will usually be `block`. The spacing between children is handled via vertical margins.
 -   Constrained: Items are stacked vertically, using the same spacing logic as the Flow layout. Features constrained widths for child content, outputting widths for standard content size and wide size. Defaults to using global `contentSize` and `wideSize` values set in `settings.layout` in the `theme.json`.
 -   Flex: Items are displayed using a Flexbox layout. Defaults to a horizontal orientation. Spacing between children is handled via the `gap` CSS property.
 -   Grid: Items are displayed using a Grid layout. Defaults to an `auto-fill` approach to column generation but can also be set to a fixed number of columns. Spacing between children is handled via the `gap` CSS property.

@@ -72,6 +72,8 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 					? RichTextData.fromHTMLString( value )
 					: new RichTextData( value );
 
+			let hasFootnotes = false;
+
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
 					const id = replacement.attributes[ 'data-fn' ];
@@ -92,13 +94,16 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 					replacement.innerHTML = toHTMLString( {
 						value: countValue,
 					} );
+					hasFootnotes = true;
 				}
 			} );
 
-			attributes[ key ] =
-				typeof value === 'string'
-					? richTextValue.toHTMLString()
-					: richTextValue;
+			if ( hasFootnotes ) {
+				attributes[ key ] =
+					typeof value === 'string'
+						? richTextValue.toHTMLString()
+						: richTextValue;
+			}
 		}
 
 		return attributes;

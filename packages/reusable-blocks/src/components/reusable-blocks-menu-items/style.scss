@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .reusable-blocks-menu-items__convert-modal {
 	z-index: z-index(".reusable-blocks-menu-items__convert-modal");
 }

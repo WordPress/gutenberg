@@ -16,7 +16,7 @@ import {
 	usePreferredColorSchemeStyle,
 	withPreferredColorScheme,
 } from '@wordpress/compose';
-import { warning } from '@wordpress/icons';
+import { cautionFilled } from '@wordpress/icons';
 import { Icon } from '@wordpress/components';
 
 /**
@@ -34,7 +34,7 @@ function getContent() {
 		// content serialization throughout the lifetime of a non-erroring
 		// application.
 		return select( editorStore ).getEditedPostContent();
-	} catch ( error ) {}
+	} catch {}
 }
 
 function CopyButton( {
@@ -69,7 +69,7 @@ function CopyButton( {
 			activeOpacity={ 0.5 }
 			accessibilityLabel={ accessibilityLabel }
 			style={ [ containerStyle, secondary && containerSecondaryStyle ] }
-			accessibilityRole={ 'button' }
+			accessibilityRole="button"
 			accessibilityHint={ accessibilityHint }
 			onPress={ () => {
 				Clipboard.setString(
@@ -141,7 +141,7 @@ class ErrorBoundary extends Component {
 					<View style={ styles[ 'error-boundary__container' ] }>
 						<View style={ iconContainerStyle }>
 							<Icon
-								icon={ warning }
+								icon={ cautionFilled }
 								{ ...styles[ 'error-boundary__icon' ] }
 							/>
 						</View>

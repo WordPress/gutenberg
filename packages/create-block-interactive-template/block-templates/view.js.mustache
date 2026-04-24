@@ -1,15 +1,23 @@
-{{#isBasicVariant}}
+{{#isDefaultVariant}}
 /**
  * WordPress dependencies
  */
-import { store, getContext } from "@wordpress/interactivity";
+import { store, getContext } from '@wordpress/interactivity';
 
-store( '{{namespace}}', {
+const { state } = store( '{{namespace}}', {
+	state: {
+		get themeText() {
+			return state.isDark ? state.darkText : state.lightText;
+		}
+	},
 	actions: {
-		toggle: () => {
+		toggleOpen() {
 			const context = getContext();
 			context.isOpen = ! context.isOpen;
 		},
+		toggleTheme() {
+			state.isDark = ! state.isDark;
+		}
 	},
 	callbacks: {
 		logIsOpen: () => {
@@ -19,5 +27,4 @@ store( '{{namespace}}', {
 		},
 	},
 } );
-
-{{/isBasicVariant}}
+{{/isDefaultVariant}}

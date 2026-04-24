@@ -5,7 +5,7 @@ import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
 } from '@wordpress/components';
-import { memo } from '@wordpress/element';
+import { memo, useRef } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 
 /**
@@ -123,6 +123,8 @@ function ListViewBranch( props ) {
 		draggedClientIds,
 	} = useListViewContext();
 
+	const nextPositionRef = useRef();
+
 	if ( ! canParentExpand ) {
 		return null;
 	}
@@ -133,7 +135,7 @@ function ListViewBranch( props ) {
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
-	let nextPosition = listPosition;
+	nextPositionRef.current = listPosition;
 
 	return (
 		<>
@@ -141,7 +143,7 @@ function ListViewBranch( props ) {
 				const { clientId, innerBlocks } = block;
 
 				if ( index > 0 ) {
-					nextPosition += countBlocks(
+					nextPositionRef.current += countBlocks(
 						filteredBlocks[ index - 1 ],
 						expandedState,
 						draggedClientIds,
@@ -165,7 +167,7 @@ function ListViewBranch( props ) {
 					} );
 
 				const { itemInView } = fixedListWindow;
-				const blockInView = itemInView( nextPosition );
+				const blockInView = itemInView( nextPositionRef.current );
 
 				const position = index + 1;
 				const updatedPath =
@@ -194,10 +196,14 @@ function ListViewBranch( props ) {
 				// This prevents the entire tree from being rendered when a branch is
 				// selected, or a user selects all blocks, while still enabling scroll
 				// into view behavior when selecting a block or opening the list view.
+				// The first and last blocks of the list are always rendered, to ensure
+				// that Home and End keys work as expected.
 				const showBlock =
 					isDragged ||
 					blockInView ||
-					( isSelected && clientId === selectedClientIds[ 0 ] );
+					( isSelected && clientId === selectedClientIds[ 0 ] ) ||
+					index === 0 ||
+					index === blockCount - 1;
 				return (
 					<AsyncModeProvider key={ clientId } value={ ! isSelected }>
 						{ showBlock && (
@@ -214,7 +220,7 @@ function ListViewBranch( props ) {
 								showBlockMovers={ showBlockMovers }
 								path={ updatedPath }
 								isExpanded={ isDragged ? false : shouldExpand }
-								listPosition={ nextPosition }
+								listPosition={ nextPositionRef.current }
 								selectedClientIds={ selectedClientIds }
 								isSyncedBranch={ syncedBranch }
 								displacement={ displacement }
@@ -235,7 +241,7 @@ function ListViewBranch( props ) {
 								showBlockMovers={ showBlockMovers }
 								level={ level + 1 }
 								path={ updatedPath }
-								listPosition={ nextPosition + 1 }
+								listPosition={ nextPositionRef.current + 1 }
 								fixedListWindow={ fixedListWindow }
 								isBranchSelected={ isSelectedBranch }
 								selectedClientIds={ selectedClientIds }

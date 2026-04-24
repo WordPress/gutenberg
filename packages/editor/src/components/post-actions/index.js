@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -17,67 +17,74 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-import { store as editorStore } from '../../store';
 
-const {
-	DropdownMenuV2: DropdownMenu,
-	DropdownMenuGroupV2: DropdownMenuGroup,
-	DropdownMenuItemV2: DropdownMenuItem,
-	DropdownMenuItemLabelV2: DropdownMenuItemLabel,
-	kebabCase,
-} = unlock( componentsPrivateApis );
+const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
-export default function PostActions( { onActionPerformed, buttonProps } ) {
-	const [ isActionsMenuOpen, setIsActionsMenuOpen ] = useState( false );
-	const { item, postType } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const _postType = getCurrentPostType();
+export default function PostActions( { postType, postId, onActionPerformed } ) {
+	const [ activeModalAction, setActiveModalAction ] = useState( null );
+
+	const { item, permissions } = useSelect(
+		( select ) => {
+			const { getEditedEntityRecord, getEntityRecordPermissions } =
+				unlock( select( coreStore ) );
+			return {
+				item: getEditedEntityRecord( 'postType', postType, postId ),
+				permissions: getEntityRecordPermissions(
+					'postType',
+					postType,
+					postId
+				),
+			};
+		},
+		[ postId, postType ]
+	);
+	const itemWithPermissions = useMemo( () => {
 		return {
-			item: getEditedEntityRecord(
-				'postType',
-				_postType,
-				getCurrentPostId()
-			),
-			postType: _postType,
+			...item,
+			permissions,
 		};
-	}, [] );
-	const allActions = usePostActions( postType, onActionPerformed );
+	}, [ item, permissions ] );
+	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {
-			return ! action.isEligible || action.isEligible( item );
+			return (
+				! action.isEligible || action.isEligible( itemWithPermissions )
+			);
 		} );
-	}, [ allActions, item ] );
+	}, [ allActions, itemWithPermissions ] );
 
 	return (
-		<DropdownMenu
-			open={ isActionsMenuOpen }
-			trigger={
-				<Button
-					size="small"
-					icon={ moreVertical }
-					label={ __( 'Actions' ) }
-					disabled={ ! actions.length }
-					__experimentalIsFocusable
-					className="editor-all-actions-button"
-					onClick={ () =>
-						setIsActionsMenuOpen( ! isActionsMenuOpen )
+		<>
+			<Menu placement="bottom-end">
+				<Menu.TriggerButton
+					render={
+						<Button
+							size="small"
+							icon={ moreVertical }
+							label={ __( 'Actions' ) }
+							disabled={ ! actions.length }
+							accessibleWhenDisabled
+							className="editor-all-actions-button"
+						/>
 					}
-					{ ...buttonProps }
 				/>
-			}
-			onOpenChange={ setIsActionsMenuOpen }
-			placement="bottom-end"
-		>
-			<ActionsDropdownMenuGroup
-				actions={ actions }
-				item={ item }
-				onClose={ () => {
-					setIsActionsMenuOpen( false );
-				} }
-			/>
-		</DropdownMenu>
+				<Menu.Popover>
+					<ActionsDropdownMenuGroup
+						actions={ actions }
+						items={ [ itemWithPermissions ] }
+						setActiveModalAction={ setActiveModalAction }
+					/>
+				</Menu.Popover>
+			</Menu>
+			{ !! activeModalAction && (
+				<ActionModal
+					action={ activeModalAction }
+					items={ [ itemWithPermissions ] }
+					closeModal={ () => setActiveModalAction( null ) }
+				/>
+			) }
+		</>
 	);
 }
 
@@ -86,79 +93,55 @@ export default function PostActions( { onActionPerformed, buttonProps } ) {
 // and the dataviews package should not be using the editor packages directly,
 // so duplicating the code here seems like the least bad option.
 
-// Copied as is from packages/dataviews/src/item-actions.js
-function DropdownMenuItemTrigger( { action, onClick } ) {
+function DropdownMenuItemTrigger( { action, onClick, items } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<DropdownMenuItem
-			onClick={ onClick }
-			hideOnClick={ ! action.RenderModal }
+		<Menu.Item onClick={ onClick }>
+			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+		</Menu.Item>
+	);
+}
+
+export function ActionModal( { action, items, closeModal } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	return (
+		<Modal
+			title={ action.modalHeader || label }
+			__experimentalHideHeader={ !! action.hideModalHeader }
+			onRequestClose={ closeModal ?? ( () => {} ) }
+			focusOnMount="firstContentElement"
+			size="medium"
+			overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
+				action.id
+			) }` }
 		>
-			<DropdownMenuItemLabel>{ action.label }</DropdownMenuItemLabel>
-		</DropdownMenuItem>
+			<action.RenderModal items={ items } closeModal={ closeModal } />
+		</Modal>
 	);
 }
 
-// Copied as is from packages/dataviews/src/item-actions.js
-// With an added onClose prop.
-function ActionWithModal( { action, item, ActionTrigger, onClose } ) {
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const actionTriggerProps = {
-		action,
-		onClick: () => setIsModalOpen( true ),
-	};
-	const { RenderModal, hideModalHeader } = action;
+function ActionsDropdownMenuGroup( { actions, items, setActiveModalAction } ) {
+	const registry = useRegistry();
 	return (
-		<>
-			<ActionTrigger { ...actionTriggerProps } />
-			{ isModalOpen && (
-				<Modal
-					title={ action.modalHeader || action.label }
-					__experimentalHideHeader={ !! hideModalHeader }
-					onRequestClose={ () => {
-						setIsModalOpen( false );
-					} }
-					overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
-						action.id
-					) }` }
-				>
-					<RenderModal
-						items={ [ item ] }
-						closeModal={ () => {
-							setIsModalOpen( false );
-							onClose();
-						} }
-					/>
-				</Modal>
-			) }
-		</>
-	);
-}
-
-// Copied as is from packages/dataviews/src/item-actions.js
-// With an added onClose prop.
-function ActionsDropdownMenuGroup( { actions, item, onClose } ) {
-	return (
-		<DropdownMenuGroup>
+		<Menu.Group>
 			{ actions.map( ( action ) => {
-				if ( action.RenderModal ) {
-					return (
-						<ActionWithModal
-							key={ action.id }
-							action={ action }
-							item={ item }
-							ActionTrigger={ DropdownMenuItemTrigger }
-							onClose={ onClose }
-						/>
-					);
-				}
 				return (
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
-						onClick={ () => action.callback( [ item ] ) }
+						onClick={ () => {
+							if ( 'RenderModal' in action ) {
+								setActiveModalAction( action );
+								return;
+							}
+							action.callback( items, { registry } );
+						} }
+						items={ items }
 					/>
 				);
 			} ) }
-		</DropdownMenuGroup>
+		</Menu.Group>
 	);
 }

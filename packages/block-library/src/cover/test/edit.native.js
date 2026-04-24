@@ -53,13 +53,13 @@ const COVER_BLOCK_SOLID_COLOR_HTML = `<!-- wp:cover {"overlayColor":"cyan-bluish
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isDark":false} -->
-<div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+const COVER_BLOCK_IMAGE_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"isDark":false} -->
+<div class="wp-block-cover is-light"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
-const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","minHeight":20,"minHeightUnit":"vw","isDark":false} -->
-<div class="wp-block-cover is-light" style="min-height:20vw"><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
+const COVER_BLOCK_CUSTOM_HEIGHT_HTML = `<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":10710,"dimRatio":50,"overlayColor":"foreground","isUserOverlayColor":true,"minHeight":20,"minHeightUnit":"vw","isDark":false} -->
+<div class="wp-block-cover is-light" style="min-height:20vw"><img class="wp-block-cover__image-background wp-image-10710" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-foreground-background-color has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
@@ -101,7 +101,7 @@ const attributes = {
 };
 
 beforeAll( () => {
-	// Mock Image.getSize to avoid failed attempt to size non-existant image.
+	// Mock Image.getSize to avoid failed attempt to size non-existent image.
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
@@ -541,7 +541,7 @@ describe( 'color settings', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	it( 'clears the selected overlay color and mantains the inner blocks', async () => {
+	it( 'clears the selected overlay color and maintains the inner blocks', async () => {
 		const screen = await initializeEditor( {
 			initialHtml: COVER_BLOCK_SOLID_COLOR_HTML,
 		} );

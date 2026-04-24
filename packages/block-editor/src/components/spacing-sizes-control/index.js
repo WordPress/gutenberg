@@ -7,16 +7,16 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import useSpacingSizes from './hooks/use-spacing-sizes';
 import AxialInputControls from './input-controls/axial';
 import SeparatedInputControls from './input-controls/separated';
 import SingleInputControl from './input-controls/single';
-import SidesDropdown from './sides-dropdown';
-import useSpacingSizes from './hooks/use-spacing-sizes';
+import LinkedButton from './linked-button';
 import {
 	ALL_SIDES,
 	DEFAULT_VALUES,
@@ -25,6 +25,49 @@ import {
 	getInitialView,
 } from './utils';
 
+/**
+ * A flexible control for managing spacing values in the block editor. Supports single, axial,
+ * and separated input controls for different spacing configurations with automatic view selection
+ * based on current values and available sides.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/spacing-sizes-control/README.md
+ *
+ * @example
+ * ```jsx
+ * import { __experimentalSpacingSizesControl as SpacingSizesControl } from '@wordpress/block-editor';
+ * import { useState } from '@wordpress/element';
+ *
+ * function Example() {
+ *   const [ sides, setSides ] = useState( {
+ *     top: '0px',
+ *     right: '0px',
+ *     bottom: '0px',
+ *     left: '0px',
+ *   } );
+ *
+ *   return (
+ *     <SpacingSizesControl
+ *       values={ sides }
+ *       onChange={ setSides }
+ *       label="Sides"
+ *     />
+ *   );
+ * }
+ * ```
+ *
+ * @param {Object}   props                    Component props.
+ * @param {Object}   props.inputProps         Additional props for input controls.
+ * @param {string}   props.label              Label for the control.
+ * @param {number}   props.minimumCustomValue Minimum value for custom input.
+ * @param {Function} props.onChange           Called when spacing values change.
+ * @param {Function} props.onMouseOut         Called when mouse leaves the control.
+ * @param {Function} props.onMouseOver        Called when mouse enters the control.
+ * @param {boolean}  props.showSideInLabel    Show side in control label.
+ * @param {Array}    props.sides              Available sides for control.
+ * @param {boolean}  props.useSelect          Use select control for predefined values.
+ * @param {Object}   props.values             Current spacing values.
+ * @return {Element}                         Spacing sizes control component.
+ */
 export default function SpacingSizesControl( {
 	inputProps,
 	label: labelProp,
@@ -46,6 +89,10 @@ export default function SpacingSizesControl( {
 		sides?.length === 2;
 
 	const [ view, setView ] = useState( getInitialView( inputValues, sides ) );
+
+	const toggleLinked = () => {
+		setView( view === VIEWS.axial ? VIEWS.custom : VIEWS.axial );
+	};
 
 	const handleOnChange = ( nextValue ) => {
 		const newValues = { ...values, ...nextValue };
@@ -85,17 +132,11 @@ export default function SpacingSizesControl( {
 		ALL_SIDES.includes( view ) && showSideInLabel ? LABELS[ view ] : '';
 
 	const label = sprintf(
-		// translators: 2. Type of spacing being modified (Padding, margin, etc). 1: The side of the block being modified (top, bottom, left etc.).
-		__( '%1$s %2$s' ),
+		// translators: 1: The side of the block being modified (top, bottom, left etc.). 2. Type of spacing being modified (padding, margin, etc).
+		_x( '%1$s %2$s', 'spacing' ),
 		labelProp,
 		sideLabel
 	).trim();
-
-	const dropdownLabelText = sprintf(
-		// translators: %s: The current spacing property e.g. "Padding", "Margin".
-		_x( '%s options', 'Button label to reveal side configuration options' ),
-		labelProp
-	);
 
 	return (
 		<fieldset className="spacing-sizes-control">
@@ -107,11 +148,10 @@ export default function SpacingSizesControl( {
 					{ label }
 				</BaseControl.VisualLabel>
 				{ ! hasOneSide && ! hasOnlyAxialSides && (
-					<SidesDropdown
-						label={ dropdownLabelText }
-						onChange={ setView }
-						sides={ sides }
-						value={ view }
+					<LinkedButton
+						label={ labelProp }
+						onClick={ toggleLinked }
+						isLinked={ view === VIEWS.axial }
 					/>
 				) }
 			</HStack>

@@ -2,8 +2,6 @@
  * Internal dependencies
  */
 import SidebarNavigationItem from '../sidebar-navigation-item';
-import { useLink } from '../routes/link';
-import { TEMPLATE_PART_POST_TYPE, PATTERN_TYPES } from '../../utils/constants';
 
 export default function CategoryItem( {
 	count,
@@ -13,24 +11,20 @@ export default function CategoryItem( {
 	label,
 	type,
 } ) {
-	const linkInfo = useLink( {
-		categoryId: id,
-		postType:
-			type === TEMPLATE_PART_POST_TYPE
-				? TEMPLATE_PART_POST_TYPE
-				: PATTERN_TYPES.user,
-	} );
-
 	if ( ! count ) {
 		return;
+	}
+	const queryArgs = [ `postType=${ type }` ];
+	if ( id ) {
+		queryArgs.push( `categoryId=${ id }` );
 	}
 
 	return (
 		<SidebarNavigationItem
-			{ ...linkInfo }
 			icon={ icon }
 			suffix={ <span>{ count }</span> }
 			aria-current={ isActive ? 'true' : undefined }
+			to={ `/pattern?${ queryArgs.join( '&' ) }` }
 		>
 			{ label }
 		</SidebarNavigationItem>

@@ -14,7 +14,16 @@ exports[`Missing block renders without crashing 1`] = `
       "selected": undefined,
     }
   }
+  accessibilityValue={
+    {
+      "max": undefined,
+      "min": undefined,
+      "now": undefined,
+      "text": undefined,
+    }
+  }
   accessible={true}
+  collapsable={false}
   focusable={true}
   onClick={[Function]}
   onResponderGrant={[Function]}
@@ -23,72 +32,79 @@ exports[`Missing block renders without crashing 1`] = `
   onResponderTerminate={[Function]}
   onResponderTerminationRequest={[Function]}
   onStartShouldSetResponder={[Function]}
+  style={
+    {
+      "opacity": 1,
+    }
+  }
 >
-  <View
-    accessibilityHint="Tap here to show help"
-    accessibilityLabel="Help button"
-    accessibilityRole="button"
-    accessibilityState={
-      {
-        "busy": undefined,
-        "checked": undefined,
-        "disabled": undefined,
-        "expanded": undefined,
-        "selected": undefined,
-      }
-    }
-    accessibilityValue={
-      {
-        "max": undefined,
-        "min": undefined,
-        "now": undefined,
-        "text": undefined,
-      }
-    }
-    accessible={true}
-    collapsable={false}
-    focusable={true}
-    onClick={[Function]}
-    onResponderGrant={[Function]}
-    onResponderMove={[Function]}
-    onResponderRelease={[Function]}
-    onResponderTerminate={[Function]}
-    onResponderTerminationRequest={[Function]}
-    onStartShouldSetResponder={[Function]}
-    style={
-      {
-        "opacity": 1,
-      }
-    }
-  >
-    <Svg
-      height={24}
-      label="Help icon"
-      style={{}}
-      viewBox="0 0 24 24"
-      width={24}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      Path
-    </Svg>
-  </View>
   <View>
-    <Svg
-      fill="white"
-      height={24}
-      style={{}}
-      viewBox="0 0 24 24"
-      width={24}
-      xmlns="http://www.w3.org/2000/svg"
+    <View
+      accessibilityHint="Tap here to show help"
+      accessibilityLabel="Help button"
+      accessibilityRole="button"
+      accessibilityState={
+        {
+          "busy": undefined,
+          "checked": undefined,
+          "disabled": undefined,
+          "expanded": undefined,
+          "selected": undefined,
+        }
+      }
+      accessibilityValue={
+        {
+          "max": undefined,
+          "min": undefined,
+          "now": undefined,
+          "text": undefined,
+        }
+      }
+      accessible={true}
+      collapsable={false}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        {
+          "opacity": 1,
+        }
+      }
     >
-      Path
-    </Svg>
+      <Svg
+        height={24}
+        label="Help icon"
+        style={{}}
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        Path
+      </Svg>
+    </View>
+    <View>
+      <Svg
+        fill="white"
+        height={24}
+        style={{}}
+        viewBox="0 0 24 24"
+        width={24}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        Path
+      </Svg>
+      <Text>
+        missing/block/title
+      </Text>
+    </View>
     <Text>
-      missing/block/title
+      Unsupported
     </Text>
   </View>
-  <Text>
-    Unsupported
-  </Text>
 </View>
 `;

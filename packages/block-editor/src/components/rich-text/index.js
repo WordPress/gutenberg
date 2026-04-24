@@ -2,25 +2,27 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
 import {
 	useRef,
+	useState,
 	useCallback,
+	useMemo,
 	forwardRef,
 	createContext,
+	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import {
-	__unstableUseRichText as useRichText,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
-import { getBlockType, store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,17 +33,21 @@ import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
-import { useFormatTypes } from './use-format-types';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
+import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
-import { canBindBlock } from '../../hooks/use-bindings-attributes';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 export const keyboardShortcutContext = createContext();
+keyboardShortcutContext.displayName = 'keyboardShortcutContext';
+
 export const inputEventContext = createContext();
+inputEventContext.displayName = 'inputEventContext';
 
 const instanceIdKey = Symbol( 'instanceId' );
 
@@ -118,9 +124,12 @@ export function RichTextWrapper(
 
 	const instanceId = useInstanceId( RichTextWrapper );
 	const anchorRef = useRef();
+	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
 	const blockBindings = context[ blockBindingsKey ];
+	const blockContext = useContext( BlockContext );
+	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected.
@@ -160,46 +169,106 @@ export function RichTextWrapper(
 		isBlockSelected,
 	] );
 
-	const disableBoundBlocks = useSelect(
+	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			// Disable Rich Text editing if block bindings specify that.
-			let _disableBoundBlocks = false;
-			if ( blockBindings && canBindBlock( blockName ) ) {
-				const blockTypeAttributes =
-					getBlockType( blockName ).attributes;
-				const { getBlockBindingsSource } = unlock(
-					select( blocksStore )
-				);
-				for ( const [ attribute, args ] of Object.entries(
-					blockBindings
-				) ) {
-					if (
-						blockTypeAttributes?.[ attribute ]?.source !==
-						'rich-text'
-					) {
-						break;
-					}
+			if ( ! blockBindings?.[ identifier ] ) {
+				return {};
+			}
 
-					// If the source is not defined, or if its value of `lockAttributesEditing` is `true`, disable it.
-					const blockBindingsSource = getBlockBindingsSource(
-						args.source
-					);
-					if (
-						! blockBindingsSource ||
-						blockBindingsSource.lockAttributesEditing()
-					) {
-						_disableBoundBlocks = true;
-						break;
-					}
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+
+			const bindableAttributes =
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+
+			if ( ! bindableAttributes ) {
+				return {};
+			}
+
+			const relatedBinding = blockBindings[ identifier ];
+			const blockBindingsSource = getBlockBindingsSource(
+				relatedBinding.source
+			);
+			const blockBindingsContext = {};
+			if ( blockBindingsSource?.usesContext?.length ) {
+				for ( const key of blockBindingsSource.usesContext ) {
+					blockBindingsContext[ key ] = blockContext[ key ];
 				}
 			}
 
-			return _disableBoundBlocks;
-		},
-		[ blockBindings, blockName ]
-	);
+			const _disableBoundBlock =
+				! blockBindingsSource?.canUserEditValue?.( {
+					select,
+					context: blockBindingsContext,
+					args: relatedBinding.args,
+				} );
 
-	const shouldDisableEditing = readOnly || disableBoundBlocks;
+			// Don't modify placeholders if value is not empty.
+			if ( adjustedValue.length > 0 ) {
+				return {
+					disableBoundBlock: _disableBoundBlock,
+					// Null values will make them fall back to the default behavior.
+					bindingsPlaceholder: null,
+					bindingsLabel: null,
+				};
+			}
+
+			const { getBlockAttributes } = select( blockEditorStore );
+			const blockAttributes = getBlockAttributes( clientId );
+			let clientSideFieldLabel = null;
+			if ( blockBindingsSource?.getFieldsList ) {
+				const fieldsItems = blockBindingsSource.getFieldsList( {
+					select,
+					context: blockBindingsContext,
+				} );
+				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
+					fastDeepEqual( item.args, relatedBinding?.args )
+				)?.label;
+			}
+
+			const bindingKey =
+				clientSideFieldLabel ?? blockBindingsSource?.label;
+
+			const _bindingsPlaceholder = _disableBoundBlock
+				? bindingKey
+				: sprintf(
+						/* translators: %s: connected field label or source label */
+						__( 'Add %s' ),
+						bindingKey
+				  );
+			const _bindingsLabel = _disableBoundBlock
+				? relatedBinding?.args?.key || blockBindingsSource?.label
+				: sprintf(
+						/* translators: %s: source label or key */
+						__( 'Empty %s; start writing to edit its value' ),
+						relatedBinding?.args?.key || blockBindingsSource?.label
+				  );
+
+			return {
+				disableBoundBlock: _disableBoundBlock,
+				bindingsPlaceholder:
+					blockAttributes?.placeholder || _bindingsPlaceholder,
+				bindingsLabel: _bindingsLabel,
+			};
+		},
+		[
+			blockBindings,
+			identifier,
+			blockName,
+			adjustedValue,
+			clientId,
+			blockContext,
+		]
+	);
+	const isInsidePatternOverrides = !! blockContext?.[ 'pattern/overrides' ];
+	const hasOverrideEnabled =
+		blockBindings?.__default?.source === 'core/pattern-overrides';
+
+	const shouldDisableForPattern =
+		isInsidePatternOverrides && ! hasOverrideEnabled;
+
+	const shouldDisableEditing =
+		readOnly || disableBoundBlock || shouldDisableForPattern;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );
@@ -271,72 +340,31 @@ export function RichTextWrapper(
 	);
 
 	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier,
-		withoutInteractiveFormatting,
-		allowedFormats: adjustedAllowedFormats,
-	} );
-
-	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	function removeEditorOnlyFormats( value ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat(
-					value,
-					formatType.name,
-					0,
-					value.text.length
-				);
-			}
-		} );
-
-		return value.formats;
-	}
-
-	function addInvisibleFormats( value ) {
-		return prepareHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	const {
 		value,
 		getValue,
 		onChange,
 		ref: richTextRef,
+		formatTypes,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange( html, { __unstableFormats, __unstableText } ) {
-			adjustedOnChange( html );
-			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-				changeHandler( __unstableFormats, __unstableText );
-			} );
-		},
+		onChange: adjustedOnChange,
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
-		placeholder,
+		placeholder: bindingsPlaceholder || placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
-		__unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -354,7 +382,6 @@ export function RichTextWrapper(
 		anchorRef.current?.focus();
 	}
 
-	const registry = useRegistry();
 	const TagName = tagName;
 	return (
 		<>
@@ -379,16 +406,23 @@ export function RichTextWrapper(
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
-					editableContentElement={ anchorRef.current }
+					editableContentElement={ anchorElement }
 				/>
 			) }
 			<TagName
 				// Overridable props.
 				role="textbox"
 				aria-multiline={ ! disableLineBreaks }
-				aria-label={ placeholder }
 				aria-readonly={ shouldDisableEditing }
 				{ ...props }
+				// Unset draggable (coming from block props) for contentEditable
+				// elements because it will interfere with multi block selection
+				// when the contentEditable and draggable elements are the same
+				// element.
+				draggable={ undefined }
+				aria-label={
+					bindingsLabel || props[ 'aria-label' ] || placeholder
+				}
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
 					// Rich text ref must be first because its focus listener
@@ -415,7 +449,6 @@ export function RichTextWrapper(
 						pastePlainText,
 						onMerge,
 						onRemove,
-						removeEditorOnlyFormats,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,
@@ -423,6 +456,7 @@ export function RichTextWrapper(
 						inputEvents,
 					} ),
 					anchorRef,
+					setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning
@@ -501,9 +535,10 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 		} = removeNativeProps( props );
 		return (
 			<Tag
+				ref={ ref }
 				{ ...contentProps }
 				dangerouslySetInnerHTML={ {
-					__html: valueToHTMLString( value, multiline ),
+					__html: valueToHTMLString( value, multiline ) || '<br>',
 				} }
 			/>
 		);
@@ -520,4 +555,4 @@ PublicForwardedRichTextContainer.isEmpty = ( value ) => {
 export default PublicForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { __unstableRichTextInputEvent } from './input-event';
+export { RichTextInputEvent as __unstableRichTextInputEvent } from './input-event';

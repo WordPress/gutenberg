@@ -8,14 +8,11 @@
 	"keywords": [ "text" ],
 	"textdomain": "default",
 	"attributes": {
-		"align": {
-			"type": "string"
-		},
 		"content": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "p",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"dropCap": {
 			"type": "boolean",
@@ -30,9 +27,16 @@
 		}
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"splitting": true,
 		"anchor": true,
 		"className": false,
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -52,6 +56,9 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
+			"textColumns": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalFontStyle": true,
@@ -59,6 +66,7 @@
 			"__experimentalLetterSpacing": true,
 			"__experimentalTextTransform": true,
 			"__experimentalWritingMode": true,
+			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -67,6 +75,12 @@
 		"__unstablePasteTextInline": true,
 		"interactivity": {
 			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"root": "p",
+		"typography": {
+			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",

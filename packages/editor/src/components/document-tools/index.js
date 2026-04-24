@@ -9,12 +9,8 @@ import clsx from 'clsx';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import {
-	NavigableToolbar,
-	ToolSelector,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { NavigableToolbar } from '@wordpress/block-editor';
+import { ToolbarButton, ToolbarItem } from '@wordpress/components';
 import { listView, plus } from '@wordpress/icons';
 import { useCallback } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -28,16 +24,7 @@ import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
 
-const preventDefault = ( event ) => {
-	event.preventDefault();
-};
-
-function DocumentTools( {
-	className,
-	disableBlockTools = false,
-	// This is a temporary prop until the list view is fully unified between post and site editors.
-	listViewLabel = __( 'Document Overview' ),
-} ) {
+function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
 		useDispatch( editorStore );
 	const {
@@ -47,10 +34,8 @@ function DocumentTools( {
 		listViewShortcut,
 		inserterSidebarToggleRef,
 		listViewToggleRef,
-		hasFixedToolbar,
 		showIconLabels,
 	} = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
 		const { get } = select( preferencesStore );
 		const {
 			isListViewOpened,
@@ -59,7 +44,6 @@ function DocumentTools( {
 			getListViewToggleRef,
 		} = unlock( select( editorStore ) );
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
-		const { __unstableGetEditorMode } = select( blockEditorStore );
 
 		return {
 			isInserterOpened: select( editorStore ).isInserterOpened(),
@@ -69,15 +53,25 @@ function DocumentTools( {
 			),
 			inserterSidebarToggleRef: getInserterSidebarToggleRef(),
 			listViewToggleRef: getListViewToggleRef(),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isVisualMode: getEditorMode() === 'visual',
-			isZoomedOutView: __unstableGetEditorMode() === 'zoom-out',
 		};
 	}, [] );
 
-	const isLargeViewport = useViewportMatch( 'medium' );
+	const preventDefault = ( event ) => {
+		// Because the inserter behaves like a dialog,
+		// if the inserter is opened already then when we click on the toggle button
+		// then the initial click event will close the inserter and then be propagated
+		// to the inserter toggle and it will open it again.
+		// To prevent this we need to stop the propagation of the event.
+		// This won't be necessary when the inserter no longer behaves like a dialog.
+
+		if ( isInserterOpened ) {
+			event.preventDefault();
+		}
+	};
+
 	const isWideViewport = useViewportMatch( 'wide' );
 
 	/* translators: accessibility text for the editor toolbar */
@@ -95,7 +89,7 @@ function DocumentTools( {
 
 	/* translators: button label text should, if possible, be under 16 characters. */
 	const longLabel = _x(
-		'Toggle block inserter',
+		'Block Inserter',
 		'Generic label for block inserter button'
 	);
 	const shortLabel = ! isInserterOpened ? __( 'Add' ) : __( 'Close' );
@@ -116,9 +110,8 @@ function DocumentTools( {
 		>
 			<div className="editor-document-tools__left">
 				{ ! isDistractionFree && (
-					<ToolbarItem
+					<ToolbarButton
 						ref={ inserterSidebarToggleRef }
-						as={ Button }
 						className="editor-document-tools__inserter-toggle"
 						variant="primary"
 						isPressed={ isInserterOpened }
@@ -133,17 +126,6 @@ function DocumentTools( {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						{ isLargeViewport && ! hasFixedToolbar && (
-							<ToolbarItem
-								as={ ToolSelector }
-								showTooltip={ ! showIconLabels }
-								variant={
-									showIconLabels ? 'tertiary' : undefined
-								}
-								disabled={ disableBlockTools }
-								size="compact"
-							/>
-						) }
 						<ToolbarItem
 							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
@@ -157,14 +139,13 @@ function DocumentTools( {
 							size="compact"
 						/>
 						{ ! isDistractionFree && (
-							<ToolbarItem
-								as={ Button }
+							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"
 								icon={ listView }
 								disabled={ disableBlockTools }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */
-								label={ listViewLabel }
+								label={ __( 'Document Overview' ) }
 								onClick={ toggleListView }
 								shortcut={ listViewShortcut }
 								showTooltip={ ! showIconLabels }
@@ -173,7 +154,6 @@ function DocumentTools( {
 								}
 								aria-expanded={ isListViewOpen }
 								ref={ listViewToggleRef }
-								size="compact"
 							/>
 						) }
 					</>

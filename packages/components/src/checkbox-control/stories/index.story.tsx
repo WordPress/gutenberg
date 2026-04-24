@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -16,14 +16,16 @@ import { VStack } from '../../v-stack';
 import { HStack } from '../../h-stack';
 
 const meta: Meta< typeof CheckboxControl > = {
+	tags: [ 'manifest' ],
 	component: CheckboxControl,
-	title: 'Components/CheckboxControl',
+	title: 'Components/Selection & Input/Common/CheckboxControl',
+	id: 'components-checkboxcontrol',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
 		},
 		checked: {
-			control: { type: null },
+			control: false,
 		},
 		help: { control: { type: 'text' } },
 	},
@@ -33,6 +35,11 @@ const meta: Meta< typeof CheckboxControl > = {
 			exclude: [ 'heading' ],
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `CheckboxControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -88,7 +95,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 				} }
 			/>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label="Apple"
 				checked={ fruits.apple }
 				onChange={ ( apple ) =>
@@ -99,7 +105,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 				}
 			/>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label="Orange"
 				checked={ fruits.orange }
 				onChange={ ( orange ) =>
@@ -114,7 +119,6 @@ export const Indeterminate: StoryFn< typeof CheckboxControl > = ( {
 };
 Indeterminate.args = {
 	label: 'Select all',
-	__nextHasNoMarginBottom: true,
 };
 
 /**
@@ -142,6 +146,8 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
 					setChecked( v );
 					onChange( v );
 				} }
+				// Disable reason: For simplicity of the code snippet.
+				// eslint-disable-next-line no-restricted-syntax
 				id="my-checkbox-with-custom-label"
 				aria-describedby="my-custom-description"
 			/>
@@ -149,13 +155,11 @@ export const WithCustomLabel: StoryFn< typeof CheckboxControl > = ( {
 				<label htmlFor="my-checkbox-with-custom-label">
 					My custom label
 				</label>
+				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<div id="my-custom-description" style={ { fontSize: 13 } }>
 					A custom description.
 				</div>
 			</VStack>
 		</HStack>
 	);
-};
-WithCustomLabel.args = {
-	__nextHasNoMarginBottom: true,
 };

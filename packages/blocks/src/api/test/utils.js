@@ -9,11 +9,14 @@ import {
 	setDefaultBlockName,
 } from '../registration';
 import {
+	isUnmodifiedBlock,
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
+	isBlockRegistered,
 	__experimentalSanitizeBlockAttributes,
-	__experimentalGetBlockAttributesNamesByRole,
+	getBlockAttributesNamesByRole,
+	isContentBlock,
 } from '../utils';
 
 const noop = () => {};
@@ -34,6 +37,7 @@ describe( 'block helpers', () => {
 	describe( 'isUnmodifiedDefaultBlock()', () => {
 		it( 'should return true if the default block is unmodified', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -54,6 +58,7 @@ describe( 'block helpers', () => {
 
 		it( 'should return false if the default block is updated', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					align: {
 						type: 'string',
@@ -76,6 +81,7 @@ describe( 'block helpers', () => {
 
 		it( 'should invalidate cache if the default block name changed', () => {
 			registerBlockType( 'core/test-block1', {
+				apiVersion: 3,
 				attributes: {
 					includesDefault1: {
 						type: 'boolean',
@@ -87,6 +93,7 @@ describe( 'block helpers', () => {
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block2', {
+				apiVersion: 3,
 				attributes: {
 					includesDefault2: {
 						type: 'boolean',
@@ -212,6 +219,23 @@ describe( 'getAccessibleBlockLabel', () => {
 	} );
 } );
 
+describe( 'isBlockRegistered', () => {
+	it( 'returns true if the block is registered', () => {
+		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
+			title: 'Test block',
+		} );
+		expect( isBlockRegistered( 'core/test-block' ) ).toBe( true );
+		unregisterBlockType( 'core/test-block' );
+	} );
+
+	it( 'returns false if the block is not registered', () => {
+		expect( isBlockRegistered( 'core/not-registered-test-block' ) ).toBe(
+			false
+		);
+	} );
+} );
+
 describe( 'sanitizeBlockAttributes', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
@@ -221,6 +245,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'sanitize block attributes not defined in the block type', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				defined: {
 					type: 'string',
@@ -255,6 +280,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'handles undefined values and default values', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				hasDefaultValue: {
 					type: 'string',
@@ -279,6 +305,7 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'handles node and children sources as arrays', () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			attributes: {
 				nodeContent: {
 					source: 'node',
@@ -309,24 +336,25 @@ describe( 'sanitizeBlockAttributes', () => {
 	} );
 } );
 
-describe( '__experimentalGetBlockAttributesNamesByRole', () => {
+describe( 'getBlockAttributesNamesByRole', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block-1', {
+			apiVersion: 3,
 			attributes: {
 				align: {
 					type: 'string',
 				},
 				content: {
 					type: 'boolean',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 				level: {
 					type: 'number',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 				color: {
 					type: 'string',
-					__experimentalRole: 'other',
+					role: 'other',
 				},
 			},
 			save: noop,
@@ -334,6 +362,7 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 			title: 'test block 1',
 		} );
 		registerBlockType( 'core/test-block-2', {
+			apiVersion: 3,
 			attributes: {
 				align: { type: 'string' },
 				content: { type: 'boolean' },
@@ -344,6 +373,7 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 			title: 'test block 2',
 		} );
 		registerBlockType( 'core/test-block-3', {
+			apiVersion: 3,
 			save: noop,
 			category: 'text',
 			title: 'test block 3',
@@ -357,42 +387,154 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 		].forEach( unregisterBlockType );
 	} );
 	it( 'should return empty array if block has no attributes', () => {
-		expect(
-			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-3' )
-		).toEqual( [] );
+		expect( getBlockAttributesNamesByRole( 'core/test-block-3' ) ).toEqual(
+			[]
+		);
 	} );
 	it( 'should return all attribute names if no role is provided', () => {
-		expect(
-			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-1' )
-		).toEqual(
+		expect( getBlockAttributesNamesByRole( 'core/test-block-1' ) ).toEqual(
 			expect.arrayContaining( [ 'align', 'content', 'level', 'color' ] )
 		);
 	} );
 	it( 'should return proper results with existing attributes and provided role', () => {
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'content'
-			)
+			getBlockAttributesNamesByRole( 'core/test-block-1', 'content' )
 		).toEqual( expect.arrayContaining( [ 'content', 'level' ] ) );
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'other'
-			)
+			getBlockAttributesNamesByRole( 'core/test-block-1', 'other' )
 		).toEqual( [ 'color' ] );
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-1',
-				'not-exists'
-			)
+			getBlockAttributesNamesByRole( 'core/test-block-1', 'not-exists' )
 		).toEqual( [] );
 		// A block with no `role` in any attributes.
 		expect(
-			__experimentalGetBlockAttributesNamesByRole(
-				'core/test-block-2',
-				'content'
-			)
+			getBlockAttributesNamesByRole( 'core/test-block-2', 'content' )
 		).toEqual( [] );
+	} );
+} );
+
+describe( 'isContentBlock', () => {
+	it( 'returns true if the block has a content role attribute', () => {
+		registerBlockType( 'core/test-content-block', {
+			apiVersion: 3,
+			attributes: {
+				content: {
+					type: 'string',
+					role: 'content',
+				},
+				align: {
+					type: 'string',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test content block',
+		} );
+		expect( isContentBlock( 'core/test-content-block' ) ).toBe( true );
+	} );
+
+	it( 'returns false if the block does not have a content role attribute', () => {
+		registerBlockType( 'core/test-non-content-block', {
+			apiVersion: 3,
+			attributes: {
+				content: {
+					type: 'string',
+				},
+				align: {
+					type: 'string',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test non-content block',
+		} );
+		expect( isContentBlock( 'core/test-non-content-block' ) ).toBe( false );
+	} );
+} );
+
+describe( 'isUnmodifiedBlock', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
+			attributes: {
+				align: {
+					type: 'string',
+				},
+				includesDefault: {
+					type: 'boolean',
+					default: true,
+				},
+				content: {
+					type: 'string',
+					role: 'content',
+				},
+				metadata: {
+					type: 'object',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( 'core/test-block' );
+	} );
+
+	it( 'should return true if all attributes match their defaults', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block ) ).toBe( true );
+	} );
+
+	it( 'should return false if any attribute does not match its default', () => {
+		const block = createBlock( 'core/test-block', {
+			includesDefault: false,
+		} );
+		expect( isUnmodifiedBlock( block ) ).toBe( false );
+	} );
+
+	it( 'should return true if attributes with a specific role match their defaults', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+	} );
+
+	it( 'should return false if attributes with a specific role do not match their defaults', () => {
+		const block = createBlock( 'core/test-block', {
+			content: 'Updated content',
+		} );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
+	} );
+
+	it( 'should return true if no attributes exist for the specified role', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( true );
+	} );
+
+	it( 'should return false if no attributes exist for the role and some are modified', () => {
+		const block = createBlock( 'core/test-block', {
+			align: 'center',
+			content: 'Updated content',
+		} );
+		expect( isUnmodifiedBlock( block, 'non-existent-role' ) ).toBe( false );
+	} );
+
+	it( 'should return true if metadata attributes is not modified for role content', () => {
+		const block = createBlock( 'core/test-block' );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( true );
+	} );
+
+	it( 'should return false if metadata attributes is modified for role content', () => {
+		const block = createBlock( 'core/test-block', {
+			metadata: {
+				bindings: {
+					content: {
+						source: 'core/post-meta',
+						args: { key: 'genre' },
+					},
+				},
+			},
+		} );
+		expect( isUnmodifiedBlock( block, 'content' ) ).toBe( false );
 	} );
 } );

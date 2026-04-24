@@ -15,7 +15,7 @@ import { __experimentalUnitControl as UnitControl } from '@wordpress/components'
 const Example = () => {
 	const [ value, setValue ] = useState( '10px' );
 
-	return <UnitControl onChange={ setValue } value={ value } />;
+	return <UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } />;
 };
 ```
 
@@ -128,7 +128,7 @@ const Example = () => {
 	];
 
 	return (
-		<UnitControl onChange={ setValue } value={ value } units={ units } />
+		<UnitControl __next40pxDefaultSize onChange={ setValue } value={ value } units={ units } />
 	);
 };
 ```
@@ -143,7 +143,14 @@ For example, a `value` of `50%` will set the current unit to `%`.
 Example:
 
 ```jsx
-<UnitControl value="50%" />
+<UnitControl __next40pxDefaultSize value="50%" />
 ```
 
 -   Required: No
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+-   Required: No
+-   Default: `false`

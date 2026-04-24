@@ -4,9 +4,7 @@
 import { getQueryArg } from '@wordpress/url';
 
 export function isPreviewingTheme() {
-	return (
-		getQueryArg( window.location.href, 'wp_theme_preview' ) !== undefined
-	);
+	return !! getQueryArg( window.location.href, 'wp_theme_preview' );
 }
 
 export function currentlyPreviewingTheme() {

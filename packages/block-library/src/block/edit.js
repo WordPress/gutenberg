@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	useEntityRecord,
 	store as coreStore,
@@ -29,14 +29,14 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { store as blocksStore } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { name as patternBlockName } from './index';
 import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
@@ -73,31 +73,6 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-function hasOverridableBlocks( blocks ) {
-	return blocks.some( ( block ) => {
-		if ( isOverridableBlock( block ) ) {
-			return true;
-		}
-		return hasOverridableBlocks( block.innerBlocks );
-	} );
-}
-
-function setBlockEditMode( setEditMode, blocks, mode ) {
-	blocks.forEach( ( block ) => {
-		const editMode =
-			mode ||
-			( isOverridableBlock( block ) ? 'contentOnly' : 'disabled' );
-		setEditMode( block.clientId, editMode );
-
-		setBlockEditMode(
-			setEditMode,
-			block.innerBlocks,
-			// Disable editing for nested patterns.
-			block.name === patternBlockName ? 'disabled' : mode
-		);
-	} );
-}
-
 function RecursionWarning() {
 	const blockProps = useBlockProps();
 	return (
@@ -129,11 +104,57 @@ export default function ReusableBlockEditRecursionWrapper( props ) {
 	);
 }
 
+function ReusableBlockControl( {
+	recordId,
+	canOverrideBlocks,
+	hasContent,
+	handleEditOriginal,
+	resetContent,
+} ) {
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: recordId,
+			} ),
+		[ recordId ]
+	);
+
+	return (
+		<>
+			{ canUserEdit && !! handleEditOriginal && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton onClick={ handleEditOriginal }>
+							{ __( 'Edit original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
+			{ canOverrideBlocks && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+		</>
+	);
+}
+
+const EMPTY_OBJECT = {};
+
 function ReusableBlockEdit( {
 	name,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
-	clientId: patternClientId,
 	setAttributes,
 } ) {
 	const { record, hasResolved } = useEntityRecord(
@@ -146,63 +167,41 @@ function ReusableBlockEdit( {
 	} );
 	const isMissing = hasResolved && ! record;
 
-	const { setBlockEditingMode, __unstableMarkLastChangeAsPersistent } =
+	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
 
 	const {
-		innerBlocks,
-		userCanEdit,
 		onNavigateToEntityRecord,
-		editingMode,
 		hasPatternOverridesSource,
-	} = useSelect(
-		( select ) => {
-			const { canUser } = select( coreStore );
-			const {
-				getBlocks,
-				getSettings,
-				getBlockEditingMode: _getBlockEditingMode,
-			} = select( blockEditorStore );
-			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			const canEdit = canUser( 'update', 'blocks', ref );
+		supportedBlockTypesRaw,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlockTypesRaw:
+				getSettings().__experimentalBlockBindingsSupportedAttributes ||
+				EMPTY_OBJECT,
+		};
+	}, [] );
 
-			// For editing link to the site editor if the theme and user permissions support it.
-			return {
-				innerBlocks: getBlocks( patternClientId ),
-				userCanEdit: canEdit,
-				getBlockEditingMode: _getBlockEditingMode,
-				onNavigateToEntityRecord:
-					getSettings().onNavigateToEntityRecord,
-				editingMode: _getBlockEditingMode( patternClientId ),
-				hasPatternOverridesSource: !! getBlockBindingsSource(
-					'core/pattern-overrides'
-				),
-			};
-		},
-		[ patternClientId, ref ]
-	);
-
-	// Sync the editing mode of the pattern block with the inner blocks.
-	useEffect( () => {
-		setBlockEditMode(
-			setBlockEditingMode,
-			innerBlocks,
-			// Disable editing if the pattern itself is disabled.
-			editingMode === 'disabled' || ! hasPatternOverridesSource
-				? 'disabled'
-				: undefined
-		);
-	}, [
-		editingMode,
-		innerBlocks,
-		setBlockEditingMode,
-		hasPatternOverridesSource,
-	] );
-
-	const canOverrideBlocks = useMemo(
-		() => hasPatternOverridesSource && hasOverridableBlocks( blocks ),
-		[ hasPatternOverridesSource, blocks ]
-	);
+	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
+		const hasOverridableBlocks = ( _blocks ) =>
+			_blocks.some( ( block ) => {
+				if (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				) {
+					return true;
+				}
+				return hasOverridableBlocks( block.innerBlocks );
+			} );
+		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
@@ -215,14 +214,14 @@ function ReusableBlockEdit( {
 		),
 	} );
 
-	// Use `blocks` variable until `innerBlocks` is populated, which has the proper clientIds.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: 'all',
 		layout,
-		value: innerBlocks.length > 0 ? innerBlocks : blocks,
+		value: blocks,
 		onInput: NOOP,
 		onChange: NOOP,
-		renderAppender: blocks?.length ? undefined : blocks.ButtonBlockAppender,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 	} );
 
 	const handleEditOriginal = () => {
@@ -260,28 +259,18 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
-			{ userCanEdit && onNavigateToEntityRecord && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-
-			{ canOverrideBlocks && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ resetContent }
-							disabled={ ! content }
-							__experimentalIsFocusable
-						>
-							{ __( 'Reset' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				</BlockControls>
+			{ hasResolved && ! isMissing && (
+				<ReusableBlockControl
+					recordId={ ref }
+					canOverrideBlocks={ canOverrideBlocks }
+					hasContent={ !! content }
+					handleEditOriginal={
+						onNavigateToEntityRecord
+							? handleEditOriginal
+							: undefined
+					}
+					resetContent={ resetContent }
+				/>
 			) }
 
 			{ children === null ? (

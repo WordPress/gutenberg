@@ -29,7 +29,7 @@ const getMockedReusableBlock = ( id ) => ( {
     <!-- /wp:heading -->
 
     <!-- wp:paragraph -->
-    <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noreferrer noopener">Link</a></p>
+    <p><strong>Bold</strong> <em>Italic</em> <s>Striked</s> Superscript<sup>(1)</sup> Subscript<sub>(2)</sub> <a href="http://www.wordpress.org" target="_blank" rel="noopener">Link</a></p>
     <!-- /wp:paragraph -->
 
     !-- wp:heading {"level":4} -->
@@ -158,7 +158,9 @@ describe( 'Synced patterns', () => {
 			if ( path.startsWith( endpoint ) ) {
 				response = getMockedReusableBlock( id );
 			}
-			return Promise.resolve( response );
+			return Promise.resolve( {
+				json: () => Promise.resolve( response ),
+			} );
 		} );
 
 		const screen = await initializeEditor( {
@@ -229,7 +231,9 @@ describe( 'Synced patterns', () => {
 			response.content.raw = `<!-- wp:image {"id":1,"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="" class="wp-image-1"/></figure>
 <!-- /wp:image -->`;
-			return Promise.resolve( response );
+			return Promise.resolve( {
+				json: () => Promise.resolve( response ),
+			} );
 		} );
 
 		const screen = await initializeEditor( {

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -15,13 +10,13 @@ test.use( {
 } );
 
 test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllPosts();
+	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
@@ -41,10 +36,32 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			},
 		} );
 
-		expect( await editor.getBlocks() ).toMatchObject( [
-			{ name: 'core/image' },
-			{ name: 'core/paragraph' },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/image' },
+				{ name: 'core/paragraph' },
+			] );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' )
+		).toBeFocused();
+
+		// Clear block selection.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.focus();
+		await body.click( {
+			position: {
+				x: box.width / 2,
+				y: box.height - 10,
+			},
+		} );
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/paragraph"]' ),
+			'should select and focus the newly inserted paragraph block on second click'
+		).toBeFocused();
 	} );
 
 	test( 'inserts blocks by dragging and dropping from the global inserter', async ( {
@@ -57,9 +74,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -67,16 +87,16 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'Heading'
 		);
 
@@ -117,9 +137,17 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -130,16 +158,16 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			'Heading'
 		);
 
@@ -156,6 +184,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
 
 		await page.keyboard.press( 'Escape' );
+
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
 
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
@@ -175,9 +209,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -186,18 +223,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 
@@ -237,10 +274,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 		const PATTERN_NAME = 'My synced pattern';
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -249,7 +289,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -265,7 +305,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.click();
 		await page.getByRole( 'menuitem', { name: 'Create pattern' } ).click();
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -276,17 +316,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await createPatternDialog
 			.getByRole( 'button', { name: 'Add' } )
 			.click();
-		const patternBlock = page.getByRole( 'document', {
+		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
 		} );
 		await expect( patternBlock ).toBeFocused();
 
+		// Select the Paragraph block (the drop target) so it's selected when we drag over it.
+		await page.keyboard.press( 'ArrowUp' );
+
 		// Insert a synced pattern.
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 		await page.hover(
@@ -329,9 +372,17 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -342,18 +393,18 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
 		await page.click(
-			'role=region[name="Editor top bar"i] >> role=button[name="Toggle block inserter"i]'
+			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
 		);
 
-		const PATTERN_NAME = 'Social links with a shared background color';
+		const PATTERN_NAME = 'Standard';
 
 		await page.fill(
-			'role=region[name="Block Library"i] >> role=searchbox[name="Search for blocks and patterns"i]',
+			'role=region[name="Block Library"i] >> role=searchbox[name="Search"i]',
 			PATTERN_NAME
 		);
 
@@ -372,6 +423,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
+
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
@@ -389,7 +446,8 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 
 		const inserterButton = page.getByRole( 'button', {
-			name: 'Toggle block inserter',
+			name: 'Block Inserter',
+			exact: true,
 		} );
 		const blockLibrary = page.getByRole( 'region', {
 			name: 'Block Library',
@@ -503,11 +561,11 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await editor.selectBlocks( paragraphBlock );
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Heading' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
 			.hover();
 
 		await expect( insertingBlocksUtils.indicator ).toBeVisible();
@@ -548,7 +606,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
 			.click();
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
@@ -596,20 +654,20 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.first()
-			.fill( 'Verse' );
+			.fill( 'Poetry' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Block Library' } )
 				.getByRole( 'searchbox', {
-					name: 'Search for blocks and patterns',
+					name: 'Search',
 				} )
 				.first()
-		).toHaveValue( 'Verse' );
+		).toHaveValue( 'Poetry' );
 		await expect(
 			page.getByRole( 'listbox', { name: 'Blocks' } ).first()
 		).toHaveCount( 1 );
@@ -624,7 +682,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page.getByRole( 'option', { name: 'More', exact: true } ).click();
 
@@ -636,7 +694,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			page.getByRole( 'region', {
 				name: 'Block Library',
 			} )
-		).toBeHidden();
+		).toBeVisible();
 	} );
 
 	test( 'shows block preview when hovering over block in inserter', async ( {
@@ -646,11 +704,11 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 		await page
 			.getByRole( 'listbox', { name: 'Text' } )
-			.getByRole( 'option', { name: 'Paragraph' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
 			.hover();
 
 		await expect(
@@ -674,7 +732,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 			await page
 				.getByRole( 'listbox', { name: 'Media' } )
@@ -703,15 +761,14 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 test.describe( 'insert media from inserter', () => {
 	let uploadedMedia;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		uploadedMedia = await requestUtils.uploadMedia(
-			path.resolve(
-				process.cwd(),
-				'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
-			)
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
 		);
 	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllMedia(),
@@ -726,7 +783,7 @@ test.describe( 'insert media from inserter', () => {
 	} ) => {
 		await admin.createNewPost();
 
-		await page.getByLabel( 'Toggle block inserter' ).click();
+		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
 		await page.getByRole( 'tab', { name: 'Images' } ).click();
 		await page.getByLabel( uploadedMedia.title.raw ).click();

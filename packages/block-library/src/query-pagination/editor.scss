@@ -1,11 +1,9 @@
-$pagination-margin: 0.5em;
-
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-query-pagination {
 	justify-content: center;
 }
 
-.editor-styles-wrapper {
+:where(.editor-styles-wrapper) {
 	.wp-block-query-pagination {
 		max-width: 100%;
 		&.block-editor-block-list__layout {
@@ -14,21 +12,3 @@ $pagination-margin: 0.5em;
 	}
 }
 
-.wp-block-query-pagination {
-	> .wp-block-query-pagination-next,
-	> .wp-block-query-pagination-previous,
-	> .wp-block-query-pagination-numbers {
-		// Override editor auto block margins.
-		margin-left: 0;
-		margin-top: $pagination-margin;
-
-		/*rtl:ignore*/
-		margin-right: $pagination-margin;
-		margin-bottom: $pagination-margin;
-
-		&:last-child {
-			/*rtl:ignore*/
-			margin-right: 0;
-		}
-	}
-}

@@ -232,7 +232,7 @@ export default function ReusableBlockEdit( {
 			<TouchableWithoutFeedback
 				disabled={ ! isSelected }
 				accessibilityLabel={ __( 'Help button' ) }
-				accessibilityRole={ 'button' }
+				accessibilityRole="button"
 				accessibilityHint={ __( 'Tap here to show help' ) }
 				onPress={ openSheet }
 			>

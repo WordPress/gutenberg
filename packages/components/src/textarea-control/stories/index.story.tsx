@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,19 +14,29 @@ import { useState } from '@wordpress/element';
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
+	tags: [ 'manifest' ],
 	component: TextareaControl,
-	title: 'Components/TextareaControl',
+	title: 'Components/Selection & Input/Common/TextareaControl',
+	id: 'components-textareacontrol',
 	argTypes: {
 		onChange: { action: 'onChange' },
 		label: { control: { type: 'text' } },
 		help: { control: { type: 'text' } },
-		value: { control: { type: null } },
+		disabled: {
+			control: { type: 'boolean' },
+		},
+		value: { control: false },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `TextareaControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -53,4 +63,5 @@ export const Default: StoryFn< typeof TextareaControl > = Template.bind( {} );
 Default.args = {
 	label: 'Text',
 	help: 'Enter some text',
+	placeholder: 'Placeholder',
 };

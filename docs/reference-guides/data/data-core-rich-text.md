@@ -46,7 +46,7 @@ _Parameters_
 
 _Returns_
 
--   `Object?`: Format type.
+-   `?Object`: Format type.
 
 ### getFormatTypeForBareElement
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -18,7 +18,6 @@ import { navigation } from '@wordpress/icons';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
-import { useLink } from '../routes/link';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
@@ -27,7 +26,7 @@ import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.js.
 function buildMenuLabel( title, id, status ) {
 	if ( ! title ) {
-		/* translators: %s is the index of the menu in the list of menus. */
+		/* translators: %s: the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
@@ -36,15 +35,12 @@ function buildMenuLabel( title, id, status ) {
 	}
 
 	return sprintf(
-		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
-		__( '%1$s (%2$s)' ),
+		// translators: 1: title of the menu. 2: status of the menu (draft, pending, etc.).
+		_x( '%1$s (%2$s)', 'menu label' ),
 		decodeEntities( title ),
 		status
 	);
 }
-
-// Save a boolean to prevent us creating a fallback more than once per session.
-let hasCreatedFallback = false;
 
 export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	const {
@@ -61,13 +57,13 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 		isResolvingNavigationMenus && ! hasResolvedNavigationMenus;
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
+	const isCreatingNavigationFallback = useSelect(
+		( select ) =>
+			select( coreStore ).isResolving( 'getNavigationFallbackId' ),
+		[]
+	);
 
 	const firstNavigationMenu = navigationMenus?.[ 0 ];
-
-	// Save a boolean to prevent us creating a fallback more than once per session.
-	if ( firstNavigationMenu ) {
-		hasCreatedFallback = true;
-	}
 
 	// If there is no navigation menu found
 	// then trigger fallback algorithm to create one.
@@ -75,7 +71,8 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 		! firstNavigationMenu &&
 		! isResolvingNavigationMenus &&
 		hasResolvedNavigationMenus &&
-		! hasCreatedFallback
+		// Ensure a fallback navigation is created only once
+		! isCreatingNavigationFallback
 	) {
 		getNavigationFallbackId();
 	}
@@ -119,7 +116,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 
 	return (
 		<SidebarNavigationScreenWrapper backPath={ backPath }>
-			<ItemGroup>
+			<ItemGroup className="edit-site-sidebar-navigation-screen-navigation-menus">
 				{ navigationMenus?.map( ( { id, title, status }, index ) => (
 					<NavMenuItem
 						postId={ id }
@@ -154,9 +151,10 @@ export function SidebarNavigationScreenWrapper( {
 }
 
 const NavMenuItem = ( { postId, ...props } ) => {
-	const linkInfo = useLink( {
-		postId,
-		postType: 'wp_navigation',
-	} );
-	return <SidebarNavigationItem { ...linkInfo } { ...props } />;
+	return (
+		<SidebarNavigationItem
+			to={ `/wp_navigation/${ postId }` }
+			{ ...props }
+		/>
+	);
 };

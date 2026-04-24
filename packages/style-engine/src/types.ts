@@ -28,6 +28,7 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		gradient?: CSSProperties[ 'backgroundImage' ];
 	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
@@ -48,7 +49,10 @@ export interface Style {
 	};
 	dimensions?: {
 		aspectRatio?: CSSProperties[ 'aspectRatio' ];
+		height?: CSSProperties[ 'height' ];
 		minHeight?: CSSProperties[ 'minHeight' ];
+		minWidth?: CSSProperties[ 'minWidth' ];
+		width?: CSSProperties[ 'width' ];
 	};
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
@@ -94,7 +98,7 @@ export interface StyleOptions {
 
 export interface GeneratedCSSRule {
 	selector?: string;
-	value: string;
+	value: string | unknown;
 	/**
 	 * The CSS key in JS style attribute format, compatible with React.
 	 * E.g. `paddingTop` instead of `padding-top`.

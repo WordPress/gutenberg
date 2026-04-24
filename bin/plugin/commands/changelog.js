@@ -67,6 +67,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] E2E Test Utils': 'Tools',
 	'[Package] Env': 'Tools',
 	'[Package] ESLint plugin': 'Tools',
+	'[Tool] ESLint plugin': 'Tools',
 	'[Package] stylelint config': 'Tools',
 	'[Package] Project management automation': 'Tools',
 	'[Type] Project Management': 'Tools',
@@ -88,7 +89,7 @@ const LABEL_TYPE_MAPPING = {
 };
 
 /**
- * Mapping of label names to arbitary features in the release notes.
+ * Mapping of label names to arbitrary features in the release notes.
  *
  * Mapping a given label to a feature will guarantee it will be categorised
  * under that feature name in the changelog within each section.
@@ -96,6 +97,8 @@ const LABEL_TYPE_MAPPING = {
  * @type {Record<string,string>}
  */
 const LABEL_FEATURE_MAPPING = {
+	'[Feature] Real-time Collaboration': 'Collaboration',
+	'[Feature] Notes': 'Collaboration',
 	'[Feature] Widgets Screen': 'Widgets Editor',
 	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
@@ -117,14 +120,17 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] Icons': 'Icons',
 	'[Package] Block editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
+	'[Package] DataViews': 'Components',
 	'[Package] Editor': 'Post Editor',
 	'[Package] Edit Site': 'Site Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
+	'[Package] Admin UI': 'Components',
 	'[Package] Block Library': 'Block Library',
 	'[Package] Rich text': 'Block Editor',
 	'[Package] Data': 'Data Layer',
+	'[Package] Core Data': 'Data Layer',
 	'[Package] Commands': 'Commands',
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
@@ -132,6 +138,11 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'[Type] Automated Testing': 'Testing',
+	'Connectors screen': 'Connectors',
+	'[Package] UI': 'Components',
+	'[Package] Compose': 'Components',
+	'[Package] Theme': 'Components',
+	'Design System': 'Components',
 	'CSS Styling': 'CSS & Styling',
 	'developer-docs': 'Documentation',
 	'[Type] Developer Documentation': 'Documentation',
@@ -274,7 +285,7 @@ function mapLabelsToFeatures( labels ) {
  *
  * @param {string[]} labels Label names.
  *
- * @return {boolean} whether or not the issue's is labbeled as block specific
+ * @return {boolean} whether or not the issue's is labeled as block specific
  */
 function getIsBlockSpecificIssue( labels ) {
 	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
@@ -343,7 +354,7 @@ function getIssueFeature( issue ) {
 
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
-		// Get occurances of the feature labels.
+		// Get occurrences of the feature labels.
 		const featureCounts = featureCandidates.reduce(
 			/**
 			 * @param {Record<string,number>} acc     Accumulator
@@ -606,11 +617,11 @@ function getEntry( issue ) {
 
 /**
  * Builds a formatted string of the Issue/PR title with a link
- * to the Github URL for that item.
+ * to the GitHub URL for that item.
  *
  * @param {string} title  the title of the Issue/PR.
  * @param {number} number the ID/number of the Issue/PR.
- * @param {string} url    the URL of the Github Issue/PR.
+ * @param {string} url    the URL of the GitHub Issue/PR.
  * @return {string} the formatted item
  */
 function getFormattedItemDescription( title, number, url ) {
@@ -856,7 +867,7 @@ function sortFeatureGroups( featureGroups ) {
 }
 
 /**
- * Returns a list of PRs created by first time contributors based on the Github
+ * Returns a list of PRs created by first time contributors based on the GitHub
  * label associated with the PR. Also filters out any "bots".
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
@@ -941,7 +952,7 @@ function skipCreatedByBots( pullRequests ) {
 }
 
 /**
- * Produces the formatted markdown for the contributor props seciton.
+ * Produces the formatted markdown for the contributor props section.
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *
@@ -961,9 +972,9 @@ function getContributorProps( pullRequests ) {
 	}
 
 	return (
-		'## First time contributors' +
+		'## First-time contributors' +
 		'\n\n' +
-		'The following PRs were merged by first time contributors:' +
+		'The following PRs were merged by first-time contributors:' +
 		'\n\n' +
 		contributorsList
 	);

@@ -130,10 +130,6 @@ When hiding the URLInput using CSS (as is sometimes done for accessibility purpo
 
 This prop allows the suggestions list to be programmatically not rendered by passing a boolean—it can be `true` to make sure suggestions aren't rendered, or `false`/`undefined` to fall back to the default behaviour of showing suggestions when matching autocompletion items are found.
 
-### `__nextHasNoMarginBottom: Boolean`
-
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
-
 ## Example
 
 
@@ -156,7 +152,6 @@ registerBlockType( /* ... */, {
 	edit( { className, attributes, setAttributes } ) {
 		return (
 			<URLInput
-				__nextHasNoMarginBottom
 				className={ className }
 				value={ attributes.url }
 				onChange={ ( url, post ) => setAttributes( { url, text: (post && post.title) || 'Click here' } ) }

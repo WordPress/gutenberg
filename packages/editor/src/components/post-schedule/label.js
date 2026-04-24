@@ -15,7 +15,7 @@ import { store as editorStore } from '../../store';
  *
  * @param {Object} props Props.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 export default function PostScheduleLabel( props ) {
 	return usePostScheduleLabel( props );
@@ -48,7 +48,7 @@ export function getFullPostScheduleLabel( dateAttribute ) {
 
 	const timezoneAbbreviation = getTimezoneAbbreviation();
 	const formattedDate = dateI18n(
-		// translators: If using a space between 'g:i' and 'a', use a non-breaking space.
+		// translators: Use a non-breaking space between 'g:i' and 'a' if appropriate.
 		_x( 'F j, Y g:i\xa0a', 'post schedule full date format' ),
 		date
 	);

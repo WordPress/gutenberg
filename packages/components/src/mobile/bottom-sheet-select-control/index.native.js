@@ -62,9 +62,9 @@ const BottomSheetSelectControl = ( {
 					icon={ icon }
 					value={ selectedOption.label }
 					onPress={ openSubSheet }
-					accessibilityRole={ 'button' }
+					accessibilityRole="button"
 					accessibilityLabel={ sprintf(
-						// translators:  %1$s: Select control button label e.g. "Button width". %2$s: Select control option value e.g: "Auto, 25%".
+						// translators:  1: Select control button label e.g. "Button width". 2: Select control option value e.g: "Auto, 25%".
 						__( '%1$s. Currently selected: %2$s' ),
 						label,
 						selectedOption.label
@@ -98,11 +98,11 @@ const BottomSheetSelectControl = ( {
 							onPress={ onChangeValue( item.value ) }
 							leftAlign
 							key={ index }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={
 								item.value === selectedValue
 									? sprintf(
-											// translators: %s: Select control option value e.g: "Auto, 25%".
+											// translators: %s: The selected option.
 											__( 'Selected: %s' ),
 											item.label
 									  )

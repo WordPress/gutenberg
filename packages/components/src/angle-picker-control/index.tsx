@@ -16,8 +16,9 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { Flex, FlexBlock } from '../flex';
 import { Spacer } from '../spacer';
 import NumberControl from '../number-control';
+import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
+import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 import AngleCircle from './angle-circle';
-import { UnitText } from './styles/angle-picker-control-styles';
 
 import type { WordPressComponentProps } from '../context';
 import type { AnglePickerControlProps } from './types';
@@ -48,26 +49,26 @@ function UnforwardedAnglePickerControl(
 
 	const classes = clsx( 'components-angle-picker-control', className );
 
-	const unitText = <UnitText>°</UnitText>;
-	const [ prefixedUnitText, suffixedUnitText ] = isRTL()
-		? [ unitText, null ]
-		: [ null, unitText ];
+	// Override the default behavior and position the degree symbol to the
+	// right of the number, regardless of the language direction.
+	const prefixOrSuffixProp = isRTL()
+		? { prefix: <InputControlPrefixWrapper>°</InputControlPrefixWrapper> }
+		: { suffix: <InputControlSuffixWrapper>°</InputControlSuffixWrapper> };
 
 	return (
 		<Flex { ...restProps } ref={ ref } className={ classes } gap={ 2 }>
 			<FlexBlock>
 				<NumberControl
+					__next40pxDefaultSize
 					label={ label }
 					className="components-angle-picker-control__input-field"
 					max={ 360 }
 					min={ 0 }
 					onChange={ handleOnNumberChange }
-					size="__unstable-large"
 					step="1"
 					value={ value }
 					spinControls="none"
-					prefix={ prefixedUnitText }
-					suffix={ suffixedUnitText }
+					{ ...prefixOrSuffixProp }
 				/>
 			</FlexBlock>
 			<Spacer marginBottom="1" marginTop="auto">
@@ -97,11 +98,12 @@ function UnforwardedAnglePickerControl(
  *     <AnglePickerControl
  *       value={ angle }
  *       onChange={ setAngle }
- *     </>
+ *     />
  *   );
  * }
  * ```
  */
 export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
+AnglePickerControl.displayName = 'AnglePickerControl';
 
 export default AnglePickerControl;

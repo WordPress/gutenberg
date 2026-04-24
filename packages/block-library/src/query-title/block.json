@@ -10,12 +10,12 @@
 		"type": {
 			"type": "string"
 		},
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 1
+		},
+		"levelOptions": {
+			"type": "array"
 		},
 		"showPrefix": {
 			"type": "boolean",
@@ -26,7 +26,14 @@
 			"default": true
 		}
 	},
+	"example": {
+		"attributes": {
+			"type": "search"
+		}
+	},
+	"usesContext": [ "query" ],
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -43,6 +50,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
@@ -55,6 +63,18 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
 	},
 	"style": "wp-block-query-title"

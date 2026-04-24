@@ -13,7 +13,7 @@ import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { Icon, warning } from '@wordpress/icons';
+import { Icon, cautionFilled } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -52,7 +52,7 @@ function ContrastCheckerMessage( {
 
 	return (
 		<View style={ styles[ 'block-editor-contrast-checker' ] }>
-			<Icon style={ iconStyle } icon={ warning } />
+			<Icon style={ iconStyle } icon={ cautionFilled } />
 			<Text style={ msgStyle }>{ msg }</Text>
 		</View>
 	);

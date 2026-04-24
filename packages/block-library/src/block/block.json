@@ -12,8 +12,12 @@
 			"type": "number"
 		},
 		"content": {
-			"type": "object"
+			"type": "object",
+			"default": {}
 		}
+	},
+	"providesContext": {
+		"pattern/overrides": "content"
 	},
 	"supports": {
 		"customClassName": false,
@@ -22,6 +26,7 @@
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"customCSS": false
 	}
 }

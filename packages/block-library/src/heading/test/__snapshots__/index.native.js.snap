@@ -12,6 +12,12 @@ exports[`Heading block inserts block 1`] = `
 <!-- /wp:heading -->"
 `;
 
+exports[`Heading block should keep the heading when there is an empty paragraph block before and backspace is pressed at the start 1`] = `
+"<!-- wp:heading -->
+<h2 class="wp-block-heading">A quick brown fox jumps over the lazy dog.</h2>
+<!-- /wp:heading -->"
+`;
+
 exports[`Heading block should merge with an empty Paragraph block and keep being the Heading block 1`] = `
 "<!-- wp:heading -->
 <h2 class="wp-block-heading">A quick brown fox jumps over the lazy dog.</h2>
@@ -28,4 +34,10 @@ exports[`Heading block should set a text color 1`] = `
 "<!-- wp:heading {"textColor":"pale-pink"} -->
 <h2 class="wp-block-heading has-pale-pink-color has-text-color">A quick brown fox jumps over the lazy dog.</h2>
 <!-- /wp:heading -->"
+`;
+
+exports[`Heading block should transform to a paragraph block when pressing backspace at the beginning of the first heading block 1`] = `
+"<!-- wp:paragraph -->
+<p>A quick brown fox jumps over the lazy dog.</p>
+<!-- /wp:paragraph -->"
 `;

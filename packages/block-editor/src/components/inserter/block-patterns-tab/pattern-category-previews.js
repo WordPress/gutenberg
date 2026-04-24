@@ -14,7 +14,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	FlexBlock,
 } from '@wordpress/components';
 
@@ -30,6 +30,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
@@ -79,6 +80,13 @@ export function PatternCategoryPreviews( {
 					return true;
 				}
 
+				if (
+					category.name === starterPatternsCategory.name &&
+					pattern.blockTypes?.includes( 'core/post-content' )
+				) {
+					return true;
+				}
+
 				if ( category.name === 'uncategorized' ) {
 					// The uncategorized category should show all the patterns without any category...
 					if ( ! pattern.categories ) {
@@ -110,7 +118,6 @@ export function PatternCategoryPreviews( {
 	const { changePage } = pagingProps;
 
 	// Hide block pattern preview on unmount.
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	useEffect( () => () => onHover( null ), [] );
 
 	const onSetPatternSyncFilter = useCallback(
@@ -136,7 +143,12 @@ export function PatternCategoryPreviews( {
 			>
 				<HStack>
 					<FlexBlock>
-						<Heading level={ 4 } as="div">
+						<Heading
+							className="block-editor-inserter__patterns-category-panel-title"
+							size={ 13 }
+							level={ 4 }
+							as="div"
+						>
 							{ category.label }
 						</Heading>
 					</FlexBlock>
@@ -150,30 +162,37 @@ export function PatternCategoryPreviews( {
 					/>
 				</HStack>
 				{ ! currentCategoryPatterns.length && (
-					<Text
+					<WCText
 						variant="muted"
 						className="block-editor-inserter__patterns-category-no-results"
 					>
 						{ __( 'No results found' ) }
-					</Text>
+					</WCText>
 				) }
 			</VStack>
-
 			{ currentCategoryPatterns.length > 0 && (
-				<BlockPatternsList
-					ref={ scrollContainerRef }
-					shownPatterns={ pagingProps.categoryPatternsAsyncList }
-					blockPatterns={ pagingProps.categoryPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHover }
-					label={ category.label }
-					orientation="vertical"
-					category={ category.name }
-					isDraggable
-					showTitlesAsTooltip={ showTitlesAsTooltip }
-					patternFilter={ patternSourceFilter }
-					pagingProps={ pagingProps }
-				/>
+				<>
+					<WCText
+						size="12"
+						as="p"
+						className="block-editor-inserter__help-text"
+					>
+						{ __( 'Drag and drop patterns into the canvas.' ) }
+					</WCText>
+					<BlockPatternsList
+						ref={ scrollContainerRef }
+						blockPatterns={ pagingProps.categoryPatterns }
+						onClickPattern={ onClickPattern }
+						onHover={ onHover }
+						label={ category.label }
+						orientation="vertical"
+						category={ category.name }
+						isDraggable
+						showTitlesAsTooltip={ showTitlesAsTooltip }
+						patternFilter={ patternSourceFilter }
+						pagingProps={ pagingProps }
+					/>
+				</>
 			) }
 		</>
 	);

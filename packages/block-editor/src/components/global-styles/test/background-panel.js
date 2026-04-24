@@ -3,52 +3,9 @@
  */
 
 import {
-	backgroundPositionToCoords,
-	coordsToBackgroundPosition,
 	hasBackgroundImageValue,
+	hasBackgroundGradientValue,
 } from '../background-panel';
-
-describe( 'backgroundPositionToCoords', () => {
-	it( 'should return the correct coordinates for a percentage value using 2-value syntax', () => {
-		expect( backgroundPositionToCoords( '25% 75%' ) ).toEqual( {
-			x: 0.25,
-			y: 0.75,
-		} );
-	} );
-
-	it( 'should return the correct coordinates for a percentage using 1-value syntax', () => {
-		expect( backgroundPositionToCoords( '50%' ) ).toEqual( {
-			x: 0.5,
-			y: 0.5,
-		} );
-	} );
-
-	it( 'should return undefined coords in given an empty value', () => {
-		expect( backgroundPositionToCoords( '' ) ).toEqual( {
-			x: undefined,
-			y: undefined,
-		} );
-	} );
-
-	it( 'should return undefined coords in given a string that cannot be converted', () => {
-		expect( backgroundPositionToCoords( 'apples' ) ).toEqual( {
-			x: undefined,
-			y: undefined,
-		} );
-	} );
-} );
-
-describe( 'coordsToBackgroundPosition', () => {
-	it( 'should return the correct background position for a set of coordinates', () => {
-		expect( coordsToBackgroundPosition( { x: 0.25, y: 0.75 } ) ).toBe(
-			'25% 75%'
-		);
-	} );
-
-	it( 'should return undefined if no coordinates are provided', () => {
-		expect( coordsToBackgroundPosition( {} ) ).toBeUndefined();
-	} );
-} );
 
 describe( 'hasBackgroundImageValue', () => {
 	it( 'should return `true` when id and url exist', () => {
@@ -81,5 +38,45 @@ describe( 'hasBackgroundImageValue', () => {
 				background: { backgroundImage: {} },
 			} )
 		).toBe( false );
+	} );
+} );
+
+describe( 'hasBackgroundGradientValue', () => {
+	it( 'should return `true` when a gradient string is set', () => {
+		expect(
+			hasBackgroundGradientValue( {
+				background: {
+					gradient: 'linear-gradient(135deg, red 0%, blue 100%)',
+				},
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `true` for a preset slug reference', () => {
+		expect(
+			hasBackgroundGradientValue( {
+				background: { gradient: 'var:preset|gradient|vivid-cyan-blue' },
+			} )
+		).toBe( true );
+	} );
+
+	it( 'should return `false` when gradient is undefined', () => {
+		expect( hasBackgroundGradientValue( { background: {} } ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'should return `false` when gradient is an empty string', () => {
+		expect(
+			hasBackgroundGradientValue( { background: { gradient: '' } } )
+		).toBe( false );
+	} );
+
+	it( 'should return `false` when background is undefined', () => {
+		expect( hasBackgroundGradientValue( {} ) ).toBe( false );
+	} );
+
+	it( 'should return `false` when style is undefined', () => {
+		expect( hasBackgroundGradientValue( undefined ) ).toBe( false );
 	} );
 } );

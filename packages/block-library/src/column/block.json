@@ -14,9 +14,6 @@
 		"width": {
 			"type": "string"
 		},
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
@@ -48,10 +45,12 @@
 		},
 		"__experimentalBorder": {
 			"color": true,
+			"radius": true,
 			"style": true,
 			"width": true,
 			"__experimentalDefaultControls": {
 				"color": true,
+				"radius": true,
 				"style": true,
 				"width": true
 			}
@@ -72,6 +71,7 @@
 		"layout": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"allowedBlocks": true
 	}
 }

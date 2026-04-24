@@ -6,10 +6,6 @@ import { test, expect } from './fixtures';
 test.describe( 'Router navigate', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
-		const link2 = await utils.addPostWithBlock( 'test/router-navigate', {
-			alias: 'router navigate - link 2',
-			attributes: { title: 'Link 2' },
-		} );
 		const link1 = await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - link 1',
 			attributes: {
@@ -20,6 +16,10 @@ test.describe( 'Router navigate', () => {
 					prop3: 'link 1',
 				},
 			},
+		} );
+		const link2 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - link 2',
+			attributes: { title: 'Link 2' },
 		} );
 		const link3 = await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - disabled',
@@ -33,11 +33,19 @@ test.describe( 'Router navigate', () => {
 				},
 			},
 		} );
+
+		const link4 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - closure',
+			attributes: {
+				title: 'Link with derivedStateClosure',
+				derivedStateClosure: true,
+			},
+		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - main',
 			attributes: {
 				title: 'Main',
-				links: [ link1, link2, link3 ],
+				links: [ link1, link2, link3, link4 ],
 				data: {
 					getterProp: 'value from main',
 					prop1: 'main',
@@ -211,29 +219,26 @@ test.describe( 'Router navigate', () => {
 		await expect( count ).toHaveText( '0' );
 	} );
 
-	test( 'should overwrite the state with the one serialized in the new page', async ( {
+	test( 'should merge the state with the one serialized in the new page', async ( {
 		page,
 	} ) => {
 		const prop1 = page.getByTestId( 'prop1' );
 		const prop2 = page.getByTestId( 'prop2' );
 		const prop3 = page.getByTestId( 'prop3' );
+		const title = page.getByTestId( 'title' );
 
 		await expect( prop1 ).toHaveText( 'main' );
 		await expect( prop2 ).toHaveText( 'main' );
 		await expect( prop3 ).toBeEmpty();
 
 		await page.getByTestId( 'link 1' ).click();
-
-		// New values for existing properties should change.
-		// Old values not overwritten should remain the same.
-		// New properties should appear.
-		await expect( prop1 ).toHaveText( 'link 1' );
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( prop1 ).toHaveText( 'main' );
 		await expect( prop2 ).toHaveText( 'main' );
 		await expect( prop3 ).toHaveText( 'link 1' );
 
 		await page.goBack();
-
-		// New added properties are preserved.
+		await expect( title ).toHaveText( 'Main' );
 		await expect( prop1 ).toHaveText( 'main' );
 		await expect( prop2 ).toHaveText( 'main' );
 		await expect( prop3 ).toHaveText( 'link 1' );
@@ -245,26 +250,20 @@ test.describe( 'Router navigate', () => {
 		const title = page.getByTestId( 'title' );
 		const getter = page.getByTestId( 'getterProp' );
 
-		// Title should start in 'Main' and the getter prop should be the one
-		// returned once hydrated.
 		await expect( title ).toHaveText( 'Main' );
 		await expect( getter ).toHaveText( 'value from getter (main)' );
 
 		await page.getByTestId( 'link 1' ).click();
-
-		// Title should have changed. If not, that means there was an error
-		// during render. The getter should return the correct value.
 		await expect( title ).toHaveText( 'Link 1' );
-		await expect( getter ).toHaveText( 'value from getter (link 1)' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
 
-		// Same behavior navigating back and forward.
 		await page.goBack();
 		await expect( title ).toHaveText( 'Main' );
 		await expect( getter ).toHaveText( 'value from getter (main)' );
 
 		await page.goForward();
 		await expect( title ).toHaveText( 'Link 1' );
-		await expect( getter ).toHaveText( 'value from getter (link 1)' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
 	} );
 
 	test( 'should force a page reload when navigating to a page with `clientNavigationDisabled`', async ( {
@@ -273,7 +272,7 @@ test.describe( 'Router navigate', () => {
 		const count = page.getByTestId( 'router navigations count' );
 		const title = page.getByTestId( 'title' );
 
-		// Check the cound to ensure the page has hydrated.
+		// Check the count to ensure the page has hydrated.
 		await expect( count ).toHaveText( '0' );
 
 		// Navigate to a page without clientNavigationDisabled.
@@ -293,5 +292,37 @@ test.describe( 'Router navigate', () => {
 		// Check the page has updated and the navigation count is zero.
 		await expect( title ).toHaveText( 'Main (navigation disabled)' );
 		await expect( count ).toHaveText( '0' );
+	} );
+
+	test( 'should support derived state closures', async ( { page } ) => {
+		const count = page.getByTestId( 'router navigations count' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+		const derivedStateClosure = page.getByTestId( 'derivedStateClosure' );
+
+		// Check the count to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+
+		// Ensure the value from the getter is correct.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		// Navigate to a page without clientNavigationDisabled.
+		await page.getByTestId( 'link 4' ).click();
+
+		// Check the page has updated and the navigation was successfull.
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		await page.goBack();
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Main' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
 	} );
 } );

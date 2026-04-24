@@ -1,6 +1,15 @@
+@use "@wordpress/base-styles/variables" as *;
+
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
+$panelPadding: $grid-unit-20;
+
 .format-library__inline-color-popover {
 
 	[role="tabpanel"] {
-		padding: 16px;
+		padding: $panelPadding;
+		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
 	}
 }

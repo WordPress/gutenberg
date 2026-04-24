@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -9,8 +9,10 @@ import type { Meta, StoryFn } from '@storybook/react';
 import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
+	tags: [ 'manifest' ],
 	component: ExternalLink,
-	title: 'Components/ExternalLink',
+	title: 'Components/Navigation/ExternalLink',
+	id: 'components-externallink',
 	argTypes: {
 		children: { control: { type: 'text' } },
 	},
@@ -19,6 +21,10 @@ const meta: Meta< typeof ExternalLink > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

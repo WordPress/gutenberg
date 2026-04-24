@@ -16,6 +16,7 @@ import type {
 	QueryControlsProps,
 	QueryControlsWithMultipleCategorySelectionProps,
 	QueryControlsWithSingleCategorySelectionProps,
+	OrderByOption,
 } from './types';
 
 const DEFAULT_MIN_ITEMS = 1;
@@ -34,13 +35,34 @@ function isMultipleCategorySelection(
 	return 'categorySuggestions' in props;
 }
 
+const defaultOrderByOptions: OrderByOption[] = [
+	{
+		label: __( 'Newest to oldest' ),
+		value: 'date/desc',
+	},
+	{
+		label: __( 'Oldest to newest' ),
+		value: 'date/asc',
+	},
+	{
+		/* translators: Label for ordering posts by title in ascending order. */
+		label: __( 'A → Z' ),
+		value: 'title/asc',
+	},
+	{
+		/* translators: Label for ordering posts by title in descending order. */
+		label: __( 'Z → A' ),
+		value: 'title/desc',
+	},
+];
+
 /**
  * Controls to query for posts.
  *
  * ```jsx
  * const MyQueryControls = () => (
  *   <QueryControls
- *     { ...{ maxItems, minItems, numberOfItems, order, orderBy } }
+ *     { ...{ maxItems, minItems, numberOfItems, order, orderBy, orderByOptions } }
  *     onOrderByChange={ ( newOrderBy ) => {
  *       updateQuery( { orderBy: newOrderBy } )
  *     }
@@ -60,12 +82,12 @@ function isMultipleCategorySelection(
  * ```
  */
 export function QueryControls( {
-	__next40pxDefaultSize = false,
 	authorList,
 	selectedAuthorId,
 	numberOfItems,
 	order,
 	orderBy,
+	orderByOptions = defaultOrderByOptions,
 	maxItems = DEFAULT_MAX_ITEMS,
 	minItems = DEFAULT_MIN_ITEMS,
 	onAuthorChange,
@@ -81,31 +103,15 @@ export function QueryControls( {
 			{ [
 				onOrderChange && onOrderByChange && (
 					<SelectControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						key="query-controls-order-select"
 						label={ __( 'Order by' ) }
-						value={ `${ orderBy }/${ order }` }
-						options={ [
-							{
-								label: __( 'Newest to oldest' ),
-								value: 'date/desc',
-							},
-							{
-								label: __( 'Oldest to newest' ),
-								value: 'date/asc',
-							},
-							{
-								/* translators: Label for ordering posts by title in ascending order. */
-								label: __( 'A → Z' ),
-								value: 'title/asc',
-							},
-							{
-								/* translators: Label for ordering posts by title in descending order. */
-								label: __( 'Z → A' ),
-								value: 'title/desc',
-							},
-						] }
+						value={
+							orderBy === undefined || order === undefined
+								? undefined
+								: `${ orderBy }/${ order }`
+						}
+						options={ orderByOptions }
 						onChange={ ( value ) => {
 							if ( typeof value !== 'string' ) {
 								return;
@@ -133,7 +139,7 @@ export function QueryControls( {
 					props.categoriesList &&
 					props.onCategoryChange && (
 						<CategorySelect
-							__next40pxDefaultSize={ __next40pxDefaultSize }
+							__next40pxDefaultSize
 							key="query-controls-category-select"
 							categoriesList={ props.categoriesList }
 							label={ __( 'Category' ) }
@@ -146,8 +152,7 @@ export function QueryControls( {
 					props.categorySuggestions &&
 					props.onCategoryChange && (
 						<FormTokenField
-							__next40pxDefaultSize={ __next40pxDefaultSize }
-							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							key="query-controls-categories-select"
 							label={ __( 'Categories' ) }
 							value={
@@ -170,7 +175,7 @@ export function QueryControls( {
 					),
 				onAuthorChange && (
 					<AuthorSelect
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						key="query-controls-author-select"
 						authorList={ authorList }
 						label={ __( 'Author' ) }
@@ -181,8 +186,7 @@ export function QueryControls( {
 				),
 				onNumberOfItemsChange && (
 					<RangeControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize={ __next40pxDefaultSize }
+						__next40pxDefaultSize
 						key="query-controls-range-control"
 						label={ __( 'Number of items' ) }
 						value={ numberOfItems }

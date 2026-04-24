@@ -10,11 +10,10 @@ import isElement from './is-element';
 
 const noop = () => {};
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef SchemaItem
  * @property {string[]}                            [attributes] Attributes.
- * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against.
+ * @property {(string | RegExp)[]}                 [classes]    Classnames or RegExp to test against. Use '*' to keep all classes.
  * @property {'*' | { [tag: string]: SchemaItem }} [children]   Child schemas.
  * @property {string[]}                            [require]    Selectors to test required children against. Leave empty or undefined if there are no requirements.
  * @property {boolean}                             allowEmpty   Whether to allow nodes without children.
@@ -22,7 +21,6 @@ const noop = () => {};
  */
 
 /** @typedef {{ [tag: string]: SchemaItem }} Schema */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on a node
@@ -76,7 +74,10 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 						// TODO: Explore patching this in jsdom-jscore.
 						if ( node.classList && node.classList.length ) {
 							const mattchers = classes.map( ( item ) => {
-								if ( typeof item === 'string' ) {
+								if ( item === '*' ) {
+									// Keep all classes.
+									return () => true;
+								} else if ( typeof item === 'string' ) {
 									return (
 										/** @type {string} */ className
 									) => className === item;

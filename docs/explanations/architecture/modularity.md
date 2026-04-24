@@ -42,7 +42,7 @@ function MyApp() {
 
 ```php
 // myplugin.php
-// Example of script registration dependending on the "components" and "element packages.
+// Example of script registration depending on the "components" and "element packages.
 wp_register_script( 'myscript', 'pathtomyscript.js', array ('wp-components', "react" ) );
 ```
 

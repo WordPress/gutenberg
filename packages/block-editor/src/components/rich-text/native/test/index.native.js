@@ -151,7 +151,7 @@ describe( '<RichText/>', () => {
 			const expectedFontSize = 16;
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } />
+				<RichText accessibilityLabel="editor" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -164,8 +164,8 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
-					fontSize={ 'min(2em, 3em)' }
+					accessibilityLabel="editor"
+					fontSize="min(2em, 3em)"
 				/>
 			);
 			// Assert.
@@ -179,7 +179,7 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: 'min(2em, 3em)' } }
 				/>
 			);
@@ -195,7 +195,7 @@ describe( '<RichText/>', () => {
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } tagName="div" />
+				<RichText accessibilityLabel="editor" tagName="div" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -209,7 +209,7 @@ describe( '<RichText/>', () => {
 			mockGlobalSettings( { fontSize: 'min(2em, 3em)' } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } tagName="p" />
+				<RichText accessibilityLabel="editor" tagName="p" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -224,7 +224,7 @@ describe( '<RichText/>', () => {
 				mockGlobalSettings( { fontSize: unit } );
 				// Act.
 				const { getByLabelText } = render(
-					<RichText accessibilityLabel={ 'editor' } tagName="p" />
+					<RichText accessibilityLabel="editor" tagName="p" />
 				);
 				// Assert.
 				const actualFontSize =
@@ -241,9 +241,9 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: '1' } }
-					fontSize={ '2' }
+					fontSize="2"
 					tagName="p"
 				/>
 			);
@@ -260,7 +260,7 @@ describe( '<RichText/>', () => {
 			// Act.
 			const { getByLabelText } = render(
 				<RichText
-					accessibilityLabel={ 'editor' }
+					accessibilityLabel="editor"
 					style={ { fontSize: '1' } }
 					tagName="p"
 				/>
@@ -276,7 +276,7 @@ describe( '<RichText/>', () => {
 			Dimensions.set( { window: { ...window, width: 300 } } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vw' } />
+				<RichText accessibilityLabel="editor" fontSize="1vw" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -289,7 +289,7 @@ describe( '<RichText/>', () => {
 			Dimensions.set( { window: { ...window, height: 300 } } );
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } fontSize={ '1vh' } />
+				<RichText accessibilityLabel="editor" fontSize="1vh" />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.fontSize;
@@ -335,7 +335,7 @@ describe( '<RichText/>', () => {
 			const style = { lineHeight: 0.2 };
 			// Act.
 			const { getByLabelText } = render(
-				<RichText accessibilityLabel={ 'editor' } style={ style } />
+				<RichText accessibilityLabel="editor" style={ style } />
 			);
 			// Assert.
 			const actualFontSize = getByLabelText( 'editor' ).props.lineHeight;

@@ -8,16 +8,16 @@ test.describe( 'Global styles sidebar', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'should filter blocks list results', async ( { page } ) => {
@@ -28,22 +28,20 @@ test.describe( 'Global styles sidebar', () => {
 			.click();
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Blocks styles' } )
+			.getByRole( 'button', { name: 'Blocks' } )
 			.click();
 
 		await page
-			.getByRole( 'searchbox', { name: 'Search for blocks' } )
+			.getByRole( 'searchbox', { name: 'Search' } )
 			.fill( 'heading' );
 
-		// Matches both Heading and Table of Contents blocks.
+		// Matches both Heading and Accordion Item blocks.
 		// The latter contains "heading" in its description.
 		await expect(
-			page.getByRole( 'button', { name: 'Heading block styles' } )
+			page.getByRole( 'button', { name: 'Heading', exact: true } )
 		).toBeVisible();
 		await expect(
-			page.getByRole( 'button', {
-				name: 'Table of Contents block styles',
-			} )
+			page.getByRole( 'button', { name: 'Accordion Item' } )
 		).toBeVisible();
 	} );
 } );

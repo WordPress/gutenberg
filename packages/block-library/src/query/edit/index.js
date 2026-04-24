@@ -10,7 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import QueryContent from './query-content';
 import QueryPlaceholder from './query-placeholder';
-import PatternSelectionModal from './pattern-selection-modal';
+import { PatternSelectionModal } from './pattern-selection';
 
 const QueryEdit = ( props ) => {
 	const { clientId, attributes } = props;
@@ -22,6 +22,7 @@ const QueryEdit = ( props ) => {
 		[ clientId ]
 	);
 	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+
 	return (
 		<>
 			<Component

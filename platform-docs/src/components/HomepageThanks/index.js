@@ -31,7 +31,7 @@ export default function HomepageThanks() {
 						</div>
 						<div>
 							<a href="http://github.com/wordPress/gutenberg/">
-								Github ↗
+								GitHub ↗
 							</a>
 						</div>
 					</div>

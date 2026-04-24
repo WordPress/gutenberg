@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -13,21 +14,23 @@ import { store as editorStore } from '../../store';
 import { AUTHORS_QUERY, BASE_QUERY } from './constants';
 
 export function useAuthorsQuery( search ) {
-	const { authorId, authors, postAuthor } = useSelect(
+	const { authorId, authors, postAuthor, isLoading } = useSelect(
 		( select ) => {
-			const { getUser, getUsers } = select( coreStore );
+			const { getUser, getUsers, isResolving } = select( coreStore );
 			const { getEditedPostAttribute } = select( editorStore );
 			const _authorId = getEditedPostAttribute( 'author' );
 			const query = { ...AUTHORS_QUERY };
 
 			if ( search ) {
 				query.search = search;
+				query.search_columns = [ 'name' ];
 			}
 
 			return {
 				authorId: _authorId,
 				authors: getUsers( query ),
 				postAuthor: getUser( _authorId, BASE_QUERY ),
+				isLoading: isResolving( 'getUsers', [ query ] ),
 			};
 		},
 		[ search ]
@@ -46,18 +49,25 @@ export function useAuthorsQuery( search ) {
 			( { value } ) => postAuthor?.id === value
 		);
 
+		let currentAuthor = [];
 		if ( foundAuthor < 0 && postAuthor ) {
-			return [
+			currentAuthor = [
 				{
 					value: postAuthor.id,
 					label: decodeEntities( postAuthor.name ),
 				},
-				...fetchedAuthors,
+			];
+		} else if ( foundAuthor < 0 && ! postAuthor ) {
+			currentAuthor = [
+				{
+					value: 0,
+					label: __( '(No author)' ),
+				},
 			];
 		}
 
-		return fetchedAuthors;
+		return [ ...currentAuthor, ...fetchedAuthors ];
 	}, [ authors, postAuthor ] );
 
-	return { authorId, authorOptions, postAuthor };
+	return { authorId, authorOptions, postAuthor, isLoading };
 }

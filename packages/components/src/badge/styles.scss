@@ -1,0 +1,61 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+$badge-colors: (
+	"info": #3858e9,
+	"warning": $alert-yellow,
+	"error": $alert-red,
+	"success": $alert-green,
+);
+
+.components-badge {
+	@include reset;
+
+	background-color: color-mix(in srgb, $white 90%, var(--base-color));
+	color: color-mix(in srgb, $black 50%, var(--base-color));
+	padding: 2px $grid-unit-10;
+	min-height: $grid-unit-30;
+	border-radius: $radius-small;
+	line-height: 0;
+	max-width: 100%;
+
+	// Prevents anchor text-decoration styles from being applied through a parent.
+	display: inline-block;
+
+	&:where(.is-default) {
+		background-color: $gray-100;
+		color: $gray-800;
+	}
+
+	&.has-icon {
+		padding-inline-start: $grid-unit-05;
+	}
+
+	// Generate color variants
+	@each $type, $color in $badge-colors {
+		&.is-#{$type} {
+			--base-color: #{$color};
+		}
+	}
+}
+
+.components-badge__flex-wrapper {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	max-width: 100%;
+	font-size: $font-size-small;
+	font-weight: 400;
+	line-height: $font-line-height-small;
+}
+
+.components-badge__icon {
+	flex-shrink: 0;
+}
+
+.components-badge__content {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

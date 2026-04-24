@@ -36,17 +36,19 @@ async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
  * @param {string[]}                  lines                Changelog content split into lines.
  * @param {('patch'|'minor'|'major')} [minimumVersionBump] Minimum version bump for the package.
  *                                                         Defaults to `patch`.
+ * @param {string}                    [currentVersion]     Current version of the package.
  *
  * @return {string|null} Version bump when applicable, or null otherwise.
  */
 function calculateVersionBumpFromChangelog(
 	lines,
-	minimumVersionBump = 'patch'
+	minimumVersionBump = 'patch',
+	currentVersion = '1.0.0'
 ) {
 	let changesDetected = false;
 	let versionBump = null;
 	for ( const line of lines ) {
-		const lineNormalized = line.toLowerCase().trimLeft();
+		const lineNormalized = line.toLowerCase().trimStart();
 		// Detect unpublished changes first.
 		if ( lineNormalized.startsWith( '## unreleased' ) ) {
 			changesDetected = true;
@@ -63,9 +65,23 @@ function calculateVersionBumpFromChangelog(
 			break;
 		}
 
-		// A major version bump required. Stop processing.
-		if ( lineNormalized.startsWith( '### breaking change' ) ) {
+		// Promote a pre-1.0 package to stable 1.0.0 release. Stop processing.
+		if (
+			lineNormalized.startsWith( '### stable release' ) &&
+			semver.lt( currentVersion, '1.0.0' )
+		) {
 			versionBump = 'major';
+			break;
+		}
+
+		// A major version bump required for stable packages. Stop processing.
+		if ( lineNormalized.startsWith( '### breaking change' ) ) {
+			if ( semver.lt( currentVersion, '1.0.0' ) ) {
+				versionBump = 'minor';
+			} else {
+				versionBump = 'major';
+			}
+
 			break;
 		}
 
@@ -89,6 +105,7 @@ function calculateVersionBumpFromChangelog(
 			versionBump = minimumVersionBump;
 		}
 	}
+
 	return versionBump;
 }
 

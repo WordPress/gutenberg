@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -19,11 +19,15 @@ const meta: Meta< typeof DuotonePicker > = {
 	component: DuotonePicker,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

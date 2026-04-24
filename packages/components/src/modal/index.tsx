@@ -1,17 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type {
-	ForwardedRef,
-	KeyboardEvent,
-	MutableRefObject,
-	UIEvent,
-} from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useCallback,
@@ -20,7 +7,6 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import {
@@ -33,27 +19,21 @@ import {
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
-
-// Used to track and dismiss the prior modal when another opens unless nested.
-const ModalContext = createContext<
-	MutableRefObject< ModalProps[ 'onRequestClose' ] | undefined >[]
->( [] );
+import { Spacer } from '../spacer';
+import { useModalExitAnimation } from './use-modal-exit-animation';
+import { ModalContext, type Dismissers } from './context';
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();
 
 function UnforwardedModal(
 	props: ModalProps,
-	forwardedRef: ForwardedRef< HTMLDivElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) {
 	const {
 		bodyOpenClassName = 'modal-open',
@@ -73,7 +53,7 @@ function UnforwardedModal(
 		closeButtonLabel,
 		children,
 		style,
-		overlayClassName,
+		overlayClassName: overlayClassnameProp,
 		className,
 		contentLabel,
 		onKeyDown,
@@ -83,7 +63,7 @@ function UnforwardedModal(
 		__experimentalHideHeader = false,
 	} = props;
 
-	const ref = useRef< HTMLDivElement >();
+	const ref = useRef< HTMLDivElement >( null );
 
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
@@ -133,37 +113,44 @@ function UnforwardedModal(
 
 	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		ariaHelper.modalize( ref.current );
+		ariaHelper.modalize( ref.current! );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.
-	const refOnRequestClose = useRef< ModalProps[ 'onRequestClose' ] >();
+	const onRequestCloseRef =
+		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
 	useEffect( () => {
-		refOnRequestClose.current = onRequestClose;
+		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
 
 	// The list of `onRequestClose` callbacks of open (non-nested) Modals. Only
 	// one should remain open at a time and the list enables closing prior ones.
 	const dismissers = useContext( ModalContext );
 	// Used for the tracking and dismissing any nested modals.
-	const nestedDismissers = useRef< typeof dismissers >( [] );
+	const [ nestedDismissers ] = useState< Dismissers >( () => new Set() );
 
 	// Updates the stack tracking open modals at this level and calls
 	// onRequestClose for any prior and/or nested modals as applicable.
 	useEffect( () => {
-		dismissers.push( refOnRequestClose );
-		const [ first, second ] = dismissers;
-		if ( second ) {
-			first?.current?.();
+		// add this modal instance to the dismissers set
+		dismissers.add( onRequestCloseRef );
+		// request that all the other modals close themselves
+		for ( const dismisser of dismissers ) {
+			if ( dismisser !== onRequestCloseRef ) {
+				dismisser.current?.();
+			}
 		}
-
-		const nested = nestedDismissers.current;
 		return () => {
-			nested[ 0 ]?.current?.();
-			dismissers.shift();
+			// request that all the nested modals close themselves
+			for ( const dismisser of nestedDismissers ) {
+				dismisser.current?.();
+			}
+			// remove this modal instance from the dismissers set
+			dismissers.delete( onRequestCloseRef );
 		};
-	}, [ dismissers ] );
+	}, [ dismissers, nestedDismissers ] );
 
 	// Adds/removes the value of bodyOpenClassName to body element.
 	useEffect( () => {
@@ -182,6 +169,9 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
+	const { closeModal, frameRef, frameStyle, overlayClassname } =
+		useModalExitAnimation();
+
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
 		if ( ! window.ResizeObserver || ! childrenContainerRef.current ) {
@@ -198,21 +188,21 @@ function UnforwardedModal(
 		};
 	}, [ isContentScrollable, childrenContainerRef ] );
 
-	function handleEscapeKeyDown( event: KeyboardEvent< HTMLDivElement > ) {
+	function handleEscapeKeyDown(
+		event: React.KeyboardEvent< HTMLDivElement >
+	) {
 		if (
 			shouldCloseOnEsc &&
 			( event.code === 'Escape' || event.key === 'Escape' ) &&
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
-			if ( onRequestClose ) {
-				onRequestClose( event );
-			}
+			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
 
 	const onContentContainerScroll = useCallback(
-		( e: UIEvent< HTMLDivElement > ) => {
+		( e: React.UIEvent< HTMLDivElement > ) => {
 			const scrollY = e?.currentTarget?.scrollTop ?? -1;
 
 			if ( ! hasScrolledContent && scrollY > 0 ) {
@@ -246,7 +236,7 @@ function UnforwardedModal(
 			const isSameTarget = target === pressTarget;
 			pressTarget = null;
 			if ( button === 0 && isSameTarget ) {
-				onRequestClose();
+				closeModal().then( () => onRequestClose() );
 			}
 		},
 	};
@@ -257,7 +247,8 @@ function UnforwardedModal(
 			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
 			className={ clsx(
 				'components-modal__screen-overlay',
-				overlayClassName
+				overlayClassname,
+				overlayClassnameProp
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
@@ -269,8 +260,12 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ style }
+					style={ {
+						...frameStyle,
+						...style,
+					} }
 					ref={ useMergeRefs( [
+						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
 						focusOnMount !== 'firstContentElement'
@@ -322,13 +317,27 @@ function UnforwardedModal(
 								</div>
 								{ headerActions }
 								{ isDismissible && (
-									<Button
-										onClick={ onRequestClose }
-										icon={ close }
-										label={
-											closeButtonLabel || __( 'Close' )
-										}
-									/>
+									<>
+										<Spacer
+											marginBottom={ 0 }
+											marginLeft={ 2 }
+										/>
+										<Button
+											size="compact"
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) =>
+												closeModal().then( () =>
+													onRequestClose( event )
+												)
+											}
+											icon={ close }
+											label={
+												closeButtonLabel ||
+												__( 'Close' )
+											}
+										/>
+									</>
 								) }
 							</div>
 						) }
@@ -340,6 +349,7 @@ function UnforwardedModal(
 									? focusOnMountRef
 									: null,
 							] ) }
+							className="components-modal__children-container"
 						>
 							{ children }
 						</div>
@@ -350,7 +360,7 @@ function UnforwardedModal(
 	);
 
 	return createPortal(
-		<ModalContext.Provider value={ nestedDismissers.current }>
+		<ModalContext.Provider value={ nestedDismissers }>
 			{ modal }
 		</ModalContext.Provider>,
 		document.body
@@ -389,5 +399,6 @@ function UnforwardedModal(
  * ```
  */
 export const Modal = forwardRef( UnforwardedModal );
+Modal.displayName = 'Modal';
 
 export default Modal;

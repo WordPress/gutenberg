@@ -27,6 +27,7 @@ function BlockNavigationDropdownToggle( {
 } ) {
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			ref={ innerRef }
 			icon={ listView }

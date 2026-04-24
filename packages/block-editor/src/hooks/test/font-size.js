@@ -19,6 +19,15 @@ import {
 import _fontSize from '../font-size';
 
 const noop = () => {};
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
+const fontSizes = [
+	{
+		name: 'A larger font',
+		size: '32px',
+		slug: 'larger',
+	},
+];
 
 function addUseSettingFilter( callback ) {
 	addFilter(
@@ -30,6 +39,7 @@ function addUseSettingFilter( callback ) {
 
 describe( 'useBlockProps', () => {
 	const blockSettings = {
+		apiVersion: 3,
 		save: () => noop,
 		category: 'text',
 		title: 'font size title',
@@ -55,13 +65,7 @@ describe( 'useBlockProps', () => {
 		registerBlockType( blockSettings.name, blockSettings );
 		addUseSettingFilter( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
-				return [
-					{
-						name: 'A larger font',
-						size: '32px',
-						slug: 'larger',
-					},
-				];
+				return fontSizes;
 			}
 
 			if ( 'typography.fluid' === path ) {
@@ -69,7 +73,7 @@ describe( 'useBlockProps', () => {
 			}
 
 			if ( 'layout' === path ) {
-				return {};
+				return EMPTY_OBJECT;
 			}
 
 			return result;
@@ -95,7 +99,7 @@ describe( 'useBlockProps', () => {
 		registerBlockType( blockSettings.name, blockSettings );
 		addUseSettingFilter( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
-				return [];
+				return EMPTY_ARRAY;
 			}
 
 			if ( 'typography.fluid' === path ) {
@@ -103,7 +107,7 @@ describe( 'useBlockProps', () => {
 			}
 
 			if ( 'layout' === path ) {
-				return {};
+				return EMPTY_OBJECT;
 			}
 
 			return result;
@@ -132,7 +136,7 @@ describe( 'useBlockProps', () => {
 		registerBlockType( blockSettings.name, blockSettings );
 		addUseSettingFilter( ( result, path ) => {
 			if ( 'typography.fontSizes' === path ) {
-				return [];
+				return EMPTY_ARRAY;
 			}
 
 			if ( 'typography.fluid' === path ) {
@@ -140,7 +144,7 @@ describe( 'useBlockProps', () => {
 			}
 
 			if ( 'layout' === path ) {
-				return {};
+				return EMPTY_OBJECT;
 			}
 
 			return result;

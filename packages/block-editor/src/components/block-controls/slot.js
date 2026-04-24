@@ -31,9 +31,10 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 		[ toolbarState, contextState ]
 	);
 
-	const Slot = groups[ group ]?.Slot;
-	const fills = useSlotFills( Slot?.__unstableName );
-	if ( ! Slot ) {
+	const slotFill = groups[ group ];
+	const fills = useSlotFills( slotFill.name );
+
+	if ( ! slotFill ) {
 		warning( `Unknown BlockControls group "${ group }" provided.` );
 		return null;
 	}
@@ -42,6 +43,7 @@ export default function BlockControlsSlot( { group = 'default', ...props } ) {
 		return null;
 	}
 
+	const { Slot } = slotFill;
 	const slot = <Slot { ...props } bubblesVirtually fillProps={ fillProps } />;
 
 	if ( group === 'default' ) {

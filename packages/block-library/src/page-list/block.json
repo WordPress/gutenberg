@@ -31,9 +31,11 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"style",
-		"openSubmenusOnClick"
+		"openSubmenusOnClick",
+		"submenuVisibility"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"typography": {
@@ -51,7 +53,33 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"color": {
+			"text": true,
+			"background": true,
+			"link": true,
+			"gradients": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true,
+				"link": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"__experimentalDefaultControls": {
+				"padding": false,
+				"margin": false
+			}
+		},
+		"contentRole": true
 	},
 	"editorStyle": "wp-block-page-list-editor",
 	"style": "wp-block-page-list"

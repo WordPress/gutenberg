@@ -16,7 +16,7 @@ Install the module
 npm install @wordpress/e2e-test-utils-playwright --save-dev
 ```
 
-**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It is not compatible with older versions.
 
 ## API
 
@@ -42,6 +42,7 @@ await admin.visitAdminPage( 'options-general.php' );
 End to end test utilities for the WordPress Block Editor.
 
 To use these utilities, instantiate them within each test file:
+
 ```js
 test.use( {
 	editor: async ( { page }, use ) => {
@@ -53,7 +54,7 @@ test.use( {
 Within a test or test utility, use the `canvas` property to select elements within the iframe canvas:
 
 ```js
-await editor.canvas.locator( 'role=document[name="Paragraph block"i]' )
+await editor.canvas.locator( 'role=document[name="Paragraph block"i]' );
 ```
 
 ### PageUtils

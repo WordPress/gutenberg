@@ -14,7 +14,6 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-
 const { interfaceStore } = unlock( editorPrivateApis );
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
@@ -378,7 +377,6 @@ export const isMetaBoxLocationVisible = createRegistrySelector(
 			isMetaBoxLocationActive( state, location ) &&
 			getMetaBoxesPerLocation( state, location )?.some( ( { id } ) => {
 				return select( editorStore ).isEditorPanelEnabled(
-					state,
 					`meta-box-${ id }`
 				);
 			} )
@@ -506,7 +504,7 @@ export const __experimentalGetInsertionPoint = createRegistrySelector(
 				version: '6.7',
 			}
 		);
-		return unlock( select( editorStore ) ).getInsertionPoint();
+		return unlock( select( editorStore ) ).getInserter();
 	}
 );
 
@@ -552,70 +550,23 @@ export function areMetaBoxesInitialized( state ) {
 /**
  * Retrieves the template of the currently edited post.
  *
- * @return {Object?} Post Template.
+ * @return {?Object} Post Template.
  */
 export const getEditedPostTemplate = createRegistrySelector(
 	( select ) => () => {
-		const {
-			id: postId,
-			type: postType,
-			slug,
-		} = select( editorStore ).getCurrentPost();
-		const { getSite, getEditedEntityRecord, getEntityRecords } =
-			select( coreStore );
-		const siteSettings = getSite();
-		// First check if the current page is set as the posts page.
-		const isPostsPage = +postId === siteSettings?.page_for_posts;
-		if ( isPostsPage ) {
-			const defaultTemplateId = select( coreStore ).getDefaultTemplateId(
-				{ slug: 'home' }
-			);
-			return getEditedEntityRecord(
-				'postType',
-				'wp_template',
-				defaultTemplateId
-			);
+		const { id: postId, type: postType } =
+			select( editorStore ).getCurrentPost();
+		const templateId = unlock( select( coreStore ) ).getTemplateId(
+			postType,
+			postId
+		);
+		if ( ! templateId ) {
+			return undefined;
 		}
-		const currentTemplate =
-			select( editorStore ).getEditedPostAttribute( 'template' );
-		if ( currentTemplate ) {
-			const templateWithSameSlug = getEntityRecords(
-				'postType',
-				'wp_template',
-				{ per_page: -1 }
-			)?.find( ( template ) => template.slug === currentTemplate );
-			if ( ! templateWithSameSlug ) {
-				return templateWithSameSlug;
-			}
-			return getEditedEntityRecord(
-				'postType',
-				'wp_template',
-				templateWithSameSlug.id
-			);
-		}
-		let slugToCheck;
-		// In `draft` status we might not have a slug available, so we use the `single`
-		// post type templates slug(ex page, single-post, single-product etc..).
-		// Pages do not need the `single` prefix in the slug to be prioritized
-		// through template hierarchy.
-		if ( slug ) {
-			slugToCheck =
-				postType === 'page'
-					? `${ postType }-${ slug }`
-					: `single-${ postType }-${ slug }`;
-		} else {
-			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
-		}
-		const defaultTemplateId = select( coreStore ).getDefaultTemplateId( {
-			slug: slugToCheck,
-		} );
-
-		return defaultTemplateId
-			? select( coreStore ).getEditedEntityRecord(
-					'postType',
-					'wp_template',
-					defaultTemplateId
-			  )
-			: null;
+		return select( coreStore ).getEditedEntityRecord(
+			'postType',
+			'wp_template',
+			templateId
+		);
 	}
 );

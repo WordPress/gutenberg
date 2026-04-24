@@ -15,8 +15,9 @@ import {
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { hasStickyOrFixedPositionValue } from '../../hooks/position';
+import { getElementBounds } from '../../utils/dom';
 
 const COMMON_PROPS = {
 	placement: 'top-start',
@@ -67,7 +68,7 @@ function getProps(
 	// Get how far the content area has been scrolled.
 	const scrollTop = scrollContainer?.scrollTop || 0;
 
-	const blockRect = selectedBlockElement.getBoundingClientRect();
+	const blockRect = getElementBounds( selectedBlockElement );
 	const contentRect = contentElement.getBoundingClientRect();
 
 	// Get the vertical position of top of the visible content area.

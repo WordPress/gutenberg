@@ -111,7 +111,6 @@ function ColorPicker( {
 		// the hook’s dependencies and running it a single time. Ideally there
 		// may be a way to refactor and obviate the disabled lint rule. If not,
 		// this comment should be replaced by one that explains the reasoning.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	function onButtonPress( action ) {

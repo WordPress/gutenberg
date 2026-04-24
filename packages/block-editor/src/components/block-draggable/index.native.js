@@ -60,9 +60,9 @@ const DEFAULT_IOS_LONG_PRESS_MIN_DURATION =
  * that should be attached to the list that renders the blocks.
  *
  *
- * @param {Object}      props          Component props.
- * @param {JSX.Element} props.children Children to be rendered.
- * @param {boolean}     props.isRTL    Check if current locale is RTL.
+ * @param {Object}            props          Component props.
+ * @param {React.JSX.Element} props.children Children to be rendered.
+ * @param {boolean}           props.isRTL    Check if current locale is RTL.
  *
  * @return {Function} Render function that passes `onScroll` event handler.
  */
@@ -342,12 +342,12 @@ function useIsEditingText() {
  * This component serves for animating the block when it is being dragged.
  * Hence, it should be wrapped around the rendering of a block.
  *
- * @param {Object}      props                    Component props.
- * @param {JSX.Element} props.children           Children to be rendered.
- * @param {string}      props.clientId           Client id of the block.
- * @param {string}      [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
- * @param {boolean}     [props.enabled]          Enables the draggable trigger.
- * @param {string}      [props.testID]           Id used for querying the long-press gesture handler in tests.
+ * @param {Object}            props                    Component props.
+ * @param {React.JSX.Element} props.children           Children to be rendered.
+ * @param {string}            props.clientId           Client id of the block.
+ * @param {string}            [props.draggingClientId] Client id to use for dragging. If not defined, the value from `clientId` will be used.
+ * @param {boolean}           [props.enabled]          Enables the draggable trigger.
+ * @param {string}            [props.testID]           Id used for querying the long-press gesture handler in tests.
  *
  * @return {Function} Render function which includes the parameter `isDraggable` to determine if the block can be dragged.
  */

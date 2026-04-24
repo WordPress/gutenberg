@@ -1,0 +1,60 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-block-manager__no-results {
+	font-style: italic;
+	padding: $grid-unit-30 0;
+	text-align: center;
+}
+
+.block-editor-block-manager__category {
+	margin: 0 0 $grid-unit-30 0;
+}
+
+.block-editor-block-manager__category-title {
+	position: sticky;
+	top: - $grid-unit-05; // Offsets the top padding on the modal content container
+	padding: $grid-unit-20 0;
+	background-color: $white;
+	z-index: z-index(".block-editor-block-manager__category-title");
+
+	.components-checkbox-control__label {
+		font-weight: 600;
+	}
+}
+
+.block-editor-block-manager__checklist {
+	margin-top: 0;
+}
+
+.block-editor-block-manager__category-title,
+.block-editor-block-manager__checklist-item {
+	border-bottom: 1px solid $gray-300;
+}
+
+.block-editor-block-manager__checklist-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 0;
+	padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-20;
+
+	.components-modal__content &.components-checkbox-control__input-container {
+		margin: 0 $grid-unit-10;
+	}
+
+	.block-editor-block-icon {
+		margin-right: 10px;
+		fill: $gray-900;
+	}
+}
+
+.block-editor-block-manager__results {
+	border-top: $border-width solid $gray-300;
+}
+
+// Remove the top border from results when adjacent to the disabled block count
+.block-editor-block-manager__disabled-blocks-count + .block-editor-block-manager__results {
+	border-top-width: 0;
+}

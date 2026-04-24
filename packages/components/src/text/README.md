@@ -156,7 +156,7 @@ Adjusts all text line-height based on the typography system.
 
 **Type**: `number`
 
-Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
+Clamps the text content to the specific `numberOfLines`, adding the `ellipsis` at the end.
 
 ### optimizeReadabilityFor
 

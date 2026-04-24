@@ -6,15 +6,25 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	__experimentalHStack as HStack,
+	Flex,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
-import { Icon, globe, info, linkOff, edit, copySmall } from '@wordpress/icons';
+import {
+	Icon,
+	globe,
+	info,
+	linkOff,
+	pencil,
+	copySmall,
+} from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -23,7 +33,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { ViewerSlot } from './viewer-slot';
+
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 import useRichUrlData from './use-rich-url-data';
 
@@ -57,7 +70,9 @@ export default function LinkPreview( {
 
 	const displayTitle =
 		! isEmptyURL &&
-		stripHTML( richData?.title || value?.title || displayURL );
+		stripHTML(
+			value?.entityTitle || richData?.title || value?.title || displayURL
+		);
 
 	let icon;
 
@@ -78,9 +93,10 @@ export default function LinkPreview( {
 	} );
 
 	return (
-		<div
-			aria-label={ __( 'Currently selected' ) }
-			className={ clsx( 'block-editor-link-control__search-item', {
+		<Flex
+			role="group"
+			aria-label={ __( 'Manage link' ) }
+			className={ clsx( 'block-editor-link-control__preview', {
 				'is-current': true,
 				'is-rich': hasRichData,
 				'is-fetching': !! isFetching,
@@ -89,49 +105,89 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<div className="block-editor-link-control__search-item-top">
-				<span className="block-editor-link-control__search-item-header">
-					<span
-						className={ clsx(
-							'block-editor-link-control__search-item-icon',
-							{
-								'is-image': richData?.icon,
-							}
-						) }
+			<Flex gap={ 0 } align="flex-start">
+				<Flex
+					className="block-editor-link-control__link-information"
+					role="figure"
+					aria-label={
+						/* translators: Accessibility text for the link preview when editing a link. */
+						__( 'Link information' )
+					}
+					justify="start"
+					align="flex-start"
+				>
+					{ value?.image ? (
+						<Flex
+							className="block-editor-link-control__preview-image"
+							justify="center"
+						>
+							<img src={ value?.image } alt="" />
+						</Flex>
+					) : (
+						<Flex
+							className={ clsx(
+								'block-editor-link-control__preview-icon',
+								{
+									'is-image': richData?.icon,
+								}
+							) }
+							justify="center"
+						>
+							{ icon }
+						</Flex>
+					) }
+					<Flex
+						className="block-editor-link-control__preview-details"
+						direction="column"
+						gap={ 2 }
 					>
-						{ icon }
-					</span>
-					<span className="block-editor-link-control__search-item-details">
 						{ ! isEmptyURL ? (
 							<>
 								<ExternalLink
-									className="block-editor-link-control__search-item-title"
+									className="block-editor-link-control__preview-title"
 									href={ value.url }
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ value?.url && displayTitle !== displayURL && (
-									<span className="block-editor-link-control__search-item-info">
-										<Truncate numberOfLines={ 1 }>
-											{ displayURL }
-										</Truncate>
-									</span>
+								<span className="block-editor-link-control__preview-info">
+									<Truncate numberOfLines={ 1 }>
+										{ displayURL }
+									</Truncate>
+								</span>
+								{ value?.badges?.length > 0 && (
+									<HStack
+										className="block-editor-link-control__preview-badges"
+										alignment="left"
+										gap={ 1 }
+									>
+										{ value.badges.map(
+											( badge, index ) => (
+												<WCBadge
+													key={ `${ badge.label }|${ badge.intent }|${ index }` }
+													intent={ badge.intent }
+												>
+													{ badge.label }
+												</WCBadge>
+											)
+										) }
+									</HStack>
 								) }
 							</>
 						) : (
-							<span className="block-editor-link-control__search-item-error-notice">
+							<span className="block-editor-link-control__preview-error-notice">
 								{ __( 'Link is empty' ) }
 							</span>
 						) }
-					</span>
-				</span>
+					</Flex>
+				</Flex>
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"
+					showTooltip={ ! showIconLabels }
 				/>
 				{ hasUnlinkControl && (
 					<Button
@@ -139,21 +195,20 @@ export default function LinkPreview( {
 						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
 						size="compact"
+						showTooltip={ ! showIconLabels }
 					/>
 				) }
 				<Button
 					icon={ copySmall }
-					label={ sprintf(
-						// Translators: %s is a placeholder for the link URL and an optional colon, (if a Link URL is present).
-						__( 'Copy link%s' ), // Ends up looking like "Copy link: https://example.com".
-						isEmptyURL || showIconLabels ? '' : ': ' + value.url
-					) }
+					label={ __( 'Copy link' ) }
 					ref={ ref }
+					accessibleWhenDisabled
 					disabled={ isEmptyURL }
 					size="compact"
+					showTooltip={ ! showIconLabels }
 				/>
 				<ViewerSlot fillProps={ value } />
-			</div>
-		</div>
+			</Flex>
+		</Flex>
 	);
 }

@@ -10,6 +10,4 @@ const cdata = `
 const cdataElement = new DOMParser()
 	.parseFromString( cdata, 'text/xml' )
 	.querySelector( 'div' );
-document
-	.getElementById( 'replace-with-cdata' )
-	.replaceWith( cdataElement );
+document.getElementById( 'replace-with-cdata' ).replaceWith( cdataElement );

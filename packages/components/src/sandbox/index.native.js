@@ -172,7 +172,7 @@ const style = `
 
 const EMPTY_ARRAY = [];
 
-const Sandbox = forwardRef( function Sandbox(
+const Sandbox = forwardRef( function UnforwardedSandbox(
 	{
 		containerStyle,
 		customJS,
@@ -297,7 +297,7 @@ const Sandbox = forwardRef( function Sandbox(
 
 			try {
 				data = JSON.parse( data );
-			} catch ( e ) {
+			} catch {
 				return;
 			}
 
@@ -336,9 +336,7 @@ const Sandbox = forwardRef( function Sandbox(
 
 	useEffect( () => {
 		updateContentHtml();
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {

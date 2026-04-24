@@ -1,7 +1,9 @@
-.wp-block-image figcaption {
+@use "@wordpress/base-styles/mixins" as *;
+
+:root :where(.wp-block-image figcaption) {
 	@include caption-style-theme();
 }
 
-:where(.wp-block-image) {
+.wp-block-image {
 	margin: 0 0 1em 0;
 }

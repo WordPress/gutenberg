@@ -14,7 +14,7 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../../../utils/selection';
 
-function findSelection( blocks ) {
+export function findSelection( blocks ) {
 	let i = blocks.length;
 
 	while ( i-- ) {
@@ -99,6 +99,7 @@ export default ( props ) => ( element ) => {
 			__unstableAllowPrefixTransformations,
 			formatTypes,
 			registry,
+			onReplace,
 		} = props.current;
 
 		// Only run input rules when inserting text.
@@ -111,13 +112,29 @@ export default ( props ) => ( element ) => {
 		}
 
 		const value = getValue();
+
+		const transforms = getBlockTransforms( 'from' ).filter(
+			( transform ) => transform.type === 'input'
+		);
+		const transformation = findTransform( transforms, ( item ) => {
+			return item.regExp.test( value.text );
+		} );
+
+		if ( transformation ) {
+			onReplace( transformation.transform() );
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkAutomaticChange();
+			return;
+		}
+
 		const transformed = formatTypes.reduce(
-			( accumlator, { __unstableInputRule } ) => {
+			( accumulator, { __unstableInputRule } ) => {
 				if ( __unstableInputRule ) {
-					accumlator = __unstableInputRule( accumlator );
+					accumulator = __unstableInputRule( accumulator );
 				}
 
-				return accumlator;
+				return accumulator;
 			},
 			preventEventDiscovery( value )
 		);

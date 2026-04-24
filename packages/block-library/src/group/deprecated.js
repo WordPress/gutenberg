@@ -109,15 +109,11 @@ const deprecated = [
 			);
 		},
 		isEligible: ( { layout } ) =>
-			! layout ||
-			layout.inherit ||
-			( layout.contentSize && layout.type !== 'constrained' ),
+			layout?.inherit ||
+			( layout?.contentSize && layout?.type !== 'constrained' ),
 		migrate: ( attributes ) => {
 			const { layout = null } = attributes;
-			if ( ! layout ) {
-				return attributes;
-			}
-			if ( layout.inherit || layout.contentSize ) {
+			if ( layout?.inherit || layout?.contentSize ) {
 				return {
 					...attributes,
 					layout: {

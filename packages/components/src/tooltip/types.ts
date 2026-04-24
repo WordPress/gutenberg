@@ -17,6 +17,10 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
+	 * Custom class name for the tooltip.
+	 */
+	className?: string;
+	/**
 	 * Option to hide the tooltip when the anchor is clicked.
 	 *
 	 * @default true
@@ -31,7 +35,7 @@ export type TooltipProps = {
 	/**
 	 * Where the tooltip should be positioned relative to its parent.
 	 *
-	 * @default bottom
+	 * @default top
 	 */
 	placement?: Placement;
 	/**
@@ -43,7 +47,7 @@ export type TooltipProps = {
 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 	 *
 	 * @deprecated
-	 * @default bottom
+	 * @default top
 	 */
 	position?: PopoverProps[ 'position' ];
 	/**

@@ -1,5 +1,7 @@
 // Lowest specificity on wrapper margins to avoid overriding layout styles.
 :where(.wp-block-term-description) {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 	margin-top: var(--wp--style--block-gap);
 	margin-bottom: var(--wp--style--block-gap);
 }

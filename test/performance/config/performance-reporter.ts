@@ -34,6 +34,7 @@ export interface WPRawPerformanceResults {
 	inserterSearch: number[];
 	inserterHover: number[];
 	loadPatterns: number[];
+	loadPages: number[];
 	listViewOpen: number[];
 	navigate: number[];
 	wpBeforeTemplate: number[];
@@ -41,6 +42,9 @@ export interface WPRawPerformanceResults {
 	wpTotal: number[];
 	wpMemoryUsage: number[];
 	wpDbQueries: number[];
+	mediaProcessingJpeg: number[];
+	mediaProcessingAvif: number[];
+	mediaProcessingJpegToAvif: number[];
 }
 
 type PerformanceStats = {
@@ -69,6 +73,7 @@ export interface WPPerformanceResults {
 	inserterSearch?: PerformanceStats;
 	inserterHover?: PerformanceStats;
 	loadPatterns?: PerformanceStats;
+	loadPages?: PerformanceStats;
 	listViewOpen?: PerformanceStats;
 	navigate?: PerformanceStats;
 	wpBeforeTemplate?: PerformanceStats;
@@ -76,6 +81,9 @@ export interface WPPerformanceResults {
 	wpTotal?: PerformanceStats;
 	wpMemoryUsage?: PerformanceStats;
 	wpDbQueries?: PerformanceStats;
+	mediaProcessingJpeg?: PerformanceStats;
+	mediaProcessingAvif?: PerformanceStats;
+	mediaProcessingJpegToAvif?: PerformanceStats;
 }
 
 /**
@@ -106,6 +114,7 @@ export function curateResults(
 		inserterSearch: stats( results.inserterSearch ),
 		inserterHover: stats( results.inserterHover ),
 		loadPatterns: stats( results.loadPatterns ),
+		loadPages: stats( results.loadPages ),
 		listViewOpen: stats( results.listViewOpen ),
 		navigate: stats( results.navigate ),
 		wpBeforeTemplate: stats( results.wpBeforeTemplate ),
@@ -113,12 +122,15 @@ export function curateResults(
 		wpTotal: stats( results.wpTotal ),
 		wpMemoryUsage: stats( results.wpMemoryUsage ),
 		wpDbQueries: stats( results.wpDbQueries ),
+		mediaProcessingJpeg: stats( results.mediaProcessingJpeg ),
+		mediaProcessingAvif: stats( results.mediaProcessingAvif ),
+		mediaProcessingJpegToAvif: stats( results.mediaProcessingJpegToAvif ),
 	};
 
 	return Object.fromEntries(
 		Object.entries( output )
 			// Reduce the output to contain taken metrics only.
-			.filter( ( [ _, value ] ) => value !== undefined )
+			.filter( ( [ , value ] ) => value !== undefined )
 	);
 }
 
@@ -211,6 +223,18 @@ class PerformanceReporter implements Reporter {
 			// eslint-disable-next-line no-console
 			console.table( printableResults );
 		}
+	}
+
+	printsToStdio() {
+		return true;
+	}
+
+	onStdOut( chunk: string | Buffer ) {
+		process.stdout.write( chunk );
+	}
+
+	onStdErr( chunk: string | Buffer ) {
+		process.stderr.write( chunk );
 	}
 }
 

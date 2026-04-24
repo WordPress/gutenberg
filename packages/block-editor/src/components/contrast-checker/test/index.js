@@ -375,7 +375,7 @@ describe( 'ContrastChecker', () => {
 		render(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				textColor={ 'rgba(0,0,0,0.9)' }
+				textColor="rgba(0,0,0,0.9)"
 				linkColor={ linkColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker
@@ -396,7 +396,7 @@ describe( 'ContrastChecker', () => {
 		render(
 			<ContrastChecker
 				backgroundColor={ backgroundColor }
-				linkColor={ 'rgba(0,0,0,0.9)' }
+				linkColor="rgba(0,0,0,0.9)"
 				textColor={ textColor }
 				isLargeText={ isLargeText }
 				enableAlphaChecker
@@ -416,7 +416,7 @@ describe( 'ContrastChecker', () => {
 	test( 'should render nothing when the colors meet AA WCAG guidelines but the background color only has alpha transparency with alpha checker enabled.', () => {
 		const { container } = render(
 			<ContrastChecker
-				backgroundColor={ 'rgba(255,255,255,0.7)' }
+				backgroundColor="rgba(255,255,255,0.7)"
 				textColor={ textColor }
 				linkColor={ linkColor }
 				isLargeText={ isLargeText }
@@ -450,7 +450,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor={ colorWithTransparency }
 				textColor={ sameShade }
-				linkColor={ 'rgba(0,0,0,0.9)' }
+				linkColor="rgba(0,0,0,0.9)"
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
 				fallbackTextColor={ fallbackTextColor }
@@ -472,7 +472,7 @@ describe( 'ContrastChecker', () => {
 		render(
 			<ContrastChecker
 				backgroundColor={ sameShade }
-				textColor={ 'rgba(0,0,0,0.9)' }
+				textColor="rgba(0,0,0,0.9)"
 				linkColor={ sameShade }
 				isLargeText={ isLargeText }
 				fallbackBackgroundColor={ fallbackBackgroundColor }
@@ -494,9 +494,9 @@ describe( 'ContrastChecker', () => {
 	test( 'should render component when the colors meet AA WCAG guidelines but all colors have alpha transparency with alpha checker enabled.', () => {
 		render(
 			<ContrastChecker
-				backgroundColor={ 'rgba(255,255,255,0.7)' }
-				linkColor={ 'rgba(0,0,0,0.7)' }
-				textColor={ 'rgba(0,0,0,0.7)' }
+				backgroundColor="rgba(255,255,255,0.7)"
+				linkColor="rgba(0,0,0,0.7)"
+				textColor="rgba(0,0,0,0.7)"
 				isLargeText={ isLargeText }
 				enableAlphaChecker
 			/>

@@ -19,8 +19,12 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await editor.insertBlock( { name: 'core/heading' } );
-		await editor.clickBlockToolbarButton( 'Change level' );
-		await page.locator( 'role=menuitemradio[name="Heading 3"]' ).click();
+
+		// Open the block inspector sidebar and use variations to change level.
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'radio', { name: 'Transform to Heading 3' } )
+			.click();
 
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{
@@ -100,7 +104,9 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		editor,
 		pageUtils,
 	} ) => {
-		await page.keyboard.press( 'Enter' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -119,7 +125,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		expect( count ).toBe( 1 );
 	} );
 
-	test( 'should return focus when pressing formatting button', async ( {
+	test( 'should return focus when pressing formatting button (-firefox)', async ( {
 		page,
 		editor,
 	} ) => {
@@ -415,7 +421,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should update internal selection after fresh focus', async ( {
+	test( 'should update internal selection after fresh focus (-firefox)', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -758,7 +764,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
-	test( 'should navigate arround emoji', async ( { page, editor } ) => {
+	test( 'should navigate around emoji', async ( { page, editor } ) => {
 		await editor.canvas
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();

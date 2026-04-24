@@ -166,12 +166,74 @@ class DependencyExtractionWebpackPlugin {
 					{
 						name: this.constructor.name,
 						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY,
+					},
+					() => this.checkForMagicComments( compilation )
+				);
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
 							.PROCESS_ASSETS_STAGE_ANALYSE,
 					},
 					() => this.addAssets( compilation )
 				);
 			}
 		);
+	}
+
+	/**
+	 * Check for magic comments before minification, so minification doesn't have to preserve them.
+	 * @param {webpack.Compilation} compilation
+	 */
+	checkForMagicComments( compilation ) {
+		// Accumulate all entrypoint chunks, some of them shared
+		const entrypointChunks = new Set();
+		for ( const entrypoint of compilation.entrypoints.values() ) {
+			for ( const chunk of entrypoint.chunks ) {
+				entrypointChunks.add( chunk );
+			}
+		}
+
+		// Process each entrypoint chunk independently
+		for ( const chunk of entrypointChunks ) {
+			const chunkFiles = Array.from( chunk.files );
+
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
+			);
+			if ( ! chunkJSFile ) {
+				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
+				continue;
+			}
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const processContentsForMagicComments = ( content ) => {
+				const magicComments = [];
+
+				if ( content.includes( '/* wp:polyfill */' ) ) {
+					magicComments.push( 'wp-polyfill' );
+				}
+
+				return magicComments;
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				const wpMagicComments =
+					processContentsForMagicComments( content );
+				compilation.updateAsset( filename, ( v ) => v, {
+					wpMagicComments,
+				} );
+			} );
+		}
 	}
 
 	/** @param {webpack.Compilation} compilation */
@@ -269,7 +331,7 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			// Go through the assets and hash the sources. We can't just use
+			// Prepare to hash the sources. We can't just use
 			// `chunk.contentHash` because that's not updated when
 			// assets are minified. In practice the hash is updated by
 			// `RealContentHashPlugin` after minification, but it only modifies
@@ -278,12 +340,35 @@ class DependencyExtractionWebpackPlugin {
 			const { hashFunction, hashDigest, hashDigestLength } =
 				compilation.outputOptions;
 
-			const contentHash = chunkFiles
-				.sort()
-				.reduce( ( hash, filename ) => {
-					const asset = compilation.getAsset( filename );
-					return hash.update( asset.source.buffer() );
-				}, createHash( hashFunction ) )
+			const hashBuilder = createHash( hashFunction );
+
+			const processContentsForHash = ( content ) => {
+				hashBuilder.update( content );
+			};
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const handleMagicComments = ( info ) => {
+				if ( ! info ) {
+					return;
+				}
+				if ( info.includes( 'wp-polyfill' ) ) {
+					chunkStaticDeps.add( 'wp-polyfill' );
+				}
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to generate hashes, as well as look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				processContentsForHash( content );
+				handleMagicComments( asset.info.wpMagicComments );
+			} );
+
+			// Finalise hash.
+			const contentHash = hashBuilder
 				.digest( hashDigest )
 				.slice( 0, hashDigestLength );
 
@@ -300,6 +385,16 @@ class DependencyExtractionWebpackPlugin {
 
 			if ( this.useModules ) {
 				assetData.type = 'module';
+			}
+
+			if ( compilation.options?.optimization?.runtimeChunk !== false ) {
+				// Sets the script handle for the shared runtime file so WordPress registers it only once when using the asset file.
+				assetData.handle =
+					compilation.name +
+					'-' +
+					chunkJSFile
+						.replace( /\\/g, '/' )
+						.replace( jsExtensionRegExp, '' );
 			}
 
 			if ( combineAssets ) {
@@ -349,6 +444,9 @@ class DependencyExtractionWebpackPlugin {
 		}
 	}
 
+	static #staticDepsCurrent = new WeakSet();
+	static #staticDepsCache = new WeakMap();
+
 	/**
 	 * Can we trace a line of static dependencies from an entry to a module
 	 *
@@ -358,6 +456,20 @@ class DependencyExtractionWebpackPlugin {
 	 * @return {boolean} True if there is a static import path to the root
 	 */
 	static hasStaticDependencyPathToRoot( compilation, block ) {
+		if ( DependencyExtractionWebpackPlugin.#staticDepsCache.has( block ) ) {
+			return DependencyExtractionWebpackPlugin.#staticDepsCache.get(
+				block
+			);
+		}
+
+		if (
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.has( block )
+		) {
+			return false;
+		}
+
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.add( block );
+
 		const incomingConnections = [
 			...compilation.moduleGraph.getIncomingConnections( block ),
 		].filter(
@@ -371,6 +483,13 @@ class DependencyExtractionWebpackPlugin {
 		// If we don't have non-entry, non-library incoming connections,
 		// we've reached a root of
 		if ( ! incomingConnections.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				true
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
 			return true;
 		}
 
@@ -389,16 +508,28 @@ class DependencyExtractionWebpackPlugin {
 
 		// All the dependencies were Async, the module was reached via a dynamic import
 		if ( ! staticDependentModules.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				false
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
 			return false;
 		}
 
 		// Continue to explore any static dependencies
-		return staticDependentModules.some( ( parentStaticDependentModule ) =>
-			DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
-				compilation,
-				parentStaticDependentModule
-			)
+		const result = staticDependentModules.some(
+			( parentStaticDependentModule ) =>
+				DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+					compilation,
+					parentStaticDependentModule
+				)
 		);
+
+		DependencyExtractionWebpackPlugin.#staticDepsCache.set( block, result );
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete( block );
+		return result;
 	}
 }
 

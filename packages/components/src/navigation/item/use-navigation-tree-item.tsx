@@ -41,7 +41,7 @@ export const useNavigationTreeItem = (
 		return () => {
 			removeItem( itemId );
 		};
-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/41639
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Not adding deps for now, as it would require either a larger refactor.
+		// See https://github.com/WordPress/gutenberg/pull/41639
 	}, [ activeMenu, search ] );
 };

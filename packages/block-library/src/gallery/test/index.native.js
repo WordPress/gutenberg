@@ -594,9 +594,9 @@ describe( 'Gallery block', () => {
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );
 
-	// Test case related to TC012 - Settings - Link to
+	// Test case related to TC012 - Settings - Link
 	// Reference: https://github.com/wordpress-mobile/test-cases/blob/trunk/test-cases/gutenberg/gallery.md#tc012
-	it( 'overrides "Link to" setting of gallery items', async () => {
+	it( 'overrides "Link" setting of gallery items', async () => {
 		// Initialize with a gallery that contains two items, the latter includes "linkDestination" attribute
 		const screen = await initializeWithGalleryBlock( {
 			html: `<!-- wp:gallery {"linkTo":"none"} -->
@@ -612,10 +612,10 @@ describe( 'Gallery block', () => {
 		} );
 		const { getByText } = screen;
 
-		// Set "Link to" setting via Gallery block settings
+		// Set "Link" setting via Gallery block settings
 		await openBlockSettings( screen );
-		fireEvent.press( getByText( 'Link to' ) );
-		fireEvent.press( getByText( 'Media File' ) );
+		fireEvent.press( getByText( 'Link' ) );
+		fireEvent.press( getByText( 'Link images to media files' ) );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
 	} );

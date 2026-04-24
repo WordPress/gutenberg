@@ -6,7 +6,12 @@ import {
 	PluginSidebar as EditorPluginSidebar,
 	PluginSidebarMoreMenuItem as EditorPluginSidebarMoreMenuItem,
 } from '@wordpress/editor';
+import { getPath } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+
+const isSiteEditor = getPath( window.location.href )?.includes(
+	'site-editor.php'
+);
 
 const deprecateSlot = ( name ) => {
 	deprecated( `wp.editPost.${ name }`, {
@@ -20,6 +25,9 @@ const deprecateSlot = ( name ) => {
  * @see PluginMoreMenuItem in @wordpress/editor package.
  */
 export function PluginMoreMenuItem( props ) {
+	if ( ! isSiteEditor ) {
+		return null;
+	}
 	deprecateSlot( 'PluginMoreMenuItem' );
 	return <EditorPluginMoreMenuItem { ...props } />;
 }
@@ -28,6 +36,9 @@ export function PluginMoreMenuItem( props ) {
  * @see PluginSidebar in @wordpress/editor package.
  */
 export function PluginSidebar( props ) {
+	if ( ! isSiteEditor ) {
+		return null;
+	}
 	deprecateSlot( 'PluginSidebar' );
 	return <EditorPluginSidebar { ...props } />;
 }
@@ -36,6 +47,9 @@ export function PluginSidebar( props ) {
  * @see PluginSidebarMoreMenuItem in @wordpress/editor package.
  */
 export function PluginSidebarMoreMenuItem( props ) {
+	if ( ! isSiteEditor ) {
+		return null;
+	}
 	deprecateSlot( 'PluginSidebarMoreMenuItem' );
 	return <EditorPluginSidebarMoreMenuItem { ...props } />;
 }

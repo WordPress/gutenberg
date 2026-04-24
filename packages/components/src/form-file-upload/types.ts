@@ -11,10 +11,15 @@ import type Icon from '../icon';
 // TODO: Replace `children` and `icon` types with props from Button once Button is typed.
 export type FormFileUploadProps = {
 	/**
-	 * A string passed to `input` element that tells the browser which file types can be
-	 * upload to the upload by the user use. e.g: `image/*,video/*`.
+	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers.
+	 * @default false
+	 */
+	__next40pxDefaultSize?: boolean;
+	/**
+	 * A string passed to the `input` element that tells the browser which
+	 * [file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers)
+	 * can be uploaded by the user. e.g: `image/*,video/*`.
 	 */
 	accept?: InputHTMLAttributes< HTMLInputElement >[ 'accept' ];
 	/**
@@ -22,7 +27,9 @@ export type FormFileUploadProps = {
 	 */
 	children?: ReactNode;
 	/**
-	 * The icon to render in the `Button`.
+	 * The icon to render in the default button.
+	 *
+	 * See the `Icon` component docs for more information.
 	 */
 	icon?: ComponentProps< typeof Icon >[ 'icon' ];
 	/**
@@ -44,10 +51,11 @@ export type FormFileUploadProps = {
 	 *
 	 * ```jsx
 	 * <FormFileUpload
-	 * 	onClick={ ( event ) => ( event.target.value = '' ) }
-	 * 	onChange={ onChange }
+	 *   __next40pxDefaultSize
+	 *   onClick={ ( event ) => ( event.target.value = '' ) }
+	 *   onChange={ onChange }
 	 * >
-	 * 	Upload
+	 *   Upload
 	 * </FormFileUpload>
 	 * ```
 	 */

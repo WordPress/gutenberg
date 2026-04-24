@@ -15,8 +15,8 @@ const initialHtml = `
 <figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
 <!-- /wp:audio -->`;
 
-const tranformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [ 'File', ...tranformsWithInnerBlocks ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [ 'File', ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 
@@ -25,7 +25,8 @@ describe( `${ block } block transformations`, () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const newBlock = await transformBlock( screen, block, blockTransform, {
 			isMediaBlock: false,
-			hasInnerBlocks: tranformsWithInnerBlocks.includes( blockTransform ),
+			hasInnerBlocks:
+				transformsWithInnerBlocks.includes( blockTransform ),
 		} );
 		expect( newBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();

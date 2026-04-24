@@ -6,7 +6,7 @@ import {
 	useInit,
 	useWatch,
 	getElement,
-	privateApis
+	privateApis,
 } from '@wordpress/interactivity';
 
 const { directive, cloneElement } = privateApis(
@@ -16,13 +16,17 @@ const { directive, cloneElement } = privateApis(
 // Custom directive to show hide the content elements in which it is placed.
 directive(
 	'show-children',
-	( { directives: { 'show-children': showChildren }, element, evaluate } ) => {
-		const entry = showChildren.find(
-			( { suffix } ) => suffix === 'default'
-		);
-		return evaluate( entry )
-			? element
-			: cloneElement( element, { children: null } );
+	( {
+		directives: { 'show-children': showChildren },
+		element,
+		evaluate,
+	} ) => {
+		const entry = showChildren.find( ( { suffix } ) => suffix === null );
+		let result = evaluate( entry );
+		if ( typeof result === 'function' ) {
+			result = result();
+		}
+		return result ? element : cloneElement( element, { children: null } );
 	},
 	{ priority: 9 }
 );
@@ -51,7 +55,7 @@ const { state } = store( 'directive-run', {
 		isHydrated: 'no',
 		isMounted: 'no',
 		renderCount: 0,
-		clickCount: 0
+		clickCount: 0,
 	},
 	actions: {
 		toggle() {
@@ -62,7 +66,7 @@ const { state } = store( 'directive-run', {
 		},
 		*navigate() {
 			const { actions } = yield import(
-				"@wordpress/interactivity-router"
+				'@wordpress/interactivity-router'
 			);
 			return actions.navigate( window.location, {
 				force: true,
@@ -84,13 +88,13 @@ const { state } = store( 'directive-run', {
 			// Runs only on first render.
 			useInit( () => {
 				const { ref } = getElement();
-				ref
-					.closest( '[data-testid="wp-run hooks results"]')
-					.setAttribute( 'data-init', 'initialized' );
+				ref.closest(
+					'[data-testid="wp-run hooks results"]'
+				).setAttribute( 'data-init', 'initialized' );
 				return () => {
-					ref
-						.closest( '[data-testid="wp-run hooks results"]')
-						.setAttribute( 'data-init', 'cleaned up' );
+					ref.closest(
+						'[data-testid="wp-run hooks results"]'
+					).setAttribute( 'data-init', 'cleaned up' );
 				};
 			} );
 
@@ -99,15 +103,15 @@ const { state } = store( 'directive-run', {
 			useWatch( () => {
 				const { ref } = getElement();
 				const { clickCount } = state;
-				ref
-					.closest( '[data-testid="wp-run hooks results"]')
-					.setAttribute( 'data-watch', clickCount );
+				ref.closest(
+					'[data-testid="wp-run hooks results"]'
+				).setAttribute( 'data-watch', clickCount );
 				return () => {
-					ref
-						.closest( '[data-testid="wp-run hooks results"]')
-						.setAttribute( 'data-watch', 'cleaned up' );
+					ref.closest(
+						'[data-testid="wp-run hooks results"]'
+					).setAttribute( 'data-watch', 'cleaned up' );
 				};
 			} );
-		}
-	}
+		},
+	},
 } );

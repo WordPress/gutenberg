@@ -10,7 +10,7 @@ exports[`PluginPostPublishPanel renders fill properly 1`] = `
     >
       <button
         aria-expanded="true"
-        class="components-button components-panel__body-toggle"
+        class="components-button components-panel__body-toggle is-next-40px-default-size"
         type="button"
       >
         <span

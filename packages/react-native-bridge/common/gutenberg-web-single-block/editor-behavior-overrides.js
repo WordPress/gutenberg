@@ -13,10 +13,10 @@ function isAndroid() {
  * tapped. This is done via the 'hideTextSelectionContextMenu' method, which
  * is sent back to the Android app, where the dismissal is then handle.
  *
- * @return {void}
  * @see https://github.com/WordPress/gutenberg/pull/34668
+ * @return {void}
  */
-function manageTextSelectonContextMenu() {
+function manageTextSelectionContextMenu() {
 	// Listeners for native context menu visibility changes.
 	let isContextMenuVisible = false;
 	const hideContextMenuListeners = [];
@@ -74,7 +74,7 @@ function manageTextSelectonContextMenu() {
 }
 
 if ( isAndroid() ) {
-	manageTextSelectonContextMenu();
+	manageTextSelectionContextMenu();
 }
 
 function _toggleBlockSelectedClass( isBlockSelected ) {

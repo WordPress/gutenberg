@@ -27,15 +27,28 @@ export default function SavePublishPanels( {
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } =
 		useDispatch( editorStore );
-	const { publishSidebarOpened, hasNonPostEntityChanges } = useSelect(
-		( select ) => ( {
-			publishSidebarOpened:
-				select( editorStore ).isPublishSidebarOpened(),
-			hasNonPostEntityChanges:
-				select( editorStore ).hasNonPostEntityChanges(),
-		} ),
-		[]
-	);
+	const {
+		publishSidebarOpened,
+		isPublishable,
+		isDirty,
+		hasOtherEntitiesChanges,
+	} = useSelect( ( select ) => {
+		const {
+			isPublishSidebarOpened,
+			isEditedPostPublishable,
+			isCurrentPostPublished,
+			isEditedPostDirty,
+			hasNonPostEntityChanges,
+		} = select( editorStore );
+		const _hasOtherEntitiesChanges = hasNonPostEntityChanges();
+		return {
+			publishSidebarOpened: isPublishSidebarOpened(),
+			isPublishable:
+				! isCurrentPostPublished() && isEditedPostPublishable(),
+			isDirty: _hasOtherEntitiesChanges || isEditedPostDirty(),
+			hasOtherEntitiesChanges: _hasOtherEntitiesChanges,
+		};
+	}, [] );
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),
@@ -54,29 +67,32 @@ export default function SavePublishPanels( {
 				PostPublishExtension={ PluginPostPublishPanel.Slot }
 			/>
 		);
-	} else if ( hasNonPostEntityChanges ) {
+	} else if ( isPublishable && ! hasOtherEntitiesChanges ) {
 		unmountableContent = (
-			<div className="editor-layout__toggle-entities-saved-states-panel">
+			<div className="editor-layout__toggle-publish-panel">
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
-					className="editor-layout__toggle-entities-saved-states-panel-button"
-					onClick={ openEntitiesSavedStates }
+					onClick={ togglePublishSidebar }
 					aria-expanded={ false }
 				>
-					{ __( 'Open save panel' ) }
+					{ __( 'Open publish panel' ) }
 				</Button>
 			</div>
 		);
 	} else {
 		unmountableContent = (
-			<div className="editor-layout__toggle-publish-panel">
+			<div className="editor-layout__toggle-entities-saved-states-panel">
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
-					className="editor-layout__toggle-publish-panel-button"
-					onClick={ togglePublishSidebar }
+					onClick={ openEntitiesSavedStates }
 					aria-expanded={ false }
+					aria-haspopup="dialog"
+					disabled={ ! isDirty }
+					accessibleWhenDisabled
 				>
-					{ __( 'Open publish panel' ) }
+					{ __( 'Open save panel' ) }
 				</Button>
 			</div>
 		);
@@ -87,7 +103,10 @@ export default function SavePublishPanels( {
 	return (
 		<>
 			{ isEntitiesSavedStatesOpen && (
-				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
+				<EntitiesSavedStates
+					close={ closeEntitiesSavedStates }
+					renderDialog
+				/>
 			) }
 			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }

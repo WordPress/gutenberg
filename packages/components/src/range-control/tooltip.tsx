@@ -22,7 +22,7 @@ export default function SimpleTooltip(
 	const {
 		className,
 		inputRef,
-		tooltipPosition,
+		tooltipPlacement,
 		show = false,
 		style = {},
 		value = 0,
@@ -30,7 +30,7 @@ export default function SimpleTooltip(
 		zIndex = 100,
 		...restProps
 	} = props;
-	const position = useTooltipPosition( { inputRef, tooltipPosition } );
+	const placement = useTooltipPlacement( { inputRef, tooltipPlacement } );
 	const classes = clsx( 'components-simple-tooltip', className );
 	const styles = {
 		...style,
@@ -40,9 +40,9 @@ export default function SimpleTooltip(
 	return (
 		<Tooltip
 			{ ...restProps }
-			aria-hidden={ show }
+			aria-hidden="false"
 			className={ classes }
-			position={ position }
+			placement={ placement }
 			show={ show }
 			role="tooltip"
 			style={ styles }
@@ -52,26 +52,26 @@ export default function SimpleTooltip(
 	);
 }
 
-function useTooltipPosition( { inputRef, tooltipPosition }: TooltipProps ) {
-	const [ position, setPosition ] = useState< string >();
+function useTooltipPlacement( { inputRef, tooltipPlacement }: TooltipProps ) {
+	const [ placement, setPlacement ] = useState< string >();
 
-	const setTooltipPosition = useCallback( () => {
+	const setTooltipPlacement = useCallback( () => {
 		if ( inputRef && inputRef.current ) {
-			setPosition( tooltipPosition );
+			setPlacement( tooltipPlacement );
 		}
-	}, [ tooltipPosition, inputRef ] );
+	}, [ tooltipPlacement, inputRef ] );
 
 	useEffect( () => {
-		setTooltipPosition();
-	}, [ setTooltipPosition ] );
+		setTooltipPlacement();
+	}, [ setTooltipPlacement ] );
 
 	useEffect( () => {
-		window.addEventListener( 'resize', setTooltipPosition );
+		window.addEventListener( 'resize', setTooltipPlacement );
 
 		return () => {
-			window.removeEventListener( 'resize', setTooltipPosition );
+			window.removeEventListener( 'resize', setTooltipPlacement );
 		};
 	} );
 
-	return position;
+	return placement;
 }

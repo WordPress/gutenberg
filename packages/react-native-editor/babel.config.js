@@ -10,7 +10,7 @@ module.exports = function ( api ) {
 		plugins: [
 			path.resolve(
 				__dirname,
-				'../../node_modules/@babel/plugin-proposal-async-generator-functions'
+				'../../node_modules/@babel/plugin-transform-async-generator-functions'
 			),
 			'@babel/plugin-transform-runtime',
 			'@babel/plugin-transform-named-capturing-groups-regex',

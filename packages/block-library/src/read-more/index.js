@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { link as icon } from '@wordpress/icons';
 
 /**
@@ -16,6 +17,11 @@ export { metadata, name };
 export const settings = {
 	icon,
 	edit,
+	example: {
+		attributes: {
+			content: __( 'Read more' ),
+		},
+	},
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

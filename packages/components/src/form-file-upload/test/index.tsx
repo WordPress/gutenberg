@@ -7,12 +7,16 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import FormFileUpload from '..';
+import _FormFileUpload from '..';
 
 /**
  * Browser dependencies
  */
 const { File } = window;
+
+const FormFileUpload = (
+	props: React.ComponentProps< typeof _FormFileUpload >
+) => <_FormFileUpload __next40pxDefaultSize { ...props } />;
 
 // @testing-library/user-event considers changing <input type="file"> to a string as a change, but it do not occur on real browsers, so the comparisons will be against this result
 const fakePath = expect.objectContaining( {

@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	AlignmentControl,
 	useBlockProps,
 	BlockControls,
 	HeadingLevelDropdown,
@@ -17,24 +11,25 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
-const HEADING_LEVELS = [ 0, 1, 2, 3, 4, 5, 6 ];
+export default function SiteTaglineEdit( props ) {
+	useDeprecatedTextAlign( props );
 
-export default function SiteTaglineEdit( {
-	attributes,
-	setAttributes,
-	insertBlocksAfter,
-} ) {
-	const { textAlign, level } = attributes;
+	const { attributes, setAttributes, insertBlocksAfter } = props;
+	const { level, levelOptions } = attributes;
 	const { canUserEdit, tagline } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord, getEditedEntityRecord } =
 			select( coreStore );
-		const canEdit = canUser( 'update', 'settings' );
+		const canEdit = canUser( 'update', {
+			kind: 'root',
+			name: 'site',
+		} );
 		const settings = canEdit ? getEditedEntityRecord( 'root', 'site' ) : {};
 		const readOnlySettings = getEntityRecord( 'root', '__unstableBase' );
 
 		return {
-			canUserEdit: canUser( 'update', 'settings' ),
+			canUserEdit: canEdit,
 			tagline: canEdit
 				? settings?.description
 				: readOnlySettings?.description,
@@ -51,11 +46,10 @@ export default function SiteTaglineEdit( {
 	}
 
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			'wp-block-site-tagline__placeholder': ! canUserEdit && ! tagline,
-		} ),
+		className:
+			! canUserEdit && ! tagline && 'wp-block-site-tagline__placeholder',
 	} );
+
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }
@@ -79,17 +73,11 @@ export default function SiteTaglineEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
-					options={ HEADING_LEVELS }
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
-				/>
-				<AlignmentControl
-					onChange={ ( newAlign ) =>
-						setAttributes( { textAlign: newAlign } )
-					}
-					value={ textAlign }
 				/>
 			</BlockControls>
 			{ siteTaglineContent }
