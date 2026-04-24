@@ -104,6 +104,21 @@ export interface ContentProps extends ComponentProps< 'div' > {
 	 * The body content to be rendered inside the scroll container.
 	 */
 	children?: ReactNode;
+	/**
+	 * The scroll region automatically becomes a keyboard-reachable tab
+	 * stop (`tabindex="0"`) whenever the body overflows, so keyboard
+	 * users can arrow-scroll the region (WCAG 2.1.1). It becomes
+	 * non-tabbable again as soon as the content no longer overflows.
+	 *
+	 * If you supply `tabIndex` explicitly, your value wins and is never
+	 * overwritten — including `tabIndex={ -1 }` to opt out of the
+	 * automatic tab stop entirely. The one edge case to be aware of:
+	 * if you later *remove* an explicit `tabIndex` at runtime, the
+	 * component will resume managing it on the next overflow tick; it
+	 * can't distinguish a previous explicit opt-out from an
+	 * unconfigured state.
+	 */
+	tabIndex?: number;
 }
 
 export interface TitleProps extends ComponentProps< 'h2' > {
