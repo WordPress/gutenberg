@@ -549,12 +549,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = '0px';
 		}
 
+		$auto_placement = ! empty( $layout['autoFit'] ) ? 'auto-fit' : 'auto-fill';
+
 		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
 			$max_value       = 'max(min(' . $layout['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(' . $max_value . ', 1fr))',
+					'grid-template-columns' => 'repeat(' . $auto_placement . ', minmax(' . $max_value . ', 1fr))',
 					'container-type'        => 'inline-size',
 				),
 			);
@@ -581,7 +583,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array(
-					'grid-template-columns' => 'repeat(auto-fill, minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
+					'grid-template-columns' => 'repeat(' . $auto_placement . ', minmax(min(' . $minimum_column_width . ', 100%), 1fr))',
 					'container-type'        => 'inline-size',
 				),
 			);

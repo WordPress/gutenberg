@@ -8,6 +8,7 @@ import {
 	Flex,
 	FlexItem,
 	RangeControl,
+	ToggleControl,
 	__experimentalNumberControl as NumberControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -120,7 +121,10 @@ export default {
 			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
+			autoFit = false,
 		} = layout;
+
+		const autoPlacement = autoFit ? 'auto-fit' : 'auto-fill';
 
 		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
 		// write code that stores a string attribute instead of a number.
@@ -170,7 +174,7 @@ export default {
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(${ maxValue }, 1fr))`,
 				`container-type: inline-size`
 			);
 			if ( rowCount ) {
@@ -189,7 +193,7 @@ export default {
 			}
 		} else {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${
+				`grid-template-columns: repeat(${ autoPlacement }, minmax(min(${
 					minimumColumnWidth || '12rem'
 				}, 100%), 1fr))`,
 				'container-type: inline-size'
@@ -223,7 +227,8 @@ export default {
 
 // Enables setting minimum width of grid items.
 function GridLayoutMinimumWidthControl( { layout, onChange } ) {
-	const { minimumColumnWidth, columnCount, isManualPlacement } = layout;
+	const { minimumColumnWidth, columnCount, isManualPlacement, autoFit } =
+		layout;
 	const defaultValue = isManualPlacement || columnCount ? null : '12rem';
 	const value = minimumColumnWidth || defaultValue;
 	const [ quantity, unit = 'rem' ] =
@@ -298,6 +303,16 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 					'Columns will wrap to fewer per row when they can no longer maintain the minimum width.'
 				) }
 			</p>
+			<ToggleControl
+				label={ __( 'Fill available space' ) }
+				checked={ !! autoFit }
+				onChange={ ( autoFitValue ) =>
+					onChange( {
+						...layout,
+						autoFit: autoFitValue || undefined,
+					} )
+				}
+			/>
 		</fieldset>
 	);
 }
