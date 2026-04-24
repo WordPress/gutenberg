@@ -38,8 +38,8 @@ export default function PostTextEditor() {
 	return (
 		<>
 			<VisuallyHidden
-				as="label"
-				htmlFor={ `post-content-${ instanceId }` }
+				// eslint-disable-next-line jsx-a11y/label-has-associated-control
+				render={ <label htmlFor={ `post-content-${ instanceId }` } /> }
 			>
 				{ __( 'Type text or HTML' ) }
 			</VisuallyHidden>
