@@ -14,17 +14,15 @@ import { getRotatedBBox } from '../../image-editor/core/camera';
  *      rotate by `rotation` degrees, then flip horizontally / vertically.
  *      The server applies the same operations to produce the same canvas.
  *
- *   2. `crop` — an axis-aligned rectangle in the **post-transform canvas**.
- *      Pixel units match that canvas. No mixed frames, no rotation math
- *      on the rect.
+ *   2. `crop` — an axis-aligned rectangle in the **post-transform canvas**
+ *      (the full-rotation AABB of the source). Pixel units match that
+ *      canvas. No mixed frames.
  *
- * Caveat for fine rotation: the cropper's stencil is laid out against the
- * snap-rotation bbox (stable through ±45° fine rotation), so `crop` is
- * expressed in that canvas. At snap angles (multiples of 90°) this equals
- * the full post-transform canvas and the result is pixel-exact WYSIWYG.
- * At non-snap angles the server rotates to the full AABB and crops the
- * same-dimension rect; the content is visually close to the stencil but
- * not pixel-identical. MVP scope.
+ * Fine rotation (non-multiple of 90°) is the straighten-then-crop case:
+ * the output is the fully-rotated image with an axis-aligned slice taken
+ * around the stencil center. The slice dimensions match the stencil; the
+ * slice's content is a clean rectangle of straightened image, which is
+ * what the "straighten a tilted photo and crop" workflow wants.
  */
 export interface EditPayload {
 	transform: {
@@ -42,25 +40,28 @@ export interface EditPayload {
 /**
  * Build the canonical edit payload from the cropper state.
  *
- * The cropper's `cropRect` is stored as fractions of the snap-rotation
+ * The cropper's `cropRect` is stored as fractions of the **snap-rotation**
  * bounding box (the stencil-reference frame — see `createCamera` /
- * `createExportCamera`). Pan is also in that frame, and zoom scales the
- * image under a fixed stencil.
+ * `createExportCamera`). Pan is in that frame; zoom scales the image
+ * under a fixed stencil.
  *
- * Converting to post-transform canvas pixels is a pure bookkeeping step:
+ * Two conversions:
  *
- *   - The post-transform canvas is the snap-rotation bbox of the source
- *     (e.g. 1024×576 source at 90° → 576×1024 canvas).
- *   - At zoom 1, pan 0, the image fills the canvas. The stencil then
- *     samples `[cropRect.x * rotW .. +cropRect.width * rotW]` directly.
- *   - With zoom z, pan p, the image is scaled about the canvas center
- *     and offset by pan. The stencil's footprint in canvas pixels is the
- *     inverse of that transform applied to the stencil rect.
+ *   1. Express the stencil rect in snap-AABB pixels:
+ *      Image screen-normalized top-left with zoom/pan is
+ *      `(0.5 + pan - zoom/2)`; the stencil's pixel footprint is the
+ *      inverse of that transform applied to `cropRect`.
  *
- * Fine rotation (non-multiple of 90°) is represented purely in `transform`.
- * The crop rect stays in the snap-rotation canvas because that's the frame
- * the user framed their crop in; the server composes snap + fine into a
- * single rotate call before cropping.
+ *   2. Translate from snap-AABB coords to full-AABB coords. Both AABBs
+ *      share the source-image center, so the conversion is a pure
+ *      translation by `(fullCenter - snapCenter)`. No rotation: the
+ *      server's `rotate(state.rotation)` on the source already produces
+ *      the full-AABB canvas in its natural orientation, so the crop
+ *      rect just needs to slide to the full AABB's origin.
+ *
+ * The resulting `crop` is axis-aligned in the full post-rotate AABB, so
+ * the server can apply it directly with `WP_Image_Editor::crop` after
+ * rotating the source by `transform.rotation`.
  *
  * @param state     Current cropper state.
  * @param imageSize Natural dimensions of the source image.
@@ -71,30 +72,42 @@ export function buildEditPayload(
 	imageSize: Size
 ): EditPayload {
 	const snapRotation = Math.round( state.rotation / 90 ) * 90;
-	const { width: rotW, height: rotH } = getRotatedBBox(
+	const { width: snapW, height: snapH } = getRotatedBBox(
 		imageSize.width,
 		imageSize.height,
 		snapRotation
 	);
+	const { width: fullW, height: fullH } = getRotatedBBox(
+		imageSize.width,
+		imageSize.height,
+		state.rotation
+	);
 
 	const { cropRect, pan, zoom } = state;
 
-	// Image's screen-normalized top-left with zoom/pan applied. The image
-	// is centered on (0.5 + pan) and scaled by `zoom` about that center,
-	// so its top-left sits at (0.5 + pan - zoom/2).
+	// Stencil rect in snap-AABB pixels.
 	const imgLeft = 0.5 + pan.x - zoom / 2;
 	const imgTop = 0.5 + pan.y - zoom / 2;
+	const snapX = ( ( cropRect.x - imgLeft ) / zoom ) * snapW;
+	const snapY = ( ( cropRect.y - imgTop ) / zoom ) * snapH;
+	const width = ( cropRect.width / zoom ) * snapW;
+	const height = ( cropRect.height / zoom ) * snapH;
 
-	const x = ( ( cropRect.x - imgLeft ) / zoom ) * rotW;
-	const y = ( ( cropRect.y - imgTop ) / zoom ) * rotH;
-	const width = ( cropRect.width / zoom ) * rotW;
-	const height = ( cropRect.height / zoom ) * rotH;
+	// Pure translation from snap-AABB to full-AABB (both share source
+	// center; only their AABB extents differ).
+	const offsetX = ( fullW - snapW ) / 2;
+	const offsetY = ( fullH - snapH ) / 2;
 
 	return {
 		transform: {
 			rotation: state.rotation,
 			flip: { ...state.flip },
 		},
-		crop: { x, y, width, height },
+		crop: {
+			x: snapX + offsetX,
+			y: snapY + offsetY,
+			width,
+			height,
+		},
 	};
 }
