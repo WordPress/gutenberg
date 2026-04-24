@@ -10,6 +10,25 @@ columns **and** multiple rows. It does not implement other grid
 models such as masonry (column-flow) or justified rows (equal-height
 rows).
 
+## Relation to `@wordpress/components`'s `__experimentalGrid`
+
+`@wordpress/components` already exports a `__experimentalGrid` (often
+imported as `Grid`). The two solve different problems:
+
+- **`__experimentalGrid`** is a low-level CSS Grid layout primitive:
+  it accepts `columns`, `gap`, `templateColumns`, `alignment`, etc.,
+  and renders children in a static grid. There is no concept of an
+  item having a span, no drag, no resize, no per-item state.
+- **`DashboardGrid`** is a higher-level component for user-arrangeable
+  tile surfaces. Items declare `(width, height)` spans, can be
+  reordered via drag-and-drop and resized via handles in edit mode,
+  and the resulting layout is emitted to the consumer through
+  `onChangeLayout`.
+
+Reach for `__experimentalGrid` when you only need static CSS Grid
+ergonomics. Reach for `DashboardGrid` when the user — not the
+developer — places and resizes the tiles.
+
 ## Installation
 
 Install the module:
