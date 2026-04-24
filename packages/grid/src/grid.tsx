@@ -140,12 +140,14 @@ export function DashboardGrid( {
 
 	const items = useMemo(
 		() =>
-			[ ...activeLayout ]
+			activeLayout
+				.map( ( item, index ) => ( { item, index } ) )
 				.sort(
 					( a, b ) =>
-						( a.order ?? Infinity ) - ( b.order ?? Infinity )
+						( a.item.order ?? a.index ) -
+						( b.item.order ?? b.index )
 				)
-				.map( ( item ) => item.key ),
+				.map( ( { item } ) => item.key ),
 		[ activeLayout ]
 	);
 
@@ -227,7 +229,7 @@ export function DashboardGrid( {
 					order: newOrder,
 				};
 			} );
-			// eslint-disable-next-line react-compiler/react-compiler -- Ref mirrors the next state for synchronous reads on drag end
+
 			latestLayoutRef.current = updatedLayout;
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
@@ -243,7 +245,6 @@ export function DashboardGrid( {
 	 */
 	function persistTemporaryLayout() {
 		const latest = latestLayoutRef.current;
-		// eslint-disable-next-line react-compiler/react-compiler -- Ref reset pairs with the mirrored writes on drag/resize
 		latestLayoutRef.current = undefined;
 
 		if ( ! onChangeLayout || ! latest ) {
@@ -307,7 +308,7 @@ export function DashboardGrid( {
 				}
 				return item;
 			} );
-			// eslint-disable-next-line react-compiler/react-compiler -- Ref mirrors the next state for synchronous reads on drag end
+
 			latestLayoutRef.current = updatedLayout;
 			setTemporaryLayout( updatedLayout );
 			onPreviewLayout?.( updatedLayout );
