@@ -3132,6 +3132,7 @@ class WP_Theme_JSON_Gutenberg {
 					'path'       => $node_path,
 					'selector'   => $selector,
 					'selectors'  => $feature_selectors,
+					'elements'   => $selectors[ $name ]['elements'] ?? array(),
 					'duotone'    => $duotone_selector,
 					'variations' => $variation_selectors,
 					'css'        => $selector,
@@ -3164,6 +3165,7 @@ class WP_Theme_JSON_Gutenberg {
 								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
 								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
 								'selectors'  => $pseudo_feature_selectors,
+								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
@@ -3185,6 +3187,7 @@ class WP_Theme_JSON_Gutenberg {
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
 								'selectors'  => $feature_selectors,
+								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
 								'css'        => $custom_css_selector,
@@ -3200,6 +3203,7 @@ class WP_Theme_JSON_Gutenberg {
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
 											'selectors'  => $feature_selectors,
+											'elements'   => $selectors[ $name ]['elements'] ?? array(),
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,
 											'css'        => $compound_css_selector,
@@ -3274,8 +3278,7 @@ class WP_Theme_JSON_Gutenberg {
 		// Update text indent selector for paragraph blocks based on the textIndent setting.
 		$block_name           = $block_metadata['name'] ?? null;
 		$feature_declarations = static::update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name );
-		$blocks_metadata      = static::get_blocks_metadata();
-		$block_elements       = $block_name && isset( $blocks_metadata[ $block_name ]['elements'] ) ? $blocks_metadata[ $block_name ]['elements'] : array();
+		$block_elements       = $block_metadata['elements'] ?? array();
 
 		// Update button width declarations for percentage values to use calc() with block gap.
 		$feature_declarations = static::update_button_width_declarations( $feature_declarations, $settings );
