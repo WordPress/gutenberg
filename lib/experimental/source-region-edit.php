@@ -369,12 +369,22 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 
 	$original_attachment_post = get_post( $attachment_id );
 
+	// Honor Details-tab edits sent in the same request. The modal bundles
+	// staged title/caption/description/alt_text edits into the `/edit` call
+	// so a single save can't silently drop them; fall back to the parent's
+	// values when the client didn't send an override. Caption and description
+	// are passed through raw here — `wp_insert_attachment` runs the usual
+	// post-field sanitizers (kses, etc.) before writing to the DB.
+	$request_title   = isset( $params['title'] ) ? sanitize_text_field( (string) $params['title'] ) : null;
+	$request_caption = isset( $params['caption'] ) ? (string) $params['caption'] : null;
+	$request_desc    = isset( $params['description'] ) ? (string) $params['description'] : null;
+
 	$new_attachment_post                 = new stdClass();
 	$new_attachment_post->post_mime_type = $saved['mime-type'];
 	$new_attachment_post->guid           = $uploads['url'] . "/$filename";
-	$new_attachment_post->post_title     = $original_attachment_post->post_title ?? $image_name;
-	$new_attachment_post->post_excerpt   = $original_attachment_post->post_excerpt ?? '';
-	$new_attachment_post->post_content   = $original_attachment_post->post_content ?? '';
+	$new_attachment_post->post_title     = $request_title ?? $original_attachment_post->post_title ?? $image_name;
+	$new_attachment_post->post_excerpt   = $request_caption ?? $original_attachment_post->post_excerpt ?? '';
+	$new_attachment_post->post_content   = $request_desc ?? $original_attachment_post->post_content ?? '';
 	$new_attachment_post->post_parent    = 0;
 
 	$new_attachment_id = wp_insert_attachment(

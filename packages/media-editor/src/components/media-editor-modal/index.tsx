@@ -9,7 +9,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -198,6 +198,8 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 		[ id ]
 	);
 
+	const registry = useRegistry();
+
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 	// `editMediaEntity` is a private core-data action; unlock to reach it.
@@ -339,12 +341,39 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 					width: controller.state.image.naturalWidth,
 					height: controller.state.image.naturalHeight,
 				} );
+
+				// Bundle any staged Details-tab edits into the same /edit
+				// request. Transformed saves create a new attachment, and
+				// the prior core-data edits were staged against the old id
+				// — if we don't forward them here they'd be silently lost.
+				// Server mirrors Core's fallback: request value if present,
+				// otherwise the parent's value.
+				const pendingEdits = registry
+					.select( coreStore )
+					.getEntityRecordNonTransientEdits(
+						'postType',
+						'attachment',
+						id
+					) as Record< string, unknown > | undefined;
+				const metadataEdits: Record< string, unknown > = {};
+				for ( const key of [
+					'title',
+					'caption',
+					'description',
+					'alt_text',
+				] ) {
+					if ( pendingEdits && key in pendingEdits ) {
+						metadataEdits[ key ] = pendingEdits[ key ];
+					}
+				}
+
 				saved = await editMediaEntity(
 					id,
 					{
 						src: media?.source_url,
 						transform: payload.transform,
 						crop: payload.crop,
+						...metadataEdits,
 					},
 					{ throwOnError: true }
 				);
@@ -357,6 +386,20 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 			}
 
 			const next = ( saved ?? media ) as Media | null;
+
+			// A transformed save creates a new attachment; the Details edits
+			// now live on the new record (sent in the /edit payload). Reset
+			// the old record's staged edits back to its original values so
+			// it doesn't appear dirty in the Media Library afterwards.
+			if ( next && next.id !== id && originalFieldValuesRef.current ) {
+				editEntityRecord(
+					'postType',
+					'attachment',
+					id,
+					originalFieldValuesRef.current
+				);
+			}
+
 			if ( next && next.id && onUpdate ) {
 				// Normalize to the public callback shape — see
 				// `MediaEditorModalUpdate` in `../../store/actions.ts`.
