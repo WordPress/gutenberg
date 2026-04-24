@@ -358,6 +358,14 @@ function CropperInner(
 	}, [] );
 
 	/**
+	 * Handle Escape on a resize handle — return focus to the canvas so
+	 * arrow keys pan the image rather than resize.
+	 */
+	const handleEscape = useCallback( () => {
+		canvasRef.current?.focus( { preventScroll: true } );
+	}, [] );
+
+	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
@@ -465,6 +473,7 @@ function CropperInner(
 					onCropChange={ handleCropChange }
 					onResizeStart={ onGestureStart }
 					onResizeEnd={ handleResizeEnd }
+					onEscape={ handleEscape }
 					aspectRatio={ aspectRatio }
 					freeformCrop={ freeformCrop }
 					stencilTransition={ settleStencilTransition }

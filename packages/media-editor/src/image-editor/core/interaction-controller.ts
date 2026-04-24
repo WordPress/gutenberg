@@ -247,11 +247,17 @@ export class InteractionController {
 		}
 		e.preventDefault();
 
-		// Blur any focused handle so its focus ring doesn't linger.
+		// Blur any focused handle so its focus ring doesn't linger,
+		// but leave the canvas itself alone so keyboard control works after drag.
 		const ownerDoc = el.ownerDocument;
-		if ( ownerDoc?.activeElement instanceof HTMLElement ) {
+		if (
+			ownerDoc?.activeElement instanceof HTMLElement &&
+			ownerDoc.activeElement !== el
+		) {
 			ownerDoc.activeElement.blur();
 		}
+
+		el.focus();
 
 		// Capture pointer so drag works across iframe boundaries.
 		el.setPointerCapture( e.pointerId );
@@ -780,7 +786,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y - this.keyboardStep,
+							y: currentState.pan.y + this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -799,7 +805,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y + this.keyboardStep,
+							y: currentState.pan.y - this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -817,7 +823,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x - this.keyboardStep,
+							x: currentState.pan.x + this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -836,7 +842,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x + this.keyboardStep,
+							x: currentState.pan.x - this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -877,6 +883,9 @@ export class InteractionController {
 			}
 			case 'r':
 			case 'R': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
 				e.preventDefault();
 				this.options.dispatch( {
 					type: 'SNAP_ROTATE_90',
