@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
-import { Autocomplete, Icon, Input, InputLayout, Textarea } from '../../../..';
+import * as Autocomplete from '../index';
+import { Icon } from '../../../../icon';
+import { Input } from '../../input';
+import { InputLayout } from '../../input-layout';
+import { Textarea } from '../../textarea';
 import { COMMANDS, URLS, USERS, type FixtureItem } from './fixtures';
 
 const meta: Meta< typeof Autocomplete.Root > = {
