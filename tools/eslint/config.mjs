@@ -258,6 +258,7 @@ export default dedupePlugins( [
 				{
 					'@wordpress/components': {
 						__experimentalText: 'WCText',
+						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 					},
 				},
