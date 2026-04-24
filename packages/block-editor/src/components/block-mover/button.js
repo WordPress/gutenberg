@@ -8,7 +8,7 @@ import clsx from 'clsx';
  */
 import { getBlockType } from '@wordpress/blocks';
 import { Button, VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
@@ -66,6 +66,7 @@ const BlockMoverButton = forwardRef(
 			? clientIds
 			: [ clientIds ];
 		const blocksCount = normalizedClientIds.length;
+		const isMobileViewport = useViewportMatch( 'small', '<' );
 
 		const {
 			blockType,
@@ -138,7 +139,13 @@ const BlockMoverButton = forwardRef(
 						direction,
 						orientation
 					) }
-					tooltipPosition={ direction === 'down' ? 'bottom' : 'top' }
+					tooltipPosition={
+						! isMobileViewport &&
+						direction === 'down' &&
+						orientation === 'vertical'
+							? 'bottom'
+							: 'top'
+					}
 					aria-describedby={ descriptionId }
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
