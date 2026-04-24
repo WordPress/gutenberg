@@ -163,37 +163,6 @@ function gutenberg_get_all_image_sizes(): array {
 }
 
 /**
- * Returns the default output format mapping for the supported image formats.
- *
- * @return array<string,string> Map of input formats to output formats.
- */
-function gutenberg_get_default_image_output_formats() {
-	$input_formats = array(
-		'image/jpeg',
-		'image/png',
-		'image/gif',
-		'image/webp',
-		'image/avif',
-		'image/heic',
-		'image/heif',
-	);
-
-	$output_formats = array();
-
-	foreach ( $input_formats as $mime_type ) {
-		/** This filter is documented in wp-includes/media.php */
-		$output_formats = apply_filters(
-			'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			$output_formats,
-			'',
-			$mime_type
-		);
-	}
-
-	return $output_formats;
-}
-
-/**
  * Filters the REST API root index data to add custom settings.
  *
  * @param WP_REST_Response $response Response data.
@@ -202,22 +171,9 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	/** This filter is documented in wp-admin/includes/images.php */
 	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-	$default_image_output_formats = gutenberg_get_default_image_output_formats();
-
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$jpeg_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/jpeg' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$png_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/png' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$gif_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/gif' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
 	if ( current_user_can( 'upload_files' ) ) {
 		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
 		$response->data['image_size_threshold'] = $image_size_threshold;
-		$response->data['image_output_formats'] = (object) $default_image_output_formats;
-		$response->data['jpeg_interlaced']      = $jpeg_interlaced;
-		$response->data['png_interlaced']       = $png_interlaced;
-		$response->data['gif_interlaced']       = $gif_interlaced;
 	}
 
 	return $response;
