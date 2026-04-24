@@ -68,6 +68,13 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	// Mirror of `temporaryLayout` read synchronously on drag end —
 	// the state update from `handleDragMove` may still be batched.
 	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
+	// Cursor center at the last applied reorder. Used to skip the
+	// cascade of re-measured `onDragMove` events after a layout
+	// change, when the cursor has not actually moved.
+	const lastReorderCursorRef = useRef< {
+		x: number;
+		y: number;
+	} | null >( null );
 	const activeLayout = temporaryLayout ?? layout;
 
 	const rootRef = useRef< HTMLDivElement >( null );
@@ -185,11 +192,13 @@ export function DashboardGrid( props: DashboardGridProps ) {
 
 	const handleDragStart = useEvent( ( event: DragStartEvent ) => {
 		setActiveId( String( event.active.id ) );
+		lastReorderCursorRef.current = null;
 	} );
 
 	const handleDragCancel = useEvent( () => {
 		setActiveId( null );
 		latestLayoutRef.current = undefined;
+		lastReorderCursorRef.current = null;
 		setTemporaryLayout( undefined );
 	} );
 
@@ -207,8 +216,21 @@ export function DashboardGrid( props: DashboardGridProps ) {
 			return;
 		}
 
-		const overCenterX = over.rect.left + over.rect.width / 2;
 		const activeCenterX = activeRect.left + activeRect.width / 2;
+		const activeCenterY = activeRect.top + activeRect.height / 2;
+
+		// Skip re-measured events after a layout change: require
+		// meaningful cursor movement between reorders.
+		const lastCursor = lastReorderCursorRef.current;
+		if ( lastCursor ) {
+			const dx = activeCenterX - lastCursor.x;
+			const dy = activeCenterY - lastCursor.y;
+			if ( dx * dx + dy * dy < 100 ) {
+				return;
+			}
+		}
+
+		const overCenterX = over.rect.left + over.rect.width / 2;
 		const insertAfter = activeCenterX > overCenterX;
 
 		const currentIndex = items.indexOf( String( active.id ) );
@@ -231,6 +253,10 @@ export function DashboardGrid( props: DashboardGridProps ) {
 			order: updatedItems.indexOf( item.key ),
 		} ) );
 
+		lastReorderCursorRef.current = {
+			x: activeCenterX,
+			y: activeCenterY,
+		};
 		latestLayoutRef.current = updatedLayout;
 		setTemporaryLayout( updatedLayout );
 		onPreviewLayout?.( updatedLayout );
@@ -316,6 +342,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 			onDragEnd={ () => {
 				persistTemporaryLayout();
 				setActiveId( null );
+				lastReorderCursorRef.current = null;
 			} }
 		>
 			{ /* No-op strategy: reorder comes from `temporaryLayout`
