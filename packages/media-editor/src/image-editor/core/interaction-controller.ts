@@ -786,7 +786,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y - this.keyboardStep,
+							y: currentState.pan.y + this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -805,7 +805,7 @@ export class InteractionController {
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y + this.keyboardStep,
+							y: currentState.pan.y - this.keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -823,7 +823,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x - this.keyboardStep,
+							x: currentState.pan.x + this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -842,7 +842,7 @@ export class InteractionController {
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x + this.keyboardStep,
+							x: currentState.pan.x - this.keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
