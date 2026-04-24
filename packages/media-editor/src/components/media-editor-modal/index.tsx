@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Flex,
@@ -9,7 +10,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	useContext,
@@ -44,8 +45,25 @@ import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
+import {
+	CropperProvider,
+	useCropper,
+	type UseCropperStateReturn,
+} from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { buildModifiers } from './build-modifiers';
+
+// Details-tab edits the modal bundles into a transformed `/edit` request.
+// These are the same fields Core's `edit_media_item` reads from the
+// request body via `prepare_item_for_database` / `alt_text` — forwarding
+// them preserves any staged changes across the attachment-duplicating
+// save.
+const METADATA_EDIT_KEYS = [
+	'title',
+	'caption',
+	'description',
+	'alt_text',
+] as const;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -121,7 +139,7 @@ interface HeaderActionsProps {
 	hasMedia: boolean;
 	hasEdits: boolean;
 	onCancel: () => void;
-	onSave: () => void;
+	onSave: ( controller: UseCropperStateReturn ) => void;
 }
 
 function HeaderActions( {
@@ -131,7 +149,8 @@ function HeaderActions( {
 	onCancel,
 	onSave,
 }: HeaderActionsProps ) {
-	const { isDirty } = useCropper();
+	const controller = useCropper();
+	const { isDirty } = controller;
 	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
 	return (
 		<Flex
@@ -153,7 +172,7 @@ function HeaderActions( {
 			<Button
 				size="compact"
 				variant="primary"
-				onClick={ onSave }
+				onClick={ () => onSave( controller ) }
 				isBusy={ isSaving }
 				disabled={ saveDisabled }
 				accessibleWhenDisabled
@@ -200,7 +219,8 @@ export function MediaEditorModal( {
 		[ id ]
 	);
 
-	const { editEntityRecord, saveEditedEntityRecord } =
+	const registry = useRegistry();
+	const { editEntityRecord, receiveEntityRecords, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
@@ -317,16 +337,86 @@ export function MediaEditorModal( {
 		closeMediaEditorModal();
 	};
 
-	const handleSave = async () => {
+	const handleSave = async ( controller: UseCropperStateReturn ) => {
 		setIsSaving( true );
 		try {
-			const saved = ( await saveEditedEntityRecord(
-				'postType',
-				'attachment',
-				id
-			) ) as Media | undefined;
+			let saved: Media | null | undefined;
+
+			const modifiers =
+				controller.isDirty && controller.state.image
+					? buildModifiers( controller.state, {
+							width: controller.state.image.naturalWidth,
+							height: controller.state.image.naturalHeight,
+					  } )
+					: [];
+
+			if ( modifiers.length > 0 ) {
+				// Bundle staged Details-tab edits into the same /edit
+				// request. Transformed saves duplicate the attachment,
+				// and the prior core-data edits were staged against the
+				// old id — if we don't forward them here they'd be
+				// silently lost. Core's `edit_media_item` honors these
+				// keys via `prepare_item_for_database` and `alt_text`.
+				const pendingEdits = registry
+					.select( coreStore )
+					.getEntityRecordNonTransientEdits(
+						'postType',
+						'attachment',
+						id
+					) as Record< string, unknown > | undefined;
+				const metadataEdits: Record< string, unknown > = {};
+				for ( const key of METADATA_EDIT_KEYS ) {
+					if ( pendingEdits && key in pendingEdits ) {
+						metadataEdits[ key ] = pendingEdits[ key ];
+					}
+				}
+
+				saved = ( await apiFetch( {
+					path: `/wp/v2/media/${ id }/edit`,
+					method: 'POST',
+					data: {
+						src: media?.source_url,
+						modifiers,
+						...metadataEdits,
+					},
+				} ) ) as Media;
+
+				if ( saved ) {
+					// Put the newly-created attachment into the core-data
+					// cache so downstream consumers see it without an
+					// extra fetch round-trip.
+					receiveEntityRecords(
+						'postType',
+						'attachment',
+						saved,
+						undefined,
+						true
+					);
+				}
+			} else {
+				saved = ( await saveEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) ) as Media | undefined;
+			}
 
 			const next = ( saved ?? media ) as Media | null;
+
+			// A transformed save creates a new attachment; the Details
+			// edits now live on the new record (sent in the /edit
+			// payload). Reset the old record's staged edits back to its
+			// original values so it doesn't appear dirty in the Media
+			// Library afterwards.
+			if ( next && next.id !== id && originalFieldValuesRef.current ) {
+				editEntityRecord(
+					'postType',
+					'attachment',
+					id,
+					originalFieldValuesRef.current
+				);
+			}
+
 			if ( next && next.id && onUpdate ) {
 				// Normalize to the public callback shape — see
 				// `MediaEditorModalUpdate` in `../../store/actions.ts`.
