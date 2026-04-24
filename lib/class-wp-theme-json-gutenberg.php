@@ -1561,7 +1561,7 @@ class WP_Theme_JSON_Gutenberg {
 					continue;
 				}
 
-				$nested_selector = trim( substr( $part, 0, $brace_pos ) );
+				$nested_selector = substr( $part, 0, $brace_pos );
 
 				// Find the body: everything after the first `{` up to the last `}`.
 				$body       = substr( $part, $brace_pos + 1 );
@@ -1582,9 +1582,9 @@ class WP_Theme_JSON_Gutenberg {
 				$nested_selector    = $has_pseudo_element
 					? str_replace( $pseudo_part, '', $nested_selector )
 					: $nested_selector;
-
+				$trimmed_nested = trim( $nested_selector );
 				// Build the composed selector for this nesting level.
-				$part_selector = str_starts_with( $nested_selector, ' ' )
+				$part_selector  = ( ! empty( $trimmed_nested ) && str_starts_with( $nested_selector, ' ' ) )
 					? static::scope_selector( $selector, $nested_selector )
 					: static::append_to_selector( $selector, $nested_selector );
 

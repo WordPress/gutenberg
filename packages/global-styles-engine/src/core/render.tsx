@@ -1883,7 +1883,7 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 				return;
 			}
 
-			const nestedSelector = part.slice( 0, braceIndex ).trim();
+			const nestedSelector = part.slice( 0, braceIndex );
 
 			// Body is everything after the first `{` up to the last `}`.
 			let body = part.slice( braceIndex + 1 );
@@ -1907,11 +1907,12 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 			const cleanNestedSelector = pseudoPart
 				? nestedSelector.replace( pseudoPart, '' )
 				: nestedSelector;
-
+			const trimmedClean = cleanNestedSelector.trim();
 			// Build the composed selector for this nesting level.
-			const partSelector = cleanNestedSelector.startsWith( ' ' )
-				? `${ blockSelector } ${ cleanNestedSelector.trim() }`
-				: `${ blockSelector }${ cleanNestedSelector.trim() }`;
+			const partSelector =
+				trimmedClean && cleanNestedSelector.startsWith( ' ' )
+					? `${ blockSelector } ${ cleanNestedSelector.trim() }`
+					: `${ blockSelector }${ cleanNestedSelector.trim() }`;
 
 			if ( body.includes( '&' ) ) {
 				/*
