@@ -74,10 +74,13 @@ function textSimilarity( text1, text2 ) {
 	const segmenter = new Intl.Segmenter( undefined, {
 		granularity: 'word',
 	} );
+	// Safari's Intl.Segmenter returns isWordLike: false for numeric segments,
+	// so fall back to a Unicode-aware regex for letters and numbers.
+	const wordLikeRegex = /[\p{L}\p{N}]/u;
 	const getWords = ( text ) => {
 		const words = [];
 		for ( const { segment, isWordLike } of segmenter.segment( text ) ) {
-			if ( isWordLike ) {
+			if ( isWordLike || wordLikeRegex.test( segment ) ) {
 				words.push( segment );
 			}
 		}
