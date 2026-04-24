@@ -11,54 +11,44 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import type { CoreDataError, TaxonomyFormData } from '../types';
 
-function getSuccessMessage( count: number, nextStatus: 'publish' | 'draft' ) {
-	if ( count === 1 ) {
-		return nextStatus === 'publish'
-			? __( 'Taxonomy activated.' )
-			: __( 'Taxonomy deactivated.' );
-	}
-	if ( nextStatus === 'publish' ) {
-		return sprintf(
-			/* translators: %d: The number of taxonomies. */
-			_n( '%d taxonomy activated.', '%d taxonomies activated.', count ),
-			count
-		);
-	}
-	return sprintf(
-		/* translators: %d: The number of taxonomies. */
-		_n( '%d taxonomy deactivated.', '%d taxonomies deactivated.', count ),
-		count
-	);
-}
-
-const toggleActiveAction: Action< TaxonomyFormData > = {
-	id: 'toggle-active',
-	label: ( items: TaxonomyFormData[] ) =>
-		items.every( ( i ) => i.status === 'publish' )
-			? __( 'Deactivate' )
-			: __( 'Activate' ),
+const deactivateAction: Action< TaxonomyFormData > = {
+	id: 'deactivate',
+	label: __( 'Deactivate' ),
 	supportsBulk: true,
+	isEligible: ( item ) => item.status === 'publish',
 	async callback( items, { registry } ) {
+		const itemsToUpdate = items.filter(
+			( item ) => item.id !== undefined && item.status === 'publish'
+		);
+		if ( itemsToUpdate.length === 0 ) {
+			return;
+		}
 		const { saveEntityRecord } = registry.dispatch( coreStore );
 		const { createSuccessNotice, createErrorNotice } =
 			registry.dispatch( noticesStore );
-		const nextStatus = items.every( ( i ) => i.status === 'publish' )
-			? 'draft'
-			: 'publish';
-		const itemsToUpdate = items.filter( ( item ) => item.id !== undefined );
 		const promiseResult = await Promise.allSettled(
 			itemsToUpdate.map( ( item ) =>
 				saveEntityRecord(
 					'postType',
 					'wp_user_taxonomy',
-					{ id: item.id, status: nextStatus },
+					{ id: item.id, status: 'draft' },
 					{ throwOnError: true }
 				)
 			)
 		);
 		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 			createSuccessNotice(
-				getSuccessMessage( itemsToUpdate.length, nextStatus ),
+				itemsToUpdate.length === 1
+					? __( 'Taxonomy deactivated.' )
+					: sprintf(
+							/* translators: %d: The number of taxonomies. */
+							_n(
+								'%d taxonomy deactivated.',
+								'%d taxonomies deactivated.',
+								itemsToUpdate.length
+							),
+							itemsToUpdate.length
+					  ),
 				{ type: 'snackbar' }
 			);
 		} else {
@@ -73,7 +63,7 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 				) {
 					errorMessage = typedError.reason.message;
 				} else {
-					errorMessage = __( 'Failed to update taxonomy status.' );
+					errorMessage = __( 'Failed to deactivate taxonomy.' );
 				}
 			} else {
 				const errorMessages = new Set< string >();
@@ -92,12 +82,12 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 					}
 				}
 				if ( errorMessages.size === 0 ) {
-					errorMessage = __( 'Failed to update taxonomies status.' );
+					errorMessage = __( 'Failed to deactivate taxonomies.' );
 				} else if ( errorMessages.size === 1 ) {
 					errorMessage = sprintf(
 						/* translators: %s: an error message */
 						__(
-							'An error occurred while updating the taxonomy status: %s'
+							'An error occurred while deactivating the taxonomy: %s'
 						),
 						[ ...errorMessages ][ 0 ]
 					);
@@ -105,7 +95,7 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 					errorMessage = sprintf(
 						/* translators: %s: a list of comma separated error messages */
 						__(
-							'Some errors occurred while updating the taxonomies status: %s'
+							'Some errors occurred while deactivating the taxonomies: %s'
 						),
 						[ ...errorMessages ].join( ',' )
 					);
@@ -116,4 +106,4 @@ const toggleActiveAction: Action< TaxonomyFormData > = {
 	},
 };
 
-export default toggleActiveAction;
+export default deactivateAction;
