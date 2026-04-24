@@ -71,7 +71,15 @@ function cleanupScrollAttributes( el: HTMLElement ) {
  * users can focus the region and arrow-scroll it (WCAG 2.1.1). The tabindex
  * is removed again as soon as the element no longer overflows — a stray tab
  * stop on a non-scrolling region is an anti-pattern. An internal flag
- * attribute ensures a consumer-supplied `tabindex` is never overwritten.
+ * attribute (`data-wp-ui-overlay-scroll-tabbable`) marks tabindex values
+ * the hook installed, so a consumer-supplied `tabindex` is never
+ * overwritten.
+ *
+ * Overflow detection is block-axis-only. Overlay popups are expected to
+ * constrain content width (`overlay-chrome.module.css` clips `.content`
+ * with `overflow-inline: hidden`); horizontal scrolling is intentionally
+ * not supported, so this hook doesn't toggle tabindex on inline-axis
+ * overflow and the scroll-state attributes don't track it.
  *
  * Returns a callback `ref` that the caller must attach to the scroll
  * container, and an `onScroll` handler to wire up to the same element. A

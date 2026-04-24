@@ -78,11 +78,19 @@
 	 * show a scrollbar when content exceeds the available space. Default
 	 * padding is `padding-2xl` on all sides; the yield rules below strip
 	 * block padding when chrome occupies that edge.
+	 *
+	 * Scrolling is intentionally block-axis-only. `overflow-inline: hidden`
+	 * clips wide content instead of introducing a horizontal scrollbar:
+	 * the sibling chrome doesn't scroll inline, the popup edge already
+	 * clips, and `useOverlayScrollStateAttributes` only tracks block-axis
+	 * overflow (tabindex + separator state). Overlay consumers should
+	 * constrain content width rather than rely on horizontal scroll.
 	 */
 	.content {
 		flex: 1 1 auto;
 		min-block-size: 0;
 		overflow-block: auto;
+		overflow-inline: hidden;
 		padding: var(--wpds-dimension-padding-2xl);
 	}
 
