@@ -128,7 +128,9 @@ export function DashboardGrid( {
 		);
 		return Math.max( 1, maxColumns );
 	}, [ minColumnWidth, gapPx, containerWidth, columns ] );
-	const columnWidth = ( containerWidth - gapPx ) / effectiveColumns;
+	const columnWidth =
+		( containerWidth - ( effectiveColumns - 1 ) * gapPx ) /
+		effectiveColumns;
 
 	const layoutMap = useMemo( () => {
 		const map = new Map< string, DashboardGridLayoutItem >();
