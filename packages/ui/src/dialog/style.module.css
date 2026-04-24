@@ -187,6 +187,11 @@
 		display: flex;
 		align-items: center;
 		gap: var(--wpds-dimension-gap-sm);
+
+		/* This is to ensure that the header footprint doesn't change
+		 * if the close button is not shown. It affects AlertDialog, too.
+		 */
+		min-height: 32px; /* TODO: refactor to DS element size token when available */
 	}
 
 	.headerSticky {

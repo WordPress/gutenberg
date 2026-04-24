@@ -98,7 +98,7 @@ export const WithCustomContent: Story = {
 				>
 					<ul
 						style={ {
-							margin: 0,
+							margin: 'var(--wpds-dimension-gap-sm) 0 0',
 							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
 						} }
 					>

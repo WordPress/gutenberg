@@ -69,11 +69,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 						{ ...props }
 						onScroll={ onScroll }
 					>
-						<Stack
-							direction="column"
-							gap="sm"
+						<div
 							className={ clsx(
-								dialogStyles.headerChrome,
+								dialogStyles.header,
 								stickyHeader && dialogStyles.headerSticky
 							) }
 						>
@@ -83,15 +81,15 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 							>
 								{ title }
 							</Text>
-							{ description && (
-								<Text
-									variant="body-md"
-									render={ <_AlertDialog.Description /> }
-								>
-									{ description }
-								</Text>
-							) }
-						</Stack>
+						</div>
+						{ description && (
+							<Text
+								variant="body-md"
+								render={ <_AlertDialog.Description /> }
+							>
+								{ description }
+							</Text>
+						) }
 						{ children }
 						<Stack
 							direction="column"
