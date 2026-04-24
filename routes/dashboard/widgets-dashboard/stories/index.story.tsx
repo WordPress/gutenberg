@@ -275,7 +275,7 @@ export const Empty: Story = {
 							color: 'var(--wpds-color-fg-content-neutral-weak)',
 						} }
 					>
-						No widgets yet.
+						No widgets added.
 					</div>
 				</WidgetDashboard.Empty>
 				<WidgetDashboard.Widgets />

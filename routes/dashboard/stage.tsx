@@ -8,8 +8,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { WidgetDashboard } from '.';
-import type { WidgetInstance, WidgetType } from '.';
+import {
+	WidgetDashboard,
+	type WidgetInstance,
+	type WidgetType,
+} from './widgets-dashboard';
 
 /*
  * Widget types will be provided by `@wordpress/widget-types` once that
