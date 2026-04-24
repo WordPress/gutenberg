@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param array           $handler         Matched route handler (unused).
  * @return mixed Null to fall through to the registered callback, otherwise a response/error.
  */
-function gutenberg_source_region_dispatch( $dispatch_result, $request, $route, $handler ) {
+function gutenberg_source_region_dispatch( $dispatch_result, $request, $route, $handler ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	if ( null !== $dispatch_result ) {
 		return $dispatch_result;
 	}
@@ -246,7 +246,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 	) {
 		return new WP_Error(
 			'rest_unknown_attachment',
-			__( 'Unable to get meta information for file.' ),
+			__( 'Unable to get meta information for file.', 'default' ),
 			array( 'status' => 404 )
 		);
 	}
@@ -256,7 +256,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 	if ( ! in_array( $mime_type, $supported_types, true ) ) {
 		return new WP_Error(
 			'rest_cannot_edit_file_type',
-			__( 'This type of file cannot be edited.' ),
+			__( 'This type of file cannot be edited.', 'default' ),
 			array( 'status' => 400 )
 		);
 	}
@@ -270,7 +270,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 	if ( is_wp_error( $image_editor ) ) {
 		return new WP_Error(
 			'rest_unknown_image_file_type',
-			__( 'Unable to edit this image.' ),
+			__( 'Unable to edit this image.', 'default' ),
 			array( 'status' => 500 )
 		);
 	}
@@ -290,7 +290,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 		if ( is_wp_error( $result ) ) {
 			return new WP_Error(
 				'rest_image_rotation_failed',
-				__( 'Unable to rotate this image.' ),
+				__( 'Unable to rotate this image.', 'default' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -304,7 +304,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 		if ( is_wp_error( $result ) ) {
 			return new WP_Error(
 				'rest_image_flip_failed',
-				__( 'Unable to flip this image.' ),
+				__( 'Unable to flip this image.', 'default' ),
 				array( 'status' => 500 )
 			);
 		}
@@ -322,7 +322,7 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 		if ( is_wp_error( $result ) ) {
 			return new WP_Error(
 				'rest_image_crop_failed',
-				__( 'Unable to crop this image.' ),
+				__( 'Unable to crop this image.', 'default' ),
 				array( 'status' => 500 )
 			);
 		}
