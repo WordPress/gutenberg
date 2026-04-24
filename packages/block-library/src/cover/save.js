@@ -35,6 +35,7 @@ export default function save( { attributes } ) {
 		customOverlayColor,
 		dimRatio,
 		focalPoint,
+		customPosition,
 		useFeaturedImage,
 		hasParallax,
 		isDark,
@@ -77,13 +78,13 @@ export default function save( { attributes } ) {
 
 	const objectPosition =
 		// prettier-ignore
-		focalPoint && isImgElement
-			  ? mediaPosition(focalPoint)
+		( focalPoint || customPosition ) && isImgElement
+			  ? ( customPosition ?? mediaPosition(focalPoint) )
 			  : undefined;
 
 	const backgroundImage = url ? `url(${ url })` : undefined;
 
-	const backgroundPosition = mediaPosition( focalPoint );
+	const backgroundPosition = customPosition ?? mediaPosition( focalPoint );
 
 	const classes = clsx(
 		{

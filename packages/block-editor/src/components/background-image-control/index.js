@@ -50,6 +50,32 @@ import {
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 
+const BACKGROUND_POSITION_UNITS = [
+	{ value: '%', label: '%', default: 50 },
+	{ value: 'px', label: 'px', default: 0 },
+	{ value: 'em', label: 'em', default: 0 },
+	{ value: 'rem', label: 'rem', default: 0 },
+	{ value: 'vw', label: 'vw', default: 0 },
+	{ value: 'vh', label: 'vh', default: 0 },
+];
+
+/**
+ * Parses a CSS background-position string into X and Y components.
+ *
+ * @param {string} value CSS background-position value.
+ * @return {{ x: string|undefined, y: string|undefined }} Parsed X and Y components.
+ */
+const parseBackgroundPosition = ( value ) => {
+	if ( ! value ) {
+		return { x: undefined, y: undefined };
+	}
+	const parts = value.split( ' ' ).filter( Boolean );
+	return {
+		x: parts[ 0 ] ?? undefined,
+		y: parts.length > 1 ? parts[ 1 ] : parts[ 0 ],
+	};
+};
+
 const BACKGROUND_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 36,
@@ -451,6 +477,12 @@ function BackgroundSizeControls( {
 		style?.background?.backgroundAttachment ||
 		inheritedValue?.background?.backgroundAttachment;
 
+	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
+	const backgroundPositionValue =
+		! positionValue && isUploadedImage && 'contain' === sizeValue
+			? defaultValues?.backgroundPosition
+			: positionValue;
+
 	/*
 	 * Set default values for uploaded images.
 	 * The default values are passed by the consumer.
@@ -541,6 +573,52 @@ function BackgroundSizeControls( {
 		);
 	};
 
+	const { x: posX, y: posY } = parseBackgroundPosition(
+		backgroundPositionValue ?? ''
+	);
+	const positionXValue = posX ?? '50%';
+	const positionYValue = posY ?? '50%';
+
+	const updateBackgroundPositionX = ( next ) => {
+		if ( next === undefined ) {
+			onChange(
+				setImmutably(
+					style,
+					[ 'background', 'backgroundPosition' ],
+					undefined
+				)
+			);
+			return;
+		}
+		onChange(
+			setImmutably(
+				style,
+				[ 'background', 'backgroundPosition' ],
+				`${ next } ${ positionYValue }`
+			)
+		);
+	};
+
+	const updateBackgroundPositionY = ( next ) => {
+		if ( next === undefined ) {
+			onChange(
+				setImmutably(
+					style,
+					[ 'background', 'backgroundPosition' ],
+					undefined
+				)
+			);
+			return;
+		}
+		onChange(
+			setImmutably(
+				style,
+				[ 'background', 'backgroundPosition' ],
+				`${ positionXValue } ${ next }`
+			)
+		);
+	};
+
 	const toggleIsRepeated = () =>
 		onChange(
 			setImmutably(
@@ -559,20 +637,31 @@ function BackgroundSizeControls( {
 			)
 		);
 
-	// Set a default background position for non-site-wide, uploaded images with a size of 'contain'.
-	const backgroundPositionValue =
-		! positionValue && isUploadedImage && 'contain' === sizeValue
-			? defaultValues?.backgroundPosition
-			: positionValue;
-
 	return (
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
 				label={ __( 'Focal point' ) }
+				__experimentalHideControls
 				url={ imageValue }
 				value={ backgroundPositionToCoords( backgroundPositionValue ) }
 				onChange={ updateBackgroundPosition }
 			/>
+			<HStack spacing={ 2 }>
+				<UnitControl
+					label={ __( 'X position' ) }
+					value={ positionXValue }
+					onChange={ updateBackgroundPositionX }
+					units={ BACKGROUND_POSITION_UNITS }
+					size="__unstable-large"
+				/>
+				<UnitControl
+					label={ __( 'Y position' ) }
+					value={ positionYValue }
+					onChange={ updateBackgroundPositionY }
+					units={ BACKGROUND_POSITION_UNITS }
+					size="__unstable-large"
+				/>
+			</HStack>
 			<ToggleControl
 				label={ __( 'Fixed background' ) }
 				checked={ attachmentValue === 'fixed' }
