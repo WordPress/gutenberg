@@ -88,17 +88,18 @@ export function Comments( {
 	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
+	const firstBlockElement = useBlockElement( orderedBlockIds[ 0 ] );
 
 	const editorCanvasElement = useMemo( () => {
-		if ( ! relatedBlockElement ) {
+		if ( ! firstBlockElement ) {
 			return null;
 		}
-		const editorBody = relatedBlockElement.closest( 'body' );
+		const editorBody = firstBlockElement.closest( 'body' );
 		if ( ! editorBody ) {
 			return null;
 		}
 		return getScrollContainer( editorBody );
-	}, [ relatedBlockElement ] );
+	}, [ firstBlockElement ] );
 
 	const threads = useMemo( () => {
 		const t = [ ...noteThreads ];
