@@ -143,9 +143,6 @@ function getBlockFiles( blockDir ) {
 	return {
 		hasSaveJs: fs.existsSync( path.join( dir, 'save.js' ) ),
 		hasIndexPhp: fs.existsSync( path.join( dir, 'index.php' ) ),
-		hasEditJs: fs.existsSync( path.join( dir, 'edit.js' ) ),
-		hasDeprecated: fs.existsSync( path.join( dir, 'deprecated.js' ) ),
-		hasVariations: fs.existsSync( path.join( dir, 'variations.js' ) ),
 	};
 }
 
