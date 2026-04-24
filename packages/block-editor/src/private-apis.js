@@ -50,6 +50,7 @@ import {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -133,6 +134,7 @@ lock( privateApis, {
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
+	openMediaEditorModalKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

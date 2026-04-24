@@ -21,10 +21,15 @@ module.exports = {
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [ '/--wp-components-color-/' ],
+				cursor: [ 'pointer' ],
 			},
 			{
-				message: ( property, value ) =>
-					`Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`,
+				message: ( property, value ) => {
+					if ( property === 'cursor' ) {
+						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					}
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+				},
 			},
 		],
 		'font-weight-notation': null,

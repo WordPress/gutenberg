@@ -1,6 +1,7 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
+import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
-import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { Text } from '../text';
 import { useDialogValidationContext } from './context';
 import styles from './style.module.css';
@@ -25,14 +26,16 @@ import type { TitleProps } from './types';
  * ```
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function DialogTitle( { children, ...props }, forwardedRef ) {
+	function DialogTitle( { children, className, ...props }, forwardedRef ) {
 		const validationContext = useDialogValidationContext();
 		const internalRef = useRef< HTMLHeadingElement >( null );
 		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
 
-		// Register this title with the parent Popup for validation (dev only)
-		useLayoutEffect( () => {
-			validationContext?.registerTitle( internalRef.current );
+		useEffect( () => {
+			if ( validationContext ) {
+				return validationContext.registerTitle( internalRef.current );
+			}
+			return undefined;
 		}, [ validationContext ] );
 
 		return (
@@ -40,7 +43,7 @@ const Title = forwardRef< HTMLHeadingElement, TitleProps >(
 				ref={ mergedRef }
 				variant="heading-xl"
 				render={ <_Dialog.Title { ...props } /> }
-				className={ styles.title }
+				className={ clsx( styles.title, className ) }
 			>
 				{ children }
 			</Text>
