@@ -82,11 +82,12 @@ function cleanupScrollAttributes( el: HTMLElement ) {
  * attachments of the same node (Strict Mode remount, stable refs) without
  * re-running the effect.
  *
- * Change detection uses a `ResizeObserver` on the container and its direct
- * children plus a `MutationObserver` on the container's `childList`, so the
- * attributes follow children that are added, removed, or resized after the
- * popup opens. Deep descendant resizes are caught as long as they propagate
- * up to a direct child (the common case in normal block layouts).
+ * Change detection combines a `ResizeObserver` scoped to the container and
+ * its direct children (to catch flex-layout growth) with a
+ * `MutationObserver` on the entire subtree (to catch async content added
+ * deep inside the scroll region). The MutationObserver itself doesn't add
+ * per-descendant observers — it just refreshes the scroll-state attributes
+ * on any subtree change, so cost stays bounded regardless of tree depth.
  *
  * Once CSS scroll-state container queries are supported across target
  * browsers, both the data attributes and this hook can be replaced with
@@ -134,20 +135,38 @@ export function useOverlayScrollStateAttributes<
 		if ( typeof MutationObserver !== 'undefined' ) {
 			mutationObserver = new MutationObserver( ( records ) => {
 				for ( const record of records ) {
-					for ( const added of Array.from( record.addedNodes ) ) {
-						if ( added instanceof Element ) {
-							resizeObserver.observe( added );
+					// Only direct-child additions/removals affect what the
+					// ResizeObserver is observing; deeper descendant changes
+					// reach us through this callback for attribute refresh,
+					// but we don't observe them individually to keep the
+					// cost bounded on large subtrees.
+					if ( record.target === node ) {
+						for ( const added of Array.from( record.addedNodes ) ) {
+							if ( added instanceof Element ) {
+								resizeObserver.observe( added );
+							}
 						}
-					}
-					for ( const removed of Array.from( record.removedNodes ) ) {
-						if ( removed instanceof Element ) {
-							resizeObserver.unobserve( removed );
+						for ( const removed of Array.from(
+							record.removedNodes
+						) ) {
+							if ( removed instanceof Element ) {
+								resizeObserver.unobserve( removed );
+							}
 						}
 					}
 				}
 				updateScrollAttributes( node );
 			} );
-			mutationObserver.observe( node, { childList: true } );
+			// `subtree: true` so async content added deep inside the
+			// scroll region (rows appended to a nested list, a lazy
+			// component mounting into a wrapper that doesn't itself
+			// resize, etc.) still triggers attribute refresh. The
+			// callback only re-observes resize on direct children —
+			// subtree observation is purely for discovery.
+			mutationObserver.observe( node, {
+				childList: true,
+				subtree: true,
+			} );
 		}
 
 		return () => {
