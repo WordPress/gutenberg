@@ -181,43 +181,6 @@ function gutenberg_source_region_validate( $params ) {
 }
 
 /**
- * Normalizes a `transform` block with defaults applied.
- *
- * @param array|null $transform Raw `transform` subtree or null.
- * @return array{rotation:float,flip:array{horizontal:bool,vertical:bool}}
- */
-function gutenberg_source_region_normalize_transform( $transform ) {
-	if ( ! is_array( $transform ) ) {
-		$transform = array();
-	}
-	return array(
-		'rotation' => isset( $transform['rotation'] ) ? (float) $transform['rotation'] : 0.0,
-		'flip'     => array(
-			'horizontal' => ! empty( $transform['flip']['horizontal'] ),
-			'vertical'   => ! empty( $transform['flip']['vertical'] ),
-		),
-	);
-}
-
-/**
- * Normalizes a `crop` block (rounds to integer pixels).
- *
- * @param array|null $crop Raw `crop` subtree or null.
- * @return array{x:int,y:int,width:int,height:int}|null Null if no crop was supplied.
- */
-function gutenberg_source_region_normalize_crop( $crop ) {
-	if ( ! is_array( $crop ) ) {
-		return null;
-	}
-	return array(
-		'x'      => (int) round( (float) $crop['x'] ),
-		'y'      => (int) round( (float) $crop['y'] ),
-		'width'  => (int) round( (float) $crop['width'] ),
-		'height' => (int) round( (float) $crop['height'] ),
-	);
-}
-
-/**
  * Handles a validated `{ transform, crop }` edit request. Mirrors Core's
  * `edit_media_item` for everything outside the operation loop so the
  * response shape, filename scheme, metadata regeneration, and filter
@@ -275,13 +238,30 @@ function gutenberg_source_region_process( $attachment_id, $request, $params ) {
 		);
 	}
 
-	$transform = gutenberg_source_region_normalize_transform(
-		isset( $params['transform'] ) ? $params['transform'] : null
-	);
-	$crop      = gutenberg_source_region_normalize_crop(
-		isset( $params['crop'] ) ? $params['crop'] : null
+	$raw_transform = isset( $params['transform'] ) && is_array( $params['transform'] )
+		? $params['transform']
+		: array();
+	$transform     = array(
+		'rotation' => isset( $raw_transform['rotation'] ) ? (float) $raw_transform['rotation'] : 0.0,
+		'flip'     => array(
+			'horizontal' => ! empty( $raw_transform['flip']['horizontal'] ),
+			'vertical'   => ! empty( $raw_transform['flip']['vertical'] ),
+		),
 	);
 
+	// Round crop to integer pixels — `WP_Image_Editor::crop` requires ints.
+	$crop = null;
+	if ( isset( $params['crop'] ) && is_array( $params['crop'] ) ) {
+		$crop = array(
+			'x'      => (int) round( (float) $params['crop']['x'] ),
+			'y'      => (int) round( (float) $params['crop']['y'] ),
+			'width'  => (int) round( (float) $params['crop']['width'] ),
+			'height' => (int) round( (float) $params['crop']['height'] ),
+		);
+	}
+
+	// Normalize to [0, 360) so snap-rotation comparisons and the sign flip
+	// below behave for negative or > 360° inputs.
 	$angle = fmod( fmod( $transform['rotation'], 360 ) + 360, 360 );
 	if ( 0.0 !== $angle ) {
 		// Core's WP_Image_Editor::rotate is counterclockwise-positive;
