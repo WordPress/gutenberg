@@ -1564,7 +1564,7 @@ class WP_Theme_JSON_Gutenberg {
 				$nested_selector = trim( substr( $part, 0, $brace_pos ) );
 
 				// Find the body: everything after the first `{` up to the last `}`.
-				$body = substr( $part, $brace_pos + 1 );
+				$body       = substr( $part, $brace_pos + 1 );
 				$last_brace = strrpos( $body, '}' );
 				if ( false !== $last_brace ) {
 					$body = substr( $body, 0, $last_brace );
