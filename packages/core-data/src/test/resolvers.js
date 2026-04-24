@@ -11,6 +11,7 @@ import { getSyncManager } from '../sync';
 jest.mock( '@wordpress/api-fetch' );
 jest.mock( '../sync', () => ( {
 	getSyncManager: jest.fn(),
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
 } ) );
 
 /**
@@ -24,6 +25,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 } from '../resolvers';
+import { saveEntityRecord } from '../actions';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 
 describe( 'getEntityRecord', () => {
@@ -285,7 +287,8 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'post',
-			EDITED_RECORD
+			EDITED_RECORD,
+			{ __unstableSkipSyncUpdate: true }
 		);
 	} );
 
@@ -336,8 +339,118 @@ describe( 'getEntityRecord', () => {
 		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
 			'postType',
 			'post',
-			POST_RECORD
+			POST_RECORD,
+			{ __unstableSkipSyncUpdate: true }
 		);
+	} );
+
+	it( 'persistCRDTDoc does not replay a stale save response into the sync document', async () => {
+		const INITIAL_TITLE = 'Initial Title';
+		const SYNCED_TITLE = 'Synced Title';
+		const POST_RECORD = { id: 1, title: INITIAL_TITLE, meta: {} };
+		const EDITED_RECORD = { id: 1, title: SYNCED_TITLE, meta: {} };
+		const STALE_SAVE_RESPONSE = {
+			id: 1,
+			title: INITIAL_TITLE,
+			meta: { _crdt_document: 'serialized-crdt-doc' },
+		};
+		const liveSyncState = {
+			isSaved: false,
+			title: SYNCED_TITLE,
+		};
+		const POST_RESPONSE = {
+			json: () => Promise.resolve( POST_RECORD ),
+		};
+		const ENTITIES_WITH_SYNC = [
+			{
+				name: 'post',
+				kind: 'postType',
+				baseURL: '/wp/v2/posts',
+				baseURLParams: { context: 'edit' },
+				syncConfig: {},
+				__unstablePrePersist: jest.fn( async () => ( {
+					meta: { _crdt_document: 'serialized-crdt-doc' },
+				} ) ),
+			},
+		];
+
+		const select = {
+			getEditedEntityRecord: jest.fn( () => EDITED_RECORD ),
+			getRawEntityRecord: jest.fn( () => POST_RECORD ),
+		};
+		const resolveSelectWithSync = {
+			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
+			getEditedEntityRecord: jest.fn( () =>
+				Promise.resolve( EDITED_RECORD )
+			),
+		};
+		let savePromise;
+
+		syncManager.update = jest.fn(
+			( _objectType, _objectId, changes, _origin, options ) => {
+				if (
+					Object.prototype.hasOwnProperty.call( changes, 'title' )
+				) {
+					liveSyncState.title = changes.title;
+				}
+				if ( options?.isSave ) {
+					liveSyncState.isSaved = true;
+				}
+			}
+		);
+		dispatch.saveEntityRecord = jest.fn(
+			( kind, name, record, options ) => {
+				savePromise = saveEntityRecord(
+					kind,
+					name,
+					record,
+					options
+				)( {
+					select,
+					dispatch,
+					resolveSelect: resolveSelectWithSync,
+				} );
+				return savePromise;
+			}
+		);
+
+		triggerFetch
+			.mockImplementationOnce( () => POST_RESPONSE )
+			.mockImplementationOnce( () => STALE_SAVE_RESPONSE );
+
+		await getEntityRecord(
+			'postType',
+			'post',
+			1
+		)( {
+			dispatch,
+			registry,
+			resolveSelect: resolveSelectWithSync,
+		} );
+
+		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
+
+		handlers.persistCRDTDoc();
+		await Promise.resolve();
+		await savePromise;
+
+		expect( dispatch.saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'post',
+			EDITED_RECORD,
+			{ __unstableSkipSyncUpdate: true }
+		);
+		expect( syncManager.update ).toHaveBeenCalledWith(
+			'postType/post',
+			1,
+			{},
+			'local-undo-ignored',
+			{ isSave: true }
+		);
+		expect( liveSyncState ).toEqual( {
+			isSaved: true,
+			title: SYNCED_TITLE,
+		} );
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {
