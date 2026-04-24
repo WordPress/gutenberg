@@ -644,14 +644,19 @@ function generateBlockApiSection( blockDir ) {
 		lines.push( '' );
 	}
 
+	if ( description ) {
+		lines.push( description );
+		lines.push( '' );
+	}
+
 	// Metadata.
-	lines.push( `**Name:** \`${ name }\`` );
+	lines.push( `- **Name:** \`${ name }\`` );
 	lines.push(
-		`**Category:** [${ category }](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
+		`- **Category:** [${ category }](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-${ category }/)`
 	);
 	if ( apiVersion ) {
 		lines.push(
-			`**API Version:** [${ apiVersion }](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)`
+			`- **API Version:** [${ apiVersion }](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)`
 		);
 	}
 
@@ -662,22 +667,17 @@ function generateBlockApiSection( blockDir ) {
 		dynamic: `[Dynamic](${ RENDERING_GUIDE }) (server-rendered)`,
 		hybrid: `[Hybrid](${ RENDERING_GUIDE }) (static save + server enhancements)`,
 	};
-	lines.push( `**Block Type:** ${ typeLabel[ blockType ] || 'Unknown' }` );
-	lines.push( '' );
-
-	if ( description ) {
-		lines.push( `> ${ description }` );
-		lines.push( '' );
-	}
+	lines.push( `- **Block Type:** ${ typeLabel[ blockType ] || 'Unknown' }` );
 
 	if ( keywords && keywords.length > 0 ) {
 		lines.push(
-			`**Keywords:** ${ keywords
+			`- **Keywords:** ${ keywords
 				.map( ( k ) => `\`${ k }\`` )
 				.join( ', ' ) }`
 		);
-		lines.push( '' );
 	}
+
+	lines.push( '' );
 
 	// Block relationships.
 	const relationships = formatRelationships( blockJson );
