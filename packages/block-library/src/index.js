@@ -303,7 +303,8 @@ const getAllBlocks = () => {
 	//   - a query argument specifies that TinyMCE should be loaded
 	if (
 		window?.wp?.oldEditor &&
-		( ! window?.__experimentalDisableTinymce ||
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce ||
 			!! new URLSearchParams( window?.location?.search ).get(
 				'requiresTinymce'
 			) )

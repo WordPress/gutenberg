@@ -7,6 +7,17 @@
 
 // add_action( 'admin_footer', 'gutenberg_test_tinymce_access' ); // Uncomment the following line to force an external TinyMCE usage.
 
+/**
+ * Render a variable that we'll use to declare that the editor will need the classic block.
+ */
+function gutenberg_declare_classic_block_necessary() {
+	if ( ! gutenberg_post_being_edited_requires_classic_block() ) {
+		return;
+	}
+	echo '<script type="text/javascript">window.wp.needsClassicBlock = true;</script>';
+}
+add_action( 'admin_print_footer_scripts', 'gutenberg_declare_classic_block_necessary', 20 );
+
 // If user has already requested TinyMCE, we're ending the experiment.
 if ( ! empty( $_GET['requiresTinymce'] ) || gutenberg_post_being_edited_requires_classic_block() ) {
 	return;
