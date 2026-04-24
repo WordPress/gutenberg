@@ -5,6 +5,7 @@ export { Input } from './input';
 export { Item } from './item';
 export { List } from './list';
 export { ListBody } from './list-body';
+export { Portal } from './portal';
 export { Popup } from './popup';
 export { Root } from './root';
 export { Value } from './value';

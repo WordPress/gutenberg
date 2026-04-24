@@ -1,7 +1,12 @@
 import type { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
+import type { ComponentPropsWithoutRef, ReactElement } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 
 export type AutocompleteCollectionProps = _Autocomplete.Collection.Props;
+
+export type PortalProps = ComponentPropsWithoutRef<
+	typeof _Autocomplete.Portal
+>;
 
 export type AutocompleteClearProps = ComponentProps<
 	typeof _Autocomplete.Clear
@@ -40,6 +45,13 @@ export type AutocompletePopupProps = ComponentProps<
 	typeof _Autocomplete.Popup
 > & {
 	children?: React.ReactNode;
+	/**
+	 * Optional portal element, typically `<Autocomplete.Portal />` with custom
+	 * `container`. When omitted, `Autocomplete.Popup` uses
+	 * `Autocomplete.Portal` with default props. Do not pass `children` on the
+	 * portal element; they would be ignored.
+	 */
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
 
 export type AutocompleteRootProps = ComponentProps<

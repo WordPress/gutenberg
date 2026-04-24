@@ -135,4 +135,95 @@ describe( 'Autocomplete', () => {
 			expect( screen.getByText( 'No results found.' ) ).toBeVisible();
 		} );
 	} );
+
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<div data-testid="wrapper">
+					<Autocomplete.Root items={ ITEMS }>
+						<Autocomplete.Input placeholder="Search" />
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Autocomplete.Popup
+							portal={
+								<Autocomplete.Portal
+									container={ containerRef }
+								/>
+							}
+						>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</div>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				item
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="wrapper">
+					<Autocomplete.Root items={ ITEMS }>
+						<Autocomplete.Input placeholder="Search" />
+						<Autocomplete.Popup>
+							<Autocomplete.List>
+								<Autocomplete.ListBody>
+									<Autocomplete.Collection>
+										{ ( item ) => (
+											<Autocomplete.Item
+												key={ item.id }
+												value={ item }
+											>
+												{ item.value }
+											</Autocomplete.Item>
+										) }
+									</Autocomplete.Collection>
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+				</div>
+			);
+
+			await user.type( screen.getByRole( 'combobox' ), 'Item 1' );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
+				item
+			);
+		} );
+	} );
 } );
