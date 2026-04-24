@@ -21,6 +21,9 @@ import {
 	ROOT_CSS_PROPERTIES_SELECTOR,
 	scopeSelector,
 	scopeFeatureSelectors,
+	// Unit tests rely on this function being exported, even though it's not used internally.
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	appendToSelector,
 	getBlockStyleVariationSelector,
 	getResolvedValue,
 } from '../utils/common';
@@ -863,7 +866,6 @@ function pickStyleKeys( treeToPickFrom: any ): any {
 	const pickedEntries = entries.filter( ( [ key ] ) =>
 		STYLE_KEYS.includes( key )
 	);
-	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
 		key,
 		JSON.parse( JSON.stringify( style ) ),
