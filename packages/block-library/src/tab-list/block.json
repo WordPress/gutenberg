@@ -50,6 +50,5 @@
 			}
 		}
 	},
-	"editorScript": "file:./index.js",
-	"editorStyle": "file:./editor.css"
+	"editorScript": "file:./index.js"
 }
