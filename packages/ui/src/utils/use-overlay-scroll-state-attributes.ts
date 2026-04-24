@@ -1,9 +1,15 @@
 import type { UIEvent, UIEventHandler } from 'react';
 import { useCallback, useLayoutEffect, useState } from '@wordpress/element';
 
-const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
+export const SCROLL_CONTAINER_ATTR = 'data-wp-ui-overlay-scroll-container';
 const SCROLLED_FROM_TOP_ATTR = 'data-wp-ui-overlay-scrolled-from-top';
 const SCROLLED_FROM_BOTTOM_ATTR = 'data-wp-ui-overlay-scrolled-from-bottom';
+/**
+ * Marks a `tabindex` that this hook installed, so subsequent runs can tell
+ * a hook-managed tabindex apart from one the consumer set on the element
+ * themselves.
+ */
+const SCROLL_TABBABLE_FLAG_ATTR = 'data-wp-ui-overlay-scroll-tabbable';
 
 /**
  * Allow fractional-pixel rounding when comparing scroll offsets. Browsers can
@@ -14,11 +20,41 @@ const SCROLL_END_EPSILON = 1;
 
 function updateScrollAttributes( el: HTMLElement ) {
 	const { scrollTop, clientHeight, scrollHeight } = el;
+	const overflows = scrollHeight - clientHeight > SCROLL_END_EPSILON;
+
 	el.toggleAttribute( SCROLLED_FROM_TOP_ATTR, scrollTop > 0 );
 	el.toggleAttribute(
 		SCROLLED_FROM_BOTTOM_ATTR,
 		scrollTop + clientHeight < scrollHeight - SCROLL_END_EPSILON
 	);
+
+	// Keyboard-scrollable regions must be reachable via Tab (WCAG 2.1.1),
+	// but adding a stray tab stop to a non-scrolling `<div>` is an
+	// anti-pattern. Toggle `tabindex="0"` only while the element actually
+	// overflows. The flag attribute guards against clobbering a
+	// consumer-supplied tabindex: we only touch attributes we installed.
+	if ( overflows ) {
+		if (
+			! el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
+			el.getAttribute( 'tabindex' ) === null
+		) {
+			el.setAttribute( 'tabindex', '0' );
+			el.setAttribute( SCROLL_TABBABLE_FLAG_ATTR, '' );
+		}
+	} else if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
+		el.removeAttribute( 'tabindex' );
+		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
+	}
+}
+
+function cleanupScrollAttributes( el: HTMLElement ) {
+	el.removeAttribute( SCROLL_CONTAINER_ATTR );
+	el.removeAttribute( SCROLLED_FROM_TOP_ATTR );
+	el.removeAttribute( SCROLLED_FROM_BOTTOM_ATTR );
+	if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
+		el.removeAttribute( 'tabindex' );
+		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
+	}
 }
 
 /**
@@ -30,6 +66,12 @@ function updateScrollAttributes( el: HTMLElement ) {
  * class name. Descendant selectors (e.g. sticky header/footer chrome) read
  * these attributes to toggle their separator border without forcing a React
  * re-render on every scroll frame.
+ *
+ * When the element overflows, a `tabindex="0"` is also installed so keyboard
+ * users can focus the region and arrow-scroll it (WCAG 2.1.1). The tabindex
+ * is removed again as soon as the element no longer overflows — a stray tab
+ * stop on a non-scrolling region is an anti-pattern. An internal flag
+ * attribute ensures a consumer-supplied `tabindex` is never overwritten.
  *
  * Returns a callback `ref` that the caller must attach to the scroll
  * container, and an `onScroll` handler to wire up to the same element. A
@@ -76,7 +118,7 @@ export function useOverlayScrollStateAttributes<
 
 		if ( typeof ResizeObserver === 'undefined' ) {
 			return () => {
-				node.removeAttribute( SCROLL_CONTAINER_ATTR );
+				cleanupScrollAttributes( node );
 			};
 		}
 
@@ -111,7 +153,7 @@ export function useOverlayScrollStateAttributes<
 		return () => {
 			resizeObserver.disconnect();
 			mutationObserver?.disconnect();
-			node.removeAttribute( SCROLL_CONTAINER_ATTR );
+			cleanupScrollAttributes( node );
 		};
 	}, [ node ] );
 

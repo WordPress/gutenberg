@@ -1,5 +1,5 @@
 import type { Popover as _Popover } from '@base-ui/react/popover';
-import { useMemo, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { tabbable } from 'tabbable';
 
 /**
@@ -24,39 +24,42 @@ const getTabbableOptions = () => ( {
 
 /**
  * Returns a resolved `initialFocus` value that deprioritizes elements
- * marked with a given data attribute (e.g. a close icon), and an internal
- * ref that must be merged onto the popup element.
+ * marked with any of the given data attributes (e.g. a close icon, a
+ * library-managed scroll container), and an internal ref that must be
+ * merged onto the popup element.
  *
  * When `initialFocus` is `undefined` or `true` (the default behavior),
  * the hook replaces it with a callback that:
  * 1. On touch interactions — focuses the popup element itself (preventing
  *    the virtual keyboard on Android), matching Base UI's default.
  * 2. On other interactions — returns the first tabbable element that does
- *    *not* carry `deprioritizedAttribute`. Falls back to Base UI's default
- *    when the deprioritized element is the only tabbable element.
+ *    *not* carry any of `deprioritizedAttributes`. Falls back to Base
+ *    UI's default when every tabbable element is deprioritized.
  *
  * All other `initialFocus` values (`false`, `RefObject`, callback) pass
  * through unchanged.
  *
  * @param props
- * @param props.initialFocus           The consumer-provided `initialFocus` value.
- * @param props.deprioritizedAttribute The data attribute whose elements should be deprioritized.
+ * @param props.initialFocus            The consumer-provided `initialFocus` value.
+ * @param props.deprioritizedAttributes The data attributes whose elements should be deprioritized.
  */
 export function useDeprioritizedInitialFocus( {
 	initialFocus,
-	deprioritizedAttribute,
+	deprioritizedAttributes,
 }: {
 	initialFocus: InitialFocus;
-	deprioritizedAttribute: string;
+	deprioritizedAttributes: readonly string[];
 } ) {
 	const popupRef = useRef< HTMLDivElement >( null );
 
-	const resolvedInitialFocus = useMemo( (): InitialFocus => {
-		if ( initialFocus !== undefined && initialFocus !== true ) {
-			return initialFocus;
-		}
-
-		return ( interactionType ): HTMLElement | boolean | null => {
+	// The returned `initialFocus` callback only runs once per popup open,
+	// so there's no meaningful benefit to memoizing it; skipping the memo
+	// also avoids either forcing callers to memoize their attributes array
+	// or introducing a stringified dep key that would fight the React
+	// Compiler's exhaustive-deps linting.
+	let resolvedInitialFocus: InitialFocus = initialFocus;
+	if ( initialFocus === undefined || initialFocus === true ) {
+		resolvedInitialFocus = ( interactionType ) => {
 			if ( interactionType === 'touch' ) {
 				return popupRef.current ?? true;
 			}
@@ -70,7 +73,9 @@ export function useDeprioritizedInitialFocus( {
 			for ( const el of tabbables ) {
 				if (
 					el instanceof HTMLElement &&
-					! el.hasAttribute( deprioritizedAttribute )
+					! deprioritizedAttributes.some( ( attr ) =>
+						el.hasAttribute( attr )
+					)
 				) {
 					return el;
 				}
@@ -78,7 +83,7 @@ export function useDeprioritizedInitialFocus( {
 
 			return true;
 		};
-	}, [ initialFocus, deprioritizedAttribute ] );
+	}
 
 	return { resolvedInitialFocus, popupRef };
 }
