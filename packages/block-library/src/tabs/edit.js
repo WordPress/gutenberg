@@ -128,11 +128,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 	return (
 		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				<Controls
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
+				<Controls clientId={ clientId } />
 				{ innerBlockProps.children }
 			</div>
 		</BlockContextProvider>
