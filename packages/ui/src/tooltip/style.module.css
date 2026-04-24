@@ -6,6 +6,7 @@
 	}
 
 	.popup {
+		box-sizing: border-box;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		padding:
 			var(--wpds-dimension-padding-xs)
@@ -16,5 +17,16 @@
 		line-height: 1.4; /* TODO: use DS token for line height */
 		color: var(--wpds-color-fg-content-neutral);
 		box-shadow: var(--wpds-elevation-sm);
+
+		/*
+		 * Forced-colors mode strips `box-shadow` and replaces the
+		 * `background-color` with `Canvas`, so the tooltip would merge
+		 * into the page. A 1px `CanvasText` border restores the edge,
+		 * and `box-sizing: border-box` keeps the non-FC layout exactly
+		 * as before (the 1px is absorbed).
+		 */
+		@media (forced-colors: active) {
+			border: 1px solid CanvasText;
+		}
 	}
 }
