@@ -37,7 +37,6 @@ function isValidWidgetModule( module: unknown ): module is WidgetModule {
 }
 
 interface ErrorBoundaryProps {
-	onError?: ( error: Error ) => void;
 	children: ReactNode;
 }
 
@@ -53,10 +52,6 @@ class WidgetErrorBoundary extends Component<
 
 	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
-	}
-
-	componentDidCatch( error: Error ) {
-		this.props.onError?.( error );
 	}
 
 	render() {
@@ -100,7 +95,7 @@ export function WidgetRender( {
 	widget,
 	widgetType,
 }: WidgetRenderInternalProps ) {
-	const { layout, onLayoutChange, resolveWidgetModule, onWidgetError } =
+	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
 
 	const WidgetComponent = useMemo(
@@ -138,17 +133,8 @@ export function WidgetRender( {
 		[ widget.uuid, layout, onLayoutChange ]
 	);
 
-	const handleError = useCallback(
-		( error: Error ) => {
-			onWidgetError?.( widget.uuid, {
-				message: error.message,
-			} );
-		},
-		[ widget.uuid, onWidgetError ]
-	);
-
 	return (
-		<WidgetErrorBoundary onError={ handleError }>
+		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
 				<WidgetComponent
 					attributes={ widget.attributes }

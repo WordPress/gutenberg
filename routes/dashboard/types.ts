@@ -2,7 +2,7 @@
  * Widget type definitions.
  *
  * The widget-related exports in this file (`WidgetName`,
- * `WidgetStyleVariation`, `WidgetTypeMetadata`, `WidgetType`) are defined
+ * `WidgetTypeMetadata`, `WidgetType`) are defined
  * locally so the engine stays self-contained while its surface stabilises.
  * The canonical home for them is `@wordpress/widget-types` — once that
  * package publishes the matching exports, swap these definitions for
@@ -28,16 +28,6 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
  * enforced by the `widget.json` schema at authoring time.
  */
 export type WidgetName = `${ string }/${ string }`;
-
-/**
- * Style variation entry — one per item in `WidgetTypeMetadata.styles`.
- * Mirrors the `widget.json` `styles[]` shape.
- */
-export interface WidgetStyleVariation {
-	name: string;
-	label: string;
-	isDefault?: boolean;
-}
 
 /**
  * Literal contents of a widget's `widget.json` metadata file.
@@ -116,12 +106,6 @@ export interface WidgetTypeMetadata {
 	attributes?: Field< any >[];
 
 	/**
-	 * Visual style variations. Each entry adds a class name to the widget
-	 * wrapper that themes can target via CSS.
-	 */
-	styles?: WidgetStyleVariation[];
-
-	/**
 	 * Structured example data for the Inspector Help Panel preview, and
 	 * the default attributes applied by `createWidgetInstance` when no
 	 * initial attributes are supplied.
@@ -187,32 +171,6 @@ export interface WidgetInstance<
 	 * Grid-model-specific placement (column/row spans, ordering, etc.).
 	 */
 	placement?: Placement;
-}
-
-/**
- * Badge displayed in the widget header.
- *
- * Surfaced by chrome (`WidgetDashboard.Widget`); not part of the widget
- * render contract.
- */
-export interface WidgetBadge {
-	value: string | number;
-	ariaLabel?: string;
-	info?: string;
-	intent?: 'positive' | 'warning' | 'negative';
-}
-
-/**
- * Error configuration surfaced by the chrome wrapper when a widget fails to
- * render or explicitly reports an error upstream.
- */
-export interface WidgetErrorConfig {
-	message?: string;
-	icon?: React.ReactElement;
-	action?: {
-		label: string;
-		onClick: () => void;
-	};
 }
 
 /**
@@ -357,19 +315,6 @@ export interface WidgetDashboardProps {
 	 * @default 4
 	 */
 	spacing?: number;
-
-	/**
-	 * Called when a widget reports an error via chrome.
-	 */
-	onWidgetError?: (
-		uuid: string,
-		error: WidgetErrorConfig | true | null
-	) => void;
-
-	/**
-	 * Custom empty-state content rendered when `layout` is empty.
-	 */
-	empty?: ReactNode;
 
 	children?: ReactNode;
 }

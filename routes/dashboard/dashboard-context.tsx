@@ -14,7 +14,6 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetDashboardContextValue,
-	WidgetErrorConfig,
 	WidgetInstance,
 	WidgetType,
 } from './types';
@@ -43,10 +42,6 @@ interface InternalDashboardContextValue {
 	minColumnWidth: number;
 	rowHeight: number | 'auto';
 	spacing: number;
-	onWidgetError?: (
-		uuid: string,
-		error: WidgetErrorConfig | true | null
-	) => void;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -95,10 +90,6 @@ interface ProviderProps {
 	minColumnWidth?: number;
 	rowHeight?: number | 'auto';
 	spacing?: number;
-	onWidgetError?: (
-		uuid: string,
-		error: WidgetErrorConfig | true | null
-	) => void;
 	children: ReactNode;
 }
 
@@ -114,7 +105,6 @@ export function WidgetDashboardProvider( {
 	minColumnWidth = DEFAULT_MIN_COLUMN_WIDTH,
 	rowHeight = DEFAULT_ROW_HEIGHT,
 	spacing = DEFAULT_SPACING,
-	onWidgetError,
 	children,
 }: ProviderProps ) {
 	const value = useMemo< InternalDashboardContextValue >(
@@ -130,7 +120,6 @@ export function WidgetDashboardProvider( {
 			minColumnWidth,
 			rowHeight,
 			spacing,
-			onWidgetError,
 		} ),
 		[
 			id,
@@ -144,7 +133,6 @@ export function WidgetDashboardProvider( {
 			minColumnWidth,
 			rowHeight,
 			spacing,
-			onWidgetError,
 		]
 	);
 

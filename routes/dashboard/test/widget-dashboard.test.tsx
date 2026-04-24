@@ -133,7 +133,7 @@ describe( 'WidgetDashboard', () => {
 		expect( screen.queryByTestId( 'greeting' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders the empty slot when layout is empty and empty prop is provided', () => {
+	it( 'renders the Empty compound when layout is empty', () => {
 		render(
 			<WidgetDashboard
 				id={ DASHBOARD_ID }
@@ -141,8 +141,12 @@ describe( 'WidgetDashboard', () => {
 				onLayoutChange={ () => {} }
 				widgetTypes={ widgetTypes }
 				resolveWidgetModule={ resolveWidgetModule }
-				empty={ <p>Nothing here yet</p> }
-			/>
+			>
+				<WidgetDashboard.Empty>
+					<p>Nothing here yet</p>
+				</WidgetDashboard.Empty>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
 		);
 		expect( screen.getByText( 'Nothing here yet' ) ).toBeInTheDocument();
 	} );

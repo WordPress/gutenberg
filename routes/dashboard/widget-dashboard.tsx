@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { WidgetDashboardProvider } from './dashboard-context';
+import { Empty } from './empty';
 import { Widget } from './widget';
 import { Widgets } from './widgets';
 import type { WidgetDashboardProps } from './types';
@@ -31,8 +32,6 @@ import type { WidgetDashboardProps } from './types';
  * @param root0.minColumnWidth
  * @param root0.rowHeight
  * @param root0.spacing
- * @param root0.onWidgetError
- * @param root0.empty
  * @param root0.children
  * @example
  * ```tsx
@@ -63,8 +62,6 @@ export function WidgetDashboard( {
 	minColumnWidth,
 	rowHeight,
 	spacing,
-	onWidgetError,
-	empty,
 	children,
 }: WidgetDashboardProps ) {
 	return (
@@ -80,17 +77,12 @@ export function WidgetDashboard( {
 			minColumnWidth={ minColumnWidth }
 			rowHeight={ rowHeight }
 			spacing={ spacing }
-			onWidgetError={ onWidgetError }
 		>
-			{ children ??
-				( layout.length === 0 && empty ? (
-					empty
-				) : (
-					<WidgetDashboard.Widgets />
-				) ) }
+			{ children ?? <WidgetDashboard.Widgets /> }
 		</WidgetDashboardProvider>
 	);
 }
 
 WidgetDashboard.Widgets = Widgets;
 WidgetDashboard.Widget = Widget;
+WidgetDashboard.Empty = Empty;

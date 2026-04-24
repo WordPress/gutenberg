@@ -265,16 +265,21 @@ export const EditMode: Story = {
 export const Empty: Story = {
 	args: {
 		layout: [],
-		empty: (
-			<div
-				style={ {
-					padding: 48,
-					textAlign: 'center',
-					color: 'var(--wpds-color-fg-content-neutral-weak)',
-				} }
-			>
-				No widgets yet.
-			</div>
+		children: (
+			<>
+				<WidgetDashboard.Empty>
+					<div
+						style={ {
+							padding: 48,
+							textAlign: 'center',
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+						} }
+					>
+						No widgets yet.
+					</div>
+				</WidgetDashboard.Empty>
+				<WidgetDashboard.Widgets />
+			</>
 		),
 	},
 };

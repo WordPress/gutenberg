@@ -34,16 +34,13 @@ export { createWidgetInstance } from './create-widget-instance';
  */
 export type {
 	ResolveWidgetModule,
-	WidgetBadge,
 	WidgetContextValue,
 	WidgetDashboardContextValue,
 	WidgetDashboardProps,
-	WidgetErrorConfig,
 	WidgetInstance,
 	WidgetModule,
 	WidgetName,
 	WidgetRenderProps,
-	WidgetStyleVariation,
 	WidgetType,
 	WidgetTypeMetadata,
 } from './types';
