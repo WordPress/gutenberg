@@ -11,7 +11,11 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { useEffect, createInterpolateElement } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -61,7 +65,11 @@ function CollaborationContext() {
 function PostLockedModal() {
 	const instanceId = useInstanceId( PostLockedModal );
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
-	const { autosave, updatePostLock } = useDispatch( editorStore );
+	const { autosave, savePost, updatePostLock } = useDispatch( editorStore );
+	const { editEntityRecord, saveEditedEntityRecord } =
+		useDispatch( coreStore );
+	const [ showRTCReloadModal, setShowRTCReloadModal ] = useState( false );
+
 	const {
 		isCollaborationEnabled,
 		isLocked,
@@ -72,6 +80,7 @@ function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
+		canUserEnableRTC,
 	} = useSelect( ( select ) => {
 		const {
 			isCollaborationEnabledForCurrentPost,
@@ -84,7 +93,7 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, canUser } = select( coreStore );
 		return {
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
@@ -95,6 +104,7 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
+			canUserEnableRTC: canUser( 'update', 'settings' ),
 		};
 	}, [] );
 
@@ -115,6 +125,7 @@ function PostLockedModal() {
 			data[ 'wp-refresh-post-lock' ] = {
 				lock: activePostLock,
 				post_id: postId,
+				real_time_collaboration: isCollaborationEnabled,
 			};
 		}
 
@@ -129,6 +140,7 @@ function PostLockedModal() {
 			}
 
 			const received = data[ 'wp-refresh-post-lock' ];
+
 			if ( received.lock_error ) {
 				// Auto save and display the takeover modal.
 				autosave();
@@ -145,6 +157,16 @@ function PostLockedModal() {
 					isLocked: false,
 					activePostLock: received.new_lock,
 				} );
+			}
+
+			// If another user enabled RTC through the modal, we send this through the
+			// heartbeat. If we receive that RTC is enabled in the heartbeat, but it is not in the current state,
+			// we save and reload the page to enable RTC state for the current user.
+			if (
+				received.real_time_collaboration &&
+				! isCollaborationEnabled
+			) {
+				setShowRTCReloadModal( true );
 			}
 		}
 
@@ -183,6 +205,45 @@ function PostLockedModal() {
 			window.removeEventListener( 'beforeunload', releasePostLock );
 		};
 	}, [] );
+
+	if ( showRTCReloadModal ) {
+		return (
+			<Modal
+				title={ __( 'Real-Time Collaboration Enabled' ) }
+				focusOnMount
+				shouldCloseOnClickOutside={ false }
+				shouldCloseOnEsc={ false }
+				isDismissible={ false }
+				className="editor-post-locked-modal"
+				size="medium"
+			>
+				<HStack alignment="top" spacing={ 6 }>
+					<div>
+						<p>
+							{ __(
+								'Another user has just enabled real-time collaboration. To join them and avoid losing your recent changes, please save and reload the editor.'
+							) }
+						</p>
+						<HStack
+							className="editor-post-locked-modal__buttons"
+							justify="flex-end"
+						>
+							<Button
+								__next40pxDefaultSize
+								variant="primary"
+								onClick={ async () => {
+									await savePost();
+									window.location.reload();
+								} }
+							>
+								{ __( 'Save and Reload' ) }
+							</Button>
+						</HStack>
+					</div>
+				</HStack>
+			</Modal>
+		);
+	}
 
 	if ( ! isLocked ) {
 		return null;
@@ -299,6 +360,29 @@ function PostLockedModal() {
 						className="editor-post-locked-modal__buttons"
 						justify="flex-end"
 					>
+						{ ! isTakeover && canUserEnableRTC && (
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ async () => {
+									await editEntityRecord(
+										'root',
+										'site',
+										undefined,
+										{
+											wp_collaboration_enabled: true,
+										}
+									);
+									await saveEditedEntityRecord(
+										'root',
+										'site'
+									);
+									window.location.reload();
+								} }
+							>
+								{ __( 'Enable real-time collaboration' ) }
+							</Button>
+						) }
 						{ ! isTakeover && (
 							<Button
 								__next40pxDefaultSize
