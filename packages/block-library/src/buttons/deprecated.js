@@ -5,11 +5,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	InnerBlocks,
-	useBlockProps,
-	useInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * @param {Object} attributes Block's attributes.
@@ -38,73 +34,6 @@ const migrateWithLayout = ( attributes ) => {
 };
 
 const deprecated = [
-	{
-		attributes: {},
-		supports: {
-			anchor: true,
-			align: [ 'wide', 'full' ],
-			html: false,
-			__experimentalExposeControlsToChildren: true,
-			color: {
-				gradients: true,
-				text: false,
-				__experimentalDefaultControls: {
-					background: true,
-				},
-			},
-			spacing: {
-				blockGap: [ 'horizontal', 'vertical' ],
-				padding: true,
-				margin: [ 'top', 'bottom' ],
-				__experimentalDefaultControls: {
-					blockGap: true,
-				},
-			},
-			typography: {
-				fontSize: true,
-				lineHeight: true,
-				__experimentalFontFamily: true,
-				__experimentalFontWeight: true,
-				__experimentalFontStyle: true,
-				__experimentalTextTransform: true,
-				__experimentalTextDecoration: true,
-				__experimentalLetterSpacing: true,
-				__experimentalDefaultControls: {
-					fontSize: true,
-				},
-			},
-			__experimentalBorder: {
-				color: true,
-				radius: true,
-				style: true,
-				width: true,
-				__experimentalDefaultControls: {
-					color: true,
-					radius: true,
-					style: true,
-					width: true,
-				},
-			},
-			layout: {
-				allowSwitching: false,
-				allowInheriting: false,
-				default: {
-					type: 'flex',
-				},
-			},
-		},
-		save( { attributes, className } ) {
-			const { fontSize, style } = attributes;
-			const blockProps = useBlockProps.save( {
-				className: clsx( className, {
-					'has-custom-font-size':
-						fontSize || style?.typography?.fontSize,
-				} ),
-			} );
-			const innerBlocksProps = useInnerBlocksProps.save( blockProps );
-			return <div { ...innerBlocksProps } />;
-		},
-	},
 	{
 		attributes: {
 			contentJustification: {
