@@ -354,9 +354,8 @@ function ListItem< Item >( {
 									className="dataviews-view-list__field"
 								>
 									<VisuallyHidden
-										render={
-											<span className="dataviews-view-list__field-label" />
-										}
+										className="dataviews-view-list__field-label"
+										render={ <span /> }
 									>
 										{ field.label }
 									</VisuallyHidden>

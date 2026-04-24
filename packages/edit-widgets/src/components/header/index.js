@@ -42,8 +42,8 @@ function Header() {
 					) }
 					{ ! isLargeViewport && (
 						<VisuallyHidden
-							render={ <h1 /> }
 							className="edit-widgets-header__title"
+							render={ <h1 /> }
 						>
 							{ __( 'Widgets' ) }
 						</VisuallyHidden>

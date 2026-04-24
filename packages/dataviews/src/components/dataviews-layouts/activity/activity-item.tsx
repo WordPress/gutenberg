@@ -161,9 +161,8 @@ function ActivityItem< Item >(
 								className="dataviews-view-activity__item-field"
 							>
 								<VisuallyHidden
-									render={
-										<span className="dataviews-view-activity__item-field-label" />
-									}
+									className="dataviews-view-activity__item-field-label"
+									render={ <span /> }
 								>
 									{ field.label }
 								</VisuallyHidden>
