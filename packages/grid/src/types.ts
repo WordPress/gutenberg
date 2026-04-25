@@ -20,11 +20,14 @@ export type DashboardGridLayoutItem = {
 
 	/**
 	 * Number of rows this item spans.
+	 *
+	 * @default 1
 	 */
 	height?: number;
 
 	/**
-	 * Optional order value for responsive mode (lower values displayed first)
+	 * Display order for the item. Lower values render first. When
+	 * omitted, the item falls back to its index in the `layout` array.
 	 */
 	order?: number;
 };
@@ -39,12 +42,14 @@ interface BaseDashboardGridProps {
 	layout: DashboardGridLayoutItem[];
 
 	/**
-	 * Grid children.
+	 * Grid children. Each child must carry a `key` that matches an
+	 * entry in `layout`; children without a match are rendered outside
+	 * the grid.
 	 */
 	children: React.ReactNode;
 
 	/**
-	 * Additional CSS class.
+	 * Additional CSS class on the grid root.
 	 */
 	className?: string;
 
@@ -57,7 +62,10 @@ interface BaseDashboardGridProps {
 	spacing?: number;
 
 	/**
-	 * Height of each row in pixels or auto.
+	 * Height of each row in pixels, or `'auto'` to let the tallest
+	 * tile in the row size it.
+	 *
+	 * @default 'auto'
 	 */
 	rowHeight?: number | 'auto';
 
@@ -70,7 +78,8 @@ interface BaseDashboardGridProps {
 	editMode?: boolean;
 
 	/**
-	 * Callback fired when layout changes due to item dragging.
+	 * Callback fired when the user commits a drag or resize. Receives
+	 * the resulting layout.
 	 */
 	onChangeLayout?: ( newLayout: DashboardGridLayoutItem[] ) => void;
 
@@ -96,9 +105,9 @@ interface FixedDashboardGridProps extends BaseDashboardGridProps {
 
 interface ResponsiveDashboardGridProps extends BaseDashboardGridProps {
 	/**
-	 * Minimum width in pixels for each column in responsive mode.
-	 * If provided, enables responsive mode which automatically
-	 * adjusts columns based on container width.
+	 * Minimum width in pixels per column. Enables responsive mode:
+	 * the column count is derived from container width, down to a
+	 * minimum of 1 column. Mutually exclusive with `columns`.
 	 */
 	minColumnWidth?: number;
 

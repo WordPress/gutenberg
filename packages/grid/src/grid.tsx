@@ -41,6 +41,9 @@ import styles from './grid.module.css';
 
 /**
  * 2D packed dashboard grid with drag-to-reorder and resize handles.
+ * Supports fixed-column and responsive modes, `number | 'fill' | 'full'`
+ * widths, and multi-row tiles.
+ *
  * Each child's `key` must match an entry in the `layout` array;
  * children without a match are rendered outside the grid.
  *

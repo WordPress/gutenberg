@@ -60,21 +60,22 @@ type GridItemProps = {
 	children: React.ReactNode;
 
 	/**
-	 * Content rendered above the draggable area that remains interactive
-	 * during edit mode. Useful for controls like action buttons, inputs,
-	 * or links that need to stay actionable.
+	 * Content rendered above the draggable area that stays interactive
+	 * in edit mode — typically action buttons, menus, or links. While
+	 * any tile in the grid is being dragged or resized, this content
+	 * is set `inert` so hovers on other tiles can't steal the gesture.
 	 */
 	actionableArea?: React.ReactNode;
 
 	/**
-	 * Callback fired when the item is being resized.
-	 *
-	 * @param delta - The width and height change in grid units.
+	 * Callback fired while the item is being resized. Receives the
+	 * cursor offset from the gesture start in pixels; the grid
+	 * converts it to column/row spans.
 	 */
 	onResize: ( delta: { width: number; height: number } ) => void;
 
 	/**
-	 * Callback fired when resize operation ends.
+	 * Callback fired when the resize gesture ends.
 	 */
 	onResizeEnd: () => void;
 };
