@@ -131,6 +131,15 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		return map;
 	}, [ activeLayout ] );
 
+	// Stable key set derived from the consumer's `layout` prop. Reorder
+	// frames mutate `order` but never the set of keys, so depending on
+	// `layout` (not `activeLayout`) keeps this Set's identity stable
+	// across a gesture and avoids re-walking children every frame.
+	const layoutKeys = useMemo(
+		() => new Set( layout.map( ( item ) => item.key ) ),
+		[ layout ]
+	);
+
 	const items = useMemo(
 		() =>
 			activeLayout
@@ -177,7 +186,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 			}
 
 			const key = child.key?.toString();
-			if ( key && layoutMap.has( key ) ) {
+			if ( key && layoutKeys.has( key ) ) {
 				// Lift `actionableArea` to a grid slot; strip it
 				// from the child so it does not leak to the DOM.
 				const { actionableArea } = child.props;
@@ -196,7 +205,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		} );
 
 		return [ childMap, actionableMap, rest ];
-	}, [ children, layoutMap ] );
+	}, [ children, layoutKeys ] );
 
 	const sensors = useSensors(
 		useSensor( PointerSensor ),
