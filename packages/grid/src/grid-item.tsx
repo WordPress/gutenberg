@@ -7,7 +7,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -90,6 +90,15 @@ export function GridItem( {
 	// edge — which has shifted whenever the width/height stepped a
 	// column/row. Re-anchor locally by subtracting the tile growth.
 	const initialResizeRectRef = useRef< DOMRect | null >( null );
+	// Latest cursor delta from the resize handle. Reading this in a
+	// `useLayoutEffect` lets the overlay re-measure the tile rect
+	// *after* React commits a width step but before paint, so the
+	// frame that follows a column step never renders the overlay
+	// at the pre-step offset.
+	const lastResizeDeltaRef = useRef< {
+		width: number;
+		height: number;
+	} | null >( null );
 	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
 		id: item.key,
 		disabled,
@@ -124,28 +133,56 @@ export function GridItem( {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
 		};
-		onResize( clamped );
-
 		const node = itemRef.current;
-		if ( ! node ) {
-			return;
-		}
-		if ( ! initialResizeRectRef.current ) {
+		if ( node && ! initialResizeRectRef.current ) {
 			initialResizeRectRef.current = node.getBoundingClientRect();
 		}
-		const currentRect = node.getBoundingClientRect();
-		const offsetX = currentRect.right - initialResizeRectRef.current.right;
-		const offsetY =
-			currentRect.bottom - initialResizeRectRef.current.bottom;
-		setPreviewDelta( {
-			width: clamped.width - offsetX,
-			height: clamped.height - ( verticalResizable ? offsetY : 0 ),
-		} );
+		lastResizeDeltaRef.current = clamped;
+		onResize( clamped );
+		// Provisional preview against the pre-commit rect; the
+		// `useLayoutEffect` below refines it once React commits the
+		// new tile size so a column step never paints with the
+		// stale offset.
+		if ( node && initialResizeRectRef.current ) {
+			const currentRect = node.getBoundingClientRect();
+			const offsetX =
+				currentRect.right - initialResizeRectRef.current.right;
+			const offsetY =
+				currentRect.bottom - initialResizeRectRef.current.bottom;
+			setPreviewDelta( {
+				width: clamped.width - offsetX,
+				height: clamped.height - ( verticalResizable ? offsetY : 0 ),
+			} );
+		}
 	};
+
+	useLayoutEffect( () => {
+		const lastDelta = lastResizeDeltaRef.current;
+		const initialRect = initialResizeRectRef.current;
+		const node = itemRef.current;
+		if ( ! lastDelta || ! initialRect || ! node ) {
+			return;
+		}
+		const currentRect = node.getBoundingClientRect();
+		const offsetX = currentRect.right - initialRect.right;
+		const offsetY = currentRect.bottom - initialRect.bottom;
+		const next = {
+			width: lastDelta.width - offsetX,
+			height: lastDelta.height - ( verticalResizable ? offsetY : 0 ),
+		};
+		if (
+			next.width === previewDelta?.width &&
+			next.height === previewDelta?.height
+		) {
+			return;
+		}
+		setPreviewDelta( next );
+	}, [ item.width, item.height, previewDelta, verticalResizable ] );
 
 	const handleResizeEnd = () => {
 		setPreviewDelta( null );
 		initialResizeRectRef.current = null;
+		lastResizeDeltaRef.current = null;
 		onResizeEnd();
 	};
 
