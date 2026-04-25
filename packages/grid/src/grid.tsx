@@ -55,6 +55,26 @@ const NO_SORT_STRATEGY = () => null;
  * Each child's `key` must match an entry in the `layout` array;
  * children without a match are rendered outside the grid.
  *
+ * @example
+ * ```jsx
+ * const layout = [
+ *   { key: 'a', width: 2 },
+ *   { key: 'b', width: 'fill' },
+ *   { key: 'c', width: 'full' },
+ * ];
+ *
+ * <DashboardGrid
+ *   layout={ layout }
+ *   columns={ 6 }
+ *   editMode
+ *   onChangeLayout={ setLayout }
+ * >
+ *   <div key="a">A</div>
+ *   <div key="b">B</div>
+ *   <div key="c">C</div>
+ * </DashboardGrid>
+ * ```
+ *
  * @param props Component props.
  * @param ref   Forwarded to the grid's root `<div>`.
  */

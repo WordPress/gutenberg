@@ -16,10 +16,39 @@ import { useThrottle } from '@wordpress/compose';
 import styles from './resize-handle.module.css';
 
 interface ResizeHandleProps {
+	/**
+	 * Whether the handle is inert. When true, it renders muted and
+	 * does not respond to pointer events.
+	 *
+	 * @default false
+	 */
 	disabled?: boolean;
+
+	/**
+	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
+	 * draggable so the parent can correlate the gesture with a tile
+	 * if needed.
+	 */
 	itemId?: string;
+
+	/**
+	 * Whether the handle should track vertical movement. When false,
+	 * the handle still appears but only emits horizontal deltas, and
+	 * the cursor is constrained to the column resize axis.
+	 *
+	 * @default true
+	 */
 	verticalResizable?: boolean;
+
+	/**
+	 * Callback fired while the handle is being dragged. Receives the
+	 * cursor offset from the gesture start in pixels.
+	 */
 	onResize?: ( delta: { width: number; height: number } ) => void;
+
+	/**
+	 * Callback fired when the gesture ends.
+	 */
 	onResizeEnd?: () => void;
 }
 
