@@ -10,7 +10,6 @@ $z-layers: (
 	".block-editor-block-switcher__arrow": 1,
 	".block-editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 31, // When scrolled to top this toolbar needs to sit over block-editor-block-toolbar
-	".components-form-toggle__input": 1,
 	".editor-text-editor__toolbar": 1,
 
 	// These next three share a stacking context
@@ -166,11 +165,6 @@ $z-layers: (
 
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
-
-	// Make sure corner handles are above side handles for ResizableBox component
-	".components-resizable-box__handle": 2,
-	".components-resizable-box__side-handle": 2,
-	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
 	".block-editor-block-manager__category-title": 1,
