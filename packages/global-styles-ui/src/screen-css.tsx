@@ -36,6 +36,10 @@ function ScreenCSS() {
 		'merged',
 		false
 	);
+	// Compare against theme-default CSS so Reset remains available when the
+	// user has cleared CSS to an empty string while the theme provides one.
+	const [ baseStyle ] = useStyle( '', undefined, 'base', false );
+	const canReset = inheritedStyle?.css !== baseStyle?.css;
 
 	return (
 		<>
@@ -75,7 +79,7 @@ function ScreenCSS() {
 							/>
 							<Menu.Popover>
 								<Menu.Item
-									disabled={ ! style?.css }
+									disabled={ ! canReset }
 									onClick={ () => {
 										const { css: _css, ...rest } =
 											style ?? {};
