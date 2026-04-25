@@ -94,7 +94,7 @@ export function getCropperControllerDispatch(
 	const dispatch = controllerDispatches.get( controller );
 	if ( ! dispatch ) {
 		throw new Error(
-			'Missing internal cropper dispatch for this controller.'
+			'Missing internal cropper dispatch for this controller. Pass the exact controller object returned by useCropperState(); do not pass a copied, cloned, or spread version of it.'
 		);
 	}
 	return dispatch;
