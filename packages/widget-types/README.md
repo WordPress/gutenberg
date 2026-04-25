@@ -84,26 +84,18 @@ Build (@wordpress/build)               Data layer
 
 ### Three-layer separation
 
-1. **Build** (`@wordpress/build`) — discovers `widgets/*/widget.json`,
-   compiles `widget.ts` and `render.tsx`, generates `registry.php` and
-   script module registrations. No runtime coupling to surfaces.
-
+1. **Build** (`@wordpress/build`) — compiles widgets, generates
+   `registry.php`, registers script modules. No coupling to surfaces.
 2. **Data layer** (this package + PHP loader) — populates the
-   `core/widget-types` store. PHP injects the widget registry as
-   `window.__registeredWidgetTypes`; the client store imports each
-   widget's metadata module and calls `registerWidgetType()`. Exposes
-   `gutenberg_get_widget_module_dependencies()` as a helper for surfaces
-   that want widgets in their import map. Knows nothing about specific
-   pages.
+   `core/widget-types` store and exposes
+   `gutenberg_get_widget_module_dependencies()`. Knows nothing about
+   specific pages.
+3. **Surface** (dashboard, analytics) — hooks its page's
+   `script_module_dependencies` filter, reads the store, lazy-loads
+   render modules, handles layout/persistence/chrome.
 
-3. **Surface** (dashboard, analytics, etc.) — hooks its page's
-   `script_module_dependencies` filter to declare which widgets should
-   be available in its import map; reads the store with
-   `getWidgetTypes()`; lazy-loads render modules; and handles layout,
-   persistence, and chrome (headers, actions, resize).
-
-Each layer depends only on the layer below. Surfaces never touch build
-artifacts directly; the store and the helper are the only contracts.
+Each layer depends only on the layer below. The store and the helper
+are the only contracts surfaces consume.
 
 ## Why the page module filter?
 
@@ -125,18 +117,12 @@ considered several alternatives:
 
 The filter pattern solves this cleanly:
 
-- **The page module is the natural host.** It's the unit that gets
-  enqueued on page load; its dep tree becomes the import map; it's
-  conditional (only enqueued for that specific page).
 - **`'import' => 'dynamic'` is the right contract.** Widgets appear in
   the import map but are not fetched eagerly — the browser waits for
   `import()` to resolve them.
 - **Build-time vs runtime composition.** The build knows which pages
   and widgets exist, but *which pages want widgets* is a runtime
-  composition decision. The filter is the sutura between the two.
-- **Each layer stays clean.** Build registers modules; data layer
-  exposes a helper; surface hooks its own filter. No deregister, no
-  timing games, no cross-layer coupling.
+  composition decision. The filter is the seam between the two.
 
 The filter follows the same pattern already used by routes in the
 wp-build page template: extensions add dynamic deps to the page's
@@ -212,24 +198,9 @@ gutenberg_get_widget_module_dependencies( array(
 ) ); // only these two
 ```
 
-## Examples: multiple pages consuming widgets
-
-The same widget type can be wired into many pages. Each surface hooks
-its own page filter and picks its widget subset.
-
-### Dashboard — all core widgets
-
-```php
-// lib/experimental/dashboard-widgets/load.php
-add_filter(
-	'dashboard-wp-admin_script_module_dependencies',
-	function ( $deps ) {
-		return array_merge( $deps, gutenberg_get_widget_module_dependencies() );
-	}
-);
-```
-
-### Analytics page — analytics-specific subset
+The same widget type can be wired into multiple pages — each surface
+hooks its own filter and picks its subset. For example, an analytics
+page that wants only three widgets:
 
 ```php
 // lib/experimental/analytics/load.php
@@ -248,30 +219,7 @@ add_filter(
 );
 ```
 
-### Shop overview — commerce widgets
-
-```php
-// plugins/woo/shop-overview/load.php
-add_filter(
-	'shop-overview_script_module_dependencies',
-	function ( $deps ) {
-		return array_merge(
-			$deps,
-			gutenberg_get_widget_module_dependencies( array(
-				'woo/todays-orders',
-				'woo/low-stock',
-				'woo/new-customers',
-			) )
-		);
-	}
-);
-```
-
-Notice that `core/on-this-day` could appear in the dashboard *and* an
-"editorial" page without any duplication or redefinition — each page
-independently opts in.
-
-### Sidebars and nested contexts
+## Sidebars and nested contexts
 
 A sidebar inside a page is composition *within* that page, not a
 separate surface. The page's filter already wires the widget modules
@@ -532,22 +480,6 @@ The page filter hook lives in each surface's file (e.g., `load.php` for
 the dashboard), not in `widget-types.php`. This preserves the
 surface-agnostic promise of the data layer: any new page can opt in
 to widgets without modifying the data layer.
-
-### No duplicate registration check
-
-`registerWidgetType()` does not check whether a widget with the same
-name already exists — it silently overwrites. The blocks package
-checks and warns. This should be added before the experiment
-graduates to stable.
-
-### Bootstrap as public export
-
-`bootstrapWidgetTypes()` is exported publicly, unlike the blocks
-package which uses `unstable__bootstrapServerSideBlockDefinitions`
-(marked unstable). Since widget-types is experimental (behind an
-experiment flag), the entire public API is implicitly unstable.
-When the experiment graduates, this function should be prefixed
-or moved to a private export.
 
 ## Known concerns
 
