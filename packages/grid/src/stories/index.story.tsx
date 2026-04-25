@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { IconButton, Stack } from '@wordpress/ui';
@@ -539,6 +539,34 @@ export const EditMode: Story = {
 			);
 		};
 
+		// Memoize the Tile elements so the grid's `children` prop keeps
+		// a stable reference across parent re-renders driven by
+		// onPreviewLayout. Without this, every preview tick produces a
+		// fresh array of elements and the grid's children walk has to
+		// re-run on each frame of a resize gesture.
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						actionableArea={
+							<TileActions
+								isFill={ tile.width === 'fill' }
+								isFull={ tile.width === 'full' }
+								onToggleFill={ () => toggleFill( tile.key ) }
+								onToggleFull={ () => toggleFull( tile.key ) }
+								onRemove={ () => removeTile( tile.key ) }
+							/>
+						}
+					>
+						{ formatTileLabel( tile ) }
+					</Tile>
+				) ),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[ tiles ]
+		);
+
 		return (
 			<Stack direction="row" gap="lg" align="flex-start">
 				<div style={ { width: '800px' } }>
@@ -548,29 +576,7 @@ export const EditMode: Story = {
 						onChangeLayout={ onChangeLayout }
 						onPreviewLayout={ setPreviewLayout }
 					>
-						{ tiles.map( ( tile ) => (
-							<Tile
-								key={ tile.key }
-								tone={ tile.tone }
-								actionableArea={
-									<TileActions
-										isFill={ tile.width === 'fill' }
-										isFull={ tile.width === 'full' }
-										onToggleFill={ () =>
-											toggleFill( tile.key )
-										}
-										onToggleFull={ () =>
-											toggleFull( tile.key )
-										}
-										onRemove={ () =>
-											removeTile( tile.key )
-										}
-									/>
-								}
-							>
-								{ formatTileLabel( tile ) }
-							</Tile>
-						) ) }
+						{ tileElements }
 					</DashboardGrid>
 				</div>
 
