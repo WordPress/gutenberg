@@ -63,8 +63,12 @@
 	// Button elements can have colors applied with high CSS specificity,
 	// and since this specificity is impossible to predict, we use
 	// `!important` to reset the color.
-	background-color: inherit !important;
-	color: inherit !important;
+	&:not(.has-text-color) {
+		color: inherit !important;
+	}
+	&:not(.has-background) {
+		background-color: inherit !important;
+	}
 
 	&:hover,
 	&:focus {
