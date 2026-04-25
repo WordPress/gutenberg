@@ -204,3 +204,114 @@ export function computeLockedResizeRect(
 
 	return { x: newX, y: newY, width: distW, height: distH };
 }
+
+/**
+ * Compute the new crop rect for a resize that temporarily locks the
+ * aspect ratio to `drag.startRect`'s ratio (e.g. while Shift is held).
+ *
+ * Corner handles delegate to {@link computeLockedResizeRect}. Edge
+ * handles size the dragged axis freely, then expand the perpendicular
+ * axis symmetrically around the rect's center to preserve the ratio,
+ * clamping symmetrically so the rect stays within bounds.
+ *
+ * @param drag      The current drag state.
+ * @param clientX   Current mouse/touch X position in pixels.
+ * @param clientY   Current mouse/touch Y position in pixels.
+ * @param imageSize The rendered image dimensions in pixels.
+ * @param bounds    The allowed crop area bounds.
+ * @return The new crop rect in normalized coordinates.
+ */
+export function computeShiftLockedResizeRect(
+	drag: ResizeDragState,
+	clientX: number,
+	clientY: number,
+	imageSize: Size,
+	bounds: CropBounds
+): NormalizedRect {
+	const s = drag.startRect;
+	const pixelW = s.width * imageSize.width;
+	const pixelH = s.height * imageSize.height;
+	if ( pixelH <= 0 || pixelW <= 0 ) {
+		return computeFreeResizeRect(
+			drag,
+			clientX,
+			clientY,
+			imageSize,
+			bounds
+		);
+	}
+	const normalizedRatio = s.width / s.height;
+
+	const handle = drag.handle;
+	if (
+		handle === 'nw' ||
+		handle === 'ne' ||
+		handle === 'sw' ||
+		handle === 'se'
+	) {
+		return computeLockedResizeRect(
+			drag,
+			clientX,
+			clientY,
+			imageSize,
+			bounds,
+			normalizedRatio
+		);
+	}
+
+	// Edge handle: size the dragged axis with free-resize logic, then
+	// expand the perpendicular axis symmetrically around the rect's center.
+	const free = computeFreeResizeRect(
+		drag,
+		clientX,
+		clientY,
+		imageSize,
+		bounds
+	);
+
+	if ( handle === 'n' || handle === 's' ) {
+		// Height is the driver; derive width from ratio.
+		let newHeight = free.height;
+		let newWidth = newHeight * normalizedRatio;
+		const centerX = s.x + s.width / 2;
+		// Symmetric clamp: limit by the smaller of the two side gaps so
+		// the rect stays centered around centerX.
+		const maxWidth =
+			Math.min( centerX - bounds.minX, bounds.maxX - centerX ) * 2;
+		if ( newWidth > maxWidth ) {
+			newWidth = maxWidth;
+			newHeight = newWidth / normalizedRatio;
+		}
+		newWidth = Math.max( newWidth, MIN_CROP_SIZE );
+		newHeight = Math.max( newHeight, MIN_CROP_SIZE );
+		// Re-anchor the dragged axis to the opposite edge so the
+		// height adjustment after clamping keeps that edge fixed.
+		const newY = handle === 'n' ? s.y + s.height - newHeight : s.y;
+		return {
+			x: centerX - newWidth / 2,
+			y: newY,
+			width: newWidth,
+			height: newHeight,
+		};
+	}
+
+	// 'e' or 'w': width is the driver; derive height from ratio.
+	let newWidth = free.width;
+	let newHeight = newWidth / normalizedRatio;
+	const centerY = s.y + s.height / 2;
+	const maxHeight =
+		Math.min( centerY - bounds.minY, bounds.maxY - centerY ) * 2;
+	if ( newHeight > maxHeight ) {
+		newHeight = maxHeight;
+		newWidth = newHeight * normalizedRatio;
+	}
+	newWidth = Math.max( newWidth, MIN_CROP_SIZE );
+	newHeight = Math.max( newHeight, MIN_CROP_SIZE );
+	const newX = handle === 'w' ? s.x + s.width - newWidth : s.x;
+	return {
+		x: newX,
+		y: centerY - newHeight / 2,
+		width: newWidth,
+		height: newHeight,
+	};
+}
