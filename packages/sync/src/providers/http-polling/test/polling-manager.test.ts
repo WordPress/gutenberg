@@ -133,6 +133,7 @@ describe( 'polling-manager', () => {
 	let mockPostSyncUpdateNonBlocking: jest.Mock<
 		typeof import('../utils').postSyncUpdateNonBlocking
 	>;
+	let mockEncodeStateAsUpdateV2: jest.Mock;
 	let mockApplyFilters: jest.Mock;
 
 	beforeEach( () => {
@@ -145,6 +146,7 @@ describe( 'polling-manager', () => {
 			mockPostSyncUpdate = require( '../utils' ).postSyncUpdate;
 			mockPostSyncUpdateNonBlocking =
 				require( '../utils' ).postSyncUpdateNonBlocking;
+			mockEncodeStateAsUpdateV2 = require( 'yjs' ).encodeStateAsUpdateV2;
 			mockApplyFilters = require( '@wordpress/hooks' ).applyFilters;
 		} );
 	} );
@@ -252,6 +254,75 @@ describe( 'polling-manager', () => {
 						code: 'document-size-limit-exceeded',
 					} ),
 				} )
+			);
+		} );
+
+		it( 'does not send an oversized server-requested compaction update', async () => {
+			const responseWithCollaborator = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			};
+			const responseWithCompactionRequest = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 2,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+						should_compact: true,
+					},
+				],
+			};
+			mockPostSyncUpdate
+				.mockResolvedValueOnce( responseWithCollaborator )
+				.mockResolvedValueOnce( responseWithCompactionRequest )
+				.mockResolvedValueOnce( responseWithCollaborator );
+			mockEncodeStateAsUpdateV2.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			await jest.advanceTimersByTimeAsync( 1000 );
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+			expect( onStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+			expect( mockPostSyncUpdateNonBlocking ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+			expect( doc.off ).toHaveBeenCalledWith(
+				'updateV2',
+				expect.any( Function )
 			);
 		} );
 	} );
@@ -880,6 +951,70 @@ describe( 'polling-manager', () => {
 			const retryUpdates = thirdCallPayload.rooms[ 0 ].updates;
 			expect( retryUpdates ).toHaveLength( 1 );
 			expect( retryUpdates[ 0 ].type ).toBe( 'compaction' );
+		} );
+
+		it( 'does not retry a failed poll with an oversized compaction update', async () => {
+			const responseWithCollaborator = {
+				rooms: [
+					{
+						room: 'test-room',
+						end_cursor: 1,
+						awareness: { 1: {}, 2: {} },
+						updates: [],
+					},
+				],
+			};
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+			mockEncodeStateAsUpdateV2.mockReturnValueOnce(
+				new Uint8Array( 11 )
+			);
+
+			const onStatusChange = jest.fn();
+			const doc = createMockDoc( 1 );
+			pollingManager.registerRoom( {
+				room: 'test-room',
+				doc,
+				awareness: createMockAwareness(),
+				log: jest.fn(),
+				onStatusChange,
+				onSync: jest.fn(),
+			} );
+
+			await jest.advanceTimersByTimeAsync( 0 );
+			const onDocUpdate = getOnDocUpdate( doc );
+			onDocUpdate( new Uint8Array( [ 1, 2, 3 ] ), 'user' );
+
+			mockPostSyncUpdate.mockRejectedValueOnce( new Error( 'timeout' ) );
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			mockPostSyncUpdate.mockResolvedValueOnce(
+				responseWithCollaborator
+			);
+			await jest.advanceTimersByTimeAsync( 1000 );
+
+			expect( mockPostSyncUpdate ).toHaveBeenCalledTimes( 2 );
+			expect( onStatusChange ).toHaveBeenCalledWith( {
+				status: 'disconnected',
+				error: expect.objectContaining( {
+					code: 'document-size-limit-exceeded',
+				} ),
+			} );
+			expect( mockPostSyncUpdateNonBlocking ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					rooms: expect.arrayContaining( [
+						expect.objectContaining( {
+							room: 'test-room',
+							awareness: null,
+						} ),
+					] ),
+				} )
+			);
+			expect( doc.off ).toHaveBeenCalledWith(
+				'updateV2',
+				expect.any( Function )
+			);
 		} );
 
 		it( 'does not queue a compaction for rooms with no outgoing updates', async () => {
