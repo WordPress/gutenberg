@@ -121,6 +121,7 @@ export default function save( { attributes } ) {
 						style={ { objectPosition } }
 						data-object-fit="cover"
 						data-object-position={ objectPosition }
+						sizes="100vw"
 					/>
 				) : (
 					<div
