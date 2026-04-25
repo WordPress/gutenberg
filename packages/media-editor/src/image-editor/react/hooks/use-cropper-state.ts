@@ -13,7 +13,6 @@ import type {
 	NormalizedRect,
 	Flip,
 } from '../../core/types';
-import type { CropperAction } from '../../core/actions';
 import { DEFAULT_STATE } from '../../core/constants';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
@@ -43,6 +42,8 @@ export interface UseCropperStateReturn {
 	setPan: ( pan: NormalizedPoint ) => void;
 	/** Set the zoom level. Clamped to [1, 10]. */
 	setZoom: ( zoom: number ) => void;
+	/** Set zoom and pan together so focal-point zoom remains atomic. */
+	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
 	/** Set the rotation in degrees. Normalized to [0, 360). */
 	setRotation: ( rotation: number ) => void;
 	/** Set the flip state. */
@@ -70,34 +71,6 @@ export interface UseCropperStateReturn {
 	 * try/catch if you need to recover.
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
-}
-
-const controllerDispatches = new WeakMap<
-	UseCropperStateReturn,
-	React.Dispatch< CropperAction >
->();
-
-/**
- * Internal bridge for React components that still need reducer-level actions.
- *
- * The dispatch function is intentionally not present on the public controller
- * object returned by `useCropperState()`. `<Cropper>` uses this helper to wire
- * low-level pointer/keyboard interactions without exposing the reducer action
- * shape as consumer API.
- *
- * @param controller The public cropper controller.
- * @return The reducer dispatch associated with the controller.
- */
-export function getCropperControllerDispatch(
-	controller: UseCropperStateReturn
-): React.Dispatch< CropperAction > {
-	const dispatch = controllerDispatches.get( controller );
-	if ( ! dispatch ) {
-		throw new Error(
-			'Missing internal cropper dispatch for this controller. Pass the exact controller object returned by useCropperState(); do not pass a copied, cloned, or spread version of it.'
-		);
-	}
-	return dispatch;
 }
 
 /**
@@ -153,6 +126,16 @@ export function useCropperState(
 	const setZoom = useCallback(
 		( zoom: number ) => {
 			dispatch( { type: 'SET_ZOOM', payload: zoom } );
+		},
+		[ dispatch ]
+	);
+
+	const setZoomAtPoint = useCallback(
+		( zoom: number, pan: NormalizedPoint ) => {
+			dispatch( {
+				type: 'SET_ZOOM_AT_POINT',
+				payload: { zoom, pan },
+			} );
 		},
 		[ dispatch ]
 	);
@@ -240,6 +223,7 @@ export function useCropperState(
 		setImage,
 		setPan,
 		setZoom,
+		setZoomAtPoint,
 		setRotation,
 		setFlip,
 		snapRotate90,
@@ -250,6 +234,5 @@ export function useCropperState(
 		isDirty,
 		getCroppedImage,
 	};
-	controllerDispatches.set( controller, dispatch );
 	return controller;
 }

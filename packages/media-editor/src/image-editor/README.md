@@ -83,6 +83,7 @@ State management hook. Returns a `controller` object with the current state and 
 | `setImage`        | `(image: CropperState['image']) => void`             | Set the loaded image (src + natural size)                                           |
 | `setPan`          | `(pan: NormalizedPoint) => void`                     | Set image pan offset                                                                |
 | `setZoom`         | `(zoom: number) => void`                             | Set zoom (clamped 1–10)                                                             |
+| `setZoomAtPoint`  | `(zoom: number, pan: NormalizedPoint) => void`       | Set zoom and pan together for focal-point zoom                                      |
 | `setRotation`     | `(degrees: number) => void`                          | Set rotation (normalized 0–360)                                                     |
 | `setFlip`         | `(flip: Flip) => void`                               | Set flip state                                                                      |
 | `snapRotate90`    | `(direction: 1 \| -1) => void`                       | 90° snap rotation                                                                   |

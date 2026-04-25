@@ -26,10 +26,7 @@ import type {
 	Size,
 	NormalizedRect,
 } from '../../core/types';
-import {
-	getCropperControllerDispatch,
-	type UseCropperStateReturn,
-} from '../hooks/use-cropper-state';
+import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit } from '../../core/camera';
 import { getCropBounds } from '../../core/containment';
 import { useInteraction } from '../hooks/use-interaction';
@@ -168,7 +165,6 @@ function CropperInner(
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const { state, setImage, setCropRect, settleCrop } = controller;
-	const dispatch = getCropperControllerDispatch( controller );
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -280,7 +276,7 @@ function CropperInner(
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
 		state,
-		dispatch,
+		controller,
 		canvasSize,
 		visualSize,
 		{

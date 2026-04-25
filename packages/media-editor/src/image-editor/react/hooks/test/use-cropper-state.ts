@@ -54,6 +54,17 @@ describe( 'useCropperState', () => {
 		expect( result.current.state.zoom ).toBe( 3 );
 	} );
 
+	it( 'should dispatch SET_ZOOM_AT_POINT via setZoomAtPoint', () => {
+		const { result } = renderHook( () => useCropperState() );
+
+		act( () => {
+			result.current.setZoomAtPoint( 3, { x: 0.2, y: 0.1 } );
+		} );
+
+		expect( result.current.state.zoom ).toBe( 3 );
+		expect( result.current.state.pan ).toEqual( { x: 0.2, y: 0.1 } );
+	} );
+
 	it( 'should clamp zoom to valid range via SET_ZOOM', () => {
 		const { result } = renderHook( () => useCropperState() );
 
