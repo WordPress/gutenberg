@@ -29,10 +29,14 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 	const startRect = { x: 0, y: 0, width: 0, height: 0 };
 
 	it( 'lets height drive when the user moves more pixels vertically than horizontally (between normalized and pixel thresholds)', () => {
-		// Drag SE corner to (80px, 100px) from anchor (0, 0).
-		// pixelDistW=80, pixelDistH=100, ratio=0.8.
-		// Pixel ratio test (correct): 0.8 < aspectRatio(1) → height drives.
-		// Result: 100×100 pixels.
+		// Drag SE corner to (144px, 160px) from anchor (0, 0).
+		// pixelDistW=144, pixelDistH=160, ratio=0.9 — comfortably above
+		// MIN_CROP_SIZE (0.05 = 80px on a 1600px image), so neither axis
+		// is at the min-clamp boundary. The ratio (0.9) sits between the
+		// old buggy threshold (normalizedRatio=0.5625) and the correct
+		// pixel-space threshold (aspectRatio=1) — that's the gap where
+		// the unit mismatch produced the wrong driver axis.
+		// Correct: 0.9 < aspectRatio(1) → height drives → 160×160 pixels.
 		const drag: ResizeDragState = {
 			handle: 'se',
 			startX: 0,
@@ -41,8 +45,8 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		};
 		const rect = computeLockedResizeRect(
 			drag,
-			80,
-			100,
+			144,
+			160,
 			imageSize,
 			FULL_BOUNDS,
 			normalizedRatio
@@ -52,8 +56,8 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		const pixelH = rect.height * imageSize.height;
 
 		expect( pixelW / pixelH ).toBeCloseTo( 1, 5 );
-		expect( pixelH ).toBeCloseTo( 100, 5 );
-		expect( pixelW ).toBeCloseTo( 100, 5 );
+		expect( pixelH ).toBeCloseTo( 160, 5 );
+		expect( pixelW ).toBeCloseTo( 160, 5 );
 	} );
 
 	it( 'lets width drive when the user moves more pixels horizontally than vertically', () => {
