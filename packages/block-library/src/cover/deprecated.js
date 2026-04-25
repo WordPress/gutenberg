@@ -274,6 +274,12 @@ const v14BlockSupports = {
 const v15 = {
 	attributes: v14BlockAttributes,
 	supports: v14BlockSupports,
+	migrate( attributes ) {
+		return {
+			...attributes,
+			tagName: attributes.tagName || 'div',
+		};
+	},
 	save( { attributes } ) {
 		const {
 			backgroundType,
