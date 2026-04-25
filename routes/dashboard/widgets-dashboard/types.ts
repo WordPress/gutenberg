@@ -20,10 +20,7 @@ import type { ComponentType, ReactNode } from 'react';
  * WordPress dependencies
  */
 import type { Field } from '@wordpress/dataviews';
-import type {
-	DashboardGridLayoutItem,
-	DashboardGridProps,
-} from '@wordpress/grid';
+import type { DashboardGridLayoutItem } from '@wordpress/grid';
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -235,20 +232,39 @@ export type ResolveWidgetModule = (
 ) => Promise< WidgetModule >;
 
 /**
- * Grid-model-derived configuration: column sizing, row sizing and gap. The
- * shape (including the `columns` ↔ `minColumnWidth` discriminated union) is
- * inferred from the active grid model — `@wordpress/grid` today, swappable
- * when alternative models land.
+ * Grid-model configuration. Today maps to `@wordpress/grid`'s settings.
+ * When alternative grid models (masonry, stack, ...) ship, this type
+ * becomes a discriminated union keyed by the chosen model and per-model
+ * settings are inferred from the model's own props.
  *
- * When alternative grid models (masonry, stack, ...) ship, the type passed
- * to `WidgetDashboard.grid` becomes a discriminated union keyed by the
- * model identifier; per-model settings are inferred from the model's own
- * props.
+ * `columns` and `minColumnWidth` are mutually exclusive at runtime — set
+ * either one or the other depending on whether you want a fixed or
+ * responsive grid. The dashboard does not enforce the xor at the type
+ * level so `react-docgen-typescript` (Storybook) can serialize the prop
+ * cleanly; the underlying grid component handles the conflict.
  */
-export type WidgetGridSettings = Pick<
-	DashboardGridProps,
-	'columns' | 'minColumnWidth' | 'rowHeight' | 'spacing'
->;
+export interface WidgetGridSettings {
+	/**
+	 * Fixed column count. Mutually exclusive with `minColumnWidth`.
+	 */
+	columns?: number;
+
+	/**
+	 * Responsive minimum column width in pixels. Mutually exclusive with
+	 * `columns`.
+	 */
+	minColumnWidth?: number;
+
+	/**
+	 * Row height in pixels, or `'auto'`.
+	 */
+	rowHeight?: number | 'auto';
+
+	/**
+	 * Grid gap multiplier (multiplied by 4px).
+	 */
+	spacing?: number;
+}
 
 /**
  * Props for `WidgetDashboard`.
@@ -291,12 +307,9 @@ export interface WidgetDashboardProps {
 	resolveWidgetModule?: ResolveWidgetModule;
 
 	/**
-	 * Grid model configuration. Today the engine targets a single packed
-	 * 2D grid model and `grid` follows the shape inferred from
-	 * `DashboardGridProps`. When alternative grid models land, this prop
-	 * becomes a discriminated union keyed by the chosen model.
+	 * Grid model configuration. See `WidgetGridSettings` for the shape.
 	 */
-	grid?: WidgetGridSettings;
+	gridSettings?: WidgetGridSettings;
 
 	children?: ReactNode;
 }

@@ -43,7 +43,7 @@ export const WidgetDashboard = Object.assign(
 		editMode,
 		onEditChange,
 		resolveWidgetModule,
-		grid,
+		gridSettings,
 		children,
 	}: WidgetDashboardProps ) {
 		return (
@@ -54,7 +54,7 @@ export const WidgetDashboard = Object.assign(
 				editMode={ editMode }
 				onEditChange={ onEditChange }
 				resolveWidgetModule={ resolveWidgetModule }
-				grid={ grid }
+				gridSettings={ gridSettings }
 			>
 				{ children ?? <Widgets /> }
 			</WidgetDashboardProvider>

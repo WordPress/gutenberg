@@ -20,9 +20,9 @@ import type {
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits
- * `grid` entirely; if `grid` is provided, the consumer's shape passes
- * through untouched and missing fields fall back to whatever defaults
- * the grid model itself supplies.
+ * `gridSettings` entirely; if `gridSettings` is provided, the consumer's
+ * shape passes through untouched and missing fields fall back to whatever
+ * defaults the grid model itself supplies.
  */
 const DEFAULT_GRID: WidgetGridSettings = {
 	minColumnWidth: 350,
@@ -43,7 +43,7 @@ interface InternalDashboardContextValue {
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
-	grid: WidgetGridSettings;
+	gridSettings: WidgetGridSettings;
 }
 
 const Context = createContext< InternalDashboardContextValue | null >( null );
@@ -70,7 +70,7 @@ interface ProviderProps {
 	editMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule?: ResolveWidgetModule;
-	grid?: WidgetGridSettings;
+	gridSettings?: WidgetGridSettings;
 	children: ReactNode;
 }
 
@@ -81,7 +81,7 @@ export function WidgetDashboardProvider( {
 	editMode = false,
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
-	grid = DEFAULT_GRID,
+	gridSettings = DEFAULT_GRID,
 	children,
 }: ProviderProps ) {
 	const value = useMemo< InternalDashboardContextValue >(
@@ -92,7 +92,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
-			grid,
+			gridSettings,
 		} ),
 		[
 			widgetTypes,
@@ -101,7 +101,7 @@ export function WidgetDashboardProvider( {
 			editMode,
 			onEditChange,
 			resolveWidgetModule,
-			grid,
+			gridSettings,
 		]
 	);
 

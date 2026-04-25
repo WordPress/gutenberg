@@ -209,14 +209,14 @@ const meta: Meta< typeof WidgetDashboard > = {
 		widgetTypes,
 		resolveWidgetModule,
 		editMode: false,
-		grid: { columns: 6, spacing: 2, rowHeight: 120 },
+		gridSettings: { columns: 6, spacing: 2, rowHeight: 120 },
 	},
 	argTypes: {
 		children: { control: false },
 		layout: { control: false },
 		widgetTypes: { control: false },
 		resolveWidgetModule: { control: false },
-		grid: { control: false },
+		gridSettings: { control: false },
 		onLayoutChange: { action: 'onLayoutChange' },
 		onEditChange: { action: 'onEditChange' },
 		editMode: { control: { type: 'boolean' } },
@@ -267,7 +267,7 @@ export const Empty: Story = {
 export const Responsive: Story = {
 	args: {
 		layout: defaultLayout,
-		grid: { minColumnWidth: 220, spacing: 2, rowHeight: 120 },
+		gridSettings: { minColumnWidth: 220, spacing: 2, rowHeight: 120 },
 	},
 };
 
