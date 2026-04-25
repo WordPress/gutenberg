@@ -9,16 +9,38 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 		return;
 	}
 
-	$is_apple_os    = (bool) preg_match( '/Macintosh|Mac OS X|Mac_PowerPC/i', $_SERVER['HTTP_USER_AGENT'] ?? '' );
-	$shortcut_label = $is_apple_os
-		? _x( '⌘K', 'keyboard shortcut to open the command palette' )
-		: _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' );
-	$title          = sprintf(
+	$shortcut_labels = array(
+		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
+		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
+	);
+	$is_apple_os     = (bool) preg_match( '/Macintosh|Mac OS X|Mac_PowerPC/i', $_SERVER['HTTP_USER_AGENT'] ?? '' );
+	$shortcut_label  = $is_apple_os ? $shortcut_labels['appleOS'] : $shortcut_labels['default'];
+	$title           = sprintf(
 		'<span class="ab-icon" aria-hidden="true"></span><span class="ab-label"><kbd>%s</kbd><span class="screen-reader-text"> %s</span></span>',
 		$shortcut_label,
 		/* translators: Hidden accessibility text. */
 		__( 'Open command palette' ),
 	);
+
+	/*
+	 * Detect Apple OS via JavaScript for users behind a CDN blocking the UA header.
+	 *
+	 * Running the script as the admin bar is rendered avoids a flash of incorrect content
+	 * for users with Apple OS when the UA header is blocked. It also prevents the need for
+	 * wp-i18n to be loaded as a dependency as it is most likely not included on the front
+	 * end of a site.
+	 */
+	$script  = <<<'JS'
+		(( shortcutLabels ) => {
+			const isAppleOS = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone" || navigator.platform === "iPad";
+			if ( ! isAppleOS ) {
+				return;
+			}
+			document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' ).textContent = shortcutLabels.appleOS;
+		})
+	JS;
+	$script .= '(' . wp_json_encode( $shortcut_labels, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');';
+	$script .= "\n//# sourceURL=gutenberg_admin_bar_command_palette_menu";
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'command-palette',
@@ -27,6 +49,7 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 			'meta'  => array(
 				'class'   => 'hide-if-no-js',
 				'onclick' => 'wp.data.dispatch( "core/commands" ).open(); return false;',
+				'html'    => "<script>{$script}</script>",
 			),
 		)
 	);
@@ -79,34 +102,3 @@ CSS;
 	wp_add_inline_style( 'admin-bar', $css );
 }
 add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_styles' );
-
-function gutenberg_add_admin_bar_script() {
-	if ( ! is_admin_bar_showing() ) {
-		return;
-	}
-	$labels  = array(
-		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
-		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
-	);
-	$script  = <<<'JS'
-		(( shortcutLabels ) => {
-			let userAgent = '';
-			// Assigning agent may error if the HTTP header is blocked at the browser level.
-			try {
-				userAgent = navigator.userAgent;
-			} catch (error) {
-				// Make no change to the default shortcut label.
-				return;
-			}
-			const isAppleOS = /Macintosh|Mac OS X|Mac_PowerPC/i.test( userAgent );
-			const shortcutLabel = isAppleOS ? shortcutLabels.appleOS : shortcutLabels.default;
-			const commandPaletteNode = document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' );
-			if ( commandPaletteNode ) {
-				commandPaletteNode.textContent = shortcutLabel;
-			}
-		})
-	JS;
-	$script .= '(' . wp_json_encode( $labels ) . ');';
-	wp_add_inline_script( 'admin-bar', $script );
-}
-add_action( 'admin_bar_init', 'gutenberg_add_admin_bar_script' );
