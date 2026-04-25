@@ -631,6 +631,7 @@ const Cell = memo( function ( {
 			) }
 		>
 			<RichText
+				identifier={ `${ name }.${ rowIndex }.cells.${ columnIndex }.content` }
 				value={ content }
 				onChange={ onChange }
 				onFocus={ () => {

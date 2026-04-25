@@ -169,7 +169,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey );
+	const currentYText = attributes
+		? getYTextByAttributeKey( attributes, selection.attributeKey )
+		: null;
 
 	// If the attribute is not a Y.Text, return null.
 	if ( ! ( currentYText instanceof Y.Text ) ) {
@@ -185,6 +187,47 @@ function getCursorPosition(
 		relativePosition,
 		absoluteOffset: selection.offset,
 	};
+}
+
+/**
+ * Resolve a selection attribute key to a Y.Text value.
+ *
+ * RichText identifiers are normally top-level block attribute keys, but nested
+ * rich-text fields can provide a dot path such as `body.0.cells.0.content`.
+ *
+ * @param attributes   - The block attributes map.
+ * @param attributeKey - The top-level attribute key or nested attribute path.
+ * @return The matching Y.Text, or null if the path is not a rich-text field.
+ */
+function getYTextByAttributeKey(
+	attributes: Y.Map< unknown >,
+	attributeKey: string
+): Y.Text | null {
+	const directValue = attributes.get( attributeKey );
+	if ( directValue instanceof Y.Text ) {
+		return directValue;
+	}
+
+	let value: unknown = attributes;
+	for ( const pathPart of attributeKey.split( '.' ) ) {
+		if ( value instanceof Y.Map ) {
+			value = value.get( pathPart );
+		} else if ( value instanceof Y.Array ) {
+			const index = Number.parseInt( pathPart, 10 );
+			if (
+				! Number.isSafeInteger( index ) ||
+				index < 0 ||
+				index.toString() !== pathPart
+			) {
+				return null;
+			}
+			value = value.get( index );
+		} else {
+			return null;
+		}
+	}
+
+	return value instanceof Y.Text ? value : null;
 }
 
 /**
