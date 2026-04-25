@@ -67,14 +67,21 @@ export default function MediaEditorModalMount() {
 			return undefined;
 		}
 
-		return [
+		const candidateRatios = [
 			...( showDefaultRatios && Array.isArray( defaultRatios )
 				? defaultRatios
 				: [] ),
 			...( Array.isArray( themeRatios ) ? themeRatios : [] ),
-		]
+		];
+		const presets = candidateRatios
 			.map( aspectRatioPresetFromSettings )
 			.filter( Boolean );
+
+		if ( presets.length || showDefaultRatios === false ) {
+			return presets;
+		}
+
+		return undefined;
 	}, [ defaultRatios, themeRatios, showDefaultRatios ] );
 
 	return (
