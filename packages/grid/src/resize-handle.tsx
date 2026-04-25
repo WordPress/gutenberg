@@ -50,13 +50,13 @@ function ResizeHandle( {
 /**
  * Renders a corner resize handle inside an isolated `<DndContext>`.
  * Reports the cursor offset since the gesture started (in pixels)
- * via `onResize`, throttled to ~60ms so the grid commit loop doesn't
- * run on every pointer move.
+ * via `onResize`, throttled to one animation frame so the grid
+ * commit loop runs at most once per paint.
  *
  * @param props Component props.
  */
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
-	const throttleDelay = 60;
+	const throttleDelay = 16;
 	const throttledResize = useThrottle(
 		( delta: { width: number; height: number } ) => {
 			if ( props.onResize ) {
