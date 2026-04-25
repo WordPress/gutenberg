@@ -60,6 +60,29 @@ describe( 'computeLockedResizeRect — driver-axis selection', () => {
 		expect( pixelW ).toBeCloseTo( 160, 5 );
 	} );
 
+	it( 'returns the start rect unchanged when normalizedRatio is 0 (image not loaded)', () => {
+		// Reachable in practice: keyboard arrows on a focused resize
+		// handle before the image's natural size is known make the
+		// stencil pass `normalizedRatio === 0`.
+		const preLoadStart = { x: 0.1, y: 0.2, width: 0.3, height: 0.4 };
+		const drag: ResizeDragState = {
+			handle: 'se',
+			startX: 0,
+			startY: 0,
+			startRect: preLoadStart,
+		};
+		const rect = computeLockedResizeRect(
+			drag,
+			100,
+			100,
+			{ width: 0, height: 0 },
+			FULL_BOUNDS,
+			0
+		);
+
+		expect( rect ).toEqual( preLoadStart );
+	} );
+
 	it( 'lets width drive when the user moves more pixels horizontally than vertically', () => {
 		// Drag SE corner to (200px, 50px) from anchor (0, 0).
 		// pixelDistW=200, pixelDistH=50, ratio=4 > aspectRatio(1).
