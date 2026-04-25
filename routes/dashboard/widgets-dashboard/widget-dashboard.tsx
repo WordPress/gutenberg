@@ -15,11 +15,6 @@ import type { WidgetDashboardProps } from './types';
  * fully updated array. The engine never queries a widget-types store — types
  * flow in via the `widgetTypes` prop.
  *
- * The `id` prop is required and exposed via `useWidgetDashboardContext()`
- * so consumers can scope persistence keys and extension filters to this
- * specific dashboard. Multiple dashboards can coexist in the same admin and
- * stay independently addressable.
- *
  * ```tsx
  * import { WidgetDashboard } from '@wordpress/dashboard';
  *
@@ -27,7 +22,6 @@ import type { WidgetDashboardProps } from './types';
  * 	const [ layout, setLayout ] = useState( defaultLayout );
  * 	return (
  * 		<WidgetDashboard
- * 			id="core/dashboard"
  * 			layout={ layout }
  * 			onLayoutChange={ setLayout }
  * 			widgetTypes={ widgetTypes }
@@ -43,7 +37,6 @@ import type { WidgetDashboardProps } from './types';
  */
 export const WidgetDashboard = Object.assign(
 	function WidgetDashboard( {
-		id,
 		layout,
 		onLayoutChange,
 		widgetTypes,
@@ -55,7 +48,6 @@ export const WidgetDashboard = Object.assign(
 	}: WidgetDashboardProps ) {
 		return (
 			<WidgetDashboardProvider
-				id={ id }
 				layout={ layout }
 				onLayoutChange={ onLayoutChange }
 				widgetTypes={ widgetTypes }

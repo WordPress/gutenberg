@@ -13,7 +13,6 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
  */
 import type {
 	ResolveWidgetModule,
-	WidgetDashboardContextValue,
 	WidgetGridSettings,
 	WidgetInstance,
 	WidgetType,
@@ -35,12 +34,9 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
 
 /**
  * Rich state distributed to every compound component inside `WidgetDashboard`.
- * Not exported — compounds that need the full state use
- * `useDashboardInternalContext()`. Public consumers use
- * `useWidgetDashboardContext()` for the narrow, stable shape.
+ * Internal — compounds reach the full state via `useDashboardInternalContext()`.
  */
 interface InternalDashboardContextValue {
-	id: string;
 	widgetTypes: WidgetType[];
 	layout: WidgetInstance[];
 	onLayoutChange: ( layout: WidgetInstance[] ) => void;
@@ -53,26 +49,9 @@ interface InternalDashboardContextValue {
 const Context = createContext< InternalDashboardContextValue | null >( null );
 
 /**
- * Access the dashboard identity (the `id` prop passed to `WidgetDashboard`).
- *
- * Primary use case: scoping persistence keys and extensibility filters to a
- * specific dashboard when multiple coexist in the same admin (core,
- * WooCommerce, third-party).
- */
-export function useWidgetDashboardContext(): WidgetDashboardContextValue {
-	const ctx = useContext( Context );
-	if ( ! ctx ) {
-		throw new Error(
-			'useWidgetDashboardContext must be used within a WidgetDashboard.'
-		);
-	}
-	return { id: ctx.id };
-}
-
-/**
  * Compound-internal hook — exposes the full provider state. Not part of the
  * public API; lives in the same module so compound components can reach the
- * state without widening `WidgetDashboardContextValue`.
+ * state directly.
  */
 export function useDashboardInternalContext(): InternalDashboardContextValue {
 	const ctx = useContext( Context );
@@ -85,7 +64,6 @@ export function useDashboardInternalContext(): InternalDashboardContextValue {
 }
 
 interface ProviderProps {
-	id: string;
 	widgetTypes: WidgetType[];
 	layout: WidgetInstance[];
 	onLayoutChange: ( layout: WidgetInstance[] ) => void;
@@ -97,7 +75,6 @@ interface ProviderProps {
 }
 
 export function WidgetDashboardProvider( {
-	id,
 	widgetTypes,
 	layout,
 	onLayoutChange,
@@ -109,7 +86,6 @@ export function WidgetDashboardProvider( {
 }: ProviderProps ) {
 	const value = useMemo< InternalDashboardContextValue >(
 		() => ( {
-			id,
 			widgetTypes,
 			layout,
 			onLayoutChange,
@@ -119,7 +95,6 @@ export function WidgetDashboardProvider( {
 			grid,
 		} ),
 		[
-			id,
 			widgetTypes,
 			layout,
 			onLayoutChange,

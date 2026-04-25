@@ -22,8 +22,6 @@ import type {
 	WidgetType,
 } from '../types';
 
-const DASHBOARD_ID = 'core/dashboard';
-
 type Attrs = { greeting: string };
 
 function TestWidget( {
@@ -80,7 +78,6 @@ function Harness( {
 
 	return (
 		<WidgetDashboard
-			id={ DASHBOARD_ID }
 			layout={ layout }
 			onLayoutChange={ ( next ) => {
 				setLayout( next as WidgetInstance< Attrs >[] );
@@ -123,7 +120,6 @@ describe( 'WidgetDashboard', () => {
 	it( 'renders nothing for an unknown widget type (no crash)', () => {
 		render(
 			<WidgetDashboard
-				id={ DASHBOARD_ID }
 				layout={ [
 					{
 						uuid: 'w1',
@@ -142,7 +138,6 @@ describe( 'WidgetDashboard', () => {
 	it( 'renders the Empty compound when layout is empty', () => {
 		render(
 			<WidgetDashboard
-				id={ DASHBOARD_ID }
 				layout={ [] }
 				onLayoutChange={ () => {} }
 				widgetTypes={ widgetTypes }

@@ -219,18 +219,6 @@ export interface WidgetContextValue {
 }
 
 /**
- * Identity of the dashboard itself. Returned by
- * `useWidgetDashboardContext()` from anywhere inside a `WidgetDashboard`
- * subtree. Used to scope persistence keys, extension filters, and analytics.
- */
-export interface WidgetDashboardContextValue {
-	/**
-	 * Stable identifier passed as `WidgetDashboard`'s `id` prop.
-	 */
-	id: string;
-}
-
-/**
  * Widget render module shape returned by the module resolver.
  */
 export interface WidgetModule {
@@ -269,13 +257,6 @@ export type WidgetGridSettings = Pick<
  * and every mutation fires `onLayoutChange` with the fully updated array.
  */
 export interface WidgetDashboardProps {
-	/**
-	 * Stable identifier for this dashboard instance. Required so consumers
-	 * can scope persistence keys and extensions (`core/dashboard`,
-	 * `woocommerce/dashboard`, etc.).
-	 */
-	id: string;
-
 	/**
 	 * Widget instances to render. Consumer owns this state.
 	 */

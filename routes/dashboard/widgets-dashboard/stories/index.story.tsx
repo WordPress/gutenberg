@@ -159,8 +159,6 @@ const widgetTypes: WidgetType[] = [
 	},
 ];
 
-const DASHBOARD_ID = 'stories/dashboard';
-
 const defaultLayout: WidgetInstance[] = [
 	{
 		uuid: 'w1',
@@ -208,7 +206,6 @@ const meta: Meta< typeof WidgetDashboard > = {
 	component: WidgetDashboard,
 	render: ( args ) => <StatefulDashboard { ...args } />,
 	args: {
-		id: DASHBOARD_ID,
 		widgetTypes,
 		resolveWidgetModule,
 		editMode: false,

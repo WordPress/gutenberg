@@ -21,15 +21,12 @@ import {
  */
 const widgetTypes: WidgetType[] = [];
 
-const DASHBOARD_ID = 'core/dashboard';
-
 function Dashboard() {
 	const [ layout, setLayout ] = useState< WidgetInstance[] >( [] );
 
 	return (
 		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>
 			<WidgetDashboard
-				id={ DASHBOARD_ID }
 				layout={ layout }
 				onLayoutChange={ setLayout }
 				widgetTypes={ widgetTypes }
