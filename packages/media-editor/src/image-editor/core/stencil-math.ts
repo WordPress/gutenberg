@@ -154,10 +154,18 @@ export function computeLockedResizeRect(
 	distH = Math.max( distH, MIN_CROP_SIZE );
 
 	// Determine which axis "drives" — whichever the user moved more
-	// (in pixel space) determines the size, the other follows.
+	// (in pixel space) determines the size, the other follows. The
+	// `normalizedRatio` is w/h in normalized space; the equivalent
+	// pixel-space ratio is `normalizedRatio * imageW / imageH`. We
+	// compare the pixel motion ratio against that pixel-space ratio
+	// so the units line up (was a unit mismatch on non-square images).
 	const pixelDistW = distW * imageSize.width;
 	const pixelDistH = distH * imageSize.height;
-	if ( pixelDistW / pixelDistH > normalizedRatio ) {
+	const pixelRatio =
+		imageSize.height > 0
+			? ( normalizedRatio * imageSize.width ) / imageSize.height
+			: normalizedRatio;
+	if ( pixelDistW / pixelDistH > pixelRatio ) {
 		// Width is the driver — compute height from ratio.
 		distH = distW / normalizedRatio;
 	} else {
