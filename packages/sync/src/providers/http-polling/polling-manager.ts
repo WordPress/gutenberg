@@ -77,7 +77,7 @@ interface RegisterRoomOptions {
 
 interface RoomState {
 	clientId: number;
-	createCompactionUpdate: () => SyncUpdate;
+	createCompactionUpdate: () => SyncUpdate | void;
 	endCursor: number;
 	isPrimaryRoom: boolean;
 	localAwarenessState: LocalAwarenessState;
@@ -210,6 +210,40 @@ function handleForbiddenError(
 
 const roomStates: Map< string, RoomState > = new Map();
 
+function disconnectForDocumentSizeLimit(
+	roomState: RoomState,
+	updateSizeInBytes: number
+): void {
+	roomState.log( 'Document size limit exceeded', {
+		maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
+		updateSizeInBytes,
+	} );
+
+	roomState.onStatusChange( {
+		status: 'disconnected',
+		error: new ConnectionError(
+			ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
+			'Document size limit exceeded'
+		),
+	} );
+
+	// This is an unrecoverable error. Unregister the room to prevent syncing.
+	unregisterRoom( roomState.room );
+}
+
+function createSyncUpdateIfWithinSizeLimit(
+	roomState: RoomState,
+	data: Uint8Array,
+	type: SyncUpdateType
+): SyncUpdate | void {
+	if ( data.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
+		disconnectForDocumentSizeLimit( roomState, data.byteLength );
+		return;
+	}
+
+	return createSyncUpdate( data, type );
+}
+
 /**
  * Create a compaction update by merging existing updates. This preserves
  * the original operation metadata (client IDs, logical clocks) so that
@@ -219,7 +253,7 @@ const roomStates: Map< string, RoomState > = new Map();
  *
  * @param updates The updates to merge
  */
-function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
+function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): Uint8Array {
 	// Extract only compaction and update types for merging (skip sync-step updates).
 	// Decode base64 updates to Uint8Array for merging.
 	const mergeable = updates
@@ -230,11 +264,7 @@ function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 		)
 		.map( ( u ) => base64ToUint8Array( u.data ) );
 
-	// Merge all updates while preserving operation metadata.
-	return createSyncUpdate(
-		Y.mergeUpdatesV2( mergeable ),
-		SyncUpdateType.COMPACTION
-	);
+	return Y.mergeUpdatesV2( mergeable );
 }
 
 /**
@@ -683,17 +713,23 @@ function poll(): void {
 				if ( room.should_compact ) {
 					roomState.log( 'Server requested compaction update' );
 					roomState.updateQueue.clear();
-					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
-					);
+					const compactionUpdate = roomState.createCompactionUpdate();
+					if ( compactionUpdate ) {
+						roomState.updateQueue.add( compactionUpdate );
+					}
 				} else if ( room.compaction_request ) {
 					// Deprecated
 					roomState.log( 'Server requested (old) compaction update' );
-					roomState.updateQueue.add(
+					const compactionUpdate = createSyncUpdateIfWithinSizeLimit(
+						roomState,
 						createDeprecatedCompactionUpdate(
 							room.compaction_request
-						)
+						),
+						SyncUpdateType.COMPACTION
 					);
+					if ( compactionUpdate ) {
+						roomState.updateQueue.add( compactionUpdate );
+					}
 				}
 			} );
 
@@ -756,9 +792,16 @@ function poll(): void {
 
 					if ( room.updates.length > 0 && state.endCursor > 0 ) {
 						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
+						const compactionUpdate = state.createCompactionUpdate();
+						if ( compactionUpdate ) {
+							state.updateQueue.add( compactionUpdate );
+						}
 					} else if ( room.updates.length > 0 ) {
 						state.updateQueue.restore( room.updates );
+					}
+
+					if ( roomStates.get( room.room ) !== state ) {
+						continue;
 					}
 
 					state.log(
@@ -864,22 +907,8 @@ function registerRoom( {
 			if ( ! state ) {
 				return;
 			}
-
-			state.log( 'Document size limit exceeded', {
-				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
-				updateSizeInBytes: update.byteLength,
-			} );
-
-			state.onStatusChange( {
-				status: 'disconnected',
-				error: new ConnectionError(
-					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
-					'Document size limit exceeded'
-				),
-			} );
-
-			// This is an unrecoverable error. Unregister the room to prevent syncing.
-			unregisterRoom( room );
+			disconnectForDocumentSizeLimit( state, update.byteLength );
+			return;
 		}
 
 		// Tag local document changes as 'update' type.
@@ -895,7 +924,8 @@ function registerRoom( {
 	const roomState: RoomState = {
 		clientId: doc.clientID,
 		createCompactionUpdate: () =>
-			createSyncUpdate(
+			createSyncUpdateIfWithinSizeLimit(
+				roomState,
 				Y.encodeStateAsUpdateV2( doc ),
 				SyncUpdateType.COMPACTION
 			),
