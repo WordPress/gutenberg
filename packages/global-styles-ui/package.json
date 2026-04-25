@@ -60,6 +60,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"
