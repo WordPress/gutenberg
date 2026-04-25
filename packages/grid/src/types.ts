@@ -33,9 +33,15 @@ export type DashboardGridLayoutItem = {
 };
 
 /**
- * Props shared by fixed and responsive DashboardGrid variants.
+ * Props shared by fixed and responsive DashboardGrid variants. Extends
+ * the standard div props so consumers can pass `id`, `aria-*`, `data-*`,
+ * event handlers, etc., directly on the grid root.
  */
-interface BaseDashboardGridProps {
+interface BaseDashboardGridProps
+	extends Omit<
+		React.ComponentPropsWithoutRef< 'div' >,
+		'children' | 'className' | 'style'
+	> {
 	/**
 	 * Array of layout items.
 	 */
@@ -52,6 +58,13 @@ interface BaseDashboardGridProps {
 	 * Additional CSS class on the grid root.
 	 */
 	className?: string;
+
+	/**
+	 * Inline styles applied to the grid root. Merged underneath the
+	 * grid's own layout styles, so the layout (`gridTemplateColumns`,
+	 * `gridAutoRows`, `gap`) always wins.
+	 */
+	style?: React.CSSProperties;
 
 	/**
 	 * Grid gap multiplier size (e.g., a spacing of 2 results in a gap
