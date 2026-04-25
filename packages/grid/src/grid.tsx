@@ -65,6 +65,10 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	>();
 	// Drives `<DragOverlay>` content while a drag is in progress.
 	const [ activeId, setActiveId ] = useState< string | null >( null );
+	// True while any tile is being resized. Combined with `activeId`,
+	// it drives the grid-wide `inert` flag on actionable areas so
+	// hovering over another tile's buttons can't steal the gesture.
+	const [ isResizing, setIsResizing ] = useState( false );
 	// Mirror of `temporaryLayout` read synchronously on drag end —
 	// the state update from `handleDragMove` may still be batched.
 	const latestLayoutRef = useRef< DashboardGridLayoutItem[] | undefined >();
@@ -208,6 +212,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		latestLayoutRef.current = undefined;
 		lastReorderCursorRef.current = null;
 		resizeBaselineRef.current = null;
+		setIsResizing( false );
 		setTemporaryLayout( undefined );
 	} );
 
@@ -277,6 +282,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		const latest = latestLayoutRef.current;
 		latestLayoutRef.current = undefined;
 		resizeBaselineRef.current = null;
+		setIsResizing( false );
 
 		if ( ! onChangeLayout || ! latest ) {
 			return;
@@ -292,6 +298,10 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	) {
 		if ( ! editMode ) {
 			return;
+		}
+
+		if ( ! isResizing ) {
+			setIsResizing( true );
 		}
 
 		const relativeDelta = {
@@ -393,6 +403,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 							maxColumns={ effectiveColumns }
 							disabled={ ! editMode }
 							verticalResizable={ rowHeight !== 'auto' }
+							interacting={ activeId !== null || isResizing }
 							onResize={ ( delta ) => handleResize( id, delta ) }
 							onResizeEnd={ persistTemporaryLayout }
 							actionableArea={ actionableAreaMap.get( id ) }

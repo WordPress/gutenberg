@@ -45,6 +45,16 @@ type GridItemProps = {
 	verticalResizable?: boolean;
 
 	/**
+	 * Whether any tile in the grid is currently being dragged or
+	 * resized. When true, the item mutes its `actionableArea` with
+	 * `inert` so pointer hovers over buttons in other tiles do not
+	 * steal the in-progress gesture.
+	 *
+	 * @default false
+	 */
+	interacting?: boolean;
+
+	/**
 	 * The content to be displayed within the grid item.
 	 */
 	children: React.ReactNode;
@@ -74,6 +84,7 @@ export function GridItem( {
 	maxColumns,
 	disabled = false,
 	verticalResizable = true,
+	interacting = false,
 	children,
 	actionableArea = null,
 	onResize,
@@ -203,7 +214,14 @@ export function GridItem( {
 			style={ style }
 			{ ...attributes }
 		>
-			{ actionableArea }
+			{ actionableArea ? (
+				<div
+					style={ { display: 'contents' } }
+					{ ...( interacting ? { inert: '' } : {} ) }
+				>
+					{ actionableArea }
+				</div>
+			) : null }
 
 			<div { ...listeners } style={ { height: '100%' } }>
 				<div className={ styles[ 'item-content' ] }>
