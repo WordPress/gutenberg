@@ -30,17 +30,17 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 	 * wp-i18n to be loaded as a dependency as it is most likely not included on the front
 	 * end of a site.
 	 */
-	$script  = <<<'JS'
-		(( shortcutLabels ) => {
+	$function = <<<'JS'
+		( shortcutLabels ) => {
 			const isAppleOS = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone" || navigator.platform === "iPad";
 			if ( ! isAppleOS ) {
 				return;
 			}
 			document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' ).textContent = shortcutLabels.appleOS;
-		})
+		}
 	JS;
-	$script .= '(' . wp_json_encode( $shortcut_labels, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');';
-	$script .= "\n//# sourceURL=gutenberg_admin_bar_command_palette_menu";
+	$script   = sprintf( '( %s )( %s );', $function, wp_json_encode( $shortcut_labels, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) );
+	$script  .= "\n//# sourceURL=gutenberg_admin_bar_command_palette_menu";
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'command-palette',
