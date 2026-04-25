@@ -270,3 +270,81 @@ export const Responsive: Story = {
 		grid: { minColumnWidth: 220, spacing: 2, rowHeight: 120 },
 	},
 };
+
+/*
+ * Demonstrates that `<WidgetDashboard>` is just a container around its
+ * children. Consumers can interleave the compound parts (`Empty`,
+ * `Widgets`) with any other markup — headers, sidebars, stats, footers —
+ * to compose richer surfaces without losing the engine's behaviour.
+ */
+export const Composition: Story = {
+	args: {
+		layout: defaultLayout,
+		editMode: true,
+		children: (
+			<div
+				style={ {
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 16,
+				} }
+			>
+				<header
+					style={ {
+						display: 'flex',
+						alignItems: 'baseline',
+						justifyContent: 'space-between',
+						padding: '12px 16px',
+						background: 'var(--wpds-color-bg-surface-neutral)',
+						borderRadius: 8,
+					} }
+				>
+					<div>
+						<h2 style={ { margin: 0, fontSize: 18 } }>Workspace</h2>
+						<p
+							style={ {
+								margin: '4px 0 0',
+								color: 'var(--wpds-color-fg-content-neutral-weak)',
+								fontSize: 13,
+							} }
+						>
+							Custom chrome can wrap the engine compounds.
+						</p>
+					</div>
+					<span
+						style={ {
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							fontSize: 13,
+						} }
+					>
+						{ defaultLayout.length } widgets
+					</span>
+				</header>
+
+				<WidgetDashboard.Empty>
+					<div
+						style={ {
+							padding: 48,
+							textAlign: 'center',
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+						} }
+					>
+						Add a widget to get started.
+					</div>
+				</WidgetDashboard.Empty>
+
+				<WidgetDashboard.Widgets />
+
+				<footer
+					style={ {
+						color: 'var(--wpds-color-fg-content-neutral-weak)',
+						fontSize: 12,
+						textAlign: 'center',
+					} }
+				>
+					Drag widgets to reorder while edit mode is on.
+				</footer>
+			</div>
+		),
+	},
+};
