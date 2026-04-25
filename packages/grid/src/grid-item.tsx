@@ -69,10 +69,10 @@ type GridItemProps = {
 
 	/**
 	 * Callback fired while the item is being resized. Receives the
-	 * cursor offset from the gesture start in pixels; the grid
-	 * converts it to column/row spans.
+	 * item's `key` plus the cursor offset from the gesture start in
+	 * pixels; the grid converts the offset to column/row spans.
 	 */
-	onResize: ( delta: { width: number; height: number } ) => void;
+	onResize: ( id: string, delta: { width: number; height: number } ) => void;
 
 	/**
 	 * Callback fired when the resize gesture ends.
@@ -150,7 +150,7 @@ export function GridItem( {
 			initialResizeRectRef.current = node.getBoundingClientRect();
 		}
 		lastResizeDeltaRef.current = clamped;
-		onResize( clamped );
+		onResize( item.key, clamped );
 		// Provisional preview against the pre-commit rect; the
 		// `useLayoutEffect` below refines it once React commits the
 		// new tile size so a column step never paints with the

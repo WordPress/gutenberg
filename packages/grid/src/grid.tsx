@@ -39,6 +39,13 @@ import { resolveFillWidths } from './resolve-fill-widths';
 import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import styles from './grid.module.css';
 
+// Reorder is driven by `temporaryLayout` + CSS Grid, not by dnd-kit
+// transforms. Hoist the no-op strategy outside the component so its
+// reference is stable across renders — passing a fresh `() => null`
+// to `<SortableContext>` updates its context value and triggers all
+// `useSortable` subscribers to re-render every frame.
+const NO_SORT_STRATEGY = () => null;
+
 /**
  * 2D packed dashboard grid with drag-to-reorder and resize handles.
  * Supports fixed-column and responsive modes, `number | 'fill' | 'full'`
@@ -150,18 +157,26 @@ export function DashboardGrid( props: DashboardGridProps ) {
 	}
 	const layoutKeys = layoutKeysRef.current.set;
 
-	const items = useMemo(
-		() =>
-			activeLayout
-				.map( ( item, index ) => ( { item, index } ) )
-				.sort(
-					( a, b ) =>
-						( a.item.order ?? a.index ) -
-						( b.item.order ?? b.index )
-				)
-				.map( ( { item } ) => item.key ),
-		[ activeLayout ]
-	);
+	// Sorted item keys, identity-stable when the resulting sequence is
+	// unchanged. Avoids producing a fresh `items` array on every parent
+	// re-render so `<SortableContext>` doesn't update its context value
+	// and notify every `useSortable` subscriber unnecessarily.
+	const sortedItems = activeLayout
+		.map( ( item, index ) => ( { item, index } ) )
+		.sort(
+			( a, b ) =>
+				( a.item.order ?? a.index ) - ( b.item.order ?? b.index )
+		)
+		.map( ( { item } ) => item.key );
+	const itemsSig = sortedItems.join( '\0' );
+	const itemsRef = useRef< {
+		sig: string;
+		arr: string[];
+	} | null >( null );
+	if ( itemsRef.current?.sig !== itemsSig ) {
+		itemsRef.current = { sig: itemsSig, arr: sortedItems };
+	}
+	const items = itemsRef.current.arr;
 
 	// Resolve `width: 'fill'` items to concrete column spans.
 	const resolvedItemMap = useMemo( () => {
@@ -300,7 +315,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 
 	// Commit the latest temporary layout and clear local state.
 	// Reads from the ref to bypass React's state batching.
-	function persistTemporaryLayout() {
+	const persistTemporaryLayout = useEvent( () => {
 		const latest = latestLayoutRef.current;
 		latestLayoutRef.current = undefined;
 		resizeBaselineRef.current = null;
@@ -312,83 +327,82 @@ export function DashboardGrid( props: DashboardGridProps ) {
 
 		onChangeLayout( latest );
 		setTemporaryLayout( undefined );
-	}
+	} );
 
-	function handleResize(
-		id: string,
-		delta: { width: number; height: number }
-	) {
-		if ( ! editMode ) {
-			return;
-		}
-
-		if ( ! isResizing ) {
-			setIsResizing( true );
-		}
-
-		const relativeDelta = {
-			width: Math.round( delta.width / ( columnWidth + gapPx ) ),
-			height:
-				rowHeight === 'auto'
-					? 0
-					: Math.round( delta.height / ( rowHeight + gapPx ) ),
-		};
-
-		if ( relativeDelta.width !== 0 || relativeDelta.height !== 0 ) {
-			// Snapshot baseline on the first meaningful frame and read
-			// from it on every frame after — `delta` is absolute from
-			// the gesture start, so summing it with the live (already
-			// mutated) `activeLayout` width compounds and oscillates,
-			// which thrashes any adjacent `fill` tile.
-			if ( ! resizeBaselineRef.current ) {
-				const baseItem = activeLayout.find(
-					( item ) => item.key === id
-				);
-				const resolvedItem = resolvedItemMap.get( id );
-				// `'fill'`/`'full'` resize from the rendered span
-				// and convert to a numeric width.
-				let baseWidth: number;
-				if ( baseItem?.width === 'full' ) {
-					baseWidth = effectiveColumns;
-				} else if ( baseItem?.width === 'fill' ) {
-					baseWidth =
-						typeof resolvedItem?.width === 'number'
-							? resolvedItem.width
-							: 1;
-				} else {
-					baseWidth = baseItem?.width ?? 1;
-				}
-				resizeBaselineRef.current = {
-					width: baseWidth,
-					height: baseItem?.height ?? 1,
-				};
+	const handleResize = useEvent(
+		( id: string, delta: { width: number; height: number } ) => {
+			if ( ! editMode ) {
+				return;
 			}
-			const baseline = resizeBaselineRef.current;
-			const updatedLayout = activeLayout.map( ( item ) => {
-				if ( item.key === id ) {
-					return {
-						...item,
-						width: Math.max(
-							1,
-							Math.min(
-								baseline.width + relativeDelta.width,
-								effectiveColumns
-							)
-						),
-						height: Math.max(
-							1,
-							baseline.height + relativeDelta.height
-						),
+
+			if ( ! isResizing ) {
+				setIsResizing( true );
+			}
+
+			const relativeDelta = {
+				width: Math.round( delta.width / ( columnWidth + gapPx ) ),
+				height:
+					rowHeight === 'auto'
+						? 0
+						: Math.round( delta.height / ( rowHeight + gapPx ) ),
+			};
+
+			if ( relativeDelta.width !== 0 || relativeDelta.height !== 0 ) {
+				// Snapshot baseline on the first meaningful frame and read
+				// from it on every frame after — `delta` is absolute from
+				// the gesture start, so summing it with the live (already
+				// mutated) `activeLayout` width compounds and oscillates,
+				// which thrashes any adjacent `fill` tile.
+				if ( ! resizeBaselineRef.current ) {
+					const baseItem = activeLayout.find(
+						( item ) => item.key === id
+					);
+					const resolvedItem = resolvedItemMap.get( id );
+					// `'fill'`/`'full'` resize from the rendered span
+					// and convert to a numeric width.
+					let baseWidth: number;
+					if ( baseItem?.width === 'full' ) {
+						baseWidth = effectiveColumns;
+					} else if ( baseItem?.width === 'fill' ) {
+						baseWidth =
+							typeof resolvedItem?.width === 'number'
+								? resolvedItem.width
+								: 1;
+					} else {
+						baseWidth = baseItem?.width ?? 1;
+					}
+					resizeBaselineRef.current = {
+						width: baseWidth,
+						height: baseItem?.height ?? 1,
 					};
 				}
-				return item;
-			} );
+				const baseline = resizeBaselineRef.current;
+				const updatedLayout = activeLayout.map( ( item ) => {
+					if ( item.key === id ) {
+						return {
+							...item,
+							width: Math.max(
+								1,
+								Math.min(
+									baseline.width + relativeDelta.width,
+									effectiveColumns
+								)
+							),
+							height: Math.max(
+								1,
+								baseline.height + relativeDelta.height
+							),
+						};
+					}
+					return item;
+				} );
 
-			latestLayoutRef.current = updatedLayout;
-			setTemporaryLayout( updatedLayout );
-			onPreviewLayout?.( updatedLayout );
+				latestLayoutRef.current = updatedLayout;
+				setTemporaryLayout( updatedLayout );
+				onPreviewLayout?.( updatedLayout );
+			}
 		}
-	}
+	);
 
 	return (
 		<DndContext
@@ -404,7 +418,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		>
 			{ /* No-op strategy: reorder comes from `temporaryLayout`
 				 + CSS Grid, not dnd-kit transforms. */ }
-			<SortableContext items={ items } strategy={ () => null }>
+			<SortableContext items={ items } strategy={ NO_SORT_STRATEGY }>
 				<div
 					ref={ mergedGridRef }
 					className={ clsx( styles.grid, className ) }
@@ -426,7 +440,7 @@ export function DashboardGrid( props: DashboardGridProps ) {
 							disabled={ ! editMode }
 							verticalResizable={ rowHeight !== 'auto' }
 							interacting={ activeId !== null || isResizing }
-							onResize={ ( delta ) => handleResize( id, delta ) }
+							onResize={ handleResize }
 							onResizeEnd={ persistTemporaryLayout }
 							actionableArea={ actionableAreaMap.get( id ) }
 						>
