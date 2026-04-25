@@ -11,6 +11,7 @@ import { Y } from '@wordpress/sync';
  */
 import {
 	findBlockByClientIdInDoc,
+	getYTextByAttributeKey,
 	richTextOffsetToHtmlIndex,
 } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
@@ -146,14 +147,16 @@ function convertWPBlockSelectionToSelection(
 	const attributes = block?.get( 'attributes' );
 	const attributeKey = selection.attributeKey;
 
-	const changedYText = attributeKey
-		? attributes?.get( attributeKey )
-		: undefined;
+	let changedYText: Y.Text | null = null;
+	if ( attributeKey && attributes ) {
+		changedYText = getYTextByAttributeKey( attributes, attributeKey );
+	}
 
-	const isYText = changedYText instanceof Y.Text;
-	const isFullyDefinedSelection = attributeKey && clientId;
-
-	if ( ! isYText || ! isFullyDefinedSelection ) {
+	if (
+		! ( changedYText instanceof Y.Text ) ||
+		! attributeKey ||
+		! clientId
+	) {
 		// We either don't have a valid YText (it's been deleted) or we've
 		// been passed a selection that's just a block clientId.
 		// Store as BlockSelection.

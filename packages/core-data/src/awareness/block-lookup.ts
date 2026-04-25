@@ -43,6 +43,7 @@ export function getContainingBlockYMap(
 
 		if (
 			parent instanceof Y.Map &&
+			parent.parent instanceof Y.Array &&
 			parent.get( 'clientId' ) !== undefined &&
 			parent.get( 'innerBlocks' ) instanceof Y.Array
 		) {

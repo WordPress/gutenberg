@@ -290,6 +290,26 @@ describe( 'getContainingBlockYMap', () => {
 
 		expect( getContainingBlockYMap( text ) ).toBeNull();
 	} );
+
+	it( 'should skip nested attribute maps that look like blocks', () => {
+		const block = createTestYBlock( 'block' );
+		const attributes = new Y.Map< any >();
+		const blockLikeAttribute = new Y.Map< any >();
+		const text = new Y.Text( 'Nested text' );
+		blockLikeAttribute.set( 'clientId', 'attribute-client-id' );
+		blockLikeAttribute.set( 'innerBlocks', new Y.Array() );
+		blockLikeAttribute.set( 'content', text );
+		attributes.set( 'nested', blockLikeAttribute );
+		block.set( 'attributes', attributes );
+
+		const ydoc = new Y.Doc();
+		const rootMap = ydoc.getMap( 'test' );
+		const blocks = new Y.Array< Y.Map< any > >();
+		rootMap.set( 'blocks', blocks );
+		blocks.push( [ block ] );
+
+		expect( getContainingBlockYMap( text ) ).toBe( block );
+	} );
 } );
 
 describe( 'resolveBlockClientIdByPath', () => {
