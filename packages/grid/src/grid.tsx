@@ -131,14 +131,24 @@ export function DashboardGrid( props: DashboardGridProps ) {
 		return map;
 	}, [ activeLayout ] );
 
-	// Stable key set derived from the consumer's `layout` prop. Reorder
-	// frames mutate `order` but never the set of keys, so depending on
-	// `layout` (not `activeLayout`) keeps this Set's identity stable
-	// across a gesture and avoids re-walking children every frame.
-	const layoutKeys = useMemo(
-		() => new Set( layout.map( ( item ) => item.key ) ),
-		[ layout ]
-	);
+	// Stable-identity key set, preserved across renders whenever the
+	// *contents* of the key set are unchanged — even if the consumer
+	// passes a fresh `layout` array reference (common when `layout`
+	// is derived inline from state). Without this, downstream memos
+	// would invalidate on every parent re-render and the children
+	// walk skip during gestures wouldn't hold.
+	const layoutKeysSig = layout.map( ( item ) => item.key ).join( '\0' );
+	const layoutKeysRef = useRef< {
+		sig: string;
+		set: Set< string >;
+	} | null >( null );
+	if ( layoutKeysRef.current?.sig !== layoutKeysSig ) {
+		layoutKeysRef.current = {
+			sig: layoutKeysSig,
+			set: new Set( layout.map( ( item ) => item.key ) ),
+		};
+	}
+	const layoutKeys = layoutKeysRef.current.set;
 
 	const items = useMemo(
 		() =>
