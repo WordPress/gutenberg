@@ -112,6 +112,12 @@ interface DashboardGridLayoutItem {
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
 | `className` | `string` | — | Extra class on the grid root. |
 
+`DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
+attributes (`id`, `aria-*`, `data-*`, event handlers, `style`, etc.)
+flow through. The grid's own layout styles
+(`gridTemplateColumns`, `gridAutoRows`, `gap`) override any user-supplied
+`style` for those properties.
+
 ### Child-level props
 
 Children render with the layout entry that matches their `key`. An optional
@@ -163,6 +169,30 @@ When `editMode` is true:
 - `onPreviewLayout` fires continuously during the interaction for
   live feedback; the committed layout is still emitted via
   `onChangeLayout`.
+
+## Performance
+
+`onPreviewLayout` typically causes the parent to re-render on every
+gesture frame. To prevent the grid's internal children walk from
+re-running on each of those frames, **memoize the children array**
+when its content is stable across re-renders:
+
+```jsx
+const tiles = useMemo(
+	() => layout.map( ( item ) => <Tile key={ item.key }>...</Tile> ),
+	[ layout ]
+);
+
+return (
+	<DashboardGrid layout={ layout } editMode onPreviewLayout={ ... }>
+		{ tiles }
+	</DashboardGrid>
+);
+```
+
+Without memoization the grid still works, but it walks the children
+on every preview update. For typical N (10–50 tiles) the overhead is
+minor; for larger grids it adds up.
 
 ## Accessibility
 
