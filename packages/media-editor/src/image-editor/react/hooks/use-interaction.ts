@@ -6,7 +6,8 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { CropperAction, CropperState, Size } from '../../core/types';
+import type { CropperAction } from '../../core/actions';
+import type { CropperState, Size } from '../../core/types';
 import { InteractionController } from '../../core/interaction-controller';
 
 /**

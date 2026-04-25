@@ -8,12 +8,12 @@ import { useReducer, useCallback, useRef } from '@wordpress/element';
  */
 import type {
 	CropperState,
-	CropperAction,
 	TransformOperation,
 	NormalizedPoint,
 	NormalizedRect,
 	Flip,
 } from '../../core/types';
+import type { CropperAction } from '../../core/actions';
 import { DEFAULT_STATE } from '../../core/constants';
 import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
@@ -34,16 +34,6 @@ import {
 export interface UseCropperStateReturn {
 	/** The current cropper state (read-only). */
 	state: CropperState;
-	/**
-	 * Internal: the raw reducer dispatch. Used by `<Cropper>` and the
-	 * interaction hook for actions that don't have a dedicated setter
-	 * (or for behavior that expects a compact action object). Not
-	 * part of the public API — consumers should use the named
-	 * setters. Prefixed `__` to signal "do not reach in".
-	 *
-	 * @internal
-	 */
-	__dispatch: React.Dispatch< CropperAction >;
 	/** Set the loaded image (natural size and src). */
 	setImage: ( image: CropperState[ 'image' ] ) => void;
 	/**
@@ -80,6 +70,34 @@ export interface UseCropperStateReturn {
 	 * try/catch if you need to recover.
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
+}
+
+const controllerDispatches = new WeakMap<
+	UseCropperStateReturn,
+	React.Dispatch< CropperAction >
+>();
+
+/**
+ * Internal bridge for React components that still need reducer-level actions.
+ *
+ * The dispatch function is intentionally not present on the public controller
+ * object returned by `useCropperState()`. `<Cropper>` uses this helper to wire
+ * low-level pointer/keyboard interactions without exposing the reducer action
+ * shape as consumer API.
+ *
+ * @param controller The public cropper controller.
+ * @return The reducer dispatch associated with the controller.
+ */
+export function getCropperControllerDispatch(
+	controller: UseCropperStateReturn
+): React.Dispatch< CropperAction > {
+	const dispatch = controllerDispatches.get( controller );
+	if ( ! dispatch ) {
+		throw new Error(
+			'Missing internal cropper dispatch for this controller.'
+		);
+	}
+	return dispatch;
 }
 
 /**
@@ -217,9 +235,8 @@ export function useCropperState(
 		[ state ]
 	);
 
-	return {
+	const controller: UseCropperStateReturn = {
 		state,
-		__dispatch: dispatch,
 		setImage,
 		setPan,
 		setZoom,
@@ -233,4 +250,6 @@ export function useCropperState(
 		isDirty,
 		getCroppedImage,
 	};
+	controllerDispatches.set( controller, dispatch );
+	return controller;
 }

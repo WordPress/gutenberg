@@ -1,7 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { CropperState, CropperAction, TransformOperation } from './types';
+import type { CropperAction } from './actions';
+import type { CropperState, TransformOperation } from './types';
 import { DEFAULT_STATE, MAX_ZOOM } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';

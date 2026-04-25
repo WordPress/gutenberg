@@ -2,7 +2,8 @@
  * Internal dependencies
  */
 import { InteractionController } from '../interaction-controller';
-import type { CropperAction, CropperState, Size } from '../types';
+import type { CropperAction } from '../actions';
+import type { CropperState, Size } from '../types';
 import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../constants';
 
 // The test environment is Node (not jsdom), so DOM globals like HTMLElement
