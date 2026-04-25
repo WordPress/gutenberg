@@ -45,6 +45,7 @@ import { store as mediaEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -56,6 +57,11 @@ interface MediaEditorModalProps {
 	 * since `@wordpress/media-editor` cannot depend on `@wordpress/editor`.
 	 */
 	fields?: Field< Media >[];
+	/**
+	 * Fixed aspect-ratio presets for image cropping. Free and Original are
+	 * always provided by the modal.
+	 */
+	aspectRatioPresets?: AspectRatioPreset[];
 }
 
 interface ModalTab {
@@ -158,7 +164,10 @@ function HeaderActions( {
 	);
 }
 
-export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
+export function MediaEditorModal( {
+	fields = [],
+	aspectRatioPresets,
+}: MediaEditorModalProps ) {
 	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
 		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
 		return {
@@ -279,13 +288,14 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 							onAspectRatioChange={ setAspectRatioValue }
 							freeformCrop={ freeformCrop }
 							onFreeformChange={ setFreeformCrop }
+							aspectRatioPresets={ aspectRatioPresets }
 						/>
 					</Stack>
 				),
 			},
 			detailsTab,
 		];
-	}, [ isImage, aspectRatioValue, freeformCrop ] );
+	}, [ isImage, aspectRatioValue, freeformCrop, aspectRatioPresets ] );
 
 	if ( ! isModalOpen || ! id ) {
 		return null;
