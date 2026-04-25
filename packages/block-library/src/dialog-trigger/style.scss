@@ -1,22 +1,2 @@
-.wp-block-dialog-trigger {
-	display: block;
-	width: 100%;
-}
-
-button.wp-block-dialog-trigger,
-.wp-block-dialog-trigger[role="button"] {
-	appearance: none;
-	padding: none;
-	margin: none;
-	border: none;
-	background: none;
-	text-align: inherit;
-	font-size: inherit;
-	font-family: inherit;
-	color: inherit;
-	cursor: pointer;
-	&:focus-visible {
-		outline: 2px solid currentColor;
-		outline-offset: 2px;
-	}
-}
+// The wp-block-dialog-trigger class is applied to the core/button element
+// rendered inside the trigger. Visual styling is handled by core/button.

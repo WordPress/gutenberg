@@ -30,6 +30,7 @@ export const settings = {
 								name: 'core/button',
 								attributes: {
 									text: __( 'Open dialog' ),
+									tagName: 'button',
 								},
 							},
 						],

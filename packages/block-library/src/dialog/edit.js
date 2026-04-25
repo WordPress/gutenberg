@@ -33,6 +33,7 @@ const TEMPLATE = [
 						'core/button',
 						{
 							text: __( 'Open dialog' ),
+							tagName: 'button',
 						},
 					],
 				],

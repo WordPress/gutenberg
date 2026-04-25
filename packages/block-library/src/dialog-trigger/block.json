@@ -8,25 +8,14 @@
 	"category": "media",
 	"__experimental": true,
 	"attributes": {},
-	"allowedBlocks": [
-		"core/buttons",
-		"core/button",
-		"core/paragraph",
-		"core/heading",
-		"core/image",
-		"core/group"
-	],
+	"allowedBlocks": [ "core/buttons" ],
 	"supports": {
 		"html": false,
 		"align": false,
 		"inserter": false,
 		"reusable": false,
 		"spacing": {
-			"margin": [ "top", "bottom" ],
-			"padding": true,
-			"__experimentalDefaultControls": {
-				"padding": true
-			}
+			"margin": [ "top", "bottom" ]
 		},
 		"typography": {
 			"fontSize": true,

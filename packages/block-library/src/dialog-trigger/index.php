@@ -8,6 +8,10 @@
 /**
  * Render the 'core/dialog-trigger' block.
  *
+ * The trigger must contain a single core/buttons block with one core/button
+ * inside. Interactivity directives are applied directly to the rendered
+ * <button> or <a> element.
+ *
  * @param array    $attributes Attributes.
  * @param string   $content Content.
  * @param WP_Block $block Block.
@@ -27,46 +31,23 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 		'data-wp-on--keydown'         => 'actions.onTriggerKeydown',
 	);
 
-	// If the only inner block is a core/button attach directives directly to the rendered
-	// button or anchor element to avoid a nested <button> situation.
-	$inner_blocks        = $block->inner_blocks;
-	$only_one_block      = 1 === count( $inner_blocks );
-	$singular_block_name = $only_one_block ? $inner_blocks[0]->name : null;
-	if ( $only_one_block && 'core/buttons' === $singular_block_name ) {
-		$tag_processor = new WP_HTML_Tag_Processor( $content );
-		while ( $tag_processor->next_tag() ) {
-			$tag = strtolower( $tag_processor->get_tag() );
-			if ( 'button' === $tag || 'a' === $tag ) {
-				$tag_processor->add_class( 'wp-block-dialog-trigger' );
-				$tag_processor->set_attribute( 'id', $trigger_id );
-				foreach ( $trigger_attrs as $attr => $value ) {
-					$tag_processor->set_attribute( $attr, $value );
-				}
-				if ( 'button' === $tag && ! $tag_processor->get_attribute( 'type' ) ) {
-					$tag_processor->set_attribute( 'type', 'button' );
-				}
-				break;
+	$tag_processor = new WP_HTML_Tag_Processor( $content );
+	while ( $tag_processor->next_tag() ) {
+		$tag = strtolower( $tag_processor->get_tag() );
+		if ( 'button' === $tag || 'a' === $tag ) {
+			$tag_processor->add_class( 'wp-block-dialog-trigger' );
+			$tag_processor->set_attribute( 'id', $trigger_id );
+			foreach ( $trigger_attrs as $attr => $value ) {
+				$tag_processor->set_attribute( $attr, $value );
 			}
+			if ( 'button' === $tag && ! $tag_processor->get_attribute( 'type' ) ) {
+				$tag_processor->set_attribute( 'type', 'button' );
+			}
+			break;
 		}
-		return $tag_processor->get_updated_html();
 	}
 
-	// Default: wrap inner content in a <div role="button"> to allow block-level content
-	// (e.g. <p>, <h*>) which would be invalid inside a native <button>.
-	return wp_sprintf(
-		'<div %1$s>%2$s</div>',
-		get_block_wrapper_attributes(
-			array_merge(
-				$trigger_attrs,
-				array(
-					'id'       => $trigger_id,
-					'role'     => 'button',
-					'tabindex' => '0',
-				)
-			)
-		),
-		$content,
-	);
+	return $tag_processor->get_updated_html();
 }
 
 /**

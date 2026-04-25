@@ -12,22 +12,34 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
+const TEMPLATE = [
+	[
+		'core/buttons',
+		{},
+		[
+			[
+				'core/button',
+				{
+					text: __( 'Open dialog' ),
+					tagName: 'button',
+				},
+			],
+		],
+	],
+];
+
 export default function Edit( { context, clientId } ) {
 	const dialogId = context[ 'core/dialog-id' ] ?? '';
 	const isDialogOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
 
-	// Get the parent dialog block's clientId
 	const { dialogClientId } = useSelect(
-		( select ) => {
-			return {
-				dialogClientId:
-					select( blockEditorStore ).getBlockRootClientId( clientId ),
-			};
-		},
+		( select ) => ( {
+			dialogClientId:
+				select( blockEditorStore ).getBlockRootClientId( clientId ),
+		} ),
 		[ clientId ]
 	);
 
-	// Get block editor dispatch for non-persistent updates
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -40,16 +52,11 @@ export default function Edit( { context, clientId } ) {
 		}
 	};
 
-	const blockProps = useBlockProps( {
-		role: 'button',
-		tabIndex: 0,
-		'aria-haspopup': 'dialog',
-		'aria-controls': dialogId,
-		'aria-expanded': isDialogOpen ? 'true' : 'false',
-	} );
+	const blockProps = useBlockProps();
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: false,
+		template: TEMPLATE,
+		templateLock: 'insert',
 		__experimentalCaptureToolbars: true,
 	} );
 
