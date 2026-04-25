@@ -182,14 +182,15 @@ export function GridItem( {
 			width: lastDelta.width - offsetX,
 			height: lastDelta.height - ( verticalResizable ? offsetY : 0 ),
 		};
-		if (
-			next.width === previewDelta?.width &&
-			next.height === previewDelta?.height
-		) {
-			return;
-		}
-		setPreviewDelta( next );
-	}, [ item.width, item.height, previewDelta, verticalResizable ] );
+		// Use the updater form so the effect doesn't need `previewDelta`
+		// in its deps. Returning `prev` when nothing changed lets React
+		// bail out without a re-render.
+		setPreviewDelta( ( prev ) =>
+			next.width === prev?.width && next.height === prev?.height
+				? prev
+				: next
+		);
+	}, [ item.width, item.height, verticalResizable ] );
 
 	const handleResizeEnd = () => {
 		setPreviewDelta( null );
