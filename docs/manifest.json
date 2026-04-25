@@ -2130,6 +2130,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widget-types",
+		"slug": "packages-widget-types",
+		"markdown_source": "../packages/widget-types/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/widgets",
 		"slug": "packages-widgets",
 		"markdown_source": "../packages/widgets/README.md",
