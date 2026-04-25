@@ -140,7 +140,7 @@ function TileActions( {
 			<IconButton
 				size="small"
 				variant="solid"
-				tone="neutral"
+				tone={ isFill ? 'brand' : 'neutral' }
 				icon={ justifyStretch }
 				label="Fill width"
 				aria-pressed={ isFill }
@@ -150,7 +150,7 @@ function TileActions( {
 			<IconButton
 				size="small"
 				variant="solid"
-				tone="neutral"
+				tone={ isFull ? 'brand' : 'neutral' }
 				icon={ stretchFullWidth }
 				label="Full width"
 				aria-pressed={ isFull }
