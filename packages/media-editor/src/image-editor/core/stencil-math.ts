@@ -282,8 +282,18 @@ export function computeShiftLockedResizeRect(
 			newWidth = maxWidth;
 			newHeight = newWidth / normalizedRatio;
 		}
-		newWidth = Math.max( newWidth, MIN_CROP_SIZE );
-		newHeight = Math.max( newHeight, MIN_CROP_SIZE );
+		// Enforce the minimum on the driving axis, then derive the
+		// other axis from the ratio so it stays consistent. The
+		// effective minimum height has to satisfy MIN_CROP_SIZE on
+		// both axes simultaneously.
+		const minHeight = Math.max(
+			MIN_CROP_SIZE,
+			MIN_CROP_SIZE / normalizedRatio
+		);
+		if ( newHeight < minHeight ) {
+			newHeight = minHeight;
+			newWidth = newHeight * normalizedRatio;
+		}
 		// Re-anchor the dragged axis to the opposite edge so the
 		// height adjustment after clamping keeps that edge fixed.
 		const newY = handle === 'n' ? s.y + s.height - newHeight : s.y;
@@ -305,8 +315,11 @@ export function computeShiftLockedResizeRect(
 		newHeight = maxHeight;
 		newWidth = newHeight * normalizedRatio;
 	}
-	newWidth = Math.max( newWidth, MIN_CROP_SIZE );
-	newHeight = Math.max( newHeight, MIN_CROP_SIZE );
+	const minWidth = Math.max( MIN_CROP_SIZE, MIN_CROP_SIZE * normalizedRatio );
+	if ( newWidth < minWidth ) {
+		newWidth = minWidth;
+		newHeight = newWidth / normalizedRatio;
+	}
 	const newX = handle === 'w' ? s.x + s.width - newWidth : s.x;
 	return {
 		x: newX,

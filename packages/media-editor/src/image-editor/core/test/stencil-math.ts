@@ -235,6 +235,58 @@ describe( 'computeShiftLockedResizeRect', () => {
 		} );
 	} );
 
+	describe( 'minimum size clamping preserves ratio', () => {
+		it( 'east edge: clamps a tall crop without breaking ratio when width hits MIN_CROP_SIZE', () => {
+			// Tall start rect — small ratio (0.0625 in normalized space).
+			const tallStart = { x: 0.2, y: 0.1, width: 0.05, height: 0.8 };
+			const drag: ResizeDragState = {
+				handle: 'e',
+				startX: 250,
+				startY: 250,
+				startRect: tallStart,
+			};
+			// Drag the east edge inward — width tries to shrink below MIN.
+			const rect = computeShiftLockedResizeRect(
+				drag,
+				200,
+				250,
+				IMAGE,
+				FULL_BOUNDS
+			);
+
+			const startRatio = tallStart.width / tallStart.height;
+			const newRatio = rect.width / rect.height;
+			expect( newRatio ).toBeCloseTo( startRatio, 5 );
+			expect( rect.width ).toBeGreaterThanOrEqual( 0.05 - 1e-9 );
+			expect( rect.height ).toBeGreaterThanOrEqual( 0.05 - 1e-9 );
+		} );
+
+		it( 'north edge: clamps a wide crop without breaking ratio when height hits MIN_CROP_SIZE', () => {
+			// Wide start rect — large ratio (16 in normalized space).
+			const wideStart = { x: 0.1, y: 0.4, width: 0.8, height: 0.05 };
+			const drag: ResizeDragState = {
+				handle: 'n',
+				startX: 500,
+				startY: 200,
+				startRect: wideStart,
+			};
+			// Drag the north edge down — height tries to shrink below MIN.
+			const rect = computeShiftLockedResizeRect(
+				drag,
+				500,
+				220,
+				IMAGE,
+				FULL_BOUNDS
+			);
+
+			const startRatio = wideStart.width / wideStart.height;
+			const newRatio = rect.width / rect.height;
+			expect( newRatio ).toBeCloseTo( startRatio, 5 );
+			expect( rect.width ).toBeGreaterThanOrEqual( 0.05 - 1e-9 );
+			expect( rect.height ).toBeGreaterThanOrEqual( 0.05 - 1e-9 );
+		} );
+	} );
+
 	describe( 'bounds clamping', () => {
 		it( 'east edge: clamps height to the symmetric bounds limit and shrinks width to keep ratio', () => {
 			// Center-y of START_RECT is 0.5; tightest bounds are bounds.minY=0.4
