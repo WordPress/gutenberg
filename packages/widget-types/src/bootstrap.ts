@@ -7,8 +7,13 @@ import { dispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store } from './store';
-import type { WidgetType } from './types';
+import type { WidgetName, WidgetType } from './types';
 
+/**
+ * Shape injected by PHP via `window.__registeredWidgetTypes`. PHP keeps
+ * snake_case (project convention); the camelCase mapping happens once in
+ * this boundary. Downstream JS/TS only sees `renderModule`.
+ */
 interface RegisteredEntry {
 	name: string;
 	render_module?: string;
@@ -41,8 +46,8 @@ export async function bootstrapWidgetTypes(): Promise< void > {
 
 				return {
 					...( module.default as Partial< WidgetType > ),
-					name: entry.name,
-					render_module: entry.render_module ?? '',
+					name: entry.name as WidgetName,
+					renderModule: entry.render_module ?? '',
 				};
 			} catch {
 				return null;

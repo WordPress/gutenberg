@@ -3,6 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"references": [
 		{ "path": "../data" },
+		{ "path": "../dataviews" },
 		{ "path": "../hooks" },
 		{ "path": "../warning" }
 	]

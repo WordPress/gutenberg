@@ -53,6 +53,7 @@
 	],
 	"dependencies": {
 		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/warning": "file:../warning"
 	},

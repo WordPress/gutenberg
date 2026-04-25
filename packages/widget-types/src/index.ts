@@ -1,3 +1,3 @@
 export { store } from './store';
 export { bootstrapWidgetTypes } from './bootstrap';
-export type { WidgetType } from './types';
+export type { WidgetName, WidgetTypeMetadata, WidgetType } from './types';

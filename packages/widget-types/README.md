@@ -21,7 +21,7 @@ can be rendered in a dashboard grid, a sidebar inside another page, a
 modal inserter, or a plugin panel. Its identity does not belong to any
 surface.
 
-**Wiring (per-page).** For `import( widget.render_module )` to work at
+**Wiring (per-page).** For `import( widget.renderModule )` to work at
 runtime, the module must be in the browser's import map. The import map
 is built per page load from the dependency tree of enqueued script
 modules. So "getting widget modules into the import map" is inherently
@@ -72,7 +72,7 @@ Build (@wordpress/build)               Data layer
   bootstrapWidgetTypes() on the client
     ├─ reads window.__registeredWidgetTypes
     ├─ import( widget_module ) for each entry
-    ├─ merges metadata + render_module
+    ├─ merges metadata + renderModule (snake→camel boundary)
     └─ dispatch → registerWidgetType()
                    │
                    ▼
@@ -153,7 +153,7 @@ import { store } from '@wordpress/widget-types';
 // Register a widget type.
 dispatch( store ).registerWidgetType( 'my-plugin/stats', {
 	title: 'Stats Overview',
-	render_module: 'my-plugin/widgets/stats/render',
+	renderModule: 'my-plugin/widgets/stats/render',
 } );
 
 // Query registered types.
@@ -285,7 +285,7 @@ function MySidebar() {
 	if ( ! widget ) {
 		return null;
 	}
-	const Render = lazy( () => import( widget.render_module ) );
+	const Render = lazy( () => import( widget.renderModule ) );
 	return (
 		<Suspense fallback={ null }>
 			<Render />
@@ -307,7 +307,7 @@ meta-box in `edit.php` — don't have that filter.
 For those contexts, the wiring mechanism is different: call
 `wp_enqueue_script_module()` directly with the widget module IDs at the
 right moment (e.g., the action where the surface enqueues its assets).
-The widget identity (the store, `getWidgetType()`, `render_module`) is
+The widget identity (the store, `getWidgetType()`, `renderModule`) is
 unchanged; only the import-map wiring differs.
 
 This is a limitation of how WordPress loads scripts, not of the widget
@@ -325,7 +325,7 @@ architecture.
 #### `registerWidgetType( name, settings )`
 
 Register a widget type in the store. Validates the name format
-(`namespace/slug`) and required fields (`title`, `render_module`).
+(`namespace/slug`) and required fields (`title`, `renderModule`).
 Applies the `widgets.registerWidgetType` filter before storing.
 
 **Parameters:**
@@ -336,7 +336,7 @@ Applies the `widgets.registerWidgetType` filter before storing.
 - Name must be a string
 - Name must match `^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$`
 - `title` is required
-- `render_module` is required
+- `renderModule` is required
 
 #### `unregisterWidgetType( name )`
 
@@ -388,9 +388,14 @@ addFilter(
 
 #### `bootstrapWidgetTypes()` — client
 
-Reads `window.__registeredWidgetTypes` (injected by PHP), dynamically
-imports each widget's metadata module (`widget.ts`), merges it with the
-`render_module` handle, and calls `registerWidgetType()` for each.
+Reads `window.__registeredWidgetTypes` (injected by PHP, snake_case),
+dynamically imports each widget's metadata module (`widget.ts`), merges
+it with the `renderModule` handle (mapped from `render_module` at this
+boundary), and calls `registerWidgetType()` for each.
+
+This is the single point where the PHP snake_case shape is mapped to the
+camelCase shape used throughout JS/TS. Downstream code should never see
+`render_module`.
 
 Returns a `Promise<void>` that resolves when all widgets are registered.
 
@@ -398,7 +403,7 @@ Returns a `Promise<void>` that resolves when all widgets are registered.
 - Entries without `widget_module` are skipped
 - Modules that fail to import are silently skipped (no throw)
 - Modules must export a `default` object with widget metadata
-- `render_module` falls back to empty string if absent
+- `renderModule` falls back to empty string if absent
 
 #### `gutenberg_get_widget_module_dependencies( $widget_names = null )` — PHP
 
@@ -415,24 +420,38 @@ filter to add widgets to the import map.
 
 ## WidgetType shape
 
+The shape is split into two interfaces. `WidgetTypeMetadata` is the
+literal contents of `widget.json` (authoring shape). `WidgetType` extends
+it with runtime-only fields produced by the build pipeline.
+
 ```ts
-interface WidgetType {
-	name: string;
+type WidgetName = `${ string }/${ string }`;
+
+interface WidgetTypeMetadata {
+	apiVersion: number;
+	name: WidgetName;
 	title: string;
 	description?: string;
-	icon?: string | Record< string, unknown >;
+	icon?: string;
 	category?: string;
 	keywords?: string[];
-	render_module: string;
-	attributes?: Array< {
-		id: string;
-		type: string;
-		label: string;
-		elements?: Array< { value: string; label: string } >;
-	} >;
-	example?: Record< string, unknown >;
+	version?: string;
+	textdomain?: string;
+	__experimental?: string | boolean;
+	attributes?: Field< any >[];
+	example?: {
+		attributes?: Record< string, unknown >;
+	};
+}
+
+interface WidgetType extends WidgetTypeMetadata {
+	renderModule: string;
 }
 ```
+
+`Field< any >` comes from `@wordpress/dataviews`. Each widget narrows the
+generic to its own attribute type at the point of registration; the
+array is heterogeneous in the metadata and homogeneous per widget.
 
 Layout-related properties (dimensions, position, padding, scroll)
 belong to the surface that renders the widget (e.g., a grid layout
@@ -443,15 +462,19 @@ identity and capabilities — how it's placed is the layout's concern.
 
 | Field | Required | Description |
 |-------|----------|-------------|
+| `apiVersion` | yes | Widget API version |
 | `name` | yes | Namespaced identifier (`core/on-this-day`) |
 | `title` | yes | Human-readable display name |
 | `description` | no | Short description for widget picker |
-| `icon` | no | Dashicon slug or icon object |
+| `icon` | no | Dashicon slug |
 | `category` | no | Grouping category for widget picker |
 | `keywords` | no | Search keywords for discoverability |
-| `render_module` | yes | Script module ID for lazy-loaded component |
-| `attributes` | no | User-configurable fields (settings UI) |
-| `example` | no | Preview data for widget picker |
+| `version` | no | Widget version, used for asset cache invalidation |
+| `textdomain` | no | Gettext text domain for translations |
+| `__experimental` | no | Experiment gate (`true` or experiment name) |
+| `attributes` | no | User-configurable fields (DataViews `Field<>`) |
+| `example` | no | Preview/default attributes (`{ attributes: {...} }`) |
+| `renderModule` | yes | Script module ID for lazy-loaded component (build-time, runtime only) |
 
 ## PHP registration
 

@@ -1,6 +1,6 @@
 import { applyFilters } from '@wordpress/hooks';
 import warning from '@wordpress/warning';
-import type { WidgetType } from '../types';
+import type { WidgetName, WidgetType } from '../types';
 
 const WIDGET_NAME_REGEXP = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
 
@@ -11,11 +11,11 @@ const WIDGET_NAME_REGEXP = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
  * before applying the `widgets.registerWidgetType` filter and
  * dispatching the type to the store.
  *
- * @param {string}              name     Namespaced identifier, e.g. `core/on-this-day`.
+ * @param {WidgetName}          name     Namespaced identifier, e.g. `core/on-this-day`.
  * @param {Partial<WidgetType>} settings Widget configuration.
  */
 export const registerWidgetType =
-	( name: string, settings: Partial< WidgetType > ) =>
+	( name: WidgetName, settings: Partial< WidgetType > ) =>
 	( {
 		select,
 		dispatch,
@@ -43,8 +43,8 @@ export const registerWidgetType =
 			return;
 		}
 
-		if ( ! settings.render_module ) {
-			warning( 'The widget "' + name + '" must have a render_module.' );
+		if ( ! settings.renderModule ) {
+			warning( 'The widget "' + name + '" must have a renderModule.' );
 			return;
 		}
 
@@ -62,7 +62,7 @@ export const registerWidgetType =
 		dispatch( { type: 'ADD_WIDGET_TYPE', widgetType } );
 	};
 
-export function unregisterWidgetType( name: string ) {
+export function unregisterWidgetType( name: WidgetName ) {
 	return {
 		type: 'REMOVE_WIDGET_TYPE' as const,
 		name,
