@@ -21,7 +21,6 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 		} );
 
 		await collaborationUtils.openCollaborativeSession( post.id );
-		await editor.setIsFixedToolbar( true );
 
 		const { page2 } = collaborationUtils;
 
@@ -35,13 +34,13 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 				},
 			] );
 
-		const firstCell = editor.canvas
-			.locator(
-				'[data-type="core/table"] tbody td [contenteditable="true"]'
-			)
-			.first();
+		const firstCell = editor.canvas.locator(
+			'role=textbox[name="Body cell text"i] >> nth=0'
+		);
 
 		await firstCell.click();
+		await firstCell.click();
+		await page.keyboard.press( 'End' );
 		await page.keyboard.press( 'ArrowRight' );
 
 		await expect
@@ -51,7 +50,7 @@ test.describe( 'Collaboration - Nested Awareness Selection', () => {
 						() =>
 							window.wp.data
 								.select( 'core/block-editor' )
-								.getSelectionStart()?.attributeKey
+								.getSelectionStart()?.attributeKey ?? ''
 					),
 				{ timeout: 5000 }
 			)
