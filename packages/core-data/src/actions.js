@@ -597,17 +597,15 @@ export const __unstableCreateUndoLevel =
  *                                                the exceptions. Defaults to false.
  */
 export const saveEntityRecord =
-	(
-		kind,
-		name,
-		record,
-		{
+	( kind, name, record, options = {} ) =>
+	async ( { select, resolveSelect, dispatch } ) => {
+		const {
 			isAutosave = false,
 			__unstableFetch = apiFetch,
+			__unstableSkipSyncUpdate = false,
 			throwOnError = false,
-		} = {}
-	) =>
-	async ( { select, resolveSelect, dispatch } ) => {
+		} = options;
+
 		logEntityDeprecation( kind, name, 'saveEntityRecord' );
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
@@ -798,7 +796,7 @@ export const saveEntityRecord =
 						getSyncManager()?.update(
 							`${ kind }/${ name }`,
 							recordId,
-							updatedRecord,
+							__unstableSkipSyncUpdate ? {} : updatedRecord,
 							LOCAL_UNDO_IGNORED_ORIGIN,
 							{ isSave: true }
 						);

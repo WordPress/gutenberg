@@ -253,7 +253,8 @@ export const getEntityRecord =
 									dispatch.saveEntityRecord(
 										kind,
 										name,
-										editedRecord
+										editedRecord,
+										{ __unstableSkipSyncUpdate: true }
 									);
 								} );
 						},
