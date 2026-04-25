@@ -23,7 +23,7 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 	);
 
 	/*
-	 * Detect Apple OS via JavaScript for users behind a CDN blocking the UA header.
+	 * Detect Apple OS via JavaScript for sites behind a CDN blocking the UA header.
 	 *
 	 * Running the script as the admin bar is rendered avoids a flash of incorrect content
 	 * for users with Apple OS when the UA header is blocked. It also prevents the need for
