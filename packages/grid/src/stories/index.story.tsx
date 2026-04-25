@@ -9,7 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
-import { IconButton } from '@wordpress/ui';
+import { IconButton, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -182,28 +182,67 @@ function formatTileLabel( item: DashboardGridLayoutItem ): string {
 	return width + height;
 }
 
-function LayoutStatePanel( { layout }: { layout: DashboardGridLayoutItem[] } ) {
+// Static token maps so the build-time token fallback plugin can inject
+// fallbacks into each `var()` call.
+const panelBgTokens: Record< 'warning' | 'success', string > = {
+	warning: 'var(--wpds-color-bg-surface-warning)',
+	success: 'var(--wpds-color-bg-surface-success)',
+};
+
+const panelFgTokens: Record< 'warning' | 'success', string > = {
+	warning: 'var(--wpds-color-fg-content-warning)',
+	success: 'var(--wpds-color-fg-content-success)',
+};
+
+const panelStrokeTokens: Record< 'warning' | 'success', string > = {
+	warning: 'var(--wpds-color-stroke-surface-warning)',
+	success: 'var(--wpds-color-stroke-surface-success)',
+};
+
+function LayoutStatePanel( {
+	label,
+	layout,
+	tone,
+}: {
+	label: string;
+	layout: DashboardGridLayoutItem[];
+	tone: 'warning' | 'success';
+} ) {
 	return (
-		<div
+		<Stack
+			direction="column"
+			gap="sm"
 			style={ {
-				marginBottom: 16,
-				padding: 12,
-				background: 'var(--wpds-color-bg-surface-neutral-weak)',
-				borderRadius: 4,
+				width: 280,
+				padding: 16,
+				background: panelBgTokens[ tone ],
+				border: `1px solid ${ panelStrokeTokens[ tone ] }`,
+				borderRadius: 8,
 				fontFamily: 'var(--wpds-typography-font-family-mono)',
 				fontSize: 12,
+				color: panelFgTokens[ tone ],
 			} }
 		>
-			<strong>Layout state:</strong>
+			<strong
+				style={ {
+					fontFamily: 'var(--wpds-typography-font-family-body)',
+					fontSize: 11,
+					textTransform: 'uppercase',
+					letterSpacing: '0.04em',
+				} }
+			>
+				{ label }
+			</strong>
 			<pre
 				style={ {
-					margin: '8px 0 0',
-					whiteSpace: 'pre-wrap',
+					margin: 0,
+					overflow: 'auto',
+					lineHeight: 1.5,
 				} }
 			>
 				{ JSON.stringify( layout, null, 2 ) }
 			</pre>
-		</div>
+		</Stack>
 	);
 }
 
@@ -447,6 +486,9 @@ export const EditMode: Story = {
 		];
 
 		const [ tiles, setTiles ] = useState( initialLayout );
+		const [ previewLayout, setPreviewLayout ] = useState<
+			DashboardGridLayoutItem[] | null
+		>( null );
 
 		const layout: DashboardGridLayoutItem[] = tiles.map(
 			( { tone: _tone, ...item } ) => item
@@ -462,6 +504,7 @@ export const EditMode: Story = {
 					};
 				} )
 			);
+			setPreviewLayout( null );
 		};
 
 		const removeTile = ( key: string ) => {
@@ -497,37 +540,46 @@ export const EditMode: Story = {
 		};
 
 		return (
-			<div style={ { width: '800px' } }>
-				<DashboardGrid
-					{ ...args }
-					layout={ layout }
-					onChangeLayout={ onChangeLayout }
-				>
-					{ tiles.map( ( tile ) => (
-						<Tile
-							key={ tile.key }
-							tone={ tile.tone }
-							actionableArea={
-								<TileActions
-									isFill={ tile.width === 'fill' }
-									isFull={ tile.width === 'full' }
-									onToggleFill={ () =>
-										toggleFill( tile.key )
-									}
-									onToggleFull={ () =>
-										toggleFull( tile.key )
-									}
-									onRemove={ () => removeTile( tile.key ) }
-								/>
-							}
-						>
-							{ formatTileLabel( tile ) }
-						</Tile>
-					) ) }
-				</DashboardGrid>
+			<Stack direction="row" gap="lg" align="flex-start">
+				<div style={ { width: '800px' } }>
+					<DashboardGrid
+						{ ...args }
+						layout={ layout }
+						onChangeLayout={ onChangeLayout }
+						onPreviewLayout={ setPreviewLayout }
+					>
+						{ tiles.map( ( tile ) => (
+							<Tile
+								key={ tile.key }
+								tone={ tile.tone }
+								actionableArea={
+									<TileActions
+										isFill={ tile.width === 'fill' }
+										isFull={ tile.width === 'full' }
+										onToggleFill={ () =>
+											toggleFill( tile.key )
+										}
+										onToggleFull={ () =>
+											toggleFull( tile.key )
+										}
+										onRemove={ () =>
+											removeTile( tile.key )
+										}
+									/>
+								}
+							>
+								{ formatTileLabel( tile ) }
+							</Tile>
+						) ) }
+					</DashboardGrid>
+				</div>
 
-				<LayoutStatePanel layout={ layout } />
-			</div>
+				<LayoutStatePanel
+					label={ previewLayout ? 'Staging' : 'Committed' }
+					layout={ previewLayout ?? layout }
+					tone={ previewLayout ? 'warning' : 'success' }
+				/>
+			</Stack>
 		);
 	},
 };
