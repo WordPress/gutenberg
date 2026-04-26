@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useState } from '@wordpress/element';
 import * as Dialog from '../index';
@@ -22,11 +22,11 @@ describe( 'Dialog', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const actionRef = createRef< HTMLButtonElement >();
-		const headerRef = createRef< HTMLDivElement >();
+		const headerRef = createRef< HTMLElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const descriptionRef = createRef< HTMLParagraphElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
-		const footerRef = createRef< HTMLDivElement >();
+		const footerRef = createRef< HTMLElement >();
 
 		render(
 			<Dialog.Root>
@@ -60,12 +60,39 @@ describe( 'Dialog', () => {
 		} );
 
 		// Now that the dialog is open, verify all inner refs
-		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( headerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( headerRef.current?.tagName ).toBe( 'HEADER' );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( descriptionRef.current ).toBeInstanceOf( HTMLParagraphElement );
 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
-		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
+		expect( footerRef.current ).toBeInstanceOf( HTMLElement );
+		expect( footerRef.current?.tagName ).toBe( 'FOOTER' );
+	} );
+
+	it( 'merges user `className` on Dialog.Title with the internal one', async () => {
+		// Regression test for the shared `useRender` class-name merge
+		// that also covers Popover.Title, Dialog.Description and
+		// Popover.Description.
+		const user = userEvent.setup();
+
+		render(
+			<Dialog.Root>
+				<Dialog.Trigger>Open</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Title className="custom-title">Title</Dialog.Title>
+				</Dialog.Popup>
+			</Dialog.Root>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		const heading = await screen.findByRole( 'heading', { name: 'Title' } );
+		// The regression this guards against: `useRender` must still forward
+		// the user-supplied className to the underlying DOM node. CSS module
+		// classes are stubbed in the Jest environment, so we can only assert
+		// the user class end-to-end.
+		expect( heading ).toHaveClass( 'custom-title' );
 	} );
 
 	it( 'associates Dialog.Description with the popup via aria-describedby', async () => {
@@ -122,9 +149,7 @@ describe( 'Dialog', () => {
 	} );
 
 	it( 'renders backdrop only when modal is true', async () => {
-		const getBackdrops = () =>
-			// eslint-disable-next-line testing-library/no-node-access -- The backdrop has no semantic role; querying by the stable `data-wp-ui-dialog-backdrop` attribute (mirroring the Dialog close-icon pattern) is more robust than the Base UI role/state it inherits.
-			document.querySelectorAll( '[data-wp-ui-dialog-backdrop]' );
+		const getBackdrops = () => screen.queryAllByTestId( 'dialog-backdrop' );
 
 		const view = render(
 			<Dialog.Root open modal>
@@ -351,7 +376,9 @@ describe( 'Dialog', () => {
 			} );
 
 			// Allow deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -457,7 +484,9 @@ describe( 'Dialog', () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			cleanup();
@@ -493,7 +522,9 @@ describe( 'Dialog', () => {
 			} );
 
 			// Let initial validation settle — no errors expected.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 			expect( errors ).toHaveLength( 0 );
 
 			// Remove the title.
@@ -558,7 +589,9 @@ describe( 'Dialog', () => {
 			);
 
 			// Wait for deferred validation to settle.
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+			await act(
+				() => new Promise( ( resolve ) => setTimeout( resolve, 50 ) )
+			);
 
 			// No new errors should have been thrown.
 			expect( errors ).toHaveLength( errorCountAfterInitial );

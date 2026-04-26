@@ -111,6 +111,44 @@ export const WithCustomContent: Story = {
 	},
 };
 
+/**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where an alert dialog renders below another popover when
+ * you want it above.
+ *
+ * `AlertDialog` reuses `Dialog`'s styles, so the same
+ * `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
+ * backdrop and the popup. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   dialog and alert dialog in the page), or
+ * - **Per instance**, by passing an `AlertDialog.Portal` with a `style` (or
+ *   `className`) to `AlertDialog.Popup`'s `portal` prop. The variable
+ *   cascades from the portal wrapper to the backdrop and the popup, which
+ *   are both rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: Story = {
+	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<AlertDialog.Trigger>Move to trash</AlertDialog.Trigger>
+				<AlertDialog.Popup
+					title="Move to trash?"
+					description="This post will be moved to trash. You can restore it later."
+					portal={
+						<AlertDialog.Portal
+							style={ { '--wp-ui-dialog-z-index': '9999' } }
+						/>
+					}
+				/>
+			</>
+		),
+	},
+};
+
 const menuPopupStyles: React.CSSProperties = {
 	background: 'var(--wpds-color-bg-surface-neutral-strong)',
 	border: '1px solid var(--wpds-color-stroke-surface-neutral)',

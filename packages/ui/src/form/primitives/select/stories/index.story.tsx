@@ -251,12 +251,21 @@ export const WithCustomTriggerAndItem: Story = {
 };
 
 /**
- * Popovers in Gutenberg are managed with explicit z-index values, which can create
- * situations where a popover renders below another popover, when you want it to be rendered above.
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a popover renders below another popover, when you
+ * want it to be rendered above.
  *
- * The `--wp-ui-select-z-index` CSS variable, available on the `Select.Popup` component,
- * is an escape hatch that can be used to override the z-index of a given `Select` popover
- * on a case-by-case basis.
+ * The `--wp-ui-select-z-index` CSS variable is an escape hatch for that
+ * case. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   `Select` popover in the page),
+ * - **Per instance on the popup**, by setting the variable via `style` on
+ *   `Select.Popup` (as this story does), or
+ * - **Per instance on the portal**, by passing a `Select.Portal` with a
+ *   `style` (or `className`) to `Select.Popup`'s `portal` prop. The
+ *   variable then cascades from the portal wrapper to everything rendered
+ *   inside it.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',

@@ -1,5 +1,18 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+// Size the stage to the viewport so DataViews owns its own scroll and
+// the sticky footer stays visible. Note: when the wp-admin sidebar
+// (#adminmenu) is taller than the viewport, #wpwrap still grows to
+// fit it, so empty space may appear below DataViews.
+.boot-layout__stage:has(.taxonomies-page) {
+	height: calc(100vh - #{$admin-bar-height-big});
+
+	@include break-medium {
+		height: calc(100vh - #{$admin-bar-height});
+	}
+}
 
 .dataviews-action-modal__edit-taxonomy {
 	justify-content: flex-end;
@@ -32,38 +45,28 @@
 	}
 
 	.components-modal__content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
 		padding: 0;
+		overflow-y: auto;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-header {
-		flex: 0 0 auto;
-		padding: $grid-unit-15 $grid-unit-20 $grid-unit-15 $grid-unit-30;
-		border-bottom: 1px solid $gray-200;
-		background: #fff;
-	}
-
-	.dataviews-action-modal__edit-taxonomy-title {
-		margin: 0;
-		font-size: 13px;
-		font-weight: 600;
-		line-height: 1.4;
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: $white;
+		padding: $grid-unit-20 $grid-unit-30;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-content {
-		flex: 1 1 auto;
-		min-height: 0;
-		overflow-y: auto;
-		padding: $grid-unit-20 $grid-unit-30;
+		padding: 0 $grid-unit-30;
 	}
 
 	.dataviews-action-modal__edit-taxonomy-footer {
-		flex: 0 0 auto;
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
+		background: $white;
 		padding: $grid-unit-20 $grid-unit-30;
-		border-top: 1px solid $gray-200;
-		background: #fff;
 
 		.components-button {
 			flex: 1;

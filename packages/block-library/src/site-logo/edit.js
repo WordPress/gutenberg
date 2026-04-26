@@ -51,7 +51,9 @@ import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const { mediaEditKey } = unlock( blockEditorPrivateApis );
+const { mediaEditKey, openMediaEditorModalKey } = unlock(
+	blockEditorPrivateApis
+);
 
 const SiteLogo = ( {
 	alt,
@@ -78,22 +80,26 @@ const SiteLogo = ( {
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
 
-	const { imageEditing, maxWidth, title, editMediaEntity } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			const siteEntities = select( coreStore ).getEntityRecord(
-				'root',
-				'__unstableBase'
-			);
-			return {
-				title: siteEntities?.name,
-				imageEditing: settings.imageEditing,
-				maxWidth: settings.maxWidth,
-				editMediaEntity: settings?.[ mediaEditKey ],
-			};
-		},
-		[]
-	);
+	const {
+		imageEditing,
+		maxWidth,
+		title,
+		editMediaEntity,
+		openMediaEditorModal,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		const siteEntities = select( coreStore ).getEntityRecord(
+			'root',
+			'__unstableBase'
+		);
+		return {
+			title: siteEntities?.name,
+			imageEditing: settings.imageEditing,
+			maxWidth: settings.maxWidth,
+			editMediaEntity: settings?.[ mediaEditKey ],
+			openMediaEditorModal: settings?.[ openMediaEditorModalKey ],
+		};
+	}, [] );
 
 	useEffect( () => {
 		// Turn the `Use as site icon` toggle off if it is on but the logo and icon have
@@ -109,6 +115,12 @@ const SiteLogo = ( {
 			setIsEditingImage( false );
 		}
 	}, [ isSelected ] );
+
+	const handleMediaUpdate = ( { id: newId } ) => {
+		if ( typeof newId === 'number' && newId !== logoId ) {
+			setLogo( newId );
+		}
+	};
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -388,7 +400,15 @@ const SiteLogo = ( {
 				shouldShowCropAndDimensions && (
 					<BlockControls group="block">
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								openMediaEditorModal && logoId
+									? () =>
+											openMediaEditorModal( {
+												id: logoId,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

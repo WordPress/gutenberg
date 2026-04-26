@@ -10,6 +10,7 @@ const meta: Meta< typeof Tooltip.Root > = {
 		Provider: Tooltip.Provider,
 		Trigger: Tooltip.Trigger,
 		Popup: Tooltip.Popup,
+		Portal: Tooltip.Portal,
 	},
 };
 export default meta;
@@ -73,6 +74,42 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 			</Tooltip.Root>
 		</div>
 	),
+};
+
+/**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where a tooltip renders below another popover when you
+ * want it above.
+ *
+ * The `--wp-ui-tooltip-z-index` CSS variable is an escape hatch for that
+ * case. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   tooltip in the page), or
+ * - **Per instance**, by passing a `Tooltip.Portal` with a `style` (or
+ *   `className`) to `Tooltip.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to the popup rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: StoryObj< typeof Tooltip.Root > = {
+	name: 'With Custom z-index',
+	args: {
+		children: (
+			<>
+				<Tooltip.Trigger aria-label="Save">💾</Tooltip.Trigger>
+				<Tooltip.Popup
+					portal={
+						<Tooltip.Portal
+							style={ { '--wp-ui-tooltip-z-index': '9999' } }
+						/>
+					}
+				>
+					Save
+				</Tooltip.Popup>
+			</>
+		),
+	},
 };
 
 /**
