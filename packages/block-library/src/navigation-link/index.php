@@ -157,7 +157,49 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	foreach ( $block->inner_blocks as $inner_block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
-	$has_submenu = ! empty( trim( $inner_blocks_html ) );
+
+	// Fetch child categories and initialize output buffer and flag for dynamic child term HTML.
+	$child_terms_html = '';
+	$has_child_terms  = false;
+
+	// Only fetch child terms when the attribute is enabled, a term ID exists, and the link points to a taxonomy.
+	if (
+		! empty( $attributes['showChildCategories'] ) &&
+		true === $attributes['showChildCategories'] &&
+		! empty( $attributes['id'] ) &&
+		! empty( $attributes['kind'] ) &&
+		'taxonomy' === $attributes['kind']
+	) {
+		// Fall back to 'category' if no specific taxonomy type is set.
+		$taxonomy    = ! empty( $attributes['type'] ) ? $attributes['type'] : 'category';
+
+		// Query direct children of the current term, excluding empty ones.
+		$child_terms = get_terms( array(
+			'taxonomy'   => $taxonomy,
+			'parent'     => (int) $attributes['id'],
+			'hide_empty' => true,
+		) );
+
+		// Build list item HTML for each child term if the query returned valid results.
+		if ( ! empty( $child_terms ) && ! is_wp_error( $child_terms ) ) {
+			$has_child_terms = true;
+
+			// Render each child term as a navigation link list item.
+			foreach ( $child_terms as $term ) {
+				$child_terms_html .= sprintf(
+					'<li class="wp-block-navigation-item wp-block-navigation-link">' .
+						'<a class="wp-block-navigation-item__content" href="%s">' .
+							'<span class="wp-block-navigation-item__label">%s</span>' .
+						'</a>' .
+					'</li>',
+					esc_url( get_term_link( $term ) ),
+					esc_html( $term->name )
+				);
+			}
+		}
+	}
+
+	$has_submenu = ! empty( trim( $inner_blocks_html ) ) || $has_child_terms;
 
 	$css_classes = trim( implode( ' ', $classes ) );
 	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
@@ -239,8 +281,9 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( $has_submenu ) {
 		$html .= sprintf(
-			'<ul class="wp-block-navigation__submenu-container">%s</ul>',
-			$inner_blocks_html
+			'<ul data-wp-on--focus="actions.openMenuOnFocus" class="wp-block-navigation__submenu-container">%s%s</ul>',
+			$inner_blocks_html,
+			$child_terms_html
 		);
 	}
 
