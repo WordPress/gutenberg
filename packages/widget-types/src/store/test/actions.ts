@@ -8,7 +8,6 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { store } from '../';
-import { unregisterWidgetType } from '../actions';
 import type { WidgetName, WidgetType } from '../../types';
 
 const baseSettings = ( name: WidgetName ): Partial< WidgetType > => ( {
@@ -148,11 +147,12 @@ describe( 'widget-types actions', () => {
 	} );
 
 	describe( 'unregisterWidgetType', () => {
-		it( 'returns the REMOVE_WIDGET_TYPE action', () => {
-			expect( unregisterWidgetType( 'test/widget' ) ).toEqual( {
-				type: 'REMOVE_WIDGET_TYPE',
-				name: 'test/widget',
-			} );
+		it( 'warns when the widget type is not registered', () => {
+			dispatch( store ).unregisterWidgetType( 'test/missing' );
+
+			expect( console ).toHaveWarnedWith(
+				'Widget type "test/missing" is not registered.'
+			);
 		} );
 
 		it( 'removes a registered widget from the store', () => {
@@ -168,6 +168,22 @@ describe( 'widget-types actions', () => {
 			expect(
 				select( store ).getWidgetType( 'test/widget' )
 			).toBeUndefined();
+		} );
+
+		it( 'returns the removed widget type', async () => {
+			dispatch( store ).registerWidgetType(
+				'test/widget',
+				baseSettings( 'test/widget' )
+			);
+
+			const removed =
+				await dispatch( store ).unregisterWidgetType( 'test/widget' );
+
+			expect( removed ).toMatchObject( {
+				name: 'test/widget',
+				title: 'Test Widget',
+				renderModule: 'test/widget/render',
+			} );
 		} );
 	} );
 

@@ -288,10 +288,14 @@ Applies the `widgets.registerWidgetType` filter before storing.
 
 #### `unregisterWidgetType( name )`
 
-Remove a widget type from the store.
+Remove a widget type from the store. Warns and returns `undefined` if
+the widget type is not registered; otherwise returns the removed
+`WidgetType`.
 
 **Parameters:**
 - `name` (`string`) — The widget type name to remove
+
+**Returns:** `WidgetType | undefined`
 
 ### Selectors
 

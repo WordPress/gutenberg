@@ -62,9 +62,35 @@ export const registerWidgetType =
 		dispatch( { type: 'ADD_WIDGET_TYPE', widgetType } );
 	};
 
-export function unregisterWidgetType( name: WidgetName ) {
-	return {
-		type: 'REMOVE_WIDGET_TYPE' as const,
-		name,
+/**
+ * Unregister a widget type.
+ *
+ * Warns and returns `undefined` if the widget type is not registered.
+ * Otherwise removes it from the store and returns the removed widget
+ * type, mirroring `unregisterBlockType` from `@wordpress/blocks`.
+ *
+ * @param {WidgetName} name Widget type name to remove.
+ */
+export const unregisterWidgetType =
+	( name: WidgetName ) =>
+	( {
+		select,
+		dispatch,
+	}: {
+		select: { getWidgetType: ( n: string ) => WidgetType | undefined };
+		dispatch: ( action: {
+			type: string;
+			[ key: string ]: unknown;
+		} ) => void;
+	} ): WidgetType | undefined => {
+		const oldWidgetType = select.getWidgetType( name );
+
+		if ( ! oldWidgetType ) {
+			warning( 'Widget type "' + name + '" is not registered.' );
+			return undefined;
+		}
+
+		dispatch( { type: 'REMOVE_WIDGET_TYPE', name } );
+
+		return oldWidgetType;
 	};
-}
