@@ -1306,6 +1306,38 @@ describe( 'updateSelectedCell', () => {
 		} );
 	} );
 
+	it( 'preserves unknown row properties when updating a cell', () => {
+		const tableWithRowIdentity = deepFreeze( {
+			body: [
+				{
+					__unstableSyncId: 'row-1',
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		} );
+		const cellSelection = {
+			type: 'cell',
+			sectionName: 'body',
+			rowIndex: 0,
+			columnIndex: 0,
+		};
+		const updated = updateSelectedCell(
+			tableWithRowIdentity,
+			cellSelection,
+			( cell ) => ( {
+				...cell,
+				content: 'test',
+			} )
+		);
+
+		expect( updated.body[ 0 ].__unstableSyncId ).toBe( 'row-1' );
+	} );
+
 	it( 'updates every cell in the column when the selection type is `column`', () => {
 		const cellSelection = { type: 'column', columnIndex: 1 };
 		const updated = updateSelectedCell(
