@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider-track",
+	"title": "Slides",
+	"description": "Track container for slides in a slider.",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/slider" ],
+	"allowedBlocks": [ "core/slide" ],
+	"usesContext": [ "core/slider-id" ],
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"listView": true
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "wp-block-slider-track-editor",
+	"style": "wp-block-slider-track"
+}

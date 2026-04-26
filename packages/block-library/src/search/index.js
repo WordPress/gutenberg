@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+
 import { __ } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';

@@ -1,0 +1,22 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider-pagination-indicator",
+	"title": "Slider Pagination Indicator",
+	"description": "Dot indicators showing the current slide position.",
+	"category": "design",
+	"textdomain": "default",
+	"ancestor": [ "core/slider-pagination" ],
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"color": {
+			"text": true,
+			"background": false
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "wp-block-slider-pagination-indicator"
+}

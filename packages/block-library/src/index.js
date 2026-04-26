@@ -132,6 +132,12 @@ import * as shortcode from './shortcode';
 import * as siteLogo from './site-logo';
 import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
+import * as slide from './slide';
+import * as slider from './slider';
+import * as sliderTrack from './slider-track';
+import * as sliderPagination from './slider-pagination';
+import * as sliderPaginationButton from './slider-pagination-button';
+import * as sliderPaginationIndicator from './slider-pagination-indicator';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
@@ -294,6 +300,12 @@ const getAllBlocks = () => {
 		blocks.push( tabPanels );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
+		blocks.push( slider );
+		blocks.push( sliderTrack );
+		blocks.push( slide );
+		blocks.push( sliderPagination );
+		blocks.push( sliderPaginationButton );
+		blocks.push( sliderPaginationIndicator );
 	}
 
 	// When in a WordPress context, conditionally

@@ -959,6 +959,70 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget
 
+## Slide
+
+A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slide))
+
+-	**Name:** core/slide
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/slider-track
+-	**Supports:** anchor, color (background, gradients, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), shadow, spacing (blockGap, padding, ~~margin~~), ~~html~~, ~~reusable~~
+
+## Slider
+
+Display content in a horizontally scrolling slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider))
+
+-	**Name:** core/slider
+-	**Experimental:** true
+-	**Category:** design
+-	**Allowed Blocks:** core/slider-pagination, core/slider-track
+-	**Supports:** align, color (background, ~~text~~), interactivity, spacing (margin, padding), ~~html~~
+-	**Attributes:** activeSlideIndex, loop, sliderId
+
+## Slider Pagination
+
+Container for slider controls and indicators. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination))
+
+-	**Name:** core/slider-pagination
+-	**Experimental:** true
+-	**Category:** design
+-	**Ancestor:** core/slider
+-	**Allowed Blocks:** core/slider-pagination-button, core/slider-pagination-indicator
+-	**Supports:** color (background, text), layout (default), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
+
+## Slider Pagination Button
+
+Navigation button for a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination-button))
+
+-	**Name:** core/slider-pagination-button
+-	**Experimental:** true
+-	**Category:** design
+-	**Ancestor:** core/slider-pagination
+-	**Supports:** color (background, text), shadow, spacing (margin, padding), typography (fontSize), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Attributes:** type
+
+## Slider Pagination Indicator
+
+Dot indicators showing the current slide position. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-pagination-indicator))
+
+-	**Name:** core/slider-pagination-indicator
+-	**Experimental:** true
+-	**Category:** design
+-	**Ancestor:** core/slider-pagination
+-	**Supports:** color (text, ~~background~~), ~~anchor~~, ~~html~~, ~~reusable~~
+
+## Slides
+
+Track container for slides in a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-track))
+
+-	**Name:** core/slider-track
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/slider
+-	**Allowed Blocks:** core/slide
+-	**Supports:** listView, ~~anchor~~, ~~html~~, ~~reusable~~
+
 ## Social Icon
 
 Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))

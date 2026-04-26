@@ -1,0 +1,45 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slide",
+	"title": "Slide",
+	"description": "A single slide within a slider.",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/slider-track" ],
+	"usesContext": [ "core/slider-activeSlideIndex" ],
+	"supports": {
+		"anchor": true,
+		"html": false,
+		"reusable": false,
+		"layout": {
+			"allowSwitching": true,
+			"allowInheriting": false,
+			"allowVerticalAlignment": true,
+			"allowJustification": true,
+			"allowOrientation": true,
+			"allowSizingOnChildren": true
+		},
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": false
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"gradients": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"shadow": true
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "wp-block-slide-editor",
+	"style": "wp-block-slide"
+}

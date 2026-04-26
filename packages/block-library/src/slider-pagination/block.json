@@ -1,0 +1,51 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider-pagination",
+	"title": "Slider Pagination",
+	"description": "Container for slider controls and indicators.",
+	"category": "design",
+	"textdomain": "default",
+	"ancestor": [ "core/slider" ],
+	"allowedBlocks": [
+		"core/slider-pagination-button",
+		"core/slider-pagination-indicator"
+	],
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"layout": {
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap",
+				"justifyContent": "center"
+			}
+		},
+		"spacing": {
+			"margin": true,
+			"padding": true,
+			"blockGap": true
+		},
+		"color": {
+			"background": true,
+			"text": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
+			}
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "wp-block-slider-pagination",
+	"editorStyle": "wp-block-slider-pagination-editor"
+}
