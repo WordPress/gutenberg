@@ -126,9 +126,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		// Record an intermediate paragraph-with-URL state so a single undo
-		// after the URL → block transformation restores the pasted text.
+		// after the URL → block transformation restores the pasted link.
 		if ( mode === 'BLOCKS' ) {
-			onChange( insert( value, create( { text: trimmedPlainText } ) ) );
+			pasteInline( html );
 			registry
 				.dispatch( blockEditorStore )
 				.__unstableMarkLastChangeAsPersistent();

@@ -702,7 +702,8 @@ test.describe( 'Copy/cut/paste', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+					content:
+						'<a href="https://www.youtube.com/watch?v=FcTLMTyD2DU">https://www.youtube.com/watch?v=FcTLMTyD2DU</a>',
 				},
 			},
 		] );
