@@ -180,6 +180,42 @@ describe( 'widget-types actions', () => {
 
 			removeFilter( 'widgets.registerWidgetType', 'test/icon-injector' );
 		} );
+
+		it( 'applies defaults for missing optional fields', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				name: 'test/widget',
+				apiVersion: 1,
+				title: 'Test Widget',
+				renderModule: 'test/widget/render',
+			} );
+
+			const widget = select( store ).getWidgetType( 'test/widget' );
+			expect( widget?.keywords ).toEqual( [] );
+			expect( widget?.attributes ).toEqual( [] );
+		} );
+
+		it( 'defaults apiVersion to 1 when missing', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				name: 'test/widget',
+				title: 'Test Widget',
+				renderModule: 'test/widget/render',
+			} );
+
+			expect(
+				select( store ).getWidgetType( 'test/widget' )?.apiVersion
+			).toBe( 1 );
+		} );
+
+		it( 'preserves author-provided values over defaults', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				...baseSettings( 'test/widget' ),
+				keywords: [ 'foo', 'bar' ],
+			} );
+
+			expect(
+				select( store ).getWidgetType( 'test/widget' )?.keywords
+			).toEqual( [ 'foo', 'bar' ] );
+		} );
 	} );
 
 	describe( 'unregisterWidgetType', () => {

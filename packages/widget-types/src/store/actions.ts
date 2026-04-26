@@ -4,6 +4,12 @@ import type { WidgetName, WidgetType } from '../types';
 
 const WIDGET_NAME_REGEXP = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
 
+const DEFAULT_WIDGET_TYPE_SETTINGS: Partial< WidgetType > = {
+	apiVersion: 1,
+	keywords: [],
+	attributes: [],
+};
+
 /**
  * Register a widget type.
  *
@@ -76,7 +82,7 @@ export const registerWidgetType =
 
 		const widgetType = applyFilters(
 			'widgets.registerWidgetType',
-			{ ...settings, name },
+			{ ...DEFAULT_WIDGET_TYPE_SETTINGS, ...settings, name },
 			name
 		) as WidgetType;
 

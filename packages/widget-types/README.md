@@ -288,6 +288,11 @@ Applies the `widgets.registerWidgetType` filter before storing.
 - `attributes`, when present, must be an array
 - `renderModule` is required
 
+**Defaults applied when missing:**
+- `apiVersion`: `1`
+- `keywords`: `[]`
+- `attributes`: `[]`
+
 #### `unregisterWidgetType( name )`
 
 Remove a widget type from the store.
