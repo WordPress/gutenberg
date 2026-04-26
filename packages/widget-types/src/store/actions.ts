@@ -7,7 +7,7 @@ const WIDGET_NAME_REGEXP = /^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/;
 /**
  * Register a widget type.
  *
- * Validates the name, required fields, and checks for duplicates
+ * Validates the name, required fields, value shapes, and duplicates
  * before applying the `widgets.registerWidgetType` filter and
  * dispatching the type to the store.
  *
@@ -40,6 +40,27 @@ export const registerWidgetType =
 
 		if ( ! settings.title ) {
 			warning( 'The widget "' + name + '" must have a title.' );
+			return;
+		}
+
+		if ( typeof settings.title !== 'string' ) {
+			warning( 'Widget type titles must be strings.' );
+			return;
+		}
+
+		if (
+			settings.description !== undefined &&
+			typeof settings.description !== 'string'
+		) {
+			warning( 'Widget type descriptions must be strings.' );
+			return;
+		}
+
+		if (
+			settings.attributes !== undefined &&
+			! Array.isArray( settings.attributes )
+		) {
+			warning( 'Widget type attributes must be an array.' );
 			return;
 		}
 

@@ -283,19 +283,17 @@ Applies the `widgets.registerWidgetType` filter before storing.
 **Validation rules:**
 - Name must be a string
 - Name must match `^[a-z][a-z0-9-]*/[a-z][a-z0-9-]*$`
-- `title` is required
+- `title` is required and must be a string
+- `description`, when present, must be a string
+- `attributes`, when present, must be an array
 - `renderModule` is required
 
 #### `unregisterWidgetType( name )`
 
-Remove a widget type from the store. Warns and returns `undefined` if
-the widget type is not registered; otherwise returns the removed
-`WidgetType`.
+Remove a widget type from the store.
 
 **Parameters:**
 - `name` (`string`) — The widget type name to remove
-
-**Returns:** `WidgetType | undefined`
 
 ### Selectors
 

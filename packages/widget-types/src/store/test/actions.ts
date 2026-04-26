@@ -93,6 +93,42 @@ describe( 'widget-types actions', () => {
 			);
 		} );
 
+		it( 'warns when title is not a string', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				...baseSettings( 'test/widget' ),
+				// @ts-expect-error testing runtime validation
+				title: 123,
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Widget type titles must be strings.'
+			);
+		} );
+
+		it( 'warns when description is not a string', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				...baseSettings( 'test/widget' ),
+				// @ts-expect-error testing runtime validation
+				description: 42,
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Widget type descriptions must be strings.'
+			);
+		} );
+
+		it( 'warns when attributes is not an array', () => {
+			dispatch( store ).registerWidgetType( 'test/widget', {
+				...baseSettings( 'test/widget' ),
+				// @ts-expect-error testing runtime validation
+				attributes: { foo: 'bar' },
+			} );
+
+			expect( console ).toHaveWarnedWith(
+				'Widget type attributes must be an array.'
+			);
+		} );
+
 		it( 'warns when renderModule is missing', () => {
 			dispatch( store ).registerWidgetType( 'test/widget', {
 				name: 'test/widget',
