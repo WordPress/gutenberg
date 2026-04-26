@@ -12,6 +12,8 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	VisuallyHidden,
+	CheckboxControl,
+	PanelBody,
 } from '@wordpress/components';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
@@ -90,7 +92,7 @@ export default function NavigationLinkEdit( {
 	context,
 	clientId,
 } ) {
-	const { id, label, type, url, description, kind, metadata } = attributes;
+	const { id, label, type, url, description, kind, metadata, showChildCategories } = attributes;
 	const { maxNestingLevel } = context;
 
 	const {
@@ -285,6 +287,7 @@ export default function NavigationLinkEdit( {
 			kind: undefined,
 			type: undefined,
 			opensInNewTab: false,
+			showChildCategories: false,
 		} );
 
 		// Close the link editing UI.
@@ -398,6 +401,16 @@ export default function NavigationLinkEdit( {
 					setAttributes={ setAttributes }
 					clientId={ clientId }
 				/>
+				<PanelBody title={ __( 'Show Child Categories' ) }>
+					<CheckboxControl
+						style={{padding:'16px'}}
+						label={ __( 'Show Child Categories' ) }
+						checked={ !! showChildCategories }
+						onChange={ ( value ) =>
+							setAttributes( { showChildCategories: value } )
+						}
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
@@ -436,7 +449,7 @@ export default function NavigationLinkEdit( {
 											)
 										}
 										aria-label={ __(
-											'Navigation link text'
+											'Navigation link text priyanshu'
 										) }
 										placeholder={ itemLabelPlaceholder }
 										withoutInteractiveFormatting

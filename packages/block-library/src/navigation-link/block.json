@@ -45,6 +45,10 @@
 		},
 		"isTopLevelLink": {
 			"type": "boolean"
+		},
+		"showChildCategories": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [
