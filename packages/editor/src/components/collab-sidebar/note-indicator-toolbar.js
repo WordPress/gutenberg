@@ -13,7 +13,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from './utils';
 
-const { CommentIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
+const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
 export function NoteAvatarIndicator( { onClick, note } ) {
 	const threadParticipants = useMemo( () => {
@@ -73,7 +73,7 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 			  );
 
 	return (
-		<CommentIconToolbarSlotFill.Fill>
+		<NoteIconToolbarSlotFill.Fill>
 			<ToolbarButton
 				className="editor-note-indicator"
 				label={ __( 'View notes' ) }
@@ -101,6 +101,6 @@ export function NoteAvatarIndicator( { onClick, note } ) {
 					) }
 				</Stack>
 			</ToolbarButton>
-		</CommentIconToolbarSlotFill.Fill>
+		</NoteIconToolbarSlotFill.Fill>
 	);
 }

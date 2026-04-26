@@ -39,26 +39,20 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, blockCommentId, isClassicBlock } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockName,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isClassicBlock: _clientId
-					? getBlockName( _clientId ) === 'core/freeform'
-					: false,
-			};
-		},
-		[]
-	);
+	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			noteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+		};
+	}, [] );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -91,10 +85,7 @@ function NotesSidebar( { postId } ) {
 			// When multiple notes per block are supported. Remove note ID check.
 			// See: https://github.com/WordPress/gutenberg/pull/75147.
 			isDisabled:
-				isDistractionFree ||
-				isClassicBlock ||
-				! clientId ||
-				!! blockCommentId,
+				isDistractionFree || isClassicBlock || ! clientId || !! noteId,
 		}
 	);
 
@@ -103,8 +94,8 @@ function NotesSidebar( { postId } ) {
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Find the current thread for the selected block.
-	const currentThread = blockCommentId
-		? notes.find( ( thread ) => thread.id === blockCommentId )
+	const currentThread = noteId
+		? notes.find( ( thread ) => thread.id === noteId )
 		: null;
 
 	async function openTheSidebar( selectedClientId ) {

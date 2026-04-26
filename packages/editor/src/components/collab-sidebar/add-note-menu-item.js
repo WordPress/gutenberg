@@ -16,7 +16,7 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { unlock } from '../../lock-unlock';
 
-const { CommentIconSlotFill } = unlock( blockEditorPrivateApis );
+const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
 function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 	const block = useSelect(
@@ -65,7 +65,7 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 
 export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 	return (
-		<CommentIconSlotFill.Fill>
+		<NoteIconSlotFill.Fill>
 			{ ( { clientId, onClose } ) => (
 				<NoteMenuItem
 					clientId={ clientId }
@@ -76,6 +76,6 @@ export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 					} }
 				/>
 			) }
-		</CommentIconSlotFill.Fill>
+		</NoteIconSlotFill.Fill>
 	);
 }

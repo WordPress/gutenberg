@@ -11,23 +11,23 @@ Notes are stored as WordPress comments (`type: 'note'`) attached to the post. A 
 
 ```
 collab-sidebar/
-├── README.md                         this file
-├── index.js              219         NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
-├── notes.js              276         Notes - coordinator (outer Stack, actions, keyboard nav)
-├── note-thread.js        331         NoteThread - per-thread (selection, floating registration, reply form)
-├── note.js               209         Note - per-card state (edit/delete mode, menu, dialog)
-├── note-card.js           36         NoteCard - presentational shell (byline + actions slot + children)
-├── note-byline.js        110         NoteByline - avatar + name + relative date
-├── note-form.js           95         NoteForm - autosizing textarea + submit/cancel
-├── add-note.js            86         AddNote - new-note surface (floating + template-locked cases)
-├── add-note-menu-item.js  81         AddNoteMenuItem - block-toolbar "Add note" trigger
-├── note-indicator-toolbar.js 106     NoteAvatarIndicator - toolbar participants avatars
-├── floating-container.js  30         FloatingContainer - stack wrapper that applies `top` in floating mode
+├── README.md                       this file
+├── index.js                        NotesSidebarContainer → NotesSidebar (entry, toolbar slot fills)
+├── notes.js                        Notes - coordinator (outer Stack, actions, keyboard nav)
+├── note-thread.js                  NoteThread - per-thread (selection, floating registration, reply form)
+├── note.js                         Note - per-card state (edit/delete mode, menu, dialog)
+├── note-card.js                    NoteCard - presentational shell (byline + actions slot + children)
+├── note-byline.js                  NoteByline - avatar + name + relative date
+├── note-form.js                    NoteForm - autosizing textarea + submit/cancel
+├── add-note.js                     AddNote - new-note surface (floating + template-locked cases)
+├── add-note-menu-item.js           AddNoteMenuItem - block-toolbar "Add note" trigger
+├── note-indicator-toolbar.js       NoteAvatarIndicator - toolbar participants avatars
+├── floating-container.js           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
-├── hooks.js              385         useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js              250         focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
-├── board-store.js         85         createBoardStore - ResizeObserver + ref registry for floating layout
-├── constants.js            3         sidebar identifier strings
+├── hooks.js                        useNoteThreads, useNoteActions, useFloatingBoard, useEnableFloatingSidebar
+├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
+├── board-store.js                  createBoardStore - ResizeObserver + ref registry for floating layout
+├── constants.js                    sidebar identifier strings
 ├── style.scss
 └── test/
     └── utils.js
