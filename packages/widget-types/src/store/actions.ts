@@ -67,7 +67,7 @@ export const registerWidgetType =
  *
  * Warns and returns `undefined` if the widget type is not registered.
  * Otherwise removes it from the store and returns the removed widget
- * type, mirroring `unregisterBlockType` from `@wordpress/blocks`.
+ * type.
  *
  * @param {WidgetName} name Widget type name to remove.
  */
