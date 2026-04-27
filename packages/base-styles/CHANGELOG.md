@@ -7,6 +7,25 @@
 -   Remove `.components-resizable-box__handle`, `.components-resizable-box__side-handle`, and `.components-resizable-box__corner-handle` from the `z-index()` helper ([#77620](https://github.com/WordPress/gutenberg/pull/77620)).
 -   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
 -   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
+-   Remove the following stale entries from the `z-index()` helper ([#77714](https://github.com/WordPress/gutenberg/pull/77714)):
+    -   `.block-editor-block-contextual-toolbar`
+    -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
+    -   `.block-editor-block-list__block::before`
+    -   `.block-editor-block-list__block.has-block-overlay`
+    -   `.block-editor-block-list__insertion-point`
+    -   `.block-editor-block-switcher__arrow`
+    -   `.block-editor-url-input__suggestions`
+    -   `.block-editor-warning`
+    -   `.block-library-classic__toolbar`
+    -   `.components-autocomplete__results`
+    -   `.components-popover.block-editor-inspector-list-view-content-popover`
+    -   `.components-popover.interface-more-menu__content`
+    -   `.dataviews-action-modal__quick-edit`
+    -   `.edit-site-editor__toggle-save-panel`
+    -   `.edit-site-template-panel__replace-template-modal`
+    -   `.edit-widgets-header`
+    -   `.edit-widgets-sidebar {greater than small}`
+    -   `.wp-block-template-part__placeholder-preview-filter-input`
 
 ## 6.20.0 (2026-04-15)
 
