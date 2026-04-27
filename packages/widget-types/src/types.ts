@@ -4,9 +4,6 @@
  * Canonical home for widget identity types consumed by the registry,
  * surfaces that render widgets, and tools that author them
  * (`@wordpress/build`, schema validators, IDE autocomplete).
- *
- * Surfaces (e.g., the dashboard engine) re-export these types and add
- * surface-specific shapes on top — placement, layout, props.
  */
 
 /**
@@ -75,11 +72,6 @@ export interface WidgetTypeMetadata {
 	 * Widget version — used for asset cache invalidation.
 	 */
 	version?: string;
-
-	/**
-	 * Gettext text domain for translations.
-	 */
-	textdomain?: string;
 
 	/**
 	 * Experiment gate — boolean `true`, or a specific experiment name.

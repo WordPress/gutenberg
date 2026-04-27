@@ -391,7 +391,6 @@ interface WidgetTypeMetadata {
 	category?: string;
 	keywords?: string[];
 	version?: string;
-	textdomain?: string;
 	__experimental?: string | boolean;
 	attributes?: Field< any >[];
 	example?: {
@@ -425,7 +424,6 @@ identity and capabilities — how it's placed is the layout's concern.
 | `category` | no | Grouping category for widget picker |
 | `keywords` | no | Search keywords for discoverability |
 | `version` | no | Widget version, used for asset cache invalidation |
-| `textdomain` | no | Gettext text domain for translations |
 | `__experimental` | no | Experiment gate (`true` or experiment name) |
 | `attributes` | no | User-configurable fields (DataViews `Field<>`) |
 | `example` | no | Preview/default attributes (`{ attributes: {...} }`) |
