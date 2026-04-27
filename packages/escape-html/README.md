@@ -49,6 +49,9 @@ split HTML strings. This is a WordPress specific fix
 Note that if a resolution for Trac#45387 comes to fruition, it is no longer
 necessary for `__unstableEscapeGreaterThan` to be used.
 
+Note we also escape the less-than symbol to prevent HTML injection vulnerabilities
+and parsing issues, particularly for users without the unfiltered_html capability.
+
 See: <https://core.trac.wordpress.org/ticket/45387>
 
 _Parameters_

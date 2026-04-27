@@ -141,7 +141,7 @@ Only used when `asButtons` is not true.
 
 ### `onChange`
 
- - Type: `(currentGradient: string) => void`
+ - Type: `(currentGradient: string | undefined) => void`
  - Required: Yes
 
 The function called when a new gradient has been defined. It is passed to
@@ -149,7 +149,7 @@ the `currentGradient` as an argument.
 
 ### `value`
 
- - Type: `string`
+ - Type: `string | null`
  - Required: No
  - Default: `'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'`
 

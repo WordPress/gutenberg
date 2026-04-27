@@ -12,7 +12,7 @@ export default function usePostTerms( { postId, term } ) {
 	return useSelect(
 		( select ) => {
 			const visible = term?.visibility?.publicly_queryable;
-			if ( ! visible ) {
+			if ( ! visible || ! postId ) {
 				return {
 					postTerms: EMPTY_ARRAY,
 					isLoading: false,

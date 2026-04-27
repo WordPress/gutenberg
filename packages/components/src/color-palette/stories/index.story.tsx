@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import ColorPalette from '..';
 
 const meta: Meta< typeof ColorPalette > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Color/ColorPalette',
 	id: 'components-colorpalette',
 	component: ColorPalette,
@@ -25,15 +26,21 @@ const meta: Meta< typeof ColorPalette > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
 
-const Template: StoryFn< typeof ColorPalette > = ( {
+type ColorPaletteStory = StoryObj< typeof ColorPalette >;
+
+const Template = ( {
 	onChange,
 	value,
 	...args
-} ) => {
+}: React.ComponentProps< typeof ColorPalette > ) => {
 	const [ color, setColor ] = useState< string | undefined >( value );
 
 	return (
@@ -48,49 +55,55 @@ const Template: StoryFn< typeof ColorPalette > = ( {
 	);
 };
 
-export const Default = Template.bind( {} );
-Default.args = {
-	colors: [
-		{ name: 'Red', color: '#f00' },
-		{ name: 'White', color: '#fff' },
-		{ name: 'Blue', color: '#00f' },
-	],
+export const Default: ColorPaletteStory = {
+	render: Template,
+	args: {
+		colors: [
+			{ name: 'Red', color: '#f00' },
+			{ name: 'White', color: '#fff' },
+			{ name: 'Blue', color: '#00f' },
+		],
+	},
 };
 
-export const InitialValue = Template.bind( {} );
-InitialValue.args = {
-	colors: [
-		{ name: 'Red', color: '#f00' },
-		{ name: 'White', color: '#fff' },
-		{ name: 'Blue', color: '#00f' },
-	],
-	value: '#00f',
+export const InitialValue: ColorPaletteStory = {
+	render: Template,
+	args: {
+		colors: [
+			{ name: 'Red', color: '#f00' },
+			{ name: 'White', color: '#fff' },
+			{ name: 'Blue', color: '#00f' },
+		],
+		value: '#00f',
+	},
 };
 
-export const MultipleOrigins = Template.bind( {} );
-MultipleOrigins.args = {
-	colors: [
-		{
-			name: 'Primary colors',
-			colors: [
-				{ name: 'Red', color: '#f00' },
-				{ name: 'Yellow', color: '#ff0' },
-				{ name: 'Blue', color: '#00f' },
-			],
-		},
-		{
-			name: 'Secondary colors',
-			colors: [
-				{ name: 'Orange', color: '#f60' },
-				{ name: 'Green', color: '#0f0' },
-				{ name: 'Purple', color: '#60f' },
-			],
-		},
-	],
+export const MultipleOrigins: ColorPaletteStory = {
+	render: Template,
+	args: {
+		colors: [
+			{
+				name: 'Primary colors',
+				colors: [
+					{ name: 'Red', color: '#f00' },
+					{ name: 'Yellow', color: '#ff0' },
+					{ name: 'Blue', color: '#00f' },
+				],
+			},
+			{
+				name: 'Secondary colors',
+				colors: [
+					{ name: 'Orange', color: '#f60' },
+					{ name: 'Green', color: '#0f0' },
+					{ name: 'Purple', color: '#60f' },
+				],
+			},
+		],
+	},
 };
 
-export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
-	return (
+export const CSSVariables: ColorPaletteStory = {
+	render: ( args ) => (
 		<div
 			style={ {
 				'--red': '#f00',
@@ -100,12 +113,12 @@ export const CSSVariables: StoryFn< typeof ColorPalette > = ( args ) => {
 		>
 			<Template { ...args } />
 		</div>
-	);
-};
-CSSVariables.args = {
-	colors: [
-		{ name: 'Red', color: 'var(--red)' },
-		{ name: 'Yellow', color: 'var(--yellow)' },
-		{ name: 'Blue', color: 'var(--blue)' },
-	],
+	),
+	args: {
+		colors: [
+			{ name: 'Red', color: 'var(--red)' },
+			{ name: 'Yellow', color: 'var(--yellow)' },
+			{ name: 'Blue', color: 'var(--blue)' },
+		],
+	},
 };

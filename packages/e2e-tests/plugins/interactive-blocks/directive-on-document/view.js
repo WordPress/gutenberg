@@ -31,6 +31,7 @@ const { state } = store( 'directive-on-document', {
 		isEventAttached: 'no',
 		keydownHandler: 'no',
 		keydownSecondHandler: 'no',
+		keydownThirdHandler: 'no',
 	},
 	callbacks: {
 		keydownHandler() {
@@ -50,6 +51,9 @@ const { state } = store( 'directive-on-document', {
 		},
 		keydownSecondHandler: () => {
 			state.keydownSecondHandler = 'yes';
+		},
+		keydownThirdHandler: () => {
+			state.keydownThirdHandler = 'yes';
 		},
 	},
 } );

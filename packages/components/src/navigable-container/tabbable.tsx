@@ -88,5 +88,6 @@ export function UnforwardedTabbableContainer(
  *  ```
  */
 export const TabbableContainer = forwardRef( UnforwardedTabbableContainer );
+TabbableContainer.displayName = 'TabbableContainer';
 
 export default TabbableContainer;

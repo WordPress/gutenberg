@@ -5,17 +5,13 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { external, moreVertical } from '@wordpress/icons';
-import {
-	MenuGroup,
-	MenuItem,
-	VisuallyHidden,
-	DropdownMenu,
-} from '@wordpress/components';
+import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
 import {
 	PreferenceToggleMenuItem,
 	store as preferencesStore,
 } from '@wordpress/preferences';
 import { store as interfaceStore, ActionItem } from '@wordpress/interface';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -26,7 +22,7 @@ import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
 
-export default function MoreMenu() {
+export default function MoreMenu( { disabled = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
@@ -54,6 +50,7 @@ export default function MoreMenu() {
 					...( showIconLabels && { variant: 'tertiary' } ),
 					tooltipPosition: 'bottom',
 					size: 'compact',
+					disabled,
 				} }
 			>
 				{ ( { onClose } ) => (
@@ -112,7 +109,7 @@ export default function MoreMenu() {
 						<ModeSwitcher />
 						<ActionItem.Slot
 							name="core/plugin-more-menu"
-							label={ __( 'Plugins' ) }
+							label={ __( 'Panels' ) }
 							fillProps={ { onClick: onClose } }
 						/>
 						<MenuGroup label={ __( 'Tools' ) }>
@@ -131,10 +128,10 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/wordpress-block-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-post-meta-boxes-main {
 	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
 	// Windows High Contrast mode will show this outline, but not the shadow.
@@ -6,34 +10,38 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-
-	&.is-resizable {
-		padding-block-start: $grid-unit-30;
-	}
 }
 
 .edit-post-meta-boxes-main__presenter {
+	flex-shrink: 0;
 	display: flex;
+	justify-content: center;
 	box-shadow: 0 $border-width $gray-300;
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
 	position: relative;
 	z-index: 1;
+	height: $button-size-compact;
+	// Enlarge the toggle/resizable hit area on touch devices.
+	@media (pointer: coarse) {
+		height: $button-size;
+	}
 
-	// Button style reset for both toggle or resizable.
-	.is-toggle-only > &,
-	.is-resizable.edit-post-meta-boxes-main & > button {
+	// Style reset for both toggle and separator buttons.
+	> button {
 		appearance: none;
 		padding: 0;
 		border: none;
 		outline: none;
 		background-color: transparent;
+		// Ensure the drag gesture behaves as expected for touch input.
+		touch-action: none;
 	}
 
-	.is-toggle-only > & {
-		flex-shrink: 0;
-		cursor: pointer;
-		height: $button-size-compact;
+	> button[aria-expanded] {
+		cursor: var(--wpds-cursor-control);
+		width: 100%;
+		display: flex;
 		justify-content: space-between;
 		align-items: center;
 		padding-inline: $grid-unit-30 $grid-unit-15;
@@ -52,54 +60,49 @@
 		}
 	}
 
-	.is-resizable.edit-post-meta-boxes-main & {
-		inset: 0 0 auto;
+	// This button is only present when resizable.
+	> button[role="separator"] {
+		cursor: row-resize;
+		position: absolute;
+		width: $grid-unit-80;
+		height: inherit;
 
-		> button {
-			cursor: inherit;
-			width: $grid-unit-80;
-			height: $grid-unit-30;
-			margin: auto;
-
-			&::before {
-				content: "";
-				background-color: $gray-300;
-				// Windows High Contrast mode will show this outline, but not the background-color.
-				outline: 2px solid transparent;
-				outline-offset: -2px;
-				position: absolute;
-				inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
-				transform: translateX(-50%);
-				width: inherit;
-				height: $grid-unit-05;
-				border-radius: $radius-small;
-				@media not (prefers-reduced-motion) {
-					transition: width 0.3s ease-out;
-				}
+		&::before {
+			content: "";
+			background-color: $gray-300;
+			// Windows High Contrast mode will show this outline, but not the background-color.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+			position: absolute;
+			inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+			transform: translateX(-50%);
+			width: inherit;
+			height: $grid-unit-05;
+			border-radius: $radius-small;
+			@media not (prefers-reduced-motion) {
+				transition: width 0.3s ease-out;
 			}
 		}
 
-		&:is(:hover, :focus-within) > button::before {
+		&:is(:hover, :focus)::before {
 			background-color: var(--wp-admin-theme-color);
 			width: $grid-unit-80 + $grid-unit-20;
 		}
 	}
 }
 
-@media (pointer: coarse) {
-	.is-resizable.edit-post-meta-boxes-main {
-		padding-block-start: $button-size-compact;
-
-		.edit-post-meta-boxes-main__presenter > button {
-			height: $button-size-compact;
-		}
-	}
-}
-
 .edit-post-meta-boxes-main__liner {
-	overflow: auto;
-	// Keep the contents behind the resize handle or details summary.
+	// Enable scrolling only for the split view.
+	.edit-post-meta-boxes-main & {
+		overflow: auto;
+	}
+	// Keep the contents behind the resize handle.
 	isolation: isolate;
+
+	// While resizing override hidden attribute in case starting from closed state.
+	.is-resizing.edit-post-meta-boxes-main & {
+		display: unset;
+	}
 }
 
 // In case the canvas is not iframe’d.
@@ -107,24 +110,16 @@
 	clear: both;
 }
 
-// Only when the split view is active the visual editor should allow shrinking and
-// its main size should be zero.
+// Only when the split view is active the visual editor should allow shrinking,
+// its main size should be zero, and overflow should be hidden so that the inner
+// container provides the scrollable viewport.
 .has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
 	flex-shrink: 1;
 	flex-basis: 0%;
-}
-
-.has-metaboxes .editor-visual-editor.is-iframed {
+	overflow: hidden;
 	isolation: isolate;
 }
 
-// Adjust the position of the notices
-.components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 24px;
-	padding-left: 24px;
-	padding-right: 24px;
+.edit-post-layout__snackbar {
+	@include snackbar-container();
 }
-
-@include editor-left(".edit-post-layout .components-editor-notices__snackbar");

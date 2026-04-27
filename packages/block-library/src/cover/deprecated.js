@@ -1847,7 +1847,11 @@ const v3 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1933,7 +1937,11 @@ const v2 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),
@@ -1993,7 +2001,11 @@ const v1 = {
 			[
 				createBlock( 'core/paragraph', {
 					content: attributes.title,
-					align: attributes.contentAlign,
+					style: {
+						typography: {
+							textAlign: attributes.contentAlign,
+						},
+					},
 					fontSize: 'large',
 					placeholder: __( 'Write title…' ),
 				} ),

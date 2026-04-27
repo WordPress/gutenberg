@@ -186,6 +186,11 @@ export function BlockTypesTab(
 			continue;
 		}
 
+		// Skip search-only items from browse view (they're still searchable).
+		if ( item.isSearchOnly ) {
+			continue;
+		}
+
 		if ( item.isAllowedInCurrentRoot ) {
 			itemsForCurrentRoot.push( item );
 		} else {

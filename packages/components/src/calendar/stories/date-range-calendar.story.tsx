@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import {
 	enUS,
 	fr,
@@ -21,7 +21,7 @@ import {
 	ar,
 	sv,
 } from 'date-fns/locale';
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 /**
  * WordPress dependencies
  */
@@ -34,6 +34,7 @@ import { DateRangeCalendar, TZDate } from '..';
 const meta: Meta< typeof DateRangeCalendar > = {
 	title: 'Components/Selection & Input/Time & Date/DateRangeCalendar',
 	component: DateRangeCalendar,
+	tags: [ 'status-private' ],
 	argTypes: {
 		locale: {
 			options: [
@@ -158,6 +159,17 @@ export const WithSelectedRangeAndMonth: Story = {
 			to: fourthDayOfNextMonth,
 		},
 		defaultMonth: firstDayOfNextMonth,
+	},
+};
+
+/**
+ * Shows days from adjacent months in the grid. Outside days use a lighter style
+ * and are still interactive. Use `fixedWeeks` to keep the grid height constant.
+ */
+export const WithOutsideDays: Story = {
+	args: {
+		showOutsideDays: true,
+		fixedWeeks: true,
 	},
 };
 

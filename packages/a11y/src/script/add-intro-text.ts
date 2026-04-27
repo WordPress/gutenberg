@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
  * This text is initially hidden from assistive technologies by using a `hidden`
  * HTML attribute which is then removed once a message fills the aria-live regions.
  *
- * @return {HTMLParagraphElement} The explanatory text HTML element.
+ * @return The explanatory text HTML element.
  */
 export default function addIntroText() {
 	const introText = document.createElement( 'p' );
@@ -20,19 +20,18 @@ export default function addIntroText() {
 
 	introText.setAttribute(
 		'style',
-		'position: absolute;' +
-			'margin: -1px;' +
-			'padding: 0;' +
-			'height: 1px;' +
-			'width: 1px;' +
-			'overflow: hidden;' +
-			'clip: rect(1px, 1px, 1px, 1px);' +
-			'-webkit-clip-path: inset(50%);' +
-			'clip-path: inset(50%);' +
-			'border: 0;' +
-			'word-wrap: normal !important;'
+		'position:absolute;' +
+			'margin:-1px;' +
+			'padding:0;' +
+			'height:1px;' +
+			'width:1px;' +
+			'overflow:hidden;' +
+			'clip-path:inset(50%);' +
+			'border:0;' +
+			'word-wrap:normal !important;' +
+			'word-break:normal !important;'
 	);
-	introText.setAttribute( 'hidden', 'hidden' );
+	introText.setAttribute( 'hidden', '' );
 
 	const { body } = document;
 	if ( body ) {

@@ -22,25 +22,21 @@ import { TEMPLATE_ORIGINS } from '../../utils/constants';
  *
  * @typedef AddedByData
  * @type {Object}
- * @property {AddedByType}  type         The type of the data.
- * @property {JSX.Element}  icon         The icon to display.
- * @property {string}       [imageUrl]   The optional image URL to display.
- * @property {string}       [text]       The text to display.
- * @property {boolean}      isCustomized Whether the template has been customized.
+ * @property {AddedByType}       type         The type of the data.
+ * @property {React.JSX.Element} icon         The icon to display.
+ * @property {string}            [imageUrl]   The optional image URL to display.
+ * @property {string}            [text]       The text to display.
+ * @property {boolean}           isCustomized Whether the template has been customized.
  *
- * @param    {TemplateType} postType     The template post type.
- * @param    {number}       postId       The template post id.
+ * @param    {TemplateType}      postType     The template post type.
+ * @param    {number}            postId       The template post id.
  * @return {AddedByData} The added by object or null.
  */
 export function useAddedBy( postType, postId ) {
 	return useSelect(
 		( select ) => {
-			const {
-				getEntityRecord,
-				getMedia,
-				getUser,
-				getEditedEntityRecord,
-			} = select( coreStore );
+			const { getEntityRecord, getUser, getEditedEntityRecord } =
+				select( coreStore );
 			const template = getEditedEntityRecord(
 				'postType',
 				postType,
@@ -77,7 +73,11 @@ export function useAddedBy( postType, postId ) {
 						type: originalSource,
 						icon: globeIcon,
 						imageUrl: siteData?.site_logo
-							? getMedia( siteData.site_logo )?.source_url
+							? getEntityRecord(
+									'postType',
+									'attachment',
+									siteData.site_logo
+							  )?.source_url
 							: undefined,
 						text: authorText,
 						isCustomized: false,
@@ -89,7 +89,7 @@ export function useAddedBy( postType, postId ) {
 						type: 'user',
 						icon: authorIcon,
 						imageUrl: user?.avatar_urls?.[ 48 ],
-						text: authorText,
+						text: authorText ?? user?.name,
 						isCustomized: false,
 					};
 				}

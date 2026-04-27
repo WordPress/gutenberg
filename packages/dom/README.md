@@ -114,7 +114,7 @@ _Returns_
 
 ### getRectangleFromRange
 
-Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found.
+Get the rectangle of a given Range. Returns `null` if no suitable rectangle can be found. Use instead of `Range.getBoundingClientRect()`, which is often broken, especially for collapsed ranges.
 
 _Parameters_
 
