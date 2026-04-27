@@ -103,11 +103,19 @@ export interface ContentProps extends ComponentProps< 'div' > {
 	 *
 	 * If you supply `tabIndex` explicitly, your value wins and is never
 	 * overwritten — including `tabIndex={ -1 }` to opt out of the
-	 * automatic tab stop entirely. The one edge case to be aware of:
-	 * if you later *remove* an explicit `tabIndex` at runtime, the
-	 * component will resume managing it on the next overflow tick; it
-	 * can't distinguish a previous explicit opt-out from an
-	 * unconfigured state.
+	 * automatic tab stop entirely, and including overrides applied
+	 * after the component had already managed the value.
+	 *
+	 * Two narrow edge cases:
+	 * - If you later *remove* an explicit `tabIndex` at runtime, the
+	 *   component will resume managing it on the next overflow tick; it
+	 *   can't distinguish a previous explicit opt-out from an
+	 *   unconfigured state.
+	 * - Passing `tabIndex={ 0 }` while the body overflows produces a
+	 *   value identical to the auto-managed one, so the component can
+	 *   no longer tell the two apart and may strip it on the next
+	 *   non-overflow tick. Pick a different value (or rely on the
+	 *   default behavior, which is already `0` while overflowing).
 	 *
 	 * Note: the scroll region is intentionally rendered without
 	 * `role` / `aria-label`, so screen readers don't announce a
