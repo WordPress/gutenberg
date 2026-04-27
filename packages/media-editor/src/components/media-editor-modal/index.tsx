@@ -12,13 +12,7 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 import type { Field } from '@wordpress/dataviews';
@@ -223,32 +217,15 @@ export function MediaEditorModal( {
 	);
 
 	const registry = useRegistry();
-	const { editEntityRecord, receiveEntityRecords, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+	const {
+		clearEntityRecordEdits,
+		editEntityRecord,
+		receiveEntityRecords,
+		saveEditedEntityRecord,
+	} = useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
-
-	// Snapshot the original values for fields the modal edits, so Cancel can
-	// restore them. Captured once per open.
-	const originalFieldValuesRef = useRef< Record< string, unknown > | null >(
-		null
-	);
-	useEffect( () => {
-		if ( ! isModalOpen ) {
-			originalFieldValuesRef.current = null;
-			return;
-		}
-		if ( ! originalFieldValuesRef.current && media ) {
-			const snapshot: Record< string, unknown > = {};
-			fields.forEach( ( field ) => {
-				snapshot[ field.id ] = ( media as Record< string, unknown > )[
-					field.id
-				];
-			} );
-			originalFieldValuesRef.current = snapshot;
-		}
-	}, [ isModalOpen, media, fields ] );
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
@@ -329,14 +306,7 @@ export function MediaEditorModal( {
 	};
 
 	const handleCancel = () => {
-		if ( originalFieldValuesRef.current ) {
-			editEntityRecord(
-				'postType',
-				'attachment',
-				id,
-				originalFieldValuesRef.current
-			);
-		}
+		clearEntityRecordEdits( 'postType', 'attachment', id );
 		closeMediaEditorModal();
 	};
 
@@ -406,18 +376,11 @@ export function MediaEditorModal( {
 
 			const next = ( saved ?? media ) as Media | null;
 
-			// A transformed save creates a new attachment; the Details
-			// edits now live on the new record (sent in the /edit
-			// payload). Reset the old record's staged edits back to its
-			// original values so it doesn't appear dirty in the Media
-			// Library afterwards.
-			if ( next && next.id !== id && originalFieldValuesRef.current ) {
-				editEntityRecord(
-					'postType',
-					'attachment',
-					id,
-					originalFieldValuesRef.current
-				);
+			// A transformed save creates a new attachment; clear staged
+			// edits on the old record so it doesn't appear dirty in the
+			// Media Library afterwards.
+			if ( next && next.id !== id ) {
+				clearEntityRecordEdits( 'postType', 'attachment', id );
 			}
 
 			if ( next && next.id && onUpdate ) {
