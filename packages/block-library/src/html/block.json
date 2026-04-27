@@ -24,5 +24,6 @@
 		"customCSS": false,
 		"visibility": false
 	},
+	"style": "wp-block-html",
 	"editorStyle": "wp-block-html-editor"
 }
