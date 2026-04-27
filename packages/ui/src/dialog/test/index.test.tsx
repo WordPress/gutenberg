@@ -1035,6 +1035,15 @@ describe( 'Dialog', () => {
 			expect( content ).not.toHaveAttribute( 'tabindex' );
 		} );
 
+		// This test exercises the `updateScrollAttributes` path for
+		// consumer takeover (overflow flips off while the override is
+		// in place). The matching `cleanupScrollAttributes` path —
+		// popup unmounts while the override is in place — is covered
+		// transitively because both paths share a single
+		// `reconcileTabbableFlag` helper inside the hook. If that
+		// shared helper is ever inlined or split, add an explicit
+		// unmount-after-takeover test to keep both paths regressions-
+		// guarded.
 		it( 'preserves a consumer-supplied tabindex set after the hook installed its own', async () => {
 			const user = userEvent.setup();
 			const contentRef = createRef< HTMLDivElement >();
