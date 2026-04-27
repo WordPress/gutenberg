@@ -32,7 +32,7 @@ function generateSlug( text ) {
  *
  * @param {Object}   props
  * @param {string}   props.initialTitle       Pre-populated from the search input value.
- * @param {Function} props.onCreateSuggestion Consumer-provided async creator: (title) => suggestion.
+ * @param {Function} props.onCreateSuggestion Consumer-provided async creator.
  * @param {Function} props.onPageCreated      Called with the resulting link object on success.
  * @param {Function} props.onCancel           Called when the user cancels.
  */

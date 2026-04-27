@@ -292,7 +292,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__loading {
-	margin: $grid-unit-20;
+	margin: $grid-unit-20; // when only loading control is shown it requires it's own spacing.
 	display: flex;
 	align-items: center;
 
