@@ -48,7 +48,7 @@ export function getBlockClientId( node ) {
 		return;
 	}
 
-	const elementNode = /** @type {Element} */ ( node );
+	const elementNode = /** @type {Element} */ node;
 	const blockNode = elementNode.closest( BLOCK_SELECTOR );
 
 	if ( ! blockNode ) {
