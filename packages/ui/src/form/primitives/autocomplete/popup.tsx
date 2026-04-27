@@ -18,7 +18,7 @@ const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
-	function Popup( { className, portal, style, ...restProps }, ref ) {
+	function Popup( { className, portal, ...restProps }, ref ) {
 		const portalChildren = (
 			<_Autocomplete.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
