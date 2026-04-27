@@ -181,6 +181,7 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 	handleEntities = false,
+	showCreateSuggestionInDropdown,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -710,6 +711,9 @@ function LinkControl( {
 									onSubmit={ handleSubmit }
 									helpTextId={ helpTextId }
 								/>
+							}
+							showCreateSuggestionInDropdown={
+								showCreateSuggestionInDropdown
 							}
 						/>
 						{ isEntity && helpTextId && (
