@@ -21,7 +21,7 @@ import { __ } from '@wordpress/i18n';
 import { useDashboardInternalContext } from './dashboard-context';
 import styles from './widget-dashboard.module.css';
 import type {
-	WidgetInstance,
+	DashboardWidget,
 	WidgetModule,
 	WidgetRenderProps,
 	WidgetType,
@@ -75,7 +75,7 @@ function LoadingOverlay() {
 }
 
 interface WidgetRenderInternalProps {
-	widget: WidgetInstance< unknown >;
+	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
 }
 

@@ -15,7 +15,7 @@ import { useState } from '@wordpress/element';
 import { WidgetDashboard } from '../widget-dashboard';
 import type {
 	ResolveWidgetModule,
-	WidgetInstance,
+	DashboardWidget,
 	WidgetRenderProps,
 	WidgetType,
 } from '../types';
@@ -159,7 +159,7 @@ const widgetTypes: WidgetType[] = [
 	},
 ];
 
-const defaultLayout: WidgetInstance[] = [
+const defaultLayout: DashboardWidget[] = [
 	{
 		uuid: 'w1',
 		type: 'mock/hello',

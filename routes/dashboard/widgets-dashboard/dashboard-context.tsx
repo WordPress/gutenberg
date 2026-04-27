@@ -14,7 +14,7 @@ import { createContext, useContext, useMemo } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetGridSettings,
-	WidgetInstance,
+	DashboardWidget,
 	WidgetType,
 } from './types';
 
@@ -38,8 +38,8 @@ const DEFAULT_RESOLVE_WIDGET_MODULE: ResolveWidgetModule = ( moduleId ) =>
  */
 interface InternalDashboardContextValue {
 	widgetTypes: WidgetType[];
-	layout: WidgetInstance[];
-	onLayoutChange: ( layout: WidgetInstance[] ) => void;
+	layout: DashboardWidget[];
+	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	editMode: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule: ResolveWidgetModule;
@@ -65,8 +65,8 @@ export function useDashboardInternalContext(): InternalDashboardContextValue {
 
 interface ProviderProps {
 	widgetTypes: WidgetType[];
-	layout: WidgetInstance[];
-	onLayoutChange: ( layout: WidgetInstance[] ) => void;
+	layout: DashboardWidget[];
+	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	editMode?: boolean;
 	onEditChange?: ( next: boolean ) => void;
 	resolveWidgetModule?: ResolveWidgetModule;

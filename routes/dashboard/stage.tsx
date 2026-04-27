@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	WidgetDashboard,
-	type WidgetInstance,
+	type DashboardWidget,
 	type WidgetType,
 } from './widgets-dashboard';
 
@@ -22,7 +22,7 @@ import {
 const widgetTypes: WidgetType[] = [];
 
 function Dashboard() {
-	const [ layout, setLayout ] = useState< WidgetInstance[] >( [] );
+	const [ layout, setLayout ] = useState< DashboardWidget[] >( [] );
 
 	return (
 		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>

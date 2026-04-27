@@ -1,6 +1,8 @@
 # `WidgetDashboard`
 
-Stateless rendering engine for widget dashboards. Renders an editable grid of widget instances, with drag-to-reorder and resize when edit mode is on. Widget types flow in as a prop and every layout mutation fires `onLayoutChange` with the fully updated array — the engine owns no data of its own.
+Stateless rendering engine for widget dashboards. Renders an editable grid of widget instances, with drag-to-reorder and resize when edit mode is on.
+Widget types flow in as a prop and every layout mutation fires `onLayoutChange` with the fully updated array.
+The engine owns no data of its own.
 
 ## Usage
 
@@ -38,17 +40,17 @@ function Dashboard() {
 
 ## Properties
 
-#### `layout`: `WidgetInstance[]`
+#### `layout`: `DashboardWidget[]`
 
 Widget instances to render. Each instance carries a stable `uuid`, a `type` reference, optional `attributes`, and a `placement` describing its slot in the grid.
 
-#### `onLayoutChange`: `( layout: WidgetInstance[] ) => void`
+#### `onLayoutChange`: `( layout: DashboardWidget[] ) => void`
 
 Called on every mutation — reorder, resize, or `setAttributes` from a widget render module. Receives the fully updated array; the consumer owns the storage.
 
 #### `widgetTypes`: `WidgetType[]`
 
-The widget types available to the dashboard. The engine never queries a registry — the consumer is responsible for scoping, filtering, or mocking this list.
+The widget types available to the dashboard.
 
 #### `editMode`: `boolean`
 
@@ -64,7 +66,7 @@ Optional. Maps a `WidgetType.renderModule` id to the React component that render
 
 #### `gridSettings`: `WidgetGridSettings`
 
-Optional. Configures the underlying grid: `columns` for a fixed grid or `minColumnWidth` for a responsive one (mutually exclusive), plus `rowHeight` and `spacing`.
+Optional. Configures the underlying grid.
 
 #### `children`: `ReactNode`
 
@@ -99,7 +101,7 @@ interface WidgetRenderProps< Item = unknown > {
 
 ## Types
 
-- `WidgetInstance` — a placement of a widget on the dashboard. Carries `uuid`, `type`, `attributes`, `placement`.
+- `DashboardWidget` — a placement of a widget on the dashboard. Carries `uuid`, `type`, `attributes`, `placement`.
 - `WidgetType` — runtime widget type. Extends the `widget.json` shape with `renderModule`.
 - `WidgetRenderProps` — widget render contract.
 - `ResolveWidgetModule` — module resolver signature.

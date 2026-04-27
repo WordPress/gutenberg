@@ -16,9 +16,9 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
 import { useDashboardInternalContext } from './dashboard-context';
 import { Widget } from './widget';
 import styles from './widget-dashboard.module.css';
-import type { WidgetInstance, WidgetName } from './types';
+import type { DashboardWidget, WidgetName } from './types';
 
-function toGridLayout( widgets: WidgetInstance[] ): DashboardGridLayoutItem[] {
+function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
 		key: w.uuid,
 		...w.placement,
@@ -26,9 +26,9 @@ function toGridLayout( widgets: WidgetInstance[] ): DashboardGridLayoutItem[] {
 }
 
 function applyGridChange(
-	widgets: WidgetInstance[],
+	widgets: DashboardWidget[],
 	gridLayout: DashboardGridLayoutItem[]
-): WidgetInstance[] {
+): DashboardWidget[] {
 	return gridLayout.map( ( { key, ...placement } ) => {
 		const existing = widgets.find( ( w ) => w.uuid === key );
 		if ( ! existing ) {

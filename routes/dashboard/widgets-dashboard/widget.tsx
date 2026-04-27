@@ -10,10 +10,10 @@ import { useDashboardInternalContext } from './dashboard-context';
 import { WidgetContextProvider } from './widget-context';
 import { WidgetRender } from './widget-render';
 import styles from './widget-dashboard.module.css';
-import type { WidgetInstance } from './types';
+import type { DashboardWidget } from './types';
 
 export interface WidgetProps {
-	widget: WidgetInstance< unknown >;
+	widget: DashboardWidget< unknown >;
 	index: number;
 }
 

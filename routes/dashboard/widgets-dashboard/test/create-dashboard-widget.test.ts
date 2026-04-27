@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createWidgetInstance } from '../create-widget-instance';
+import { createDashboardWidget } from '../utils/create-dashboard-widget';
 import type { WidgetType } from '../types';
 
 const baseType: WidgetType = {
@@ -11,10 +11,10 @@ const baseType: WidgetType = {
 	renderModule: 'https://example.test/widget.js',
 };
 
-describe( 'createWidgetInstance', () => {
+describe( 'createDashboardWidget', () => {
 	it( 'stamps the type name and a unique uuid', () => {
-		const a = createWidgetInstance( baseType );
-		const b = createWidgetInstance( baseType );
+		const a = createDashboardWidget( baseType );
+		const b = createDashboardWidget( baseType );
 
 		expect( a.type ).toBe( 'core/example' );
 		expect( b.type ).toBe( 'core/example' );
@@ -23,7 +23,7 @@ describe( 'createWidgetInstance', () => {
 	} );
 
 	it( 'applies default placement values', () => {
-		const instance = createWidgetInstance( baseType );
+		const instance = createDashboardWidget( baseType );
 		expect( instance.placement ).toEqual( {
 			width: 1,
 			height: 2,
@@ -32,7 +32,7 @@ describe( 'createWidgetInstance', () => {
 	} );
 
 	it( 'uses initialAttributes when provided', () => {
-		const instance = createWidgetInstance< { greeting: string } >(
+		const instance = createDashboardWidget< { greeting: string } >(
 			baseType,
 			{ greeting: 'hi' }
 		);
@@ -44,12 +44,12 @@ describe( 'createWidgetInstance', () => {
 			...baseType,
 			example: { attributes: { greeting: 'default' } },
 		};
-		const instance = createWidgetInstance( typeWithExample );
+		const instance = createDashboardWidget( typeWithExample );
 		expect( instance.attributes ).toEqual( { greeting: 'default' } );
 	} );
 
 	it( 'leaves attributes undefined when no example and no initial provided', () => {
-		const instance = createWidgetInstance( baseType );
+		const instance = createDashboardWidget( baseType );
 		expect( instance.attributes ).toBeUndefined();
 	} );
 } );

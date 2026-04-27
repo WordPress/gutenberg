@@ -17,7 +17,7 @@ import { useState } from '@wordpress/element';
 import { WidgetDashboard } from '../widget-dashboard';
 import type {
 	ResolveWidgetModule,
-	WidgetInstance,
+	DashboardWidget,
 	WidgetRenderProps,
 	WidgetType,
 } from '../types';
@@ -60,7 +60,7 @@ const resolveWidgetModule: ResolveWidgetModule = async ( id ) => {
 	throw new Error( `Unknown module: ${ id }` );
 };
 
-const initialLayout: WidgetInstance< Attrs >[] = [
+const initialLayout: DashboardWidget< Attrs >[] = [
 	{
 		uuid: 'w1',
 		type: 'test/greet',
@@ -72,7 +72,7 @@ const initialLayout: WidgetInstance< Attrs >[] = [
 function Harness( {
 	onLayoutChange,
 }: {
-	onLayoutChange?: ( layout: WidgetInstance[] ) => void;
+	onLayoutChange?: ( layout: DashboardWidget[] ) => void;
 } ) {
 	const [ layout, setLayout ] = useState( initialLayout );
 
@@ -80,7 +80,7 @@ function Harness( {
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ ( next ) => {
-				setLayout( next as WidgetInstance< Attrs >[] );
+				setLayout( next as DashboardWidget< Attrs >[] );
 				onLayoutChange?.( next );
 			} }
 			widgetTypes={ widgetTypes }

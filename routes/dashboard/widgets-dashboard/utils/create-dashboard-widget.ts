@@ -1,14 +1,16 @@
 /**
  * Internal dependencies
  */
-import type { WidgetInstance, WidgetType } from './types';
+import type { DashboardWidget, WidgetType, GridTilePlacement } from '../types';
 
-const DEFAULT_WIDTH = 1;
-const DEFAULT_HEIGHT = 2;
-const DEFAULT_ORDER = 0;
+const DEFAULT_PLACEMENT: GridTilePlacement = {
+	width: 1,
+	height: 2,
+	order: 0,
+};
 
 /**
- * Create a new widget instance from a widget type.
+ * Create a new dashboard widget from a widget type.
  *
  * Generates a unique id and applies default placement. If no initial
  * attributes are provided, falls back to the type's `example.attributes`
@@ -16,19 +18,15 @@ const DEFAULT_ORDER = 0;
  * @param widgetType
  * @param initialAttributes
  */
-export function createWidgetInstance< T >(
+export function createDashboardWidget< T >(
 	widgetType: WidgetType,
 	initialAttributes?: T
-): WidgetInstance< T > {
+): DashboardWidget< T > {
 	return {
 		uuid: crypto.randomUUID(),
 		type: widgetType.name,
 		attributes:
 			initialAttributes ?? ( widgetType.example?.attributes as T ),
-		placement: {
-			width: DEFAULT_WIDTH,
-			height: DEFAULT_HEIGHT,
-			order: DEFAULT_ORDER,
-		},
+		placement: DEFAULT_PLACEMENT,
 	};
 }

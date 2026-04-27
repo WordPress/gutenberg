@@ -111,7 +111,7 @@ export interface WidgetTypeMetadata {
 
 	/**
 	 * Structured example data for the Inspector Help Panel preview, and
-	 * the default attributes applied by `createWidgetInstance` when no
+	 * the default attributes applied by `createDashboardWidget` when no
 	 * initial attributes are supplied.
 	 */
 	example?: {
@@ -140,10 +140,12 @@ export interface WidgetType extends WidgetTypeMetadata {
 	renderModule: string;
 }
 
+export type GridTilePlacement = Omit< DashboardGridLayoutItem, 'key' >;
+
 /**
- * A widget instance on the dashboard.
+ * A widget placed on the dashboard.
  *
- * A `WidgetType` describes the blueprint. A `WidgetInstance` is a concrete
+ * A `WidgetType` describes the blueprint. A `DashboardWidget` is a concrete
  * placement of that type on a specific dashboard: its unique id, the type it
  * references, user-configured attributes, and its `placement` in the grid.
  *
@@ -152,9 +154,9 @@ export interface WidgetType extends WidgetTypeMetadata {
  * `uuid`). A different grid model — masonry, stack, absolute — would use a
  * different `Placement` shape; the widget identity stays unchanged.
  */
-export interface WidgetInstance<
+export interface DashboardWidget<
 	Item = unknown,
-	Placement = Omit< DashboardGridLayoutItem, 'key' >,
+	Placement = GridTilePlacement,
 > {
 	/**
 	 * Unique instance identifier.
@@ -280,12 +282,12 @@ export interface WidgetDashboardProps {
 	/**
 	 * Widget instances to render. Consumer owns this state.
 	 */
-	layout: WidgetInstance[];
+	layout: DashboardWidget[];
 
 	/**
 	 * Called on every layout mutation (reorder, resize, add, remove).
 	 */
-	onLayoutChange: ( layout: WidgetInstance[] ) => void;
+	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 
 	/**
 	 * Widget types available for rendering. The dashboard never queries a
