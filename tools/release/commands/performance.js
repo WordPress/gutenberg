@@ -598,6 +598,7 @@ async function runPerformanceTests( branches, options ) {
 		}
 
 		// Print the results.
+		// eslint-disable-next-line no-console
 		console.table( printedResult );
 
 		// Use yet another structure to generate a Markdown table.

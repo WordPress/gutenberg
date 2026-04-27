@@ -452,6 +452,6 @@ jobs:
               run: |
                   cd main
                   npm ci
-                  ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
+                  ./tools/release/cli.js npm-latest --semver minor --ci --repository-path ../publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

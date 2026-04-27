@@ -65,8 +65,8 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── bin/packages
     │   Set of scripts used to build the WordPress packages.
     │
-    ├── bin/plugin
-    │   Tool use to perform the Gutenberg plugin release and the npm releases as well.
+    ├── tools/release
+    │   CLI tool used to perform the Gutenberg plugin release and the npm releases as well.
     │
     ├── docs/tool
     │   Tool used to generate the Block editor handbook's markdown pages.
