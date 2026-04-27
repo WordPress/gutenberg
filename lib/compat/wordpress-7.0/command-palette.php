@@ -27,20 +27,21 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 	 *
 	 * Running the script as the admin bar is rendered avoids a flash of incorrect content
 	 * for users with Apple OS when the UA header is blocked. It also prevents the need for
-	 * wp-i18n to be loaded as a dependency as it is most likely not included on the front
-	 * end of a site.
+	 * wp-i18n to be loaded as a dependency.
 	 */
 	$function = <<<'JS'
-		( shortcutLabels ) => {
-			const isAppleOS = navigator.platform.startsWith("Mac") || navigator.platform === "iPhone" || navigator.platform === "iPad";
-			if ( ! isAppleOS ) {
-				return;
+		( appleOSLabel ) => {
+			if ( navigator.platform.startsWith("Mac") || navigator.platform === "iPhone" || navigator.platform === "iPad" ) {
+				document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' ).textContent = appleOSLabel;
 			}
-			document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' ).textContent = shortcutLabels.appleOS;
 		}
 	JS;
-	$script   = sprintf( '( %s )( %s );', $function, wp_json_encode( $shortcut_labels, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) );
-	$script  .= "\n//# sourceURL=gutenberg_admin_bar_command_palette_menu";
+	$script   = sprintf(
+		'( %s )( %s );',
+		$function,
+		wp_json_encode( $shortcut_labels['appleOS'], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
+	);
+	$script  .= "\n//# sourceURL=" . rawurlencode( __FUNCTION__ );
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'command-palette',
@@ -49,7 +50,7 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 			'meta'  => array(
 				'class'   => 'hide-if-no-js',
 				'onclick' => 'wp.data.dispatch( "core/commands" ).open(); return false;',
-				'html'    => "<script>{$script}</script>",
+				'html'    => wp_get_inline_script_tag( $script ),
 			),
 		)
 	);
