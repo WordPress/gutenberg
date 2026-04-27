@@ -18,6 +18,14 @@ const hasFunctionWithName = ( node, name ) =>
 const hasTSDeclareFunction = ( node, name ) =>
 	node.type === 'TSDeclareFunction' && node.id?.name === name;
 
+// Matches the concrete implementation node (FunctionDeclaration with a body),
+// as opposed to a TypeScript overload signature (TSDeclareFunction).
+const hasImplementationWithName = ( node, name ) =>
+	hasFunctionWithName( node, name ) ||
+	( node.type === 'ExportNamedDeclaration' &&
+		node.declaration &&
+		hasFunctionWithName( node.declaration, name ) );
+
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
 	node.declarations.some( ( declaration ) => {
@@ -104,11 +112,14 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		if ( candidates.length === 0 ) {
 			return doc;
 		}
+		const implementationNode = candidates.find( ( node ) =>
+			hasImplementationWithName( node, entry.localName )
+		);
 		for ( const node of candidates ) {
 			if ( isImportDeclaration( node ) ) {
 				doc = getJSDocFromDependency( node, entry, parseDependency );
 			} else {
-				doc = getJSDocFromToken( node );
+				doc = getJSDocFromToken( node, implementationNode ?? node );
 			}
 			if ( doc !== undefined ) {
 				return doc;

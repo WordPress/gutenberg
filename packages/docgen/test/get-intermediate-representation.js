@@ -663,7 +663,7 @@ describe( 'Intermediate Representation', () => {
 	} );
 
 	describe( 'TypeScript function overloads', () => {
-		it( 'extracts JSDoc with tags from first overload signature', () =>
+		it( 'extracts description from first overload signature and infers types from the implementation', () =>
 			expect(
 				parse( `
 					/**
@@ -682,6 +682,20 @@ describe( 'Intermediate Representation', () => {
 				expect.objectContaining( {
 					description: 'Registers a new block.',
 					name: 'registerBlockType',
+					tags: expect.arrayContaining( [
+						expect.objectContaining( {
+							tag: 'param',
+							name: 'blockNameOrMetadata',
+							// Type comes from the implementation signature (string | object),
+							// not the first overload signature (object).
+							type: 'string | object',
+						} ),
+						expect.objectContaining( {
+							tag: 'return',
+							// Return type comes from the implementation signature.
+							type: 'object | undefined',
+						} ),
+					] ),
 				} ),
 			] ) );
 	} );
