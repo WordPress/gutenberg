@@ -120,6 +120,9 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__search {
 	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-20;
+	position: sticky;
+	top: 0;
+	z-index: 2;
 }
 
 .block-editor-inserter__no-tab-container {
