@@ -1,6 +1,7 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import clsx from 'clsx';
 import { forwardRef, useContext } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	type ThemeProvider as ThemeProviderType,
@@ -12,7 +13,11 @@ import { Button } from '../button';
 import dialogStyles from '../dialog/style.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
-import { useOverlayScrollStateAttributes } from '../utils/use-overlay-scroll-state-attributes';
+import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import {
+	SCROLL_CONTAINER_ATTR,
+	useOverlayScrollStateAttributes,
+} from '../utils/use-overlay-scroll-state-attributes';
 import { unlock } from '../lock-unlock';
 import { Stack } from '../stack';
 import { Text } from '../text';
@@ -37,6 +42,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 			cancelButtonText = __( 'Cancel' ),
 			stickyHeader = true,
 			stickyFooter = true,
+			initialFocus,
+			finalFocus,
 			...props
 		},
 		ref
@@ -54,6 +61,21 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 		 */
 		const { ref: scrollStateRef, onScroll } =
 			useOverlayScrollStateAttributes< HTMLDivElement >();
+
+		/*
+		 * Skip the internal scroll container during initial focus
+		 * resolution: when the body overflows, that container becomes
+		 * `tabindex="0"` (so keyboard users can arrow-scroll it) and
+		 * would otherwise win first-tabbable status over the action
+		 * buttons. Mirrors the same wiring on Dialog/Drawer popups.
+		 */
+		const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus(
+			{
+				initialFocus,
+				deprioritizedAttributes: [ SCROLL_CONTAINER_ATTR ],
+			}
+		);
+		const mergedRef = useMergeRefs( [ ref, popupRef ] );
 
 		const confirmClassName =
 			intent === 'irreversible'
@@ -118,12 +140,14 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >(
 				<_AlertDialog.Backdrop className={ dialogStyles.backdrop } />
 				<ThemeProvider>
 					<_AlertDialog.Popup
-						ref={ ref }
+						ref={ mergedRef }
 						className={ clsx(
 							dialogStyles.popup,
 							className,
 							dialogStyles[ 'is-medium' ]
 						) }
+						initialFocus={ resolvedInitialFocus }
+						finalFocus={ finalFocus }
 						{ ...props }
 						data-wp-ui-overlay-modal=""
 					>

@@ -1748,5 +1748,88 @@ describe( 'AlertDialog', () => {
 				'data-wp-ui-overlay-scrolled-from-bottom'
 			);
 		} );
+
+		it( 'does not focus the scroll container on open even when it is keyboard-tabbable', async () => {
+			// JSDOM reports `scrollHeight`/`clientHeight` as 0 by default,
+			// so the scroll container would never overflow on its own and
+			// would never become `tabindex="0"`. Forcing both prototype
+			// getters to overflow values here makes the scroller
+			// keyboard-reachable at the moment Base UI resolves
+			// `initialFocus` — exactly the configuration that, without
+			// `useDeprioritizedInitialFocus` wired up, lets the scroller
+			// steal focus from the action buttons.
+			const originalScrollHeight = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'scrollHeight'
+			);
+			const originalClientHeight = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'clientHeight'
+			);
+			Object.defineProperty( Element.prototype, 'scrollHeight', {
+				configurable: true,
+				get() {
+					return 500;
+				},
+			} );
+			Object.defineProperty( Element.prototype, 'clientHeight', {
+				configurable: true,
+				get() {
+					return 100;
+				},
+			} );
+
+			try {
+				const user = userEvent.setup();
+				const popupRef = createRef< HTMLDivElement >();
+
+				render(
+					<AlertDialog.Root>
+						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+						<AlertDialog.Popup ref={ popupRef } title="Title">
+							Body that overflows
+						</AlertDialog.Popup>
+					</AlertDialog.Root>
+				);
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Open' } )
+				);
+
+				await waitFor( () => {
+					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+				} );
+
+				// The scroll container (overflow forced via the
+				// prototype stubs above) must not steal focus from the
+				// action buttons — that's exactly what the
+				// `useDeprioritizedInitialFocus` wiring on
+				// `AlertDialog.Popup` is there to prevent. The Cancel
+				// button is the first non-deprioritized tabbable, so
+				// focus should settle on it.
+				const scroller = findScroller( popupRef.current );
+				await waitFor( () => {
+					expect(
+						screen.getByRole( 'button', { name: 'Cancel' } )
+					).toHaveFocus();
+				} );
+				expect( scroller ).not.toHaveFocus();
+			} finally {
+				if ( originalScrollHeight ) {
+					Object.defineProperty(
+						Element.prototype,
+						'scrollHeight',
+						originalScrollHeight
+					);
+				}
+				if ( originalClientHeight ) {
+					Object.defineProperty(
+						Element.prototype,
+						'clientHeight',
+						originalClientHeight
+					);
+				}
+			}
+		} );
 	} );
 } );
