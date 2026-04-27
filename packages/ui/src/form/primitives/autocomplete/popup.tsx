@@ -22,17 +22,15 @@ export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 		const portalChildren = (
 			<_Autocomplete.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
-				style={ style }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
-					styles.positioner,
-					className
+					styles.positioner
 				) }
 			>
 				<ThemeProvider>
 					<_Autocomplete.Popup
 						ref={ ref }
-						className={ itemPopupStyles.popup }
+						className={ clsx( itemPopupStyles.popup, className ) }
 						{ ...restProps }
 					/>
 				</ThemeProvider>
