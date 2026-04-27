@@ -35,11 +35,10 @@ function render_block_core_slider_pagination_button( $attributes, $content ) {
 
 		if ( $is_previous ) {
 			$p->set_attribute( 'data-wp-on--click', 'actions.prevSlide' );
-			$p->set_attribute( 'data-wp-bind--disabled', 'state.isAtStart' );
+			$p->set_attribute( 'data-wp-bind--aria-disabled', 'state.isAtStart' );
 		} else {
 			$p->set_attribute( 'data-wp-on--click', 'actions.nextSlide' );
-			// Only disable the next button if loop is false and at end.
-			$p->set_attribute( 'data-wp-bind--disabled', '(!context.loop) && state.isAtEnd' );
+			$p->set_attribute( 'data-wp-bind--aria-disabled', 'state.isAtEnd' );
 		}
 	}
 

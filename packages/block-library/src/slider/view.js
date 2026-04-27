@@ -229,10 +229,16 @@ store( 'core/slider', {
 	actions: {
 		nextSlide() {
 			const { ref } = getElement();
+			if ( ref.getAttribute( 'aria-disabled' ) === 'true' ) {
+				return;
+			}
 			moveSlide( ref, 1 );
 		},
 		prevSlide() {
 			const { ref } = getElement();
+			if ( ref.getAttribute( 'aria-disabled' ) === 'true' ) {
+				return;
+			}
 			moveSlide( ref, -1 );
 		},
 		handleScroll() {
