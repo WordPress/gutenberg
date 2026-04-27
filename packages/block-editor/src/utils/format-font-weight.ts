@@ -14,7 +14,9 @@ import type { FormattedFont } from './types';
  * @param fontWeight font weight string
  * @return new object with formatted font weight
  */
-export function formatFontWeight( fontWeight: string ): FormattedFont {
+export function formatFontWeight(
+	fontWeight: string | undefined
+): FormattedFont {
 	if ( ! fontWeight ) {
 		return {};
 	}

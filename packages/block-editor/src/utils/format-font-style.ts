@@ -14,7 +14,9 @@ import type { FormattedFont } from './types';
  * @param fontStyle font style string
  * @return new object with formatted font style
  */
-export function formatFontStyle( fontStyle: string ): FormattedFont {
+export function formatFontStyle(
+	fontStyle: string | undefined
+): FormattedFont {
 	if ( ! fontStyle ) {
 		return {};
 	}
