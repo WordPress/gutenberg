@@ -229,7 +229,7 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 				);
 			},
 			isValid: { required: true },
-			filterBy: false,
+			filterBy: { operators: [ 'isAny' ] },
 		};
 	}, [ publicPostTypes ] );
 }

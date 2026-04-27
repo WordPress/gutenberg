@@ -8,12 +8,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type {
-	StoredConfig,
-	StoredLabels,
-	TaxonomyFormData,
-	TaxonomyRecord,
-} from './types';
+import type { StoredLabels, TaxonomyFormData, TaxonomyRecord } from './types';
 
 export const BLANK_RECORD: TaxonomyFormData = {
 	slug: '',
@@ -27,18 +22,6 @@ export const BLANK_RECORD: TaxonomyFormData = {
 		hierarchical: false,
 	},
 };
-
-export function parseConfig( raw?: string ): StoredConfig {
-	if ( ! raw ) {
-		return {};
-	}
-	try {
-		const parsed = JSON.parse( raw );
-		return typeof parsed === 'object' && parsed !== null ? parsed : {};
-	} catch {
-		return {};
-	}
-}
 
 export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 	'singular_name',
@@ -61,10 +44,10 @@ export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 ];
 
 export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
-	const parsed = parseConfig( row.content.raw );
+	const config = row.config ?? {};
 	const labels: StoredLabels = {};
 	for ( const key of STRING_LABEL_KEYS ) {
-		const value = parsed.labels?.[ key ];
+		const value = config.labels?.[ key ];
 		if ( typeof value === 'string' ) {
 			labels[ key ] = value;
 		}
@@ -76,17 +59,17 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		title: { raw: row.title.raw },
 		config: {
 			labels: { singular_name: '', ...labels },
-			object_type: Array.isArray( parsed.object_type )
-				? parsed.object_type
+			object_type: Array.isArray( row.object_type )
+				? row.object_type
 				: [],
-			description: parsed.description ?? '',
-			public: parsed.public ?? true,
-			hierarchical: parsed.hierarchical ?? false,
+			description: config.description ?? '',
+			public: config.public ?? true,
+			hierarchical: config.hierarchical ?? false,
 		},
 	};
 }
 
-function serializeConfig( data: TaxonomyFormData ): StoredConfig {
+export function serializeForSave( data: TaxonomyFormData ) {
 	const { config } = data;
 
 	const labels: StoredLabels = {};
@@ -102,21 +85,17 @@ function serializeConfig( data: TaxonomyFormData ): StoredConfig {
 
 	const description = config.description.trim();
 	return {
-		labels,
-		object_type: config.object_type,
-		public: config.public,
-		hierarchical: config.hierarchical,
-		...( description !== '' ? { description } : {} ),
-	};
-}
-
-export function serializeForSave( data: TaxonomyFormData ) {
-	return {
 		...( data.id !== undefined ? { id: data.id } : {} ),
 		slug: data.slug,
 		status: data.status,
 		title: data.title.raw,
-		content: JSON.stringify( serializeConfig( data ) ),
+		object_type: config.object_type,
+		config: {
+			labels,
+			public: config.public,
+			hierarchical: config.hierarchical,
+			...( description !== '' ? { description } : {} ),
+		},
 	};
 }
 
