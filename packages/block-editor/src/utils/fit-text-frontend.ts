@@ -14,14 +14,21 @@ import { store, getElement, getContext } from '@wordpress/interactivity';
  */
 import { optimizeFitText } from './fit-text-utils';
 
+interface FitTextContext {
+	fontSize?: number;
+}
+
 // Initialize via Interactivity API for client-side navigation
 store( 'core/fit-text', {
 	callbacks: {
 		init() {
-			const context = getContext();
-			const { ref } = getElement();
+			const context = getContext< FitTextContext >();
+			const { ref } = getElement() as { ref: HTMLElement | null };
 
-			const applyFontSize = ( fontSize ) => {
+			const applyFontSize = ( fontSize: number ) => {
+				if ( ! ref ) {
+					return;
+				}
 				if ( fontSize === 0 ) {
 					ref.style.fontSize = '';
 				} else {
@@ -33,7 +40,7 @@ store( 'core/fit-text', {
 			context.fontSize = optimizeFitText( ref, applyFontSize );
 
 			// Starts ResizeObserver to handle dynamic resizing.
-			if ( window.ResizeObserver && ref.parentElement ) {
+			if ( window.ResizeObserver && ref?.parentElement ) {
 				const resizeObserver = new window.ResizeObserver( () => {
 					context.fontSize = optimizeFitText( ref, applyFontSize );
 				} );
@@ -47,6 +54,7 @@ store( 'core/fit-text', {
 					}
 				};
 			}
+			return undefined;
 		},
 	},
 } );
