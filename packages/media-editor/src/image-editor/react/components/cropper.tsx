@@ -40,6 +40,9 @@ import './cropper.scss';
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
 
+/** How long to wait after the last interaction before fading the grid out. */
+const GRID_FADE_DELAY_MS = 800;
+
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
 // rect (1×1) if `aspectRatio` is unset or non-positive.
@@ -81,8 +84,14 @@ export interface CropperProps {
 	controller: UseCropperStateReturn;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
-	/** Show the rule-of-thirds grid overlay. */
-	showGrid?: boolean;
+	/**
+	 * Controls the rule-of-thirds grid overlay.
+	 * - `false` (default): grid is never shown.
+	 * - `true`: grid is always shown.
+	 * - `'interactive'`: grid fades in when any cropper value changes and fades
+	 *   out automatically after the user stops interacting.
+	 */
+	showGrid?: boolean | 'interactive';
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -132,7 +141,7 @@ export interface CropperProps {
  * @param root0.src            Image source URL.
  * @param root0.controller     The full state/setter object from `useCropperState`.
  * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Show rule-of-thirds grid overlay.
+ * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
  * @param root0.showDimming    Show dimming overlay outside crop.
  * @param root0.minZoom        Minimum zoom level.
  * @param root0.maxZoom        Maximum zoom level.
@@ -351,6 +360,55 @@ function CropperInner(
 		};
 	}, [] );
 
+	// Interactive grid: visible while the user is interacting, fades out
+	// after GRID_FADE_DELAY_MS of inactivity.
+	const [ gridVisible, setGridVisible ] = useState( false );
+	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const gridInteractionReadyRef = useRef( false );
+
+	// Defer readiness until after image load and its dependent effects settle,
+	// so automatic initialisation changes don't trigger the interactive grid.
+	useEffect( () => {
+		gridInteractionReadyRef.current = false;
+		if ( ! state.image ) {
+			return;
+		}
+		const id = setTimeout( () => {
+			gridInteractionReadyRef.current = true;
+		}, 0 );
+		return () => clearTimeout( id );
+	}, [ state.image ] );
+
+	useEffect( () => {
+		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
+			return;
+		}
+		setGridVisible( true );
+		clearTimeout( gridFadeTimerRef.current );
+		gridFadeTimerRef.current = setTimeout( () => {
+			setGridVisible( false );
+		}, GRID_FADE_DELAY_MS );
+		return () => clearTimeout( gridFadeTimerRef.current );
+	}, [
+		// Scalar interaction values used as triggers — only fire when a real
+		// user-driven value changes, not on image load or other state updates.
+		state.zoom,
+		state.rotation,
+		state.pan.x,
+		state.pan.y,
+		state.cropRect.x,
+		state.cropRect.y,
+		state.cropRect.width,
+		state.cropRect.height,
+		state.flip.horizontal,
+		state.flip.vertical,
+		showGrid,
+	] );
+
+	useEffect( () => {
+		return () => clearTimeout( gridFadeTimerRef.current );
+	}, [] );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -475,11 +533,14 @@ function CropperInner(
 				/>
 
 				{ /* Rule-of-thirds grid */ }
-				{ showGrid && (
+				{ ( showGrid === true || showGrid === 'interactive' ) && (
 					<GridOverlay
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
 						imageSize={ visualSize }
+						opacity={
+							showGrid === 'interactive' && ! gridVisible ? 0 : 1
+						}
 					/>
 				) }
 

@@ -44,6 +44,7 @@ export default function MediaEditorCanvas( {
 				controller={ controller }
 				aspectRatio={ aspectRatio }
 				freeformCrop={ freeformCrop }
+				showGrid="interactive"
 			/>
 		</div>
 	);

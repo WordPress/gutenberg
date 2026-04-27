@@ -13,6 +13,8 @@ interface GridOverlayProps {
 	containerSize: Size;
 	/** The rendered image dimensions in pixels within the container. */
 	imageSize: Size;
+	/** Opacity of the grid overlay (0–1). Defaults to 1. */
+	opacity?: number;
 }
 
 /**
@@ -25,12 +27,14 @@ interface GridOverlayProps {
  * @param props.cropRect      The crop rectangle in normalized coordinates.
  * @param props.containerSize The container element dimensions in pixels.
  * @param props.imageSize     The rendered image dimensions in pixels.
+ * @param props.opacity       Opacity of the overlay (0–1).
  * @return The grid overlay element.
  */
 export function GridOverlay( {
 	cropRect,
 	containerSize,
 	imageSize,
+	opacity = 1,
 }: GridOverlayProps ) {
 	if ( containerSize.width === 0 || containerSize.height === 0 ) {
 		return null;
@@ -54,6 +58,7 @@ export function GridOverlay( {
 				top,
 				width,
 				height,
+				opacity,
 			} }
 		>
 			{ /* Horizontal lines at 1/3 and 2/3 */ }
