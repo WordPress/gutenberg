@@ -36,6 +36,9 @@
 		"sprintf-js": "1.1.1",
 		"uuid": "9.0.1"
 	},
+	"publishConfig": {
+		"access": "public"
+	},
 	"scripts": {
 		"changelog": "node ./cli.js changelog"
 	}
