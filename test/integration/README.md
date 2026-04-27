@@ -1,6 +1,7 @@
 # Integration Tests
 
-This directory contains the integration test suite for the Gutenberg project, published as the `@wordpress/integration-tests` workspace package.
+This directory contains the integration test suite for the Gutenberg project.
+These tests live in the internal `@wordpress/integration-tests` workspace package, which is private and not published.
 
 ## What Are Integration Tests?
 
