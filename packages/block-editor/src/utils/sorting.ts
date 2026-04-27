@@ -1,14 +1,22 @@
+type Comparable = string | number | undefined;
+type SortItem = Record< string, Comparable >;
+type SortField< T > = string | ( ( item: T ) => Comparable );
+
 /**
  * Recursive stable sorting comparator function.
  *
- * @param {string|Function} field Field to sort by.
- * @param {Array}           items Items to sort.
- * @param {string}          order Order, 'asc' or 'desc'.
- * @return {Function} Comparison function to be used in a `.sort()`.
+ * @param field Field to sort by.
+ * @param items Items to sort.
+ * @param order Order, 'asc' or 'desc'.
+ * @return Comparison function to be used in a `.sort()`.
  */
-const comparator = ( field, items, order ) => {
-	return ( a, b ) => {
-		let cmpA, cmpB;
+const comparator = < T extends SortItem >(
+	field: SortField< T >,
+	items: T[],
+	order: string
+) => {
+	return ( a: T, b: T ) => {
+		let cmpA: Comparable, cmpB: Comparable;
 
 		if ( typeof field === 'function' ) {
 			cmpA = field( a );
@@ -18,9 +26,9 @@ const comparator = ( field, items, order ) => {
 			cmpB = b[ field ];
 		}
 
-		if ( cmpA > cmpB ) {
+		if ( ( cmpA as number ) > ( cmpB as number ) ) {
 			return order === 'asc' ? 1 : -1;
-		} else if ( cmpB > cmpA ) {
+		} else if ( ( cmpB as number ) > ( cmpA as number ) ) {
 			return order === 'asc' ? -1 : 1;
 		}
 
@@ -44,11 +52,15 @@ const comparator = ( field, items, order ) => {
  * Sorts in ascending order by default, but supports descending as well.
  * Stable sort - maintains original order of equal items.
  *
- * @param {Array}           items Items to order.
- * @param {string|Function} field Field to order by.
- * @param {string}          order Sorting order, `asc` or `desc`.
- * @return {Array} Sorted items.
+ * @param items Items to order.
+ * @param field Field to order by.
+ * @param order Sorting order, `asc` or `desc`.
+ * @return Sorted items.
  */
-export function orderBy( items, field, order = 'asc' ) {
+export function orderBy< T extends SortItem >(
+	items: T[],
+	field: SortField< T >,
+	order = 'asc'
+) {
 	return items.concat().sort( comparator( field, items, order ) );
 }

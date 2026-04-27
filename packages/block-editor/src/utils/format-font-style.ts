@@ -4,12 +4,17 @@
 import { _x } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import type { FormattedFont } from './types';
+
+/**
  * Formats font styles to human readable names.
  *
- * @param {string} fontStyle font style string
- * @return {Object} new object with formatted font style
+ * @param fontStyle font style string
+ * @return new object with formatted font style
  */
-export function formatFontStyle( fontStyle ) {
+export function formatFontStyle( fontStyle: string ): FormattedFont {
 	if ( ! fontStyle ) {
 		return {};
 	}
