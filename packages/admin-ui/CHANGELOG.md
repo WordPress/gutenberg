@@ -6,7 +6,7 @@
 
 -   `Page`: Add `visual` prop to render a decorative-only icon or image alongside the header title or breadcrumbs. [#76469](https://github.com/WordPress/gutenberg/pull/76469)
 
-### Code Quality
+### Breaking Changes
 
 -   Convert styles to CSS modules with logical properties, removing previously exposed class names. [#77088](https://github.com/WordPress/gutenberg/pull/77088).
 
