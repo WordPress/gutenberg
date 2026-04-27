@@ -78,28 +78,25 @@ function TaxonomyEditStage() {
 			if ( isAddMode ) {
 				return BLANK_RECORD;
 			}
+			// beforeLoad (route.ts) guarantees the record is in cache.
 			const record = select(
 				coreStore
 			).getEntityRecord< TaxonomyRecord >(
 				'postType',
 				USER_TAXONOMY_POST_TYPE,
 				taxonomyId
-			);
-			return record ? toFormData( record ) : null;
+			)!;
+			return toFormData( record );
 		},
 		[ isAddMode, taxonomyId ]
 	);
 
-	if ( ! initialData ) {
-		return null;
-	}
-
 	const title = isAddMode ? __( 'Add taxonomy' ) : initialData.title.raw;
+	const commonProps = { initialData, title };
 	const taxonomyPageProps: TaxonomyPageProps = isAddMode
 		? {
+				...commonProps,
 				isAddMode: true,
-				initialData,
-				title,
 				breadcrumbLabel: __( 'Add new' ),
 				subTitle: __(
 					'Define a new taxonomy. Fill in the essentials under General; expand Labels to customize.'
@@ -107,9 +104,8 @@ function TaxonomyEditStage() {
 				onSaved: ( saved ) => navigate( { to: `/edit/${ saved.id }` } ),
 		  }
 		: {
+				...commonProps,
 				isAddMode: false,
-				initialData,
-				title,
 				breadcrumbLabel: title,
 				subTitle: __(
 					'Edit this taxonomy. Expand the Labels section to adjust labels.'

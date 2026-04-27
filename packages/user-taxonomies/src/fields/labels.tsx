@@ -8,6 +8,7 @@ import type { Field, Form } from '@wordpress/dataviews';
  * Internal dependencies
  */
 import type { StoredLabels, TaxonomyFormData } from '../types';
+import { STRING_LABEL_KEYS } from '../utils';
 
 type LabelFieldOptions = {
 	placeholder?: string;
@@ -45,31 +46,26 @@ function labelField(
 }
 
 export const menuNameField = labelField( 'menu_name', __( 'Menu name' ), {
-	placeholder: __( 'Defaults to the plural label' ),
-	description: __( 'The menu name text. Defaults to the value of name.' ),
+	placeholder: __( 'Categories' ),
+	description: __( 'Defaults to the plural label.' ),
 } );
 export const allItemsField = labelField( 'all_items', __( 'All items' ), {
 	placeholder: __( 'All Categories' ),
-	description: __( 'The all items text.' ),
 } );
 export const editItemField = labelField( 'edit_item', __( 'Edit item' ), {
 	placeholder: __( 'Edit Category' ),
-	description: __( 'The edit item text.' ),
 } );
 export const viewItemField = labelField( 'view_item', __( 'View item' ), {
 	placeholder: __( 'View Category' ),
-	description: __( 'The view item text.' ),
 } );
 export const updateItemField = labelField( 'update_item', __( 'Update item' ), {
 	placeholder: __( 'Update Category' ),
-	description: __( 'The update item text.' ),
 } );
 export const addNewItemLabelField = labelField(
 	'add_new_item',
 	__( 'Add new item' ),
 	{
 		placeholder: __( 'Add New Category' ),
-		description: __( 'The add new item text.' ),
 	}
 );
 export const newItemNameField = labelField(
@@ -77,7 +73,6 @@ export const newItemNameField = labelField(
 	__( 'New item name' ),
 	{
 		placeholder: __( 'New Category Name' ),
-		description: __( 'The new item name text.' ),
 	}
 );
 export const searchItemsField = labelField(
@@ -85,7 +80,6 @@ export const searchItemsField = labelField(
 	__( 'Search items' ),
 	{
 		placeholder: __( 'Search Categories' ),
-		description: __( 'The search items text.' ),
 	}
 );
 export const notFoundField = labelField( 'not_found', __( 'Not found' ), {
@@ -104,9 +98,7 @@ export const backToItemsField = labelField(
 );
 export const parentItemField = labelField( 'parent_item', __( 'Parent item' ), {
 	placeholder: __( 'Parent Category' ),
-	description: __(
-		'The parent item text. Not used on non-hierarchical taxonomies.'
-	),
+	description: __( 'Not used on non-hierarchical taxonomies.' ),
 	isVisible: ( item ) => item.config.hierarchical,
 } );
 export const popularItemsField = labelField(
@@ -114,7 +106,9 @@ export const popularItemsField = labelField(
 	__( 'Popular items' ),
 	{
 		placeholder: __( 'Popular Tags' ),
-		description: __( 'The popular items text.' ),
+		description: __(
+			'The popular items text. Not used on hierarchical taxonomies.'
+		),
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
 );
@@ -124,7 +118,7 @@ export const separateItemsField = labelField(
 	{
 		placeholder: __( 'Separate tags with commas' ),
 		description: __(
-			'The separate items with commas text used in the taxonomy meta box. Not used on hierarchical taxonomies.'
+			'Shown in the taxonomy meta box. Not used on hierarchical taxonomies.'
 		),
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
@@ -135,7 +129,7 @@ export const parentItemColonField = labelField(
 	__( 'Parent item with colon' ),
 	{
 		placeholder: __( 'Parent Category:' ),
-		description: __( 'The same as parent item, with a colon at the end.' ),
+		description: __( 'Same as Parent item, with a colon at the end.' ),
 		isVisible: ( item ) => item.config.hierarchical,
 	}
 );
@@ -145,7 +139,7 @@ export const addOrRemoveItemsField = labelField(
 	{
 		placeholder: __( 'Add or remove tags' ),
 		description: __(
-			'The add or remove items text used in the meta box when JavaScript is disabled. Not used on hierarchical taxonomies.'
+			'Shown in the meta box when JavaScript is disabled. Not used on hierarchical taxonomies.'
 		),
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
@@ -156,7 +150,7 @@ export const chooseFromMostUsedField = labelField(
 	{
 		placeholder: __( 'Choose from the most used tags' ),
 		description: __(
-			'The choose from most used text used in the taxonomy meta box. Not used on hierarchical taxonomies.'
+			'Shown in the taxonomy meta box. Not used on hierarchical taxonomies.'
 		),
 		isVisible: ( item ) => ! item.config.hierarchical,
 	}
@@ -164,22 +158,6 @@ export const chooseFromMostUsedField = labelField(
 
 export const labelsForm: Form = {
 	layout: { type: 'regular' },
-	fields: [
-		'menu_name',
-		'all_items',
-		'edit_item',
-		'view_item',
-		'update_item',
-		'add_new_item',
-		'new_item_name',
-		'search_items',
-		'not_found',
-		'back_to_items',
-		'parent_item',
-		'popular_items',
-		'separate_items_with_commas',
-		'parent_item_colon',
-		'add_or_remove_items',
-		'choose_from_most_used',
-	],
+	// singular_name lives in the General card, so exclude it here.
+	fields: STRING_LABEL_KEYS.filter( ( key ) => key !== 'singular_name' ),
 };

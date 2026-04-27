@@ -40,7 +40,7 @@ export function parseConfig( raw?: string ): StoredConfig {
 	}
 }
 
-const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
+export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 	'singular_name',
 	'menu_name',
 	'all_items',

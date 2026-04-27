@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { notFound } from '@wordpress/route';
+import { store as noticesStore } from '@wordpress/notices';
+import { redirect } from '@wordpress/route';
 
 const USER_TAXONOMY_POST_TYPE = 'wp_user_taxonomy';
 const NEW_ID = 'new';
@@ -17,20 +18,24 @@ export const route = {
 			return;
 		}
 		const id = parseInt( params.id, 10 );
-		if ( Number.isNaN( id ) ) {
-			throw notFound();
-		}
-		try {
-			const record = await resolveSelect( coreStore ).getEntityRecord(
-				'postType',
-				USER_TAXONOMY_POST_TYPE,
-				id
-			);
-			if ( ! record ) {
-				throw notFound();
+		let record;
+		if ( ! Number.isNaN( id ) ) {
+			try {
+				record = await resolveSelect( coreStore ).getEntityRecord(
+					'postType',
+					USER_TAXONOMY_POST_TYPE,
+					id
+				);
+			} catch {
+				// Fall through to the redirect below.
 			}
-		} catch {
-			throw notFound();
+		}
+		if ( ! record ) {
+			dispatch( noticesStore ).createErrorNotice(
+				__( 'Taxonomy not found.' ),
+				{ type: 'snackbar' }
+			);
+			throw redirect( { throw: true, to: '/' } );
 		}
 	},
 	title: async ( { params }: RouteArgs ) => {
@@ -45,20 +50,6 @@ export const route = {
 		) ) as { title?: { raw?: string; rendered?: string } } | null;
 		return (
 			record?.title?.raw ?? record?.title?.rendered ?? __( 'Taxonomy' )
-		);
-	},
-	loader: async ( { params }: RouteArgs ) => {
-		if ( params.id === NEW_ID ) {
-			return;
-		}
-		const id = parseInt( params.id, 10 );
-		if ( Number.isNaN( id ) ) {
-			return;
-		}
-		await resolveSelect( coreStore ).getEntityRecord(
-			'postType',
-			USER_TAXONOMY_POST_TYPE,
-			id
 		);
 	},
 };

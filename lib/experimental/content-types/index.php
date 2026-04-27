@@ -139,7 +139,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	);
 
 	if ( isset( $config['description'] ) && is_string( $config['description'] ) ) {
-		$description = sanitize_text_field( $config['description'] );
+		$description = sanitize_textarea_field( $config['description'] );
 		if ( '' !== $description ) {
 			$args['description'] = $description;
 		}
