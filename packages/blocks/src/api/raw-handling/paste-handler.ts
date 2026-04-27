@@ -118,10 +118,11 @@ export function pasteHandler( {
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
 			const parseResult = parse( content );
-			const isSingleFreeFormBlock =
+			const isSingleNonEmptyFreeFormBlock =
 				parseResult.length === 1 &&
-				parseResult[ 0 ].name === 'core/freeform';
-			if ( ! isSingleFreeFormBlock ) {
+				parseResult[ 0 ].name === 'core/freeform' &&
+				parseResult[ 0 ].attributes?.content;
+			if ( ! isSingleNonEmptyFreeFormBlock ) {
 				return parseResult;
 			}
 		}

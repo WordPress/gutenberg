@@ -190,10 +190,18 @@ export function parseRawBlock(
 	// It might be a good idea to throw a warning here.
 	// TODO: I'm unsure about the unregisteredFallbackBlock check,
 	// it might ignore some dynamic unregistered third party blocks wrongly.
-	const isFallbackBlock =
-		normalizedBlock.blockName === getFreeformContentHandlerName() ||
+	const isUnregisteredBlock =
 		normalizedBlock.blockName === getUnregisteredTypeHandlerName();
-	if ( ! blockType || ( ! normalizedBlock.innerHTML && isFallbackBlock ) ) {
+
+	const isImplicitFreeformBlock =
+		normalizedBlock.blockName === getFreeformContentHandlerName() &&
+		rawBlock.blockName !== getFreeformContentHandlerName();
+
+	if (
+		! blockType ||
+		( ! normalizedBlock.innerHTML &&
+			( isUnregisteredBlock || isImplicitFreeformBlock ) )
+	) {
 		return;
 	}
 

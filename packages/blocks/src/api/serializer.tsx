@@ -415,11 +415,16 @@ export function serializeBlock(
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
 
-	if (
-		blockName === getUnregisteredTypeHandlerName() ||
-		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
-	) {
+	if ( blockName === getUnregisteredTypeHandlerName() ) {
 		return saveContent;
+	}
+
+	if ( ! isInnerBlocks && blockName === getFreeformContentHandlerName() ) {
+		if ( saveContent ) {
+			return saveContent;
+		}
+
+		return getCommentDelimitedContent( blockName, {}, saveContent );
 	}
 
 	const blockType = getBlockType( blockName );
