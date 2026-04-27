@@ -671,7 +671,7 @@ export default function GalleryEdit( props ) {
 						label={ __( 'Settings' ) }
 						resetAll={ () => {
 							setAttributes( {
-								navigationButtonType: 'icon',
+								navigationButtonType: 'both',
 								columns: undefined,
 								imageCrop: true,
 								randomOrder: false,
@@ -810,10 +810,10 @@ export default function GalleryEdit( props ) {
 						<ToolsPanelItem
 							label={ __( 'Navigation button type' ) }
 							isShownByDefault
-							hasValue={ () => navigationButtonType !== 'icon' }
+							hasValue={ () => navigationButtonType !== 'both' }
 							onDeselect={ () =>
 								setAttributes( {
-									navigationButtonType: 'icon',
+									navigationButtonType: 'both',
 								} )
 							}
 						>
