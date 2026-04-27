@@ -470,15 +470,6 @@ breaking selectors.
 The `@wordpress/blocks` store started similarly and grew to 12 combined
 reducers. The widget-types store anticipates the same growth path.
 
-### Plain action creators (not thunks)
-
-Unlike `@wordpress/blocks` which uses thunks for `registerBlockType`,
-widget-types uses plain action creators. The validation and
-`applyFilters()` call happen directly in the action creator. This
-is a simplification for MVP — the blocks package evolved to thunks
-to support two-phase registration (bootstrapped → processed), which
-widget-types doesn't need yet.
-
 ### Hook location: surface, not data layer
 
 The page filter hook lives in each surface's file (e.g., `load.php` for
