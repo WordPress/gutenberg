@@ -29,6 +29,7 @@
 -   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
+-   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
 
 ### Internal
 
