@@ -15,6 +15,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -97,7 +98,7 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 	}
 
 	return (
-		<button
+		<Button
 			className={ `revision-diff-marker is-${ status }` }
 			style={ {
 				top: `${ position.top }%`,
