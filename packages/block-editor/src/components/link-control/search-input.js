@@ -3,7 +3,10 @@
  */
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { plus } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
+import { LinkControlPageCreator } from './page-creator';
 
 /**
  * Internal dependencies
@@ -46,13 +49,14 @@ const LinkControlSearchInput = forwardRef(
 			suffix,
 			isEntity = false,
 			customValidity: customValidityProp,
+			showCreateSuggestionInDropdown = false,
 		},
 		ref
 	) => {
 		const genericSearchHandler = useSearchHandler(
 			suggestionsQuery,
 			allowDirectEntry,
-			withCreateSuggestion,
+			withCreateSuggestion && showCreateSuggestionInDropdown,
 			withURLSuggestion
 		);
 
@@ -61,6 +65,7 @@ const LinkControlSearchInput = forwardRef(
 			: noopSearchHandler;
 
 		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
+		const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 
 		/**
 		 * Handles the user moving between different suggestions. Does not handle
@@ -129,6 +134,17 @@ const LinkControlSearchInput = forwardRef(
 				? _placeholder
 				: __( 'Link' );
 
+		if ( withCreateSuggestion && isCreatingPage ) {
+			return (
+				<LinkControlPageCreator
+					initialTitle={ value || '' }
+					onCreateSuggestion={ onCreateSuggestion }
+					onPageCreated={ () => setIsCreatingPage( false ) }
+					onCancel={ () => setIsCreatingPage( false ) }
+				/>
+			);
+		}
+
 		return (
 			<div className="block-editor-link-control__search-input-container">
 				<URLInput
@@ -169,6 +185,18 @@ const LinkControlSearchInput = forwardRef(
 					suffix={ suffix }
 					disabled={ isEntity }
 				/>
+				{ withCreateSuggestion && ! showCreateSuggestionInDropdown && (
+					<Button
+						className="block-editor-link-control__search-create has-text"
+						icon={ plus }
+						onClick={ () => setIsCreatingPage( true ) }
+						__next40pxDefaultSize
+					>
+						{ value
+							? createSuggestionButtonText( value )
+							: __( 'Create page' ) }
+					</Button>
+				) }
 				{ children }
 			</div>
 		);

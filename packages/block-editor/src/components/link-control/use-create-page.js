@@ -9,7 +9,11 @@ export default function useCreatePage( handleCreatePage ) {
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
 	const [ errorMessage, setErrorMessage ] = useState( null );
 
-	const createPage = async function ( suggestionTitle ) {
+	const createPage = async function (
+		suggestionTitle,
+		publishImmediately,
+		Slug
+	) {
 		setIsCreatingPage( true );
 		setErrorMessage( null );
 
@@ -19,7 +23,13 @@ export default function useCreatePage( handleCreatePage ) {
 			cancelableCreateSuggestion.current = makeCancelable(
 				// Using Promise.resolve to allow createSuggestion to return a
 				// non-Promise based value.
-				Promise.resolve( handleCreatePage( suggestionTitle ) )
+				Promise.resolve(
+					handleCreatePage(
+						suggestionTitle,
+						publishImmediately,
+						Slug
+					)
+				)
 			);
 
 			return await cancelableCreateSuggestion.current.promise;

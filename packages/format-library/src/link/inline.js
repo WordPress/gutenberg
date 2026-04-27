@@ -251,11 +251,16 @@ function InlineLinkUI( {
 		},
 	} );
 
-	async function handleCreate( pageTitle ) {
-		const page = await createPageEntity( {
+	async function handleCreate( pageTitle, publishImmediately, Slug ) {
+		const payload = {
 			title: pageTitle,
-			status: 'draft',
-		} );
+			status: publishImmediately ? 'publish' : 'draft',
+		};
+
+		if ( Slug ) {
+			payload.slug = Slug;
+		}
+		const page = await createPageEntity( payload );
 
 		return {
 			id: page.id,

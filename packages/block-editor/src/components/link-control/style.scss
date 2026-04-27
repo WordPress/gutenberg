@@ -56,6 +56,22 @@ $block-editor-link-control-number-of-actions: 1;
 			}
 		}
 	}
+
+	&__page-creator {
+		max-width: 350px;
+		min-width: auto;
+		width: 90vw;
+		padding-top: $grid-unit-10;
+
+		&__back {
+			margin-left: $grid-unit-10;
+			text-transform: uppercase;
+		}
+
+		&__inner {
+			padding: $grid-unit-20;
+		}
+	}
 }
 
 // Provides positioning context for reset button. Without this then when an
@@ -276,7 +292,7 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__loading {
-	margin: $grid-unit-20; // when only loading control is shown it requires it's own spacing.
+	margin: $grid-unit-20;
 	display: flex;
 	align-items: center;
 
@@ -304,6 +320,21 @@ $block-editor-link-control-number-of-actions: 1;
 
 .block-editor-link-control__search-create {
 	align-items: center; // align text with icon.
+	width: 100%;
+	border-top: 1px solid $gray-200;
+	padding: $grid-unit-10 $grid-unit-15;
+	color: $gray-900;
+
+	&:hover,
+	&:focus {
+		background-color: $gray-100;
+	}
+
+	mark {
+		font-weight: 600;
+		color: inherit;
+		background-color: transparent;
+	}
 
 	.block-editor-link-control__preview-title {
 		margin-bottom: 0;
