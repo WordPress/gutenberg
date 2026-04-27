@@ -1,14 +1,5 @@
 /**
  * Widget type definitions.
- *
- * The widget-related exports in this file (`WidgetName`,
- * `WidgetTypeMetadata`, `WidgetType`) are defined
- * locally so the engine stays self-contained while its surface stabilises.
- * The canonical home for them is `@wordpress/widget-types` — once that
- * package publishes the matching exports, swap these definitions for
- * re-exports and keep the rest of the engine untouched. Until then, treat
- * any change here as something to sync with `@wordpress/widget-types`
- * when it catches up.
  */
 
 /**
@@ -21,6 +12,23 @@ import type { ComponentType, ReactNode } from 'react';
  */
 import type { Field } from '@wordpress/dataviews';
 import type { DashboardGridLayoutItem } from '@wordpress/grid';
+
+/*
+ * MIGRATION: `WidgetName`, `WidgetTypeMetadata`, and `WidgetType` below
+ * are also defined in `@wordpress/widget-types` (currently on its own
+ * branch). When that package lands in trunk, replace the three
+ * declarations with:
+ *
+ *   export type {
+ *       WidgetName,
+ *       WidgetTypeMetadata,
+ *       WidgetType,
+ *   } from '@wordpress/widget-types';
+ *
+ * The shapes are kept identical on purpose so the swap is mechanical —
+ * any change to the fields here must land in lockstep on the
+ * `@wordpress/widget-types` package to keep the cutover trivial.
+ */
 
 /**
  * Widget type identifier, structured as `<widget-namespace>/<widget-name>`.
@@ -40,9 +48,6 @@ export type WidgetName = `${ string }/${ string }`;
  * The dashboard engine consumes the richer `WidgetType` below, which
  * extends this shape with runtime-only fields produced by the build
  * manifest.
- *
- * This is a local mirror. Once `@wordpress/widget-types` publishes the
- * canonical type, replace this with a re-export.
  */
 export interface WidgetTypeMetadata {
 	/**
