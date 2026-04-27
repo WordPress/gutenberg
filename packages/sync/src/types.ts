@@ -165,6 +165,11 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => State | undefined;
+	hasPersistedCRDTDocChanges: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

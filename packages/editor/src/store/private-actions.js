@@ -699,3 +699,17 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Set whether a save was interrupted because the server-side CRDT has
+ * changes. When true the merge confirmation dialog is shown.
+ *
+ * @param {boolean} isPending Whether the merge is pending.
+ * @return {Object} Action object.
+ */
+export function setPendingServerCRDTMerge( isPending ) {
+	return {
+		type: 'SET_PENDING_SERVER_CRDT_MERGE',
+		isPending,
+	};
+}

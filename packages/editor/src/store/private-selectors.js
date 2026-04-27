@@ -506,3 +506,14 @@ export const getPreviousRevision = createRegistrySelector(
 		return null;
 	}
 );
+
+/**
+ * Returns true when a save was interrupted because the server-side CRDT
+ * has changes the user hasn't seen yet.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the merge confirmation dialog should be shown.
+ */
+export function hasPendingServerCRDTMerge( state ) {
+	return state.pendingServerCRDTMerge;
+}
