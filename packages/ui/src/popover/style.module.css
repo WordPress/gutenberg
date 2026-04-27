@@ -50,8 +50,9 @@
 		fill: var(--wpds-color-stroke-surface-neutral-weak);
 	}
 
-	.description {
-		color: var(--wpds-color-fg-content-neutral-weak);
+	.title {
+		color: var(--wpds-color-fg-content-neutral);
+		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
 	}
 
 	.backdrop {

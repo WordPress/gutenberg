@@ -263,8 +263,7 @@ function DirectionSelector( {
  *   drawer in the page), or
  * - **Per instance**, by passing a `Drawer.Portal` with a `style` (or
  *   `className`) to `Drawer.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to everything rendered inside it (backdrop,
- *   viewport, and popup).
+ *   from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */
