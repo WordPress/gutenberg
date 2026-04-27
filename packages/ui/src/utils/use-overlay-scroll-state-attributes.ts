@@ -8,6 +8,11 @@ const SCROLLED_FROM_BOTTOM_ATTR = 'data-wp-ui-overlay-scrolled-from-bottom';
  * Marks a `tabindex` that this hook installed, so subsequent runs can tell
  * a hook-managed tabindex apart from one the consumer set on the element
  * themselves.
+ *
+ * Internal: the constant is not exported, but the literal string is named
+ * in the public JSDoc on `useOverlayScrollStateAttributes` so consumers
+ * grepping for "why does this element have a `tabindex='0'` I didn't set?"
+ * can find the breadcrumb. If this string changes, update the JSDoc too.
  */
 const SCROLL_TABBABLE_FLAG_ATTR = 'data-wp-ui-overlay-scroll-tabbable';
 
@@ -54,10 +59,16 @@ function updateScrollAttributes( el: HTMLElement ) {
 	}
 }
 
+const HOOK_OWNED_ATTRS = [
+	SCROLL_CONTAINER_ATTR,
+	SCROLLED_FROM_TOP_ATTR,
+	SCROLLED_FROM_BOTTOM_ATTR,
+] as const;
+
 function cleanupScrollAttributes( el: HTMLElement ) {
-	el.removeAttribute( SCROLL_CONTAINER_ATTR );
-	el.removeAttribute( SCROLLED_FROM_TOP_ATTR );
-	el.removeAttribute( SCROLLED_FROM_BOTTOM_ATTR );
+	for ( const attr of HOOK_OWNED_ATTRS ) {
+		el.removeAttribute( attr );
+	}
 	// The flag is the only signal that the current tabindex is ours. If
 	// it isn't set, the tabindex either was supplied by the consumer or
 	// doesn't exist at all — either way, leaving it alone is correct.
