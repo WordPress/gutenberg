@@ -99,6 +99,7 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			className={ `revision-diff-marker is-${ status }` }
 			style={ {
 				top: `${ position.top }%`,
@@ -106,6 +107,7 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 			} }
 			onClick={ () => blockRef.current?.focus() }
 			aria-label={ STATUS_LABELS[ status ] }
+			showTooltip
 		/>
 	);
 }
