@@ -1035,6 +1035,70 @@ describe( 'Dialog', () => {
 			expect( content ).not.toHaveAttribute( 'tabindex' );
 		} );
 
+		it( 'preserves a consumer-supplied tabindex set after the hook installed its own', async () => {
+			const user = userEvent.setup();
+			const contentRef = createRef< HTMLDivElement >();
+
+			render(
+				<Dialog.Root>
+					<Dialog.Trigger>Open</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Title>Title</Dialog.Title>
+						<Dialog.Content ref={ contentRef }>
+							<p>Body</p>
+						</Dialog.Content>
+					</Dialog.Popup>
+				</Dialog.Root>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+			await waitFor( () => {
+				expect( contentRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			const content = contentRef.current!;
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( content, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+			Object.defineProperty( content, 'scrollTop', {
+				configurable: true,
+				value: 0,
+			} );
+
+			act( () => {
+				content.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( content ).toHaveAttribute( 'tabindex', '0' );
+
+			// Simulate the consumer taking over the tabindex after the
+			// hook installed its own (e.g. a re-render with an explicit
+			// `tabIndex={ -1 }` prop). The hook should detect the
+			// consumer takeover and not clobber that value on the next
+			// non-overflow tick.
+			content.setAttribute( 'tabindex', '-1' );
+
+			Object.defineProperty( content, 'scrollHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			act( () => {
+				content.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( content ).toHaveAttribute( 'tabindex', '-1' );
+		} );
+
 		it( 'toggles data-wp-ui-overlay-scrolled-from-* based on scroll position', async () => {
 			const user = userEvent.setup();
 			const contentRef = createRef< HTMLDivElement >();

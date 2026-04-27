@@ -23,6 +23,23 @@ const SCROLL_TABBABLE_FLAG_ATTR = 'data-wp-ui-overlay-scroll-tabbable';
  */
 const SCROLL_END_EPSILON = 1;
 
+/**
+ * Detect consumer takeover of a previously hook-managed `tabindex`: if the
+ * flag is set but the current `tabindex` is no longer `"0"`, the consumer
+ * has overridden our value. Drop the flag so subsequent ticks treat the
+ * `tabindex` as consumer-owned and never touch it again.
+ *
+ * @param el The scroll container.
+ */
+function reconcileTabbableFlag( el: HTMLElement ) {
+	if (
+		el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
+		el.getAttribute( 'tabindex' ) !== '0'
+	) {
+		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
+	}
+}
+
 function updateScrollAttributes( el: HTMLElement ) {
 	const { scrollTop, clientHeight, scrollHeight } = el;
 	const overflows = scrollHeight - clientHeight > SCROLL_END_EPSILON;
@@ -45,6 +62,8 @@ function updateScrollAttributes( el: HTMLElement ) {
 	// installed. If the consumer later *removes* their tabindex, the hook
 	// will install its own on the next overflow tick; there's no way to
 	// distinguish a prior explicit opt-out from an unconfigured state.
+	reconcileTabbableFlag( el );
+
 	if ( overflows ) {
 		if (
 			! el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
@@ -69,9 +88,12 @@ function cleanupScrollAttributes( el: HTMLElement ) {
 	for ( const attr of HOOK_OWNED_ATTRS ) {
 		el.removeAttribute( attr );
 	}
-	// The flag is the only signal that the current tabindex is ours. If
-	// it isn't set, the tabindex either was supplied by the consumer or
-	// doesn't exist at all — either way, leaving it alone is correct.
+	// Reconcile first so a flag left over from a consumer-takeover never
+	// causes us to clobber the consumer's `tabindex` here.
+	reconcileTabbableFlag( el );
+	// After reconciliation the flag is set only when the current
+	// `tabindex` is still `"0"` (i.e. ours). Any other value belongs to
+	// the consumer and is left alone.
 	if ( el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) ) {
 		el.removeAttribute( 'tabindex' );
 		el.removeAttribute( SCROLL_TABBABLE_FLAG_ATTR );
