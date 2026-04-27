@@ -124,6 +124,8 @@ function unescapeAndFormatSpaces( str: string ) {
 
 describe( 'FormTokenField', () => {
 	afterEach( () => {
+		// `@wordpress/deprecated` caches each warning message after the first
+		// log; reset it so multiple tests can assert the same deprecation.
 		for ( const key in logged ) {
 			delete logged[ key ];
 		}
