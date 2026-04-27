@@ -82,7 +82,7 @@ class Gutenberg_Guidelines_Post_Type {
 	/**
 	 * Register the custom post type.
 	 */
-	public static function register() {
+	public static function register(): void {
 		if ( post_type_exists( self::POST_TYPE ) ) {
 			return;
 		}
@@ -192,7 +192,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $name Human-readable term name, used when creating.
 	 * @return int|WP_Error Term ID on success, WP_Error on failure.
 	 */
-	public static function get_or_create_term_id( $slug, $name ) {
+	public static function get_or_create_term_id( string $slug, string $name ) {
 		$term = get_term_by( 'slug', $slug, self::TAXONOMY );
 		if ( $term ) {
 			return (int) $term->term_id;
@@ -214,13 +214,13 @@ class Gutenberg_Guidelines_Post_Type {
 	/**
 	 * Register post meta fields with revision support.
 	 */
-	public static function register_post_meta() {
+	public static function register_post_meta(): void {
 		$meta_args = array(
 			'show_in_rest'      => true,
 			'single'            => true,
 			'type'              => 'string',
 			'revisions_enabled' => true,
-			'auth_callback'     => function () {
+			'auth_callback'     => function (): bool {
 				return current_user_can( 'manage_options' );
 			},
 			'sanitize_callback' => 'sanitize_textarea_field',
@@ -242,7 +242,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 *
 	 * @return array Block names with content role.
 	 */
-	public static function get_content_blocks() {
+	public static function get_content_blocks(): array {
 		$content_blocks = array();
 		$registry       = WP_Block_Type_Registry::get_instance();
 
@@ -261,7 +261,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param WP_Block_Type $block_type The block type to check.
 	 * @return bool True if block has content role attribute.
 	 */
-	private static function block_has_content_role( $block_type ) {
+	private static function block_has_content_role( WP_Block_Type $block_type ): bool {
 		if ( empty( $block_type->attributes ) ) {
 			return false;
 		}
@@ -281,7 +281,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $block_name The block name (e.g., 'core/paragraph').
 	 * @return string The meta key (e.g., '_guideline_block_core_paragraph').
 	 */
-	public static function block_name_to_meta_key( $block_name ) {
+	public static function block_name_to_meta_key( string $block_name ): string {
 		// Replace '/' with '_' to create a valid meta key.
 		$sanitized = str_replace( '/', '_', $block_name );
 		return self::BLOCK_META_PREFIX . $sanitized;
@@ -293,7 +293,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $meta_key The meta key (e.g., '_guideline_block_core_paragraph').
 	 * @return string The block name (e.g., 'core/paragraph').
 	 */
-	public static function meta_key_to_block_name( $meta_key ) {
+	public static function meta_key_to_block_name( string $meta_key ): string {
 		// Remove prefix and convert first '_' back to '/'.
 		$without_prefix = str_replace( self::BLOCK_META_PREFIX, '', $meta_key );
 		// Replace first underscore with '/' (namespace separator).
@@ -306,7 +306,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $meta_key The meta key to check.
 	 * @return bool True if it's a block guideline meta key.
 	 */
-	public static function is_block_meta_key( $meta_key ) {
+	public static function is_block_meta_key( string $meta_key ): bool {
 		return strpos( $meta_key, self::BLOCK_META_PREFIX ) === 0;
 	}
 
@@ -318,7 +318,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param int $post_id Post ID (can be a post or revision ID).
 	 * @return array Guideline categories.
 	 */
-	public static function get_guideline_categories_from_meta( $post_id ) {
+	public static function get_guideline_categories_from_meta( int $post_id ): array {
 		$category_labels = array(
 			'copy'       => __( 'Copy Guidelines', 'gutenberg' ),
 			'images'     => __( 'Image Guidelines', 'gutenberg' ),

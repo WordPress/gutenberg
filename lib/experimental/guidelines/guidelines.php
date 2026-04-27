@@ -111,7 +111,7 @@ if ( ! function_exists( '_wp_guidelines_maybe_map_term_label' ) ) {
 	 * @param string $taxonomy Taxonomy slug.
 	 * @return array Possibly modified term data.
 	 */
-	function _wp_guidelines_maybe_map_term_label( $data, $taxonomy ) {
+	function _wp_guidelines_maybe_map_term_label( array $data, string $taxonomy ): array {
 		if ( 'wp_guideline_type' !== $taxonomy ) {
 			return $data;
 		}

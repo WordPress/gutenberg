@@ -106,7 +106,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_guidelines_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	public function get_guidelines_permissions_check( WP_REST_Request $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
@@ -187,7 +187,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response Response object.
 	 */
-	public function get_guidelines( $request ) {
+	public function get_guidelines( WP_REST_Request $request ) {
 		$status_filter = $request->get_param( 'status' );
 		$post          = $this->get_guidelines_post( $status_filter );
 
@@ -454,7 +454,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param int   $post_id    Post ID.
 	 * @param array $categories Sanitized guideline categories.
 	 */
-	protected function save_guideline_categories_to_meta( $post_id, $categories ) {
+	protected function save_guideline_categories_to_meta( int $post_id, array $categories ): void {
 		// Save standard categories.
 		foreach ( Gutenberg_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
@@ -485,7 +485,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param mixed $categories Raw guideline categories from the request.
 	 * @return array Sanitized guideline categories.
 	 */
-	protected function sanitize_guideline_categories( $categories ) {
+	protected function sanitize_guideline_categories( $categories ): array {
 		if ( ! is_array( $categories ) ) {
 			return array();
 		}
@@ -516,7 +516,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param array $category Raw category data.
 	 * @return array Sanitized category data.
 	 */
-	private function sanitize_standard_category( $category ) {
+	private function sanitize_standard_category( array $category ): array {
 		$sanitized = array_intersect_key( $category, array_flip( array( 'label', 'guidelines' ) ) );
 
 		foreach ( $sanitized as $key => &$value ) {
@@ -537,7 +537,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param array $blocks Raw blocks category data.
 	 * @return array Sanitized blocks category data.
 	 */
-	private function sanitize_blocks_category( $blocks ) {
+	private function sanitize_blocks_category( array $blocks ): array {
 		$sanitized = array();
 
 		foreach ( $blocks as $block_name => $block_data ) {
@@ -573,7 +573,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param string|null $status_filter Optional. Filter by status ('publish' or 'draft').
 	 * @return WP_Post|null The guidelines post or null if not found.
 	 */
-	protected function get_guidelines_post( $status_filter = null ) {
+	protected function get_guidelines_post( ?string $status_filter = null ): ?WP_Post {
 		$post_status = array( 'publish', 'draft' );
 
 		if ( $status_filter ) {
