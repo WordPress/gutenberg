@@ -117,6 +117,12 @@ export interface ContentProps extends ComponentProps< 'div' > {
 	 * component will resume managing it on the next overflow tick; it
 	 * can't distinguish a previous explicit opt-out from an
 	 * unconfigured state.
+	 *
+	 * Note: the scroll region is intentionally rendered without
+	 * `role` / `aria-label`, so screen readers don't announce a
+	 * generic "scrollable" landmark on top of the drawer's existing
+	 * heading + body; the surrounding `Drawer.Title` and body content
+	 * provide the context.
 	 */
 	tabIndex?: number;
 }
