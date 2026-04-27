@@ -46,6 +46,5 @@
 		}
 	},
 	"editorScript": "file:./index.js",
-	"style": "wp-block-slider-pagination",
-	"editorStyle": "wp-block-slider-pagination-editor"
+	"style": "wp-block-slider-pagination"
 }

@@ -26,6 +26,14 @@
 		"align": true,
 		"html": false,
 		"interactivity": true,
+		"layout": {
+			"default": {
+				"type": "flex",
+				"orientation": "horizontal"
+			},
+			"allowOrientation": true,
+			"allowJustification": false
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true
@@ -53,6 +61,5 @@
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "wp-block-slider-editor",
-	"style": "wp-block-slider",
 	"viewScriptModule": "@wordpress/block-library/slider/view"
 }

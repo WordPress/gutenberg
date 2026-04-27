@@ -1,24 +1,19 @@
 .wp-block-slider-pagination-button {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
+	justify-content: center;
 	cursor: pointer;
-	background: rgba(0, 0, 0, 0.5);
-	color: #fff;
+	background: none;
+	color: currentColor;
 	border: none;
-	padding: 6px 12px;
-	font-size: 14px;
+	border-radius: 2px;
+	padding: 4px;
 	line-height: 1;
-	border-radius: 4px;
-	transition: opacity 0.2s ease;
 
-	&:hover:not(:disabled) {
-		background: rgba(0, 0, 0, 0.7);
-	}
-
-	&:disabled {
-		opacity: 0.3;
-		cursor: not-allowed;
+	&[aria-disabled="true"] {
+		cursor: default;
+		opacity: 0.4;
+		pointer-events: none;
 	}
 
 	.wp-block-slider-pagination-button__icon,

@@ -13,14 +13,6 @@
 		"anchor": true,
 		"html": false,
 		"reusable": false,
-		"layout": {
-			"allowSwitching": true,
-			"allowInheriting": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true,
-			"allowSizingOnChildren": true
-		},
 		"spacing": {
 			"blockGap": true,
 			"padding": true,

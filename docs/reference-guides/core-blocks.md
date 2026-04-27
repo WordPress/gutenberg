@@ -967,7 +967,7 @@ A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/slider-track
--	**Supports:** anchor, color (background, gradients, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), shadow, spacing (blockGap, padding, ~~margin~~), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), shadow, spacing (blockGap, padding, ~~margin~~), ~~html~~, ~~reusable~~
 
 ## Slider
 
@@ -977,7 +977,7 @@ Display content in a horizontally scrolling slider. ([Source](https://github.com
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/slider-pagination, core/slider-track
--	**Supports:** align, color (background, ~~text~~), interactivity, spacing (margin, padding), ~~html~~
+-	**Supports:** align, color (background, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
 -	**Attributes:** activeSlideIndex, loop, sliderId
 
 ## Slider Pagination
@@ -1010,7 +1010,7 @@ Dot indicators showing the current slide position. ([Source](https://github.com/
 -	**Experimental:** true
 -	**Category:** design
 -	**Ancestor:** core/slider-pagination
--	**Supports:** color (text, ~~background~~), ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Supports:** color (text, ~~background~~), spacing (margin), ~~anchor~~, ~~html~~, ~~reusable~~
 
 ## Slides
 

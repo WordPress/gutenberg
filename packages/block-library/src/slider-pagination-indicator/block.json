@@ -15,6 +15,9 @@
 		"color": {
 			"text": true,
 			"background": false
+		},
+		"spacing": {
+			"margin": true
 		}
 	},
 	"editorScript": "file:./index.js",

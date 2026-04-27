@@ -1,5 +1,7 @@
 .wp-block-slider-track {
 	display: flex;
+	min-width: 0;
+	flex: 1 1 0%;
 	overflow-x: scroll;
 	overflow-y: hidden;
 	scroll-snap-type: x mandatory;
@@ -13,4 +15,10 @@
 	&::-webkit-scrollbar {
 		display: none;
 	}
+}
+
+.is-vertical .wp-block-slider-track {
+	min-height: 0;
+	min-width: 100%;
+	flex: 1 1 0%;
 }

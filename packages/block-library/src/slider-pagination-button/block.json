@@ -45,6 +45,5 @@
 		"shadow": true
 	},
 	"editorScript": "file:./index.js",
-	"style": "wp-block-slider-pagination-button",
-	"editorStyle": "wp-block-slider-pagination-button-editor"
+	"style": "wp-block-slider-pagination-button"
 }
