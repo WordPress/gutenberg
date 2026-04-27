@@ -21,13 +21,6 @@ $z-layers: (
 	".interface-interface-skeleton__header": 30,
 	".interface-interface-skeleton__content": 20,
 
-	".wp-block-cover.is-placeholder .components-placeholder.is-large": 1, // Cover block resizer component inside a large placeholder.
-	// These z-index are now used only for a deprecated version of the cover block.
-	".wp-block-cover__inner-container": 1, // InnerBlocks area inside cover image block.
-	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
-	".wp-block-cover__image-background": 0, // Image background inside cover block.
-	".wp-block-cover__video-background": 0, // Video background inside cover block.
-
 	// Fixed position appender:
 	".block-editor-block-list__block .block-list-appender": 2,
 
