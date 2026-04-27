@@ -10,10 +10,9 @@ import type { WidgetDashboardProps } from './types';
 /**
  * Stateless rendering engine for widget dashboards.
  *
- * Follows the DataViews stateless-pure pattern: the consumer owns `layout`
- * and `editMode` state, and every mutation fires `onLayoutChange` with the
- * fully updated array. The engine never queries a widget-types store — types
- * flow in via the `widgetTypes` prop.
+ * The consumer owns `layout` and `editMode` state; every mutation fires
+ * `onLayoutChange` with the fully updated array. The engine never queries a
+ * widget-types store — types flow in via the `widgetTypes` prop.
  *
  * ```tsx
  * import { WidgetDashboard } from '@wordpress/dashboard';

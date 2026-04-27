@@ -102,11 +102,10 @@ export interface WidgetTypeMetadata {
 	__experimental?: string | boolean;
 
 	/**
-	 * Declarative attribute schema, reusing the DataViews `Field` shape so
-	 * the dashboard can render forms via `DataForm` without per-widget
-	 * form wiring. `Field< any >` is used here because the array is
-	 * heterogeneous — each widget narrows `Item` to its own attribute
-	 * type at the point of registration.
+	 * Declarative attribute schema. Surfaces render forms straight from
+	 * this list via `DataForm`, with no per-widget form wiring. `any` is
+	 * used here because the array is heterogeneous — each widget narrows
+	 * `Item` to its own attribute type at the point of registration.
 	 */
 	attributes?: Field< any >[];
 
@@ -274,8 +273,8 @@ export interface WidgetGridSettings {
 /**
  * Props for `WidgetDashboard`.
  *
- * Follows the DataViews stateless pattern: the consumer owns layout state,
- * and every mutation fires `onLayoutChange` with the fully updated array.
+ * The consumer owns layout state; every mutation fires `onLayoutChange`
+ * with the fully updated array.
  */
 export interface WidgetDashboardProps {
 	/**
