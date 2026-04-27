@@ -19,6 +19,10 @@ const DEFAULT_STYLES = `
 		overflow: visible !important;
 		min-height: auto !important;
 	}
+	p,
+	blockquote {
+		overflow-wrap: break-word;
+	}
 `;
 
 export default function HTMLEditPreview( { content, isSelected } ) {
