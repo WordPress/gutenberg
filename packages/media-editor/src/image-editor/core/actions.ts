@@ -30,7 +30,7 @@ export type CropperAction =
 	 */
 	| {
 			type: 'SET_ZOOM_AT_POINT';
-			payload: { zoom: number; pan: { x: number; y: number } };
+			payload: { zoom: number; pan: NormalizedPoint };
 	  }
 	/** Sets the absolute rotation angle in degrees. */
 	| { type: 'SET_ROTATION'; payload: number }
