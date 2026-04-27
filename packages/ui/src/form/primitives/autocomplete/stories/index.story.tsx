@@ -387,7 +387,20 @@ export const TextareaInlineAutocomplete: Story = {
 };
 
 /**
- * The `--wp-ui-autocomplete-z-index` CSS variable can be used to override the popup z-index.
+ * Popovers in Gutenberg are managed with explicit z-index values, which can
+ * create situations where an autocomplete popup renders below another popover
+ * when you want it above.
+ *
+ * The `--wp-ui-autocomplete-z-index` CSS variable controls the z-index of the
+ * `Autocomplete` positioner. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   `Autocomplete` popup in the page), or
+ * - **Per instance**, by passing an `Autocomplete.Portal` with a `style` (or
+ *   `className`) to `Autocomplete.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -397,7 +410,11 @@ export const WithCustomZIndex: Story = {
 			<>
 				<Autocomplete.Input placeholder="Enter a URL" type="url" />
 				<Autocomplete.Popup
-					style={ { '--wp-ui-autocomplete-z-index': '1000001' } }
+					portal={
+						<Autocomplete.Portal
+							style={ { '--wp-ui-autocomplete-z-index': '9999' } }
+						/>
+					}
 				>
 					<Autocomplete.List>
 						<Autocomplete.ListBody>
