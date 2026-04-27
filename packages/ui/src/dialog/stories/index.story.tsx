@@ -136,15 +136,14 @@ export const AllSizes: Story = {
  * create situations where a dialog renders below another popover when you
  * want it above.
  *
- * The `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
- * backdrop and the popup. Override it either:
+ * The `--wp-ui-dialog-z-index` CSS variable controls the z-index of the
+ * dialog's backdrop and popup. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   dialog in the page), or
  * - **Per instance**, by passing a `Dialog.Portal` with a `style` (or
  *   `className`) to `Dialog.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to the backdrop and the popup, which are both
- *   rendered inside it.
+ *   from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */

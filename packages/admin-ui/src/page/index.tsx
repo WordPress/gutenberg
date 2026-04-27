@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import Header from './header';
 import NavigableRegion from '../navigable-region';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
+import styles from './style.module.css';
 
 function Page( {
 	headingLevel,
@@ -48,7 +49,7 @@ function Page( {
 	hasPadding?: boolean;
 	showSidebarToggle?: boolean;
 } ) {
-	const classes = clsx( 'admin-ui-page', className );
+	const classes = clsx( styles.page, className );
 	const effectiveAriaLabel =
 		ariaLabel ?? ( typeof title === 'string' ? title : '' );
 
@@ -67,7 +68,12 @@ function Page( {
 				/>
 			) }
 			{ hasPadding ? (
-				<div className="admin-ui-page__content has-padding">
+				<div
+					className={ clsx(
+						styles.content,
+						styles[ 'has-padding' ]
+					) }
+				>
 					{ children }
 				</div>
 			) : (
