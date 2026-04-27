@@ -8,12 +8,6 @@
 	"category": "media",
 	"__experimental": true,
 	"attributes": {
-		"backdropColor": {
-			"type": "string"
-		},
-		"customBackdropColor": {
-			"type": "string"
-		},
 		"animationDuration": {
 			"type": "number",
 			"default": 400

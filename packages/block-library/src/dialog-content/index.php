@@ -9,7 +9,7 @@
 /**
  * Render the 'core/dialog-content' block.
  *
- * Applies IAPI directives and dialog-specific attributes to the saved content.
+ * Applies Interactivity API directives and dialog-specific attributes to the saved content.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content Block content.
@@ -64,7 +64,7 @@ function render_block_core_dialog_content( array $attributes, string $content, W
 		$aria_labelledby = $hidden_id;
 	}
 
-	// Process the saved content to add IAPI directives.
+	// Process the saved content to add Interactivity API directives.
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
 
 	if ( $tag_processor->next_tag( 'dialog' ) ) {
@@ -74,7 +74,7 @@ function render_block_core_dialog_content( array $attributes, string $content, W
 		$tag_processor->set_attribute( 'aria-modal', 'true' );
 		$tag_processor->set_attribute( 'aria-labelledby', $aria_labelledby );
 
-		// Add IAPI directives.
+		// Add Interactivity API directives.
 		$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
 
 		// Set the animation duration as a CSS custom property to keep CSS animations in sync with JS.

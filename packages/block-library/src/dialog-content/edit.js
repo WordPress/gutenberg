@@ -11,13 +11,11 @@ import {
 	useRef,
 	useEffect,
 	useState,
-	useMemo,
 	useCallback,
 } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	withColors,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { KeyboardShortcuts } from '@wordpress/components';
@@ -26,15 +24,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { Toolbar, InspectorPanel } from './controls';
+import { Toolbar } from './controls';
 
 function Edit( {
 	attributes,
 	setAttributes,
 	context,
 	clientId,
-	backdropColor,
-	setBackdropColor,
 } ) {
 	const {
 		selectBlock,
@@ -42,10 +38,8 @@ function Edit( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	// Get isOpen from context
 	const isOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
 
-	// Local state for closing animation
 	const [ showClosingAnimation, setShowClosingAnimation ] = useState( false );
 
 	const { rootClientId, dialogClientId } = useSelect(
@@ -60,16 +54,11 @@ function Edit( {
 		[ clientId ]
 	);
 
-	/**
-	 * Setup ref for the dialog.
-	 */
 	const dialogElementRef = useRef( null );
 
-	// Sync DOM state with context state
 	useEffect( () => {
 		if ( dialogElementRef.current ) {
 			if ( isOpen && ! dialogElementRef.current.open ) {
-				// Reset closing animation when opening
 				setShowClosingAnimation( false );
 				dialogElementRef.current.showModal();
 			} else if ( ! isOpen && dialogElementRef.current.open ) {
@@ -78,9 +67,6 @@ function Edit( {
 		}
 	}, [ isOpen ] );
 
-	/**
-	 * Finalize the close operation - update block attributes and select parent.
-	 */
 	const finalizeClose = useCallback( () => {
 		if ( dialogClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -98,9 +84,6 @@ function Edit( {
 		__unstableMarkNextChangeAsNotPersistent,
 	] );
 
-	/**
-	 * Helper functions:
-	 */
 	const openDialog = () => {
 		if ( dialogClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -111,7 +94,6 @@ function Edit( {
 	};
 
 	const closeDialog = useCallback( () => {
-		// Check if user prefers reduced motion - if so, close immediately
 		const prefersReducedMotion = window.matchMedia(
 			'(prefers-reduced-motion: reduce)'
 		).matches;
@@ -121,12 +103,8 @@ function Edit( {
 			return;
 		}
 
-		// Start closing animation
 		setShowClosingAnimation( true );
 
-		// Wait for the CSS animation to complete before closing.
-		// Using animationend ensures we close at the exact moment
-		// the animation finishes, avoiding timing mismatches.
 		const dialogElement = dialogElementRef.current;
 		if ( ! dialogElement ) {
 			finalizeClose();
@@ -134,7 +112,6 @@ function Edit( {
 		}
 
 		const onAnimationEnd = ( event ) => {
-			// Only handle our closing animation
 			if ( event.animationName !== 'turn-off-visibility' ) {
 				return;
 			}
@@ -144,29 +121,17 @@ function Edit( {
 
 		dialogElement.addEventListener( 'animationend', onAnimationEnd );
 	}, [ finalizeClose ] );
+
 	const onEscHandler = ( e ) => {
 		e.preventDefault();
 		closeDialog();
 	};
+
 	const onBackdropClick = ( event ) => {
-		// Only close if clicking directly on the dialog backdrop, not its children
 		if ( event.target === event.currentTarget ) {
 			closeDialog();
 		}
 	};
-
-	// Build CSS custom properties for backdrop color
-	const customColorStyles = useMemo( () => {
-		const styles = {};
-		const backdropColorValue =
-			backdropColor?.color || attributes.customBackdropColor;
-
-		if ( backdropColorValue ) {
-			styles[ '--wp--style--dialog-backdrop-color' ] = backdropColorValue;
-		}
-
-		return styles;
-	}, [ backdropColor?.color, attributes.customBackdropColor ] );
 
 	const blockProps = useBlockProps( {
 		ref: dialogElementRef,
@@ -174,7 +139,6 @@ function Edit( {
 			active: isOpen && ! showClosingAnimation,
 			'show-closing-animation': showClosingAnimation,
 		} ),
-		style: customColorStyles,
 		role: 'dialog',
 		'aria-modal': 'true',
 		'aria-labelledby': '',
@@ -199,17 +163,6 @@ function Edit( {
 		>
 			{ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- Keyboard support provided via KeyboardShortcuts ESC handler above */ }
 			<dialog { ...blockProps } onClick={ onBackdropClick }>
-				<InspectorPanel
-					colors={ {
-						backdropColor,
-						setBackdropColor,
-					} }
-					openDialog={ openDialog }
-					closeDialog={ closeDialog }
-					clientId={ clientId }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
 				<Toolbar
 					openDialog={ openDialog }
 					closeDialog={ closeDialog }
@@ -231,4 +184,4 @@ function Edit( {
 	);
 }
 
-export default withColors( { backdropColor: 'backdrop-color' } )( Edit );
+export default Edit;

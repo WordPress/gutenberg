@@ -4,10 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import {
-	InspectorControls,
 	BlockControls,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
@@ -47,45 +44,5 @@ export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
 				</ToolbarButton>
 			</ToolbarGroup>
 		</BlockControls>
-	);
-}
-
-export function InspectorPanel( {
-	colors,
-	clientId,
-	attributes,
-	setAttributes,
-} ) {
-	const { customBackdropColor } = attributes || {};
-	const { backdropColor, setBackdropColor } = colors;
-	const colorSettings = useMultipleOriginColorsAndGradients();
-
-	return (
-		<>
-			<InspectorControls group="color">
-				<ColorGradientSettingsDropdown
-					settings={ [
-						{
-							label: __( 'Backdrop' ),
-							colorValue:
-								backdropColor?.color ?? customBackdropColor,
-							onColorChange: ( value ) => {
-								setBackdropColor( value );
-								setAttributes( {
-									customBackdropColor: value,
-								} );
-							},
-							enableAlpha: true,
-							clearable: true,
-						},
-					] }
-					panelId={ clientId }
-					hasColorsOrGradients={ false }
-					disableCustomColors={ false }
-					__experimentalIsRenderedInSidebar
-					{ ...colorSettings }
-				/>
-			</InspectorControls>
-		</>
 	);
 }
