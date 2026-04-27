@@ -24,10 +24,16 @@ const SCROLL_TABBABLE_FLAG_ATTR = 'data-wp-ui-overlay-scroll-tabbable';
 const SCROLL_END_EPSILON = 1;
 
 /**
- * Detect consumer takeover of a previously hook-managed `tabindex`: if the
- * flag is set but the current `tabindex` is no longer `"0"`, the consumer
- * has overridden our value. Drop the flag so subsequent ticks treat the
- * `tabindex` as consumer-owned and never touch it again.
+ * Detect consumer takeover of a previously hook-managed `tabindex` after the
+ * hook had already installed its own: if the flag is set but the current
+ * `tabindex` is no longer `"0"`, the consumer has overridden our value. Drop
+ * the flag so subsequent ticks treat the `tabindex` as consumer-owned and
+ * never touch it again.
+ *
+ * Limitation: the heuristic compares the DOM attribute, so a consumer who
+ * passes `tabIndex={ 0 }` explicitly is indistinguishable from our own
+ * managed `"0"` and would still be cleaned up on the next non-overflow
+ * tick. See the contract paragraph on `useOverlayScrollStateAttributes`.
  *
  * @param el The scroll container.
  */
@@ -55,16 +61,21 @@ function updateScrollAttributes( el: HTMLElement ) {
 	// anti-pattern. Toggle `tabindex="0"` only while the element actually
 	// overflows. The flag attribute guards against clobbering a
 	// consumer-supplied tabindex: we only touch attributes we installed.
-	//
-	// Edge case: a consumer who sets `tabindex` before first overflow is
-	// detected — including `tabindex="-1"` to intentionally hide the
-	// region from Tab order — keeps their value because the flag is never
-	// installed. If the consumer later *removes* their tabindex, the hook
-	// will install its own on the next overflow tick; there's no way to
-	// distinguish a prior explicit opt-out from an unconfigured state.
+
+	// Takeover-after-install: detect a consumer who started overriding
+	// our managed `"0"` *after* the hook installed it (e.g. a re-render
+	// passing `tabIndex={ -1 }`). The flag is dropped so the install /
+	// cleanup branches below leave the consumer's value untouched.
 	reconcileTabbableFlag( el );
 
 	if ( overflows ) {
+		// Pre-install opt-out: a consumer-supplied `tabindex` (including
+		// `tabindex="-1"` to hide the region from Tab order) keeps its
+		// value because the flag is never installed in the first place.
+		// If that consumer-supplied value is later *removed*, the hook
+		// will install its own on the next overflow tick — the DOM
+		// attribute alone can't distinguish a prior explicit opt-out
+		// from an unconfigured state.
 		if (
 			! el.hasAttribute( SCROLL_TABBABLE_FLAG_ATTR ) &&
 			el.getAttribute( 'tabindex' ) === null
@@ -117,6 +128,25 @@ function cleanupScrollAttributes( el: HTMLElement ) {
  * attribute (`data-wp-ui-overlay-scroll-tabbable`) marks tabindex values
  * the hook installed, so a consumer-supplied `tabindex` is never
  * overwritten.
+ *
+ * Tabindex contract:
+ * - **Pre-install opt-out**: a `tabindex` set on the element before the
+ *   first overflow is detected is left alone forever. The flag is never
+ *   installed, so the hook never owns the attribute. (This means
+ *   `tabIndex={ -1 }` on `Dialog.Content` / `Drawer.Content` reliably
+ *   suppresses the auto tab stop.)
+ * - **Takeover after install**: if the consumer overrides the hook's
+ *   `"0"` with a *different* value after the fact, the flag is dropped
+ *   on the next tick (`reconcileTabbableFlag`) and the consumer's value
+ *   is preserved through subsequent overflow / non-overflow transitions
+ *   and through cleanup.
+ * - **Indistinguishable case**: a consumer who passes `tabIndex={ 0 }`
+ *   explicitly while the hook also has `"0"` installed cannot be
+ *   detected — the DOM attribute is identical to the hook-managed
+ *   value, so the hook will still strip it on the next non-overflow
+ *   tick. This is rarely intentional (the consumer's `0` matches the
+ *   hook's behavior anyway), but consumers needing a guaranteed
+ *   sticky `0` should avoid relying on it across overflow flips.
  *
  * Overflow detection is block-axis-only. Overlay popups are expected to
  * constrain content width (`overlay-chrome.module.css` clips `.content`
