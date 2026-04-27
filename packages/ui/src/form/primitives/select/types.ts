@@ -32,6 +32,17 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	children?: _Select.Value.Props[ 'children' ];
 };
 
+/**
+ * `Select.Popup` maps to two Base UI elements internally: the
+ * **Positioner** (outer, handles fixed positioning and z-index) and the
+ * **Popup** (inner, holds content and visual styles).
+ *
+ * `style`, `className`, and all other HTML attributes are forwarded to the
+ * inner **Popup** element.
+ *
+ * To override the z-index, use the `--wp-ui-select-z-index` CSS variable
+ * via `Select.Portal` (per-instance) or globally on a wrapping element.
+ */
 export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
 	 * The content to be rendered inside the popup.

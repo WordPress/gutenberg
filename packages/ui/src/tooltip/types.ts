@@ -19,6 +19,17 @@ export interface TriggerProps extends ComponentProps< 'button' > {
 	children?: ReactNode;
 }
 
+/**
+ * `Tooltip.Popup` maps to two Base UI elements internally: the
+ * **Positioner** (outer, handles fixed positioning and z-index) and the
+ * **Popup** (inner, holds content and visual styles).
+ *
+ * `style`, `className`, and all other HTML attributes are forwarded to the
+ * inner **Popup** element.
+ *
+ * To override the z-index, use the `--wp-ui-tooltip-z-index` CSS variable
+ * via `Tooltip.Portal` (per-instance) or globally on a wrapping element.
+ */
 export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick< _Tooltip.Positioner.Props, 'align' | 'side' | 'sideOffset' > {

@@ -75,19 +75,18 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			side={ side }
 			sideOffset={ sideOffset }
 			sticky={ sticky }
-			style={ style }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				styles.positioner,
-				className
-			) }
+			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
 		>
 			<ThemeProvider>
 				<_Popover.Popup
 					ref={ mergedPopupRef }
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
-					className={ clsx( variant !== 'unstyled' && styles.popup ) }
+					style={ style }
+					className={ clsx(
+						variant !== 'unstyled' && styles.popup,
+						className
+					) }
 					{ ...props }
 				>
 					<PopoverValidationProvider>

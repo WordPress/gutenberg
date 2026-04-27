@@ -33,12 +33,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 			align={ align }
 			side={ side }
 			sideOffset={ sideOffset }
-			style={ style }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				className,
-				styles.positioner
-			) }
+			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
 		>
 			{ /* This should ideally use whatever dark color makes sense,
 				and not be hardcoded to #1e1e1e. The solutions would be to:
@@ -52,7 +47,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 			<ThemeProvider color={ { bg: '#1e1e1e' } }>
 				<_Tooltip.Popup
 					ref={ ref }
-					className={ styles.popup }
+					style={ style }
+					className={ clsx( styles.popup, className ) }
 					{ ...props }
 				>
 					{ children }

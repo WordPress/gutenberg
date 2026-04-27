@@ -30,10 +30,13 @@ export interface TriggerProps
  * **Positioner** (outer, handles fixed positioning and z-index) and the
  * **Popup** (inner, holds content and visual styles).
  *
- * `style` and `className` are forwarded to the **Positioner** so that
- * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
- * (`--available-height`, `--available-width`) work correctly. All other
- * HTML attributes are forwarded to the inner **Popup** element.
+ * `style`, `className`, and all other HTML attributes are forwarded to the
+ * inner **Popup** element. Base UI CSS variables exposed by the positioner
+ * (`--available-height`, `--available-width`, `--anchor-width`, etc.)
+ * cascade down and remain readable from the popup.
+ *
+ * To override the z-index, use the `--wp-ui-popover-z-index` CSS variable
+ * via `Popover.Portal` (per-instance) or globally on a wrapping element.
  */
 export interface PopupProps
 	extends ComponentProps< 'div' >,

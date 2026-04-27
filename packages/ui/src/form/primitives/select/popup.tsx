@@ -26,17 +26,16 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 			<_Select.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
 				alignItemWithTrigger={ false }
-				style={ style }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
-					styles.positioner,
-					className
+					styles.positioner
 				) }
 			>
 				<ThemeProvider>
 					<_Select.Popup
 						ref={ ref }
-						className={ itemPopupStyles.popup }
+						style={ style }
+						className={ clsx( itemPopupStyles.popup, className ) }
 						{ ...restProps }
 					>
 						<_Select.List className={ itemPopupStyles.list }>
