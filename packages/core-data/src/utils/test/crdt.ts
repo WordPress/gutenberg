@@ -288,6 +288,59 @@ describe( 'crdt', () => {
 			);
 		} );
 
+		it( 'converges duplicate table row edit/delete through the post changes wrapper', () => {
+			const docB = new Y.Doc();
+
+			try {
+				applyPostChangesToCRDTDoc(
+					doc,
+					{
+						blocks: [
+							createTableBlock( [ 'anchor', 'same', 'same' ] ),
+						],
+					},
+					defaultSyncedProperties
+				);
+				Y.applyUpdate( docB, Y.encodeStateAsUpdate( doc ) );
+
+				const stateVectorA = Y.encodeStateVector( doc );
+				const stateVectorB = Y.encodeStateVector( docB );
+				const runtimeBlocksA = getRuntimeBlocksFromDoc( doc );
+				const runtimeBlocksB = getRuntimeBlocksFromDoc( docB );
+
+				getRuntimeTableBody( runtimeBlocksA )[ 2 ].cells[ 0 ].content =
+					'edited-second-duplicate';
+				getRuntimeTableBody( runtimeBlocksB ).splice( 1, 1 );
+
+				applyPostChangesToCRDTDoc(
+					doc,
+					{ blocks: runtimeBlocksA },
+					defaultSyncedProperties
+				);
+				applyPostChangesToCRDTDoc(
+					docB,
+					{ blocks: runtimeBlocksB },
+					defaultSyncedProperties
+				);
+
+				const updateA = Y.encodeStateAsUpdate( doc, stateVectorB );
+				const updateB = Y.encodeStateAsUpdate( docB, stateVectorA );
+				Y.applyUpdate( doc, updateB );
+				Y.applyUpdate( docB, updateA );
+
+				expect( getTableBodyCellContentsFromDoc( doc ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+				expect( getTableBodyCellContentsFromDoc( docB ) ).toEqual( [
+					'anchor',
+					'edited-second-duplicate',
+				] );
+			} finally {
+				docB.destroy();
+			}
+		} );
+
 		it( 'initializes blocks as Y.Array when not present', () => {
 			const changes = {
 				blocks: [],
@@ -1199,4 +1252,48 @@ function addBlockToDoc(
 	( blocks as YBlocks ).push( [ block ] );
 
 	return ytext;
+}
+
+function createTableBlock( values: string[] ): Block {
+	return {
+		name: 'core/table',
+		clientId: 'table',
+		attributes: {
+			body: values.map( ( value ) => ( {
+				cells: [
+					{
+						content: value,
+						tag: 'td',
+					},
+				],
+			} ) ),
+		},
+		innerBlocks: [],
+	};
+}
+
+function getRuntimeBlocksFromDoc( ydoc: Y.Doc ): Block[] {
+	return getPostChangesFromCRDTDoc(
+		ydoc,
+		{ blocks: [] } as unknown as Post,
+		defaultSyncedProperties
+	).blocks as Block[];
+}
+
+function getRuntimeTableBody( blocks: Block[] ) {
+	return blocks[ 0 ].attributes.body as Array< {
+		cells: Array< Record< string, unknown > >;
+	} >;
+}
+
+function getCellContentText( content: unknown ) {
+	return typeof content === 'object' && content && 'valueOf' in content
+		? String( content.valueOf() )
+		: content;
+}
+
+function getTableBodyCellContentsFromDoc( ydoc: Y.Doc ) {
+	return getRuntimeTableBody( getRuntimeBlocksFromDoc( ydoc ) ).map(
+		( row ) => getCellContentText( row.cells[ 0 ].content )
+	);
 }
