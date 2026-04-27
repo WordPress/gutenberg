@@ -11,13 +11,11 @@ const TABLE_POST_CONTENT = `<!-- wp:table -->
 <!-- /wp:table -->`;
 
 async function getTableBodyCellContents( editor: Editor ) {
-	const [ table ] = await editor.getBlocks();
-	if ( ! table?.attributes?.body ) {
-		return [];
-	}
-	return table.attributes.body.map(
-		( row: { cells: { content?: string }[] } ) => row.cells[ 0 ]?.content
-	);
+	return editor.canvas
+		.getByRole( 'textbox', { name: 'Body cell text' } )
+		.evaluateAll( ( cells ) =>
+			cells.map( ( cell ) => cell.textContent?.trim() )
+		);
 }
 
 async function editTableCell( {

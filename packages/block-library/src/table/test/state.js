@@ -466,6 +466,30 @@ describe( 'insertColumn', () => {
 		expect( state ).toEqual( expected );
 	} );
 
+	it( 'preserves symbol row and cell properties when inserting a column', () => {
+		const syncId = Symbol( 'syncId' );
+		const tableWithSymbolIdentity = deepFreeze( {
+			body: [
+				{
+					[ syncId ]: 'row-1',
+					cells: [
+						{
+							[ syncId ]: 'cell-1',
+							content: 'test',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		} );
+		const state = insertColumn( tableWithSymbolIdentity, {
+			columnIndex: 0,
+		} );
+
+		expect( state.body[ 0 ][ syncId ] ).toBe( 'row-1' );
+		expect( state.body[ 0 ].cells[ 1 ][ syncId ] ).toBe( 'cell-1' );
+	} );
+
 	it( 'adds `th` cells to the head', () => {
 		const state = insertColumn( tableWithHead, {
 			columnIndex: 1,
@@ -772,6 +796,34 @@ describe( 'deleteColumn', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'preserves symbol row and cell properties when deleting a column', () => {
+		const syncId = Symbol( 'syncId' );
+		const tableWithSymbolIdentity = deepFreeze( {
+			body: [
+				{
+					[ syncId ]: 'row-1',
+					cells: [
+						{
+							content: 'remove',
+							tag: 'td',
+						},
+						{
+							[ syncId ]: 'cell-2',
+							content: 'keep',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		} );
+		const state = deleteColumn( tableWithSymbolIdentity, {
+			columnIndex: 0,
+		} );
+
+		expect( state.body[ 0 ][ syncId ] ).toBe( 'row-1' );
+		expect( state.body[ 0 ].cells[ 0 ][ syncId ] ).toBe( 'cell-2' );
 	} );
 
 	it( 'should delete all rows when only one column present', () => {
@@ -1336,6 +1388,41 @@ describe( 'updateSelectedCell', () => {
 		);
 
 		expect( updated.body[ 0 ].__unstableSyncId ).toBe( 'row-1' );
+	} );
+
+	it( 'preserves symbol row and cell properties when updating a cell', () => {
+		const syncId = Symbol( 'syncId' );
+		const tableWithSymbolIdentity = deepFreeze( {
+			body: [
+				{
+					[ syncId ]: 'row-1',
+					cells: [
+						{
+							[ syncId ]: 'cell-1',
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		} );
+		const cellSelection = {
+			type: 'cell',
+			sectionName: 'body',
+			rowIndex: 0,
+			columnIndex: 0,
+		};
+		const updated = updateSelectedCell(
+			tableWithSymbolIdentity,
+			cellSelection,
+			( cell ) => ( {
+				...cell,
+				content: 'test',
+			} )
+		);
+
+		expect( updated.body[ 0 ][ syncId ] ).toBe( 'row-1' );
+		expect( updated.body[ 0 ].cells[ 0 ][ syncId ] ).toBe( 'cell-1' );
 	} );
 
 	it( 'updates every cell in the column when the selection type is `column`', () => {
