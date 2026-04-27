@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix block appender button not visible on no ref navigation block. ([#77688](https://github.com/WordPress/gutenberg/pull/77688))
+
 ## 9.44.0 (2026-04-15)
 
 ## 9.43.0 (2026-04-01)
