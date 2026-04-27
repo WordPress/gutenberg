@@ -100,12 +100,20 @@ function cleanupScrollAttributes( el: HTMLElement ) {
  * attachments of the same node (Strict Mode remount, stable refs) without
  * re-running the effect.
  *
- * Change detection combines a `ResizeObserver` scoped to the container and
- * its direct children (to catch flex-layout growth) with a
- * `MutationObserver` on the entire subtree (to catch async content added
- * deep inside the scroll region). The MutationObserver itself doesn't add
- * per-descendant observers — it just refreshes the scroll-state attributes
- * on any subtree change, so cost stays bounded regardless of tree depth.
+ * Change detection combines a `ResizeObserver` scoped to the container
+ * and its direct children (to catch flex-layout growth) with a
+ * `MutationObserver` on direct-child additions/removals only (to keep
+ * the resize-observer set in sync as direct children come and go).
+ *
+ * Deeper subtree mutations are intentionally not observed: in practice,
+ * any descendant whose growth changes the scroll size also propagates a
+ * resize up the layout tree, so the existing `ResizeObserver` on direct
+ * children catches it. Watching the full subtree would fan out the
+ * mutation callback over every text-node insertion in content-heavy
+ * overlays (rich-text editors, virtualized lists), which isn't worth
+ * the cost of the rare deep-mutation-without-resize case. Revisit
+ * (and consider rAF-coalescing the callback) if a real consumer hits
+ * an attribute-staleness regression.
  *
  * Once CSS scroll-state container queries are supported across target
  * browsers, both the data attributes and this hook can be replaced with
@@ -175,15 +183,10 @@ export function useOverlayScrollStateAttributes<
 				}
 				updateScrollAttributes( node );
 			} );
-			// `subtree: true` so async content added deep inside the
-			// scroll region (rows appended to a nested list, a lazy
-			// component mounting into a wrapper that doesn't itself
-			// resize, etc.) still triggers attribute refresh. The
-			// callback only re-observes resize on direct children —
-			// subtree observation is purely for discovery.
+			// Direct children only — see the JSDoc above for why we
+			// intentionally don't observe the full subtree.
 			mutationObserver.observe( node, {
 				childList: true,
-				subtree: true,
 			} );
 		}
 
