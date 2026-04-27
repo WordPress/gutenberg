@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { lock, unlock } from '@wordpress/icons';
 import {
 	BlockControls,
 	useBlockProps,
@@ -31,6 +32,7 @@ const TEMPLATE = [
 export default function Edit( { context, clientId } ) {
 	const dialogId = context[ 'core/dialog-id' ] ?? '';
 	const isDialogOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
+	const isDialogLocked = context[ 'core/dialog-isDialogLocked' ] ?? false;
 
 	const { dialogClientId } = useSelect(
 		( select ) => ( {
@@ -48,6 +50,17 @@ export default function Edit( { context, clientId } ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( dialogClientId, {
 				editorIsDialogOpen: ! isDialogOpen,
+				// Clear the lock whenever the trigger explicitly closes the dialog.
+				...( isDialogOpen && { editorIsDialogLocked: false } ),
+			} );
+		}
+	};
+
+	const toggleLock = () => {
+		if ( dialogClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( dialogClientId, {
+				editorIsDialogLocked: ! isDialogLocked,
 			} );
 		}
 	};
@@ -76,6 +89,18 @@ export default function Edit( { context, clientId } ) {
 					>
 						{ buttonLabel }
 					</ToolbarButton>
+					{ isDialogOpen && (
+						<ToolbarButton
+							icon={ isDialogLocked ? lock : unlock }
+							label={
+								isDialogLocked
+									? __( 'Unlock dialog' )
+									: __( 'Lock dialog open' )
+							}
+							isPressed={ isDialogLocked }
+							onClick={ toggleLock }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...innerBlocksProps } />

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { lock, unlock } from '@wordpress/icons';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -35,6 +36,9 @@ export function Toolbar( {
 	buttonLabel,
 	dialogElementClientId,
 	toggleDialog,
+	editorIsDialogOpen,
+	editorIsDialogLocked,
+	toggleLock,
 } ) {
 	return (
 		<BlockControls __experimentalShareWithChildBlocks>
@@ -50,6 +54,18 @@ export function Toolbar( {
 				>
 					{ buttonLabel }
 				</ToolbarButton>
+				{ editorIsDialogOpen && (
+					<ToolbarButton
+						icon={ editorIsDialogLocked ? lock : unlock }
+						label={
+							editorIsDialogLocked
+								? __( 'Unlock dialog' )
+								: __( 'Lock dialog open' )
+						}
+						isPressed={ editorIsDialogLocked }
+						onClick={ toggleLock }
+					/>
+				) }
 			</ToolbarGroup>
 		</BlockControls>
 	);

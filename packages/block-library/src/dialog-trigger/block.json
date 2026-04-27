@@ -27,7 +27,7 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen" ],
+	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen", "core/dialog-isDialogLocked" ],
 	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-trigger",
 	"editorScript": "file:./index.js",

@@ -6,6 +6,7 @@
 	min-width: 320px;
 	max-width: 90vw;
 	width: fit-content;
+	transform-origin: center center;
 
 	// Default hidden state for animation
 	visibility: hidden;
@@ -58,7 +59,7 @@
 		opacity: 0;
 
 		@media not (prefers-reduced-motion) {
-			animation: turn-on-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
+			animation: backdrop-fade-in var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 		@media (prefers-reduced-motion) {
 			opacity: 0.5;
@@ -67,12 +68,15 @@
 
 	&.show-closing-animation:not(.active)::backdrop {
 		@media not (prefers-reduced-motion) {
-			animation: turn-off-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
+			animation: backdrop-fade-out var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 	}
 
 	&__inner {
 		margin-block-start: 0 !important;
+		& > :where(:not(.alignleft):not(.alignright):not(.alignfull)) {
+			width: 100vw;
+		}
 		& > *:first-child {
 			margin-top: 0;
 		}
@@ -89,8 +93,8 @@
 	}
 }
 
-// Animation keyframes (adapted from image block lightbox)
-@keyframes turn-on-visibility {
+// Dialog keyframes: scale + fade for the dialog element, pure fade for the backdrop
+@keyframes backdrop-fade-in {
 	0% {
 		opacity: 0;
 	}
@@ -99,12 +103,35 @@
 	}
 }
 
-@keyframes turn-off-visibility {
+@keyframes backdrop-fade-out {
 	0% {
 		opacity: 1;
 	}
 	100% {
 		opacity: 0;
+	}
+}
+
+// Dialog element keyframes (adapted from image block lightbox)
+@keyframes turn-on-visibility {
+	0% {
+		opacity: 0;
+		transform: scale(0.95);
+	}
+	100% {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes turn-off-visibility {
+	0% {
+		opacity: 1;
+		transform: scale(1);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.95);
 	}
 }
 

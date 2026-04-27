@@ -15,6 +15,11 @@
 			"role": "local",
 			"default": false
 		},
+		"editorIsDialogLocked": {
+			"type": "boolean",
+			"role": "local",
+			"default": false
+		},
 		"dialogLabel": {
 			"type": "string",
 			"default": ""
@@ -28,6 +33,7 @@
 	},
 	"providesContext": {
 		"core/dialog-isDialogOpen": "editorIsDialogOpen",
+		"core/dialog-isDialogLocked": "editorIsDialogLocked",
 		"core/dialog-label": "dialogLabel"
 	},
 	"usesContext": [ "core/dialog-id" ],

@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
+import { lock, unlock } from '@wordpress/icons';
 import {
 	BlockControls,
 	store as blockEditorStore,
@@ -10,7 +11,14 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
-export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
+export function Toolbar( {
+	openDialog,
+	closeDialog,
+	isOpen,
+	isLocked,
+	toggleLock,
+	clientId,
+} ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const { rootClientId } = useSelect(
 		( select ) => {
@@ -42,6 +50,18 @@ export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
 				>
 					{ buttonLabel }
 				</ToolbarButton>
+				{ isOpen && (
+					<ToolbarButton
+						icon={ isLocked ? lock : unlock }
+						label={
+							isLocked
+								? __( 'Unlock dialog' )
+								: __( 'Lock dialog open' )
+						}
+						isPressed={ isLocked }
+						onClick={ toggleLock }
+					/>
+				) }
 			</ToolbarGroup>
 		</BlockControls>
 	);

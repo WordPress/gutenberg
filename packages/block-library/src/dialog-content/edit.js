@@ -7,12 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Icon, close } from '@wordpress/icons';
-import {
-	useRef,
-	useEffect,
-	useState,
-	useCallback,
-} from '@wordpress/element';
+import { useRef, useEffect, useState, useCallback } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -26,12 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { Toolbar } from './controls';
 
-function Edit( {
-	attributes,
-	setAttributes,
-	context,
-	clientId,
-} ) {
+function Edit( { context, clientId } ) {
 	const {
 		selectBlock,
 		updateBlockAttributes,
@@ -39,6 +29,7 @@ function Edit( {
 	} = useDispatch( blockEditorStore );
 
 	const isOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
+	const isLocked = context[ 'core/dialog-isDialogLocked' ] ?? false;
 
 	const [ showClosingAnimation, setShowClosingAnimation ] = useState( false );
 
@@ -72,6 +63,7 @@ function Edit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( dialogClientId, {
 				editorIsDialogOpen: false,
+				editorIsDialogLocked: false,
 			} );
 		}
 		setShowClosingAnimation( false );
@@ -89,6 +81,15 @@ function Edit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( dialogClientId, {
 				editorIsDialogOpen: true,
+			} );
+		}
+	};
+
+	const toggleLock = () => {
+		if ( dialogClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( dialogClientId, {
+				editorIsDialogLocked: ! isLocked,
 			} );
 		}
 	};
@@ -128,6 +129,9 @@ function Edit( {
 	};
 
 	const onBackdropClick = ( event ) => {
+		if ( isLocked ) {
+			return;
+		}
 		if ( event.target === event.currentTarget ) {
 			closeDialog();
 		}
@@ -167,8 +171,9 @@ function Edit( {
 					openDialog={ openDialog }
 					closeDialog={ closeDialog }
 					isOpen={ isOpen }
+					isLocked={ isLocked }
+					toggleLock={ toggleLock }
 					clientId={ clientId }
-					attributes={ attributes }
 				/>
 				<button
 					className="wp-block-dialog-content__close-button"

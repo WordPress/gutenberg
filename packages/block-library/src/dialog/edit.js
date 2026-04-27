@@ -53,7 +53,11 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { editorIsDialogOpen = false, dialogLabel = '' } = attributes;
+	const {
+		editorIsDialogOpen = false,
+		editorIsDialogLocked = false,
+		dialogLabel = '',
+	} = attributes;
 
 	// Get the dialog-content block from inner blocks and check if it's selected.
 	const { dialogElementClientId, isDialogElementSelected } = useSelect(
@@ -124,7 +128,14 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		__unstableMarkNextChangeAsNotPersistent();
 		setAttributes( {
 			editorIsDialogOpen: ! editorIsDialogOpen,
+			// Reset lock whenever the toolbar explicitly closes the dialog.
+			...( editorIsDialogOpen && { editorIsDialogLocked: false } ),
 		} );
+	};
+
+	const toggleLock = () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { editorIsDialogLocked: ! editorIsDialogLocked } );
 	};
 
 	return (
@@ -137,12 +148,16 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				buttonLabel={ buttonLabel }
 				dialogElementClientId={ dialogElementClientId }
 				toggleDialog={ toggleDialog }
+				editorIsDialogOpen={ editorIsDialogOpen }
+				editorIsDialogLocked={ editorIsDialogLocked }
+				toggleLock={ toggleLock }
 			/>
 			<div { ...blockProps }>
 				<BlockContextProvider
 					value={ {
 						'core/dialog-id': dialogId || null,
 						'core/dialog-isDialogOpen': editorIsDialogOpen,
+						'core/dialog-isDialogLocked': editorIsDialogLocked,
 						'core/dialog-label': dialogLabel,
 					} }
 				>
