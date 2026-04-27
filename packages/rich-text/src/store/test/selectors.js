@@ -11,6 +11,7 @@ import {
 	getFormatType,
 	getFormatTypeForBareElement,
 	getFormatTypeForClassName,
+	getDisabledFormatTypesForBlock,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -77,6 +78,45 @@ describe( 'selectors', () => {
 			);
 
 			expect( result ).toEqual( formatTypeClassName );
+		} );
+	} );
+
+	describe( 'getDisabledFormatTypesForBlock', () => {
+		it( 'should return an empty array when no formats are disabled for the block', () => {
+			const state = deepFreeze( {
+				...defaultState,
+				disabledFormatTypesByBlock: {},
+			} );
+
+			expect(
+				getDisabledFormatTypesForBlock( state, 'core/heading' )
+			).toEqual( [] );
+		} );
+
+		it( 'should return the disabled format names for the given block', () => {
+			const state = deepFreeze( {
+				...defaultState,
+				disabledFormatTypesByBlock: {
+					'core/heading': [ 'core/italic', 'core/bold' ],
+				},
+			} );
+
+			expect(
+				getDisabledFormatTypesForBlock( state, 'core/heading' )
+			).toEqual( [ 'core/italic', 'core/bold' ] );
+		} );
+
+		it( 'should not return disabled formats from other blocks', () => {
+			const state = deepFreeze( {
+				...defaultState,
+				disabledFormatTypesByBlock: {
+					'core/paragraph': [ 'core/bold' ],
+				},
+			} );
+
+			expect(
+				getDisabledFormatTypesForBlock( state, 'core/heading' )
+			).toEqual( [] );
 		} );
 	} );
 } );

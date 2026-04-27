@@ -9,6 +9,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as richTextStore } from '../store';
 
+const EMPTY_ARRAY = [];
+
 function formatTypesSelector( select ) {
 	return select( richTextStore ).getFormatTypes();
 }
@@ -63,17 +65,33 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * @param {Object}  options                                    Options
  * @param {Array}   options.allowedFormats                     Allowed formats
  * @param {boolean} options.withoutInteractiveFormatting       Whether to clean the interactive formatting or not.
+ * @param {string}  [options.blockName]                        Optional block type name used to filter out format
+ *                                                             types disabled for that block via `unregisterFormatTypeInBlock`.
  * @param {Object}  options.__unstableFormatTypeHandlerContext Context object passed to experimental format type methods.
  */
 export function useFormatTypes( {
 	allowedFormats,
 	withoutInteractiveFormatting,
+	blockName,
 	__unstableFormatTypeHandlerContext,
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
+	const disabledFormatsForBlock = useSelect(
+		( select ) =>
+			blockName
+				? select( richTextStore ).getDisabledFormatTypesForBlock(
+						blockName
+				  )
+				: EMPTY_ARRAY,
+		[ blockName ]
+	);
 	const formatTypes = useMemo( () => {
 		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
 			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+				return false;
+			}
+
+			if ( disabledFormatsForBlock.includes( name ) ) {
 				return false;
 			}
 
@@ -86,7 +104,12 @@ export function useFormatTypes( {
 
 			return true;
 		} );
-	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
+	}, [
+		allFormatTypes,
+		allowedFormats,
+		disabledFormatsForBlock,
+		withoutInteractiveFormatting,
+	] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

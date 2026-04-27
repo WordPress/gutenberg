@@ -21,6 +21,7 @@ export { toDom as __unstableToDom } from './to-dom';
 export { toHTMLString } from './to-html-string';
 export { toggleFormat } from './toggle-format';
 export { unregisterFormatType } from './unregister-format-type';
+export { unregisterFormatTypeInBlock } from './unregister-format-type-in-block';
 export { createElement as __unstableCreateElement } from './create-element';
 
 export { privateApis } from './private-apis';

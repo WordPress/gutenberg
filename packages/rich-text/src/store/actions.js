@@ -35,3 +35,43 @@ export function removeFormatTypes( names ) {
 		names: Array.isArray( names ) ? names : [ names ],
 	};
 }
+
+/**
+ * Returns an action object used to disable a format type for a specific block type.
+ *
+ * Ignored from documentation as unregisterFormatTypeInBlock should be used instead from @wordpress/rich-text
+ *
+ * @ignore
+ *
+ * @param {string} blockName  Block name (e.g. 'core/heading').
+ * @param {string} formatName Format type name (e.g. 'core/bold').
+ *
+ * @return {Object} Action object.
+ */
+export function disableFormatTypeInBlock( blockName, formatName ) {
+	return {
+		type: 'DISABLE_FORMAT_TYPE_IN_BLOCK',
+		blockName,
+		formatName,
+	};
+}
+
+/**
+ * Returns an action object used to re-enable a format type for a specific block type.
+ *
+ * Ignored from documentation as registerFormatTypeInBlock should be used instead from @wordpress/rich-text
+ *
+ * @ignore
+ *
+ * @param {string} blockName  Block name (e.g. 'core/heading').
+ * @param {string} formatName Format type name (e.g. 'core/bold').
+ *
+ * @return {Object} Action object.
+ */
+export function enableFormatTypeInBlock( blockName, formatName ) {
+	return {
+		type: 'ENABLE_FORMAT_TYPE_IN_BLOCK',
+		blockName,
+		formatName,
+	};
+}

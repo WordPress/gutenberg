@@ -239,6 +239,7 @@ function useRichTextBase( {
 export function useRichText( {
 	allowedFormats,
 	withoutInteractiveFormatting,
+	blockName,
 	onChange,
 	__unstableDependencies = [],
 	__unstableFormatTypeHandlerContext,
@@ -253,6 +254,7 @@ export function useRichText( {
 	} = useFormatTypes( {
 		allowedFormats,
 		withoutInteractiveFormatting,
+		blockName,
 		__unstableFormatTypeHandlerContext,
 	} );
 

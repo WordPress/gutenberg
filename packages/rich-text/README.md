@@ -454,6 +454,29 @@ _Returns_
 
 -   `WPFormat|undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
+### unregisterFormatTypeInBlock
+
+Disables a format type for a specific block type. Unlike `unregisterFormatType`, which removes the format globally, this function hides the format only when editing a particular block type.
+
+_Usage_
+
+```js
+import { unregisterFormatTypeInBlock } from '@wordpress/rich-text';
+
+// Disable italic and bold formatting in heading blocks.
+unregisterFormatTypeInBlock( 'core/heading', 'core/italic' );
+unregisterFormatTypeInBlock( 'core/heading', 'core/bold' );
+```
+
+_Parameters_
+
+-   _blockName_ `string`: The name of the block type (e.g. 'core/heading').
+-   _formatName_ `string`: The name of the format type to disable (e.g. 'core/italic').
+
+_Returns_
+
+-   `WPFormat|undefined`: The format settings if successfully disabled; otherwise `undefined`.
+
 ### useAnchor
 
 This hook, to be used in a format type's Edit component, returns the active element that is formatted, or a virtual element for the selection range if no format is active. The returned value is meant to be used for positioning UI, e.g. by passing it to the `Popover` component via the `anchor` prop.
