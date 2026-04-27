@@ -23,7 +23,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 		sideOffset = 4,
 		children,
 		className,
-		style,
 		...props
 	},
 	ref
@@ -47,7 +46,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 			<ThemeProvider color={ { bg: '#1e1e1e' } }>
 				<_Tooltip.Popup
 					ref={ ref }
-					style={ style }
 					className={ clsx( styles.popup, className ) }
 					{ ...props }
 				>

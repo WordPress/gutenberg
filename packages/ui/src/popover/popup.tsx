@@ -47,7 +47,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		side = 'bottom',
 		sideOffset = 8,
 		sticky,
-		style,
 		variant = 'default',
 		...props
 	},
@@ -82,7 +81,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					ref={ mergedPopupRef }
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
-					style={ style }
 					className={ clsx(
 						variant !== 'unstyled' && styles.popup,
 						className
