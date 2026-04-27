@@ -130,39 +130,33 @@ dependency tree at runtime.
 
 ## Usage
 
-### Client: registering a widget
+### Client: registering widgets
 
-```js
-import { dispatch, select } from '@wordpress/data';
-import { store } from '@wordpress/widget-types';
-
-// Register a widget type.
-dispatch( store ).registerWidgetType( 'my-plugin/stats', {
-	title: 'Stats Overview',
-	renderModule: 'my-plugin/widgets/stats/render',
-} );
-
-// Query registered types.
-const types = select( store ).getWidgetTypes();
-const stats = select( store ).getWidgetType( 'my-plugin/stats' );
-```
-
-### Client: automated bootstrap (recommended)
-
-For widgets built with the `@wordpress/build` pipeline, registration
-is automatic. The widget scaffold provides:
+Widgets are authored by placing files under `widgets/<name>/`:
 
 - `widget.json` — build discovery metadata (name)
 - `widget.ts` — client-side metadata (`title`, `description`, etc.)
 - `render.tsx` — lazy-loaded React component
 
-The PHP loader and `bootstrapWidgetTypes()` handle the rest:
+The build pipeline discovers them, emits the manifest, and the PHP
+loader injects the bootstrap data. The client calls
+`bootstrapWidgetTypes()` once before rendering any surface that uses
+widgets:
 
 ```js
 import { bootstrapWidgetTypes } from '@wordpress/widget-types';
 
-// Call once before rendering any surface that uses widgets.
 await bootstrapWidgetTypes();
+```
+
+### Client: querying registered widgets
+
+```js
+import { select } from '@wordpress/data';
+import { store } from '@wordpress/widget-types';
+
+const types = select( store ).getWidgetTypes();
+const stats = select( store ).getWidgetType( 'my-plugin/stats' );
 ```
 
 ### Server: a surface opts in to widgets
