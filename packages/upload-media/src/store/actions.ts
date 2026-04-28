@@ -7,6 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
  * WordPress dependencies
  */
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
@@ -223,8 +224,9 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 						parentId,
 						new UploadError( {
 							code: 'IMAGE_PROCESSING_ERROR',
-							message:
-								'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
+							message: __(
+								'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+							),
 							file: parentItem.file,
 							cause: error instanceof Error ? error : undefined,
 						} )
