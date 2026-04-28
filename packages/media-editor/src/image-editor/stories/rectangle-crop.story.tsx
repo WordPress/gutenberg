@@ -173,6 +173,9 @@ const WithControlsComponent = () => {
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( false );
+	const [ gridMode, setGridMode ] = useState< 'off' | 'on' | 'interactive' >(
+		'interactive'
+	);
 	const { src, isCustom, handleFileChange, resetToSample } =
 		useUploadableImage();
 	const fileInputRef = useRef< HTMLInputElement >( null );
@@ -411,6 +414,28 @@ const WithControlsComponent = () => {
 					</FlexItem>
 					<FlexItem isBlock />
 					<FlexItem>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label="Grid"
+							hideLabelFromVision
+							value={ gridMode }
+							onChange={ ( value ) =>
+								setGridMode(
+									value as 'off' | 'on' | 'interactive'
+								)
+							}
+							options={ [
+								{ label: 'Grid: off', value: 'off' },
+								{ label: 'Grid: always on', value: 'on' },
+								{
+									label: 'Grid: interactive',
+									value: 'interactive',
+								},
+							] }
+						/>
+					</FlexItem>
+					<FlexItem>
 						<Button
 							__next40pxDefaultSize
 							variant="primary"
@@ -451,7 +476,15 @@ const WithControlsComponent = () => {
 				<Cropper
 					src={ src }
 					controller={ controller }
-					showGrid
+					showGrid={
+						(
+							{
+								off: false,
+								on: true,
+								interactive: 'interactive',
+							} as const
+						 )[ gridMode ]
+					}
 					showDimming
 					freeformCrop={ freeformCrop }
 					aspectRatio={ resolveAspectRatio(

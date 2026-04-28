@@ -58,6 +58,7 @@ $handle-touch-target-size: 44px;
 		position: absolute;
 		pointer-events: none;
 		overflow: hidden;
+		transition: opacity 0.2s ease;
 	}
 
 	&__grid-line {
