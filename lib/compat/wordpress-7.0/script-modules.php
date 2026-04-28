@@ -1,6 +1,6 @@
 <?php
 /**
- * Script Modules API: Polyfill for wp_set_script_module_translations().
+ * Script Modules API: Polyfill for script module translations.
  *
  * Provides translation support for script modules on WordPress versions
  * that do not yet include this functionality in Core.
@@ -9,145 +9,94 @@
  * @since X.X.X
  */
 
-if ( ! function_exists( 'wp_set_script_module_translations' ) ) {
+/**
+ * Gets the raw source URL for a registered script module.
+ *
+ * Uses WP_Script_Modules::get_registered() if available (WP 7.0+),
+ * otherwise falls back to reflection to access the private registered array.
+ *
+ * @since X.X.X
+ *
+ * @param string $id The script module identifier.
+ * @return string|null The script module source URL, or null if not registered.
+ */
+function gutenberg_get_script_module_src( string $id ): ?string {
+	$script_modules = wp_script_modules();
 
-	/**
-	 * Gets the raw source URL for a registered script module.
-	 *
-	 * Uses WP_Script_Modules::get_registered() if available (WP 7.0+),
-	 * otherwise falls back to reflection to access the private registered array.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param string $id The script module identifier.
-	 * @return string|null The script module source URL, or null if not registered.
-	 */
-	function gutenberg_get_script_module_src( string $id ): ?string {
-		$script_modules = wp_script_modules();
-
-		if ( method_exists( $script_modules, 'get_registered' ) ) {
-			$module = $script_modules->get_registered( $id );
-			return null === $module ? null : ( $module['src'] ?? null );
-		}
-
-		// Fallback for WP versions without get_registered().
-		$reflection = new ReflectionClass( $script_modules );
-		$prop       = $reflection->getProperty( 'registered' );
-		$prop->setAccessible( true );
-		$registered = $prop->getValue( $script_modules );
-
-		return $registered[ $id ]['src'] ?? null;
+	if ( method_exists( $script_modules, 'get_registered' ) ) {
+		$module = $script_modules->get_registered( $id );
+		return null === $module ? null : ( $module['src'] ?? null );
 	}
 
-	/**
-	 * Storage for text-domain overrides for specific script modules.
-	 *
-	 * Only populated when a caller explicitly overrides the text domain for a
-	 * module via wp_set_script_module_translations().
-	 *
-	 * @var array<string, array{textdomain: string, path: string}>
-	 */
-	global $gutenberg_script_module_translations;
-	$gutenberg_script_module_translations = array();
+	// Fallback for WP versions without get_registered().
+	$reflection = new ReflectionClass( $script_modules );
+	$prop       = $reflection->getProperty( 'registered' );
+	$prop->setAccessible( true );
+	$registered = $prop->getValue( $script_modules );
 
-	/**
-	 * Overrides the text domain and path used to load translations for a script module.
-	 *
-	 * Translations for script modules are loaded automatically from the default
-	 * text domain. This function is only needed when a module's text domain
-	 * differs from 'default' or when translation files live outside the
-	 * standard location.
-	 *
-	 * @since X.X.X
-	 *
-	 * @param string $id     The identifier of the script module.
-	 * @param string $domain Optional. Text domain. Default 'default'.
-	 * @param string $path   Optional. The full file path to the directory containing translation files.
-	 * @return bool True if the text domain was registered, false if the module is not registered.
-	 */
-	function wp_set_script_module_translations( string $id, string $domain = 'default', string $path = '' ): bool {
-		global $gutenberg_script_module_translations;
-
-		$src = gutenberg_get_script_module_src( $id );
-		if ( null === $src ) {
-			return false;
-		}
-
-		$gutenberg_script_module_translations[ $id ] = array(
-			'textdomain' => $domain,
-			'path'       => $path,
-		);
-
-		return true;
-	}
-
-	/**
-	 * Prints translations for all enqueued script modules.
-	 *
-	 * Auto-detects the text domain for each enqueued module. Callers can opt
-	 * into a non-default text domain via wp_set_script_module_translations().
-	 *
-	 * @since X.X.X
-	 */
-	function gutenberg_print_script_module_translations() {
-		global $gutenberg_script_module_translations;
-
-		$script_modules = wp_script_modules();
-		$queue          = $script_modules->get_queue();
-		if ( empty( $queue ) ) {
-			return;
-		}
-
-		// Collect enqueued modules and their static/dynamic dependencies.
-		$module_ids = array();
-		$reflection = new ReflectionClass( $script_modules );
-		if ( $reflection->hasMethod( 'get_sorted_dependencies' ) ) {
-			$method = $reflection->getMethod( 'get_sorted_dependencies' );
-			$method->setAccessible( true );
-			$module_ids = $method->invoke( $script_modules, $queue );
-		} else {
-			$module_ids = $queue;
-		}
-
-		$set_locale_data_js_function = <<<'JS'
-		( domain, translations ) => {
-			const localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
-			localeData[""].domain = domain;
-			wp.i18n.setLocaleData( localeData, domain );
-		}
-		JS;
-
-		foreach ( $module_ids as $id ) {
-			$domain = $gutenberg_script_module_translations[ $id ]['textdomain'] ?? 'default';
-			$path   = $gutenberg_script_module_translations[ $id ]['path'] ?? '';
-
-			$json_translations = load_script_module_textdomain( $id, $domain, $path );
-			if ( ! $json_translations ) {
-				continue;
-			}
-
-			$output     = sprintf(
-				'( %s )( %s, %s );',
-				$set_locale_data_js_function,
-				wp_json_encode( $domain ),
-				$json_translations
-			);
-			$source_url = rawurlencode( "wp-script-module-translation-data-{$id}" );
-			$output    .= "\n//# sourceURL={$source_url}";
-
-			// Ensure wp-i18n is printed; the inline script below relies on wp.i18n.setLocaleData().
-			if ( ! wp_script_is( 'wp-i18n', 'done' ) ) {
-				wp_scripts()->do_items( array( 'wp-i18n' ) );
-			}
-
-			wp_print_inline_script_tag( $output, array( 'id' => "wp-script-module-translation-data-{$id}" ) );
-		}
-	}
-
-	// Print translations after classic scripts are loaded (priority 10) but before modules execute.
-	add_action( 'wp_footer', 'gutenberg_print_script_module_translations', 21 );
-	add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_translations', 11 );
+	return $registered[ $id ]['src'] ?? null;
 }
+
+/**
+ * Prints translations for all enqueued script modules.
+ *
+ * Auto-detects the text domain for each enqueued module from its source URL.
+ *
+ * @since X.X.X
+ */
+function gutenberg_print_script_module_translations() {
+	$script_modules = wp_script_modules();
+	$queue          = $script_modules->get_queue();
+	if ( empty( $queue ) ) {
+		return;
+	}
+
+	// Collect enqueued modules and their static/dynamic dependencies.
+	$module_ids = array();
+	$reflection = new ReflectionClass( $script_modules );
+	if ( $reflection->hasMethod( 'get_sorted_dependencies' ) ) {
+		$method = $reflection->getMethod( 'get_sorted_dependencies' );
+		$method->setAccessible( true );
+		$module_ids = $method->invoke( $script_modules, $queue );
+	} else {
+		$module_ids = $queue;
+	}
+
+	$set_locale_data_js_function = <<<'JS'
+	( domain, translations ) => {
+		const localeData = translations.locale_data[ domain ] || translations.locale_data.messages;
+		localeData[""].domain = domain;
+		wp.i18n.setLocaleData( localeData, domain );
+	}
+	JS;
+
+	foreach ( $module_ids as $id ) {
+		$json_translations = load_script_module_textdomain( $id );
+		if ( ! $json_translations ) {
+			continue;
+		}
+
+		$output     = sprintf(
+			'( %s )( %s, %s );',
+			$set_locale_data_js_function,
+			wp_json_encode( 'default' ),
+			$json_translations
+		);
+		$source_url = rawurlencode( "wp-script-module-translation-data-{$id}" );
+		$output    .= "\n//# sourceURL={$source_url}";
+
+		// Ensure wp-i18n is printed; the inline script below relies on wp.i18n.setLocaleData().
+		if ( ! wp_script_is( 'wp-i18n', 'done' ) ) {
+			wp_scripts()->do_items( array( 'wp-i18n' ) );
+		}
+
+		wp_print_inline_script_tag( $output, array( 'id' => "wp-script-module-translation-data-{$id}" ) );
+	}
+}
+
+// Print translations after classic scripts are loaded (priority 10) but before modules execute.
+add_action( 'wp_footer', 'gutenberg_print_script_module_translations', 21 );
+add_action( 'admin_print_footer_scripts', 'gutenberg_print_script_module_translations', 11 );
 
 if ( ! function_exists( 'load_script_module_textdomain' ) ) {
 	/**
