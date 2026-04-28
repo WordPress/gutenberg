@@ -32,29 +32,111 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 	protected $parent_post_type;
 
 	/**
+	 * Parent controller used to format restore responses.
+	 *
+	 * Falls back to the post type's registered REST controller when null,
+	 * which is the right behavior for the standard /wp/v2/guidelines route.
+	 * The content-guidelines route passes its own controller in so restore
+	 * responses keep the singleton shape.
+	 *
+	 * @var WP_REST_Controller|null
+	 */
+	protected $parent_controller;
+
+	/**
 	 * Constructor.
 	 *
-	 * @param string $parent_post_type Post type of the parent.
+	 * @param string                  $parent_post_type  Post type of the parent.
+	 * @param string|null             $parent_base       Optional. Override the parent base segment of the route.
+	 *                                                   Defaults to the post type's registered rest_base.
+	 * @param WP_REST_Controller|null $parent_controller Optional. Controller instance used to shape restore responses.
+	 *                                                   Defaults to the post type's registered REST controller.
 	 */
-	public function __construct( $parent_post_type = 'wp_guideline' ) {
+	public function __construct( $parent_post_type = 'wp_guideline', $parent_base = null, $parent_controller = null ) {
 		parent::__construct( $parent_post_type );
 
 		// Re-set private properties from WP_REST_Revisions_Controller.
 		$this->parent_post_type = $parent_post_type;
 		$post_type_object       = get_post_type_object( $parent_post_type );
-		$this->parent_base      = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+
+		if ( null !== $parent_base ) {
+			$this->parent_base = $parent_base;
+		} else {
+			$this->parent_base = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+		}
+
+		$this->parent_controller = $parent_controller;
 	}
 
 	/**
 	 * Registers the routes for guideline revisions.
 	 *
-	 * Calls parent to register standard list + single revision routes,
-	 * then adds a custom restore endpoint.
+	 * Mirrors the route shape of WP_REST_Revisions_Controller::register_routes()
+	 * but uses this controller's $parent_base so the same class can be mounted
+	 * under multiple parent bases (e.g. /content-guidelines and /guidelines).
+	 * The parent's $parent_base is private, so calling parent::register_routes()
+	 * would always register under the post type's rest_base regardless of any
+	 * override done here.
 	 */
 	public function register_routes() {
-		parent::register_routes();
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base,
+			array(
+				'args'   => array(
+					'parent' => array(
+						'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
 
-		// Register restore revision route.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				'args'   => array(
+					'parent' => array(
+						'description' => __( 'The ID for the parent of the revision.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+					'id'     => array(
+						'description' => __( 'Unique identifier for the revision.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => array(
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Required to be true, as revisions do not support trashing.', 'gutenberg' ),
+						),
+					),
+				),
+				'schema' => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->parent_base . '/(?P<parent>[\d]+)/' . $this->rest_base . '/(?P<id>[\d]+)/restore',
@@ -205,11 +287,14 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 			);
 		}
 
-		// Return the updated parent post using its registered controller for
+		// Return the updated parent post using the registered controller for
 		// consistent response formatting including _links and field filtering.
-		$post             = get_post( $parent->ID );
-		$post_type_object = get_post_type_object( $this->parent_post_type );
-		$controller       = $post_type_object->get_rest_controller();
+		$post       = get_post( $parent->ID );
+		$controller = $this->parent_controller;
+		if ( null === $controller ) {
+			$post_type_object = get_post_type_object( $this->parent_post_type );
+			$controller       = $post_type_object->get_rest_controller();
+		}
 
 		return $controller->prepare_item_for_response( $post, $request );
 	}

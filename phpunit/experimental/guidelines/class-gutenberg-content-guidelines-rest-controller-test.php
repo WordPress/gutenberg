@@ -1,10 +1,10 @@
 <?php
 /**
- * Tests for the Guidelines REST API Controller.
+ * Tests for the Content Guidelines REST API Controller (singleton).
  *
  * @package gutenberg
  */
-class Gutenberg_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
+class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_Controller_Testcase {
 
 	/**
 	 * @var int Administrator user ID.
@@ -21,7 +21,7 @@ class Gutenberg_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_C
 	 *
 	 * @var string
 	 */
-	const REST_BASE = '/wp/v2/guidelines';
+	const REST_BASE = '/wp/v2/content-guidelines';
 
 	/**
 	 * Set up class fixtures.
@@ -721,7 +721,7 @@ class Gutenberg_Guidelines_REST_Controller_Test extends WP_Test_REST_Post_Type_C
 		$data     = $response->get_data();
 		$schema   = $data['schema'];
 
-		$this->assertSame( 'guidelines', $schema['title'] );
+		$this->assertSame( 'content-guidelines', $schema['title'] );
 		$this->assertArrayHasKey( 'id', $schema['properties'] );
 		$this->assertArrayHasKey( 'status', $schema['properties'] );
 		$this->assertArrayHasKey( 'guideline_categories', $schema['properties'] );

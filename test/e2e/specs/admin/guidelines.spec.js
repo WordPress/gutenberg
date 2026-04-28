@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const GUIDELINES_PAGE_QUERY = 'page=guidelines-wp-admin';
-const GUIDELINES_REST_BASE = '/wp/v2/guidelines';
+const GUIDELINES_REST_BASE = '/wp/v2/content-guidelines';
 
 // Remove any existing singleton guideline post so each test starts from a
 // clean slate. Uses REST for speed — this is test scaffolding, not the

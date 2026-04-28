@@ -118,8 +118,6 @@ class Gutenberg_Guidelines_Post_Type {
 				'show_in_menu'                    => false,
 				'show_in_rest'                    => true,
 				'rest_base'                       => 'guidelines',
-				'rest_controller_class'           => 'Gutenberg_Guidelines_REST_Controller',
-				'revisions_rest_controller_class' => 'Gutenberg_Guidelines_Revisions_Controller',
 				'capability_type'                 => 'guideline',
 				'map_meta_cap'                    => true,
 				'capabilities'                    => array(
