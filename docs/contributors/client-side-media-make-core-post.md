@@ -62,7 +62,7 @@ On the PHP side:
 - **Cross-origin isolation** — `gutenberg_start_cross_origin_isolation_output_buffer()` sends `Document-Isolation-Policy` on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` for Chromium 137+. The behavior is filterable via `gutenberg_use_document_isolation_policy`.
 - **REST API extensions** — New `generate_sub_sizes` and `convert_format` parameters, sideload endpoint (`POST /wp/v2/media/{id}/sideload`), finalize endpoint (`POST /wp/v2/media/{id}/finalize`), `replace_file` flag for HEIC companion uploads, and new response fields (`exif_orientation`, `missing_image_sizes`, `filename`, `filesize`).
 
-For the full architecture deep-dive, see the [client-side media processing architecture documentation](https://developer.wordpress.org/block-editor/explanations/architecture/client-side-media/).
+For the full architecture deep-dive, see the [client-side media processing architecture documentation](https://developer.wordpress.org/block-editor/explanations/architecture/client-side-media-architecture/).
 
 ## What plugin developers need to know
 
@@ -189,7 +189,7 @@ Please report any issues on the [Gutenberg GitHub repository](https://github.com
 
 For detailed developer documentation, see:
 
-- [Architecture explanation](https://developer.wordpress.org/block-editor/explanations/architecture/client-side-media/)
+- [Architecture explanation](https://developer.wordpress.org/block-editor/explanations/architecture/client-side-media-architecture/)
 - [Developer how-to guide](https://developer.wordpress.org/block-editor/how-to-guides/client-side-media/)
 - [Editor filters reference](https://developer.wordpress.org/block-editor/reference-guides/filters/editor-filters/#client-side-media-processing)
 

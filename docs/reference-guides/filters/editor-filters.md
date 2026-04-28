@@ -228,7 +228,7 @@ function example_filter_block_editor_rest_api_preload_paths_when_post_provided( 
 
 Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly. The following filters and parameters control its behavior.
 
-For a full overview, see the [architecture explanation](/docs/explanations/architecture/client-side-media.md) and the [developer how-to guide](/docs/how-to-guides/client-side-media.md).
+For a full overview, see the [architecture explanation](/docs/explanations/architecture/client-side-media-architecture.md) and the [developer how-to guide](/docs/how-to-guides/client-side-media.md).
 
 ### `wp_client_side_media_processing_enabled`
 

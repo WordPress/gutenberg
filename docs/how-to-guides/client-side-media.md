@@ -6,7 +6,7 @@ Client-side media processing handles image compression, resizing, format convers
 
 This guide covers how plugin and theme developers can interact with, customize, and troubleshoot client-side media processing.
 
-For a deep dive into the architecture, see [Client-side media processing architecture](/docs/explanations/architecture/client-side-media.md).
+For a deep dive into the architecture, see [Client-side media processing architecture](/docs/explanations/architecture/client-side-media-architecture.md).
 
 ## Disabling client-side media processing
 
