@@ -28,6 +28,8 @@ export interface UseInteractionReturn {
 	isDragging: boolean;
 	/** Whether a double-tap zoom animation is in progress. */
 	isZooming: boolean;
+	/** Whether the user is currently performing a placement interaction. */
+	isPlacementInteracting: boolean;
 }
 
 /**
@@ -48,6 +50,21 @@ export interface UseInteractionOptions {
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointer release). */
 	onGestureEnd?: () => void;
+}
+
+/** How long keyboard placement stays active after the latest handled key. */
+const KEYBOARD_INTERACTION_IDLE_MS = 300;
+
+function isHandledKeyboardPan( event: KeyboardEvent ): boolean {
+	switch ( event.key ) {
+		case 'ArrowUp':
+		case 'ArrowDown':
+		case 'ArrowLeft':
+		case 'ArrowRight':
+			return true;
+		default:
+			return false;
+	}
 }
 
 /**
@@ -74,6 +91,10 @@ export function useInteraction(
 ): UseInteractionReturn {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isZooming, setIsZooming ] = useState( false );
+	const [ isPlacementInteracting, setIsPlacementInteracting ] =
+		useState( false );
+	const keyboardInteractionTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	// Keep mutable refs so the controller always reads fresh values
 	// without needing to be recreated.
@@ -89,6 +110,30 @@ export function useInteraction(
 	actionsRef.current = actions;
 
 	const controllerRef = useRef< InteractionController | null >( null );
+
+	const startPlacementInteracting = useCallback( () => {
+		clearTimeout( keyboardInteractionTimerRef.current );
+		setIsPlacementInteracting( true );
+	}, [] );
+
+	const stopPlacementInteracting = useCallback( () => {
+		clearTimeout( keyboardInteractionTimerRef.current );
+		setIsPlacementInteracting( false );
+	}, [] );
+
+	const signalKeyboardPlacement = useCallback( () => {
+		setIsPlacementInteracting( true );
+		clearTimeout( keyboardInteractionTimerRef.current );
+		keyboardInteractionTimerRef.current = setTimeout( () => {
+			setIsPlacementInteracting( false );
+		}, KEYBOARD_INTERACTION_IDLE_MS );
+	}, [] );
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( keyboardInteractionTimerRef.current );
+		};
+	}, [] );
 
 	// Create / destroy the controller. The controller reads all volatile
 	// values through refs, so it can stay mounted across render updates.
@@ -125,6 +170,11 @@ export function useInteraction(
 			onStatusChange: ( status ) => {
 				setIsDragging( status.isDragging );
 				setIsZooming( status.isZooming );
+				if ( status.isDragging ) {
+					startPlacementInteracting();
+				} else {
+					stopPlacementInteracting();
+				}
 			},
 		} );
 		controllerRef.current = controller;
@@ -132,7 +182,7 @@ export function useInteraction(
 			controller.destroy();
 			controllerRef.current = null;
 		};
-	}, [] );
+	}, [ startPlacementInteracting, stopPlacementInteracting ] );
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		const el = e.currentTarget as HTMLElement;
@@ -149,9 +199,15 @@ export function useInteraction(
 		);
 	}, [] );
 
-	const onKeyDown = useCallback( ( e: React.KeyboardEvent ) => {
-		controllerRef.current?.handleKeyDown( e.nativeEvent );
-	}, [] );
+	const onKeyDown = useCallback(
+		( e: React.KeyboardEvent ) => {
+			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
+				signalKeyboardPlacement();
+			}
+			controllerRef.current?.handleKeyDown( e.nativeEvent );
+		},
+		[ signalKeyboardPlacement ]
+	);
 
 	const onWheelNative = useCallback( ( e: WheelEvent ) => {
 		controllerRef.current?.handleWheel( e );
@@ -166,5 +222,6 @@ export function useInteraction(
 		onWheelNative,
 		isDragging,
 		isZooming,
+		isPlacementInteracting,
 	};
 }

@@ -40,6 +40,9 @@ import './cropper.scss';
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
 
+/** How long to wait after the last placement change before fading the grid out. */
+const GRID_FADE_DELAY_MS = 100;
+
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
 // rect (1×1) if `aspectRatio` is unset or non-positive.
@@ -81,8 +84,13 @@ export interface CropperProps {
 	controller: UseCropperStateReturn;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
-	/** Show the rule-of-thirds grid overlay. */
-	showGrid?: boolean;
+	/**
+	 * Controls the rule-of-thirds grid overlay.
+	 * - `false` (default): grid is never shown.
+	 * - `true`: grid is always shown.
+	 * - `'interactive'`: grid is shown for placement interactions.
+	 */
+	showGrid?: boolean | 'interactive';
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -132,7 +140,7 @@ export interface CropperProps {
  * @param root0.src            Image source URL.
  * @param root0.controller     The full state/setter object from `useCropperState`.
  * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Show rule-of-thirds grid overlay.
+ * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
  * @param root0.showDimming    Show dimming overlay outside crop.
  * @param root0.minZoom        Minimum zoom level.
  * @param root0.maxZoom        Maximum zoom level.
@@ -164,7 +172,7 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const { state, setImage, setCropRect, settleCrop } = controller;
+	const { state, setImage, setCropRect, settleCrop, isDirty } = controller;
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -274,18 +282,18 @@ function CropperInner(
 	}, [ state, elementSize, visualSize, canvasSize ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
-	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
-		state,
-		controller,
-		canvasSize,
-		visualSize,
-		{
-			minZoom,
-			maxZoom,
-			onGestureStart,
-			onGestureEnd,
-		}
-	);
+	const {
+		handlers,
+		onWheelNative,
+		isDragging,
+		isZooming,
+		isPlacementInteracting,
+	} = useInteraction( state, controller, canvasSize, visualSize, {
+		minZoom,
+		maxZoom,
+		onGestureStart,
+		onGestureEnd,
+	} );
 
 	// Register wheel handler natively with { passive: false } so
 	// preventDefault works. React's onWheel registers as passive. Bound
@@ -351,6 +359,144 @@ function CropperInner(
 		};
 	}, [] );
 
+	// Interactive grid: keep it visible for direct placement gestures
+	// (pan/crop-resize), and briefly flash it for zoom changes.
+	const [ gridVisible, setGridVisible ] = useState( false );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const gridInteractionReadyRef = useRef( false );
+	const isCropperInteracting = isPlacementInteracting || isResizing;
+	const previousPlacementValuesRef = useRef( {
+		zoom: state.zoom,
+		panX: state.pan.x,
+		panY: state.pan.y,
+		rotation: state.rotation,
+		flipHorizontal: state.flip.horizontal,
+		flipVertical: state.flip.vertical,
+		cropX: state.cropRect.x,
+		cropY: state.cropRect.y,
+		cropWidth: state.cropRect.width,
+		cropHeight: state.cropRect.height,
+	} );
+
+	const showInteractiveGrid = useCallback( () => {
+		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
+			return;
+		}
+		clearTimeout( gridFadeTimerRef.current );
+		setGridVisible( true );
+	}, [ showGrid ] );
+
+	const fadeInteractiveGridSoon = useCallback( () => {
+		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
+			return;
+		}
+		clearTimeout( gridFadeTimerRef.current );
+		gridFadeTimerRef.current = setTimeout( () => {
+			setGridVisible( false );
+		}, GRID_FADE_DELAY_MS );
+	}, [ showGrid ] );
+
+	// Defer readiness until after image load and its dependent effects settle,
+	// so automatic initialisation changes don't trigger the interactive grid.
+	useEffect( () => {
+		gridInteractionReadyRef.current = false;
+		if ( ! state.image ) {
+			return;
+		}
+		const id = setTimeout( () => {
+			gridInteractionReadyRef.current = true;
+		}, 0 );
+		return () => clearTimeout( id );
+	}, [ state.image ] );
+
+	useEffect( () => {
+		if ( showGrid !== 'interactive' ) {
+			return;
+		}
+		if ( isCropperInteracting ) {
+			showInteractiveGrid();
+			return;
+		}
+		if ( gridVisible ) {
+			fadeInteractiveGridSoon();
+		}
+		return () => {
+			clearTimeout( gridFadeTimerRef.current );
+		};
+	}, [
+		isCropperInteracting,
+		gridVisible,
+		showGrid,
+		showInteractiveGrid,
+		fadeInteractiveGridSoon,
+	] );
+
+	useEffect( () => {
+		const previous = previousPlacementValuesRef.current;
+		const current = {
+			zoom: state.zoom,
+			panX: state.pan.x,
+			panY: state.pan.y,
+			rotation: state.rotation,
+			flipHorizontal: state.flip.horizontal,
+			flipVertical: state.flip.vertical,
+			cropX: state.cropRect.x,
+			cropY: state.cropRect.y,
+			cropWidth: state.cropRect.width,
+			cropHeight: state.cropRect.height,
+		};
+		previousPlacementValuesRef.current = current;
+
+		if (
+			showGrid !== 'interactive' ||
+			isCropperInteracting ||
+			! gridInteractionReadyRef.current ||
+			! isDirty
+		) {
+			return;
+		}
+
+		const zoomOrPanChanged =
+			previous.zoom !== current.zoom ||
+			previous.panX !== current.panX ||
+			previous.panY !== current.panY;
+		const cropRectChanged =
+			previous.cropX !== current.cropX ||
+			previous.cropY !== current.cropY ||
+			previous.cropWidth !== current.cropWidth ||
+			previous.cropHeight !== current.cropHeight;
+		const orientationChanged =
+			previous.rotation !== current.rotation ||
+			previous.flipHorizontal !== current.flipHorizontal ||
+			previous.flipVertical !== current.flipVertical;
+
+		if ( zoomOrPanChanged && ! cropRectChanged && ! orientationChanged ) {
+			showInteractiveGrid();
+			fadeInteractiveGridSoon();
+		}
+	}, [
+		state.zoom,
+		state.pan.x,
+		state.pan.y,
+		state.rotation,
+		state.flip.horizontal,
+		state.flip.vertical,
+		state.cropRect.x,
+		state.cropRect.y,
+		state.cropRect.width,
+		state.cropRect.height,
+		showGrid,
+		isCropperInteracting,
+		isDirty,
+		showInteractiveGrid,
+		fadeInteractiveGridSoon,
+	] );
+
+	useEffect( () => {
+		return () => clearTimeout( gridFadeTimerRef.current );
+	}, [] );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -360,9 +506,20 @@ function CropperInner(
 	}, [] );
 
 	/**
+	 * Handle resize start — resize handles live outside useInteraction, so
+	 * they provide their own interaction signal for the interactive grid.
+	 */
+	const handleResizeStart = useCallback( () => {
+		setIsResizing( true );
+		showInteractiveGrid();
+		onGestureStart?.();
+	}, [ showInteractiveGrid, onGestureStart ] );
+
+	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
+		setIsResizing( false );
 		setSettling( true );
 		settleCrop();
 		onGestureEnd?.();
@@ -465,7 +622,7 @@ function CropperInner(
 					containerSize={ canvasSize }
 					imageSize={ visualSize }
 					onCropChange={ handleCropChange }
-					onResizeStart={ onGestureStart }
+					onResizeStart={ handleResizeStart }
 					onResizeEnd={ handleResizeEnd }
 					onEscape={ handleEscape }
 					aspectRatio={ aspectRatio }
@@ -475,11 +632,14 @@ function CropperInner(
 				/>
 
 				{ /* Rule-of-thirds grid */ }
-				{ showGrid && (
+				{ ( showGrid === true || showGrid === 'interactive' ) && (
 					<GridOverlay
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
 						imageSize={ visualSize }
+						opacity={
+							showGrid === 'interactive' && ! gridVisible ? 0 : 1
+						}
 					/>
 				) }
 
