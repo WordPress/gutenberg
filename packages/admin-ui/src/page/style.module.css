@@ -39,7 +39,7 @@
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	flex-shrink: 0;
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. *
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
 	width: calc(var(--wpds-dimension-base) * 6);
 	height: calc(var(--wpds-dimension-base) * 6);
 
