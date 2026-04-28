@@ -1,10 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	getOverlayLegacySlot,
-	OVERLAY_LEGACY_SLOT_CLASSNAME,
-} from '../overlay-legacy-slot';
+import { getOverlayLegacySlot, OVERLAY_LEGACY_SLOT_CLASSNAME } from '..';
 
 describe( 'getOverlayLegacySlot', () => {
 	afterEach( () => {
