@@ -12,6 +12,8 @@ add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_activity_wid
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_activity_widget' );
 add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_quick_draft_widget' );
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_quick_draft_widget' );
+add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_site_preview_widget' );
+add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_site_preview_widget' );
 
 /**
  * Registers the Dashboard Widgets menu item.
@@ -46,6 +48,22 @@ function gutenberg_dashboard_widgets_register_demo_widget() {
 
 	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
 		gutenberg_register_dashboard_wp_admin_route( '/__widget_demo_hello_world', $widget_module );
+	}
+}
+
+/**
+ * Wires the `site-preview` widget as a dynamic dep of the dashboard module so it
+ * lands in the import map and React.lazy in the dashboard stage can resolve it.
+ */
+function gutenberg_dashboard_widgets_register_site_preview_widget() {
+	$widget_module = 'wp/widgets/site-preview/render';
+
+	if ( function_exists( 'gutenberg_register_dashboard_route' ) ) {
+		gutenberg_register_dashboard_route( '/__widget_site_preview', $widget_module );
+	}
+
+	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
+		gutenberg_register_dashboard_wp_admin_route( '/__widget_site_preview', $widget_module );
 	}
 }
 
