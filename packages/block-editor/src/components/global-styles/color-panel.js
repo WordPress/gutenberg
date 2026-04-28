@@ -693,9 +693,7 @@ export default function ColorPanel( {
 			onChange( newValue );
 		};
 		const supportsTextColor = true;
-		// Background color is not supported for `caption`
-		// as there isn't yet a way to set padding for the element.
-		const supportsBackground = name !== 'caption';
+		const supportsBackground = true;
 
 		items.push( {
 			key: name,

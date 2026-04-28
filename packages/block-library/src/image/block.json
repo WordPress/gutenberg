@@ -113,7 +113,8 @@
 		"anchor": true,
 		"color": {
 			"text": false,
-			"background": false
+			"background": false,
+			"caption": true
 		},
 		"filter": {
 			"duotone": true

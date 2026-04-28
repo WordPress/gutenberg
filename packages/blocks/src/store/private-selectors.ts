@@ -19,6 +19,7 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'color',
 	'linkColor',
 	'captionColor',
+	'captionBackgroundColor',
 	'buttonColor',
 	'headingColor',
 	'fontFamily',

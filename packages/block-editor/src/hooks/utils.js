@@ -298,6 +298,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		isCaptionEnabled,
 		shadow,
 	] = useSettings(
 		'background.backgroundImage',
@@ -362,6 +363,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.text',
 		'color.heading',
 		'color.button',
+		'color.caption',
 		'shadow'
 	);
 
@@ -398,6 +400,7 @@ export function useBlockSettings( name, parentLayout ) {
 				link: isLinkEnabled,
 				heading: isHeadingEnabled,
 				button: isButtonEnabled,
+				caption: isCaptionEnabled,
 				text: isTextEnabled,
 			},
 			typography: {
@@ -520,6 +523,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		isCaptionEnabled,
 		shadow,
 	] );
 

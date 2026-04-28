@@ -377,6 +377,7 @@ const elementTypes = [
 		elementType: 'heading',
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	},
+	{ elementType: 'caption' },
 ];
 
 // Used for generating the instance ID
