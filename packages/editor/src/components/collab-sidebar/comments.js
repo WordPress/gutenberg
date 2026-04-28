@@ -630,34 +630,35 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 		actionButtonRef.current?.focus();
 	};
 
-	// Check if this is a resolution comment by checking metadata.
-	const isResolutionComment =
-		thread.type === 'note' &&
-		thread.meta &&
-		( thread.meta._wp_note_status === 'resolved' ||
-			thread.meta._wp_note_status === 'reopen' );
+	const isParent = thread.parent === 0;
+	const metaStatus = thread.meta?._wp_note_status;
+	const isResolvedComment = metaStatus === 'resolved';
+	const isReopenComment = metaStatus === 'reopen';
+	const isResolutionComment = isResolvedComment || isReopenComment;
+
+	const hasResolved = ( status ) =>
+		status === 'approved' || parent?.status === 'approved';
 
 	const actions = [
 		{
 			id: 'edit',
 			title: __( 'Edit' ),
-			isEligible: ( { status } ) => status !== 'approved',
-			onClick: () => {
-				setActionState( 'edit' );
-			},
+			isEligible: ( { status } ) =>
+				! isResolvedComment && ! hasResolved( status ),
+			onClick: () => setActionState( 'edit' ),
 		},
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => status === 'approved',
-			onClick: () => {
-				onEdit( { id: thread.id, status: 'hold' } );
-			},
+			isEligible: ( { status } ) => isParent && hasResolved( status ),
+			onClick: () => onEdit( { id: thread.id, status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
-			isEligible: () => true,
+			isEligible: ( { status } ) =>
+				isParent ||
+				( ! isResolutionComment && ! hasResolved( status ) ),
 			onClick: () => {
 				setActionState( 'delete' );
 				setShowConfirmDialog( true );
@@ -666,10 +667,7 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 	];
 
 	const canResolve = thread.parent === 0;
-	const moreActions =
-		parent?.status !== 'approved'
-			? actions.filter( ( item ) => item.isEligible( thread ) )
-			: [];
+	const moreActions = actions.filter( ( item ) => item.isEligible( thread ) );
 
 	const deleteConfirmMessage =
 		// When deleting a top level note, descendants will also be deleted.
@@ -782,7 +780,8 @@ const CommentBoard = ( { thread, parent, isExpanded, onEdit, onDelete } ) => {
 						'editor-collab-sidebar-panel__user-comment',
 						{
 							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
+								metaStatus === 'resolved' ||
+								metaStatus === 'reopen',
 						}
 					) }
 				>
