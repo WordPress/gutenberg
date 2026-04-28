@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Stack } from '@wordpress/ui';
+import { Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { SidebarToggleSlot } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 
 export default function Header( {
-	headingLevel = 2,
+	headingLevel = 1,
 	breadcrumbs,
 	badges,
 	visual,
@@ -52,9 +52,13 @@ export default function Header( {
 						</div>
 					) }
 					{ title && (
-						<HeadingTag className={ styles[ 'header-title' ] }>
+						<Text
+							className={ styles[ 'header-title' ] }
+							render={ <HeadingTag /> }
+							variant="heading-lg"
+						>
 							{ title }
-						</HeadingTag>
+						</Text>
 					) }
 					{ breadcrumbs }
 					{ badges }
@@ -70,7 +74,13 @@ export default function Header( {
 				</Stack>
 			</Stack>
 			{ subTitle && (
-				<p className={ styles[ 'header-subtitle' ] }>{ subTitle }</p>
+				<Text
+					render={ <p /> }
+					variant="body-md"
+					className={ styles[ 'header-subtitle' ] }
+				>
+					{ subTitle }
+				</Text>
 			) }
 		</Stack>
 	);

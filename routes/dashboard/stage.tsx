@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 
 function Dashboard() {
 	return (
-		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>
+		<Page title={ __( 'Dashboard' ) }>
 			<div className="dashboard-widgets" />
 		</Page>
 	);

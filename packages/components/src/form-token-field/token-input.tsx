@@ -87,12 +87,7 @@ export function UnForwardedTokenInput(
 					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
-			aria-describedby={ [
-				`components-form-token-suggestions-howto-${ instanceId }`,
-				ariaDescribedBy,
-			]
-				.filter( Boolean )
-				.join( ' ' ) }
+			aria-describedby={ ariaDescribedBy }
 		/>
 	);
 }
