@@ -41,7 +41,7 @@ import './cropper.scss';
 const CROP_RECT_EPSILON = 1e-6;
 
 /** How long to wait after the last interaction before fading the grid out. */
-const GRID_FADE_DELAY_MS = 200;
+const GRID_FADE_DELAY_MS = 500;
 
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
@@ -378,18 +378,39 @@ function CropperInner(
 	}, [ state.image ] );
 
 	// Show the grid when pan, zoom, rotation, or crop rect changes — the
-	// interactions that affect image placement and composition. Flip changes
-	// are deliberately excluded (discrete button tap, not a drag interaction).
-	// Guard against reset by detecting the isDirty true→false transition.
+	// interactions that affect image placement and composition.
+	//
+	// Flip is excluded even though SET_FLIP mutates pan and cropRect (it
+	// mirrors them): we track the previous flip state and bail out whenever
+	// flip is the reason the effect fired.
+	//
+	// Reset is excluded by detecting the isDirty true→false transition. isDirty
+	// is read through a ref so it doesn't enter the dep array — adding it
+	// directly would re-fire the effect on flip (flip changes isDirty too).
+	const isDirtyRef = useRef( controller.isDirty );
+	isDirtyRef.current = controller.isDirty;
 	const prevIsDirtyRef = useRef( controller.isDirty );
+	const prevFlipRef = useRef( {
+		horizontal: state.flip.horizontal,
+		vertical: state.flip.vertical,
+	} );
 	useEffect( () => {
-		const wasJustReset = prevIsDirtyRef.current && ! controller.isDirty;
-		prevIsDirtyRef.current = controller.isDirty;
+		const wasJustReset = prevIsDirtyRef.current && ! isDirtyRef.current;
+		prevIsDirtyRef.current = isDirtyRef.current;
+
+		const flipChanged =
+			prevFlipRef.current.horizontal !== state.flip.horizontal ||
+			prevFlipRef.current.vertical !== state.flip.vertical;
+		prevFlipRef.current = {
+			horizontal: state.flip.horizontal,
+			vertical: state.flip.vertical,
+		};
 
 		if (
 			showGrid !== 'interactive' ||
 			! gridInteractionReadyRef.current ||
-			wasJustReset
+			wasJustReset ||
+			flipChanged
 		) {
 			return;
 		}
@@ -408,7 +429,8 @@ function CropperInner(
 		state.cropRect.y,
 		state.cropRect.width,
 		state.cropRect.height,
-		controller.isDirty,
+		state.flip.horizontal,
+		state.flip.vertical,
 		showGrid,
 	] );
 
