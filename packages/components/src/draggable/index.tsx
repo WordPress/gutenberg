@@ -13,6 +13,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import type { DraggableProps } from './types';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 
 const dragImageClass = 'components-draggable__invisible-drag-image';
 const cloneWrapperClass = 'components-draggable__clone';
@@ -141,8 +142,8 @@ export function Draggable( {
 			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
 			cloneWrapper.appendChild( clonedDragComponent );
 
-			// Inject the cloneWrapper into the DOM.
-			ownerDocument.body.appendChild( cloneWrapper );
+			// Inject the cloneWrapper into the overlay legacy slot.
+			getOverlayLegacySlot().appendChild( cloneWrapper );
 		} else {
 			const element = ownerDocument.getElementById(
 				elementId
@@ -175,7 +176,7 @@ export function Draggable( {
 
 			// Inject the cloneWrapper into the DOM.
 			if ( appendToOwnerDocument ) {
-				ownerDocument.body.appendChild( cloneWrapper );
+				getOverlayLegacySlot().appendChild( cloneWrapper );
 			} else {
 				elementWrapper?.appendChild( cloneWrapper );
 			}
