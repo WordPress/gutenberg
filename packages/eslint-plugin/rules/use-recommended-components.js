@@ -13,6 +13,7 @@ const ALLOWLIST = {
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'Link',
 			'Stack',
 			'Text',
 			'VisuallyHidden',

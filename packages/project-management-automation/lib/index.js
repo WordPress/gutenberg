@@ -16,7 +16,7 @@ const debug = require( './debug' );
 /**
  * Automation task function.
  *
- * @typedef {( payload: any, octokit: ReturnType<getOctokit> ) => void} WPAutomationTask
+ * @typedef {( payload: any, octokit: ReturnType<typeof getOctokit> ) => void} WPAutomationTask
  */
 
 /**
