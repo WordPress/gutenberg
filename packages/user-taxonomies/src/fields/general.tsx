@@ -12,8 +12,8 @@ import { Badge, Notice, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { usePublicPostTypes } from './utils';
-import type { TaxonomyFormData } from './types';
+import { usePublicPostTypes } from '../utils';
+import type { TaxonomyFormData } from '../types';
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
@@ -51,6 +51,21 @@ export const singularLabelField: Field< TaxonomyFormData > = {
 		},
 	} ),
 	isValid: { required: true },
+	enableSorting: false,
+};
+
+export const descriptionField: Field< TaxonomyFormData > = {
+	id: 'description',
+	label: __( 'Description' ),
+	type: 'text',
+	Edit: { control: 'textarea', rows: 3 },
+	description: __(
+		'Optional summary of the taxonomy. Shown in admin UIs that surface taxonomy details.'
+	),
+	getValue: ( { item } ) => item.config.description,
+	setValue: ( { item, value } ) => ( {
+		config: { ...item.config, description: String( value ?? '' ) },
+	} ),
 	enableSorting: false,
 };
 
@@ -219,8 +234,7 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 	}, [ publicPostTypes ] );
 }
 
-// --- Form layout ---------------------------------------------------------
-
+// The minimal form used by the quick-edit modal.
 export const defaultForm: Form = {
 	layout: { type: 'regular' },
 	fields: [
@@ -229,6 +243,19 @@ export const defaultForm: Form = {
 		'slug',
 		'object_type',
 		'public',
+		'hierarchical',
+		'status',
+	],
+};
+
+export const generalForm: Form = {
+	layout: { type: 'regular' },
+	fields: [
+		'plural_name',
+		'singular_name',
+		'slug',
+		'description',
+		'object_type',
 		'hierarchical',
 		'status',
 	],

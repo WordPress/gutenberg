@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 // `className` on `<Modal>` is applied to `.components-modal__frame`, so the
 // compound selector below bumps specificity over the shipped rule at
@@ -110,4 +111,17 @@
 			}
 		}
 	}
+}
+
+// `<SnackbarNotices>` renders `.components-snackbar-list` with
+// `position: absolute; width: 100%`. Portaled to `<body>` it has no
+// positioned ancestor, so it collapses to a 0-size box at the document
+// origin and would also be painted under the modal overlay since both
+// share the default snackbar z-index. `snackbar-container` fixes the
+// list to the viewport bottom; the elevated z-index (registered in
+// base-styles) lifts it above the modal overlay and any popovers that
+// may open inside the modal.
+.media-editor-modal__snackbar {
+	@include snackbar-container();
+	z-index: z-index(".components-snackbar-list.media-editor-modal__snackbar");
 }
