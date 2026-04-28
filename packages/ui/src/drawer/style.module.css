@@ -1,0 +1,324 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+/*
+ * Temporary workaround for a Base UI tabbability regression with
+ * checkVisibility() and display: contents.
+ * See: https://github.com/mui/base-ui/issues/4622
+ *
+ * This must stay outside the CSS layers to override ThemeProvider's
+ * unlayered display: contents.
+ */
+[data-wpds-theme-provider-id]:has(> .popup) {
+	display: block;
+}
+
+@layer wp-ui-components {
+	.backdrop {
+		--backdrop-opacity: 0.35;
+		position: fixed;
+		inset: 0;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		min-height: 100dvh;
+		background-color: rgb(0, 0, 0);
+		opacity: calc(var(--backdrop-opacity) * (1 - var(--drawer-swipe-progress)));
+
+		/*
+		 * WebKit/iOS Safari workaround: use absolute positioning so the
+		 * backdrop tracks the visible viewport instead of the layout one.
+		 */
+		@supports (-webkit-touch-callout: none) {
+			position: absolute;
+		}
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+		}
+
+		@media not (prefers-reduced-motion) {
+			/*
+			 * The duration and easing are intentionally different from
+			 * Dialog's backdrop: they match the popup's slide-in/out so the
+			 * two surfaces transition together. The ending-style duration is
+			 * further scaled by `--drawer-swipe-strength` so the backdrop
+			 * fades in lockstep with a swipe-dismissed popup.
+			 */
+			transition: opacity 450ms cubic-bezier(0.32, 0.72, 0, 1);
+
+			&[data-ending-style] {
+				pointer-events: none;
+				transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+			}
+
+			&[data-swiping] {
+				transition-duration: 0ms;
+			}
+		}
+	}
+
+	.viewport {
+		position: fixed;
+		inset: 0;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		pointer-events: none;
+	}
+
+	/*
+	 * The popup is a flex column laying out three regions — header, content,
+	 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
+	 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
+	 * content to the rounded border; transform-based swipe animations are
+	 * unaffected by it. See `overlay-chrome.module.css` for the shared
+	 * chrome/content primitives.
+	 */
+	.popup {
+		--viewport-inset: var(--wpds-dimension-padding-2xl);
+
+		position: fixed;
+		z-index: var(--wp-ui-drawer-z-index, initial);
+		box-sizing: border-box;
+		display: flex;
+		flex-direction: column;
+		outline: 0;
+		overflow: hidden;
+		pointer-events: auto;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		box-shadow: var(--wpds-elevation-lg);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-md);
+		color: var(--wpds-color-fg-content-neutral);
+		touch-action: auto;
+
+		&[data-open],
+		&[data-swiping] {
+			will-change: transform;
+
+			@media not (prefers-reduced-motion) {
+				transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
+
+				&[data-ending-style] {
+					transition-duration: calc(var(--drawer-swipe-strength) * 400ms);
+				}
+
+				&[data-swiping] {
+					transition-duration: 0ms;
+				}
+			}
+		}
+
+		/*
+		 * TODO: should top/bottom sides use different tokens for the height
+		 * of the popup, compared to the width?
+		 */
+		&.is-small {
+			--popup-size: var(--wpds-dimension-surface-width-sm);
+		}
+
+		&.is-medium {
+			--popup-size: var(--wpds-dimension-surface-width-md);
+		}
+
+		&.is-large {
+			--popup-size: var(--wpds-dimension-surface-width-lg);
+		}
+
+		&.is-stretch {
+			--popup-size: var(--stretch-size);
+		}
+
+		&.is-auto {
+			--popup-size: auto;
+		}
+
+		&[data-swiping] {
+			user-select: none;
+		}
+
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+		&[data-swipe-direction="left"] {
+			--stretch-size: calc(100vw - var(--viewport-inset));
+
+			top: 0;
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			width: var(--popup-size);
+			max-width: calc(100vw - var(--viewport-inset));
+			border-start-end-radius: var(--wpds-border-radius-lg);
+			border-end-end-radius: var(--wpds-border-radius-lg);
+			transform: translateX(var(--drawer-swipe-movement-x));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateX(-100%);
+			}
+		}
+
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+		&[data-swipe-direction="right"] {
+			--stretch-size: calc(100vw - var(--viewport-inset));
+
+			top: 0;
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			width: var(--popup-size);
+			max-width: calc(100vw - var(--viewport-inset));
+			border-start-start-radius: var(--wpds-border-radius-lg);
+			border-end-start-radius: var(--wpds-border-radius-lg);
+			transform: translateX(var(--drawer-swipe-movement-x));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateX(100%);
+			}
+		}
+
+		&[data-swipe-direction="down"] {
+			--stretch-size: calc(100dvh - var(--viewport-inset));
+
+			bottom: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			height: var(--popup-size);
+			max-height: calc(100dvh - var(--viewport-inset));
+			border-start-start-radius: var(--wpds-border-radius-lg);
+			border-start-end-radius: var(--wpds-border-radius-lg);
+			transform: translateY(var(--drawer-swipe-movement-y));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateY(100%);
+			}
+		}
+
+		&[data-swipe-direction="up"] {
+			--stretch-size: calc(100dvh - var(--viewport-inset));
+
+			top: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			left: 0;
+			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical positioning needed for slide-in animation direction */
+			right: 0;
+			height: var(--popup-size);
+			max-height: calc(100dvh - var(--viewport-inset));
+			border-end-start-radius: var(--wpds-border-radius-lg);
+			border-end-end-radius: var(--wpds-border-radius-lg);
+			transform: translateY(var(--drawer-swipe-movement-y));
+
+			&[data-starting-style],
+			&[data-ending-style] {
+				transform: translateY(-100%);
+			}
+		}
+	}
+
+	/*
+	 * When a backdrop is rendered alongside the popup (modal mode),
+	 * hide the regular-mode border. The backdrop already provides
+	 * visual containment, so the border becomes redundant noise.
+	 * `transparent` (not `none`) keeps popup geometry identical
+	 * across modal/non-modal — `box-sizing: border-box` absorbs the
+	 * 1px into the existing box.
+	 */
+	.backdrop ~ * .popup {
+		border-color: transparent;
+	}
+
+	/*
+	 * Forced-colors mode strips `box-shadow` and substitutes
+	 * `background-color` with `Canvas` (the page background), so the
+	 * boundary depends entirely on the border. Set `CanvasText`
+	 * explicitly for both modal and non-modal popups: `transparent`
+	 * is not substituted by the UA, and being explicit also removes
+	 * any reliance on UA color-substitution behavior for the
+	 * non-modal case.
+	 */
+	@media (forced-colors: active) {
+		.popup,
+		.backdrop ~ * .popup {
+			border-color: CanvasText;
+		}
+	}
+
+	/*
+	 * Chrome + content primitives are centralized in
+	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
+	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+	 * overscroll rule live there too, keyed off the
+	 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
+	 * `useOverlayScrollStateAttributes`.
+	 *
+	 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
+	 * discovers the scrollable element by walking up from the touch target,
+	 * so moving scroll ownership from the popup onto `.content` remains
+	 * transparent to the gesture handling.
+	 */
+	.header {
+		composes: header from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.footer {
+		composes: footer from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.title {
+		composes: title from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.content {
+		composes: content from "../utils/css/overlay-chrome.module.css";
+	}
+
+	/*
+	 * Push the close icon to the inline end even when the title is taken out
+	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+	 * no-op because the title no longer participates in the flex layout, so
+	 * we also anchor the close icon itself.
+	 */
+	.header [data-wp-ui-drawer-close-icon] {
+		margin-inline-start: auto;
+	}
+
+	/*
+	 * Safe-area insets. The popup is anchored to a physical edge regardless
+	 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
+	 * so `env(safe-area-inset-*)` — which is already physical — is paired
+	 * with matching physical padding properties.
+	 *
+	 * For left/right drawers the inset lives on the scroll container itself.
+	 * For up/down drawers it lives on the chrome that occupies the popup's
+	 * anchored edge (pinned case); when that edge has no chrome sibling,
+	 * the scroll container carries the padding instead.
+	 */
+	.popup[data-swipe-direction="left"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-left: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-left));
+	}
+
+	.popup[data-swipe-direction="right"] .content {
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
+		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
+	}
+
+	.popup[data-swipe-direction="up"] > .header {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+	}
+
+	.popup[data-swipe-direction="down"] > .footer {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+	}
+
+	.popup[data-swipe-direction="up"] > .content:first-child {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
+	}
+
+	.popup[data-swipe-direction="down"] > .content:last-child {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
+	}
+}

@@ -1,2 +1,2 @@
-export { default as editTaxonomyAction } from './edit';
-export { default as toggleActiveAction } from './toggle-active';
+export { useEditTaxonomyAction } from './edit';
+export { default as quickEditTaxonomyAction } from './quick-edit';
