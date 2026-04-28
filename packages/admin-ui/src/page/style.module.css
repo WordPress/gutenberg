@@ -18,7 +18,7 @@
 	z-index: 1;
 }
 
-/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. See https://github.com/WordPress/gutenberg/issues/77391 */
 .header-title {
 	overflow: hidden;
 	text-overflow: ellipsis;
