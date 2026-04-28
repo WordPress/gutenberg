@@ -36,6 +36,8 @@
 -   `Select`: Tighten spacing after checkmark when `Select.Item` is `size="small"` ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
 -   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
 -   `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `Select`, `Tooltip`: Unify the hairline border across overlay popups. Popups without a backdrop show a token-colored border in regular mode; popups with a backdrop hide the border (which would be redundant with the backdrop's containment); all popups show a `CanvasText` border in forced-colors mode ([#77691](https://github.com/WordPress/gutenberg/pull/77691)).
+-   `Dialog`, `AlertDialog`, `Drawer`: Always show the token-colored hairline border (including in modal mode), and render the backdrop with the `--wpds-color-bg-surface-neutral-weak` system token instead of a hardcoded black, and bump the backdrop opacity to 75% to keep similar presence given the lighter token. Tunes the popup edge against the backdrop so the boundary no longer appears fuzzy.
+-   `Drawer`: Inset the popup by 4px from the viewport edges it is anchored to and round all four corners, so the always-on hairline border no longer butts directly against the viewport edge.
 
 ### Internal
 
