@@ -56,33 +56,6 @@ export const settings = {
 							},
 						],
 					},
-					{
-						name: 'core/slide',
-						innerBlocks: [
-							{
-								name: 'core/cover',
-								attributes: {
-									dimRatio: 100,
-									overlayColor: 'cyan-bluish-gray',
-									minHeight: 300,
-									minHeightUnit: 'px',
-								},
-								innerBlocks: [
-									{
-										name: 'core/paragraph',
-										attributes: {
-											content: __( 'Slide 2' ),
-											style: {
-												typography: {
-													textAlign: 'center',
-												},
-											},
-										},
-									},
-								],
-							},
-						],
-					},
 				],
 			},
 		],
