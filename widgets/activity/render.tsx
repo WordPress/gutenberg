@@ -1,11 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useId } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getDate } from '@wordpress/date';
+import { Spinner } from '@wordpress/components';
+import { DataViews } from '@wordpress/dataviews';
+
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { EmptyState, Link, Card, Text } from '@wordpress/ui';
+import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
@@ -24,7 +31,6 @@ import type { Post, Comment } from '@wordpress/core-data';
  */
 function formatDate( dateString: string ): string {
 	const now = getDate();
-
 	const postDay = dateI18n( 'Y-m-d', dateString );
 	const today = dateI18n( 'Y-m-d', now );
 
@@ -52,124 +58,141 @@ function formatDate( dateString: string ): string {
 	return dateI18n( __( 'M jS' ), dateString );
 }
 
-// ─── Sub-components ───────────────────────────────────────────────────────────
+// ─── Item types ───────────────────────────────────────────────────────────────
 
-interface PostSectionProps {
+type PostItem = {
+	id: string;
 	title: string;
-	sectionId: string;
-	status: 'publish' | 'future';
-	order: 'asc' | 'desc';
-}
+	date: string;
+	link: string;
+};
 
-function PostSection( { title, sectionId, status, order }: PostSectionProps ) {
-	const posts = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< Post >( 'postType', 'post', {
-				status,
-				orderby: 'date',
-				order,
-				per_page: 5,
-			} ),
-		[ status, order ]
-	);
+type CommentItem = {
+	id: string;
+	title: string;
+	date: string;
+	link: string;
+	/** HTML snippet from the comment body. */
+	description: string;
+};
 
-	if ( ! posts?.length ) {
-		return null;
-	}
+// ─── Fields ───────────────────────────────────────────────────────────────────
 
-	return (
-		<div id={ sectionId } className="activity-block">
-			<h3>{ title }</h3>
-			<ul>
-				{ posts.map( ( post ) => (
-					<li key={ post.id }>
-						<span>
-							{
-								/* translators: 1: Relative date (Today/Tomorrow/Jun 15th), 2: Time */
-								sprintf(
-									/* translators: 1: date, 2: time */
-									__( '%1$s, %2$s' ),
-									formatDate( post.date ),
-									/* translators: Time format for dashboard post list, see https://www.php.net/manual/datetime.format.php */
-									dateI18n( __( 'g:i a' ), post.date )
-								)
-							}
-						</span>{ ' ' }
-						<a href={ post.link }>
-							{ ( post.title as { rendered: string } )
-								?.rendered || __( '(no title)' ) }
-						</a>
-					</li>
-				) ) }
-			</ul>
-		</div>
-	);
-}
-
-function CommentsSection() {
-	const sectionId = useId();
-	const comments = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< Comment >(
-				'root',
-				'comment',
-				{
-					per_page: 5,
-				}
+const POST_FIELDS: Field< PostItem >[] = [
+	{
+		id: 'title',
+		label: __( 'Title' ),
+		getValue: ( { item } ) => item.title,
+		enableSorting: false,
+		enableGlobalSearch: true,
+	},
+	{
+		id: 'date',
+		label: __( 'Date' ),
+		getValue: ( { item } ) => item.date,
+		render: ( { item } ) =>
+			sprintf(
+				/* translators: 1: date label (Today / Jun 15th), 2: time */
+				__( '%1$s, %2$s' ),
+				formatDate( item.date ),
+				/* translators: Time format for dashboard post list, see https://www.php.net/manual/datetime.format.php */
+				dateI18n( __( 'g:i a' ), item.date )
 			),
-		[]
-	);
+		enableSorting: false,
+	},
+];
 
-	if ( ! comments?.length ) {
-		return null;
-	}
+const COMMENT_FIELDS: Field< CommentItem >[] = [
+	{
+		id: 'title',
+		label: __( 'Author' ),
+		getValue: ( { item } ) => item.title,
+		enableSorting: false,
+		enableGlobalSearch: true,
+	},
+	{
+		id: 'date',
+		label: __( 'Date' ),
+		getValue: ( { item } ) => item.date,
+		render: ( { item } ) =>
+			sprintf(
+				/* translators: 1: date label (Today / Jun 15th), 2: time */
+				__( '%1$s, %2$s' ),
+				formatDate( item.date ),
+				/* translators: Time format for dashboard post list, see https://www.php.net/manual/datetime.format.php */
+				dateI18n( __( 'g:i a' ), item.date )
+			),
+		enableSorting: false,
+	},
+	{
+		id: 'description',
+		label: __( 'Comment' ),
+		getValue: ( { item } ) => item.description,
+		render: ( { item } ) =>
+			item.description ? (
+				<span
+					dangerouslySetInnerHTML={ { __html: item.description } }
+				/>
+			) : null,
+		enableSorting: false,
+	},
+];
 
+// ─── Default views ────────────────────────────────────────────────────────────
+
+const DEFAULT_POST_VIEW: View = {
+	type: 'activity',
+	titleField: 'title',
+	fields: [ 'date' ],
+	page: 1,
+	perPage: 5,
+	layout: { density: 'compact' },
+};
+
+const DEFAULT_COMMENT_VIEW: View = {
+	type: 'activity',
+	titleField: 'title',
+	descriptionField: 'description',
+	fields: [ 'date' ],
+	page: 1,
+	perPage: 5,
+	layout: { density: 'compact' },
+};
+
+// ─── Link renderers ───────────────────────────────────────────────────────────
+
+function renderPostLink( {
+	item,
+	children,
+	...aProps
+}: { item: PostItem } & React.ComponentProps< 'a' > ) {
 	return (
-		<div id={ sectionId } className="activity-block table-view-list">
-			<h3>{ __( 'Recent Comments' ) }</h3>
-			<ul>
-				{ comments.map( ( comment ) => {
-					const authorName = comment.author_name as string;
-					const authorUrl = comment.author_url as string;
-					const content = ( comment.content as { rendered: string } )
-						?.rendered;
+		<Link href={ item.link } { ...aProps }>
+			{ children }
+		</Link>
+	);
+}
 
-					return (
-						<li key={ comment.id }>
-							<div className="dashboard-comment-wrap">
-								<p className="comment-meta">
-									{ authorUrl ? (
-										<a href={ authorUrl }>
-											<cite className="comment-author">
-												{ authorName }
-											</cite>
-										</a>
-									) : (
-										<cite className="comment-author">
-											{ authorName }
-										</cite>
-									) }
-								</p>
-								<blockquote>
-									<p
-										dangerouslySetInnerHTML={ {
-											__html: content,
-										} }
-									/>
-								</blockquote>
-							</div>
-						</li>
-					);
-				} ) }
-			</ul>
-		</div>
+function renderCommentLink( {
+	item,
+	children,
+	...aProps
+}: { item: CommentItem } & React.ComponentProps< 'a' > ) {
+	return (
+		<Link href={ item.link } { ...aProps }>
+			{ children }
+		</Link>
 	);
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Activity() {
-	const widgetId = useId();
+	const [ futureView, setFutureView ] = useState< View >( DEFAULT_POST_VIEW );
+	const [ recentView, setRecentView ] = useState< View >( DEFAULT_POST_VIEW );
+	const [ commentView, setCommentView ] =
+		useState< View >( DEFAULT_COMMENT_VIEW );
+
 	const futurePosts = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords< Post >( 'postType', 'post', {
@@ -197,9 +220,7 @@ export default function Activity() {
 			select( coreStore ).getEntityRecords< Comment >(
 				'root',
 				'comment',
-				{
-					per_page: 5,
-				}
+				{ per_page: 5 }
 			),
 		[]
 	);
@@ -209,34 +230,150 @@ export default function Activity() {
 		recentPosts !== undefined &&
 		comments !== undefined;
 
-	if (
-		isResolved &&
-		! futurePosts?.length &&
-		! recentPosts?.length &&
-		! comments?.length
-	) {
+	const futureItems = useMemo< PostItem[] >(
+		() =>
+			( futurePosts ?? [] ).map( ( post ) => ( {
+				id: `post-future-${ post.id }`,
+				title: ( post.title as { rendered: string } )?.rendered ?? '',
+				date: post.date ?? '',
+				link: post.link ?? '',
+			} ) ),
+		[ futurePosts ]
+	);
+
+	const recentItems = useMemo< PostItem[] >(
+		() =>
+			( recentPosts ?? [] ).map( ( post ) => ( {
+				id: `post-recent-${ post.id }`,
+				title: ( post.title as { rendered: string } )?.rendered ?? '',
+				date: post.date ?? '',
+				link: post.link ?? '',
+			} ) ),
+		[ recentPosts ]
+	);
+
+	const commentItems = useMemo< CommentItem[] >(
+		() =>
+			( comments ?? [] ).map( ( comment ) => ( {
+				id: `comment-${ comment.id }`,
+				title: ( comment.author_name as string ) ?? '',
+				date: ( comment.date as string ) ?? '',
+				link: ( comment.link as string ) ?? '',
+				description:
+					( comment.content as { rendered: string } )?.rendered ?? '',
+			} ) ),
+		[ comments ]
+	);
+
+	if ( ! isResolved ) {
+		return <Spinner />;
+	}
+
+	const isEmpty =
+		futureItems.length === 0 &&
+		recentItems.length === 0 &&
+		commentItems.length === 0;
+
+	if ( isEmpty ) {
 		return (
-			<div className="no-activity">
-				<p>{ __( 'No activity yet!' ) }</p>
-			</div>
+			<EmptyState.Root>
+				<EmptyState.Title>
+					{ __( 'No activity yet!' ) }
+				</EmptyState.Title>
+				<EmptyState.Description>
+					{ __(
+						'When you publish posts or receive comments, they will appear here.'
+					) }
+				</EmptyState.Description>
+			</EmptyState.Root>
 		);
 	}
 
 	return (
-		<div id={ widgetId }>
-			<PostSection
-				title={ __( 'Publishing Soon' ) }
-				sectionId="future-posts"
-				status="future"
-				order="asc"
-			/>
-			<PostSection
-				title={ __( 'Recently Published' ) }
-				sectionId="published-posts"
-				status="publish"
-				order="desc"
-			/>
-			<CommentsSection />
-		</div>
+		<>
+			{ futureItems.length > 0 && (
+				<>
+					<Text variant="heading-md" render={ <h3 /> }>
+						{ __( 'Publishing Soon' ) }
+					</Text>
+					<Card.FullBleed>
+						<DataViews
+							data={ futureItems }
+							fields={ POST_FIELDS }
+							view={ futureView }
+							onChangeView={ setFutureView }
+							paginationInfo={ {
+								totalItems: futureItems.length,
+								totalPages: 1,
+							} }
+							getItemId={ ( item ) => item.id }
+							search={ false }
+							isLoading={ false }
+							defaultLayouts={ { activity: {} } }
+							renderItemLink={ renderPostLink }
+							isItemClickable={ ( item ) => !! item.link }
+						>
+							<DataViews.Layout />
+						</DataViews>
+					</Card.FullBleed>
+				</>
+			) }
+
+			{ recentItems.length > 0 && (
+				<>
+					<Text variant="heading-md" render={ <h3 /> }>
+						{ __( 'Recently Published' ) }
+					</Text>
+					<Card.FullBleed>
+						<DataViews
+							data={ recentItems }
+							fields={ POST_FIELDS }
+							view={ recentView }
+							onChangeView={ setRecentView }
+							paginationInfo={ {
+								totalItems: recentItems.length,
+								totalPages: 1,
+							} }
+							getItemId={ ( item ) => item.id }
+							search={ false }
+							isLoading={ false }
+							defaultLayouts={ { activity: {} } }
+							renderItemLink={ renderPostLink }
+							isItemClickable={ ( item ) => !! item.link }
+						>
+							<DataViews.Layout />
+						</DataViews>
+					</Card.FullBleed>
+				</>
+			) }
+
+			{ commentItems.length > 0 && (
+				<>
+					<Text variant="heading-md" render={ <h3 /> }>
+						{ __( 'Recent Comments' ) }
+					</Text>
+					<Card.FullBleed>
+						<DataViews
+							data={ commentItems }
+							fields={ COMMENT_FIELDS }
+							view={ commentView }
+							onChangeView={ setCommentView }
+							paginationInfo={ {
+								totalItems: commentItems.length,
+								totalPages: 1,
+							} }
+							getItemId={ ( item ) => item.id }
+							search={ false }
+							isLoading={ false }
+							defaultLayouts={ { activity: {} } }
+							renderItemLink={ renderCommentLink }
+							isItemClickable={ ( item ) => !! item.link }
+						>
+							<DataViews.Layout />
+						</DataViews>
+					</Card.FullBleed>
+				</>
+			) }
+		</>
 	);
 }
