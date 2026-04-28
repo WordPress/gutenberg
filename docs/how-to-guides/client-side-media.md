@@ -2,7 +2,7 @@
 
 ## Overview
 
-Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly, rather than on the server. It is enabled by default in WordPress 7.0 for supported browsers and transparently falls back to server-side processing when unavailable.
+Client-side media processing handles image compression, resizing, format conversion, rotation, and thumbnail generation in the browser using WebAssembly, rather than on the server. It is enabled by default in WordPress 7.1 for supported browsers and transparently falls back to server-side processing when unavailable. The infrastructure landed during the 7.0 cycle; the 7.1 release adds HEIC support, AVIF end-to-end uploads, batch thumbnail generation, sub-size deduplication, and tightened upload locking.
 
 This guide covers how plugin and theme developers can interact with, customize, and troubleshoot client-side media processing.
 
@@ -78,19 +78,14 @@ add_filter( 'image_save_progressive', function ( $interlaced, $mime_type ) {
 }, 10, 2 );
 ```
 
-## Customizing supported MIME types
+## Supported file formats
 
-The `client_side_supported_mime_types` filter controls which MIME types are eligible for client-side processing. By default, JPEG, PNG, GIF, WebP, and AVIF are supported.
+Client-side processing handles the following MIME types in the WASM/vips pipeline: `image/jpeg`, `image/png`, `image/gif`, `image/webp`, `image/avif`. Files outside this set fall through to one of two paths depending on type:
 
-```php
-// Add a custom image format to client-side processing.
-add_filter( 'client_side_supported_mime_types', function ( $mime_types ) {
-	$mime_types[] = 'image/x-custom';
-	return $mime_types;
-} );
-```
+-   **HEIC/HEIF** (`image/heic`, `image/heif`): the client decodes the file with `createImageBitmap`, an `HTMLImageElement`/`OffscreenCanvas` strategy, or a HEIC-container + WebCodecs `VideoDecoder` path (Chrome 107+ on macOS), exports a JPEG (`.jpg`, MIME `image/jpeg`), and lets the server generate sub-sizes from the JPEG. The original HEIC is kept as a companion file in `$metadata['original']` and deleted with the attachment.
+-   **Other** (video, audio, documents): the file is uploaded directly to the server with default parameters and standard server-side processing. No client-side step runs.
 
-When a MIME type is not in this list, the file is uploaded directly to the server without client-side processing.
+The set of MIME types eligible for the WASM pipeline is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` in `packages/upload-media/src/store/constants.ts` — there is no public filter for adding or removing types.
 
 ## Working with the upload store (JavaScript)
 
@@ -227,9 +222,10 @@ POST /wp/v2/media/{id}/sideload
 
 | Parameter | Type | Required | Description |
 | --- | --- | --- | --- |
-| `image_size` | string | Yes | The image size name (e.g., `thumbnail`, `medium`, `large`, `scaled`, `original`). |
-| `convert_format` | boolean | No | Whether to apply server-side format conversion. Default `true`. |
-| `replace_file` | boolean | No | When `true`, replaces the attachment's main file with the uploaded file, updating the MIME type and metadata and deleting the old file. Default `false`. |
+| `image_size` | string \| string[] | Yes | The image size name (e.g., `thumbnail`, `medium`, `large`, `scaled`, `original`). Pass an array to register a single physical file under multiple sizes that share dimensions. |
+| `generate_sub_sizes` | boolean | No | Whether the server should generate additional sub-sizes from this upload. Default `true`. |
+| `convert_format` | boolean | No | Whether to apply server-side format conversion via `image_editor_output_format`. Default `true`. |
+| `replace_file` | boolean | No | When `true`, replaces the attachment's main file with the uploaded file, updating the MIME type and metadata and deleting the old file. Default `false`. Used by the HEIC → JPEG companion path. |
 
 ### Example
 
@@ -251,12 +247,16 @@ This endpoint requires both `edit_post` and `upload_files` capabilities.
 | Problem | Cause | Solution |
 | --- | --- | --- |
 | Client-side processing not activating | Browser lacks Document-Isolation-Policy support | Client-side processing requires Chrome/Edge 137+. Check `window.crossOriginIsolated` in the browser console. |
-| Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent | Verify you're editing a post or page. Some third-party page builders may suppress the header. |
+| Client-side processing not activating on Chrome 137+ | `Document-Isolation-Policy` header not sent | Verify you're editing a post or page (the header is skipped on admin pages with an `action` other than `edit`). Some third-party page builders may suppress the header. |
 | WASM module fails to load | Incorrect MIME type for `.wasm` files | Add `AddType application/wasm wasm` to your `.htaccess` or server configuration. WordPress does this automatically for Apache via `mod_rewrite_rules`. |
 | CSP blocks worker creation | `worker-src` directive too restrictive | Add `blob:` to the `worker-src` CSP directive: `worker-src 'self' blob:` |
 | Processing falls back on capable browser | Feature disabled server-side | Check that `wp_client_side_media_processing_enabled` filter is not returning `false`. |
 | Large images cause browser to slow down | Insufficient device memory | Devices with ≤ 2 GB RAM are automatically excluded. Consider reducing the big image size threshold for your site. |
-| Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF). HEIC/HEIF files are uploaded server-side. |
+| Feature disabled on a low-spec laptop | Below 2 CPU cores or 2 GB RAM | These thresholds protect underpowered devices from OOMs. Disable the gate per request only if you've confirmed the device can handle WASM image processing. |
+| Feature disabled on slow network | `2g`/`slow-2g` connection or Save-Data is on | The ~13 MB worker download is gated behind `effectiveType` and `saveData`. `3g` and faster connections are allowed. |
+| HEIC upload error on a server without HEIC support | Server-side HEIC decoder missing | The client converts HEIC to JPEG before upload — this should not occur in browsers that match `isHeicCanvasSupported()`. Verify the browser provides `createImageBitmap` and `OffscreenCanvas`. |
+| Upload fails with "image transcoding error" | Unsupported format or corrupt file | Verify the file is a supported format (JPEG, PNG, WebP, AVIF, GIF, HEIC). |
+| Save Draft button stays disabled | Lock not released | Ensure all upload items have completed or been cancelled. The lock releases when the upload queue is empty (see [#76973](https://github.com/WordPress/gutenberg/pull/76973)). |
 
 ## Browser compatibility
 

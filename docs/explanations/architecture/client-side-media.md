@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Client-side media processing is a capability in WordPress that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server.
+Client-side media processing is a capability shipping in WordPress 7.1 that handles image compression, resizing, format conversion, rotation, and thumbnail generation directly in the user's browser using WebAssembly, rather than on the server. Most of the underlying infrastructure landed during the 7.0 development cycle when the feature graduated from a Gutenberg experiment; the 7.1 cycle adds HEIC support, AVIF end-to-end uploads, performance improvements, and finishes hardening before the public release.
 
 Key benefits include:
 
@@ -103,13 +103,15 @@ The `uploadItem()` operation uploads the (optionally transcoded) image to the se
 
 After the upload completes, the server responds with `missing_image_sizes` — a list of thumbnail sizes that still need to be generated. The `generateThumbnails()` operation creates sideload items for each missing size.
 
+Sizes are deduplicated by their effective output dimensions before processing ([#77036](https://github.com/WordPress/gutenberg/pull/77036)). When a theme registers an image size with the same width/height/crop as a built-in size (for example, Twenty Eleven's `large` matches WordPress core's `medium_large` at 768×1024), the client generates one physical file and tells the server to register it under both names by passing an array to the sideload route's `image_size` parameter. This matches how the server-side path handles duplicate dimensions and avoids producing extra files with `-1` suffixes.
+
 For images that exceed the `big_image_size_threshold` (default: 2560px), a scaled version is also generated and sideloaded.
 
 If the original image requires EXIF rotation (orientation ≠ 1), a rotated version is generated and sideloaded as well.
 
 ### 5. Sideload sub-sizes
 
-Each thumbnail is processed client-side (resize/crop → optional format conversion) and then uploaded to the server via the sideload endpoint (`POST /wp/v2/media/{id}/sideload`). The server stores each sub-size in the attachment metadata.
+Each thumbnail is processed client-side (resize/crop → optional format conversion) and then uploaded to the server via the sideload endpoint (`POST /wp/v2/media/{id}/sideload`). The server stores each sub-size in the attachment metadata, registering it under each size name supplied in `image_size`.
 
 To prevent race conditions, sideload uploads to the same post are serialized — if one item is being sideloaded, other items targeting the same post are paused until the sideload completes.
 
@@ -142,15 +144,17 @@ The quality value is passed through to the vips worker during resize and crop op
 
 ## WASM module loading
 
-The WASM binary (~3.8 MB) is loaded lazily — only when the first image needs processing:
+The WASM worker bundle (~13 MB minified, ~10 MB after build-output trimming) is loaded lazily — only when the first image needs processing:
 
-1.  **Loader discovery**: `@wordpress/vips/loader` is a minimal module that returns a dynamic `import( '@wordpress/vips/worker' )`. This allows WordPress's script module system to discover the dependency without loading the heavy WASM binary upfront.
+1.  **Loader discovery**: `@wordpress/vips/loader` is a minimal module that returns a dynamic `import( '@wordpress/vips/worker' )`. This lets WordPress's script module system discover the dependency without pulling the heavy WASM binary into the initial editor bundle.
 
-2.  **Worker creation**: When processing is first needed, a Web Worker is created from an inline blob URL. The WASM modules (`vips.wasm` and `vips-jxl.wasm`) are inlined as base64 data URLs at build time, eliminating separate file downloads and WASM MIME type issues.
+2.  **Worker creation**: When processing is first needed, a Web Worker is created from an inline blob URL. The WASM modules (`vips.wasm` and `vips-heif.wasm`) are inlined as base64 data URLs at build time, eliminating separate file downloads and WASM MIME type issues. The unused `vips-jxl.wasm` module was removed in [#76639](https://github.com/WordPress/gutenberg/pull/76639) (saving ~3.1 MB), and the unminified worker plus its source map are skipped at build time ([#76615](https://github.com/WordPress/gutenberg/pull/76615), [#75993](https://github.com/WordPress/gutenberg/pull/75993)) since they provide no debugging value for inlined base64 WASM.
 
-3.  **Instance reuse**: The vips instance is created once and reused across all operations. The worker is kept alive until the upload queue is empty, at which point `terminateVipsWorker()` is called to free memory.
+3.  **Single instance**: `getVips()` caches a *promise* rather than a fully-initialized instance, so concurrent first-time calls share one initialization rather than racing to create multiple vips instances ([#76780](https://github.com/WordPress/gutenberg/pull/76780)). The worker is kept alive until the upload queue is empty, at which point `terminateVipsWorker()` is called to free memory.
 
 4.  **Memory management**: Emscripten's `setAutoDeleteLater(true)` is configured for automatic cleanup. Each operation also calls a manual cleanup function after completion. Operations are tracked via an `inProgressOperations` set, allowing mid-operation cancellation via a progress callback kill switch.
+
+5.  **Batch thumbnail generation**: The `batchResizeImage()` path decodes the source image once with `newFromBuffer()`, then calls `image.copyMemory()` to materialize the pixels in WASM memory. Each sub-size is generated by calling `thumbnailImage()` against the in-memory copy and writing directly to the output format ([#76979](https://github.com/WordPress/gutenberg/pull/76979)). This avoids re-decoding the source for every thumbnail — a 60× improvement per the [libvips discussion](https://github.com/libvips/libvips/discussions/4585) the change is based on. The path falls back to per-thumbnail processing if the batch operation fails (for example, animated GIFs).
 
 ## Cross-origin isolation
 
@@ -179,9 +183,11 @@ add_filter( 'gutenberg_use_document_isolation_policy', '__return_true' );
 
 Cross-origin isolation requires that cross-origin resources include proper CORS attributes. WordPress handles this at two levels:
 
-**Server-side** (PHP output buffer): The `wp_add_crossorigin_attributes()` function uses `WP_HTML_Tag_Processor` to add `crossorigin="anonymous"` to `<audio>`, `<img>`, `<link>`, `<script>`, `<video>`, and `<source>` tags that load cross-origin URLs.
+**Server-side** (PHP output buffer): The `wp_add_crossorigin_attributes()` function uses `WP_HTML_Tag_Processor` to add `crossorigin="anonymous"` to `<audio>`, `<link>`, `<script>`, `<video>`, and `<source>` tags that load cross-origin URLs.
 
 **Client-side** (JavaScript MutationObserver): A MutationObserver in `packages/block-editor/src/hooks/cross-origin-isolation.js` monitors the DOM for dynamically added elements and adds `crossorigin="anonymous"` attributes at runtime.
+
+> **Note:** `<img>` was intentionally removed from the mutated-element list in [#76618](https://github.com/WordPress/gutenberg/pull/76618). Adding `crossorigin="anonymous"` to images that link to external hosts without CORS headers (a common case for the Image block linking to a third-party URL) caused those previews to break. With the move to Document-Isolation-Policy, image elements no longer need the attribute for client-side processing to function — DIP doesn't require `<img>` resources to be CORS-enabled.
 
 ### Browser support
 
@@ -198,17 +204,27 @@ Browsers that do not support DIP fall back automatically to server-side processi
 
 ## Feature detection
 
-Before enabling client-side processing, the browser's capabilities are checked (in `packages/upload-media/src/feature-detection.ts`). All checks must pass; failure at any point causes a transparent fallback to server-side processing.
+Before enabling client-side processing, the browser's capabilities are checked in `packages/upload-media/src/feature-detection.ts`. All checks must pass; failure at any point causes a transparent fallback to server-side processing.
 
-| Check | Reason |
-| --- | --- |
-| WebAssembly available | Required for wasm-vips |
-| SharedArrayBuffer available | Required for WASM threading (implies Document-Isolation-Policy is active) |
-| CSP allows `blob:` workers | Required for inline worker creation |
+| Check | Threshold | Reason |
+| --- | --- | --- |
+| WebAssembly available | — | Required for wasm-vips |
+| SharedArrayBuffer available | — | Required for WASM threading (implies Document-Isolation-Policy is active) |
+| Web Worker available | — | Required for the off-main-thread vips worker |
+| Device memory | > 2 GB | WASM image processing can hold the full image in memory plus working buffers; very low-memory devices can OOM |
+| Hardware concurrency | ≥ 2 CPU cores | WASM workers can monopolize a core for tens of seconds during encode |
+| Network connection | not `2g`/`slow-2g`, no Save-Data | Avoid the ~13 MB worker download on connections that can't bear it |
+| CSP allows `blob:` workers | — | Required for inline worker creation; verified by attempting to construct a worker from a blob URL |
 
-The PHP-side feature flag (`wp_client_side_media_processing_enabled` filter) is also checked before any JavaScript feature detection runs. Browser-level checks (device memory, network conditions, credentialless iframe support) are gated server-side by limiting DIP to Chromium 137+, which implies a modern, capable device.
+These thresholds were tuned in [#76616](https://github.com/WordPress/gutenberg/pull/76616): the CPU minimum was lowered from 4 to 2 cores, and `3g` connections are now allowed. The device-memory and Save-Data gates are unchanged.
+
+The PHP-side feature flag (`wp_client_side_media_processing_enabled` filter) is also checked before any JavaScript feature detection runs. The Document-Isolation-Policy header is only sent on Chromium 137+, which short-circuits the JavaScript path on browsers that don't support cross-origin isolation through DIP.
+
+A separate `isHeicCanvasSupported()` check (`createImageBitmap` + `OffscreenCanvas`) gates the HEIC fallback path. This runs independently of full VIPS support so Safari (which can't run the WASM pipeline but can decode HEIC natively) can still handle iPhone photos in the browser.
 
 ## Supported formats
+
+The following formats are processed in the WASM/vips pipeline (`CLIENT_SIDE_SUPPORTED_MIME_TYPES`):
 
 | Format | Read | Write | Transparency | Animation | Progressive/Interlace |
 | --- | --- | --- | --- | --- | --- |
@@ -219,10 +235,22 @@ The PHP-side feature flag (`wp_client_side_media_processing_enabled` filter) is 
 | GIF | Yes | Yes | No | Yes | Yes |
 
 Notes:
--   HEIC/HEIF is not supported due to trademark/licensing concerns.
 -   AVIF encoding uses `effort: 2` to balance encoding speed with quality.
 -   Animated GIF and WebP images preserve all frames during processing.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
+-   AVIF uploads bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so a host without server-side AVIF support can still accept client-processed AVIF files.
+
+### HEIC/HEIF
+
+HEIC/HEIF is handled via a canvas-based fallback path rather than wasm-vips, since the HEVC codec used by HEIC has patent/licensing restrictions that prevent shipping a decoder in the browser bundle.
+
+When a HEIC file is uploaded, the client tries three decoding strategies in order:
+
+1.  **`createImageBitmap()`** — Works in Safari (which can decode HEIC via macOS platform codecs) and any future browser that adds HEIC to its image pipeline.
+2.  **OS-licensed image decoders via `HTMLImageElement` → `OffscreenCanvas`** — A second-tier path for browsers with platform HEIC support.
+3.  **HEIC container parsing + WebCodecs `VideoDecoder`** — Chrome 107+ on macOS can decode HEVC bitstreams via VideoToolbox even without HEIC image support. The client parses the ISOBMFF container, extracts the HEVC tiles, and re-assembles them on a canvas.
+
+The decoded image is exported as a JPEG (`.jpg`, MIME `image/jpeg`) and uploaded with the original HEIC kept as a companion file in `$metadata['original']`. The server is responsible for sub-size generation in this path (`generate_sub_sizes: true`, `convert_format: true`), so the `image_editor_output_format` mapping is preserved for the JPEG sub-sizes.
 
 ## Fallback behavior
 
@@ -243,9 +271,10 @@ Client-side media processing extends the WordPress REST API in several ways:
 
 | Parameter | Endpoint | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `generate_sub_sizes` | `POST /wp/v2/media` | boolean | `true` | When `false`, the server skips thumbnail generation. The client will generate and sideload thumbnails. |
-| `convert_format` | `POST /wp/v2/media`, `POST /wp/v2/media/{id}/sideload` | boolean | `true` | When `false`, the server skips format conversion (via `image_editor_output_format` filter). |
-| `replace_file` | `POST /wp/v2/media/{id}/sideload` | boolean | `false` | When `true`, replaces the attachment's main file with the sideloaded file, updating the MIME type and metadata and deleting the old file. |
+| `generate_sub_sizes` | `POST /wp/v2/media`, `POST /wp/v2/media/{id}/sideload` | boolean | `true` | When `false`, the server skips thumbnail generation. The client generates and sideloads thumbnails itself. |
+| `convert_format` | `POST /wp/v2/media`, `POST /wp/v2/media/{id}/sideload` | boolean | `true` | When `false`, the server skips format conversion via the `image_editor_output_format` filter. Declared as a boolean on the sideload route since [#77565](https://github.com/WordPress/gutenberg/pull/77565) so REST coerces `multipart/form-data` string values correctly. |
+| `replace_file` | `POST /wp/v2/media/{id}/sideload` | boolean | `false` | When `true`, replaces the attachment's main file with the sideloaded file, updating the MIME type and metadata and deleting the old file. Used for the HEIC → JPEG companion path. |
+| `image_size` | `POST /wp/v2/media/{id}/sideload` | string \| string[] | — | The image size name (e.g., `thumbnail`, `medium`, `scaled`, `original`). Accepts an array of names since [#77036](https://github.com/WordPress/gutenberg/pull/77036) so a single physical file can be registered under multiple sizes that share dimensions. |
 
 When `generate_sub_sizes` is `false`, the following server-side filters are also temporarily disabled:
 -   `intermediate_image_sizes_advanced` — Prevents sub-size generation.
@@ -282,13 +311,12 @@ The endpoint requires `edit_post` and `upload_files` capabilities. It reads the 
 
 ### REST index media settings
 
-When client-side processing is enabled, the REST API root index (`GET /`) includes additional media settings (for users with `upload_files` capability):
+When client-side processing is enabled, the REST API root index (`GET /`) is augmented (for users with `upload_files` capability) with:
 
--   `image_sizes` — All registered image sizes with dimensions and crop settings.
--   `image_size_threshold` — The big image size threshold value.
--   `image_output_formats` — Format conversion map (respects `image_editor_output_format` filter).
--   `jpeg_interlaced`, `png_interlaced`, `gif_interlaced` — Progressive/interlace settings (respects `image_save_progressive` filter).
--   `clientSideSupportedMimeTypes` — Array of MIME types eligible for client-side processing (respects `client_side_supported_mime_types` filter).
+-   `image_sizes` — All registered image sizes with dimensions and crop settings, derived from `wp_get_registered_image_subsizes()`.
+-   `image_size_threshold` — The current `big_image_size_threshold` filter value.
+
+Other server-side filters (`image_editor_output_format`, `image_save_progressive`) are read at upload time on the server rather than exposed via the index. The set of MIME types eligible for client-side processing is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (JPEG, PNG, GIF, WebP, AVIF) — there is no public filter for this list.
 
 ## Concurrency
 
@@ -302,3 +330,12 @@ The upload store enforces two separate concurrency limits to balance performance
 When a concurrency limit is reached, new items wait in the queue. As operations complete, pending items are automatically dequeued and processed.
 
 Additionally, sideload uploads to the same WordPress post are serialized to prevent race conditions in attachment metadata updates. If one sideload is in progress for a post, other sideloads targeting the same post are paused until the first completes.
+
+## Post-save locking
+
+While uploads are in flight, the editor takes a post-saving lock so the user can't publish or save a draft that references attachments which haven't finished sideloading. Both the legacy upload path and the client-side path share this behavior:
+
+-   `useUploadSaveLock` watches the `core/upload-media` store and dispatches `lockPostSaving`/`unlockPostSaving` against the editor store as items enter and leave the queue.
+-   The legacy (`uploadMedia`-only) path also locks via `UploadSaveLockWrapper`, which counts active uploads instead of tracking a queue.
+
+The Save Draft button, Publish button, and `Ctrl/Cmd+S` shortcut all check `isPostSavingLocked()` ([#76973](https://github.com/WordPress/gutenberg/pull/76973) closed an earlier gap where Save Draft did not respect the lock). The lock releases when all items are uploaded or any in-flight item is cancelled.
