@@ -4,194 +4,153 @@
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate } from '@wordpress/date';
 import { Spinner } from '@wordpress/components';
-import { DataViews } from '@wordpress/dataviews';
+import { Icon, comment, postList } from '@wordpress/icons';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { EmptyState, Link, Card, Text } from '@wordpress/ui';
+import { EmptyState, Link } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
+
+// ─── Item type ────────────────────────────────────────────────────────────────
+
+type ActivityKind = 'post-future' | 'post-published' | 'comment';
+
+type ActivityEvent = {
+	id: string;
+	/** ISO date string — used for sorting and extracting the `date` group key. */
+	datetime: string;
+	title: string;
+	description: string;
+	link: string;
+	kind: ActivityKind;
+};
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
 
 /**
- * Formats a date string into a human-readable label, mirroring the PHP logic
- * in `wp_dashboard_recent_posts()`. Uses `dateI18n` so the result respects the
- * site timezone and locale (same as PHP's `date_i18n()`):
+ * Formats a `YYYY-MM-DD` string into a human-readable group label:
+ *  - Today / Yesterday / "Jun 15th" / "Jun 15th 2023"
  *
- *  - Same calendar day  → "Today"
- *  - Next calendar day  → "Tomorrow"
- *  - Same year          → "Jun 15th"
- *  - Different year     → "Jun 15th 2023"
- *
- * @param {string} dateString ISO date string to format.
+ * @param {string} dateStr YYYY-MM-DD date string.
  */
-function formatDate( dateString: string ): string {
+function formatGroupDate( dateStr: string ): string {
 	const now = getDate();
-	const postDay = dateI18n( 'Y-m-d', dateString );
 	const today = dateI18n( 'Y-m-d', now );
 
-	if ( postDay === today ) {
+	if ( dateStr === today ) {
 		return __( 'Today' );
 	}
 
-	const tomorrow = getDate();
-	tomorrow.setDate( tomorrow.getDate() + 1 );
-	const tomorrowDay = dateI18n( 'Y-m-d', tomorrow );
+	const yesterday = getDate();
+	yesterday.setDate( yesterday.getDate() - 1 );
+	const yesterdayStr = dateI18n( 'Y-m-d', yesterday );
 
-	if ( postDay === tomorrowDay ) {
-		return __( 'Tomorrow' );
+	if ( dateStr === yesterdayStr ) {
+		return __( 'Yesterday' );
 	}
 
-	const postYear = dateI18n( 'Y', dateString );
 	const currentYear = dateI18n( 'Y', now );
 
-	if ( postYear !== currentYear ) {
-		/* translators: Date format for dashboard posts from a different year, see https://www.php.net/manual/datetime.format.php */
-		return dateI18n( __( 'M jS Y' ), dateString );
+	if ( dateStr.slice( 0, 4 ) === currentYear ) {
+		/* translators: Date format for dashboard activity group header (current year), see https://www.php.net/manual/datetime.format.php */
+		return dateI18n( __( 'M jS' ), dateStr );
 	}
 
-	/* translators: Date format for dashboard posts from the current year, see https://www.php.net/manual/datetime.format.php */
-	return dateI18n( __( 'M jS' ), dateString );
+	/* translators: Date format for dashboard activity group header (different year), see https://www.php.net/manual/datetime.format.php */
+	return dateI18n( __( 'M jS Y' ), dateStr );
 }
-
-// ─── Item types ───────────────────────────────────────────────────────────────
-
-type PostItem = {
-	id: string;
-	title: string;
-	date: string;
-	link: string;
-};
-
-type CommentItem = {
-	id: string;
-	title: string;
-	date: string;
-	link: string;
-	/** HTML snippet from the comment body. */
-	description: string;
-};
 
 // ─── Fields ───────────────────────────────────────────────────────────────────
 
-const POST_FIELDS: Field< PostItem >[] = [
+const FIELDS: Field< ActivityEvent >[] = [
 	{
-		id: 'title',
-		label: __( 'Title' ),
+		id: 'icon',
+		label: __( 'Icon' ),
+		type: 'media',
+		render: ( { item } ) => (
+			<Icon icon={ item.kind === 'comment' ? comment : postList } />
+		),
+		enableSorting: false,
+		enableHiding: false,
+	},
+	{
+		id: 'content',
+		label: __( 'Content' ),
 		getValue: ( { item } ) => item.title,
+		render: ( { item } ) => (
+			<>
+				<strong>{ item.title }</strong>
+				{ item.description && (
+					<>
+						{ ': ' }
+						<span
+							dangerouslySetInnerHTML={ {
+								__html: item.description,
+							} }
+						/>
+					</>
+				) }
+			</>
+		),
 		enableSorting: false,
 		enableGlobalSearch: true,
 	},
 	{
-		id: 'date',
-		label: __( 'Date' ),
-		getValue: ( { item } ) => item.date,
-		render: ( { item } ) =>
-			sprintf(
-				/* translators: 1: date label (Today / Jun 15th), 2: time */
-				__( '%1$s, %2$s' ),
-				formatDate( item.date ),
-				/* translators: Time format for dashboard post list, see https://www.php.net/manual/datetime.format.php */
-				dateI18n( __( 'g:i a' ), item.date )
-			),
+		id: 'time',
+		label: __( 'Time' ),
+		getValue: ( { item } ) => item.datetime,
+		render: ( { item } ) => (
+			<span>
+				{ /* translators: Time format for activity stream, see https://www.php.net/manual/datetime.format.php */ }
+				{ dateI18n( __( 'g:i a' ), item.datetime ) }
+			</span>
+		),
 		enableSorting: false,
-	},
-];
-
-const COMMENT_FIELDS: Field< CommentItem >[] = [
-	{
-		id: 'title',
-		label: __( 'Author' ),
-		getValue: ( { item } ) => item.title,
-		enableSorting: false,
-		enableGlobalSearch: true,
 	},
 	{
 		id: 'date',
 		label: __( 'Date' ),
-		getValue: ( { item } ) => item.date,
-		render: ( { item } ) =>
-			sprintf(
-				/* translators: 1: date label (Today / Jun 15th), 2: time */
-				__( '%1$s, %2$s' ),
-				formatDate( item.date ),
-				/* translators: Time format for dashboard post list, see https://www.php.net/manual/datetime.format.php */
-				dateI18n( __( 'g:i a' ), item.date )
-			),
+		getValue: ( { item } ) => item.datetime.split( 'T' )[ 0 ],
+		render: ( { item } ) => (
+			<span>{ formatGroupDate( item.datetime.split( 'T' )[ 0 ] ) }</span>
+		),
 		enableSorting: false,
-	},
-	{
-		id: 'description',
-		label: __( 'Comment' ),
-		getValue: ( { item } ) => item.description,
-		render: ( { item } ) =>
-			item.description ? (
-				<span
-					dangerouslySetInnerHTML={ { __html: item.description } }
-				/>
-			) : null,
-		enableSorting: false,
+		enableHiding: false,
 	},
 ];
 
-// ─── Default views ────────────────────────────────────────────────────────────
+// ─── Default view ─────────────────────────────────────────────────────────────
 
-const DEFAULT_POST_VIEW: View = {
+const DEFAULT_VIEW: View = {
 	type: 'activity',
-	titleField: 'title',
-	fields: [ 'date' ],
+	search: '',
 	page: 1,
-	perPage: 5,
-	layout: { density: 'compact' },
+	perPage: 20,
+	filters: [],
+	fields: [ 'time' ],
+	titleField: 'content',
+	mediaField: 'icon',
+	showMedia: true,
+	sort: {
+		field: 'datetime',
+		direction: 'desc',
+	},
+	groupBy: {
+		field: 'date',
+		direction: 'desc',
+		showLabel: false,
+	},
 };
-
-const DEFAULT_COMMENT_VIEW: View = {
-	type: 'activity',
-	titleField: 'title',
-	descriptionField: 'description',
-	fields: [ 'date' ],
-	page: 1,
-	perPage: 5,
-	layout: { density: 'compact' },
-};
-
-// ─── Link renderers ───────────────────────────────────────────────────────────
-
-function renderPostLink( {
-	item,
-	children,
-	...aProps
-}: { item: PostItem } & React.ComponentProps< 'a' > ) {
-	return (
-		<Link href={ item.link } { ...aProps }>
-			{ children }
-		</Link>
-	);
-}
-
-function renderCommentLink( {
-	item,
-	children,
-	...aProps
-}: { item: CommentItem } & React.ComponentProps< 'a' > ) {
-	return (
-		<Link href={ item.link } { ...aProps }>
-			{ children }
-		</Link>
-	);
-}
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Activity() {
-	const [ futureView, setFutureView ] = useState< View >( DEFAULT_POST_VIEW );
-	const [ recentView, setRecentView ] = useState< View >( DEFAULT_POST_VIEW );
-	const [ commentView, setCommentView ] =
-		useState< View >( DEFAULT_COMMENT_VIEW );
+	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
 
 	const futurePosts = useSelect(
 		( select ) =>
@@ -230,55 +189,60 @@ export default function Activity() {
 		recentPosts !== undefined &&
 		comments !== undefined;
 
-	const futureItems = useMemo< PostItem[] >(
-		() =>
-			( futurePosts ?? [] ).map( ( post ) => ( {
+	const allEvents = useMemo< ActivityEvent[] >( () => {
+		const events: ActivityEvent[] = [];
+
+		for ( const post of futurePosts ?? [] ) {
+			events.push( {
 				id: `post-future-${ post.id }`,
+				datetime: post.date ?? '',
 				title: ( post.title as { rendered: string } )?.rendered ?? '',
-				date: post.date ?? '',
+				description: '',
 				link: post.link ?? '',
-			} ) ),
-		[ futurePosts ]
-	);
+				kind: 'post-future',
+			} );
+		}
 
-	const recentItems = useMemo< PostItem[] >(
-		() =>
-			( recentPosts ?? [] ).map( ( post ) => ( {
-				id: `post-recent-${ post.id }`,
+		for ( const post of recentPosts ?? [] ) {
+			events.push( {
+				id: `post-published-${ post.id }`,
+				datetime: post.date ?? '',
 				title: ( post.title as { rendered: string } )?.rendered ?? '',
-				date: post.date ?? '',
+				description: '',
 				link: post.link ?? '',
-			} ) ),
-		[ recentPosts ]
-	);
+				kind: 'post-published',
+			} );
+		}
 
-	const commentItems = useMemo< CommentItem[] >(
-		() =>
-			( comments ?? [] ).map( ( comment ) => ( {
-				id: `comment-${ comment.id }`,
-				title: ( comment.author_name as string ) ?? '',
-				date: ( comment.date as string ) ?? '',
-				link: ( comment.link as string ) ?? '',
+		for ( const c of comments ?? [] ) {
+			events.push( {
+				id: `comment-${ c.id }`,
+				datetime: ( c.date as string ) ?? '',
+				title: ( c.author_name as string ) ?? '',
 				description:
-					( comment.content as { rendered: string } )?.rendered ?? '',
-			} ) ),
-		[ comments ]
+					( c.content as { rendered: string } )?.rendered ?? '',
+				link: ( c.link as string ) ?? '',
+				kind: 'comment',
+			} );
+		}
+
+		return events;
+	}, [ futurePosts, recentPosts, comments ] );
+
+	const { data: shownData, paginationInfo } = useMemo(
+		() => filterSortAndPaginate( allEvents, view, FIELDS ),
+		[ allEvents, view ]
 	);
 
 	if ( ! isResolved ) {
 		return <Spinner />;
 	}
 
-	const isEmpty =
-		futureItems.length === 0 &&
-		recentItems.length === 0 &&
-		commentItems.length === 0;
-
-	if ( isEmpty ) {
+	if ( allEvents.length === 0 ) {
 		return (
 			<EmptyState.Root>
 				<EmptyState.Title>
-					{ __( 'No activity yet!' ) }
+					{ __( 'No activity yet.' ) }
 				</EmptyState.Title>
 				<EmptyState.Description>
 					{ __(
@@ -290,90 +254,31 @@ export default function Activity() {
 	}
 
 	return (
-		<>
-			{ futureItems.length > 0 && (
-				<>
-					<Text variant="heading-md" render={ <h3 /> }>
-						{ __( 'Publishing Soon' ) }
-					</Text>
-					<Card.FullBleed>
-						<DataViews
-							data={ futureItems }
-							fields={ POST_FIELDS }
-							view={ futureView }
-							onChangeView={ setFutureView }
-							paginationInfo={ {
-								totalItems: futureItems.length,
-								totalPages: 1,
-							} }
-							getItemId={ ( item ) => item.id }
-							search={ false }
-							isLoading={ false }
-							defaultLayouts={ { activity: {} } }
-							renderItemLink={ renderPostLink }
-							isItemClickable={ ( item ) => !! item.link }
-						>
-							<DataViews.Layout />
-						</DataViews>
-					</Card.FullBleed>
-				</>
+		<DataViews
+			data={ shownData }
+			fields={ FIELDS }
+			view={ view }
+			onChangeView={ setView }
+			paginationInfo={ paginationInfo }
+			getItemId={ ( item ) => item.id }
+			search={ false }
+			isLoading={ false }
+			defaultLayouts={ {
+				activity: {
+					sort: {
+						field: 'datetime',
+						direction: 'desc',
+					},
+				},
+			} }
+			renderItemLink={ ( { item, children, ...aProps } ) => (
+				<Link href={ item.link } { ...aProps }>
+					{ children }
+				</Link>
 			) }
-
-			{ recentItems.length > 0 && (
-				<>
-					<Text variant="heading-md" render={ <h3 /> }>
-						{ __( 'Recently Published' ) }
-					</Text>
-					<Card.FullBleed>
-						<DataViews
-							data={ recentItems }
-							fields={ POST_FIELDS }
-							view={ recentView }
-							onChangeView={ setRecentView }
-							paginationInfo={ {
-								totalItems: recentItems.length,
-								totalPages: 1,
-							} }
-							getItemId={ ( item ) => item.id }
-							search={ false }
-							isLoading={ false }
-							defaultLayouts={ { activity: {} } }
-							renderItemLink={ renderPostLink }
-							isItemClickable={ ( item ) => !! item.link }
-						>
-							<DataViews.Layout />
-						</DataViews>
-					</Card.FullBleed>
-				</>
-			) }
-
-			{ commentItems.length > 0 && (
-				<>
-					<Text variant="heading-md" render={ <h3 /> }>
-						{ __( 'Recent Comments' ) }
-					</Text>
-					<Card.FullBleed>
-						<DataViews
-							data={ commentItems }
-							fields={ COMMENT_FIELDS }
-							view={ commentView }
-							onChangeView={ setCommentView }
-							paginationInfo={ {
-								totalItems: commentItems.length,
-								totalPages: 1,
-							} }
-							getItemId={ ( item ) => item.id }
-							search={ false }
-							isLoading={ false }
-							defaultLayouts={ { activity: {} } }
-							renderItemLink={ renderCommentLink }
-							isItemClickable={ ( item ) => !! item.link }
-						>
-							<DataViews.Layout />
-						</DataViews>
-					</Card.FullBleed>
-				</>
-			) }
-		</>
+			isItemClickable={ ( item ) => !! item.link }
+		>
+			<DataViews.Layout />
+		</DataViews>
 	);
 }
