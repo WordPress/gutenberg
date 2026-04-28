@@ -296,4 +296,3 @@ function gutenberg_register_user_defined_taxonomies() {
 	}
 }
 add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
-

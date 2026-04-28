@@ -106,5 +106,4 @@ class User_Taxonomy_Content_Filter_Test extends WP_UnitTestCase {
 
 		wp_delete_post( $post_id, true );
 	}
-
 }
