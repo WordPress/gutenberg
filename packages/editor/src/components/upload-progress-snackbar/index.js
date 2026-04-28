@@ -7,7 +7,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
-import { SVG, Circle, Path } from '@wordpress/primitives';
+import { Icon, Spinner } from '@wordpress/components';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -24,35 +25,13 @@ const UPLOAD_SPINNER = (
 		className="editor-upload-progress-snackbar__spinner"
 		aria-hidden="true"
 	>
-		<SVG width="20" height="20" viewBox="0 0 20 20">
-			<Circle
-				cx="10"
-				cy="10"
-				r="8"
-				fill="none"
-				stroke="currentColor"
-				strokeOpacity="0.3"
-				strokeWidth="2"
-			/>
-			<Path
-				d="M 10 2 A 8 8 0 0 1 18 10"
-				fill="none"
-				stroke="currentColor"
-				strokeWidth="2"
-				strokeLinecap="round"
-			/>
-		</SVG>
+		<Spinner />
 	</span>
 );
 
 const UPLOAD_DONE = (
 	<span className="editor-upload-progress-snackbar__check" aria-hidden="true">
-		<SVG width="20" height="20" viewBox="0 0 24 24">
-			<Path
-				d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"
-				fill="currentColor"
-			/>
-		</SVG>
+		<Icon icon={ check } />
 	</span>
 );
 
