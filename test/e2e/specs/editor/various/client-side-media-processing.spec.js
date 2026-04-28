@@ -60,12 +60,9 @@ class MediaProcessingUtils {
 	async waitForUploadQueueEmpty( timeout = 120000 ) {
 		await this.page.waitForFunction(
 			() => {
-				const uploadStore =
-					window.wp.data.select( 'core/upload-media' );
-				if ( ! uploadStore ) {
-					return true; // Store not available, upload happened server-side.
-				}
-				const items = uploadStore.getItems();
+				const items = window.wp.data
+					.select( 'core/upload-media' )
+					.getItems();
 				return items.length === 0;
 			},
 			{ timeout }
@@ -73,17 +70,40 @@ class MediaProcessingUtils {
 	}
 
 	/**
-	 * Skip the test if cross-origin isolation is not enabled.
+	 * Skip the test unless the client-side media processing pipeline is the
+	 * active upload path. This mirrors the gate used in the editor's
+	 * media-upload util: the global flag must be set AND the browser must
+	 * meet the feature detection requirements (cross-origin isolation,
+	 * SharedArrayBuffer, Web Workers, WebAssembly).
 	 *
 	 * @param {import('@playwright/test').TestInfo} testInstance The test object for skipping.
 	 */
-	async skipIfNotCrossOriginIsolated( testInstance ) {
-		const isCrossOriginIsolated = await this.page.evaluate(
-			() => window.crossOriginIsolated
-		);
+	async skipIfClientSideMediaInactive( testInstance ) {
+		const isActive = await this.page.evaluate( () => {
+			if ( ! window.__clientSideMediaProcessing ) {
+				return false;
+			}
+			// Prefer the package's own detection when available so the
+			// gate stays in sync with the editor's runtime decision.
+			if (
+				window.wp?.uploadMedia &&
+				typeof window.wp.uploadMedia.isClientSideMediaSupported ===
+					'function'
+			) {
+				return window.wp.uploadMedia.isClientSideMediaSupported();
+			}
+			// Fall back to the core preconditions for CSM. These are the
+			// signals the package's feature detection inspects first.
+			return (
+				window.crossOriginIsolated === true &&
+				typeof SharedArrayBuffer !== 'undefined' &&
+				typeof WebAssembly !== 'undefined' &&
+				typeof Worker !== 'undefined'
+			);
+		} );
 		testInstance.skip(
-			! isCrossOriginIsolated,
-			'Cross-origin isolation headers not configured on server'
+			! isActive,
+			'Client-side media processing is not active in this environment'
 		);
 	}
 
@@ -113,6 +133,43 @@ class MediaProcessingUtils {
 			path: `/wp/v2/media/${ imageId }`,
 		} );
 	}
+
+	/**
+	 * Insert a core/image block, upload an asset, and return its REST media object.
+	 *
+	 * @param {Object} editor       The editor fixture.
+	 * @param {Object} requestUtils The requestUtils fixture.
+	 * @param {string} fileName     File name in the assets directory.
+	 * @return {Promise<Object>} REST media object for the uploaded attachment.
+	 */
+	async uploadImageAndGetMedia( editor, requestUtils, fileName ) {
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await this.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			fileName
+		);
+
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+
+		await this.waitForUploadQueueEmpty();
+
+		const imageId = await this.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
+
+		return await this.getMediaDetails( requestUtils, imageId );
+	}
 }
 
 test.describe( 'Client-side media processing', () => {
@@ -120,353 +177,143 @@ test.describe( 'Client-side media processing', () => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, mediaProcessingUtils } ) => {
 		await admin.createNewPost();
+		// Every test in this describe exercises the CSM upload pipeline.
+		// Skip up-front if it isn't the active path so we never assert on
+		// server-side fallback behavior (covered by the image/gallery e2es).
+		await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 	} );
 
-	test( 'should verify browser capabilities for client-side processing', async ( {
-		page,
-	} ) => {
-		const isCrossOriginIsolated = await page.evaluate(
-			() => window.crossOriginIsolated
-		);
-
-		if ( ! isCrossOriginIsolated ) {
-			// eslint-disable-next-line playwright/no-skipped-test
-			test.skip(
-				true,
-				'Cross-origin isolation is not enabled in this environment'
-			);
-		}
-
-		expect( isCrossOriginIsolated ).toBe( true );
-
-		const hasSharedArrayBuffer = await page.evaluate(
-			() => typeof SharedArrayBuffer !== 'undefined'
-		);
-		expect( hasSharedArrayBuffer ).toBe( true );
-
-		const hasUploadMediaStore = await page.evaluate(
-			() => !! window.wp.data.select( 'core/upload-media' )
-		);
-		expect( hasUploadMediaStore ).toBe( true );
-	} );
-
-	test( 'should upload and process a JPEG image', async ( {
+	test( 'preserves a JPEG below the size threshold', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'1024x768_e2e_test_image_size.jpeg'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
 		expect( media.mime_type ).toBe( 'image/jpeg' );
-		// Dimensions should be preserved (below 2560 threshold).
 		expect( media.media_details.width ).toBe( 1024 );
 		expect( media.media_details.height ).toBe( 768 );
 		expect( media.source_url ).not.toContain( '-scaled' );
 	} );
 
-	test( 'should upload and process a PNG image', async ( {
+	test( 'preserves an opaque PNG without format conversion', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'200x150_e2e_test_image_opaque.png'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
 		expect( media.mime_type ).toBe( 'image/png' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
 	} );
 
-	test( 'should upload GIF images', async ( {
+	test( 'preserves an animated GIF', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'100x80_e2e_test_image_animated.gif'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
 		expect( media.mime_type ).toBe( 'image/gif' );
+		expect( media.media_details.width ).toBe( 100 );
+		expect( media.media_details.height ).toBe( 80 );
 	} );
 
-	test( 'should upload and process a WebP image', async ( {
+	test( 'decodes and uploads a WebP image as WebP', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'200x150_e2e_test_image_decode.webp'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
-		// WebP decoded client-side by wasm-vips; output may be WebP or JPEG.
-		expect( [ 'image/webp', 'image/jpeg' ] ).toContain( media.mime_type );
+		expect( media.mime_type ).toBe( 'image/webp' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
 	} );
 
-	test( 'should upload and process an AVIF image', async ( {
+	test( 'decodes and uploads an AVIF image as AVIF', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'200x150_e2e_test_image_decode.avif'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-			timeout: 30_000,
-		} );
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
-		// AVIF decoded client-side by wasm-vips; output format depends on config.
-		expect( [ 'image/avif', 'image/jpeg', 'image/webp' ] ).toContain(
-			media.mime_type
-		);
+		expect( media.mime_type ).toBe( 'image/avif' );
+		expect( media.media_details.width ).toBe( 200 );
+		expect( media.media_details.height ).toBe( 150 );
 	} );
 
-	test( 'should generate sub-sizes and scale large images', async ( {
+	test( 'scales oversized images and generates the standard sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
-			'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
-		);
-
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
 			requestUtils,
-			imageId
-		);
-
-		// The image should be scaled down to at most 2560px.
-		expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
-		expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
-
-		// Verify sub-sizes were generated.
-		const sizes = media.media_details.sizes;
-		expect( sizes ).toBeDefined();
-
-		const hasStandardSizes = sizes.thumbnail || sizes.medium || sizes.large;
-		expect( hasStandardSizes ).toBeTruthy();
-
-		// Verify thumbnail dimensions are reasonable.
-		if ( sizes?.thumbnail ) {
-			expect( sizes.thumbnail.width ).toBeLessThanOrEqual( 150 );
-			expect( sizes.thumbnail.height ).toBeLessThanOrEqual( 150 );
-		}
-
-		if ( sizes?.medium ) {
-			expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
-			expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
-		}
-
-		if ( sizes?.large ) {
-			expect( sizes.large.width ).toBeLessThanOrEqual( 1024 );
-			expect( sizes.large.height ).toBeLessThanOrEqual( 1024 );
-		}
-	} );
-
-	test( 'should handle oversized images', async ( {
-		editor,
-		mediaProcessingUtils,
-		requestUtils,
-	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		// Upload 5000x4000 image, well above the 2560 threshold.
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
 			'5000x4000_e2e_test_image_oversized.jpeg'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
+		// 5000x4000 must be scaled to fit within the 2560 default threshold.
+		// CSM scales the longest edge to 2560 and writes a -scaled file.
+		expect( media.source_url ).toContain( '-scaled' );
+		expect( media.media_details.width ).toBe( 2560 );
+		expect( media.media_details.height ).toBe( 2048 );
 
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
+		// The unscaled original is preserved alongside the scaled main file.
+		expect( media.media_details.original_image ).toBeDefined();
 
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
+		// CSM must produce the WordPress default sub-sizes.
+		const sizes = media.media_details.sizes;
+		expect( sizes.thumbnail ).toBeDefined();
+		expect( sizes.medium ).toBeDefined();
+		expect( sizes.large ).toBeDefined();
 
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
+		// Default thumbnail is 150x150 (cropped).
+		expect( sizes.thumbnail.width ).toBe( 150 );
+		expect( sizes.thumbnail.height ).toBe( 150 );
 
-		// Should be scaled to at most 2560px on the longest side.
-		expect( media.media_details.width ).toBeLessThanOrEqual( 2560 );
-		expect( media.media_details.height ).toBeLessThanOrEqual( 2560 );
+		// Default medium fits within 300x300 (preserves aspect ratio).
+		expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
+		expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
+
+		// Default large fits within 1024x1024 (preserves aspect ratio).
+		expect( sizes.large.width ).toBeLessThanOrEqual( 1024 );
+		expect( sizes.large.height ).toBeLessThanOrEqual( 1024 );
 	} );
 
-	test( 'should upload multiple images via gallery', async ( {
+	test( 'uploads multiple images via gallery', async ( {
 		page,
 		editor,
 		mediaProcessingUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
 		await editor.insertBlock( { name: 'core/gallery' } );
 
 		const galleryBlock = editor.canvas.locator(
@@ -478,7 +325,6 @@ test.describe( 'Client-side media processing', () => {
 			'data-testid=form-file-upload-input'
 		);
 
-		// Upload 3 images at once.
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-gallery-' )
 		);
@@ -501,80 +347,20 @@ test.describe( 'Client-side media processing', () => {
 
 		await mediaProcessingUtils.waitForUploadQueueEmpty();
 
-		// Verify all images appear in the gallery.
 		const images = galleryBlock.locator(
 			'role=document[name="Block: Image"i]'
 		);
-		await expect( images ).toHaveCount( 3, { timeout: 60_000 } );
+		await expect( images ).toHaveCount( files.length, { timeout: 60_000 } );
 
-		// After all uploads complete, the Publish button should be enabled.
+		// CSM holds the post-save lock until every queued upload finishes.
+		// The Publish button should be enabled after the queue drains.
 		const publishButton = page.locator(
 			'role=region[name="Editor top bar"i] >> role=button[name="Publish"i]'
 		);
-		await expect( publishButton ).toBeEnabled( {
-			timeout: 60_000,
-		} );
+		await expect( publishButton ).toBeEnabled( { timeout: 60_000 } );
 	} );
 
-	test( 'should fall back to server-side when client-side disabled', async ( {
-		page,
-		editor,
-		mediaProcessingUtils,
-		requestUtils,
-	} ) => {
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
-
-		try {
-			await page.reload();
-
-			await editor.insertBlock( { name: 'core/image' } );
-
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			await mediaProcessingUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
-				'1024x768_e2e_test_image_size.jpeg'
-			);
-
-			const image = imageBlock.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-				timeout: 30_000,
-			} );
-
-			const imageId =
-				await mediaProcessingUtils.getSelectedBlockImageId();
-			expect( imageId ).toBeDefined();
-
-			const media = await mediaProcessingUtils.getMediaDetails(
-				requestUtils,
-				imageId
-			);
-
-			// Should still upload successfully via server-side processing.
-			expect( media.media_details.width ).toBe( 1024 );
-			expect( media.media_details.height ).toBe( 768 );
-		} finally {
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-plugin-disable-client-side-media-processing'
-			);
-		}
-	} );
-
-	test( 'should show error for unsupported file type', async ( {
-		page,
-		editor,
-		mediaProcessingUtils,
-	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
+	test( 'rejects an unsupported file type', async ( { page, editor } ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 
 		const imageBlock = editor.canvas.locator(
@@ -582,79 +368,45 @@ test.describe( 'Client-side media processing', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		// Create a text file to attempt upload.
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-invalid-' )
 		);
 		const tmpFile = path.join( tmpDirectory, 'test.txt' );
 		await fs.writeFile( tmpFile, 'This is not an image.' );
 
-		const uploadInput = imageBlock.locator(
-			'data-testid=form-file-upload-input'
-		);
-		await uploadInput.setInputFiles( tmpFile );
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFile );
 
-		// An error notice should be shown.
-		const errorNotice = page.locator(
-			'role=region[name="Editor publish"i] >> .components-snackbar, .components-notice'
-		);
-		// Check either the snackbar list or notice region for an error.
 		const snackbar = page.locator( '.components-snackbar-list' );
-		await expect( snackbar.or( errorNotice ) ).toBeVisible( {
-			timeout: 10_000,
-		} );
+		await expect( snackbar ).toBeVisible( { timeout: 10_000 } );
 	} );
 
-	test( 'should convert PNG to JPEG when configured', async ( {
+	test( 'converts an opaque PNG to JPEG when image_editor_output_format is filtered', async ( {
 		page,
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
 		);
 
 		try {
-			// Reload to pick up the new output format settings.
 			await page.reload();
+			// Re-check after the reload — the plugin doesn't change CSM
+			// availability, but the page state is fresh.
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 
-			await editor.insertBlock( { name: 'core/image' } );
-
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			// Upload an opaque PNG (no transparency).
-			await mediaProcessingUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
 				'200x150_e2e_test_image_opaque.png'
 			);
 
-			const image = imageBlock.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
-			await expect( image ).toBeVisible();
-
-			await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-			const imageId =
-				await mediaProcessingUtils.getSelectedBlockImageId();
-			expect( imageId ).toBeDefined();
-
-			const media = await mediaProcessingUtils.getMediaDetails(
-				requestUtils,
-				imageId
-			);
-
-			// The opaque PNG should have been converted to JPEG
-			// (or remain as PNG if client-side conversion is not yet supported).
-			expect( [ 'image/jpeg', 'image/png' ] ).toContain(
-				media.mime_type
-			);
+			// With the filter active and no transparency, CSM transcodes
+			// sub-sizes to JPEG and the server transcodes the main file.
+			expect( media.mime_type ).toBe( 'image/jpeg' );
 		} finally {
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
@@ -662,51 +414,28 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
-	test( 'should preserve PNG when image has transparency', async ( {
+	test( 'preserves a transparent PNG even when PNG-to-JPEG is filtered', async ( {
 		page,
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-image-format-conversion-png-to-jpeg'
 		);
 
 		try {
 			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 
-			await editor.insertBlock( { name: 'core/image' } );
-
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			// Upload a transparent PNG.
-			await mediaProcessingUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
 				'200x150_e2e_test_image_transparent.png'
 			);
 
-			const image = imageBlock.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
-			await expect( image ).toBeVisible();
-
-			await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-			const imageId =
-				await mediaProcessingUtils.getSelectedBlockImageId();
-			expect( imageId ).toBeDefined();
-
-			const media = await mediaProcessingUtils.getMediaDetails(
-				requestUtils,
-				imageId
-			);
-
-			// The transparent PNG should stay as PNG even with the conversion filter.
+			// CSM detects the alpha channel and skips the JPEG transcode to
+			// preserve transparency.
 			expect( media.mime_type ).toBe( 'image/png' );
 		} finally {
 			await requestUtils.deactivatePlugin(
@@ -715,54 +444,27 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
-	test( 'should convert JPEG to WebP when configured', async ( {
+	test( 'converts a JPEG to WebP when image_editor_output_format is filtered', async ( {
 		page,
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
 		await requestUtils.activatePlugin(
 			'gutenberg-test-plugin-image-format-conversion-jpeg-to-webp'
 		);
 
 		try {
 			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
 
-			await editor.insertBlock( { name: 'core/image' } );
-
-			const imageBlock = editor.canvas.locator(
-				'role=document[name="Block: Image"i]'
-			);
-			await expect( imageBlock ).toBeVisible();
-
-			await mediaProcessingUtils.upload(
-				imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
 				'1024x768_e2e_test_image_size.jpeg'
 			);
 
-			const image = imageBlock.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
-			await expect( image ).toBeVisible();
-
-			await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-			const imageId =
-				await mediaProcessingUtils.getSelectedBlockImageId();
-			expect( imageId ).toBeDefined();
-
-			const media = await mediaProcessingUtils.getMediaDetails(
-				requestUtils,
-				imageId
-			);
-
-			// The JPEG should have been converted to WebP
-			// (or remain as JPEG if client-side conversion is not yet supported).
-			expect( [ 'image/webp', 'image/jpeg' ] ).toContain(
-				media.mime_type
-			);
+			expect( media.mime_type ).toBe( 'image/webp' );
 		} finally {
 			await requestUtils.deactivatePlugin(
 				'gutenberg-test-plugin-image-format-conversion-jpeg-to-webp'
@@ -770,48 +472,21 @@ test.describe( 'Client-side media processing', () => {
 		}
 	} );
 
-	test( 'should auto-rotate images based on EXIF orientation', async ( {
+	test( 'auto-rotates images based on EXIF orientation', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		await mediaProcessingUtils.skipIfNotCrossOriginIsolated( test );
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		// Upload image with EXIF orientation=6 (90 degrees CW).
-		// Original pixel dimensions are 1024x768 but after rotation should be 768x1024.
-		await mediaProcessingUtils.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+		// EXIF orientation=6 means a 90° clockwise rotation. The asset is
+		// stored 1024x768 in pixels but should land 768x1024 after CSM
+		// applies the EXIF-driven rotation.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
 			'1024x768_e2e_test_image_rotated.jpeg'
 		);
 
-		const image = imageBlock.getByRole( 'img', {
-			name: 'This image has an empty alt attribute',
-		} );
-		await expect( image ).toBeVisible();
-
-		await mediaProcessingUtils.waitForUploadQueueEmpty();
-
-		const imageId = await mediaProcessingUtils.getSelectedBlockImageId();
-		expect( imageId ).toBeDefined();
-
-		const media = await mediaProcessingUtils.getMediaDetails(
-			requestUtils,
-			imageId
-		);
-
-		// After auto-rotation, dimensions should be swapped (768x1024).
-		// If the image processor does not apply EXIF rotation,
-		// dimensions remain at the original 1024x768.
-		const { width, height } = media.media_details;
-		const isRotated = width === 768 && height === 1024;
-		const isOriginal = width === 1024 && height === 768;
-		expect( isRotated || isOriginal ).toBe( true );
+		expect( media.media_details.width ).toBe( 768 );
+		expect( media.media_details.height ).toBe( 1024 );
 	} );
 } );
