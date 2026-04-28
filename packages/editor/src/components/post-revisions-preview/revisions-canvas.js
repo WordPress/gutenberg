@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { Spinner } from '@wordpress/components';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -24,7 +24,9 @@ import {
 } from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 
-const { usePrivateStyleOverride } = unlock( blockEditorPrivateApis );
+const { usePrivateStyleOverride, useBlockElementRef } = unlock(
+	blockEditorPrivateApis
+);
 
 // SVG filter for removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
@@ -102,6 +104,9 @@ function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
 		const { block, className } = props;
 		const diffStatus = block?.__revisionDiffStatus?.status;
+
+		const blockRef = useRef();
+		useBlockElementRef( block.clientId, blockRef );
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
