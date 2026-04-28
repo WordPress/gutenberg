@@ -39,6 +39,14 @@ add_action( 'admin_init', 'gutenberg_disable_tinymce' );
  */
 function gutenberg_enqueue_tinymce_proxy() {
 	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js', __FILE__ ) );
+	wp_localize_script(
+		'gutenberg-tinymce-proxy',
+		'gutenbergTinymceProxy',
+		array(
+			'noticeText' => __( 'TinyMCE is currently disabled, but a feature you are trying to use needs it.', 'gutenberg' ),
+			'reloadText' => __( 'Reload the page with TinyMCE enabled.', 'gutenberg' ),
+		)
+	);
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
