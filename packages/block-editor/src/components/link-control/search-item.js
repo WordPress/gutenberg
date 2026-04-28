@@ -18,18 +18,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
-import { applyFilters, addFilter } from '@wordpress/hooks';
-
-addFilter(
-	'blockEditor.linkControl.searchItemIcon',
-	'block-editor/link-control',
-	( icon, suggestionType ) => {
-		if ( suggestionType === 'rt-movie' ) {
-			return verse; // @wordpress/icons SVG — no dashicon string needed
-		}
-		return icon;
-	}
-);
+import { applyFilters } from '@wordpress/hooks';
 
 const TYPES = {
 	post: {
