@@ -74,7 +74,6 @@ export default function ArrayControl< Item >( {
 			value={ arrayValueAsElements }
 			onChange={ onChangeControl }
 			placeholder={ placeholder }
-			help={ description }
 			suggestions={ elements?.map( ( element ) => element.value ) }
 			disabled={ disabled }
 			__experimentalValidateInput={ ( token: string ) => {
@@ -90,7 +89,7 @@ export default function ArrayControl< Item >( {
 				return true;
 			} }
 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
-			help={ field.isValid?.elements ? '' : undefined }
+			help={ description ?? ( field.isValid?.elements ? '' : undefined ) }
 			displayTransform={ ( token: any ) => {
 				// For existing tokens (element objects), display their label
 				if ( typeof token === 'object' && 'label' in token ) {
