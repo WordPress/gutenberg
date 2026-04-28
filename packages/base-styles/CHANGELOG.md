@@ -20,7 +20,7 @@
     -   `.components-circular-option-picker__option.is-pressed`
     -   `.components-circular-option-picker__option.is-pressed + svg`
     -   `.components-circular-option-picker__swatches`
-    -   `.components-circular-option-picker__swatches > *:not(.components-circular-option-picker__swatches)`
+    -   `> *:not(.components-circular-option-picker__swatches)`
     -   `.components-form-toggle__input`
     -   `.components-popover.block-editor-inspector-list-view-content-popover`
     -   `.components-popover.interface-more-menu__content`
