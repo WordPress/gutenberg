@@ -11,6 +11,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -107,6 +108,21 @@ function withRevisionDiffClasses( BlockListBlock ) {
 
 		const blockRef = useRef();
 		useBlockElementRef( block.clientId, blockRef );
+
+		useEffect( () => {
+			const el = blockRef.current;
+			if ( ! el || ! diffStatus ) {
+				return;
+			}
+
+			const blockTitle = getBlockType( block.name )?.title;
+			console.log( blockTitle );
+			if ( ! blockTitle ) {
+				return;
+			}
+
+			el.setAttribute( 'aria-label', 'something' );
+		}, [ block.clientId, diffStatus, block.name ] );
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',
