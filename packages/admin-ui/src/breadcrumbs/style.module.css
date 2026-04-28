@@ -3,17 +3,17 @@
 	padding: 0;
 	margin: 0;
 	min-height: 32px;
+}
 
-	/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
-	.current {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
+/* @TODO: Remove truncation styles once `Text` supports truncation natively. */
+.current {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
 
-	.admin-ui-breadcrumbs__separator {
-		color: var(--wpds-color-stroke-surface-neutral);
-		margin: 0 var(--wpds-dimension-gap-sm);
-		user-select: none;
-	}
+.separator {
+	color: var(--wpds-color-stroke-surface-neutral);
+	margin: 0 var(--wpds-dimension-gap-sm);
+	user-select: none;
 }
