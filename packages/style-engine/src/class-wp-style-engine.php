@@ -41,7 +41,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @var array
 		 */
 		const BLOCK_STYLE_DEFINITIONS_METADATA = array(
-			'background' => array(
+			'background'     => array(
 				'backgroundImage'      => array(
 					'property_keys' => array(
 						'default' => 'background-image',
@@ -86,7 +86,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'color'      => array(
+			'color'          => array(
 				'text'       => array(
 					'property_keys' => array(
 						'default' => 'color',
@@ -127,7 +127,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'border'     => array(
+			'border'         => array(
 				'color'  => array(
 					'property_keys' => array(
 						'default'    => 'border-color',
@@ -192,7 +192,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'shadow'     => array(
+			'shadow'         => array(
 				'shadow' => array(
 					'property_keys' => array(
 						'default' => 'box-shadow',
@@ -214,7 +214,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'dimensions' => array(
+			'dimensions'     => array(
 				'aspectRatio' => array(
 					'property_keys' => array(
 						'default' => 'aspect-ratio',
@@ -258,7 +258,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'spacing'    => array(
+			'spacing'        => array(
 				'padding' => array(
 					'property_keys' => array(
 						'default'    => 'padding',
@@ -280,7 +280,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
-			'typography' => array(
+			'typography'     => array(
 				'fontSize'       => array(
 					'property_keys' => array(
 						'default' => 'font-size',
