@@ -13,7 +13,10 @@ import type { DashboardGridLayoutItem } from './types';
  *   Each fixed item between two fills is visited at most once by a fill's
  *   look-ahead.
  * - Multi-row path (any item with `height > 1`): per-column skyline that
- *   tracks shadow occupation of tall tiles, O(n · maxColumns).
+ *   tracks shadow occupation of tall tiles. Placement scans rows in
+ *   row-major order, so worst-case cost depends on both columns and rows
+ *   scanned (rows bounded by the sum of item heights), not only on
+ *   `maxColumns`.
  *
  * @param sortedKeys - Item keys in display order.
  * @param layoutMap  - Map of key to DashboardGridLayoutItem.
@@ -28,9 +31,10 @@ export function resolveFillWidths(
 	const resolved = new Map< string, number >();
 	const n = sortedKeys.length;
 
-	// Pre-extract items, clamp widths, and detect which path to take.
+	// Pre-extract items, clamp widths and heights, detect which path to take.
 	const items = new Array< DashboardGridLayoutItem | undefined >( n );
 	const widths = new Array< number >( n );
+	const heights = new Array< number >( n );
 	let hasFill = false;
 	let hasMultiRow = false;
 	let totalRows = 0;
@@ -42,10 +46,13 @@ export function resolveFillWidths(
 			item && typeof item.width === 'number'
 				? Math.min( item.width, maxColumns )
 				: 1;
+		// Clamp to a positive integer so `0`, fractional, or negative
+		// values match the `|| 1` defaulting used in GridItem styles.
+		const h = Math.max( 1, Math.floor( item?.height ?? 1 ) );
+		heights[ i ] = h;
 		if ( item?.width === 'fill' ) {
 			hasFill = true;
 		}
-		const h = item?.height ?? 1;
 		if ( h > 1 ) {
 			hasMultiRow = true;
 		}
@@ -123,7 +130,7 @@ export function resolveFillWidths(
 			continue;
 		}
 
-		const h = item.height ?? 1;
+		const h = heights[ i ];
 
 		if ( item.width === 'full' ) {
 			let r = cursorRow;
