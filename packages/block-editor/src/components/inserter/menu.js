@@ -168,6 +168,18 @@ function InserterMenu(
 
 	const showMediaPanel = selectedTab === 'media' && !! selectedMediaCategory;
 
+	const [ isScrolled, setIsScrolled ] = useState( false );
+
+	const handleScroll = useCallback( ( event ) => {
+		const hasScrolled = event.target.scrollTop > 0;
+		setIsScrolled( ( prevIsScrolled ) => {
+			if ( hasScrolled !== prevIsScrolled ) {
+				return hasScrolled;
+			}
+			return prevIsScrolled;
+		} );
+	}, [] );
+
 	const inserterSearch = useMemo( () => {
 		if ( selectedTab === 'media' ) {
 			return null;
@@ -176,7 +188,9 @@ function InserterMenu(
 		return (
 			<>
 				<SearchControl
-					className="block-editor-inserter__search"
+					className={ clsx( 'block-editor-inserter__search', {
+						'is-scrolled': isScrolled,
+					} ) }
 					onChange={ ( value ) => {
 						if ( hoveredItem ) {
 							setHoveredItem( null );
@@ -219,6 +233,7 @@ function InserterMenu(
 		rootClientId,
 		__experimentalInsertionIndex,
 		isAppender,
+		isScrolled,
 	] );
 
 	const blocksTab = useMemo( () => {
@@ -332,7 +347,10 @@ function InserterMenu(
 			} ) }
 			ref={ ref }
 		>
-			<div className="block-editor-inserter__main-area">
+			<div
+				className="block-editor-inserter__main-area"
+				onScrollCapture={ handleScroll }
+			>
 				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
