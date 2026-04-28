@@ -50,6 +50,33 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	}
 
 	/**
+	 * Resolves a post ID to a content-typed guideline post.
+	 *
+	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
+	 * `content` term — artifact-typed guidelines are addressable only via the
+	 * standard /wp/v2/guidelines collection.
+	 *
+	 * @param int $id Post ID.
+	 * @return WP_Post|WP_Error Post object on success, WP_Error on failure.
+	 */
+	protected function get_post( $id ) {
+		$post = parent::get_post( $id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $post->ID ) ) {
+			return new WP_Error(
+				'rest_post_invalid_id',
+				__( 'Invalid post ID.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $post;
+	}
+
+	/**
 	 * Registers the routes for the content guidelines singleton.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
@@ -103,7 +130,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		// Mount the revisions controller under this base so /content-guidelines/{id}/revisions
 		// returns responses shaped like the singleton (including guideline_categories) and the
 		// custom restore endpoint resolves to this controller.
-		$revisions_controller = new Gutenberg_Guidelines_Revisions_Controller(
+		$revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller(
 			Gutenberg_Guidelines_Post_Type::POST_TYPE,
 			$this->rest_base,
 			$this

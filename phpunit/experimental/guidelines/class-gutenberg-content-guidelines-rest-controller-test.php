@@ -438,6 +438,92 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
+	 * Helper: insert an artifact-typed guideline post directly, bypassing the singleton route.
+	 *
+	 * @return int Post ID.
+	 */
+	private function create_artifact_post() {
+		$artifact_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
+			Gutenberg_Guidelines_Post_Type::TERM_ARTIFACT,
+			'Artifact'
+		);
+
+		$post_id = wp_insert_post(
+			array(
+				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
+				'post_status' => 'draft',
+				'post_title'  => 'Artifact',
+			)
+		);
+
+		wp_set_object_terms( $post_id, array( $artifact_term_id ), Gutenberg_Guidelines_Post_Type::TAXONOMY );
+
+		return $post_id;
+	}
+
+	/**
+	 * Test that GET /content-guidelines/{id} rejects non-content-typed posts.
+	 *
+	 * @covers ::get_post
+	 */
+	public function test_get_item_rejects_artifact_post() {
+		wp_set_current_user( self::$admin_id );
+		$artifact_id = $this->create_artifact_post();
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $artifact_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * Test that PATCH /content-guidelines/{id} rejects non-content-typed posts.
+	 *
+	 * @covers ::get_post
+	 */
+	public function test_update_item_rejects_artifact_post() {
+		wp_set_current_user( self::$admin_id );
+		$artifact_id = $this->create_artifact_post();
+
+		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $artifact_id );
+		$request->set_param( 'status', 'publish' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * Test that DELETE /content-guidelines/{id} rejects non-content-typed posts.
+	 *
+	 * @covers ::get_post
+	 */
+	public function test_delete_item_rejects_artifact_post() {
+		wp_set_current_user( self::$admin_id );
+		$artifact_id = $this->create_artifact_post();
+
+		$request = new WP_REST_Request( 'DELETE', self::REST_BASE . '/' . $artifact_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_id', $response, 404 );
+	}
+
+	/**
+	 * Test that /content-guidelines/{id}/revisions rejects non-content-typed parents.
+	 *
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::get_parent
+	 */
+	public function test_revisions_reject_artifact_parent() {
+		wp_set_current_user( self::$admin_id );
+		$artifact_id = $this->create_artifact_post();
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $artifact_id . '/revisions' );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_post_invalid_parent', $response, 404 );
+	}
+
+	/**
 	 * Test that editors cannot delete guidelines.
 	 *
 	 * @covers ::delete_item_permissions_check
@@ -606,7 +692,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restoring a revision works and returns parent post response.
 	 *
-	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision() {
 		wp_set_current_user( self::$admin_id );
@@ -650,7 +736,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restore response includes _links (via prepare_item_for_response).
 	 *
-	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision
 	 */
 	public function test_restore_revision_response_includes_links() {
 		wp_set_current_user( self::$admin_id );
@@ -681,7 +767,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	/**
 	 * Tests that restoring requires admin permissions.
 	 *
-	 * @covers Gutenberg_Guidelines_Revisions_Controller::restore_revision_permissions_check
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision_permissions_check
 	 */
 	public function test_restore_revision_no_permission() {
 		wp_set_current_user( self::$admin_id );

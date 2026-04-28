@@ -210,6 +210,31 @@ class Gutenberg_Guidelines_Post_Type {
 	}
 
 	/**
+	 * Determines whether a guideline post belongs to the content singleton.
+	 *
+	 * Used by the /wp/v2/content-guidelines route to reject non-content-typed
+	 * posts addressed by ID — those belong to the standard /wp/v2/guidelines
+	 * collection.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool True if the post has the `content` term.
+	 */
+	public static function is_content_guideline( $post_id ) {
+		$terms = get_the_terms( $post_id, self::TAXONOMY );
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return false;
+		}
+
+		foreach ( $terms as $term ) {
+			if ( self::TERM_CONTENT === $term->slug ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Register post meta fields with revision support.
 	 */
 	public static function register_post_meta(): void {

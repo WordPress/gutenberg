@@ -1,9 +1,13 @@
 <?php
 /**
- * Guidelines Revisions REST API Controller.
+ * Content Guidelines Revisions REST API Controller.
  *
- * Extends WP_REST_Revisions_Controller to inherit standard WordPress revision
- * list/get behavior and adds guideline_categories to responses + a restore endpoint.
+ * Specialized revisions controller mounted under /wp/v2/content-guidelines.
+ * Inherits standard WordPress revision list/get behavior and adds
+ * guideline_categories to responses plus a restore endpoint that returns the
+ * parent post in the singleton response shape. The standard
+ * /wp/v2/guidelines/{id}/revisions route is served by the default
+ * WP_REST_Revisions_Controller.
  *
  * @package gutenberg
  */
@@ -13,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Guidelines revisions.
+ * REST API controller for content guidelines revisions.
  */
-class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Controller {
+class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revisions_Controller {
 
 	/**
 	 * The base of the parent controller's route.
@@ -161,6 +165,33 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 	}
 
 	/**
+	 * Resolves a parent post ID to a content-typed guideline post.
+	 *
+	 * Restricts /wp/v2/content-guidelines/{parent}/revisions to parents tagged
+	 * with the `content` term so the singleton revisions endpoint cannot list
+	 * or restore revisions of artifact-typed posts.
+	 *
+	 * @param int $parent_post_id Supplied ID.
+	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
+	 */
+	protected function get_parent( $parent_post_id ) {
+		$parent = parent::get_parent( $parent_post_id );
+		if ( is_wp_error( $parent ) ) {
+			return $parent;
+		}
+
+		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $parent->ID ) ) {
+			return new WP_Error(
+				'rest_post_invalid_parent',
+				__( 'Invalid post parent ID.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $parent;
+	}
+
+	/**
 	 * Prepares the revision for the REST response.
 	 *
 	 * Adds guideline_categories from revision meta to the standard revision response.
@@ -224,13 +255,9 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
 	 */
 	public function restore_revision_permissions_check( $request ) {
-		$parent = get_post( $request['parent'] );
-		if ( ! $parent || $this->parent_post_type !== $parent->post_type ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+		$parent = $this->get_parent( $request['parent'] );
+		if ( is_wp_error( $parent ) ) {
+			return $parent;
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -255,13 +282,9 @@ class Gutenberg_Guidelines_Revisions_Controller extends WP_REST_Revisions_Contro
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
 	 */
 	public function restore_revision( $request ) {
-		$parent = get_post( $request['parent'] );
-		if ( ! $parent || $this->parent_post_type !== $parent->post_type ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+		$parent = $this->get_parent( $request['parent'] );
+		if ( is_wp_error( $parent ) ) {
+			return $parent;
 		}
 
 		$revision = get_post( $request['id'] );
