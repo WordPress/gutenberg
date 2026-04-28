@@ -135,6 +135,7 @@ function RevisionsSlider() {
 	return (
 		<RangeControl
 			__next40pxDefaultSize
+			aria-valuetext={ renderTooltipContent( selectedIndex ) }
 			className="editor-revisions-header__slider"
 			hideLabelFromVision
 			label={ __( 'Revision' ) }
