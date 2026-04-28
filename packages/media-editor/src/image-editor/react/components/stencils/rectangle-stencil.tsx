@@ -11,6 +11,7 @@ import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
+	computeShiftLockedResizeRect,
 	type HandlePosition,
 	type CropBounds,
 	type ResizeDragState,
@@ -18,21 +19,23 @@ import {
 
 /**
  * Corner handle positions only — used when aspect ratio is locked.
+ * Ordered clockwise from top-left for logical tab order.
  */
-const CORNER_POSITIONS: HandlePosition[] = [ 'nw', 'ne', 'sw', 'se' ];
+const CORNER_POSITIONS: HandlePosition[] = [ 'nw', 'ne', 'se', 'sw' ];
 
 /**
  * All handle positions rendered by the stencil.
+ * Ordered clockwise from top-left for logical tab order.
  */
 const ALL_POSITIONS: HandlePosition[] = [
-	'n',
-	's',
-	'e',
-	'w',
 	'nw',
+	'n',
 	'ne',
-	'sw',
+	'e',
 	'se',
+	's',
+	'sw',
+	'w',
 ];
 
 /**
@@ -62,10 +65,11 @@ function getHandleLabel( pos: HandlePosition ): string {
 	}
 }
 
-/**
- * Step size for keyboard-driven handle resize, in normalized coordinates.
- */
-const KEYBOARD_STEP = 0.02;
+/** Fine step for keyboard-driven handle resize, in normalized coordinates. */
+const KEYBOARD_STEP = 0.01;
+
+/** Coarse step when Shift is held — 10× the fine step. */
+const KEYBOARD_STEP_SHIFT = 0.1;
 
 /** Delay before keyboard resize triggers settle (ms). */
 const KEYBOARD_SETTLE_DELAY = 500;
@@ -93,6 +97,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.freeformCrop      Whether resize handles are shown.
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -106,6 +111,7 @@ export function RectangleStencil( {
 	freeformCrop = false,
 	stencilTransition,
 	cropBounds,
+	onEscape,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -146,6 +152,11 @@ export function RectangleStencil( {
 			clientY: number
 		) => NormalizedRect;
 		computeFreeRect: (
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		) => NormalizedRect;
+		computeShiftLockedRect: (
 			drag: ResizeDragState,
 			clientX: number,
 			clientY: number
@@ -192,7 +203,7 @@ export function RectangleStencil( {
 				ownerDoc.activeElement.blur();
 			}
 			// Capture pointer so drag works across iframe boundaries.
-			const el = event.currentTarget;
+			const el = event.currentTarget as HTMLButtonElement;
 			el.setPointerCapture( event.pointerId );
 
 			const drag: ResizeDragState = {
@@ -210,11 +221,13 @@ export function RectangleStencil( {
 			let rafId = 0;
 			let latestX = event.clientX;
 			let latestY = event.clientY;
+			let latestShift = event.shiftKey;
 
 			const onMove = ( e: Event ) => {
 				const pe = e as PointerEvent;
 				latestX = pe.clientX;
 				latestY = pe.clientY;
+				latestShift = pe.shiftKey;
 				if ( rafId ) {
 					return;
 				}
@@ -224,9 +237,18 @@ export function RectangleStencil( {
 					if ( ! h ) {
 						return;
 					}
-					const newRect = h.hasLockedRatio
-						? h.computeLockedRect( drag, latestX, latestY )
-						: h.computeFreeRect( drag, latestX, latestY );
+					let newRect: NormalizedRect;
+					if ( h.hasLockedRatio ) {
+						newRect = h.computeLockedRect( drag, latestX, latestY );
+					} else if ( latestShift ) {
+						newRect = h.computeShiftLockedRect(
+							drag,
+							latestX,
+							latestY
+						);
+					} else {
+						newRect = h.computeFreeRect( drag, latestX, latestY );
+					}
 					h.onCropChange( newRect );
 				} );
 			};
@@ -247,6 +269,11 @@ export function RectangleStencil( {
 				el.removeEventListener( 'pointerup', onEnd );
 				el.removeEventListener( 'lostpointercapture', onEnd );
 				latestHandlersRef.current?.onResizeEnd?.();
+				// Restore focus to the handle so arrow keys work
+				// immediately after a mouse drag. Browsers suppress
+				// :focus-visible after pointer interactions, so the
+				// focus ring stays hidden until the user presses a key.
+				el.focus( { preventScroll: true } );
 			};
 
 			el.addEventListener( 'pointermove', onMove );
@@ -293,21 +320,51 @@ export function RectangleStencil( {
 		[ imageSize, bounds, normalizedRatio ]
 	);
 
+	/**
+	 * Compute the new crop rect when Shift is held during a freeform
+	 * resize — preserves the start rect's aspect ratio.
+	 */
+	const computeShiftLockedRect = useCallback(
+		(
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		): NormalizedRect =>
+			computeShiftLockedResizeRect(
+				drag,
+				clientX,
+				clientY,
+				imageSize,
+				bounds
+			),
+		[ imageSize, bounds ]
+	);
+
 	latestHandlersRef.current = {
 		hasLockedRatio,
 		computeLockedRect,
 		computeFreeRect,
+		computeShiftLockedRect,
 		onCropChange,
 		onResizeEnd,
 	};
 
 	/**
-	 * Handle keyboard arrow keys on a resize handle.
-	 * Moves the corresponding edge(s) by KEYBOARD_STEP in normalized space.
+	 * Handle keyboard events on a resize handle.
+	 * Arrow keys resize; Escape returns focus to the canvas.
+	 * Shift multiplies the step size by 10 for coarser movement.
 	 */
 	const handleKeyDown = useCallback(
 		( handle: HandlePosition, event: React.KeyboardEvent ) => {
 			const key = event.key;
+
+			if ( key === 'Escape' ) {
+				event.preventDefault();
+				event.stopPropagation();
+				onEscape?.();
+				return;
+			}
+
 			if (
 				key !== 'ArrowUp' &&
 				key !== 'ArrowDown' &&
@@ -320,20 +377,22 @@ export function RectangleStencil( {
 			event.preventDefault();
 			event.stopPropagation();
 
+			const step = event.shiftKey ? KEYBOARD_STEP_SHIFT : KEYBOARD_STEP;
+
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
 			let dy = 0;
 			if ( key === 'ArrowLeft' ) {
-				dx = -KEYBOARD_STEP;
+				dx = -step;
 			}
 			if ( key === 'ArrowRight' ) {
-				dx = KEYBOARD_STEP;
+				dx = step;
 			}
 			if ( key === 'ArrowUp' ) {
-				dy = -KEYBOARD_STEP;
+				dy = -step;
 			}
 			if ( key === 'ArrowDown' ) {
-				dy = KEYBOARD_STEP;
+				dy = step;
 			}
 
 			if ( hasLockedRatio ) {
@@ -382,6 +441,7 @@ export function RectangleStencil( {
 			computeFreeRect,
 			onCropChange,
 			onResizeEnd,
+			onEscape,
 		]
 	);
 

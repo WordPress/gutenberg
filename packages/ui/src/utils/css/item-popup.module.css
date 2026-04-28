@@ -55,8 +55,7 @@
 		--wp-ui-popup-item-padding-inline: 12px;
 		--wp-ui-popup-item-padding-block: 4px;
 
-		display: grid;
-		grid-template-columns: 24px 1fr;
+		display: flex;
 		align-items: center;
 		justify-content: flex-start;
 		gap: var(--wpds-dimension-gap-xs);
@@ -106,23 +105,22 @@
 		}
 	}
 
-	.item-indicator {
-		justify-self: center;
+	.item-indicator-icon {
+		flex-shrink: 0;
 	}
 
-	.empty {
+	/* Only style when there is content, because otherwise the element would block clicks
+	on the .list beneath it (both share grid-area: main and overlap). */
+	.empty:not(:empty) {
 		--wp-ui-popup-empty-min-height: 40px;
 		--wp-ui-popup-empty-padding-inline: 12px;
 
 		grid-area: main;
 		display: flex;
 		align-items: center;
+		min-height: var(--wp-ui-popup-empty-min-height);
 		padding-inline: var(--wp-ui-popup-empty-padding-inline);
 		color: var(--wpds-color-fg-content-neutral-weak);
-
-		&:not(:empty) {
-			min-height: var(--wp-ui-popup-empty-min-height);
-		}
 	}
 
 }

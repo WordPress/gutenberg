@@ -1,4 +1,4 @@
-.admin-ui-page {
+.page {
 	display: flex;
 	height: 100%;
 	background-color: var(--wpds-color-bg-surface-neutral);
@@ -9,17 +9,17 @@
 	text-wrap: pretty;
 }
 
-.admin-ui-page__header {
+.header {
 	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
-	border-bottom: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	border-block-end: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 	background: var(--wpds-color-bg-surface-neutral-strong);
 	position: sticky;
-	top: 0;
+	inset-block-start: 0;
 	z-index: 1;
 }
 
-.admin-ui-page__header-title {
-	// @TODO: use Text component from UI when available.
+.header-title {
+	/* @TODO: use Text component from UI when available. */
 	font-family: var(--wpds-typography-font-family-heading);
 	font-size: var(--wpds-typography-font-size-lg);
 	font-weight: var(--wpds-typography-font-weight-medium);
@@ -30,12 +30,12 @@
 	white-space: nowrap;
 }
 
-.admin-ui-page__header-visual {
+.header-visual {
 	display: grid;
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	flex-shrink: 0;
-	// TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm.
+	/* TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm. */
 	width: 24px;
 	height: 24px;
 
@@ -47,11 +47,11 @@
 	}
 }
 
-.admin-ui-page__sidebar-toggle-slot:empty {
+.sidebar-toggle-slot:empty {
 	display: none;
 }
 
-.admin-ui-page__header-subtitle {
+.header-subtitle {
 	padding-block-end: var(--wpds-dimension-padding-xs);
 	color: var(--wpds-color-fg-content-neutral-weak);
 	font-size: var(--wpds-typography-font-size-md);
@@ -59,7 +59,7 @@
 	margin: 0;
 }
 
-.admin-ui-page__content {
+.content {
 	flex-grow: 1;
 	overflow: auto;
 	display: flex;

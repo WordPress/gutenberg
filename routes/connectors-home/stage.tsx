@@ -50,7 +50,6 @@ function ConnectorsPage() {
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
-			headingLevel={ 1 }
 			subTitle={ __(
 				'All of your API keys and credentials are stored here and shared across plugins. Configure once and use everywhere.'
 			) }
