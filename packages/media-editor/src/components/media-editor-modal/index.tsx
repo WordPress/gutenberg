@@ -15,7 +15,7 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
+import { close, drawerRight } from '@wordpress/icons';
 import type { Field } from '@wordpress/dataviews';
 import {
 	ComplementaryArea,
@@ -172,6 +172,14 @@ function HeaderActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
+			<Button
+				size="compact"
+				icon={ close }
+				label={ __( 'Close' ) }
+				onClick={ onCancel }
+				disabled={ isSaving }
+				accessibleWhenDisabled
+			/>
 		</Flex>
 	);
 }
@@ -390,6 +398,9 @@ function MediaEditorModalContent( {
 				className="media-editor-modal"
 				title={ __( 'Edit media' ) }
 				size="fill"
+				isDismissible={ false }
+				shouldCloseOnEsc={ ! hasChanges }
+				shouldCloseOnClickOutside={ ! hasChanges }
 				onRequestClose={ handleRequestClose }
 				headerActions={
 					<HeaderActions
