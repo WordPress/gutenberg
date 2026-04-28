@@ -92,7 +92,7 @@ function SliderEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Slider Settings' ) }>
+				<PanelBody title={ __( 'Loop' ) }>
 					<ToggleControl
 						label={ __( 'Loop' ) }
 						help={ __( 'Loop back to the first or last slide.' ) }
