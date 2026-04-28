@@ -12,8 +12,8 @@
 	position: sticky;
 	// When sticking, tuck the top border beneath the modal header border
 	top: ($grid-unit-05 + 1) * -1;
-	// Keep the sticky disabled block count above the sticky category titles.
-	z-index: 2;
+	// Keep the sticky disabled block count above the category items.
+	z-index: 1;
 
 	// Stick the category titles to the bottom
 	~ .block-editor-block-manager__content .block-editor-block-manager__category-title {

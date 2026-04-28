@@ -8,6 +8,7 @@
 }
 
 .block-editor-block-manager__category {
+	isolation: isolate;
 	margin: 0 0 $grid-unit-30 0;
 }
 
