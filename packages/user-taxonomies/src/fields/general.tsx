@@ -7,13 +7,13 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import type { Field, Form } from '@wordpress/dataviews';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
-import { Notice, Stack } from '@wordpress/ui';
+import { Badge, Notice, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
-import { usePublicPostTypes } from './utils';
-import type { TaxonomyFormData } from './types';
+import { usePublicPostTypes } from '../utils';
+import type { TaxonomyFormData } from '../types';
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
@@ -51,6 +51,21 @@ export const singularLabelField: Field< TaxonomyFormData > = {
 		},
 	} ),
 	isValid: { required: true },
+	enableSorting: false,
+};
+
+export const descriptionField: Field< TaxonomyFormData > = {
+	id: 'description',
+	label: __( 'Description' ),
+	type: 'text',
+	Edit: { control: 'textarea', rows: 3 },
+	description: __(
+		'Optional summary of the taxonomy. Shown in admin UIs that surface taxonomy details.'
+	),
+	getValue: ( { item } ) => item.config.description,
+	setValue: ( { item, value } ) => ( {
+		config: { ...item.config, description: String( value ?? '' ) },
+	} ),
 	enableSorting: false,
 };
 
@@ -94,6 +109,14 @@ export const statusField: Field< TaxonomyFormData > = {
 		{ value: 'publish', label: __( 'Active' ) },
 		{ value: 'draft', label: __( 'Inactive' ) },
 	],
+	render: ( { item } ) => {
+		const isActive = item.status === 'publish';
+		return (
+			<Badge intent={ isActive ? 'stable' : 'draft' }>
+				{ isActive ? __( 'Active' ) : __( 'Inactive' ) }
+			</Badge>
+		);
+	},
 	enableSorting: false,
 };
 
@@ -211,8 +234,7 @@ export function useObjectTypeField(): Field< TaxonomyFormData > {
 	}, [ publicPostTypes ] );
 }
 
-// --- Form layout ---------------------------------------------------------
-
+// The minimal form used by the quick-edit modal.
 export const defaultForm: Form = {
 	layout: { type: 'regular' },
 	fields: [
@@ -221,6 +243,19 @@ export const defaultForm: Form = {
 		'slug',
 		'object_type',
 		'public',
+		'hierarchical',
+		'status',
+	],
+};
+
+export const generalForm: Form = {
+	layout: { type: 'regular' },
+	fields: [
+		'plural_name',
+		'singular_name',
+		'slug',
+		'description',
+		'object_type',
 		'hierarchical',
 		'status',
 	],

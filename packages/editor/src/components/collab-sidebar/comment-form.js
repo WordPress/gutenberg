@@ -10,9 +10,8 @@ import { useState } from '@wordpress/element';
 import {
 	__experimentalTruncate as Truncate,
 	Button,
-	VisuallyHidden,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
@@ -50,7 +49,8 @@ function CommentForm( {
 				setInputComment( '' );
 			} }
 		>
-			<VisuallyHidden as="label" htmlFor={ inputId }>
+			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
+			<VisuallyHidden render={ <label htmlFor={ inputId } /> }>
 				{ labelText ?? __( 'Note' ) }
 			</VisuallyHidden>
 			<TextareaAutosize

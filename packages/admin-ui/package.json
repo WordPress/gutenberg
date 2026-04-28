@@ -26,7 +26,6 @@
 		"src",
 		"build",
 		"build-module",
-		"build-style",
 		"build-types",
 		"*.md"
 	],
@@ -38,14 +37,12 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./package.json": "./package.json",
-		"./build-style/": "./build-style/"
+		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": [
-		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.module.css"
 	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
