@@ -75,6 +75,7 @@ describe( 'generate', () => {
 						lineHeight: '3.3',
 						textColumns: '2',
 						textDecoration: 'line-through',
+						textShadow: '2px 2px 4px rgba(0,0,0,0.35)',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
 					},
@@ -376,6 +377,11 @@ describe( 'getCSSRules', () => {
 				selector: '.some-selector',
 				key: 'textDecoration',
 				value: 'line-through',
+			},
+			{
+				selector: '.some-selector',
+				key: 'textShadow',
+				value: '2px 2px 4px rgba(0,0,0,0.35)',
 			},
 			{
 				selector: '.some-selector',

@@ -5545,6 +5545,33 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected_styles, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	public function test_get_text_shadow_styles_for_blocks() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks'   => array(
+						'core/paragraph' => array(
+							'typography' => array(
+								'textShadow' => '2px 2px 0 #000',
+							),
+						),
+					),
+					'elements' => array(
+						'link' => array(
+							'typography' => array(
+								'textShadow' => '1px 1px 2px rgba(0,0,0,0.3)',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected_styles = 'a:where(:not(.wp-element-button)){text-shadow: 1px 1px 2px rgba(0,0,0,0.3);}:root :where(p){text-shadow: 2px 2px 0 #000;}';
+		$this->assertSameCSS( $expected_styles, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_top_level_background_image_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

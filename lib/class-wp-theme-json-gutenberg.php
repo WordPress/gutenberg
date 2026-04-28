@@ -243,6 +243,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
 	 *              `typography.textIndent` properties.
+	 * @since 7.1.0 Added `text-shadow` property.
 	 *
 	 * @var array
 	 */
@@ -306,6 +307,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--root--padding-bottom' => array( 'spacing', 'padding', 'bottom' ),
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
+		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
@@ -478,6 +480,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
+			'textShadow'       => null,
 			'textIndent'       => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
@@ -524,6 +527,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
 	 *              `typography.textIndent` properties.
+	 * @since 7.1.0 Added `typography.textShadow` property.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -582,6 +586,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
+			'textShadow'     => null,
 			'textIndent'     => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
