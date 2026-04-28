@@ -140,7 +140,6 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			}
 
 			const blockTitle = getBlockType( block.name )?.title;
-
 			if ( ! blockTitle ) {
 				return;
 			}
