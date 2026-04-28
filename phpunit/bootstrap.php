@@ -91,7 +91,7 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-form-blocks'        => 1,
 		'gutenberg-block-experiments'  => 1,
 		'gutenberg-media-processing'   => 1,
-		'gutenberg-content-guidelines' => 1,
+		'gutenberg-guidelines'         => 1,
 	),
 );
 

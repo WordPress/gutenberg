@@ -1,113 +1,29 @@
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+import { createOverlayModalContext } from '../utils/create-overlay-modal-context';
+import { createOverlayTitleValidation } from '../utils/create-overlay-title-validation';
 
-/**
- * Whether validation is enabled. This is a build-time constant that allows
- * bundlers to tree-shake all validation code in production builds.
- */
-const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
+// -- Modal context ----------------------------------------------------------
 
-type DialogValidationContextType = {
-	registerTitle: ( element: HTMLElement | null ) => void;
-};
+const dialogModal =
+	createOverlayModalContext< _Dialog.Root.Props[ 'modal' ] >( true );
 
-// Context is only created in development mode.
-const DialogValidationContext = VALIDATION_ENABLED
-	? createContext< DialogValidationContextType | null >( null )
-	: ( null as unknown as React.Context< DialogValidationContextType | null > );
+export const DialogModalProvider = dialogModal.Provider;
+export const useDialogModal = dialogModal.useModal;
 
-/**
- * Development-only hook to access the dialog validation context.
- */
-function useDialogValidationContextDev() {
-	return useContext( DialogValidationContext );
-}
+// -- Validation context (dev-only) ------------------------------------------
 
-/**
- * Production no-op hook.
- */
-function useDialogValidationContextProd() {
-	return null;
-}
+const dialogTitleValidation = createOverlayTitleValidation( 'Dialog' );
 
 /**
  * Hook to access the dialog validation context.
  * Returns null in production or if not within a Dialog.Popup.
  */
-export const useDialogValidationContext = VALIDATION_ENABLED
-	? useDialogValidationContextDev
-	: useDialogValidationContextProd;
-
-/**
- * Development-only provider that tracks whether Dialog.Title is rendered.
- */
-function DialogValidationProviderDev( {
-	children,
-}: {
-	children: React.ReactNode;
-} ) {
-	const titleElementRef = useRef< HTMLElement | null >( null );
-
-	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
-		titleElementRef.current = element;
-	}, [] );
-
-	const contextValue = useMemo(
-		() => ( { registerTitle } ),
-		[ registerTitle ]
-	);
-
-	// Validate that Dialog.Title is rendered with non-empty text content
-	useEffect( () => {
-		// useLayoutEffect in Title runs before this useEffect,
-		// so titleElementRef should already be set if Title is present
-		const titleElement = titleElementRef.current;
-
-		if ( ! titleElement ) {
-			throw new Error(
-				'Dialog: Missing <Dialog.Title>. ' +
-					'For accessibility, every dialog requires a title. ' +
-					'If needed, the title can be visually hidden but must not be omitted.'
-			);
-		}
-
-		const textContent = titleElement.textContent?.trim();
-		if ( ! textContent ) {
-			throw new Error(
-				'Dialog: <Dialog.Title> cannot be empty. ' +
-					'Provide meaningful text content for the dialog title.'
-			);
-		}
-	}, [] );
-
-	return (
-		<DialogValidationContext.Provider value={ contextValue }>
-			{ children }
-		</DialogValidationContext.Provider>
-	);
-}
-
-/**
- * Production no-op provider that just renders children.
- */
-function DialogValidationProviderProd( {
-	children,
-}: {
-	children: React.ReactNode;
-} ) {
-	return <>{ children }</>;
-}
+export const useDialogValidationContext =
+	dialogTitleValidation.useValidationContext;
 
 /**
  * Provider component that validates Dialog.Title presence in development mode.
  * In production, this component is a no-op and just renders children.
  */
-export const DialogValidationProvider = VALIDATION_ENABLED
-	? DialogValidationProviderDev
-	: DialogValidationProviderProd;
+export const DialogValidationProvider =
+	dialogTitleValidation.ValidationProvider;

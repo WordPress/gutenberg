@@ -279,6 +279,7 @@ export default function PostList( { postType } ) {
 	return (
 		<Page
 			title={ labels?.name }
+			headingLevel={ 2 }
 			actions={
 				<>
 					{ labels?.add_new_item && canCreateRecord && (
@@ -322,7 +323,7 @@ export default function PostList( { postType } ) {
 				} }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
-				defaultLayouts={ defaultLayouts ?? {} }
+				defaultLayouts={ defaultLayouts }
 				onReset={
 					isModified
 						? () => {

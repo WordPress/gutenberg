@@ -5,6 +5,7 @@ import * as Card from '../card';
 import * as Collapsible from '../collapsible';
 import { Icon } from '../icon';
 import styles from './style.module.css';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import focusStyles from '../utils/css/focus.module.css';
 import { HeaderDescriptionIdContext } from './context';
 import type { HeaderProps } from './types';
@@ -55,6 +56,7 @@ export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 						<div
 							className={ clsx(
 								styles[ 'header-trigger-wrapper' ],
+								defenseStyles.div,
 								// While the interactive trigger element is the whole header,
 								// the focus ring will be displayed only on the icon to visually
 								// emulate it being the button.

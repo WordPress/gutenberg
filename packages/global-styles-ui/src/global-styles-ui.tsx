@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { Navigator, useNavigator } from '@wordpress/components';
-// @ts-expect-error: Not typed yet.
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 // @ts-expect-error: Not typed yet.
@@ -13,10 +12,7 @@ import {
 	generateGlobalStyles,
 	mergeGlobalStyles,
 } from '@wordpress/global-styles-engine';
-import type {
-	GlobalStylesConfig,
-	BlockType,
-} from '@wordpress/global-styles-engine';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -228,7 +224,7 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />
 					</GlobalStylesNavigationScreen>
-					{ blocks.map( ( block: BlockType ) => (
+					{ blocks.map( ( block ) => (
 						<Fragment key={ block.name }>
 							<GlobalStylesNavigationScreen
 								path={

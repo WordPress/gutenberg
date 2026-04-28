@@ -41,7 +41,6 @@ import {
 	Icon,
 	SlotFillProvider,
 	Tooltip,
-	VisuallyHidden,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -51,6 +50,7 @@ import {
 	useRefEffect,
 	useViewportMatch,
 } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -329,7 +329,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separator = ! isShort && (
 		<>
 			<Tooltip text={ __( 'Drag to resize' ) }>
-				<button // eslint-disable-line jsx-a11y/role-supports-aria-props
+				<button
 					ref={ separatorRef }
 					role="separator" // eslint-disable-line jsx-a11y/no-interactive-element-to-noninteractive-role
 					aria-valuenow={ usedAriaValueNow }
