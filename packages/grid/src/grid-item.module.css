@@ -1,0 +1,43 @@
+.item {
+	position: relative;
+}
+
+.item-content {
+	position: relative;
+	height: 100%;
+}
+
+/*
+ * During drag, the original item acts as a placeholder in its grid
+ * cell while `<DragOverlay>` renders a clone that follows the cursor.
+ * Fading the placeholder and outlining it with a dashed border makes
+ * the destination visible without any scaling or translation on the
+ * original element.
+ */
+.is-dragging {
+	opacity: 0.4;
+	pointer-events: none;
+	outline: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
+}
+
+@media (forced-colors: active) {
+	.is-dragging {
+		outline-color: Highlight;
+	}
+}
+
+.preview-overlay {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	pointer-events: none;
+	z-index: 1;
+	border: var(--wpds-border-width-sm) dashed var(--wpds-color-stroke-interactive-brand);
+	background: transparent;
+}
+
+@media (forced-colors: active) {
+	.preview-overlay {
+		border-color: Highlight;
+	}
+}
