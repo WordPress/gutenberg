@@ -19,8 +19,8 @@
 }
 
 .header-content {
-	/* TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-md. See https://github.com/WordPress/gutenberg/pull/76545 */
-	min-height: 32px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
+	min-height: calc(var(--wpds-dimension-base) * 8);
 }
 
 .header-actions {
