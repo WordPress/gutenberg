@@ -43,6 +43,13 @@ import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspect
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
+// Keep in sync with RESPONSIVE_BREAKPOINTS in
+// lib/class-wp-theme-json-gutenberg.php.
+const RESPONSIVE_STATE_MEDIA_QUERIES = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
+
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	BORDER_SUPPORT_KEY,
@@ -342,13 +349,13 @@ function BlockStyleControls( {
 	const blockEditingMode = useBlockEditingMode();
 	const [ selectedState, setSelectedState ] = useState( 'default' );
 	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+	const isPseudoSelectorState = selectedState?.startsWith( ':' );
 
-	// Inject state styles onto the editor canvas so the selected state is
+	// Inject pseudo-state styles onto the editor canvas so the selected state is
 	// visible while editing. Scoped to this block instance via data-block so
-	// other blocks of the same type are not affected. Must be called before
-	// any early returns because it is a hook.
+	// other blocks of the same type are not affected.
 	const canvasStateCSS = useMemo( () => {
-		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+		if ( ! showStateOnCanvas || ! isPseudoSelectorState ) {
 			return undefined;
 		}
 		const stateValue = style?.[ selectedState ];
@@ -360,8 +367,46 @@ function BlockStyleControls( {
 		// Use !important to override utility classes (e.g. has-accent-3-color)
 		// that the block's default color support generates with !important.
 		return css ? css.replace( /;/g, ' !important;' ) : undefined;
-	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
-	useStyleOverride( { css: canvasStateCSS } );
+	}, [
+		showStateOnCanvas,
+		isPseudoSelectorState,
+		selectedState,
+		style,
+		clientId,
+		name,
+	] );
+
+	// Always emit responsive-state styles with media queries in the editor so
+	// responsive preview (or viewport resizing) displays responsive styles as
+	// on the frontend.
+	const canvasResponsiveCSS = useMemo( () => {
+		const selector = buildCanvasStateSelector( clientId, name );
+		const responsiveCSSRules = [];
+
+		Object.entries( RESPONSIVE_STATE_MEDIA_QUERIES ).forEach(
+			( [ state, mediaQuery ] ) => {
+				const responsiveStyles = style?.[ state ];
+				if ( ! responsiveStyles ) {
+					return;
+				}
+				const css = compileCSS( responsiveStyles, { selector } );
+				if ( css ) {
+					responsiveCSSRules.push( `${ mediaQuery }{${ css }}` );
+				}
+			}
+		);
+
+		return responsiveCSSRules.length > 0
+			? responsiveCSSRules.join( '' )
+			: undefined;
+	}, [ style, clientId, name ] );
+
+	useStyleOverride( {
+		css:
+			canvasStateCSS || canvasResponsiveCSS
+				? `${ canvasStateCSS || '' }${ canvasResponsiveCSS || '' }`
+				: undefined,
+	} );
 
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -392,7 +437,7 @@ function BlockStyleControls( {
 				value={ selectedState }
 				onChange={ setSelectedState }
 			/>
-			{ selectedState !== 'default' && (
+			{ isPseudoSelectorState && (
 				<BlockInspectorPreTabsFill>
 					<Spacer paddingX={ 4 } paddingY={ 2 }>
 						<ToggleControl
@@ -558,6 +603,25 @@ function useBlockProps( { name, style } ) {
 				}
 			} );
 		}
+
+		Object.entries( RESPONSIVE_STATE_MEDIA_QUERIES ).forEach(
+			( [ state, mediaQuery ] ) => {
+				const responsiveStyles = style?.[ state ];
+				if ( responsiveStyles ) {
+					const selector = buildStateSelector(
+						baseElementSelector,
+						name,
+						''
+					);
+					const css = compileCSS( responsiveStyles, {
+						selector,
+					} );
+					if ( css ) {
+						cssRules.push( `${ mediaQuery }{${ css }}` );
+					}
+				}
+			}
+		);
 
 		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
 	}, [ baseElementSelector, blockElementStyles, name, style ] );

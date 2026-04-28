@@ -19,24 +19,37 @@ export const STATE_LABELS = {
 };
 
 /**
- * Renders a state selector (hover, focus, active) in the block card header.
- * Only shown for blocks that declare `states` support.
+ * Responsive state labels — available on all blocks without any block.json support declaration.
+ * Keep in sync with RESPONSIVE_BREAKPOINTS in lib/class-wp-theme-json-gutenberg.php.
+ */
+export const RESPONSIVE_STATE_LABELS = {
+	mobile: __( 'Mobile' ),
+	tablet: __( 'Tablet' ),
+};
+
+/**
+ * Renders a state selector in the block card header.
+ * Always includes responsive states (Mobile, Tablet) for all blocks.
+ * Also includes pseudo-states (:hover, :focus, :active) for blocks that
+ * declare `states` support in block.json.
  *
  * @param {Object}   props          Component props.
  * @param {string}   props.name     Block name.
  * @param {string}   props.value    Currently selected state value.
  * @param {Function} props.onChange Callback when selection changes.
- * @return {Element|null} State control component, or null if not applicable.
+ * @return {Element} State control component.
  */
 export function BlockStatesControl( { name, value, onChange } ) {
-	const validStates = getBlockSupport( name, STATES_SUPPORT_KEY ) ?? [];
-	const stateOptions = validStates
+	const pseudoStates = getBlockSupport( name, STATES_SUPPORT_KEY ) ?? [];
+	const pseudoStateOptions = pseudoStates
 		.filter( ( state ) => STATE_LABELS[ state ] )
 		.map( ( state ) => ( { value: state, label: STATE_LABELS[ state ] } ) );
 
-	if ( ! stateOptions.length ) {
-		return null;
-	}
+	const responsiveStateOptions = Object.entries(
+		RESPONSIVE_STATE_LABELS
+	).map( ( [ key, label ] ) => ( { value: key, label } ) );
+
+	const stateOptions = [ ...pseudoStateOptions, ...responsiveStateOptions ];
 
 	return (
 		<BlockCardControlsFill>
