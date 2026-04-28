@@ -22,6 +22,7 @@
 	.components-panel__header {
 		position: sticky;
 		top: 0;
+		// Sit above the panel's scrolling content within the stacking context above.
 		z-index: 1;
 
 		&.editor-sidebar__panel-tabs {
