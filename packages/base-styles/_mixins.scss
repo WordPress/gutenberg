@@ -221,22 +221,6 @@
  * Styles that are reused verbatim in a few places
  */
 
-@mixin snackbar-container() {
-	position: fixed;
-	bottom: 24px;
-	left: 0;
-	right: 0;
-	padding-inline: 16px;
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	pointer-events: none;
-
-	.components-snackbar {
-		margin-inline: auto;
-	}
-}
-
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;

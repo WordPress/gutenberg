@@ -14,9 +14,10 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 	Button,
 	SlotFillProvider,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import { useState, useEffect } from '@wordpress/element';
+import { createPortal, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page } from '@wordpress/admin-ui';
 
@@ -33,6 +34,9 @@ import './style.scss';
 import { UserThemeProvider } from '../user-theme-provider';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 export default function Root() {
 	const matches = useMatches();
@@ -68,7 +72,10 @@ export default function Root() {
 						} ) }
 					>
 						<SavePanel />
-						<SnackbarNotices className="boot-notices__snackbar" />
+						{ createPortal(
+							<SnackbarNotices className="boot-notices__snackbar" />,
+							getOverlayLegacySlot()
+						) }
 						{ isMobileViewport && (
 							<Page.SidebarToggleFill>
 								<Button

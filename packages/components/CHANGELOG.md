@@ -16,6 +16,7 @@
 ### Breaking Changes
 
 -   `ExternalLink`: No longer adds `noreferrer` to the `rel` attribute. `noopener` is still applied. Consumers relying on the previous behavior should pass `rel="noopener noreferrer"` explicitly ([#26968](https://github.com/WordPress/gutenberg/pull/26968)).
+-   The `snackbar-container()` SCSS mixin in `@wordpress/base-styles/mixins` has been removed. Its rules are now baked into `.components-snackbar-list`. Plugins that called `@include snackbar-container()` should target `.components-snackbar-list` directly or inline the equivalent positioning.
 
 ### Internal
 
@@ -23,6 +24,7 @@
 -   `Popover`: Render the fallback container inside the new overlay legacy slot. The popover's per-class z-index is preserved and now stacks relative to the slot.
 -   `Modal`: Portal modals into the overlay legacy slot. Update the aria-helper to walk up from the modal so siblings of the slot wrapper (and outer modals when nested) continue to be aria-hidden.
 -   `Tooltip`, `Menu`, `CustomSelectControl` v2: Pass `portalElement={ getOverlayLegacySlot }` so each Ariakit-backed overlay portals into the overlay legacy slot. Per-overlay z-indexes are unchanged.
+-   `SnackbarList`: Bake the previously-mixin-only positioning (`position: fixed; bottom; padding-inline; pointer-events: none;`) into `.components-snackbar-list` directly so the list self-positions whether portaled or rendered inline.
 -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
 -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
 -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).

@@ -76,15 +76,30 @@
 }
 
 .components-snackbar-list {
-	position: absolute;
+	// Self-positioning at the viewport bottom. Previously these styles came
+	// from the `snackbar-container()` mixin applied to a shell wrapper class
+	// (e.g. `.edit-post-layout__snackbar`). Baking them in lets the list
+	// render correctly whether it is portaled into the overlay legacy slot
+	// or rendered inline by other consumers.
+	position: fixed;
+	bottom: $grid-unit-30;
+	left: 0;
+	right: 0;
 	z-index: z-index(".components-snackbar-list");
+	padding-inline: $grid-unit-20;
 	width: 100%;
 	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
 
 	// Disable pointer events, so that clicking this area
 	// outside of an individual notice still allows the UI
 	// underneath to be clicked.
 	pointer-events: none;
+
+	.components-snackbar {
+		margin-inline: auto;
+	}
 }
 
 .components-snackbar-list__notice-container {

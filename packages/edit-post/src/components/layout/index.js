@@ -23,6 +23,7 @@ import { getLayoutStyles } from '@wordpress/global-styles-engine';
 import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
+	createPortal,
 	useCallback,
 	useMemo,
 	useId,
@@ -72,7 +73,8 @@ import { useMetaBoxInitialization } from '../meta-boxes/use-meta-box-initializat
 
 const { useCommandContext } = unlock( commandsPrivateApis );
 /** @type {{} & {useDrag: import('@use-gesture/react').useDrag}} */
-const { useDrag } = unlock( componentsPrivateApis );
+const { useDrag, __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } =
+	unlock( componentsPrivateApis );
 const { Editor, FullscreenMode } = unlock( editorPrivateApis );
 const { BlockKeyboardShortcuts } = unlock( blockLibraryPrivateApis );
 const DESIGN_POST_TYPES = [
@@ -619,7 +621,10 @@ function Layout( {
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
-						<SnackbarNotices className="edit-post-layout__snackbar" />
+						{ createPortal(
+							<SnackbarNotices className="edit-post-layout__snackbar" />,
+							getOverlayLegacySlot()
+						) }
 					</Editor>
 				</div>
 			</ErrorBoundary>

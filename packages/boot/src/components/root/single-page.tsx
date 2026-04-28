@@ -8,7 +8,11 @@ import clsx from 'clsx';
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { SnackbarNotices } from '@wordpress/notices';
-import { SlotFillProvider } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+import { createPortal } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,6 +26,9 @@ import useRouteTitle from '../app/use-route-title';
 import { UserThemeProvider } from '../user-theme-provider';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 /**
  * Root component for single page mode (no sidebar).
@@ -54,7 +61,10 @@ export default function RootSinglePage() {
 						) }
 					>
 						<SavePanel />
-						<SnackbarNotices className="boot-notices__snackbar" />
+						{ createPortal(
+							<SnackbarNotices className="boot-notices__snackbar" />,
+							getOverlayLegacySlot()
+						) }
 						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />

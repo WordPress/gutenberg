@@ -12,6 +12,7 @@ import {
 	__unstableAnimatePresence as AnimatePresence,
 	__unstableUseNavigateRegions as useNavigateRegions,
 	SlotFillProvider,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	useReducedMotion,
@@ -20,7 +21,7 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState, useRef, useEffect } from '@wordpress/element';
+import { createPortal, useState, useRef, useEffect } from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
 	ErrorBoundary,
@@ -47,6 +48,9 @@ import SavePanel from '../save-panel';
 
 const { useLocation } = unlock( routerPrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 const ANIMATION_DURATION = 0.3;
 
@@ -156,7 +160,10 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<SnackbarNotices className="edit-site-layout__snackbar" />
+					{ createPortal(
+						<SnackbarNotices className="edit-site-layout__snackbar" />,
+						getOverlayLegacySlot()
+					) }
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">

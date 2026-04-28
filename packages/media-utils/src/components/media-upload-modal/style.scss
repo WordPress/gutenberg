@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/mixins" as *;
 
 .media-upload-modal {
 	.components-modal__header {
@@ -58,7 +57,8 @@
 }
 
 .media-upload-modal__snackbar {
-	@include snackbar-container();
+	// `.components-snackbar-list` self-positions at the viewport bottom;
+	// only the elevated z-index and transform overrides remain here.
 	z-index: 200000;
 
 	// Override the transform and transform-origin applied by the Snackbar component
