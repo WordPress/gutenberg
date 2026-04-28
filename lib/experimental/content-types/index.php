@@ -94,42 +94,15 @@ function gutenberg_register_user_taxonomy_cpt() {
 add_action( 'init', 'gutenberg_register_user_taxonomy_cpt' );
 
 /**
- * Allowed keys inside the stored taxonomy config. Anything outside this list
- * is dropped by the sanitizer — this is the structural allowlist that backs
- * `additionalProperties: false` in the REST schema.
+ * Sanitizes a decoded taxonomy config to the canonical shape declared by
+ * the REST controller's config schema. Single sanitization site for
+ * taxonomy records — called from {@see gutenberg_filter_user_taxonomy_post_content}
+ * on `wp_insert_post_data`.
  *
- * @return string[]
- */
-function gutenberg_user_taxonomy_allowed_label_keys() {
-	return array(
-		'singular_name',
-		'menu_name',
-		'all_items',
-		'edit_item',
-		'view_item',
-		'update_item',
-		'add_new_item',
-		'new_item_name',
-		'search_items',
-		'not_found',
-		'back_to_items',
-		'parent_item',
-		'popular_items',
-		'separate_items_with_commas',
-		'parent_item_colon',
-		'add_or_remove_items',
-		'choose_from_most_used',
-	);
-}
-
-/**
- * Sanitizes a decoded taxonomy config to the canonical allowlisted shape.
- * Called from {@see gutenberg_filter_user_taxonomy_post_content} on
- * `wp_insert_post_data` — the single sanitization site for taxonomy records.
- *
- * Unknown keys are dropped, label values are HTML-stripped via
- * `sanitize_text_field`, and empty values are omitted so callers can
- * distinguish "not set" from "set to empty".
+ * Shape, type coercion, and unknown-key stripping are all driven by the
+ * schema returned by {@see WP_REST_User_Taxonomies_Controller_Gutenberg::get_config_schema}.
+ * Text-sanitization (HTML/control-char stripping) is layered on top because
+ * `rest_sanitize_value_from_schema()` only casts strings, it doesn't strip.
  *
  * @param array $config Raw decoded config.
  * @return array Sanitized config.
@@ -139,36 +112,20 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
 		return array();
 	}
 
-	$clean = array();
-
-	if ( isset( $config['labels'] ) && is_array( $config['labels'] ) ) {
-		$labels = array();
-		foreach ( gutenberg_user_taxonomy_allowed_label_keys() as $key ) {
-			if ( ! isset( $config['labels'][ $key ] ) || ! is_string( $config['labels'][ $key ] ) ) {
-				continue;
-			}
-			$value = sanitize_text_field( $config['labels'][ $key ] );
-			if ( '' !== $value ) {
-				$labels[ $key ] = $value;
-			}
-		}
-		if ( ! empty( $labels ) ) {
-			$clean['labels'] = $labels;
-		}
+	$clean = rest_sanitize_value_from_schema(
+		$config,
+		WP_REST_User_Taxonomies_Controller_Gutenberg::get_config_schema()
+	);
+	if ( ! is_array( $clean ) ) {
+		return array();
 	}
 
-	if ( isset( $config['public'] ) ) {
-		$clean['public'] = (bool) $config['public'];
+	if ( isset( $clean['description'] ) ) {
+		$clean['description'] = sanitize_textarea_field( (string) $clean['description'] );
 	}
-
-	if ( isset( $config['hierarchical'] ) ) {
-		$clean['hierarchical'] = (bool) $config['hierarchical'];
-	}
-
-	if ( isset( $config['description'] ) && is_string( $config['description'] ) ) {
-		$description = sanitize_textarea_field( $config['description'] );
-		if ( '' !== $description ) {
-			$clean['description'] = $description;
+	if ( isset( $clean['labels'] ) && is_array( $clean['labels'] ) ) {
+		foreach ( $clean['labels'] as $key => $value ) {
+			$clean['labels'][ $key ] = sanitize_text_field( (string) $value );
 		}
 	}
 
@@ -216,7 +173,7 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 	$data['post_content'] = wp_slash(
 		wp_json_encode(
 			$clean,
-			JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
+			JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_FORCE_OBJECT
 		)
 	);
 
@@ -277,16 +234,19 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		'singular_name' => '' !== $singular ? $singular : $title,
 	);
 
-	// Merge optional label overrides. Empty strings fall through to the
-	// WordPress-generated defaults, so we skip any label whose stored value
-	// is empty after sanitization.
-	$optional_label_keys = array_diff(
-		gutenberg_user_taxonomy_allowed_label_keys(),
-		array( 'singular_name' )
-	);
-	foreach ( $optional_label_keys as $label_key ) {
-		if ( ! empty( $config['labels'][ $label_key ] ) ) {
-			$labels[ $label_key ] = (string) $config['labels'][ $label_key ];
+	// Merge optional label overrides. The sanitizer has already pruned
+	// unknown keys against the schema, so we can trust whatever the stored
+	// labels object contains. Empty strings fall through to the
+	// WordPress-generated defaults.
+	$stored_labels = isset( $config['labels'] ) && is_array( $config['labels'] )
+		? $config['labels']
+		: array();
+	foreach ( array_keys( $stored_labels ) as $label_key ) {
+		if ( 'singular_name' === $label_key ) {
+			continue;
+		}
+		if ( ! empty( $stored_labels[ $label_key ] ) ) {
+			$labels[ $label_key ] = (string) $stored_labels[ $label_key ];
 		}
 	}
 
@@ -340,105 +300,3 @@ function gutenberg_register_user_defined_taxonomies() {
 }
 add_action( 'init', 'gutenberg_register_user_defined_taxonomies', 20 );
 
-/**
- * Rejects a wp_user_taxonomy save when its slug collides with an existing
- * registered taxonomy or another wp_user_taxonomy post. Primary server-side
- * defense — the Add/Edit modals do the same check client-side for UX, but
- * the server enforces the invariant.
- *
- * @param stdClass $prepared_post Post object prepared for insertion.
- * @return stdClass|WP_Error Filtered post object, or WP_Error to abort.
- */
-function gutenberg_validate_user_taxonomy_slug( $prepared_post ) {
-	$slug = ! empty( $prepared_post->post_name )
-		? (string) $prepared_post->post_name
-		: '';
-	if ( '' === $slug ) {
-		return $prepared_post;
-	}
-
-	$editing_id = isset( $prepared_post->ID ) ? (int) $prepared_post->ID : 0;
-
-	// Unchanged slug on an existing record — allow.
-	if ( $editing_id > 0 ) {
-		$existing = get_post( $editing_id );
-		if ( $existing && $existing->post_name === $slug ) {
-			return $prepared_post;
-		}
-	}
-
-	// Another wp_user_taxonomy post already owns this slug → reject.
-	$other_posts = get_posts(
-		array(
-			'post_type'        => 'wp_user_taxonomy',
-			'post_status'      => 'any',
-			'name'             => $slug,
-			'posts_per_page'   => 1,
-			'no_found_rows'    => true,
-			'suppress_filters' => true,
-			'post__not_in'     => $editing_id > 0 ? array( $editing_id ) : array(),
-		)
-	);
-	if ( ! empty( $other_posts ) ) {
-		return new WP_Error(
-			'gutenberg_user_taxonomy_slug_taken',
-			__( 'Another user-defined taxonomy already uses this key.', 'gutenberg' ),
-			array( 'status' => 400 )
-		);
-	}
-
-	// Registered taxonomy owns this slug (core / plugin) → reject. Our own
-	// `register_taxonomy()` step runs at init priority 20 and skips colliding
-	// slugs, so a taxonomy_exists() hit here means a non-user-taxonomy
-	// registration.
-	if ( taxonomy_exists( $slug ) ) {
-		return new WP_Error(
-			'gutenberg_user_taxonomy_slug_reserved',
-			sprintf(
-				/* translators: %s: taxonomy slug */
-				__( 'The taxonomy key "%s" is reserved by an existing taxonomy.', 'gutenberg' ),
-				$slug
-			),
-			array( 'status' => 400 )
-		);
-	}
-
-	return $prepared_post;
-}
-add_filter( 'rest_pre_insert_wp_user_taxonomy', 'gutenberg_validate_user_taxonomy_slug' );
-
-/**
- * Persists the `object_type` array sent over REST as repeated meta rows.
- * Runs after the post is inserted/updated so the post ID is known and
- * permissions have already been checked by the controller.
- *
- * @param WP_Post         $post    Saved post.
- * @param WP_REST_Request $request REST request.
- */
-function gutenberg_save_user_taxonomy_object_type( $post, $request ) {
-	if ( ! ( $post instanceof WP_Post ) || ! ( $request instanceof WP_REST_Request ) ) {
-		return;
-	}
-	if ( ! $request->has_param( 'object_type' ) ) {
-		return;
-	}
-
-	$incoming = (array) $request['object_type'];
-	$values   = array();
-	foreach ( $incoming as $slug ) {
-		if ( ! is_string( $slug ) ) {
-			continue;
-		}
-		$clean = sanitize_key( $slug );
-		if ( '' !== $clean && post_type_exists( $clean ) ) {
-			$values[] = $clean;
-		}
-	}
-	$values = array_values( array_unique( $values ) );
-
-	delete_post_meta( $post->ID, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY );
-	foreach ( $values as $slug ) {
-		add_post_meta( $post->ID, GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY, $slug );
-	}
-}
-add_action( 'rest_after_insert_wp_user_taxonomy', 'gutenberg_save_user_taxonomy_object_type', 10, 2 );

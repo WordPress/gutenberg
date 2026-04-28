@@ -13,7 +13,6 @@
  * @package gutenberg
  *
  * @covers WP_REST_User_Taxonomies_Controller_Gutenberg
- * @group rigas
  */
 class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Controller_Testcase {
 
@@ -62,7 +61,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	 * @param array  $object_type Post type slugs to attach as meta.
 	 * @return int Post ID.
 	 */
-	protected static function insert_user_taxonomy_record( $config, $slug, $title = 'Genre', $status = 'publish', $object_type = array( 'post' ) ) {
+	protected static function insert_user_taxonomy_record( $config, $slug, $title, $status = 'publish', $object_type = array( 'post' ) ) {
 		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_user_taxonomy',
