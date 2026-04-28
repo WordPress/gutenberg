@@ -157,9 +157,41 @@ export function getBlockContentSchema( context?: string ) {
 }
 
 /**
+ * Checks whether the given element is a non-semantic wrapper. A non-semantic
+ * wrapper is a `<span>` or `<div>` element that has no attributes that imply
+ * meaning (such as `class`, `id`, `role`, `data-*`, or `aria-*`). Plugins and
+ * themes commonly use those attributes to drive custom raw transforms (e.g.
+ * converting `<div class="box">` to a custom block), so wrappers carrying them
+ * must be preserved instead of being unwrapped.
+ *
+ * @param element The element to check.
+ *
+ * @return Whether the element is a non-semantic wrapper.
+ */
+function isNonSemanticWrapper( element: Element ) {
+	const { tagName } = element;
+	if ( tagName !== 'SPAN' && tagName !== 'DIV' ) {
+		return false;
+	}
+	for ( const { name } of element.attributes ) {
+		if (
+			name === 'class' ||
+			name === 'id' ||
+			name === 'role' ||
+			name.startsWith( 'data-' ) ||
+			name.startsWith( 'aria-' )
+		) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * Checks whether HTML can be considered plain text. That is, it does not contain
- * any elements that are not line breaks, or it only contains a single non-semantic
- * wrapper element (span) with no semantic child elements.
+ * any elements that are not line breaks, or it only contains non-semantic
+ * wrapper elements (span/div without semantic attributes) with no semantic
+ * child elements.
  *
  * @param HTML The HTML to check.
  *
@@ -179,15 +211,19 @@ export function isPlain( HTML: string ) {
 
 	const wrapper = doc.body.children.item( 0 )!;
 
-	const descendants = wrapper.getElementsByTagName( '*' );
-	for ( let i = 0; i < descendants.length; i++ ) {
-		if ( descendants.item( i )!.tagName !== 'BR' ) {
-			return false;
-		}
+	if ( ! isNonSemanticWrapper( wrapper ) ) {
+		return false;
 	}
 
-	if ( wrapper.tagName !== 'SPAN' ) {
-		return false;
+	const descendants = wrapper.getElementsByTagName( '*' );
+	for ( let i = 0; i < descendants.length; i++ ) {
+		const descendant = descendants.item( i )!;
+		if ( descendant.tagName === 'BR' ) {
+			continue;
+		}
+		if ( ! isNonSemanticWrapper( descendant ) ) {
+			return false;
+		}
 	}
 
 	return true;

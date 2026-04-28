@@ -60,6 +60,40 @@ describe( 'isPlain', () => {
 		expect( isPlain( '<ul><li>test</li></ul>' ) ).toBe( false );
 		expect( isPlain( '<article>test</article>' ) ).toBe( false );
 	} );
+
+	it( 'should return true for a single div wrapper with only styles', () => {
+		expect( isPlain( '<div>test</div>' ) ).toBe( true );
+		expect( isPlain( '<div style="color: red;">test</div>' ) ).toBe( true );
+	} );
+
+	it( 'should return true for nested div/span wrappers with only styles', () => {
+		expect(
+			isPlain(
+				'<div style="color: red;"><div><span style="color: blue;">test</span></div><br><div><span>more</span></div></div>'
+			)
+		).toBe( true );
+	} );
+
+	it( 'should return false for div wrappers with semantic attributes', () => {
+		expect( isPlain( '<div class="box">test</div>' ) ).toBe( false );
+		expect( isPlain( '<div id="content">test</div>' ) ).toBe( false );
+		expect( isPlain( '<div role="alert">test</div>' ) ).toBe( false );
+		expect( isPlain( '<div data-block="custom">test</div>' ) ).toBe(
+			false
+		);
+		expect( isPlain( '<div aria-label="content">test</div>' ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'should return false when a descendant has semantic attributes', () => {
+		expect( isPlain( '<div><div class="box">test</div></div>' ) ).toBe(
+			false
+		);
+		expect(
+			isPlain( '<div><span data-token="abc">test</span></div>' )
+		).toBe( false );
+	} );
 } );
 
 describe( 'getBlockContentSchema', () => {
