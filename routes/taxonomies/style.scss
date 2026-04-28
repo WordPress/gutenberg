@@ -14,7 +14,7 @@
 	}
 }
 
-.dataviews-action-modal__edit-taxonomy {
+.dataviews-action-modal__quick-edit-taxonomy {
 	justify-content: flex-end;
 	align-items: stretch;
 
@@ -28,7 +28,7 @@
 		animation-name: none;
 
 		@media (prefers-reduced-motion: no-preference) {
-			animation-name: edit-taxonomy-slide-in-right;
+			animation-name: quick-edit-taxonomy-slide-in-right;
 			animation-duration: 0.2s;
 			animation-timing-function: ease-out;
 		}
@@ -38,7 +38,7 @@
 		animation-name: none;
 
 		@media (prefers-reduced-motion: no-preference) {
-			animation-name: edit-taxonomy-slide-out-right;
+			animation-name: quick-edit-taxonomy-slide-out-right;
 			animation-duration: 0.2s;
 			animation-timing-function: ease-out;
 		}
@@ -49,7 +49,7 @@
 		overflow-y: auto;
 	}
 
-	.dataviews-action-modal__edit-taxonomy-header {
+	.dataviews-action-modal__quick-edit-taxonomy-header {
 		position: sticky;
 		top: 0;
 		z-index: 1;
@@ -57,11 +57,11 @@
 		padding: $grid-unit-20 $grid-unit-30;
 	}
 
-	.dataviews-action-modal__edit-taxonomy-content {
+	.dataviews-action-modal__quick-edit-taxonomy-content {
 		padding: 0 $grid-unit-30;
 	}
 
-	.dataviews-action-modal__edit-taxonomy-footer {
+	.dataviews-action-modal__quick-edit-taxonomy-footer {
 		position: sticky;
 		bottom: 0;
 		z-index: 1;
@@ -75,7 +75,7 @@
 	}
 }
 
-@keyframes edit-taxonomy-slide-in-right {
+@keyframes quick-edit-taxonomy-slide-in-right {
 	from {
 		transform: translateX(100%);
 	}
@@ -84,7 +84,7 @@
 	}
 }
 
-@keyframes edit-taxonomy-slide-out-right {
+@keyframes quick-edit-taxonomy-slide-out-right {
 	from {
 		transform: translateX(0);
 	}
