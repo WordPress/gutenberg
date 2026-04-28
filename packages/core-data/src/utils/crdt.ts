@@ -26,7 +26,6 @@ import {
 	mergeRichTextUpdate,
 	type Block,
 	type MergeCursorPosition,
-	type RichTextCursorSelection,
 	type YBlock,
 	type YBlocks,
 } from './crdt-blocks';
@@ -39,6 +38,7 @@ import {
 	updateSelectionHistory,
 } from './crdt-selection';
 import {
+	createRichTextOffset,
 	createYMap,
 	getRootMap,
 	isYMap,
@@ -279,8 +279,8 @@ function getMergeCursorPosition(
 	return {
 		attributeKey: selectionStart.attributeKey,
 		clientId: selectionStart.clientId,
-		offset: selectionStart.offset,
-	} as RichTextCursorSelection;
+		offset: createRichTextOffset( selectionStart.offset ),
+	};
 }
 
 function defaultGetChangesFromCRDTDoc( crdtDoc: CRDTDoc ): ObjectData {

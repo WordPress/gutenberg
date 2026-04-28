@@ -157,11 +157,7 @@ function makeRandomRichTextHtml( random, text ) {
 	return html;
 }
 
-function makeCursor( offset, useScopedCursor = true ) {
-	if ( ! useScopedCursor ) {
-		return offset;
-	}
-
+function makeCursor( offset ) {
 	return {
 		attributeKey: 'content',
 		clientId: 'block-1',
@@ -221,7 +217,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 		mergeCrdtBlocks(
 			yblocks,
 			[ makeParagraphBlock( NEW_HTML ) ],
-			TEXT_OFFSET
+			makeCursor( TEXT_OFFSET )
 		);
 
 		expect( readFirstBlockContentFromYBlocks( yblocks ) ).toBe( NEW_HTML );
@@ -276,7 +272,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 			mergeCrdtBlocks(
 				yblocks,
 				[ makeParagraphBlock( newHtml ) ],
-				makeCursor( cursorOffset, i % 2 === 0 )
+				makeCursor( cursorOffset )
 			);
 
 			assertEqualWithContext(
@@ -365,7 +361,7 @@ describe( 'RTC rich-text offset-space bug', () => {
 			mergeCrdtBlocks(
 				yblocks,
 				[ makeParagraphBlock( newHtml ) ],
-				makeCursor( cursorOffset, attempts % 2 === 0 )
+				makeCursor( cursorOffset )
 			);
 
 			assertEqualWithContext( content.toString(), newHtml, {

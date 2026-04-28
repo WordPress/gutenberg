@@ -84,6 +84,37 @@ export function isYMap< T extends YMapRecord >(
 	return value instanceof Y.Map;
 }
 
+declare const richTextOffsetBrand: unique symbol;
+declare const htmlStringIndexBrand: unique symbol;
+
+export type RichTextOffset = number & {
+	readonly [ richTextOffsetBrand ]: 'RichTextOffset';
+};
+
+export type HtmlStringIndex = number & {
+	readonly [ htmlStringIndexBrand ]: 'HtmlStringIndex';
+};
+
+/**
+ * Brand a number as a rich-text offset, counting visible text characters.
+ *
+ * @param offset The rich-text offset to brand.
+ * @return The branded rich-text offset.
+ */
+export function createRichTextOffset( offset: number ): RichTextOffset {
+	return offset as RichTextOffset;
+}
+
+/**
+ * Brand a number as an HTML string index, counting tag characters.
+ *
+ * @param index The HTML string index to brand.
+ * @return The branded HTML string index.
+ */
+export function createHtmlStringIndex( index: number ): HtmlStringIndex {
+	return index as HtmlStringIndex;
+}
+
 /**
  * Given a block ID and a Y.Doc, find the block in the document.
  *
@@ -141,15 +172,15 @@ function pickMarker( text: string ): string | null {
  */
 export function htmlIndexToRichTextOffset(
 	html: string,
-	htmlIndex: number
-): number {
+	htmlIndex: HtmlStringIndex
+): RichTextOffset {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return htmlIndex;
+		return createRichTextOffset( htmlIndex );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return htmlIndex;
+		return createRichTextOffset( htmlIndex );
 	}
 
 	// Insert marker and let create() do the parsing.
@@ -158,7 +189,7 @@ export function htmlIndexToRichTextOffset(
 	const value = create( { html: withMarker } );
 	const markerPos = value.text.indexOf( marker );
 
-	return markerPos === -1 ? htmlIndex : markerPos;
+	return createRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
 }
 
 /**
@@ -172,15 +203,15 @@ export function htmlIndexToRichTextOffset(
  */
 export function richTextOffsetToHtmlIndex(
 	html: string,
-	richTextOffset: number
-): number {
+	richTextOffset: RichTextOffset
+): HtmlStringIndex {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return richTextOffset;
+		return createHtmlStringIndex( richTextOffset );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return richTextOffset;
+		return createHtmlStringIndex( richTextOffset );
 	}
 
 	const value = create( { html } );
@@ -200,7 +231,9 @@ export function richTextOffsetToHtmlIndex(
 
 	const htmlWithMarker = toHTMLString( { value: withMarker } );
 	const markerIndex = htmlWithMarker.indexOf( marker );
-	return markerIndex === -1 ? richTextOffset : markerIndex;
+	return createHtmlStringIndex(
+		markerIndex === -1 ? richTextOffset : markerIndex
+	);
 }
 
 function findBlockByClientIdInBlocks(
