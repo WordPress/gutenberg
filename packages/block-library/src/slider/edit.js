@@ -6,8 +6,6 @@ import {
 	useInnerBlocksProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 
@@ -74,14 +72,7 @@ const SLIDER_TEMPLATE = [
 ];
 
 function SliderEdit( { attributes, setAttributes } ) {
-	const { sliderId, loop } = attributes;
-	const instanceId = useInstanceId( SliderEdit );
-	// Generate unique ID for the slider
-	useEffect( () => {
-		if ( ! sliderId ) {
-			setAttributes( { sliderId: instanceId } );
-		}
-	}, [ sliderId, setAttributes, instanceId ] );
+	const { loop } = attributes;
 
 	const blockProps = useBlockProps();
 

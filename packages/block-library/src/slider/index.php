@@ -15,17 +15,15 @@
  * @return string Returns the block markup.
  */
 function render_block_core_slider( $attributes, $content, $block ) {
+	/*
+	 * Count slides from the rendered markup. Empty slides return ''
+	 * from their render callback, so only non-empty slides are present
+	 * in $content.
+	 */
 	$slide_count = 0;
-	foreach ( $block->inner_blocks as $inner_block ) {
-		if ( 'core/slider-track' === $inner_block->name ) {
-			// Only count slides that have inner blocks; empty slides are not rendered.
-			foreach ( $inner_block->inner_blocks as $slide_block ) {
-				if ( 'core/slide' === $slide_block->name && ! empty( $slide_block->inner_blocks ) ) {
-					++$slide_count;
-				}
-			}
-			break;
-		}
+	$p           = new WP_HTML_Tag_Processor( $content );
+	while ( $p->next_tag( array( 'class_name' => 'wp-block-slide' ) ) ) {
+		++$slide_count;
 	}
 
 	$context = array(

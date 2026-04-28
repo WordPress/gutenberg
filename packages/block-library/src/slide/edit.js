@@ -13,12 +13,9 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
-function SlideEdit( { clientId, isSelected, context } ) {
-	const activeSlideIndex = context[ 'core/slider-activeSlideIndex' ] ?? 0;
-
-	const { blockIndex, hasInnerBlocksSelected, trackHasSelectedSlide } =
+function SlideEdit( { clientId, isSelected } ) {
+	const { blockIndex, hasInnerBlocksSelected, trackHasSelectedInnerBlock } =
 		useSelect(
 			( select ) => {
 				const {
@@ -37,7 +34,7 @@ function SlideEdit( { clientId, isSelected, context } ) {
 						true
 					),
 					// Check if any slide in the track is selected (not controls)
-					trackHasSelectedSlide: hasSelectedInnerBlock(
+					trackHasSelectedInnerBlock: hasSelectedInnerBlock(
 						trackClientId,
 						true
 					),
@@ -46,24 +43,12 @@ function SlideEdit( { clientId, isSelected, context } ) {
 			[ clientId ]
 		);
 
-	// Determine if this slide should be visible
-	const isSelectedSlide = useMemo( () => {
-		// Show if this slide or its inner blocks are selected
-		if ( isSelected || hasInnerBlocksSelected ) {
-			return true;
-		}
-		// Show if this is the active slide and no other slide is selected
-		if ( blockIndex === activeSlideIndex && ! trackHasSelectedSlide ) {
-			return true;
-		}
-		return false;
-	}, [
-		isSelected,
-		hasInnerBlocksSelected,
-		blockIndex,
-		activeSlideIndex,
-		trackHasSelectedSlide,
-	] );
+	// Show this slide if it is selected, has selected inner blocks,
+	// or is the first slide and nothing else in the track is selected.
+	const isSelectedSlide =
+		isSelected ||
+		hasInnerBlocksSelected ||
+		( blockIndex === 0 && ! trackHasSelectedInnerBlock );
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-slide', {

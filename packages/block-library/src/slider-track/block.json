@@ -8,7 +8,6 @@
 	"category": "design",
 	"textdomain": "default",
 	"allowedBlocks": [ "core/slide" ],
-	"usesContext": [ "core/slider-id" ],
 	"supports": {
 		"anchor": false,
 		"html": false,

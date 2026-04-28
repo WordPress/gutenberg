@@ -9,14 +9,6 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/slider-pagination" ],
 	"attributes": {
-		"sliderId": {
-			"type": "string",
-			"default": ""
-		},
-		"activeSlideIndex": {
-			"type": "number",
-			"default": 0
-		},
 		"loop": {
 			"type": "boolean",
 			"default": true
@@ -43,10 +35,6 @@
 			"gradients": true,
 			"text": false
 		}
-	},
-	"providesContext": {
-		"core/slider-id": "sliderId",
-		"core/slider-activeSlideIndex": "activeSlideIndex"
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "wp-block-slider-editor",
