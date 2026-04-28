@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../api-fetch" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
@@ -13,6 +14,7 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../notices" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui" }
 	]

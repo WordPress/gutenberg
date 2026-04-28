@@ -63,7 +63,7 @@ graph TD
     getImageFit --> |"visualSize"| useInteraction
     getImageFit --> |"visualSize"| useTransformStyle
 
-    useInteraction --> |"SET_PAN"| State
+    useInteraction --> |"named controller actions"| State
 
     State --> createExportCamera --> canvasRenderer
 ```
@@ -93,5 +93,4 @@ See [recipes.md](recipes.md) for the full developer guide. Summary:
 | Custom export | `exportCroppedImage()` or `applyToCanvas()` for multi-step pipelines |
 | Theming | BEM CSS classes (`.wp-media-editor-image-editor__*`) |
 | State observation | `onStateChange` (every frame), `onGestureStart`/`onGestureEnd` (gesture boundaries) |
-| Undo/redo | Snapshot state at gesture boundaries, `RESET` to restore — see recipes.md |
-
+| Undo/redo | Snapshot state at gesture boundaries, `reset()` to restore — see recipes.md |

@@ -6,8 +6,11 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { CropperAction, CropperState, Size } from '../../core/types';
-import { InteractionController } from '../../core/interaction-controller';
+import type { CropperState, Size } from '../../core/types';
+import {
+	InteractionController,
+	type CropperInteractionActions,
+} from '../../core/interaction-controller';
 
 /**
  * The return type of the useInteraction hook.
@@ -56,7 +59,7 @@ export interface UseInteractionOptions {
  * layout thrashing.
  *
  * @param state         The current cropper state.
- * @param dispatch      The dispatch function for cropper actions.
+ * @param actions       Named state updates for cropper interactions.
  * @param containerSize The container dimensions in pixels.
  * @param imageSize     The rendered image dimensions in pixels.
  * @param options       Optional configuration for zoom and keyboard behavior.
@@ -64,7 +67,7 @@ export interface UseInteractionOptions {
  */
 export function useInteraction(
 	state: CropperState,
-	dispatch: React.Dispatch< CropperAction >,
+	actions: CropperInteractionActions,
 	containerSize: Size,
 	imageSize?: Size,
 	options?: UseInteractionOptions
@@ -82,16 +85,24 @@ export function useInteraction(
 	imageSizeRef.current = imageSize;
 	const optionsRef = useRef( options );
 	optionsRef.current = options;
+	const actionsRef = useRef( actions );
+	actionsRef.current = actions;
 
 	const controllerRef = useRef< InteractionController | null >( null );
 
 	// Create / destroy the controller. The controller reads all volatile
-	// values through refs, so it only needs to be recreated when dispatch
-	// changes (which is stable for useReducer).
+	// values through refs, so it can stay mounted across render updates.
 	useEffect( () => {
 		const controller = new InteractionController( {
-			dispatch,
 			getState: () => stateRef.current,
+			actions: {
+				setPan: ( pan ) => actionsRef.current.setPan( pan ),
+				setZoom: ( zoom ) => actionsRef.current.setZoom( zoom ),
+				setZoomAtPoint: ( zoom, pan ) =>
+					actionsRef.current.setZoomAtPoint( zoom, pan ),
+				snapRotate90: ( direction ) =>
+					actionsRef.current.snapRotate90( direction ),
+			},
 			getContainerSize: () => containerSizeRef.current,
 			getImageSize: () => imageSizeRef.current,
 			get minZoom() {
@@ -121,7 +132,7 @@ export function useInteraction(
 			controller.destroy();
 			controllerRef.current = null;
 		};
-	}, [ dispatch ] );
+	}, [] );
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		const el = e.currentTarget as HTMLElement;
