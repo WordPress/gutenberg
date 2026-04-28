@@ -11,6 +11,8 @@
 	-ms-overflow-style: none; // IE and Edge
 	gap: 0;
 	flex-wrap: nowrap;
+	outline: 1px solid transparent;
+	outline-offset: 1px;
 
 	// Hide scrollbar in Chrome, Safari and Opera
 	&::-webkit-scrollbar {
@@ -21,4 +23,8 @@
 .is-horizontal .wp-block-slider-track {
 	min-width: 0;
 	min-height: 100%;
+}
+
+.wp-block-slider-track:focus {
+	outline: 1px solid currentColor;
 }
