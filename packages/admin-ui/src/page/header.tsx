@@ -70,10 +70,10 @@ export default function Header( {
 				</Stack>
 				{ actions && (
 					<Stack
+						align="center"
+						className={ styles[ 'header-actions' ] }
 						direction="row"
 						gap="sm"
-						className={ styles[ 'header-actions' ] }
-						align="center"
 					>
 						{ actions }
 					</Stack>
