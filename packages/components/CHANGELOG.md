@@ -6,6 +6,10 @@
 
 -   `ControlWithError`: Connect validation error messages to controls via `aria-describedby` ([#76742](https://github.com/WordPress/gutenberg/pull/76742)).
 
+### Enhancements
+
+-   `Sandbox`: Add `allowSameOrigin` prop to opt in to `allow-same-origin` on the iframe sandbox. The default is now `false`, removing same-origin access for user-controlled content like the Custom HTML block ([#77212](https://github.com/WordPress/gutenberg/pull/77212)).
+
 ## 32.4.0 (2026-03-18)
 
 ### Bug Fixes
