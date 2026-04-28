@@ -18,6 +18,18 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
+import { applyFilters, addFilter } from '@wordpress/hooks';
+
+addFilter(
+	'blockEditor.linkControl.searchItemIcon',
+	'block-editor/link-control',
+	( icon, suggestionType ) => {
+		if ( suggestionType === 'rt-movie' ) {
+			return verse; // @wordpress/icons SVG — no dashicon string needed
+		}
+		return icon;
+	}
+);
 
 const TYPES = {
 	post: {
@@ -58,6 +70,21 @@ function SearchItemIcon( { isURL, suggestion } ) {
 			}
 		}
 	}
+
+	/**
+	 * Filters the icon used in the Link Control search item.
+	 *
+	 * Useful for providing icons for custom post types not covered by the
+	 * built-in TYPES map. Return a @wordpress/icons SVG component, a null to render nothing.
+	 *
+	 * @param {string} icon     The resolved icon, or null.
+	 * @param {string} postType The post type of the suggestion.
+	 */
+	icon = applyFilters(
+		'blockEditor.linkControl.searchItemIcon',
+		icon,
+		suggestion.type
+	);
 
 	if ( icon ) {
 		return (
