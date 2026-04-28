@@ -4,7 +4,7 @@
 	"apiVersion": 3,
 	"name": "core/slider-track",
 	"title": "Slides",
-	"description": "Track container for slides in a slider.",
+	"description": "Container for slides in a slider.",
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/slider" ],

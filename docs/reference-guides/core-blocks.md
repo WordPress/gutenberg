@@ -1014,7 +1014,7 @@ Dot indicators showing the current slide position. ([Source](https://github.com/
 
 ## Slides
 
-Track container for slides in a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-track))
+Container for slides in a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-track))
 
 -	**Name:** core/slider-track
 -	**Experimental:** true
