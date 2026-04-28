@@ -971,13 +971,13 @@ A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg
 
 ## Slider
 
-Display content in a horizontally scrolling slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider))
+Display content in a scrolling slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider))
 
 -	**Name:** core/slider
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/slider-pagination
--	**Supports:** align, color (background, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
+-	**Supports:** align, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
 -	**Attributes:** activeSlideIndex, loop, sliderId
 
 ## Slider Pagination

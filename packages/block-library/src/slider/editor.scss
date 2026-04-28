@@ -1,5 +1,4 @@
 .wp-block-slider {
-	// Minimal editor styling - just show block boundary
-	outline: 1px dashed rgba(0, 0, 0, 0.1);
+	outline: 1px dashed currentColor;
 	outline-offset: -1px;
 }

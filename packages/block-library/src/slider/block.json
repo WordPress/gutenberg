@@ -4,7 +4,7 @@
 	"apiVersion": 3,
 	"name": "core/slider",
 	"title": "Slider",
-	"description": "Display content in a horizontally scrolling slider.",
+	"description": "Display content in a scrolling slider.",
 	"category": "design",
 	"textdomain": "default",
 	"allowedBlocks": [ "core/slider-pagination" ],
@@ -40,19 +40,8 @@
 		},
 		"color": {
 			"background": true,
+			"gradients": true,
 			"text": false
-		},
-		"__experimentalBorder": {
-			"color": true,
-			"radius": true,
-			"style": true,
-			"width": true,
-			"__experimentalDefaultControls": {
-				"color": true,
-				"radius": true,
-				"style": true,
-				"width": true
-			}
 		}
 	},
 	"providesContext": {
