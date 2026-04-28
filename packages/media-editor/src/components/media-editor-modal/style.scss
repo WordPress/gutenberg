@@ -111,3 +111,16 @@
 		}
 	}
 }
+
+// `<SnackbarNotices>` renders `.components-snackbar-list` with
+// `position: absolute; width: 100%; z-index: 100000`. Portaled to
+// `<body>` it has no positioned ancestor, so it collapses to a 0-size
+// box at the document origin; even when laid out, the modal overlay
+// (also z-index 100000) paints on top of it. `snackbar-container`
+// fixes-positions the list at the viewport bottom; the elevated
+// z-index lifts it above the modal overlay. Mirrors the
+// `media-upload-modal__snackbar` precedent.
+.media-editor-modal__snackbar {
+	@include snackbar-container();
+	z-index: 200000;
+}

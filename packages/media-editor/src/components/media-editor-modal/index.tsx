@@ -13,9 +13,16 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useContext, useEffect, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import {
+	createPortal,
+	useContext,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { close, drawerRight } from '@wordpress/icons';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
 	ComplementaryArea,
@@ -59,6 +66,10 @@ const METADATA_EDIT_KEYS = [
 	'alt_text',
 	'post',
 ] as const;
+
+// Scope save-failure snackbars to this modal so they don't leak into the
+// host editor's notices tray (and vice versa).
+const NOTICES_CONTEXT = 'media-editor';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -215,6 +226,7 @@ function MediaEditorModalContent( {
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
@@ -294,6 +306,7 @@ function MediaEditorModalContent( {
 	};
 
 	const discardAndClose = () => {
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', id );
 		closeMediaEditorModal();
 	};
@@ -312,6 +325,9 @@ function MediaEditorModalContent( {
 	};
 
 	const handleSave = async () => {
+		// Clear any prior failure snackbar so a successful retry doesn't
+		// leave a stale "Could not save image" hovering.
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		setIsSaving( true );
 		try {
 			let saved: Media | null | undefined;
@@ -390,6 +406,20 @@ function MediaEditorModalContent( {
 				onUpdate( { id: next.id, url: next.source_url } );
 			}
 			closeMediaEditorModal();
+		} catch ( error ) {
+			const message =
+				error instanceof Error
+					? error.message
+					: ( error as { message?: string } )?.message ??
+					  __( 'An unknown error occurred.' );
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Error message. */
+					__( 'Could not save image. %s' ),
+					message
+				),
+				{ type: 'snackbar', context: NOTICES_CONTEXT }
+			);
 		} finally {
 			setIsSaving( false );
 		}
@@ -496,6 +526,13 @@ function MediaEditorModalContent( {
 					) }
 				</ConfirmDialog>
 			</MediaEditorProvider>
+			{ createPortal(
+				<SnackbarNotices
+					className="media-editor-modal__snackbar"
+					context={ NOTICES_CONTEXT }
+				/>,
+				document.body
+			) }
 		</Modal>
 	);
 }
