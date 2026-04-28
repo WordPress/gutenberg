@@ -96,6 +96,13 @@ const REVISION_DIFF_STYLES = `
 	}
 `;
 
+/**
+ * Returns an accessible label for a block based on its revision diff status.
+ *
+ * @param {string} status     The diff status: 'added', 'removed', or 'modified'.
+ * @param {string} blockTitle The human-readable block type name.
+ * @return {string|undefined} The aria-label string, or undefined if not applicable.
+ */
 function getDiffStatusLabel( status, blockTitle ) {
 	if ( status === 'added' ) {
 		// translators: %s: block type name e.g. "Paragraph"
