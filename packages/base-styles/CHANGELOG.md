@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717)):
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77772](https://github.com/WordPress/gutenberg/pull/77772)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
     -   `.block-editor-block-list__block::before`
@@ -32,6 +32,8 @@
     -   `.edit-site-template-panel__replace-template-modal`
     -   `.edit-widgets-header`
     -   `.edit-widgets-sidebar {greater than small}`
+    -   `.editor-start-page-options__modal__actions`
+    -   `.editor-start-template-options__modal__actions`
     -   `.interface-complementary-area .components-panel`
     -   `.interface-complementary-area .components-panel__header`
     -   `.wp-block-template-part__placeholder-preview-filter-input`
