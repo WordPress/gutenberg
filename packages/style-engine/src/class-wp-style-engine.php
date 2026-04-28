@@ -203,6 +203,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 				),
 			),
+			'backdropFilter' => array(
+				'backdropFilter' => array(
+					'property_keys' => array(
+						'default' => 'backdrop-filter',
+					),
+					'path'          => array( 'backdropFilter' ),
+					'css_vars'      => array(
+						'backdrop-filter' => '--wp--preset--backdrop-filter--$slug',
+					),
+				),
+			),
 			'dimensions' => array(
 				'aspectRatio' => array(
 					'property_keys' => array(

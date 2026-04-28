@@ -53,6 +53,17 @@ Setting that enables the following UI tools:
 
 ---
 
+### backdropFilter
+
+Settings related to backdrop filters.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| defaultPresets | Allow users to choose backdrop filters from the default presets. | `boolean` | `true` |
+| presets | Backdrop filter presets for the picker. | `[ { name, slug, backdropFilter } ]` |  |
+
+---
+
 ### background
 
 Settings related to background.
@@ -306,6 +317,12 @@ Outline styles.
 ### shadow
 
 Box shadow styles.
+
+---
+
+### backdropFilter
+
+Backdrop-filter styles. Accepts a raw CSS value or a preset reference (`var:preset|backdrop-filter|{slug}`).
 
 ---
 

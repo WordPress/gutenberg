@@ -405,6 +405,50 @@
 				}
 			}
 		},
+		"settingsBackdropFilterProperties": {
+			"type": "object",
+			"properties": {
+				"backdropFilter": {
+					"description": "Settings related to backdrop filters.",
+					"type": "object",
+					"properties": {
+						"defaultPresets": {
+							"description": "Allow users to choose backdrop filters from the default presets.",
+							"type": "boolean",
+							"default": true
+						},
+						"presets": {
+							"description": "Backdrop filter presets for the picker.\nGenerates a single custom property (`--wp--preset--backdrop-filter--{slug}`) per preset value.",
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"description": "Name of the backdrop-filter preset, translatable.",
+										"type": "string"
+									},
+									"slug": {
+										"description": "Kebab-case unique identifier for the backdrop-filter preset.",
+										"type": "string"
+									},
+									"backdropFilter": {
+										"description": "CSS backdrop-filter value (e.g. `blur(12px) saturate(150%)`).",
+										"type": "string"
+									}
+								},
+								"required": [
+									"name",
+									"slug",
+									"backdropFilter"
+								],
+								"additionalProperties": false
+							}
+						}
+					},
+					"additionalProperties": false
+				}
+			}
+		},
 		"settingsShadowProperties": {
 			"type": "object",
 			"properties": {
@@ -870,6 +914,7 @@
 		"settingsProperties": {
 			"allOf": [
 				{ "$ref": "#/definitions/settingsAppearanceToolsProperties" },
+				{ "$ref": "#/definitions/settingsBackdropFilterProperties" },
 				{ "$ref": "#/definitions/settingsBackgroundProperties" },
 				{ "$ref": "#/definitions/settingsBorderProperties" },
 				{ "$ref": "#/definitions/settingsColorProperties" },
@@ -886,6 +931,7 @@
 		"settingsPropertyNames": {
 			"enum": [
 				"appearanceTools",
+				"backdropFilter",
 				"background",
 				"border",
 				"color",
@@ -1639,6 +1685,13 @@
 						{ "$ref": "#/definitions/refComplete" }
 					]
 				},
+				"backdropFilter": {
+					"description": "Backdrop-filter styles. Accepts a raw CSS value or a preset reference (`var:preset|backdrop-filter|{slug}`).",
+					"oneOf": [
+						{ "type": "string" },
+						{ "$ref": "#/definitions/refComplete" }
+					]
+				},
 				"spacing": {
 					"description": "Spacing styles.",
 					"type": "object",
@@ -1818,6 +1871,7 @@
 		},
 		"stylesPropertyNames": {
 			"enum": [
+				"backdropFilter",
 				"background",
 				"border",
 				"color",
