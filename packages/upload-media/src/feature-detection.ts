@@ -30,21 +30,18 @@ let cachedResult: FeatureDetectionResult | null = null;
 /**
  * Detects whether the browser supports client-side media processing.
  *
- * This checks for:
- * 1. WebAssembly support (required for wasm-vips)
- * 2. SharedArrayBuffer support (required for WASM threading)
- * 3. CSP compatibility for blob URL workers (required for inline worker creation)
- * 4. Credentialless iframe support (required so cross-origin isolation does not
- *    break third-party embeds). Browsers that lack `credentialless` iframe support
- *    (currently Firefox and Safari) will have client-side media processing disabled
- *    by default. Developers can re-enable the feature via the server-side
- *    `client_side_media_processing_enabled` filter if it works for their site.
- * 5. Device memory (disables on devices with ≤2 GB RAM)
- * 6. Hardware concurrency (disables on devices with fewer than 2 CPU cores)
- * 7. Network conditions (disables when data saver / reduced data mode is on or connection is 2g/slow-2g)
- * 8. Web Worker support (baseline requirement)
- *
- * Item 4 is a planned addition not yet implemented in the checks below.
+ * Checks (in order of evaluation):
+ * 1. WebAssembly support (required for wasm-vips).
+ * 2. SharedArrayBuffer support (required for WASM threading; relies on
+ *    cross-origin isolation headers being set).
+ * 3. Web Worker support (baseline requirement for the processing worker).
+ * 4. Device memory: disables on devices reporting ≤ 2 GB of RAM.
+ * 5. Hardware concurrency: disables on devices reporting fewer than 2 CPU cores.
+ * 6. Network conditions: disables when the data saver flag is on, or when the
+ *    connection's effective type is `slow-2g` or `2g`.
+ * 7. CSP compatibility for blob URL workers: a probe Worker is created from a
+ *    blob: URL to confirm the site's Content Security Policy permits inline
+ *    worker creation (`worker-src` must allow `blob:`).
  *
  * Results are cached after the first call. Use `clearFeatureDetectionCache()` to reset.
  *
