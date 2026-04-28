@@ -138,9 +138,11 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			}
 
 			const diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
-			console.log( diffLabel );
+			if ( ! diffLabel ) {
+				return;
+			}
 
-			el.setAttribute( 'aria-label', 'something' );
+			el.setAttribute( 'aria-label', diffLabel );
 		}, [ block.clientId, diffStatus, block.name ] );
 
 		const enhancedClassName = clsx( className, {
