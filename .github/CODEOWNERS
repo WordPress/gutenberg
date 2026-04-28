@@ -83,7 +83,6 @@
 /packages/design-system-mcp                     @WordPress/gutenberg-components
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra
-/packages/nux                                   @ajitbohra @peterwilsoncc
 /packages/viewport                              @ajitbohra
 /packages/base-styles
 /packages/icons

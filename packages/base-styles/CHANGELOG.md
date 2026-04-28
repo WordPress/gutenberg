@@ -35,6 +35,7 @@
     -   `.interface-complementary-area .components-panel`
     -   `.interface-complementary-area .components-panel__header`
     -   `.wp-block-template-part__placeholder-preview-filter-input`
+-   Remove `.nux-dot-tip` from the `z-index()` helper after removing the deprecated `@wordpress/nux` package.
 
 ## 6.20.0 (2026-04-15)
 
