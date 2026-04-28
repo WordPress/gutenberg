@@ -23,27 +23,27 @@ export const settings = {
 	icon,
 	example: {
 		innerBlocks: [
-			[ 'core/slider-pagination' ],
-			[
-				'core/slider-track',
-				{},
-				[
-					[
-						'core/slide',
-						{},
-						[
-							[
-								'core/cover',
-								{
+			{
+				name: 'core/slider-pagination',
+			},
+			{
+				name: 'core/slider-track',
+				innerBlocks: [
+					{
+						name: 'core/slide',
+						innerBlocks: [
+							{
+								name: 'core/cover',
+								attributes: {
 									dimRatio: 100,
 									overlayColor: 'black',
 									minHeight: 300,
 									minHeightUnit: 'px',
 								},
-								[
-									[
-										'core/paragraph',
-										{
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
 											content: __( 'Slide 1' ),
 											style: {
 												typography: {
@@ -51,27 +51,26 @@ export const settings = {
 												},
 											},
 										},
-									],
+									},
 								],
-							],
+							},
 						],
-					],
-					[
-						'core/slide',
-						{},
-						[
-							[
-								'core/cover',
-								{
+					},
+					{
+						name: 'core/slide',
+						innerBlocks: [
+							{
+								name: 'core/cover',
+								attributes: {
 									dimRatio: 100,
 									overlayColor: 'cyan-bluish-gray',
 									minHeight: 300,
 									minHeightUnit: 'px',
 								},
-								[
-									[
-										'core/paragraph',
-										{
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: {
 											content: __( 'Slide 2' ),
 											style: {
 												typography: {
@@ -79,13 +78,13 @@ export const settings = {
 												},
 											},
 										},
-									],
+									},
 								],
-							],
+							},
 						],
-					],
+					},
 				],
-			],
+			},
 		],
 	},
 };
