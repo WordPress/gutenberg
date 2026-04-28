@@ -99,7 +99,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			$config  = ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) )
 				? $decoded
 				: array();
-			unset( $config[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
 			// Empty config must serialize as `{}` to match the schema's
 			// `type: 'object'`. PHP encodes empty arrays as `[]`, so cast
 			// to stdClass for the empty case.
@@ -116,9 +115,9 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 
 	/**
 	 * Translates the typed `config` field on the request into the JSON blob
-	 * that lives in `post_content`. Encodes the request body as-is and tags
-	 * it with the marker — the kses filter on `content_save_pre` does the
-	 * structural sanitize in flight.
+	 * that lives in `post_content`. Encodes the request body as-is — the
+	 * sanitizer hooked to `wp_insert_post_data` does the structural sanitize
+	 * in flight before the row is written.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 * @return stdClass|WP_Error
@@ -130,9 +129,8 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		}
 
 		if ( $request->has_param( 'config' ) || empty( $request['id'] ) ) {
-			$config = is_array( $request['config'] ?? null ) ? $request['config'] : array();
-			$config[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] = true;
-			$prepared->post_content                          = wp_json_encode(
+			$config                 = is_array( $request['config'] ?? null ) ? $request['config'] : array();
+			$prepared->post_content = wp_json_encode(
 				$config,
 				JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
 			);

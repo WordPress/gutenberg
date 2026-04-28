@@ -8,7 +8,7 @@
  * the abstract methods on WP_Test_REST_Controller_Testcase enforce that every
  * standard REST verb has an opinionated test, plus we add coverage for the
  * security-sensitive bits — schema strictness, label sanitization, the
- * JSON-aware kses filter, and slug rules.
+ * post-type-scoped wp_insert_post_data filter, and slug rules.
  *
  * @package gutenberg
  *
@@ -52,8 +52,8 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	/**
 	 * Build a wp_user_taxonomy record directly via wp_insert_post so tests can
 	 * seed both REST-shaped and pathological payloads without going through
-	 * the controller. The marker key matches what the controller writes so
-	 * the kses-priority-9 filter recognizes the payload.
+	 * the controller. The wp_insert_post_data filter sanitizes the content
+	 * in flight, so seeded data follows the same path as production writes.
 	 *
 	 * @param array  $config      Decoded config payload.
 	 * @param string $slug        Record post_name (taxonomy slug).
@@ -63,16 +63,13 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	 * @return int Post ID.
 	 */
 	protected static function insert_user_taxonomy_record( $config, $slug, $title = 'Genre', $status = 'publish', $object_type = array( 'post' ) ) {
-		$marked = $config;
-		$marked[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] = true;
-
 		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_user_taxonomy',
 				'post_status'  => $status,
 				'post_name'    => $slug,
 				'post_title'   => $title,
-				'post_content' => wp_json_encode( $marked ),
+				'post_content' => wp_json_encode( $config ),
 			)
 		);
 

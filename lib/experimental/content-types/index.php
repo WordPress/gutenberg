@@ -15,7 +15,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/class-wp-rest-user-taxonomies-controller-gutenberg.php';
-require_once __DIR__ . '/kses.php';
 
 /**
  * Post meta key that stores the post types attached to a user-defined
@@ -25,12 +24,6 @@ require_once __DIR__ . '/kses.php';
  * Surfaced in REST as the typed top-level `object_type` field.
  */
 const GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY = '_wp_user_taxonomy_object_type';
-
-/**
- * Self-identifies our JSON payloads on `content_save_pre`, which has no
- * post-type context. Mirrors core's `isGlobalStylesUserThemeJSON`.
- */
-const GUTENBERG_USER_TAXONOMY_CONFIG_MARKER = 'isUserTaxonomyConfigJSON';
 
 /**
  * Registers the wp_user_taxonomy CPT.
@@ -132,8 +125,7 @@ function gutenberg_user_taxonomy_allowed_label_keys() {
 /**
  * Sanitizes a decoded taxonomy config to the canonical allowlisted shape.
  * Called from {@see gutenberg_filter_user_taxonomy_post_content} on
- * `content_save_pre` — the single sanitization site for taxonomy records,
- * mirroring core's `wp_filter_global_styles_post` for `wp_global_styles`.
+ * `wp_insert_post_data` — the single sanitization site for taxonomy records.
  *
  * Unknown keys are dropped, label values are HTML-stripped via
  * `sanitize_text_field`, and empty values are omitted so callers can
@@ -184,6 +176,55 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
 }
 
 /**
+ * Sanitizes wp_user_taxonomy JSON `post_content` during `wp_insert_post`.
+ *
+ * Acts on:
+ *   - posts of type `wp_user_taxonomy`
+ *   - revisions whose parent is a `wp_user_taxonomy` post
+ *
+ * Returns input unchanged for any other post type or for invalid JSON.
+ * The filter is unconditional — taxonomy config isn't HTML and shouldn't
+ * carry scripts even for users with `unfiltered_html`.
+ *
+ * Storage is encoded with `JSON_HEX_TAG | JSON_HEX_AMP`, so the bytes that
+ * reach kses are inert and ordering vs `wp_filter_post_kses` is irrelevant.
+ *
+ * @param array $data Slashed post data being inserted/updated.
+ * @return array Filtered data.
+ */
+function gutenberg_filter_user_taxonomy_post_content( $data ) {
+	if ( ! isset( $data['post_type'], $data['post_content'] ) ) {
+		return $data;
+	}
+
+	$is_taxonomy          = 'wp_user_taxonomy' === $data['post_type'];
+	$is_taxonomy_revision = 'revision' === $data['post_type']
+		&& ! empty( $data['post_parent'] )
+		&& 'wp_user_taxonomy' === get_post_type( $data['post_parent'] );
+
+	if ( ! $is_taxonomy && ! $is_taxonomy_revision ) {
+		return $data;
+	}
+
+	$decoded = json_decode( wp_unslash( (string) $data['post_content'] ), true );
+	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+		return $data;
+	}
+
+	$clean = gutenberg_user_taxonomy_sanitize_config( $decoded );
+
+	$data['post_content'] = wp_slash(
+		wp_json_encode(
+			$clean,
+			JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
+		)
+	);
+
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'gutenberg_filter_user_taxonomy_post_content' );
+
+/**
  * Reads the stored object_type meta values for a record, filtering down to
  * post types that currently exist.
  *
@@ -221,9 +262,8 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
 		return null;
 	}
-	unset( $decoded[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
-	// Storage is sanitized at write-time by the kses filter on
-	// `content_save_pre`, so we trust the decoded shape here.
+	// Storage is sanitized at write-time by the filter on
+	// `wp_insert_post_data`, so we trust the decoded shape here.
 	$config = $decoded;
 
 	$object_type = gutenberg_user_taxonomy_read_object_type( $record->ID );
