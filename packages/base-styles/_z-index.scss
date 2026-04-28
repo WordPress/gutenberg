@@ -111,6 +111,12 @@ $z-layers: (
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
+	// Snackbars portaled inside a Modal need to clear the modal overlay
+	// (".components-modal__screen-overlay" at 100000) and any popovers
+	// that may open inside the modal (".components-popover" at 1000000).
+	// Sits at the same tier as the in-modal action modals below.
+	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
+
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,
 
