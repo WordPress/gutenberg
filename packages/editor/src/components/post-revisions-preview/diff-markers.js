@@ -145,7 +145,7 @@ export function useDiffMarkers() {
 			key="diff-markers"
 			className="revision-diff-markers"
 			role="navigation"
-			aria-label={ __( 'Diff markers' ) }
+			aria-label={ __( 'Document changes' ) }
 		>
 			{ isMounted &&
 				diffBlocks.map( ( { clientId, status } ) => (

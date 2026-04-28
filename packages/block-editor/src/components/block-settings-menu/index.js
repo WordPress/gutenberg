@@ -7,12 +7,12 @@ import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
  * Internal dependencies
  */
 import BlockSettingsDropdown from './block-settings-dropdown';
-import CommentIconToolbarSlotFill from '../../components/collab/block-comment-icon-toolbar-slot';
+import NoteIconToolbarSlotFill from '../../components/collab/note-icon-toolbar-slot';
 
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	return (
 		<ToolbarGroup>
-			<CommentIconToolbarSlotFill.Slot />
+			<NoteIconToolbarSlotFill.Slot />
 
 			<ToolbarItem>
 				{ ( toggleProps ) => (
