@@ -590,55 +590,90 @@ class WP_Theme_JSON_Gutenberg {
 	);
 
 	/**
-	 * Defines which pseudo selectors are enabled for which elements.
+	 * Defines the available state groups and their valid states.
 	 *
-	 * The order of the selectors should be: link, any-link, visited, hover, focus, focus-visible, active.
-	 * This is to ensure the user action (hover, focus and active) styles have a higher
-	 * specificity than the visited styles, which in turn have a higher specificity than
-	 * the unvisited styles.
-	 *
-	 * See https://core.trac.wordpress.org/ticket/56928.
-	 * Note: this will affect both top-level and block-level elements.
-	 *
-	 * @since 6.1.0
-	 * @since 6.2.0 Added support for `:link` and `:any-link`.
-	 * @since 6.8.0 Added support for `:focus-visible`.
-	 */
-	const VALID_ELEMENT_PSEUDO_SELECTORS = array(
-		'link'   => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-		'button' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
-	);
-
-	/**
-	 * The valid pseudo-selectors that can be used for blocks.
+	 * Each group has:
+	 * - 'order'  : Nesting order (lower = outer level). When states from multiple
+	 *              groups are combined, lower-order groups wrap higher-order ones.
+	 *              E.g. a current_item state (order 10) wraps a pseudo state (order 20).
+	 * - 'states' : An associative array of valid state keys to metadata.
+	 *              State keys use a prefix character (':' for CSS pseudo-selectors,
+	 *              '@' for class-based states) to distinguish them from style property
+	 *              keys in theme.json.
 	 *
 	 * @since 7.0.0
 	 * @var array
 	 */
-	const VALID_BLOCK_PSEUDO_SELECTORS = array(
-		'core/button'          => array( ':hover', ':focus', ':focus-visible', ':active' ),
-		'core/navigation-link' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+	const STATE_GROUPS = array(
+		'current_item' => array(
+			'order'  => 10,
+			'states' => array(
+				'@current' => array( 'label' => 'Current' ),
+			),
+		),
+		'pseudo'       => array(
+			'order'  => 20,
+			'states' => array(
+				':hover'         => array( 'label' => 'Hover' ),
+				':focus'         => array( 'label' => 'Focus' ),
+				':focus-visible' => array( 'label' => 'Focus-visible' ),
+				':active'        => array( 'label' => 'Active' ),
+				':link'          => array( 'label' => 'Link' ),
+				':any-link'      => array( 'label' => 'Any Link' ),
+				':visited'       => array( 'label' => 'Visited' ),
+			),
+		),
 	);
 
 	/**
-	 * Custom states for blocks that map to CSS class selectors rather than
-	 * CSS pseudo-selectors. Values use the '@' prefix (e.g. '@current') to
-	 * distinguish them from real CSS pseudo-selectors.
+	 * Defines which state groups (and which states within those groups) each block supports.
 	 *
-	 * The CSS selector for each state is defined in the block's block.json
-	 * under `selectors.states`, e.g.:
+	 * Each entry maps a block name to an associative array of group names to arrays
+	 * of valid state keys from that group. Blocks only receive state-related schema
+	 * entries and CSS output for the states listed here.
 	 *
-	 *   "selectors": { "states": { "@current": ".some-css-selector" } }
+	 * The order of pseudo-selectors should be: link, any-link, visited, hover, focus,
+	 * focus-visible, active — to ensure user action styles have higher specificity than
+	 * visited styles. See https://core.trac.wordpress.org/ticket/56928.
 	 *
-	 * This constant controls which states are valid in theme.json for a given
-	 * block. Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS
-	 * as valid sub-states, producing compound selectors such as
+	 * For states in the 'current_item' group (or any group with '@' prefix), the CSS
+	 * selector is defined in the block's block.json under `selectors.states`. States
+	 * from higher-order groups (e.g. pseudo) can be nested inside lower-order states
+	 * (e.g. current_item), producing compound selectors such as
 	 * `.wp-block-navigation-item.current-menu-item:hover`.
 	 *
+	 * @since 7.0.0
 	 * @var array
 	 */
-	const VALID_BLOCK_CUSTOM_STATES = array(
-		'core/navigation-link' => array( '@current' ),
+	const BLOCK_STATE_SUPPORT = array(
+		'core/button'          => array(
+			'pseudo' => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		),
+		'core/navigation-link' => array(
+			'current_item' => array( '@current' ),
+			'pseudo'       => array( ':hover', ':focus', ':focus-visible', ':active' ),
+		),
+	);
+
+	/**
+	 * Defines which state groups each element supports.
+	 *
+	 * Similar to BLOCK_STATE_SUPPORT but for elements (link, button).
+	 * These apply to both top-level and block-level elements.
+	 *
+	 * The order of pseudo-selectors should be: link, any-link, visited, hover, focus,
+	 * focus-visible, active. See https://core.trac.wordpress.org/ticket/56928.
+	 *
+	 * @since 7.0.0
+	 * @var array
+	 */
+	const ELEMENT_STATE_SUPPORT = array(
+		'link'   => array(
+			'pseudo' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		),
+		'button' => array(
+			'pseudo' => array( ':link', ':any-link', ':visited', ':hover', ':focus', ':focus-visible', ':active' ),
+		),
 	);
 
 	/**
@@ -733,30 +768,123 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Processes pseudo-selectors for any node (block or variation).
+	 * Returns a flat array of all valid state keys for a block, across all groups.
 	 *
-	 * @param array  $node The node data (block or variation).
-	 * @param string $base_selector The base selector.
-	 * @param array  $settings The theme settings.
-	 * @param string $block_name The block name.
-	 * @return array Array of pseudo-selector declarations.
+	 * @since 7.0.0
+	 *
+	 * @param string $block_name The block name (e.g. 'core/button').
+	 * @return string[] Array of state keys (e.g. array( ':hover', ':focus', '@current' )).
 	 */
-	private static function process_pseudo_selectors( $node, $base_selector, $settings, $block_name ) {
-		$pseudo_declarations = array();
-
-		if ( ! isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) ) {
-			return $pseudo_declarations;
+	protected static function get_block_states( $block_name ) {
+		if ( ! isset( static::BLOCK_STATE_SUPPORT[ $block_name ] ) ) {
+			return array();
 		}
 
-		foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] as $pseudo_selector ) {
+		$states = array();
+		foreach ( static::BLOCK_STATE_SUPPORT[ $block_name ] as $group_states ) {
+			$states = array_merge( $states, $group_states );
+		}
+		return $states;
+	}
+
+	/**
+	 * Returns a flat array of all valid state keys for an element, across all groups.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $element The element name (e.g. 'link', 'button').
+	 * @return string[] Array of state keys (e.g. array( ':hover', ':focus' )).
+	 */
+	protected static function get_element_states( $element ) {
+		if ( ! isset( static::ELEMENT_STATE_SUPPORT[ $element ] ) ) {
+			return array();
+		}
+
+		$states = array();
+		foreach ( static::ELEMENT_STATE_SUPPORT[ $element ] as $group_states ) {
+			$states = array_merge( $states, $group_states );
+		}
+		return $states;
+	}
+
+	/**
+	 * Returns the states for a specific group that a block supports.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $block_name The block name (e.g. 'core/button').
+	 * @param string $group_name The state group name (e.g. 'pseudo', 'current_item').
+	 * @return string[] Array of state keys, or empty array if the block doesn't support the group.
+	 */
+	protected static function get_block_states_for_group( $block_name, $group_name ) {
+		return static::BLOCK_STATE_SUPPORT[ $block_name ][ $group_name ] ?? array();
+	}
+
+	/**
+	 * Returns the state groups for a block, sorted by order (ascending).
+	 *
+	 * Each entry in the returned array contains the group name, the group definition
+	 * from STATE_GROUPS, and the specific states the block supports from that group.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $block_name The block name (e.g. 'core/button').
+	 * @return array[] Array of arrays with keys 'name', 'order', and 'states'.
+	 */
+	protected static function get_state_groups_for_block( $block_name ) {
+		if ( ! isset( static::BLOCK_STATE_SUPPORT[ $block_name ] ) ) {
+			return array();
+		}
+
+		$groups = array();
+		foreach ( static::BLOCK_STATE_SUPPORT[ $block_name ] as $group_name => $block_states ) {
+			if ( ! isset( static::STATE_GROUPS[ $group_name ] ) ) {
+				continue;
+			}
+			$groups[] = array(
+				'name'   => $group_name,
+				'order'  => static::STATE_GROUPS[ $group_name ]['order'],
+				'states' => $block_states,
+			);
+		}
+
+		usort(
+			$groups,
+			static function ( $a, $b ) {
+				return $a['order'] - $b['order'];
+			}
+		);
+
+		return $groups;
+	}
+
+	/**
+	 * Processes block state styles for any node (block or variation).
+	 *
+	 * Iterates over all valid states for the given block and computes
+	 * style declarations for each state that exists in the node data.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array  $node          The node data (block or variation).
+	 * @param string $base_selector The base CSS selector.
+	 * @param array  $settings      The theme settings.
+	 * @param string $block_name    The block name.
+	 * @return array Associative array of CSS selector => declarations.
+	 */
+	private static function process_block_states( $node, $base_selector, $settings, $block_name ) {
+		$state_declarations = array();
+
+		$pseudo_states = static::get_block_states_for_group( $block_name, 'pseudo' );
+		foreach ( $pseudo_states as $pseudo_selector ) {
 			if ( isset( $node[ $pseudo_selector ] ) ) {
-				$combined_selector                         = static::append_to_selector( $base_selector, $pseudo_selector );
-				$declarations                              = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
-				$pseudo_declarations[ $combined_selector ] = $declarations;
+				$combined_selector                        = static::append_to_selector( $base_selector, $pseudo_selector );
+				$declarations                             = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
+				$state_declarations[ $combined_selector ] = $declarations;
 			}
 		}
 
-		return $pseudo_declarations;
+		return $state_declarations;
 	}
 
 	/**
@@ -1053,7 +1181,7 @@ class WP_Theme_JSON_Gutenberg {
 		$schema_styles_elements = array();
 
 		/*
-		 * Set allowed element pseudo selectors based on per element allow list.
+		 * Set allowed element state selectors based on per element allow list.
 		 * Target data structure in schema:
 		 * e.g.
 		 * - top level elements: `$schema['styles']['elements']['link'][':hover']`.
@@ -1062,10 +1190,8 @@ class WP_Theme_JSON_Gutenberg {
 		foreach ( $valid_element_names as $element ) {
 			$schema_styles_elements[ $element ] = $styles_non_top_level;
 
-			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
-				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-					$schema_styles_elements[ $element ][ $pseudo_selector ] = $styles_non_top_level;
-				}
+			foreach ( static::get_element_states( $element ) as $state ) {
+				$schema_styles_elements[ $element ][ $state ] = $styles_non_top_level;
 			}
 		}
 
@@ -1087,25 +1213,23 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
-			// Add pseudo-selectors for blocks that support them.
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-				foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-					$schema_styles_blocks[ $block ][ $pseudo_selector ] = $styles_non_top_level;
-				}
-			}
-
-			// Add custom states for blocks that support them (e.g. '@current' for navigation).
-			if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) ) {
-				foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $block ] as $custom_state ) {
-					$custom_state_schema = $styles_non_top_level;
-					// The same pseudo-selectors valid for the block at the top level
-					// are also valid within each custom state.
-					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo ) {
-							$custom_state_schema[ $pseudo ] = $styles_non_top_level;
+			// Add state selectors for blocks, iterating groups by order.
+			// Higher-order states (e.g. pseudo) can be nested inside lower-order states
+			// (e.g. current_item), producing compound selectors.
+			$block_groups  = static::get_state_groups_for_block( $block );
+			$pseudo_states = static::get_block_states_for_group( $block, 'pseudo' );
+			foreach ( $block_groups as $group ) {
+				foreach ( $group['states'] as $state ) {
+					if ( 'pseudo' === $group['name'] ) {
+						$schema_styles_blocks[ $block ][ $state ] = $styles_non_top_level;
+					} else {
+						// Non-pseudo states can nest pseudo states inside them.
+						$state_schema = $styles_non_top_level;
+						foreach ( $pseudo_states as $pseudo ) {
+							$state_schema[ $pseudo ] = $styles_non_top_level;
 						}
+						$schema_styles_blocks[ $block ][ $state ] = $state_schema;
 					}
-					$schema_styles_blocks[ $block ][ $custom_state ] = $custom_state_schema;
 				}
 			}
 		}
@@ -1133,11 +1257,9 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $style_variation_names as $variation_name ) {
 					$variation_schema = $block_style_variation_styles;
 
-					// Add pseudo-selectors to variations for blocks that support them.
-					if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] ) ) {
-						foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block ] as $pseudo_selector ) {
-							$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
-						}
+					// Add pseudo-state selectors to variations for blocks that support them.
+					foreach ( static::get_block_states_for_group( $block, 'pseudo' ) as $pseudo_selector ) {
+						$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
 					}
 
 					$schema_styles_variations[ $variation_name ] = $variation_schema;
@@ -2800,16 +2922,13 @@ class WP_Theme_JSON_Gutenberg {
 					'selector' => static::ELEMENTS[ $element ],
 				);
 
-				// Handle any pseudo selectors for the element.
-				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
-					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-
-						if ( isset( $theme_json['styles']['elements'][ $element ][ $pseudo_selector ] ) ) {
-							$nodes[] = array(
-								'path'     => array( 'styles', 'elements', $element ),
-								'selector' => static::append_to_selector( static::ELEMENTS[ $element ], $pseudo_selector ),
-							);
-						}
+				// Handle any state selectors for the element.
+				foreach ( static::get_element_states( $element ) as $state ) {
+					if ( isset( $theme_json['styles']['elements'][ $element ][ $state ] ) ) {
+						$nodes[] = array(
+							'path'     => array( 'styles', 'elements', $element ),
+							'selector' => static::append_to_selector( static::ELEMENTS[ $element ], $state ),
+						);
 					}
 				}
 			}
@@ -3101,74 +3220,78 @@ class WP_Theme_JSON_Gutenberg {
 					'css'        => $selector,
 				);
 
-				// Handle any pseudo selectors for the block.
-				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
-					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo_selector ) {
-						if ( isset( $theme_json['styles']['blocks'][ $name ][ $pseudo_selector ] ) ) {
+				// Handle block state selectors, iterating groups by order.
+				// Higher-order states (e.g. pseudo) can be nested inside lower-order
+				// states (e.g. current_item), producing compound selectors.
+				$block_groups  = static::get_state_groups_for_block( $name );
+				$pseudo_states = static::get_block_states_for_group( $name, 'pseudo' );
+
+				foreach ( $block_groups as $group ) {
+					foreach ( $group['states'] as $state ) {
+						if ( ! isset( $theme_json['styles']['blocks'][ $name ][ $state ] ) ) {
+							continue;
+						}
+
+						if ( 'pseudo' === $group['name'] ) {
 							/*
-							 * Append the pseudo-selector to each feature selector so that
-							 * get_feature_declarations_for_node generates CSS scoped to the
-							 * pseudo-state (e.g. '.wp-block-button:hover') rather than the
-							 * default state (e.g. '.wp-block-button').
+							 * Pseudo-selectors: append the pseudo-selector to each feature
+							 * selector so that get_feature_declarations_for_node generates CSS
+							 * scoped to the pseudo-state (e.g. '.wp-block-button:hover').
 							 */
-							$pseudo_feature_selectors = array();
+							$state_feature_selectors = array();
 							foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
 								if ( is_array( $feature_selector ) ) {
-									$pseudo_feature_selectors[ $feature ] = array();
+									$state_feature_selectors[ $feature ] = array();
 									foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
-										$pseudo_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $pseudo_selector );
+										$state_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $state );
 									}
 								} else {
-									$pseudo_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $pseudo_selector );
+									$state_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $state );
 								}
 							}
 
 							$nodes[] = array(
 								'name'       => $name,
-								'path'       => array( 'styles', 'blocks', $name, $pseudo_selector ),
-								'selector'   => static::append_to_selector( $selector, $pseudo_selector ),
-								'selectors'  => $pseudo_feature_selectors,
+								'path'       => array( 'styles', 'blocks', $name, $state ),
+								'selector'   => static::append_to_selector( $selector, $state ),
+								'selectors'  => $state_feature_selectors,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
-								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
+								'css'        => static::append_to_selector( $selector, $state ),
 							);
-						}
-					}
-				}
+						} else {
+							/*
+							 * Non-pseudo states (e.g. '@current'): use the CSS selector
+							 * defined in block.json under selectors.states.
+							 */
+							if ( ! isset( $selectors[ $name ]['states'][ $state ] ) ) {
+								continue;
+							}
 
-				// Handle custom states (e.g. '@current' for navigation).
-				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
-					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state ) {
-						if (
-							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
-							isset( $selectors[ $name ]['states'][ $custom_state ] )
-						) {
-							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
-							$nodes[]             = array(
+							$state_css_selector = $selectors[ $name ]['states'][ $state ];
+							$nodes[]            = array(
 								'name'       => $name,
-								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
-								'selector'   => $custom_css_selector,
+								'path'       => array( 'styles', 'blocks', $name, $state ),
+								'selector'   => $state_css_selector,
 								'selectors'  => $feature_selectors,
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
-								'css'        => $custom_css_selector,
+								'css'        => $state_css_selector,
 							);
 
-							// Sub-pseudo-selectors within the custom state.
-							if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
-								foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo ) {
-									if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ][ $pseudo ] ) ) {
-										$compound_css_selector = static::append_to_selector( $custom_css_selector, $pseudo );
-										$nodes[]               = array(
-											'name'       => $name,
-											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
-											'selector'   => $compound_css_selector,
-											'selectors'  => $feature_selectors,
-											'duotone'    => $duotone_selector,
-											'variations' => $variation_selectors,
-											'css'        => $compound_css_selector,
-										);
-									}
+							// Check for nested pseudo-selectors within this state.
+							foreach ( $pseudo_states as $pseudo ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ][ $state ][ $pseudo ] ) ) {
+									$compound_css_selector = static::append_to_selector( $state_css_selector, $pseudo );
+									$nodes[]               = array(
+										'name'       => $name,
+										'path'       => array( 'styles', 'blocks', $name, $state, $pseudo ),
+										'selector'   => $compound_css_selector,
+										'selectors'  => $feature_selectors,
+										'duotone'    => $duotone_selector,
+										'variations' => $variation_selectors,
+										'css'        => $compound_css_selector,
+									);
 								}
 							}
 						}
@@ -3190,23 +3313,21 @@ class WP_Theme_JSON_Gutenberg {
 						'selector' => $selectors[ $name ]['elements'][ $element ],
 					);
 
-					// Handle any pseudo selectors for the element.
-					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
-						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-								$node_path = array( 'styles', 'blocks', $name, 'elements', $element );
-								if ( $include_node_paths_only ) {
-									$nodes[] = array(
-										'path' => $node_path,
-									);
-									continue;
-								}
-
+					// Handle any state selectors for the element.
+					foreach ( static::get_element_states( $element ) as $state ) {
+						if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $state ] ) ) {
+							$node_path = array( 'styles', 'blocks', $name, 'elements', $element );
+							if ( $include_node_paths_only ) {
 								$nodes[] = array(
-									'path'     => $node_path,
-									'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
+									'path' => $node_path,
 								);
+								continue;
 							}
+
+							$nodes[] = array(
+								'path'     => $node_path,
+								'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $state ),
+							);
 						}
 					}
 				}
@@ -3287,10 +3408,10 @@ class WP_Theme_JSON_Gutenberg {
 				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
-				// Process pseudo-selectors for this variation (e.g., :hover, :focus).
-				$block_name                    = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
-				$variation_pseudo_declarations = static::process_pseudo_selectors( $style_variation_node, $style_variation['selector'], $settings, $block_name );
-				$style_variation_declarations  = array_merge( $style_variation_declarations, $variation_pseudo_declarations );
+				// Process block state styles for this variation (e.g., :hover, :focus).
+				$block_name                   = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
+				$variation_state_declarations = static::process_block_states( $style_variation_node, $style_variation['selector'], $settings, $block_name );
+				$style_variation_declarations = array_merge( $style_variation_declarations, $variation_state_declarations );
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
@@ -3321,11 +3442,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$current_element = $is_processing_element ? $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ] : null;
 
-		$element_pseudo_allowed = array();
-
-		if ( isset( $current_element, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
-			$element_pseudo_allowed = static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ];
-		}
+		$element_states_allowed = $current_element ? static::get_element_states( $current_element ) : array();
 
 		/*
 		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
@@ -3333,7 +3450,7 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		$pseudo_matches = array_values(
 			array_filter(
-				$element_pseudo_allowed,
+				$element_states_allowed,
 				static function ( $pseudo_selector ) use ( $selector ) {
 					/*
 					 * Check if the pseudo selector is in the current selector,
@@ -3351,14 +3468,13 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
-			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
-			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
+		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] )
+			&& in_array( $pseudo_selector, $element_states_allowed, true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
 			/*
-			 * For block pseudo-selector nodes (e.g. ':hover'), $node has already had any
+			 * For block state nodes (e.g. ':hover'), $node has already had any
 			 * feature-selector properties (e.g. writingMode) removed by get_feature_declarations_for_node,
 			 * so those properties are not output twice.
 			 */
@@ -3995,14 +4111,12 @@ class WP_Theme_JSON_Gutenberg {
 			$current_element = $metadata['path'][ count( $metadata['path'] ) - 1 ];
 
 			/*
-			 * $output is stripped of pseudo selectors. Re-add and process them
-			 * or insecure styles here.
+			 * $output is stripped of state selectors. Re-add and process them
+			 * for insecure styles here.
 			 */
-			if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] ) ) {
-				foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] as $pseudo_selector ) {
-					if ( isset( $input[ $pseudo_selector ] ) ) {
-						$output[ $pseudo_selector ] = static::remove_insecure_styles( $input[ $pseudo_selector ] );
-					}
+			foreach ( static::get_element_states( $current_element ) as $state ) {
+				if ( isset( $input[ $state ] ) ) {
+					$output[ $state ] = static::remove_insecure_styles( $input[ $state ] );
 				}
 			}
 
@@ -4079,11 +4193,9 @@ class WP_Theme_JSON_Gutenberg {
 			if ( $element_input ) {
 				$element_output = static::remove_insecure_styles( $element_input );
 
-				if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] ) ) {
-					foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element_name ] as $pseudo_selector ) {
-						if ( isset( $element_input[ $pseudo_selector ] ) ) {
-							$element_output[ $pseudo_selector ] = static::remove_insecure_styles( $element_input[ $pseudo_selector ] );
-						}
+				foreach ( static::get_element_states( $element_name ) as $state ) {
+					if ( isset( $element_input[ $state ] ) ) {
+						$element_output[ $state ] = static::remove_insecure_styles( $element_input[ $state ] );
 					}
 				}
 

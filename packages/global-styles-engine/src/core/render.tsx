@@ -156,12 +156,29 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	typography: 'typography',
 };
 
-// The valid pseudo-selectors that can be used for blocks.
-// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS.
-const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
-	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
-	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+// Block state support: which state groups each block supports.
+// Keep in sync with WP_Theme_JSON_Gutenberg::BLOCK_STATE_SUPPORT.
+const BLOCK_STATE_SUPPORT: Record< string, Record< string, string[] > > = {
+	'core/button': {
+		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
+	},
+	'core/navigation-link': {
+		currentItem: [ '@current' ],
+		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
+	},
 };
+
+/**
+ * Get the flat list of pseudo-state keys a block supports.
+ * This is the primary list used for CSS generation since pseudo-selectors
+ * are the only state type that modifies CSS selectors directly.
+ *
+ * @param blockName The block name (e.g. 'core/button').
+ * @return Array of pseudo-state keys (e.g. [':hover', ':focus']).
+ */
+function getBlockPseudoStates( blockName: string ): string[] {
+	return BLOCK_STATE_SUPPORT[ blockName ]?.pseudo ?? [];
+}
 
 /**
  * Transform given preset tree into a set of preset class declarations.
@@ -873,7 +890,7 @@ function pickStyleAndPseudoKeys(
 	}
 	const entries = Object.entries( treeToPickFrom );
 	const allowedPseudoSelectors = blockName
-		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
+		? getBlockPseudoStates( blockName )
 		: [];
 	const pickedEntries = entries.filter(
 		( [ key ] ) =>

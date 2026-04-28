@@ -14,61 +14,132 @@ export interface StateDefinition {
 }
 
 /**
- * Valid states for elements with their labels.
- * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ * State group definition with order and available states.
  */
-export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
-	link: [
-		{ value: ':link', label: __( 'Link' ) },
-		{ value: ':any-link', label: __( 'Any Link' ) },
-		{ value: ':visited', label: __( 'Visited' ) },
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
-	],
-	button: [
-		{ value: ':link', label: __( 'Link' ) },
-		{ value: ':any-link', label: __( 'Any Link' ) },
-		{ value: ':visited', label: __( 'Visited' ) },
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
-	],
+export interface StateGroupDefinition {
+	order: number;
+	states: Record< string, { label: string } >;
+}
+
+/**
+ * Defines the available state groups and their valid states.
+ *
+ * Each group has:
+ * - `order`: Nesting order (lower = outer level). When states from multiple
+ *   groups are combined, lower-order groups wrap higher-order ones.
+ * - `states`: A map of valid state keys to metadata (label for UI display).
+ *   State keys use a prefix character (':' for CSS pseudo-selectors,
+ *   '@' for class-based states) to distinguish them from style property keys.
+ *
+ * Keep in sync with WP_Theme_JSON_Gutenberg::STATE_GROUPS.
+ */
+export const STATE_GROUPS: Record< string, StateGroupDefinition > = {
+	currentItem: {
+		order: 10,
+		states: {
+			'@current': { label: __( 'Current' ) },
+		},
+	},
+	pseudo: {
+		order: 20,
+		states: {
+			':hover': { label: __( 'Hover' ) },
+			':focus': { label: __( 'Focus' ) },
+			':focus-visible': { label: __( 'Focus-visible' ) },
+			':active': { label: __( 'Active' ) },
+			':link': { label: __( 'Link' ) },
+			':any-link': { label: __( 'Any Link' ) },
+			':visited': { label: __( 'Visited' ) },
+		},
+	},
 };
 
 /**
- * Valid states for blocks with their labels.
- * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ * Defines which state groups (and which states within those groups) each block supports.
+ *
+ * Keep in sync with WP_Theme_JSON_Gutenberg::BLOCK_STATE_SUPPORT.
  */
-export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
-	'core/button': [
-		{ value: ':hover', label: __( 'Hover' ) },
-		{ value: ':focus', label: __( 'Focus' ) },
-		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
-		{ value: ':active', label: __( 'Active' ) },
-	],
+export const BLOCK_STATE_SUPPORT: Record<
+	string,
+	Record< string, string[] >
+> = {
+	'core/button': {
+		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
+	},
+	'core/navigation-link': {
+		currentItem: [ '@current' ],
+		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
+	},
 };
 
 /**
- * Get the valid states for a given block or element.
+ * Defines which state groups each element supports.
+ *
+ * Keep in sync with WP_Theme_JSON_Gutenberg::ELEMENT_STATE_SUPPORT.
+ */
+export const ELEMENT_STATE_SUPPORT: Record<
+	string,
+	Record< string, string[] >
+> = {
+	link: {
+		pseudo: [
+			':link',
+			':any-link',
+			':visited',
+			':hover',
+			':focus',
+			':focus-visible',
+			':active',
+		],
+	},
+	button: {
+		pseudo: [
+			':link',
+			':any-link',
+			':visited',
+			':hover',
+			':focus',
+			':focus-visible',
+			':active',
+		],
+	},
+};
+
+/**
+ * Get the valid states for a given block or element, flattened across all groups.
+ *
+ * Returns state definitions sorted by group order (lower-order groups first),
+ * preserving state order within each group.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
  * @return Array of valid state definitions, or empty array if none
  */
 export function getValidStates( name: string ): StateDefinition[] {
-	// Check if it's a block
-	if ( VALID_BLOCK_STATES[ name ] ) {
-		return VALID_BLOCK_STATES[ name ];
+	const support =
+		BLOCK_STATE_SUPPORT[ name ] ?? ELEMENT_STATE_SUPPORT[ name ];
+	if ( ! support ) {
+		return [];
 	}
 
-	// Check if it's an element
-	if ( VALID_ELEMENT_STATES[ name ] ) {
-		return VALID_ELEMENT_STATES[ name ];
-	}
+	// Sort groups by order before flattening.
+	const sortedGroupNames = Object.keys( support ).sort( ( a, b ) => {
+		const orderA = STATE_GROUPS[ a ]?.order ?? Infinity;
+		const orderB = STATE_GROUPS[ b ]?.order ?? Infinity;
+		return orderA - orderB;
+	} );
 
-	return [];
+	return sortedGroupNames.flatMap( ( groupName ) => {
+		const group = STATE_GROUPS[ groupName ];
+		if ( ! group ) {
+			return [];
+		}
+		return ( support[ groupName ] ?? [] )
+			.filter( ( key: string ) => key in group.states )
+			.map( ( key: string ) => ( {
+				value: key,
+				label: group.states[ key ].label,
+			} ) );
+	} );
 }
 
 /**
