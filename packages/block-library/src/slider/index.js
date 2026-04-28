@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { gallery as icon } from '@wordpress/icons';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -62,4 +63,36 @@ export const settings = {
 	},
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	// Prevent nesting a slider inside another slider.
+	const DISALLOWED_PARENTS = [ 'core/slider' ];
+	addFilter(
+		'blockEditor.__unstableCanInsertBlockType',
+		'core/block-library/preventInsertingSliderIntoAnotherSlider',
+		(
+			canInsert,
+			blockType,
+			rootClientId,
+			{ getBlock, getBlockParentsByBlockName }
+		) => {
+			if ( blockType.name !== 'core/slider' ) {
+				return canInsert;
+			}
+
+			for ( const disallowedParentType of DISALLOWED_PARENTS ) {
+				const hasDisallowedParent =
+					getBlock( rootClientId )?.name === disallowedParentType ||
+					getBlockParentsByBlockName(
+						rootClientId,
+						disallowedParentType
+					).length;
+				if ( hasDisallowedParent ) {
+					return false;
+				}
+			}
+			return true;
+		}
+	);
+
+	return initBlock( { name, metadata, settings } );
+};
