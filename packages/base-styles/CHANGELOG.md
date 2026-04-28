@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Remove `.wp-block-cover.is-placeholder .components-placeholder.is-large`, `.wp-block-cover__inner-container`, `.wp-block-cover.has-background-dim::before`, `.wp-block-cover__image-background`, and `.wp-block-cover__video-background` from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753)).
 -   Remove `.components-circular-option-picker__option-wrapper::before`, `.components-circular-option-picker__option.is-pressed`, `.components-circular-option-picker__option.is-pressed + svg`, `.components-circular-option-picker__swatches`, and `> *:not(.components-circular-option-picker__swatches)` from the `z-index()` helper ([#77715](https://github.com/WordPress/gutenberg/pull/77715)).
 -   Remove `.components-resizable-box__handle`, `.components-resizable-box__side-handle`, and `.components-resizable-box__corner-handle` from the `z-index()` helper ([#77620](https://github.com/WordPress/gutenberg/pull/77620)).
 -   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
