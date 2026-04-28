@@ -46,19 +46,21 @@ const CIRCUMFERENCE = 2 * Math.PI * RADIUS; // ≈ 565.48
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+type HealthTone = 'success' | 'warning' | 'error';
+
 /**
- * Returns the accent colour for the progress ring based on percentage.
+ * Maps a percentage to a semantic tone used for CSS class selection.
  *
  * @param {number} pct Percentage of passing tests (0–100).
  */
-function colorForPercentage( pct: number ): string {
+function toneForPercentage( pct: number ): HealthTone {
 	if ( pct === 100 ) {
-		return '#1da462';
-	} // green  — all good
+		return 'success';
+	}
 	if ( pct >= 75 ) {
-		return '#f0b849';
-	} // yellow — some recommended
-	return '#d63638'; // red    — critical issues
+		return 'warning';
+	}
+	return 'error';
 }
 
 /**
@@ -101,17 +103,19 @@ function statusMessage( counts: IssueCounts ): string {
 // ─── Circle progress ──────────────────────────────────────────────────────────
 
 /**
- * @param {{ percentage: number }} props
+ * @param {{ percentage: number, tone: HealthTone }} props
  */
-function CircleProgress( { percentage }: { percentage: number } ) {
-	const color = colorForPercentage( percentage );
+function CircleProgress( {
+	percentage,
+	tone,
+}: {
+	percentage: number;
+	tone: HealthTone;
+} ) {
 	const offset = CIRCUMFERENCE * ( 1 - percentage / 100 );
 
 	return (
-		<div
-			className={ styles.circle }
-			style={ { '--site-health-color': color } as React.CSSProperties }
-		>
+		<div className={ `${ styles.circle } ${ styles[ `is-${ tone }` ] }` }>
 			<svg
 				aria-hidden="true"
 				focusable="false"
@@ -181,18 +185,15 @@ export default function SiteHealth() {
 	const percentage =
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
 	const issuesTotal = counts.recommended + counts.critical;
-	const color = colorForPercentage( percentage );
+	const tone = toneForPercentage( percentage );
 
 	return (
 		<div className={ styles.widget }>
-			<div className={ styles.header }>
-				<CircleProgress percentage={ percentage } />
-				<span
-					className={ styles.percentage }
-					style={ { color } as React.CSSProperties }
-				>
-					{ percentage }%
-				</span>
+			<div
+				className={ `${ styles.header } ${ styles[ `is-${ tone }` ] }` }
+			>
+				<CircleProgress percentage={ percentage } tone={ tone } />
+				<span className={ styles.percentage }>{ percentage }%</span>
 			</div>
 
 			<div className={ styles.details }>
