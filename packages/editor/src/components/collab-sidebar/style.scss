@@ -71,7 +71,7 @@
 	color: $gray-700;
 }
 
-.editor-collab-sidebar-panel__user-comment {
+.editor-collab-sidebar-panel__note-content {
 	p:last-child {
 		margin-bottom: 0;
 	}
@@ -86,7 +86,7 @@
 	background: $white;
 }
 
-.editor-collab-sidebar-panel__comment-status {
+.editor-collab-sidebar-panel__note-actions {
 	margin-left: auto;
 
 	button {
@@ -98,10 +98,6 @@
 			flex-shrink: 0;
 		}
 	}
-}
-
-.editor-collab-sidebar-panel__comment-dropdown-menu {
-	flex-shrink: 0;
 }
 
 .editor-collab-sidebar-panel__more-reply-separator {
@@ -125,15 +121,11 @@
 	color: $gray-700;
 }
 
-.editor-collab-sidebar-panel__participant-overflow {
-	font-weight: $font-weight-medium;
-}
-
 .editor-collab-sidebar-panel__resolution-text {
 	font-style: italic;
 }
 
-.editor-collab-sidebar-panel__comment-form textarea {
+.editor-collab-sidebar-panel__note-form textarea {
 	@include input-control;
 	// Vertical padding is to match the standard 40px control height when rows=1,
 	// in conjunction with the 20px line-height.
@@ -144,7 +136,7 @@
 }
 
 // Visually hidden until focused (skip link pattern)
-.editor-collab-sidebar-panel__skip-to-comment,
+.editor-collab-sidebar-panel__skip-to-note,
 .editor-collab-sidebar-panel__skip-to-block {
 	position: absolute;
 	top: -9999px;
@@ -161,7 +153,7 @@
 		right: $grid-unit-10;
 	}
 }
-.editor-collab-sidebar-panel__skip-to-comment:focus {
+.editor-collab-sidebar-panel__skip-to-note:focus {
 	top: $grid-unit-10;
 }
 .editor-collab-sidebar-panel__skip-to-block:focus {
@@ -169,7 +161,7 @@
 	bottom: $grid-unit-10;
 }
 
-.comment-avatar {
+.editor-note-indicator__avatar {
 	width: $icon-size;
 	border-radius: $radius-round;
 	margin-left: -12px;
@@ -184,8 +176,12 @@
 	}
 }
 
+.editor-note-indicator__overflow {
+	font-weight: $font-weight-medium;
+}
+
 .show-icon-labels {
-	.comment-avatar-indicator {
+	.editor-note-indicator {
 		width: auto;
 		// Hide the user avatars container when labels are set to display...
 		div {

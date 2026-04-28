@@ -22,6 +22,7 @@ import {
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
+	LOCAL_EDITOR_ORIGIN,
 } from '../config';
 import { getProviderCreators } from '../providers';
 import type {
@@ -224,6 +225,69 @@ describe( 'SyncManager', () => {
 				mockSyncConfig.applyChangesToCRDTDoc
 			).toHaveBeenCalledTimes( 2 );
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'only adds undo metadata for the entity that changed', async () => {
+			mockSyncConfig.applyChangesToCRDTDoc = jest.fn(
+				( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+					const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+					Object.entries( changes ).forEach( ( [ key, value ] ) => {
+						recordMap.set( key, value );
+					} );
+				}
+			);
+
+			const recordA = { id: '123', title: 'Post A', meta: {} };
+			const recordB = { id: '456', title: 'Post B', meta: {} };
+			const handlersA = {
+				...mockHandlers,
+				addUndoMeta: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( recordA )
+				),
+				restoreUndoMeta: jest.fn(),
+			};
+			const handlersB = {
+				...mockHandlers,
+				addUndoMeta: jest.fn(),
+				getEditedRecord: jest.fn( async () =>
+					Promise.resolve( recordB )
+				),
+				restoreUndoMeta: jest.fn(),
+			};
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				recordA,
+				handlersA
+			);
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'456',
+				recordB,
+				handlersB
+			);
+
+			handlersA.addUndoMeta.mockClear();
+			handlersB.addUndoMeta.mockClear();
+
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Post A updated' },
+				LOCAL_EDITOR_ORIGIN,
+				{ isNewUndoLevel: true }
+			);
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( handlersA.addUndoMeta ).toHaveBeenCalledTimes( 1 );
+			expect( handlersB.addUndoMeta ).not.toHaveBeenCalled();
 		} );
 
 		describe( 'persisted CRDT doc behavior', () => {

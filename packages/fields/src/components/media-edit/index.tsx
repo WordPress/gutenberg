@@ -17,7 +17,6 @@ import {
 	__experimentalHStack as HStack,
 	BaseControl,
 	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -42,6 +41,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -914,7 +914,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
