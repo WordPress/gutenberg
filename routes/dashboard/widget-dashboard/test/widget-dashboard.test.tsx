@@ -135,7 +135,7 @@ describe( 'WidgetDashboard', () => {
 		expect( screen.queryByTestId( 'greeting' ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'renders the Empty compound when layout is empty', () => {
+	it( 'renders the NoWidgetsState compound when layout is empty', () => {
 		render(
 			<WidgetDashboard
 				layout={ [] }
@@ -143,9 +143,9 @@ describe( 'WidgetDashboard', () => {
 				widgetTypes={ widgetTypes }
 				resolveWidgetModule={ resolveWidgetModule }
 			>
-				<WidgetDashboard.Empty>
+				<WidgetDashboard.NoWidgetsState>
 					<p>Nothing here yet</p>
-				</WidgetDashboard.Empty>
+				</WidgetDashboard.NoWidgetsState>
 				<WidgetDashboard.Widgets />
 			</WidgetDashboard>
 		);

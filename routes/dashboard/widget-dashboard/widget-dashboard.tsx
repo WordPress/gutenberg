@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 import { WidgetDashboardProvider } from './context/dashboard-context';
-import { Empty } from './components/empty';
 import { Widget } from './components/widget';
 import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
+import { NoWidgetsState } from './components/no-widgets-state';
 
 /**
  * Stateless rendering engine for widget dashboards.
@@ -25,9 +25,9 @@ import type { WidgetDashboardProps } from './types';
  * 			onLayoutChange={ setLayout }
  * 			widgetTypes={ widgetTypes }
  * 		>
- * 			<WidgetDashboard.Empty>
+ * 			<WidgetDashboard.NoWidgetsState>
  * 				<p>No widgets yet.</p>
- * 			</WidgetDashboard.Empty>
+ * 			</WidgetDashboard.NoWidgetsState>
  * 			<WidgetDashboard.Widgets />
  * 		</WidgetDashboard>
  * 	);
@@ -57,12 +57,12 @@ export const WidgetDashboard = Object.assign(
 			>
 				{ children ?? (
 					<>
-						<Empty />
+						<NoWidgetsState />
 						<Widgets />
 					</>
 				) }
 			</WidgetDashboardProvider>
 		);
 	},
-	{ Widgets, Widget, Empty }
+	{ Widgets, Widget, NoWidgetsState }
 );

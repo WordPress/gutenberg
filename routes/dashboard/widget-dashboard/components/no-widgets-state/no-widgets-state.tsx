@@ -13,28 +13,14 @@ import { EmptyState, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import { useDashboardInternalContext } from '../context/dashboard-context';
-import styles from './empty.module.css';
+import { useDashboardInternalContext } from '../../context/dashboard-context';
+import styles from './no-widgets-state.module.css';
 
-export interface EmptyProps {
+export interface NoWidgetsStateProps {
 	children?: ReactNode;
 }
 
-function DefaultEmpty() {
-	return (
-		<EmptyState.Root>
-			<EmptyState.Icon icon={ widget } />
-			<EmptyState.Title>
-				{ __( 'Your dashboard is empty' ) }
-			</EmptyState.Title>
-			<EmptyState.Description>
-				{ __( 'Add widgets to start customizing your dashboard.' ) }
-			</EmptyState.Description>
-		</EmptyState.Root>
-	);
-}
-
-function EmptyImpl( { children }: EmptyProps ) {
+function NoWidgetsStateImpl( { children }: NoWidgetsStateProps ) {
 	const { layout } = useDashboardInternalContext();
 	if ( layout.length > 0 ) {
 		return null;
@@ -42,7 +28,19 @@ function EmptyImpl( { children }: EmptyProps ) {
 
 	return (
 		<Stack justify="center" align="center" className={ styles.root }>
-			{ children ?? <DefaultEmpty /> }
+			{ children ?? (
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ widget } />
+					<EmptyState.Title>
+						{ __( 'Your dashboard is empty' ) }
+					</EmptyState.Title>
+					<EmptyState.Description>
+						{ __(
+							'Add widgets to start customizing your dashboard.'
+						) }
+					</EmptyState.Description>
+				</EmptyState.Root>
+			) }
 		</Stack>
 	);
 }
@@ -54,4 +52,4 @@ function EmptyImpl( { children }: EmptyProps ) {
  * Without children, falls back to a built-in placeholder; pass children to
  * override.
  */
-export const Empty = EmptyImpl;
+export const NoWidgetsState = NoWidgetsStateImpl;

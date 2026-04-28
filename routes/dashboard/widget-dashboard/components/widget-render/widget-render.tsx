@@ -18,14 +18,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useDashboardInternalContext } from '../context/dashboard-context';
+import { useDashboardInternalContext } from '../../context/dashboard-context';
 import styles from './widget-render.module.css';
 import type {
 	DashboardWidget,
 	WidgetModule,
 	WidgetRenderProps,
 	WidgetType,
-} from '../types';
+} from '../../types';
 
 function isValidWidgetModule( module: unknown ): module is WidgetModule {
 	return (

@@ -249,7 +249,7 @@ export const Empty: Story = {
 		layout: [],
 		children: (
 			<>
-				<WidgetDashboard.Empty>
+				<WidgetDashboard.NoWidgetsState>
 					<EmptyState.Root>
 						<EmptyState.Icon icon={ widget } />
 						<EmptyState.Title>
@@ -259,7 +259,7 @@ export const Empty: Story = {
 							Add widgets to start customizing your dashboard.
 						</EmptyState.Description>
 					</EmptyState.Root>
-				</WidgetDashboard.Empty>
+				</WidgetDashboard.NoWidgetsState>
 				<WidgetDashboard.Widgets />
 			</>
 		),
@@ -275,7 +275,7 @@ export const Responsive: Story = {
 
 /*
  * Demonstrates that `<WidgetDashboard>` is just a container around its
- * children. Consumers can interleave the compound parts (`Empty`,
+ * children. Consumers can interleave the compound parts (`NoWidgetsState`,
  * `Widgets`) with any other markup — headers, sidebars, stats, footers —
  * to compose richer surfaces without losing the engine's behaviour.
  */
@@ -323,7 +323,7 @@ export const Composition: Story = {
 					</span>
 				</header>
 
-				<WidgetDashboard.Empty>
+				<WidgetDashboard.NoWidgetsState>
 					<EmptyState.Root>
 						<EmptyState.Icon icon={ widget } />
 						<EmptyState.Title>
@@ -333,7 +333,7 @@ export const Composition: Story = {
 							Add widgets to start customizing your dashboard.
 						</EmptyState.Description>
 					</EmptyState.Root>
-				</WidgetDashboard.Empty>
+				</WidgetDashboard.NoWidgetsState>
 
 				<WidgetDashboard.Widgets />
 

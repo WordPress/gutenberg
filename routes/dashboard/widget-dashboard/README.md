@@ -31,9 +31,9 @@ function Dashboard() {
 	onLayoutChange={ setLayout }
 	widgetTypes={ widgetTypes }
 >
-	<WidgetDashboard.Empty>
+	<WidgetDashboard.NoWidgetsState>
 		<p>{ __( 'No widgets yet.' ) }</p>
-	</WidgetDashboard.Empty>
+	</WidgetDashboard.NoWidgetsState>
 	<WidgetDashboard.Widgets />
 </WidgetDashboard>
 ```
@@ -82,7 +82,7 @@ Iterates `layout`, renders each entry through `<WidgetDashboard.Widget />`, and 
 
 Per-instance wrapper. Provides widget identity to the render tree via context and hosts the widget's render module under a `Suspense` boundary and an error boundary. The instance is read from `layout`; consumers don't pass it manually.
 
-#### `<WidgetDashboard.Empty>`
+#### `<WidgetDashboard.NoWidgetsState>`
 
 Renders its children only when `layout` is empty. Pair it with `<WidgetDashboard.Widgets />` so the empty state shows up in place of the grid until widgets are added.
 
