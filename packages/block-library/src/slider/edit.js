@@ -15,7 +15,7 @@ const SLIDER_TEMPLATE = [
 	[ 'core/slider-pagination' ],
 	[
 		'core/slider-track',
-		{},
+		{ lock: { move: true, remove: true } },
 		[
 			[
 				'core/slide',

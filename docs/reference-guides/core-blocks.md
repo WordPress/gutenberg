@@ -976,7 +976,7 @@ Display content in a horizontally scrolling slider. ([Source](https://github.com
 -	**Name:** core/slider
 -	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/slider-pagination, core/slider-track
+-	**Allowed Blocks:** core/slider-pagination
 -	**Supports:** align, color (background, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
 -	**Attributes:** activeSlideIndex, loop, sliderId
 
@@ -1019,9 +1019,8 @@ Container for slides in a slider. ([Source](https://github.com/WordPress/gutenbe
 -	**Name:** core/slider-track
 -	**Experimental:** true
 -	**Category:** design
--	**Parent:** core/slider
 -	**Allowed Blocks:** core/slide
--	**Supports:** listView, ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Supports:** listView, ~~anchor~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~, ~~visibility~~
 
 ## Social Icon
 

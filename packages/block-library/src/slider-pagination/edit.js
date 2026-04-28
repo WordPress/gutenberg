@@ -13,10 +13,6 @@ export default function Edit() {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: PAGINATION_TEMPLATE,
-		allowedBlocks: [
-			'core/slider-pagination-button',
-			'core/slider-pagination-indicator',
-		],
 		renderAppender: false,
 	} );
 

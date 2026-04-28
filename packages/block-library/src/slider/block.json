@@ -7,7 +7,7 @@
 	"description": "Display content in a horizontally scrolling slider.",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/slider-pagination", "core/slider-track" ],
+	"allowedBlocks": [ "core/slider-pagination" ],
 	"attributes": {
 		"sliderId": {
 			"type": "string",

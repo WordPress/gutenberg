@@ -7,14 +7,16 @@
 	"description": "Container for slides in a slider.",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [ "core/slider" ],
 	"allowedBlocks": [ "core/slide" ],
 	"usesContext": [ "core/slider-id" ],
 	"supports": {
 		"anchor": false,
 		"html": false,
+		"inserter": false,
 		"reusable": false,
-		"listView": true
+		"listView": true,
+		"visibility": false,
+		"lock": false
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "wp-block-slider-track-editor",
