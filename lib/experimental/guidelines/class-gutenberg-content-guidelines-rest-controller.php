@@ -127,14 +127,8 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			true
 		);
 
-		// Mount the revisions controller under this base so /content-guidelines/{id}/revisions
-		// returns responses shaped like the singleton (including guideline_categories) and the
-		// custom restore endpoint resolves to this controller.
-		$revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller(
-			Gutenberg_Guidelines_Post_Type::POST_TYPE,
-			$this->rest_base,
-			$this
-		);
+		// Mount the dedicated revisions controller for the content singleton.
+		$revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller();
 		$revisions_controller->register_routes();
 	}
 
