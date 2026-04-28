@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -47,48 +47,50 @@ function snapshotPlacement( state: CropperState ): PlacementSnapshot {
  * pan changes without a direct gesture (e.g. slider input). It fades out
  * shortly after the interaction ends.
  *
- * Returns `gridVisible` (whether to show the grid at full opacity), plus
- * `notifyResizeStart` / `notifyResizeEnd` — call these from the host component
- * when a crop-handle resize begins and ends, since resize events live outside
- * `useInteraction`.
+ * Returns `gridVisible` — whether the grid should be shown at full opacity.
+ * When `showGrid` is not `'interactive'`, the effect exits immediately and
+ * `gridVisible` stays `false`.
  *
- * When `showGrid` is not `'interactive'`, all returned values are inert and no
- * timers are scheduled.
+ * Design note — single merged effect: the interaction path and the zoom-flash
+ * path share one fade timer. They must both be able to cancel each other's
+ * pending fade (e.g. a zoom change while the drag-end timer is counting down
+ * should reset the delay). A single effect with one timer ref is the only way
+ * to guarantee that without introducing shared mutable state across effects.
  *
- * @param root0                        Destructured options.
- * @param root0.showGrid               Grid mode prop from the Cropper.
- * @param root0.isPlacementInteracting Whether a drag/pan is in progress (from useInteraction).
- * @param root0.isDirty                Whether the user has made any edits.
- * @param root0.state                  Current cropper state (read for placement values).
- * @return gridVisible, notifyResizeStart, notifyResizeEnd.
+ * @param root0                      Destructured options.
+ * @param root0.showGrid             Grid mode prop from the Cropper.
+ * @param root0.isCropperInteracting True while any placement gesture is active.
+ * @param root0.isDirty              Whether the user has made any edits.
+ * @param root0.state                Current cropper state (read for placement values).
+ * @return gridVisible.
  */
 export function useInteractiveGrid( {
 	showGrid,
-	isPlacementInteracting,
+	isCropperInteracting,
 	isDirty,
 	state,
 }: {
 	showGrid: boolean | 'interactive';
-	isPlacementInteracting: boolean;
+	isCropperInteracting: boolean;
 	isDirty: boolean;
 	state: CropperState;
 } ): {
 	gridVisible: boolean;
-	notifyResizeStart: () => void;
-	notifyResizeEnd: () => void;
 } {
 	const [ gridVisible, setGridVisible ] = useState( false );
-	const [ isResizing, setIsResizing ] = useState( false );
 	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	const previousSnapshotRef = useRef( snapshotPlacement( state ) );
-	const isCropperInteracting = isPlacementInteracting || isResizing;
 
 	useEffect( () => {
+		// All paths other than 'interactive' are intentional no-ops.
 		if ( showGrid !== 'interactive' ) {
 			return;
 		}
 
 		const previous = previousSnapshotRef.current;
+		// Inline field reads rather than snapshotPlacement(state) so the
+		// exhaustive-deps rule can confirm every accessed field is in the
+		// deps array below.
 		const current: PlacementSnapshot = {
 			zoom: state.zoom,
 			panX: state.pan.x,
@@ -103,17 +105,21 @@ export function useInteractiveGrid( {
 		};
 		previousSnapshotRef.current = current;
 
-		// Always cancel any pending fade before deciding what to do next.
-		clearTimeout( gridFadeTimerRef.current );
-
 		// Keep the grid visible for the full duration of any placement gesture.
+		// Cancel any pending fade so the timer resets if the user re-engages.
 		if ( isCropperInteracting ) {
+			clearTimeout( gridFadeTimerRef.current );
 			setGridVisible( true );
 			return () => clearTimeout( gridFadeTimerRef.current );
 		}
 
 		// Flash briefly when zoom or pan changes via a non-gesture (e.g. slider).
-		// Skips flips, rotations, and aspect-ratio-driven crop changes.
+		// Skips flips, rotations, and aspect-ratio-driven crop-rect changes.
+		//
+		// The timer is scheduled here directly rather than relying on a
+		// subsequent effect re-run, because if gridVisible is already true,
+		// setGridVisible(true) is a no-op — React won't re-render, the
+		// fade-scheduling branch below is never reached, and the grid gets stuck.
 		if ( isDirty ) {
 			const zoomOrPanChanged =
 				previous.zoom !== current.zoom ||
@@ -134,13 +140,18 @@ export function useInteractiveGrid( {
 				! cropRectChanged &&
 				! orientationChanged
 			) {
+				clearTimeout( gridFadeTimerRef.current );
 				setGridVisible( true );
+				gridFadeTimerRef.current = setTimeout( () => {
+					setGridVisible( false );
+				}, GRID_FADE_DELAY_MS );
 				return () => clearTimeout( gridFadeTimerRef.current );
 			}
 		}
 
-		// Schedule fade-out if the grid is currently visible (interaction or
-		// flash just ended and this effect re-ran with gridVisible = true).
+		// Schedule fade-out if the grid is visible and nothing above is keeping
+		// it open. Reached when interaction ends (isCropperInteracting → false)
+		// or when gridVisible flips true (causing a re-run with no new trigger).
 		if ( gridVisible ) {
 			gridFadeTimerRef.current = setTimeout( () => {
 				setGridVisible( false );
@@ -153,6 +164,9 @@ export function useInteractiveGrid( {
 		isCropperInteracting,
 		gridVisible,
 		isDirty,
+		// Placement values — needed for zoom-flash detection only, but must
+		// always be in the deps array because the snapshot is updated on every
+		// run (including during interaction) to keep it current.
 		state.zoom,
 		state.pan.x,
 		state.pan.y,
@@ -165,13 +179,5 @@ export function useInteractiveGrid( {
 		state.cropRect.height,
 	] );
 
-	const notifyResizeStart = useCallback( () => {
-		setIsResizing( true );
-	}, [] );
-
-	const notifyResizeEnd = useCallback( () => {
-		setIsResizing( false );
-	}, [] );
-
-	return { gridVisible, notifyResizeStart, notifyResizeEnd };
+	return { gridVisible };
 }

@@ -357,13 +357,15 @@ function CropperInner(
 		};
 	}, [] );
 
-	const { gridVisible, notifyResizeStart, notifyResizeEnd } =
-		useInteractiveGrid( {
-			showGrid,
-			isPlacementInteracting,
-			isDirty,
-			state,
-		} );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isCropperInteracting = isPlacementInteracting || isResizing;
+
+	const { gridVisible } = useInteractiveGrid( {
+		showGrid,
+		isCropperInteracting,
+		isDirty,
+		state,
+	} );
 
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
@@ -374,15 +376,15 @@ function CropperInner(
 	}, [] );
 
 	const handleResizeStart = useCallback( () => {
-		notifyResizeStart();
+		setIsResizing( true );
 		onGestureStart?.();
-	}, [ notifyResizeStart, onGestureStart ] );
+	}, [ onGestureStart ] );
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
-		notifyResizeEnd();
+		setIsResizing( false );
 		setSettling( true );
 		settleCrop();
 		onGestureEnd?.();
@@ -390,7 +392,7 @@ function CropperInner(
 		settleTimerRef.current = setTimeout( () => {
 			setSettling( false );
 		}, 200 );
-	}, [ notifyResizeEnd, settleCrop, onGestureEnd ] );
+	}, [ settleCrop, onGestureEnd ] );
 
 	const imageTransition =
 		settling || isZooming ? 'transform 150ms linear' : undefined;
