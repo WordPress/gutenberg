@@ -59,28 +59,73 @@ export async function visitSiteEditor(
 	 * loading is done.
 	 */
 	if ( ! query.size || postId || canvas === 'edit' ) {
-		const canvasLoader = this.page.locator(
+		const canvasLoaderSelector =
 			// Spinner was used instead of the progress bar in an earlier
 			// version of the site editor.
-			'.edit-site-canvas-loader, .edit-site-canvas-spinner'
+			'.edit-site-canvas-loader, .edit-site-canvas-spinner';
+		const readySelector = [
+			'.edit-site-editor__editor-interface',
+			'iframe[src*="wp_site_preview=1"]',
+		].join( ', ' );
+		// Larger timeout is needed for large entities, like the Large Post HTML
+		// fixture that we load for performance tests.
+		const canvasLoadTimeout = 60_000;
+
+		// The loader can finish before this helper starts waiting. Wait for
+		// either the loader or a ready canvas state, then verify the loader is gone.
+		await this.page.waitForFunction(
+			( { canvasLoaderSelector: loader, readySelector: ready } ) => {
+				const isReadyElement = ( element: Element ) => {
+					if ( ! element.getClientRects().length ) {
+						return false;
+					}
+					if ( element instanceof HTMLIFrameElement ) {
+						return (
+							element.contentDocument?.readyState === 'complete'
+						);
+					}
+					return true;
+				};
+
+				return (
+					document.querySelector( loader ) ||
+					Array.from( document.querySelectorAll( ready ) ).some(
+						isReadyElement
+					)
+				);
+			},
+			{ canvasLoaderSelector, readySelector },
+			{ timeout: canvasLoadTimeout }
 		);
 
-		try {
-			// Wait for the canvas loader to appear first, so that the locator that
-			// waits for the hidden state doesn't resolve prematurely.
-			await canvasLoader.waitFor( { state: 'visible', timeout: 60_000 } );
-			await canvasLoader.waitFor( {
-				state: 'hidden',
-				// Bigger timeout is needed for larger entities, like the Large Post
-				// HTML fixture that we load for performance tests, which often
-				// doesn't make it under the default timeout value.
-				timeout: 60_000,
-			} );
-		} catch {
-			// If the canvas loader is already disappeared, skip the waiting.
-			await this.page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.waitFor();
-		}
+		await this.page.waitForFunction(
+			( loader ) => ! document.querySelector( loader ),
+			canvasLoaderSelector,
+			{ timeout: canvasLoadTimeout }
+		);
+		await this.page.waitForFunction(
+			( { canvasLoaderSelector: loader, readySelector: ready } ) => {
+				const isReadyElement = ( element: Element ) => {
+					if ( ! element.getClientRects().length ) {
+						return false;
+					}
+					if ( element instanceof HTMLIFrameElement ) {
+						return (
+							element.contentDocument?.readyState === 'complete'
+						);
+					}
+					return true;
+				};
+
+				return (
+					! document.querySelector( loader ) &&
+					Array.from( document.querySelectorAll( ready ) ).some(
+						isReadyElement
+					)
+				);
+			},
+			{ canvasLoaderSelector, readySelector },
+			{ timeout: canvasLoadTimeout }
+		);
 	}
 }
