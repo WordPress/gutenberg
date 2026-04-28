@@ -263,9 +263,14 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// If there are settings changes, we need to update both styles and
 		// settings atomically to avoid race conditions.
 		if ( newSettings?.typography ) {
+			// Build the state-aware path so that breakpoint styles (e.g. mobile)
+			// are written to the correct sub-path and do not overwrite the default.
+			const stylePathForBreakpoint = [ prefix, stateParam ]
+				.filter( Boolean )
+				.join( '.' );
 			let updatedConfig = setStyleHelper(
 				userConfig,
-				prefix,
+				stylePathForBreakpoint,
 				styleWithoutSettings,
 				name
 			);
@@ -366,7 +371,10 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					value={ style }
 					onChange={ onChangeTypography }
 					settings={ settings }
-					isGlobalStyles
+					// Only expose global-settings controls (e.g. "Indent all
+					// paragraphs") when not editing a breakpoint-specific state,
+					// because those settings are global and cannot be per-breakpoint.
+					isGlobalStyles={ selectedState === 'default' }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -395,7 +403,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					includeLayoutControls
 				/>
 			) }
-			{ hasImageSettingsPanel && (
+			{ hasImageSettingsPanel && selectedState === 'default' && (
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
 					value={ userSettings }
