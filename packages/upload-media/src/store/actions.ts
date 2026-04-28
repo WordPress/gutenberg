@@ -216,11 +216,27 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					) {
 						dispatch.processItem( parentId );
 					}
+				} else if (
+					parentItem.subSizes &&
+					parentItem.subSizes.length > 0
+				) {
+					// Partial success: at least one child sideload succeeded
+					// (its sub-size is already accumulated on the parent),
+					// but the last in-flight child failed. Keep the parent
+					// attachment and finalize with whichever sub-sizes did
+					// succeed — matching WordPress core's best-effort
+					// behavior when individual sub-size generations fail.
+					if (
+						parentItem.operations &&
+						parentItem.operations.length > 0
+					) {
+						dispatch.processItem( parentId );
+					}
 				} else {
-					// No children remain and we got here via cancellation,
-					// meaning no child succeeded. The parent file already
-					// uploaded — delete the orphaned attachment from the
-					// server so it doesn't appear in the media library.
+					// Total failure: no child succeeded. The parent file
+					// already uploaded — delete the orphaned attachment
+					// from the server so it doesn't appear in the media
+					// library.
 					const parentAttachmentId = parentItem.attachment?.id;
 					const { mediaDelete } = select.getSettings();
 					if ( parentAttachmentId && mediaDelete ) {
