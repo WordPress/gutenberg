@@ -105,7 +105,11 @@ export interface CropperState {
 }
 
 /**
- * Actions for the cropper reducer.
+ * Internal reducer action union.
+ *
+ * This type is intentionally not exported from the image-editor public barrel.
+ * Consumers should drive state through the controller returned by
+ * `useCropperState()` or through serializable `TransformOperation` values.
  */
 export type CropperAction =
 	/** Sets the loaded image metadata (natural size, src). */
@@ -121,17 +125,17 @@ export type CropperAction =
 	 */
 	| {
 			type: 'SET_ZOOM_AT_POINT';
-			payload: { zoom: number; pan: { x: number; y: number } };
+			payload: { zoom: number; pan: NormalizedPoint };
 	  }
 	/** Sets the absolute rotation angle in degrees. */
 	| { type: 'SET_ROTATION'; payload: number }
-	/** Rotates by ±90° (snap). */
+	/** Rotates by +/-90 degrees (snap). */
 	| { type: 'SNAP_ROTATE_90'; payload: { direction: 1 | -1 } }
 	/** Sets the flip state. */
 	| { type: 'SET_FLIP'; payload: Flip }
 	/** Sets the crop rectangle. */
 	| { type: 'SET_CROP_RECT'; payload: NormalizedRect }
-	/** Settle animation after resize drag — recenters the crop rect. */
+	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
 	/** Applies a single pipeline transform via the reducer. */
 	| { type: 'APPLY_OPERATION'; payload: TransformOperation }

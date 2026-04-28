@@ -88,7 +88,7 @@ export default function ArrayControl< Item >( {
 				return true;
 			} }
 			__experimentalExpandOnFocus={ elements && elements.length > 0 }
-			__experimentalShowHowTo={ ! field.isValid?.elements }
+			help={ field.isValid?.elements ? '' : undefined }
 			displayTransform={ ( token: any ) => {
 				// For existing tokens (element objects), display their label
 				if ( typeof token === 'object' && 'label' in token ) {

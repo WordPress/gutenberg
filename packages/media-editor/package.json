@@ -44,6 +44,7 @@
 		"build-module/store/index.mjs"
 	],
 	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/components": "file:../components",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",

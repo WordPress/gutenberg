@@ -19,6 +19,7 @@ import {
 	MIN_ZOOM,
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -33,6 +34,11 @@ export interface MediaEditorCropPanelProps {
 	freeformCrop: boolean;
 	/** Setter for freeform mode. */
 	onFreeformChange: ( value: boolean ) => void;
+	/**
+	 * Fixed aspect-ratio presets to display after Free and Original. When
+	 * omitted, the media editor's default fixed-ratio presets are used.
+	 */
+	aspectRatioPresets?: AspectRatioPreset[];
 }
 
 /**
@@ -69,14 +75,21 @@ export function resolveAspectRatio(
  * @param props.onAspectRatioChange
  * @param props.freeformCrop
  * @param props.onFreeformChange
+ * @param props.aspectRatioPresets
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	freeformCrop,
 	onFreeformChange,
+	aspectRatioPresets,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
+	const aspectRatioOptions = [
+		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
+		...( aspectRatioPresets ??
+			DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value > 0 ) ),
+	];
 
 	return (
 		<Stack direction="column" gap="md">
@@ -106,7 +119,7 @@ export default function MediaEditorCropPanel( {
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
-				options={ DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+				options={ aspectRatioOptions.map( ( preset ) => ( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }
