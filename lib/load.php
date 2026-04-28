@@ -170,7 +170,7 @@ require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 
@@ -226,4 +226,9 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 	require __DIR__ . '/experimental/content-types/load.php';
 	require __DIR__ . '/experimental/content-types/index.php';
+}
+
+// Dashboard Widgets (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
+	require __DIR__ . '/experimental/dashboard-widgets/load.php';
 }
