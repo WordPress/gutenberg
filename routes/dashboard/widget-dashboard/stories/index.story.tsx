@@ -9,6 +9,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 import { useState } from '@wordpress/element';
 import { widget } from '@wordpress/icons';
+// eslint-disable-next-line @wordpress/use-recommended-components -- EmptyState promotion tracked separately.
 import { EmptyState } from '@wordpress/ui';
 
 /**
