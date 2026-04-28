@@ -71,6 +71,22 @@ export interface UseCropperStateReturn {
 	 * try/catch if you need to recover.
 	 */
 	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
+	/**
+	 * Notify the interactive grid that a user interaction has started
+	 * (e.g. pointerdown on a slider). Call the matching `notifyInteractionEnd`
+	 * when the interaction completes.
+	 */
+	notifyInteractionStart: () => void;
+	/** Notify the interactive grid that the current interaction has ended. */
+	notifyInteractionEnd: () => void;
+	/**
+	 * Register the Cropper's grid show/hide handlers so external controls
+	 * can trigger them via `notifyInteractionStart`/`notifyInteractionEnd`.
+	 * Used by the Cropper component only.
+	 */
+	registerInteractionListener: (
+		listener: { onStart: () => void; onEnd: () => void } | null
+	) => void;
 }
 
 /**
@@ -201,6 +217,28 @@ export function useCropperState(
 
 	const isDirty = isStateDirty( state, initialRef.current );
 
+	// Lightweight pub/sub for the interactive grid: external controls (sliders)
+	// call notifyInteractionStart/End; the Cropper registers its handlers here.
+	const interactionListenerRef = useRef< {
+		onStart: () => void;
+		onEnd: () => void;
+	} | null >( null );
+
+	const registerInteractionListener = useCallback(
+		( listener: { onStart: () => void; onEnd: () => void } | null ) => {
+			interactionListenerRef.current = listener;
+		},
+		[]
+	);
+
+	const notifyInteractionStart = useCallback( () => {
+		interactionListenerRef.current?.onStart();
+	}, [] );
+
+	const notifyInteractionEnd = useCallback( () => {
+		interactionListenerRef.current?.onEnd();
+	}, [] );
+
 	const getCroppedImage = useCallback(
 		( mimeType?: string, quality?: number ): Promise< Blob > => {
 			if ( ! state.image ) {
@@ -233,6 +271,9 @@ export function useCropperState(
 		reset,
 		isDirty,
 		getCroppedImage,
+		notifyInteractionStart,
+		notifyInteractionEnd,
+		registerInteractionListener,
 	};
 	return controller;
 }

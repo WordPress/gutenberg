@@ -37,8 +37,16 @@ export interface MediaEditorToolbarProps {
 export default function MediaEditorToolbar( {
 	onReset,
 }: MediaEditorToolbarProps ) {
-	const { state, setRotation, setFlip, snapRotate90, reset, isDirty } =
-		useCropper();
+	const {
+		state,
+		setRotation,
+		setFlip,
+		snapRotate90,
+		reset,
+		isDirty,
+		notifyInteractionStart,
+		notifyInteractionEnd,
+	} = useCropper();
 
 	const handleReset = () => {
 		reset();
@@ -117,7 +125,11 @@ export default function MediaEditorToolbar( {
 					} )
 				}
 			/>
-			<div className="media-editor-toolbar__rotation-slider">
+			<div
+				className="media-editor-toolbar__rotation-slider"
+				onPointerDown={ notifyInteractionStart }
+				onPointerUp={ notifyInteractionEnd }
+			>
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom

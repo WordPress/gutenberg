@@ -41,7 +41,7 @@ import './cropper.scss';
 const CROP_RECT_EPSILON = 1e-6;
 
 /** How long to wait after the last interaction before fading the grid out. */
-const GRID_FADE_DELAY_MS = 800;
+const GRID_FADE_DELAY_MS = 200;
 
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
@@ -282,6 +282,48 @@ function CropperInner(
 		return getCropBounds( state, elementSize, visualSize, canvasSize );
 	}, [ state, elementSize, visualSize, canvasSize ] );
 
+	// Interactive grid: visible while the user is interacting, fades out
+	// after GRID_FADE_DELAY_MS of inactivity.
+	const [ gridVisible, setGridVisible ] = useState( false );
+	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const gridInteractionReadyRef = useRef( false );
+
+	// Defer readiness until after image load and its dependent effects settle,
+	// so automatic initialisation changes don't trigger the interactive grid.
+	useEffect( () => {
+		gridInteractionReadyRef.current = false;
+		if ( ! state.image ) {
+			return;
+		}
+		const id = setTimeout( () => {
+			gridInteractionReadyRef.current = true;
+		}, 0 );
+		return () => clearTimeout( id );
+	}, [ state.image ] );
+
+	// Show the grid at the start of a canvas gesture (pan, zoom, rotate,
+	// stencil resize) and schedule the fade-out when the gesture ends.
+	// These are defined before useInteraction() so they can be passed as
+	// its options — they also forward to the external onGestureStart/End props.
+	const handleGestureStart = useCallback( () => {
+		if ( showGrid === 'interactive' && gridInteractionReadyRef.current ) {
+			clearTimeout( gridFadeTimerRef.current );
+			setGridVisible( true );
+		}
+		onGestureStart?.();
+	}, [ showGrid, onGestureStart ] );
+
+	const handleGestureEnd = useCallback( () => {
+		if ( showGrid === 'interactive' ) {
+			clearTimeout( gridFadeTimerRef.current );
+			gridFadeTimerRef.current = setTimeout(
+				() => setGridVisible( false ),
+				GRID_FADE_DELAY_MS
+			);
+		}
+		onGestureEnd?.();
+	}, [ showGrid, onGestureEnd ] );
+
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
 		state,
@@ -291,8 +333,8 @@ function CropperInner(
 		{
 			minZoom,
 			maxZoom,
-			onGestureStart,
-			onGestureEnd,
+			onGestureStart: handleGestureStart,
+			onGestureEnd: handleGestureEnd,
 		}
 	);
 
@@ -360,50 +402,17 @@ function CropperInner(
 		};
 	}, [] );
 
-	// Interactive grid: visible while the user is interacting, fades out
-	// after GRID_FADE_DELAY_MS of inactivity.
-	const [ gridVisible, setGridVisible ] = useState( false );
-	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
-	const gridInteractionReadyRef = useRef( false );
-
-	// Defer readiness until after image load and its dependent effects settle,
-	// so automatic initialisation changes don't trigger the interactive grid.
+	// Register the grid handlers with the controller so that external controls
+	// (e.g. the fine-rotation and zoom sliders) can trigger the grid via
+	// controller.notifyInteractionStart/End without needing to know about
+	// the Cropper's internal grid state.
 	useEffect( () => {
-		gridInteractionReadyRef.current = false;
-		if ( ! state.image ) {
-			return;
-		}
-		const id = setTimeout( () => {
-			gridInteractionReadyRef.current = true;
-		}, 0 );
-		return () => clearTimeout( id );
-	}, [ state.image ] );
-
-	useEffect( () => {
-		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
-			return;
-		}
-		setGridVisible( true );
-		clearTimeout( gridFadeTimerRef.current );
-		gridFadeTimerRef.current = setTimeout( () => {
-			setGridVisible( false );
-		}, GRID_FADE_DELAY_MS );
-		return () => clearTimeout( gridFadeTimerRef.current );
-	}, [
-		// Scalar interaction values used as triggers — only fire when a real
-		// user-driven value changes, not on image load or other state updates.
-		state.zoom,
-		state.rotation,
-		state.pan.x,
-		state.pan.y,
-		state.cropRect.x,
-		state.cropRect.y,
-		state.cropRect.width,
-		state.cropRect.height,
-		state.flip.horizontal,
-		state.flip.vertical,
-		showGrid,
-	] );
+		controller.registerInteractionListener( {
+			onStart: handleGestureStart,
+			onEnd: handleGestureEnd,
+		} );
+		return () => controller.registerInteractionListener( null );
+	}, [ controller, handleGestureStart, handleGestureEnd ] );
 
 	useEffect( () => {
 		return () => clearTimeout( gridFadeTimerRef.current );
@@ -423,12 +432,12 @@ function CropperInner(
 	const handleResizeEnd = useCallback( () => {
 		setSettling( true );
 		settleCrop();
-		onGestureEnd?.();
+		handleGestureEnd();
 		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
 			setSettling( false );
 		}, 200 );
-	}, [ settleCrop, onGestureEnd ] );
+	}, [ settleCrop, handleGestureEnd ] );
 
 	const imageTransition =
 		settling || isZooming ? 'transform 150ms linear' : undefined;
@@ -523,7 +532,7 @@ function CropperInner(
 					containerSize={ canvasSize }
 					imageSize={ visualSize }
 					onCropChange={ handleCropChange }
-					onResizeStart={ onGestureStart }
+					onResizeStart={ handleGestureStart }
 					onResizeEnd={ handleResizeEnd }
 					onEscape={ handleEscape }
 					aspectRatio={ aspectRatio }

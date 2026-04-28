@@ -11,6 +11,8 @@ const DOUBLE_TAP_TIME = 300;
 const DOUBLE_TAP_DISTANCE = 30;
 /** Duration of the zoom animation state (ms). */
 const ZOOM_ANIMATION_DURATION = 200;
+/** Debounce delay for detecting keyboard pan gesture end (ms). */
+const KEYBOARD_GESTURE_DEBOUNCE_MS = 200;
 
 /**
  * Get the natural image dimensions from cropper state, falling back to 1x1.
@@ -180,6 +182,12 @@ export class InteractionController {
 
 	/** Whether a wheel gesture is currently active. */
 	private wheelGestureActive = false;
+
+	/** Timer for keyboard pan gesture debounce. */
+	private keyboardGestureTimer: ReturnType< typeof setTimeout > | undefined;
+
+	/** Whether a keyboard pan gesture is currently active. */
+	private keyboardGestureActive = false;
 
 	/** Current requestAnimationFrame ID. */
 	private rafId = 0;
@@ -771,6 +779,26 @@ export class InteractionController {
 	handleKeyDown( e: KeyboardEvent ): void {
 		const currentState = this.options.getState();
 
+		// Arrow keys trigger a keyboard pan gesture — show the grid for the
+		// duration, using a debounce to detect when the key is released
+		// (key-repeat fires every ~30–50 ms, so 200 ms reliably detects release).
+		if (
+			e.key === 'ArrowUp' ||
+			e.key === 'ArrowDown' ||
+			e.key === 'ArrowLeft' ||
+			e.key === 'ArrowRight'
+		) {
+			if ( ! this.keyboardGestureActive ) {
+				this.keyboardGestureActive = true;
+				this.options.onGestureStart?.();
+			}
+			clearTimeout( this.keyboardGestureTimer );
+			this.keyboardGestureTimer = setTimeout( () => {
+				this.keyboardGestureActive = false;
+				this.options.onGestureEnd?.();
+			}, KEYBOARD_GESTURE_DEBOUNCE_MS );
+		}
+
 		switch ( e.key ) {
 			case 'ArrowUp': {
 				e.preventDefault();
@@ -878,6 +906,7 @@ export class InteractionController {
 		cancelAnimationFrame( this.rafId );
 		clearTimeout( this.zoomTimer );
 		clearTimeout( this.wheelGestureTimer );
+		clearTimeout( this.keyboardGestureTimer );
 		this.touchCleanup?.();
 		this.touchCleanup = null;
 		this.pointerCleanup?.();

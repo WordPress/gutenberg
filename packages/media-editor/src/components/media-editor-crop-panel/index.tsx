@@ -84,7 +84,8 @@ export default function MediaEditorCropPanel( {
 	onFreeformChange,
 	aspectRatioPresets,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useCropper();
+	const { state, setZoom, notifyInteractionStart, notifyInteractionEnd } =
+		useCropper();
 	const aspectRatioOptions = [
 		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
 		...( aspectRatioPresets ??
@@ -93,26 +94,32 @@ export default function MediaEditorCropPanel( {
 
 	return (
 		<Stack direction="column" gap="md">
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Zoom' ) }
-				min={ MIN_ZOOM }
-				max={ MAX_ZOOM }
-				step={ 0.1 }
-				value={ state.zoom }
-				onChange={ ( value ) =>
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
-				}
-				renderTooltipContent={ ( value ) => {
-					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
-					return sprintf(
-						/* translators: %d: zoom level as a percentage. */
-						__( '%d%%' ),
-						Math.round( zoom * 100 )
-					);
-				} }
-			/>
+			<div
+				onPointerDown={ notifyInteractionStart }
+				onPointerUp={ notifyInteractionEnd }
+			>
+				<RangeControl
+					__next40pxDefaultSize
+					__nextHasNoMarginBottom
+					label={ __( 'Zoom' ) }
+					min={ MIN_ZOOM }
+					max={ MAX_ZOOM }
+					step={ 0.1 }
+					value={ state.zoom }
+					onChange={ ( value ) =>
+						setZoom( typeof value === 'number' ? value : MIN_ZOOM )
+					}
+					renderTooltipContent={ ( value ) => {
+						const zoom =
+							typeof value === 'number' ? value : MIN_ZOOM;
+						return sprintf(
+							/* translators: %d: zoom level as a percentage. */
+							__( '%d%%' ),
+							Math.round( zoom * 100 )
+						);
+					} }
+				/>
+			</div>
 			<SelectControl
 				__next40pxDefaultSize
 				__nextHasNoMarginBottom
