@@ -93,6 +93,13 @@
 		"align": true,
 		"html": false,
 		"shadow": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],
