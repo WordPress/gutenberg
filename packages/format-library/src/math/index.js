@@ -9,6 +9,7 @@ import {
 	Popover,
 	TextControl,
 	__experimentalVStack as VStack,
+	ExternalLink,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { math as icon } from '@wordpress/icons';
@@ -87,15 +88,19 @@ function InlineUI( {
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__math-popover"
 		>
-			<div style={ { minWidth: '300px', padding: '4px' } }>
-				<VStack spacing={ 1 }>
+			<div className="block-editor-format-toolbar__math-popover-content">
+				<VStack spacing={ 4 }>
 					<TextControl
 						__next40pxDefaultSize
-						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }
 						value={ latex }
 						onChange={ handleLatexChange }
-						placeholder={ __( 'e.g., x^2, \\frac{a}{b}' ) }
+						placeholder={ __(
+							'e.g., x^2, \\frac{a}{b}, \\sqrt{x}'
+						) }
+						help={ __(
+							'Enter valid LaTeX for equations, fractions, roots, and symbols.'
+						) }
 						autoComplete="off"
 						className="block-editor-format-toolbar__math-input"
 					/>
@@ -114,6 +119,9 @@ function InlineUI( {
 							<style children=".wp-block-math__error .components-badge__content{white-space:normal}" />
 						</>
 					) }
+					<ExternalLink href="https://wordpress.org/documentation/article/math-block/">
+						{ __( 'Learn more about LaTeX syntax' ) }
+					</ExternalLink>
 				</VStack>
 			</div>
 		</Popover>
