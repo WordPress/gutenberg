@@ -1,3 +1,7 @@
-.is-vertical .wp-block-slider-pagination {
+.wp-block-slider-pagination {
 	width: 100%;
+}
+
+.is-horizontal .wp-block-slider-pagination {
+	width: auto;
 }

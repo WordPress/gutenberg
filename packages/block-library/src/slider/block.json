@@ -29,7 +29,7 @@
 		"layout": {
 			"default": {
 				"type": "flex",
-				"orientation": "horizontal"
+				"orientation": "vertical"
 			},
 			"allowOrientation": true,
 			"allowJustification": false

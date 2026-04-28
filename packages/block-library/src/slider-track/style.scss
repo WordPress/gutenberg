@@ -1,6 +1,7 @@
 .wp-block-slider-track {
 	display: flex;
-	min-width: 0;
+	min-height: 0;
+	min-width: 100%;
 	flex: 1 1 0%;
 	overflow-x: scroll;
 	overflow-y: hidden;
@@ -17,8 +18,7 @@
 	}
 }
 
-.is-vertical .wp-block-slider-track {
-	min-height: 0;
-	min-width: 100%;
-	flex: 1 1 0%;
+.is-horizontal .wp-block-slider-track {
+	min-width: 0;
+	min-height: 100%;
 }
