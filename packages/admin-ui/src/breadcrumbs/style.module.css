@@ -5,6 +5,19 @@
 	min-height: 32px;
 }
 
+/*
+ * Preceding items keep their intrinsic width; only the last (current) item
+ * is allowed to shrink so that the truncation styles on `.current` engage.
+ */
+.list > li {
+	flex-shrink: 0;
+}
+
+.list > li:last-child {
+	flex-shrink: 1;
+	min-width: 0;
+}
+
 /* @TODO: Remove truncation styles once `Text` supports truncation natively. */
 .current {
 	overflow: hidden;
