@@ -111,12 +111,6 @@ $z-layers: (
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 
-	// Snackbars portaled inside a Modal need to clear the modal overlay
-	// (".components-modal__screen-overlay" at 100000) and any popovers
-	// that may open inside the modal (".components-popover" at 1000000).
-	// Sits at the same tier as the in-modal action modals below.
-	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
-
 	// Show modal under the wp-admin menus and the popover
 	".components-modal__screen-overlay": 100000,
 
@@ -140,6 +134,7 @@ $z-layers: (
 	".editor-post-template__create-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
 	".editor-sync-connection-error-modal": 1000001,
+	".components-snackbar-list.media-editor-modal__snackbar": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
