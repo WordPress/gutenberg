@@ -30,6 +30,7 @@ import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit } from '../../core/camera';
 import { getCropBounds } from '../../core/containment';
 import { useInteraction } from '../hooks/use-interaction';
+import { useInteractiveGrid } from '../hooks/use-interactive-grid';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
@@ -39,9 +40,6 @@ import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
-
-/** How long to wait after the last placement change before fading the grid out. */
-const GRID_FADE_DELAY_MS = 100;
 
 // Largest rect of the given pixel aspect ratio that fits inside the visual
 // bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
@@ -359,143 +357,13 @@ function CropperInner(
 		};
 	}, [] );
 
-	// Interactive grid: keep it visible for direct placement gestures
-	// (pan/crop-resize), and briefly flash it for zoom changes.
-	const [ gridVisible, setGridVisible ] = useState( false );
-	const [ isResizing, setIsResizing ] = useState( false );
-	const gridFadeTimerRef = useRef< ReturnType< typeof setTimeout > >();
-	const gridInteractionReadyRef = useRef( false );
-	const isCropperInteracting = isPlacementInteracting || isResizing;
-	const previousPlacementValuesRef = useRef( {
-		zoom: state.zoom,
-		panX: state.pan.x,
-		panY: state.pan.y,
-		rotation: state.rotation,
-		flipHorizontal: state.flip.horizontal,
-		flipVertical: state.flip.vertical,
-		cropX: state.cropRect.x,
-		cropY: state.cropRect.y,
-		cropWidth: state.cropRect.width,
-		cropHeight: state.cropRect.height,
-	} );
-
-	const showInteractiveGrid = useCallback( () => {
-		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
-			return;
-		}
-		clearTimeout( gridFadeTimerRef.current );
-		setGridVisible( true );
-	}, [ showGrid ] );
-
-	const fadeInteractiveGridSoon = useCallback( () => {
-		if ( showGrid !== 'interactive' || ! gridInteractionReadyRef.current ) {
-			return;
-		}
-		clearTimeout( gridFadeTimerRef.current );
-		gridFadeTimerRef.current = setTimeout( () => {
-			setGridVisible( false );
-		}, GRID_FADE_DELAY_MS );
-	}, [ showGrid ] );
-
-	// Defer readiness until after image load and its dependent effects settle,
-	// so automatic initialisation changes don't trigger the interactive grid.
-	useEffect( () => {
-		gridInteractionReadyRef.current = false;
-		if ( ! state.image ) {
-			return;
-		}
-		const id = setTimeout( () => {
-			gridInteractionReadyRef.current = true;
-		}, 0 );
-		return () => clearTimeout( id );
-	}, [ state.image ] );
-
-	useEffect( () => {
-		if ( showGrid !== 'interactive' ) {
-			return;
-		}
-		if ( isCropperInteracting ) {
-			showInteractiveGrid();
-			return;
-		}
-		if ( gridVisible ) {
-			fadeInteractiveGridSoon();
-		}
-		return () => {
-			clearTimeout( gridFadeTimerRef.current );
-		};
-	}, [
-		isCropperInteracting,
-		gridVisible,
-		showGrid,
-		showInteractiveGrid,
-		fadeInteractiveGridSoon,
-	] );
-
-	useEffect( () => {
-		const previous = previousPlacementValuesRef.current;
-		const current = {
-			zoom: state.zoom,
-			panX: state.pan.x,
-			panY: state.pan.y,
-			rotation: state.rotation,
-			flipHorizontal: state.flip.horizontal,
-			flipVertical: state.flip.vertical,
-			cropX: state.cropRect.x,
-			cropY: state.cropRect.y,
-			cropWidth: state.cropRect.width,
-			cropHeight: state.cropRect.height,
-		};
-		previousPlacementValuesRef.current = current;
-
-		if (
-			showGrid !== 'interactive' ||
-			isCropperInteracting ||
-			! gridInteractionReadyRef.current ||
-			! isDirty
-		) {
-			return;
-		}
-
-		const zoomOrPanChanged =
-			previous.zoom !== current.zoom ||
-			previous.panX !== current.panX ||
-			previous.panY !== current.panY;
-		const cropRectChanged =
-			previous.cropX !== current.cropX ||
-			previous.cropY !== current.cropY ||
-			previous.cropWidth !== current.cropWidth ||
-			previous.cropHeight !== current.cropHeight;
-		const orientationChanged =
-			previous.rotation !== current.rotation ||
-			previous.flipHorizontal !== current.flipHorizontal ||
-			previous.flipVertical !== current.flipVertical;
-
-		if ( zoomOrPanChanged && ! cropRectChanged && ! orientationChanged ) {
-			showInteractiveGrid();
-			fadeInteractiveGridSoon();
-		}
-	}, [
-		state.zoom,
-		state.pan.x,
-		state.pan.y,
-		state.rotation,
-		state.flip.horizontal,
-		state.flip.vertical,
-		state.cropRect.x,
-		state.cropRect.y,
-		state.cropRect.width,
-		state.cropRect.height,
-		showGrid,
-		isCropperInteracting,
-		isDirty,
-		showInteractiveGrid,
-		fadeInteractiveGridSoon,
-	] );
-
-	useEffect( () => {
-		return () => clearTimeout( gridFadeTimerRef.current );
-	}, [] );
+	const { gridVisible, notifyResizeStart, notifyResizeEnd } =
+		useInteractiveGrid( {
+			showGrid,
+			isPlacementInteracting,
+			isDirty,
+			state,
+		} );
 
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
@@ -505,21 +373,16 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
-	/**
-	 * Handle resize start — resize handles live outside useInteraction, so
-	 * they provide their own interaction signal for the interactive grid.
-	 */
 	const handleResizeStart = useCallback( () => {
-		setIsResizing( true );
-		showInteractiveGrid();
+		notifyResizeStart();
 		onGestureStart?.();
-	}, [ showInteractiveGrid, onGestureStart ] );
+	}, [ notifyResizeStart, onGestureStart ] );
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
-		setIsResizing( false );
+		notifyResizeEnd();
 		setSettling( true );
 		settleCrop();
 		onGestureEnd?.();
@@ -527,7 +390,7 @@ function CropperInner(
 		settleTimerRef.current = setTimeout( () => {
 			setSettling( false );
 		}, 200 );
-	}, [ settleCrop, onGestureEnd ] );
+	}, [ notifyResizeEnd, settleCrop, onGestureEnd ] );
 
 	const imageTransition =
 		settling || isZooming ? 'transform 150ms linear' : undefined;
