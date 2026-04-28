@@ -39,6 +39,7 @@ const Example = () => {
 			<img src={ url } alt="" style={ style } />
 		</>
 	);
+};
 ```
 
 ## Props

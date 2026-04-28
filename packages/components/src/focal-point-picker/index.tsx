@@ -74,18 +74,19 @@ const GRID_OVERLAY_TIMEOUT = 600;
  *		objectPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
  *	};
  *
- *	return (
- *		<>
- *			<FocalPointPicker
- *				url={ url }
- *				value={ focalPoint }
- *				onDragStart={ setFocalPoint }
- *				onDrag={ setFocalPoint }
- *				onChange={ setFocalPoint }
- *			/>
- *			<img src={ url } alt="" style={ style } />
- *		</>
- *	);
+ * 	return (
+ * 		<>
+ * 			<FocalPointPicker
+ * 				url={ url }
+ * 				value={ focalPoint }
+ * 				onDragStart={ setFocalPoint }
+ * 				onDrag={ setFocalPoint }
+ * 				onChange={ setFocalPoint }
+ * 			/>
+ * 			<img src={ url } alt="" style={ style } />
+ * 		</>
+ * 	);
+ * };
  * ```
  */
 export function FocalPointPicker( {
