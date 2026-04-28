@@ -12,7 +12,7 @@ import {
 	WidgetDashboard,
 	type DashboardWidget,
 	type WidgetType,
-} from './widgets-dashboard';
+} from './widget-dashboard';
 
 /*
  * Widget types will be provided by `@wordpress/widget-types` once that

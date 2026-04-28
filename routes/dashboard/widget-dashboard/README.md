@@ -8,7 +8,7 @@ The engine owns no data of its own.
 
 ```tsx
 import { useState } from '@wordpress/element';
-import { WidgetDashboard } from './widgets-dashboard';
+import { WidgetDashboard } from './widget-dashboard';
 
 function Dashboard() {
 	const [ layout, setLayout ] = useState( defaultLayout );
