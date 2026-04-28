@@ -80,9 +80,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Registers the routes for the content guidelines singleton.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
-	 * collection route with a singleton GET endpoint and mounts a dedicated
-	 * revisions controller under the same base so revision/restore semantics
-	 * stay consistent with the singleton response shape.
+	 * collection route with a singleton GET endpoint.
 	 */
 	public function register_routes() {
 		parent::register_routes();
@@ -126,10 +124,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			),
 			true
 		);
-
-		// Mount the dedicated revisions controller for the content singleton.
-		$revisions_controller = new Gutenberg_Content_Guidelines_Revisions_Controller();
-		$revisions_controller->register_routes();
 	}
 
 	/**
