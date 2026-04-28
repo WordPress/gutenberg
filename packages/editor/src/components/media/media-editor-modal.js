@@ -77,6 +77,8 @@ export default function MediaEditorModalMount() {
 			.map( aspectRatioPresetFromSettings )
 			.filter( Boolean );
 
+		// Passing `undefined` lets the media editor use its fallback presets.
+		// Passing `[]` explicitly removes fixed presets when defaults are off.
 		if ( presets.length || showDefaultRatios === false ) {
 			return presets;
 		}
