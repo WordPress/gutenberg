@@ -14,7 +14,7 @@ import { useCallback } from '@wordpress/element';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, buildStateResetAllFilter } from './utils';
 import { store as blockEditorStore } from '../store';
 import {
 	default as StylesBackgroundPanel,
@@ -23,6 +23,7 @@ import {
 	hasBackgroundGradientValue,
 } from '../components/global-styles/background-panel';
 import { globalStylesDataKey } from '../store/private-keys';
+import { useBlockStyle } from './use-block-style';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -123,9 +124,17 @@ export function getBackgroundImageClasses( style ) {
 function BackgroundInspectorControl( {
 	children,
 	backgroundGradientSupported = false,
+	selectedState = 'default',
 } ) {
+	const isStateSelected = selectedState !== 'default';
 	const resetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return buildStateResetAllFilter( selectedState, ( style ) => ( {
+					...style,
+					background: undefined,
+				} ) )( attributes );
+			}
 			const updatedClassName = attributes.className?.includes(
 				'has-background'
 			)
@@ -149,7 +158,7 @@ function BackgroundInspectorControl( {
 				} ),
 			};
 		},
-		[ backgroundGradientSupported ]
+		[ backgroundGradientSupported, isStateSelected, selectedState ]
 	);
 	return (
 		<InspectorControls group="background" resetAllFilter={ resetAllFilter }>
@@ -163,15 +172,15 @@ export function BackgroundImagePanel( {
 	name,
 	setAttributes,
 	settings,
+	selectedState = 'default',
 } ) {
-	const { style, className, inheritedValue } = useSelect(
+	const { className, inheritedValue } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } =
 				select( blockEditorStore );
 			const _settings = getSettings();
 			const blockAttributes = getBlockAttributes( clientId );
 			return {
-				style: blockAttributes?.style,
 				className: blockAttributes?.className,
 				/*
 				 * To ensure we pass down the right inherited values:
@@ -187,6 +196,9 @@ export function BackgroundImagePanel( {
 		[ clientId, name ]
 	);
 
+	const [ style, setStyle ] = useBlockStyle( null, selectedState );
+	const isStateSelected = selectedState !== 'default';
+
 	const backgroundGradientSupported = hasBackgroundSupport(
 		name,
 		'gradient'
@@ -199,11 +211,12 @@ export function BackgroundImagePanel( {
 		( { children } ) => (
 			<BackgroundInspectorControl
 				backgroundGradientSupported={ backgroundGradientSupported }
+				selectedState={ selectedState }
 			>
 				{ children }
 			</BackgroundInspectorControl>
 		),
-		[ backgroundGradientSupported ]
+		[ backgroundGradientSupported, selectedState ]
 	);
 
 	if (
@@ -213,44 +226,49 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const onChange = ( newStyle ) => {
-		const isMigrating =
-			backgroundGradientSupported && !! style?.color?.gradient;
-		const newAttributes = {
-			style: cleanEmptyObject(
-				backgroundGradientSupported
-					? {
-							...newStyle,
-							color: {
-								...newStyle?.color,
-								gradient: undefined,
-							},
-					  }
-					: newStyle
-			),
-		};
+	const onChange = isStateSelected
+		? setStyle
+		: ( newStyle ) => {
+				const isMigrating =
+					backgroundGradientSupported && !! style?.color?.gradient;
+				const newAttributes = {
+					style: cleanEmptyObject(
+						backgroundGradientSupported
+							? {
+									...newStyle,
+									color: {
+										...newStyle?.color,
+										gradient: undefined,
+									},
+							  }
+							: newStyle
+					),
+				};
 
-		// When migrating from color.gradient to background.gradient, preserve
-		// the has-background class so existing styles relying on it (e.g.
-		// theme padding) are not silently broken. Only add the class when a
-		// gradient value is being set — not when it is being cleared/reset.
-		// Conversely, if the gradient is cleared and has-background was added
-		// during a previous migration, remove it so it does not linger.
-		if ( isMigrating && !! newStyle?.background?.gradient ) {
-			newAttributes.className = clsx( className, 'has-background' );
-		} else if (
-			! newStyle?.background?.gradient &&
-			className?.includes( 'has-background' )
-		) {
-			newAttributes.className =
-				className
-					.split( ' ' )
-					.filter( ( c ) => c !== 'has-background' )
-					.join( ' ' ) || undefined;
-		}
+				// When migrating from color.gradient to background.gradient, preserve
+				// the has-background class so existing styles relying on it (e.g.
+				// theme padding) are not silently broken. Only add the class when a
+				// gradient value is being set — not when it is being cleared/reset.
+				// Conversely, if the gradient is cleared and has-background was added
+				// during a previous migration, remove it so it does not linger.
+				if ( isMigrating && !! newStyle?.background?.gradient ) {
+					newAttributes.className = clsx(
+						className,
+						'has-background'
+					);
+				} else if (
+					! newStyle?.background?.gradient &&
+					className?.includes( 'has-background' )
+				) {
+					newAttributes.className =
+						className
+							.split( ' ' )
+							.filter( ( c ) => c !== 'has-background' )
+							.join( ' ' ) || undefined;
+				}
 
-		setAttributes( newAttributes );
-	};
+				setAttributes( newAttributes );
+		  };
 
 	// When background.gradient is supported but not yet explicitly set, fall
 	// back to color.gradient for display. Any write from this panel migrates
@@ -292,7 +310,7 @@ export function BackgroundImagePanel( {
 			settings={ updatedSettings }
 			onChange={ onChange }
 			defaultControls={ defaultControls }
-			value={ styleValue }
+			value={ isStateSelected ? style : styleValue }
 		/>
 	);
 }

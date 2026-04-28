@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
+import {
+	ToggleControl,
+	__experimentalSpacer as Spacer,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { addFilter } from '@wordpress/hooks';
 import {
 	getBlockSupport,
@@ -32,6 +37,9 @@ import {
 	useStyleOverride,
 	useBlockSettings,
 } from './utils';
+import { BlockStatesControl, STATES_SUPPORT_KEY } from './states';
+import { buildStateSelector, buildCanvasStateSelector } from './state-utils';
+import { BlockInspectorPreTabsFill } from '../components/block-inspector/inspector-pre-tabs-slot-fill';
 import { scopeSelector } from '../components/global-styles/utils';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 
@@ -327,29 +335,74 @@ function BlockStyleControls( {
 	clientId,
 	name,
 	setAttributes,
+	style,
 	__unstableParentLayout,
 } ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
+	const [ selectedState, setSelectedState ] = useState( 'default' );
+	const [ showStateOnCanvas, setShowStateOnCanvas ] = useState( true );
+
+	// Inject state styles onto the editor canvas so the selected state is
+	// visible while editing. Scoped to this block instance via data-block so
+	// other blocks of the same type are not affected. Must be called before
+	// any early returns because it is a hook.
+	const canvasStateCSS = useMemo( () => {
+		if ( ! showStateOnCanvas || selectedState === 'default' ) {
+			return undefined;
+		}
+		const stateValue = style?.[ selectedState ];
+		if ( ! stateValue ) {
+			return undefined;
+		}
+		const selector = buildCanvasStateSelector( clientId, name );
+		const css = compileCSS( stateValue, { selector } );
+		// Use !important to override utility classes (e.g. has-accent-3-color)
+		// that the block's default color support generates with !important.
+		return css ? css.replace( /;/g, ' !important;' ) : undefined;
+	}, [ showStateOnCanvas, selectedState, style, clientId, name ] );
+	useStyleOverride( { css: canvasStateCSS } );
+
+	if ( blockEditingMode !== 'default' ) {
+		return null;
+	}
+
+	const panelSettings = {
+		...settings,
+		typography: {
+			...settings.typography,
+			// The text alignment UI for individual blocks is rendered in
+			// the block toolbar, so disable it here.
+			textAlign: false,
+		},
+	};
+
 	const passedProps = {
 		clientId,
 		name,
 		setAttributes,
-		settings: {
-			...settings,
-			typography: {
-				...settings.typography,
-				// The text alignment UI for individual blocks is rendered in
-				// the block toolbar, so disable it here.
-				textAlign: false,
-			},
-		},
+		settings: panelSettings,
+		selectedState,
 	};
-	if ( blockEditingMode !== 'default' ) {
-		return null;
-	}
+
 	return (
 		<>
+			<BlockStatesControl
+				name={ name }
+				value={ selectedState }
+				onChange={ setSelectedState }
+			/>
+			{ selectedState !== 'default' && (
+				<BlockInspectorPreTabsFill>
+					<Spacer paddingX={ 4 } paddingY={ 2 }>
+						<ToggleControl
+							label={ __( 'Show state on canvas' ) }
+							checked={ showStateOnCanvas }
+							onChange={ setShowStateOnCanvas }
+						/>
+					</Spacer>
+				</BlockInspectorPreTabsFill>
+			) }
 			<ColorEdit { ...passedProps } />
 			<BackgroundImagePanel { ...passedProps } />
 			<TypographyPanel { ...passedProps } />
@@ -469,11 +522,45 @@ function useBlockProps( { name, style } ) {
 	const baseElementSelector = `.${ blockElementsContainerIdentifier }`;
 	const blockElementStyles = style?.elements;
 
-	const styles = useMemo(
-		() =>
-			getElementCSSRules( blockElementStyles, name, baseElementSelector ),
-		[ baseElementSelector, blockElementStyles, name ]
-	);
+	const styles = useMemo( () => {
+		const cssRules = [];
+
+		const elementCSS = getElementCSSRules(
+			blockElementStyles,
+			name,
+			baseElementSelector
+		);
+		if ( elementCSS ) {
+			cssRules.push( elementCSS );
+		}
+
+		// Generate per-instance state CSS (e.g., :hover, :focus).
+		const validStates = getBlockSupport( name, STATES_SUPPORT_KEY );
+		if ( validStates ) {
+			validStates.forEach( ( state ) => {
+				const stateStyles = style?.[ state ];
+				if ( stateStyles ) {
+					const selector = buildStateSelector(
+						baseElementSelector,
+						name,
+						state
+					);
+					// State styles use !important to override utility classes
+					// like .has-accent-3-background-color which the block's
+					// default color support generates with !important.
+					const css = compileCSS( stateStyles, { selector } ).replace(
+						/;/g,
+						' !important;'
+					);
+					if ( css ) {
+						cssRules.push( css );
+					}
+				}
+			} );
+		}
+
+		return cssRules.length > 0 ? cssRules.join( '' ) : undefined;
+	}, [ baseElementSelector, blockElementStyles, name, style ] );
 
 	useStyleOverride( { css: styles } );
 

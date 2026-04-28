@@ -12,6 +12,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	createSlotFill,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -33,6 +34,10 @@ import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
 const { Badge: WCBadge } = unlock( componentsPrivateApis );
+
+const BlockCardControlsKey = Symbol( 'BlockCardControls' );
+export const { Fill: BlockCardControlsFill, Slot: BlockCardControlsSlot } =
+	createSlotFill( BlockCardControlsKey );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
@@ -151,58 +156,65 @@ function BlockCard( {
 			) }
 		>
 			<VStack>
-				<HStack justify="flex-start" spacing={ 0 }>
-					{ parentBlockClientId && (
-						<Button
-							onClick={ () => selectBlock( parentBlockClientId ) }
-							label={
-								parentBlockName
-									? sprintf(
-											/* translators: %s: The name of the parent block. */
-											__( 'Go to "%s" block' ),
-											getBlockType( parentBlockName )
-												?.title
-									  )
-									: __( 'Go to parent block' )
+				<HStack justify="space-between" spacing={ 0 }>
+					<HStack justify="flex-start" spacing={ 0 }>
+						{ parentBlockClientId && (
+							<Button
+								onClick={ () =>
+									selectBlock( parentBlockClientId )
+								}
+								label={
+									parentBlockName
+										? sprintf(
+												/* translators: %s: The name of the parent block. */
+												__( 'Go to "%s" block' ),
+												getBlockType( parentBlockName )
+													?.title
+										  )
+										: __( 'Go to parent block' )
+								}
+								style={
+									// TODO: This style override is also used in ToolsPanelHeader.
+									// It should be supported out-of-the-box by Button.
+									{ minWidth: 24, padding: 0 }
+								}
+								icon={ isRTL() ? chevronRight : chevronLeft }
+								size="small"
+							/>
+						) }
+						{ isChild && (
+							<span className="block-editor-block-card__child-indicator-icon">
+								<Icon
+									icon={ isRTL() ? arrowLeft : arrowRight }
+								/>
+							</span>
+						) }
+						<OptionalParentSelectButton
+							onClick={
+								parentClientId
+									? () => {
+											selectBlock( parentClientId );
+									  }
+									: undefined
 							}
-							style={
-								// TODO: This style override is also used in ToolsPanelHeader.
-								// It should be supported out-of-the-box by Button.
-								{ minWidth: 24, padding: 0 }
-							}
-							icon={ isRTL() ? chevronRight : chevronLeft }
-							size="small"
-						/>
-					) }
-					{ isChild && (
-						<span className="block-editor-block-card__child-indicator-icon">
-							<Icon icon={ isRTL() ? arrowLeft : arrowRight } />
-						</span>
-					) }
-					<OptionalParentSelectButton
-						onClick={
-							parentClientId
-								? () => {
-										selectBlock( parentClientId );
-								  }
-								: undefined
-						}
-					>
-						<BlockIcon icon={ icon } showColors />
-						<VStack spacing={ 1 }>
-							<TitleElement className="block-editor-block-card__title">
-								<span className="block-editor-block-card__name">
-									{ !! name?.length ? name : title }
-								</span>
-								{ ! parentClientId &&
-									! isChild &&
-									!! name?.length && (
-										<WCBadge>{ title }</WCBadge>
-									) }
-							</TitleElement>
-							{ children }
-						</VStack>
-					</OptionalParentSelectButton>
+						>
+							<BlockIcon icon={ icon } showColors />
+							<VStack spacing={ 1 }>
+								<TitleElement className="block-editor-block-card__title">
+									<span className="block-editor-block-card__name">
+										{ !! name?.length ? name : title }
+									</span>
+									{ ! parentClientId &&
+										! isChild &&
+										!! name?.length && (
+											<WCBadge>{ title }</WCBadge>
+										) }
+								</TitleElement>
+								{ children }
+							</VStack>
+						</OptionalParentSelectButton>
+					</HStack>
+					<BlockCardControlsSlot />
 				</HStack>
 				{ ! parentClientId && ! isChild && description && (
 					<WCText className="block-editor-block-card__description">

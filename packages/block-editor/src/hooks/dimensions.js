@@ -6,8 +6,14 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Platform, useState, useEffect, useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	Platform,
+	useState,
+	useEffect,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 
@@ -22,7 +28,8 @@ import {
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import { shouldSkipSerialization, buildStateResetAllFilter } from './utils';
+import { useBlockStyle } from './use-block-style';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -45,9 +52,20 @@ function useVisualizer() {
 	return [ property, setProperty ];
 }
 
-function DimensionsInspectorControl( { children, resetAllFilter } ) {
+function DimensionsInspectorControl( {
+	children,
+	resetAllFilter,
+	selectedState = 'default',
+} ) {
+	const isStateSelected = selectedState !== 'default';
 	const attributesResetAllFilter = useCallback(
 		( attributes ) => {
+			if ( isStateSelected ) {
+				return buildStateResetAllFilter(
+					selectedState,
+					resetAllFilter
+				)( attributes );
+			}
 			const existingStyle = attributes.style;
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -55,7 +73,7 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 				style: updatedStyle,
 			};
 		},
-		[ resetAllFilter ]
+		[ isStateSelected, selectedState, resetAllFilter ]
 	);
 
 	return (
@@ -68,26 +86,29 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( {
+	clientId,
+	name,
+	settings,
+	selectedState = 'default',
+} ) {
 	const isEnabled = useHasDimensionsPanel( settings );
-	const value = useSelect(
-		( select ) => {
-			// Early return to avoid subscription when disabled
-			if ( ! isEnabled ) {
-				return undefined;
-			}
-			return select( blockEditorStore ).getBlockAttributes( clientId )
-				?.style;
-		},
-		[ clientId, isEnabled ]
-	);
-
+	const isStateSelected = selectedState !== 'default';
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
-	const onChange = ( newStyle ) => {
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-		} );
-	};
+	const [ value, onChange ] = useBlockStyle( null, selectedState );
+
+	const DimensionsWrapper = useMemo(
+		() =>
+			function DimensionsWrapperComponent( props ) {
+				return (
+					<DimensionsInspectorControl
+						{ ...props }
+						selectedState={ selectedState }
+					/>
+				);
+			},
+		[ selectedState ]
+	);
 
 	if ( ! isEnabled ) {
 		return null;
@@ -113,15 +134,18 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 	return (
 		<>
 			<StylesDimensionsPanel
-				as={ DimensionsInspectorControl }
+				as={ DimensionsWrapper }
 				panelId={ clientId }
 				settings={ settings }
 				value={ value }
 				onChange={ onChange }
 				defaultControls={ defaultControls }
-				onVisualize={ setVisualizedProperty }
+				onVisualize={
+					isStateSelected ? undefined : setVisualizedProperty
+				}
 			/>
-			{ !! settings?.spacing?.padding &&
+			{ ! isStateSelected &&
+				!! settings?.spacing?.padding &&
 				visualizedProperty === 'padding' && (
 					<PaddingVisualizer
 						forceShow={ visualizedProperty === 'padding' }
@@ -129,7 +153,8 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 						value={ value }
 					/>
 				) }
-			{ !! settings?.spacing?.margin &&
+			{ ! isStateSelected &&
+				!! settings?.spacing?.margin &&
 				visualizedProperty === 'margin' && (
 					<MarginVisualizer
 						forceShow={ visualizedProperty === 'margin' }

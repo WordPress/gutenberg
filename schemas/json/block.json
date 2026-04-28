@@ -613,6 +613,13 @@
 						}
 					}
 				},
+				"states": {
+					"description": "An array of interactive pseudo-states (e.g. \":hover\", \":focus\", \":active\") for which the block supports per-instance style overrides. Custom state keys are also supported for future extensibility.",
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
 				"shadow": {
 					"description": "Allow blocks to define a box shadow.",
 					"oneOf": [
