@@ -135,6 +135,7 @@ function withRevisionDiffClasses( BlockListBlock ) {
 		useEffect( () => {
 			const el = blockRef.current;
 			if ( ! el || ! diffStatus ) {
+				el?.removeAttribute( 'aria-label' );
 				return;
 			}
 
