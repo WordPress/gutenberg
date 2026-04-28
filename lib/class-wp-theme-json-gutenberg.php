@@ -593,9 +593,12 @@ class WP_Theme_JSON_Gutenberg {
 	 * Defines the available state groups and their valid states.
 	 *
 	 * Each group has:
-	 * - 'order'  : Nesting order (lower = outer level). When states from multiple
-	 *              groups are combined, lower-order groups wrap higher-order ones.
-	 *              E.g. a current_item state (order 10) wraps a pseudo state (order 20).
+	 * - 'type'   : How the state modifies CSS output. Either 'append' (appends to the
+	 *              CSS selector, e.g. `:hover`) or 'wrap' (provides an outer context,
+	 *              e.g. a replacement selector from block.json or a media query).
+	 * - 'order'  : Nesting precedence within the same type. Lower values nest outside
+	 *              higher values. Between types, 'wrap' groups always nest outside
+	 *              'append' groups.
 	 * - 'states' : A list of valid state keys.
 	 *              State keys use a prefix character (':' for CSS pseudo-selectors,
 	 *              '@' for class-based states) to distinguish them from style property
@@ -606,10 +609,12 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const STATE_GROUPS = array(
 		'current_item' => array(
+			'type'   => 'wrap',
 			'order'  => 10,
 			'states' => array( '@current' ),
 		),
 		'pseudo'       => array(
+			'type'   => 'append',
 			'order'  => 20,
 			'states' => array( ':hover', ':focus', ':focus-visible', ':active', ':link', ':any-link', ':visited' ),
 		),
@@ -798,19 +803,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns the states for a specific group that a block supports.
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param string $block_name The block name (e.g. 'core/button').
-	 * @param string $group_name The state group name (e.g. 'pseudo', 'current_item').
-	 * @return string[] Array of state keys, or empty array if the block doesn't support the group.
-	 */
-	protected static function get_block_states_for_group( $block_name, $group_name ) {
-		return static::BLOCK_STATE_SUPPORT[ $block_name ][ $group_name ] ?? array();
-	}
-
-	/**
 	 * Returns the state groups for a block, sorted by order (ascending).
 	 *
 	 * Each entry in the returned array contains the group name, the group definition
@@ -819,7 +811,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0
 	 *
 	 * @param string $block_name The block name (e.g. 'core/button').
-	 * @return array[] Array of arrays with keys 'name', 'order', and 'states'.
+	 * @return array[] Array of arrays with keys 'name', 'type', 'order', and 'states'.
 	 */
 	protected static function get_state_groups_for_block( $block_name ) {
 		if ( ! isset( static::BLOCK_STATE_SUPPORT[ $block_name ] ) ) {
@@ -831,9 +823,11 @@ class WP_Theme_JSON_Gutenberg {
 			if ( ! isset( static::STATE_GROUPS[ $group_name ] ) ) {
 				continue;
 			}
-			$groups[] = array(
+			$group_def = static::STATE_GROUPS[ $group_name ];
+			$groups[]  = array(
 				'name'   => $group_name,
-				'order'  => static::STATE_GROUPS[ $group_name ]['order'],
+				'type'   => $group_def['type'],
+				'order'  => $group_def['order'],
 				'states' => $block_states,
 			);
 		}
@@ -849,28 +843,87 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Processes block state styles for any node (block or variation).
+	 * Returns the states that can be nested inside a given group for a block.
 	 *
-	 * Iterates over all valid states for the given block and computes
-	 * style declarations for each state that exists in the node data.
+	 * For 'wrap' groups, returns all states from 'append' groups the block supports,
+	 * plus states from other 'wrap' groups with a higher order. For 'append' groups,
+	 * returns an empty array (no nesting within append states for now).
 	 *
 	 * @since 7.0.0
 	 *
-	 * @param array  $node          The node data (block or variation).
-	 * @param string $base_selector The base CSS selector.
-	 * @param array  $settings      The theme settings.
-	 * @param string $block_name    The block name.
+	 * @param string $block_name The block name (e.g. 'core/button').
+	 * @param array  $group      The group entry from get_state_groups_for_block().
+	 * @return string[] Array of state keys that can nest inside this group.
+	 */
+	protected static function get_nested_states_for_group( $block_name, $group ) {
+		if ( 'append' === $group['type'] ) {
+			return array();
+		}
+
+		$nested = array();
+		foreach ( static::get_state_groups_for_block( $block_name ) as $other ) {
+			if ( $other['name'] === $group['name'] ) {
+				continue;
+			}
+			if ( 'append' === $other['type'] || $other['order'] > $group['order'] ) {
+				$nested = array_merge( $nested, $other['states'] );
+			}
+		}
+		return $nested;
+	}
+
+	/**
+	 * Processes block state styles for any node (block or variation).
+	 *
+	 * Iterates over all valid state groups for the given block and computes
+	 * style declarations for each state that exists in the node data. For
+	 * 'append' states, the state key is appended to the base selector. For
+	 * 'wrap' states, the CSS selector is looked up from the block metadata.
+	 * Nested states within wrap states are also processed.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array  $node           The node data (block or variation).
+	 * @param string $base_selector  The base CSS selector.
+	 * @param array  $settings       The theme settings.
+	 * @param string $block_name     The block name.
+	 * @param array  $block_metadata Optional. Block metadata from get_blocks_metadata(),
+	 *                               used to look up custom state selectors. Default empty array.
 	 * @return array Associative array of CSS selector => declarations.
 	 */
-	private static function process_block_states( $node, $base_selector, $settings, $block_name ) {
+	private static function process_block_states( $node, $base_selector, $settings, $block_name, $block_metadata = array() ) {
 		$state_declarations = array();
+		$block_groups       = static::get_state_groups_for_block( $block_name );
 
-		$pseudo_states = static::get_block_states_for_group( $block_name, 'pseudo' );
-		foreach ( $pseudo_states as $pseudo_selector ) {
-			if ( isset( $node[ $pseudo_selector ] ) ) {
-				$combined_selector                        = static::append_to_selector( $base_selector, $pseudo_selector );
-				$declarations                             = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, null );
-				$state_declarations[ $combined_selector ] = $declarations;
+		foreach ( $block_groups as $group ) {
+			$nested_states = static::get_nested_states_for_group( $block_name, $group );
+
+			foreach ( $group['states'] as $state ) {
+				if ( ! isset( $node[ $state ] ) ) {
+					continue;
+				}
+
+				if ( 'append' === $group['type'] ) {
+					$state_selector = static::append_to_selector( $base_selector, $state );
+				} else {
+					// 'wrap' states: use the CSS selector from block metadata.
+					if ( ! isset( $block_metadata['states'][ $state ] ) ) {
+						continue;
+					}
+					$state_selector = $block_metadata['states'][ $state ];
+				}
+
+				$declarations                          = static::compute_style_properties( $node[ $state ], $settings, null, null );
+				$state_declarations[ $state_selector ] = $declarations;
+
+				// Process nested states within this state.
+				foreach ( $nested_states as $nested ) {
+					if ( isset( $node[ $state ][ $nested ] ) ) {
+						$compound_selector                        = static::append_to_selector( $state_selector, $nested );
+						$nested_declarations                      = static::compute_style_properties( $node[ $state ][ $nested ], $settings, null, null );
+						$state_declarations[ $compound_selector ] = $nested_declarations;
+					}
+				}
 			}
 		}
 
@@ -1204,22 +1257,17 @@ class WP_Theme_JSON_Gutenberg {
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
 			// Add state selectors for blocks, iterating groups by order.
-			// Higher-order states (e.g. pseudo) can be nested inside lower-order states
-			// (e.g. current_item), producing compound selectors.
-			$block_groups  = static::get_state_groups_for_block( $block );
-			$pseudo_states = static::get_block_states_for_group( $block, 'pseudo' );
+			// 'wrap' groups can contain nested states from higher-order 'wrap'
+			// groups and all 'append' groups.
+			$block_groups = static::get_state_groups_for_block( $block );
 			foreach ( $block_groups as $group ) {
+				$nested_states = static::get_nested_states_for_group( $block, $group );
 				foreach ( $group['states'] as $state ) {
-					if ( 'pseudo' === $group['name'] ) {
-						$schema_styles_blocks[ $block ][ $state ] = $styles_non_top_level;
-					} else {
-						// Non-pseudo states can nest pseudo states inside them.
-						$state_schema = $styles_non_top_level;
-						foreach ( $pseudo_states as $pseudo ) {
-							$state_schema[ $pseudo ] = $styles_non_top_level;
-						}
-						$schema_styles_blocks[ $block ][ $state ] = $state_schema;
+					$state_schema = $styles_non_top_level;
+					foreach ( $nested_states as $nested ) {
+						$state_schema[ $nested ] = $styles_non_top_level;
 					}
+					$schema_styles_blocks[ $block ][ $state ] = $state_schema;
 				}
 			}
 		}
@@ -1247,9 +1295,17 @@ class WP_Theme_JSON_Gutenberg {
 				foreach ( $style_variation_names as $variation_name ) {
 					$variation_schema = $block_style_variation_styles;
 
-					// Add pseudo-state selectors to variations for blocks that support them.
-					foreach ( static::get_block_states_for_group( $block, 'pseudo' ) as $pseudo_selector ) {
-						$variation_schema[ $pseudo_selector ] = $styles_non_top_level;
+					// Add state selectors to variations for blocks that support them.
+					$block_groups = static::get_state_groups_for_block( $block );
+					foreach ( $block_groups as $group ) {
+						$nested_states = static::get_nested_states_for_group( $block, $group );
+						foreach ( $group['states'] as $state ) {
+							$state_schema = $styles_non_top_level;
+							foreach ( $nested_states as $nested ) {
+								$state_schema[ $nested ] = $styles_non_top_level;
+							}
+							$variation_schema[ $state ] = $state_schema;
+						}
 					}
 
 					$schema_styles_variations[ $variation_name ] = $variation_schema;
@@ -3211,22 +3267,23 @@ class WP_Theme_JSON_Gutenberg {
 				);
 
 				// Handle block state selectors, iterating groups by order.
-				// Higher-order states (e.g. pseudo) can be nested inside lower-order
-				// states (e.g. current_item), producing compound selectors.
-				$block_groups  = static::get_state_groups_for_block( $name );
-				$pseudo_states = static::get_block_states_for_group( $name, 'pseudo' );
+				// 'wrap' groups can contain nested states from higher-order 'wrap'
+				// groups and all 'append' groups.
+				$block_groups = static::get_state_groups_for_block( $name );
 
 				foreach ( $block_groups as $group ) {
+					$nested_states = static::get_nested_states_for_group( $name, $group );
+
 					foreach ( $group['states'] as $state ) {
 						if ( ! isset( $theme_json['styles']['blocks'][ $name ][ $state ] ) ) {
 							continue;
 						}
 
-						if ( 'pseudo' === $group['name'] ) {
+						if ( 'append' === $group['type'] ) {
 							/*
-							 * Pseudo-selectors: append the pseudo-selector to each feature
+							 * 'append' states: append the state key to each feature
 							 * selector so that get_feature_declarations_for_node generates CSS
-							 * scoped to the pseudo-state (e.g. '.wp-block-button:hover').
+							 * scoped to the state (e.g. '.wp-block-button:hover').
 							 */
 							$state_feature_selectors = array();
 							foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
@@ -3251,8 +3308,8 @@ class WP_Theme_JSON_Gutenberg {
 							);
 						} else {
 							/*
-							 * Non-pseudo states (e.g. '@current'): use the CSS selector
-							 * defined in block.json under selectors.states.
+							 * 'wrap' states: use the CSS selector defined in block.json
+							 * under selectors.states if available.
 							 */
 							if ( ! isset( $selectors[ $name ]['states'][ $state ] ) ) {
 								continue;
@@ -3269,13 +3326,13 @@ class WP_Theme_JSON_Gutenberg {
 								'css'        => $state_css_selector,
 							);
 
-							// Check for nested pseudo-selectors within this state.
-							foreach ( $pseudo_states as $pseudo ) {
-								if ( isset( $theme_json['styles']['blocks'][ $name ][ $state ][ $pseudo ] ) ) {
-									$compound_css_selector = static::append_to_selector( $state_css_selector, $pseudo );
+							// Check for nested states within this wrap state.
+							foreach ( $nested_states as $nested ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ][ $state ][ $nested ] ) ) {
+									$compound_css_selector = static::append_to_selector( $state_css_selector, $nested );
 									$nodes[]               = array(
 										'name'       => $name,
-										'path'       => array( 'styles', 'blocks', $name, $state, $pseudo ),
+										'path'       => array( 'styles', 'blocks', $name, $state, $nested ),
 										'selector'   => $compound_css_selector,
 										'selectors'  => $feature_selectors,
 										'duotone'    => $duotone_selector,
@@ -3398,9 +3455,10 @@ class WP_Theme_JSON_Gutenberg {
 				// Compute declarations for remaining styles not covered by feature level selectors.
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
-				// Process block state styles for this variation (e.g., :hover, :focus).
+				// Process block state styles for this variation (e.g., :hover, :focus, @current).
 				$block_name                   = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
-				$variation_state_declarations = static::process_block_states( $style_variation_node, $style_variation['selector'], $settings, $block_name );
+				$blocks_metadata              = static::get_blocks_metadata();
+				$variation_state_declarations = static::process_block_states( $style_variation_node, $style_variation['selector'], $settings, $block_name, $blocks_metadata[ $block_name ] ?? array() );
 				$style_variation_declarations = array_merge( $style_variation_declarations, $variation_state_declarations );
 
 				// Store custom CSS for the style variation.
