@@ -104,6 +104,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 			return (
 				hasClassWithName( node, entry.localName ) ||
 				hasFunctionWithName( node, entry.localName ) ||
+				hasTSDeclareFunction( node, entry.localName ) ||
 				hasVariableWithName( node, entry.localName ) ||
 				hasNamedExportWithName( node, entry.localName ) ||
 				hasImportWithName( node, entry.localName )

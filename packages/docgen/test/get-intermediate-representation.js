@@ -698,6 +698,29 @@ describe( 'Intermediate Representation', () => {
 					] ),
 				} ),
 			] ) );
+
+		it( 'extracts JSDoc from non-exported overload signatures exported via export { }', () =>
+			expect(
+				parse( `
+					/**
+					 * My overloaded function.
+					 * @param a The argument.
+					 * @return The result.
+					 */
+					function myDeclaration( a: string ): string;
+					function myDeclaration( a: number ): number;
+					function myDeclaration( a: string | number ): string | number {
+						return a;
+					}
+
+					export { myDeclaration };
+				` )
+			).toEqual( [
+				expect.objectContaining( {
+					description: 'My overloaded function.',
+					name: 'myDeclaration',
+				} ),
+			] ) );
 	} );
 
 	describe( 'JSDoc in module dependency through import', () => {

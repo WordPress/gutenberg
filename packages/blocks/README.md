@@ -626,7 +626,7 @@ registerBlockType( 'namespace/block-name', {
 
 _Parameters_
 
--   _blockNameOrMetadata_ `BlockConfiguration< Attributes >`: Block type name or its metadata.
+-   _blockNameOrMetadata_ `string | BlockConfiguration< Attributes >`: Block type name or its metadata.
 -   _settings_ `Partial< BlockConfiguration< Attributes > >`: Block settings.
 
 _Returns_
