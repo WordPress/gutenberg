@@ -74,7 +74,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 						<Text
 							variant="body-lg"
 							aria-hidden="true"
-							className="admin-ui-breadcrumbs__separator"
+							className={ styles.separator }
 						>
 							/
 						</Text>
