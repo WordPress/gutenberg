@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Small spacing adjustments between title, subtitle and action elements in the header. [#76683](https://github.com/WordPress/gutenberg/pull/76683)
+-   `Page`: Keep the header row at a consistent height regardless of whether actions are present, and stop rendering an empty actions container when no actions are provided [#76683](https://github.com/WordPress/gutenberg/pull/76683).
 
 ### Breaking Changes
 
