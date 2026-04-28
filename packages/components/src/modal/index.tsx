@@ -23,6 +23,7 @@ import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 import { useModalExitAnimation } from './use-modal-exit-animation';
@@ -363,7 +364,7 @@ function UnforwardedModal(
 		<ModalContext.Provider value={ nestedDismissers }>
 			{ modal }
 		</ModalContext.Provider>,
-		document.body
+		getOverlayLegacySlot()
 	);
 }
 

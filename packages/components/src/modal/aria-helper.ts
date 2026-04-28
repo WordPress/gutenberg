@@ -21,18 +21,42 @@ const hiddenElementsByDepth: Element[][] = [];
  * @param modalElement The element that should not be hidden.
  */
 export function modalize( modalElement?: HTMLDivElement ) {
-	const elements = Array.from( document.body.children );
 	const hiddenElements: Element[] = [];
 	hiddenElementsByDepth.push( hiddenElements );
-	for ( const element of elements ) {
-		if ( element === modalElement ) {
-			continue;
-		}
 
-		if ( elementShouldBeHidden( element ) ) {
-			element.setAttribute( 'aria-hidden', 'true' );
-			hiddenElements.push( element );
+	if ( ! modalElement ) {
+		// Fallback (no modal element provided): hide all body children. Kept
+		// for backwards compatibility with legacy callers.
+		for ( const element of Array.from( document.body.children ) ) {
+			if ( elementShouldBeHidden( element ) ) {
+				element.setAttribute( 'aria-hidden', 'true' );
+				hiddenElements.push( element );
+			}
 		}
+		return;
+	}
+
+	// Walk up from the modal to <body>, hiding non-modal siblings at each
+	// level. This preserves correct screen-reader semantics when the modal
+	// is portaled into a wrapper (e.g. the overlay legacy slot): siblings
+	// inside the wrapper — including an outer modal when nested — get
+	// hidden, and so do siblings of the wrapper at the body level.
+	let current: Element = modalElement;
+	while ( current.parentElement ) {
+		const parent = current.parentElement;
+		for ( const sibling of Array.from( parent.children ) ) {
+			if ( sibling === current ) {
+				continue;
+			}
+			if ( elementShouldBeHidden( sibling ) ) {
+				sibling.setAttribute( 'aria-hidden', 'true' );
+				hiddenElements.push( sibling );
+			}
+		}
+		if ( parent === document.body ) {
+			break;
+		}
+		current = parent;
 	}
 }
 
