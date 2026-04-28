@@ -18,8 +18,6 @@ const hasFunctionWithName = ( node, name ) =>
 const hasTSDeclareFunction = ( node, name ) =>
 	node.type === 'TSDeclareFunction' && node.id?.name === name;
 
-// Matches the concrete implementation node (FunctionDeclaration with a body),
-// as opposed to a TypeScript overload signature (TSDeclareFunction).
 const hasImplementationWithName = ( node, name ) =>
 	hasFunctionWithName( node, name ) ||
 	( node.type === 'ExportNamedDeclaration' &&

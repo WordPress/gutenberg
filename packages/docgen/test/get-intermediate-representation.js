@@ -686,13 +686,10 @@ describe( 'Intermediate Representation', () => {
 						expect.objectContaining( {
 							tag: 'param',
 							name: 'blockNameOrMetadata',
-							// Type comes from the implementation signature (string | object),
-							// not the first overload signature (object).
 							type: 'string | object',
 						} ),
 						expect.objectContaining( {
 							tag: 'return',
-							// Return type comes from the implementation signature.
 							type: 'object | undefined',
 						} ),
 					] ),
