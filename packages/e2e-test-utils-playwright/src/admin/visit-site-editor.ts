@@ -15,6 +15,42 @@ interface SiteEditorOptions {
 interface CanvasReadyWaitArgs {
 	canvasLoaderSelector: string;
 	readySelector: string;
+	state: 'loading-or-ready' | 'loaded';
+}
+
+function isCanvasReadyState( {
+	canvasLoaderSelector: loader,
+	readySelector: ready,
+	state,
+}: CanvasReadyWaitArgs ) {
+	const isVisibleElement = ( element: Element ) => {
+		if ( ! element.getClientRects().length ) {
+			return false;
+		}
+		const style = window.getComputedStyle( element );
+		return style.display !== 'none' && style.visibility !== 'hidden';
+	};
+
+	const isReadyElement = ( element: Element ) => {
+		if ( ! isVisibleElement( element ) ) {
+			return false;
+		}
+		if ( element instanceof HTMLIFrameElement ) {
+			return element.contentDocument?.readyState === 'complete';
+		}
+		return true;
+	};
+
+	const hasVisibleLoader = Array.from(
+		document.querySelectorAll( loader )
+	).some( isVisibleElement );
+	const hasReadyCanvas = Array.from(
+		document.querySelectorAll( ready )
+	).some( isReadyElement );
+
+	return state === 'loading-or-ready'
+		? hasVisibleLoader || hasReadyCanvas
+		: ! hasVisibleLoader && hasReadyCanvas;
 }
 
 /**
@@ -79,84 +115,22 @@ export async function visitSiteEditor(
 		// The loader can finish before this helper starts waiting. Wait for
 		// either the loader or a ready canvas state, then verify the loader is gone.
 		await this.page.waitForFunction(
-			( {
-				canvasLoaderSelector: loader,
-				readySelector: ready,
-			}: CanvasReadyWaitArgs ) => {
-				const isVisibleElement = ( element: Element ) => {
-					if ( ! element.getClientRects().length ) {
-						return false;
-					}
-					const style = window.getComputedStyle( element );
-					return (
-						style.display !== 'none' &&
-						style.visibility !== 'hidden'
-					);
-				};
-
-				const isReadyElement = ( element: Element ) => {
-					if ( ! isVisibleElement( element ) ) {
-						return false;
-					}
-					if ( element instanceof HTMLIFrameElement ) {
-						return (
-							element.contentDocument?.readyState === 'complete'
-						);
-					}
-					return true;
-				};
-
-				return (
-					Array.from( document.querySelectorAll( loader ) ).some(
-						isVisibleElement
-					) ||
-					Array.from( document.querySelectorAll( ready ) ).some(
-						isReadyElement
-					)
-				);
-			},
-			{ canvasLoaderSelector, readySelector },
+			isCanvasReadyState,
+			{
+				canvasLoaderSelector,
+				readySelector,
+				state: 'loading-or-ready',
+			} satisfies CanvasReadyWaitArgs,
 			{ timeout: canvasLoadTimeout }
 		);
 
 		await this.page.waitForFunction(
-			( {
-				canvasLoaderSelector: loader,
-				readySelector: ready,
-			}: CanvasReadyWaitArgs ) => {
-				const isVisibleElement = ( element: Element ) => {
-					if ( ! element.getClientRects().length ) {
-						return false;
-					}
-					const style = window.getComputedStyle( element );
-					return (
-						style.display !== 'none' &&
-						style.visibility !== 'hidden'
-					);
-				};
-
-				const isReadyElement = ( element: Element ) => {
-					if ( ! isVisibleElement( element ) ) {
-						return false;
-					}
-					if ( element instanceof HTMLIFrameElement ) {
-						return (
-							element.contentDocument?.readyState === 'complete'
-						);
-					}
-					return true;
-				};
-
-				return (
-					! Array.from( document.querySelectorAll( loader ) ).some(
-						isVisibleElement
-					) &&
-					Array.from( document.querySelectorAll( ready ) ).some(
-						isReadyElement
-					)
-				);
-			},
-			{ canvasLoaderSelector, readySelector },
+			isCanvasReadyState,
+			{
+				canvasLoaderSelector,
+				readySelector,
+				state: 'loaded',
+			} satisfies CanvasReadyWaitArgs,
 			{ timeout: canvasLoadTimeout }
 		);
 	}
