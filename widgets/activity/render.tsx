@@ -22,7 +22,7 @@ type ActivityKind = 'post-future' | 'post-published' | 'comment';
 
 type ActivityEvent = {
 	id: string;
-	/** ISO date string — used for sorting and extracting the `date` group key. */
+	// ISO date string — used for sorting and extracting the `date` group key.
 	datetime: string;
 	title: string;
 	description: string;
