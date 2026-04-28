@@ -1,0 +1,21 @@
+// Overlay legacy slot — body-level container that establishes a stacking
+// context for legacy `@wordpress/components` overlays (Modal, Popover,
+// Tooltip, Snackbar, Draggable clone).
+//
+// Sits below the WP admin bar (99,999) and below the overlay prime slot
+// used by `@wordpress/ui` leaf overlays (99,998). Declared outside any CSS
+// layer for predictable plugin-override semantics.
+//
+// `position: fixed; top: 0; left: 0` (with no width/height) makes the slot
+// a zero-sized anchor at the viewport origin. Descendants positioned with
+// viewport-relative coordinates (via floating-ui or similar) resolve
+// correctly. `isolation: isolate` creates a stacking context regardless of
+// the slot's positioning. The slot has no size, so it never intercepts
+// pointer events on its own.
+.wp-overlay-legacy {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 99997;
+	isolation: isolate;
+}

@@ -19,6 +19,7 @@
 
 ### Internal
 
+-   Add `getOverlayLegacySlot()` helper and matching `.wp-overlay-legacy` styles. Lazily mounts a body-level container at `z-index: 99997` with `isolation: isolate` to be used as the portal target for legacy overlays in a follow-up. No runtime behavior change yet.
 -   `NavigableContainer`: Refactor from class component to function component with hooks ([#77171](https://github.com/WordPress/gutenberg/pull/77171)).
 -   `Menu`: Refactor `Menu.Popover` to use Ariakit’s `render` prop, wrapping content in `MenuMotionRoot` (motion styles) and `MenuSurface` (panel layout and `variant` chrome) ([#77460](https://github.com/WordPress/gutenberg/pull/77460)).
 -   Fix types for TypeScript 7.0 ([#77177](https://github.com/WordPress/gutenberg/pull/77177)).
