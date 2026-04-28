@@ -12,6 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockType } from '@wordpress/blocks';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -95,6 +96,21 @@ const REVISION_DIFF_STYLES = `
 	}
 `;
 
+function getDiffStatusLabel( status, blockTitle ) {
+	if ( status === 'added' ) {
+		// translators: %s: block type name e.g. "Paragraph"
+		return sprintf( __( 'Added Block: %s' ), blockTitle );
+	}
+	if ( status === 'removed' ) {
+		// translators: %s: block type name e.g. "Paragraph"
+		return sprintf( __( 'Removed Block: %s' ), blockTitle );
+	}
+	if ( status === 'modified' ) {
+		// translators: %s: block type name e.g. "Paragraph"
+		return sprintf( __( 'Modified Block: %s' ), blockTitle );
+	}
+}
+
 /**
  * Filter to add diff status CSS classes to blocks.
  *
@@ -116,10 +132,13 @@ function withRevisionDiffClasses( BlockListBlock ) {
 			}
 
 			const blockTitle = getBlockType( block.name )?.title;
-			console.log( blockTitle );
+
 			if ( ! blockTitle ) {
 				return;
 			}
+
+			const diffLabel = getDiffStatusLabel( diffStatus, blockTitle );
+			console.log( diffLabel );
 
 			el.setAttribute( 'aria-label', 'something' );
 		}, [ block.clientId, diffStatus, block.name ] );
