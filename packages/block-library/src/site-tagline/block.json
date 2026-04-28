@@ -10,7 +10,8 @@
 	"attributes": {
 		"level": {
 			"type": "number",
-			"default": 0
+			"default": 0,
+			"role": "content"
 		},
 		"levelOptions": {
 			"type": "array",
@@ -38,7 +39,6 @@
 				"text": true
 			}
 		},
-		"contentRole": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
