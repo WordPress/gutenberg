@@ -237,6 +237,90 @@ function gutenberg_register_layout_support( $block_type ) {
 	}
 }
 
+
+/**
+ * Split a CSS shorthand value by top-level whitespace only.
+ *
+ * @param string $value CSS shorthand value.
+ * @return string[] Top-level parts.
+ */
+function gutenberg_split_top_level_gap_values( $value ) {
+	if ( ! is_string( $value ) || '' === trim( $value ) ) {
+		return array();
+	}
+
+	$parts   = array();
+	$current = '';
+	$depth   = 0;
+	$length  = strlen( $value );
+
+	for ( $i = 0; $i < $length; $i++ ) {
+		$char = $value[ $i ];
+
+		if ( '(' === $char ) {
+			++$depth;
+			$current .= $char;
+			continue;
+		}
+
+		if ( ')' === $char ) {
+			$depth = max( 0, $depth - 1 );
+			$current .= $char;
+			continue;
+		}
+
+		if ( preg_match( '/\s/', $char ) && 0 === $depth ) {
+			if ( '' !== $current ) {
+				$parts[] = $current;
+				$current = '';
+			}
+			continue;
+		}
+
+		$current .= $char;
+	}
+
+	if ( '' !== $current ) {
+		$parts[] = $current;
+	}
+
+	return $parts;
+}
+
+/**
+ * Resolve a block gap value against a fallback, preserving row and column separately.
+ *
+ * @param string|array|null $gap_value          User-set gap value.
+ * @param string|array|null $fallback_gap_value Fallback gap value.
+ * @return string|array|null
+ */
+function gutenberg_get_gap_value_with_fallback( $gap_value, $fallback_gap_value = '0.5em' ) {
+	if ( null === $gap_value ) {
+		return null;
+	}
+
+	if ( is_string( $gap_value ) ) {
+		return $gap_value;
+	}
+
+	if ( is_array( $fallback_gap_value ) ) {
+		$fallback_top  = $fallback_gap_value['top'] ?? reset( $fallback_gap_value ) ?? '0.5em';
+		$fallback_left = $fallback_gap_value['left'] ?? $fallback_top;
+	} else {
+		$fallback_parts = gutenberg_split_top_level_gap_values(
+			is_string( $fallback_gap_value ) ? $fallback_gap_value : '0.5em'
+		);
+
+		$fallback_top  = $fallback_parts[0] ?? ( is_string( $fallback_gap_value ) ? $fallback_gap_value : '0.5em' );
+		$fallback_left = $fallback_parts[1] ?? $fallback_top;
+	}
+
+	return array(
+		'top'  => $gap_value['top'] ?? $fallback_top,
+		'left' => $gap_value['left'] ?? $fallback_left,
+	);
+}
+
 /**
  * Generates the CSS corresponding to the provided layout.
  *
@@ -434,19 +518,13 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
+			$gap_value          = gutenberg_get_gap_value_with_fallback( $gap_value, $fallback_gap_value );
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
 
 			foreach ( $gap_sides as $gap_side ) {
-				$process_value = $gap_value;
-				if ( is_array( $gap_value ) ) {
-					if ( is_array( $fallback_gap_value ) ) {
-						$fallback_value = $fallback_gap_value[ $gap_side ] ?? reset( $fallback_gap_value );
-					} else {
-						$fallback_value = $fallback_gap_value;
-					}
-					$process_value = $gap_value[ $gap_side ] ?? $fallback_value;
-				}
+				$process_value = is_array( $gap_value ) ? $gap_value[ $gap_side ] ?? null : $gap_value;
+
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
 					$index_to_splice = strrpos( $process_value, '|' ) + 1;
