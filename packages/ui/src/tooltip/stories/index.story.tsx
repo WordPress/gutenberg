@@ -81,14 +81,14 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
  * create situations where a tooltip renders below another popover when you
  * want it above.
  *
- * The `--wp-ui-tooltip-z-index` CSS variable is an escape hatch for that
- * case. Override it either:
+ * The `--wp-ui-tooltip-z-index` CSS variable controls the z-index of the
+ * tooltip's positioner. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   tooltip in the page), or
  * - **Per instance**, by passing a `Tooltip.Portal` with a `style` (or
  *   `className`) to `Tooltip.Popup`'s `portal` prop. The variable cascades
- *   from the portal wrapper to the popup rendered inside it.
+ *   from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */

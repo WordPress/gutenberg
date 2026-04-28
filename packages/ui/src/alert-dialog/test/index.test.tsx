@@ -1510,4 +1510,326 @@ describe( 'AlertDialog', () => {
 			);
 		} );
 	} );
+
+	describe( 'overlay scroll container', () => {
+		// AlertDialog's scroll container is a library-internal `<div>` with
+		// no role or testid — a `querySelector` is the only way to reach
+		// it from a test. The Testing Library rule is disabled for this
+		// helper because that's exactly what it's flagging.
+		const findScroller = ( popup: HTMLElement | null ): HTMLDivElement => {
+			if ( ! popup ) {
+				throw new Error(
+					'Popup ref not attached — did AlertDialog.Popup render?'
+				);
+			}
+			// eslint-disable-next-line testing-library/no-node-access
+			const el = popup.querySelector(
+				'[data-wp-ui-overlay-scroll-container]'
+			);
+			if ( ! ( el instanceof HTMLDivElement ) ) {
+				throw new Error(
+					'Scroll container not found inside AlertDialog popup'
+				);
+			}
+			return el;
+		};
+
+		it( 'renders an internal scroll container with data-wp-ui-overlay-scroll-container', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( findScroller( popupRef.current ) ).toBeInstanceOf(
+				HTMLDivElement
+			);
+		} );
+
+		it( 'is always modal (data-wp-ui-overlay-modal present on popup)', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			expect( popupRef.current ).toHaveAttribute(
+				'data-wp-ui-overlay-modal'
+			);
+		} );
+
+		it( 'pins header and footer outside the scroller when sticky props are true (default)', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			const scroller = findScroller( popupRef.current );
+			const title = screen.getByRole( 'heading', { name: 'Title' } );
+			const ok = screen.getByRole( 'button', { name: 'OK' } );
+
+			// Default: chrome sits outside the scroll container.
+			expect( scroller ).not.toContainElement( title );
+			expect( scroller ).not.toContainElement( ok );
+		} );
+
+		it( 'nests header and footer inside the scroller when stickyHeader and stickyFooter are false', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup
+						ref={ popupRef }
+						title="Title"
+						stickyHeader={ false }
+						stickyFooter={ false }
+					>
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			const scroller = findScroller( popupRef.current );
+			const title = screen.getByRole( 'heading', { name: 'Title' } );
+			const ok = screen.getByRole( 'button', { name: 'OK' } );
+
+			expect( scroller ).toContainElement( title );
+			expect( scroller ).toContainElement( ok );
+		} );
+
+		it( 'toggles tabindex="0" on the scroller based on overflow', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			const scroller = findScroller( popupRef.current );
+
+			Object.defineProperty( scroller, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( scroller, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+			Object.defineProperty( scroller, 'scrollTop', {
+				configurable: true,
+				value: 0,
+			} );
+
+			act( () => {
+				scroller.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( scroller ).toHaveAttribute( 'tabindex', '0' );
+
+			Object.defineProperty( scroller, 'scrollHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			act( () => {
+				scroller.dispatchEvent(
+					new Event( 'scroll', { bubbles: true } )
+				);
+			} );
+
+			expect( scroller ).not.toHaveAttribute( 'tabindex' );
+		} );
+
+		it( 'toggles data-wp-ui-overlay-scrolled-from-* on the scroller based on scroll position', async () => {
+			const popupRef = createRef< HTMLDivElement >();
+
+			render(
+				<AlertDialog.Root defaultOpen>
+					<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+					<AlertDialog.Popup ref={ popupRef } title="Title">
+						Body
+					</AlertDialog.Popup>
+				</AlertDialog.Root>
+			);
+
+			await waitFor( () => {
+				expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+			} );
+
+			// JSDOM doesn't lay out elements, so we simulate an
+			// overflowing scroll container by stubbing layout metrics
+			// per scenario and dispatching a scroll event.
+			const scroller = findScroller( popupRef.current );
+			Object.defineProperty( scroller, 'scrollHeight', {
+				configurable: true,
+				value: 500,
+			} );
+			Object.defineProperty( scroller, 'clientHeight', {
+				configurable: true,
+				value: 100,
+			} );
+
+			const setScrollTop = ( value: number ) => {
+				Object.defineProperty( scroller, 'scrollTop', {
+					configurable: true,
+					value,
+				} );
+				act( () => {
+					scroller.dispatchEvent(
+						new Event( 'scroll', { bubbles: true } )
+					);
+				} );
+			};
+
+			setScrollTop( 0 );
+			expect( scroller ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 200 );
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+
+			setScrollTop( 400 );
+			expect( scroller ).toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-top'
+			);
+			expect( scroller ).not.toHaveAttribute(
+				'data-wp-ui-overlay-scrolled-from-bottom'
+			);
+		} );
+
+		it( 'does not focus the scroll container on open even when it is keyboard-tabbable', async () => {
+			// JSDOM reports `scrollHeight`/`clientHeight` as 0 by default,
+			// so the scroll container would never overflow on its own and
+			// would never become `tabindex="0"`. Forcing both prototype
+			// getters to overflow values here makes the scroller
+			// keyboard-reachable at the moment Base UI resolves
+			// `initialFocus` — exactly the configuration that, without
+			// `useDeprioritizedInitialFocus` wired up, lets the scroller
+			// steal focus from the action buttons.
+			const originalScrollHeight = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'scrollHeight'
+			);
+			const originalClientHeight = Object.getOwnPropertyDescriptor(
+				Element.prototype,
+				'clientHeight'
+			);
+			Object.defineProperty( Element.prototype, 'scrollHeight', {
+				configurable: true,
+				get() {
+					return 500;
+				},
+			} );
+			Object.defineProperty( Element.prototype, 'clientHeight', {
+				configurable: true,
+				get() {
+					return 100;
+				},
+			} );
+
+			try {
+				const user = userEvent.setup();
+				const popupRef = createRef< HTMLDivElement >();
+
+				render(
+					<AlertDialog.Root>
+						<AlertDialog.Trigger>Open</AlertDialog.Trigger>
+						<AlertDialog.Popup ref={ popupRef } title="Title">
+							Body that overflows
+						</AlertDialog.Popup>
+					</AlertDialog.Root>
+				);
+
+				await user.click(
+					screen.getByRole( 'button', { name: 'Open' } )
+				);
+
+				await waitFor( () => {
+					expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
+				} );
+
+				// The scroll container (overflow forced via the
+				// prototype stubs above) must not steal focus from the
+				// action buttons — that's exactly what the
+				// `useDeprioritizedInitialFocus` wiring on
+				// `AlertDialog.Popup` is there to prevent. The Cancel
+				// button is the first non-deprioritized tabbable, so
+				// focus should settle on it.
+				const scroller = findScroller( popupRef.current );
+				await waitFor( () => {
+					expect(
+						screen.getByRole( 'button', { name: 'Cancel' } )
+					).toHaveFocus();
+				} );
+				expect( scroller ).not.toHaveFocus();
+			} finally {
+				if ( originalScrollHeight ) {
+					Object.defineProperty(
+						Element.prototype,
+						'scrollHeight',
+						originalScrollHeight
+					);
+				}
+				if ( originalClientHeight ) {
+					Object.defineProperty(
+						Element.prototype,
+						'clientHeight',
+						originalClientHeight
+					);
+				}
+			}
+		} );
+	} );
 } );
