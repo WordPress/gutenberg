@@ -393,87 +393,101 @@ function MediaEditorModalContent( {
 	};
 
 	return (
-		<>
-			<Modal
-				className="media-editor-modal"
-				title={ __( 'Edit media' ) }
-				size="fill"
-				isDismissible={ false }
-				shouldCloseOnEsc={ ! hasChanges }
-				shouldCloseOnClickOutside={ ! hasChanges }
-				onRequestClose={ handleRequestClose }
-				headerActions={
-					<HeaderActions
-						isSaving={ isSaving }
-						hasMedia={ !! media }
-						hasChanges={ hasChanges }
-						onCancel={ handleRequestClose }
-						onSave={ handleSave }
-					/>
+		<Modal
+			className="media-editor-modal"
+			title={ __( 'Edit media' ) }
+			size="fill"
+			isDismissible={ false }
+			shouldCloseOnClickOutside={ ! hasChanges }
+			onKeyDown={ ( event ) => {
+				// When there are pending changes, intercept ESC and
+				// open the confirm dialog ourselves. `preventDefault`
+				// short-circuits Modal's own ESC-to-close handler on
+				// the overlay so the modal doesn't animate out before
+				// the dialog appears.
+				if (
+					hasChanges &&
+					( event.code === 'Escape' || event.key === 'Escape' )
+				) {
+					event.preventDefault();
+					setIsDiscardDialogOpen( true );
 				}
+			} }
+			onRequestClose={ handleRequestClose }
+			headerActions={
+				<HeaderActions
+					isSaving={ isSaving }
+					hasMedia={ !! media }
+					hasChanges={ hasChanges }
+					onCancel={ handleRequestClose }
+					onSave={ handleSave }
+				/>
+			}
+		>
+			<MediaEditorProvider
+				value={ media ?? undefined }
+				onChange={ handleChange }
+				settings={ { fields } }
 			>
-				<MediaEditorProvider
-					value={ media ?? undefined }
-					onChange={ handleChange }
-					settings={ { fields } }
-				>
-					{ ! media ? (
-						<Spinner />
-					) : (
-						<>
-							<Tabs>
-								<MediaEditorModalSidebar tabs={ tabs } />
-							</Tabs>
-							<InterfaceSkeleton
-								className="media-editor-modal__skeleton"
-								content={
-									<div className="media-editor-modal__canvas">
-										{ isImage ? (
-											<MediaEditorCanvas
-												aspectRatio={ resolveAspectRatio(
-													aspectRatioValue,
-													imageAspectRatio
-												) }
-												freeformCrop={ freeformCrop }
-											/>
-										) : (
-											<MediaPreview />
-										) }
-									</div>
-								}
-								footer={
-									isImage ? (
-										<MediaEditorToolbar
-											onReset={ () => {
-												setAspectRatioValue( '0' );
-												setFreeformCrop( true );
-											} }
+				{ ! media ? (
+					<Spinner />
+				) : (
+					<>
+						<Tabs>
+							<MediaEditorModalSidebar tabs={ tabs } />
+						</Tabs>
+						<InterfaceSkeleton
+							className="media-editor-modal__skeleton"
+							content={
+								<div className="media-editor-modal__canvas">
+									{ isImage ? (
+										<MediaEditorCanvas
+											aspectRatio={ resolveAspectRatio(
+												aspectRatioValue,
+												imageAspectRatio
+											) }
+											freeformCrop={ freeformCrop }
 										/>
-									) : undefined
-								}
-								sidebar={
-									<ComplementaryArea.Slot scope="media-editor" />
-								}
-							/>
-						</>
-					) }
-				</MediaEditorProvider>
-			</Modal>
-			<ConfirmDialog
-				isOpen={ isDiscardDialogOpen }
-				confirmButtonText={ __( 'Discard' ) }
-				cancelButtonText={ __( 'Keep editing' ) }
-				onCancel={ () => setIsDiscardDialogOpen( false ) }
-				onConfirm={ () => {
-					setIsDiscardDialogOpen( false );
-					discardAndClose();
-				} }
-			>
-				{ __(
-					'Are you sure you want to discard your unsaved changes?'
+									) : (
+										<MediaPreview />
+									) }
+								</div>
+							}
+							footer={
+								isImage ? (
+									<MediaEditorToolbar
+										onReset={ () => {
+											setAspectRatioValue( '0' );
+											setFreeformCrop( true );
+										} }
+									/>
+								) : undefined
+							}
+							sidebar={
+								<ComplementaryArea.Slot scope="media-editor" />
+							}
+						/>
+					</>
 				) }
-			</ConfirmDialog>
-		</>
+				{ /* Rendered inside the parent Modal so it's tracked as
+					 a nested dismisser. As a top-level sibling it would,
+					 on mount, request the parent Modal close. */ }
+				<ConfirmDialog
+					isOpen={ isDiscardDialogOpen }
+					confirmButtonText={ __( 'Discard' ) }
+					cancelButtonText={ __( 'Keep editing' ) }
+					onCancel={ () => setIsDiscardDialogOpen( false ) }
+					onConfirm={ () => {
+						setIsDiscardDialogOpen( false );
+						discardAndClose();
+					} }
+				>
+					{ __(
+						'Are you sure you want to discard your unsaved changes?'
+					) }
+				</ConfirmDialog>
+			</MediaEditorProvider>
+		</Modal>
 	);
 }
 
