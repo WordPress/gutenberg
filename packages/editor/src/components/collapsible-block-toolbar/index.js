@@ -11,8 +11,12 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
-import { Button, Popover } from '@wordpress/components';
+import { createPortal, useEffect } from '@wordpress/element';
+import {
+	Button,
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
@@ -23,6 +27,9 @@ import { useSelect } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 	const { blockSelectionStart } = useSelect( ( select ) => {
@@ -55,7 +62,10 @@ export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 			>
 				<BlockToolbar hideDragHandle />
 			</div>
-			<Popover.Slot name="block-toolbar" />
+			{ createPortal(
+				<Popover.Slot name="block-toolbar" />,
+				getOverlayLegacySlot()
+			) }
 
 			<Button
 				className="editor-collapsible-block-toolbar__toggle"

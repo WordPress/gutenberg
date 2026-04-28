@@ -3,9 +3,12 @@
  */
 import { BlockToolbar } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
+import { createPortal, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Popover } from '@wordpress/components';
+import {
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -17,6 +20,11 @@ import { VisuallyHidden } from '@wordpress/ui';
 import DocumentTools from './document-tools';
 import SaveButton from '../save-button';
 import MoreMenu from '../more-menu';
+import { unlock } from '../../lock-unlock';
+
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 function Header() {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -54,10 +62,13 @@ function Header() {
 							<div className="selected-block-tools-wrapper">
 								<BlockToolbar hideDragHandle />
 							</div>
-							<Popover.Slot
-								ref={ blockToolbarRef }
-								name="block-toolbar"
-							/>
+							{ createPortal(
+								<Popover.Slot
+									ref={ blockToolbarRef }
+									name="block-toolbar"
+								/>,
+								getOverlayLegacySlot()
+							) }
 						</>
 					) }
 				</div>

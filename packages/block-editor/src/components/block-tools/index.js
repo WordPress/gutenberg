@@ -8,9 +8,12 @@ import clsx from 'clsx';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { Popover } from '@wordpress/components';
+import {
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef, useState } from '@wordpress/element';
+import { useRef, useState, createPortal } from '@wordpress/element';
 import {
 	switchToBlockType,
 	hasBlockSupport,
@@ -33,6 +36,10 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
@@ -322,18 +329,24 @@ export default function BlockTools( {
 				) }
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
-				{ ! isZoomOutMode && ! hasFixedToolbar && (
-					<Popover.Slot
-						name="block-toolbar"
-						ref={ blockToolbarRef }
-					/>
-				) }
+				{ ! isZoomOutMode &&
+					! hasFixedToolbar &&
+					createPortal(
+						<Popover.Slot
+							name="block-toolbar"
+							ref={ blockToolbarRef }
+						/>,
+						getOverlayLegacySlot()
+					) }
 				{ children }
 				{ /* Used for inline rich text popovers. */ }
-				<Popover.Slot
-					name="__unstable-block-tools-after"
-					ref={ blockToolbarAfterRef }
-				/>
+				{ createPortal(
+					<Popover.Slot
+						name="__unstable-block-tools-after"
+						ref={ blockToolbarAfterRef }
+					/>,
+					getOverlayLegacySlot()
+				) }
 				{ isZoomOutMode && ! isDragging && (
 					<ZoomOutModeInserters
 						__unstableContentRef={ __unstableContentRef }

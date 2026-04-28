@@ -11,6 +11,7 @@ import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
 import { Tabs } from './tabs';
+import { getOverlayLegacySlot } from './utils/overlay-legacy-slot';
 import { kebabCase, normalizeTextString } from './utils/strings';
 import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
@@ -34,6 +35,7 @@ import { ValidatedFormTokenField } from './validated-form-controls/components/fo
 export const privateApis = {};
 lock( privateApis, {
 	__experimentalPopoverLegacyPositionToPlacement,
+	__experimentalGetOverlayLegacySlot: getOverlayLegacySlot,
 	ComponentsContext,
 	Tabs,
 	Theme,

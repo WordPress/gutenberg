@@ -35,6 +35,7 @@ import { __ } from '@wordpress/i18n';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 import {
 	computePopoverPosition,
 	positionToPlacement,
@@ -93,13 +94,14 @@ import { slotNameContext } from './context';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {
-	let container = document.body.querySelector(
+	const legacySlot = getOverlayLegacySlot();
+	let container = legacySlot.querySelector(
 		'.' + fallbackContainerClassname
 	);
 	if ( ! container ) {
 		container = document.createElement( 'div' );
 		container.className = fallbackContainerClassname;
-		document.body.append( container );
+		legacySlot.append( container );
 	}
 
 	return container;

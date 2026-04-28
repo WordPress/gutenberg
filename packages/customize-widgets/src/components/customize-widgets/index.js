@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useState, useEffect, useRef, createPortal } from '@wordpress/element';
-import { SlotFillProvider, Popover } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	Popover,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,6 +16,11 @@ import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
 import SidebarControls from '../sidebar-controls';
 import useClearSelectedBlock from './use-clear-selected-block';
+import { unlock } from '../../lock-unlock';
+
+const { __experimentalGetOverlayLegacySlot: getOverlayLegacySlot } = unlock(
+	componentsPrivateApis
+);
 
 export default function CustomizeWidgets( {
 	api,
@@ -19,9 +28,6 @@ export default function CustomizeWidgets( {
 	blockEditorSettings,
 } ) {
 	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
 	const popoverRef = useRef();
 
 	useClearSelectedBlock( activeSidebarControl, popoverRef );
@@ -55,16 +61,15 @@ export default function CustomizeWidgets( {
 			activeSidebarControl.container[ 0 ]
 		);
 
-	// We have to portal this to the parent of both the editor and the inspector,
-	// so that the popovers will appear above both of them.
-	const popover =
-		parentContainer &&
-		createPortal(
-			<div className="customize-widgets-popover" ref={ popoverRef }>
-				<Popover.Slot />
-			</div>,
-			parentContainer
-		);
+	// Portal this into the overlay legacy slot so popovers appear above both
+	// the editor and the inspector. The slot's stacking context (above the
+	// customizer panes, below the WP admin bar) handles the layering.
+	const popover = createPortal(
+		<div className="customize-widgets-popover" ref={ popoverRef }>
+			<Popover.Slot />
+		</div>,
+		getOverlayLegacySlot()
+	);
 
 	return (
 		<SlotFillProvider>
