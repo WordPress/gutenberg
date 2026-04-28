@@ -14,11 +14,19 @@
 
 -   Convert styles to CSS modules with logical properties, removing previously exposed class names. [#77088](https://github.com/WordPress/gutenberg/pull/77088).
 
+### Enhancements
+
+-   Admin UI: use UI Text component in header. [#77372](https://github.com/WordPress/gutenberg/pull/77372)
+
 ## 1.12.0 (2026-04-15)
 
 ### Enhancements
 
 -   Increase page header vertical padding. [#77152](https://github.com/WordPress/gutenberg/pull/77152)
+
+### Internal
+
+-   `Breadcrumbs`: Migrate from `@wordpress/components` to `Link`, `Stack`, and `Text` from `@wordpress/ui`. [#77012](https://github.com/WordPress/gutenberg/pull/77012)
 
 ## 1.11.0 (2026-04-01)
 
