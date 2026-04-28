@@ -189,7 +189,6 @@ interface MediaEditorModalContentProps {
 	id: number;
 	media: Media | null;
 	hasEdits: boolean;
-	isModalOpen: boolean;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onUpdate: ( ( updated: MediaEditorModalUpdate ) => void ) | null;
 }
@@ -202,7 +201,6 @@ function MediaEditorModalContent( {
 	id,
 	media,
 	hasEdits,
-	isModalOpen,
 	aspectRatioPresets,
 	onUpdate,
 }: MediaEditorModalContentProps ) {
@@ -301,6 +299,11 @@ function MediaEditorModalContent( {
 	};
 
 	const handleRequestClose = () => {
+		// Disallow closing while a save is in flight so the in-progress
+		// request can settle without the modal unmounting under it.
+		if ( isSaving ) {
+			return;
+		}
 		if ( hasChanges ) {
 			setIsDiscardDialogOpen( true );
 			return;
@@ -398,17 +401,23 @@ function MediaEditorModalContent( {
 			title={ __( 'Edit media' ) }
 			size="fill"
 			isDismissible={ false }
-			shouldCloseOnClickOutside={ ! hasChanges }
+			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
+				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
+					return;
+				}
+				// While saving, swallow ESC so the in-progress request
+				// can settle without the modal closing under it.
+				if ( isSaving ) {
+					event.preventDefault();
+					return;
+				}
 				// When there are pending changes, intercept ESC and
 				// open the confirm dialog ourselves. `preventDefault`
 				// short-circuits Modal's own ESC-to-close handler on
 				// the overlay so the modal doesn't animate out before
 				// the dialog appears.
-				if (
-					hasChanges &&
-					( event.code === 'Escape' || event.key === 'Escape' )
-				) {
+				if ( hasChanges ) {
 					event.preventDefault();
 					setIsDiscardDialogOpen( true );
 				}
@@ -545,7 +554,6 @@ export function MediaEditorModal( {
 				id={ id }
 				media={ media }
 				hasEdits={ hasEdits }
-				isModalOpen={ isModalOpen }
 				aspectRatioPresets={ aspectRatioPresets }
 				onUpdate={ onUpdate }
 			/>
