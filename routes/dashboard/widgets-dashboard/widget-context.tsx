@@ -30,7 +30,7 @@ export function WidgetContextProvider( {
 }
 
 /**
- * Returns the current widget's identity (`uuid`, `name`, `position`). Returns
+ * Returns the current widget's identity (`uuid`, `name`, `index`). Returns
  * `null` when called outside a widget render subtree.
  */
 export function useWidgetContext(): WidgetContextValue | null {

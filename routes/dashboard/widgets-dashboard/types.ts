@@ -181,11 +181,6 @@ export interface DashboardWidget<
 
 /**
  * Props passed to every widget render component.
- *
- * Intentionally minimal. Removal, badges, and error reporting are surface
- * concerns handled by the chrome wrapper — widgets never see them. This
- * mirrors the `BlockEdit` contract: blocks do not receive "remove this block"
- * callbacks either.
  */
 export interface WidgetRenderProps< Item = unknown > {
 	/**
@@ -216,9 +211,9 @@ export interface WidgetContextValue {
 	name: WidgetName;
 
 	/**
-	 * Index of the instance in the `layout` array.
+	 * Index of the widget in the `layout` array.
 	 */
-	position: number;
+	index: number;
 }
 
 /**

@@ -32,7 +32,7 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 			() => ( {
 				uuid: widget.uuid,
 				name: widget.type,
-				position: index,
+				index,
 			} ),
 			[ widget.uuid, widget.type, index ]
 		);
