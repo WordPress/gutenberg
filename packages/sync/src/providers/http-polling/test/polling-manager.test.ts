@@ -9,7 +9,7 @@ import {
 	it,
 	jest,
 } from '@jest/globals';
-import { type SyncResponse } from '../types';
+import { type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 jest.mock( 'yjs', () => ( {
@@ -137,6 +137,12 @@ function countOutgoingUpdates( payload: {
 
 function getPayloadSize( payload: unknown ): number {
 	return JSON.stringify( payload ).length;
+}
+
+function getServerAwareness(
+	room: string
+): SyncResponse[ 'rooms' ][ number ][ 'awareness' ] {
+	return room === 'room-0' ? { 1: {}, 2: {} } : {};
 }
 
 describe( 'polling-manager', () => {
@@ -827,12 +833,11 @@ describe( 'polling-manager', () => {
 	describe( 'error recovery', () => {
 		it( 'splits outgoing updates so a poll stays within the request body budget', async () => {
 			mockPostSyncUpdate.mockImplementation(
-				async ( payload: { rooms: Array< { room: string } > } ) => ( {
+				async ( payload: SyncPayload ): Promise< SyncResponse > => ( {
 					rooms: payload.rooms.map( ( room ) => ( {
 						room: room.room,
 						end_cursor: 1,
-						awareness:
-							room.room === 'room-0' ? { 1: {}, 2: {} } : {},
+						awareness: getServerAwareness( room.room ),
 						updates: [],
 					} ) ),
 				} )

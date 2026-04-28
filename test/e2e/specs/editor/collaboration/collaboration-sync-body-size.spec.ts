@@ -9,6 +9,14 @@ const LARGE_FIELD_SIZE = 450 * 1024;
 const MAX_SYNC_BODY_SIZE = 16 * 1024 * 1024;
 const EXPECTED_ROOMS = EXTRA_POST_COUNT + 4;
 
+function isSyncUpdateRequest( url: string ): boolean {
+	const decodedUrl = decodeURIComponent( url );
+	return (
+		decodedUrl.includes( '/wp-json/wp-sync/v1/updates' ) ||
+		decodedUrl.includes( 'rest_route=/wp-sync/v1/updates' )
+	);
+}
+
 test.describe( 'Collaboration sync body size', () => {
 	test( 'keeps multi-room sync polls under the body-size limit', async ( {
 		collaborationUtils,
@@ -29,7 +37,7 @@ test.describe( 'Collaboration sync body size', () => {
 		} > = [];
 
 		page.on( 'request', ( request ) => {
-			if ( ! request.url().includes( '/wp-json/wp-sync/v1/updates' ) ) {
+			if ( ! isSyncUpdateRequest( request.url() ) ) {
 				return;
 			}
 			const body = request.postData() || '';
@@ -59,7 +67,7 @@ test.describe( 'Collaboration sync body size', () => {
 		} );
 
 		page.on( 'response', ( response ) => {
-			if ( ! response.url().includes( '/wp-json/wp-sync/v1/updates' ) ) {
+			if ( ! isSyncUpdateRequest( response.url() ) ) {
 				return;
 			}
 			syncResponses.push( {
