@@ -25,6 +25,7 @@ import type {
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
 import BaseControl from '../base-control';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -151,6 +152,7 @@ function CustomSelect(
 					onKeyDown={ onSelectPopoverKeyDown }
 					// Match legacy behavior
 					flip={ ! isLegacy }
+					portalElement={ getOverlayLegacySlot }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }

@@ -19,6 +19,7 @@ import {
 import type { WordPressComponentProps } from '../context';
 import type { PopoverProps } from './types';
 import * as Styled from './styles';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 import { Context } from './context';
 
 export const Popover = forwardRef<
@@ -96,6 +97,7 @@ export const Popover = forwardRef<
 			data-submenu={ !! menuContext.store.parent || undefined }
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
+			portalElement={ getOverlayLegacySlot }
 			unmountOnHide
 			render={ renderMenu }
 		/>

@@ -11,6 +11,7 @@ import deprecated from '@wordpress/deprecated';
 import type { TooltipProps } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
+import { getOverlayLegacySlot } from '../utils/overlay-legacy-slot';
 import { TooltipInternalContext } from './context';
 
 /**
@@ -122,6 +123,7 @@ function UnforwardedTooltip(
 					gutter={ 4 }
 					id={ describedById }
 					overflowPadding={ 0.5 }
+					portalElement={ getOverlayLegacySlot }
 					store={ tooltipStore }
 				>
 					{ text }
