@@ -1,0 +1,94 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
+// Size the stage to the viewport so DataViews owns its own scroll and
+// the sticky footer stays visible. Note: when the wp-admin sidebar
+// (#adminmenu) is taller than the viewport, #wpwrap still grows to
+// fit it, so empty space may appear below DataViews.
+.boot-layout__stage:has(.post-types-page) {
+	height: calc(100vh - #{$admin-bar-height-big});
+
+	@include break-medium {
+		height: calc(100vh - #{$admin-bar-height});
+	}
+}
+
+.dataviews-action-modal__quick-edit-post-type {
+	justify-content: flex-end;
+	align-items: stretch;
+
+	.components-modal__frame {
+		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
+		height: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$grid-unit-20 * 2});
+		max-width: 400px;
+		border-radius: $radius-large;
+		position: relative;
+		animation-name: none;
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: quick-edit-post-type-slide-in-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
+		}
+	}
+
+	&.is-animating-out .components-modal__frame {
+		animation-name: none;
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: quick-edit-post-type-slide-out-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
+		}
+	}
+
+	.components-modal__content {
+		padding: 0;
+		overflow-y: auto;
+	}
+
+	.dataviews-action-modal__quick-edit-post-type-header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: $white;
+		padding: $grid-unit-20 $grid-unit-30;
+	}
+
+	.dataviews-action-modal__quick-edit-post-type-content {
+		padding: 0 $grid-unit-30;
+	}
+
+	.dataviews-action-modal__quick-edit-post-type-footer {
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
+		background: $white;
+		padding: $grid-unit-20 $grid-unit-30;
+
+		.components-button {
+			flex: 1;
+			justify-content: center;
+		}
+	}
+}
+
+@keyframes quick-edit-post-type-slide-in-right {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes quick-edit-post-type-slide-out-right {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}
