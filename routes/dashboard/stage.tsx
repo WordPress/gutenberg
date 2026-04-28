@@ -30,12 +30,7 @@ function Dashboard() {
 				layout={ layout }
 				onLayoutChange={ setLayout }
 				widgetTypes={ widgetTypes }
-			>
-				<WidgetDashboard.Empty>
-					<p>{ __( 'No widgets yet.' ) }</p>
-				</WidgetDashboard.Empty>
-				<WidgetDashboard.Widgets />
-			</WidgetDashboard>
+			/>
 		</Page>
 	);
 }

@@ -8,6 +8,8 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { widget } from '@wordpress/icons';
+import { EmptyState } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -248,15 +250,15 @@ export const Empty: Story = {
 		children: (
 			<>
 				<WidgetDashboard.Empty>
-					<div
-						style={ {
-							padding: 48,
-							textAlign: 'center',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
-						} }
-					>
-						No widgets added.
-					</div>
+					<EmptyState.Root>
+						<EmptyState.Icon icon={ widget } />
+						<EmptyState.Title>
+							Your dashboard is empty
+						</EmptyState.Title>
+						<EmptyState.Description>
+							Add widgets to start customizing your dashboard.
+						</EmptyState.Description>
+					</EmptyState.Root>
 				</WidgetDashboard.Empty>
 				<WidgetDashboard.Widgets />
 			</>
@@ -322,15 +324,15 @@ export const Composition: Story = {
 				</header>
 
 				<WidgetDashboard.Empty>
-					<div
-						style={ {
-							padding: 48,
-							textAlign: 'center',
-							color: 'var(--wpds-color-fg-content-neutral-weak)',
-						} }
-					>
-						Add a widget to get started.
-					</div>
+					<EmptyState.Root>
+						<EmptyState.Icon icon={ widget } />
+						<EmptyState.Title>
+							Your dashboard is empty
+						</EmptyState.Title>
+						<EmptyState.Description>
+							Add widgets to start customizing your dashboard.
+						</EmptyState.Description>
+					</EmptyState.Root>
 				</WidgetDashboard.Empty>
 
 				<WidgetDashboard.Widgets />

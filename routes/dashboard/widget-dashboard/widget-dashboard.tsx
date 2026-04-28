@@ -55,7 +55,12 @@ export const WidgetDashboard = Object.assign(
 				resolveWidgetModule={ resolveWidgetModule }
 				gridSettings={ gridSettings }
 			>
-				{ children ?? <Widgets /> }
+				{ children ?? (
+					<>
+						<Empty />
+						<Widgets />
+					</>
+				) }
 			</WidgetDashboardProvider>
 		);
 	},

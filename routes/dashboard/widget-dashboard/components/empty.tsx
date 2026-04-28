@@ -4,12 +4,33 @@
 import type { ReactNode } from 'react';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { widget } from '@wordpress/icons';
+import { EmptyState, Stack } from '@wordpress/ui';
+
+/**
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../context/dashboard-context';
 
 export interface EmptyProps {
-	children: ReactNode;
+	children?: ReactNode;
+}
+
+function DefaultEmpty() {
+	return (
+		<EmptyState.Root>
+			<EmptyState.Icon icon={ widget } />
+			<EmptyState.Title>
+				{ __( 'Your dashboard is empty' ) }
+			</EmptyState.Title>
+			<EmptyState.Description>
+				{ __( 'Add widgets to start customizing your dashboard.' ) }
+			</EmptyState.Description>
+		</EmptyState.Root>
+	);
 }
 
 function EmptyImpl( { children }: EmptyProps ) {
@@ -17,12 +38,19 @@ function EmptyImpl( { children }: EmptyProps ) {
 	if ( layout.length > 0 ) {
 		return null;
 	}
-	return <>{ children }</>;
+
+	return (
+		<Stack justify="center" align="center">
+			{ children ?? <DefaultEmpty /> }
+		</Stack>
+	);
 }
 
 /**
- * Renders its children only when the dashboard's `layout` is empty. Pair
- * with `WidgetDashboard.Widgets` inside `WidgetDashboard` so the empty
- * state shows up in place of the grid until widgets are added.
+ * Renders an empty-state placeholder when the dashboard's `layout` has no
+ * widgets. Pair with `WidgetDashboard.Widgets` inside `WidgetDashboard` so
+ * the placeholder shows up in place of the grid until widgets are added.
+ * Without children, falls back to a built-in placeholder; pass children to
+ * override.
  */
 export const Empty = EmptyImpl;
