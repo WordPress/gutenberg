@@ -8,7 +8,6 @@ import { useReducer, useCallback, useRef } from '@wordpress/element';
  */
 import type {
 	CropperState,
-	CropperAction,
 	TransformOperation,
 	NormalizedPoint,
 	NormalizedRect,
@@ -34,16 +33,6 @@ import {
 export interface UseCropperStateReturn {
 	/** The current cropper state (read-only). */
 	state: CropperState;
-	/**
-	 * Internal: the raw reducer dispatch. Used by `<Cropper>` and the
-	 * interaction hook for actions that don't have a dedicated setter
-	 * (or for behavior that expects a compact action object). Not
-	 * part of the public API — consumers should use the named
-	 * setters. Prefixed `__` to signal "do not reach in".
-	 *
-	 * @internal
-	 */
-	__dispatch: React.Dispatch< CropperAction >;
 	/** Set the loaded image (natural size and src). */
 	setImage: ( image: CropperState[ 'image' ] ) => void;
 	/**
@@ -53,6 +42,8 @@ export interface UseCropperStateReturn {
 	setPan: ( pan: NormalizedPoint ) => void;
 	/** Set the zoom level. Clamped to [1, 10]. */
 	setZoom: ( zoom: number ) => void;
+	/** Set zoom and pan together so focal-point zoom remains atomic. */
+	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
 	/** Set the rotation in degrees. Normalized to [0, 360). */
 	setRotation: ( rotation: number ) => void;
 	/** Set the flip state. */
@@ -139,6 +130,16 @@ export function useCropperState(
 		[ dispatch ]
 	);
 
+	const setZoomAtPoint = useCallback(
+		( zoom: number, pan: NormalizedPoint ) => {
+			dispatch( {
+				type: 'SET_ZOOM_AT_POINT',
+				payload: { zoom, pan },
+			} );
+		},
+		[ dispatch ]
+	);
+
 	const setRotation = useCallback(
 		( rotation: number ) => {
 			dispatch( { type: 'SET_ROTATION', payload: rotation } );
@@ -217,12 +218,12 @@ export function useCropperState(
 		[ state ]
 	);
 
-	return {
+	const controller: UseCropperStateReturn = {
 		state,
-		__dispatch: dispatch,
 		setImage,
 		setPan,
 		setZoom,
+		setZoomAtPoint,
 		setRotation,
 		setFlip,
 		snapRotate90,
@@ -233,4 +234,5 @@ export function useCropperState(
 		isDirty,
 		getCroppedImage,
 	};
+	return controller;
 }

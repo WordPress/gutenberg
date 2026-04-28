@@ -6,6 +6,7 @@
 		"checkJs": false
 	},
 	"references": [
+		{ "path": "../api-fetch" },
 		{ "path": "../components" },
 		{ "path": "../core-data" },
 		{ "path": "../data" },
