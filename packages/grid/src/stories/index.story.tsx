@@ -424,6 +424,68 @@ export const RowHeight: Story = {
 };
 
 /**
+ * Visualizes the grid's column tracks and gaps as a Chrome
+ * DevTools-style overlay. Renders a sibling grid behind
+ * `DashboardGrid` with the same template, so the column tracks
+ * line up exactly with the live layout.
+ */
+function GridVisualizer( {
+	columns,
+	spacing,
+}: {
+	columns: number;
+	spacing: number;
+} ) {
+	const gapPx = spacing * 4;
+	return (
+		<div
+			aria-hidden
+			style={ {
+				position: 'absolute',
+				top: 24,
+				right: 0,
+				bottom: 0,
+				left: 0,
+				background: `repeating-linear-gradient(135deg, color-mix(in srgb, var(--wpds-color-bg-surface-warning) 28%, transparent) 0 6px, transparent 6px 12px)`,
+				display: 'grid',
+				gridTemplateColumns: `repeat(${ columns }, minmax(0, 1fr))`,
+				gap: gapPx,
+				pointerEvents: 'none',
+				zIndex: 0,
+			} }
+		>
+			{ Array.from( { length: columns } ).map( ( _, i ) => (
+				<div
+					key={ i }
+					style={ {
+						outline:
+							'1px dashed var(--wpds-color-stroke-surface-warning)',
+						position: 'relative',
+					} }
+				>
+					<span
+						style={ {
+							position: 'absolute',
+							top: -18,
+							left: 0,
+							fontSize: 10,
+							padding: '1px 4px',
+							borderRadius: 2,
+							background: 'var(--wpds-color-bg-surface-warning)',
+							color: 'var(--wpds-color-fg-content-warning)',
+							fontFamily:
+								'var(--wpds-typography-font-family-mono)',
+						} }
+					>
+						{ i + 1 }
+					</span>
+				</div>
+			) ) }
+		</div>
+	);
+}
+
+/**
  * Edit mode with drag, resize, and all width modes. A state panel
  * shows the raw layout JSON. Drag items to reorder; resize from the
  * bottom-right handle. Keyboard sensor is enabled: use Tab to focus
@@ -449,8 +511,8 @@ export const EditMode: Story = {
 				tone: 'success',
 			},
 			{
-				key: 'fill',
-				width: 'fill',
+				key: 'fixed-1-1',
+				width: 5,
 				height: 1,
 				order: 2,
 				tone: 'info',
@@ -569,7 +631,17 @@ export const EditMode: Story = {
 
 		return (
 			<Stack direction="row" gap="lg" align="flex-start">
-				<div style={ { width: '800px' } }>
+				<div
+					style={ {
+						width: '800px',
+						position: 'relative',
+						paddingTop: 24,
+					} }
+				>
+					<GridVisualizer
+						columns={ args.columns ?? 12 }
+						spacing={ args.spacing ?? 4 }
+					/>
 					<DashboardGrid
 						{ ...args }
 						layout={ layout }
