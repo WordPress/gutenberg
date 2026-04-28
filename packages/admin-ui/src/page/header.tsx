@@ -35,7 +35,12 @@ export default function Header( {
 			className={ styles.header }
 			render={ <header /> }
 		>
-			<Stack direction="row" justify="space-between" gap="sm">
+			<Stack
+				className={ styles[ 'header-content' ] }
+				direction="row"
+				gap="sm"
+				justify="space-between"
+			>
 				<Stack direction="row" gap="sm" align="center" justify="start">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
@@ -63,15 +68,16 @@ export default function Header( {
 					{ breadcrumbs }
 					{ badges }
 				</Stack>
-				<Stack
-					direction="row"
-					gap="sm"
-					style={ { width: 'auto', flexShrink: 0 } }
-					className={ styles[ 'header-actions' ] }
-					align="center"
-				>
-					{ actions }
-				</Stack>
+				{ actions && (
+					<Stack
+						align="center"
+						className={ styles[ 'header-actions' ] }
+						direction="row"
+						gap="sm"
+					>
+						{ actions }
+					</Stack>
+				) }
 			</Stack>
 			{ subTitle && (
 				<Text
