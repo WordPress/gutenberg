@@ -81,8 +81,8 @@ export interface CropperProps {
 	controller: UseCropperStateReturn;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
-	/** Show the rule-of-thirds grid overlay. */
-	showGrid?: boolean;
+	/** Show the rule-of-thirds grid overlay, or only during interactions. */
+	showGrid?: boolean | 'interactive';
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -132,7 +132,7 @@ export interface CropperProps {
  * @param root0.src            Image source URL.
  * @param root0.controller     The full state/setter object from `useCropperState`.
  * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Show rule-of-thirds grid overlay.
+ * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
  * @param root0.showDimming    Show dimming overlay outside crop.
  * @param root0.minZoom        Minimum zoom level.
  * @param root0.maxZoom        Maximum zoom level.
@@ -274,18 +274,18 @@ function CropperInner(
 	}, [ state, elementSize, visualSize, canvasSize ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
-	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
-		state,
-		controller,
-		canvasSize,
-		visualSize,
-		{
-			minZoom,
-			maxZoom,
-			onGestureStart,
-			onGestureEnd,
-		}
-	);
+	const {
+		handlers,
+		onWheelNative,
+		isDragging,
+		isZooming,
+		isPlacementInteracting,
+	} = useInteraction( state, controller, canvasSize, visualSize, {
+		minZoom,
+		maxZoom,
+		onGestureStart,
+		onGestureEnd,
+	} );
 
 	// Register wheel handler natively with { passive: false } so
 	// preventDefault works. React's onWheel registers as passive. Bound
@@ -351,6 +351,11 @@ function CropperInner(
 		};
 	}, [] );
 
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isInteractiveGrid = showGrid === 'interactive';
+	const showInteractiveGrid =
+		isInteractiveGrid && ( isPlacementInteracting || isResizing );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -359,10 +364,16 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
+	const handleResizeStart = useCallback( () => {
+		setIsResizing( true );
+		onGestureStart?.();
+	}, [ onGestureStart ] );
+
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
+		setIsResizing( false );
 		setSettling( true );
 		settleCrop();
 		onGestureEnd?.();
@@ -434,7 +445,13 @@ function CropperInner(
 			 */ }
 			<div
 				ref={ canvasRef }
-				className="wp-media-editor-image-editor__canvas"
+				className={ clsx(
+					'wp-media-editor-image-editor__canvas',
+					isInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--grid-interactive',
+					showInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--show-grid'
+				) }
 				tabIndex={ 0 }
 				role="group"
 				aria-label={ __( 'Image editor' ) }
@@ -465,7 +482,7 @@ function CropperInner(
 					containerSize={ canvasSize }
 					imageSize={ visualSize }
 					onCropChange={ handleCropChange }
-					onResizeStart={ onGestureStart }
+					onResizeStart={ handleResizeStart }
 					onResizeEnd={ handleResizeEnd }
 					onEscape={ handleEscape }
 					aspectRatio={ aspectRatio }
@@ -475,7 +492,7 @@ function CropperInner(
 				/>
 
 				{ /* Rule-of-thirds grid */ }
-				{ showGrid && (
+				{ ( showGrid === true || isInteractiveGrid ) && (
 					<GridOverlay
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
