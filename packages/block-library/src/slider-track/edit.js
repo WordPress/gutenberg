@@ -37,9 +37,7 @@ function SliderTrackEdit( { clientId } ) {
 				<ToolbarGroup>
 					<ToolbarButton
 						className="components-toolbar__control"
-						label={ __( 'Add Slide' ) }
 						onClick={ addSlide }
-						showTooltip
 						text={ __( 'Add Slide' ) }
 					/>
 				</ToolbarGroup>
