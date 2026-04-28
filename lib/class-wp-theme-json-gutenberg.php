@@ -596,7 +596,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * - 'order'  : Nesting order (lower = outer level). When states from multiple
 	 *              groups are combined, lower-order groups wrap higher-order ones.
 	 *              E.g. a current_item state (order 10) wraps a pseudo state (order 20).
-	 * - 'states' : An associative array of valid state keys to metadata.
+	 * - 'states' : A list of valid state keys.
 	 *              State keys use a prefix character (':' for CSS pseudo-selectors,
 	 *              '@' for class-based states) to distinguish them from style property
 	 *              keys in theme.json.
@@ -607,21 +607,11 @@ class WP_Theme_JSON_Gutenberg {
 	const STATE_GROUPS = array(
 		'current_item' => array(
 			'order'  => 10,
-			'states' => array(
-				'@current' => array( 'label' => 'Current' ),
-			),
+			'states' => array( '@current' ),
 		),
 		'pseudo'       => array(
 			'order'  => 20,
-			'states' => array(
-				':hover'         => array( 'label' => 'Hover' ),
-				':focus'         => array( 'label' => 'Focus' ),
-				':focus-visible' => array( 'label' => 'Focus-visible' ),
-				':active'        => array( 'label' => 'Active' ),
-				':link'          => array( 'label' => 'Link' ),
-				':any-link'      => array( 'label' => 'Any Link' ),
-				':visited'       => array( 'label' => 'Visited' ),
-			),
+			'states' => array( ':hover', ':focus', ':focus-visible', ':active', ':link', ':any-link', ':visited' ),
 		),
 	);
 
