@@ -9,7 +9,7 @@ import { forwardRef, useMemo } from '@wordpress/element';
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { WidgetContextProvider } from '../context/widget-context';
 import { WidgetRender } from './widget-render';
-import styles from '../widget-dashboard.module.css';
+import styles from './widget.module.css';
 import type { DashboardWidget } from '../types';
 
 export interface WidgetProps {

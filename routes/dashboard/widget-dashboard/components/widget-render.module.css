@@ -1,12 +1,3 @@
-.grid {
-	width: 100%;
-}
-
-.widget {
-	height: 100%;
-	box-sizing: border-box;
-}
-
 .loading,
 .error {
 	display: flex;

@@ -14,6 +14,7 @@ import { EmptyState, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../context/dashboard-context';
+import styles from './empty.module.css';
 
 export interface EmptyProps {
 	children?: ReactNode;
@@ -40,7 +41,7 @@ function EmptyImpl( { children }: EmptyProps ) {
 	}
 
 	return (
-		<Stack justify="center" align="center">
+		<Stack justify="center" align="center" className={ styles.root }>
 			{ children ?? <DefaultEmpty /> }
 		</Stack>
 	);

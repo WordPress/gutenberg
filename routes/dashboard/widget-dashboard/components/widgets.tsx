@@ -15,7 +15,7 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
  */
 import { useDashboardInternalContext } from '../context/dashboard-context';
 import { Widget } from './widget';
-import styles from '../widget-dashboard.module.css';
+import styles from './widgets.module.css';
 import type { DashboardWidget, WidgetName } from '../types';
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
