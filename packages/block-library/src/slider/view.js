@@ -23,44 +23,9 @@ function debounce( func, wait ) {
 
 const debouncedUpdates = new WeakMap();
 
-let sliderTouchStartX = 0;
-let sliderTouchStartY = 0;
-let sliderTouchStartTime = 0;
-
-const sliderTouchEndHandlerWrappers = new WeakMap();
-
-function handleSliderTouchStart( event ) {
-	const t = event.touches && event.touches[ 0 ];
-	if ( t ) {
-		sliderTouchStartX = t.clientX;
-		sliderTouchStartY = t.clientY;
-		sliderTouchStartTime = Date.now();
-	}
-}
-
-function handleSliderTouchEnd( event, ref ) {
-	const touchEndEvent =
-		( event.changedTouches && event.changedTouches[ 0 ] ) ||
-		( event.touches && event.touches[ 0 ] );
-	const now = Date.now();
-	if ( touchEndEvent ) {
-		const deltaX = touchEndEvent.clientX - sliderTouchStartX;
-		const deltaY = touchEndEvent.clientY - sliderTouchStartY;
-		const absDeltaX = Math.abs( deltaX );
-		const absDeltaY = Math.abs( deltaY );
-		const elapsedMs = now - sliderTouchStartTime;
-		const isHorizontalSwipe =
-			absDeltaX > 50 && absDeltaX > absDeltaY * 1.5 && elapsedMs < 800;
-		if ( isHorizontalSwipe ) {
-			event.preventDefault();
-			if ( deltaX < 0 ) {
-				moveSlide( ref, 1 ); // Next slide
-			} else {
-				moveSlide( ref, -1 ); // Previous slide
-			}
-		}
-	}
-}
+// Store touch start data per track element to avoid cross-slider interference.
+const touchStartData = new WeakMap();
+const touchHandlers = new WeakMap();
 
 function clampIndex( index, totalSlides ) {
 	if ( totalSlides <= 0 ) {
@@ -134,9 +99,9 @@ function scrollToSlide( ref, index ) {
 	context.totalSlides = slides.length;
 	updateSlideInert( slides, nextIndex );
 
-	const slideWidth = slides[ 0 ].offsetWidth;
+	const targetSlide = slides[ nextIndex ];
 	track.scrollTo( {
-		left: nextIndex * slideWidth,
+		left: targetSlide.offsetLeft - track.offsetLeft,
 		behavior: 'smooth',
 	} );
 }
@@ -159,6 +124,28 @@ function moveSlide( ref, direction ) {
 	scrollToSlide( ref, nextIndex );
 }
 
+/**
+ * Determines the closest slide index based on the current scroll position.
+ * @param {HTMLElement}   track  The track element containing the slides.
+ * @param {HTMLElement[]} slides The array of slide elements.
+ */
+function getClosestSlideIndex( track, slides ) {
+	const scrollLeft = track.scrollLeft;
+	const trackLeft = track.offsetLeft;
+	let closestIndex = 0;
+	let closestDistance = Infinity;
+
+	slides.forEach( ( slide, index ) => {
+		const distance = Math.abs( slide.offsetLeft - trackLeft - scrollLeft );
+		if ( distance < closestDistance ) {
+			closestDistance = distance;
+			closestIndex = index;
+		}
+	} );
+
+	return closestIndex;
+}
+
 function getDebouncedUpdate( trackElement ) {
 	if ( ! debouncedUpdates.has( trackElement ) ) {
 		debouncedUpdates.set(
@@ -169,16 +156,7 @@ function getDebouncedUpdate( trackElement ) {
 					return;
 				}
 
-				const slideWidth = slides[ 0 ].offsetWidth;
-				if ( slideWidth === 0 ) {
-					return;
-				}
-
-				const scrollLeft = ref.scrollLeft;
-				const currentIndex = clampIndex(
-					Math.round( scrollLeft / slideWidth ),
-					slides.length
-				);
+				const currentIndex = getClosestSlideIndex( ref, slides );
 
 				context.currentIndex = currentIndex;
 				context.totalSlides = slides.length;
@@ -276,30 +254,71 @@ store( 'core/slider', {
 			);
 			updateSlideInert( slides, context.currentIndex );
 
-			// Add touch event listeners for swipe navigation
-			// Remove previous listeners if any (to avoid duplicates)
-			ref.removeEventListener( 'touchstart', handleSliderTouchStart );
-			const prevWrapper = sliderTouchEndHandlerWrappers.get( ref );
-			if ( prevWrapper ) {
-				ref.removeEventListener( 'touchend', prevWrapper );
+			// Clean up previous touch listeners if initTrack runs again.
+			const prev = touchHandlers.get( ref );
+			if ( prev ) {
+				ref.removeEventListener( 'touchstart', prev.start );
+				ref.removeEventListener( 'touchend', prev.end );
 			}
 
-			// Handler wrapper to pass ref
-			function sliderTouchEndHandlerWrapper( event ) {
-				handleSliderTouchEnd( event, ref );
+			// Touch start: store per-track touch data.
+			function onTouchStart( event ) {
+				const t = event.touches && event.touches[ 0 ];
+				if ( t ) {
+					touchStartData.set( ref, {
+						x: t.clientX,
+						y: t.clientY,
+						time: Date.now(),
+					} );
+				}
 			}
-			// Store wrapper in WeakMap for removal if needed
-			sliderTouchEndHandlerWrappers.set(
-				ref,
-				sliderTouchEndHandlerWrapper
-			);
 
-			ref.addEventListener( 'touchstart', handleSliderTouchStart, {
+			// Touch end: determine swipe direction using per-track data.
+			function onTouchEnd( event ) {
+				const startData = touchStartData.get( ref );
+				if ( ! startData ) {
+					return;
+				}
+
+				const touchEndEvent =
+					( event.changedTouches && event.changedTouches[ 0 ] ) ||
+					( event.touches && event.touches[ 0 ] );
+				if ( ! touchEndEvent ) {
+					return;
+				}
+
+				const deltaX = touchEndEvent.clientX - startData.x;
+				const deltaY = touchEndEvent.clientY - startData.y;
+				const absDeltaX = Math.abs( deltaX );
+				const absDeltaY = Math.abs( deltaY );
+				const elapsedMs = Date.now() - startData.time;
+				const isHorizontalSwipe =
+					absDeltaX > 50 &&
+					absDeltaX > absDeltaY * 1.5 &&
+					elapsedMs < 800;
+
+				if ( isHorizontalSwipe ) {
+					event.preventDefault();
+					moveSlide( ref, deltaX < 0 ? 1 : -1 );
+				}
+			}
+
+			touchHandlers.set( ref, { start: onTouchStart, end: onTouchEnd } );
+
+			ref.addEventListener( 'touchstart', onTouchStart, {
 				passive: true,
 			} );
-			ref.addEventListener( 'touchend', sliderTouchEndHandlerWrapper, {
+			ref.addEventListener( 'touchend', onTouchEnd, {
 				passive: false,
 			} );
+
+			// Return cleanup function for when the element is removed.
+			return () => {
+				ref.removeEventListener( 'touchstart', onTouchStart );
+				ref.removeEventListener( 'touchend', onTouchEnd );
+				touchHandlers.delete( ref );
+				touchStartData.delete( ref );
+			};
 		},
 	},
 } );
