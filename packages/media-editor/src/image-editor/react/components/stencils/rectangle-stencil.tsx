@@ -11,6 +11,7 @@ import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
+	computeShiftLockedResizeRect,
 	type HandlePosition,
 	type CropBounds,
 	type ResizeDragState,
@@ -155,6 +156,11 @@ export function RectangleStencil( {
 			clientX: number,
 			clientY: number
 		) => NormalizedRect;
+		computeShiftLockedRect: (
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		) => NormalizedRect;
 		onCropChange: ( rect: NormalizedRect ) => void;
 		onResizeEnd?: () => void;
 	} | null >( null );
@@ -215,11 +221,13 @@ export function RectangleStencil( {
 			let rafId = 0;
 			let latestX = event.clientX;
 			let latestY = event.clientY;
+			let latestShift = event.shiftKey;
 
 			const onMove = ( e: Event ) => {
 				const pe = e as PointerEvent;
 				latestX = pe.clientX;
 				latestY = pe.clientY;
+				latestShift = pe.shiftKey;
 				if ( rafId ) {
 					return;
 				}
@@ -229,9 +237,18 @@ export function RectangleStencil( {
 					if ( ! h ) {
 						return;
 					}
-					const newRect = h.hasLockedRatio
-						? h.computeLockedRect( drag, latestX, latestY )
-						: h.computeFreeRect( drag, latestX, latestY );
+					let newRect: NormalizedRect;
+					if ( h.hasLockedRatio ) {
+						newRect = h.computeLockedRect( drag, latestX, latestY );
+					} else if ( latestShift ) {
+						newRect = h.computeShiftLockedRect(
+							drag,
+							latestX,
+							latestY
+						);
+					} else {
+						newRect = h.computeFreeRect( drag, latestX, latestY );
+					}
 					h.onCropChange( newRect );
 				} );
 			};
@@ -303,10 +320,31 @@ export function RectangleStencil( {
 		[ imageSize, bounds, normalizedRatio ]
 	);
 
+	/**
+	 * Compute the new crop rect when Shift is held during a freeform
+	 * resize — preserves the start rect's aspect ratio.
+	 */
+	const computeShiftLockedRect = useCallback(
+		(
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		): NormalizedRect =>
+			computeShiftLockedResizeRect(
+				drag,
+				clientX,
+				clientY,
+				imageSize,
+				bounds
+			),
+		[ imageSize, bounds ]
+	);
+
 	latestHandlersRef.current = {
 		hasLockedRatio,
 		computeLockedRect,
 		computeFreeRect,
+		computeShiftLockedRect,
 		onCropChange,
 		onResizeEnd,
 	};

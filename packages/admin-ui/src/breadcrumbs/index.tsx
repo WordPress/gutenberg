@@ -12,6 +12,7 @@ import {
  * Internal dependencies
  */
 import type { BreadcrumbsProps } from './types';
+import styles from './style.module.css';
 
 /**
  * Renders a breadcrumb navigation trail.
@@ -56,7 +57,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 		<nav aria-label={ __( 'Breadcrumbs' ) }>
 			<HStack
 				as="ul"
-				className="admin-ui-breadcrumbs__list"
+				className={ styles.list }
 				spacing={ 0 }
 				justify="flex-start"
 				alignment="center"
