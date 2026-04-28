@@ -121,7 +121,8 @@ function ConnectorsPage() {
 								'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
 							) }
 						</p>
-						<p>{ __( 'WP-CLI examples:' ) }</p>
+						<details>
+							<summary>{ __( 'WP-CLI examples' ) }</summary>
 						<ul>
 							{ manualInstallPluginSlugs.map( ( slug ) => {
 								const command = `wp plugin install ${ slug } --activate`;
@@ -137,6 +138,7 @@ function ConnectorsPage() {
 								);
 							} ) }
 						</ul>
+						</details>
 					</Notice>
 				) }
 				{ isEmpty ? (
