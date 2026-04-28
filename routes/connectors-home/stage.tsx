@@ -110,21 +110,27 @@ function ConnectorsPage() {
 					isEmpty ? ' connectors-page--empty' : ''
 				}` }
 			>
-				{ isFileModsDisabled && manualInstallPluginSlugs.length > 0 && (
+				{ manualInstallPluginSlugs.length > 0 &&
+					( isFileModsDisabled || ! canInstallPlugins ) && (
 					<Notice
 						status="notice"
 						isDismissible={ false }
 						className="connectors-page__file-mods-notice"
 					>
+							{ isFileModsDisabled ? (
+								<>
 						<p>
 							{ __(
 								'Plugins cannot be installed here due to your site configuration. Install them manually using your normal deployment workflow.'
 							) }
 						</p>
 						<details>
-							<summary>{ __( 'WP-CLI examples' ) }</summary>
+										<summary>
+											{ __( 'WP-CLI examples' ) }
+										</summary>
 						<ul>
-							{ manualInstallPluginSlugs.map( ( slug ) => {
+											{ manualInstallPluginSlugs.map(
+												( slug ) => {
 								const command = `wp plugin install ${ slug } --activate`;
 								return (
 									<li key={ slug }>
@@ -133,12 +139,23 @@ function ConnectorsPage() {
 											__( '%s:' ),
 											slug
 										) }{ ' ' }
-										<code>{ command }</code>
+															<code>
+																{ command }
+															</code>
 									</li>
 								);
-							} ) }
+												}
+											) }
 						</ul>
 						</details>
+								</>
+							) : (
+								<p>
+									{ __(
+										'You do not have permission to install plugins. Please ask a site administrator to install them for you.'
+									) }
+								</p>
+							) }
 					</Notice>
 				) }
 				{ isEmpty ? (
