@@ -3,7 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { closeSmall, pencil } from '@wordpress/icons';
-import { store as coreStore, useEntityRecord } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import {
 	DataForm,
@@ -30,12 +30,8 @@ import {
 	useObjectTypeField,
 	useSlugField,
 } from '../fields';
-import {
-	serializeForSave,
-	toFormData,
-	type TaxonomyFormData,
-	type TaxonomyRecord,
-} from '../utils';
+import { serializeForSave } from '../utils';
+import type { TaxonomyFormData } from '../types';
 
 function EditTaxonomyModal( {
 	items,
@@ -45,20 +41,9 @@ function EditTaxonomyModal( {
 	closeModal?: () => void;
 } ) {
 	const item = items[ 0 ];
-	const { record, hasResolved } = useEntityRecord< TaxonomyRecord >(
-		'postType',
-		'wp_user_taxonomy',
-		item.id ?? 0
-	);
-
-	const initialData = useMemo< TaxonomyFormData >(
-		() => ( record ? toFormData( record ) : item ),
-		[ record, item ]
-	);
-
-	const [ data, setData ] = useState< TaxonomyFormData >( initialData );
+	const [ data, setData ] = useState< TaxonomyFormData >( item );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const slugField = useSlugField( item.slug );
+	const slugField = useSlugField( item.slug, data.slug );
 	const objectTypeField = useObjectTypeField();
 
 	const fields = useMemo< Field< TaxonomyFormData >[] >(
@@ -112,23 +97,18 @@ function EditTaxonomyModal( {
 		}
 	}
 
-	if ( ! hasResolved ) {
-		return <></>;
-	}
-
 	return (
-		<>
+		<Stack
+			className="dataviews-action-modal__edit-taxonomy-body"
+			direction="column"
+		>
 			<Stack
 				className="dataviews-action-modal__edit-taxonomy-header"
 				direction="row"
 				justify="space-between"
 				align="center"
 			>
-				<Text
-					variant="heading-sm"
-					render={ <h2 /> }
-					className="dataviews-action-modal__edit-taxonomy-title"
-				>
+				<Text variant="heading-sm" render={ <h2 /> }>
 					{ __( 'Edit taxonomy' ) }
 				</Text>
 				<Button
@@ -175,7 +155,7 @@ function EditTaxonomyModal( {
 					{ __( 'Done' ) }
 				</Button>
 			</Stack>
-		</>
+		</Stack>
 	);
 }
 

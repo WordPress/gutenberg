@@ -15,7 +15,6 @@
 # Blocks
 /packages/block-library                         @ajitbohra @fabiankaegy
 /packages/block-library/src/gallery
-/packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
 /lib/block-supports/duotone.php									@sgomes

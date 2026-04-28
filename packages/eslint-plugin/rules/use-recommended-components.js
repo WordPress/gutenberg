@@ -15,6 +15,7 @@ const ALLOWLIST = {
 			'CollapsibleCard',
 			'Stack',
 			'Text',
+			'VisuallyHidden',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -44,6 +45,7 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };
 

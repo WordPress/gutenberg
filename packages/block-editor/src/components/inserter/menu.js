@@ -14,7 +14,8 @@ import {
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -235,7 +236,7 @@ function InserterMenu(
 				</div>
 				{ showInserterHelpPanel && (
 					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
+						<VisuallyHidden render={ <h2 /> }>
 							{ __( 'A tip for using the block editor' ) }
 						</VisuallyHidden>
 						<Tips />

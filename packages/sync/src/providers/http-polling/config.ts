@@ -26,6 +26,10 @@ export const MANUAL_RETRY_INTERVAL_MS = 15000;
 
 export const MAX_UPDATE_SIZE_IN_BYTES = 1 * 1024 * 1024; // 1 MB
 
+// Corresponds with server-side
+// WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST.
+export const MAX_ROOMS_PER_REQUEST = 50;
+
 export const POLLING_INTERVAL_IN_MS = applyFilters(
 	'sync.pollingManager.pollingInterval',
 	4000 // 4 seconds
