@@ -7,6 +7,7 @@ import {
 	Flex,
 	Modal,
 	Spinner,
+	__experimentalConfirmDialog as ConfirmDialog,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
@@ -37,13 +38,10 @@ import MediaEditorCropPanel, {
 } from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
+import type { MediaEditorModalUpdate } from '../../store/actions';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import {
-	CropperProvider,
-	useCropper,
-	type UseCropperStateReturn,
-} from '../../image-editor';
+import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { buildModifiers } from './build-modifiers';
 
@@ -134,21 +132,19 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 interface HeaderActionsProps {
 	isSaving: boolean;
 	hasMedia: boolean;
-	hasEdits: boolean;
+	hasChanges: boolean;
 	onCancel: () => void;
-	onSave: ( controller: UseCropperStateReturn ) => void;
+	onSave: () => void;
 }
 
 function HeaderActions( {
 	isSaving,
 	hasMedia,
-	hasEdits,
+	hasChanges,
 	onCancel,
 	onSave,
 }: HeaderActionsProps ) {
-	const controller = useCropper();
-	const { isDirty } = controller;
-	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
+	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -169,7 +165,7 @@ function HeaderActions( {
 			<Button
 				size="compact"
 				variant="primary"
-				onClick={ () => onSave( controller ) }
+				onClick={ onSave }
 				isBusy={ isSaving }
 				disabled={ saveDisabled }
 				accessibleWhenDisabled
@@ -180,41 +176,30 @@ function HeaderActions( {
 	);
 }
 
-export function MediaEditorModal( {
-	fields = [],
-	aspectRatioPresets,
-}: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
-		return {
-			isModalOpen: isOpen(),
-			id: getId(),
-			onUpdate: getOnUpdate(),
-		};
-	}, [] );
+interface MediaEditorModalContentProps {
+	fields: Field< Media >[];
+	id: number;
+	media: Media | null;
+	hasEdits: boolean;
+	isModalOpen: boolean;
+	aspectRatioPresets?: AspectRatioPreset[];
+	onUpdate: ( ( updated: MediaEditorModalUpdate ) => void ) | null;
+}
 
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			if ( ! id ) {
-				return { media: null, hasEdits: false };
-			}
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					id
-				),
-			};
-		},
-		[ id ]
-	);
+// Inner component rendered inside `CropperProvider` so it can read
+// `isDirty` from the cropper. The outer `MediaEditorModal` keeps the
+// store reads and provider tree above this.
+function MediaEditorModalContent( {
+	fields,
+	id,
+	media,
+	hasEdits,
+	isModalOpen,
+	aspectRatioPresets,
+	onUpdate,
+}: MediaEditorModalContentProps ) {
+	const cropper = useCropper();
+	const hasChanges = cropper.isDirty || hasEdits;
 
 	const registry = useRegistry();
 	const {
@@ -226,6 +211,7 @@ export function MediaEditorModal( {
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
@@ -297,29 +283,33 @@ export function MediaEditorModal( {
 		];
 	}, [ isImage, aspectRatioValue, freeformCrop, aspectRatioPresets ] );
 
-	if ( ! isModalOpen || ! id ) {
-		return null;
-	}
-
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
 
-	const handleCancel = () => {
+	const discardAndClose = () => {
 		clearEntityRecordEdits( 'postType', 'attachment', id );
 		closeMediaEditorModal();
 	};
 
-	const handleSave = async ( controller: UseCropperStateReturn ) => {
+	const handleRequestClose = () => {
+		if ( hasChanges ) {
+			setIsDiscardDialogOpen( true );
+			return;
+		}
+		discardAndClose();
+	};
+
+	const handleSave = async () => {
 		setIsSaving( true );
 		try {
 			let saved: Media | null | undefined;
 
 			const modifiers =
-				controller.isDirty && controller.state.image
-					? buildModifiers( controller.state, {
-							width: controller.state.image.naturalWidth,
-							height: controller.state.image.naturalHeight,
+				cropper.isDirty && cropper.state.image
+					? buildModifiers( cropper.state, {
+							width: cropper.state.image.naturalWidth,
+							height: cropper.state.image.naturalHeight,
 					  } )
 					: [];
 
@@ -394,28 +384,19 @@ export function MediaEditorModal( {
 		}
 	};
 
-	// `CropperProvider` is always mounted — it's just a `useReducer` with
-	// no side effects — so the header actions can read `isDirty` for
-	// images without the JSX forking on media type. React context flows
-	// through `<Modal>`'s portal to the `headerActions` slot.
-	//
-	// The `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Today the modal always
-	// closes between edits so this is belt-and-braces, but it guards
-	// against future flows that swap `id` in the store without closing.
 	return (
-		<CropperProvider key={ media?.id ?? 'none' }>
+		<>
 			<Modal
 				className="media-editor-modal"
 				title={ __( 'Edit media' ) }
 				size="fill"
-				onRequestClose={ handleCancel }
+				onRequestClose={ handleRequestClose }
 				headerActions={
 					<HeaderActions
 						isSaving={ isSaving }
 						hasMedia={ !! media }
-						hasEdits={ hasEdits }
-						onCancel={ handleCancel }
+						hasChanges={ hasChanges }
+						onCancel={ handleRequestClose }
 						onSave={ handleSave }
 					/>
 				}
@@ -467,6 +448,82 @@ export function MediaEditorModal( {
 					) }
 				</MediaEditorProvider>
 			</Modal>
+			<ConfirmDialog
+				isOpen={ isDiscardDialogOpen }
+				confirmButtonText={ __( 'Discard' ) }
+				cancelButtonText={ __( 'Keep editing' ) }
+				onCancel={ () => setIsDiscardDialogOpen( false ) }
+				onConfirm={ () => {
+					setIsDiscardDialogOpen( false );
+					discardAndClose();
+				} }
+			>
+				{ __(
+					'Are you sure you want to discard your unsaved changes?'
+				) }
+			</ConfirmDialog>
+		</>
+	);
+}
+
+export function MediaEditorModal( {
+	fields = [],
+	aspectRatioPresets,
+}: MediaEditorModalProps ) {
+	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
+		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
+		return {
+			isModalOpen: isOpen(),
+			id: getId(),
+			onUpdate: getOnUpdate(),
+		};
+	}, [] );
+
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return { media: null, hasEdits: false };
+			}
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					id
+				),
+			};
+		},
+		[ id ]
+	);
+
+	if ( ! isModalOpen || ! id ) {
+		return null;
+	}
+
+	// `CropperProvider` is always mounted while the modal is open — it's
+	// just a `useReducer` with no side effects — so the inner component
+	// can read `isDirty` for images without forking on media type. The
+	// `key` remounts the provider when the edited attachment changes,
+	// discarding the previous cropper state. Today the modal always
+	// closes between edits so this is belt-and-braces, but it guards
+	// against future flows that swap `id` in the store without closing.
+	return (
+		<CropperProvider key={ media?.id ?? 'none' }>
+			<MediaEditorModalContent
+				fields={ fields }
+				id={ id }
+				media={ media }
+				hasEdits={ hasEdits }
+				isModalOpen={ isModalOpen }
+				aspectRatioPresets={ aspectRatioPresets }
+				onUpdate={ onUpdate }
+			/>
 		</CropperProvider>
 	);
 }
