@@ -218,8 +218,20 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					}
 				} else {
 					// No children remain and we got here via cancellation,
-					// meaning no child succeeded. Cancel the parent too so
-					// the block resets rather than showing a partial upload.
+					// meaning no child succeeded. The parent file already
+					// uploaded — delete the orphaned attachment from the
+					// server so it doesn't appear in the media library.
+					const parentAttachmentId = parentItem.attachment?.id;
+					const { mediaDelete } = select.getSettings();
+					if ( parentAttachmentId && mediaDelete ) {
+						mediaDelete( parentAttachmentId ).catch( () => {
+							// Best-effort cleanup; surface nothing to the
+							// user if the delete itself fails.
+						} );
+					}
+
+					// Cancel the parent too so the block resets rather
+					// than showing a partial upload.
 					dispatch.cancelItem(
 						parentId,
 						new UploadError( {
