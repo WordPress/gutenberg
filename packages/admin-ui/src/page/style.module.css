@@ -39,9 +39,9 @@
 	grid-template-columns: 1fr;
 	grid-template-rows: 1fr;
 	flex-shrink: 0;
-	/* TODO: replace fixed size values with design tokens when ready, likely --wpds-dimension-size-sm. See https://github.com/WordPress/gutenberg/pull/76545 */
-	width: 24px;
-	height: 24px;
+	/* @TODO: Replace with a `size` token once that category exists in the theme package. *
+	width: calc(var(--wpds-dimension-base) * 6);
+	height: calc(var(--wpds-dimension-base) * 6);
 
 	> * {
 		grid-column: 1 / -1;
