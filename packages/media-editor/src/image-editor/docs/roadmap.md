@@ -8,7 +8,7 @@ Follow-up work and future phases for the image editor. These are not blockers fo
 
 Reducer details are no longer part of the public API. `useCropperState()` returns a `controller` object with named setters (`setPan`, `setZoom`, `setZoomAtPoint`, `setRotation`, `setFlip`, `snapRotate90`, `setCropRect`, `settleCrop`, `applyOperation`, `reset`), plus `setImage` for loading and `getCroppedImage` for export. `<Cropper>` takes the controller as a single prop (`controller={ controller }`).
 
-The controller object does not expose the reducer dispatch. Internal React code uses named interaction callbacks, and the reducer action type `CropperAction` lives in an internal module that is not exported from the public barrel.
+The controller object does not expose the reducer dispatch. Internal React code uses named interaction callbacks, and the reducer action type `CropperAction` is intentionally not exported from the public barrel.
 
 ## Phase 2 — Framework-agnostic consumers
 
