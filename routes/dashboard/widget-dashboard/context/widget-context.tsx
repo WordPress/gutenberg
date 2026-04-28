@@ -11,7 +11,7 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WidgetContextValue } from './types';
+import type { WidgetContextValue } from '../types';
 
 const WidgetContext = createContext< WidgetContextValue | null >( null );
 

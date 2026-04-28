@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { useWidgetContext } from '../widget-context';
+import { useWidgetContext } from '../context/widget-context';
 
 function CaptureWidgetContext( {
 	onRender,

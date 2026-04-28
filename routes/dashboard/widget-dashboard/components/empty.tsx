@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 /**
  * Internal dependencies
  */
-import { useDashboardInternalContext } from './dashboard-context';
+import { useDashboardInternalContext } from '../context/dashboard-context';
 
 export interface EmptyProps {
 	children: ReactNode;

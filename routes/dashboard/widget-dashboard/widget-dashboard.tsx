@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import { WidgetDashboardProvider } from './dashboard-context';
-import { Empty } from './empty';
-import { Widget } from './widget';
-import { Widgets } from './widgets';
+import { WidgetDashboardProvider } from './context/dashboard-context';
+import { Empty } from './components/empty';
+import { Widget } from './components/widget';
+import { Widgets } from './components/widgets';
 import type { WidgetDashboardProps } from './types';
 
 /**

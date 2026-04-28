@@ -16,7 +16,7 @@ import type {
 	WidgetGridSettings,
 	DashboardWidget,
 	WidgetType,
-} from './types';
+} from '../types';
 
 /*
  * Defaults for the active grid model. Applied when the consumer omits

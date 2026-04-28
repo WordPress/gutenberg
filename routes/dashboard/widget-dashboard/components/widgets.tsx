@@ -13,10 +13,10 @@ import type { DashboardGridLayoutItem } from '@wordpress/grid';
 /**
  * Internal dependencies
  */
-import { useDashboardInternalContext } from './dashboard-context';
+import { useDashboardInternalContext } from '../context/dashboard-context';
 import { Widget } from './widget';
-import styles from './widget-dashboard.module.css';
-import type { DashboardWidget, WidgetName } from './types';
+import styles from '../widget-dashboard.module.css';
+import type { DashboardWidget, WidgetName } from '../types';
 
 function toGridLayout( widgets: DashboardWidget[] ): DashboardGridLayoutItem[] {
 	return widgets.map( ( w ) => ( {
