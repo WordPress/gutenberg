@@ -14,7 +14,7 @@ const getTypeAnnotation = require( './get-type-annotation' );
  * a object representing the leading JSDoc comment of the token,
  * if any.
  *
- * @param {Object} token               Espree token to extract the leading JSDoc comment from.
+ * @param {Object} token                 Espree token to extract the leading JSDoc comment from.
  * @param {Object} [typeAnnotationToken] Espree token to use for type inference. Defaults to `token`.
  *                                       Pass the function implementation node when the JSDoc lives on
  *                                       an overload signature so that inferred types reflect the
