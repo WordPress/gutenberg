@@ -4,12 +4,7 @@
 
 ### Breaking Changes
 
--   Remove `.components-circular-option-picker__option-wrapper::before`, `.components-circular-option-picker__option.is-pressed`, `.components-circular-option-picker__option.is-pressed + svg`, `.components-circular-option-picker__swatches`, and `> *:not(.components-circular-option-picker__swatches)` from the `z-index()` helper ([#77715](https://github.com/WordPress/gutenberg/pull/77715)).
--   Remove `.components-resizable-box__handle`, `.components-resizable-box__side-handle`, and `.components-resizable-box__corner-handle` from the `z-index()` helper ([#77620](https://github.com/WordPress/gutenberg/pull/77620)).
--   Remove `.components-form-toggle__input` from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
--   Remove `.interface-complementary-area .components-panel` and `.interface-complementary-area .components-panel__header` from the `z-index()` helper ([#77717](https://github.com/WordPress/gutenberg/pull/77717)).
--   Remove `.components-button {:focus or .is-primary}` from the `z-index()` helper ([#77621](https://github.com/WordPress/gutenberg/pull/77621)).
--   Remove the following stale entries from the `z-index()` helper ([#77714](https://github.com/WordPress/gutenberg/pull/77714)):
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
     -   `.block-editor-block-list__block::before`
@@ -20,13 +15,25 @@
     -   `.block-editor-warning`
     -   `.block-library-classic__toolbar`
     -   `.components-autocomplete__results`
+    -   `.components-button {:focus or .is-primary}`
+    -   `.components-circular-option-picker__option-wrapper::before`
+    -   `.components-circular-option-picker__option.is-pressed`
+    -   `.components-circular-option-picker__option.is-pressed + svg`
+    -   `.components-circular-option-picker__swatches`
+    -   `> *:not(.components-circular-option-picker__swatches)`
+    -   `.components-form-toggle__input`
     -   `.components-popover.block-editor-inspector-list-view-content-popover`
     -   `.components-popover.interface-more-menu__content`
+    -   `.components-resizable-box__handle`
+    -   `.components-resizable-box__side-handle`
+    -   `.components-resizable-box__corner-handle`
     -   `.dataviews-action-modal__quick-edit`
     -   `.edit-site-editor__toggle-save-panel`
     -   `.edit-site-template-panel__replace-template-modal`
     -   `.edit-widgets-header`
     -   `.edit-widgets-sidebar {greater than small}`
+    -   `.interface-complementary-area .components-panel`
+    -   `.interface-complementary-area .components-panel__header`
     -   `.wp-block-template-part__placeholder-preview-filter-input`
 
 ## 6.20.0 (2026-04-15)
