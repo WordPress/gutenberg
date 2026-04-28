@@ -83,6 +83,8 @@ export interface CropperProps {
 	stencil?: React.ComponentType< StencilProps >;
 	/** Show the rule-of-thirds grid overlay, or only during interactions. */
 	showGrid?: boolean | 'interactive';
+	/** Whether an external placement control, such as a zoom slider, is active. */
+	isPlacementControlActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -128,22 +130,23 @@ export interface CropperProps {
  * The component fills its parent container (100% width and height).
  * Wrap it in a sized container to control its dimensions.
  *
- * @param root0                Component props implementing CropperProps.
- * @param root0.src            Image source URL.
- * @param root0.controller     The full state/setter object from `useCropperState`.
- * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Grid overlay mode: false | true | 'interactive'.
- * @param root0.showDimming    Show dimming overlay outside crop.
- * @param root0.minZoom        Minimum zoom level.
- * @param root0.maxZoom        Maximum zoom level.
- * @param root0.aspectRatio    Fixed aspect ratio (width/height).
- * @param root0.freeformCrop   Enable resize handles.
- * @param root0.onImageLoaded  Image load callback.
- * @param root0.onStateChange  Every-frame state callback.
- * @param root0.onGestureStart Gesture boundary start.
- * @param root0.onGestureEnd   Gesture boundary end.
- * @param root0.className      Additional CSS class.
- * @param ref                  Forwarded ref for the container div.
+ * @param root0                          Component props implementing CropperProps.
+ * @param root0.src                      Image source URL.
+ * @param root0.controller               The full state/setter object from `useCropperState`.
+ * @param root0.stencil                  Custom stencil component.
+ * @param root0.showGrid                 Grid overlay mode: false | true | 'interactive'.
+ * @param root0.isPlacementControlActive
+ * @param root0.showDimming              Show dimming overlay outside crop.
+ * @param root0.minZoom                  Minimum zoom level.
+ * @param root0.maxZoom                  Maximum zoom level.
+ * @param root0.aspectRatio              Fixed aspect ratio (width/height).
+ * @param root0.freeformCrop             Enable resize handles.
+ * @param root0.onImageLoaded            Image load callback.
+ * @param root0.onStateChange            Every-frame state callback.
+ * @param root0.onGestureStart           Gesture boundary start.
+ * @param root0.onGestureEnd             Gesture boundary end.
+ * @param root0.className                Additional CSS class.
+ * @param ref                            Forwarded ref for the container div.
  */
 function CropperInner(
 	{
@@ -151,6 +154,7 @@ function CropperInner(
 		controller,
 		stencil: StencilComponent = RectangleStencil,
 		showGrid = false,
+		isPlacementControlActive = false,
 		showDimming = true,
 		minZoom,
 		maxZoom,
@@ -354,7 +358,8 @@ function CropperInner(
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isInteractiveGrid = showGrid === 'interactive';
 	const showInteractiveGrid =
-		isInteractiveGrid && ( isPlacementInteracting || isResizing );
+		isInteractiveGrid &&
+		( isPlacementInteracting || isResizing || isPlacementControlActive );
 
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
