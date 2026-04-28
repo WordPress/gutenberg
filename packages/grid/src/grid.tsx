@@ -382,60 +382,73 @@ export const DashboardGrid = forwardRef< HTMLDivElement, DashboardGridProps >(
 							  ),
 				};
 
-				if ( relativeDelta.width !== 0 || relativeDelta.height !== 0 ) {
-					// Snapshot baseline on the first meaningful frame and read
-					// from it on every frame after — `delta` is absolute from
-					// the gesture start, so summing it with the live (already
-					// mutated) `activeLayout` width compounds and oscillates,
-					// which thrashes any adjacent `fill` tile.
-					if ( ! resizeBaselineRef.current ) {
-						const baseItem = activeLayout.find(
-							( item ) => item.key === id
-						);
-						const resolvedItem = resolvedItemMap.get( id );
-						// `'fill'`/`'full'` resize from the rendered span
-						// and convert to a numeric width.
-						let baseWidth: number;
-						if ( baseItem?.width === 'full' ) {
-							baseWidth = effectiveColumns;
-						} else if ( baseItem?.width === 'fill' ) {
-							baseWidth =
-								typeof resolvedItem?.width === 'number'
-									? resolvedItem.width
-									: 1;
-						} else {
-							baseWidth = baseItem?.width ?? 1;
-						}
-						resizeBaselineRef.current = {
-							width: baseWidth,
-							height: baseItem?.height ?? 1,
-						};
+				// Snapshot the baseline once at gesture start. The handle's
+				// `delta` is absolute from the gesture start, so summing it
+				// with the live (already mutated) `activeLayout` width would
+				// compound and oscillate — and stepping back through the
+				// zero-delta zone would never restore the original size.
+				if ( ! resizeBaselineRef.current ) {
+					const baseItem = activeLayout.find(
+						( item ) => item.key === id
+					);
+					const resolvedItem = resolvedItemMap.get( id );
+					// `'fill'`/`'full'` resize from the rendered span
+					// and convert to a numeric width.
+					let baseWidth: number;
+					if ( baseItem?.width === 'full' ) {
+						baseWidth = effectiveColumns;
+					} else if ( baseItem?.width === 'fill' ) {
+						baseWidth =
+							typeof resolvedItem?.width === 'number'
+								? resolvedItem.width
+								: 1;
+					} else {
+						baseWidth = baseItem?.width ?? 1;
 					}
-					const baseline = resizeBaselineRef.current;
-					const updatedLayout = activeLayout.map( ( item ) => {
-						if ( item.key === id ) {
-							return {
-								...item,
-								width: Math.max(
-									1,
-									Math.min(
-										baseline.width + relativeDelta.width,
-										effectiveColumns
-									)
-								),
-								height: Math.max(
-									1,
-									baseline.height + relativeDelta.height
-								),
-							};
-						}
-						return item;
-					} );
-
-					latestLayoutRef.current = updatedLayout;
-					setTemporaryLayout( updatedLayout );
-					onPreviewLayout?.( updatedLayout );
+					resizeBaselineRef.current = {
+						width: baseWidth,
+						height: baseItem?.height ?? 1,
+					};
 				}
+				const baseline = resizeBaselineRef.current;
+				const newWidth = Math.max(
+					1,
+					Math.min(
+						baseline.width + relativeDelta.width,
+						effectiveColumns
+					)
+				);
+				const newHeight = Math.max(
+					1,
+					baseline.height + relativeDelta.height
+				);
+
+				// Bail when the resulting size matches the current preview.
+				// Covers both the zero-delta start frame and the case where
+				// the cursor returns through the zero-delta zone after a
+				// step. A symbolic width (`'fill'`/`'full'`) on the live
+				// item never matches a numeric `newWidth`, so the first
+				// step still converts it to a numeric span.
+				const currentItem = activeLayout.find(
+					( item ) => item.key === id
+				);
+				if (
+					currentItem &&
+					currentItem.width === newWidth &&
+					( currentItem.height ?? 1 ) === newHeight
+				) {
+					return;
+				}
+
+				const updatedLayout = activeLayout.map( ( item ) =>
+					item.key === id
+						? { ...item, width: newWidth, height: newHeight }
+						: item
+				);
+
+				latestLayoutRef.current = updatedLayout;
+				setTemporaryLayout( updatedLayout );
+				onPreviewLayout?.( updatedLayout );
 			}
 		);
 
