@@ -466,8 +466,8 @@ test.describe( 'Unsynced pattern', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		);
 
-		// Open the block options menu and click "Detach pattern".
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		// Open the block options menu and click "Detach".
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Detach' } )
@@ -812,10 +812,10 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -852,10 +852,10 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -958,10 +958,10 @@ test.describe( 'Synced pattern', () => {
 		await editor.selectBlocks(
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
-		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Disconnect' } )
+			.getByRole( 'button', { name: 'Detach' } )
 			.click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

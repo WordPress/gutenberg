@@ -69,6 +69,7 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/router": "file:../router",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
 		"@wordpress/wordcount": "file:../wordcount",

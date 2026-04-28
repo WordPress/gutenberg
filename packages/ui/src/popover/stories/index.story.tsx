@@ -762,20 +762,19 @@ export const CrossIframeWithSlotFill: Story = {
 
 /**
  * Popovers in Gutenberg are managed with explicit z-index values, which can
- * create situations where a popover renders below another popover, when you
- * want it to be rendered above.
+ * create situations where a popover renders below another popover when you
+ * want it above.
  *
- * The `--wp-ui-popover-z-index` CSS variable is an escape hatch for that
- * case. Override it either:
+ * The `--wp-ui-popover-z-index` CSS variable controls the z-index of the
+ * popover's positioner (and its optional backdrop). Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
- *   popover in the page),
- * - **Per instance on the popup**, by setting the variable via `style` on
- *   `Popover.Popup` (as this story does), or
- * - **Per instance on the portal**, by passing a `Popover.Portal` with a
- *   `style` (or `className`) to `Popover.Popup`'s `portal` prop. The
- *   variable then cascades from the portal wrapper to everything rendered
- *   inside it.
+ *   popover in the page), or
+ * - **Per instance**, by passing a `Popover.Portal` with a `style` (or
+ *   `className`) to `Popover.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -783,7 +782,13 @@ export const WithCustomZIndex: Story = {
 		children: (
 			<>
 				<Popover.Trigger>Open Popover</Popover.Trigger>
-				<Popover.Popup style={ { '--wp-ui-popover-z-index': '9999' } }>
+				<Popover.Popup
+					portal={
+						<Popover.Portal
+							style={ { '--wp-ui-popover-z-index': '9999' } }
+						/>
+					}
+				>
 					<Popover.Arrow />
 					<Popover.Title
 						style={ {
@@ -793,8 +798,9 @@ export const WithCustomZIndex: Story = {
 						Custom z-index
 					</Popover.Title>
 					<Popover.Description>
-						This popover&apos;s positioner has z-index: 9999 via the
-						`--wp-ui-popover-z-index` CSS custom property.
+						This popover renders at `z-index: 9999` via the
+						`--wp-ui-popover-z-index` CSS custom property, set on
+						`Popover.Portal` through the `portal` prop.
 					</Popover.Description>
 				</Popover.Popup>
 			</>

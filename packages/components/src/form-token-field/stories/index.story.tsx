@@ -25,6 +25,7 @@ const meta: Meta< typeof FormTokenField > = {
 		__experimentalValidateInput: {
 			control: false,
 		},
+		help: { control: 'text' },
 	},
 	parameters: {
 		controls: {
