@@ -63,14 +63,24 @@
 		pointer-events: none;
 	}
 
+	/*
+	 * The popup is a flex column laying out three regions — header, content,
+	 * footer — as siblings. Scrolling lives on `Drawer.Content` (which wraps
+	 * Base UI's `_Drawer.Content`), not the popup. `overflow: hidden` clips
+	 * content to the rounded border; transform-based swipe animations are
+	 * unaffected by it. See `overlay-chrome.module.css` for the shared
+	 * chrome/content primitives.
+	 */
 	.popup {
 		--viewport-inset: var(--wpds-dimension-padding-2xl);
 
 		position: fixed;
 		z-index: var(--wp-ui-drawer-z-index, initial);
 		box-sizing: border-box;
-		display: block;
+		display: flex;
+		flex-direction: column;
 		outline: 0;
+		overflow: hidden;
 		pointer-events: auto;
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		box-shadow: var(--wpds-elevation-lg);
@@ -78,13 +88,6 @@
 		font-size: var(--wpds-typography-font-size-md);
 		line-height: var(--wpds-typography-line-height-md);
 		color: var(--wpds-color-fg-content-neutral);
-		/*
-		 * Scroll on the block axis. For left/right drawers, swipe is on the
-		 * inline axis (no conflict). For up/down drawers, swipe dismissal only
-		 * engages once scroll reaches an edge.
-		 */
-		overflow-block: auto;
-		overscroll-behavior: contain;
 		touch-action: auto;
 
 		&[data-open],
@@ -213,15 +216,56 @@
 		}
 	}
 
+	/*
+	 * Chrome + content primitives are centralized in
+	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
+	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
+	 * overscroll rule live there too, keyed off the
+	 * `data-wp-ui-overlay-scroll-container` attribute set on `.content` by
+	 * `useOverlayScrollStateAttributes`.
+	 *
+	 * For up/down drawers Base UI's swipe-dismiss-on-scroll-edge logic
+	 * discovers the scrollable element by walking up from the touch target,
+	 * so moving scroll ownership from the popup onto `.content` remains
+	 * transparent to the gesture handling.
+	 */
+	.header {
+		composes: header from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.footer {
+		composes: footer from "../utils/css/overlay-chrome.module.css";
+	}
+
+	.title {
+		composes: title from "../utils/css/overlay-chrome.module.css";
+	}
+
 	.content {
-		padding: var(--wpds-dimension-padding-2xl);
+		composes: content from "../utils/css/overlay-chrome.module.css";
 	}
 
 	/*
-	 * The popup is anchored to a physical edge regardless of writing direction
-	 * (see `left: 0` / `right: 0` above), so the safe-area padding uses the
-	 * matching physical side. `env(safe-area-inset-*)` is already physical,
-	 * so pairing it with logical `padding-inline-*` would be wrong in RTL.
+	 * Push the close icon to the inline end even when the title is taken out
+	 * of flow (e.g. wrapped in `VisuallyHidden`, which sets `position:
+	 * absolute`). In that case `.title`'s `margin-inline-end: auto` is a
+	 * no-op because the title no longer participates in the flex layout, so
+	 * we also anchor the close icon itself.
+	 */
+	.header [data-wp-ui-drawer-close-icon] {
+		margin-inline-start: auto;
+	}
+
+	/*
+	 * Safe-area insets. The popup is anchored to a physical edge regardless
+	 * of writing direction (see `left: 0` / `right: 0` on `.popup` above),
+	 * so `env(safe-area-inset-*)` — which is already physical — is paired
+	 * with matching physical padding properties.
+	 *
+	 * For left/right drawers the inset lives on the scroll container itself.
+	 * For up/down drawers it lives on the chrome that occupies the popup's
+	 * anchored edge (pinned case); when that edge has no chrome sibling,
+	 * the scroll container carries the padding instead.
 	 */
 	.popup[data-swipe-direction="left"] .content {
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- physical to match the physical popup anchoring */
@@ -233,41 +277,19 @@
 		padding-right: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-right));
 	}
 
-	.popup[data-swipe-direction="down"] .content {
-		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
-	}
-
-	.popup[data-swipe-direction="up"] .content {
+	.popup[data-swipe-direction="up"] > .header {
 		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
 	}
 
-	.header {
-		display: flex;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
-		margin-bottom: var(--wpds-dimension-gap-lg);
+	.popup[data-swipe-direction="down"] > .footer {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
 	}
 
-	.title {
-		color: var(--wpds-color-fg-content-neutral);
-		--_gcd-heading-color: var(--wpds-color-fg-content-neutral);
-
-		margin-inline-end: auto;
-		/* Workaround: the GCD shorthand `margin` overrides the longhand above.
-		 * Keep both so the layout survives GCD removal. */
-		--_gcd-heading-margin: 0 auto 0 0;
-
-		&:dir(rtl) {
-			--_gcd-heading-margin: 0 0 0 auto;
-		}
+	.popup[data-swipe-direction="up"] > .content:first-child {
+		padding-top: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-top));
 	}
 
-	.footer {
-		display: flex;
-		justify-content: flex-end;
-		align-items: center;
-		gap: var(--wpds-dimension-gap-sm);
-		margin-top: var(--wpds-dimension-gap-lg);
-		padding-top: var(--wpds-dimension-padding-lg);
+	.popup[data-swipe-direction="down"] > .content:last-child {
+		padding-bottom: max(var(--wpds-dimension-padding-2xl), env(safe-area-inset-bottom));
 	}
 }

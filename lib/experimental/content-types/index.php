@@ -98,12 +98,52 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		'singular_name' => '' !== $singular ? $singular : $title,
 	);
 
+	// Merge the optional label overrides. Empty strings fall through to the
+	// WordPress-generated defaults, so we skip any label whose stored value
+	// is empty after sanitization.
+	$optional_label_keys = array(
+		'menu_name',
+		'all_items',
+		'edit_item',
+		'view_item',
+		'update_item',
+		'add_new_item',
+		'new_item_name',
+		'search_items',
+		'not_found',
+		'back_to_items',
+		'parent_item',
+		'popular_items',
+		'separate_items_with_commas',
+		'parent_item_colon',
+		'add_or_remove_items',
+		'choose_from_most_used',
+	);
+	if ( isset( $config['labels'] ) && is_array( $config['labels'] ) ) {
+		foreach ( $optional_label_keys as $label_key ) {
+			if ( ! isset( $config['labels'][ $label_key ] ) ) {
+				continue;
+			}
+			$label_value = sanitize_text_field( (string) $config['labels'][ $label_key ] );
+			if ( '' !== $label_value ) {
+				$labels[ $label_key ] = $label_value;
+			}
+		}
+	}
+
 	$args = array(
 		'labels'       => $labels,
 		'public'       => ! empty( $config['public'] ),
 		'hierarchical' => ! empty( $config['hierarchical'] ),
 		'show_in_rest' => true,
 	);
+
+	if ( isset( $config['description'] ) && is_string( $config['description'] ) ) {
+		$description = sanitize_textarea_field( $config['description'] );
+		if ( '' !== $description ) {
+			$args['description'] = $description;
+		}
+	}
 
 	return array( $slug, $object_type, $args );
 }
