@@ -135,16 +135,18 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
 /**
  * Sanitizes wp_user_taxonomy JSON `post_content` during `wp_insert_post`.
  *
- * Acts on:
- *   - posts of type `wp_user_taxonomy`
- *   - revisions whose parent is a `wp_user_taxonomy` post
- *
- * Returns input unchanged for any other post type or for invalid JSON.
- * The filter is unconditional — taxonomy config isn't HTML and shouldn't
- * carry scripts even for users with `unfiltered_html`.
+ * Acts on posts of type `wp_user_taxonomy`. Returns input unchanged for any
+ * other post type or for invalid JSON. The filter is unconditional —
+ * taxonomy config isn't HTML and shouldn't carry scripts even for users
+ * with `unfiltered_html`.
  *
  * Storage is encoded with `JSON_HEX_TAG | JSON_HEX_AMP`, so the bytes that
  * reach kses are inert and ordering vs `wp_filter_post_kses` is irrelevant.
+ *
+ * Revisions are not handled here because the CPT doesn't include
+ * `'revisions'` in its `supports` array; if revisions are enabled in a
+ * future iteration, the filter will need an analogous revision branch
+ * (and an accompanying meta-versioning strategy for `object_type`).
  *
  * @param array $data Slashed post data being inserted/updated.
  * @return array Filtered data.
@@ -154,12 +156,7 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 		return $data;
 	}
 
-	$is_taxonomy          = 'wp_user_taxonomy' === $data['post_type'];
-	$is_taxonomy_revision = 'revision' === $data['post_type']
-		&& ! empty( $data['post_parent'] )
-		&& 'wp_user_taxonomy' === get_post_type( $data['post_parent'] );
-
-	if ( ! $is_taxonomy && ! $is_taxonomy_revision ) {
+	if ( 'wp_user_taxonomy' !== $data['post_type'] ) {
 		return $data;
 	}
 

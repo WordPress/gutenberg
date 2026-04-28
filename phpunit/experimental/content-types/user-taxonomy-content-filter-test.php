@@ -107,46 +107,4 @@ class User_Taxonomy_Content_Filter_Test extends WP_UnitTestCase {
 		wp_delete_post( $post_id, true );
 	}
 
-	/**
-	 * Revisions whose parent is a wp_user_taxonomy post are also sanitized —
-	 * defense in depth for paths that write directly to revisions. Runs as
-	 * admin to isolate our filter's behavior from kses.
-	 */
-	public function test_sanitizes_revision_of_taxonomy() {
-		wp_set_current_user( self::$admin_id );
-
-		$parent_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_user_taxonomy',
-				'post_status'  => 'publish',
-				'post_name'    => 'filter-revision-parent',
-				'post_title'   => 'Parent',
-				'post_content' => wp_json_encode(
-					array( 'labels' => array( 'singular_name' => 'Parent' ) )
-				),
-			)
-		);
-
-		$revision_id = wp_insert_post(
-			array(
-				'post_type'    => 'revision',
-				'post_status'  => 'inherit',
-				'post_parent'  => $parent_id,
-				'post_content' => wp_json_encode(
-					array(
-						'labels' => array(
-							'singular_name' => '<script>alert(1)</script>Rev',
-						),
-					)
-				),
-			)
-		);
-
-		$content = get_post( $revision_id )->post_content;
-		$decoded = json_decode( $content, true );
-		$this->assertSame( 'Rev', $decoded['labels']['singular_name'] );
-		$this->assertStringNotContainsString( '<script', $content );
-
-		wp_delete_post( $parent_id, true );
-	}
 }

@@ -119,9 +119,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Adds a typed `config` object and `object_type` array to the response,
-	 * and removes the raw `content` field that the parent controller would
-	 * otherwise expose.
+	 * Adds the typed `config` object and `object_type` array to the response.
 	 *
 	 * @param WP_Post         $item    Stored record.
 	 * @param WP_REST_Request $request REST request.
@@ -131,17 +129,17 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		$response = parent::prepare_item_for_response( $item, $request );
 		$data     = $response->get_data();
 
-		unset( $data['content'] );
-
 		$fields = $this->get_fields_for_response( $request );
 
 		if ( rest_is_field_included( 'config', $fields ) ) {
-			// Decode as objects (assoc=false) so empty/nested object positions
-			// keep their `{}` shape through to JSON encoding. Storage encodes
-			// with JSON_FORCE_OBJECT, so well-formed records always decode to
-			// stdClass; anything else falls through to an empty object.
-			$decoded        = json_decode( (string) $item->post_content );
-			$data['config'] = $decoded instanceof stdClass ? $decoded : new stdClass();
+			$decoded = json_decode( (string) $item->post_content, true );
+			$config  = ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) )
+				? $decoded
+				: array();
+			// Empty config must serialize as `{}` to match the schema's
+			// `type: 'object'`. PHP encodes empty associative arrays as `[]`
+			// in JSON, so cast empties to stdClass.
+			$data['config'] = empty( $config ) ? new stdClass() : $config;
 		}
 
 		if ( rest_is_field_included( 'object_type', $fields ) ) {
