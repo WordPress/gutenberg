@@ -154,7 +154,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 
 	.reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
+		z-index: 1;
 	}
 
 	/**
