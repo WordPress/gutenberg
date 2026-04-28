@@ -64,6 +64,7 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 			css = `${ selector } {
 				flex-basis: ${ flexSize };
 				box-sizing: border-box;
+				flex-shrink: 0;
 			}`;
 		} else if ( selfStretch === 'fill' ) {
 			css = `${ selector } {
