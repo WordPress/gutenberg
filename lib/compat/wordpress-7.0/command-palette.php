@@ -13,7 +13,8 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 		'appleOS' => _x( '⌘K', 'keyboard shortcut to open the command palette' ),
 		'default' => _x( 'Ctrl+K', 'keyboard shortcut to open the command palette' ),
 	);
-	$is_apple_os     = (bool) preg_match( '/Macintosh|Mac OS X|Mac_PowerPC/i', $_SERVER['HTTP_USER_AGENT'] ?? '' );
+	$apple_pattern   = 'Macintosh|Mac OS X|Mac_PowerPC';
+	$is_apple_os     = (bool) preg_match( "/{$apple_pattern}/i", $_SERVER['HTTP_USER_AGENT'] ?? '' );
 	$shortcut_label  = $is_apple_os ? $shortcut_labels['appleOS'] : $shortcut_labels['default'];
 	$title           = sprintf(
 		'<span class="ab-icon" aria-hidden="true"></span><span class="ab-label"><kbd>%s</kbd><span class="screen-reader-text"> %s</span></span>',
@@ -30,15 +31,16 @@ function gutenberg_admin_bar_command_palette_menu( WP_Admin_Bar $wp_admin_bar ):
 	 * wp-i18n to be loaded as a dependency.
 	 */
 	$function = <<<'JS'
-		( appleOSLabel ) => {
-			if ( navigator.platform.startsWith("Mac") || navigator.platform === "iPhone" || navigator.platform === "iPad" ) {
+		( applePattern, appleOSLabel ) => {
+			if ( ( new RegExp( applePattern ) ).test( navigator.userAgent ) ) {
 				document.querySelector( '#wp-admin-bar-command-palette .ab-label kbd' ).textContent = appleOSLabel;
 			}
 		}
 	JS;
 	$script   = sprintf(
-		'( %s )( %s );',
+		'( %s )( %s, %s );',
 		$function,
+		wp_json_encode( $apple_pattern, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ),
 		wp_json_encode( $shortcut_labels['appleOS'], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES )
 	);
 	$script  .= "\n//# sourceURL=" . rawurlencode( __FUNCTION__ );
