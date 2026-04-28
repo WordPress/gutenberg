@@ -7,10 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Button, VisuallyHidden } from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 
@@ -62,9 +63,10 @@ const BlockMoverButton = forwardRef(
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
-		const normalizedClientIds = Array.isArray( clientIds )
-			? clientIds
-			: [ clientIds ];
+		const normalizedClientIds = useMemo(
+			() => ( Array.isArray( clientIds ) ? clientIds : [ clientIds ] ),
+			[ clientIds ]
+		);
 		const blocksCount = normalizedClientIds.length;
 		const isMobileViewport = useViewportMatch( 'small', '<' );
 
@@ -108,7 +110,7 @@ const BlockMoverButton = forwardRef(
 					orientation: moverOrientation || blockListOrientation,
 				};
 			},
-			[ clientIds, direction ]
+			[ direction, moverOrientation, normalizedClientIds ]
 		);
 
 		const { moveBlocksDown, moveBlocksUp } =

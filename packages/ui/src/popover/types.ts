@@ -25,16 +25,6 @@ export interface TriggerProps
 	children?: ReactNode;
 }
 
-/**
- * `Popover.Popup` maps to two Base UI elements internally: the
- * **Positioner** (outer, handles fixed positioning and z-index) and the
- * **Popup** (inner, holds content and visual styles).
- *
- * `style` and `className` are forwarded to the **Positioner** so that
- * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
- * (`--available-height`, `--available-width`) work correctly. All other
- * HTML attributes are forwarded to the inner **Popup** element.
- */
 export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick<

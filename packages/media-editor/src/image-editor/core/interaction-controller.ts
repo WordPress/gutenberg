@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { CropperAction, CropperState, Size } from './types';
+import type { CropperState, NormalizedPoint, Size } from './types';
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
 import { restrictPanZoom } from './containment';
 
@@ -51,6 +51,20 @@ export interface InteractionStatus {
 }
 
 /**
+ * State updates the interaction controller can request from its host UI.
+ */
+export interface CropperInteractionActions {
+	/** Set the image pan offset in normalized coordinates. */
+	setPan: ( pan: NormalizedPoint ) => void;
+	/** Set the zoom level. */
+	setZoom: ( zoom: number ) => void;
+	/** Set zoom and pan together for focal-point zoom. */
+	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
+	/** Snap rotate by 90 degrees. */
+	snapRotate90: ( direction: 1 | -1 ) => void;
+}
+
+/**
  * Options for creating an InteractionController.
  *
  * Scalar options (minZoom, maxZoom, etc.) are read lazily on each
@@ -60,8 +74,8 @@ export interface InteractionStatus {
 export interface InteractionControllerOptions {
 	/** Returns the current cropper state. Called on every interaction. */
 	getState: () => CropperState;
-	/** Dispatches a cropper action. */
-	dispatch: ( action: CropperAction ) => void;
+	/** State updates the interaction controller can request from its host UI. */
+	actions: CropperInteractionActions;
 	/** Returns the container dimensions in pixels. */
 	getContainerSize: () => Size;
 	/** Returns the rendered image dimensions in pixels, if available. */
@@ -307,10 +321,7 @@ export class InteractionController {
 					s.cropRect
 				);
 
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 			} );
 		};
 
@@ -397,12 +408,9 @@ export class InteractionController {
 				getImageSizeFromState( s ),
 				s.cropRect
 			);
-			this.options.dispatch( {
-				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom: newZoom, pan: clampedCrop },
-			} );
+			this.options.actions.setZoomAtPoint( newZoom, clampedCrop );
 		} else {
-			this.options.dispatch( { type: 'SET_ZOOM', payload: newZoom } );
+			this.options.actions.setZoom( newZoom );
 		}
 	}
 
@@ -626,15 +634,9 @@ export class InteractionController {
 						getImageSizeFromState( s ),
 						s.cropRect
 					);
-					this.options.dispatch( {
-						type: 'SET_ZOOM_AT_POINT',
-						payload: { zoom: newZoom, pan: clampedCrop },
-					} );
+					this.options.actions.setZoomAtPoint( newZoom, clampedCrop );
 				} else if ( newZoom !== s.zoom ) {
-					this.options.dispatch( {
-						type: 'SET_ZOOM',
-						payload: newZoom,
-					} );
+					this.options.actions.setZoom( newZoom );
 				}
 			} else if ( moveEvent.touches.length === 1 && ! touch.didPinch ) {
 				// One finger and no pinch ever detected → pan.
@@ -673,10 +675,7 @@ export class InteractionController {
 					s.cropRect
 				);
 
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 			}
 		} );
 	};
@@ -755,15 +754,9 @@ export class InteractionController {
 				getImageSizeFromState( currentState ),
 				currentState.cropRect
 			);
-			this.options.dispatch( {
-				type: 'SET_ZOOM_AT_POINT',
-				payload: { zoom: targetZoom, pan: clampedCrop },
-			} );
+			this.options.actions.setZoomAtPoint( targetZoom, clampedCrop );
 		} else {
-			this.options.dispatch( {
-				type: 'SET_ZOOM',
-				payload: targetZoom,
-			} );
+			this.options.actions.setZoom( targetZoom );
 		}
 		return true;
 	}
@@ -792,10 +785,7 @@ export class InteractionController {
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowDown': {
@@ -811,10 +801,7 @@ export class InteractionController {
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowLeft': {
@@ -830,10 +817,7 @@ export class InteractionController {
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case 'ArrowRight': {
@@ -849,10 +833,7 @@ export class InteractionController {
 					getImageSizeFromState( currentState ),
 					currentState.cropRect
 				);
-				this.options.dispatch( {
-					type: 'SET_PAN',
-					payload: newCrop,
-				} );
+				this.options.actions.setPan( newCrop );
 				break;
 			}
 			case '+':
@@ -862,10 +843,7 @@ export class InteractionController {
 					this.maxZoom,
 					Math.max( this.minZoom, currentState.zoom + 0.5 )
 				);
-				this.options.dispatch( {
-					type: 'SET_ZOOM',
-					payload: newZoom,
-				} );
+				this.options.actions.setZoom( newZoom );
 				break;
 			}
 			case '-':
@@ -875,10 +853,7 @@ export class InteractionController {
 					this.maxZoom,
 					Math.max( this.minZoom, currentState.zoom - 0.5 )
 				);
-				this.options.dispatch( {
-					type: 'SET_ZOOM',
-					payload: newZoom,
-				} );
+				this.options.actions.setZoom( newZoom );
 				break;
 			}
 			case 'r':
@@ -887,10 +862,7 @@ export class InteractionController {
 					break;
 				}
 				e.preventDefault();
-				this.options.dispatch( {
-					type: 'SNAP_ROTATE_90',
-					payload: { direction: 1 },
-				} );
+				this.options.actions.snapRotate90( 1 );
 				break;
 			}
 		}
