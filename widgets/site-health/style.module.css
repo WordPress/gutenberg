@@ -1,0 +1,44 @@
+.widget {
+	padding: 16px;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 12px;
+}
+
+.circle {
+	flex-shrink: 0;
+	width: 68px;
+	height: 68px;
+}
+
+.circle svg circle:first-child {
+	stroke: #e0e0e0;
+	stroke-width: 12;
+}
+
+.circle svg circle:last-child {
+	stroke: var(--site-health-color, #1da462);
+	stroke-width: 12;
+	stroke-linecap: round;
+	transform: rotate(-90deg);
+	transform-origin: 50% 50%;
+	transition: stroke-dashoffset 0.5s ease;
+}
+
+.percentage {
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--site-health-color, #1da462);
+}
+
+.details p {
+	margin: 0 0 8px;
+}
+
+.details p:last-child {
+	margin-bottom: 0;
+}
