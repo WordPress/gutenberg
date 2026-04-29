@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
@@ -303,23 +302,6 @@ export const prePersistPostType = async (
 				persistedRecord?.title === 'Auto Draft' )
 		) {
 			newEdits.title = '';
-		}
-	}
-
-	// Add meta for persisted CRDT document.
-	if ( persistedRecord ) {
-		const objectType = `postType/${ name }`;
-		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
-			objectType,
-			objectId
-		);
-
-		if ( serializedDoc ) {
-			newEdits.meta = {
-				...edits.meta,
-				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
-			};
 		}
 	}
 

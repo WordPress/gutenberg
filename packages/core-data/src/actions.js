@@ -25,6 +25,7 @@ import {
 	getSyncManager,
 } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './utils/crdt';
 
 function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
@@ -779,10 +780,32 @@ export const saveEntityRecord =
 							) ),
 						};
 					}
+
+					let fetchPayload = edits;
+
+					if ( persistedRecord ) {
+						const objectType = `${ kind }/${ name }`;
+						const serializedDoc =
+							await getSyncManager()?.createPersistedCRDTDoc(
+								objectType,
+								persistedRecord[ entityIdKey ]
+							);
+
+						if ( serializedDoc ) {
+							fetchPayload = {
+								...fetchPayload,
+								meta: {
+									...fetchPayload.meta,
+									[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
+										serializedDoc,
+								},
+							};
+						}
+					}
 					updatedRecord = await __unstableFetch( {
 						path,
 						method: recordId ? 'PUT' : 'POST',
-						data: edits,
+						data: fetchPayload,
 					} );
 					dispatch.receiveEntityRecords(
 						kind,
@@ -790,7 +813,7 @@ export const saveEntityRecord =
 						updatedRecord,
 						undefined,
 						true,
-						record
+						edits
 					);
 					if ( entityConfig.syncConfig ) {
 						// Use an untracked origin so that the save
