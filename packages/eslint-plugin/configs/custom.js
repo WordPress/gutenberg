@@ -16,6 +16,7 @@ module.exports = [
 			'@wordpress/no-unguarded-get-range-at': 'error',
 			'@wordpress/no-global-active-element': 'error',
 			'@wordpress/no-global-get-selection': 'error',
+			'@wordpress/no-unsafe-render-order': 'error',
 			'@wordpress/no-setting-ds-tokens': 'error',
 			'@wordpress/no-unknown-ds-tokens': 'error',
 			'@wordpress/no-unsafe-wp-apis': 'error',

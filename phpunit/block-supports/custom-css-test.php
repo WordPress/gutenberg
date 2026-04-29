@@ -438,4 +438,103 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
 	}
+
+	/**
+	 * Tests that style.css is stripped from a single block.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_removes_css_from_block() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped from block attributes.' );
+	}
+
+	/**
+	 * Tests that style.css is stripped from nested inner blocks.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_removes_css_from_inner_blocks() {
+		$content = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$inner_block = $blocks[0]['innerBlocks'][0];
+		$this->assertArrayNotHasKey( 'css', $inner_block['attrs']['style'] ?? array(), 'style.css should be stripped from inner block attributes.' );
+	}
+
+	/**
+	 * Tests that content without blocks is returned unchanged.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_returns_non_block_content_unchanged() {
+		$content = '<p>This is plain HTML content with no blocks.</p>';
+
+		$result = gutenberg_strip_custom_css_from_blocks( $content );
+
+		$this->assertSame( $content, $result, 'Non-block content should be returned unchanged.' );
+	}
+
+	/**
+	 * Tests that content without style.css attributes is returned unchanged.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_returns_unchanged_when_no_css_attributes() {
+		$content = '<!-- wp:paragraph {"style":{"color":{"text":"#ff0000"}}} --><p class="has-text-color" style="color:#ff0000">Hello</p><!-- /wp:paragraph -->';
+
+		$result = gutenberg_strip_custom_css_from_blocks( $content );
+
+		$this->assertSame( $content, $result, 'Content without style.css attributes should be returned unchanged.' );
+	}
+
+	/**
+	 * Tests that other style properties are preserved when css is stripped.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_preserves_other_style_properties() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;","color":{"text":"#ff0000"}}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'], 'style.css should be stripped.' );
+		$this->assertSame( '#ff0000', $blocks[0]['attrs']['style']['color']['text'], 'Other style properties should be preserved.' );
+	}
+
+	/**
+	 * Tests that empty style object is cleaned up after stripping css.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_cleans_up_empty_style_object() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'style', $blocks[0]['attrs'], 'Empty style object should be cleaned up after stripping css.' );
+	}
+
+	/**
+	 * Tests that slashed content is handled correctly.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_handles_slashed_content() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+		$slashed = wp_slash( $content );
+
+		$result = gutenberg_strip_custom_css_from_blocks( $slashed );
+		$blocks = parse_blocks( wp_unslash( $result ) );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped even from slashed content.' );
+	}
 }

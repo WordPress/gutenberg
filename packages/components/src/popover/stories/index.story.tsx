@@ -33,6 +33,7 @@ const AVAILABLE_PLACEMENTS: PopoverProps[ 'placement' ][] = [
 ];
 
 const meta: Meta< typeof Popover > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Popover',
 	id: 'components-popover',
 	component: Popover,

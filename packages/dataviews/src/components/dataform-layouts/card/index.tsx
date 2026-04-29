@@ -9,9 +9,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-// TODO: enable in the ESlint rule once we complete
-// https://github.com/WordPress/gutenberg/issues/76135.
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 
 /**

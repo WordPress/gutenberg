@@ -1233,6 +1233,41 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 				.getByRole( 'button', { name: 'Bold' } )
 		).toBeVisible();
 	} );
+
+	// Regression test: ArrowDown should not skip over a paragraph that contains
+	// a link. See https://github.com/WordPress/gutenberg/issues/77473.
+	test( 'should not skip paragraph with link when navigating down with ArrowDown', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<a href="#">a</a>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a' },
+		} );
+
+		// Position cursor at the start of the first paragraph.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+
+		// ArrowDown should move to the second paragraph (with the link),
+		// not skip over it to the third.
+		await page.keyboard.press( 'ArrowDown' );
+
+		// The focused element should be the second paragraph, which contains a link.
+		const focusedElement = editor.canvas.locator( ':focus' );
+		await expect( focusedElement.locator( 'a[href="#"]' ) ).toBeVisible();
+	} );
 } );
 
 class WritingFlowUtils {
