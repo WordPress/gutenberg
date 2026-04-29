@@ -3,13 +3,13 @@
  */
 import {
 	Icon,
-	__experimentalText as WCText,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { unseen } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -131,7 +131,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 		<WCBadge className="block-editor-block-visibility-info">
 			<HStack spacing={ 2 } justify="start">
 				<Icon icon={ unseen } />
-				<WCText>{ label }</WCText>
+				<Text>{ label }</Text>
 			</HStack>
 		</WCBadge>
 	);

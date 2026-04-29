@@ -76,7 +76,7 @@
 	},
 	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.js": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/border-radius-control/index.js": {
