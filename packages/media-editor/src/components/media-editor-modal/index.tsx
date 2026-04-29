@@ -74,9 +74,6 @@ const METADATA_EDIT_KEYS = [
 const NOTICES_CONTEXT = 'media-editor';
 const IMAGE_LOAD_ERROR_NOTICE_ID = 'media-editor-image-load-error';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
-const IMAGE_LOAD_ERROR_MESSAGE = __(
-	'Could not load image. Please check your connection and try again.'
-);
 const LOAD_TIMEOUT_MS = 5000;
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -308,11 +305,16 @@ function MediaEditorModalContent( {
 
 	const showImageLoadErrorNotice = useCallback(
 		() =>
-			createErrorNotice( IMAGE_LOAD_ERROR_MESSAGE, {
-				id: IMAGE_LOAD_ERROR_NOTICE_ID,
-				type: 'snackbar',
-				context: NOTICES_CONTEXT,
-			} ),
+			createErrorNotice(
+				__(
+					'Could not load image. Please check your connection and try again.'
+				),
+				{
+					id: IMAGE_LOAD_ERROR_NOTICE_ID,
+					type: 'snackbar',
+					context: NOTICES_CONTEXT,
+				}
+			),
 		[ createErrorNotice ]
 	);
 
