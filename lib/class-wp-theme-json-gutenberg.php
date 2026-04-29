@@ -612,7 +612,8 @@ class WP_Theme_JSON_Gutenberg {
 	 *              '@' for class-based states) to distinguish them from style property
 	 *              keys in theme.json.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0.0 Introduced, replacing separate VALID_ELEMENT_PSEUDO_SELECTORS,
+	 *              VALID_BLOCK_PSEUDO_SELECTORS, and VALID_BLOCK_CUSTOM_STATES constants.
 	 * @var array
 	 */
 	const STATE_GROUPS = array(
@@ -645,7 +646,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * (e.g. current_item), producing compound selectors such as
 	 * `.wp-block-navigation-item.current-menu-item:hover`.
 	 *
-	 * @since 7.0.0
+	 * @since 7.0.0 Introduced, combining data from VALID_BLOCK_PSEUDO_SELECTORS
+	 *              and VALID_BLOCK_CUSTOM_STATES into a grouped structure.
 	 * @var array
 	 */
 	const BLOCK_STATE_SUPPORT = array(
@@ -667,7 +669,10 @@ class WP_Theme_JSON_Gutenberg {
 	 * The order of pseudo-selectors should be: link, any-link, visited, hover, focus,
 	 * focus-visible, active. See https://core.trac.wordpress.org/ticket/56928.
 	 *
-	 * @since 7.0.0
+	 * @since 6.1.0 Introduced as VALID_ELEMENT_PSEUDO_SELECTORS.
+	 * @since 6.2.0 Added support for `:link` and `:any-link`.
+	 * @since 6.8.0 Added support for `:focus-visible`.
+	 * @since 7.0.0 Restructured from VALID_ELEMENT_PSEUDO_SELECTORS to use state group format.
 	 * @var array
 	 */
 	const ELEMENT_STATE_SUPPORT = array(
