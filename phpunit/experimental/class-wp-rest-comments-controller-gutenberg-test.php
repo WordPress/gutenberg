@@ -657,6 +657,92 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that creating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error rather than silently truncated.
+	 */
+	public function test_create_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that updating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error.
+	 */
+	public function test_update_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'a suggestion',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that the sanitize_callback rejects rather than truncates an
+	 * oversized payload reaching the meta layer through a non-REST path.
+	 * Truncating mid-string would corrupt the JSON.
+	 */
+	public function test_sanitize_callback_rejects_oversized_value() {
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+		update_comment_meta( $comment_id, '_wp_suggestion', $oversized );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
+	}
+
+	/**
 	 * Test that `is_suggestion_lifecycle_update` correctly rejects
 	 * request bodies that touch fields outside the suggestion-lifecycle
 	 * allowlist. We assert against the private helper via a request

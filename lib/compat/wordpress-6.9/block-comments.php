@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Maximum byte length of a `_wp_suggestion` payload. Mirrored on the client
+ * (`SUGGESTION_PAYLOAD_MAX_BYTES` in suggestion-mode/provider.js) so the
+ * editor refuses to submit anything the REST controller will reject.
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
+	define( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES', 65536 );
+}
+
+/**
  * Adds support for block comments to the built-in post types.
  *
  * @return void
@@ -54,10 +63,13 @@ function gutenberg_register_block_comment_metadata() {
 	// block, baseline revision, and proposed operations. See
 	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
 	//
-	// Maximum payload size is 64KB. Requests exceeding this are truncated by
-	// the sanitize_callback — this prevents a malicious user from flooding
-	// the meta table with arbitrarily large JSON blobs.
-	$max_suggestion_payload_bytes = 65536;
+	// Maximum payload size is enforced at three layers:
+	//   1. The REST controller rejects oversized requests with a 413 so the
+	//      client gets a clear error.
+	//   2. The schema's `maxLength` documents the bound for API consumers.
+	//   3. This sanitize_callback rejects oversized values rather than
+	//      truncating, since truncating arbitrary JSON corrupts it.
+	$max_suggestion_payload_bytes = GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES;
 
 	register_meta(
 		'comment',
@@ -76,16 +88,20 @@ function gutenberg_register_block_comment_metadata() {
 				if ( ! is_string( $value ) ) {
 					return '';
 				}
+				// Reject rather than truncate. Truncating mid-string produces
+				// invalid JSON; `parseSuggestionPayload` would then return
+				// null and the suggestion would silently disappear.
 				if ( strlen( $value ) > $max_suggestion_payload_bytes ) {
-					return substr( $value, 0, $max_suggestion_payload_bytes );
+					return '';
 				}
 				return $value;
 			},
 			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
 				// During comment creation the comment does not yet exist, so
-				// `object_id` is 0. Defer to the comment controller's own
-				// create permission — if the request can create the
-				// comment at all, it can set the suggestion meta on it.
+				// `object_id` is 0. The controller's create-permissions check
+				// is the actual gate; require `edit_posts` here as a minimum
+				// baseline so subscribers can't ever attach suggestion meta
+				// even if an upstream check is loosened in the future.
 				if ( ! $object_id ) {
 					return current_user_can( 'edit_posts' );
 				}

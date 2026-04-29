@@ -6,6 +6,8 @@ import {
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
+	payloadByteLength,
+	PAYLOAD_MAX_BYTES,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -176,6 +178,23 @@ describe( 'hasAttributeConflict', () => {
 	it( 'returns false for malformed input', () => {
 		expect( hasAttributeConflict( {}, undefined ) ).toBe( false );
 		expect( hasAttributeConflict( {}, [] ) ).toBe( false );
+	} );
+} );
+
+describe( 'payloadByteLength', () => {
+	it( 'measures ASCII payload byte length', () => {
+		// {"a":"hello"} is 13 bytes.
+		expect( payloadByteLength( { a: 'hello' } ) ).toBe( 13 );
+	} );
+
+	it( 'counts multi-byte characters by UTF-8 byte length', () => {
+		// {"a":"€"} = 8 ASCII bytes + 3 bytes for the euro sign = 11.
+		expect( payloadByteLength( { a: '€' } ) ).toBe( 11 );
+	} );
+
+	it( 'exposes a numeric size cap', () => {
+		expect( PAYLOAD_MAX_BYTES ).toBeGreaterThan( 0 );
+		expect( typeof PAYLOAD_MAX_BYTES ).toBe( 'number' );
 	} );
 } );
 

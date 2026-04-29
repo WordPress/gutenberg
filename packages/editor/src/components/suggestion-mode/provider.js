@@ -35,6 +35,33 @@ import { EDITOR_STORE_NAME } from './constants';
 const SCHEMA_VERSION = 1;
 
 /**
+ * Maximum byte length of a serialized suggestion payload. Mirrors
+ * `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in
+ * `lib/compat/wordpress-6.9/block-comments.php`. The client checks before
+ * submitting so a doomed request never leaves the browser; the REST
+ * controller is the authoritative gate.
+ */
+const PAYLOAD_MAX_BYTES = 65536;
+
+/**
+ * Byte length of a serialized payload, measured the way PHP `strlen()`
+ * counts (UTF-8 bytes, not chars).
+ *
+ * @param {SuggestionPayload} payload
+ * @return {number} UTF-8 byte length of the serialized JSON.
+ */
+function payloadByteLength( payload ) {
+	const serialized = JSON.stringify( payload );
+	if ( typeof TextEncoder !== 'undefined' ) {
+		return new TextEncoder().encode( serialized ).length;
+	}
+	// Conservative upper bound: 4 bytes per UTF-16 code unit covers all
+	// possible UTF-8 expansions. Used only in test/JSDOM environments
+	// without TextEncoder.
+	return serialized.length * 4;
+}
+
+/**
  * Build attribute-set operations by diffing an overlay entry against its
  * captured baseline. Attributes whose value differs are emitted; unchanged
  * or absent keys are skipped.
@@ -209,6 +236,17 @@ export function useSuggestionsProvider() {
 				operations,
 			} );
 
+			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
+				const error = new Error(
+					__( 'Suggestion is too large to save.' )
+				);
+				createNotice( 'error', error.message, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				throw error;
+			}
+
 			try {
 				const savedRecord = await saveEntityRecord(
 					'root',
@@ -272,6 +310,17 @@ export function useSuggestionsProvider() {
 				baseRevision: postModified,
 				operations,
 			} );
+
+			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
+				const error = new Error(
+					__( 'Suggestion is too large to save.' )
+				);
+				createNotice( 'error', error.message, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				throw error;
+			}
 
 			try {
 				return await saveEntityRecord(
@@ -445,4 +494,4 @@ export function useSuggestionsProvider() {
 	};
 }
 
-export { SCHEMA_VERSION };
+export { SCHEMA_VERSION, PAYLOAD_MAX_BYTES, payloadByteLength };
