@@ -68,22 +68,19 @@ module.exports = async function loadConfig(
 		}
 	}
 
-	// Legacy cache directory name
-	const legacyCacheDirectoryPath = path.resolve(
-		await getCacheDirectory(),
+	// Try legacy md5 cache first, fall back to descriptive name
+	const cacheDirectory = await getCacheDirectory();
+	let cacheDirectoryPath = path.resolve(
+		cacheDirectory,
 		md5( configFilePath )
 	);
 
-	// Descriptive cache directory name. Format: wp-env-<project-dir>[-<variant>]-<short-hash>
-	const descriptiveCacheDirectoryPath = path.resolve(
-		await getCacheDirectory(),
-		buildDescriptiveCacheDirectoryName( configFilePath )
-	);
-
-	// If cache doesn't exist, create with new name
-	const cacheDirectoryPath = existsSync( legacyCacheDirectoryPath )
-		? legacyCacheDirectoryPath
-		: descriptiveCacheDirectoryPath;
+	if ( ! existsSync( cacheDirectoryPath ) ) {
+		cacheDirectoryPath = path.resolve(
+			cacheDirectory,
+			buildDescriptiveCacheDirectoryName( configFilePath )
+		);
+	}
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
