@@ -54,18 +54,15 @@ test.describe( 'Suggestion mode', () => {
 		expect( serialized ).not.toContain( 'plus suggested' );
 	} );
 
-	// The overlay HOC only intercepts `setAttributes` calls the block's own
-	// `BlockEdit` receives as a prop. Heading level on web is changed via
-	// the block-switcher variation picker, which dispatches
-	// `updateBlockAttributes` directly on the block-editor store and
-	// bypasses the HOC. Capturing store-level attribute changes requires
-	// an additional interception layer in the suggestion provider and is
-	// tracked as follow-up work.
-	// eslint-disable-next-line playwright/no-skipped-test
-	test.skip( 'captures non-text attribute changes (heading level)', async ( {
+	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
 		editor,
 		page,
 	} ) => {
+		// The block-switcher dispatches `updateBlockAttributes` directly on
+		// the block-editor store, bypassing the BlockEdit `setAttributes`
+		// prop the overlay HOC intercepts. The store interceptor catches
+		// these mutations and reroutes them into the overlay so the change
+		// becomes a suggestion rather than a real edit.
 		await editor.insertBlock( {
 			name: 'core/heading',
 			attributes: { content: 'My Heading', level: 2 },
@@ -73,6 +70,23 @@ test.describe( 'Suggestion mode', () => {
 
 		await switchIntent( page, 'Suggest' );
 
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+
+		// Open the block-switcher and pick the H3 variation.
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Heading', exact: true } )
+			.click();
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+
+		// Overlay reflects the user's change in the rendered DOM.
+		await expect( heading ).toHaveAttribute( 'aria-level', '3' );
+
+		// But the serialized post still says level 2 — the interceptor
+		// reverted the underlying store and routed the change to the overlay.
 		const serialized = await editor.getEditedPostContent();
 		expect( serialized ).toContain( '<!-- wp:heading' );
 		expect( serialized ).not.toContain( '"level":3' );
