@@ -31,7 +31,9 @@ export default function FileNameView( {
 
 	return fileName.length > TRUNCATE_LENGTH ? (
 		<Tooltip text={ fileName }>
-			<Truncate>{ fileName }</Truncate>
+			<Truncate limit={ TRUNCATE_LENGTH } ellipsizeMode="tail">
+				{ fileName }
+			</Truncate>
 		</Tooltip>
 	) : (
 		<>{ fileName }</>

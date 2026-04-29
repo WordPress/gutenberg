@@ -9,15 +9,14 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useView } from '@wordpress/views';
+import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import {
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_DEFAULT_CATEGORY,
@@ -32,40 +31,13 @@ import {
 	previewField,
 	templatePartAuthorField,
 } from './fields';
-import { addQueryArgs } from '@wordpress/url';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import { Button } from '@wordpress/components';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
-const defaultLayouts = {
-	[ LAYOUT_TABLE ]: {
-		layout: {
-			styles: {
-				author: {
-					width: '1%',
-				},
-			},
-		},
-	},
-	[ LAYOUT_GRID ]: {
-		layout: {
-			badgeFields: [ 'sync-status' ],
-		},
-	},
-};
-const DEFAULT_VIEW = {
-	type: LAYOUT_GRID,
-	perPage: 20,
-	titleField: 'title',
-	mediaField: 'preview',
-	fields: [ 'sync-status' ],
-	filters: [],
-	...defaultLayouts[ LAYOUT_GRID ],
-};
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
@@ -100,11 +72,17 @@ export default function DataviewsPatterns() {
 	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();
 	const categoryId = categoryIdFromURL || PATTERN_DEFAULT_CATEGORY;
+	const { default_view: defaultView, default_layouts: defaultLayouts } =
+		useViewConfig( {
+			kind: 'postType',
+			name: postType,
+		} );
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: categoryId,
-		defaultView: DEFAULT_VIEW,
+		slug: 'default',
+		defaultView,
+		defaultLayouts,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -203,19 +181,13 @@ export default function DataviewsPatterns() {
 			<Page
 				className="edit-site-page-patterns-dataviews"
 				title={ title }
+				headingLevel={ 2 }
 				subTitle={ description }
 				actions={
-					<>
-						{ isModified && (
-							<Button
-								__next40pxDefaultSize
-								onClick={ resetToDefault }
-							>
-								{ __( 'Reset view' ) }
-							</Button>
-						) }
-						<PatternsActions />
-					</>
+					<PatternsActions
+						categoryId={ categoryId }
+						type={ postType }
+					/>
 				}
 			>
 				<DataViews
@@ -244,6 +216,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
+					onReset={ isModified ? resetToDefault : false }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

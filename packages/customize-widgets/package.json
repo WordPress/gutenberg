@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/customize-widgets",
-	"version": "5.36.0",
+	"version": "5.44.0",
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -28,12 +28,11 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
@@ -61,6 +60,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1",
 		"fast-deep-equal": "^3.1.3"

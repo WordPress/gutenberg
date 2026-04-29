@@ -29,11 +29,12 @@ function AngleCircle( {
 	className,
 	...props
 }: WordPressComponentProps< AngleCircleProps, 'div' > ) {
-	const angleCircleRef = useRef< HTMLDivElement | null >( null );
-	const angleCircleCenterRef = useRef<
-		{ x: number; y: number } | undefined
-	>();
-	const previousCursorValueRef = useRef< CSSStyleDeclaration[ 'cursor' ] >();
+	const angleCircleRef = useRef< HTMLDivElement >( null );
+	const angleCircleCenterRef = useRef< { x: number; y: number } >(
+		undefined
+	);
+	const previousCursorValueRef =
+		useRef< CSSStyleDeclaration[ 'cursor' ] >( undefined );
 
 	const setAngleCircleCenter = () => {
 		if ( angleCircleRef.current === null ) {

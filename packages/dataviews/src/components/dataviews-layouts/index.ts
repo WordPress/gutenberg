@@ -27,8 +27,8 @@ import {
 	LAYOUT_PICKER_GRID,
 	LAYOUT_PICKER_TABLE,
 } from '../../constants';
-import PreviewSizePicker from './utils/preview-size-picker';
-import DensityPicker from './table/density-picker';
+import DensityPicker from './utils/density-picker';
+import GridConfigOptions from './utils/grid-config-options';
 
 export const VIEW_LAYOUTS = [
 	{
@@ -43,13 +43,14 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Grid' ),
 		component: ViewGrid,
 		icon: category,
-		viewConfigOptions: PreviewSizePicker,
+		viewConfigOptions: GridConfigOptions,
 	},
 	{
 		type: LAYOUT_LIST,
 		label: __( 'List' ),
 		component: ViewList,
 		icon: isRTL() ? formatListBulletsRTL : formatListBullets,
+		viewConfigOptions: DensityPicker,
 	},
 	{
 		type: LAYOUT_ACTIVITY,
@@ -63,7 +64,7 @@ export const VIEW_LAYOUTS = [
 		label: __( 'Grid' ),
 		component: ViewPickerGrid,
 		icon: category,
-		viewConfigOptions: PreviewSizePicker,
+		viewConfigOptions: GridConfigOptions,
 		isPicker: true,
 	},
 	{

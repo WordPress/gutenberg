@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "5.36.0",
+	"version": "5.44.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,13 +29,12 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
@@ -45,7 +44,9 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/data": "file:../data"
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"deep-freeze": "0.0.1"

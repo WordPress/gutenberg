@@ -18,6 +18,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../store/constants';
@@ -156,6 +157,7 @@ export default function StartPageOptions() {
 			postId: getCurrentPostId(),
 			enabled:
 				choosePatternModalEnabled &&
+				ATTACHMENT_POST_TYPE !== currentPostType &&
 				TEMPLATE_POST_TYPE !== currentPostType &&
 				TEMPLATE_PART_POST_TYPE !== currentPostType,
 		};

@@ -13,10 +13,9 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalVStack as VStack,
 	DropZone,
-	FlexItem,
+	FlexBlock,
 	FocalPointPicker,
 	MenuItem,
-	VisuallyHidden,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Dropdown,
@@ -25,6 +24,7 @@ import {
 	__experimentalDropdownContentWrapper as DropdownContentWrapper,
 	Button,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
@@ -146,32 +146,23 @@ function InspectorImagePreviewItem( {
 
 	const renderPreviewContent = () => {
 		return (
-			<HStack
-				justify="flex-start"
-				as="span"
-				className="block-editor-global-styles-background-panel__inspector-preview-inner"
-			>
-				{ imgUrl && (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
-						<span
-							className="block-editor-global-styles-background-panel__inspector-image-indicator"
-							style={ {
-								backgroundImage: `url(${ imgUrl })`,
-							} }
-						/>
-					</span>
-				) }
-				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
+			<HStack className="block-editor-global-styles-background-panel__inspector-preview-inner">
+				<span
+					className="block-editor-global-styles-background-panel__inspector-image-indicator"
+					style={ {
+						backgroundImage: imgUrl
+							? `url(${ imgUrl })`
+							: undefined,
+					} }
+				/>
+				<FlexBlock>
 					<Truncate
 						numberOfLines={ 1 }
 						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
 					>
 						{ label }
 					</Truncate>
-					<VisuallyHidden as="span">
+					<VisuallyHidden render={ <span /> }>
 						{ imgUrl
 							? sprintf(
 									/* translators: %s: file name */
@@ -180,7 +171,7 @@ function InspectorImagePreviewItem( {
 							  )
 							: __( 'No background image selected' ) }
 					</VisuallyHidden>
-				</FlexItem>
+				</FlexBlock>
 			</HStack>
 		);
 	};
@@ -208,8 +199,7 @@ function BackgroundControlsPanel( {
 		return;
 	}
 
-	const imgLabel =
-		label || getFilename( imgUrl ) || __( 'Add background image' );
+	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
 
 	return (
 		<Dropdown
@@ -385,8 +375,7 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
-	const imgLabel =
-		title || getFilename( url ) || __( 'Add background image' );
+	const imgLabel = title || getFilename( url ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">

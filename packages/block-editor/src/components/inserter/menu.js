@@ -14,7 +14,8 @@ import {
 	useRef,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { VisuallyHidden, SearchControl, Popover } from '@wordpress/components';
+import { SearchControl, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDebouncedInput, useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
@@ -75,6 +76,8 @@ function InserterMenu(
 	const [ selectedMediaCategory, setSelectedMediaCategory ] =
 		useState( null );
 	const isLargeViewport = useViewportMatch( 'large' );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
 
 	function getInitialTab() {
 		if ( __experimentalInitialTab ) {
@@ -114,6 +117,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
+			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
 			window.requestAnimationFrame( () => {
@@ -128,7 +132,7 @@ function InserterMenu(
 				}
 			} );
 		},
-		[ onInsertBlocks, onSelect, shouldFocusBlock ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, ref, shouldFocusBlock ]
 	);
 
 	const onInsertPattern = useCallback(
@@ -136,8 +140,9 @@ function InserterMenu(
 			onToggleInsertionPoint( false );
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			maybeCloseInserter();
 		},
-		[ onInsertBlocks, onSelect ]
+		[ onInsertBlocks, maybeCloseInserter, onSelect, onToggleInsertionPoint ]
 	);
 
 	const onHover = useCallback(
@@ -231,7 +236,7 @@ function InserterMenu(
 				</div>
 				{ showInserterHelpPanel && (
 					<div className="block-editor-inserter__tips">
-						<VisuallyHidden as="h2">
+						<VisuallyHidden render={ <h2 /> }>
 							{ __( 'A tip for using the block editor' ) }
 						</VisuallyHidden>
 						<Tips />

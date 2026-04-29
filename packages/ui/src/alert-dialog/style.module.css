@@ -1,0 +1,30 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.error-message {
+		align-self: flex-end;
+		color: var(--wpds-color-fg-content-error);
+	}
+
+	/*
+	 * AlertDialog stacks an actions row and an optional error message in
+	 * its footer. Override the shared `.footer` row layout to a column so
+	 * both children lay out vertically while inheriting the chrome
+	 * padding + separator from `overlay-chrome.module.css`.
+	 */
+	.footer-column {
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-start;
+		gap: var(--wpds-dimension-gap-md);
+	}
+}
+
+@layer wp-ui-compositions {
+	.irreversible-action {
+		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-error-strong);
+		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-error-strong-active);
+		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-error-strong);
+		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-error-strong-active);
+	}
+}

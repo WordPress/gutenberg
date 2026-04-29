@@ -4,7 +4,7 @@
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-basecontrol--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
-`BaseControl` is a component used to generate labels and help text for components handling user inputs.
+`BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
 
 ```jsx
 import { BaseControl, useBaseControlProps } from '@wordpress/components';

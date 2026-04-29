@@ -115,6 +115,20 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 						'Affects the "name" attribute of the input element, and is used as a name for the form submission results.'
 					) }
 				/>
+				{ 'hidden' === type && (
+					<TextControl
+						__next40pxDefaultSize
+						autoComplete="off"
+						label={ __( 'Value' ) }
+						value={ value }
+						onChange={ ( newVal ) =>
+							setAttributes( { value: newVal } )
+						}
+						help={ __(
+							'Sets the stored value for this hidden field.'
+						) }
+					/>
+				) }
 			</InspectorControls>
 		</>
 	);
@@ -133,23 +147,13 @@ function InputFieldBlock( { attributes, setAttributes, className } ) {
 
 	if ( 'hidden' === type ) {
 		return (
-			<>
+			<div { ...blockProps }>
 				{ controls }
-				<input
-					type="hidden"
-					className={ clsx(
-						className,
-						'wp-block-form-input__input',
-						colorProps.className,
-						borderProps.className
-					) }
-					aria-label={ __( 'Value' ) }
-					value={ value }
-					onChange={ ( event ) =>
-						setAttributes( { value: event.target.value } )
-					}
+				<span
+					className="wp-block-form-input__label is-input-hidden"
+					data-message={ __( 'Hidden field' ) }
 				/>
-			</>
+			</div>
 		);
 	}
 

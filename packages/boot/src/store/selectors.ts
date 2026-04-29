@@ -10,3 +10,7 @@ export function getMenuItems( state: State ) {
 export function getRoutes( state: State ) {
 	return state.routes;
 }
+
+export function getDashboardLink( state: State ) {
+	return state.dashboardLink;
+}

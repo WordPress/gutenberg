@@ -578,4 +578,89 @@ describe( 'Popover', () => {
 			}
 		);
 	} );
+
+	describe( 'closing all nested popovers', () => {
+		// Test component that simulates the nested popover scenario:
+		// A parent popover (like ColorGradient dropdown) containing a trigger
+		// that opens a nested popover (like custom color picker dropdown)
+		function NestedPopoverTestComponent( {
+			onParentFocusOutside,
+			onNestedFocusOutside,
+		}: {
+			onParentFocusOutside: jest.Mock;
+			onNestedFocusOutside: jest.Mock;
+		} ) {
+			const [ isNestedOpen, setIsNestedOpen ] = useState( false );
+
+			return (
+				<>
+					<button data-testid="external-button">
+						External Button
+					</button>
+					<Popover
+						data-testid="parent-popover"
+						onFocusOutside={ onParentFocusOutside }
+						focusOnMount={ false }
+					>
+						<button
+							data-testid="parent-button"
+							onClick={ () => setIsNestedOpen( ! isNestedOpen ) }
+						>
+							Open Nested
+						</button>
+						{ isNestedOpen && (
+							<Popover
+								data-testid="nested-popover"
+								onFocusOutside={ onNestedFocusOutside }
+								focusOnMount={ false }
+							>
+								<button data-testid="nested-dummy-button">
+									Nested Dummy Button
+								</button>
+							</Popover>
+						) }
+					</Popover>
+				</>
+			);
+		}
+
+		it( 'should call parent onFocusOutside when focus moves from nested popover to external element', async () => {
+			const user = userEvent.setup();
+			const onParentFocusOutside = jest.fn();
+			const onNestedFocusOutside = jest.fn();
+
+			render(
+				<NestedPopoverTestComponent
+					onParentFocusOutside={ onParentFocusOutside }
+					onNestedFocusOutside={ onNestedFocusOutside }
+				/>
+			);
+
+			await waitFor( () => {
+				expect(
+					screen.getByTestId( 'parent-popover' )
+				).toBeInTheDocument();
+			} );
+
+			await user.click( screen.getByTestId( 'parent-button' ) );
+
+			await waitFor( () => {
+				expect(
+					screen.getByTestId( 'nested-popover' )
+				).toBeInTheDocument();
+			} );
+
+			await user.click( screen.getByTestId( 'nested-dummy-button' ) );
+
+			await user.click( screen.getByTestId( 'external-button' ) );
+
+			await waitFor( () => {
+				expect( onNestedFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+
+			await waitFor( () => {
+				expect( onParentFocusOutside ).toHaveBeenCalledTimes( 1 );
+			} );
+		} );
+	} );
 } );

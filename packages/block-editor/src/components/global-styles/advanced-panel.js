@@ -14,10 +14,26 @@ import { __ } from '@wordpress/i18n';
  */
 import { default as transformStyles } from '../../utils/transform-styles';
 
+/**
+ * Validates that a CSS string doesn't contain HTML markup.
+ * Uses the same validation as the PHP/global styles REST API.
+ *
+ * @param {string} css The CSS string to validate.
+ * @return {boolean} True if the CSS is valid, false otherwise.
+ */
+export function validateCSS( css ) {
+	// Check for HTML markup.
+	if ( typeof css === 'string' && /<\/?\w/.test( css ) ) {
+		return false;
+	}
+	return true;
+}
+
 export default function AdvancedPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	help,
 } ) {
 	// Custom CSS
 	const [ cssError, setCSSError ] = useState( null );
@@ -27,30 +43,32 @@ export default function AdvancedPanel( {
 			...value,
 			css: newValue,
 		} );
-		if ( cssError ) {
-			// Check if the new value is valid CSS, and pass a wrapping selector
-			// to ensure that `transformStyles` validates the CSS. Note that the
-			// wrapping selector here is not used in the actual output of any styles.
-			const [ transformed ] = transformStyles(
-				[ { css: newValue } ],
-				'.for-validation-only'
+
+		// Validate immediately on change for quick feedback.
+		if ( ! validateCSS( newValue ) ) {
+			setCSSError(
+				__( 'The custom CSS is invalid. Do not use <> markup.' )
 			);
-			if ( transformed ) {
-				setCSSError( null );
-			}
-		}
-	}
-	function handleOnBlur( event ) {
-		if ( ! event?.target?.value ) {
-			setCSSError( null );
 			return;
 		}
 
-		// Check if the new value is valid CSS, and pass a wrapping selector
-		// to ensure that `transformStyles` validates the CSS. Note that the
-		// wrapping selector here is not used in the actual output of any styles.
+		// Clear HTML markup error if CSS is now valid.
+		if ( cssError ) {
+			setCSSError( null );
+		}
+	}
+	function handleOnBlur( event ) {
+		const cssValue = event?.target?.value;
+
+		if ( ! cssValue || ! validateCSS( cssValue ) ) {
+			return;
+		}
+
+		// Check if the value is valid CSS structure on blur (more expensive check).
+		// Pass a wrapping selector to ensure that `transformStyles` validates the CSS.
+		// Note that the wrapping selector here is not used in the actual output of any styles.
 		const [ transformed ] = transformStyles(
-			[ { css: event.target.value } ],
+			[ { css: cssValue } ],
 			'.for-validation-only'
 		);
 
@@ -75,6 +93,7 @@ export default function AdvancedPanel( {
 				onBlur={ handleOnBlur }
 				className="block-editor-global-styles-advanced-panel__custom-css-input"
 				spellCheck={ false }
+				help={ help }
 			/>
 		</VStack>
 	);

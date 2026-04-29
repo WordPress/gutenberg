@@ -453,3 +453,79 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 		hasBlockSpotlight,
 	};
 }
+
+/**
+ * Opens the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function openListViewContentPanel() {
+	return {
+		type: 'OPEN_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Closes the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function closeListViewContentPanel() {
+	return {
+		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Returns an action object used to open the viewport modal
+ * for the given client IDs.
+ *
+ * @param {string[]} clientIds Client IDs of blocks to configure viewport settings for.
+ * @return {Object} Action object.
+ */
+export function showViewportModal( clientIds ) {
+	return {
+		type: 'SHOW_VIEWPORT_MODAL',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object used to close the viewport modal.
+ *
+ * @return {Object} Action object.
+ */
+export function hideViewportModal() {
+	return {
+		type: 'HIDE_VIEWPORT_MODAL',
+	};
+}
+
+/**
+ * Requests to open a specific inspector tab, optionally with additional options.
+ * This action signals intent to switch to a particular tab in the block inspector.
+ *
+ * @param {string} tabName             The name of the tab to open (e.g., 'list-view', 'settings', 'styles').
+ * @param {Object} [options]           Optional configuration.
+ * @param {string} [options.openPanel] Client ID of a specific panel to open (for tabs that support panels).
+ *
+ * @return {Object} Action object.
+ */
+export function requestInspectorTab( tabName, options = {} ) {
+	return {
+		type: 'REQUEST_INSPECTOR_TAB',
+		tabName,
+		options,
+	};
+}
+
+/**
+ * Clears the requested inspector tab state after it has been handled.
+ *
+ * @return {Object} Action object.
+ */
+export function clearRequestedInspectorTab() {
+	return {
+		type: 'CLEAR_REQUESTED_INSPECTOR_TAB',
+	};
+}

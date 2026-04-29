@@ -132,9 +132,57 @@ Files to copy with optional PHP transformations:
 }
 ```
 
+### `wpWorkers`
+
+Worker bundle definitions for packages that need self-contained Web Worker files.
+Workers are bundled with all dependencies included and can be loaded via Blob URLs.
+
+**String shorthand** — entry path only:
+
+```json
+{
+	"wpWorkers": {
+		"./worker": "./src/worker.ts"
+	}
+}
+```
+
+**Object format** — entry path with module resolve redirects:
+
+```json
+{
+	"wpWorkers": {
+		"./worker": {
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"vips-es6.js": "vips.js"
+			}
+		}
+	}
+}
+```
+
+The `resolve` map redirects module loads during bundling. Keys are filename
+patterns to match; values are replacement filenames in the same directory.
+This is useful when a dependency's ES module entry point uses `import.meta.url`,
+which fails in Blob URL Worker contexts. By redirecting to an alternative
+entry point (e.g., a CommonJS version), the issue is avoided.
+
 ## Root Configuration
 
 Configure your root `package.json` with a `wpPlugin` object to control global namespace and externalization behavior:
+
+### `wpPlugin.name`
+
+Name used to prefix genereated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
+
+```json
+{
+	"wpPlugin": {
+		"name": "myPlugin"
+	}
+}
+```
 
 ### `wpPlugin.scriptGlobal`
 
@@ -248,14 +296,16 @@ WP-Admin mode integrates within the standard WordPress admin interface (keeping 
 
 ```php
 add_submenu_page(
-	'themes.php',                              // Parent menu
-	__( 'My Page', 'my-plugin' ),             // Page title
-	__( 'My Page', 'my-plugin' ),             // Menu title
-	'edit_theme_options',                      // Capability
-	'my-admin-page-wp-admin',                  // Menu slug (simple)
-	'my_admin_page_wp_admin_render_page'       // Callback from generated PHP
+	'themes.php',                                      // Parent menu
+	__( 'My Page', 'my-plugin' ),                     // Page title
+	__( 'My Page', 'my-plugin' ),                     // Menu title
+	'edit_theme_options',                              // Capability
+	'my-admin-page-wp-admin',                          // Menu slug (simple)
+	'my_plugin_my_admin_page_wp_admin_render_page'     // Callback from generated PHP (prefixed)
 );
 ```
+
+Note: The callback function name is prefixed with your plugin name (from `wpPlugin.name` in root `package.json`). For example, if your plugin name is `my-plugin`, the function will be `my_plugin_my_admin_page_wp_admin_render_page`.
 
 The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
 
@@ -274,7 +324,7 @@ When the page loads, the JavaScript boot system reads the `p` parameter and navi
 Full-page mode takes over the entire admin screen with a custom sidebar:
 
 ```php
-add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
+add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_plugin_my_admin_page_render_page', 'icon', 20 );
 ```
 
 **Init Modules:**
@@ -337,6 +387,7 @@ This configuration:
 ```json
 {
 	"wpPlugin": {
+		"name": "acme",
 		"scriptGlobal": "acme",
 		"packageNamespace": "acme"
 	}
@@ -364,7 +415,7 @@ The built tool generates several files in the `build/` directory, but the primar
 Make sure to include the generated PHP file in your plugin file.
 
 ```php
-require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
+require_once plugin_dir_path( __FILE__ ) . 'build/build.php';
 ```
 
 ## Routes (Experimental)
@@ -470,7 +521,7 @@ The `canvas()` function controls which canvas is rendered:
 The build system generates:
 - `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
 - `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
-- `build/routes/index.php` - Route registry data
+- `build/routes/registry.php` - Route registry data
 - `build/routes.php` - Route registration logic
 
 The boot package in Gutenberg will automatically use these routes and make them available.

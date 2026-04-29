@@ -15,7 +15,7 @@ import {
 	pin,
 	link,
 } from '@wordpress/icons';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import { Button, __experimentalText as WCText } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -484,7 +484,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="sm" justify="start" align="center">
 				<Icon icon={ category } />
 				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>
@@ -554,9 +554,9 @@ export const orderEventActions: Action< OrderEvent >[] = [
 				closeModal?.();
 			};
 			return (
-				<Stack direction="column" gap="lg">
-					<Text>{ label }</Text>
-					<Stack direction="row" gap="xs" justify="right">
+				<Stack direction="column" gap="xl">
+					<WCText>{ label }</WCText>
+					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -580,6 +580,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 
 const LayoutActivityComponent = ( {
 	backgroundColor,
+	fullWidth = false,
 	hasClickableItems = true,
 	groupBy = true,
 	groupByLabel = true,
@@ -587,6 +588,7 @@ const LayoutActivityComponent = ( {
 	showMedia = true,
 }: {
 	backgroundColor?: string;
+	fullWidth?: boolean;
 	hasClickableItems?: boolean;
 	groupBy?: boolean;
 	groupByLabel?: boolean;
@@ -638,11 +640,11 @@ const LayoutActivityComponent = ( {
 
 	return (
 		<div
-			style={
-				{
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				maxWidth: fullWidth ? undefined : '400px',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }

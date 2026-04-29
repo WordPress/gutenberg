@@ -234,7 +234,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should add a disabled prop to the button', () => {
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeDisabled();
@@ -522,7 +521,6 @@ describe( 'Button', () => {
 
 		it( 'should become a button again when disabled is supplied', () => {
 			// @ts-expect-error - a button should not have `href`
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button href="https://wordpress.org/" disabled /> );
 
 			expect( screen.getByRole( 'button' ) ).toBeVisible();
@@ -618,7 +616,6 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should not break when the legacy __experimentalIsFocusable prop is passed', () => {
-			// eslint-disable-next-line no-restricted-syntax
 			render( <Button disabled __experimentalIsFocusable /> );
 			const button = screen.getByRole( 'button' );
 
@@ -633,10 +630,8 @@ describe( 'Button', () => {
 			{ /* @ts-expect-error - `target` requires `href` */ }
 			<Button target="foo" />
 
-			{ /* eslint-disable no-restricted-syntax */ }
 			{ /* @ts-expect-error - `disabled` is only for buttons */ }
 			<Button href="foo" disabled />
-			{ /* eslint-enable no-restricted-syntax */ }
 
 			<Button href="foo" type="image/png" />
 			{ /* @ts-expect-error - if button, type must be submit/reset/button */ }

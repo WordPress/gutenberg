@@ -117,7 +117,7 @@ The CSS class to apply to the wrapper element.
 
 -   Required: No
 
-###### `icon`: `JSX.Element`
+###### `icon`: `React.JSX.Element`
 
 An icon to be shown next to the title.
 

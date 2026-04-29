@@ -86,7 +86,7 @@ function PatternList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_block',
-		slug: type,
+		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -258,31 +258,22 @@ function PatternList() {
 	return (
 		<Page
 			title={ __( 'Patterns' ) }
+			headingLevel={ 2 }
 			subTitle={ __(
 				'Reusable design elements for your site. Create once, use everywhere.'
 			) }
 			className="pattern-page"
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item && canCreateRecord && (
-						<Button
-							variant="primary"
-							onClick={ () => setShowPatternModal( true ) }
-							size="compact"
-						>
-							{ labels.add_new_item }
-						</Button>
-					) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord && (
+					<Button
+						variant="primary"
+						onClick={ () => setShowPatternModal( true ) }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -320,6 +311,7 @@ function PatternList() {
 				} }
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

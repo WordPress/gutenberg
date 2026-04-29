@@ -1,7 +1,7 @@
 {
 	"wpds-elevation": {
 		"$type": "shadow",
-		"x-small": {
+		"xs": {
 			"$value": [
 				{
 					"color": {
@@ -50,7 +50,7 @@
 			],
 			"$description": "For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame."
 		},
-		"small": {
+		"sm": {
 			"$value": [
 				{
 					"color": {
@@ -99,7 +99,7 @@
 			],
 			"$description": "For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar."
 		},
-		"medium": {
+		"md": {
 			"$value": [
 				{
 					"color": {
@@ -148,7 +148,7 @@
 			],
 			"$description": "For components that offer additional actions. Example: Menus, Command Palette"
 		},
-		"large": {
+		"lg": {
 			"$value": [
 				{
 					"color": {

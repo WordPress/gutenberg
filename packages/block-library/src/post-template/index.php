@@ -48,11 +48,11 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination = isset( $block->context['enhancedPagination'] ) && $block->context['enhancedPagination'];
+	$enhanced_pagination = (bool) ( $block->context['enhancedPagination'] ?? false );
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	// Use global query if needed.
-	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
+	$use_global_query = (bool) ( $block->context['query']['inherit'] ?? false );
 	if ( $use_global_query ) {
 		global $wp_query;
 
@@ -93,6 +93,9 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	// Ensure backwards compatibility by flagging the number of columns via classname when using grid layout.
 	if ( isset( $attributes['layout']['type'] ) && 'grid' === $attributes['layout']['type'] && ! empty( $attributes['layout']['columnCount'] ) ) {
 		$classnames .= ' ' . sanitize_title( 'columns-' . $attributes['layout']['columnCount'] );
+	}
+	if ( isset( $attributes['layout']['type'] ) && 'grid' === $attributes['layout']['type'] && ! empty( $attributes['layout']['columnCount'] ) && ! empty( $attributes['layout']['minimumColumnWidth'] ) ) {
+		$classnames .= ' has-native-responsive-grid';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );

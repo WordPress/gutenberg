@@ -68,3 +68,4 @@ const UnforwardedValidatedCustomSelectControl = (
 export const ValidatedCustomSelectControl = forwardRef(
 	UnforwardedValidatedCustomSelectControl
 );
+ValidatedCustomSelectControl.displayName = 'ValidatedCustomSelectControl';

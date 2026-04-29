@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-// @ts-expect-error: Not typed yet.
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -14,6 +13,10 @@ import {
 	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	setStyle as setStyleHelper,
+	setSetting as setSettingHelper,
+} from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 /**
@@ -27,7 +30,9 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 import { useStyle, useSetting } from './hooks';
+import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
+import { getValidStates } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -95,19 +100,35 @@ interface ScreenBlockProps {
 }
 
 function ScreenBlock( { name, variation }: ScreenBlockProps ) {
+	const { user: userConfig, onChange: onChangeGlobalStyles } =
+		useContext( GlobalStylesContext );
+
 	let prefixParts: string[] = [];
 	if ( variation ) {
 		prefixParts = [ 'variations', variation ].concat( prefixParts );
 	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useStyle(
+	// State selector state
+	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
+	const validStates = useMemo( () => getValidStates( name ), [ name ] );
+
+	const stateParam = selectedState !== 'default' ? selectedState : undefined;
+	const [ style, setStyle ] = useStyle(
+		prefix,
+		name,
+		'user',
+		false,
+		stateParam
+	);
+	const [ inheritedStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
-		false
+		false,
+		stateParam
 	);
+
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
 	const settingsForBlockElement = useSettingsForBlockElement(
@@ -234,6 +255,34 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 			} );
 		}
 	};
+
+	const onChangeTypography = ( newStyle: any ) => {
+		// Extract settings if present (e.g., from textIndent toggle)
+		const { settings: newSettings, ...styleWithoutSettings } = newStyle;
+
+		// If there are settings changes, we need to update both styles and
+		// settings atomically to avoid race conditions.
+		if ( newSettings?.typography ) {
+			let updatedConfig = setStyleHelper(
+				userConfig,
+				prefix,
+				styleWithoutSettings,
+				name
+			);
+			updatedConfig = setSettingHelper(
+				updatedConfig,
+				'typography',
+				{
+					...userSettings.typography,
+					...newSettings.typography,
+				},
+				name
+			);
+			onChangeGlobalStyles( updatedConfig );
+		} else {
+			setStyle( styleWithoutSettings );
+		}
+	};
 	const onChangeBorders = ( newStyle: any ) => {
 		if ( ! newStyle?.border ) {
 			setStyle( newStyle );
@@ -274,10 +323,18 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		<>
 			<ScreenHeader
 				title={
-					variation ? currentBlockStyle?.label : blockType?.title
+					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
+				states={ validStates }
+				selectedState={ selectedState }
+				onChangeState={ setSelectedState }
 			/>
-			<BlockPreviewPanel name={ name } variation={ variation } />
+			<BlockPreviewPanel
+				name={ name }
+				variation={ variation }
+				selectedState={ selectedState }
+				stateStyles={ selectedState !== 'default' ? style : undefined }
+			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
 					<VStack spacing={ 3 }>
@@ -307,7 +364,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ setStyle }
+					onChange={ onChangeTypography }
 					settings={ settings }
 					isGlobalStyles
 				/>
@@ -348,19 +405,17 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 
 			{ canEditCSS && (
 				<PanelBody title={ __( 'Advanced' ) } initialOpen={ false }>
-					<p>
-						{ sprintf(
-							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
-							__(
-								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
-							),
-							blockType?.title
-						) }
-					</p>
 					<StylesAdvancedPanel
 						value={ style }
 						onChange={ setStyle }
 						inheritedValue={ inheritedStyle }
+						help={ sprintf(
+							// translators: %s: is the name of a block e.g., 'Image' or 'Table'.
+							__(
+								'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
+							),
+							blockType?.title!
+						) }
 					/>
 				</PanelBody>
 			) }

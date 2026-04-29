@@ -34,6 +34,7 @@ export default function ValidatedText< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	type,
 	prefix,
 	suffix,
@@ -42,6 +43,7 @@ export default function ValidatedText< Item >( {
 	const { label, placeholder, description, getValue, setValue, isValid } =
 		field;
 	const value = getValue( { item: data } );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback(
 		( newValue: string ) =>
@@ -57,6 +59,7 @@ export default function ValidatedText< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }
@@ -67,6 +70,7 @@ export default function ValidatedText< Item >( {
 			type={ type }
 			prefix={ prefix }
 			suffix={ suffix }
+			disabled={ disabled }
 			pattern={ isValid.pattern ? isValid.pattern.constraint : undefined }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined

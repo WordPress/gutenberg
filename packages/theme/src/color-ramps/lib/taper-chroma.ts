@@ -55,10 +55,10 @@ export function taperChroma(
 	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
 
 	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
-	let hSeed = Number( get( seed, [ OKLCH, 'h' ] ) );
+	let hSeed = get( seed, [ OKLCH, 'h' ] );
 
 	const chromaIsTiny = cSeed < achromaEpsilon;
-	const hueIsInvalid = ! Number.isFinite( hSeed );
+	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
 
 	if ( chromaIsTiny || hueIsInvalid ) {
 		if ( typeof options.hueFallback === 'number' ) {

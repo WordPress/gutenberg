@@ -22,16 +22,18 @@ import type { UnstableBase } from '@wordpress/core-data';
  * Internal dependencies
  */
 import SiteIconLink from '../site-icon-link';
+import { store as bootStore } from '../../store';
 import './style.scss';
 
 function SiteHub() {
-	const { homeUrl, siteTitle } = useSelect( ( select ) => {
+	const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 		const { getEntityRecord } = select( coreStore );
 		const _base = getEntityRecord< UnstableBase >(
 			'root',
 			'__unstableBase'
 		);
 		return {
+			dashboardLink: select( bootStore ).getDashboardLink(),
 			homeUrl: _base?.home,
 			siteTitle:
 				! _base?.name && !! _base?.url
@@ -43,7 +45,10 @@ function SiteHub() {
 
 	return (
 		<div className="boot-site-hub">
-			<SiteIconLink to="/" aria-label={ __( 'Go to the Dashboard' ) } />
+			<SiteIconLink
+				to={ dashboardLink || '/' }
+				aria-label={ __( 'Go to the Dashboard' ) }
+			/>
 			<ExternalLink
 				href={ homeUrl ?? '/' }
 				className="boot-site-hub__title"

@@ -5,7 +5,7 @@ import type {
 	CSSProperties,
 	FocusEventHandler,
 	MouseEventHandler,
-	MutableRefObject,
+	RefObject,
 } from 'react';
 
 /**
@@ -267,7 +267,7 @@ export type ThumbProps = {
 export type TooltipProps = {
 	show?: boolean;
 	placement?: string;
-	inputRef?: MutableRefObject< HTMLElement | undefined >;
+	inputRef?: RefObject< HTMLElement | null >;
 	tooltipPlacement?: string;
 	value?: ControlledRangeValue;
 	renderTooltipContent?: (

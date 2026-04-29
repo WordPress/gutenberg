@@ -19,7 +19,7 @@ import { useGlobalStyles } from './hooks';
  * @param {Object}   props                  Component props.
  * @param {boolean}  props.hideWelcomeGuide Whether to hide the Welcome Guide option.
  * @param {Function} props.onChangePath     Callback for navigation to different paths (e.g., '/css').
- * @return {JSX.Element} The Global Styles Action Menu component.
+ * @return {React.JSX.Element} The Global Styles Action Menu component.
  */
 export function GlobalStylesActionMenu( {
 	hideWelcomeGuide = false,

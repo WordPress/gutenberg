@@ -350,7 +350,10 @@ export function ColorEdit( {
 			}
 		>
 			{ enableContrastChecking && (
-				<BlockColorContrastChecker clientId={ clientId } />
+				<BlockColorContrastChecker
+					clientId={ clientId }
+					name={ name }
+				/>
 			) }
 		</StylesColorPanel>
 	);

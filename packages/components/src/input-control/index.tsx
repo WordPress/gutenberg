@@ -138,5 +138,6 @@ export function UnforwardedInputControl(
  * ```
  */
 export const InputControl = forwardRef( UnforwardedInputControl );
+InputControl.displayName = 'InputControl';
 
 export default InputControl;

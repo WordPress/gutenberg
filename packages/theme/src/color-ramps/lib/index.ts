@@ -5,7 +5,6 @@ import {
 	clone,
 	get,
 	OKLCH,
-	parse,
 	set,
 	type ColorTypes,
 	type PlainColorObject,
@@ -222,7 +221,7 @@ export function buildRamp(
 ): RampResult {
 	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( parse( seedArg ) );
+		seed = clampToGamut( seedArg );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${

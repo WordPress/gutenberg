@@ -67,8 +67,12 @@ export async function visitSiteEditor(
 
 		try {
 			// Wait for the canvas loader to appear first, so that the locator that
-			// waits for the hidden state doesn't resolve prematurely.
-			await canvasLoader.waitFor( { state: 'visible', timeout: 60_000 } );
+			// waits for the hidden state doesn't resolve prematurely. The loader
+			// either renders within a tick or it is skipped entirely (when the
+			// editor finishes resolving inside the artificial-delay window in
+			// `useIsSiteEditorLoading`), so a long visible-state timeout is just
+			// wasted wall clock when the loader never shows up.
+			await canvasLoader.waitFor( { state: 'visible', timeout: 3_000 } );
 			await canvasLoader.waitFor( {
 				state: 'hidden',
 				// Bigger timeout is needed for larger entities, like the Large Post
@@ -76,7 +80,7 @@ export async function visitSiteEditor(
 				// doesn't make it under the default timeout value.
 				timeout: 60_000,
 			} );
-		} catch ( error ) {
+		} catch {
 			// If the canvas loader is already disappeared, skip the waiting.
 			await this.page
 				.getByRole( 'region', { name: 'Editor content' } )

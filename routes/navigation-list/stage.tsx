@@ -66,7 +66,7 @@ function NavigationList() {
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
-		slug: 'all',
+		slug: 'default-new',
 		defaultView,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
@@ -131,27 +131,17 @@ function NavigationList() {
 		<>
 			<Page
 				title={ __( 'Navigation' ) }
+				headingLevel={ 2 }
 				className="navigation-page"
 				hasPadding={ false }
 				actions={
-					<>
-						{ isModified && (
-							<Button
-								variant="tertiary"
-								size="compact"
-								onClick={ resetToDefault }
-							>
-								{ __( 'Reset view' ) }
-							</Button>
-						) }
-						<Button
-							variant="primary"
-							size="compact"
-							onClick={ () => setShowAddModal( true ) }
-						>
-							{ __( 'Add New' ) }
-						</Button>
-					</>
+					<Button
+						variant="primary"
+						size="compact"
+						onClick={ () => setShowAddModal( true ) }
+					>
+						{ __( 'Add New' ) }
+					</Button>
 				}
 			>
 				<DataViews
@@ -166,10 +156,11 @@ function NavigationList() {
 						totalPages,
 					} }
 					defaultLayouts={ {
-						list: {},
+						list: true,
 					} }
 					getItemId={ getItemId }
 					selection={ selection }
+					onReset={ isModified ? resetToDefault : false }
 					onChangeSelection={ ( items: string[] ) => {
 						navigate( {
 							search: {

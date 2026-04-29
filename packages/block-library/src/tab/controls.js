@@ -1,65 +1,19 @@
 /**
  * WordPress dependencies
  */
-import {
-	InspectorControls,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
+import { BlockControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import AddTabToolbarControl from './add-tab-toolbar-control';
-import slugFromLabel from './slug-from-label';
+import AddTabToolbarControl from '../tab-panel/add-tab-toolbar-control';
+import RemoveTabToolbarControl from '../tab-panel/remove-tab-toolbar-control';
 
-export default function Controls( {
-	attributes,
-	setAttributes,
-	tabsClientId,
-	blockIndex,
-	isDefaultTab,
-} ) {
-	const { label } = attributes;
-
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-
+export default function Controls( { tabsClientId } ) {
 	return (
-		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-				attributes={ attributes }
-			/>
-			<InspectorControls>
-				<PanelBody title={ __( 'Tab Settings' ) }>
-					<TextControl
-						label={ __( 'Tab Label' ) }
-						value={ decodeEntities( label ) }
-						onChange={ ( value ) => {
-							setAttributes( {
-								label: value,
-								anchor: slugFromLabel( value, blockIndex ),
-							} );
-						} }
-						__next40pxDefaultSize
-					/>
-					<ToggleControl
-						label={ __( 'Default Tab' ) }
-						checked={ isDefaultTab }
-						onChange={ ( value ) => {
-							updateBlockAttributes( tabsClientId, {
-								activeTabIndex: value ? blockIndex : 0,
-							} );
-						} }
-						help={ __(
-							'If toggled, this tab will be selected when the page loads.'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		</>
+		<BlockControls>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
+		</BlockControls>
 	);
 }

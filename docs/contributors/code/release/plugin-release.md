@@ -46,15 +46,17 @@ For urgent fixes after RC1 or critical bug fixes between major releases:
 
 -   For new RCs: Use PRs labeled `Backport to Gutenberg RC`
 -   For minor releases: Use PRs labeled `Backport to Gutenberg Minor Release`
+-   **Note:** You must be a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) or work with one to cherry-pick to release branches
 -   Checkout the appropriate release branch: `git checkout release/X.Y`
--   Run: `npm run other:cherry-pick "[Label Name]"`
+-   Run: `npm run other:cherry-pick "[Label Name]"` (or request a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) to run it)
 -   Reassign PRs to correct milestone (e.g., from `12.6` to `12.5`) **before** running the workflow
 
 #### Run Release Workflow
 
 -   Go to [Build Plugin Zip workflow](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml)
--   Select the release branch from `Use workflow from` dropdown
--   Continue with the steps 2-4 above
+-   Select `trunk` if no RC exists for the next version, otherwise select the release branch from `Use workflow from` dropdown
+-   Type `stable` in the text input field
+-   Continue with steps 2-4 from the general release process above
 
 ---
 
@@ -203,7 +205,9 @@ There are a couple of ways you might be made aware of these bugs as a release ma
 The cherry-picking process can be automated with the `npm run other:cherry-pick "[Insert Label]"` script, which is included in Gutenberg. You will need to use the label `Backport to Gutenberg RC` when running the command and ensure all PRs that need cherry-picking have the label assigned.
 
 <div class="callout callout-warning">
-To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> have the necessary permissions to perform this action.</div>
+To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams"><strong>Gutenberg Core</strong> team</a> have the necessary permissions to push directly to release branches.</div>
+
+#### For "Gutenberg Core" members with push access
 
 Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch:
 
@@ -228,6 +232,38 @@ Behind the scenes, the script will:
 Here is a screenshot of the process:
 
 ![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
+
+#### Alternative process for contributors who are not members of the "Gutenberg Core" team
+
+If you don't have write access to push directly to release branches, you can use this alternative approach **from your fork**:
+
+1. Ensure you have a fork of the Gutenberg repository and add the upstream remote:
+   ```
+   git remote add upstream https://github.com/WordPress/gutenberg.git
+   git fetch upstream
+   ```
+
+2. Create a new branch based on the upstream release branch:
+   ```
+   git checkout -b backport-fixes-X.Y.Z upstream/release/X.Y
+   ```
+
+3. Manually cherry-pick each PR commit (in chronological order):
+   ```
+   git cherry-pick [SHA]
+   ```
+   (The automated script won't work from a fork as it requires push access to the main repository)
+
+4. Push your branch to your fork:
+   ```
+   git push origin backport-fixes-X.Y.Z
+   ```
+
+5. Create a pull request from your fork targeting the `release/X.Y` branch in the main repository and request review from a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team
+
+6. Once approved and merged, coordinate with a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team or release lead to continue the release process
+
+Alternatively, you can ask a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team to run the cherry-pick command for you in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
 
 #### Manual cherry-picking
 
@@ -391,13 +427,23 @@ Once you have the stable release branch in order and the correct Milestone assig
 
 ![Run workflow dropdown for the plugin release](https://developer.wordpress.org/files/2023/07/image-1.png)
 
-Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). You should now _carefully_ choose the next action based on information about the current Plugin release version:
+Go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml).
 
-_If_ the previous release version was **stable** (`X.Y.Z` - e.g. `12.5.0`, `12.5.1` .etc) leave the `Use workflow from` field as `trunk` and then specify `stable` in the text input field. The workflow will automatically create a minor release, with z incremented (`x.y.(z+1)`) as required.
+**Important:** The branch you select in the "Use workflow from" dropdown determines which release branch the workflow will use to create the minor release.
 
-_If_ however, the previous release was an **RC** (e.g. `X.Y.0-rc.1`) you will need to _manually_ select the _stable version's release branch_ (e.g. `12.5.0`) when creating the release. Failure to do this will cause the workflow to release the next major _stable_ version (e.g. `12.6.0`) which is not what you want.
+#### When to select `trunk`:
 
-To do this, when running the Workflow, select the appropriate `release/` branch from the `Use workflow from` dropdown (e.g. `release/12.5`) and specify `stable` in the text input field.
+If the **previous release was stable** (e.g., `12.5.0`, `12.5.1`) and **no RC exists for the next major version** (e.g., no `12.6.0-rc.1`):
+- Leave `Use workflow from` as `Branch: trunk`
+- Type `stable` in the text input field
+- The workflow will automatically increment the patch version (e.g., `12.5.1` → `12.5.2`)
+
+#### When to select the release branch:
+
+If **an RC already exists for the next major version** (e.g., `12.6.0-rc.1` exists and you need to release `12.5.1`):
+- Select the stable release branch from the `Use workflow from` dropdown (e.g., `release/12.5`)
+- Type `stable` in the text input field
+- Failure to do this will cause the workflow to release the next major stable version instead of a minor release
 
 #### Creating a minor release for previous stable releases
 

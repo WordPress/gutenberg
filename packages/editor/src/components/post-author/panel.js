@@ -30,7 +30,6 @@ function PostAuthorToggle( { isOpen, onClick } ) {
 	return (
 		<Button
 			size="compact"
-			className="editor-post-author__panel-toggle"
 			variant="tertiary"
 			aria-expanded={ isOpen }
 			aria-label={

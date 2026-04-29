@@ -46,3 +46,4 @@ const UnforwardedValidatedTextControl = (
 export const ValidatedTextControl = forwardRef(
 	UnforwardedValidatedTextControl
 );
+ValidatedTextControl.displayName = 'ValidatedTextControl';

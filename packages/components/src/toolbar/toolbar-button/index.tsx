@@ -132,4 +132,5 @@ function UnforwardedToolbarButton(
  * ```
  */
 export const ToolbarButton = forwardRef( UnforwardedToolbarButton );
+ToolbarButton.displayName = 'ToolbarButton';
 export default ToolbarButton;

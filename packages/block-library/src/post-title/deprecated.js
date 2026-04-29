@@ -2,6 +2,91 @@
  * Internal dependencies
  */
 import migrateFontFamily from '../utils/migrate-font-family';
+import migrateTextAlign from '../utils/migrate-text-align';
+
+const v2 = {
+	attributes: {
+		textAlign: {
+			type: 'string',
+		},
+		level: {
+			type: 'number',
+			default: 2,
+		},
+		levelOptions: {
+			type: 'array',
+		},
+		isLink: {
+			type: 'boolean',
+			default: false,
+		},
+		rel: {
+			type: 'string',
+			attribute: 'rel',
+			default: '',
+		},
+		linkTarget: {
+			type: 'string',
+			default: '_self',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'wide', 'full' ],
+		html: false,
+		color: {
+			gradients: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+				link: true,
+			},
+		},
+		spacing: {
+			padding: true,
+			margin: true,
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalFontStyle: true,
+			__experimentalFontWeight: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+		__experimentalBorder: {
+			radius: true,
+			color: true,
+			width: true,
+			style: true,
+			__experimentalDefaultControls: {
+				radius: true,
+				color: true,
+				width: true,
+				style: true,
+			},
+		},
+	},
+	migrate: migrateTextAlign,
+	isEligible( attributes ) {
+		return (
+			!! attributes.textAlign ||
+			!! attributes.className?.match(
+				/\bhas-text-align-(left|center|right)\b/
+			)
+		);
+	},
+	save: () => null,
+};
 
 const v1 = {
 	attributes: {
@@ -62,4 +147,4 @@ const v1 = {
  *
  * See block-deprecation.md
  */
-export default [ v1 ];
+export default [ v2, v1 ];

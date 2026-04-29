@@ -10,8 +10,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { addQueryArgs } from '@wordpress/url';
 import { useEvent } from '@wordpress/compose';
-import { useView } from '@wordpress/views';
-import { Button } from '@wordpress/components';
+import { useView, useViewConfig } from '@wordpress/views';
 
 /**
  * Internal dependencies
@@ -21,7 +20,6 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import { authorField, descriptionField, previewField } from './fields';
-import { defaultLayouts, getDefaultView } from './view-utils';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -29,17 +27,28 @@ const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 export default function PageTemplates() {
 	const { path, query } = useLocation();
-	const { activeView = 'active', postId } = query;
+	const { activeView = 'all', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
 
-	const defaultView = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const {
+		default_view: defaultView,
+		default_layouts: defaultLayouts,
+		view_list: viewList,
+	} = useViewConfig( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+	} );
+	const activeViewOverrides = useMemo(
+		() => viewList?.find( ( v ) => v.slug === activeView )?.view ?? {},
+		[ viewList, activeView ]
+	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
-		slug: activeView,
+		slug: 'default',
 		defaultView,
+		activeViewOverrides,
+		defaultLayouts,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -116,33 +125,19 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	return (
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			headingLevel={ 2 }
+			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
 				key={ activeView }
@@ -160,6 +155,14 @@ export default function PageTemplates() {
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
 		</Page>
 	);

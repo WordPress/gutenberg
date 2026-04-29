@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import {
 } from '@wordpress/blocks';
 import {
 	__experimentalItem as Item,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 	privateApis as componentsPrivateApis,
@@ -50,10 +50,15 @@ export default function BlockBindingsAttributeControl( {
 				getBlockType,
 			} = unlock( select( blocksStore ) );
 
-			const _attributeType =
-				getBlockType( blockName ).attributes?.[ attribute ]?.type;
+			const _attribute =
+				getBlockType( blockName ).attributes?.[ attribute ];
+
+			if ( _attribute?.enum ) {
+				return {};
+			}
+
 			const attributeType =
-				_attributeType === 'rich-text' ? 'string' : _attributeType;
+				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
 
 			const sourceFields = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
@@ -137,14 +142,14 @@ export default function BlockBindingsAttributeControl( {
 						className="block-editor-bindings__item"
 						spacing={ 0 }
 					>
-						<Text truncate>{ attribute }</Text>
-						<Text
+						<WCText truncate>{ attribute }</WCText>
+						<WCText
 							truncate
 							variant={ isValid ? 'muted' : undefined }
 							isDestructive={ ! isValid }
 						>
 							{ displayText }
-						</Text>
+						</WCText>
 					</VStack>
 				</Menu.TriggerButton>
 				{ ! isAttributeReadOnly && (

@@ -57,6 +57,7 @@
 			"fontSize": true,
 			"lineHeight": true,
 			"textAlign": true,
+			"textColumns": true,
 			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextDecoration": true,
@@ -79,7 +80,7 @@
 	"selectors": {
 		"root": "p",
 		"typography": {
-			"textIndent": "p + p"
+			"textIndent": ".wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
 	"editorStyle": "wp-block-paragraph-editor",

@@ -437,6 +437,9 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 		 *
 		 * @since Gutenberg 5.8.0
 		 *
+		 * @global WP_Scripts $wp_scripts WordPress scripts objects.
+		 * @global WP_Styles  $wp_styles  WordPress styles objects.
+		 *
 		 * @param array $html_templates Optional. Array of HTML template strings.
 		 * @return array Structured asset data.
 		 */
@@ -456,7 +459,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 
 			// Get boot module asset file for dependencies.
 			$boot_asset_file   = include __DIR__ . '/../../build/modules/boot/index.min.asset.php';
-			$boot_dependencies = isset( $boot_asset_file['dependencies'] ) ? $boot_asset_file['dependencies'] : array();
+			$boot_dependencies = $boot_asset_file['dependencies'] ?? array();
 
 			// Get all dependencies that should be excluded (boot dependencies + their deep dependencies).
 			$excluded_scripts = $this->get_all_dependencies( $boot_dependencies, $wp_scripts );

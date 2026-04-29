@@ -34,7 +34,7 @@ if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 
 /**
  * Registers the Registered Templates Parts REST API routes.
- * The template activation experiement does not, however, register the routes for the wp_template_part post type,
+ * The template activation experiment does not, however, register the routes for the wp_template_part post type,
  * so we need to register the routes for that post type here.
  * See: lib/compat/wordpress-7.0/template-activate.php
  *
@@ -49,26 +49,31 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Registers the 'overlay' template part area when the experiment is enabled.
+ * Registers the 'navigation-overlay' template part area.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
-if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	function gutenberg_register_overlay_template_part_area( $areas ) {
-
-		$areas[] = array(
-			'area'        => 'overlay',
-			'label'       => __( 'Overlay', 'gutenberg' ),
-			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
-			'icon'        => 'overlay',
-			'area_tag'    => 'div',
-		);
-
-		return $areas;
+function gutenberg_register_overlay_template_part_area( $areas ) {
+	foreach ( $areas as $area ) {
+		if ( isset( $area['area'] ) && 'navigation-overlay' === $area['area'] ) {
+			return $areas;
+		}
 	}
-	add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
+
+	$areas[] = array(
+		'area'        => 'navigation-overlay',
+		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
+		'description' => __(
+			'The Navigation Overlay template defines an overlay area that typically contains navigation links and can be toggled open and closed.'
+		),
+		'icon'        => 'navigation-overlay',
+		'area_tag'    => 'div',
+	);
+
+	return $areas;
 }
+add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
 
 /**
  * Adds user global styles link relation to all theme responses.
@@ -111,3 +116,45 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 	return $response;
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );
+
+/**
+ * Overrides the default REST controller for autosaves to fix real-time
+ * collaboration on draft posts.
+ *
+ * When RTC is enabled, draft autosaves from all users update the post directly
+ * instead of creating per-user autosave revisions depending on post lock and
+ * assigned author.
+ *
+ * Only overrides when autosave_rest_controller_class is not explicitly set,
+ * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
+ * with their own specialized autosave controller (e.g. templates) are left alone.
+ */
+function gutenberg_override_autosaves_rest_controller( $args ) {
+	if ( empty( $args['autosave_rest_controller_class'] ) ) {
+		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
+	}
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
+
+/**
+ * Overrides the default REST controller for revisions to support nested
+ * _fields parameters (e.g. content.raw without content.rendered).
+ *
+ * The core WP_REST_Revisions_Controller uses in_array() checks for content,
+ * title, excerpt, and guid fields, which prevents sub-field filtering via
+ * the _fields parameter. The Gutenberg override uses rest_is_field_included()
+ * so that clients can avoid expensive server-side rendering when only raw
+ * data is needed.
+ *
+ * Only overrides when revisions_rest_controller_class is not explicitly set.
+ */
+function gutenberg_override_revisions_rest_controller( $args ) {
+	if ( empty( $args['revisions_rest_controller_class'] ) ) {
+		$args['revisions_rest_controller_class'] = 'Gutenberg_REST_Revisions_Controller';
+	}
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_override_revisions_rest_controller', 10, 1 );

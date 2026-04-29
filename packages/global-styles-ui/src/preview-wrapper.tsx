@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -98,7 +103,9 @@ function PreviewWrapper( {
 			</div>
 			{ isReady && (
 				<div
-					className="global-styles-ui-preview__wrapper"
+					className={ clsx( 'global-styles-ui-preview__wrapper', {
+						'is-hoverable': withHoverView,
+					} ) }
 					style={ {
 						height: normalizedHeight * ratio,
 					} }
@@ -111,7 +118,6 @@ function PreviewWrapper( {
 							height: normalizedHeight * ratio,
 							width: '100%',
 							background: gradientValue ?? backgroundColor,
-							cursor: withHoverView ? 'pointer' : undefined,
 						} }
 						initial="start"
 						animate={

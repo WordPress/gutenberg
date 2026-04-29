@@ -1,17 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
-export default function Save( { attributes } ) {
-	const { anchor } = attributes;
+export default function save() {
+	const blockProps = useBlockProps.save( {
+		type: 'button',
+		role: 'tab',
+	} );
 
-	const tabPanelId = anchor;
-
-	// eslint-disable-next-line react-compiler/react-compiler
-	const blockProps = useBlockProps.save();
-	// eslint-disable-next-line react-compiler/react-compiler
-	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
-
-	return <section { ...innerBlocksProps } id={ tabPanelId } />;
+	return <button { ...blockProps } />;
 }

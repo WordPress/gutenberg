@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import {
 	Button,
 	Icon,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
@@ -32,7 +32,7 @@ import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 function OptionalParentSelectButton( { children, onClick } ) {
 	if ( ! onClick ) {
@@ -113,10 +113,10 @@ function BlockCard( {
 			const { getBlockParents, getBlockName } =
 				select( blockEditorStore );
 
-			// Find the closest parent block that is either:
+			// Find the top-most parent block that is either:
 			// 1. A navigation block (special case for ad-hoc list view support)
 			// 2. Any block with listView support
-			const parents = getBlockParents( clientId, true );
+			const parents = getBlockParents( clientId, false );
 			const foundParentId = parents.find( ( parentId ) => {
 				const parentName = getBlockName( parentId );
 				return (
@@ -197,7 +197,7 @@ function BlockCard( {
 								{ ! parentClientId &&
 									! isChild &&
 									!! name?.length && (
-										<Badge>{ title }</Badge>
+										<WCBadge>{ title }</WCBadge>
 									) }
 							</TitleElement>
 							{ children }
@@ -205,9 +205,9 @@ function BlockCard( {
 					</OptionalParentSelectButton>
 				</HStack>
 				{ ! parentClientId && ! isChild && description && (
-					<Text className="block-editor-block-card__description">
+					<WCText className="block-editor-block-card__description">
 						{ description }
-					</Text>
+					</WCText>
 				) }
 			</VStack>
 		</div>

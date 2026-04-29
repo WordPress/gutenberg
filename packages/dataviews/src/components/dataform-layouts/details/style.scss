@@ -1,5 +1,10 @@
 @use "@wordpress/base-styles/variables" as *;
 
+.dataforms-layouts-details__summary-content {
+	display: inline-flex;
+	min-height: $grid-unit-30;
+}
+
 .dataforms-layouts-details__content {
 	padding-top: $grid-unit-15;
 }

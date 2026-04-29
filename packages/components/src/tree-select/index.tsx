@@ -99,6 +99,8 @@ export function TreeSelect( props: TreeSelectProps ) {
 	} );
 
 	return (
+		// Disable reason: the parent component already takes case of the `__next40pxDefaultSize` prop.
+		// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 		<SelectControl
 			__shouldNotWarnDeprecated36pxSize
 			{ ...{ label, options, onChange } }

@@ -137,5 +137,6 @@ function UnforwardedSearchControl(
  * ```
  */
 export const SearchControl = forwardRef( UnforwardedSearchControl );
+SearchControl.displayName = 'SearchControl';
 
 export default SearchControl;

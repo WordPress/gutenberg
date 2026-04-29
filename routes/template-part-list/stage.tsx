@@ -24,7 +24,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 
 /**
@@ -32,9 +31,9 @@ import { CreateTemplatePartModal } from '@wordpress/fields';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
-	DEFAULT_LAYOUTS,
 	viewToQuery,
 } from './view-utils';
 import { previewField } from './fields/preview';
@@ -78,9 +77,12 @@ function TemplatePartList() {
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
 
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject, area );
-	}, [ postTypeObject, area ] );
+	const defaultView = DEFAULT_VIEW;
+
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( area ),
+		[ area ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -99,8 +101,9 @@ function TemplatePartList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template_part',
-		slug: area,
+		slug: 'default-new',
 		defaultView,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -246,29 +249,20 @@ function TemplatePartList() {
 	return (
 		<Page
 			title={ postTypeObject.labels?.name }
+			headingLevel={ 2 }
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item && canCreateRecord && (
-						<Button
-							variant="primary"
-							onClick={ () => setShowTemplatePartModal( true ) }
-							size="compact"
-						>
-							{ labels.add_new_item }
-						</Button>
-					) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord && (
+					<Button
+						variant="primary"
+						onClick={ () => setShowTemplatePartModal( true ) }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -304,9 +298,9 @@ function TemplatePartList() {
 					totalItems,
 					totalPages,
 				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Notice,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -370,7 +371,13 @@ export default function TypographyPanel( {
 	// Text Indent
 	const hasTextIndentControl = useHasTextIndentControl( settings );
 	const textIndent = decodeValue( inheritedValue?.typography?.textIndent );
-	const setTextIndent = ( newValue ) => {
+
+	// Get the setting value - can be 'subsequent' (default), 'all', or false.
+	// The setting determines which CSS selector is used for the text-indent style.
+	const textIndentSetting = settings?.typography?.textIndent ?? 'subsequent';
+	const isTextIndentAll = textIndentSetting === 'all';
+
+	const setTextIndentValue = ( newValue ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -379,8 +386,29 @@ export default function TypographyPanel( {
 			)
 		);
 	};
+
+	const onToggleTextIndentAll = ( newValue ) => {
+		// Toggle between 'all' and 'subsequent' for the setting.
+		// Include the settings change so it can be handled atomically by the parent.
+		onChange( {
+			...value,
+			settings: {
+				typography: {
+					textIndent: newValue ? 'all' : 'subsequent',
+				},
+			},
+		} );
+	};
+
 	const hasTextIndent = () => !! value?.typography?.textIndent;
-	const resetTextIndent = () => setTextIndent( undefined );
+	const resetTextIndent = () => {
+		onChange(
+			setImmutably( value, [ 'typography', 'textIndent' ], undefined )
+		);
+	};
+	const textIndentHelp = isTextIndentAll
+		? __( 'Indents the first line of all paragraphs.' )
+		: __( 'Indents the first line of each paragraph after the first one.' );
 
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
@@ -577,18 +605,20 @@ export default function TypographyPanel( {
 				>
 					<TextIndentControl
 						value={ textIndent }
-						onChange={ setTextIndent }
+						onChange={ setTextIndentValue }
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
-						help={
-							isGlobalStyles
-								? __(
-										'Indents the first line of each paragraph after the first one.'
-								  )
-								: __( 'Indents the first line of text.' )
-						}
+						hasBottomMargin={ isGlobalStyles }
 					/>
+					{ isGlobalStyles && (
+						<ToggleControl
+							label={ __( 'Indent all paragraphs' ) }
+							checked={ isTextIndentAll }
+							onChange={ onToggleTextIndentAll }
+							help={ textIndentHelp }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ hasTextColumnsControl && (

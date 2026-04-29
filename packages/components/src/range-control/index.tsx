@@ -122,7 +122,7 @@ function UnforwardedRangeControl(
 	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
 	const [ isFocused, setIsFocused ] = useState( false );
 
-	const inputRef = useRef< HTMLInputElement >();
+	const inputRef = useRef< HTMLInputElement >( null );
 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 	const isThumbFocused = ! disabled && isFocused;
 
@@ -405,5 +405,6 @@ function UnforwardedRangeControl(
  * ```
  */
 export const RangeControl = forwardRef( UnforwardedRangeControl );
+RangeControl.displayName = 'RangeControl';
 
 export default RangeControl;

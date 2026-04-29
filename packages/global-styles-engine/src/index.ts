@@ -16,6 +16,7 @@ export {
 	transformToStyles as toStyles,
 	getBlockSelectors,
 	getLayoutStyles,
+	processCSSNesting,
 } from './core/render';
 export { getBlockSelector } from './core/selectors';
 
@@ -30,3 +31,5 @@ export {
 
 // Types
 export type * from './types';
+
+export { generatePreviewStateStyles as __unstableGeneratePreviewStateStyles } from './preview-state-styles';

@@ -9,12 +9,30 @@ import { _x } from '@wordpress/i18n';
  *
  * If it is already a File object, it is returned unchanged.
  *
+ * Handles cross-realm File objects (e.g., from iframes) that have a `name`
+ * property but fail `instanceof File` checks because the File constructor
+ * differs between browsing contexts.
+ *
  * @param fileOrBlob Blob object.
  * @return File object.
  */
 export function convertBlobToFile( fileOrBlob: Blob | File ): File {
 	if ( fileOrBlob instanceof File ) {
 		return fileOrBlob;
+	}
+
+	// Handle cross-realm File objects (e.g., from iframes where the block
+	// editor canvas renders). These objects have a `name` property but fail
+	// the `instanceof File` check because each browsing context has its own
+	// File constructor.
+	if (
+		'name' in fileOrBlob &&
+		typeof ( fileOrBlob as File ).name === 'string'
+	) {
+		return new File( [ fileOrBlob ], ( fileOrBlob as File ).name, {
+			type: fileOrBlob.type,
+			lastModified: ( fileOrBlob as File ).lastModified,
+		} );
 	}
 
 	// Extension is only an approximation.

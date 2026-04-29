@@ -6,69 +6,133 @@
  */
 class WP_Block_Supports_Anchor_Test extends WP_UnitTestCase {
 	/**
-	 * @var string|null
+	 * @var string
 	 */
-	private $test_block_name;
-
-	public function set_up() {
-		parent::set_up();
-		$this->test_block_name = null;
-	}
+	const TEST_BLOCK_NAME = 'test/anchor-block';
 
 	public function tear_down() {
-		unregister_block_type( $this->test_block_name );
-		$this->test_block_name = null;
+		unregister_block_type( self::TEST_BLOCK_NAME );
 		parent::tear_down();
 	}
 
 	/**
-	 * Registers a new block for testing anchor support.
+	 * Tests that anchor block support attribute registration works as expected.
 	 *
-	 * @param string $block_name Name for the test block.
-	 * @param array  $supports   Array defining block support configuration.
+	 * @covers ::gutenberg_register_anchor_support
 	 *
-	 * @return WP_Block_Type The block type for the newly registered test block.
+	 * @dataProvider data_gutenberg_register_anchor_support
+	 *
+	 * @param bool                                      $support  Anchor block support configuration.
+	 * @param array<string, array<string, string>>|null $value    Attributes array for the block.
+	 * @param array<string, array<string, string>>      $expected Expected attributes for the block.
 	 */
-	private function register_anchor_block_with_support( $block_name, $supports = array() ) {
-		$this->test_block_name = $block_name;
+	public function test_gutenberg_register_anchor_support( bool $support, ?array $value, array $expected ) {
 		register_block_type(
-			$this->test_block_name,
+			self::TEST_BLOCK_NAME,
 			array(
 				'api_version' => 3,
-				'supports'    => $supports,
+				'supports'    => array( 'anchor' => $support ),
+				'attributes'  => $value,
 			)
 		);
-		$registry = WP_Block_Type_Registry::get_instance();
-
-		return $registry->get_registered( $this->test_block_name );
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( self::TEST_BLOCK_NAME );
+		$this->assertInstanceOf( WP_Block_Type::class, $block_type );
+		gutenberg_register_anchor_support( $block_type );
+		$actual = $block_type->attributes;
+		$this->assertIsArray( $actual );
+		$expected = array_merge( WP_Block_Type::GLOBAL_ATTRIBUTES, $expected );
+		$this->assertSameSetsWithIndex( $expected, $actual );
 	}
 
 	/**
-	 * Tests that anchor block support works as expected.
+	 * Tests that anchor block support is applied as expected.
 	 *
-	 * @dataProvider data_anchor_block_support
+	 * @covers ::gutenberg_apply_anchor_support
 	 *
-	 * @param boolean|array $support Anchor block support configuration.
-	 * @param string        $value   Anchor value for attribute object.
-	 * @param array         $expected Expected anchor block support output.
+	 * @dataProvider data_gutenberg_apply_anchor_support
+	 *
+	 * @param bool                                 $support  Anchor block support configuration.
+	 * @param mixed                                $value    Anchor value for attribute object.
+	 * @param array<string, array<string, string>> $expected Expected anchor block support output.
 	 */
-	public function test_gutenberg_apply_anchor_support( $support, $value, $expected ) {
-		$block_type  = self::register_anchor_block_with_support(
-			'test/anchor-block',
-			array( 'anchor' => $support )
+	public function test_gutenberg_apply_anchor_support( bool $support, $value, array $expected ) {
+		register_block_type(
+			self::TEST_BLOCK_NAME,
+			array(
+				'api_version' => 3,
+				'supports'    => array( 'anchor' => $support ),
+			)
 		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( self::TEST_BLOCK_NAME );
+		$this->assertInstanceOf( WP_Block_Type::class, $block_type );
 		$block_attrs = array( 'anchor' => $value );
 		$actual      = gutenberg_apply_anchor_support( $block_type, $block_attrs );
-
 		$this->assertSame( $expected, $actual );
 	}
 
 	/**
-	 * Data provider.
+	 * Data provider for test_gutenberg_register_anchor_support().
 	 *
-	 * @return array
+	 * @return array<string, array<string, mixed>>
 	 */
-	public function data_anchor_block_support() {
+	public function data_gutenberg_register_anchor_support(): array {
+		return array(
+			'anchor attribute is registered when block supports anchor' => array(
+				'support'  => true,
+				'value'    => null,
+				'expected' => array(
+					'anchor' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'anchor attribute is not registered when block does not support anchor' => array(
+				'support'  => false,
+				'value'    => null,
+				'expected' => array(),
+			),
+			'anchor attribute is added to existing attributes' => array(
+				'support'  => true,
+				'value'    => array(
+					'foo' => array(
+						'type' => 'string',
+					),
+				),
+				'expected' => array(
+					'foo'    => array(
+						'type' => 'string',
+					),
+					'anchor' => array(
+						'type' => 'string',
+					),
+				),
+			),
+			'existing anchor attribute is not overwritten' => array(
+				'support'  => true,
+				'value'    => array(
+					'anchor' => array(
+						'type'    => 'string',
+						'default' => 'default-anchor',
+					),
+				),
+				'expected' => array(
+					'anchor' => array(
+						'type'    => 'string',
+						'default' => 'default-anchor',
+					),
+				),
+			),
+		);
+	}
+
+	/**
+	 * Data provider for test_gutenberg_apply_anchor_support().
+	 *
+	 * @return array<string, array<string, mixed>>
+	 */
+	public function data_gutenberg_apply_anchor_support(): array {
 		return array(
 			'anchor id attribute is applied'          => array(
 				'support'  => true,
