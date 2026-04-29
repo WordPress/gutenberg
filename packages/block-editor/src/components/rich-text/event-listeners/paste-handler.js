@@ -8,6 +8,7 @@ import { isURL } from '@wordpress/url';
 /**
  * Internal dependencies
  */
+import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
 
@@ -25,6 +26,7 @@ export default ( props ) => ( element ) => {
 			__unstableEmbedURLOnPaste,
 			preserveWhiteSpace,
 			pastePlainText,
+			registry,
 		} = props.current;
 
 		// The event listener is attached to the window, so we need to check if
@@ -116,11 +118,23 @@ export default ( props ) => ( element ) => {
 
 		if ( typeof content === 'string' ) {
 			pasteInline( content );
-		} else if ( content.length > 0 ) {
-			if ( onReplace && isEmpty( value ) ) {
-				onReplace( content, content.length - 1, -1 );
-			}
+			return;
 		}
+
+		if ( ! content.length || ! onReplace || ! isEmpty( value ) ) {
+			return;
+		}
+
+		// Record an intermediate paragraph-with-URL state so a single undo
+		// after the URL → block transformation restores the pasted link.
+		if ( mode === 'BLOCKS' ) {
+			pasteInline( html );
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkLastChangeAsPersistent();
+		}
+
+		onReplace( content, content.length - 1, -1 );
 	}
 
 	const { defaultView } = element.ownerDocument;

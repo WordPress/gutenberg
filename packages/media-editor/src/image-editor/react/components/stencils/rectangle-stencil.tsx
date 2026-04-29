@@ -128,6 +128,7 @@ export function RectangleStencil( {
 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const keyboardResizeActiveRef = useRef( false );
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -135,6 +136,7 @@ export function RectangleStencil( {
 	useEffect( () => {
 		return () => {
 			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		};
 	}, [] );
 
@@ -281,6 +283,11 @@ export function RectangleStencil( {
 			el.addEventListener( 'lostpointercapture', onEnd );
 
 			onResizeStart?.();
+			// Cancel any pending keyboard settle so it can't fire onResizeEnd
+			// mid-drag if the user switches from keyboard to pointer within
+			// the settle window.
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		},
 		[ cropRect, onResizeStart ]
 	);
@@ -377,6 +384,19 @@ export function RectangleStencil( {
 			event.preventDefault();
 			event.stopPropagation();
 
+			if ( ! keyboardResizeActiveRef.current ) {
+				keyboardResizeActiveRef.current = true;
+				onResizeStart?.();
+			}
+
+			const scheduleKeyboardResizeEnd = () => {
+				clearTimeout( keyboardSettleTimerRef.current );
+				keyboardSettleTimerRef.current = setTimeout( () => {
+					keyboardResizeActiveRef.current = false;
+					onResizeEnd?.();
+				}, KEYBOARD_SETTLE_DELAY );
+			};
+
 			const step = event.shiftKey ? KEYBOARD_STEP_SHIFT : KEYBOARD_STEP;
 
 			// Determine the normalized delta from the arrow key.
@@ -409,10 +429,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeLockedRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			} else {
 				// For freeform resize, synthesize a drag via computeFreeRect.
 				const syntheticDrag: ResizeDragState = {
@@ -426,10 +443,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeFreeRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			}
 		},
 		[
@@ -440,6 +454,7 @@ export function RectangleStencil( {
 			computeLockedRect,
 			computeFreeRect,
 			onCropChange,
+			onResizeStart,
 			onResizeEnd,
 			onEscape,
 		]

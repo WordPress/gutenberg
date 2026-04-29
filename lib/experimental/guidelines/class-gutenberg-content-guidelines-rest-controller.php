@@ -1,10 +1,12 @@
 <?php
 /**
- * Guidelines REST API Controller.
+ * Content Guidelines REST API Controller.
  *
- * Extends WP_REST_Posts_Controller to inherit standard WordPress CRUD behavior,
- * permission checks, and response formatting. Follows the pattern used by
- * WP_REST_Global_Styles_Controller.
+ * Specialized controller for the site-wide "content" guideline singleton.
+ * Exposes a flat `/wp/v2/content-guidelines` endpoint that always reads,
+ * creates, and updates a single post tagged with the `content` term in
+ * the `wp_guideline_type` taxonomy. Other guideline posts (artifacts) are
+ * served by the standard `/wp/v2/guidelines` collection.
  *
  * @package gutenberg
  */
@@ -14,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Guidelines.
+ * REST API controller for the site-wide content guidelines singleton.
  */
-class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
+class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Maximum length for guideline text strings.
@@ -33,14 +35,49 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	const MAX_LABEL_LENGTH = 200;
 
 	/**
+	 * REST base for the singleton route.
+	 *
+	 * @var string
+	 */
+	const REST_BASE = 'content-guidelines';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		parent::__construct( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+		$this->rest_base = self::REST_BASE;
 	}
 
 	/**
-	 * Registers the routes for guidelines.
+	 * Resolves a post ID to a content-typed guideline post.
+	 *
+	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
+	 * `content` term. Other guideline types are addressable only via the
+	 * standard /wp/v2/guidelines collection.
+	 *
+	 * @param int $id Post ID.
+	 * @return WP_Post|WP_Error Post object on success, WP_Error on failure.
+	 */
+	protected function get_post( $id ) {
+		$post = parent::get_post( $id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $post->ID ) ) {
+			return new WP_Error(
+				'rest_post_invalid_id',
+				__( 'Invalid post ID.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $post;
+	}
+
+	/**
+	 * Registers the routes for the content guidelines singleton.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
 	 * collection route with a singleton GET endpoint.
@@ -106,7 +143,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_guidelines_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	public function get_guidelines_permissions_check( WP_REST_Request $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
@@ -120,6 +157,63 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Restricts guideline creation to administrators.
+	 *
+	 * Defers to the parent controller for per-post checks (status validation,
+	 * sticky support, etc.) once the admin gate passes.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_create',
+				__( 'Sorry, you are not allowed to create guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::create_item_permissions_check( $request );
+	}
+
+	/**
+	 * Restricts guideline updates to administrators.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_edit',
+				__( 'Sorry, you are not allowed to edit guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::update_item_permissions_check( $request );
+	}
+
+	/**
+	 * Restricts guideline deletion to administrators.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'Sorry, you are not allowed to delete guidelines.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::delete_item_permissions_check( $request );
+	}
+
+	/**
 	 * Gets the singleton guidelines.
 	 *
 	 * Supports query parameters:
@@ -130,7 +224,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response Response object.
 	 */
-	public function get_guidelines( $request ) {
+	public function get_guidelines( WP_REST_Request $request ) {
 		$status_filter = $request->get_param( 'status' );
 		$post          = $this->get_guidelines_post( $status_filter );
 
@@ -149,9 +243,10 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Creates guidelines.
+	 * Creates the content guidelines singleton.
 	 *
-	 * Enforces singleton pattern — only one guidelines post per site.
+	 * Enforces the singleton constraint — only one post tagged with the
+	 * `content` term may exist.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
@@ -208,7 +303,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Updates guidelines.
+	 * Updates the content guidelines singleton.
 	 *
 	 * Saves guideline categories to meta before updating the post so that
 	 * the revision captures the updated meta values.
@@ -397,7 +492,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param int   $post_id    Post ID.
 	 * @param array $categories Sanitized guideline categories.
 	 */
-	protected function save_guideline_categories_to_meta( $post_id, $categories ) {
+	protected function save_guideline_categories_to_meta( int $post_id, array $categories ): void {
 		// Save standard categories.
 		foreach ( Gutenberg_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
 			if ( isset( $categories[ $category ] ) ) {
@@ -428,7 +523,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param mixed $categories Raw guideline categories from the request.
 	 * @return array Sanitized guideline categories.
 	 */
-	protected function sanitize_guideline_categories( $categories ) {
+	protected function sanitize_guideline_categories( $categories ): array {
 		if ( ! is_array( $categories ) ) {
 			return array();
 		}
@@ -459,7 +554,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param array $category Raw category data.
 	 * @return array Sanitized category data.
 	 */
-	private function sanitize_standard_category( $category ) {
+	private function sanitize_standard_category( array $category ): array {
 		$sanitized = array_intersect_key( $category, array_flip( array( 'label', 'guidelines' ) ) );
 
 		foreach ( $sanitized as $key => &$value ) {
@@ -480,7 +575,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	 * @param array $blocks Raw blocks category data.
 	 * @return array Sanitized blocks category data.
 	 */
-	private function sanitize_blocks_category( $blocks ) {
+	private function sanitize_blocks_category( array $blocks ): array {
 		$sanitized = array();
 
 		foreach ( $blocks as $block_name => $block_data ) {
@@ -511,12 +606,12 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Gets the single guidelines post.
+	 * Gets the single content guidelines post.
 	 *
 	 * @param string|null $status_filter Optional. Filter by status ('publish' or 'draft').
 	 * @return WP_Post|null The guidelines post or null if not found.
 	 */
-	protected function get_guidelines_post( $status_filter = null ) {
+	protected function get_guidelines_post( ?string $status_filter = null ): ?WP_Post {
 		$post_status = array( 'publish', 'draft' );
 
 		if ( $status_filter ) {
@@ -556,7 +651,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'guidelines',
+			'title'      => 'content-guidelines',
 			'type'       => 'object',
 			'properties' => array(
 				'id'                   => array(

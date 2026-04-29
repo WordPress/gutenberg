@@ -256,6 +256,7 @@ export const generalForm: Form = {
 		'slug',
 		'description',
 		'object_type',
+		'public',
 		'hierarchical',
 		'status',
 	],

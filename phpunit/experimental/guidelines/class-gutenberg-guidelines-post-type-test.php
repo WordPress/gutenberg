@@ -65,12 +65,11 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Regression test: the taxonomy must not be registered with `default_term`.
-	 *
-	 * Using `default_term` triggers cross-site `clean_term_cache` work on
-	 * multisite installs and is the root cause this fix addresses.
+	 * The taxonomy is intentionally registered without `default_term`.
+	 * Fallback is assigned in save_post. See
+	 * https://github.com/WordPress/gutenberg/pull/77592.
 	 */
-	public function test_taxonomy_does_not_use_default_term() {
+	public function test_taxonomy_registered_without_default_term() {
 		$taxonomy = get_taxonomy( Gutenberg_Guidelines_Post_Type::TAXONOMY );
 
 		$this->assertNotFalse( $taxonomy );
@@ -78,9 +77,32 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A post inserted without an explicit type gets the artifact fallback.
+	 * The post type maps generated guideline primitive caps back to the core
+	 * post caps used by built-in roles.
 	 */
-	public function test_artifact_assigned_when_no_term_set() {
+	public function test_post_type_uses_core_primitive_capabilities() {
+		$post_type = get_post_type_object( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+
+		$this->assertNotFalse( $post_type );
+		$this->assertSame( 'edit_posts', $post_type->cap->read );
+		$this->assertSame( 'publish_posts', $post_type->cap->create_posts );
+		$this->assertSame( 'edit_posts', $post_type->cap->edit_posts );
+		$this->assertSame( 'publish_posts', $post_type->cap->publish_posts );
+		$this->assertSame( 'read_private_posts', $post_type->cap->read_private_posts );
+		$this->assertSame( 'edit_private_posts', $post_type->cap->edit_private_posts );
+		$this->assertSame( 'edit_published_posts', $post_type->cap->edit_published_posts );
+		$this->assertSame( 'delete_private_posts', $post_type->cap->delete_private_posts );
+		$this->assertSame( 'delete_published_posts', $post_type->cap->delete_published_posts );
+		$this->assertSame( 'delete_posts', $post_type->cap->delete_posts );
+		$this->assertSame( 'edit_others_posts', $post_type->cap->edit_others_posts );
+		$this->assertSame( 'delete_others_posts', $post_type->cap->delete_others_posts );
+	}
+
+	/**
+	 * A guideline saved without a type term should get 'artifact' assigned by
+	 * the save_post hook (replacement for default_term).
+	 */
+	public function test_save_post_assigns_artifact_fallback() {
 		$post_id = wp_insert_post(
 			array(
 				'post_type'   => Gutenberg_Guidelines_Post_Type::POST_TYPE,
@@ -92,9 +114,12 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 		$this->assertIsInt( $post_id );
 		$this->assertGreaterThan( 0, $post_id );
 
-		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );
-
-		$this->assertSame( array( Gutenberg_Guidelines_Post_Type::TERM_ARTIFACT ), $terms );
+		$terms = wp_get_object_terms( $post_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
+		$this->assertCount( 1, $terms );
+		$this->assertSame( 'artifact', $terms[0]->slug );
+		// The wp_insert_term_data filter should have mapped the raw slug to
+		// the localized label when the term was created on first use.
+		$this->assertSame( 'Artifact', $terms[0]->name );
 	}
 
 	/**
@@ -183,7 +208,7 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 		$this->assertIsInt( $revision_id );
 		$this->assertGreaterThan( 0, $revision_id );
 
-		Gutenberg_Guidelines_Post_Type::ensure_default_type_term( $revision_id );
+		_wp_guidelines_ensure_default_type_term( $revision_id );
 
 		$terms = wp_get_object_terms( $revision_id, Gutenberg_Guidelines_Post_Type::TAXONOMY );
 		$this->assertSame( array(), $terms );
