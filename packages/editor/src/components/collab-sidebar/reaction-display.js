@@ -4,9 +4,9 @@
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { smiley as smileyIcon } from '@wordpress/icons';
 import { useState, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -243,7 +243,7 @@ export default function ReactionDisplay( {
 	}
 
 	return (
-		<HStack spacing="1" justify="flex-start" expanded={ false } wrap>
+		<Stack direction="row" gap="xs" justify="flex-start" wrap="wrap">
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted( reactions, slug );
@@ -261,7 +261,7 @@ export default function ReactionDisplay( {
 					/>
 				);
 			} ) }
-		</HStack>
+		</Stack>
 	);
 }
 

@@ -19,6 +19,7 @@ import {
 	MIN_ZOOM,
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -33,6 +34,13 @@ export interface MediaEditorCropPanelProps {
 	freeformCrop: boolean;
 	/** Setter for freeform mode. */
 	onFreeformChange: ( value: boolean ) => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
+	/**
+	 * Fixed aspect-ratio presets to display after Free and Original. When
+	 * omitted, the media editor's default fixed-ratio presets are used.
+	 */
+	aspectRatioPresets?: AspectRatioPreset[];
 }
 
 /**
@@ -69,14 +77,23 @@ export function resolveAspectRatio(
  * @param props.onAspectRatioChange
  * @param props.freeformCrop
  * @param props.onFreeformChange
+ * @param props.onPlacementControlInteraction
+ * @param props.aspectRatioPresets
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	freeformCrop,
 	onFreeformChange,
+	onPlacementControlInteraction,
+	aspectRatioPresets,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
+	const aspectRatioOptions = [
+		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
+		...( aspectRatioPresets ??
+			DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value > 0 ) ),
+	];
 
 	return (
 		<Stack direction="column" gap="md">
@@ -88,9 +105,10 @@ export default function MediaEditorCropPanel( {
 				max={ MAX_ZOOM }
 				step={ 0.1 }
 				value={ state.zoom }
-				onChange={ ( value ) =>
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
-				}
+				onChange={ ( value ) => {
+					onPlacementControlInteraction?.();
+					setZoom( typeof value === 'number' ? value : MIN_ZOOM );
+				} }
 				renderTooltipContent={ ( value ) => {
 					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
 					return sprintf(
@@ -106,7 +124,7 @@ export default function MediaEditorCropPanel( {
 				label={ __( 'Aspect ratio' ) }
 				value={ aspectRatioValue }
 				onChange={ onAspectRatioChange }
-				options={ DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+				options={ aspectRatioOptions.map( ( preset ) => ( {
 					label: preset.label,
 					value: preset.value.toString(),
 				} ) ) }

@@ -17,7 +17,7 @@ import ToolbarGroupCollapsed from './toolbar-group-collapsed';
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarGroupProps, ToolbarGroupControls } from './types';
 
-function isNestedArray< T = any >( arr: T[] | T[][] ): arr is T[][] {
+function isNestedArray< T >( arr: T | T[] ): arr is T[] {
 	return Array.isArray( arr ) && Array.isArray( arr[ 0 ] );
 }
 
@@ -78,7 +78,7 @@ function ToolbarGroup( {
 
 	// Normalize controls to nested array of objects (sets of controls)
 	let controlSets: ToolbarGroupControls[][];
-	if ( isNestedArray( controls ) ) {
+	if ( isNestedArray< ToolbarGroupControls[] >( controls ) ) {
 		controlSets = controls;
 	} else {
 		controlSets = [ controls ];

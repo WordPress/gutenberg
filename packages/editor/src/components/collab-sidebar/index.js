@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -21,62 +20,14 @@ import {
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
-import { Comments } from './comments';
+import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import AddCommentMenuItem from './comment-menu-item';
-import CommentAvatarIndicator from './comment-indicator-toolbar';
+import { AddNoteMenuItem } from './add-note-menu-item';
+import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import {
-	useBlockComments,
-	useBlockCommentsActions,
-	useEnableFloatingSidebar,
-} from './hooks';
+import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
-
-function NotesSidebarContent( {
-	styles,
-	comments,
-	commentSidebarRef,
-	reactionsMap,
-	isFloating = false,
-} ) {
-	const { onCreate, onEdit, onDelete, onToggleReaction } =
-		useBlockCommentsActions( reactionsMap );
-
-	return (
-		<Stack
-			className="editor-collab-sidebar-panel"
-			style={ styles }
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node ) => {
-				// Sometimes previous sidebar unmounts after the new one mounts.
-				// This ensures we always have the latest reference.
-				if ( node ) {
-					// eslint-disable-next-line react-compiler/react-compiler
-					commentSidebarRef.current = node;
-				}
-			} }
-			aria-label={
-				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
-			}
-		>
-			<Comments
-				threads={ comments }
-				onEditComment={ onEdit }
-				onAddReply={ onCreate }
-				onCommentDelete={ onDelete }
-				onToggleReaction={ onToggleReaction }
-				commentSidebarRef={ commentSidebarRef }
-				reactionsMap={ reactionsMap }
-				isFloating={ isFloating }
-			/>
-		</Stack>
-	);
-}
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -86,28 +37,22 @@ function NotesSidebar( { postId } ) {
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const commentSidebarRef = useRef( null );
+	const sidebarRef = useRef( null );
 
-	const { clientId, blockCommentId, isClassicBlock } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockName,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isClassicBlock: _clientId
-					? getBlockName( _clientId ) === 'core/freeform'
-					: false,
-			};
-		},
-		[]
-	);
+	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			noteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+		};
+	}, [] );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -119,7 +64,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes, reactionsMap } = useBlockComments( postId );
+	const { notes, unresolvedNotes, reactionsMap } = useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -140,10 +85,7 @@ function NotesSidebar( { postId } ) {
 			// When multiple notes per block are supported. Remove note ID check.
 			// See: https://github.com/WordPress/gutenberg/pull/75147.
 			isDisabled:
-				isDistractionFree ||
-				isClassicBlock ||
-				! clientId ||
-				!! blockCommentId,
+				isDistractionFree || isClassicBlock || ! clientId || !! noteId,
 		}
 	);
 
@@ -152,8 +94,8 @@ function NotesSidebar( { postId } ) {
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
 	// Find the current thread for the selected block.
-	const currentThread = blockCommentId
-		? notes.find( ( thread ) => thread.id === blockCommentId )
+	const currentThread = noteId
+		? notes.find( ( thread ) => thread.id === noteId )
 		: null;
 
 	async function openTheSidebar( selectedClientId ) {
@@ -190,18 +132,18 @@ function NotesSidebar( { postId } ) {
 	}
 
 	if ( isDistractionFree ) {
-		return <AddCommentMenuItem isDistractionFree />;
+		return <AddNoteMenuItem isDistractionFree />;
 	}
 
 	return (
 		<>
 			{ !! currentThread && (
-				<CommentAvatarIndicator
-					thread={ currentThread }
+				<NoteAvatarIndicator
+					note={ currentThread }
 					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openTheSidebar } />
+			<AddNoteMenuItem onClick={ openTheSidebar } />
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
@@ -215,9 +157,9 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<NotesSidebarContent
-						comments={ notes }
-						commentSidebarRef={ commentSidebarRef }
+					<Notes
+						notes={ notes }
+						sidebarRef={ sidebarRef }
 						reactionsMap={ reactionsMap }
 					/>
 				</PluginSidebar>
@@ -231,13 +173,11 @@ function NotesSidebar( { postId } ) {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<NotesSidebarContent
-						comments={ unresolvedNotes }
-						commentSidebarRef={ commentSidebarRef }
+					<Notes
+						notes={ unresolvedNotes }
+						sidebarRef={ sidebarRef }
+						styles={ { backgroundColor } }
 						reactionsMap={ reactionsMap }
-						styles={ {
-							backgroundColor,
-						} }
 						isFloating
 					/>
 				</PluginSidebar>
