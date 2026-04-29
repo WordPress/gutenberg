@@ -496,14 +496,20 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 201, $response->get_status() );
 
-		// REST meta plumbing for the `note` comment type varies across WP
-		// versions, so scope this test to what the controller owns — the
-		// create call succeeded and returned a valid comment id. Meta
-		// round-trip is covered by the e2e spec against a full editor
-		// build where the REST schema is assembled at runtime.
 		$data       = $response->get_data();
 		$comment_id = $data['id'] ?? null;
 		$this->assertIsInt( $comment_id );
+
+		// Bypass REST schema variability across WP versions and check the
+		// stored meta directly. The sanitize_callback is in scope of this
+		// test; the REST layer assembles schemas at runtime in a way that
+		// isn't always available in the experimental phpunit harness.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertNotEmpty( $stored, 'Suggestion meta should round-trip into storage.' );
+		$decoded = json_decode( $stored, true );
+		$this->assertSame( 'core/paragraph', $decoded['blockName'] ?? null );
+		$this->assertSame( 1, $decoded['schemaVersion'] ?? null );
+		$this->assertCount( 1, $decoded['operations'] ?? array() );
 	}
 
 	/**
@@ -803,5 +809,31 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				"Lifecycle shortcut expectation mismatched for: {$label}"
 			);
 		}
+	}
+
+	/**
+	 * Test that the lifecycle helper also accepts form-encoded request
+	 * bodies, not only JSON. Custom integrations may issue updates with
+	 * `application/x-www-form-urlencoded` and should benefit from the
+	 * same `edit_post` shortcut as the JSON path.
+	 */
+	public function test_lifecycle_update_accepts_form_encoded_bodies() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'status' => 'approved',
+				'meta'   => array(
+					'_wp_suggestion_status' => 'applied',
+				),
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_6_9',
+			'is_suggestion_lifecycle_update'
+		);
+		$reflection->setAccessible( true );
+		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }

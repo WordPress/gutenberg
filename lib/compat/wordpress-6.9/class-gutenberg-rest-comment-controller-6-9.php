@@ -183,12 +183,16 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	 * @return bool
 	 */
 	private static function is_suggestion_lifecycle_update( $request ) {
-		$params       = $request->get_json_params();
-		$body_is_json = is_array( $params );
-		if ( ! $body_is_json ) {
-			// When the body isn't JSON, fall back to inspecting known
-			// request params. Non-JSON updates are rare from the block
-			// editor client, so a stricter fallback is safer.
+		// Accept either a JSON body (the block editor client) or a form-
+		// encoded body (custom integrations / curl scripts). Either way the
+		// shortcut is gated by the same allowlist below — query/URL params
+		// are intentionally excluded so the body is the source of truth for
+		// what's being written.
+		$params = $request->get_json_params();
+		if ( ! is_array( $params ) ) {
+			$params = $request->get_body_params();
+		}
+		if ( ! is_array( $params ) || empty( $params ) ) {
 			return false;
 		}
 
