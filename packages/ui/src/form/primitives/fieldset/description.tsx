@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-import { mergeProps, useRender } from '@base-ui/react';
 import { forwardRef, useEffect, useId } from '@wordpress/element';
 import { Text } from '../../../text';
 import { useFieldsetContext } from './context';
@@ -22,23 +20,11 @@ export const FieldsetDescription = forwardRef<
 		return unregisterDescriptionId;
 	}, [ registerDescriptionId, unregisterDescriptionId, id ] );
 
-	const element = useRender( {
-		defaultTagName: 'p',
-		render: (
-			<Text
-				render={ render }
-				variant="body-sm"
-				className={ className }
-			/>
-		),
-		ref,
-		props: mergeProps< 'p' >(
-			{
-				id,
-			},
-			restProps
-		),
-	} );
-
-	return element;
+	return (
+		<Text
+			render={ <p ref={ ref } id={ id } { ...restProps } /> }
+			variant="body-sm"
+			className={ className }
+		/>
+	);
 } );

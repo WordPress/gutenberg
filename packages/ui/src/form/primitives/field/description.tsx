@@ -13,10 +13,7 @@ export const Description = forwardRef<
 		<Text
 			render={ <_Field.Description ref={ ref } { ...restProps } /> }
 			variant="body-sm"
-			className={ clsx(
-				fieldStyles.description,
-				className
-			) }
+			className={ clsx( fieldStyles.description, className ) }
 		/>
 	);
 } );
