@@ -852,15 +852,15 @@ test.describe( 'Block Notes', () => {
 	test.describe( 'Emoji Reactions', () => {
 		test( 'can add an emoji reaction to a note', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing emoji reactions' },
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockCommentUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 
 			await expect(
 				page
@@ -878,16 +878,16 @@ test.describe( 'Block Notes', () => {
 
 		test( 'can remove own emoji reaction by clicking it', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing reaction removal' },
 				comment: 'Test comment for removing reactions',
 			} );
 
 			// Add a reaction.
-			await blockCommentUtils.addReactionToComment( 'Heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -912,16 +912,16 @@ test.describe( 'Block Notes', () => {
 
 		test( 'can see reaction tooltip on hover', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing reaction tooltip' },
 				comment: 'Test comment for reaction tooltip',
 			} );
 
 			// Add a reaction.
-			await blockCommentUtils.addReactionToComment( 'Celebration' );
+			await blockNoteUtils.addReactionToComment( 'Celebration' );
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -943,9 +943,9 @@ test.describe( 'Block Notes', () => {
 
 		test( 'reaction buttons are keyboard accessible', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing keyboard accessibility' },
 				comment: 'Test comment for keyboard access',
@@ -979,16 +979,16 @@ test.describe( 'Block Notes', () => {
 
 		test( 'can add multiple different reactions to same note', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing multiple reactions' },
 				comment: 'Test comment for multiple reactions',
 			} );
 
 			// Add first reaction.
-			await blockCommentUtils.addReactionToComment( 'Smile' );
+			await blockNoteUtils.addReactionToComment( 'Smile' );
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -996,7 +996,7 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 
 			// Add second reaction.
-			await blockCommentUtils.addReactionToComment( 'Rocket' );
+			await blockNoteUtils.addReactionToComment( 'Rocket' );
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
