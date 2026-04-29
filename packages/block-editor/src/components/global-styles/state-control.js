@@ -6,48 +6,52 @@ import { check, chevronDown } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 
 /**
- * State control for managing block state styles (hover, focus, etc.).
- * Displays a dropdown menu to select between different states.
+ * State control for managing block state styles using grouped selection.
+ * Each state group (e.g., "State", "Viewport") is rendered as a separate
+ * radio group section. The user selects one value from each group, and
+ * the combination determines which state styles are edited.
  *
- * @param {Object}   props          Component props.
- * @param {Array}    props.states   Array of available states with value and label.
- * @param {string}   props.value    Currently selected state value.
- * @param {Function} props.onChange Callback when selection changes.
+ * @param {Object}   props             Component props.
+ * @param {Array}    props.stateGroups Array of state groups, each with name, label, and states.
+ * @param {Object}   props.value       Map of group name to selected state value.
+ * @param {Function} props.onChange    Callback when selection changes.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
-	states = [],
-	value = 'default',
+	stateGroups = [],
+	value = {},
 	onChange,
 } ) {
-	if ( ! states || states.length === 0 ) {
+	if ( ! stateGroups || stateGroups.length === 0 ) {
 		return null;
 	}
 
-	const stateOptions = [
-		{ label: __( 'Default' ), value: 'default' },
-		...states.map( ( state ) => ( {
-			label: state.label,
-			value: state.value,
-		} ) ),
-	];
+	const getDropdownLabel = () => {
+		const selectedLabels = stateGroups
+			.filter( ( group ) => value[ group.name ] )
+			.map( ( group ) => {
+				const selectedState = group.states.find(
+					( s ) => s.value === value[ group.name ]
+				);
+				return selectedState?.label;
+			} )
+			.filter( Boolean );
 
-	const getCurrentStateLabel = () => {
-		const currentOption = stateOptions.find(
-			( option ) => option.value === value
-		);
-		return currentOption?.label || __( 'Default' );
+		if ( selectedLabels.length === 0 ) {
+			return __( 'Default' );
+		}
+		return selectedLabels.join( ' + ' );
 	};
 
 	return (
 		<DropdownMenu
 			icon={ chevronDown }
 			label={ sprintf(
-				/* translators: %s: Current state (e.g. "Hover", "Focus") */
+				/* translators: %s: Current state combination (e.g. "Hover", "Mobile + Focus") */
 				__( 'State: %s' ),
-				getCurrentStateLabel()
+				getDropdownLabel()
 			) }
-			text={ getCurrentStateLabel() }
+			text={ getDropdownLabel() }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
@@ -55,20 +59,52 @@ export default function StateControl( {
 			} }
 		>
 			{ ( { onClose } ) => (
-				<MenuGroup label={ __( 'State' ) }>
-					{ stateOptions.map( ( option ) => (
-						<MenuItem
-							key={ option.value }
-							onClick={ () => {
-								onChange( option.value );
-								onClose();
-							} }
-							icon={ value === option.value ? check : null }
-						>
-							{ option.label }
-						</MenuItem>
+				<>
+					{ stateGroups.map( ( group ) => (
+						<MenuGroup key={ group.name } label={ group.label }>
+							<MenuItem
+								onClick={ () => {
+									const newValue = { ...value };
+									delete newValue[ group.name ];
+									onChange( newValue );
+									if (
+										stateGroups.every(
+											( g ) => ! newValue[ g.name ]
+										)
+									) {
+										onClose();
+									}
+								} }
+								suffix={
+									! value[ group.name ]
+										? __( 'Default' )
+										: undefined
+								}
+								icon={ ! value[ group.name ] ? check : null }
+							>
+								{ __( 'Normal' ) }
+							</MenuItem>
+							{ group.states.map( ( state ) => (
+								<MenuItem
+									key={ state.value }
+									onClick={ () => {
+										onChange( {
+											...value,
+											[ group.name ]: state.value,
+										} );
+									} }
+									icon={
+										value[ group.name ] === state.value
+											? check
+											: null
+									}
+								>
+									{ state.label }
+								</MenuItem>
+							) ) }
+						</MenuGroup>
 					) ) }
-				</MenuGroup>
+				</>
 			) }
 		</DropdownMenu>
 	);

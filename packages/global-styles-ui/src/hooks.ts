@@ -36,21 +36,22 @@ extend( [ a11yPlugin ] );
  * @param blockName          The name of the block, if applicable.
  * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
  * @param shouldDecodeEncode Whether to decode and encode the style value.
- * @param state              Optional pseudo-selector state (e.g. `:hover`, `:focus`). When provided,
- *                           reads from and writes to the state sub-object automatically.
+ * @param states             Optional array of state keys (e.g. `[':hover']`, `['@mobile', ':hover']`).
+ *                           When provided, reads from and writes to the nested state sub-objects.
  * @return An array containing the style value and a function to set the style
  * value.
  *
  * @example
  * const [ color, setColor ] = useStyle<string>( 'color.text', 'core/button', 'merged' );
- * const [ hoverColor, setHoverColor ] = useStyle<string>( 'color.text', 'core/button', 'user', true, ':hover' );
+ * const [ hoverColor, setHoverColor ] = useStyle<string>( 'color.text', 'core/button', 'user', true, [ ':hover' ] );
+ * const [ mobileHover, setMobileHover ] = useStyle<string>( 'color.text', 'core/button', 'user', true, [ '@mobile', ':hover' ] );
  */
 export function useStyle< T = any >(
 	path: string,
 	blockName?: string,
 	readFrom: 'base' | 'user' | 'merged' = 'merged',
 	shouldDecodeEncode: boolean = true,
-	state?: string
+	states?: string[]
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
 
@@ -61,33 +62,59 @@ export function useStyle< T = any >(
 		sourceValue = user;
 	}
 
+	// Serialize the states array into a dot-delimited key for stable
+	// dependency comparison in useMemo/useCallback (arrays fail reference equality).
+	const statesKey = states?.join( '.' ) ?? '';
+
 	const styleValue = useMemo( () => {
+		// Parse the serialized states key back into an array.
+		const stateKeys = statesKey ? statesKey.split( '.' ) : [];
+
 		const rawValue = getStyle< T >(
 			sourceValue,
 			path,
 			blockName,
 			shouldDecodeEncode
 		);
-		if ( state ) {
-			return ( rawValue as any )?.[ state ] ?? {};
+		if ( stateKeys.length > 0 ) {
+			// Traverse nested state keys to read the value.
+			// e.g. stateKeys = ['@mobile', ':hover'] reads rawValue['@mobile'][':hover']
+			let value: any = rawValue;
+			for ( const stateKey of stateKeys ) {
+				value = value?.[ stateKey ] ?? {};
+			}
+			return value as T;
 		}
 		return rawValue;
-	}, [ sourceValue, path, blockName, shouldDecodeEncode, state ] );
+	}, [ sourceValue, path, blockName, shouldDecodeEncode, statesKey ] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
+			// Parse the serialized states key back into an array.
+			const stateKeys = statesKey ? statesKey.split( '.' ) : [];
+
 			let valueToSet: any = newValue;
-			if ( state ) {
+			if ( stateKeys.length > 0 ) {
 				const fullCurrentValue = getStyle(
 					user,
 					path,
 					blockName,
 					false
 				);
-				valueToSet = {
-					...( fullCurrentValue as object ),
-					[ state ]: newValue,
-				};
+				// Merge at the correct nesting level.
+				// e.g. stateKeys = ['@mobile', ':hover']:
+				// 1. Clone the top-level value
+				// 2. Navigate into ['@mobile'], clone it
+				// 3. Set [':hover'] = newValue
+				valueToSet = { ...( fullCurrentValue as object ) };
+				let target = valueToSet;
+				for ( let i = 0; i < stateKeys.length - 1; i++ ) {
+					target[ stateKeys[ i ] ] = {
+						...( target[ stateKeys[ i ] ] || {} ),
+					};
+					target = target[ stateKeys[ i ] ];
+				}
+				target[ stateKeys[ stateKeys.length - 1 ] ] = newValue;
 			}
 			const newGlobalStyles = setStyle< any >(
 				user,
@@ -97,7 +124,7 @@ export function useStyle< T = any >(
 			);
 			onChange( newGlobalStyles );
 		},
-		[ user, onChange, path, blockName, state ]
+		[ user, onChange, path, blockName, statesKey ]
 	);
 
 	return [ styleValue, setStyleValue ] as const;

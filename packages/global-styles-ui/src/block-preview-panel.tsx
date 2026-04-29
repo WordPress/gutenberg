@@ -16,14 +16,14 @@ import { getVariationClassName } from './utils';
 interface BlockPreviewPanelProps {
 	name: string;
 	variation?: string;
-	selectedState?: string;
+	selectedState?: Record< string, string >;
 	stateStyles?: any;
 }
 
 const BlockPreviewPanel = ( {
 	name,
 	variation = '',
-	selectedState = 'default',
+	selectedState = {},
 	stateStyles,
 }: BlockPreviewPanelProps ) => {
 	const blockExample = getBlockType( name )?.example;
@@ -47,13 +47,14 @@ const BlockPreviewPanel = ( {
 	}, [ name, blockExample, variation ] );
 
 	// Generate CSS for the selected state.
+	const hasStateSelection = Object.keys( selectedState ).length > 0;
 	const stateCSS = useMemo( () => {
-		if ( selectedState === 'default' || ! stateStyles ) {
+		if ( ! hasStateSelection || ! stateStyles ) {
 			return '';
 		}
 
 		return generatePreviewStateStyles( stateStyles, name );
-	}, [ selectedState, stateStyles, name ] );
+	}, [ hasStateSelection, stateStyles, name ] );
 
 	const viewportWidth = blockExample?.viewportWidth ?? 500;
 	// Same as height of InserterPreviewPanel.

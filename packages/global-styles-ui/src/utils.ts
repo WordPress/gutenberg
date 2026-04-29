@@ -1,58 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	areGlobalStylesEqual,
-	STATE_GROUPS,
-	BLOCK_STATE_SUPPORT,
-	ELEMENT_STATE_SUPPORT,
-} from '@wordpress/global-styles-engine';
+import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * State definition with value and label for UI display.
- */
-export interface StateDefinition {
-	value: string;
-	label: string;
-}
-
-/**
- * Get the valid states for a given block or element, flattened across all groups.
- *
- * Returns state definitions sorted by group order (lower-order groups first),
- * preserving state order within each group.
- *
- * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid state definitions, or empty array if none
- */
-export function getValidStates( name: string ): StateDefinition[] {
-	const support =
-		BLOCK_STATE_SUPPORT[ name ] ?? ELEMENT_STATE_SUPPORT[ name ];
-	if ( ! support ) {
-		return [];
-	}
-
-	// Sort groups by order before flattening.
-	const sortedGroupNames = Object.keys( support ).sort( ( a, b ) => {
-		const orderA = STATE_GROUPS[ a ]?.order ?? Infinity;
-		const orderB = STATE_GROUPS[ b ]?.order ?? Infinity;
-		return orderA - orderB;
-	} );
-
-	return sortedGroupNames.flatMap( ( groupName ) => {
-		const group = STATE_GROUPS[ groupName ];
-		if ( ! group ) {
-			return [];
-		}
-		return ( support[ groupName ] ?? [] )
-			.filter( ( key: string ) => key in group.states )
-			.map( ( key: string ) => ( {
-				value: key,
-				label: group.states[ key ].label,
-			} ) );
-	} );
-}
 
 /**
  * Removes all instances of properties from an object.

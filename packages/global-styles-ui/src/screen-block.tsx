@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -16,6 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	setStyle as setStyleHelper,
 	setSetting as setSettingHelper,
+	getValidStateGroups,
 } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
@@ -32,7 +32,6 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
-import { getValidStates } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -109,11 +108,20 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	// State selector state
-	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
-	const validStates = useMemo( () => getValidStates( name ), [ name ] );
+	// State selector state — selectedState maps group names to selected state keys.
+	const [ selectedState, setSelectedState ] = useState<
+		Record< string, string >
+	>( {} );
+	const stateGroups = useMemo( () => getValidStateGroups( name ), [ name ] );
 
-	const stateParam = selectedState !== 'default' ? selectedState : undefined;
+	// Build ordered array of state keys for useStyle (lower order groups first = outer nesting).
+	const stateParam = useMemo( () => {
+		const keys = stateGroups
+			.filter( ( g ) => selectedState[ g.name ] )
+			.map( ( g ) => selectedState[ g.name ] );
+		return keys.length > 0 ? keys : undefined;
+	}, [ selectedState, stateGroups ] );
+
 	const [ style, setStyle ] = useStyle(
 		prefix,
 		name,
@@ -325,7 +333,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				title={
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
-				states={ validStates }
+				stateGroups={ stateGroups }
 				selectedState={ selectedState }
 				onChangeState={ setSelectedState }
 			/>
@@ -333,7 +341,17 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				name={ name }
 				variation={ variation }
 				selectedState={ selectedState }
-				stateStyles={ selectedState !== 'default' ? style : undefined }
+				stateStyles={
+					stateParam && stateParam.length > 0 ? style : undefined
+				}
+			/>
+			<BlockPreviewPanel
+				name={ name }
+				variation={ variation }
+				selectedState={ selectedState }
+				stateStyles={
+					stateParam && stateParam.length > 0 ? style : undefined
+				}
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">

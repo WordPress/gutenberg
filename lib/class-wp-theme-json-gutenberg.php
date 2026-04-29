@@ -607,6 +607,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * - 'order'  : Nesting precedence within the same type. Lower values nest outside
 	 *              higher values. Between types, 'wrap' groups always nest outside
 	 *              'append' groups.
+	 * - 'label'  : Display label for the group in the UI.
 	 * - 'states' : A list of valid state keys.
 	 *              State keys use a prefix character (':' for CSS pseudo-selectors,
 	 *              '@' for class-based states) to distinguish them from style property
@@ -620,11 +621,13 @@ class WP_Theme_JSON_Gutenberg {
 		'current_item' => array(
 			'type'   => 'wrap',
 			'order'  => 10,
+			'label'  => 'Current Item',
 			'states' => array( '@current' ),
 		),
 		'pseudo'       => array(
 			'type'   => 'append',
 			'order'  => 20,
+			'label'  => 'State',
 			'states' => array( ':hover', ':focus', ':focus-visible', ':active', ':link', ':any-link', ':visited' ),
 		),
 	);

@@ -36,8 +36,9 @@ export {
 	ELEMENT_STATE_SUPPORT,
 	getBlockStates,
 	getElementStates,
+	getValidStateGroups,
 } from './core/states';
-export type { StateGroupDefinition } from './core/states';
+export type { StateGroupDefinition, ResolvedStateGroup } from './core/states';
 
 // Types
 export type * from './types';
