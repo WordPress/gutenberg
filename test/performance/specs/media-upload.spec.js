@@ -41,6 +41,76 @@ async function createTempImage( sourceFile, ext ) {
 	return { tmpFileName, tmpDirectory };
 }
 
+/**
+ * Runs upload iterations for a single image variant within one editor lifecycle.
+ *
+ * Inserts an image block, uploads the file, measures elapsed time, then
+ * removes the block and deletes uploaded media before the next iteration.
+ *
+ * @param {Object}   options
+ * @param {Object}   options.editor       Editor utility.
+ * @param {Object}   options.page         Playwright page.
+ * @param {Object}   options.requestUtils Request utility for media cleanup.
+ * @param {string}   options.sourceFile   Filename in the e2e assets directory.
+ * @param {string}   options.ext          File extension.
+ * @param {number[]} options.results      Array to append elapsed times to.
+ * @param {number}   options.samples      Number of measured iterations.
+ * @param {number}   options.throwaway    Number of warmup iterations to discard.
+ */
+async function runUploadIterations( {
+	editor,
+	page,
+	requestUtils,
+	sourceFile,
+	ext,
+	results: bucket,
+	samples,
+	throwaway,
+} ) {
+	const iterations = samples + throwaway;
+
+	for ( let i = 1; i <= iterations; i++ ) {
+		const { tmpFileName, tmpDirectory } = await createTempImage(
+			sourceFile,
+			ext
+		);
+
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		const startTime = performance.now();
+		await imageBlock
+			.locator( 'data-testid=form-file-upload-input' )
+			.setInputFiles( tmpFileName );
+
+		await expect(
+			imageBlock.getByRole( 'img', {
+				name: 'This image has an empty alt attribute',
+			} )
+		).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 120_000,
+		} );
+		const elapsed = performance.now() - startTime;
+
+		if ( i > throwaway ) {
+			bucket.push( elapsed );
+		}
+
+		// Reset state for next iteration: remove the block and any uploaded
+		// media so the editor is clean for the next upload.
+		await editor.selectBlocks( imageBlock );
+		await page.keyboard.press( 'Backspace' );
+		await requestUtils.deleteAllMedia();
+		await fs.rm( tmpDirectory, {
+			recursive: true,
+			force: true,
+		} );
+	}
+}
+
 test.describe( 'Media Upload Performance', () => {
 	test.use( {
 		perfUtils: async ( { page }, use ) => {
@@ -55,143 +125,66 @@ test.describe( 'Media Upload Performance', () => {
 		} );
 	} );
 
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
 	test.describe( 'Single Image Upload', () => {
 		const samples = 10;
 		const throwaway = 1;
-		const iterations = samples + throwaway;
 
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `JPEG upload (${ i } of ${ iterations })`, async ( {
-				admin,
+		test( 'JPEG uploads', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await runUploadIterations( {
 				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'1024x768_e2e_test_image_size.jpeg',
-					'.jpeg'
-				);
-
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
-
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.jpegUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
+				page,
+				requestUtils,
+				sourceFile: '1024x768_e2e_test_image_size.jpeg',
+				ext: '.jpeg',
+				results: results.jpegUploadProcessing,
+				samples,
+				throwaway,
 			} );
-		}
+		} );
 
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `PNG upload (${ i } of ${ iterations })`, async ( {
-				admin,
+		test( 'PNG uploads', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await runUploadIterations( {
 				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'1024x768_e2e_test_image.png',
-					'.png'
-				);
-
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
-
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.pngUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
+				page,
+				requestUtils,
+				sourceFile: '1024x768_e2e_test_image.png',
+				ext: '.png',
+				results: results.pngUploadProcessing,
+				samples,
+				throwaway,
 			} );
-		}
+		} );
 
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `Large JPEG upload (${ i } of ${ iterations })`, async ( {
-				admin,
+		test( 'Large JPEG uploads', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
+			await runUploadIterations( {
 				editor,
-			} ) => {
-				await admin.createNewPost();
-
-				const { tmpFileName, tmpDirectory } = await createTempImage(
-					'3200x2400_e2e_test_image_responsive_lightbox.jpeg',
-					'.jpeg'
-				);
-
-				await editor.insertBlock( { name: 'core/image' } );
-				const imageBlock = editor.canvas.locator(
-					'role=document[name="Block: Image"i]'
-				);
-				await expect( imageBlock ).toBeVisible();
-
-				const startTime = performance.now();
-				await imageBlock
-					.locator( 'data-testid=form-file-upload-input' )
-					.setInputFiles( tmpFileName );
-
-				await expect(
-					imageBlock.getByRole( 'img', {
-						name: 'This image has an empty alt attribute',
-					} )
-				).toHaveAttribute( 'src', /^https?:\/\//, {
-					timeout: 120_000,
-				} );
-				const elapsed = performance.now() - startTime;
-
-				if ( i > throwaway ) {
-					results.largeJpegUploadProcessing.push( elapsed );
-				}
-
-				await fs.rm( tmpDirectory, {
-					recursive: true,
-					force: true,
-				} );
+				page,
+				requestUtils,
+				sourceFile: '3200x2400_e2e_test_image_responsive_lightbox.jpeg',
+				ext: '.jpeg',
+				results: results.largeJpegUploadProcessing,
+				samples,
+				throwaway,
 			} );
-		}
+		} );
 	} );
 
 	test.describe( 'Multiple Image Upload', () => {
@@ -199,14 +192,15 @@ test.describe( 'Media Upload Performance', () => {
 		const throwaway = 1;
 		const iterations = samples + throwaway;
 
-		for ( let i = 1; i <= iterations; i++ ) {
-			test( `Batch upload 5 images (${ i } of ${ iterations })`, async ( {
-				admin,
-				editor,
-			} ) => {
-				await admin.createNewPost();
+		test( 'Batch upload 5 images', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await admin.createNewPost();
 
-				// Insert a gallery block for batch upload.
+			for ( let i = 1; i <= iterations; i++ ) {
 				await editor.insertBlock( { name: 'core/gallery' } );
 
 				const galleryBlock = editor.canvas.locator(
@@ -250,11 +244,15 @@ test.describe( 'Media Upload Performance', () => {
 					results.multipleImageUploadProcessing.push( elapsed );
 				}
 
+				// Reset state for next iteration.
+				await editor.selectBlocks( galleryBlock );
+				await page.keyboard.press( 'Backspace' );
+				await requestUtils.deleteAllMedia();
 				await fs.rm( tmpDirectory, {
 					recursive: true,
 					force: true,
 				} );
-			} );
-		}
+			}
+		} );
 	} );
 } );
