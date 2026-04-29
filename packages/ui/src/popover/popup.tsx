@@ -9,7 +9,9 @@ import {
 import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { PopoverValidationProvider } from './context';
+import { Portal } from './portal';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -22,8 +24,9 @@ const CLOSE_ATTR = 'data-wp-ui-popover-close';
  * Renders the floating popup container for the popover content.
  *
  * Handles portal rendering, positioning relative to the anchor, collision
- * avoidance, focus management, and optional backdrop. Supply a `container`
- * element for cross-document scenarios such as iframes.
+ * avoidance, focus management, and optional backdrop. Use
+ * `portal={ <Popover.Portal container={ ... } /> }` for cross-document
+ * scenarios such as iframes.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 	{
@@ -38,13 +41,12 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		collisionAvoidance,
 		collisionBoundary,
 		collisionPadding,
-		container,
+		portal,
 		finalFocus,
 		initialFocus,
 		side = 'bottom',
 		sideOffset = 8,
 		sticky,
-		style,
 		variant = 'default',
 		...props
 	},
@@ -52,7 +54,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ATTR,
+		deprioritizedAttributes: [ CLOSE_ATTR ],
 	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
 
@@ -72,12 +74,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			side={ side }
 			sideOffset={ sideOffset }
 			sticky={ sticky }
-			style={ style }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				styles.positioner,
-				className
-			) }
+			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
 		>
 			<ThemeProvider>
 				<_Popover.Popup
@@ -85,8 +82,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					className={ clsx(
-						styles.popup,
-						variant !== 'unstyled' && styles.default
+						variant !== 'unstyled' && styles.popup,
+						className
 					) }
 					{ ...props }
 				>
@@ -98,12 +95,14 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		</_Popover.Positioner>
 	);
 
-	return (
-		<_Popover.Portal container={ container }>
+	const portalChildren = (
+		<>
 			{ backdropElement }
 			{ positioner }
-		</_Popover.Portal>
+		</>
 	);
+
+	return renderPortalWithChildren( portal, <Portal />, portalChildren );
 } );
 
 export { Popup };

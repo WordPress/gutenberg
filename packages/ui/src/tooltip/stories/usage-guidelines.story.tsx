@@ -5,7 +5,11 @@ import {
 	formatUnderline,
 	info,
 } from '@wordpress/icons';
-import { Icon, IconButton, Popover, Tooltip, VisuallyHidden } from '../..';
+import * as Tooltip from '../';
+import { Icon } from '../../icon';
+import { IconButton } from '../../icon-button';
+import * as Popover from '../../popover';
+import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta = {
 	title: 'Design System/Components/Tooltip/Usage Guidelines',

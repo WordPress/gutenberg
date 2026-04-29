@@ -134,7 +134,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 				href={ buttonHref }
 				label={ buttonLabel }
 				showTooltip={ showTooltip }
-				tooltipPosition="middle right"
+				tooltipPosition="bottom"
 			>
 				<motion.div variants={ ! disableMotion && siteIconVariants }>
 					<div className="edit-post-fullscreen-mode-close__view-mode-toggle-icon">

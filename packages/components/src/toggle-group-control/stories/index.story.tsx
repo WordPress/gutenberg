@@ -33,7 +33,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

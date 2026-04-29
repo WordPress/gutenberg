@@ -45,6 +45,7 @@ import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
+import MediaEditorModalMount from '../media/media-editor-modal';
 import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
@@ -479,6 +480,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<PatternDuplicateModal />
 										<SuggestionStoreInterceptor />
 										<SuggestionAutoSave />
+										{ window?.__experimentalMediaEditorModal && (
+											<MediaEditorModalMount />
+										) }
 									</>
 								) }
 							</SuggestionOverlayProvider>

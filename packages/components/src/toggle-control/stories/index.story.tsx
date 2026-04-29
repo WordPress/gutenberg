@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/ToggleControl',
 	id: 'components-togglecontrol',
 	component: ToggleControl,
