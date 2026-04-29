@@ -53,7 +53,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Resolves a post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
-	 * `content` term — artifact-typed guidelines are addressable only via the
+	 * `content` term. Other guideline types are addressable only via the
 	 * standard /wp/v2/guidelines collection.
 	 *
 	 * @param int $id Post ID.

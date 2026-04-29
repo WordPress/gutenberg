@@ -148,8 +148,8 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	 * Resolves a parent post ID to a content-typed guideline post.
 	 *
 	 * Restricts /wp/v2/content-guidelines/{parent}/revisions to parents tagged
-	 * with the `content` term so the singleton revisions endpoint cannot list
-	 * or restore revisions of artifact-typed posts.
+	 * with the `content` term. Revisions of other guideline types are
+	 * addressable only via the standard /wp/v2/guidelines collection.
 	 *
 	 * @param int $parent_post_id Supplied ID.
 	 * @return WP_Post|WP_Error Post object if ID is valid, WP_Error otherwise.
