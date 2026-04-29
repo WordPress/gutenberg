@@ -102,7 +102,6 @@ function DiffMarkerButton( { clientId, status, subscribe } ) {
 			style={ {
 				top: `${ position.top }%`,
 				height: `${ Math.max( position.height, 0.5 ) }%`,
-				minHeight: '24px',
 			} }
 			onClick={ () => blockRef.current?.focus() }
 			aria-label={ STATUS_LABELS[ status ] }
