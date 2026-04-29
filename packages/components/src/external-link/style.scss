@@ -2,7 +2,7 @@
 	color: var(--wpds-color-fg-interactive-brand);
 	text-decoration: none;
 
-	// Match the focus ring used by `Link` in `@wordpress/ui`.
+	// Match the `outset-ring--focus` utility used by `Link` in `@wordpress/ui`.
 	@media not ( prefers-reduced-motion ) {
 		transition: outline 0.1s ease-out;
 	}
