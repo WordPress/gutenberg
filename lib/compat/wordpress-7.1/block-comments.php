@@ -20,6 +20,21 @@
  * Background discussion: https://github.com/WordPress/gutenberg/pull/75549
  * and https://github.com/WordPress/gutenberg/pull/75148.
  *
+ * Why a custom comment type (vs. comment meta on the parent note)?
+ *
+ * - Each reaction has a real author, date, and ID, so existing comment
+ *   APIs handle authorship, timestamps, and deletion without bespoke code.
+ *   This avoids client-side date math and timezone bugs.
+ * - The type is generic ('reaction', not 'note_reaction') so it can later
+ *   attach to any commentable resource (blocks, posts, other comment types),
+ *   not just block notes.
+ * - Race conditions when adding/removing reactions concurrently are handled
+ *   by the comments table (one row per reaction) rather than by read-modify-
+ *   write on a serialized meta value.
+ *
+ * Background discussion: https://github.com/WordPress/gutenberg/pull/75549
+ * and https://github.com/WordPress/gutenberg/pull/75148.
+ *
  * @package gutenberg
  */
 
