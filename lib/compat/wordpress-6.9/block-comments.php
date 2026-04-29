@@ -1,6 +1,15 @@
 <?php
 
 /**
+ * Maximum byte length of a `_wp_suggestion` payload. Mirrored on the client
+ * (`PAYLOAD_MAX_BYTES` in suggestion-mode/provider.js) so the editor refuses
+ * to submit anything the server will reject.
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES' ) ) {
+	define( 'GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES', 65536 );
+}
+
+/**
  * Adds support for block comments to the built-in post types.
  *
  * @return void
@@ -53,19 +62,34 @@ function gutenberg_register_block_comment_metadata() {
 	// is a suggested edit: the value is a JSON-encoded payload describing the
 	// block, baseline revision, and proposed operations. See
 	// packages/editor/src/components/suggestion-mode/provider.js for the shape.
+	$max_suggestion_payload_bytes = GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES;
+
 	register_meta(
 		'comment',
 		'_wp_suggestion',
 		array(
-			'type'          => 'string',
-			'description'   => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
-			'single'        => true,
-			'show_in_rest'  => array(
+			'type'              => 'string',
+			'description'       => __( 'Suggested edit payload (JSON).', 'gutenberg' ),
+			'single'            => true,
+			'show_in_rest'      => array(
 				'schema' => array(
-					'type' => 'string',
+					'type'      => 'string',
+					'maxLength' => $max_suggestion_payload_bytes,
 				),
 			),
-			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+			'sanitize_callback' => function ( $value ) use ( $max_suggestion_payload_bytes ) {
+				if ( ! is_string( $value ) ) {
+					return '';
+				}
+				// Reject rather than truncate. Truncating mid-string produces
+				// invalid JSON; `parseSuggestionPayload` would then return
+				// null and the suggestion would silently disappear.
+				if ( strlen( $value ) > $max_suggestion_payload_bytes ) {
+					return '';
+				}
+				return $value;
+			},
+			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
 				return current_user_can( 'edit_comment', $object_id );
 			},
 		)
