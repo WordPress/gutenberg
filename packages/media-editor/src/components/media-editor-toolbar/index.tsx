@@ -9,6 +9,8 @@ import {
 	rotateRight,
 	flipHorizontal,
 	flipVertical,
+	undo,
+	redo,
 } from '@wordpress/icons';
 
 /**
@@ -41,8 +43,19 @@ export default function MediaEditorToolbar( {
 	onReset,
 	onPlacementControlInteraction,
 }: MediaEditorToolbarProps ) {
-	const { state, setRotation, setFlip, snapRotate90, reset, isDirty } =
-		useCropper();
+	const {
+		state,
+		setRotation,
+		setFlip,
+		snapRotate90,
+		reset,
+		isDirty,
+		hasUndo,
+		hasRedo,
+		undo: undoCrop,
+		redo: redoCrop,
+		commitHistory,
+	} = useCropper();
 
 	const handleReset = () => {
 		reset();
@@ -84,6 +97,24 @@ export default function MediaEditorToolbar( {
 		>
 			<Button
 				size="compact"
+				icon={ undo }
+				label={ __( 'Undo' ) }
+				showTooltip
+				disabled={ ! hasUndo }
+				accessibleWhenDisabled
+				onClick={ undoCrop }
+			/>
+			<Button
+				size="compact"
+				icon={ redo }
+				label={ __( 'Redo' ) }
+				showTooltip
+				disabled={ ! hasRedo }
+				accessibleWhenDisabled
+				onClick={ redoCrop }
+			/>
+			<Button
+				size="compact"
 				icon={ rotateLeft }
 				label={ __( 'Rotate 90° counter-clockwise' ) }
 				showTooltip
@@ -122,7 +153,13 @@ export default function MediaEditorToolbar( {
 					} )
 				}
 			/>
-			<div className="media-editor-toolbar__rotation-slider">
+			{ /* onPointerUp / onKeyUp reset the gesture flag so the next
+			     drag or keyboard interaction creates a fresh undo entry. */ }
+			<div
+				className="media-editor-toolbar__rotation-slider"
+				onPointerUp={ commitHistory }
+				onKeyUp={ commitHistory }
+			>
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom

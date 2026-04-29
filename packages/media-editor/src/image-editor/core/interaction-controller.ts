@@ -731,6 +731,11 @@ export class InteractionController {
 			this.setStatus( { isZooming: false } );
 		}, ZOOM_ANIMATION_DURATION );
 
+		// Double-tap bypasses the normal handleTouchStart gesture path so
+		// onGestureStart/End are never called — fire them here so undo
+		// receives a proper boundary around this discrete zoom action.
+		this.options.onGestureStart?.();
+
 		if ( visSize.width > 0 && visSize.height > 0 ) {
 			const fx = tapX - containerRect.left - containerSize.width / 2;
 			const fy = tapY - containerRect.top - containerSize.height / 2;
@@ -758,6 +763,8 @@ export class InteractionController {
 		} else {
 			this.options.actions.setZoom( targetZoom );
 		}
+
+		this.options.onGestureEnd?.();
 		return true;
 	}
 

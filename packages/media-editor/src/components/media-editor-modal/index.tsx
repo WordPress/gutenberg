@@ -462,6 +462,29 @@ function MediaEditorModalContent( {
 			isDismissible={ false }
 			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
+				// Undo / Redo — only when a text input is not focused so
+				// browser-native field undo (Details tab) is preserved.
+				if (
+					( event.metaKey || event.ctrlKey ) &&
+					event.key === 'z' &&
+					isImage
+				) {
+					const target = event.target as HTMLElement;
+					const isTextField =
+						target.tagName === 'INPUT' ||
+						target.tagName === 'TEXTAREA' ||
+						target.isContentEditable;
+					if ( ! isTextField ) {
+						event.preventDefault();
+						if ( event.shiftKey ) {
+							cropper.redo();
+						} else {
+							cropper.undo();
+						}
+						return;
+					}
+				}
+
 				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
 					return;
 				}

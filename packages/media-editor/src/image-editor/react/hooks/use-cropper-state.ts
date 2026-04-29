@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, useCallback, useRef } from '@wordpress/element';
+import { useReducer, useCallback, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -64,6 +64,26 @@ export interface UseCropperStateReturn {
 	reset: ( resetState?: Partial< CropperState > ) => void;
 	/** Whether the current state differs from the initial state. */
 	isDirty: boolean;
+	/** Whether there is a cropper state to undo. */
+	hasUndo: boolean;
+	/** Whether there is a cropper state to redo. */
+	hasRedo: boolean;
+	/** Undo the last committed cropper operation. */
+	undo: () => void;
+	/** Redo the last undone cropper operation. */
+	redo: () => void;
+	/**
+	 * Mark the start of a continuous gesture (pan drag, pinch zoom, wheel
+	 * zoom). Pushes the current state onto the undo stack the first time it
+	 * is called within a gesture sequence; subsequent calls within the same
+	 * gesture are no-ops. Call `commitHistory` when the gesture ends.
+	 */
+	beginGesture: () => void;
+	/**
+	 * Mark the end of a continuous gesture (e.g. fine-rotation slider
+	 * release) so the next gesture creates a fresh history entry.
+	 */
+	commitHistory: () => void;
 	/**
 	 * Export the cropped image as a Blob. Throws on failure — see
 	 * `exportCroppedImage` in core for the error semantics (image
@@ -100,6 +120,75 @@ export function useCropperState(
 	// (reset, setImage) can read fresh state without re-creating themselves.
 	const stateRef = useRef( state );
 	stateRef.current = state;
+
+	// History stack for undo/redo. Using refs for the arrays avoids
+	// unnecessary re-renders on every push; a pair of boolean state values
+	// drives the enabled/disabled state of the undo/redo buttons.
+	const historyRef = useRef< CropperState[] >( [] );
+	const redoStackRef = useRef< CropperState[] >( [] );
+	const [ hasUndo, setHasUndo ] = useState( false );
+	const [ hasRedo, setHasRedo ] = useState( false );
+
+	// Tracks whether a continuous gesture (e.g. rotation slider drag) is
+	// in progress so we only push one history entry per gesture.
+	const isGestureRef = useRef( false );
+
+	const pushToHistory = useCallback( () => {
+		const current = stateRef.current;
+		// Skip duplicate pushes (e.g. rapid discrete action on unchanged state).
+		if ( historyRef.current[ historyRef.current.length - 1 ] === current ) {
+			return;
+		}
+		historyRef.current = [ ...historyRef.current, current ];
+		redoStackRef.current = [];
+		setHasUndo( true );
+		setHasRedo( false );
+	}, [] );
+
+	const undo = useCallback( () => {
+		const prev = historyRef.current[ historyRef.current.length - 1 ];
+		if ( ! prev ) {
+			return;
+		}
+		redoStackRef.current = [ stateRef.current, ...redoStackRef.current ];
+		historyRef.current = historyRef.current.slice( 0, -1 );
+		isGestureRef.current = false;
+		setHasUndo( historyRef.current.length > 0 );
+		setHasRedo( true );
+		dispatch( { type: 'RESET', payload: prev } );
+	}, [ dispatch ] );
+
+	const redo = useCallback( () => {
+		const next = redoStackRef.current[ 0 ];
+		if ( ! next ) {
+			return;
+		}
+		historyRef.current = [ ...historyRef.current, stateRef.current ];
+		redoStackRef.current = redoStackRef.current.slice( 1 );
+		isGestureRef.current = false;
+		setHasUndo( true );
+		setHasRedo( redoStackRef.current.length > 0 );
+		dispatch( { type: 'RESET', payload: next } );
+	}, [ dispatch ] );
+
+	const beginGesture = useCallback( () => {
+		if ( ! isGestureRef.current ) {
+			isGestureRef.current = true;
+			pushToHistory();
+		}
+	}, [ pushToHistory ] );
+
+	const commitHistory = useCallback( () => {
+		isGestureRef.current = false;
+	}, [] );
+
+	const clearHistory = useCallback( () => {
+		historyRef.current = [];
+		redoStackRef.current = [];
+		isGestureRef.current = false;
+		setHasUndo( false );
+		setHasRedo( false );
+	}, [] );
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
@@ -142,26 +231,35 @@ export function useCropperState(
 
 	const setRotation = useCallback(
 		( rotation: number ) => {
+			// The rotation slider fires many onChange events during a single
+			// drag gesture. Only push one history entry at the start of each
+			// gesture; commitHistory() resets the flag on pointer/key release.
+			if ( ! isGestureRef.current ) {
+				isGestureRef.current = true;
+				pushToHistory();
+			}
 			dispatch( { type: 'SET_ROTATION', payload: rotation } );
 		},
-		[ dispatch ]
+		[ dispatch, pushToHistory ]
 	);
 
 	const setFlip = useCallback(
 		( flip: Flip ) => {
+			pushToHistory();
 			dispatch( { type: 'SET_FLIP', payload: flip } );
 		},
-		[ dispatch ]
+		[ dispatch, pushToHistory ]
 	);
 
 	const snapRotate90 = useCallback(
 		( direction: 1 | -1 ) => {
+			pushToHistory();
 			dispatch( {
 				type: 'SNAP_ROTATE_90',
 				payload: { direction },
 			} );
 		},
-		[ dispatch ]
+		[ dispatch, pushToHistory ]
 	);
 
 	const setCropRect = useCallback(
@@ -172,18 +270,21 @@ export function useCropperState(
 	);
 
 	const settleCrop = useCallback( () => {
+		pushToHistory();
 		dispatch( { type: 'SETTLE_CROP' } );
-	}, [ dispatch ] );
+	}, [ dispatch, pushToHistory ] );
 
 	const applyOperation = useCallback(
 		( op: TransformOperation ) => {
+			pushToHistory();
 			dispatch( { type: 'APPLY_OPERATION', payload: op } );
 		},
-		[ dispatch ]
+		[ dispatch, pushToHistory ]
 	);
 
 	const reset = useCallback(
 		( resetState?: Partial< CropperState > ) => {
+			clearHistory();
 			dispatch( { type: 'RESET', payload: resetState } );
 			// Mirror the reducer's RESET exactly so isDirty stays in
 			// sync. RESET preserves the currently-loaded image; the
@@ -196,7 +297,7 @@ export function useCropperState(
 				...resetState,
 			} );
 		},
-		[ dispatch ]
+		[ dispatch, clearHistory ]
 	);
 
 	const isDirty = isStateDirty( state, initialRef.current );
@@ -233,6 +334,12 @@ export function useCropperState(
 		reset,
 		isDirty,
 		getCroppedImage,
+		hasUndo,
+		hasRedo,
+		undo,
+		redo,
+		beginGesture,
+		commitHistory,
 	};
 	return controller;
 }

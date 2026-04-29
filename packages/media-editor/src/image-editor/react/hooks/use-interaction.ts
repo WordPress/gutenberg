@@ -55,12 +55,16 @@ export interface UseInteractionOptions {
 /** How long keyboard placement stays active after the latest handled key. */
 const KEYBOARD_INTERACTION_IDLE_MS = 300;
 
-function isHandledKeyboardPan( event: KeyboardEvent ): boolean {
+function isHandledKeyboardInteraction( event: KeyboardEvent ): boolean {
 	switch ( event.key ) {
 		case 'ArrowUp':
 		case 'ArrowDown':
 		case 'ArrowLeft':
 		case 'ArrowRight':
+		case '+':
+		case '=':
+		case '-':
+		case '_':
 			return true;
 		default:
 			return false;
@@ -95,6 +99,9 @@ export function useInteraction(
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
 	const keyboardInteractionTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
+	// Tracks whether a keyboard gesture (pan or zoom) is currently active so
+	// onGestureStart is only fired once per gesture, not on every key repeat.
+	const isKeyboardGestureActiveRef = useRef( false );
 
 	// Keep mutable refs so the controller always reads fresh values
 	// without needing to be recreated.
@@ -117,10 +124,18 @@ export function useInteraction(
 		setIsGestureActive( false );
 	}, [] );
 	const signalKeyboardPlacement = useCallback( () => {
+		// Fire onGestureStart once at the beginning of each keyboard gesture
+		// so the undo system captures a history entry for the whole sequence.
+		if ( ! isKeyboardGestureActiveRef.current ) {
+			isKeyboardGestureActiveRef.current = true;
+			optionsRef.current?.onGestureStart?.();
+		}
 		setIsKeyboardPanning( true );
 		clearTimeout( keyboardInteractionTimerRef.current );
 		keyboardInteractionTimerRef.current = setTimeout( () => {
+			isKeyboardGestureActiveRef.current = false;
 			setIsKeyboardPanning( false );
+			optionsRef.current?.onGestureEnd?.();
 		}, KEYBOARD_INTERACTION_IDLE_MS );
 	}, [] );
 
@@ -197,7 +212,7 @@ export function useInteraction(
 
 	const onKeyDown = useCallback(
 		( e: React.KeyboardEvent ) => {
-			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
+			if ( isHandledKeyboardInteraction( e.nativeEvent ) ) {
 				signalKeyboardPlacement();
 			}
 			controllerRef.current?.handleKeyDown( e.nativeEvent );
