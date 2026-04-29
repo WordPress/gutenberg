@@ -28,6 +28,7 @@
 -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
 -   `CollapsibleCard`: Prevent the focus ring of focusable descendants from being clipped by the panel's overflow once the panel is fully expanded ([#77667](https://github.com/WordPress/gutenberg/pull/77667)).
 -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
+-   `Drawer`: Restore the slide-out animation when the popup closes via close button, Escape, or backdrop click. The popup `transform` transition was previously gated on `[data-open]`, which is removed at the start of the close sequence, so the popup snapped to its closed offset instead of animating.
 
 ### Enhancements
 
