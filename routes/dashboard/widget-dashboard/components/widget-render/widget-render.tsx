@@ -14,6 +14,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -57,9 +58,15 @@ class WidgetErrorBoundary extends Component<
 	render() {
 		if ( this.state.hasError ) {
 			return (
-				<div className={ styles.error } role="alert">
+				<Stack
+					direction="column"
+					justify="center"
+					align="center"
+					className={ styles.error }
+					role="alert"
+				>
 					<p>{ __( 'This widget encountered an error.' ) }</p>
-				</div>
+				</Stack>
 			);
 		}
 		return this.props.children;
@@ -68,9 +75,9 @@ class WidgetErrorBoundary extends Component<
 
 function LoadingOverlay() {
 	return (
-		<div className={ styles.loading }>
+		<Stack justify="center" align="center" className={ styles.loading }>
 			<span>{ __( 'Loading…' ) }</span>
-		</div>
+		</Stack>
 	);
 }
 
