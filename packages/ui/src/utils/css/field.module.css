@@ -18,13 +18,6 @@
 	}
 
 	.description {
-		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
-		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
-		--_gcd-p-margin: 0;
-
-		font-family: var(--wpds-typography-font-family-body);
-		font-size: var(--wpds-typography-font-size-sm);
-		line-height: var(--wpds-typography-line-height-xs);
 		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 }
