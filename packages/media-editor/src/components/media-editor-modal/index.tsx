@@ -271,7 +271,7 @@ function MediaEditorModalContent( {
 		}
 		createErrorNotice(
 			__(
-				'Could not load image. Please check your connection and try again.'
+				'Could not load selected media. Please check your connection and try again.'
 			),
 			{
 				id: IMAGE_LOAD_ERROR_NOTICE_ID,
@@ -286,6 +286,15 @@ function MediaEditorModalContent( {
 
 	useEffect( () => {
 		if ( hasMedia ) {
+			return;
+		}
+		// A 404 means the attachment doesn't exist — retrying on reconnect
+		// won't help. Only register the online listener for transient errors
+		// (network failures have no HTTP status).
+		const isTransientError =
+			! mediaErrorRef.current ||
+			! ( mediaErrorRef.current as { status?: number } ).status;
+		if ( ! isTransientError ) {
 			return;
 		}
 		const retry = () => {
@@ -340,7 +349,7 @@ function MediaEditorModalContent( {
 	const handleImageLoadError = useCallback( () => {
 		createErrorNotice(
 			__(
-				'Could not load image. Please check your connection and try again.'
+				'Could not load selected media. Please check your connection and try again.'
 			),
 			{
 				id: IMAGE_LOAD_ERROR_NOTICE_ID,
