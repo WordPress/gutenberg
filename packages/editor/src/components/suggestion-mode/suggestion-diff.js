@@ -2,11 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -115,13 +112,14 @@ export default function SuggestionDiff( { operations } ) {
 	}
 
 	return (
-		<VStack
+		<Stack
+			direction="column"
+			gap="xs"
 			className="editor-collab-sidebar-panel__suggestion-diff"
-			spacing="1"
 		>
-			<Text variant="muted" size="11px" upperCase weight={ 600 }>
+			<WCText variant="muted" size="11px" upperCase weight={ 600 }>
 				{ __( 'Suggested change' ) }
-			</Text>
+			</WCText>
 			{ operations.map( ( op, index ) => {
 				const canWordDiff =
 					op.type === 'attribute-set' &&
@@ -143,7 +141,7 @@ export default function SuggestionDiff( { operations } ) {
 					</div>
 				);
 			} ) }
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -159,7 +157,7 @@ function TextDiff( { before, after } ) {
 		[ before, after ]
 	);
 	return (
-		<Text
+		<WCText
 			className="editor-collab-sidebar-panel__suggestion-text-diff"
 			size="13px"
 		>
@@ -198,7 +196,7 @@ function TextDiff( { before, after } ) {
 				}
 				return <span key={ i }>{ seg.value }</span>;
 			} ) }
-		</Text>
+		</WCText>
 	);
 }
 
@@ -208,8 +206,8 @@ function AttributeDiff( { operation } ) {
 			? `${ operation.attribute }: ${ operation.before } → ${ operation.after }`
 			: `${ operation.attribute }: changed`;
 	return (
-		<Text size="12px" variant="muted">
+		<WCText size="12px" variant="muted">
 			{ label }
-		</Text>
+		</WCText>
 	);
 }
