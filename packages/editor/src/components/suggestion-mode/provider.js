@@ -142,6 +142,13 @@ function isAttributeEqual( a, b ) {
 	if ( aKeys.length !== bKeys.length ) {
 		return false;
 	}
+	// Wrapper objects like `RichTextData` hold their content in private
+	// class fields, so `Object.keys()` returns an empty array for any two
+	// instances regardless of the text they wrap. Fall back to a string
+	// compare so two wrappers with different content don't look equal.
+	if ( aKeys.length === 0 ) {
+		return String( a ) === String( b );
+	}
 	for ( const key of aKeys ) {
 		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
 			return false;
