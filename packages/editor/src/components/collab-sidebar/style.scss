@@ -51,6 +51,10 @@
 		// so each thread tracks the canvas scroll.
 		transform: translateY(var(--canvas-scroll, 0));
 		will-change: transform;
+		// Keep the reply input reachable when a thread is taller than the viewport
+		// (e.g. many replies on short content where the canvas can't scroll).
+		max-height: calc(100dvh - #{$header-height} - #{$grid-unit-30 * 2});
+		overflow-y: auto;
 	}
 }
 
