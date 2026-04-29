@@ -93,8 +93,8 @@ export default function CropAdvancedPanel( {
 					<FlexItem isBlock>
 						<NumberControl
 							__next40pxDefaultSize
-							label="X"
-							aria-label={ __( 'Horizontal position' ) }
+							label={ __( 'Left' ) }
+							aria-label={ __( 'Crop left position' ) }
 							value={ x }
 							min={ 0 }
 							max={ Math.max( 0, snapW - width ) }
@@ -106,8 +106,8 @@ export default function CropAdvancedPanel( {
 					<FlexItem isBlock>
 						<NumberControl
 							__next40pxDefaultSize
-							label="Y"
-							aria-label={ __( 'Vertical position' ) }
+							label={ __( 'Top' ) }
+							aria-label={ __( 'Crop top position' ) }
 							value={ y }
 							min={ 0 }
 							max={ Math.max( 0, snapH - height ) }
