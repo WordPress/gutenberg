@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 
 function BlockVariationPicker( {
 	icon = layout,
@@ -54,9 +55,12 @@ function BlockVariationPicker( {
 							className="block-editor-block-variation-picker__variation"
 							label={ variation.description || variation.title }
 						/>
-						<span className="block-editor-block-variation-picker__variation-label">
+						<Text
+							variant="body-sm"
+							className="block-editor-block-variation-picker__variation-label"
+						>
 							{ variation.title }
-						</span>
+						</Text>
 					</li>
 				) ) }
 			</ul>
