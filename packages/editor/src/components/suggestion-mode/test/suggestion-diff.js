@@ -58,4 +58,16 @@ describe( 'wordDiff', () => {
 			{ type: 'delete', value: 'hello' },
 		] );
 	} );
+
+	it( 'segments token-by-token at word boundaries', () => {
+		// Replacing 'b' with 'x' in the middle of 'a b c' produces
+		// delete+insert segments at the changed position.
+		const result = wordDiff( 'a b c', 'a x c' );
+		expect( result ).toEqual(
+			expect.arrayContaining( [
+				expect.objectContaining( { type: 'delete', value: 'b' } ),
+				expect.objectContaining( { type: 'insert', value: 'x' } ),
+			] )
+		);
+	} );
 } );

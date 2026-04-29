@@ -12,9 +12,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Upper bound for word-level LCS input length (characters). Beyond this,
  * we fall back to an attribute-level before→after label to avoid the
- * O(m·n) diff dominating the render.
+ * O(m·n) diff dominating the render. Two 2 KB strings produce a 4M-cell DP
+ * table, which is the practical ceiling for an interactive sidebar render.
  */
-const MAX_DIFF_LENGTH = 5000;
+const MAX_DIFF_LENGTH = 2000;
 
 /**
  * Compute a word-level diff between two strings, returning an array of
