@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.0.0 (2026-04-29)
+
 ### Breaking Changes
 
 -   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774)):
