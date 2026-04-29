@@ -1068,43 +1068,6 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Processes block state styles for any node (block or variation).
-	 *
-	 * Collects all valid state keys for the block and recursively computes
-	 * style declarations for each state and its nested states. For 'append'
-	 * states, the state key is appended to the base selector. For 'wrap'
-	 * states, the CSS selector is looked up from the block metadata.
-	 *
-	 * @since 7.0.0
-	 *
-	 * @param array  $node           The node data (block or variation).
-	 * @param string $base_selector  The base CSS selector.
-	 * @param array  $settings       The theme settings.
-	 * @param string $block_name     The block name.
-	 * @param array  $block_metadata Optional. Block metadata from get_blocks_metadata(),
-	 *                               used to look up custom state selectors. Default empty array.
-	 * @return array Associative array of CSS selector => declarations.
-	 */
-	private static function process_block_states( $node, $base_selector, $settings, $block_name, $block_metadata = array() ) {
-		$state_declarations = array();
-		$all_states         = static::get_block_states( $block_name );
-
-		if ( ! empty( $all_states ) ) {
-			static::compute_state_declarations(
-				$state_declarations,
-				$all_states,
-				$node,
-				$base_selector,
-				$settings,
-				$block_name,
-				$block_metadata
-			);
-		}
-
-		return $state_declarations;
-	}
-
-	/**
 	 * Recursively computes style declarations for a set of states.
 	 *
 	 * For each state that exists in the node data, resolves the CSS selector
@@ -3683,10 +3646,20 @@ class WP_Theme_JSON_Gutenberg {
 				$style_variation_declarations[ $style_variation['selector'] ] = static::compute_style_properties( $style_variation_node, $settings, null, $this->theme_json );
 
 				// Process block state styles for this variation (e.g., :hover, :focus, @current).
-				$block_name                   = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
-				$blocks_metadata              = static::get_blocks_metadata();
-				$variation_state_declarations = static::process_block_states( $style_variation_node, $style_variation['selector'], $settings, $block_name, $blocks_metadata[ $block_name ] ?? array() );
-				$style_variation_declarations = array_merge( $style_variation_declarations, $variation_state_declarations );
+				$block_name      = $block_metadata['name'] ?? ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 3 ? static::get_block_name_from_metadata_path( $block_metadata ) : null );
+				$all_states      = static::get_block_states( $block_name );
+				$blocks_metadata = static::get_blocks_metadata();
+				if ( ! empty( $all_states ) ) {
+					static::compute_state_declarations(
+						$style_variation_declarations,
+						$all_states,
+						$style_variation_node,
+						$style_variation['selector'],
+						$settings,
+						$block_name,
+						$blocks_metadata[ $block_name ] ?? array()
+					);
+				}
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
