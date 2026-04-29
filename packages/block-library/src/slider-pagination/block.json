@@ -8,6 +8,16 @@
 	"category": "design",
 	"textdomain": "default",
 	"ancestor": [ "core/slider" ],
+	"attributes": {
+		"arrowIcon": {
+			"type": "string",
+			"enum": [ "chevron", "arrow" ],
+			"default": "chevron"
+		}
+	},
+	"providesContext": {
+		"arrowIcon": "arrowIcon"
+	},
 	"allowedBlocks": [
 		"core/slider-pagination-button",
 		"core/slider-pagination-indicator"

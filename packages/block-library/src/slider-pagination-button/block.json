@@ -15,6 +15,7 @@
 			"default": "previous"
 		}
 	},
+	"usesContext": [ "arrowIcon" ],
 	"supports": {
 		"anchor": false,
 		"html": false,
