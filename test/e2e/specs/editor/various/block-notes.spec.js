@@ -1205,6 +1205,110 @@ test.describe( 'Multiple notes per block', () => {
 		);
 		expect( paragraphBlock?.attributes?.metadata?.noteId ).toBeUndefined();
 	} );
+
+	test( 'lazy-migrates a legacy scalar noteId to an array when a second note is added', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert a block whose metadata already carries a scalar noteId, the
+		// shape produced by older code before multi-note support shipped. The
+		// orphan id (999) does not correspond to a real thread; the test
+		// asserts that the lazy migration in addNoteIdToMetadata preserves it
+		// rather than silently dropping it on first write.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Block with legacy scalar noteId',
+				metadata: { noteId: 999 },
+			},
+		} );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'New multi-note era note' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		const blocks = await editor.getBlocks();
+		const paragraphBlock = blocks.find(
+			( b ) => b.name === 'core/paragraph'
+		);
+		const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+
+		expect( Array.isArray( noteIds ) ).toBe( true );
+		expect( noteIds ).toHaveLength( 2 );
+		// Legacy id is preserved as the first entry; the new note id is appended.
+		expect( noteIds[ 0 ] ).toBe( 999 );
+		expect( typeof noteIds[ 1 ] ).toBe( 'number' );
+		expect( noteIds[ 1 ] ).not.toBe( 999 );
+	} );
+
+	test( 'multi-note metadata persists across save and reload', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block with persisted notes' },
+			comment: 'Persisted note A',
+		} );
+
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'Persisted note B' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		const beforeIds = ( await editor.getBlocks() ).find(
+			( b ) => b.name === 'core/paragraph'
+		)?.attributes?.metadata?.noteId;
+		expect( beforeIds ).toHaveLength( 2 );
+
+		await editor.saveDraft();
+		await page.reload();
+
+		// After reload, both threads should reattach to the block.
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Persisted note A' } )
+		).toBeVisible();
+		await expect(
+			settings.getByRole( 'treeitem', { name: 'Note: Persisted note B' } )
+		).toBeVisible();
+
+		// Metadata should still be in array form, with the same ids in the
+		// same order — the round-trip through serialize/parse must not lose
+		// or reorder the array.
+		const afterIds = ( await editor.getBlocks() ).find(
+			( b ) => b.name === 'core/paragraph'
+		)?.attributes?.metadata?.noteId;
+		expect( Array.isArray( afterIds ) ).toBe( true );
+		expect( afterIds ).toEqual( beforeIds );
+	} );
 } );
 
 class BlockNoteUtils {
