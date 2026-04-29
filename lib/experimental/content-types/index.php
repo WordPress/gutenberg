@@ -45,6 +45,12 @@ const GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY = '_wp_user_taxonomy_object_t
 const GUTENBERG_USER_TAXONOMY_CONFIG_MARKER = 'isUserTaxonomyConfigJSON';
 
 /**
+ * Regex for a valid taxonomy slug. 32 chars matches the `wp_terms.slug`
+ * column width.
+ */
+const GUTENBERG_USER_TAXONOMY_SLUG_PATTERN = '/^[a-z0-9_-]{1,32}$/';
+
+/**
  * Registers the wp_user_taxonomy CPT.
  */
 function gutenberg_register_user_taxonomy_cpt() {
@@ -168,9 +174,9 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 
 	$decoded = json_decode( wp_unslash( (string) $data['post_content'] ), true );
 	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
-		// Hedge: invalid JSON falls through to a canonical empty payload so
-		// a stray read path can't surface arbitrary bytes.
-		$decoded = array();
+		// Invalid JSON: store empty content so raw bytes can't leak.
+		$data['post_content'] = '';
+		return $data;
 	}
 
 	$clean = gutenberg_user_taxonomy_sanitize_config( $decoded );
@@ -229,7 +235,7 @@ function gutenberg_user_taxonomy_read_object_type( $post_id ) {
  */
 function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	$slug = $record->post_name;
-	if ( ! is_string( $slug ) || ! preg_match( '/^[a-z0-9_-]{1,32}$/', $slug ) ) {
+	if ( ! is_string( $slug ) || ! preg_match( GUTENBERG_USER_TAXONOMY_SLUG_PATTERN, $slug ) ) {
 		return null;
 	}
 

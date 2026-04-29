@@ -22,7 +22,7 @@ export const titleField: Field< TaxonomyFormData > = {
 	enableGlobalSearch: true,
 	getValue: ( { item } ) => item.title.raw,
 	setValue: ( { value } ) => ( { title: { raw: String( value ?? '' ) } } ),
-	isValid: { required: true },
+	isValid: { required: true, maxLength: 200 },
 	filterBy: false,
 	enableHiding: false,
 };
@@ -33,7 +33,7 @@ export const pluralLabelField: Field< TaxonomyFormData > = {
 	type: 'text',
 	getValue: ( { item } ) => item.title.raw,
 	setValue: ( { value } ) => ( { title: { raw: String( value ?? '' ) } } ),
-	isValid: { required: true },
+	isValid: { required: true, maxLength: 200 },
 };
 
 export const singularLabelField: Field< TaxonomyFormData > = {
@@ -50,7 +50,7 @@ export const singularLabelField: Field< TaxonomyFormData > = {
 			},
 		},
 	} ),
-	isValid: { required: true },
+	isValid: { required: true, maxLength: 200 },
 	enableSorting: false,
 };
 
@@ -66,6 +66,7 @@ export const descriptionField: Field< TaxonomyFormData > = {
 	setValue: ( { item, value } ) => ( {
 		config: { ...item.config, description: String( value ?? '' ) },
 	} ),
+	isValid: { maxLength: 1000 },
 	enableSorting: false,
 };
 

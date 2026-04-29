@@ -191,7 +191,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 		// create). Omitting it from a PUT/PATCH preserves the stored value;
 		// there is no in-`config` partial-update support.
 		if ( $request->has_param( 'config' ) || empty( $request['id'] ) ) {
-			$config = is_array( $request['config'] ?? null ) ? $request['config'] : array();
+			$config = is_array( $request['config'] ) ? $request['config'] : array();
 
 			// `JSON_HEX_TAG | JSON_HEX_AMP` escape `<`, `>`, and `&` to their
 			// `\u00XX` forms before `wp_insert_post()` is called, so when
@@ -211,24 +211,34 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	}
 
 	/**
-	 * Prepares a config array for `wp_json_encode` so empty object-shaped
-	 * positions (top-level config and `labels`) serialize as `{}` rather
-	 * than `[]`, matching the schema's `type: 'object'` declarations.
+	 * Prepares a config array for `wp_json_encode` so every empty
+	 * object-shaped position serializes as `{}` rather than `[]`, matching
+	 * the schema's `type: 'object'` declarations.
 	 *
-	 * @param array $config Sanitized config array.
-	 * @return array|stdClass Value safe to pass to `wp_json_encode`.
+	 * Drives off `get_config_schema()` so new object-typed fields
+	 * (e.g. `capabilities`, `rewrite`, `default_term`) get the
+	 * `[] → {}` cast automatically. The `$schema` param is internal —
+	 * public callers pass just `$value`; recursion threads the
+	 * sub-schema through.
+	 *
+	 * @param mixed      $value  Value to normalize.
+	 * @param array|null $schema Schema fragment for `$value`. Defaults to the full config schema.
+	 * @return mixed
 	 */
-	public static function normalize_config_for_encode( $config ) {
-		if ( ! is_array( $config ) ) {
+	public static function normalize_config_for_encode( $value, $schema = null ) {
+		$schema = $schema ?? self::get_config_schema();
+		if ( 'object' !== $schema['type'] ) {
+			return $value;
+		}
+		if ( ! is_array( $value ) || empty( $value ) ) {
 			return new stdClass();
 		}
-		if ( isset( $config['labels'] ) && is_array( $config['labels'] ) && empty( $config['labels'] ) ) {
-			$config['labels'] = new stdClass();
+		foreach ( $schema['properties'] as $key => $sub_schema ) {
+			if ( array_key_exists( $key, $value ) ) {
+				$value[ $key ] = self::normalize_config_for_encode( $value[ $key ], $sub_schema );
+			}
 		}
-		if ( empty( $config ) ) {
-			return new stdClass();
-		}
-		return $config;
+		return $value;
 	}
 
 	/**
@@ -244,23 +254,22 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	 * @return true|WP_Error
 	 */
 	private function validate_slug( $prepared ) {
-		$slug = ! empty( $prepared->post_name ) ? (string) $prepared->post_name : '';
-		if ( '' === $slug ) {
+		$slug       = isset( $prepared->post_name ) ? (string) $prepared->post_name : '';
+		$editing_id = isset( $prepared->ID ) ? (int) $prepared->ID : 0;
+
+		// PUT/PATCH without a `slug` param leaves `post_name` empty so WP
+		// keeps the row's existing slug. Skip validation in that case.
+		if ( '' === $slug && $editing_id > 0 ) {
 			return true;
 		}
 
-		// Mirrors the regex `gutenberg_build_user_taxonomy_args` enforces on
-		// read; without this check, an overlong/malformed slug would get
-		// stored but silently skipped at `register_taxonomy()` time.
-		if ( ! preg_match( '/^[a-z0-9_-]{1,32}$/', $slug ) ) {
+		if ( ! preg_match( GUTENBERG_USER_TAXONOMY_SLUG_PATTERN, $slug ) ) {
 			return new WP_Error(
 				'gutenberg_user_taxonomy_slug_invalid',
 				__( 'Taxonomy keys must be 1–32 characters and may only contain lowercase letters, numbers, hyphens, and underscores.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
-
-		$editing_id = isset( $prepared->ID ) ? (int) $prepared->ID : 0;
 
 		// Unchanged slug on an existing record — allow.
 		if ( $editing_id > 0 ) {
@@ -411,6 +420,7 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 				'pattern' => '^[a-z0-9_-]{1,20}$',
 			),
 			'uniqueItems' => true,
+			'maxItems'    => 50,
 			'default'     => array(),
 		);
 

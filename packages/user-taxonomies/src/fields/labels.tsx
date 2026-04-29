@@ -37,6 +37,7 @@ function labelField(
 				},
 			},
 		} ),
+		isValid: { maxLength: 200 },
 		enableSorting: false,
 	};
 	if ( options.isVisible ) {
