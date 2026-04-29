@@ -545,7 +545,7 @@ function MediaEditorModalContent( {
 				) }
 			</>
 		);
-	} else if ( isImage ) {
+	} else if ( isImage && ! mediaUrl ) {
 		canvasContent = (
 			<div className="media-editor-modal__loading">
 				<Spinner />
