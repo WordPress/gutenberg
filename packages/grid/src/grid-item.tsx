@@ -14,71 +14,8 @@ import { useMergeRefs } from '@wordpress/compose';
  * Internal dependencies
  */
 import ResizeHandle from './resize-handle';
-import type { DashboardGridLayoutItem } from './types';
+import type { GridItemProps, ResizeDelta } from './types';
 import styles from './grid-item.module.css';
-
-type GridItemProps = {
-	/**
-	 * The layout item containing grid positioning information.
-	 */
-	item: DashboardGridLayoutItem;
-
-	/**
-	 * The maximum number of columns in the grid.
-	 */
-	maxColumns: number;
-
-	/**
-	 * Whether drag and resize interactions are disabled.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
-
-	/**
-	 * Whether the item can be resized vertically. Disabled when the
-	 * grid uses `rowHeight: 'auto'`, where row height is driven by
-	 * content rather than by the user.
-	 *
-	 * @default true
-	 */
-	verticalResizable?: boolean;
-
-	/**
-	 * Whether any tile in the grid is currently being dragged or
-	 * resized. When true, the item mutes its `actionableArea` with
-	 * `inert` so pointer hovers over buttons in other tiles do not
-	 * steal the in-progress gesture.
-	 *
-	 * @default false
-	 */
-	interacting?: boolean;
-
-	/**
-	 * The content to be displayed within the grid item.
-	 */
-	children: React.ReactNode;
-
-	/**
-	 * Content rendered above the draggable area that stays interactive
-	 * in edit mode — typically action buttons, menus, or links. While
-	 * any tile in the grid is being dragged or resized, this content
-	 * is set `inert` so hovers on other tiles can't steal the gesture.
-	 */
-	actionableArea?: React.ReactNode;
-
-	/**
-	 * Callback fired while the item is being resized. Receives the
-	 * item's `key` plus the cursor offset from the gesture start in
-	 * pixels; the grid converts the offset to column/row spans.
-	 */
-	onResize: ( id: string, delta: { width: number; height: number } ) => void;
-
-	/**
-	 * Callback fired when the resize gesture ends.
-	 */
-	onResizeEnd: () => void;
-};
 
 export function GridItem( {
 	item,
@@ -90,11 +27,11 @@ export function GridItem( {
 	actionableArea = null,
 	onResize,
 	onResizeEnd,
+	renderResizeHandle,
 }: GridItemProps ) {
-	const [ previewDelta, setPreviewDelta ] = useState< {
-		width: number;
-		height: number;
-	} | null >( null );
+	const [ previewDelta, setPreviewDelta ] = useState< ResizeDelta | null >(
+		null
+	);
 	const itemRef = useRef< HTMLDivElement >( null );
 	// Tile bounding rect at the first resize frame. The cursor `delta`
 	// from the handle is anchored to the gesture start, but the
@@ -107,10 +44,7 @@ export function GridItem( {
 	// *after* React commits a width step but before paint, so the
 	// frame that follows a column step never renders the overlay
 	// at the pre-step offset.
-	const lastResizeDeltaRef = useRef< {
-		width: number;
-		height: number;
-	} | null >( null );
+	const lastResizeDeltaRef = useRef< ResizeDelta | null >( null );
 	const { attributes, listeners, setNodeRef, isDragging } = useSortable( {
 		id: item.key,
 		disabled,
@@ -140,7 +74,7 @@ export function GridItem( {
 		isDragging && styles[ 'is-dragging' ]
 	);
 
-	const handleResize = ( delta: { width: number; height: number } ) => {
+	const handleResize = ( delta: ResizeDelta ) => {
 		const clamped = {
 			width: delta.width,
 			height: verticalResizable ? delta.height : 0,
@@ -234,6 +168,7 @@ export function GridItem( {
 						verticalResizable={ verticalResizable }
 						onResize={ handleResize }
 						onResizeEnd={ handleResizeEnd }
+						renderResizeHandle={ renderResizeHandle }
 					/>
 				</div>
 				{ previewOverlay }

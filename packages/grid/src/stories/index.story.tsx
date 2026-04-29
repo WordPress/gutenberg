@@ -7,7 +7,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
+import {
+	close,
+	justifyStretch,
+	resizeCornerNE,
+	stretchFullWidth,
+} from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { IconButton, Stack } from '@wordpress/ui';
 
@@ -15,7 +20,10 @@ import { IconButton, Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { DashboardGrid } from '../grid';
-import type { DashboardGridLayoutItem } from '../types';
+import type {
+	DashboardGridLayoutItem,
+	ResizeHandleRenderProps,
+} from '../types';
 
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
@@ -658,6 +666,108 @@ export const EditMode: Story = {
 					tone={ previewLayout ? 'warning' : 'success' }
 				/>
 			</Stack>
+		);
+	},
+};
+
+/**
+ * Override the default corner-triangle resize handle with a custom
+ * element via `renderResizeHandle`. The grid keeps the gesture
+ * machinery (dnd-kit context, throttled delta loop) and passes the
+ * wiring (`ref`, `listeners`, `attributes`) to the consumer — so the
+ * custom visual still drives the same resize behavior.
+ */
+function CustomResizeHandle( {
+	ref,
+	listeners,
+	attributes,
+	disabled,
+	isResizing,
+}: ResizeHandleRenderProps ) {
+	if ( disabled ) {
+		return null;
+	}
+
+	return (
+		<div
+			ref={ ref }
+			{ ...listeners }
+			{ ...attributes }
+			style={ {
+				position: 'absolute',
+				bottom: 2,
+				insetInlineEnd: 2,
+				display: 'flex',
+			} }
+		>
+			<IconButton
+				icon={ resizeCornerNE }
+				label="Resize"
+				aria-pressed={ isResizing }
+				tone="neutral"
+				variant={ isResizing ? 'outline' : 'solid' }
+				size="small"
+				style={ {
+					cursor: 'nesw-resize',
+					opacity: isResizing ? 0.5 : 1,
+				} }
+			/>
+		</div>
+	);
+}
+
+export const CustomResizeHandleStory: Story = {
+	name: 'Custom Resize Handle',
+	args: {
+		columns: 6,
+		spacing: 2,
+		rowHeight: 80,
+		editMode: true,
+		layout: [
+			{ key: 'a', width: 2, height: 1 },
+			{ key: 'b', width: 4, height: 1 },
+			{ key: 'c', width: 3, height: 2 },
+			{ key: 'd', width: 3, height: 1 },
+			{ key: 'e', width: 3, height: 1 },
+		],
+	},
+	render: function CustomResizeHandleRender( args ) {
+		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
+			args.layout
+		);
+
+		const tiles = useMemo(
+			() => [
+				<Tile key="a" tone="brand">
+					A
+				</Tile>,
+				<Tile key="b" tone="info">
+					B
+				</Tile>,
+				<Tile key="c" tone="success">
+					C
+				</Tile>,
+				<Tile key="d" tone="warning">
+					D
+				</Tile>,
+				<Tile key="e" tone="error">
+					E
+				</Tile>,
+			],
+			[]
+		);
+
+		return (
+			<DashboardGrid
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ setLayout }
+				renderResizeHandle={ ( props ) => (
+					<CustomResizeHandle { ...props } />
+				) }
+			>
+				{ tiles }
+			</DashboardGrid>
 		);
 	},
 };
