@@ -348,6 +348,17 @@ export function useSuggestionsProvider() {
 				operations,
 			} );
 
+			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
+				const error = new Error(
+					__( 'Suggestion is too large to save.' )
+				);
+				createNotice( 'error', error.message, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				throw error;
+			}
+
 			try {
 				return await saveEntityRecord(
 					'root',

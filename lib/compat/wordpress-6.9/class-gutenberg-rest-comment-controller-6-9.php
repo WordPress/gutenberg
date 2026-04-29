@@ -183,12 +183,16 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	 * @return bool
 	 */
 	private static function is_suggestion_lifecycle_update( $request ) {
-		$params       = $request->get_json_params();
-		$body_is_json = is_array( $params );
-		if ( ! $body_is_json ) {
-			// When the body isn't JSON, fall back to inspecting known
-			// request params. Non-JSON updates are rare from the block
-			// editor client, so a stricter fallback is safer.
+		// Accept either a JSON body (the block editor client) or a form-
+		// encoded body (custom integrations / curl scripts). Either way the
+		// shortcut is gated by the same allowlist below — query/URL params
+		// are intentionally excluded so the body is the source of truth for
+		// what's being written.
+		$params = $request->get_json_params();
+		if ( ! is_array( $params ) ) {
+			$params = $request->get_body_params();
+		}
+		if ( ! is_array( $params ) || empty( $params ) ) {
 			return false;
 		}
 
@@ -362,6 +366,55 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Validates that an incoming request's `_wp_suggestion` meta is within the
+	 * allowed byte budget. Truncating arbitrary JSON corrupts the payload, so
+	 * we reject before any storage happens.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if no payload or within bounds, WP_Error otherwise.
+	 */
+	protected static function validate_suggestion_payload_size( $request ) {
+		$meta = $request['meta'] ?? null;
+		if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) ) {
+			return true;
+		}
+		$value = $meta['_wp_suggestion'];
+		if ( ! is_string( $value ) ) {
+			return true;
+		}
+		if ( strlen( $value ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES ) {
+			return new WP_Error(
+				'rest_suggestion_too_large',
+				sprintf(
+					/* translators: %d: maximum allowed byte length. */
+					__( 'Suggestion payload exceeds the %d-byte limit.', 'gutenberg' ),
+					GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES
+				),
+				array( 'status' => 413 )
+			);
+		}
+		return true;
+	}
+
+	/**
+	 * Updates a comment.
+	 *
+	 * Wraps core's update path with a pre-flight size check on the suggestion
+	 * payload so oversized values are rejected with a clean 413 instead of
+	 * silently dropped by the meta sanitize_callback.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error
+	 */
+	public function update_item( $request ) {
+		$size_check = self::validate_suggestion_payload_size( $request );
+		if ( is_wp_error( $size_check ) ) {
+			return $size_check;
+		}
+		return parent::update_item( $request );
+	}
+
+	/**
 	 * Creates a comment.
 	 *
 	 * @since 4.7.0
@@ -388,6 +441,14 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
+		}
+
+		// Reject oversized suggestion payloads with a 413 so the client knows.
+		// Without this, the meta sanitize_callback would silently reject the
+		// value and the suggestion would disappear server-side.
+		$size_check = self::validate_suggestion_payload_size( $request );
+		if ( is_wp_error( $size_check ) ) {
+			return $size_check;
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );

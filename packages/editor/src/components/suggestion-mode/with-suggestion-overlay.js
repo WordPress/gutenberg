@@ -78,7 +78,7 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
 	// Relying on a local ref was fragile — it didn't reset after the entry
-	// was cleared (orphan prune, intent-switch).
+	// was cleared (auto-save trash, orphan prune, intent-switch).
 	const entryExists = !! entries[ clientId ];
 
 	const wrappedSetAttributes = useCallback(
@@ -149,8 +149,8 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			const { entries } = useSuggestionOverlay();
 			const isSuggestMode = useSelect(
 				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent?.() ===
-					'suggest',
+					select( EDITOR_STORE_NAME ).getEditorIntent() ===
+					SUGGEST_INTENT,
 				[]
 			);
 			const entry = entries[ clientId ];

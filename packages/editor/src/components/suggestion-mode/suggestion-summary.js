@@ -7,6 +7,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -63,19 +64,23 @@ const INLINE_FORMAT_TAG_LABELS = {
 const TAG_REGEX = /<\s*([a-zA-Z][a-zA-Z0-9]*)\b[^>]*>/g;
 
 /**
- * Strip HTML tags from a string, leaving only the visible text. Used to
- * decide whether a content change is purely a formatting change (same
+ * Strip HTML tags AND decode entities, leaving only the visible text. Used
+ * to decide whether a content change is purely a formatting change (same
  * visible text wrapped in different markup) or a real text edit.
+ *
+ * Wraps `__unstableStripHTML` so HTML entities such as `&amp;` and `&nbsp;`
+ * are decoded by the DOM parser rather than via a hand-rolled regex — a
+ * regex-only strip would mis-classify text edits where one side encoded an
+ * ampersand and the other didn't.
  *
  * @param {string} html Possibly-HTML content.
  * @return {string} The visible text, with whitespace collapsed.
  */
 function stripTags( html ) {
-	return html
-		.replace( /<[^>]*>/g, '' )
-		.replace( /&nbsp;/gi, ' ' )
-		.replace( /\s+/g, ' ' )
-		.trim();
+	if ( typeof html !== 'string' || html === '' ) {
+		return '';
+	}
+	return wpStripHTML( html ).replace( /\s+/g, ' ' ).trim();
 }
 
 /**

@@ -496,14 +496,20 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertSame( 201, $response->get_status() );
 
-		// REST meta plumbing for the `note` comment type varies across WP
-		// versions, so scope this test to what the controller owns — the
-		// create call succeeded and returned a valid comment id. Meta
-		// round-trip is covered by the e2e spec against a full editor
-		// build where the REST schema is assembled at runtime.
 		$data       = $response->get_data();
 		$comment_id = $data['id'] ?? null;
 		$this->assertIsInt( $comment_id );
+
+		// Bypass REST schema variability across WP versions and check the
+		// stored meta directly. The sanitize_callback is in scope of this
+		// test; the REST layer assembles schemas at runtime in a way that
+		// isn't always available in the experimental phpunit harness.
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertNotEmpty( $stored, 'Suggestion meta should round-trip into storage.' );
+		$decoded = json_decode( $stored, true );
+		$this->assertSame( 'core/paragraph', $decoded['blockName'] ?? null );
+		$this->assertSame( 1, $decoded['schemaVersion'] ?? null );
+		$this->assertCount( 1, $decoded['operations'] ?? array() );
 	}
 
 	/**
@@ -657,6 +663,92 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that creating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error rather than silently truncated.
+	 */
+	public function test_create_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'type'    => 'note',
+					'meta'    => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that updating a note with an oversized suggestion payload is
+	 * rejected with a clear 413 error.
+	 */
+	public function test_update_rejects_oversized_suggestion_payload() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 1,
+				'user_id'          => self::$editor_id,
+				'comment_content'  => 'a suggestion',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $comment_id );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'meta' => array(
+						'_wp_suggestion' => $oversized,
+					),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+	}
+
+	/**
+	 * Test that the sanitize_callback rejects rather than truncates an
+	 * oversized payload reaching the meta layer through a non-REST path.
+	 * Truncating mid-string would corrupt the JSON.
+	 */
+	public function test_sanitize_callback_rejects_oversized_value() {
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+
+		$oversized = str_repeat( 'a', GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES + 1 );
+		update_comment_meta( $comment_id, '_wp_suggestion', $oversized );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertSame( '', $stored, 'Oversized payload should be rejected, not truncated.' );
+	}
+
+	/**
 	 * Test that `is_suggestion_lifecycle_update` correctly rejects
 	 * request bodies that touch fields outside the suggestion-lifecycle
 	 * allowlist. We assert against the private helper via a request
@@ -717,5 +809,31 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				"Lifecycle shortcut expectation mismatched for: {$label}"
 			);
 		}
+	}
+
+	/**
+	 * Test that the lifecycle helper also accepts form-encoded request
+	 * bodies, not only JSON. Custom integrations may issue updates with
+	 * `application/x-www-form-urlencoded` and should benefit from the
+	 * same `edit_post` shortcut as the JSON path.
+	 */
+	public function test_lifecycle_update_accepts_form_encoded_bodies() {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/1' );
+		$request->add_header( 'Content-Type', 'application/x-www-form-urlencoded' );
+		$request->set_body_params(
+			array(
+				'status' => 'approved',
+				'meta'   => array(
+					'_wp_suggestion_status' => 'applied',
+				),
+			)
+		);
+
+		$reflection = new ReflectionMethod(
+			'Gutenberg_REST_Comment_Controller_6_9',
+			'is_suggestion_lifecycle_update'
+		);
+		$reflection->setAccessible( true );
+		$this->assertTrue( $reflection->invoke( null, $request ) );
 	}
 }
