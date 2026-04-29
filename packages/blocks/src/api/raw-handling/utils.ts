@@ -158,11 +158,12 @@ export function getBlockContentSchema( context?: string ) {
 
 /**
  * Checks whether the given element is a non-semantic wrapper. A non-semantic
- * wrapper is a `<span>` or `<div>` element that has no attributes that imply
- * meaning (such as `class`, `id`, `role`, `data-*`, or `aria-*`). Plugins and
- * themes commonly use those attributes to drive custom raw transforms (e.g.
- * converting `<div class="box">` to a custom block), so wrappers carrying them
- * must be preserved instead of being unwrapped.
+ * wrapper is a `<span>` or `<div>` element that has no `class`, `id`, `role`,
+ * `data-*`, or `aria-*` attribute. Plugins and themes commonly use those
+ * attributes to drive custom raw transforms (e.g. converting
+ * `<div class="box">` to a custom block), so wrappers carrying them must be
+ * preserved instead of being unwrapped. Other attributes (e.g. `style`,
+ * `title`, `lang`, `dir`) are ignored for this check.
  *
  * @param element The element to check.
  *

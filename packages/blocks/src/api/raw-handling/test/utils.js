@@ -86,6 +86,16 @@ describe( 'isPlain', () => {
 		);
 	} );
 
+	it( 'should return false for span wrappers with semantic attributes', () => {
+		expect( isPlain( '<span class="token">test</span>' ) ).toBe( false );
+		expect( isPlain( '<span id="content">test</span>' ) ).toBe( false );
+		expect( isPlain( '<span role="alert">test</span>' ) ).toBe( false );
+		expect( isPlain( '<span data-token="abc">test</span>' ) ).toBe( false );
+		expect( isPlain( '<span aria-label="content">test</span>' ) ).toBe(
+			false
+		);
+	} );
+
 	it( 'should return false when a descendant has semantic attributes', () => {
 		expect( isPlain( '<div><div class="box">test</div></div>' ) ).toBe(
 			false
