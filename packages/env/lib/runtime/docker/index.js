@@ -44,6 +44,48 @@ const retry = require( '../../retry' );
 const CONFIG_CACHE_KEY = 'config_checksum';
 
 /**
+ * Build the development URL reported by `getStatus()` from the live Docker
+ * port mapping rather than the configured `WP_SITEURL`. After
+ * `--auto-port` reassigns the port, the configured value goes stale.
+ * If the configured site URL has a custom host or path, that shape is
+ * preserved — only the port is rebased onto the live mapping.
+ *
+ * @param {string|undefined} configuredSiteUrl `WP_SITEURL` from config.
+ * @param {number|null}      livePort          Live Docker port for the dev
+ *                                             container, or null when the
+ *                                             environment is not running.
+ * @return {string|null} The development URL, or null when not running.
+ */
+function rebaseSiteUrlPort( configuredSiteUrl, livePort ) {
+	if ( ! livePort ) {
+		return null;
+	}
+	if ( ! configuredSiteUrl ) {
+		return `http://localhost:${ livePort }`;
+	}
+	let url;
+	try {
+		url = new URL( configuredSiteUrl );
+	} catch {
+		return `http://localhost:${ livePort }`;
+	}
+	// If the user's WP_SITEURL has no port, they explicitly want the URL
+	// as-configured (e.g. `http://example.com`). Don't append a port.
+	if ( ! url.port ) {
+		return configuredSiteUrl;
+	}
+	url.port = String( livePort );
+	let result = url.toString();
+	// `URL.toString()` emits a trailing slash for empty paths. Match the
+	// shape of the input so existing consumers that string-compare don't
+	// see a spurious change.
+	if ( ! configuredSiteUrl.endsWith( '/' ) && result.endsWith( '/' ) ) {
+		result = result.slice( 0, -1 );
+	}
+	return result;
+}
+
+/**
  * Docker runtime implementation for wp-env.
  *
  * This runtime uses Docker Compose for container orchestration.
@@ -718,7 +760,16 @@ class DockerRuntime {
 			// Containers are not running.
 		}
 
-		const siteUrl = config.env.development.config.WP_SITEURL;
+		// Derive the development URL from the live Docker port mapping.
+		// Reading `config.env.development.config.WP_SITEURL` directly goes
+		// stale after `--auto-port` reassigns the port, since WP_SITEURL is
+		// computed once at config-load time from the configured port.
+		// Replace the port in the configured site URL so a custom
+		// WP_SITEURL (different host or path) is preserved.
+		const developmentUrl = rebaseSiteUrlPort(
+			config.env.development.config.WP_SITEURL,
+			isRunning ? developmentPort : null
+		);
 
 		const testsEnabled = config.testsEnvironment !== false;
 
@@ -726,7 +777,7 @@ class DockerRuntime {
 			status: isRunning ? 'running' : 'stopped',
 			runtime: 'docker',
 			urls: {
-				development: isRunning ? siteUrl : null,
+				development: developmentUrl,
 				phpmyadmin:
 					isRunning && phpmyadminPort
 						? `http://localhost:${ phpmyadminPort }`
@@ -842,3 +893,4 @@ class DockerRuntime {
 }
 
 module.exports = DockerRuntime;
+module.exports.rebaseSiteUrlPort = rebaseSiteUrlPort;

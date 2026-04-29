@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `wp-env status` now reports the development URL based on the live Docker port mapping instead of the configured `WP_SITEURL`. This fixes a stale URL when `--auto-port` reassigns the port; consumers reading `urls.development` from `wp-env status --json` no longer have to fall back to constructing the URL from `ports.development` themselves.
+
 ## 11.5.0 (2026-04-29)
 
 ## 11.4.0 (2026-04-15)
