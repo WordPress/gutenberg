@@ -775,10 +775,11 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Interactivity packages — require react import.
+	// Override: Interactivity packages — disable react-compiler, require react import.
 	{
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
+			'react-hooks/react-compiler': 'off',
 			'react/react-in-jsx-scope': 'error',
 		},
 	},
