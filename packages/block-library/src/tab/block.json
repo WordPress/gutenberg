@@ -4,26 +4,23 @@
 	"apiVersion": 3,
 	"name": "core/tab",
 	"title": "Tab",
-	"description": "Content for a tab in a tabbed interface.",
-	"version": "1.0.0",
+	"description": "A single tab button in the tab list.",
 	"category": "design",
 	"textdomain": "default",
-	"attributes": {
-		"label": {
-			"type": "string",
-			"default": ""
-		}
-	},
-	"parent": [ "core/tab-panel" ],
+	"parent": [ "core/tab-list" ],
 	"usesContext": [
+		"core/tabs-list",
 		"core/tabs-activeTabIndex",
 		"core/tabs-editorActiveTabIndex",
-		"core/tabs-id"
+		"core/tab-index",
+		"core/tab-id",
+		"core/tab-label"
 	],
 	"supports": {
-		"anchor": true,
 		"html": false,
 		"reusable": false,
+		"visibility": false,
+		"lock": false,
 		"color": {
 			"background": true,
 			"text": true,
@@ -32,25 +29,28 @@
 				"text": true
 			}
 		},
-		"layout": true,
-		"spacing": {
-			"blockGap": true,
-			"padding": true,
-			"margin": false
-		},
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
+			"textAlign": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"__experimentalFontFamily": true
+				"fontSize": true
 			}
 		},
-		"renaming": true
-	},
-	"providesContext": {
-		"core/tab-label": "label"
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
 	},
 	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
 	"style": "file:./style-index.css"
 }

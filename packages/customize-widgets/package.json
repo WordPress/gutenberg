@@ -60,6 +60,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/widgets": "file:../widgets",
 		"clsx": "^2.1.1",
 		"fast-deep-equal": "^3.1.3"

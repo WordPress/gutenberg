@@ -55,6 +55,7 @@
 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url"
 	},
 	"peerDependencies": {

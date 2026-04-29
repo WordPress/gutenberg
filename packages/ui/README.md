@@ -28,13 +28,13 @@ npm install @wordpress/ui
 
 As an implementation of the design system and companion to the `@wordpress/theme` package, these components depend on CSS custom properties defined by the theme package. What you need to set up depends on whether you're building for a WordPress context, and how much of the theming features you want to use.
 
-### Within WordPress
+### Within standard WordPress editor screens
 
-Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+In standard WordPress editor screens (such as the post editor or the site editor), stylesheets, isolation styles, and layout styles are managed centrally by Gutenberg. You don't need to add any setup yourself — and you should avoid doing so in this shared context to prevent conflicts.
 
-### Outside WordPress
+### Elsewhere
 
-While the components ship with basic fallbacks for every CSS custom property, it's recommended that you install and load the design tokens stylesheet to support the full range of theming capabilities:
+The components ship with built-in fallback values for all CSS custom properties, so they work out of the box without any theme setup. For full theming capabilities, it's recommended that you install and load the design tokens stylesheet:
 
 ```
 npm install @wordpress/theme

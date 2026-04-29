@@ -425,18 +425,6 @@ export const getAllMetaBoxes = createSelector(
 );
 
 /**
- * Returns the list of meta box IDs marked as compatible with real-time
- * collaboration via the add_meta_box() __rtc_compatible_meta_box compatibility flag.
- *
- * @param {Object} state Global application state.
- *
- * @return {string[]} List of RTC-compatible meta box IDs.
- */
-export function getRtcCompatibleMetaBoxIds( state ) {
-	return state.metaBoxes.rtcCompatibleIds;
-}
-
-/**
  * Returns true if the post is using Meta Boxes
  *
  * @param {Object} state Global application state

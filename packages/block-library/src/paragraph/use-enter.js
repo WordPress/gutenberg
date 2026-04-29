@@ -9,24 +9,20 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	hasBlockSupport,
 	createBlock,
+	cloneBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
-	const {
-		moveBlocksToPosition,
-		replaceInnerBlocks,
-		duplicateBlocks,
-		insertBlock,
-	} = useDispatch( blockEditorStore );
+	const { moveBlocksToPosition, replaceBlocks, selectionChange } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
 		getBlockOrder,
 		getBlockName,
 		getBlock,
-		getNextBlockClientId,
 		canInsertBlockType,
 	} = useSelect( blockEditorStore );
 	const propsRef = useRef( props );
@@ -104,24 +100,22 @@ export function useOnEnter( props ) {
 
 			// If it is in the middle, split the block in two.
 			const wrapperBlock = getBlock( wrapperClientId );
-			batch( () => {
-				duplicateBlocks( [ wrapperClientId ] );
-				const blockIndex = getBlockIndex( wrapperClientId );
+			const head = cloneBlock( {
+				...wrapperBlock,
+				innerBlocks: wrapperBlock.innerBlocks.slice( 0, position ),
+			} );
+			const middle = createBlock( defaultBlockName );
+			const tail = cloneBlock( {
+				...wrapperBlock,
+				innerBlocks: wrapperBlock.innerBlocks.slice( position + 1 ),
+			} );
 
-				replaceInnerBlocks(
-					wrapperClientId,
-					wrapperBlock.innerBlocks.slice( 0, position )
-				);
-				replaceInnerBlocks(
-					getNextBlockClientId( wrapperClientId ),
-					wrapperBlock.innerBlocks.slice( position + 1 )
-				);
-				insertBlock(
-					createBlock( defaultBlockName ),
-					blockIndex + 1,
-					grandparentClientId,
-					true
-				);
+			batch( () => {
+				replaceBlocks( wrapperClientId, [ head, middle, tail ] );
+				// The selected paragraph is a descendant of the replaced
+				// wrapper, so `replaceBlocks` leaves the selection stale.
+				// Move it to the new default block explicitly.
+				selectionChange( middle.clientId );
 			} );
 		}
 

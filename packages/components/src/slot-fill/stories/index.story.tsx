@@ -14,6 +14,7 @@ import { createContext, useContext } from '@wordpress/element';
 import { Slot, Fill, Provider as SlotFillProvider } from '../';
 
 const meta: Meta< typeof Slot > = {
+	tags: [ 'manifest' ],
 	component: Slot,
 	title: 'Components/Utilities/SlotFill',
 	id: 'components-slotfill',
