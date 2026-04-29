@@ -6,6 +6,8 @@
 
 - Add `image/jxl` to `CLIENT_SIDE_SUPPORTED_MIME_TYPES` and `jxl` to the supported output formats, enabling client-side JPEG XL processing.
 
+## 0.30.0 (2026-04-29)
+
 ### Enhancement
 
 - Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).

@@ -75,7 +75,7 @@ function AuthorControl( { value, onChange } ) {
 			value={ sanitizedValue }
 			suggestions={ authorsInfo.names }
 			onChange={ onAuthorChange }
-			__experimentalShowHowTo={ false }
+			help=""
 			__next40pxDefaultSize
 		/>
 	);

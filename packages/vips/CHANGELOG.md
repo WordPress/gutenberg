@@ -6,6 +6,8 @@
 
 -   Bundle `vips-jxl.wasm` to enable client-side JPEG XL (JXL) encoding and decoding.
 
+## 1.5.0 (2026-04-29)
+
 ## 1.4.0 (2026-04-15)
 
 ## 1.3.0 (2026-04-01)
