@@ -25,7 +25,7 @@ export interface WidgetProps {
  */
 export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 	function Widget( { widget, index }, ref ) {
-		const { widgetTypes } = useDashboardInternalContext();
+		const { widgetTypes, editMode } = useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );
 
 		const contextValue = useMemo(
@@ -43,7 +43,11 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 
 		return (
 			<WidgetContextProvider value={ contextValue }>
-				<div ref={ ref } className={ styles.widget }>
+				<div
+					ref={ ref }
+					className={ styles.widget }
+					{ ...( editMode ? { inert: '' } : {} ) }
+				>
 					<WidgetRender widget={ widget } widgetType={ widgetType } />
 				</div>
 			</WidgetContextProvider>
