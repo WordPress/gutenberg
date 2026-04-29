@@ -1,8 +1,6 @@
 .components-external-link {
 	color: var(--wpds-color-fg-interactive-brand);
 	text-decoration: none;
-	text-underline-offset: 0.2em;
-	text-decoration-thickness: 0.5px;
 
 	// Match the focus ring used by `Link` in `@wordpress/ui`.
 	@media not ( prefers-reduced-motion ) {
@@ -31,6 +29,8 @@
 
 .components-external-link__contents {
 	text-decoration: underline;
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: 0.5px;
 }
 
 .components-external-link__icon {
