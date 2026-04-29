@@ -184,4 +184,19 @@ describe( 'summarizeOperations', () => {
 		] );
 		expect( lines ).toEqual( [ { label: 'Format:', value: 'content' } ] );
 	} );
+
+	it( 'decodes HTML entities when comparing visible text', () => {
+		// `&amp;` and `&` render to the same visible text. The summary
+		// should treat this as a pure formatting change (bold toggled),
+		// not as an Add/Delete of an ampersand.
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'Tom &amp; Jerry',
+				after: '<strong>Tom &amp; Jerry</strong>',
+			},
+		] );
+		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
+	} );
 } );

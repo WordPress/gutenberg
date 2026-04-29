@@ -77,8 +77,8 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
-	// Relying on a local ref was fragile — it didn't reset after
-	// Submit / Discard / orphan prune.
+	// Relying on a local ref was fragile — it didn't reset after the entry
+	// was cleared (auto-save trash, orphan prune, intent-switch).
 	const entryExists = !! entries[ clientId ];
 
 	const wrappedSetAttributes = useCallback(

@@ -129,7 +129,12 @@ export function overlayReducer( state, action ) {
 			};
 		}
 		case 'PRUNE_ORPHANS': {
-			const liveIds = action.liveClientIds;
+			// Action carries a serializable array; the reducer materializes a
+			// Set internally for the lookup. Keeps actions Redux-DevTools-
+			// friendly (Sets aren't serializable for time-travel).
+			const liveIds = Array.isArray( action.liveClientIds )
+				? new Set( action.liveClientIds )
+				: action.liveClientIds;
 			const keys = Object.keys( state );
 			let changed = false;
 			const next = {};
@@ -198,6 +203,8 @@ export function SuggestionOverlayProvider( { children } ) {
 		[]
 	);
 
+	const hasEntries = Object.keys( entries ).length > 0;
+
 	const hasOverlay = useCallback(
 		( clientId ) => {
 			const entry = entries[ clientId ];
@@ -210,16 +217,21 @@ export function SuggestionOverlayProvider( { children } ) {
 
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
-	// `blockCount` is a cheap proxy for "block tree changed"; the real
-	// orphan check reads the live id set only when the count moves. If the
-	// block-editor store is not registered (test harness, standalone), the
-	// cleanup is silently skipped.
-	const blockCount = useSelect( ( select ) => {
-		const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
-		return blockEditor?.getClientIdsWithDescendants?.().length ?? 0;
-	}, [] );
+	// The block-count subscription only runs when there are entries to
+	// prune; in Edit / View intent (no entries) there's no point watching
+	// the block tree at all.
+	const blockCount = useSelect(
+		( select ) => {
+			if ( ! hasEntries ) {
+				return 0;
+			}
+			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+			return blockEditor?.getClientIdsWithDescendants?.().length ?? 0;
+		},
+		[ hasEntries ]
+	);
 	useEffect( () => {
-		if ( Object.keys( entries ).length === 0 ) {
+		if ( ! hasEntries ) {
 			return;
 		}
 		const getLive = registry.select(
@@ -228,14 +240,15 @@ export function SuggestionOverlayProvider( { children } ) {
 		if ( ! getLive ) {
 			return;
 		}
-		const live = new Set( getLive() );
+		const live = getLive();
+		const liveSet = new Set( live );
 		const hasOrphan = Object.keys( entries ).some(
-			( key ) => ! live.has( key )
+			( key ) => ! liveSet.has( key )
 		);
 		if ( hasOrphan ) {
 			dispatch( { type: 'PRUNE_ORPHANS', liveClientIds: live } );
 		}
-	}, [ blockCount, entries, registry ] );
+	}, [ hasEntries, blockCount, entries, registry ] );
 
 	const value = useMemo(
 		() => ( {

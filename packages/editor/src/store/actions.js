@@ -1113,6 +1113,9 @@ export const setEditorIntent =
 
 		if ( label ) {
 			speak( label, 'assertive' );
+			// Reuse the same notice id across mode changes so rapid keyboard
+			// cycling doesn't pile up multiple snackbars — the new notice
+			// replaces the old one.
 			registry.dispatch( noticesStore ).createNotice( 'info', label, {
 				id: 'editor-intent-mode',
 				type: 'snackbar',
