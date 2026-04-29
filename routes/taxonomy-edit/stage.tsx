@@ -28,6 +28,7 @@ import {
 	editItemField,
 	generalForm,
 	hierarchicalField,
+	labelsActionsField,
 	labelsForm,
 	menuNameField,
 	newItemNameField,
@@ -142,6 +143,7 @@ function TaxonomyPage( {
 			hierarchicalField,
 			statusField,
 			// Labels
+			labelsActionsField,
 			menuNameField,
 			allItemsField,
 			editItemField,
@@ -182,9 +184,6 @@ function TaxonomyPage( {
 				{
 					id: 'labels',
 					label: __( 'Labels' ),
-					description: __(
-						'Override the text WordPress shows in admin lists, menus, and forms. Leave blank to use defaults derived from the plural and singular names.'
-					),
 					layout: {
 						type: 'card',
 						isCollapsible: true,

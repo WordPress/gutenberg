@@ -1,7 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .taxonomy-form {
 	box-sizing: border-box;
 	width: 100%;
 	max-width: 680px;
 	margin: 0 auto;
 	padding: 24px;
+}
+
+.taxonomy-form__help-text {
+	color: $gray-700;
 }

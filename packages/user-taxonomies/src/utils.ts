@@ -4,16 +4,12 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import type {
-	StoredConfig,
-	StoredLabels,
-	TaxonomyFormData,
-	TaxonomyRecord,
-} from './types';
+import type { StoredLabels, TaxonomyFormData, TaxonomyRecord } from './types';
 
 export const BLANK_RECORD: TaxonomyFormData = {
 	slug: '',
@@ -27,18 +23,6 @@ export const BLANK_RECORD: TaxonomyFormData = {
 		hierarchical: false,
 	},
 };
-
-export function parseConfig( raw?: string ): StoredConfig {
-	if ( ! raw ) {
-		return {};
-	}
-	try {
-		const parsed = JSON.parse( raw );
-		return typeof parsed === 'object' && parsed !== null ? parsed : {};
-	} catch {
-		return {};
-	}
-}
 
 export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 	'singular_name',
@@ -60,11 +44,96 @@ export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 	'choose_from_most_used',
 ];
 
+export function deriveLabels(
+	plural: string,
+	singular: string
+): Omit< StoredLabels, 'singular_name' > {
+	const lcPlural = plural.toLowerCase();
+	return {
+		menu_name: plural,
+		all_items: sprintf(
+			/* translators: %s: Plural taxonomy label. */
+			__( 'All %s' ),
+			plural
+		),
+		edit_item: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'Edit %s' ),
+			singular
+		),
+		view_item: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'View %s' ),
+			singular
+		),
+		update_item: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'Update %s' ),
+			singular
+		),
+		add_new_item: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'Add New %s' ),
+			singular
+		),
+		new_item_name: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'New %s Name' ),
+			singular
+		),
+		search_items: sprintf(
+			/* translators: %s: Plural taxonomy label. */
+			__( 'Search %s' ),
+			plural
+		),
+		not_found: sprintf(
+			/* translators: %s: Plural taxonomy label, lowercase. */
+			__( 'No %s found.' ),
+			lcPlural
+		),
+		back_to_items: sprintf(
+			/* translators: %s: Plural taxonomy label. */
+			__( '← Back to %s' ),
+			plural
+		),
+		parent_item: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'Parent %s' ),
+			singular
+		),
+		popular_items: sprintf(
+			/* translators: %s: Plural taxonomy label. */
+			__( 'Popular %s' ),
+			plural
+		),
+		separate_items_with_commas: sprintf(
+			/* translators: %s: Plural taxonomy label, lowercase. */
+			__( 'Separate %s with commas' ),
+			lcPlural
+		),
+		parent_item_colon: sprintf(
+			/* translators: %s: Singular taxonomy label. */
+			__( 'Parent %s:' ),
+			singular
+		),
+		add_or_remove_items: sprintf(
+			/* translators: %s: Plural taxonomy label, lowercase. */
+			__( 'Add or remove %s' ),
+			lcPlural
+		),
+		choose_from_most_used: sprintf(
+			/* translators: %s: Plural taxonomy label, lowercase. */
+			__( 'Choose from the most used %s' ),
+			lcPlural
+		),
+	};
+}
+
 export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
-	const parsed = parseConfig( row.content.raw );
+	const config = row.config ?? {};
 	const labels: StoredLabels = {};
 	for ( const key of STRING_LABEL_KEYS ) {
-		const value = parsed.labels?.[ key ];
+		const value = config.labels?.[ key ];
 		if ( typeof value === 'string' ) {
 			labels[ key ] = value;
 		}
@@ -76,17 +145,17 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 		title: { raw: row.title.raw },
 		config: {
 			labels: { singular_name: '', ...labels },
-			object_type: Array.isArray( parsed.object_type )
-				? parsed.object_type
+			object_type: Array.isArray( row.object_type )
+				? row.object_type
 				: [],
-			description: parsed.description ?? '',
-			public: parsed.public ?? true,
-			hierarchical: parsed.hierarchical ?? false,
+			description: config.description ?? '',
+			public: config.public ?? true,
+			hierarchical: config.hierarchical ?? false,
 		},
 	};
 }
 
-function serializeConfig( data: TaxonomyFormData ): StoredConfig {
+export function serializeForSave( data: TaxonomyFormData ) {
 	const { config } = data;
 
 	const labels: StoredLabels = {};
@@ -102,21 +171,17 @@ function serializeConfig( data: TaxonomyFormData ): StoredConfig {
 
 	const description = config.description.trim();
 	return {
-		labels,
-		object_type: config.object_type,
-		public: config.public,
-		hierarchical: config.hierarchical,
-		...( description !== '' ? { description } : {} ),
-	};
-}
-
-export function serializeForSave( data: TaxonomyFormData ) {
-	return {
 		...( data.id !== undefined ? { id: data.id } : {} ),
 		slug: data.slug,
 		status: data.status,
 		title: data.title.raw,
-		content: JSON.stringify( serializeConfig( data ) ),
+		object_type: config.object_type,
+		config: {
+			labels,
+			public: config.public,
+			hierarchical: config.hierarchical,
+			...( description !== '' ? { description } : {} ),
+		},
 	};
 }
 
