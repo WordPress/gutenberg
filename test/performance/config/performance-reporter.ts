@@ -42,9 +42,6 @@ export interface WPRawPerformanceResults {
 	wpTotal: number[];
 	wpMemoryUsage: number[];
 	wpDbQueries: number[];
-	mediaUploadSingle: number[];
-	mediaUploadLarge: number[];
-	mediaUploadMultiple: number[];
 	mediaProcessingJpeg: number[];
 	mediaProcessingAvif: number[];
 	mediaProcessingJpegToAvif: number[];
@@ -84,9 +81,6 @@ export interface WPPerformanceResults {
 	wpTotal?: PerformanceStats;
 	wpMemoryUsage?: PerformanceStats;
 	wpDbQueries?: PerformanceStats;
-	mediaUploadSingle?: PerformanceStats;
-	mediaUploadLarge?: PerformanceStats;
-	mediaUploadMultiple?: PerformanceStats;
 	mediaProcessingJpeg?: PerformanceStats;
 	mediaProcessingAvif?: PerformanceStats;
 	mediaProcessingJpegToAvif?: PerformanceStats;
@@ -128,9 +122,6 @@ export function curateResults(
 		wpTotal: stats( results.wpTotal ),
 		wpMemoryUsage: stats( results.wpMemoryUsage ),
 		wpDbQueries: stats( results.wpDbQueries ),
-		mediaUploadSingle: stats( results.mediaUploadSingle ),
-		mediaUploadLarge: stats( results.mediaUploadLarge ),
-		mediaUploadMultiple: stats( results.mediaUploadMultiple ),
 		mediaProcessingJpeg: stats( results.mediaProcessingJpeg ),
 		mediaProcessingAvif: stats( results.mediaProcessingAvif ),
 		mediaProcessingJpegToAvif: stats( results.mediaProcessingJpegToAvif ),
