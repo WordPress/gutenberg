@@ -45,8 +45,9 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioPresets?: AspectRatioPreset[];
 	/**
 	 * When true, render the Restore-original sticky footer button.
-	 * Driven by the modal: only true when `media_details.root_image`
-	 * exists and a restore isn't already pending.
+	 * Driven by the modal: only true when
+	 * `media_details.original_attachment` exists and a restore isn't
+	 * already pending.
 	 */
 	canRestoreOriginal?: boolean;
 	/**

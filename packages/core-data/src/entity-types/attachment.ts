@@ -22,7 +22,7 @@ interface MediaDetails {
 	sizes: { [ key: string ]: Size };
 	image_meta?: ImageMeta;
 	original_image?: string;
-	root_image?: {
+	original_attachment?: {
 		attachment_id: number;
 		source_url: string;
 	};

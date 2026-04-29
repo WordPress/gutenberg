@@ -293,25 +293,25 @@ function MediaEditorModalContent( {
 		return null;
 	}, [ isImage, media ] );
 
-	const rootImage = media?.media_details?.root_image as
+	const originalAttachment = media?.media_details?.original_attachment as
 		| { attachment_id: number; source_url: string }
 		| undefined;
 	const canRestoreOriginal =
 		isImage &&
-		!! rootImage &&
-		rootImage.attachment_id !== id &&
+		!! originalAttachment &&
+		originalAttachment.attachment_id !== id &&
 		! restoredOriginal;
 
 	const handleRestoreOriginal = useCallback( () => {
-		if ( ! rootImage ) {
+		if ( ! originalAttachment ) {
 			return;
 		}
-		setPendingSourceUrl( rootImage.source_url );
-		setPendingSourceId( rootImage.attachment_id );
+		setPendingSourceUrl( originalAttachment.source_url );
+		setPendingSourceId( originalAttachment.attachment_id );
 		cropper.reset();
 		setAspectRatioValue( '0' );
 		setFreeformCrop( true );
-	}, [ rootImage, cropper ] );
+	}, [ originalAttachment, cropper ] );
 
 	const tabs = useMemo< ModalTab[] >( () => {
 		const detailsTab: ModalTab = {
