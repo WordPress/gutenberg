@@ -30,6 +30,19 @@ const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
+// In eslint-plugin-react-hooks v7, the single `react-compiler` rule was split
+// into individual rules. Derive the off-mapping from the `recommended-latest`
+// preset (excluding the basic hooks rules) so we can disable them as a group.
+const reactCompilerRulesOff = Object.fromEntries(
+	Object.keys( reactHooksPlugin.configs.flat[ 'recommended-latest' ].rules )
+		.filter(
+			( name ) =>
+				name !== 'react-hooks/rules-of-hooks' &&
+				name !== 'react-hooks/exhaustive-deps'
+		)
+		.map( ( name ) => [ name, 'off' ] )
+);
+
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
  * reference is strictly identical. Because the @wordpress/eslint-plugin
@@ -220,6 +233,9 @@ export default dedupePlugins( [
 	// Storybook recommended (array of 3).
 	...storybookPlugin.configs[ 'flat/recommended' ],
 
+	// React Hooks recommended-latest (includes React Compiler rules).
+	reactHooksPlugin.configs.flat[ 'recommended-latest' ],
+
 	// Global settings applicable to all files.
 	{
 		languageOptions: {
@@ -283,7 +299,7 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
-			'react-hooks/react-compiler': [
+			'react-hooks/config': [
 				'error',
 				{
 					environment: {
@@ -339,7 +355,7 @@ export default dedupePlugins( [
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
-			'react-hooks/react-compiler': 'off',
+			...reactCompilerRulesOff,
 		},
 	},
 
@@ -779,7 +795,7 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
-			'react-hooks/react-compiler': 'off',
+			...reactCompilerRulesOff,
 			'react/react-in-jsx-scope': 'error',
 		},
 	},

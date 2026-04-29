@@ -113,7 +113,8 @@
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0"
+		"jsdom": "26.1.0",
+		"zod@3": "4.3.6"
 	},
 	"scripts": {
 		"build": "node ./bin/build.mjs",
