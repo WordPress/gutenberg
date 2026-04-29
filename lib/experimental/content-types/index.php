@@ -174,9 +174,10 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 
 	$decoded = json_decode( wp_unslash( (string) $data['post_content'] ), true );
 	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
-		// Invalid JSON: store empty content so raw bytes can't leak.
-		$data['post_content'] = '';
-		return $data;
+		// Hedge: invalid JSON falls through to a canonical empty payload so
+		// a stray read path can't surface arbitrary bytes. The marker is
+		// added below, keeping the stored shape uniform.
+		$decoded = array();
 	}
 
 	$clean = gutenberg_user_taxonomy_sanitize_config( $decoded );
