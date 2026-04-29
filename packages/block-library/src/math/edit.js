@@ -15,6 +15,7 @@ import {
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -36,12 +37,21 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
 			if ( initialLatex.current ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( {
-					mathML: module.default( initialLatex.current, {
+				// `wp_kses` runs on block attributes for users without
+				// `unfiltered_html`, encoding `&` to `&amp;` and similar.
+				// LaTeX uses `&` (e.g. as a column separator in `pmatrix`),
+				// so decode entities before rendering.
+				const decodedLatex = decodeEntities( initialLatex.current );
+				const updates = {
+					mathML: module.default( decodedLatex, {
 						displayMode: true,
 					} ),
-				} );
+				};
+				if ( decodedLatex !== initialLatex.current ) {
+					updates.latex = decodedLatex;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( updates );
 			}
 		} );
 	}, [
