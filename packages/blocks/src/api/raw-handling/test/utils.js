@@ -74,26 +74,20 @@ describe( 'isPlain', () => {
 		).toBe( true );
 	} );
 
-	it( 'should return false for div wrappers with semantic attributes', () => {
-		expect( isPlain( '<div class="box">test</div>' ) ).toBe( false );
-		expect( isPlain( '<div id="content">test</div>' ) ).toBe( false );
-		expect( isPlain( '<div role="alert">test</div>' ) ).toBe( false );
-		expect( isPlain( '<div data-block="custom">test</div>' ) ).toBe(
-			false
-		);
-		expect( isPlain( '<div aria-label="content">test</div>' ) ).toBe(
-			false
-		);
-	} );
-
-	it( 'should return false for span wrappers with semantic attributes', () => {
-		expect( isPlain( '<span class="token">test</span>' ) ).toBe( false );
-		expect( isPlain( '<span id="content">test</span>' ) ).toBe( false );
-		expect( isPlain( '<span role="alert">test</span>' ) ).toBe( false );
-		expect( isPlain( '<span data-token="abc">test</span>' ) ).toBe( false );
-		expect( isPlain( '<span aria-label="content">test</span>' ) ).toBe(
-			false
-		);
+	[ 'div', 'span' ].forEach( ( tag ) => {
+		it( `should return false for ${ tag } wrappers with semantic attributes`, () => {
+			[
+				'class="box"',
+				'id="content"',
+				'role="alert"',
+				'data-token="abc"',
+				'aria-label="content"',
+			].forEach( ( attr ) => {
+				expect( isPlain( `<${ tag } ${ attr }>test</${ tag }>` ) ).toBe(
+					false
+				);
+			} );
+		} );
 	} );
 
 	it( 'should return false when a descendant has semantic attributes', () => {
