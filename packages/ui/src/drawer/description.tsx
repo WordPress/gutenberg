@@ -1,7 +1,6 @@
 import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../text';
-import styles from './style.module.css';
 import type { DescriptionProps } from './types';
 
 /**
@@ -16,7 +15,6 @@ const Description = forwardRef< HTMLParagraphElement, DescriptionProps >(
 				ref={ ref }
 				variant="body-md"
 				render={ <_Drawer.Description { ...props } /> }
-				className={ styles.description }
 			>
 				{ children }
 			</Text>

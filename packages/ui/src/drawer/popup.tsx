@@ -8,6 +8,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
@@ -25,6 +26,11 @@ const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';
  *
  * When `portal` is omitted, defaults to `Drawer.Portal`. Portal merging is
  * handled by `renderPortalWithChildren` (shared with other overlay `Popup`s).
+ *
+ * The popup is a flex column; scroll ownership lives on `Drawer.Content`,
+ * which children are expected to render. Without it, long body content will
+ * clip instead of scrolling and Base UI's swipe-dismiss-on-scroll-edge
+ * logic on up/down drawers cannot engage.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 	{ className, portal, children, size, initialFocus, finalFocus, ...props },
@@ -32,7 +38,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ICON_ATTR,
+		deprioritizedAttributes: [ CLOSE_ICON_ATTR, SCROLL_CONTAINER_ATTR ],
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDrawerModal();
@@ -75,12 +81,13 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 						initialFocus={ resolvedInitialFocus }
 						finalFocus={ finalFocus }
 						{ ...props }
+						data-wp-ui-overlay-modal={
+							modal === true ? '' : undefined
+						}
 					>
-						<_Drawer.Content className={ styles.content }>
-							<DrawerValidationProvider>
-								{ children }
-							</DrawerValidationProvider>
-						</_Drawer.Content>
+						<DrawerValidationProvider>
+							{ children }
+						</DrawerValidationProvider>
 					</_Drawer.Popup>
 				</ThemeProvider>
 			</_Drawer.Viewport>

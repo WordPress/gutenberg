@@ -6,8 +6,11 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { CropperAction, CropperState, Size } from '../../core/types';
-import { InteractionController } from '../../core/interaction-controller';
+import type { CropperState, Size } from '../../core/types';
+import {
+	InteractionController,
+	type CropperInteractionActions,
+} from '../../core/interaction-controller';
 
 /**
  * The return type of the useInteraction hook.
@@ -25,6 +28,8 @@ export interface UseInteractionReturn {
 	isDragging: boolean;
 	/** Whether a double-tap zoom animation is in progress. */
 	isZooming: boolean;
+	/** Whether the user is currently performing a placement interaction. */
+	isPlacementActive: boolean;
 }
 
 /**
@@ -47,6 +52,21 @@ export interface UseInteractionOptions {
 	onGestureEnd?: () => void;
 }
 
+/** How long keyboard placement stays active after the latest handled key. */
+const KEYBOARD_INTERACTION_IDLE_MS = 300;
+
+function isHandledKeyboardPan( event: KeyboardEvent ): boolean {
+	switch ( event.key ) {
+		case 'ArrowUp':
+		case 'ArrowDown':
+		case 'ArrowLeft':
+		case 'ArrowRight':
+			return true;
+		default:
+			return false;
+	}
+}
+
 /**
  * Mouse, touch, and keyboard event handling for pan, zoom,
  * and crop manipulation.
@@ -56,7 +76,7 @@ export interface UseInteractionOptions {
  * layout thrashing.
  *
  * @param state         The current cropper state.
- * @param dispatch      The dispatch function for cropper actions.
+ * @param actions       Named state updates for cropper interactions.
  * @param containerSize The container dimensions in pixels.
  * @param imageSize     The rendered image dimensions in pixels.
  * @param options       Optional configuration for zoom and keyboard behavior.
@@ -64,13 +84,17 @@ export interface UseInteractionOptions {
  */
 export function useInteraction(
 	state: CropperState,
-	dispatch: React.Dispatch< CropperAction >,
+	actions: CropperInteractionActions,
 	containerSize: Size,
 	imageSize?: Size,
 	options?: UseInteractionOptions
 ): UseInteractionReturn {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isZooming, setIsZooming ] = useState( false );
+	const [ isGestureActive, setIsGestureActive ] = useState( false );
+	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
+	const keyboardInteractionTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	// Keep mutable refs so the controller always reads fresh values
 	// without needing to be recreated.
@@ -82,16 +106,43 @@ export function useInteraction(
 	imageSizeRef.current = imageSize;
 	const optionsRef = useRef( options );
 	optionsRef.current = options;
+	const actionsRef = useRef( actions );
+	actionsRef.current = actions;
 
 	const controllerRef = useRef< InteractionController | null >( null );
+	const startPlacementGesture = useCallback( () => {
+		setIsGestureActive( true );
+	}, [] );
+	const stopPlacementGesture = useCallback( () => {
+		setIsGestureActive( false );
+	}, [] );
+	const signalKeyboardPlacement = useCallback( () => {
+		setIsKeyboardPanning( true );
+		clearTimeout( keyboardInteractionTimerRef.current );
+		keyboardInteractionTimerRef.current = setTimeout( () => {
+			setIsKeyboardPanning( false );
+		}, KEYBOARD_INTERACTION_IDLE_MS );
+	}, [] );
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( keyboardInteractionTimerRef.current );
+		};
+	}, [] );
 
 	// Create / destroy the controller. The controller reads all volatile
-	// values through refs, so it only needs to be recreated when dispatch
-	// changes (which is stable for useReducer).
+	// values through refs, so it can stay mounted across render updates.
 	useEffect( () => {
 		const controller = new InteractionController( {
-			dispatch,
 			getState: () => stateRef.current,
+			actions: {
+				setPan: ( pan ) => actionsRef.current.setPan( pan ),
+				setZoom: ( zoom ) => actionsRef.current.setZoom( zoom ),
+				setZoomAtPoint: ( zoom, pan ) =>
+					actionsRef.current.setZoomAtPoint( zoom, pan ),
+				snapRotate90: ( direction ) =>
+					actionsRef.current.snapRotate90( direction ),
+			},
 			getContainerSize: () => containerSizeRef.current,
 			getImageSize: () => imageSizeRef.current,
 			get minZoom() {
@@ -109,8 +160,14 @@ export function useInteraction(
 			get doubleTapZoom() {
 				return optionsRef.current?.doubleTapZoom;
 			},
-			onGestureStart: () => optionsRef.current?.onGestureStart?.(),
-			onGestureEnd: () => optionsRef.current?.onGestureEnd?.(),
+			onGestureStart: () => {
+				startPlacementGesture();
+				optionsRef.current?.onGestureStart?.();
+			},
+			onGestureEnd: () => {
+				stopPlacementGesture();
+				optionsRef.current?.onGestureEnd?.();
+			},
 			onStatusChange: ( status ) => {
 				setIsDragging( status.isDragging );
 				setIsZooming( status.isZooming );
@@ -121,7 +178,7 @@ export function useInteraction(
 			controller.destroy();
 			controllerRef.current = null;
 		};
-	}, [ dispatch ] );
+	}, [ startPlacementGesture, stopPlacementGesture ] );
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		const el = e.currentTarget as HTMLElement;
@@ -138,9 +195,15 @@ export function useInteraction(
 		);
 	}, [] );
 
-	const onKeyDown = useCallback( ( e: React.KeyboardEvent ) => {
-		controllerRef.current?.handleKeyDown( e.nativeEvent );
-	}, [] );
+	const onKeyDown = useCallback(
+		( e: React.KeyboardEvent ) => {
+			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
+				signalKeyboardPlacement();
+			}
+			controllerRef.current?.handleKeyDown( e.nativeEvent );
+		},
+		[ signalKeyboardPlacement ]
+	);
 
 	const onWheelNative = useCallback( ( e: WheelEvent ) => {
 		controllerRef.current?.handleWheel( e );
@@ -155,5 +218,6 @@ export function useInteraction(
 		onWheelNative,
 		isDragging,
 		isZooming,
+		isPlacementActive: isGestureActive || isKeyboardPanning || isZooming,
 	};
 }

@@ -14,7 +14,7 @@
 	}
 }
 
-.dataviews-action-modal__edit-taxonomy {
+.dataviews-action-modal__quick-edit-taxonomy {
 	justify-content: flex-end;
 	align-items: stretch;
 
@@ -28,7 +28,7 @@
 		animation-name: none;
 
 		@media (prefers-reduced-motion: no-preference) {
-			animation-name: edit-taxonomy-slide-in-right;
+			animation-name: quick-edit-taxonomy-slide-in-right;
 			animation-duration: 0.2s;
 			animation-timing-function: ease-out;
 		}
@@ -38,45 +38,35 @@
 		animation-name: none;
 
 		@media (prefers-reduced-motion: no-preference) {
-			animation-name: edit-taxonomy-slide-out-right;
+			animation-name: quick-edit-taxonomy-slide-out-right;
 			animation-duration: 0.2s;
 			animation-timing-function: ease-out;
 		}
 	}
 
 	.components-modal__content {
-		display: flex;
-		flex-direction: column;
-		height: 100%;
 		padding: 0;
-	}
-
-	.dataviews-action-modal__edit-taxonomy-header {
-		flex: 0 0 auto;
-		padding: $grid-unit-15 $grid-unit-20 $grid-unit-15 $grid-unit-30;
-		border-bottom: 1px solid $gray-200;
-		background: #fff;
-	}
-
-	.dataviews-action-modal__edit-taxonomy-title {
-		margin: 0;
-		font-size: 13px;
-		font-weight: 600;
-		line-height: 1.4;
-	}
-
-	.dataviews-action-modal__edit-taxonomy-content {
-		flex: 1 1 auto;
-		min-height: 0;
 		overflow-y: auto;
+	}
+
+	.dataviews-action-modal__quick-edit-taxonomy-header {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: $white;
 		padding: $grid-unit-20 $grid-unit-30;
 	}
 
-	.dataviews-action-modal__edit-taxonomy-footer {
-		flex: 0 0 auto;
+	.dataviews-action-modal__quick-edit-taxonomy-content {
+		padding: 0 $grid-unit-30;
+	}
+
+	.dataviews-action-modal__quick-edit-taxonomy-footer {
+		position: sticky;
+		bottom: 0;
+		z-index: 1;
+		background: $white;
 		padding: $grid-unit-20 $grid-unit-30;
-		border-top: 1px solid $gray-200;
-		background: #fff;
 
 		.components-button {
 			flex: 1;
@@ -85,7 +75,7 @@
 	}
 }
 
-@keyframes edit-taxonomy-slide-in-right {
+@keyframes quick-edit-taxonomy-slide-in-right {
 	from {
 		transform: translateX(100%);
 	}
@@ -94,7 +84,7 @@
 	}
 }
 
-@keyframes edit-taxonomy-slide-out-right {
+@keyframes quick-edit-taxonomy-slide-out-right {
 	from {
 		transform: translateX(0);
 	}

@@ -8,6 +8,7 @@ import {
 } from '@wordpress/theme';
 import { unlock } from '../lock-unlock';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
+import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderPortalWithChildren } from '../utils/render-portal-with-children';
 import { DialogValidationProvider, useDialogModal } from './context';
 import { Portal } from './portal';
@@ -40,7 +41,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ICON_ATTR,
+		deprioritizedAttributes: [ CLOSE_ICON_ATTR, SCROLL_CONTAINER_ATTR ],
 	} );
 	const mergedRef = useMergeRefs( [ ref, popupRef ] );
 	const modal = useDialogModal();
@@ -69,6 +70,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					{ ...props }
+					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
 				>
 					<DialogValidationProvider>
 						{ children }

@@ -56,6 +56,14 @@ import './style.css';
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
 
+const GRID_MODES = {
+	off: false,
+	on: true,
+	interactive: 'interactive',
+} as const;
+
+type GridMode = keyof typeof GRID_MODES;
+
 const IMAGE_CREDIT = (
 	<p style={ { fontSize: 10, color: '#aaa', margin: '4px 0 0' } }>
 		{ '"A fashionable melange of English words (1887)" ' }
@@ -173,6 +181,7 @@ const WithControlsComponent = () => {
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( false );
+	const [ gridMode, setGridMode ] = useState< GridMode >( 'interactive' );
 	const { src, isCustom, handleFileChange, resetToSample } =
 		useUploadableImage();
 	const fileInputRef = useRef< HTMLInputElement >( null );
@@ -409,6 +418,26 @@ const WithControlsComponent = () => {
 							onChange={ setFreeformCrop }
 						/>
 					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label="Grid"
+							hideLabelFromVision
+							value={ gridMode }
+							onChange={ ( value ) =>
+								setGridMode( value as GridMode )
+							}
+							options={ [
+								{ label: 'Grid: off', value: 'off' },
+								{ label: 'Grid: always on', value: 'on' },
+								{
+									label: 'Grid: interactive',
+									value: 'interactive',
+								},
+							] }
+						/>
+					</FlexItem>
 					<FlexItem isBlock />
 					<FlexItem>
 						<Button
@@ -451,7 +480,7 @@ const WithControlsComponent = () => {
 				<Cropper
 					src={ src }
 					controller={ controller }
-					showGrid
+					showGrid={ GRID_MODES[ gridMode ] }
 					showDimming
 					freeformCrop={ freeformCrop }
 					aspectRatio={ resolveAspectRatio(
