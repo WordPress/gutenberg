@@ -96,11 +96,46 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const UPDATE_TYPE_UPDATE = 'update';
 
 		/**
+		 * Entity access level: no access.
+		 *
+		 * @since 7.0.0
+		 * @var string
+		 */
+		const ACCESS_NONE = 'none';
+
+		/**
+		 * Entity access level: read-only. The user may receive sync updates but
+		 * cannot contribute document changes.
+		 *
+		 * @since 7.0.0
+		 * @var string
+		 */
+		const ACCESS_READ = 'read';
+
+		/**
+		 * Entity access level: read-write. The user may both receive and send
+		 * sync updates.
+		 *
+		 * @since 7.0.0
+		 * @var string
+		 */
+		const ACCESS_WRITE = 'write';
+
+		/**
 		 * Storage backend for sync updates.
 		 *
 		 * @since 7.0.0
 		 */
 		private WP_Sync_Storage $storage;
+
+		/**
+		 * Room names for which the current user only has read access.
+		 * Populated by check_permissions() and consumed by handle_request().
+		 *
+		 * @since 7.0.0
+		 * @var array<string, bool>
+		 */
+		private array $read_only_rooms = array();
 
 		/**
 		 * Constructor.
@@ -201,6 +236,8 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @return bool|WP_Error True if user has permission, otherwise WP_Error with details.
 		 */
 		public function check_permissions( WP_REST_Request $request ) {
+			$this->read_only_rooms = array();
+
 			// Minimum cap check. Is user logged in with a contributor role or higher?
 			if ( ! current_user_can( 'edit_posts' ) ) {
 				return new WP_Error(
@@ -232,11 +269,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$type_parts   = explode( '/', $room, 2 );
 				$object_parts = explode( ':', $type_parts[1] ?? '', 2 );
 
-				$entity_kind = $type_parts[0];
-				$entity_name = $object_parts[0];
-				$object_id   = $object_parts[1] ?? null;
+				$entity_kind  = $type_parts[0];
+				$entity_name  = $object_parts[0];
+				$object_id    = $object_parts[1] ?? null;
+				$access_level = $this->get_entity_access_level( $entity_kind, $entity_name, $object_id );
 
-				if ( ! $this->can_user_sync_entity_type( $entity_kind, $entity_name, $object_id ) ) {
+				if ( self::ACCESS_NONE === $access_level ) {
 					return new WP_Error(
 						'rest_cannot_edit',
 						sprintf(
@@ -246,6 +284,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 						),
 						array( 'status' => rest_authorization_required_code() )
 					);
+				}
+
+				if ( self::ACCESS_READ === $access_level ) {
+					$this->read_only_rooms[ $room ] = true;
 				}
 			}
 
@@ -308,6 +350,10 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 				// Process each update according to its type.
 				foreach ( $room_request['updates'] as $update ) {
+					// Skip document-modifying updates for rooms where the user only has read access.
+					if ( isset( $this->read_only_rooms[ $room ] ) ) {
+						continue;
+					}
 					$result = $this->process_sync_update( $room, $client_id, $cursor, $update );
 					if ( is_wp_error( $result ) ) {
 						return $result;
@@ -325,25 +371,25 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		}
 
 		/**
-		 * Checks if the current user can sync a specific entity type.
+		 * Returns the access level the current user has for a specific entity.
 		 *
 		 * @since 7.0.0
 		 *
 		 * @param string      $entity_kind The entity kind, e.g. 'postType', 'taxonomy', 'root'.
 		 * @param string      $entity_name The entity name, e.g. 'post', 'category', 'site'.
 		 * @param string|null $object_id   The numeric object ID / entity key for single entities, null for collections.
-		 * @return bool True if user has permission, otherwise false.
+		 * @return string One of ACCESS_NONE, ACCESS_READ, or ACCESS_WRITE.
 		 */
-		private function can_user_sync_entity_type( string $entity_kind, string $entity_name, ?string $object_id ): bool {
+		private function get_entity_access_level( string $entity_kind, string $entity_name, ?string $object_id ): string {
 			if ( is_string( $object_id ) ) {
 				if ( ! ctype_digit( $object_id ) ) {
-					return false;
+					return self::ACCESS_NONE;
 				}
 				$object_id = (int) $object_id;
 			}
 			if ( null !== $object_id && $object_id <= 0 ) {
 				// Object ID must be numeric if provided.
-				return false;
+				return self::ACCESS_NONE;
 			}
 
 			// Validate permissions for the provided object ID.
@@ -352,9 +398,19 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				if ( 'postType' === $entity_kind ) {
 					if ( get_post_type( $object_id ) !== $entity_name ) {
 						// Post is not of the specified post type.
-						return false;
+						return self::ACCESS_NONE;
 					}
-					return current_user_can( 'edit_post', $object_id );
+					if ( current_user_can( 'edit_post', $object_id ) ) {
+						return self::ACCESS_WRITE;
+					}
+					// Allow read-only access for published, non-password-protected posts
+					// that the user cannot edit (e.g. an editor viewing a template part
+					// whose capabilities require edit_theme_options).
+					$post = get_post( $object_id );
+					if ( $post && 'publish' === $post->post_status && ! post_password_required( $post ) ) {
+						return self::ACCESS_READ;
+					}
+					return self::ACCESS_NONE;
 				}
 
 				// Handle single taxonomy term entities with a defined object ID.
@@ -362,32 +418,45 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 					$term_exists = term_exists( $object_id, $entity_name );
 					if ( ! is_array( $term_exists ) || ! isset( $term_exists['term_id'] ) ) {
 						// Either term doesn't exist OR term is not in specified taxonomy.
-						return false;
+						return self::ACCESS_NONE;
 					}
-
-					return current_user_can( 'edit_term', $object_id );
+					if ( current_user_can( 'edit_term', $object_id ) ) {
+						return self::ACCESS_WRITE;
+					}
+					// Terms are generally publicly visible; allow read-only access when the
+					// term exists but the user lacks edit capability.
+					return self::ACCESS_READ;
 				}
 
 				// Handle single comment entities with a defined object ID.
 				if ( 'root' === $entity_kind && 'comment' === $entity_name ) {
-					return current_user_can( 'edit_comment', $object_id );
+					if ( current_user_can( 'edit_comment', $object_id ) ) {
+						return self::ACCESS_WRITE;
+					}
+					$comment = get_comment( $object_id );
+					if ( $comment && current_user_can( 'read_post', (int) $comment->comment_post_ID ) ) {
+						return self::ACCESS_READ;
+					}
+					return self::ACCESS_NONE;
 				}
 			}
 
 			// All the remaining checks are for collections. If an object ID is provided,
 			// reject the request.
 			if ( null !== $object_id ) {
-				return false;
+				return self::ACCESS_NONE;
 			}
 
 			// For postType collections, check if the user can edit posts of this type.
 			if ( 'postType' === $entity_kind ) {
 				$post_type_object = get_post_type_object( $entity_name );
 				if ( ! isset( $post_type_object->cap->edit_posts ) ) {
-					return false;
+					return self::ACCESS_NONE;
 				}
 
-				return current_user_can( $post_type_object->cap->edit_posts );
+				return current_user_can( $post_type_object->cap->edit_posts )
+					? self::ACCESS_WRITE
+					: self::ACCESS_NONE;
 			}
 
 			// Collection syncing does not exchange entity data. It only signals if
@@ -399,7 +468,9 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				'taxonomy',
 			);
 
-			return in_array( $entity_kind, $allowed_collection_entity_kinds, true );
+			return in_array( $entity_kind, $allowed_collection_entity_kinds, true )
+				? self::ACCESS_WRITE
+				: self::ACCESS_NONE;
 		}
 
 		/**
