@@ -53,7 +53,6 @@ import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { buildModifiers } from './build-modifiers';
-import { NOTICES_CONTEXT, useLoadErrorNotice } from './use-load-error-notice';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -70,6 +69,8 @@ const METADATA_EDIT_KEYS = [
 	'post',
 ] as const;
 
+const NOTICES_CONTEXT = 'media-editor';
+const IMAGE_LOAD_ERROR_NOTICE_ID = 'media-editor-image-load-error';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 const { Tabs } = unlock( componentsPrivateApis );
@@ -200,6 +201,7 @@ interface MediaEditorModalContentProps {
 	fields: Field< Media >[];
 	id: number;
 	media: Media | null;
+	mediaError: unknown;
 	hasEdits: boolean;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onUpdate: ( ( updated: MediaEditorModalUpdate ) => void ) | null;
@@ -212,6 +214,7 @@ function MediaEditorModalContent( {
 	fields,
 	id,
 	media,
+	mediaError,
 	hasEdits,
 	aspectRatioPresets,
 	onUpdate,
@@ -223,11 +226,13 @@ function MediaEditorModalContent( {
 	const {
 		clearEntityRecordEdits,
 		editEntityRecord,
+		invalidateResolution,
 		receiveEntityRecords,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
-	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+	const { createErrorNotice, removeAllNotices, removeNotice } =
+		useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
@@ -259,23 +264,59 @@ function MediaEditorModalContent( {
 		setFreeformCrop( true );
 	}, [ id ] );
 
+	const hasMedia = !! media;
+	useEffect( () => {
+		if ( ! mediaError ) {
+			return;
+		}
+		createErrorNotice(
+			__(
+				'Could not load image. Please check your connection and try again.'
+			),
+			{
+				id: IMAGE_LOAD_ERROR_NOTICE_ID,
+				type: 'snackbar',
+				context: NOTICES_CONTEXT,
+			}
+		);
+	}, [ mediaError, createErrorNotice ] );
+
+	const mediaErrorRef = useRef( mediaError );
+	mediaErrorRef.current = mediaError;
+
+	useEffect( () => {
+		if ( hasMedia ) {
+			return;
+		}
+		const retry = () => {
+			invalidateResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
+				id,
+			] );
+			invalidateResolution( 'getEditedEntityRecord', [
+				'postType',
+				'attachment',
+				id,
+			] );
+		};
+		// If a stale error is already present when this effect runs (e.g. the
+		// modal was closed while offline, the network restored, then the modal
+		// reopened — so the `online` event already fired before we registered),
+		// retry immediately instead of waiting for the next `online` event.
+		if ( mediaErrorRef.current ) {
+			retry();
+		}
+		window.addEventListener( 'online', retry );
+		return () => window.removeEventListener( 'online', retry );
+	}, [ hasMedia, id, invalidateResolution ] );
+
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
 	const mediaUrl = isImage ? media?.source_url : undefined;
 	const canEditImage = isImage && !! mediaUrl;
 	const isImageLoading =
 		canEditImage && cropper.state.image?.src !== mediaUrl;
-	const {
-		clearImageLoadErrorNotice,
-		imageLoadRetryKey,
-		showImageLoadErrorNotice,
-	} = useLoadErrorNotice( {
-		id,
-		hasMedia: !! media,
-		isImage,
-		mediaUrl,
-	} );
-
 	const imageAspectRatio = useMemo( () => {
 		if ( ! isImage ) {
 			return null;
@@ -293,8 +334,21 @@ function MediaEditorModalContent( {
 	}, [ isImage, media ] );
 
 	const handleImageLoaded = useCallback( () => {
-		clearImageLoadErrorNotice();
-	}, [ clearImageLoadErrorNotice ] );
+		removeNotice( IMAGE_LOAD_ERROR_NOTICE_ID, NOTICES_CONTEXT );
+	}, [ removeNotice ] );
+
+	const handleImageLoadError = useCallback( () => {
+		createErrorNotice(
+			__(
+				'Could not load image. Please check your connection and try again.'
+			),
+			{
+				id: IMAGE_LOAD_ERROR_NOTICE_ID,
+				type: 'snackbar',
+				context: NOTICES_CONTEXT,
+			}
+		);
+	}, [ createErrorNotice ] );
 
 	const tabs = useMemo< ModalTab[] >( () => {
 		const detailsTab: ModalTab = {
@@ -475,7 +529,6 @@ function MediaEditorModalContent( {
 		canvasContent = (
 			<>
 				<MediaEditorCanvas
-					key={ imageLoadRetryKey }
 					aspectRatio={ resolveAspectRatio(
 						aspectRatioValue,
 						imageAspectRatio
@@ -483,7 +536,7 @@ function MediaEditorModalContent( {
 					freeformCrop={ freeformCrop }
 					isPlacementActive={ isPlacementActive }
 					onImageLoaded={ handleImageLoaded }
-					onImageLoadError={ showImageLoadErrorNotice }
+					onImageLoadError={ handleImageLoadError }
 				/>
 				{ isImageLoading && (
 					<div className="media-editor-modal__loading media-editor-modal__loading--overlay">
@@ -622,22 +675,31 @@ export function MediaEditorModal( {
 		};
 	}, [] );
 
-	const { media, hasEdits } = useSelect(
+	const { media, mediaError, hasEdits } = useSelect(
 		( select ) => {
 			if ( ! id ) {
 				return {
 					media: null,
+					mediaError: null,
 					hasEdits: false,
 				};
 			}
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
+			const {
+				getEditedEntityRecord,
+				getResolutionError,
+				hasEditsForEntityRecord,
+			} = select( coreStore );
 			return {
 				media: getEditedEntityRecord(
 					'postType',
 					'attachment',
 					id
 				) as Media,
+				mediaError: getResolutionError( 'getEntityRecord', [
+					'postType',
+					'attachment',
+					id,
+				] ),
 				hasEdits: hasEditsForEntityRecord(
 					'postType',
 					'attachment',
@@ -666,6 +728,7 @@ export function MediaEditorModal( {
 				fields={ fields }
 				id={ id }
 				media={ media }
+				mediaError={ mediaError }
 				hasEdits={ hasEdits }
 				aspectRatioPresets={ aspectRatioPresets }
 				onUpdate={ onUpdate }
