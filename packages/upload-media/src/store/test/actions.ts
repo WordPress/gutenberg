@@ -929,6 +929,11 @@ describe( 'actions', () => {
 		} );
 
 		it( 'executes retry after timer fires', async () => {
+			// executeRetry is now a no-op when the queue is paused (the outer
+			// beforeEach pauses); resume so the timer's executeRetry mutates
+			// state.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -959,7 +964,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'executeRetry', () => {
-		beforeEach( () => {
+		beforeEach( async () => {
 			jest.useFakeTimers();
 			unlock( registry.dispatch( uploadStore ) ).updateSettings( {
 				retry: {
@@ -970,6 +975,9 @@ describe( 'actions', () => {
 					retryJitter: 0.1,
 				},
 			} );
+			// executeRetry is now a no-op when the queue is paused (the outer
+			// beforeEach pauses); resume so executeRetry mutates state.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
 		} );
 
 		afterEach( () => {
@@ -1195,6 +1203,43 @@ describe( 'actions', () => {
 			).getAllItems()[ 0 ];
 			expect( updatedItem.status ).toBe( ItemStatus.Processing );
 			expect( updatedItem.retryCount ).toBeUndefined();
+		} );
+
+		it( 'leaves item in PendingRetry when queue is paused, then resumes on resumeQueue', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Schedule a retry to put item in PendingRetry.
+			await registry
+				.dispatch( uploadStore )
+				.scheduleRetry( item.id, new Error( 'Network error' ) );
+
+			// Pause the queue before the timer fires.
+			unlock( registry.dispatch( uploadStore ) ).pauseQueue();
+
+			// Fire the retry timer while paused — executeRetry should bail
+			// without mutating state.
+			await jest.runAllTimersAsync();
+
+			const pausedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( pausedItem.status ).toBe( ItemStatus.PendingRetry );
+			expect( pausedItem.retryCount ).toBe( 0 );
+
+			// Resume — resumeQueue should re-trigger executeRetry for any
+			// PendingRetry items so they actually process.
+			await unlock( registry.dispatch( uploadStore ) ).resumeQueue();
+
+			const resumedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+			expect( resumedItem.status ).toBe( ItemStatus.Processing );
+			expect( resumedItem.retryCount ).toBe( 1 );
 		} );
 	} );
 

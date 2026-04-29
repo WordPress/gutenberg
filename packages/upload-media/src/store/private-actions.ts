@@ -470,7 +470,14 @@ export function resumeQueue() {
 		} );
 
 		for ( const item of select.getAllItems() ) {
-			dispatch.processItem( item.id );
+			// Items left in PendingRetry while paused had their timers
+			// cleared when the timer fired during pause. Re-trigger the
+			// retry now that the queue is active again.
+			if ( item.status === ItemStatus.PendingRetry ) {
+				dispatch.executeRetry( item.id );
+			} else {
+				dispatch.processItem( item.id );
+			}
 		}
 	};
 }

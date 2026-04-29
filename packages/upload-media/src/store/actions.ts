@@ -317,6 +317,13 @@ export function executeRetry( id: QueueItemId ) {
 			return;
 		}
 
+		// If the queue is paused, leave the item in PendingRetry without
+		// mutating state. resumeQueue will re-trigger executeRetry for
+		// items in this status when the queue resumes.
+		if ( select.isPaused() ) {
+			return;
+		}
+
 		// Reset the item to Processing status and clear the error.
 		dispatch< RetryItemAction >( {
 			type: Type.RetryItem,
