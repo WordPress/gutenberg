@@ -765,6 +765,42 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	}
 
 	/**
+	 * Editors cannot delete revisions on the singleton route. The inherited
+	 * check would allow it via `delete_post`. The override locks it to
+	 * administrators to match the rest of the singleton's write policy.
+	 *
+	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::delete_item_permissions_check
+	 */
+	public function test_delete_revision_no_permission_editor() {
+		wp_set_current_user( self::$admin_id );
+		$create_response = $this->create_guidelines();
+		$post_id         = $create_response->get_data()['id'];
+
+		$request = new WP_REST_Request( 'PATCH', self::REST_BASE . '/' . $post_id );
+		$request->set_param(
+			'guideline_categories',
+			array( 'copy' => array( 'guidelines' => 'Updated.' ) )
+		);
+		rest_get_server()->dispatch( $request );
+
+		$request   = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $post_id . '/revisions' );
+		$revisions = rest_get_server()->dispatch( $request )->get_data();
+
+		$this->assertNotEmpty( $revisions );
+
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request(
+			'DELETE',
+			self::REST_BASE . '/' . $post_id . '/revisions/' . $revisions[0]['id']
+		);
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+	}
+
+	/**
 	 * Tests that restoring requires admin permissions.
 	 *
 	 * @covers Gutenberg_Content_Guidelines_Revisions_Controller::restore_revision_permissions_check

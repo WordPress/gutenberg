@@ -229,6 +229,33 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 	}
 
 	/**
+	 * Restricts revision deletion to administrators.
+	 *
+	 * The inherited check only requires `delete_post` on the parent and the
+	 * revision. The singleton route is admin-managed for every other write,
+	 * so deleting revisions follows the same rule.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) {
+		$parent = $this->get_parent( $request['parent'] );
+		if ( is_wp_error( $parent ) ) {
+			return $parent;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new WP_Error(
+				'rest_cannot_delete',
+				__( 'Sorry, you are not allowed to delete revisions.', 'gutenberg' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		return parent::delete_item_permissions_check( $request );
+	}
+
+	/**
 	 * Checks if a given request has access to restore a revision.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
