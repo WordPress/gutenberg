@@ -7,11 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Button,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -19,6 +15,7 @@ import { memo, forwardRef, useContext } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import { store as commandsStore } from '@wordpress/commands';
 import { displayShortcut } from '@wordpress/keycodes';
+import { VisuallyHidden } from '@wordpress/ui';
 import { filterURLForDisplay } from '@wordpress/url';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -84,7 +81,7 @@ const SiteHub = memo(
 								target="_blank"
 							>
 								{ decodeEntities( siteTitle ) }
-								<VisuallyHidden as="span">
+								<VisuallyHidden render={ <span /> }>
 									{
 										/* translators: accessibility text */
 										__( '(opens in a new tab)' )

@@ -137,11 +137,11 @@ import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
 import * as tabPanel from './tab-panel';
+import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
+import * as tabList from './tab-list';
 import * as tabs from './tabs';
-import * as tabsMenu from './tabs-menu';
-import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -288,10 +288,10 @@ const getAllBlocks = () => {
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( tab );
+		blocks.push( tabList );
 		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
 		blocks.push( tabPanel );
+		blocks.push( tabPanels );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
 	}
