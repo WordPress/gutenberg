@@ -851,6 +851,14 @@ test.describe( 'Block Notes', () => {
 } );
 
 test.describe( 'Multiple notes per block', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments( 'note' );
+	} );
+
 	test( 'can add multiple notes to the same block', async ( {
 		editor,
 		page,
@@ -1217,6 +1225,10 @@ test.describe( 'Multiple notes per block', () => {
 
 		await editor.saveDraft();
 		await page.reload();
+
+		// The pinned notes sidebar isn't restored on reload, so open it
+		// explicitly before asserting the threads are visible.
+		await blockNoteUtils.openBlockNoteSidebar();
 
 		// After reload, both threads should reattach to the block.
 		const settings = page.getByRole( 'region', {
