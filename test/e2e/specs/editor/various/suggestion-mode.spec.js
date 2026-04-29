@@ -75,15 +75,19 @@ test.describe( 'Suggestion mode', () => {
 			.first();
 		await heading.click();
 
-		// Open the block-switcher and pick the H3 variation.
+		// Open the block-switcher and pick the H3 variation. The block-
+		// switcher's accessible name reflects the active heading variation
+		// ("Heading 2"), not the bare block name.
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Heading', exact: true } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
 			.click();
 		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
 
-		// Overlay reflects the user's change in the rendered DOM.
-		await expect( heading ).toHaveAttribute( 'aria-level', '3' );
+		// Overlay reflects the user's change in the rendered DOM. The
+		// heading block renders the level as the actual `h{n}` tag, so
+		// check the tag name rather than `aria-level`.
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H3' );
 
 		// But the serialized post still says level 2 — the interceptor
 		// reverted the underlying store and routed the change to the overlay.
