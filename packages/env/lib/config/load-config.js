@@ -68,13 +68,16 @@ module.exports = async function loadConfig(
 		}
 	}
 
-	// Try legacy md5 cache first, fall back to descriptive name
 	const cacheDirectory = await getCacheDirectory();
+
+	// If a cache already exists at the "legacy" path (which consists of a
+	// simple but opaque md5 hash), honor it.
 	let cacheDirectoryPath = path.resolve(
 		cacheDirectory,
 		md5( configFilePath )
 	);
 
+	// Otherwise, prefer a more descriptive path.
 	if ( ! existsSync( cacheDirectoryPath ) ) {
 		cacheDirectoryPath = path.resolve(
 			cacheDirectory,
