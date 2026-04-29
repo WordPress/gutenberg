@@ -7,14 +7,9 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
-import {
-	close,
-	justifyStretch,
-	resizeCornerNE,
-	stretchFullWidth,
-} from '@wordpress/icons';
+import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
-import { IconButton, Stack } from '@wordpress/ui';
+import { Icon, IconButton, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -671,6 +666,28 @@ export const EditMode: Story = {
 };
 
 /**
+ * Custom corner-resize glyph: a diagonal line plus a filled triangle,
+ * both leaning toward the bottom-right corner of the tile.
+ */
+const resizeCornerSE = (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		aria-hidden="true"
+	>
+		<path
+			d="M0 24L24 0"
+			stroke="currentColor"
+			strokeWidth="3"
+			strokeLinecap="round"
+			fill="none"
+		/>
+
+		<polygon points="24,24 10,24 24,10" fill="currentColor" />
+	</svg>
+);
+
+/**
  * Override the default corner-triangle resize handle with a custom
  * element via `renderResizeHandle`. The grid keeps the gesture
  * machinery (dnd-kit context, throttled delta loop) and passes the
@@ -690,23 +707,15 @@ function CustomResizeHandle( {
 			{ ...attributes }
 			style={ {
 				position: 'absolute',
-				bottom: 2,
-				insetInlineEnd: 2,
+				bottom: 0,
+				insetInlineEnd: 0,
 				display: 'flex',
+				cursor: 'nwse-resize',
+				opacity: isResizing ? 0.5 : 1,
+				transition: 'opacity 120ms ease',
 			} }
 		>
-			<IconButton
-				icon={ resizeCornerNE }
-				label="Resize"
-				aria-pressed={ isResizing }
-				tone="neutral"
-				variant={ isResizing ? 'outline' : 'solid' }
-				size="small"
-				style={ {
-					cursor: 'nesw-resize',
-					opacity: isResizing ? 0.5 : 1,
-				} }
-			/>
+			<Icon icon={ resizeCornerSE } size={ 16 } />
 		</div>
 	);
 }
