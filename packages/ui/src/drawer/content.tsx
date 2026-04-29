@@ -13,20 +13,19 @@ import type { ContentProps } from './types';
  *
  * **Required for scrolling** — `Drawer.Content` is the element that owns
  * the popup's overflow. Without it, body content that exceeds the popup's
- * available space clips instead of scrolling, and Base UI's
- * swipe-dismiss-on-scroll-edge logic will not engage on up/down drawers.
+ * available space clips instead of scrolling, and swipe-to-dismiss on
+ * scrollable vertical drawers won't gate correctly at the scroll edge.
  * Render it once per popup and wrap any freeform body content in it.
  *
  * Placing `Drawer.Header` or `Drawer.Footer` *inside* `Drawer.Content`
  * makes them scroll with the body (the "non-sticky" opt-out) rather than
  * staying pinned to the popup's edges.
  *
- * Internally, the visible scroll container wraps Base UI's `_Drawer.Content`
- * marker rather than being it. Base UI excludes mouse-drag swipe-dismiss
- * over `[data-drawer-content]` to preserve text selection inside the
- * body; keeping that marker tightly scoped to the children means the
- * scroll container's padding gutter falls outside it and remains
- * mouse-draggable for swipe-dismiss in the gutter region.
+ * Mouse-drag swipe-to-dismiss is preserved in the popup-edge padding
+ * gutter and on the chrome regions; mouse drag over the body itself
+ * does not dismiss the drawer, so text selection inside the body keeps
+ * working normally. Touch swipe-to-dismiss engages from anywhere in
+ * the popup (gated by the scroll edge on vertical drawers).
  */
 const Content = forwardRef< HTMLDivElement, ContentProps >(
 	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
