@@ -79,13 +79,13 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 	}
 
 	/**
-	 * Checks whether the request type is a note or reaction.
+	 * Checks whether the request type is an internal comment type (note or reaction).
 	 *
 	 * @param string $type The comment type from the request.
-	 * @return bool True if the type is 'note' or 'reaction'.
+	 * @return bool True if the type is one of the internal comment types.
 	 */
 	protected function is_note_or_reaction( $type ) {
-		return in_array( $type, array( 'note', 'reaction' ), true );
+		return in_array( $type, gutenberg_get_internal_comment_types(), true );
 	}
 
 	public function get_items_permissions_check( $request ) {
@@ -349,8 +349,8 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			);
 		}
 
-		// Allow 'comment', 'note', and 'reaction' types.
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'reaction' ), true ) ) {
+		// Allow 'comment' plus internal comment types (note, reaction).
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array_merge( array( 'comment' ), gutenberg_get_internal_comment_types() ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
