@@ -99,10 +99,12 @@ async function runUploadIterations( {
 			bucket.push( elapsed );
 		}
 
-		// Reset state for next iteration: remove the block and any uploaded
-		// media so the editor is clean for the next upload.
-		await editor.selectBlocks( imageBlock );
-		await page.keyboard.press( 'Backspace' );
+		// Reset state for next iteration. Use resetBlocks rather than
+		// selecting and pressing Backspace because after upload, DOM focus
+		// is inside the block and Backspace is consumed by an inner element.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks( [] );
+		} );
 		await requestUtils.deleteAllMedia();
 		await fs.rm( tmpDirectory, {
 			recursive: true,
@@ -245,8 +247,11 @@ test.describe( 'Media Upload Performance', () => {
 				}
 
 				// Reset state for next iteration.
-				await editor.selectBlocks( galleryBlock );
-				await page.keyboard.press( 'Backspace' );
+				await page.evaluate( () => {
+					window.wp.data
+						.dispatch( 'core/block-editor' )
+						.resetBlocks( [] );
+				} );
 				await requestUtils.deleteAllMedia();
 				await fs.rm( tmpDirectory, {
 					recursive: true,
