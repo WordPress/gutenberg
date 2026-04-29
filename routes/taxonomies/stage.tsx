@@ -125,6 +125,10 @@ function TaxonomiesPage() {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item ) => String( item.id ) }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) =>
+					navigate( { to: `/edit/${ item.id }` } )
+				}
 			/>
 		</Page>
 	);
