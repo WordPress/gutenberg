@@ -59,9 +59,13 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
 			}
 			onBlur={ ( event ) => {
-				// Prevent blur from closing the form while the async
-				// submit is in progress. Clicking "Add note" moves focus
-				// away, triggering blur before onSubmit completes.
+				// Don't deselect notes when the browser window/tab loses focus.
+				if ( ! document.hasFocus() ) {
+					return;
+				}
+				// Prevent blur from closing the form while the async submit
+				// is in progress. Clicking "Add note" moves focus away,
+				// triggering blur before onSubmit completes.
 				if ( isSubmittingRef.current ) {
 					return;
 				}
