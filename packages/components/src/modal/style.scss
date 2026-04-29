@@ -36,6 +36,7 @@
 	margin: $grid-unit-50 0 0 0;
 	width: 100%;
 	background: $white;
+	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 	box-shadow: $elevation-large;
 	border-radius: $radius-large $radius-large 0 0;
 	overflow: hidden;
