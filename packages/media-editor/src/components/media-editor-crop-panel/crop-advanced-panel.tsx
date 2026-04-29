@@ -22,10 +22,72 @@ interface CropAdvancedPanelProps {
 	onPlacementControlInteraction?: () => void;
 }
 
-type Field = 'x' | 'y' | 'width' | 'height';
-type Drafts = Record< Field, string >;
-
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
+
+interface CropInputProps {
+	label: string;
+	'aria-label'?: string;
+	value: number;
+	min: number;
+	max: number;
+	onCommit: ( value: number ) => void;
+}
+
+// Shows a live draft while the user types, then snaps to the committed
+// (enforced) value on blur or Enter — canvas updates in real-time without
+// the input jumping to a clamped value on each keystroke.
+function CropInput( {
+	label,
+	'aria-label': ariaLabel,
+	value,
+	min,
+	max,
+	onCommit,
+}: CropInputProps ) {
+	const [ focused, setFocused ] = useState( false );
+	const [ draft, setDraft ] = useState( '' );
+
+	const handleFocus = () => {
+		setFocused( true );
+		setDraft( String( value ) );
+	};
+
+	const handleChange = ( v: string | undefined ) => {
+		setDraft( v ?? '' );
+		const parsed = parseInt( v ?? '', 10 );
+		if ( ! isNaN( parsed ) ) {
+			onCommit( Math.max( min, Math.min( parsed, max ) ) );
+		}
+	};
+
+	const handleBlur = () => setFocused( false );
+
+	const handleKeyDown = (
+		event: React.KeyboardEvent< HTMLInputElement >
+	) => {
+		if ( event.key === 'Enter' || event.key === 'Escape' ) {
+			setFocused( false );
+			event.currentTarget.blur();
+		}
+	};
+
+	return (
+		<NumberControl
+			__next40pxDefaultSize
+			label={ label }
+			aria-label={ ariaLabel }
+			value={ focused ? draft : String( value ) }
+			min={ min }
+			max={ max }
+			step={ 1 }
+			onChange={ handleChange }
+			onFocus={ handleFocus }
+			onBlur={ handleBlur }
+			onKeyDown={ handleKeyDown }
+			suffix={ pxSuffix }
+		/>
+	);
+}
 
 export default function CropAdvancedPanel( {
 	onPlacementControlInteraction,
@@ -51,94 +113,34 @@ export default function CropAdvancedPanel( {
 		};
 	}, [ state ] );
 
-	// Which field is actively focused. Used to switch between showing the
-	// user's draft (free typing) and the committed pixel value from state.
-	const [ focusedField, setFocusedField ] = useState< Field | null >( null );
-
-	// The typed string value for the focused field. Only consulted when the
-	// field is focused — otherwise the display derives from pixels directly,
-	// so it stays in sync with canvas-driven changes at no extra cost.
-	const [ drafts, setDrafts ] = useState< Drafts >( {
-		x: '',
-		y: '',
-		width: '',
-		height: '',
-	} );
-
 	if ( ! pixels ) {
 		return null;
 	}
 
 	const { snapW, snapH } = pixels;
 
-	// Returns the value to show in each input. While focused: the raw typed
-	// draft. While not focused: the committed pixel value (always current).
-	const displayValue = ( field: Field ): string =>
-		focusedField === field ? drafts[ field ] : String( pixels[ field ] );
-
-	const handleFocus = ( field: Field ) => () => {
-		setFocusedField( field );
-		// Seed the draft with the current committed value so the user sees the
-		// right starting point before they begin typing.
-		setDrafts( ( prev ) => ( {
-			...prev,
-			[ field ]: String( pixels[ field ] ),
-		} ) );
-	};
-
-	const handleChange = ( field: Field ) => ( v: string | undefined ) => {
-		// Always update the draft so the input shows what the user typed.
-		setDrafts( ( prev ) => ( { ...prev, [ field ]: v ?? '' } ) );
-
-		const parsed = parseInt( v ?? '', 10 );
-		if ( isNaN( parsed ) || ! state.image ) {
-			return;
-		}
-
-		// Clamp to valid bounds for a best-effort live update. enforceContainment
-		// in the reducer is the authoritative constraint and will catch anything
-		// we miss here, so the cropper never ends up in an invalid state.
-		const clamped = {
-			x:
-				field === 'x'
-					? Math.max( 0, Math.min( parsed, snapW - pixels.width ) )
-					: pixels.x,
-			y:
-				field === 'y'
-					? Math.max( 0, Math.min( parsed, snapH - pixels.height ) )
-					: pixels.y,
-			width:
-				field === 'width'
-					? Math.max( 1, Math.min( parsed, snapW - pixels.x ) )
-					: pixels.width,
-			height:
-				field === 'height'
-					? Math.max( 1, Math.min( parsed, snapH - pixels.y ) )
-					: pixels.height,
-		};
-
-		const imageSize = {
-			width: state.image.naturalWidth,
-			height: state.image.naturalHeight,
-		};
-
-		setCropRect( pixelsToCropRect( clamped, state, imageSize ) );
-		onPlacementControlInteraction?.();
-	};
-
-	const handleBlur = ( field: Field ) => () => {
-		// Clear the focused field — displayValue switches to pixels[field],
-		// which reflects the enforced value after the last onChange commit.
-		setFocusedField( ( prev ) => ( prev === field ? null : prev ) );
-	};
-
-	const handleKeyDown =
-		( field: Field ) =>
-		( event: React.KeyboardEvent< HTMLInputElement > ) => {
-			if ( event.key === 'Enter' || event.key === 'Escape' ) {
-				setFocusedField( ( prev ) => ( prev === field ? null : prev ) );
-				event.currentTarget.blur();
+	const handleCommit =
+		( field: 'x' | 'y' | 'width' | 'height' ) => ( clamped: number ) => {
+			if ( ! state.image ) {
+				return;
 			}
+			const imageSize = {
+				width: state.image.naturalWidth,
+				height: state.image.naturalHeight,
+			};
+			setCropRect(
+				pixelsToCropRect(
+					{
+						x: field === 'x' ? clamped : pixels.x,
+						y: field === 'y' ? clamped : pixels.y,
+						width: field === 'width' ? clamped : pixels.width,
+						height: field === 'height' ? clamped : pixels.height,
+					},
+					state,
+					imageSize
+				)
+			);
+			onPlacementControlInteraction?.();
 		};
 
 	return (
@@ -150,67 +152,43 @@ export default function CropAdvancedPanel( {
 			<Stack direction="column" gap="sm">
 				<Flex gap={ 2 } align="flex-start">
 					<FlexItem isBlock>
-						<NumberControl
-							__next40pxDefaultSize
+						<CropInput
 							label={ __( 'Left' ) }
 							aria-label={ __( 'Crop left position' ) }
-							value={ displayValue( 'x' ) }
+							value={ pixels.x }
 							min={ 0 }
 							max={ Math.max( 0, snapW - pixels.width ) }
-							step={ 1 }
-							onChange={ handleChange( 'x' ) }
-							onFocus={ handleFocus( 'x' ) }
-							onBlur={ handleBlur( 'x' ) }
-							onKeyDown={ handleKeyDown( 'x' ) }
-							suffix={ pxSuffix }
+							onCommit={ handleCommit( 'x' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
-						<NumberControl
-							__next40pxDefaultSize
+						<CropInput
 							label={ __( 'Top' ) }
 							aria-label={ __( 'Crop top position' ) }
-							value={ displayValue( 'y' ) }
+							value={ pixels.y }
 							min={ 0 }
 							max={ Math.max( 0, snapH - pixels.height ) }
-							step={ 1 }
-							onChange={ handleChange( 'y' ) }
-							onFocus={ handleFocus( 'y' ) }
-							onBlur={ handleBlur( 'y' ) }
-							onKeyDown={ handleKeyDown( 'y' ) }
-							suffix={ pxSuffix }
+							onCommit={ handleCommit( 'y' ) }
 						/>
 					</FlexItem>
 				</Flex>
 				<Flex gap={ 2 } align="flex-start">
 					<FlexItem isBlock>
-						<NumberControl
-							__next40pxDefaultSize
+						<CropInput
 							label={ __( 'Width' ) }
-							value={ displayValue( 'width' ) }
+							value={ pixels.width }
 							min={ 1 }
 							max={ Math.max( 1, snapW - pixels.x ) }
-							step={ 1 }
-							onChange={ handleChange( 'width' ) }
-							onFocus={ handleFocus( 'width' ) }
-							onBlur={ handleBlur( 'width' ) }
-							onKeyDown={ handleKeyDown( 'width' ) }
-							suffix={ pxSuffix }
+							onCommit={ handleCommit( 'width' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
-						<NumberControl
-							__next40pxDefaultSize
+						<CropInput
 							label={ __( 'Height' ) }
-							value={ displayValue( 'height' ) }
+							value={ pixels.height }
 							min={ 1 }
 							max={ Math.max( 1, snapH - pixels.y ) }
-							step={ 1 }
-							onChange={ handleChange( 'height' ) }
-							onFocus={ handleFocus( 'height' ) }
-							onBlur={ handleBlur( 'height' ) }
-							onKeyDown={ handleKeyDown( 'height' ) }
-							suffix={ pxSuffix }
+							onCommit={ handleCommit( 'height' ) }
 						/>
 					</FlexItem>
 				</Flex>
