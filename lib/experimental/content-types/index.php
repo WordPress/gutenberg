@@ -26,6 +26,25 @@ require_once __DIR__ . '/class-wp-rest-user-taxonomies-controller-gutenberg.php'
 const GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY = '_wp_user_taxonomy_object_type';
 
 /**
+ * Self-identifying key embedded in stored `post_content` JSON. Mirrors
+ * core's `isGlobalStylesUserThemeJSON` for `wp_global_styles`.
+ *
+ * Not load-bearing today: writes are sanitized via `wp_insert_post_data`,
+ * which carries `post_type` context, so payload identification doesn't
+ * need a marker. The marker is preserved as a forward-compat anchor for
+ * a content-only fallback sanitizer — e.g., if a future write path turns
+ * out to bypass `wp_insert_post_data`, or a kses-ordering issue forces a
+ * fallback to `content_save_pre`. In those scenarios a content-only
+ * sanitizer can't safely identify our payloads without a marker, and
+ * retroactively migrating stored records across WP installs is not
+ * practical, so the marker is present from day one.
+ *
+ * Storage-only: kept out of the REST schema and stripped on read so it
+ * never reaches clients.
+ */
+const GUTENBERG_USER_TAXONOMY_CONFIG_MARKER = 'isUserTaxonomyConfigJSON';
+
+/**
  * Registers the wp_user_taxonomy CPT.
  */
 function gutenberg_register_user_taxonomy_cpt() {
@@ -143,6 +162,11 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
  * Storage is encoded with `JSON_HEX_TAG | JSON_HEX_AMP`, so the bytes that
  * reach kses are inert and ordering vs `wp_filter_post_kses` is irrelevant.
  *
+ * The `GUTENBERG_USER_TAXONOMY_CONFIG_MARKER` key is attached after the
+ * schema-driven sanitize and before re-encoding. It's not consumed at
+ * runtime, but is preserved in stored bytes as a forward-compat anchor for
+ * a content-only fallback sanitizer (see the const's docblock).
+ *
  * Revisions are not handled here because the CPT doesn't include
  * `'revisions'` in its `supports` array; if revisions are enabled in a
  * future iteration, the filter will need an analogous revision branch
@@ -166,6 +190,7 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 	}
 
 	$clean = gutenberg_user_taxonomy_sanitize_config( $decoded );
+	$clean[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] = true;
 
 	$data['post_content'] = wp_slash(
 		wp_json_encode(
@@ -216,6 +241,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
 		return null;
 	}
+	unset( $decoded[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
 	// Storage is sanitized at write-time by the filter on
 	// `wp_insert_post_data`, so we trust the decoded shape here.
 	$config = $decoded;

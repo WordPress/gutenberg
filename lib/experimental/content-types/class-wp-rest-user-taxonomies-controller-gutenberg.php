@@ -136,6 +136,8 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			$config  = ( JSON_ERROR_NONE === json_last_error() && is_array( $decoded ) )
 				? $decoded
 				: array();
+			// Storage marker is server-only; never expose it to clients.
+			unset( $config[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
 			// Empty config must serialize as `{}` to match the schema's
 			// `type: 'object'`. PHP encodes empty associative arrays as `[]`
 			// in JSON, so cast empties to stdClass.
