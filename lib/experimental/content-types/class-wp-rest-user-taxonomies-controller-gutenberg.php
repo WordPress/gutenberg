@@ -14,7 +14,12 @@ if ( class_exists( 'WP_REST_User_Taxonomies_Controller_Gutenberg' ) ) {
 }
 
 /**
- * Base User Taxonomies REST API Controller.
+ * REST controller for user-defined taxonomies.
+ *
+ * Extends `WP_REST_Posts_Controller` because user taxonomies are stored
+ * as posts of the private `wp_user_taxonomy` CPT, not as WP terms — each
+ * record is the registration intent for a taxonomy, registered on `init`
+ * by `gutenberg_register_user_defined_taxonomies()`.
  */
 class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Controller {
 
@@ -61,7 +66,11 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	public static function get_config_schema() {
 		$label_props = array();
 		foreach ( self::get_allowed_label_keys() as $key ) {
-			$label_props[ $key ] = array( 'type' => 'string' );
+			// Headroom over the longest translated core label.
+			$label_props[ $key ] = array(
+				'type'      => 'string',
+				'maxLength' => 200,
+			);
 		}
 		return array(
 			'type'                 => 'object',
@@ -69,7 +78,11 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			'properties'           => array(
 				'public'       => array( 'type' => 'boolean' ),
 				'hierarchical' => array( 'type' => 'boolean' ),
-				'description'  => array( 'type' => 'string' ),
+				// Caps payload size; well above any reasonable description.
+				'description'  => array(
+					'type'      => 'string',
+					'maxLength' => 1000,
+				),
 				'labels'       => array(
 					'type'                 => 'object',
 					'additionalProperties' => false,
@@ -101,6 +114,8 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 				'pattern' => '^[a-z0-9_-]{1,20}$',
 			),
 			'uniqueItems' => true,
+			// Bounds the meta_query IN list; far above any realistic count.
+			'maxItems'    => 50,
 			'context'     => array( 'view', 'edit' ),
 			'default'     => array(),
 		);
@@ -155,19 +170,8 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	/**
 	 * Translates the typed `config` field on the request into the JSON blob
 	 * that lives in `post_content`, and rejects writes whose slug collides or
-	 * has the wrong shape.
-	 *
-	 * The encode here is as-is — the sanitizer hooked to `wp_insert_post_data`
-	 * does the structural sanitize in flight before the row is written.
-	 *
-	 * `JSON_HEX_TAG | JSON_HEX_AMP` escape `<`, `>`, and `&` to their `\u00XX`
-	 * forms in the stored bytes, so when `wp_filter_post_kses` runs later on
-	 * `content_save_pre` it sees an inert string with nothing to mangle. This
-	 * is what makes ordering vs. kses irrelevant. `JSON_UNESCAPED_SLASHES`
-	 * keeps URL-like values readable and round-trips cleanly through
-	 * `wp_slash`/`wp_unslash`. `JSON_FORCE_OBJECT` keeps empty/nested object
-	 * positions encoded as `{}` instead of `[]`, matching the schema's
-	 * `type: 'object'` declarations.
+	 * has the wrong shape. Structural sanitization is layered onto
+	 * `wp_insert_post_data`; this method only encodes.
 	 *
 	 * @param WP_REST_Request $request REST request.
 	 * @return stdClass|WP_Error
@@ -183,11 +187,23 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			return $slug_check;
 		}
 
+		// `config` is replaced atomically when the param is present (or on
+		// create). Omitting it from a PUT/PATCH preserves the stored value;
+		// there is no in-`config` partial-update support.
 		if ( $request->has_param( 'config' ) || empty( $request['id'] ) ) {
-			$config                 = is_array( $request['config'] ?? null ) ? $request['config'] : array();
+			$config = is_array( $request['config'] ?? null ) ? $request['config'] : array();
+
+			// `JSON_HEX_TAG | JSON_HEX_AMP` escape `<`, `>`, and `&` to their
+			// `\u00XX` forms before `wp_insert_post()` is called, so when
+			// kses runs first via `content_save_pre` it sees an inert string
+			// and is a no-op. `JSON_UNESCAPED_SLASHES` keeps URL-like values
+			// readable and round-trips cleanly through `wp_slash`/`wp_unslash`.
+			// Empty object-shaped positions are cast to `stdClass` via
+			// `normalize_config_for_encode()` so they serialize as `{}`,
+			// matching the schema's `type: 'object'` declarations.
 			$prepared->post_content = wp_json_encode(
-				$config,
-				JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_FORCE_OBJECT
+				self::normalize_config_for_encode( $config ),
+				JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
 			);
 		}
 
@@ -195,11 +211,29 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 	}
 
 	/**
+	 * Prepares a config array for `wp_json_encode` so empty object-shaped
+	 * positions (top-level config and `labels`) serialize as `{}` rather
+	 * than `[]`, matching the schema's `type: 'object'` declarations.
+	 *
+	 * @param array $config Sanitized config array.
+	 * @return array|stdClass Value safe to pass to `wp_json_encode`.
+	 */
+	public static function normalize_config_for_encode( $config ) {
+		if ( ! is_array( $config ) ) {
+			return new stdClass();
+		}
+		if ( isset( $config['labels'] ) && is_array( $config['labels'] ) && empty( $config['labels'] ) ) {
+			$config['labels'] = new stdClass();
+		}
+		if ( empty( $config ) ) {
+			return new stdClass();
+		}
+		return $config;
+	}
+
+	/**
 	 * Validates the prepared post's `post_name` slug. Rejects:
-	 *   - shapes outside `^[a-z0-9_-]{1,32}$` (matches the regex used by
-	 *     `gutenberg_build_user_taxonomy_args` — without this check, an
-	 *     overlong/malformed slug gets stored but silently skipped at
-	 *     `register_taxonomy()` time),
+	 *   - shapes outside `^[a-z0-9_-]{1,32}$`,
 	 *   - slugs already taken by another `wp_user_taxonomy` post,
 	 *   - slugs reserved by an existing registered taxonomy (core/plugin).
 	 *
@@ -215,6 +249,9 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			return true;
 		}
 
+		// Mirrors the regex `gutenberg_build_user_taxonomy_args` enforces on
+		// read; without this check, an overlong/malformed slug would get
+		// stored but silently skipped at `register_taxonomy()` time.
 		if ( ! preg_match( '/^[a-z0-9_-]{1,32}$/', $slug ) ) {
 			return new WP_Error(
 				'gutenberg_user_taxonomy_slug_invalid',
@@ -401,9 +438,12 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			$values = array_values( array_filter( array_unique( $values ) ) );
 
 			if ( ! empty( $values ) ) {
-				$meta_query   = isset( $query_args['meta_query'] ) && is_array( $query_args['meta_query'] )
+				$meta_query = isset( $query_args['meta_query'] ) && is_array( $query_args['meta_query'] )
 					? $query_args['meta_query']
 					: array();
+				// TODO(perf): one meta row per attached post type combined
+				// with post/meta cache behavior at higher taxonomy counts
+				// is worth profiling — see PR #77697 follow-up.
 				$meta_query[] = array(
 					'key'     => GUTENBERG_USER_TAXONOMY_OBJECT_TYPE_META_KEY,
 					'value'   => $values,

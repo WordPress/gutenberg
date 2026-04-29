@@ -358,6 +358,32 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
+	 * Invalid JSON submitted via `wp_insert_post` is rewritten to the
+	 * canonical marker-only payload so a stray read path can't surface
+	 * arbitrary bytes.
+	 */
+	public function test_filter_normalizes_invalid_json_to_marker_only() {
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_user_taxonomy',
+				'post_status'  => 'publish',
+				'post_name'    => 'broken_json',
+				'post_title'   => 'Broken JSON',
+				'post_content' => 'not json {{{',
+			)
+		);
+
+		$stored = get_post( $post_id )->post_content;
+		$this->assertJson( $stored, 'Stored content must be valid JSON.' );
+		$this->assertSame(
+			array( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER => true ),
+			json_decode( $stored, true )
+		);
+
+		wp_delete_post( $post_id, true );
+	}
+
+	/**
 	 * Unauthenticated create attempts are rejected.
 	 */
 	public function test_create_item_no_user() {
@@ -568,6 +594,178 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 		$this->assertArrayNotHasKey( 'content', $data );
 		$this->assertSame( 'Genre', $data['config']['labels']['singular_name'] );
 		$this->assertSame( array( 'post' ), $data['object_type'] );
+	}
+
+	/**
+	 * `additionalProperties: false` on `config.labels` means unknown label
+	 * keys are rejected at the REST layer with a 400.
+	 */
+	public function test_create_item_rejects_unknown_label_key() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'unknown-label',
+				'title'  => 'Unknown Label',
+				'config' => array(
+					'labels' => array(
+						'singular_name'   => 'Unknown Label',
+						'totally_made_up' => 'Should be rejected',
+					),
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
+	 * `additionalProperties: false` at the top level of `config` rejects
+	 * unknown keys with a 400 — the schema is closed.
+	 */
+	public function test_create_item_rejects_unknown_top_level_config_key() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'unknown-top',
+				'title'  => 'Unknown Top',
+				'config' => array(
+					'labels'          => array( 'singular_name' => 'Unknown Top' ),
+					'something_extra' => 'nope',
+				),
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
+	 * The storage-only marker key is never present in the REST response,
+	 * even though it lives in the stored `post_content` bytes.
+	 */
+	public function test_marker_key_absent_from_response() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE . '/' . self::$taxonomy_id );
+		$request->set_param( 'context', 'edit' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertArrayNotHasKey( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER, $data['config'] );
+
+		// And confirm it actually lives in the stored bytes — otherwise this
+		// test passes vacuously if marker injection is silently broken.
+		$raw = get_post( self::$taxonomy_id )->post_content;
+		$this->assertStringContainsString( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER, $raw );
+	}
+
+	/**
+	 * `gutenberg_register_user_defined_taxonomies()` only registers records
+	 * with `post_status === 'publish'`; drafts are skipped so the Edit
+	 * "Active" toggle effectively gates registration.
+	 */
+	public function test_drafts_are_skipped_by_registration() {
+		$draft_id = self::insert_user_taxonomy_record(
+			array( 'labels' => array( 'singular_name' => 'Draft' ) ),
+			'draft_tax',
+			'Drafts',
+			'draft',
+			array( 'post' )
+		);
+
+		gutenberg_register_user_defined_taxonomies();
+		$this->assertFalse( taxonomy_exists( 'draft_tax' ) );
+
+		// Publish and re-run — should now register.
+		wp_update_post(
+			array(
+				'ID'          => $draft_id,
+				'post_status' => 'publish',
+			)
+		);
+		gutenberg_register_user_defined_taxonomies();
+		$this->assertTrue( taxonomy_exists( 'draft_tax' ) );
+
+		unregister_taxonomy( 'draft_tax' );
+		wp_delete_post( $draft_id, true );
+	}
+
+	/**
+	 * `object_type` collection param values are pattern-validated by the
+	 * schema; values containing spaces don't satisfy `^[a-z0-9_-]{1,20}$`
+	 * and the request fails at the REST layer with a 400.
+	 */
+	public function test_get_items_rejects_invalid_object_type_value() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'GET', self::REST_BASE );
+		$request->set_param( 'context', 'edit' );
+		$request->set_param( 'object_type', array( 'has space' ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 400, $response->get_status() );
+	}
+
+	/**
+	 * Round-trip: write a config via REST, re-read the stored bytes, decode,
+	 * strip the storage marker, and assert the result is byte-equal to a
+	 * canonical re-encoding of the input. Catches encoding regressions —
+	 * stray flag changes that shift `<` vs `<`, key reordering, or
+	 * inadvertent reintroduction of `JSON_FORCE_OBJECT`.
+	 */
+	public function test_config_round_trip_is_byte_stable() {
+		wp_set_current_user( self::$admin_id );
+
+		$config = array(
+			'public'       => true,
+			'hierarchical' => false,
+			'description'  => 'Round-trip description with slash / and amp & and tag <em>.',
+			'labels'       => array(
+				'singular_name' => 'Round',
+				'menu_name'     => 'Rounds',
+			),
+		);
+
+		$request = new WP_REST_Request( 'POST', self::REST_BASE );
+		$request->set_body_params(
+			array(
+				'slug'   => 'roundtrip',
+				'title'  => 'Round-trip',
+				'config' => $config,
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertSame( 201, $response->get_status() );
+
+		$raw     = get_post( $data['id'] )->post_content;
+		$decoded = json_decode( $raw, true );
+		$this->assertIsArray( $decoded );
+
+		// The marker is storage-only; drop before comparing payload shape.
+		$this->assertArrayHasKey( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER, $decoded );
+		unset( $decoded[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] );
+
+		// `sanitize_text_field` collapses interior tags to text, so the stored
+		// description matches the post-sanitize form, not the raw input.
+		$expected_description = sanitize_textarea_field( $config['description'] );
+		$this->assertSame( $expected_description, $decoded['description'] );
+		$this->assertSame( $config['labels'], $decoded['labels'] );
+		$this->assertSame( $config['public'], $decoded['public'] );
+		$this->assertSame( $config['hierarchical'], $decoded['hierarchical'] );
+
+		// Live tag/amp characters must not appear in the stored bytes —
+		// `JSON_HEX_TAG | JSON_HEX_AMP` should escape them.
+		$this->assertStringNotContainsString( '<em>', $raw );
+		$this->assertStringNotContainsString( '&', $raw );
+
+		wp_delete_post( $data['id'], true );
 	}
 
 	/**

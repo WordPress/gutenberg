@@ -103,9 +103,6 @@ function gutenberg_register_user_taxonomy_cpt() {
 			// REST response so clients only see the typed field.
 			'show_in_rest'      => false,
 			'sanitize_callback' => 'sanitize_key',
-			'auth_callback'     => static function () {
-				return current_user_can( 'manage_options' );
-			},
 		)
 	);
 }
@@ -117,11 +114,6 @@ add_action( 'init', 'gutenberg_register_user_taxonomy_cpt' );
  * the REST controller's config schema. Single sanitization site for
  * taxonomy records — called from {@see gutenberg_filter_user_taxonomy_post_content}
  * on `wp_insert_post_data`.
- *
- * Shape, type coercion, and unknown-key stripping are all driven by the
- * schema returned by {@see WP_REST_User_Taxonomies_Controller_Gutenberg::get_config_schema}.
- * Text-sanitization (HTML/control-char stripping) is layered on top because
- * `rest_sanitize_value_from_schema()` only casts strings, it doesn't strip.
  *
  * @param array $config Raw decoded config.
  * @return array Sanitized config.
@@ -139,6 +131,8 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
 		return array();
 	}
 
+	// `rest_sanitize_value_from_schema()` casts strings to their declared
+	// type but doesn't strip HTML or control characters, so layer that on.
 	if ( isset( $clean['description'] ) ) {
 		$clean['description'] = sanitize_textarea_field( (string) $clean['description'] );
 	}
@@ -159,19 +153,6 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
  * taxonomy config isn't HTML and shouldn't carry scripts even for users
  * with `unfiltered_html`.
  *
- * Storage is encoded with `JSON_HEX_TAG | JSON_HEX_AMP`, so the bytes that
- * reach kses are inert and ordering vs `wp_filter_post_kses` is irrelevant.
- *
- * The `GUTENBERG_USER_TAXONOMY_CONFIG_MARKER` key is attached after the
- * schema-driven sanitize and before re-encoding. It's not consumed at
- * runtime, but is preserved in stored bytes as a forward-compat anchor for
- * a content-only fallback sanitizer (see the const's docblock).
- *
- * Revisions are not handled here because the CPT doesn't include
- * `'revisions'` in its `supports` array; if revisions are enabled in a
- * future iteration, the filter will need an analogous revision branch
- * (and an accompanying meta-versioning strategy for `object_type`).
- *
  * @param array $data Slashed post data being inserted/updated.
  * @return array Filtered data.
  */
@@ -186,16 +167,30 @@ function gutenberg_filter_user_taxonomy_post_content( $data ) {
 
 	$decoded = json_decode( wp_unslash( (string) $data['post_content'] ), true );
 	if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
-		return $data;
+		// Hedge: invalid JSON falls through to a canonical empty payload so
+		// a stray read path can't surface arbitrary bytes.
+		$decoded = array();
 	}
 
 	$clean = gutenberg_user_taxonomy_sanitize_config( $decoded );
+
+	// Storage-only marker: deliberately not in the REST schema so it can
+	// never reach clients. Kept as a forward-compat anchor for a
+	// content-only fallback sanitizer; full rationale on the const.
 	$clean[ GUTENBERG_USER_TAXONOMY_CONFIG_MARKER ] = true;
 
+	// `wp_insert_post_data` is the last filter before the row is written,
+	// so the re-encode here is what lands in the database.
+	// `JSON_HEX_TAG | JSON_HEX_AMP` guarantee the stored bytes carry no
+	// live `<`, `>`, or `&`, so any subsequent pass through kses (on
+	// later updates or on display) sees an inert string. kses on
+	// `content_save_pre` already ran earlier in `wp_insert_post()`; for
+	// REST writes that input was pre-escaped by
+	// `prepare_item_for_database`, so that earlier pass was also a no-op.
 	$data['post_content'] = wp_slash(
 		wp_json_encode(
-			$clean,
-			JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_FORCE_OBJECT
+			WP_REST_User_Taxonomies_Controller_Gutenberg::normalize_config_for_encode( $clean ),
+			JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP
 		)
 	);
 
@@ -290,14 +285,12 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 /**
  * Reads each published wp_user_taxonomy record and calls register_taxonomy()
  * with a tightly-validated subset of its stored config.
- *
- * Drafts (post_status != 'publish') are skipped, so Edit's Active toggle
- * gates whether a record is actually registered.
  */
 function gutenberg_register_user_defined_taxonomies() {
 	$records = get_posts(
 		array(
 			'post_type'        => 'wp_user_taxonomy',
+			// Drafts are skipped so the Edit "Active" toggle gates registration.
 			'post_status'      => 'publish',
 			'posts_per_page'   => -1,
 			'no_found_rows'    => true,
