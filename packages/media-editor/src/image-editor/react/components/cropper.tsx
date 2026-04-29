@@ -135,7 +135,7 @@ export interface CropperProps {
  * @param root0.controller               The full state/setter object from `useCropperState`.
  * @param root0.stencil                  Custom stencil component.
  * @param root0.showGrid                 Grid overlay mode: false | true | 'interactive'.
- * @param root0.isPlacementControlActive
+ * @param root0.isPlacementControlActive Whether external placement controls are active, keeping the grid visible in interactive mode.
  * @param root0.showDimming              Show dimming overlay outside crop.
  * @param root0.minZoom                  Minimum zoom level.
  * @param root0.maxZoom                  Maximum zoom level.
