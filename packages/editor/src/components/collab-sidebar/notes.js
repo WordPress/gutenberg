@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
@@ -33,7 +33,7 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		useDispatch( blockEditorStore )
 	);
 
-	const { rawNoteId, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { noteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -42,8 +42,8 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 			} = select( blockEditorStore );
 			const clientId = getSelectedBlockClientId();
 			return {
-				rawNoteId: clientId
-					? getBlockAttributes( clientId )?.metadata?.noteId ?? null
+				noteId: clientId
+					? getBlockAttributes( clientId )?.metadata?.noteId
 					: null,
 				selectedBlockClientId: clientId,
 				orderedBlockIds: getClientIdsWithDescendants(),
@@ -52,8 +52,8 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		[]
 	);
 	const blockNoteIds = useMemo(
-		() => getNoteIdsFromMetadata( { noteId: rawNoteId } ),
-		[ rawNoteId ]
+		() => getNoteIdsFromMetadata( { noteId } ),
+		[ noteId ]
 	);
 	const { selectedNote, noteFocused } = useSelect( ( select ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
@@ -129,34 +129,39 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		}
 	};
 
-	const selectedNoteRef = useRef( selectedNote );
-	selectedNoteRef.current = selectedNote;
+	// Pick the most relevant thread for the selected block: first
+	// unresolved, else first matching. Derived outside the effect so the
+	// effect body stays minimal.
+	const targetNoteId = useMemo( () => {
+		if ( blockNoteIds.length === 0 ) {
+			return undefined;
+		}
+		const unresolved = notes.find(
+			( thread ) =>
+				blockNoteIds.includes( thread.id ) && thread.status === 'hold'
+		);
+		const first = notes.find( ( thread ) =>
+			blockNoteIds.includes( thread.id )
+		);
+		return unresolved?.id ?? first?.id;
+	}, [ blockNoteIds, notes ] );
 
-	const notesRef = useRef( notes );
-	notesRef.current = notes;
-
-	// Auto-select the related note thread when a block is selected.
+	// Auto-select the related note thread when a block is selected. Bails
+	// out when the user has explicitly opened the new note form, or when
+	// the user has already picked a thread on this block — so an explicit
+	// thread choice within a block isn't clobbered.
 	useEffect( () => {
-		// Don't overwrite when the user explicitly opened the new note form.
-		if ( selectedNoteRef.current === 'new' ) {
+		if ( selectedNote === 'new' ) {
 			return;
 		}
-		if ( blockNoteIds.length > 0 ) {
-			// Prefer the first unresolved thread; otherwise fall back to the
-			// first thread referenced by this block.
-			const unresolvedThread = notesRef.current.find(
-				( thread ) =>
-					blockNoteIds.includes( thread.id ) &&
-					thread.status === 'hold'
-			);
-			const firstThread = notesRef.current.find( ( thread ) =>
-				blockNoteIds.includes( thread.id )
-			);
-			selectNote( unresolvedThread?.id ?? firstThread?.id ?? undefined );
-		} else {
-			selectNote( undefined );
+		if (
+			typeof selectedNote === 'number' &&
+			blockNoteIds.includes( selectedNote )
+		) {
+			return;
 		}
-	}, [ blockNoteIds, selectNote ] );
+		selectNote( targetNoteId );
+	}, [ targetNoteId, selectedNote, blockNoteIds, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
