@@ -791,10 +791,6 @@ export default () => {
 				 * present, so we can't remove it.
 				 * We follow Preact's logic: https://github.com/preactjs/preact/blob/10.29.1/src/diff/props.js#L138-L150
 				 */
-				if ( typeof result === 'function' ) {
-					return;
-				}
-
 				if (
 					result !== null &&
 					result !== undefined &&
