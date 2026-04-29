@@ -147,11 +147,8 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__panel-title,
 .block-editor-inserter__panel-title button {
+	--_gcd-heading-color: #{$gray-700};
 	margin: 0 $grid-unit-15 0 0;
-	color: $gray-700;
-	text-transform: uppercase;
-	font-size: 11px;
-	font-weight: $font-weight-medium;
 }
 
 .block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
