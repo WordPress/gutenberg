@@ -228,28 +228,22 @@ import { resizeCornerNE } from '@wordpress/icons';
 		ref,
 		listeners,
 		attributes,
-		disabled,
 		verticalResizable,
-	} ) => {
-		if ( disabled ) {
-			return null;
-		}
-		return (
-			<div
-				ref={ ref }
-				{ ...listeners }
-				{ ...attributes }
-				style={ {
-					position: 'absolute',
-					bottom: 4,
-					insetInlineEnd: 4,
-					cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
-				} }
-			>
-				<Icon icon={ resizeCornerNE } size={ 16 } />
-			</div>
-		);
-	} }
+	} ) => (
+		<div
+			ref={ ref }
+			{ ...listeners }
+			{ ...attributes }
+			style={ {
+				position: 'absolute',
+				bottom: 4,
+				insetInlineEnd: 4,
+				cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
+			} }
+		>
+			<Icon icon={ resizeCornerNE } size={ 16 } />
+		</div>
+	) }
 >
 	{ tiles }
 </DashboardGrid>;
@@ -262,10 +256,12 @@ The render prop receives:
 | `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
 | `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
 | `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
-| `disabled` | `boolean` | True when edit mode is off — render nothing or a muted state. |
 | `verticalResizable` | `boolean` | False when `rowHeight: 'auto'` — useful for adapting cursor or visual cue. |
 | `isResizing` | `boolean` | True while the user is actively dragging this handle. Use it to swap colors, icons, or transforms during the gesture. |
 | `itemId` | `string` | Owning tile's `key`. |
+
+The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
+so the consumer's render prop never has to short-circuit on a disabled state.
 
 ## Contributing to this package
 

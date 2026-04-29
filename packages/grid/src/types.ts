@@ -74,12 +74,6 @@ export interface ResizeHandleRenderProps {
 	attributes: DraggableBindings[ 'attributes' ];
 
 	/**
-	 * Whether the handle should render in its disabled state (edit
-	 * mode is off, etc.).
-	 */
-	disabled: boolean;
-
-	/**
 	 * Whether vertical resizing is allowed for this tile. Useful for
 	 * adapting the cursor or visual cue.
 	 */
@@ -102,14 +96,6 @@ export interface ResizeHandleRenderProps {
  * Props for the internal `<ResizeHandle />` wrapper.
  */
 export interface ResizeHandleProps {
-	/**
-	 * Whether the handle is inert. When true, it renders muted and
-	 * does not respond to pointer events.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
-
 	/**
 	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
 	 * draggable so the parent can correlate the gesture with a tile

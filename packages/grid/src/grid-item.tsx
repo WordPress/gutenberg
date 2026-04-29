@@ -162,14 +162,15 @@ export function GridItem( {
 			<div { ...listeners } style={ { height: '100%' } }>
 				<div className={ styles[ 'item-content' ] }>
 					{ children }
-					<ResizeHandle
-						disabled={ disabled }
-						itemId={ item.key }
-						verticalResizable={ verticalResizable }
-						onResize={ handleResize }
-						onResizeEnd={ handleResizeEnd }
-						renderResizeHandle={ renderResizeHandle }
-					/>
+					{ ! disabled && (
+						<ResizeHandle
+							itemId={ item.key }
+							verticalResizable={ verticalResizable }
+							onResize={ handleResize }
+							onResizeEnd={ handleResizeEnd }
+							renderResizeHandle={ renderResizeHandle }
+						/>
+					) }
 				</div>
 				{ previewOverlay }
 			</div>

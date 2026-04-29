@@ -681,13 +681,8 @@ function CustomResizeHandle( {
 	ref,
 	listeners,
 	attributes,
-	disabled,
 	isResizing,
 }: ResizeHandleRenderProps ) {
-	if ( disabled ) {
-		return null;
-	}
-
 	return (
 		<div
 			ref={ ref }

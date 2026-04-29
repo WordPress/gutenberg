@@ -17,7 +17,6 @@ import type { ResizeDelta, ResizeHandleProps } from './types';
 import styles from './resize-handle.module.css';
 
 function ResizeHandle( {
-	disabled = false,
 	itemId,
 	verticalResizable = true,
 	renderResizeHandle,
@@ -32,7 +31,6 @@ function ResizeHandle( {
 			ref: setNodeRef,
 			listeners,
 			attributes,
-			disabled,
 			verticalResizable,
 			isResizing: isDragging,
 			itemId,
@@ -44,8 +42,7 @@ function ResizeHandle( {
 			ref={ setNodeRef }
 			className={ clsx(
 				styles[ 'resize-handle' ],
-				! verticalResizable && styles[ 'is-horizontal-only' ],
-				disabled && styles[ 'is-disabled' ]
+				! verticalResizable && styles[ 'is-horizontal-only' ]
 			) }
 			{ ...listeners }
 			{ ...attributes }
