@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const SETTINGS_PAGE_PATH = 'options-general.php';
 const GUIDELINES_PAGE_QUERY = 'page=guidelines-wp-admin';
-const GUIDELINES_REST_BASE = '/wp/v2/guidelines';
+const GUIDELINES_REST_BASE = '/wp/v2/content-guidelines';
 
 // Remove any existing singleton guideline post so each test starts from a
 // clean slate. Uses REST for speed — this is test scaffolding, not the
@@ -121,11 +121,10 @@ test.describe( 'Guidelines', () => {
 			.getByRole( 'link', { name: 'Guidelines' } )
 			.click();
 
-		// The page layout renders the "Guidelines" title as an h2 (the
-		// Page component defaults headingLevel to 2) and the category
-		// accordions load once the initial fetch resolves.
+		// The page layout renders the "Guidelines" title as an h1 and
+		// the category accordions load once the initial fetch resolves.
 		await expect(
-			page.getByRole( 'heading', { name: 'Guidelines', level: 2 } )
+			page.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: 'Expand Copy guidelines' } )

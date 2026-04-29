@@ -1,25 +1,25 @@
 /**
  * Internal dependencies
  */
-import { calculateAllOffsets } from '../utils';
+import { calculateNotePositions } from '../utils';
 
 function makeRect( top ) {
 	return { top };
 }
 
-describe( 'calculateAllOffsets', () => {
-	it( 'returns empty offsets when no threads match blockRects', () => {
-		const { offsets, minHeight } = calculateAllOffsets( {
+describe( 'calculateNotePositions', () => {
+	it( 'returns empty positions when the anchor thread has no blockRect', () => {
+		const { positions } = calculateNotePositions( {
 			threads: [ { id: 1 } ],
 			selectedNoteId: undefined,
 			blockRects: {},
 			heights: {},
+			scrollTop: 0,
 		} );
-		expect( offsets ).toEqual( {} );
-		expect( minHeight ).toBe( 0 );
+		expect( positions ).toEqual( {} );
 	} );
 
-	it( 'assigns default offset when there is no selected thread', () => {
+	it( 'falls back to the first thread as anchor when none is selected', () => {
 		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
 		const blockRects = {
 			1: makeRect( 100 ),
@@ -28,68 +28,43 @@ describe( 'calculateAllOffsets', () => {
 		};
 		const heights = { 1: 50, 2: 50, 3: 50 };
 
-		const { offsets } = calculateAllOffsets( {
+		const { positions } = calculateNotePositions( {
 			threads,
 			selectedNoteId: undefined,
 			blockRects,
 			heights,
+			scrollTop: 0,
 		} );
 
-		// With no selected thread, breakIndex falls back to 0 (first thread).
-		expect( offsets[ 1 ] ).toBe( -16 );
-		// Non-overlapping threads get the default offset.
-		expect( offsets[ 2 ] ).toBe( -16 );
-		expect( offsets[ 3 ] ).toBe( -16 );
+		// 1: 100 - 16 = 84
+		// 2: 300 - 16 = 284
+		// 3: 500 - 16 = 484
+		expect( positions ).toEqual( { 1: 84, 2: 284, 3: 484 } );
 	} );
 
-	it( 'pushes neighbors below the selected thread downward when overlapping', () => {
-		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
-		// Thread 2 selected; thread 3 starts inside thread 2's space.
-		const blockRects = {
-			1: makeRect( 100 ),
-			2: makeRect( 200 ),
-			3: makeRect( 220 ),
-		};
-		const heights = { 1: 50, 2: 80, 3: 50 };
-
-		const { offsets } = calculateAllOffsets( {
-			threads,
-			selectedNoteId: 2,
-			blockRects,
-			heights,
-		} );
-
-		expect( offsets[ 2 ] ).toBe( -16 );
-		// thread 3 overlaps thread 2: previous bottom = (200-16)+80 = 264.
-		// 220 < 264+16 = 280, so offset = 264 - 220 + 20 = 64.
-		expect( offsets[ 3 ] ).toBe( 64 );
-	} );
-
-	it( 'pushes neighbors above the selected thread upward when overlapping', () => {
+	it( 'pushes an overlapping thread above the anchor upward', () => {
 		const threads = [ { id: 1 }, { id: 2 } ];
-		// Thread 1 is tall and overlaps where thread 2 sits.
 		const blockRects = {
 			1: makeRect( 150 ),
 			2: makeRect( 180 ),
 		};
 		const heights = { 1: 60, 2: 50 };
 
-		const { offsets } = calculateAllOffsets( {
+		const { positions } = calculateNotePositions( {
 			threads,
 			selectedNoteId: 2,
 			blockRects,
 			heights,
+			scrollTop: 0,
 		} );
 
-		expect( offsets[ 2 ] ).toBe( -16 );
-		// Thread 1 bottom = 150 + 60 = 210, next threadTop = 180 - 16 = 164.
-		// 210 > 164, so offset = 164 - 150 - 60 - 20 = -66.
-		expect( offsets[ 1 ] ).toBe( -66 );
+		// 2 (anchor): 180 - 16 = 164
+		// 1 (upward):  164 - 60 - 20 = 84
+		expect( positions ).toEqual( { 1: 84, 2: 164 } );
 	} );
 
-	it( 'cascades overlap adjustment across multiple threads below', () => {
+	it( 'cascades downward offsets through consecutive overlapping threads', () => {
 		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
-		// All three threads are tightly packed.
 		const blockRects = {
 			1: makeRect( 100 ),
 			2: makeRect( 110 ),
@@ -97,57 +72,84 @@ describe( 'calculateAllOffsets', () => {
 		};
 		const heights = { 1: 80, 2: 80, 3: 80 };
 
-		const { offsets } = calculateAllOffsets( {
+		const { positions } = calculateNotePositions( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
 			heights,
+			scrollTop: 0,
 		} );
 
-		expect( offsets[ 1 ] ).toBe( -16 );
-		// Thread 2: previous bottom = (100-16)+80 = 164. 110 < 164+16, offset = 164-110+20 = 74.
-		expect( offsets[ 2 ] ).toBe( 74 );
-		// Thread 3: previous bottom = (110+74)+80 = 264. 120 < 264+16, offset = 264-120+20 = 164.
-		expect( offsets[ 3 ] ).toBe( 164 );
+		// 1 (anchor):    100 - 16 = 84
+		// 2 (downward):   84 + 80 + 20 = 184
+		// 3 (downward):  184 + 80 + 20 = 284
+		expect( positions ).toEqual( { 1: 84, 2: 184, 3: 284 } );
 	} );
 
-	it( 'skips threads with missing blockRects', () => {
+	it( 'omits threads that have no blockRect', () => {
 		const threads = [ { id: 1 }, { id: 2 }, { id: 3 } ];
 		const blockRects = {
 			1: makeRect( 100 ),
-			// id 2 is missing
 			3: makeRect( 500 ),
 		};
 		const heights = { 1: 50, 3: 50 };
 
-		const { offsets } = calculateAllOffsets( {
+		const { positions } = calculateNotePositions( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
 			heights,
+			scrollTop: 0,
 		} );
 
-		expect( offsets[ 1 ] ).toBe( -16 );
-		expect( offsets[ 2 ] ).toBeUndefined();
-		expect( offsets[ 3 ] ).toBe( -16 );
+		// 1: 100 - 16 = 84
+		// 3: 500 - 16 = 484
+		expect( positions ).toEqual( { 1: 84, 3: 484 } );
 	} );
 
-	it( 'computes minHeight from the last thread position', () => {
+	it( 'allows upward cascade to produce negative positions', () => {
+		const threads = [ { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 } ];
+		const blockRects = {
+			1: makeRect( 150 ),
+			2: makeRect( 200 ),
+			3: makeRect( 250 ),
+			4: makeRect( 300 ),
+		};
+		const heights = { 1: 90, 2: 90, 3: 90, 4: 230 };
+
+		const { positions } = calculateNotePositions( {
+			threads,
+			selectedNoteId: 4,
+			blockRects,
+			heights,
+			scrollTop: 0,
+		} );
+
+		// 4 (anchor):  300 - 16 = 284
+		// 3 (upward):  284 - 90 - 20 = 174
+		// 2 (upward):  174 - 90 - 20 = 64
+		// 1 (upward):   64 - 90 - 20 = -46
+		expect( positions ).toEqual( { 1: -46, 2: 64, 3: 174, 4: 284 } );
+	} );
+
+	it( 'adds scrollTop to the final positions', () => {
 		const threads = [ { id: 1 }, { id: 2 } ];
 		const blockRects = {
 			1: makeRect( 100 ),
-			2: makeRect( 400 ),
+			2: makeRect( 300 ),
 		};
-		const heights = { 1: 50, 2: 60 };
+		const heights = { 1: 50, 2: 50 };
 
-		const { minHeight } = calculateAllOffsets( {
+		const { positions } = calculateNotePositions( {
 			threads,
 			selectedNoteId: 1,
 			blockRects,
 			heights,
+			scrollTop: 500,
 		} );
 
-		// Last thread: top=400, height=60, offset=-16, + 32 = 476.
-		expect( minHeight ).toBe( 476 );
+		// 1: 100 + 500 - 16 = 584
+		// 2: 300 + 500 - 16 = 784
+		expect( positions ).toEqual( { 1: 584, 2: 784 } );
 	} );
 } );

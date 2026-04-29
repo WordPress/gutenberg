@@ -165,7 +165,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
-			'inline_valid_dimensions_style'                => array(
+			'inline_valid_dimensions_min_height_style'     => array(
 				'block_styles'    => array(
 					'dimensions' => array(
 						'minHeight' => '50vh',
@@ -176,6 +176,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 					'css'          => 'min-height:50vh;',
 					'declarations' => array(
 						'min-height' => '50vh',
+					),
+				),
+			),
+
+			'inline_valid_dimensions_min_width_style'      => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'minWidth' => '25vw',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'min-width:25vw;',
+					'declarations' => array(
+						'min-width' => '25vw',
 					),
 				),
 			),

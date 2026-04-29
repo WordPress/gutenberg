@@ -4,24 +4,18 @@
 import { _x } from '@wordpress/i18n';
 
 /**
- * Sanitizes a comment string by removing non-printable ASCII characters.
+ * Sanitizes a note string by removing non-printable ASCII characters.
  *
- * @param {string} str - The comment string to sanitize.
- * @return {string} - The sanitized comment string.
+ * @param {string} str - The note string to sanitize.
+ * @return {string} - The sanitized note string.
  */
-export function sanitizeCommentString( str ) {
+export function sanitizeNoteContent( str ) {
 	return str.trim();
 }
-
-/**
- * A no-operation function that does nothing.
- */
-export function noop() {}
 
 const THREAD_ALIGN_OFFSET = -16;
 const THREAD_GAP = 16;
 const OVERLAP_MARGIN = 20;
-const BOARD_BOTTOM_PADDING = 32;
 
 /**
  * Avatar border colors chosen to be visually distinct from each other and from
@@ -48,13 +42,13 @@ export function getAvatarBorderColor( userId ) {
 }
 
 /**
- * Generates a comment excerpt from text based on word count type and length.
+ * Generates a note excerpt from text based on word count type and length.
  *
- * @param {string} text          - The comment text to generate excerpt from.
- * @param {number} excerptLength - The maximum length for the commentexcerpt.
- * @return {string} - The generated comment excerpt.
+ * @param {string} text          - The note text to generate excerpt from.
+ * @param {number} excerptLength - The maximum length for the note excerpt.
+ * @return {string} - The generated note excerpt.
  */
-export function getCommentExcerpt( text, excerptLength = 10 ) {
+export function getNoteExcerpt( text, excerptLength = 10 ) {
 	if ( ! text ) {
 		return '';
 	}
@@ -97,22 +91,24 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
- * Calculate y offsets for all floating comment threads. Adjusts positions
- * to prevent overlapping by pushing threads above the selected one upward
- * and threads below it downward.
+ * Calculate final top positions for all floating note threads in the
+ * editor's content coordinate space. Adjusts positions to prevent overlapping
+ * by pushing threads above the selected one upward and threads below it downward.
  *
  * @param {Object}                  params
  * @param {Array}                   params.threads        Ordered list of thread objects.
  * @param {string|number|undefined} params.selectedNoteId ID of the currently selected thread.
  * @param {Object<string,DOMRect>}  params.blockRects     Pre-read bounding rects keyed by thread ID.
  * @param {Object<string,number>}   params.heights        Rendered heights keyed by thread ID.
- * @return {{ offsets: Object<string,number>, minHeight: number }} Computed offsets and minimum editor height.
+ * @param {number}                  params.scrollTop      Current scroll offset of the editor content.
+ * @return {{ positions: Object<string,number> }} Computed top positions.
  */
-export function calculateAllOffsets( {
+export function calculateNotePositions( {
 	threads,
 	selectedNoteId,
 	blockRects,
 	heights,
+	scrollTop = 0,
 } ) {
 	const offsets = {};
 
@@ -124,7 +120,7 @@ export function calculateAllOffsets( {
 	const anchorThread = threads[ anchorIndex ];
 
 	if ( ! anchorThread || ! blockRects[ anchorThread.id ] ) {
-		return { offsets, minHeight: 0 };
+		return { positions: {} };
 	}
 
 	const anchorRect = blockRects[ anchorThread.id ];
@@ -187,42 +183,39 @@ export function calculateAllOffsets( {
 		belowAdjustedTop = threadTop + offset;
 	}
 
-	let editorMinHeight = 0;
-	const lastThread = threads[ threads.length - 1 ];
-	const lastBlockRect = blockRects[ lastThread.id ];
-	if ( lastBlockRect ) {
-		const lastThreadTop = lastBlockRect.top || 0;
-		const lastThreadHeight = heights[ lastThread.id ] || 0;
-		const lastThreadOffset = offsets[ lastThread.id ] || 0;
-		editorMinHeight =
-			lastThreadTop +
-			lastThreadHeight +
-			lastThreadOffset +
-			BOARD_BOTTOM_PADDING;
+	// blockRect.top + scrollTop is the block's absolute y within the editor's
+	// scroll content; CSS translates each thread by -scrollTop at render time.
+	const positions = {};
+	for ( const thread of threads ) {
+		const blockRect = blockRects[ thread.id ];
+		if ( blockRect && offsets[ thread.id ] !== undefined ) {
+			positions[ thread.id ] =
+				blockRect.top + scrollTop + offsets[ thread.id ];
+		}
 	}
 
-	return { offsets, minHeight: editorMinHeight };
+	return { positions };
 }
 
 /**
- * Shift focus to the comment thread associated with a particular comment ID.
+ * Shift focus to the note thread associated with a particular note ID.
  * If an additional selector is provided, the focus will be shifted to the element matching the selector.
  *
  * @typedef {import('@wordpress/element').RefObject} RefObject
  *
- * @param {string}       commentId          The ID of the comment thread to focus.
+ * @param {string}       noteId             The ID of the note thread to focus.
  * @param {?HTMLElement} container          The container element to search within.
  * @param {string}       additionalSelector The additional selector to focus on.
  */
-export function focusCommentThread( commentId, container, additionalSelector ) {
+export function focusNoteThread( noteId, container, additionalSelector ) {
 	if ( ! container ) {
 		return;
 	}
 
-	// A thread without a commentId is a new comment thread.
+	// A thread without a noteId is a new note thread.
 	const threadSelector =
-		commentId && commentId !== 'new'
-			? `[role=treeitem][id="comment-thread-${ commentId }"]`
+		noteId && noteId !== 'new'
+			? `[role=treeitem][id="note-thread-${ noteId }"]`
 			: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
