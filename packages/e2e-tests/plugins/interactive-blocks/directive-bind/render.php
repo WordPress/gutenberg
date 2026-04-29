@@ -108,4 +108,22 @@
 			data-wp-bind--data-test---unique-id="context.test"
 		></div>
 	</div>
+
+	<div
+		data-testid="popover true"
+		data-wp-context='{"popover": true}'
+		data-wp-bind--popover="context.popover"
+	></div>
+
+	<div
+		data-testid="popover false"
+		data-wp-context='{"popover": false}'
+		data-wp-bind--popover="context.popover"
+	></div>
+
+	<div
+		data-testid="popover auto"
+		data-wp-context='{"popover": "auto"}'
+		data-wp-bind--popover="context.popover"
+	></div>
 </div>

@@ -774,6 +774,15 @@ export default () => {
 					attribute !== 'rowSpan' &&
 					attribute !== 'colSpan' &&
 					attribute !== 'role' &&
+					/*
+					 * The `popover` IDL attribute is a DOMString ("auto", "manual",
+					 * or ""), so assigning a JS boolean `true` via property access
+					 * yields the string "true", which is an invalid value. We fall
+					 * through to the setAttribute/removeAttribute path below, which
+					 * maps `true` → `''` (equivalent to `popover="auto"`) and removes
+					 * the attribute for `false`/`null`/`undefined`.
+					 */
+					attribute !== 'popover' &&
 					attribute in el
 				) {
 					try {
@@ -795,7 +804,16 @@ export default () => {
 					result !== undefined &&
 					( result !== false || attribute[ 4 ] === '-' )
 				) {
-					el.setAttribute( attribute, result );
+					/*
+					 * For the `popover` attribute, a JS boolean `true` should map
+					 * to an empty string (i.e., `<div popover>`), which the browser
+					 * treats as `popover="auto"`. Any other value is passed through
+					 * as-is (e.g., `"manual"`).
+					 */
+					el.setAttribute(
+						attribute,
+						attribute === 'popover' && result === true ? '' : result
+					);
 				} else {
 					el.removeAttribute( attribute );
 				}

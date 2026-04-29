@@ -269,6 +269,30 @@ test.describe( 'data-wp-bind', () => {
 		}
 	} );
 
+	test.describe( 'popover attribute', () => {
+		test( 'sets popover attribute correctly at hydration', async ( {
+			page,
+		} ) => {
+			// Ensure hydration has happened.
+			const checkbox = page.getByTestId(
+				'add missing checked at hydration'
+			);
+			await expect( checkbox ).toBeChecked();
+
+			// `true` should set the boolean `popover` attribute (empty string).
+			const elTrue = page.getByTestId( 'popover true' );
+			await expect( elTrue ).toHaveAttribute( 'popover', '' );
+
+			// `false` should remove the attribute entirely.
+			const elFalse = page.getByTestId( 'popover false' );
+			await expect( elFalse ).not.toHaveAttribute( 'popover' );
+
+			// `"auto"` should set `popover="auto"`.
+			const elAuto = page.getByTestId( 'popover auto' );
+			await expect( elAuto ).toHaveAttribute( 'popover', 'auto' );
+		} );
+	} );
+
 	test( 'should ignore unique ids', async ( { page } ) => {
 		let element = page.getByTestId( 'without-unique-id' );
 		await expect( element ).toHaveAttribute( 'data-test' );
