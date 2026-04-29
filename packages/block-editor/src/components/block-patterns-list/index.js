@@ -10,10 +10,10 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useEffect, useState, forwardRef, useMemo } from '@wordpress/element';
 import {
 	Composite,
-	VisuallyHidden,
 	Tooltip,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Icon, symbol } from '@wordpress/icons';

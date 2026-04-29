@@ -592,9 +592,9 @@ async function bundlePackage( packageName, options = {} ) {
 			const entryPoint = path.join( packageDir, exportPath );
 			const baseFileName = path.basename( fileName );
 
-			// Skip non-minified build for WASM-inlined workers (e.g., vips).
-			// These are ~16MB of base64-encoded WASM with no debugging value
-			// over the minified version.
+			// Skip non-minified build and sourcemaps for WASM-inlined workers
+			// (e.g., vips). These are mostly base64-encoded WASM with no
+			// debugging value over the minified version.
 			const isWasmWorker =
 				packageJson.wpWorkers &&
 				Object.keys( packageJson.wpWorkers ).some(
@@ -609,7 +609,7 @@ async function bundlePackage( packageName, options = {} ) {
 						`${ fileName }.min.js`
 					),
 					bundle: true,
-					sourcemap: true,
+					sourcemap: ! isWasmWorker,
 					format: 'esm',
 					target,
 					platform: 'browser',
