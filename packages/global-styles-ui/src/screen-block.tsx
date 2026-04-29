@@ -32,7 +32,7 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
-import { getValidStates } from './utils';
+import { getValidPseudoStates, getValidViewportStates } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -110,23 +110,36 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const prefix = prefixParts.join( '.' );
 
 	// State selector state
-	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
-	const validStates = useMemo( () => getValidStates( name ), [ name ] );
+	const [ selectedViewport, setSelectedViewport ] =
+		useState< string >( 'default' );
+	const [ selectedPseudoState, setSelectedPseudoState ] =
+		useState< string >( 'default' );
+	const validViewportStates = useMemo(
+		() => getValidViewportStates( name ),
+		[ name ]
+	);
+	const validPseudoStates = useMemo(
+		() => getValidPseudoStates( name ),
+		[ name ]
+	);
 
-	const stateParam = selectedState !== 'default' ? selectedState : undefined;
+	const stateParam = [ selectedViewport, selectedPseudoState ]
+		.filter( ( value ) => value !== 'default' )
+		.join( '.' );
+	const hasSelectedState = stateParam.length > 0;
 	const [ style, setStyle ] = useStyle(
 		prefix,
 		name,
 		'user',
 		false,
-		stateParam
+		hasSelectedState ? stateParam : undefined
 	);
 	const [ inheritedStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
 		false,
-		stateParam
+		hasSelectedState ? stateParam : undefined
 	);
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
@@ -263,14 +276,14 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		// If there are settings changes, we need to update both styles and
 		// settings atomically to avoid race conditions.
 		if ( newSettings?.typography ) {
-			// Build the state-aware path so that breakpoint styles (e.g. mobile)
+			// Build the state-aware path so that viewport styles (e.g. mobile)
 			// are written to the correct sub-path and do not overwrite the default.
-			const stylePathForBreakpoint = [ prefix, stateParam ]
+			const stylePathForState = [ prefix, stateParam ]
 				.filter( Boolean )
 				.join( '.' );
 			let updatedConfig = setStyleHelper(
 				userConfig,
-				stylePathForBreakpoint,
+				stylePathForState,
 				styleWithoutSettings,
 				name
 			);
@@ -330,15 +343,18 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				title={
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
-				states={ validStates }
-				selectedState={ selectedState }
-				onChangeState={ setSelectedState }
+				viewportStates={ validViewportStates }
+				pseudoStates={ validPseudoStates }
+				selectedViewport={ selectedViewport }
+				selectedPseudoState={ selectedPseudoState }
+				onChangeViewport={ setSelectedViewport }
+				onChangePseudoState={ setSelectedPseudoState }
 			/>
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
-				selectedState={ selectedState }
-				stateStyles={ selectedState !== 'default' ? style : undefined }
+				selectedState={ hasSelectedState ? stateParam : 'default' }
+				stateStyles={ hasSelectedState ? style : undefined }
 			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
@@ -372,9 +388,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					onChange={ onChangeTypography }
 					settings={ settings }
 					// Only expose global-settings controls (e.g. "Indent all
-					// paragraphs") when not editing a breakpoint-specific state,
+					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
-					isGlobalStyles={ selectedState === 'default' }
+					isGlobalStyles={ ! hasSelectedState }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -403,7 +419,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					includeLayoutControls
 				/>
 			) }
-			{ hasImageSettingsPanel && selectedState === 'default' && (
+			{ hasImageSettingsPanel && ! hasSelectedState && (
 				<ImageSettingsPanel
 					onChange={ onChangeLightbox }
 					value={ userSettings }

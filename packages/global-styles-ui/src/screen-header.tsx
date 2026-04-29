@@ -27,18 +27,24 @@ interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
 	onBack?: () => void;
-	states?: StateDefinition[];
-	selectedState?: string;
-	onChangeState?: ( value: string ) => void;
+	viewportStates?: StateDefinition[];
+	pseudoStates?: StateDefinition[];
+	selectedViewport?: string;
+	selectedPseudoState?: string;
+	onChangeViewport?: ( value: string ) => void;
+	onChangePseudoState?: ( value: string ) => void;
 }
 
 export function ScreenHeader( {
 	title,
 	description,
 	onBack,
-	states,
-	selectedState = 'default',
-	onChangeState,
+	viewportStates,
+	pseudoStates,
+	selectedViewport = 'default',
+	selectedPseudoState = 'default',
+	onChangeViewport,
+	onChangePseudoState,
 }: ScreenHeaderProps ) {
 	return (
 		<VStack spacing={ 0 }>
@@ -65,9 +71,14 @@ export function ScreenHeader( {
 										{ title }
 									</Heading>
 									<StateControl
-										states={ states }
-										value={ selectedState }
-										onChange={ onChangeState }
+										viewportStates={ viewportStates }
+										pseudoStates={ pseudoStates }
+										viewportValue={ selectedViewport }
+										pseudoStateValue={ selectedPseudoState }
+										onChangeViewport={ onChangeViewport }
+										onChangePseudoState={
+											onChangePseudoState
+										}
 									/>
 								</HStack>
 							</Spacer>

@@ -992,18 +992,20 @@ function appendPseudoSelectorStyles(
 
 /**
  * Appends CSS rules for responsive breakpoint states to a ruleset string.
- * Block styles stored under 'mobile' or 'tablet' keys are wrapped in the
- * corresponding media queries instead of being appended to the selector.
+ * Block styles stored under responsive keys (for example, 'mobile' and
+ * 'tablet') are wrapped in corresponding media queries instead of being
+ * appended directly to the selector.
  *
  * @param styles                 The styles object potentially containing responsive keys.
  * @param selector               The base CSS selector for the block.
  * @param ruleset                The accumulating CSS ruleset string.
  * @param featureSelectors       Optional feature-level selectors for the block.
  * @param treeSettings           Global styles settings tree.
+ * @param blockName              Optional block name used to resolve valid pseudo selectors.
  * @param styleVariationSelector Optional style variation selector.
  * @param blockRootSelector      Optional block root selector used to detect block-level feature selectors.
  * @param styleVariationName     Optional variation name used when applying variation class to block-level feature selectors.
- * @return Updated ruleset string with responsive CSS rules appended.
+ * @return Updated ruleset string with responsive base, feature-level, and pseudo-state CSS appended.
  */
 function appendResponsiveStyles(
 	styles: Record< string, any >,
@@ -1014,6 +1016,7 @@ function appendResponsiveStyles(
 		| Record< string, string | Record< string, string > >
 		| undefined,
 	treeSettings: Record< string, any > | undefined,
+	blockName?: string,
 	styleVariationSelector?: string,
 	blockRootSelector?: string,
 	styleVariationName?: string
@@ -1045,7 +1048,7 @@ function appendResponsiveStyles(
 			breakpointFeatureDeclarations = updateParagraphTextIndentSelector(
 				breakpointFeatureDeclarations,
 				treeSettings,
-				undefined
+				blockName
 			);
 
 			breakpointFeatureDeclarations = updateButtonWidthDeclarations(
@@ -1103,6 +1106,20 @@ function appendResponsiveStyles(
 		ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
 			';'
 		) };}}`;
+
+		const breakpointPseudoRules = appendPseudoSelectorStyles(
+			remainingBreakpointStyles,
+			selector,
+			'',
+			featureSelectors,
+			treeSettings,
+			blockName,
+			styleVariationSelector
+		);
+
+		if ( breakpointPseudoRules ) {
+			ruleset += `${ mediaQuery }{${ breakpointPseudoRules }}`;
+		}
 	} );
 
 	return ruleset;
@@ -1838,6 +1855,7 @@ export const transformToStyles = (
 									ruleset,
 									featureSelectors,
 									tree.settings,
+									name,
 									styleVariationSelector as string,
 									selector,
 									styleVariationName
@@ -1878,7 +1896,8 @@ export const transformToStyles = (
 					selector,
 					ruleset,
 					featureSelectors,
-					tree.settings
+					tree.settings,
+					name
 				);
 			}
 		);

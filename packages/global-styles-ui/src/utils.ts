@@ -56,27 +56,40 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
  * These map to CSS media queries wrapping the block's styles.
  */
 export const RESPONSIVE_STATES: StateDefinition[] = [
-	{ value: 'mobile', label: __( 'Mobile' ) },
 	{ value: 'tablet', label: __( 'Tablet' ) },
+	{ value: 'mobile', label: __( 'Mobile' ) },
 ];
 
 /**
- * Get the valid states for a given block or element.
+ * Get the valid pseudo states for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid state definitions, or empty array if none
+ * @return Array of valid pseudo state definitions, or empty array if none
  */
-export function getValidStates( name: string ): StateDefinition[] {
+export function getValidPseudoStates( name: string ): StateDefinition[] {
 	// Check if it's a block (contains a slash, e.g. 'core/button').
-	// All blocks receive responsive states by default.
 	if ( name.includes( '/' ) ) {
-		const blockPseudoStates = VALID_BLOCK_STATES[ name ] ?? [];
-		return [ ...blockPseudoStates, ...RESPONSIVE_STATES ];
+		return VALID_BLOCK_STATES[ name ] ?? [];
 	}
 
 	// Check if it's an element
 	if ( VALID_ELEMENT_STATES[ name ] ) {
 		return VALID_ELEMENT_STATES[ name ];
+	}
+
+	return [];
+}
+
+/**
+ * Get the valid viewport states for a given block or element.
+ *
+ * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
+ * @return Array of valid viewport state definitions, or empty array if none
+ */
+export function getValidViewportStates( name: string ): StateDefinition[] {
+	// Responsive styles currently apply to blocks only.
+	if ( name.includes( '/' ) ) {
+		return RESPONSIVE_STATES;
 	}
 
 	return [];

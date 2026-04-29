@@ -1,53 +1,59 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { check, chevronDown } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 
 /**
- * State control for managing block state styles (hover, focus, etc.).
- * Displays a dropdown menu to select between different states.
+ * State control for managing viewport and pseudo-state styles.
+ * Displays a dropdown menu with separate groups for each selector.
  *
- * @param {Object}   props          Component props.
- * @param {Array}    props.states   Array of available states with value and label.
- * @param {string}   props.value    Currently selected state value.
- * @param {Function} props.onChange Callback when selection changes.
+ * @param {Object}   props                     Component props.
+ * @param {Array}    props.viewportStates      Array of available viewport states.
+ * @param {Array}    props.pseudoStates        Array of available pseudo states.
+ * @param {string}   props.viewportValue       Currently selected viewport value.
+ * @param {string}   props.pseudoStateValue    Currently selected pseudo state value.
+ * @param {Function} props.onChangeViewport    Callback when viewport selection changes.
+ * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
  * @return {Element|null} State control component.
  */
 export default function StateControl( {
-	states = [],
-	value = 'default',
-	onChange,
+	viewportStates = [],
+	pseudoStates = [],
+	viewportValue = 'default',
+	pseudoStateValue = 'default',
+	onChangeViewport,
+	onChangePseudoState,
 } ) {
-	if ( ! states || states.length === 0 ) {
+	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
 	}
 
-	const stateOptions = [
+	const viewportOptions = [
 		{ label: __( 'Default' ), value: 'default' },
-		...states.map( ( state ) => ( {
+		...viewportStates.map( ( state ) => ( {
+			label: state.label,
+			value: state.value,
+		} ) ),
+	];
+	const pseudoStateOptions = [
+		{ label: __( 'Default' ), value: 'default' },
+		...pseudoStates.map( ( state ) => ( {
 			label: state.label,
 			value: state.value,
 		} ) ),
 	];
 
-	const getCurrentStateLabel = () => {
-		const currentOption = stateOptions.find(
-			( option ) => option.value === value
-		);
-		return currentOption?.label || __( 'Default' );
-	};
+	const hasViewportOptions = viewportStates.length > 0;
+	const hasPseudoStateOptions = pseudoStates.length > 0;
+	const triggerLabel = __( 'Properties' );
 
 	return (
 		<DropdownMenu
 			icon={ chevronDown }
-			label={ sprintf(
-				/* translators: %s: Current state (e.g. "Hover", "Focus") */
-				__( 'State: %s' ),
-				getCurrentStateLabel()
-			) }
-			text={ getCurrentStateLabel() }
+			label={ triggerLabel }
+			text={ triggerLabel }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
@@ -55,20 +61,50 @@ export default function StateControl( {
 			} }
 		>
 			{ ( { onClose } ) => (
-				<MenuGroup label={ __( 'State' ) }>
-					{ stateOptions.map( ( option ) => (
-						<MenuItem
-							key={ option.value }
-							onClick={ () => {
-								onChange( option.value );
-								onClose();
-							} }
-							icon={ value === option.value ? check : null }
-						>
-							{ option.label }
-						</MenuItem>
-					) ) }
-				</MenuGroup>
+				<>
+					{ hasViewportOptions && (
+						<MenuGroup label={ __( 'Viewport' ) }>
+							{ viewportOptions.map( ( option ) => (
+								<MenuItem
+									key={ `viewport-${ option.value }` }
+									onClick={ () => {
+										onChangeViewport?.( option.value );
+										if ( ! hasPseudoStateOptions ) {
+											onClose();
+										}
+									} }
+									icon={
+										viewportValue === option.value
+											? check
+											: null
+									}
+								>
+									{ option.label }
+								</MenuItem>
+							) ) }
+						</MenuGroup>
+					) }
+					{ hasPseudoStateOptions && (
+						<MenuGroup label={ __( 'Pseudo state' ) }>
+							{ pseudoStateOptions.map( ( option ) => (
+								<MenuItem
+									key={ `pseudo-${ option.value }` }
+									onClick={ () => {
+										onChangePseudoState?.( option.value );
+										onClose();
+									} }
+									icon={
+										pseudoStateValue === option.value
+											? check
+											: null
+									}
+								>
+									{ option.label }
+								</MenuItem>
+							) ) }
+						</MenuGroup>
+					) }
+				</>
 			) }
 		</DropdownMenu>
 	);
