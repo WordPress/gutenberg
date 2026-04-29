@@ -12,7 +12,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import withSuggestionOverlay from '../with-suggestion-overlay';
+import withSuggestionOverlay, {
+	mergeOverlayAttributes,
+} from '../with-suggestion-overlay';
 import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
@@ -199,5 +201,72 @@ describe( 'withSuggestionOverlay', () => {
 		);
 		// The real setAttributes is still never invoked in suggest mode.
 		expect( setAttributes ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'mergeOverlayAttributes', () => {
+	it( 'returns base unchanged when there is no overlay', () => {
+		const base = { content: 'Hello', level: 2 };
+		expect( mergeOverlayAttributes( base, null ) ).toBe( base );
+		expect( mergeOverlayAttributes( base, undefined ) ).toBe( base );
+	} );
+
+	it( 'replaces primitive overlay values wholesale', () => {
+		expect(
+			mergeOverlayAttributes(
+				{ content: 'Hello', level: 2 },
+				{ level: 3 }
+			)
+		).toEqual( { content: 'Hello', level: 3 } );
+	} );
+
+	it( 'one-level merges the style attribute so untouched fields survive', () => {
+		expect(
+			mergeOverlayAttributes(
+				{
+					style: {
+						typography: { fontSize: '16px' },
+						color: 'red',
+					},
+				},
+				{ style: { color: 'blue' } }
+			)
+		).toEqual( {
+			style: {
+				typography: { fontSize: '16px' },
+				color: 'blue',
+			},
+		} );
+	} );
+
+	it( 'one-level merges metadata so e.g. noteId survives a name change', () => {
+		expect(
+			mergeOverlayAttributes(
+				{ metadata: { name: 'Block A', noteId: 42 } },
+				{ metadata: { name: 'Block B' } }
+			)
+		).toEqual( {
+			metadata: { name: 'Block B', noteId: 42 },
+		} );
+	} );
+
+	it( 'replaces array-valued attributes wholesale (no merge)', () => {
+		expect(
+			mergeOverlayAttributes(
+				{ classes: [ 'a', 'b' ] },
+				{ classes: [ 'c' ] }
+			)
+		).toEqual( { classes: [ 'c' ] } );
+	} );
+
+	it( 'replaces non-deep-merge object attributes wholesale', () => {
+		// `metadata` and `style` are deep-merged; everything else is
+		// replaced even if it happens to be an object.
+		expect(
+			mergeOverlayAttributes(
+				{ custom: { nested: 'old' } },
+				{ custom: { other: 'new' } }
+			)
+		).toEqual( { custom: { other: 'new' } } );
 	} );
 } );

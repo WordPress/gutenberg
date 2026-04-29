@@ -5,3 +5,9 @@
  * `SuggestionOverlayProvider`).
  */
 export const EDITOR_STORE_NAME = 'core/editor';
+
+/**
+ * Mirror of the `suggest` intent value defined in the editor store's
+ * constants. Duplicated here to avoid the module cycle described above.
+ */
+export const SUGGEST_INTENT = 'suggest';

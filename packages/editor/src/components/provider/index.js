@@ -49,6 +49,7 @@ import MediaEditorModalMount from '../media/media-editor-modal';
 import {
 	SuggestionOverlayProvider,
 	SuggestionCommitBar,
+	SuggestionStoreInterceptor,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 
@@ -463,6 +464,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<PatternRenameModal />
 										<PatternDuplicateModal />
 										<MediaEditorModalMount />
+										<SuggestionStoreInterceptor />
 										<SuggestionCommitBar />
 									</>
 								) }
