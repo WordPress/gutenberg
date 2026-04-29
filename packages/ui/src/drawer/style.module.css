@@ -102,15 +102,6 @@
 			will-change: transform;
 		}
 
-		/*
-		 * The transition itself must be declared unconditionally so it
-		 * applies in both directions: from `[data-starting-style]` to the
-		 * open state on entry, and from the open state to
-		 * `[data-ending-style]` on exit. Gating it behind `[data-open]`
-		 * (or any other open-only selector) would skip the close
-		 * animation, since the popup loses `[data-open]` the moment it
-		 * starts closing.
-		 */
 		@media not (prefers-reduced-motion) {
 			transition: transform 450ms cubic-bezier(0.32, 0.72, 0, 1);
 
