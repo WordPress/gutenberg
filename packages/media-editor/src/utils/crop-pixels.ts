@@ -46,6 +46,16 @@ export function getCropPixels(
 	state: CropperState,
 	imageSize: Size
 ): CropPixels {
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return {
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0,
+			snapBBoxWidth: 0,
+			snapBBoxHeight: 0,
+		};
+	}
 	const { cropRect, pan, zoom, rotation } = state;
 	const snapRotation = Math.round( rotation / 90 ) * 90;
 	const { width: snapBBoxWidth, height: snapBBoxHeight } = getRotatedBBox(
