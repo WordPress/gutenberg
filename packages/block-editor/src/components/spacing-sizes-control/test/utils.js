@@ -3,20 +3,15 @@
  */
 import {
 	ALL_SIDES,
-	getAllRawValue,
 	getCustomValueFromPreset,
 	getInitialView,
 	getPresetValueFromCustomValue,
 	getSliderValueFromPreset,
 	getSpacingPresetCssVar,
 	getSpacingPresetSlug,
-	getSupportedMenuItems,
 	hasAxisSupport,
 	hasBalancedSidesSupport,
-	isValuesDefined,
-	isValuesMixed,
 	isValueSpacingPreset,
-	LABELS,
 	VIEWS,
 } from '../utils';
 
@@ -114,88 +109,6 @@ describe( 'getSliderValueFromPreset', () => {
 	} );
 } );
 
-describe( 'getAllRawValue', () => {
-	const customValues = {
-		top: '5px',
-		bottom: '5px',
-		left: '6px',
-		right: '2px',
-	};
-	it( 'should return the most common custom value from the values object', () => {
-		expect( getAllRawValue( customValues ) ).toBe( '5px' );
-	} );
-	const presetValues = {
-		top: 'var:preset|spacing|30',
-		bottom: 'var:preset|spacing|20',
-		left: 'var:preset|spacing|10',
-		right: 'var:preset|spacing|30',
-	};
-	it( 'should return the most common preset value from the values object', () => {
-		expect( getAllRawValue( presetValues ) ).toBe(
-			'var:preset|spacing|30'
-		);
-	} );
-} );
-
-describe( 'isValuesMixed', () => {
-	const unmixedValues = {
-		top: '5px',
-		bottom: '5px',
-		left: '5px',
-		right: '5px',
-	};
-	it( 'should return false if all values are the same', () => {
-		expect( isValuesMixed( unmixedValues ) ).toBe( false );
-	} );
-	const mixedValues = {
-		top: 'var:preset|spacing|30',
-		bottom: 'var:preset|spacing|20',
-		left: 'var:preset|spacing|10',
-		right: 'var:preset|spacing|30',
-	};
-	it( 'should return true if all the values are not the same', () => {
-		expect( isValuesMixed( mixedValues ) ).toBe( true );
-	} );
-	const singleValue = {
-		top: 'var:preset|spacing|30',
-	};
-	it( 'should return true if only one side set', () => {
-		expect( isValuesMixed( singleValue ) ).toBe( true );
-	} );
-	const incompleteValues = {
-		top: 'var:preset|spacing|30',
-		bottom: 'var:preset|spacing|30',
-		left: 'var:preset|spacing|30',
-	};
-	it( 'should return true if all sides not set', () => {
-		expect( isValuesMixed( incompleteValues ) ).toBe( true );
-	} );
-} );
-
-describe( 'isValuesDefined', () => {
-	const undefinedValues = {
-		top: undefined,
-		bottom: undefined,
-		left: undefined,
-		right: undefined,
-	};
-	it( 'should return false if values are not defined', () => {
-		expect( isValuesDefined( undefinedValues ) ).toBe( false );
-	} );
-	it( 'should return false if values is passed in as null', () => {
-		expect( isValuesDefined( null ) ).toBe( false );
-	} );
-	const definedValues = {
-		top: 'var:preset|spacing|30',
-		bottom: 'var:preset|spacing|20',
-		left: 'var:preset|spacing|10',
-		right: 'var:preset|spacing|30',
-	};
-	it( 'should return true if all the values are not the same', () => {
-		expect( isValuesDefined( definedValues ) ).toBe( true );
-	} );
-} );
-
 describe( 'hasAxisSupport', () => {
 	it( 'should return true for horizontal support if it is in sides', () => {
 		expect( hasAxisSupport( [ 'horizontal' ], 'horizontal' ) ).toBe( true );
@@ -225,70 +138,6 @@ describe( 'hasAxisSupport', () => {
 		expect( hasAxisSupport( [ 'left', 'right' ] ) ).toBe( true );
 		expect( hasAxisSupport( [ 'top', 'bottom' ] ) ).toBe( true );
 		expect( hasAxisSupport( [ 'top', 'left' ] ) ).toBe( false );
-	} );
-} );
-
-describe( 'getSupportedMenuItems', () => {
-	it( 'returns no items when sides are not configured', () => {
-		expect( getSupportedMenuItems( [] ) ).toEqual( {} );
-		expect( getSupportedMenuItems() ).toEqual( {} );
-	} );
-
-	const sideConfigs = [
-		[ LABELS.axial, [ 'horizontal', 'vertical' ] ],
-		[ LABELS.axial, [ 'top', 'right', 'bottom', 'left' ] ],
-		[ LABELS.horizontal, [ 'horizontal' ] ],
-		[ LABELS.horizontal, [ 'left', 'right' ] ],
-		[ LABELS.vertical, [ 'vertical' ] ],
-		[ LABELS.vertical, [ 'top', 'bottom' ] ],
-		[ LABELS.horizontal, [ 'horizontal' ] ],
-	];
-
-	test.each( sideConfigs )(
-		'should include %s axial menu with %s sides',
-		( label, sides ) => {
-			expect( getSupportedMenuItems( sides ) ).toHaveProperty(
-				'axial.label',
-				label
-			);
-		}
-	);
-
-	it( 'returns no axial item when not not supported', () => {
-		expect( getSupportedMenuItems( [ 'left', 'top' ] ) ).not.toHaveProperty(
-			'axial'
-		);
-	} );
-
-	it( 'should include the correct individual side options', () => {
-		expect( getSupportedMenuItems( [ 'top' ] ) ).toHaveProperty(
-			'top.label',
-			LABELS.top
-		);
-		expect( getSupportedMenuItems( [ 'right' ] ) ).toHaveProperty(
-			'right.label',
-			LABELS.right
-		);
-		expect( getSupportedMenuItems( [ 'bottom' ] ) ).toHaveProperty(
-			'bottom.label',
-			LABELS.bottom
-		);
-		expect( getSupportedMenuItems( [ 'left' ] ) ).toHaveProperty(
-			'left.label',
-			LABELS.left
-		);
-	} );
-	it( 'should include the custom option only when applicable', () => {
-		expect( getSupportedMenuItems( [ 'top', 'left' ] ) ).toHaveProperty(
-			'custom.label',
-			LABELS.custom
-		);
-		expect( getSupportedMenuItems( [ 'top' ] ) ).not.toHaveProperty(
-			'custom'
-		);
-		expect(
-			getSupportedMenuItems( [ 'horizontal', 'vertical' ] )
-		).not.toHaveProperty( 'custom.label' );
 	} );
 } );
 

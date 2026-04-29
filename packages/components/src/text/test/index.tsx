@@ -25,7 +25,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( screen.getByRole( 'heading' ) ).toHaveStyle( {
-			color: 'rgb( 255, 255, 255 )',
+			color: COLORS.white,
 		} );
 	} );
 

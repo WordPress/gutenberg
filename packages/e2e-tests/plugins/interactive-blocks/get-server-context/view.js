@@ -1,24 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getServerContext } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getServerContext,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 store( 'test/get-server-context', {
+	state: {
+		get serverProp() {
+			return getServerContext().prop;
+		},
+	},
 	actions: {
-		*navigate( e ) {
+		navigate: withSyncEvent( function* ( e ) {
 			e.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			yield actions.navigate( e.target.href );
-		},
+		} ),
 		attemptModification() {
-			try {
-				getServerContext().prop = 'updated from client';
-				getContext().result = 'unexpectedly modified ❌';
-			} catch ( e ) {
-				getContext().result = 'not modified ✅';
-			}
+			getServerContext().prop = 'updated from client';
+			getContext().result =
+				getServerContext().prop === 'updated from client'
+					? 'unexpectedly modified ❌'
+					: 'not modified ✅';
+		},
+		updateNonChanging() {
+			getContext().nonChanging = 'modified from client';
 		},
 	},
 	callbacks: {
@@ -26,21 +38,60 @@ store( 'test/get-server-context', {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
 		},
 		updateServerContextChild() {
 			const ctx = getContext();
 			const { prop, newProp, nested, inherited } = getServerContext();
 			ctx.prop = prop;
-			ctx.newProp = newProp;
+			if ( newProp ) {
+				ctx.newProp = newProp;
+			}
 			ctx.nested.prop = nested.prop;
-			ctx.nested.newProp = nested.newProp;
+			if ( nested?.newProp ) {
+				ctx.nested.newProp = nested.newProp;
+			}
 			ctx.inherited.prop = inherited.prop;
-			ctx.inherited.newProp = inherited.newProp;
+			if ( inherited?.newProp ) {
+				ctx.inherited.newProp = inherited.newProp;
+			}
+			if ( ctx.objCopiedFromServer ) {
+				ctx.objCopiedFromServer.prop = nested?.prop;
+			} else {
+				ctx.objCopiedFromServer = nested;
+			}
+		},
+		updateNonChanging() {
+			// This property never changes in the server, but it changes in the
+			// client so every time there's a navigation, we need to overwrite
+			// it.
+			const ctx = getContext();
+			const { nonChanging } = getServerContext();
+			ctx.nonChanging = nonChanging;
+		},
+		updateOnlyInMain() {
+			// This property only exists in the main page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInMain } = getServerContext();
+			ctx.onlyInMain = onlyInMain;
+		},
+		updateOnlyInModified() {
+			// This property only exists in the modified page, so we need to clear
+			// it when navigating to a page that doesn't have it.
+			const ctx = getContext();
+			const { onlyInModified } = getServerContext();
+			ctx.onlyInModified = onlyInModified;
 		},
 	},
 } );

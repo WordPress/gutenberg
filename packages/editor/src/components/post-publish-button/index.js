@@ -101,23 +101,24 @@ export class PostPublishButton extends Component {
 		} = this.props;
 
 		const isButtonDisabled =
-			( isSaving ||
+			isPostSavingLocked ||
+			( ( isSaving ||
 				! isSaveable ||
-				isPostSavingLocked ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
+				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
 
 		const isToggleDisabled =
-			( isPublished ||
+			isPostSavingLocked ||
+			( ( isPublished ||
 				isSaving ||
 				! isSaveable ||
 				( ! isPublishable && ! forceIsDirty ) ) &&
-			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
+				( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges ) );
 
-		// If the new status has not changed explicitely, we derive it from
+		// If the new status has not changed explicitly, we derive it from
 		// other factors, like having a publish action, etc.. We need to preserve
 		// this because it affects when to show the pre and post publish panels.
-		// If it has changed though explicitely, we need to respect that.
+		// If it has changed though explicitly, we need to respect that.
 		let publishStatus = 'publish';
 		if ( postStatusHasChanged ) {
 			publishStatus = postStatus;

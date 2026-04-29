@@ -72,7 +72,7 @@ class VideoEdit extends Component {
 			this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
-		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onVideoContainerLayout = this.onVideoContainerLayout.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
@@ -179,7 +179,7 @@ class VideoEdit extends Component {
 		}
 	}
 
-	onVideoContanerLayout( event ) {
+	onVideoContainerLayout( event ) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
 		if ( height !== this.state.videoContainerHeight ) {
@@ -321,7 +321,7 @@ class VideoEdit extends Component {
 
 							return (
 								<View
-									onLayout={ this.onVideoContanerLayout }
+									onLayout={ this.onVideoContainerLayout }
 									style={ containerStyle }
 								>
 									{ showVideo && (

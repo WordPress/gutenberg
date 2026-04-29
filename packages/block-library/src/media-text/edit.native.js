@@ -218,7 +218,7 @@ class MediaTextEdit extends Component {
 				? ( containerWidth * mediaWidth ) / 100 -
 				  styles.mediaAreaPadding.width
 				: containerWidth;
-		const aligmentStyles =
+		const alignmentStyles =
 			styles[
 				`is-vertically-aligned-${ verticalAlignment || 'center' }`
 			];
@@ -244,7 +244,7 @@ class MediaTextEdit extends Component {
 					imageFill,
 					focalPoint,
 					isSelected,
-					aligmentStyles,
+					alignmentStyles,
 					shouldStack,
 				} }
 			/>

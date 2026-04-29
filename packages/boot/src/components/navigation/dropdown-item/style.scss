@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/variables";
+
+.boot-dropdown-item__children {
+	display: flex;
+	flex-direction: column;
+
+	// In order to avoid the focus ring of each list item from being cut off,
+	// we add padding around the menu items.
+	// At the same time, we use the same value to tweak margins so that
+	// the items still retain the same position and footprint.
+	$padding-to-avoid-cutting-focus-ring: 2px;
+	padding: $padding-to-avoid-cutting-focus-ring;
+	margin-block-start: -$padding-to-avoid-cutting-focus-ring;
+	margin-block-end: $padding-to-avoid-cutting-focus-ring;
+	margin-inline-start:
+		variables.$grid-unit-40 -
+		$padding-to-avoid-cutting-focus-ring;
+	overflow: hidden;
+}
+
+.boot-dropdown-item__chevron.is-up {
+	transform: rotate(180deg);
+}

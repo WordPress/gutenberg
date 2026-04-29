@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Adding `figure` to the selector increases the specificity above the global
 // styles specificity, which is levelled at 0-1-0. We should figure out why
 // `figure` is needed.
@@ -68,23 +73,6 @@
 	}
 }
 
-.gallery-image-sizes {
-	.components-base-control__label {
-		margin-bottom: 4px;
-	}
-
-	.gallery-image-sizes__loading {
-		display: flex;
-		align-items: center;
-		color: $gray-700;
-		font-size: $helptext-font-size;
-	}
-
-	.components-spinner {
-		margin: 0 8px 0 4px;
-	}
-}
-
 /**
  * Deprecated css past this point. This can be removed once all galleries are migrated
  * to V2.
@@ -117,10 +105,6 @@
 		opacity: 0.3;
 	}
 
-	.is-selected .block-library-gallery-item__inline-menu {
-		display: inline-flex;
-	}
-
 	.block-editor-media-placeholder {
 		margin: 0;
 		height: 100%;
@@ -128,56 +112,6 @@
 		.components-placeholder__label {
 			display: flex;
 		}
-	}
-}
-
-.block-library-gallery-item__inline-menu {
-	display: none;
-	position: absolute;
-	top: -2px;
-	margin: $grid-unit-10;
-	z-index: z-index(".block-library-gallery-item__inline-menu");
-	transition: box-shadow 0.2s ease-out;
-	@include reduce-motion("transition");
-	border-radius: $radius-small;
-	background: $white;
-	border: $border-width solid $gray-900;
-
-	&:hover {
-		box-shadow: $elevation-x-small;
-	}
-
-	@include break-small() {
-		// Use smaller buttons to fit when there are many columns.
-		.columns-7 &,
-		.columns-8 & {
-			padding: $grid-unit-05 * 0.5;
-		}
-	}
-
-	.components-button.has-icon {
-		&:not(:focus) {
-			border: none;
-			box-shadow: none;
-		}
-
-		@include break-small() {
-			// Use smaller buttons to fit when there are many columns.
-			.columns-7 &,
-			.columns-8 & {
-				padding: 0;
-				width: inherit;
-				height: inherit;
-			}
-		}
-	}
-
-	&.is-left {
-		left: -2px;
-	}
-
-	&.is-right {
-		right: -2px;
 	}
 }
 

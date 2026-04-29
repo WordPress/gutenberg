@@ -133,7 +133,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput.
+	// Output.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

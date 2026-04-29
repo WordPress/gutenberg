@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import {
-	PanelBody,
 	__experimentalUseSlotFills as useSlotFills,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useLayoutEffect, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -15,40 +15,75 @@ import { __ } from '@wordpress/i18n';
 import InspectorControlsGroups from '../inspector-controls/groups';
 import { default as InspectorControls } from '../inspector-controls';
 import { store as blockEditorStore } from '../../store';
+import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 const PositionControlsPanel = () => {
-	const [ initialOpen, setInitialOpen ] = useState();
+	const { selectedClientIds, selectedBlocks, hasPositionAttribute } =
+		useSelect( ( select ) => {
+			const { getBlocksByClientId, getSelectedBlockClientIds } =
+				select( blockEditorStore );
 
-	// Determine whether the panel should be expanded.
-	const { multiSelectedBlocks } = useSelect( ( select ) => {
-		const { getBlocksByClientId, getSelectedBlockClientIds } =
-			select( blockEditorStore );
-		const clientIds = getSelectedBlockClientIds();
-		return {
-			multiSelectedBlocks: getBlocksByClientId( clientIds ),
-		};
-	}, [] );
-
-	useLayoutEffect( () => {
-		// If any selected block has a position set, open the panel by default.
-		// The first block's value will still be used within the control though.
-		if ( initialOpen === undefined ) {
-			setInitialOpen(
-				multiSelectedBlocks.some(
-					( { attributes } ) => !! attributes?.style?.position?.type
-				)
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const _selectedBlocks = getBlocksByClientId(
+				selectedBlockClientIds
 			);
+
+			return {
+				selectedClientIds: selectedBlockClientIds,
+				selectedBlocks: _selectedBlocks,
+				hasPositionAttribute: _selectedBlocks?.some(
+					( { attributes } ) => !! attributes?.style?.position?.type
+				),
+			};
+		}, [] );
+
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
+	function resetPosition() {
+		if ( ! selectedClientIds?.length || ! selectedBlocks?.length ) {
+			return;
 		}
-	}, [ initialOpen, multiSelectedBlocks, setInitialOpen ] );
+
+		const attributesByClientId = Object.fromEntries(
+			selectedBlocks?.map( ( { clientId, attributes } ) => [
+				clientId,
+				{
+					style: cleanEmptyObject( {
+						...attributes?.style,
+						position: {
+							...attributes?.style?.position,
+							type: undefined,
+							top: undefined,
+							right: undefined,
+							bottom: undefined,
+							left: undefined,
+						},
+					} ),
+				},
+			] )
+		);
+
+		updateBlockAttributes( selectedClientIds, attributesByClientId, true );
+	}
 
 	return (
-		<PanelBody
+		<ToolsPanel
 			className="block-editor-block-inspector__position"
-			title={ __( 'Position' ) }
-			initialOpen={ initialOpen ?? false }
+			label={ __( 'Position' ) }
+			resetAll={ resetPosition }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
-			<InspectorControls.Slot group="position" />
-		</PanelBody>
+			<ToolsPanelItem
+				isShownByDefault={ hasPositionAttribute }
+				label={ __( 'Position' ) }
+				hasValue={ () => hasPositionAttribute }
+				onDeselect={ resetPosition }
+			>
+				<InspectorControls.Slot group="position" />
+			</ToolsPanelItem>
+		</ToolsPanel>
 	);
 };
 

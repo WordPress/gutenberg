@@ -96,7 +96,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		// motion, if the user is typing (insertion by Enter), or if the block
 		// count exceeds the threshold (insertion caused all the blocks that
 		// follow to animate).
-		// To do: consider enableing the _moving_ animation even for large
+		// To do: consider enabling the _moving_ animation even for large
 		// posts, while only disabling the _insertion_ animation?
 		const disableAnimation =
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||

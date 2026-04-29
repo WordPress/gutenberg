@@ -8,12 +8,12 @@ test.describe( 'Using Format API', () => {
 		await requestUtils.activatePlugin( 'gutenberg-test-format-api' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deactivatePlugin( 'gutenberg-test-format-api' );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin( 'gutenberg-test-format-api' );
 	} );
 
 	test( 'Clicking the control wraps the selected text properly with HTML code', async ( {

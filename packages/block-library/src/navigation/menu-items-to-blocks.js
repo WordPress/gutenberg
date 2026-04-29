@@ -5,6 +5,11 @@ import { createBlock, parse } from '@wordpress/blocks';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
+ * Internal dependencies
+ */
+import { buildNavigationLinkEntityBinding } from '../navigation-link/shared/use-entity-binding';
+
+/**
  * Convert a flat menu item structure to a nested blocks structure.
  *
  * @param {Object[]} menuItems An array of menu items.
@@ -145,12 +150,14 @@ function menuItemToBlockAttributes(
 		object = 'tag';
 	}
 
+	const inferredKind = menuItemTypeField?.replace( '_', '-' ) || 'custom';
+
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {
 			type: object,
 		} ),
-		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		kind: inferredKind,
 		url: url || '',
 		...( xfn?.length &&
 			xfn.join( ' ' ).trim() && {
@@ -165,8 +172,11 @@ function menuItemToBlockAttributes(
 			title: attr_title,
 		} ),
 		...( object_id &&
-			'custom' !== object && {
+			( inferredKind === 'post-type' || inferredKind === 'taxonomy' ) && {
 				id: object_id,
+				metadata: {
+					bindings: buildNavigationLinkEntityBinding( inferredKind ),
+				},
 			} ),
 		/* eslint-enable camelcase */
 		...( description?.length && {

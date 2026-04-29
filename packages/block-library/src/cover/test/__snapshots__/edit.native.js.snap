@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`color settings clears the selected overlay color and mantains the inner blocks 1`] = `
+exports[`color settings clears the selected overlay color and maintains the inner blocks 1`] = `
 "<!-- wp:cover {"isUserOverlayColor":true,"isDark":false} -->
 <div class="wp-block-cover is-light"><span aria-hidden="true" class="wp-block-cover__background has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
 <p class="has-text-align-center"></p>

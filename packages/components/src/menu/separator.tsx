@@ -7,15 +7,15 @@ import { forwardRef, useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import type { WordPressComponentProps } from '../context';
-import { MenuContext } from './context';
-import type { MenuSeparatorProps } from './types';
+import { Context } from './context';
+import type { SeparatorProps } from './types';
 import * as Styled from './styles';
 
-export const MenuSeparator = forwardRef<
+export const Separator = forwardRef<
 	HTMLHRElement,
-	WordPressComponentProps< MenuSeparatorProps, 'hr', false >
->( function MenuSeparator( props, ref ) {
-	const menuContext = useContext( MenuContext );
+	WordPressComponentProps< SeparatorProps, 'hr', false >
+>( function Separator( props, ref ) {
+	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {
 		throw new Error(
@@ -24,7 +24,7 @@ export const MenuSeparator = forwardRef<
 	}
 
 	return (
-		<Styled.MenuSeparator
+		<Styled.Separator
 			ref={ ref }
 			{ ...props }
 			store={ menuContext.store }

@@ -59,7 +59,7 @@ console.log( isVisible ); // true or false
 
 ## Disabling and enabling tips
 
-Tips can be programatically disabled or enabled using the `disableTips` and `enableTips` dispatch methods. You can query the current setting by using the `areTipsEnabled` select method.
+Tips can be programmatically disabled or enabled using the `disableTips` and `enableTips` dispatch methods. You can query the current setting by using the `areTipsEnabled` select method.
 
 Calling `enableTips` will also un-dismiss all previously dismissed tips.
 

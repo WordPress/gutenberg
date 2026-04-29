@@ -13,10 +13,10 @@ import { store as editorStore } from '../../store';
  * If the post is already published or the user doesn't have the
  * capability to publish, it returns null.
  *
- * @param {Object}             props          Component properties.
- * @param {React.ReactElement} props.children Children to be rendered.
+ * @param {Object}          props          Component properties.
+ * @param {React.ReactNode} props.children Children to be rendered.
  *
- * @return {React.ReactElement} The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
+ * @return {React.ReactNode} The rendered child elements or null if the post is already published or the user doesn't have the capability to publish.
  */
 export function PostPendingStatusCheck( { children } ) {
 	const { hasPublishAction, isPublished } = useSelect( ( select ) => {

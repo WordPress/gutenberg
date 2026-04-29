@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Redirects the demo page to edit a new post.
+ *
+ * @global string $pagenow The name of the current admin page being viewed.
  */
 function gutenberg_redirect_demo() {
 	global $pagenow;

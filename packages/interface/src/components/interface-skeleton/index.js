@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import { forwardRef, useEffect } from '@wordpress/element';
 import {
 	__unstableMotion as motion,
@@ -17,11 +18,6 @@ import {
 	useViewportMatch,
 	useResizeObserver,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import NavigableRegion from '../navigable-region';
 
 const ANIMATION_DURATION = 0.25;
 const commonTransition = {
@@ -129,7 +125,7 @@ function InterfaceSkeleton(
 						<NavigableRegion
 							as={ motion.div }
 							className="interface-interface-skeleton__header"
-							aria-label={ mergedLabels.header }
+							ariaLabel={ mergedLabels.header }
 							initial={
 								isDistractionFree && ! isMobileViewport
 									? 'distractionFreeHidden'

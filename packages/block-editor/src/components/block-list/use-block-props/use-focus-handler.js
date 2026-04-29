@@ -48,7 +48,7 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
-				// If an inner block is focussed, that block is resposible for
+				// If an inner block is focussed, that block is responsible for
 				// setting the selected block.
 				if ( ! isInsideRootBlock( node, event.target ) ) {
 					return;

@@ -1,0 +1,22 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.wrapper {
+		--wp-ui-textarea-min-height: 40px;
+	}
+
+	.textarea {
+		/* Prevents users from resizing the textarea below this height. */
+		min-height: calc(var(--wp-ui-textarea-min-height) - 2px);
+		resize: block;
+	}
+}
+
+@layer wp-ui-compositions {
+	.wrapper {
+		--wp-ui-input-padding-block: 9.9px;
+
+		height: auto;
+		line-height: 1.4; /* TODO: Use variable */
+	}
+}

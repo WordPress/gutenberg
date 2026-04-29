@@ -1,5 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 .editor-post-featured-image {
 	padding: 0;
+
+	.hidden {
+		display: none;
+	}
 
 	.components-spinner {
 		position: absolute;
@@ -58,6 +66,7 @@
 .editor-post-featured-image__preview {
 	height: auto !important;
 	outline: $border-width solid rgba($black, 0.1);
+	@include checkerboard-background( 12px );
 
 	.editor-post-featured-image__preview-image {
 		object-fit: cover;
@@ -78,12 +87,14 @@
 
 .editor-post-featured-image__actions {
 	&:not(.editor-post-featured-image__actions-missing-image) {
-		@include reduce-motion("transition");
 		bottom: 0;
 		opacity: 0; // Use opacity instead of visibility so that the buttons remain in the tab order.
 		padding: $grid-unit-10;
 		position: absolute;
-		transition: opacity 50ms ease-out;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 50ms ease-out;
+		}
 
 		.editor-post-featured-image__action {
 			backdrop-filter: blur(16px) saturate(180%);

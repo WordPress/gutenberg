@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
-import { useMergeRefs, useDisabled } from '@wordpress/compose';
+import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -29,8 +29,8 @@ import { useBlockRefProvider } from './use-block-refs';
 import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
-import { canBindBlock } from '../../../utils/block-bindings';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
+import { useBlockVisibility } from '../../block-visibility/';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -98,23 +98,36 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		hasChildSelected,
 		isEditingDisabled,
 		hasEditableOutline,
-		isTemporarilyEditingAsBlocks,
+		isEditingContentOnlySection,
 		defaultClassName,
 		isSectionBlock,
+		isWithinSectionBlock,
 		canMove,
+		blockVisibility,
+		deviceType,
 	} = useContext( PrivateBlockContext );
+
+	const defaultViewRef = useRefEffect( ( element ) => {
+		if ( element ) {
+			const { ownerDocument } = element;
+			const { defaultView } = ownerDocument;
+			defaultViewRef.current = defaultView;
+		}
+	}, [] );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
+	const isHoverEnabled = ! isWithinSectionBlock;
 	const mergedRefs = useMergeRefs( [
 		props.ref,
+		defaultViewRef,
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( { clientId, isSelected } ),
-		useIsHovered( { clientId } ),
+		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
 		useDisabled( { isDisabled: ! hasOverlay } ),
@@ -128,14 +141,20 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	const blockEditContext = useBlockEditContext();
 	const hasBlockBindings = !! blockEditContext[ blockBindingsKey ];
-	const bindingsStyle =
-		hasBlockBindings && canBindBlock( name )
-			? {
-					'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
-					'--wp-admin-theme-color--rgb':
-						'var(--wp-block-synced-color--rgb)',
-			  }
-			: {};
+	const bindingsStyle = hasBlockBindings
+		? {
+				'--wp-admin-theme-color': 'var(--wp-block-synced-color)',
+				'--wp-admin-theme-color--rgb':
+					'var(--wp-block-synced-color--rgb)',
+		  }
+		: {};
+
+	// Use block visibility hook with data from context to avoid extra subscription.
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+		view: defaultViewRef.current,
+	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -183,8 +202,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-editing-disabled': isEditingDisabled,
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
-				'is-content-locked-temporarily-editing-as-blocks':
-					isTemporarilyEditingAsBlocks,
+				'is-editing-content-only-section': isEditingContentOnlySection,
+				'is-block-hidden': isBlockCurrentlyHidden,
 			},
 			className,
 			props.className,

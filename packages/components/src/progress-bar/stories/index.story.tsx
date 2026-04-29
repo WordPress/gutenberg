@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
+	tags: [ 'manifest' ],
 	component: ProgressBar,
 	title: 'Components/Feedback/ProgressBar',
 	id: 'components-progressbar',
@@ -20,6 +21,10 @@ const meta: Meta< typeof ProgressBar > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
@@ -43,7 +48,7 @@ const withCustomWidthCustomCSS = `
  * You can override the default `width` by passing a custom CSS class via the
  * `className` prop.
  *
- * This example shows a progress bar with an overriden `width` of `100%` which
+ * This example shows a progress bar with an overridden `width` of `100%` which
  * makes it fit all available horizontal space of the parent element. The CSS
  * class looks like this:
  *

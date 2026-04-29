@@ -2,6 +2,112 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717)):
+    -   `.block-editor-block-contextual-toolbar`
+    -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
+    -   `.block-editor-block-list__block::before`
+    -   `.block-editor-block-list__block.has-block-overlay`
+    -   `.block-editor-block-list__insertion-point`
+    -   `.block-editor-block-switcher__arrow`
+    -   `.block-editor-url-input__suggestions`
+    -   `.block-editor-warning`
+    -   `.block-library-classic__toolbar`
+    -   `.components-autocomplete__results`
+    -   `.components-button {:focus or .is-primary}`
+    -   `.components-circular-option-picker__option-wrapper::before`
+    -   `.components-circular-option-picker__option.is-pressed`
+    -   `.components-circular-option-picker__option.is-pressed + svg`
+    -   `.components-circular-option-picker__swatches`
+    -   `> *:not(.components-circular-option-picker__swatches)`
+    -   `.components-form-toggle__input`
+    -   `.components-popover.block-editor-inspector-list-view-content-popover`
+    -   `.components-popover.interface-more-menu__content`
+    -   `.components-resizable-box__handle`
+    -   `.components-resizable-box__side-handle`
+    -   `.components-resizable-box__corner-handle`
+    -   `.dataviews-action-modal__quick-edit`
+    -   `.edit-site-editor__toggle-save-panel`
+    -   `.edit-site-template-panel__replace-template-modal`
+    -   `.edit-widgets-header`
+    -   `.edit-widgets-sidebar {greater than small}`
+    -   `.interface-complementary-area .components-panel`
+    -   `.interface-complementary-area .components-panel__header`
+    -   `.wp-block-template-part__placeholder-preview-filter-input`
+
+## 6.20.0 (2026-04-15)
+
+## 6.19.0 (2026-04-01)
+
+## 6.18.0 (2026-03-18)
+
+### Deprecations
+
+-   Deprecate `$modal-min-width`, `$modal-width-small`, `$modal-width-medium`, and `$modal-width-large` SCSS variables in favor of `--wpds-dimension-surface-width-*` design tokens. Variable values have been updated to align with the token scale ([#76494](https://github.com/WordPress/gutenberg/pull/76494)).
+
+## 6.17.0 (2026-03-04)
+
+## 6.16.0 (2026-02-18)
+
+## 6.15.0 (2026-01-29)
+
+## 6.14.0 (2026-01-16)
+
+### Internal
+
+-   Remove outdated vendor prefix properties ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
+
+## 6.12.0 (2025-11-26)
+
+## 6.11.0 (2025-11-12)
+
+## 6.10.0 (2025-10-29)
+
+### Enhancements
+
+-   Update `$font-weight-medium` to 499 ([#72473](https://github.com/WordPress/gutenberg/pull/72473)).
+
+## 6.9.0 (2025-10-17)
+
+## 6.8.0 (2025-10-01)
+
+## 6.7.0 (2025-09-17)
+
+## 6.6.0 (2025-09-03)
+
+## 6.5.0 (2025-08-20)
+
+## 6.4.0 (2025-08-07)
+
+## 6.3.0 (2025-07-23)
+
+## 6.2.0 (2025-06-25)
+
+## 6.1.0 (2025-06-04)
+
+## 6.0.0 (2025-05-22)
+
+### Breaking Changes
+
+-   This package now requires [Dart Sass](https://www.npmjs.com/package/sass) to compile. Legacy Sass compilers like [LibSass](https://sass-lang.com/blog/libsass-is-deprecated/) ([`node-sass`](https://www.npmjs.com/package/node-sass)) and [Ruby Sass](https://sass-lang.com/blog/ruby-sass-is-unsupported/) are no longer supported ([#70135](https://github.com/WordPress/gutenberg/pull/70135)).
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
 ## 5.15.0 (2025-01-02)
 
 ## 5.14.0 (2024-12-11)

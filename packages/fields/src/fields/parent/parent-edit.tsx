@@ -114,7 +114,7 @@ export function PageAttributesParent( {
 	data: BasePost;
 	onChangeControl: ( newValue: number ) => void;
 } ) {
-	const [ fieldValue, setFieldValue ] = useState< null | string >( null );
+	const [ fieldValue, setFieldValue ] = useState< string >( '' );
 
 	const pageId = data.parent;
 	const postId = data.id;
@@ -122,7 +122,6 @@ export function PageAttributesParent( {
 
 	const { parentPostTitle, pageItems, isHierarchical } = useSelect(
 		( select ) => {
-			// @ts-expect-error getPostType is not typed
 			const { getEntityRecord, getEntityRecords, getPostType } =
 				select( coreStore );
 
@@ -146,8 +145,10 @@ export function PageAttributesParent( {
 				orderby: 'menu_order',
 				order: 'asc',
 				_fields: 'id,title,parent',
-				...( fieldValue !== null && {
+				...( !! fieldValue && {
+					// Perform a search by relevance when the field is changed.
 					search: fieldValue,
+					orderby: 'relevance',
 				} ),
 			};
 
@@ -191,14 +192,8 @@ export function PageAttributesParent( {
 			] );
 
 			const sortedNodes = mappedNodes.sort( ( [ a ], [ b ] ) => {
-				const priorityA = getItemPriority(
-					a.rawName,
-					fieldValue ?? ''
-				);
-				const priorityB = getItemPriority(
-					b.rawName,
-					fieldValue ?? ''
-				);
+				const priorityA = getItemPriority( a.rawName, fieldValue );
+				const priorityB = getItemPriority( b.rawName, fieldValue );
 				return priorityA >= priorityB ? 1 : -1;
 			} );
 
@@ -265,7 +260,6 @@ export function PageAttributesParent( {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }
@@ -289,7 +283,6 @@ export const ParentEdit = ( {
 	const { id } = field;
 
 	const homeUrl = useSelect( ( select ) => {
-		// @ts-expect-error getEntityRecord is not typed with unstableBase as argument.
 		return select( coreStore ).getEntityRecord< {
 			home: string;
 		} >( 'root', '__unstableBase' )?.home as string;

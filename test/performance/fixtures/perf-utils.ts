@@ -140,6 +140,15 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Loads the content of the large post fixture.
+	 */
+	async loadContentForLargePost() {
+		return readFile(
+			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
+		);
+	}
+
+	/**
 	 * Loads blocks from an HTML fixture with given path into the editor canvas.
 	 *
 	 * @param filepath Path to the HTML fixture.

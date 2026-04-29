@@ -59,7 +59,7 @@ export function PrivatePostSchedule( {
 		startOfMonth( new Date( postDate ) )
 	);
 
-	// Pick up published and schduled site posts.
+	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {

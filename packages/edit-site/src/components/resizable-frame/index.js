@@ -86,7 +86,7 @@ function ResizableFrame( {
 	setIsOversized,
 	isReady,
 	children,
-	/** The default (unresized) width/height of the frame, based on the space availalbe in the viewport. */
+	/** The default (unresized) width/height of the frame, based on the space available in the viewport. */
 	defaultSize,
 	innerContentStyle,
 } ) {
@@ -254,7 +254,7 @@ function ResizableFrame( {
 				}
 			} }
 			whileHover={
-				canvas === 'view'
+				canvas === 'view' && isBlockTheme
 					? {
 							scale: 1.005,
 							transition: {

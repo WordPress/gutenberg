@@ -62,6 +62,25 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 
+# Create an ESLint flat config that extends wp-scripts' default config but uses
+# the monorepo's custom import resolver. This is needed because local @wordpress/*
+# packages export paths pointing to built files (build-module/), but we haven't
+# run a build. The custom resolver maps these to source files (src/) instead.
+cat > eslint.config.cjs << 'EOF'
+const defaultConfig = require( '@wordpress/scripts/config/eslint.config.cjs' );
+
+module.exports = [
+	...defaultConfig,
+	{
+		settings: {
+			'import/resolver': require.resolve(
+				'../tools/eslint/import-resolver.cjs'
+			),
+		},
+	},
+];
+EOF
+
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
 
@@ -78,6 +97,10 @@ fi
 
 status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
+
+# Ensure monorepo prelint:js scripts have run (e.g., to build design tokens for ESLint).
+status "Running prelint:js..."
+( cd .. && npm run prelint:js )
 
 status "Linting JavaScript files..."
 ../node_modules/.bin/wp-scripts lint-js

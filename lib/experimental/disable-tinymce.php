@@ -16,7 +16,7 @@ function gutenberg_declare_classic_block_necessary() {
 	}
 	echo '<script type="text/javascript">window.wp.needsClassicBlock = true;</script>';
 }
-add_action( 'admin_footer', 'gutenberg_declare_classic_block_necessary' );
+add_action( 'admin_print_footer_scripts', 'gutenberg_declare_classic_block_necessary', 20 );
 
 // If user has already requested TinyMCE, we're ending the experiment.
 if ( ! empty( $_GET['requiresTinymce'] ) || gutenberg_post_being_edited_requires_classic_block() ) {
@@ -38,10 +38,24 @@ add_action( 'admin_init', 'gutenberg_disable_tinymce' );
  * Detects TinyMCE usage and sets the `requiresTinymce` query argument to stop disabling TinyMCE loading.
  */
 function gutenberg_enqueue_tinymce_proxy() {
-	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js', __FILE__ ) );
+	wp_enqueue_script(
+		'gutenberg-tinymce-proxy',
+		plugins_url( 'assets/tinymce-proxy.js', __FILE__ ),
+		array( 'wp-i18n', 'wp-data', 'wp-notices' )
+	);
+	wp_set_script_translations( 'gutenberg-tinymce-proxy', 'gutenberg' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
+
+/**
+ * Dequeue the `mce-view` script as it was only necessary for the Classic block.
+ */
+function gutenberg_wp_enqueue_media() {
+	wp_dequeue_script( 'mce-view' );
+}
+
+add_action( 'wp_enqueue_media', 'gutenberg_wp_enqueue_media' );
 
 /**
  * Example TinyMCE usage used for testing.

@@ -9,27 +9,45 @@ test.describe( 'Template hierarchy', () => {
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'posts',
+			page_on_front: 0,
+			page_for_posts: 0,
+		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
+		] );
 	} );
 
 	test( 'shows correct template with page on front option', async ( {
 		admin,
-		page,
 		editor,
+		page,
+		requestUtils,
 	} ) => {
-		await admin.visitAdminPage( 'options-reading.php' );
-		await page.click( 'input[name="show_on_front"][value="page"]' );
-		await page.selectOption( 'select[name="page_on_front"]', '2' );
-		await page.click( 'input[type="submit"]' );
+		const newPage = await requestUtils.createPage( {
+			title: 'Page on Front',
+			status: 'publish',
+			content:
+				'<!-- wp:paragraph --><p>This is a page on front</p><!-- /wp:paragraph -->',
+		} );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: newPage.id,
+			page_for_posts: 0,
+		} );
 		await admin.visitSiteEditor();
+		await editor.canvas.locator( 'body' ).click();
 
-		// Title block should contain "Sample Page"
+		// Title block should contain "Page on Front"
 		await expect(
-			editor.canvas.locator( 'role=document[name="Block: Title"]' )
-		).toContainText( 'Sample Page' );
-
-		await admin.visitAdminPage( 'options-reading.php' );
-		await page.click( 'input[name="show_on_front"][value="posts"]' );
-		await page.click( 'input[type="submit"]' );
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Page on Front · Homepage' } )
+		).toBeVisible();
 	} );
 } );

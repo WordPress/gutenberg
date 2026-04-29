@@ -19,6 +19,7 @@ module.exports = {
 		'storybook',
 		'test',
 		'tools',
+		'ts-traces',
 		'typings',
 		'vendor',
 	],

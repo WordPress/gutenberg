@@ -57,7 +57,7 @@ export const createPatternFromFile =
 		let parsedContent;
 		try {
 			parsedContent = JSON.parse( fileContent );
-		} catch ( e ) {
+		} catch {
 			throw new Error( 'Invalid JSON file' );
 		}
 		if (
@@ -104,7 +104,7 @@ export const convertSyncedPatternToStatic =
 					delete metadata.bindings;
 					// Use overridden values of the pattern block if they exist.
 					if ( existingOverrides?.[ metadata.name ] ) {
-						// Iterate over each overriden attribute.
+						// Iterate over each overridden attribute.
 						for ( const [ attributeName, value ] of Object.entries(
 							existingOverrides[ metadata.name ]
 						) ) {

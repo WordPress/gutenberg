@@ -3,8 +3,9 @@
 exports[`Config Integration should load local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
-  "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
+  "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
       "config": {
@@ -21,10 +22,10 @@ exports[`Config Integration should load local and override configuration files 1
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -32,6 +33,7 @@ exports[`Config Integration should load local and override configuration files 1
       "multisite": false,
       "mysqlPort": 23306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 999,
@@ -52,10 +54,10 @@ exports[`Config Integration should load local and override configuration files 1
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -63,6 +65,7 @@ exports[`Config Integration should load local and override configuration files 1
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 456,
@@ -71,19 +74,23 @@ exports[`Config Integration should load local and override configuration files 1
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": "test",
+    "afterReset": null,
     "afterStart": null,
   },
   "name": "gutenberg",
-  "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
+  "testsEnvironment": true,
+  "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
 `;
 
 exports[`Config Integration should load local configuration file 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
-  "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
+  "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
       "config": {
@@ -100,10 +107,10 @@ exports[`Config Integration should load local configuration file 1`] = `
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -111,6 +118,7 @@ exports[`Config Integration should load local configuration file 1`] = `
       "multisite": false,
       "mysqlPort": 13306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 123,
@@ -131,10 +139,10 @@ exports[`Config Integration should load local configuration file 1`] = `
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -142,6 +150,7 @@ exports[`Config Integration should load local configuration file 1`] = `
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8889,
@@ -150,19 +159,23 @@ exports[`Config Integration should load local configuration file 1`] = `
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": "test",
   },
   "name": "gutenberg",
-  "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
+  "testsEnvironment": true,
+  "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
 `;
 
 exports[`Config Integration should use default configuration 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
-  "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
+  "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
       "config": {
@@ -179,10 +192,10 @@ exports[`Config Integration should use default configuration 1`] = `
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "100.0.0",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -190,6 +203,7 @@ exports[`Config Integration should use default configuration 1`] = `
       "multisite": false,
       "mysqlPort": null,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8888,
@@ -210,10 +224,10 @@ exports[`Config Integration should use default configuration 1`] = `
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "100.0.0",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -221,6 +235,7 @@ exports[`Config Integration should use default configuration 1`] = `
       "multisite": false,
       "mysqlPort": null,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 8889,
@@ -229,19 +244,23 @@ exports[`Config Integration should use default configuration 1`] = `
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": null,
   },
   "name": "gutenberg",
-  "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
+  "testsEnvironment": true,
+  "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
 `;
 
 exports[`Config Integration should use environment variables over local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
-  "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
+  "dockerComposeConfigPath": "/cache/wp-env-gutenberg-5fea4c56/docker-compose.yml",
   "env": {
     "development": {
       "config": {
@@ -258,10 +277,10 @@ exports[`Config Integration should use environment variables over local and over
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -269,6 +288,7 @@ exports[`Config Integration should use environment variables over local and over
       "multisite": false,
       "mysqlPort": 23306,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 12345,
@@ -290,10 +310,10 @@ exports[`Config Integration should use environment variables over local and over
       },
       "coreSource": {
         "basename": "WordPress",
-        "clonePath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
-        "path": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/WordPress",
+        "clonePath": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
+        "path": "/cache/wp-env-gutenberg-5fea4c56/WordPress",
         "ref": "trunk",
-        "testsPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/tests-WordPress",
+        "testsPath": "/cache/wp-env-gutenberg-5fea4c56/tests-WordPress",
         "type": "git",
         "url": "https://github.com/WordPress/WordPress.git",
       },
@@ -301,6 +321,7 @@ exports[`Config Integration should use environment variables over local and over
       "multisite": false,
       "mysqlPort": 23307,
       "phpVersion": null,
+      "phpmyadmin": false,
       "phpmyadminPort": null,
       "pluginSources": [],
       "port": 61234,
@@ -310,10 +331,13 @@ exports[`Config Integration should use environment variables over local and over
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": "test",
   },
   "name": "gutenberg",
-  "workDirectoryPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338",
+  "testsEnvironment": true,
+  "workDirectoryPath": "/cache/wp-env-gutenberg-5fea4c56",
 }
 `;

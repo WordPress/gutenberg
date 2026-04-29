@@ -74,7 +74,7 @@ const BlockVariationTransformations = ( {
 				/>
 			) }
 			{ transformations?.map( ( item ) => (
-				<BlockVariationTranformationItem
+				<BlockVariationTransformationItem
 					key={ item.name }
 					item={ item }
 					onSelect={ onSelect }
@@ -85,7 +85,7 @@ const BlockVariationTransformations = ( {
 	);
 };
 
-function BlockVariationTranformationItem( {
+function BlockVariationTransformationItem( {
 	item,
 	onSelect,
 	setHoveredTransformItemName,
@@ -100,6 +100,8 @@ function BlockVariationTranformationItem( {
 			} }
 			onMouseLeave={ () => setHoveredTransformItemName( null ) }
 			onMouseEnter={ () => setHoveredTransformItemName( name ) }
+			onFocus={ () => setHoveredTransformItemName( name ) }
+			onBlur={ () => setHoveredTransformItemName( null ) }
 		>
 			<BlockIcon icon={ icon } showColors />
 			{ title }

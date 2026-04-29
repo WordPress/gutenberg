@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalLibrary as Library } from '@wordpress/block-editor';
-import {
-	useViewportMatch,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { useCallback, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
@@ -25,19 +22,10 @@ export default function InserterSidebar() {
 		return setIsInserterOpened( false );
 	}, [ setIsInserterOpened ] );
 
-	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: closeInserter,
-		focusOnMount: true,
-	} );
-
 	const libraryRef = useRef();
 
 	return (
-		<div
-			ref={ inserterDialogRef }
-			{ ...inserterDialogProps }
-			className="edit-widgets-layout__inserter-panel"
-		>
+		<div className="edit-widgets-layout__inserter-panel">
 			<div className="edit-widgets-layout__inserter-panel-content">
 				<Library
 					showInserterHelpPanel

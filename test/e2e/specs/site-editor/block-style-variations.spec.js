@@ -11,6 +11,7 @@ test.use( {
 
 test.describe( 'Block Style Variations', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme(
@@ -20,17 +21,25 @@ test.describe( 'Block Style Variations', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllPages(),
-		] );
-	} );
-
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
 			admin.visitSiteEditor(),
+		] );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
 		] );
 	} );
 
@@ -102,6 +111,12 @@ test.describe( 'Block Style Variations', () => {
 	} ) => {
 		await draftNewPage( page );
 		await addPageContent( editor, page );
+		// switch to template mode (access to global styles)
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		const firstGroup = editor.canvas
 			.locator( '[data-type="core/group"]' )
 			.first();
@@ -204,21 +219,12 @@ test.describe( 'Block Style Variations', () => {
 		const revisionIframe = page.frameLocator( '[name="revisions"]' );
 
 		const revisionFirstGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.first();
 		const revisionSecondGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 1 );
 		const revisionThirdGroup = revisionIframe
-			.getByRole( 'document', {
-				name: 'Block: Content',
-			} )
 			.locator( '[data-type="core/group"]' )
 			.nth( 2 );
 
@@ -302,7 +308,7 @@ class SiteEditorBlockStyleVariations {
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
 		.locator( 'role=dialog[name="Draft new: page"i]' )
 		.locator( 'role=textbox[name="title"i]' )
@@ -317,7 +323,9 @@ async function draftNewPage( page ) {
 
 // Create a Group block with 2 nested Group blocks.
 async function addPageContent( editor, page ) {
-	const inserterButton = page.locator( 'role=tab[name="Blocks"i]' );
+	const inserterButton = page.locator(
+		'role=button[name="Block Inserter"i]'
+	);
 	await inserterButton.click();
 	await page.type( 'role=searchbox[name="Search"i]', 'Group' );
 	await page.click(

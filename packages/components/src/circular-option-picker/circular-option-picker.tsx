@@ -51,7 +51,6 @@ import {
  * 						style={ { backgroundColor: color, color } }
  * 						isSelected={ index === currentColor }
  * 						onClick={ () => setCurrentColor( index ) }
- * 						aria-label={ name }
  * 					/>
  * 				);
  * 			} ) }
@@ -133,7 +132,7 @@ function ButtonsCircularOptionPicker(
 	);
 
 	return (
-		<div { ...additionalProps } id={ baseId }>
+		<div { ...additionalProps } role="group" id={ baseId }>
 			<CircularOptionPickerContext.Provider value={ contextValue }>
 				{ options }
 				{ children }
@@ -192,5 +191,7 @@ CircularOptionPicker.Option = Option;
 CircularOptionPicker.OptionGroup = OptionGroup;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+CircularOptionPicker.displayName = 'CircularOptionPicker';
 
 export default CircularOptionPicker;

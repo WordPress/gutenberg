@@ -67,13 +67,12 @@ export default function QueryPaginationNumbersEdit( {
 				>
 					<ToolsPanelItem
 						label={ __( 'Number of links' ) }
-						hasValue={ () => midSize !== undefined }
+						hasValue={ () => midSize !== 2 }
 						onDeselect={ () => setAttributes( { midSize: 2 } ) }
 						isShownByDefault
 					>
 						<RangeControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Number of links' ) }
 							help={ __(
 								'Specify how many links can appear before and after the current page number. Links to the first, current and last page are always visible.'

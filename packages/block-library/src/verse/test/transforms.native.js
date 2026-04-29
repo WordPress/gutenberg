@@ -9,14 +9,18 @@ import {
 	getBlockTransformOptions,
 } from 'test/helpers';
 
-const block = 'Verse';
+const block = 'Poetry';
 const initialHtml = `
 <!-- wp:verse {"textAlign":"center"} -->
 <pre class="wp-block-verse has-text-align-center">Come<br>Home.</pre>
 <!-- /wp:verse -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [ 'Paragraph', ...transformsWithInnerBlocks ];
+const blockTransforms = [
+	'Paragraph',
+	'Preformatted',
+	...transformsWithInnerBlocks,
+];
 
 setupCoreBlocks();
 

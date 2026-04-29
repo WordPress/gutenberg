@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import type { FontSizePickerProps, FontSize } from './types';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control';
 
 /**
  * Some themes use css vars for their font sizes, so until we
@@ -20,23 +19,23 @@ export function isSimpleCssValue(
 }
 
 /**
- * If all of the given font sizes have the same unit (e.g. 'px'), return that
- * unit. Otherwise return null.
+ * Generates hint text for a font size.
+ * This function returns the hint provided by the consumer, if any.
+ * If no hint is provided, it falls back to showing the size value for simple CSS values.
  *
- * @param fontSizes List of font sizes.
- * @return The common unit, or null.
+ * @param fontSize The font size object to generate hint text for.
+ * @return The hint text provided by the consumer, or the size value for simple CSS values, or undefined.
  */
-export function getCommonSizeUnit( fontSizes: FontSize[] ) {
-	const [ firstFontSize, ...otherFontSizes ] = fontSizes;
-	if ( ! firstFontSize ) {
-		return null;
+export function generateFontSizeHint( fontSize: FontSize ): string | undefined {
+	// If the font size already has a hint, use it
+	if ( fontSize.hint ) {
+		return fontSize.hint;
 	}
-	const [ , firstUnit ] = parseQuantityAndUnitFromRawValue(
-		firstFontSize.size
-	);
-	const areAllSizesSameUnit = otherFontSizes.every( ( fontSize ) => {
-		const [ , unit ] = parseQuantityAndUnitFromRawValue( fontSize.size );
-		return unit === firstUnit;
-	} );
-	return areAllSizesSameUnit ? firstUnit : null;
+
+	// Fallback to showing the size value if it's a simple CSS value
+	if ( isSimpleCssValue( fontSize.size ) ) {
+		return String( fontSize.size );
+	}
+
+	return undefined;
 }

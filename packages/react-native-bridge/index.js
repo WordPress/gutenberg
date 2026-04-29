@@ -494,7 +494,7 @@ export function logException(
 		if ( ! wasSent ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				'An error ocurred when logging the exception',
+				'An error occurred when logging the exception',
 				parsedException
 			);
 		}
