@@ -35,6 +35,33 @@ import { EDITOR_STORE_NAME } from './constants';
 const SCHEMA_VERSION = 1;
 
 /**
+ * Maximum byte length of a serialized suggestion payload. Mirrors
+ * `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in
+ * `lib/compat/wordpress-6.9/block-comments.php`. The client checks before
+ * submitting so a doomed request never leaves the browser; the REST
+ * controller is the authoritative gate.
+ */
+const PAYLOAD_MAX_BYTES = 65536;
+
+/**
+ * Byte length of a serialized payload, measured the way PHP `strlen()`
+ * counts (UTF-8 bytes, not chars).
+ *
+ * @param {SuggestionPayload} payload
+ * @return {number} UTF-8 byte length of the serialized JSON.
+ */
+function payloadByteLength( payload ) {
+	const serialized = JSON.stringify( payload );
+	if ( typeof TextEncoder !== 'undefined' ) {
+		return new TextEncoder().encode( serialized ).length;
+	}
+	// Conservative upper bound: 4 bytes per UTF-16 code unit covers all
+	// possible UTF-8 expansions. Used only in test/JSDOM environments
+	// without TextEncoder.
+	return serialized.length * 4;
+}
+
+/**
  * Build attribute-set operations by diffing an overlay entry against its
  * captured baseline. Attributes whose value differs are emitted; unchanged
  * or absent keys are skipped.
@@ -61,6 +88,18 @@ export function operationsFromOverlay( baselineAttributes, overlayAttributes ) {
 	return operations;
 }
 
+/**
+ * Structural equality for attribute values. Handles primitives, arrays, and
+ * plain objects with arbitrary key order.
+ *
+ * `JSON.stringify` is order-sensitive ({a:1,b:2} ≠ {b:2,a:1}), so a stringify-
+ * based compare produces spurious "changed" detections when block code re-
+ * emits a `style` object with reordered keys. The recursive walk avoids that.
+ *
+ * @param {*} a First value.
+ * @param {*} b Second value.
+ * @return {boolean} True when the values are structurally equal.
+ */
 function isAttributeEqual( a, b ) {
 	if ( a === b ) {
 		return true;
@@ -71,11 +110,36 @@ function isAttributeEqual( a, b ) {
 	if ( typeof a !== 'object' || typeof b !== 'object' ) {
 		return false;
 	}
-	try {
-		return JSON.stringify( a ) === JSON.stringify( b );
-	} catch {
+	const aIsArray = Array.isArray( a );
+	const bIsArray = Array.isArray( b );
+	if ( aIsArray !== bIsArray ) {
 		return false;
 	}
+	if ( aIsArray ) {
+		if ( a.length !== b.length ) {
+			return false;
+		}
+		for ( let i = 0; i < a.length; i++ ) {
+			if ( ! isAttributeEqual( a[ i ], b[ i ] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	const aKeys = Object.keys( a );
+	const bKeys = Object.keys( b );
+	if ( aKeys.length !== bKeys.length ) {
+		return false;
+	}
+	for ( const key of aKeys ) {
+		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
+			return false;
+		}
+		if ( ! isAttributeEqual( a[ key ], b[ key ] ) ) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
@@ -135,6 +199,17 @@ export function useSuggestionsProvider() {
 				baseRevision: postModified,
 				operations,
 			} );
+
+			if ( payloadByteLength( payload ) > PAYLOAD_MAX_BYTES ) {
+				const error = new Error(
+					__( 'Suggestion is too large to save.' )
+				);
+				createNotice( 'error', error.message, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				throw error;
+			}
 
 			try {
 				const savedRecord = await saveEntityRecord(
@@ -201,4 +276,4 @@ export function useSuggestionsProvider() {
 	return { createSuggestion, applySuggestion, rejectSuggestion };
 }
 
-export { SCHEMA_VERSION };
+export { SCHEMA_VERSION, PAYLOAD_MAX_BYTES, payloadByteLength };

@@ -10,7 +10,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { useSuggestionOverlay } from './overlay-context';
-import { EDITOR_STORE_NAME } from './constants';
+import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -72,8 +72,8 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
-	// Relying on a local ref was fragile — it didn't reset after
-	// Submit / Discard / orphan prune.
+	// Relying on a local ref was fragile — it didn't reset after the entry
+	// was cleared (orphan prune, intent-switch).
 	const entryExists = !! entries[ clientId ];
 
 	const wrappedSetAttributes = useCallback(
@@ -115,8 +115,8 @@ const withSuggestionOverlay = createHigherOrderComponent(
 		function BlockEditWithSuggestionOverlay( props ) {
 			const isSuggestMode = useSelect(
 				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent?.() ===
-					'suggest',
+					select( EDITOR_STORE_NAME ).getEditorIntent() ===
+					SUGGEST_INTENT,
 				[]
 			);
 
