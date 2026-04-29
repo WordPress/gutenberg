@@ -73,6 +73,7 @@
 		background: $gray-100;
 		overflow: auto;
 		height: 100%;
+		position: relative;
 
 		// MediaPreview uses `min-height: 100%` so it can grow when needed in
 		// other contexts. Inside the modal canvas we need a definite height
@@ -88,6 +89,20 @@
 			max-height: 100%;
 			object-fit: contain;
 		}
+	}
+
+	.media-editor-modal__loading {
+		align-items: center;
+		display: flex;
+		flex: 1;
+		height: 100%;
+		justify-content: center;
+	}
+
+	.media-editor-modal__loading--overlay {
+		inset: 0;
+		pointer-events: none;
+		position: absolute;
 	}
 
 	// Matches the post editor's `.editor-sidebar` container (see

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -136,5 +136,21 @@ describe( 'Cropper grid visibility classes', () => {
 		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'calls onImageLoadError when the image fails to load', () => {
+		const onImageLoadError = jest.fn();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				onImageLoadError={ onImageLoadError }
+			/>
+		);
+
+		fireEvent.error( screen.getByAltText( '' ) );
+
+		expect( onImageLoadError ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

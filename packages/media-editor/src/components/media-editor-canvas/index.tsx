@@ -12,6 +12,10 @@ export interface MediaEditorCanvasProps {
 	freeformCrop?: boolean;
 	/** Whether external placement activity should reveal the grid. */
 	isPlacementActive?: boolean;
+	/** Called when the image has loaded. */
+	onImageLoaded?: () => void;
+	/** Called when the image fails to load. */
+	onImageLoadError?: () => void;
 }
 
 /**
@@ -25,11 +29,15 @@ export interface MediaEditorCanvasProps {
  * @param props.aspectRatio
  * @param props.freeformCrop
  * @param props.isPlacementActive
+ * @param props.onImageLoaded
+ * @param props.onImageLoadError
  */
 export default function MediaEditorCanvas( {
 	aspectRatio,
 	freeformCrop,
 	isPlacementActive = false,
+	onImageLoaded,
+	onImageLoadError,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
@@ -50,6 +58,8 @@ export default function MediaEditorCanvas( {
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				onImageLoaded={ onImageLoaded }
+				onImageLoadError={ onImageLoadError }
 			/>
 		</div>
 	);

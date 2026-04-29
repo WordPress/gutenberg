@@ -72,7 +72,12 @@ const METADATA_EDIT_KEYS = [
 // Scope save-failure snackbars to this modal so they don't leak into the
 // host editor's notices tray (and vice versa).
 const NOTICES_CONTEXT = 'media-editor';
+const IMAGE_LOAD_ERROR_NOTICE_ID = 'media-editor-image-load-error';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
+const IMAGE_LOAD_ERROR_MESSAGE = __(
+	'Could not load image. Please check your connection and try again.'
+);
+const LOAD_TIMEOUT_MS = 5000;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -219,21 +224,29 @@ function MediaEditorModalContent( {
 	onUpdate,
 }: MediaEditorModalContentProps ) {
 	const cropper = useCropper();
+	const { setImage } = cropper;
 	const hasChanges = cropper.isDirty || hasEdits;
 
 	const registry = useRegistry();
 	const {
 		clearEntityRecordEdits,
 		editEntityRecord,
+		invalidateResolution,
 		receiveEntityRecords,
 		saveEditedEntityRecord,
 	} = useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
-	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
+	const { createErrorNotice, removeAllNotices, removeNotice } =
+		useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const [ mediaLoadTimedOut, setMediaLoadTimedOut ] = useState( false );
+	const [ imageLoadAttempt, setImageLoadAttempt ] = useState( 0 );
+	const [ imageLoadState, setImageLoadState ] = useState<
+		'idle' | 'loading' | 'loaded' | 'error'
+	>( 'idle' );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -263,6 +276,15 @@ function MediaEditorModalContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
+	const mediaUrl = isImage ? media?.source_url : undefined;
+	const imageLoadFailed =
+		isImage && ( ! mediaUrl || imageLoadState === 'error' );
+	const isImageLoading =
+		!! mediaUrl &&
+		! imageLoadFailed &&
+		( imageLoadState === 'loading' ||
+			cropper.state.image?.src !== mediaUrl );
+	const canEditImage = isImage && !! mediaUrl && ! imageLoadFailed;
 
 	const imageAspectRatio = useMemo( () => {
 		if ( ! isImage ) {
@@ -280,6 +302,170 @@ function MediaEditorModalContent( {
 		return null;
 	}, [ isImage, media ] );
 
+	const clearImageLoadErrorNotice = useCallback( () => {
+		removeNotice( IMAGE_LOAD_ERROR_NOTICE_ID, NOTICES_CONTEXT );
+	}, [ removeNotice ] );
+
+	const showImageLoadErrorNotice = useCallback(
+		() =>
+			createErrorNotice( IMAGE_LOAD_ERROR_MESSAGE, {
+				id: IMAGE_LOAD_ERROR_NOTICE_ID,
+				type: 'snackbar',
+				context: NOTICES_CONTEXT,
+			} ),
+		[ createErrorNotice ]
+	);
+
+	const retryMediaLoad = useCallback( () => {
+		clearImageLoadErrorNotice();
+		setMediaLoadTimedOut( false );
+		invalidateResolution( 'getEntityRecord', [
+			'postType',
+			'attachment',
+			id,
+		] );
+		invalidateResolution( 'getEditedEntityRecord', [
+			'postType',
+			'attachment',
+			id,
+		] );
+	}, [ clearImageLoadErrorNotice, id, invalidateResolution ] );
+
+	const retryImageLoad = useCallback( () => {
+		clearImageLoadErrorNotice();
+		setImageLoadState( 'idle' );
+		setImageLoadAttempt( ( attempt ) => attempt + 1 );
+	}, [ clearImageLoadErrorNotice ] );
+
+	useEffect( () => {
+		retryMediaLoad();
+	}, [ retryMediaLoad ] );
+
+	useEffect( () => {
+		if ( media ) {
+			setMediaLoadTimedOut( false );
+			return;
+		}
+
+		const timeout = setTimeout(
+			() => {
+				setMediaLoadTimedOut( true );
+			},
+			navigator.onLine ? LOAD_TIMEOUT_MS : 0
+		);
+
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [ id, media ] );
+
+	useEffect( () => {
+		if ( mediaLoadTimedOut ) {
+			showImageLoadErrorNotice();
+		}
+	}, [ mediaLoadTimedOut, showImageLoadErrorNotice ] );
+
+	useEffect( () => {
+		if ( ! media ) {
+			setImageLoadState( 'idle' );
+			return;
+		}
+
+		if ( ! isImage ) {
+			setImageLoadState( 'idle' );
+			clearImageLoadErrorNotice();
+			return;
+		}
+
+		if ( ! mediaUrl ) {
+			setImageLoadState( 'error' );
+			showImageLoadErrorNotice();
+			return;
+		}
+
+		let isCurrent = true;
+		const image = new Image();
+
+		function handleLoad() {
+			if ( ! isCurrent ) {
+				return;
+			}
+			clearTimeout( timeout );
+			setImage( {
+				src: mediaUrl,
+				naturalWidth: image.naturalWidth,
+				naturalHeight: image.naturalHeight,
+			} );
+			setImageLoadState( 'loaded' );
+			clearImageLoadErrorNotice();
+		}
+
+		function handleError() {
+			if ( ! isCurrent ) {
+				return;
+			}
+			clearTimeout( timeout );
+			setImageLoadState( 'error' );
+			showImageLoadErrorNotice();
+		}
+
+		const timeout = setTimeout( handleError, LOAD_TIMEOUT_MS );
+		setImageLoadState( 'loading' );
+		image.addEventListener( 'load', handleLoad );
+		image.addEventListener( 'error', handleError );
+		image.src = mediaUrl;
+
+		if ( image.complete ) {
+			if ( image.naturalWidth > 0 ) {
+				handleLoad();
+			} else {
+				handleError();
+			}
+		}
+
+		return () => {
+			isCurrent = false;
+			clearTimeout( timeout );
+			image.removeEventListener( 'load', handleLoad );
+			image.removeEventListener( 'error', handleError );
+		};
+	}, [
+		clearImageLoadErrorNotice,
+		imageLoadAttempt,
+		isImage,
+		media,
+		mediaUrl,
+		setImage,
+		showImageLoadErrorNotice,
+	] );
+
+	const handleImageLoaded = useCallback( () => {
+		setImageLoadState( 'loaded' );
+		clearImageLoadErrorNotice();
+	}, [ clearImageLoadErrorNotice ] );
+
+	const handleImageLoadError = useCallback( () => {
+		setImageLoadState( 'error' );
+		showImageLoadErrorNotice();
+	}, [ showImageLoadErrorNotice ] );
+
+	useEffect( () => {
+		const handleOnline = () => {
+			if ( ! media ) {
+				retryMediaLoad();
+				return;
+			}
+			if ( isImage ) {
+				retryImageLoad();
+			}
+		};
+
+		window.addEventListener( 'online', handleOnline );
+		return () => {
+			window.removeEventListener( 'online', handleOnline );
+		};
+	}, [ isImage, media, retryImageLoad, retryMediaLoad ] );
+
 	const tabs = useMemo< ModalTab[] >( () => {
 		const detailsTab: ModalTab = {
 			id: 'details',
@@ -294,7 +480,7 @@ function MediaEditorModalContent( {
 				</Stack>
 			),
 		};
-		if ( ! isImage ) {
+		if ( ! canEditImage ) {
 			return [ detailsTab ];
 		}
 		return [
@@ -323,7 +509,7 @@ function MediaEditorModalContent( {
 			detailsTab,
 		];
 	}, [
-		isImage,
+		canEditImage,
 		aspectRatioValue,
 		freeformCrop,
 		aspectRatioPresets,
@@ -454,6 +640,37 @@ function MediaEditorModalContent( {
 		}
 	};
 
+	let canvasContent: JSX.Element;
+	if ( canEditImage ) {
+		canvasContent = (
+			<>
+				<MediaEditorCanvas
+					aspectRatio={ resolveAspectRatio(
+						aspectRatioValue,
+						imageAspectRatio
+					) }
+					freeformCrop={ freeformCrop }
+					isPlacementActive={ isPlacementActive }
+					onImageLoaded={ handleImageLoaded }
+					onImageLoadError={ handleImageLoadError }
+				/>
+				{ isImageLoading && (
+					<div className="media-editor-modal__loading media-editor-modal__loading--overlay">
+						<Spinner />
+					</div>
+				) }
+			</>
+		);
+	} else if ( isImage ) {
+		canvasContent = (
+			<div className="media-editor-modal__loading">
+				<Spinner />
+			</div>
+		);
+	} else {
+		canvasContent = <MediaPreview />;
+	}
+
 	return (
 		<Modal
 			className="media-editor-modal"
@@ -503,31 +720,18 @@ function MediaEditorModalContent( {
 					</div>
 				) : (
 					<>
-						<Tabs>
+						<Tabs key={ canEditImage ? 'image' : 'details' }>
 							<MediaEditorModalSidebar tabs={ tabs } />
 						</Tabs>
 						<InterfaceSkeleton
 							className="media-editor-modal__skeleton"
 							content={
 								<div className="media-editor-modal__canvas">
-									{ isImage ? (
-										<MediaEditorCanvas
-											aspectRatio={ resolveAspectRatio(
-												aspectRatioValue,
-												imageAspectRatio
-											) }
-											freeformCrop={ freeformCrop }
-											isPlacementActive={
-												isPlacementActive
-											}
-										/>
-									) : (
-										<MediaPreview />
-									) }
+									{ canvasContent }
 								</div>
 							}
 							footer={
-								isImage ? (
+								canEditImage ? (
 									<MediaEditorToolbar
 										onReset={ () => {
 											setAspectRatioValue( '0' );
@@ -590,7 +794,10 @@ export function MediaEditorModal( {
 	const { media, hasEdits } = useSelect(
 		( select ) => {
 			if ( ! id ) {
-				return { media: null, hasEdits: false };
+				return {
+					media: null,
+					hasEdits: false,
+				};
 			}
 			const { getEditedEntityRecord, hasEditsForEntityRecord } =
 				select( coreStore );

@@ -101,6 +101,8 @@ export interface CropperProps {
 	freeformCrop?: boolean;
 	/** Callback fired when the image is loaded. */
 	onImageLoaded?: ( size: Size ) => void;
+	/** Callback fired when the image fails to load. */
+	onImageLoadError?: () => void;
 	/**
 	 * Callback fired on every state change. Fires at pointermove rate
 	 * during drags, so keep the handler light — no heavy work, no
@@ -142,6 +144,7 @@ export interface CropperProps {
  * @param root0.aspectRatio       Fixed aspect ratio (width/height).
  * @param root0.freeformCrop      Enable resize handles.
  * @param root0.onImageLoaded     Image load callback.
+ * @param root0.onImageLoadError  Image load error callback.
  * @param root0.onStateChange     Every-frame state callback.
  * @param root0.onGestureStart    Gesture boundary start.
  * @param root0.onGestureEnd      Gesture boundary end.
@@ -161,6 +164,7 @@ function CropperInner(
 		aspectRatio,
 		freeformCrop = false,
 		onImageLoaded,
+		onImageLoadError,
 		onStateChange,
 		onGestureStart,
 		onGestureEnd,
@@ -333,6 +337,10 @@ function CropperInner(
 		[ src, setImage, onImageLoaded ]
 	);
 
+	const handleImageLoadError = useCallback( () => {
+		onImageLoadError?.();
+	}, [ onImageLoadError ] );
+
 	/**
 	 * Handle crop rect changes from the stencil (during drag).
 	 */
@@ -468,6 +476,7 @@ function CropperInner(
 					src={ src }
 					alt=""
 					onLoad={ handleImageLoad }
+					onError={ handleImageLoadError }
 					style={ imageStyle }
 					draggable={ false }
 				/>
