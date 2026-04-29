@@ -1,4 +1,6 @@
+import clsx from 'clsx';
 import { forwardRef, useEffect, useId } from '@wordpress/element';
+import fieldStyles from '../../../utils/css/field.module.css';
 import { Text } from '../../../text';
 import { useFieldsetContext } from './context';
 import type { FieldsetDescriptionProps } from './types';
@@ -22,9 +24,9 @@ export const FieldsetDescription = forwardRef<
 
 	return (
 		<Text
-			render={ <p ref={ ref } id={ id } { ...restProps } /> }
+			render={ render ?? <p ref={ ref } id={ id } { ...restProps } /> }
 			variant="body-sm"
-			className={ className }
+			className={ clsx( fieldStyles.description, className ) }
 		/>
 	);
 } );
