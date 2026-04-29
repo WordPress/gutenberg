@@ -3,11 +3,11 @@
 	"extends": "./tsconfig.src.json",
 	"compilerOptions": {
 		"composite": true,
-		"rootDir": "bin",
+		"rootDir": ".",
 		"noEmit": true,
 		"allowImportingTsExtensions": true
 	},
-	"include": [ "bin" ],
+	"include": [ "bin", "terrazzo.config.ts" ],
 	"exclude": [],
 	"references": [ { "path": "./tsconfig.src.json" } ]
 }

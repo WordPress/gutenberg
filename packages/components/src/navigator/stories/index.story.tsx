@@ -12,6 +12,7 @@ import { HStack } from '../../h-stack';
 import { Navigator, useNavigator } from '../';
 
 const meta: Meta< typeof Navigator > = {
+	tags: [ 'manifest' ],
 	component: Navigator,
 	subcomponents: {
 		Screen: Navigator.Screen,
