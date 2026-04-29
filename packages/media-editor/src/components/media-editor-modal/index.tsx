@@ -219,7 +219,20 @@ function MediaEditorModalContent( {
 	onUpdate,
 }: MediaEditorModalContentProps ) {
 	const cropper = useCropper();
-	const hasChanges = cropper.isDirty || hasEdits;
+
+	// Restore-original state. `pendingSourceUrl` is the URL loaded
+	// into the cropper via prop override; `pendingSourceId` is the
+	// matching attachment id used for the no-`/edit` save path.
+	// Both null means no restore is active.
+	const [ pendingSourceUrl, setPendingSourceUrl ] = useState< string | null >(
+		null
+	);
+	const [ pendingSourceId, setPendingSourceId ] = useState< number | null >(
+		null
+	);
+	const restoredOriginal = pendingSourceUrl !== null;
+	const cropSrc = pendingSourceUrl ?? media?.source_url;
+	const hasChanges = cropper.isDirty || hasEdits || restoredOriginal;
 
 	const registry = useRegistry();
 	const {
@@ -280,6 +293,26 @@ function MediaEditorModalContent( {
 		return null;
 	}, [ isImage, media ] );
 
+	const rootImage = media?.media_details?.root_image as
+		| { attachment_id: number; source_url: string }
+		| undefined;
+	const canRestoreOriginal =
+		isImage &&
+		!! rootImage &&
+		rootImage.attachment_id !== id &&
+		! restoredOriginal;
+
+	const handleRestoreOriginal = useCallback( () => {
+		if ( ! rootImage ) {
+			return;
+		}
+		setPendingSourceUrl( rootImage.source_url );
+		setPendingSourceId( rootImage.attachment_id );
+		cropper.reset();
+		setAspectRatioValue( '0' );
+		setFreeformCrop( true );
+	}, [ rootImage, cropper ] );
+
 	const tabs = useMemo< ModalTab[] >( () => {
 		const detailsTab: ModalTab = {
 			id: 'details',
@@ -302,11 +335,13 @@ function MediaEditorModalContent( {
 				id: 'crop',
 				title: __( 'Crop' ),
 				panel: (
-					<Stack
-						className="media-editor-modal__panel"
-						direction="column"
-						gap="lg"
-					>
+					// Plain div (not `<Stack>`) so the inner crop panel
+					// can run its own flex layout end-to-end and pin
+					// the Restore footer to the bottom. The `--crop`
+					// modifier opts the sidebar height chain in (see
+					// `.media-editor-modal__sidebar-panel:has(...)`
+					// in style.scss).
+					<div className="media-editor-modal__panel media-editor-modal__panel--crop">
 						<MediaEditorCropPanel
 							aspectRatioValue={ aspectRatioValue }
 							onAspectRatioChange={ setAspectRatioValue }
@@ -316,8 +351,14 @@ function MediaEditorModalContent( {
 								signalPlacementControlInteraction
 							}
 							aspectRatioPresets={ aspectRatioPresets }
+							canRestoreOriginal={ canRestoreOriginal }
+							isOriginalRestored={ restoredOriginal }
+							willDiscardMetadataEdits={
+								restoredOriginal && hasEdits
+							}
+							onRestoreOriginal={ handleRestoreOriginal }
 						/>
-					</Stack>
+					</div>
 				),
 			},
 			detailsTab,
@@ -328,6 +369,10 @@ function MediaEditorModalContent( {
 		freeformCrop,
 		aspectRatioPresets,
 		signalPlacementControlInteraction,
+		canRestoreOriginal,
+		restoredOriginal,
+		hasEdits,
+		handleRestoreOriginal,
 	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
@@ -337,6 +382,8 @@ function MediaEditorModalContent( {
 	const discardAndClose = () => {
 		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		clearEntityRecordEdits( 'postType', 'attachment', id );
+		setPendingSourceUrl( null );
+		setPendingSourceId( null );
 		closeMediaEditorModal();
 	};
 
@@ -359,6 +406,28 @@ function MediaEditorModalContent( {
 		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		setIsSaving( true );
 		try {
+			// Restored, not cropped: swap the block to the root
+			// attachment without calling /edit. Staged metadata edits
+			// are discarded — they were against the now-orphaned
+			// attachment and the warning notice in the panel told the
+			// user this would happen.
+			if (
+				restoredOriginal &&
+				! cropper.isDirty &&
+				pendingSourceId &&
+				pendingSourceUrl
+			) {
+				clearEntityRecordEdits( 'postType', 'attachment', id );
+				if ( onUpdate ) {
+					onUpdate( {
+						id: pendingSourceId,
+						url: pendingSourceUrl,
+					} );
+				}
+				closeMediaEditorModal();
+				return;
+			}
+
 			let saved: Media | null | undefined;
 
 			const modifiers =
@@ -390,11 +459,21 @@ function MediaEditorModalContent( {
 					}
 				}
 
+				// When restored, route /edit to the root attachment so
+				// the new edit is a sibling of the current attachment
+				// (a fresh child of the root). Posting to the current
+				// id with the root URL would fail core's
+				// `wp_image_file_matches_image_meta` check, since the
+				// root URL doesn't belong to the current attachment.
+				const editId =
+					restoredOriginal && pendingSourceId ? pendingSourceId : id;
+				const editSrc = pendingSourceUrl ?? media?.source_url;
+
 				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ id }/edit`,
+					path: `/wp/v2/media/${ editId }/edit`,
 					method: 'POST',
 					data: {
-						src: media?.source_url,
+						src: editSrc,
 						modifiers,
 						...metadataEdits,
 					},
@@ -510,6 +589,7 @@ function MediaEditorModalContent( {
 								<div className="media-editor-modal__canvas">
 									{ isImage ? (
 										<MediaEditorCanvas
+											src={ cropSrc }
 											aspectRatio={ resolveAspectRatio(
 												aspectRatioValue,
 												imageAspectRatio

@@ -1,0 +1,42 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.media-editor-crop-panel {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+}
+
+.media-editor-crop-panel__content {
+	flex: 1 1 auto;
+	min-height: 0;
+	// No overflow set: lets the RangeControl thumb render past the
+	// content's left edge without clipping. If/when more controls
+	// land here and overflow becomes a concern, switch to
+	// `overflow-y: auto; overflow-x: clip;` and add inline padding to
+	// keep the thumb visible.
+}
+
+.media-editor-crop-panel__footer {
+	// `margin-top: auto` pushes this footer to the bottom of the
+	// flex parent so the Restore action stays anchored regardless of
+	// content height. `position: sticky` is the fallback if the panel
+	// ever needs to scroll.
+	flex: 0 0 auto;
+	margin-top: auto;
+	position: sticky;
+	bottom: 0;
+	padding: $grid-unit-15 0;
+	background: $white;
+	border-top: 1px solid $gray-200;
+
+	.components-button {
+		justify-content: center;
+		width: 100%;
+	}
+}
+
+.media-editor-crop-panel__notice {
+	margin: 0 0 $grid-unit-15;
+}

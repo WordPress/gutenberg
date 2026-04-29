@@ -22,6 +22,10 @@ interface MediaDetails {
 	sizes: { [ key: string ]: Size };
 	image_meta?: ImageMeta;
 	original_image?: string;
+	root_image?: {
+		attachment_id: number;
+		source_url: string;
+	};
 	// Audio/video metadata
 	bitrate?: number;
 	mime_type?: string;

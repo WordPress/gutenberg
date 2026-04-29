@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import {
+	Button,
+	Notice,
 	RangeControl,
 	SelectControl,
 	ToggleControl,
@@ -41,6 +43,24 @@ export interface MediaEditorCropPanelProps {
 	 * omitted, the media editor's default fixed-ratio presets are used.
 	 */
 	aspectRatioPresets?: AspectRatioPreset[];
+	/**
+	 * When true, render the Restore-original sticky footer button.
+	 * Driven by the modal: only true when `media_details.root_image`
+	 * exists and a restore isn't already pending.
+	 */
+	canRestoreOriginal?: boolean;
+	/**
+	 * True after the user has clicked Restore in this session. Drives
+	 * the inline notice copy.
+	 */
+	isOriginalRestored?: boolean;
+	/**
+	 * True when staged metadata edits would be discarded by saving the
+	 * restored original. Drives notice severity.
+	 */
+	willDiscardMetadataEdits?: boolean;
+	/** Click handler for the Restore-original button. */
+	onRestoreOriginal?: () => void;
 }
 
 /**
@@ -70,8 +90,9 @@ export function resolveAspectRatio(
 
 /**
  * Sidebar panel for crop-shape controls — aspect-ratio presets and
- * freeform toggle. The tactile verbs (rotate, flip) live in the
- * bottom toolbar instead.
+ * freeform toggle, with a sticky footer for the Restore-original
+ * action when applicable.
+ *
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
@@ -79,6 +100,10 @@ export function resolveAspectRatio(
  * @param props.onFreeformChange
  * @param props.onPlacementControlInteraction
  * @param props.aspectRatioPresets
+ * @param props.canRestoreOriginal
+ * @param props.isOriginalRestored
+ * @param props.willDiscardMetadataEdits
+ * @param props.onRestoreOriginal
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
@@ -87,6 +112,10 @@ export default function MediaEditorCropPanel( {
 	onFreeformChange,
 	onPlacementControlInteraction,
 	aspectRatioPresets,
+	canRestoreOriginal = false,
+	isOriginalRestored = false,
+	willDiscardMetadataEdits = false,
+	onRestoreOriginal,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
 	const aspectRatioOptions = [
@@ -96,48 +125,83 @@ export default function MediaEditorCropPanel( {
 	];
 
 	return (
-		<Stack direction="column" gap="md">
-			<RangeControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Zoom' ) }
-				min={ MIN_ZOOM }
-				max={ MAX_ZOOM }
-				step={ 0.1 }
-				value={ state.zoom }
-				onChange={ ( value ) => {
-					onPlacementControlInteraction?.();
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM );
-				} }
-				renderTooltipContent={ ( value ) => {
-					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
-					return sprintf(
-						/* translators: %d: zoom level as a percentage. */
-						__( '%d%%' ),
-						Math.round( zoom * 100 )
-					);
-				} }
-			/>
-			<SelectControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Freeform crop' ) }
-				help={ __(
-					'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
+		<div className="media-editor-crop-panel">
+			<div className="media-editor-crop-panel__content">
+				{ isOriginalRestored && (
+					<Notice
+						className="media-editor-crop-panel__notice"
+						status={ willDiscardMetadataEdits ? 'warning' : 'info' }
+						isDismissible={ false }
+					>
+						{ willDiscardMetadataEdits
+							? __(
+									'Original image restored. Saving will discard your unsaved details edits.'
+							  )
+							: __(
+									'Original image restored. Save to apply the change, or continue cropping.'
+							  ) }
+					</Notice>
 				) }
-				checked={ freeformCrop }
-				onChange={ onFreeformChange }
-			/>
-		</Stack>
+				<Stack direction="column" gap="md">
+					<RangeControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Zoom' ) }
+						min={ MIN_ZOOM }
+						max={ MAX_ZOOM }
+						step={ 0.1 }
+						value={ state.zoom }
+						onChange={ ( value ) => {
+							onPlacementControlInteraction?.();
+							setZoom(
+								typeof value === 'number' ? value : MIN_ZOOM
+							);
+						} }
+						renderTooltipContent={ ( value ) => {
+							const zoom =
+								typeof value === 'number' ? value : MIN_ZOOM;
+							return sprintf(
+								/* translators: %d: zoom level as a percentage. */
+								__( '%d%%' ),
+								Math.round( zoom * 100 )
+							);
+						} }
+					/>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Aspect ratio' ) }
+						value={ aspectRatioValue }
+						onChange={ onAspectRatioChange }
+						options={ aspectRatioOptions.map( ( preset ) => ( {
+							label: preset.label,
+							value: preset.value.toString(),
+						} ) ) }
+					/>
+					<ToggleControl
+						__nextHasNoMarginBottom
+						label={ __( 'Freeform crop' ) }
+						help={ __(
+							'Drag the crop edges to resize freely. When off, the crop is fixed to the selected ratio.'
+						) }
+						checked={ freeformCrop }
+						onChange={ onFreeformChange }
+					/>
+				</Stack>
+			</div>
+			{ canRestoreOriginal && (
+				<div className="media-editor-crop-panel__footer">
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ onRestoreOriginal }
+						disabled={ isOriginalRestored }
+						accessibleWhenDisabled
+					>
+						{ __( 'Restore original image' ) }
+					</Button>
+				</div>
+			) }
+		</div>
 	);
 }

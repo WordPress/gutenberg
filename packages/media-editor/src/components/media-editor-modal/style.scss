@@ -88,10 +88,41 @@
 		@include reset;
 	}
 
+	// Stretch the sidebar body down to the Crop tab's `__panel--crop`
+	// so footers anchored with `margin-top: auto` (the Restore action)
+	// sit at the bottom of the visible panel rather than directly
+	// under the controls. `.interface-complementary-area` has
+	// `height: 100%`, so giving each link in the chain `height: 100%`
+	// is enough — no flex-on-the-parent gymnastics needed. The header
+	// (`.components-panel__header`) is `position: sticky`, so it
+	// doesn't take from the panel's box and full-height children
+	// still fit. Scoped via `:has(--crop)` so the Details tab is
+	// unaffected.
+	.media-editor-modal__sidebar-panel:has(.media-editor-modal__panel--crop) {
+		height: 100%;
+
+		// Tabs.TabPanel — no stable className, target the active one
+		// by descending through the panel.
+		> * {
+			height: 100%;
+		}
+	}
+
 	// Mirror the editor's `PostPanelSection` padding for tab body content,
 	// so the form inside the Details tab has breathing room.
 	.media-editor-modal__panel {
 		padding: $grid-unit-20;
+	}
+
+	// The Crop tab's panel needs to stretch to the sidebar's full
+	// height so the inner crop panel can pin its footer to the
+	// bottom. `box-sizing: border-box` so the parent padding doesn't
+	// push the footer below the visible scroll area.
+	.media-editor-modal__panel--crop {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		box-sizing: border-box;
 	}
 
 	// Match the post editor's sidebar header treatment

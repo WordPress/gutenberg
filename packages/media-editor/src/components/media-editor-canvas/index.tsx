@@ -6,6 +6,13 @@ import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper, useCropper } from '../../image-editor';
 
 export interface MediaEditorCanvasProps {
+	/**
+	 * Override the image source URL. When omitted, the canvas falls
+	 * back to the attachment's `source_url` from context. Used by the
+	 * Restore-original flow to load a different URL into the cropper
+	 * without mutating the underlying entity record.
+	 */
+	src?: string;
 	/** Fixed aspect ratio (width / height). `undefined` means free. */
 	aspectRatio?: number;
 	/** Enable freeform crop mode (resize handles). */
@@ -21,12 +28,15 @@ export interface MediaEditorCanvasProps {
  *
  * Returns `null` for missing or non-image media so the modal's outer
  * guards can render a spinner or fall through to `<MediaPreview>`.
+ *
  * @param props
+ * @param props.src
  * @param props.aspectRatio
  * @param props.freeformCrop
  * @param props.isPlacementActive
  */
 export default function MediaEditorCanvas( {
+	src,
 	aspectRatio,
 	freeformCrop,
 	isPlacementActive = false,
@@ -34,7 +44,7 @@ export default function MediaEditorCanvas( {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
 
-	const mediaUrl = media?.source_url;
+	const mediaUrl = src ?? media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
 
 	if ( ! mediaUrl || mediaType.type !== 'image' ) {
