@@ -22,9 +22,9 @@ const meta: Meta< typeof TabPanel > = {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
+			notes: 'Use `Tabs` from `@wordpress/ui` instead.',
 		},
 	},
 	args: {
