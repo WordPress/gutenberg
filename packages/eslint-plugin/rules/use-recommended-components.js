@@ -8,7 +8,7 @@
  */
 const ALLOWLIST = {
 	'@wordpress/ui': {
-		allowed: [ 'Badge', 'Stack', 'Text' ],
+		allowed: [ 'Badge', 'Link', 'Stack', 'Text' ],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
 	},
@@ -24,6 +24,8 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
+		ExternalLink:
+			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
