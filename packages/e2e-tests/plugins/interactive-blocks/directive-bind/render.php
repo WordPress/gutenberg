@@ -98,6 +98,35 @@
 	</div>
 	<?php endforeach; ?>
 
+	<?php
+	$popover_cases = array(
+		'true'   => '{ "value": true }',
+		'false'  => '{ "value": false }',
+		'null'   => '{ "value": null }',
+		'undef'  => '{ "__any": "any" }',
+		'auto'   => '{ "value": "auto" }',
+		'manual' => '{ "value": "manual" }',
+		'hint'   => '{ "value": "hint" }',
+	);
+	?>
+
+	<?php foreach ( $popover_cases as $type => $context ) : ?>
+	<div
+		data-testid='hydrating popover <?php echo $type; ?>'
+		data-wp-context='<?php echo $context; ?>'
+	>
+		<div
+			data-testid="popover"
+			data-wp-bind--popover="context.value"
+		></div>
+		<button
+			data-testid="toggle value"
+			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
+		>Toggle</button>
+	</div>
+	<?php endforeach; ?>
+
 	<div data-wp-context='{"test": true}'>
 		<div
 			data-testid="without-unique-id"
