@@ -268,7 +268,7 @@ mark.wp-note {
 	border-radius: $radius-round;
 	border: $border-width solid $gray-300;
 	background-color: $white;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 
 	&:hover {
 		background-color: $gray-100;
