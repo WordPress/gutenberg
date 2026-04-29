@@ -101,10 +101,10 @@ class Gutenberg_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
 
 	/**
 	 * Artifact guidelines can be created through the standard collection and
-	 * receive the fallback artifact type term.
+	 * receive the requested publish status and fallback artifact type term.
 	 */
 	public function test_create_artifact_guideline() {
-		$response = $this->create_artifact_guideline();
+		$response = $this->create_artifact_guideline( array( 'status' => 'publish' ) );
 
 		$this->assertSame( 201, $response->get_status() );
 
@@ -113,6 +113,7 @@ class Gutenberg_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'title', $data );
 		$this->assertArrayHasKey( 'content', $data );
 		$this->assertArrayHasKey( 'excerpt', $data );
+		$this->assertSame( 'publish', $data['status'] );
 		$this->assertArrayNotHasKey( 'guideline_categories', $data );
 
 		$terms = wp_get_object_terms( $data['id'], Gutenberg_Guidelines_Post_Type::TAXONOMY, array( 'fields' => 'slugs' ) );

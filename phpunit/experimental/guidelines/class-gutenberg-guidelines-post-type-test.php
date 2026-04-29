@@ -77,6 +77,28 @@ class Gutenberg_Guidelines_Post_Type_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The post type maps generated guideline primitive caps back to the core
+	 * post caps used by built-in roles.
+	 */
+	public function test_post_type_uses_core_primitive_capabilities() {
+		$post_type = get_post_type_object( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+
+		$this->assertNotFalse( $post_type );
+		$this->assertSame( 'edit_posts', $post_type->cap->read );
+		$this->assertSame( 'publish_posts', $post_type->cap->create_posts );
+		$this->assertSame( 'edit_posts', $post_type->cap->edit_posts );
+		$this->assertSame( 'publish_posts', $post_type->cap->publish_posts );
+		$this->assertSame( 'read_private_posts', $post_type->cap->read_private_posts );
+		$this->assertSame( 'edit_private_posts', $post_type->cap->edit_private_posts );
+		$this->assertSame( 'edit_published_posts', $post_type->cap->edit_published_posts );
+		$this->assertSame( 'delete_private_posts', $post_type->cap->delete_private_posts );
+		$this->assertSame( 'delete_published_posts', $post_type->cap->delete_published_posts );
+		$this->assertSame( 'delete_posts', $post_type->cap->delete_posts );
+		$this->assertSame( 'edit_others_posts', $post_type->cap->edit_others_posts );
+		$this->assertSame( 'delete_others_posts', $post_type->cap->delete_others_posts );
+	}
+
+	/**
 	 * A guideline saved without a type term should get 'artifact' assigned by
 	 * the save_post hook (replacement for default_term).
 	 */
