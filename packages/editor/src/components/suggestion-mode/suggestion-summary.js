@@ -2,10 +2,8 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalText as Text,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __experimentalText as WCText } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 
@@ -281,15 +279,16 @@ export default function SuggestionSummary( { operations } ) {
 	}
 
 	return (
-		<VStack
+		<Stack
+			direction="column"
+			gap="xs"
 			className="editor-collab-sidebar-panel__suggestion-summary"
-			spacing="1"
 		>
 			{ lines.map( ( line, index ) => (
-				<Text key={ index } size="13px">
+				<WCText key={ index } size="13px">
 					<strong>{ line.label }</strong> <em>{ line.value }</em>
-				</Text>
+				</WCText>
 			) ) }
-		</VStack>
+		</Stack>
 	);
 }

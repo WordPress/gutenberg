@@ -4,12 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
+	__experimentalText as WCText,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, close } from '@wordpress/icons';
@@ -155,11 +154,11 @@ export function SuggestionActionButtons( { thread } ) {
 	}
 
 	return (
-		<HStack
-			className="editor-collab-sidebar-panel__suggestion-header-actions"
-			spacing="0"
+		<Stack
+			direction="row"
 			justify="flex-end"
-			expanded={ false }
+			gap="0"
+			className="editor-collab-sidebar-panel__suggestion-header-actions"
 			onClick={ ( event ) => {
 				// Keep the click from bubbling into the thread's expand/
 				// collapse handler — the icon button is its own affordance.
@@ -186,7 +185,7 @@ export function SuggestionActionButtons( { thread } ) {
 				accessibleWhenDisabled
 				onClick={ decision.onReject }
 			/>
-		</HStack>
+		</Stack>
 	);
 }
 
@@ -215,19 +214,23 @@ export default function SuggestionActions( { thread } ) {
 	} = decision;
 
 	return (
-		<VStack spacing="2" className="editor-collab-sidebar-panel__suggestion">
+		<Stack
+			direction="column"
+			gap="sm"
+			className="editor-collab-sidebar-panel__suggestion"
+		>
 			<SuggestionSummary operations={ payload.operations } />
 			{ isResolved && (
-				<Text variant="muted" size="12px">
+				<WCText variant="muted" size="12px">
 					{ suggestionStatus === APPLIED
 						? __( 'Applied' )
 						: __( 'Rejected' ) }
-				</Text>
+				</WCText>
 			) }
 			{ ! isResolved && applyDisabledReason && (
-				<Text variant="muted" size="12px">
+				<WCText variant="muted" size="12px">
 					{ applyDisabledReason }
-				</Text>
+				</WCText>
 			) }
 			{ showStaleDialog && (
 				<ConfirmDialog
@@ -241,6 +244,6 @@ export default function SuggestionActions( { thread } ) {
 					) }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
