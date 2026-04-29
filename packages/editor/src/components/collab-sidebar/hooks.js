@@ -183,6 +183,10 @@ export function useNoteActions() {
 			);
 
 			// If it's a top-level note, update the block attributes with the note id.
+			// Read-modify-write on metadata is racy under concurrent edits:
+			// two near-simultaneous adds against the same base will each write
+			// a 2-element array and the later write wins, dropping the other
+			// id. Tracking issue: https://github.com/WordPress/gutenberg/issues/74751.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
 				if ( ! clientId ) {

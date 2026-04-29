@@ -851,20 +851,6 @@ test.describe( 'Block Notes', () => {
 } );
 
 test.describe( 'Multiple notes per block', () => {
-	test.use( {
-		blockNoteUtils: async ( { page, editor }, use ) => {
-			await use( new BlockNoteUtils( { page, editor } ) );
-		},
-	} );
-
-	test.beforeEach( async ( { admin } ) => {
-		await admin.createNewPost();
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllComments( 'note' );
-	} );
-
 	test( 'can add multiple notes to the same block', async ( {
 		editor,
 		page,
@@ -930,23 +916,10 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block with multiple notes' },
 			comment: 'First note',
 		} );
+		// Dismiss the first "Note added." so the second toast can be asserted.
+		await blockNoteUtils.dismissSnackbar( 'Note added.' );
 
-		// Dismiss the first "Note added." snackbar so it won't interfere
-		// with the second note's snackbar check.
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Note added.' } )
-			.click();
-
-		// Add second note.
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Second note' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
 
 		await expect(
 			page
@@ -975,20 +948,9 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block with notes to delete' },
 			comment: 'Note to keep',
 		} );
+		await blockNoteUtils.dismissSnackbar( 'Note added.' );
 
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Note added.' } )
-			.click();
-
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Note to delete' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Note to delete' );
 
 		await expect(
 			page
@@ -1051,20 +1013,9 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block with notes to resolve' },
 			comment: 'Note A',
 		} );
+		await blockNoteUtils.dismissSnackbar( 'Note added.' );
 
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Note added.' } )
-			.click();
-
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Note B' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Note B' );
 
 		await expect(
 			page
@@ -1113,20 +1064,9 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block for auto-select' },
 			comment: 'First note',
 		} );
+		await blockNoteUtils.dismissSnackbar( 'Note added.' );
 
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Note added.' } )
-			.click();
-
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Second note' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
 
 		await expect(
 			page
@@ -1261,20 +1201,9 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block with persisted notes' },
 			comment: 'Persisted note A',
 		} );
+		await blockNoteUtils.dismissSnackbar( 'Note added.' );
 
-		await page
-			.getByRole( 'button', { name: 'Dismiss this notice' } )
-			.filter( { hasText: 'Note added.' } )
-			.click();
-
-		await editor.clickBlockOptionsMenuItem( 'Add note' );
-		await page
-			.getByRole( 'textbox', { name: 'New note', exact: true } )
-			.fill( 'Persisted note B' );
-		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Add note', exact: true } )
-			.click();
+		await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Persisted note B' );
 		await expect(
 			page
 				.getByRole( 'button', { name: 'Dismiss this notice' } )
@@ -1381,5 +1310,23 @@ class BlockNoteUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
+	}
+
+	async dismissSnackbar( text ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: text } )
+			.click();
+	}
+
+	async addAnotherNoteToCurrentBlock( content ) {
+		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
+		await this.#page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( content );
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 	}
 }
