@@ -4,7 +4,7 @@
  *
  * @package gutenberg
  */
-class Gutenberg_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
+class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase {
 
 	/**
 	 * @var int Administrator user ID.
