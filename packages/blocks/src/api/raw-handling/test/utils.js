@@ -61,7 +61,7 @@ describe( 'isPlain', () => {
 		expect( isPlain( '<article>test</article>' ) ).toBe( false );
 	} );
 
-	it( 'should return true for a single div wrapper with only styles', () => {
+	it( 'should return true for a single div wrapper with no semantic attributes', () => {
 		expect( isPlain( '<div>test</div>' ) ).toBe( true );
 		expect( isPlain( '<div style="color: red;">test</div>' ) ).toBe( true );
 	} );
