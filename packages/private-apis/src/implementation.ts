@@ -42,6 +42,7 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
+	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-ui',

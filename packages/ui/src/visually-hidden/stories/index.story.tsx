@@ -3,6 +3,7 @@ import { useId } from '@wordpress/element';
 import { VisuallyHidden } from '../';
 
 const meta: Meta< typeof VisuallyHidden > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/VisuallyHidden',
 	component: VisuallyHidden,
 };
