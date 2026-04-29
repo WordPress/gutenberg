@@ -75,11 +75,6 @@ export default function StateControl( {
 										onClose();
 									}
 								} }
-								suffix={
-									! value[ group.name ]
-										? __( 'Default' )
-										: undefined
-								}
 								icon={ ! value[ group.name ] ? check : null }
 							>
 								{ __( 'Normal' ) }
