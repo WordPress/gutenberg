@@ -38,7 +38,12 @@ add_action( 'admin_init', 'gutenberg_disable_tinymce' );
  * Detects TinyMCE usage and sets the `requiresTinymce` query argument to stop disabling TinyMCE loading.
  */
 function gutenberg_enqueue_tinymce_proxy() {
-	wp_enqueue_script( 'gutenberg-tinymce-proxy', plugins_url( 'assets/tinymce-proxy.js', __FILE__ ) );
+	wp_enqueue_script(
+		'gutenberg-tinymce-proxy',
+		plugins_url( 'assets/tinymce-proxy.js', __FILE__ ),
+		array( 'wp-i18n', 'wp-data', 'wp-notices' )
+	);
+	wp_set_script_translations( 'gutenberg-tinymce-proxy', 'gutenberg' );
 }
 
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );

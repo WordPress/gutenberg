@@ -6,13 +6,8 @@ import { useState } from '@wordpress/element';
 import { useInstanceId, useViewportMatch } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
 
-import {
-	Composite,
-	MenuGroup,
-	MenuItem,
-	Popover,
-	VisuallyHidden,
-} from '@wordpress/components';
+import { Composite, MenuGroup, MenuItem, Popover } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

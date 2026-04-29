@@ -35,7 +35,7 @@ import {
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useBlockComments( postId ) {
+export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -58,7 +58,7 @@ export function useBlockComments( postId ) {
 		};
 	}, [] );
 
-	// Process comments to build the tree structure.
+	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
 			return { notes: [], unresolvedNotes: [] };
@@ -67,14 +67,14 @@ export function useBlockComments( postId ) {
 		// Single pass over clientIds: build clientId->noteIds map AND reverse lookup.
 		// Blocks can carry multiple note IDs in their metadata, so the forward map
 		// stores arrays and the reverse map links each note back to its block.
-		const blocksWithComments = {};
+		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const metadata = getBlockAttributes( clientId )?.metadata;
 			const noteIds = getNoteIdsFromMetadata( metadata );
 			if ( noteIds.length > 0 ) {
 				const keys = noteIds.map( ( id ) => String( id ) );
-				blocksWithComments[ clientId ] = keys;
+				blocksWithNotes[ clientId ] = keys;
 				for ( const key of keys ) {
 					clientIdByNoteId.set( key, clientId );
 				}
@@ -115,7 +115,7 @@ export function useBlockComments( postId ) {
 		// multiple note IDs, so iterate the flattened list.
 		const unresolved = [];
 		const resolved = [];
-		for ( const noteIds of Object.values( blocksWithComments ) ) {
+		for ( const noteIds of Object.values( blocksWithNotes ) ) {
 			for ( const noteId of noteIds ) {
 				const thread =
 					threadsById.get( Number( noteId ) ) ??
@@ -148,7 +148,7 @@ export function useBlockComments( postId ) {
 	};
 }
 
-export function useBlockCommentsActions() {
+export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -182,7 +182,7 @@ export function useBlockCommentsActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a main comment, update the block attributes with the comment id.
+			// If it's a top-level note, update the block attributes with the note id.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
 				if ( ! clientId ) {
@@ -236,8 +236,8 @@ export function useBlockCommentsActions() {
 					}
 				);
 
-				// Then create a new comment with the metadata.
-				const newCommentData = {
+				// Then create a new note with the metadata.
+				const newNoteData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
 					type: 'note',
@@ -249,7 +249,7 @@ export function useBlockCommentsActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newCommentData, {
+				await saveEntityRecord( 'root', 'comment', newNoteData, {
 					throwOnError: true,
 				} );
 			} else {
@@ -277,29 +277,23 @@ export function useBlockCommentsActions() {
 		}
 	};
 
-	const onDelete = async ( comment ) => {
+	const onDelete = async ( note ) => {
 		try {
-			await deleteEntityRecord(
-				'root',
-				'comment',
-				comment.id,
-				undefined,
-				{
-					throwOnError: true,
-				}
-			);
+			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+				throwOnError: true,
+			} );
 
-			if ( ! comment.parent ) {
-				// Use blockClientId if available, otherwise fall back to selected block
+			if ( ! note.parent ) {
+				// Use blockClientId if available, otherwise fall back to selected block.
 				const clientId =
-					comment.blockClientId || getSelectedBlockClientId();
+					note.blockClientId || getSelectedBlockClientId();
 				if ( ! clientId ) {
 					return;
 				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				const updatedMetadata = removeNoteIdFromMetadata(
 					metadata,
-					comment.id
+					note.id
 				);
 				updateBlockAttributes( clientId, {
 					metadata: cleanEmptyObject( updatedMetadata ),
@@ -352,7 +346,7 @@ export function useFloatingBoard( {
 	threads,
 	selectedNoteId,
 	isFloating,
-	commentSidebarRef,
+	sidebarRef,
 } ) {
 	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
@@ -362,11 +356,11 @@ export function useFloatingBoard( {
 	// Notes are positioned in canvas content-space; CSS inherits
 	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
-		if ( ! isFloating || ! commentSidebarRef?.current ) {
+		if ( ! isFloating || ! sidebarRef?.current ) {
 			return;
 		}
 
-		const panel = commentSidebarRef.current;
+		const panel = sidebarRef.current;
 		const blockEl = store.getFirstBlockElement();
 		// Climb to the block-list root so nested scroll containers
 		// (e.g. a Group with overflow:auto) don't shadow the canvas.
@@ -404,14 +398,7 @@ export function useFloatingBoard( {
 			window.cancelAnimationFrame( rafId );
 			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
 		};
-	}, [
-		commentSidebarRef,
-		heights,
-		isFloating,
-		selectedNoteId,
-		store,
-		threads,
-	] );
+	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
 
 	return {
 		notePositions,

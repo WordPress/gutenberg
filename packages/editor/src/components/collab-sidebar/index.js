@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack } from '@wordpress/ui';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -21,59 +20,15 @@ import {
 	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
-import { Comments } from './comments';
+import { Notes } from './notes';
 import { store as editorStore } from '../../store';
-import AddCommentMenuItem from './comment-menu-item';
-import CommentAvatarIndicator from './comment-indicator-toolbar';
+import { AddNoteMenuItem } from './add-note-menu-item';
+import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
-import {
-	useBlockComments,
-	useBlockCommentsActions,
-	useEnableFloatingSidebar,
-} from './hooks';
-import { focusCommentThread, getNoteIdsFromMetadata } from './utils';
+import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
+import { focusNoteThread, getNoteIdsFromMetadata } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
-
-function NotesSidebarContent( {
-	styles,
-	comments,
-	commentSidebarRef,
-	isFloating = false,
-} ) {
-	const { onCreate, onEdit, onDelete } = useBlockCommentsActions();
-
-	return (
-		<Stack
-			className="editor-collab-sidebar-panel"
-			style={ styles }
-			role="tree"
-			direction="column"
-			gap="md"
-			justify="flex-start"
-			ref={ ( node ) => {
-				// Sometimes previous sidebar unmounts after the new one mounts.
-				// This ensures we always have the latest reference.
-				if ( node ) {
-					// eslint-disable-next-line react-compiler/react-compiler
-					commentSidebarRef.current = node;
-				}
-			} }
-			aria-label={
-				isFloating ? __( 'Unresolved notes' ) : __( 'All notes' )
-			}
-		>
-			<Comments
-				threads={ comments }
-				onEditComment={ onEdit }
-				onAddReply={ onCreate }
-				onCommentDelete={ onDelete }
-				commentSidebarRef={ commentSidebarRef }
-				isFloating={ isFloating }
-			/>
-		</Stack>
-	);
-}
 
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -81,7 +36,7 @@ function NotesSidebar( { postId } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const commentSidebarRef = useRef( null );
+	const sidebarRef = useRef( null );
 
 	const { clientId, rawNoteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -110,7 +65,7 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const { notes, unresolvedNotes } = useBlockComments( postId );
+	const { notes, unresolvedNotes } = useNoteThreads( postId );
 
 	// Only enable the floating sidebar for large viewports.
 	const showFloatingSidebar = isLargeViewport;
@@ -171,27 +126,27 @@ function NotesSidebar( { postId } ) {
 		// Otherwise, select the existing thread or open new.
 		const shouldAddNew = addNewNote || ! currentThread;
 		selectNote( shouldAddNew ? 'new' : currentThread.id );
-		focusCommentThread(
+		focusNoteThread(
 			shouldAddNew ? undefined : currentThread?.id,
-			commentSidebarRef.current,
+			sidebarRef.current,
 			shouldAddNew ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
 	}
 
 	if ( isDistractionFree ) {
-		return <AddCommentMenuItem isDistractionFree />;
+		return <AddNoteMenuItem isDistractionFree />;
 	}
 
 	return (
 		<>
 			{ !! currentThread && (
-				<CommentAvatarIndicator
-					thread={ currentThread }
+				<NoteAvatarIndicator
+					note={ currentThread }
 					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem
+			<AddNoteMenuItem
 				onClick={ () => openTheSidebar( { addNewNote: true } ) }
 			/>
 			{ showAllNotesSidebar && (
@@ -207,10 +162,7 @@ function NotesSidebar( { postId } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
-					<NotesSidebarContent
-						comments={ notes }
-						commentSidebarRef={ commentSidebarRef }
-					/>
+					<Notes notes={ notes } sidebarRef={ sidebarRef } />
 				</PluginSidebar>
 			) }
 			{ isLargeViewport && (
@@ -222,12 +174,10 @@ function NotesSidebar( { postId } ) {
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }
 				>
-					<NotesSidebarContent
-						comments={ unresolvedNotes }
-						commentSidebarRef={ commentSidebarRef }
-						styles={ {
-							backgroundColor,
-						} }
+					<Notes
+						notes={ unresolvedNotes }
+						sidebarRef={ sidebarRef }
+						styles={ { backgroundColor } }
 						isFloating
 					/>
 				</PluginSidebar>

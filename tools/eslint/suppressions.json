@@ -1,9 +1,4 @@
 {
-	"packages/admin-ui/src/breadcrumbs/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/block-editor/src/components/background-image-control/index.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
