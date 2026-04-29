@@ -21,6 +21,7 @@ import {
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import CropAdvancedPanel from './crop-advanced-panel';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -142,6 +143,9 @@ export default function MediaEditorCropPanel( {
 				) }
 				checked={ freeformCrop }
 				onChange={ onFreeformChange }
+			/>
+			<CropAdvancedPanel
+				onPlacementControlInteraction={ onPlacementControlInteraction }
 			/>
 		</Stack>
 	);
