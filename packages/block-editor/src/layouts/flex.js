@@ -23,7 +23,8 @@ import {
  * Internal dependencies
  */
 import { appendSelectors, getBlockGapCSS } from './utils';
-import { getGapCSSValue } from '../hooks/gap';
+import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
+import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import {
 	BlockControls,
 	JustifyContentControl,
@@ -147,15 +148,12 @@ export default {
 		// falling back to '0.5em' for backwards compatibility.
 		let fallbackGapValue = '0.5em';
 		if ( globalBlockGapValue ) {
-			// Process the global gap value to handle preset values
-			const processedGlobalGap = getGapCSSValue(
-				globalBlockGapValue,
-				'0.5em'
-			);
-			// Use the column gap value (second value if two values exist)
-			const gapParts = processedGlobalGap.split( ' ' );
+			const gapBox =
+				getGapBoxControlValueFromStyle( globalBlockGapValue );
 			fallbackGapValue =
-				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+				getSpacingPresetCssVar( gapBox?.left ) ||
+				getSpacingPresetCssVar( gapBox?.top ) ||
+				'0.5em';
 		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
