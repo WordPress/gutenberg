@@ -92,6 +92,14 @@ export default function MediaEditorCropPanel( {
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
 	const zoomGestureHandlers = useCropGestureHandlers();
+
+	const imageAspectRatio = state.image
+		? state.image.naturalWidth / state.image.naturalHeight
+		: null;
+	const resolvedAspectRatio = resolveAspectRatio(
+		aspectRatioValue,
+		imageAspectRatio
+	);
 	const aspectRatioOptions = [
 		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
 		...( aspectRatioPresets ??
@@ -145,6 +153,7 @@ export default function MediaEditorCropPanel( {
 				onChange={ onFreeformChange }
 			/>
 			<CropAdvancedPanel
+				aspectRatio={ resolvedAspectRatio }
 				onPlacementControlInteraction={ onPlacementControlInteraction }
 			/>
 		</Stack>

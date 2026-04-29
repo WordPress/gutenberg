@@ -2,7 +2,8 @@
  * Internal dependencies
  */
 import type { CropperState, NormalizedRect, Size } from '../image-editor';
-import { getRotatedBBox } from '../image-editor/core/camera';
+import { getImageFit, getRotatedBBox } from '../image-editor/core/camera';
+import { getCropBounds } from '../image-editor/core/containment';
 
 /**
  * The crop rectangle expressed as pixel dimensions in the snap-rotation
@@ -73,6 +74,83 @@ export function getCropPixels(
 		height: ( cropRect.height / zoom ) * snapBBoxHeight,
 		snapBBoxWidth,
 		snapBBoxHeight,
+	};
+}
+
+/**
+ * The reachable pixel bounds for the crop rectangle given the current
+ * zoom, pan, rotation, and flip. Using these as `min`/`max` on the
+ * Advanced panel inputs prevents values that would require unexpected
+ * zoom or pan adjustments to accommodate.
+ *
+ * All values are in the snap-rotation bounding-box frame (same space as
+ * `CropPixels`).
+ */
+export interface ReachableCropPixelBounds {
+	/** Minimum pixel position for the left (x) edge of the crop. */
+	minLeft: number;
+	/** Minimum pixel position for the top (y) edge of the crop. */
+	minTop: number;
+	/** Maximum pixel position for the right edge of the crop (left + width ≤ maxRight). */
+	maxRight: number;
+	/** Maximum pixel position for the bottom edge of the crop (top + height ≤ maxBottom). */
+	maxBottom: number;
+}
+
+/**
+ * Canonical container used for scale-invariant bounds computation.
+ * Same pattern as `restrictPanZoom` in containment.ts.
+ */
+const CANONICAL_CONTAINER: Size = { width: 1000, height: 1000 };
+
+/**
+ * Compute the reachable crop bounds in snap-rotation pixel space, accounting
+ * for the current zoom, pan, rotation, and flip.
+ *
+ * Uses `getCropBounds` with a canonical container (scale-invariant), then
+ * converts the normalized bounds to pixels using the same formula as
+ * `getCropPixels`. This is the answer to "where are the crop boundaries?"
+ * for the Advanced panel inputs.
+ *
+ * @param state     The current cropper state.
+ * @param imageSize Natural dimensions of the source image.
+ * @return Reachable bounds in snap-rotation pixel space.
+ */
+export function getReachableCropBoundsInPixels(
+	state: CropperState,
+	imageSize: Size
+): ReachableCropPixelBounds {
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return { minLeft: 0, minTop: 0, maxRight: 0, maxBottom: 0 };
+	}
+
+	const { elementSize, visualSize } = getImageFit(
+		CANONICAL_CONTAINER,
+		imageSize,
+		state.rotation
+	);
+	const bounds = getCropBounds(
+		state,
+		elementSize,
+		visualSize,
+		CANONICAL_CONTAINER
+	);
+
+	// Convert normalized bounds to pixels using the same formula as getCropPixels.
+	const snapRotation = Math.round( state.rotation / 90 ) * 90;
+	const { width: snapBBoxWidth, height: snapBBoxHeight } = getRotatedBBox(
+		imageSize.width,
+		imageSize.height,
+		snapRotation
+	);
+	const imgLeft = 0.5 + state.pan.x - state.zoom / 2;
+	const imgTop = 0.5 + state.pan.y - state.zoom / 2;
+
+	return {
+		minLeft: ( ( bounds.minX - imgLeft ) / state.zoom ) * snapBBoxWidth,
+		minTop: ( ( bounds.minY - imgTop ) / state.zoom ) * snapBBoxHeight,
+		maxRight: ( ( bounds.maxX - imgLeft ) / state.zoom ) * snapBBoxWidth,
+		maxBottom: ( ( bounds.maxY - imgTop ) / state.zoom ) * snapBBoxHeight,
 	};
 }
 

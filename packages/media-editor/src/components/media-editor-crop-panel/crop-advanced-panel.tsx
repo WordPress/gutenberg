@@ -16,9 +16,15 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useCropper } from '../../image-editor';
-import { getCropPixels, pixelsToCropRect } from '../../utils/crop-pixels';
+import {
+	getCropPixels,
+	getReachableCropBoundsInPixels,
+	pixelsToCropRect,
+} from '../../utils/crop-pixels';
 
 interface CropAdvancedPanelProps {
+	/** Resolved aspect ratio (width / height). When set, Width and Height inputs are linked. */
+	aspectRatio?: number;
 	onPlacementControlInteraction?: () => void;
 }
 
@@ -35,7 +41,7 @@ interface CropInputProps {
 
 // Shows a live draft while the user types, then snaps to the committed
 // (enforced) value on blur or Enter — canvas updates in real-time without
-// the input jumping to a clamped value on each keystroke.
+// the input jumping to a constrained value on each keystroke.
 function CropInput( {
 	label,
 	'aria-label': ariaLabel,
@@ -60,12 +66,26 @@ function CropInput( {
 		}
 	};
 
-	const handleBlur = () => setFocused( false );
+	const commit = () => {
+		const parsed = parseInt( draft, 10 );
+		if ( ! isNaN( parsed ) ) {
+			onCommit( Math.max( min, Math.min( parsed, max ) ) );
+		}
+	};
+
+	const handleBlur = () => {
+		setFocused( false );
+		commit();
+	};
 
 	const handleKeyDown = (
 		event: React.KeyboardEvent< HTMLInputElement >
 	) => {
-		if ( event.key === 'Enter' || event.key === 'Escape' ) {
+		if ( event.key === 'Enter' ) {
+			setFocused( false );
+			commit();
+			event.currentTarget.blur();
+		} else if ( event.key === 'Escape' ) {
 			setFocused( false );
 			event.currentTarget.blur();
 		}
@@ -90,6 +110,7 @@ function CropInput( {
 }
 
 export default function CropAdvancedPanel( {
+	aspectRatio,
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
 	const { state, setCropRect } = useCropper();
@@ -103,13 +124,16 @@ export default function CropAdvancedPanel( {
 			height: state.image.naturalHeight,
 		};
 		const raw = getCropPixels( state, imageSize );
+		const reach = getReachableCropBoundsInPixels( state, imageSize );
 		return {
 			x: Math.round( raw.x ),
 			y: Math.round( raw.y ),
 			width: Math.round( raw.width ),
 			height: Math.round( raw.height ),
-			snapW: Math.round( raw.snapBBoxWidth ),
-			snapH: Math.round( raw.snapBBoxHeight ),
+			minLeft: Math.ceil( reach.minLeft ),
+			minTop: Math.ceil( reach.minTop ),
+			maxRight: Math.floor( reach.maxRight ),
+			maxBottom: Math.floor( reach.maxBottom ),
 		};
 	}, [ state ] );
 
@@ -117,9 +141,9 @@ export default function CropAdvancedPanel( {
 		return null;
 	}
 
-	const { snapW, snapH } = pixels;
+	const { minLeft, minTop, maxRight, maxBottom } = pixels;
 
-	const handleCommit =
+	const handleApply =
 		( field: 'x' | 'y' | 'width' | 'height' ) => ( clamped: number ) => {
 			if ( ! state.image ) {
 				return;
@@ -128,13 +152,33 @@ export default function CropAdvancedPanel( {
 				width: state.image.naturalWidth,
 				height: state.image.naturalHeight,
 			};
+
+			// When an aspect ratio is locked, derive the paired dimension so
+			// both stay consistent. enforceContainment will clamp the result
+			// if it falls outside the valid crop bounds.
+			let newWidth = field === 'width' ? clamped : pixels.width;
+			let newHeight = field === 'height' ? clamped : pixels.height;
+			if ( aspectRatio && aspectRatio > 0 ) {
+				if ( field === 'width' ) {
+					newHeight = Math.max(
+						1,
+						Math.round( clamped / aspectRatio )
+					);
+				} else if ( field === 'height' ) {
+					newWidth = Math.max(
+						1,
+						Math.round( clamped * aspectRatio )
+					);
+				}
+			}
+
 			setCropRect(
 				pixelsToCropRect(
 					{
 						x: field === 'x' ? clamped : pixels.x,
 						y: field === 'y' ? clamped : pixels.y,
-						width: field === 'width' ? clamped : pixels.width,
-						height: field === 'height' ? clamped : pixels.height,
+						width: newWidth,
+						height: newHeight,
 					},
 					state,
 					imageSize
@@ -156,9 +200,9 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Left' ) }
 							aria-label={ __( 'Crop left position' ) }
 							value={ pixels.x }
-							min={ 0 }
-							max={ Math.max( 0, snapW - pixels.width ) }
-							onCommit={ handleCommit( 'x' ) }
+							min={ minLeft }
+							max={ Math.max( minLeft, maxRight - pixels.width ) }
+							onCommit={ handleApply( 'x' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -166,9 +210,12 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Top' ) }
 							aria-label={ __( 'Crop top position' ) }
 							value={ pixels.y }
-							min={ 0 }
-							max={ Math.max( 0, snapH - pixels.height ) }
-							onCommit={ handleCommit( 'y' ) }
+							min={ minTop }
+							max={ Math.max(
+								minTop,
+								maxBottom - pixels.height
+							) }
+							onCommit={ handleApply( 'y' ) }
 						/>
 					</FlexItem>
 				</Flex>
@@ -178,8 +225,8 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Width' ) }
 							value={ pixels.width }
 							min={ 1 }
-							max={ Math.max( 1, snapW - pixels.x ) }
-							onCommit={ handleCommit( 'width' ) }
+							max={ Math.max( 1, maxRight - pixels.x ) }
+							onCommit={ handleApply( 'width' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -187,8 +234,8 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Height' ) }
 							value={ pixels.height }
 							min={ 1 }
-							max={ Math.max( 1, snapH - pixels.y ) }
-							onCommit={ handleCommit( 'height' ) }
+							max={ Math.max( 1, maxBottom - pixels.y ) }
+							onCommit={ handleApply( 'height' ) }
 						/>
 					</FlexItem>
 				</Flex>
