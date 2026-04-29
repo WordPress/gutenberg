@@ -102,6 +102,15 @@ export interface HeaderProps extends ComponentProps< 'header' > {
 export interface ContentProps extends ComponentProps< 'div' > {
 	/**
 	 * The body content to be rendered inside the scroll container.
+	 *
+	 * The forwarded `ref`, `className`, `style`, `onScroll`, ARIA
+	 * attributes, and any other DOM props all land on the visible scroll
+	 * container (a `<div>`). Internally, the children are wrapped in
+	 * Base UI's `[data-drawer-content]` marker so its mouse-drag
+	 * swipe-dismiss carve-out remains scoped to the body itself, leaving
+	 * the popup-edge padding gutter draggable for swipe-dismiss; that
+	 * marker is an implementation detail and not exposed via the public
+	 * API.
 	 */
 	children?: ReactNode;
 	/**

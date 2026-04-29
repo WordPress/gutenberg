@@ -21,8 +21,12 @@ import type { ContentProps } from './types';
  * makes them scroll with the body (the "non-sticky" opt-out) rather than
  * staying pinned to the popup's edges.
  *
- * Renders Base UI's `_Drawer.Content` so swipe-dismiss wiring remains
- * wired automatically.
+ * Internally, the visible scroll container wraps Base UI's `_Drawer.Content`
+ * marker rather than being it. Base UI excludes mouse-drag swipe-dismiss
+ * over `[data-drawer-content]` to preserve text selection inside the
+ * body; keeping that marker tightly scoped to the children means the
+ * scroll container's padding gutter falls outside it and remains
+ * mouse-draggable for swipe-dismiss in the gutter region.
  */
 const Content = forwardRef< HTMLDivElement, ContentProps >(
 	function DrawerContent( { className, children, onScroll, ...props }, ref ) {
@@ -31,7 +35,7 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 		const mergedRef = useMergeRefs( [ ref, scrollStateRef ] );
 
 		return (
-			<_Drawer.Content
+			<div
 				ref={ mergedRef }
 				className={ clsx(
 					styles.content,
@@ -41,8 +45,8 @@ const Content = forwardRef< HTMLDivElement, ContentProps >(
 				onScroll={ scrollStateOnScroll }
 				{ ...props }
 			>
-				{ children }
-			</_Drawer.Content>
+				<_Drawer.Content>{ children }</_Drawer.Content>
+			</div>
 		);
 	}
 );
