@@ -88,6 +88,18 @@ export function operationsFromOverlay( baselineAttributes, overlayAttributes ) {
 	return operations;
 }
 
+/**
+ * Structural equality for attribute values. Handles primitives, arrays, and
+ * plain objects with arbitrary key order.
+ *
+ * `JSON.stringify` is order-sensitive ({a:1,b:2} ≠ {b:2,a:1}), so a stringify-
+ * based compare produces spurious "changed" detections when block code re-
+ * emits a `style` object with reordered keys. The recursive walk avoids that.
+ *
+ * @param {*} a First value.
+ * @param {*} b Second value.
+ * @return {boolean} True when the values are structurally equal.
+ */
 function isAttributeEqual( a, b ) {
 	if ( a === b ) {
 		return true;
@@ -98,11 +110,36 @@ function isAttributeEqual( a, b ) {
 	if ( typeof a !== 'object' || typeof b !== 'object' ) {
 		return false;
 	}
-	try {
-		return JSON.stringify( a ) === JSON.stringify( b );
-	} catch {
+	const aIsArray = Array.isArray( a );
+	const bIsArray = Array.isArray( b );
+	if ( aIsArray !== bIsArray ) {
 		return false;
 	}
+	if ( aIsArray ) {
+		if ( a.length !== b.length ) {
+			return false;
+		}
+		for ( let i = 0; i < a.length; i++ ) {
+			if ( ! isAttributeEqual( a[ i ], b[ i ] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	const aKeys = Object.keys( a );
+	const bKeys = Object.keys( b );
+	if ( aKeys.length !== bKeys.length ) {
+		return false;
+	}
+	for ( const key of aKeys ) {
+		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
+			return false;
+		}
+		if ( ! isAttributeEqual( a[ key ], b[ key ] ) ) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
@@ -418,6 +455,28 @@ export function useSuggestionsProvider() {
 				payload.operations
 			);
 
+			// Build a rollback payload that covers exactly the keys this
+			// apply touched. `updateBlockAttributes` is a partial merge —
+			// passing `currentAttributes` alone would leave keys that the
+			// apply newly added stuck on the block (set to their `after`
+			// value), since they have no entry in the original attributes
+			// to override them. Listing each touched key with its original
+			// value (or `undefined` when the key was added by this apply)
+			// restores the block cleanly.
+			const rollbackPayload = {};
+			for ( const op of payload.operations ) {
+				if ( op.type !== 'attribute-set' ) {
+					continue;
+				}
+				rollbackPayload[ op.attribute ] =
+					Object.prototype.hasOwnProperty.call(
+						currentAttributes ?? {},
+						op.attribute
+					)
+						? currentAttributes[ op.attribute ]
+						: undefined;
+			}
+
 			try {
 				updateBlockAttributes( targetClientId, newAttributes );
 
@@ -439,7 +498,7 @@ export function useSuggestionsProvider() {
 			} catch ( error ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
-				updateBlockAttributes( targetClientId, currentAttributes );
+				updateBlockAttributes( targetClientId, rollbackPayload );
 				createNotice(
 					'error',
 					error?.message || __( 'Failed to save suggestion status.' ),

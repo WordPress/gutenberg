@@ -15,7 +15,7 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { useSuggestionOverlay } from './overlay-context';
-import { EDITOR_STORE_NAME } from './constants';
+import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -120,8 +120,8 @@ const withSuggestionOverlay = createHigherOrderComponent(
 		function BlockEditWithSuggestionOverlay( props ) {
 			const isSuggestMode = useSelect(
 				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent?.() ===
-					'suggest',
+					select( EDITOR_STORE_NAME ).getEditorIntent() ===
+					SUGGEST_INTENT,
 				[]
 			);
 
@@ -149,8 +149,8 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			const { entries } = useSuggestionOverlay();
 			const isSuggestMode = useSelect(
 				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent?.() ===
-					'suggest',
+					select( EDITOR_STORE_NAME ).getEditorIntent() ===
+					SUGGEST_INTENT,
 				[]
 			);
 			const entry = entries[ clientId ];

@@ -8,14 +8,14 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { useSuggestionOverlay } from './overlay-context';
-import { EDITOR_STORE_NAME } from './constants';
+import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
 /**
- * Compare two attribute values structurally. Falls back to JSON serialization
- * for plain objects/arrays. This is best-effort and shared with the provider's
- * conflict detection — see `isAttributeEqual` in provider.js.
+ * Compare two attribute values structurally. Mirrors `isAttributeEqual` in
+ * provider.js — kept as a private helper here so this module doesn't pull
+ * in the provider's hooks just for the comparison.
  *
  * @param {*} a First value.
  * @param {*} b Second value.
@@ -31,11 +31,36 @@ function shallowAttributeEquals( a, b ) {
 	if ( typeof a !== 'object' || typeof b !== 'object' ) {
 		return false;
 	}
-	try {
-		return JSON.stringify( a ) === JSON.stringify( b );
-	} catch {
+	const aIsArray = Array.isArray( a );
+	const bIsArray = Array.isArray( b );
+	if ( aIsArray !== bIsArray ) {
 		return false;
 	}
+	if ( aIsArray ) {
+		if ( a.length !== b.length ) {
+			return false;
+		}
+		for ( let i = 0; i < a.length; i++ ) {
+			if ( ! shallowAttributeEquals( a[ i ], b[ i ] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+	const aKeys = Object.keys( a );
+	const bKeys = Object.keys( b );
+	if ( aKeys.length !== bKeys.length ) {
+		return false;
+	}
+	for ( const key of aKeys ) {
+		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
+			return false;
+		}
+		if ( ! shallowAttributeEquals( a[ key ], b[ key ] ) ) {
+			return false;
+		}
+	}
+	return true;
 }
 
 /**
@@ -106,7 +131,7 @@ export default function SuggestionStoreInterceptor() {
 
 	const isSuggestMode = useSelect(
 		( select ) =>
-			select( EDITOR_STORE_NAME ).getEditorIntent?.() === 'suggest',
+			select( EDITOR_STORE_NAME ).getEditorIntent() === SUGGEST_INTENT,
 		[]
 	);
 

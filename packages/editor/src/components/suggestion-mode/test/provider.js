@@ -55,6 +55,31 @@ describe( 'operationsFromOverlay', () => {
 		expect( ops ).toEqual( [] );
 	} );
 
+	it( 'is insensitive to key order in object-valued attributes', () => {
+		// `style` re-emitted with reordered keys must not appear as a
+		// changed attribute. A naive JSON.stringify compare would flag it.
+		const ops = operationsFromOverlay(
+			{ style: { typography: { fontSize: '16px' }, color: 'red' } },
+			{ style: { color: 'red', typography: { fontSize: '16px' } } }
+		);
+		expect( ops ).toEqual( [] );
+	} );
+
+	it( 'compares arrays element-wise', () => {
+		expect(
+			operationsFromOverlay(
+				{ classes: [ 'a', 'b' ] },
+				{ classes: [ 'a', 'b' ] }
+			)
+		).toEqual( [] );
+		const ops = operationsFromOverlay(
+			{ classes: [ 'a', 'b' ] },
+			{ classes: [ 'b', 'a' ] }
+		);
+		expect( ops ).toHaveLength( 1 );
+		expect( ops[ 0 ].attribute ).toBe( 'classes' );
+	} );
+
 	it( 'captures a null baseline when the attribute is new', () => {
 		const ops = operationsFromOverlay( {}, { url: 'https://x.test' } );
 		expect( ops ).toEqual( [
