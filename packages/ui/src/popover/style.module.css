@@ -18,18 +18,6 @@
 		outline: 0;
 	}
 
-	/*
-	 * When a backdrop is rendered alongside the popup, hide the
-	 * regular-mode border. The backdrop already provides visual
-	 * containment, so the border becomes redundant noise.
-	 * `transparent` (not `none`) keeps popup geometry identical
-	 * regardless of the `backdrop` prop — `box-sizing: border-box`
-	 * absorbs the 1px into the existing box.
-	 */
-	.backdrop ~ * .popup {
-		border-color: transparent;
-	}
-
 	.arrow {
 		display: flex;
 
@@ -71,7 +59,7 @@
 		position: fixed;
 		inset: 0;
 		z-index: var(--wp-ui-popover-z-index, initial);
-		/* TODO: Replace with a WPDS overlay/scrim token when one exists. */
-		background-color: rgba(0, 0, 0, 0.15);
+		background-color: var(--wpds-color-bg-surface-neutral-weak);
+		opacity: 0.75;
 	}
 }
