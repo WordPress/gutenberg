@@ -88,10 +88,11 @@ class User_Taxonomy_Content_Filter_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Non-JSON post_content on a wp_user_taxonomy record passes through
-	 * untouched — invalid JSON isn't reformatted.
+	 * Non-JSON post_content on a wp_user_taxonomy record is normalized to
+	 * the canonical marker-only payload — a hedge against a stray read
+	 * path surfacing arbitrary bytes.
 	 */
-	public function test_ignores_non_json_payload() {
+	public function test_normalizes_non_json_payload_to_marker_only() {
 		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_user_taxonomy',
@@ -102,7 +103,12 @@ class User_Taxonomy_Content_Filter_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( 'plain text, not JSON', get_post( $post_id )->post_content );
+		$stored = get_post( $post_id )->post_content;
+		$this->assertJson( $stored );
+		$this->assertSame(
+			array( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER => true ),
+			json_decode( $stored, true )
+		);
 
 		wp_delete_post( $post_id, true );
 	}

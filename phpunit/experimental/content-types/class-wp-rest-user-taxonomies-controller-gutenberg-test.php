@@ -358,32 +358,6 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg_Test extends WP_Test_REST_Con
 	}
 
 	/**
-	 * Invalid JSON submitted via `wp_insert_post` is rewritten to the
-	 * canonical marker-only payload so a stray read path can't surface
-	 * arbitrary bytes.
-	 */
-	public function test_filter_normalizes_invalid_json_to_marker_only() {
-		$post_id = wp_insert_post(
-			array(
-				'post_type'    => 'wp_user_taxonomy',
-				'post_status'  => 'publish',
-				'post_name'    => 'broken_json',
-				'post_title'   => 'Broken JSON',
-				'post_content' => 'not json {{{',
-			)
-		);
-
-		$stored = get_post( $post_id )->post_content;
-		$this->assertJson( $stored, 'Stored content must be valid JSON.' );
-		$this->assertSame(
-			array( GUTENBERG_USER_TAXONOMY_CONFIG_MARKER => true ),
-			json_decode( $stored, true )
-		);
-
-		wp_delete_post( $post_id, true );
-	}
-
-	/**
 	 * Unauthenticated create attempts are rejected.
 	 */
 	public function test_create_item_no_user() {

@@ -148,10 +148,11 @@ function gutenberg_user_taxonomy_sanitize_config( $config ) {
 /**
  * Sanitizes wp_user_taxonomy JSON `post_content` during `wp_insert_post`.
  *
- * Acts on posts of type `wp_user_taxonomy`. Returns input unchanged for any
- * other post type or for invalid JSON. The filter is unconditional —
- * taxonomy config isn't HTML and shouldn't carry scripts even for users
- * with `unfiltered_html`.
+ * Acts on posts of type `wp_user_taxonomy`. Returns input unchanged for
+ * any other post type. Invalid JSON is normalized to the canonical
+ * marker-only payload rather than passed through. The filter is
+ * unconditional — taxonomy config isn't HTML and shouldn't carry scripts
+ * even for users with `unfiltered_html`.
  *
  * @param array $data Slashed post data being inserted/updated.
  * @return array Filtered data.
