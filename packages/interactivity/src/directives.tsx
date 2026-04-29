@@ -732,7 +732,27 @@ export default () => {
 			if ( typeof result === 'function' ) {
 				result = result();
 			}
-			element.props[ attribute ] = result;
+			/*
+			 * Preact 10.26+ uses loose equality (`!=`) when checking whether a
+			 * `value` prop needs to be applied to the DOM, meaning that `null`
+			 * and `undefined` are treated identically and the DOM update is
+			 * skipped for both. This differs from the previous strict (`!==`)
+			 * check, where `null` would still trigger `dom.value = ''`.
+			 * To pre/*
+			 * Preact 10.26+ uses loose equality (`!=`) when checking whether a
+			 * `value` prop needs to be applied to the DOM, meaning that `null`
+			 * and `undefined` are treated identically and the DOM update is
+			 * skipped for both. This differs from the previous strict (`!==`)
+			 * check, where `null` would still trigger `dom.value = ''`.
+			 * To preserve that correct behavior we convert `null`/`undefined`
+			 * to `''` before handing the prop to Preact so it always applies
+			 * the update.
+			 */
+			element.props[ attribute ] =
+				attribute === 'value' &&
+				( result === null || result === undefined )
+					? ''
+					: result;
 
 			/*
 			 * This is necessary because Preact doesn't change the attributes on the
