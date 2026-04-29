@@ -1854,6 +1854,8 @@ async function buildAllWidgets() {
 		return;
 	}
 
+	console.log( '   ⚠️ Note: Widgets are still experimental and subject to drastic and breaking changes.\n' );
+
 	await Promise.all(
 		widgets.map( async ( widgetName ) => {
 			const buildTime = await buildWidget( widgetName );

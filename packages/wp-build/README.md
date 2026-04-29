@@ -528,6 +528,9 @@ The boot package in Gutenberg will automatically use these routes and make them 
 
 ## Widgets (Experimental)
 
+> [!NOTE]
+> Widgets are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
 Widgets provide a file-based discovery system for building self-contained UI components that are registered as WordPress script modules. Each widget lives in its own directory under `widgets/` at the repository root.
 
 ### Structure
