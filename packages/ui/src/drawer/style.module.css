@@ -217,19 +217,6 @@
 	}
 
 	/*
-	 * Forced-colors mode strips `box-shadow` and substitutes
-	 * `background-color` with `Canvas` (the page background), so the
-	 * boundary depends entirely on the border. Set `CanvasText`
-	 * explicitly so the popup edge stays visible without relying on
-	 * UA color-substitution behavior for the token border above.
-	 */
-	@media (forced-colors: active) {
-		.popup {
-			border-color: CanvasText;
-		}
-	}
-
-	/*
 	 * Chrome + content primitives are centralized in
 	 * `overlay-chrome.module.css` and shared with `dialog/style.module.css`
 	 * and `alert-dialog/popup.tsx`. Separator coloring and the modal
