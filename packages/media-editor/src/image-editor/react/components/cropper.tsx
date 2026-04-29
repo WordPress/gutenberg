@@ -81,8 +81,10 @@ export interface CropperProps {
 	controller: UseCropperStateReturn;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
-	/** Show the rule-of-thirds grid overlay. */
-	showGrid?: boolean;
+	/** Show the rule-of-thirds grid overlay, or only during interactions. */
+	showGrid?: boolean | 'interactive';
+	/** Whether external placement activity should keep the grid visible. */
+	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -128,22 +130,23 @@ export interface CropperProps {
  * The component fills its parent container (100% width and height).
  * Wrap it in a sized container to control its dimensions.
  *
- * @param root0                Component props implementing CropperProps.
- * @param root0.src            Image source URL.
- * @param root0.controller     The full state/setter object from `useCropperState`.
- * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Show rule-of-thirds grid overlay.
- * @param root0.showDimming    Show dimming overlay outside crop.
- * @param root0.minZoom        Minimum zoom level.
- * @param root0.maxZoom        Maximum zoom level.
- * @param root0.aspectRatio    Fixed aspect ratio (width/height).
- * @param root0.freeformCrop   Enable resize handles.
- * @param root0.onImageLoaded  Image load callback.
- * @param root0.onStateChange  Every-frame state callback.
- * @param root0.onGestureStart Gesture boundary start.
- * @param root0.onGestureEnd   Gesture boundary end.
- * @param root0.className      Additional CSS class.
- * @param ref                  Forwarded ref for the container div.
+ * @param root0                   Component props implementing CropperProps.
+ * @param root0.src               Image source URL.
+ * @param root0.controller        The full state/setter object from `useCropperState`.
+ * @param root0.stencil           Custom stencil component.
+ * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
+ * @param root0.isPlacementActive Keep grid visible during external placement activity.
+ * @param root0.showDimming       Show dimming overlay outside crop.
+ * @param root0.minZoom           Minimum zoom level.
+ * @param root0.maxZoom           Maximum zoom level.
+ * @param root0.aspectRatio       Fixed aspect ratio (width/height).
+ * @param root0.freeformCrop      Enable resize handles.
+ * @param root0.onImageLoaded     Image load callback.
+ * @param root0.onStateChange     Every-frame state callback.
+ * @param root0.onGestureStart    Gesture boundary start.
+ * @param root0.onGestureEnd      Gesture boundary end.
+ * @param root0.className         Additional CSS class.
+ * @param ref                     Forwarded ref for the container div.
  */
 function CropperInner(
 	{
@@ -151,6 +154,7 @@ function CropperInner(
 		controller,
 		stencil: StencilComponent = RectangleStencil,
 		showGrid = false,
+		isPlacementActive = false,
 		showDimming = true,
 		minZoom,
 		maxZoom,
@@ -164,29 +168,25 @@ function CropperInner(
 	}: CropperProps,
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
-	const {
-		state,
-		setImage,
-		setCropRect,
-		settleCrop,
-		__dispatch: dispatch,
-	} = controller;
-	// Container measurement via ResizeObserver.
-	const containerRef = useRef< HTMLDivElement >( null );
-	const [ containerSize, setContainerSize ] = useState< Size >( {
+	const { state, setImage, setCropRect, settleCrop } = controller;
+	// Canvas measurement via ResizeObserver. The canvas is the inner
+	// positioning context for image/stencil/handles — inset from the root
+	// by the handle gutter, so crop math operates on the reduced box.
+	const canvasRef = useRef< HTMLDivElement >( null );
+	const [ canvasSize, setCanvasSize ] = useState< Size >( {
 		width: 0,
 		height: 0,
 	} );
 
 	useEffect( () => {
-		const element = containerRef.current;
+		const element = canvasRef.current;
 		if ( ! element ) {
 			return;
 		}
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setContainerSize( ( prev ) => {
+				setCanvasSize( ( prev ) => {
 					if ( prev.width === width && prev.height === height ) {
 						return prev;
 					}
@@ -214,11 +214,11 @@ function CropperInner(
 	const { elementSize, visualSize } = useMemo(
 		() =>
 			getImageFit(
-				containerSize,
+				canvasSize,
 				{ width: naturalWidth, height: naturalHeight },
 				state.rotation
 			),
-		[ containerSize, naturalWidth, naturalHeight, state.rotation ]
+		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
 	// In fixed-crop mode, auto-size the crop rect to fill the visual area
@@ -274,27 +274,29 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize, containerSize );
-	}, [ state, elementSize, visualSize, containerSize ] );
+		return getCropBounds( state, elementSize, visualSize, canvasSize );
+	}, [ state, elementSize, visualSize, canvasSize ] );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
-	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
-		state,
-		dispatch,
-		containerSize,
-		visualSize,
-		{
-			minZoom,
-			maxZoom,
-			onGestureStart,
-			onGestureEnd,
-		}
-	);
+	const {
+		handlers,
+		onWheelNative,
+		isDragging,
+		isZooming,
+		isPlacementActive: isInteractionPlacementActive,
+	} = useInteraction( state, controller, canvasSize, visualSize, {
+		minZoom,
+		maxZoom,
+		onGestureStart,
+		onGestureEnd,
+	} );
 
 	// Register wheel handler natively with { passive: false } so
-	// preventDefault works. React's onWheel registers as passive.
+	// preventDefault works. React's onWheel registers as passive. Bound
+	// to the canvas (not the root) so pointer geometry inside the handler
+	// resolves against the canvas box.
 	useEffect( () => {
-		const el = containerRef.current;
+		const el = canvasRef.current;
 		if ( ! el ) {
 			return;
 		}
@@ -353,10 +355,30 @@ function CropperInner(
 		};
 	}, [] );
 
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isInteractiveGrid = showGrid === 'interactive';
+	const showInteractiveGrid =
+		isInteractiveGrid &&
+		( isInteractionPlacementActive || isResizing || isPlacementActive );
+
+	/**
+	 * Handle Escape on a resize handle — return focus to the canvas so
+	 * arrow keys pan the image rather than resize.
+	 */
+	const handleEscape = useCallback( () => {
+		canvasRef.current?.focus( { preventScroll: true } );
+	}, [] );
+
+	const handleResizeStart = useCallback( () => {
+		setIsResizing( true );
+		onGestureStart?.();
+	}, [ onGestureStart ] );
+
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
+		setIsResizing( false );
 		setSettling( true );
 		settleCrop();
 		onGestureEnd?.();
@@ -377,8 +399,8 @@ function CropperInner(
 		if ( elementSize.width === 0 || elementSize.height === 0 ) {
 			return {};
 		}
-		const centerX = ( containerSize.width - elementSize.width ) / 2;
-		const centerY = ( containerSize.height - elementSize.height ) / 2;
+		const centerX = ( canvasSize.width - elementSize.width ) / 2;
+		const centerY = ( canvasSize.height - elementSize.height ) / 2;
 		return {
 			width: elementSize.width,
 			height: elementSize.height,
@@ -389,14 +411,11 @@ function CropperInner(
 			transform: transformString,
 			transition: imageTransition,
 		};
-	}, [ containerSize, elementSize, transformString, imageTransition ] );
+	}, [ canvasSize, elementSize, transformString, imageTransition ] );
 
-	// Merge the forwarded ref with the internal container ref.
+	// Forward the root element to the consumer's ref.
 	const setContainerRef = useCallback(
 		( element: HTMLDivElement | null ) => {
-			(
-				containerRef as React.MutableRefObject< HTMLDivElement | null >
-			 ).current = element;
 			if ( typeof ref === 'function' ) {
 				ref( element );
 			} else if ( ref ) {
@@ -416,77 +435,95 @@ function CropperInner(
 				isDragging && 'wp-media-editor-image-editor--dragging',
 				className
 			) }
-			// The container is focusable so keyboard users can pan/zoom
-			// with arrow keys and +/−. We deliberately do NOT use
-			// role="application" — it disables the screen reader's
-			// normal keyboard interception, which is too heavy-handed
-			// for a single widget in a page. Screen reader users get
-			// the ARIA live region (below) as the announcement channel.
-			tabIndex={ 0 }
-			role="group"
-			aria-label={ __( 'Image editor' ) }
-			{ ...handlers }
 		>
-			{ /* The image layer */ }
-			<img
-				className="wp-media-editor-image-editor__image"
-				src={ src }
-				alt=""
-				onLoad={ handleImageLoad }
-				style={ imageStyle }
-				draggable={ false }
-			/>
-
-			{ /* Dimming overlay outside the crop area */ }
-			{ showDimming && (
-				<DimmingOverlay
-					cropRect={ state.cropRect }
-					containerSize={ containerSize }
-					imageSize={ visualSize }
-				/>
-			) }
-
-			{ /* The stencil (crop area with handles) */ }
-			<StencilComponent
-				cropRect={ state.cropRect }
-				containerSize={ containerSize }
-				imageSize={ visualSize }
-				onCropChange={ handleCropChange }
-				onResizeStart={ onGestureStart }
-				onResizeEnd={ handleResizeEnd }
-				aspectRatio={ aspectRatio }
-				freeformCrop={ freeformCrop }
-				stencilTransition={ settleStencilTransition }
-				cropBounds={ cropBounds }
-			/>
-
-			{ /* Rule-of-thirds grid */ }
-			{ showGrid && (
-				<GridOverlay
-					cropRect={ state.cropRect }
-					containerSize={ containerSize }
-					imageSize={ visualSize }
-				/>
-			) }
-
-			{ /* ARIA live region for screen reader announcements */ }
+			{ /*
+			 * The canvas is the interactive, inset surface. Handles and
+			 * the ARIA role/tabIndex live here so pointer geometry
+			 * (getBoundingClientRect on e.currentTarget) resolves against
+			 * the same box that crop math uses. The root stays as the
+			 * clipping shell for the dimming overlay's box-shadow.
+			 *
+			 * Not role="application" — that disables the screen reader's
+			 * normal keyboard interception, too heavy-handed for a single
+			 * widget. Screen reader users get the ARIA live region below
+			 * as the announcement channel.
+			 */ }
 			<div
-				aria-live="polite"
-				aria-atomic="true"
-				className="wp-media-editor-image-editor__aria-live"
-				style={ {
-					position: 'absolute',
-					width: 1,
-					height: 1,
-					padding: 0,
-					margin: -1,
-					overflow: 'hidden',
-					clip: 'rect(0, 0, 0, 0)',
-					whiteSpace: 'nowrap',
-					border: 0,
-				} }
+				ref={ canvasRef }
+				className={ clsx(
+					'wp-media-editor-image-editor__canvas',
+					isInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--grid-interactive',
+					showInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--show-grid'
+				) }
+				tabIndex={ 0 }
+				role="group"
+				aria-label={ __( 'Image editor' ) }
+				{ ...handlers }
 			>
-				{ ariaMessage }
+				{ /* The image layer */ }
+				<img
+					className="wp-media-editor-image-editor__image"
+					src={ src }
+					alt=""
+					onLoad={ handleImageLoad }
+					style={ imageStyle }
+					draggable={ false }
+				/>
+
+				{ /* Dimming overlay outside the crop area */ }
+				{ showDimming && (
+					<DimmingOverlay
+						cropRect={ state.cropRect }
+						containerSize={ canvasSize }
+						imageSize={ visualSize }
+					/>
+				) }
+
+				{ /* The stencil (crop area with handles) */ }
+				<StencilComponent
+					cropRect={ state.cropRect }
+					containerSize={ canvasSize }
+					imageSize={ visualSize }
+					onCropChange={ handleCropChange }
+					onResizeStart={ handleResizeStart }
+					onResizeEnd={ handleResizeEnd }
+					onEscape={ handleEscape }
+					aspectRatio={ aspectRatio }
+					freeformCrop={ freeformCrop }
+					stencilTransition={ settleStencilTransition }
+					cropBounds={ cropBounds }
+				/>
+
+				{ /* Rule-of-thirds grid */ }
+				{ ( showGrid === true || isInteractiveGrid ) && (
+					<GridOverlay
+						cropRect={ state.cropRect }
+						containerSize={ canvasSize }
+						imageSize={ visualSize }
+					/>
+				) }
+
+				{ /* ARIA live region for screen reader announcements */ }
+				<div
+					aria-live="polite"
+					aria-atomic="true"
+					className="wp-media-editor-image-editor__aria-live"
+					style={ {
+						position: 'absolute',
+						width: 1,
+						height: 1,
+						padding: 0,
+						margin: -1,
+						overflow: 'hidden',
+						clip: 'rect(0, 0, 0, 0)',
+						whiteSpace: 'nowrap',
+						border: 0,
+					} }
+				>
+					{ ariaMessage }
+				</div>
 			</div>
 		</div>
 	);

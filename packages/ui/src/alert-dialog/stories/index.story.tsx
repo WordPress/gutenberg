@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { action } from 'storybook/actions';
 import { fn } from 'storybook/test';
 import * as AlertDialog from '../';
+import { Stack } from '../../stack';
 import { Text } from '../../text';
 
 const meta: Meta< typeof AlertDialog.Root > = {
@@ -97,7 +98,7 @@ export const WithCustomContent: Story = {
 				>
 					<ul
 						style={ {
-							margin: 0,
+							margin: 'var(--wpds-dimension-gap-sm) 0 0',
 							paddingInlineStart: 'var(--wpds-dimension-gap-lg)',
 						} }
 					>
@@ -117,15 +118,14 @@ export const WithCustomContent: Story = {
  * you want it above.
  *
  * `AlertDialog` reuses `Dialog`'s styles, so the same
- * `--wp-ui-dialog-z-index` CSS variable controls the z-index of both the
- * backdrop and the popup. Override it either:
+ * `--wp-ui-dialog-z-index` CSS variable controls the z-index of the alert
+ * dialog's backdrop and popup. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
  *   dialog and alert dialog in the page), or
  * - **Per instance**, by passing an `AlertDialog.Portal` with a `style` (or
  *   `className`) to `AlertDialog.Popup`'s `portal` prop. The variable
- *   cascades from the portal wrapper to the backdrop and the popup, which
- *   are both rendered inside it.
+ *   cascades from the portal wrapper to everything rendered inside it.
  *
  * This story demonstrates the per-instance approach.
  */
@@ -309,6 +309,88 @@ export const AsyncConfirm: Story = {
 				</AlertDialog.Root>
 			</>
 		);
+	},
+};
+
+function StickyToggle( {
+	label,
+	value,
+	onChange,
+}: {
+	label: string;
+	value: boolean;
+	onChange: ( value: boolean ) => void;
+} ) {
+	const id = useId();
+	return (
+		<Stack direction="row" gap="sm" align="center">
+			<input
+				id={ id }
+				type="checkbox"
+				checked={ value }
+				onChange={ ( event ) => onChange( event.target.checked ) }
+			/>
+			<label htmlFor={ id }>{ label }</label>
+		</Stack>
+	);
+}
+
+function ScrollableContent() {
+	const [ stickyHeader, setStickyHeader ] = useState( true );
+	const [ stickyFooter, setStickyFooter ] = useState( true );
+	return (
+		<>
+			<Stack direction="column" gap="lg" align="start">
+				<Stack direction="row" gap="lg" align="center">
+					<StickyToggle
+						label="Sticky header"
+						value={ stickyHeader }
+						onChange={ setStickyHeader }
+					/>
+					<StickyToggle
+						label="Sticky footer"
+						value={ stickyFooter }
+						onChange={ setStickyFooter }
+					/>
+				</Stack>
+				<AlertDialog.Trigger>Review terms</AlertDialog.Trigger>
+			</Stack>
+			<AlertDialog.Popup
+				title="Terms of service"
+				description="Please review the terms before continuing."
+				confirmButtonText="Accept"
+				cancelButtonText="Decline"
+				stickyHeader={ stickyHeader }
+				stickyFooter={ stickyFooter }
+			>
+				<Stack direction="column" gap="lg">
+					{ Array.from( { length: 20 } ).map( ( _, index ) => (
+						<p key={ index } style={ { margin: 0 } }>
+							Paragraph { index + 1 }: Lorem ipsum dolor sit amet,
+							consectetur adipiscing elit. Sed do eiusmod tempor
+							incididunt ut labore et dolore magna aliqua. Ut enim
+							ad minim veniam, quis nostrud exercitation ullamco
+							laboris nisi ut aliquip ex ea commodo consequat.
+						</p>
+					) ) }
+				</Stack>
+			</AlertDialog.Popup>
+		</>
+	);
+}
+
+/**
+ * When the dialog's body overflows the available height, the title/description
+ * area stays pinned to the top of the popup and the action buttons stay pinned
+ * to the bottom so users keep sight of the context and primary actions while
+ * scrolling. Separator borders appear only when there is off-screen content
+ * above or below. Pass `stickyHeader={ false }` or `stickyFooter={ false }` on
+ * `AlertDialog.Popup` to opt out — the toggles in this story drive both props
+ * independently.
+ */
+export const Scrollable: Story = {
+	args: {
+		children: <ScrollableContent />,
 	},
 };
 

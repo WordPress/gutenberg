@@ -7,7 +7,7 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
 	__experimentalView as View,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Navigator,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -73,9 +73,9 @@ export function ScreenHeader( {
 							</Spacer>
 						</HStack>
 						{ description && (
-							<Text className="global-styles-ui-header__description">
+							<WCText className="global-styles-ui-header__description">
 								{ description }
-							</Text>
+							</WCText>
 						) }
 					</VStack>
 				</Spacer>
