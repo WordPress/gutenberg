@@ -72,7 +72,7 @@ function gutenberg_register_block_comment_metadata() {
 	);
 
 	// Lifecycle status for a suggestion. `pending` on creation; moved to
-	// `applied` or `rejected` by Phase 3's apply/reject actions.
+	// `applied` or `rejected` by the apply/reject actions.
 	register_meta(
 		'comment',
 		'_wp_suggestion_status',
