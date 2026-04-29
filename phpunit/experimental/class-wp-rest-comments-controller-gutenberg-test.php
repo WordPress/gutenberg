@@ -59,6 +59,20 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Re-register the note/suggestion comment meta before each test.
+	 *
+	 * `WP_UnitTestCase_Base::tear_down()` wipes the global `$wp_meta_keys`
+	 * registry between tests, but `gutenberg_register_block_comment_metadata`
+	 * only fires once on `init`. Without this hook, REST writes to
+	 * `_wp_suggestion` (and friends) silently no-op for any test after the
+	 * first because the meta isn't recognized as a registered REST field.
+	 */
+	public function set_up() {
+		parent::set_up();
+		gutenberg_register_block_comment_metadata();
+	}
+
+	/**
 	 * Create a test post with note.
 	 *
 	 * @param int $user_id Post author's user ID.
