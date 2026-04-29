@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { widget } from '@wordpress/icons';
+import { home } from '@wordpress/icons';
 import { EmptyState } from '@wordpress/ui';
 
 /**
@@ -244,14 +244,14 @@ export const EditMode: Story = {
 	},
 };
 
-export const Empty: Story = {
+export const NoWidgets: Story = {
 	args: {
 		layout: [],
 		children: (
 			<>
 				<WidgetDashboard.NoWidgetsState>
 					<EmptyState.Root>
-						<EmptyState.Icon icon={ widget } />
+						<EmptyState.Icon icon={ home } />
 						<EmptyState.Title>
 							Your dashboard is empty
 						</EmptyState.Title>
@@ -325,7 +325,7 @@ export const Composition: Story = {
 
 				<WidgetDashboard.NoWidgetsState>
 					<EmptyState.Root>
-						<EmptyState.Icon icon={ widget } />
+						<EmptyState.Icon icon={ home } />
 						<EmptyState.Title>
 							Your dashboard is empty
 						</EmptyState.Title>

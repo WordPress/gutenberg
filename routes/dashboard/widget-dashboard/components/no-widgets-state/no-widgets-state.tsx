@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { widget } from '@wordpress/icons';
+import { home } from '@wordpress/icons';
 import { EmptyState, Stack } from '@wordpress/ui';
 
 /**
@@ -30,7 +30,7 @@ function NoWidgetsStateImpl( { children }: NoWidgetsStateProps ) {
 		<Stack justify="center" align="center" className={ styles.root }>
 			{ children ?? (
 				<EmptyState.Root>
-					<EmptyState.Icon icon={ widget } />
+					<EmptyState.Icon icon={ home } />
 					<EmptyState.Title>
 						{ __( 'Your dashboard is empty' ) }
 					</EmptyState.Title>
