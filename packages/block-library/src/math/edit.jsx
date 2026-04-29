@@ -7,6 +7,7 @@ import { Popover } from '@wordpress/components';
 import { ValidatedTextareaControl, Link } from '@wordpress/ui';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 	const { latex, mathML } = attributes;
@@ -22,12 +23,21 @@ export default function MathEdit( { attributes, setAttributes, isSelected } ) {
 		import( '@wordpress/latex-to-mathml' ).then( ( module ) => {
 			setLatexToMathML( () => module.default );
 			if ( initialLatex.current ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				setAttributes( {
-					mathML: module.default( initialLatex.current, {
+				// `wp_kses` runs on block attributes for users without
+				// `unfiltered_html`, encoding `&` to `&amp;` and similar.
+				// LaTeX uses `&` (e.g. as a column separator in `pmatrix`),
+				// so decode entities before rendering.
+				const decodedLatex = decodeEntities( initialLatex.current );
+				const updates = {
+					mathML: module.default( decodedLatex, {
 						displayMode: true,
 					} ),
-				} );
+				};
+				if ( decodedLatex !== initialLatex.current ) {
+					updates.latex = decodedLatex;
+				}
+				__unstableMarkNextChangeAsNotPersistent();
+				setAttributes( updates );
 			}
 		} );
 	}, [

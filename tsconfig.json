@@ -10,6 +10,7 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
+		{ "path": "packages/block-library/tsconfig.test.json" },
 		{ "path": "packages/components" },
 		{ "path": "packages/components/tsconfig.stories.json" },
 		{ "path": "packages/compose" },
