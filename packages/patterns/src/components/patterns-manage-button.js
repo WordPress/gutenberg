@@ -112,25 +112,15 @@ function PatternsManageButton( { clientId, onClose } ) {
 			{ canDetach && (
 				<>
 					<MenuItem onClick={ () => setShowConfirmDialog( true ) }>
-						{ isSyncedPattern
-							? __( 'Disconnect pattern' )
-							: __( 'Detach pattern' ) }
+						{ __( 'Detach' ) }
 					</MenuItem>
 					<ConfirmDialog
 						isOpen={ showConfirmDialog }
 						onConfirm={ handleDetach }
 						onCancel={ () => setShowConfirmDialog( false ) }
-						confirmButtonText={
-							isSyncedPattern
-								? __( 'Disconnect' )
-								: __( 'Detach' )
-						}
+						confirmButtonText={ __( 'Detach' ) }
 						size="medium"
-						title={
-							isSyncedPattern
-								? __( 'Disconnect pattern?' )
-								: __( 'Detach pattern?' )
-						}
+						title={ __( 'Detach pattern?' ) }
 						__experimentalHideHeader={ false }
 					>
 						{ isSyncedPattern

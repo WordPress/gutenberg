@@ -270,11 +270,34 @@ export function MediaUploadModal( {
 			}
 		} );
 
-		// Base media type on allowedTypes if no filter is set
-		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes?.includes( '*' )
-				? undefined
-				: allowedTypes;
+		// Base media and mime type on allowedTypes if no filter is set
+		if (
+			! filters.media_type &&
+			! filters.mime_type &&
+			allowedTypes &&
+			! allowedTypes.includes( '*' )
+		) {
+			const { mediaTypes, mimeTypes } = allowedTypes.reduce(
+				( acc, type ) => {
+					if ( type.endsWith( '/*' ) ) {
+						acc.mediaTypes.push( type.replace( '/*', '' ) );
+					} else if ( type.includes( '/' ) ) {
+						acc.mimeTypes.push( type );
+					} else {
+						acc.mediaTypes.push( type );
+					}
+
+					return acc;
+				},
+				{ mediaTypes: [] as string[], mimeTypes: [] as string[] }
+			);
+
+			if ( mediaTypes.length ) {
+				filters.media_type = mediaTypes;
+			}
+			if ( mimeTypes.length ) {
+				filters.mime_type = mimeTypes;
+			}
 		}
 
 		return {

@@ -120,6 +120,7 @@ require __DIR__ . '/compat/wordpress-7.0/kses.php';
 require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
+require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -170,7 +171,7 @@ require __DIR__ . '/block-editor-settings.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/mathml-kses.php';
 require __DIR__ . '/demo.php';
-require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/experimental/experiments/load.php';
 require __DIR__ . '/interactivity-api.php';
 require __DIR__ . '/block-template-utils.php';
 
@@ -219,4 +220,15 @@ require __DIR__ . '/overlay-patterns.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/guidelines/load.php';
 	require __DIR__ . '/experimental/guidelines/index.php';
+}
+
+// Content types (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
+	require __DIR__ . '/experimental/content-types/load.php';
+	require __DIR__ . '/experimental/content-types/index.php';
+}
+
+// Dashboard Widgets (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
+	require __DIR__ . '/experimental/dashboard-widgets/load.php';
 }

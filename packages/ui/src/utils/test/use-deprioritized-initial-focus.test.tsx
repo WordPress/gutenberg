@@ -17,7 +17,7 @@ function TestHarness( {
 } ) {
 	const result = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: ATTR,
+		deprioritizedAttributes: [ ATTR ],
 	} );
 
 	useEffect( () => {
@@ -156,7 +156,7 @@ describe( 'useDeprioritizedInitialFocus', () => {
 			} ) {
 				const result = useDeprioritizedInitialFocus( {
 					initialFocus: undefined,
-					deprioritizedAttribute: ATTR,
+					deprioritizedAttributes: [ ATTR ],
 				} );
 
 				useEffect( () => {
@@ -200,7 +200,7 @@ describe( 'useDeprioritizedInitialFocus', () => {
 			} ) {
 				const result = useDeprioritizedInitialFocus( {
 					initialFocus: undefined,
-					deprioritizedAttribute: ATTR,
+					deprioritizedAttributes: [ ATTR ],
 				} );
 
 				useEffect( () => {

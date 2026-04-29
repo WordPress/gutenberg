@@ -1,13 +1,4 @@
 /**
- * External dependencies
- */
-import {
-	useFloating,
-	offset as offsetMiddleware,
-	autoUpdate,
-} from '@floating-ui/react-dom';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -24,6 +15,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
+import { getScrollContainer } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
 
@@ -34,11 +26,11 @@ import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
-import { calculateAllOffsets } from './utils';
+import { calculateNotePositions } from './utils';
 
-const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
-export function useBlockComments( postId ) {
+export function useNoteThreads( postId ) {
 	const queryArgs = {
 		post: postId,
 		type: 'note',
@@ -61,20 +53,20 @@ export function useBlockComments( postId ) {
 		};
 	}, [] );
 
-	// Process comments to build the tree structure.
+	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
 		if ( ! threads || threads.length === 0 ) {
 			return { notes: [], unresolvedNotes: [] };
 		}
 
 		// Single pass over clientIds: build clientId->noteId map AND reverse lookup.
-		const blocksWithComments = {};
+		const blocksWithNotes = {};
 		const clientIdByNoteId = new Map();
 		for ( const clientId of clientIds ) {
 			const noteId = getBlockAttributes( clientId )?.metadata?.noteId;
 			if ( noteId ) {
 				const key = String( noteId );
-				blocksWithComments[ clientId ] = key;
+				blocksWithNotes[ clientId ] = key;
 				clientIdByNoteId.set( key, clientId );
 			}
 		}
@@ -112,7 +104,7 @@ export function useBlockComments( postId ) {
 		// Single partition over notes-in-block-order.
 		const unresolved = [];
 		const resolved = [];
-		for ( const noteId of Object.values( blocksWithComments ) ) {
+		for ( const noteId of Object.values( blocksWithNotes ) ) {
 			const thread =
 				threadsById.get( Number( noteId ) ) ??
 				threadsById.get( noteId );
@@ -143,7 +135,7 @@ export function useBlockComments( postId ) {
 	};
 }
 
-export function useBlockCommentsActions() {
+export function useNoteActions() {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -177,7 +169,7 @@ export function useBlockCommentsActions() {
 				{ throwOnError: true }
 			);
 
-			// If it's a main comment, update the block attributes with the comment id.
+			// If it's a top-level note, update the block attributes with the note id.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
@@ -227,8 +219,8 @@ export function useBlockCommentsActions() {
 					}
 				);
 
-				// Then create a new comment with the metadata.
-				const newCommentData = {
+				// Then create a new note with the metadata.
+				const newNoteData = {
 					post: getCurrentPostId(),
 					content: content || '', // Empty content for resolve, content for reopen.
 					type: 'note',
@@ -240,7 +232,7 @@ export function useBlockCommentsActions() {
 					},
 				};
 
-				await saveEntityRecord( 'root', 'comment', newCommentData, {
+				await saveEntityRecord( 'root', 'comment', newNoteData, {
 					throwOnError: true,
 				} );
 			} else {
@@ -268,19 +260,13 @@ export function useBlockCommentsActions() {
 		}
 	};
 
-	const onDelete = async ( comment ) => {
+	const onDelete = async ( note ) => {
 		try {
-			await deleteEntityRecord(
-				'root',
-				'comment',
-				comment.id,
-				undefined,
-				{
-					throwOnError: true,
-				}
-			);
+			await deleteEntityRecord( 'root', 'comment', note.id, undefined, {
+				throwOnError: true,
+			} );
 
-			if ( ! comment.parent ) {
+			if ( ! note.parent ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				updateBlockAttributes( clientId, {
@@ -333,92 +319,67 @@ export function useEnableFloatingSidebar( enabled = false ) {
 	}, [ enabled, registry ] );
 }
 
-export function useFloatingBoard( { threads, selectedNoteId, isFloating } ) {
-	const [ boardOffsets, setBoardOffsets ] = useState( {} );
+export function useFloatingBoard( {
+	threads,
+	selectedNoteId,
+	isFloating,
+	sidebarRef,
+} ) {
+	const [ notePositions, setNotePositions ] = useState( {} );
 	const [ store ] = useState( createBoardStore );
-	const { setCanvasMinHeight } = unlock( useDispatch( editorStore ) );
 
 	const heights = useSyncExternalStore( store.subscribe, store.getSnapshot );
 
-	// Recalc is deferred to a rAF; the cleanup cancels the pending frame
-	// when deps change, so back-to-back updates collapse into one paint.
+	// Notes are positioned in canvas content-space; CSS inherits
+	// `--canvas-scroll` to translate each thread in sync with the canvas.
 	useEffect( () => {
-		if ( ! isFloating ) {
+		if ( ! isFloating || ! sidebarRef?.current ) {
 			return;
 		}
 
+		const panel = sidebarRef.current;
+		const blockEl = store.getFirstBlockElement();
+		// Climb to the block-list root so nested scroll containers
+		// (e.g. a Group with overflow:auto) don't shadow the canvas.
+		const rootEl = blockEl?.closest( '.is-root-container' ) ?? blockEl;
+		const canvas = rootEl ? getScrollContainer( rootEl ) : null;
+
+		const applyScroll = () => {
+			panel.style.setProperty(
+				'--canvas-scroll',
+				`${ -( canvas?.scrollTop ?? 0 ) }px`
+			);
+		};
+
+		// Recalc is deferred to a rAF; back-to-back updates collapse into one paint.
 		const rafId = window.requestAnimationFrame( () => {
-			const { offsets, minHeight } = calculateAllOffsets( {
+			const result = calculateNotePositions( {
 				threads,
 				selectedNoteId,
 				blockRects: store.getBlockRects(),
 				heights,
+				scrollTop: canvas?.scrollTop ?? 0,
 			} );
-			setBoardOffsets( offsets );
-			setCanvasMinHeight( minHeight );
+
+			setNotePositions( result.positions );
+			applyScroll();
 		} );
 
-		return () => window.cancelAnimationFrame( rafId );
-	}, [
-		heights,
-		isFloating,
-		selectedNoteId,
-		setCanvasMinHeight,
-		store,
-		threads,
-	] );
+		// Root scrolling elements (documentElement/body) don't fire scroll
+		// on themselves; capture on the window catches them in either canvas.
+		const view = canvas?.ownerDocument?.defaultView;
+		const listenerOptions = { passive: true, capture: true };
+		view?.addEventListener( 'scroll', applyScroll, listenerOptions );
+
+		return () => {
+			window.cancelAnimationFrame( rafId );
+			view?.removeEventListener( 'scroll', applyScroll, listenerOptions );
+		};
+	}, [ sidebarRef, heights, isFloating, selectedNoteId, store, threads ] );
 
 	return {
-		boardOffsets,
+		notePositions,
 		registerThread: store.registerThread,
 		unregisterThread: store.unregisterThread,
-	};
-}
-
-export function useFloatingThread( {
-	thread,
-	calculatedOffset,
-	registerThread,
-	unregisterThread,
-} ) {
-	const blockElement = useBlockElement( thread.blockClientId );
-
-	// Use floating-ui to track the block element's position with the calculated offset.
-	const { y, refs } = useFloating( {
-		placement: 'right-start',
-		middleware: [
-			offsetMiddleware( {
-				crossAxis: calculatedOffset || -16,
-			} ),
-		],
-		whileElementsMounted: autoUpdate,
-	} );
-
-	// Set the floating-ui reference element.
-	useEffect( () => {
-		if ( blockElement ) {
-			refs.setReference( blockElement );
-		}
-	}, [ blockElement, refs ] );
-
-	// Register block + floating elements with the board.
-	// The board's ResizeObserver tracks height changes automatically.
-	useEffect( () => {
-		const floatingEl = refs.floating?.current;
-		if ( floatingEl && registerThread ) {
-			registerThread( thread.id, blockElement, floatingEl );
-		}
-		return () => unregisterThread?.( thread.id );
-	}, [
-		blockElement,
-		thread.id,
-		refs.floating,
-		registerThread,
-		unregisterThread,
-	] );
-
-	return {
-		y,
-		refs,
 	};
 }

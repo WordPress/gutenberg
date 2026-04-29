@@ -1,17 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { Link } from '@wordpress/route';
+import { Link as RouterLink } from '@wordpress/route';
 import { __ } from '@wordpress/i18n';
-import {
-	__experimentalHeading as Heading,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import type { BreadcrumbsProps } from './types';
+import styles from './style.module.css';
 
 /**
  * Renders a breadcrumb navigation trail.
@@ -54,28 +52,58 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 
 	return (
 		<nav aria-label={ __( 'Breadcrumbs' ) }>
-			<HStack
-				as="ul"
-				className="admin-ui-breadcrumbs__list"
-				spacing={ 0 }
-				justify="flex-start"
-				alignment="center"
+			<Stack
+				render={ <ul /> }
+				direction="row"
+				align="center"
+				className={ styles.list }
 			>
 				{ precedingItems.map( ( item, index ) => (
 					<li key={ index }>
-						<Link to={ item.to }>{ item.label }</Link>
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ item.to } /> }
+								/>
+							}
+						>
+							{ item.label }
+						</Text>
+						<Text
+							variant="body-lg"
+							aria-hidden="true"
+							className={ styles.separator }
+						>
+							/
+						</Text>
 					</li>
 				) ) }
 				<li>
 					{ lastItem.to ? (
-						<Link to={ lastItem.to }>{ lastItem.label }</Link>
-					) : (
-						<Heading level={ 1 } truncate>
+						<Text
+							variant="body-lg"
+							render={
+								<Link
+									tone="neutral"
+									render={ <RouterLink to={ lastItem.to } /> }
+								/>
+							}
+						>
 							{ lastItem.label }
-						</Heading>
+						</Text>
+					) : (
+						<Text
+							variant="heading-lg"
+							render={ <h1 /> }
+							className={ styles.current }
+						>
+							{ lastItem.label }
+						</Text>
 					) }
 				</li>
-			</HStack>
+			</Stack>
 		</nav>
 	);
 };

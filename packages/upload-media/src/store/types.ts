@@ -5,7 +5,11 @@
  * The client accumulates these and sends them all to the finalize endpoint.
  */
 export interface SubSizeData {
-	image_size: string;
+	/**
+	 * Size name, or an array of names when the same sideloaded file is
+	 * registered under multiple sizes that share identical dimensions.
+	 */
+	image_size: string | string[];
 	width?: number;
 	height?: number;
 	file: string;
@@ -24,6 +28,10 @@ export interface QueueItem {
 	id: QueueItemId;
 	sourceFile: File;
 	file: File;
+	// Original HEIC/HEIF file, kept separately so it can be sideloaded
+	// as the attachment's "original_image" after the converted JPEG is
+	// uploaded. Not set for non-HEIC items.
+	originalHeicFile?: File;
 	poster?: File;
 	attachment?: Partial< Attachment >;
 	status: ItemStatus;
@@ -192,14 +200,6 @@ export interface Settings {
 	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
-	// Map of source MIME types to output MIME types for transcoding.
-	imageOutputFormats?: Record< string, string >;
-	// Whether to use progressive/interlaced encoding for JPEG.
-	jpegInterlaced?: boolean;
-	// Whether to use interlaced encoding for PNG.
-	pngInterlaced?: boolean;
-	// Whether to use interlaced encoding for GIF.
-	gifInterlaced?: boolean;
 	// Default image quality (0-1) for resize/crop operations.
 	// Default is 0.82 if not set.
 	imageQuality?: number;
@@ -237,6 +237,10 @@ export interface Attachment {
 	 * 8 = Rotated 90° CCW
 	 */
 	exif_orientation?: number;
+	/** Output MIME type for format conversion, or null/undefined if no conversion needed. */
+	image_output_format?: string | null;
+	/** Whether to use progressive/interlaced encoding. */
+	image_save_progressive?: boolean;
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -325,8 +329,8 @@ export type AdditionalData = Record< string, unknown >;
 export interface SideloadAdditionalData extends AdditionalData {
 	/** The attachment ID to add the image size to. */
 	post: number;
-	/** The name of the image size being generated (e.g., 'thumbnail', 'medium'). */
-	image_size: string;
+	/** The name(s) of the image size being generated (e.g., 'thumbnail', 'medium'). When multiple size names share the same dimensions, an array can be passed to register one file under all names. */
+	image_size: string | string[];
 }
 
 export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';

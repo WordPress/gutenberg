@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: **`Popup` portal API** ([#77452](https://github.com/WordPress/gutenberg/pull/77452)). Add `Portal` subcomponents and an optional `portal` prop on `Popup` (when omitted, the default `Portal` is used). Remove `container` from every `Popup` and `portalClassName` from `Dialog.Popup` / `AlertDialog.Popup`; pass `portal={ <Matching.Portal … /> }` for `container`, `className`, `style`, and other portal options.
+-   `Popover`, `Tooltip`, `Select`: `style` and `className` on `Popup` are now forwarded to the inner Base UI `Popup` element instead of the outer `Positioner`. To override the per-instance z-index, pass `portal={ <Overlay.Portal style={ { '--wp-ui-<overlay>-z-index': '9999' } } /> }` (or set the variable globally on a wrapping element); inline `style={ { zIndex: … } }` on `Popup` no longer reaches the positioned element.
+-   `Dialog`, `Drawer`: Scrolling now requires the new `Dialog.Content` / `Drawer.Content` subcomponent; the popup itself no longer scrolls. Rendering `Header` / `Footer` as siblings of `Content` pins them to the popup edges; nesting them inside `Content` opts out of pinning. `AlertDialog.Popup` adds `stickyHeader` / `stickyFooter` props (default `true`) for the same choice on its internal chrome ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
+
+### New Features
+
+-   Add `Drawer` primitive ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
+-   Add `Autocomplete` primitive ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
+
 ### Documentation
 
 -   Restructure setup docs into "Within standard WordPress editor screens" and "Elsewhere" for clarity ([#77338](https://github.com/WordPress/gutenberg/pull/77338)).
@@ -9,17 +20,27 @@
 ### Bug Fixes
 
 -   `Link`: Fix text decoration on the `unstyled` variant when `openInNewTab` is enabled, and simplify new-tab icon markup ([#77420](https://github.com/WordPress/gutenberg/pull/77420)).
--   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Fix broken focus-trap caused by ThemeProvider's `display: contents` and Base UI's `checkVisibility()` ([#77381](https://github.com/WordPress/gutenberg/pull/77381)).
+-   `Dialog`, `AlertDialog`, `Popover`, `Tooltip`, `Select`: Restore focus-trap tabbability through `ThemeProvider`'s `display: contents` wrapper ([#77381](https://github.com/WordPress/gutenberg/pull/77381), [#77520](https://github.com/WordPress/gutenberg/pull/77520)).
+-   Remove the transitive peer dependency on `date-fns` / `@date-fns/tz` ([#77520](https://github.com/WordPress/gutenberg/pull/77520)), resolving [#77395](https://github.com/WordPress/gutenberg/issues/77395).
+-   `Text`: Apply both heading and paragraph CSS defenses regardless of variant, so the correct defense kicks in based on the rendered element rather than the typographic variant ([#77461](https://github.com/WordPress/gutenberg/pull/77461)).
 -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
+-   `CollapsibleCard`: Prevent the focus ring of focusable descendants from being clipped by the panel's overflow once the panel is fully expanded ([#77667](https://github.com/WordPress/gutenberg/pull/77667)).
 -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
 
 ### Enhancements
 
+-   `Dialog` / `AlertDialog` / `Drawer`: Pin header / footer chrome to the popup edges when the body overflows, and show separator borders only while there is off-screen content in that direction ([#77559](https://github.com/WordPress/gutenberg/pull/77559)).
+-   `Dialog`: Add `Dialog.Description` sub-component, expose `onOpenChangeComplete`, skip the backdrop when `modal` is not `true`, use `100dvh` for viewport-based heights so the popup fits the dynamic viewport on mobile, and forward `className` on `Dialog.Title` ([#77194](https://github.com/WordPress/gutenberg/pull/77194)).
+-   `Dialog`: `Dialog.Header` and `Dialog.Footer` now default to `<header>` and `<footer>` elements for richer landmark semantics. Their `ref` type widens from `HTMLDivElement` to `HTMLElement`; pass `render` to opt out of the default tag ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   `Dialog`, `Popover`: Upgrade dev-only title validation from mount-only to cleanup-based re-validation, catching conditionally rendered titles ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Link`: Honor `openInNewTab` consistently instead of treating hash links as a special case ([#77422](https://github.com/WordPress/gutenberg/pull/77422)).
+-   `Select`: Tighten spacing after checkmark when `Select.Item` is `size="small"` ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
+-   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
+-   `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `Select`, `Tooltip`: Unify the hairline border across overlay popups. Popups without a backdrop show a token-colored border in regular mode; popups with a backdrop hide the border (which would be redundant with the backdrop's containment); all popups show a `CanvasText` border in forced-colors mode ([#77691](https://github.com/WordPress/gutenberg/pull/77691)).
 
 ### Internal
 
+-   Update `@base-ui/react` from `1.4.0` to [`1.4.1`](https://github.com/mui/base-ui/releases/tag/v1.4.1) ([#77520](https://github.com/WordPress/gutenberg/pull/77520)).
 -   Extract shared `useScheduleValidation` hook; refactor `Dialog`, `Popover`, and `Tabs` validation contexts to use it ([#77165](https://github.com/WordPress/gutenberg/pull/77165)).
 -   `Tabs`: Wrap two validation timeout waits in `act(...)` to avoid intermittent test warnings ([#77319](https://github.com/WordPress/gutenberg/pull/77319)).
 

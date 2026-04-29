@@ -7,11 +7,8 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import {
-	VisuallyHidden,
-	ToolbarButton,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import {
 	chevronLeft,
 	chevronUp,
