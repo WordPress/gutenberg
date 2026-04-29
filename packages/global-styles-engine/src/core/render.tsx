@@ -32,6 +32,7 @@ import { kebabCase } from '../utils/string';
 import { getGapCSSValue } from '../utils/gap';
 import { setBackgroundStyleDefaults } from '../utils/background';
 import { LAYOUT_DEFINITIONS } from '../utils/layout';
+import { getBlockStates } from './states';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
@@ -155,30 +156,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
-
-// Block state support: which state groups each block supports.
-// Keep in sync with WP_Theme_JSON_Gutenberg::BLOCK_STATE_SUPPORT.
-const BLOCK_STATE_SUPPORT: Record< string, Record< string, string[] > > = {
-	'core/button': {
-		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
-	},
-	'core/navigation-link': {
-		currentItem: [ '@current' ],
-		pseudo: [ ':hover', ':focus', ':focus-visible', ':active' ],
-	},
-};
-
-/**
- * Get the flat list of pseudo-state keys a block supports.
- * This is the primary list used for CSS generation since pseudo-selectors
- * are the only state type that modifies CSS selectors directly.
- *
- * @param blockName The block name (e.g. 'core/button').
- * @return Array of pseudo-state keys (e.g. [':hover', ':focus']).
- */
-function getBlockPseudoStates( blockName: string ): string[] {
-	return BLOCK_STATE_SUPPORT[ blockName ]?.pseudo ?? [];
-}
 
 /**
  * Transform given preset tree into a set of preset class declarations.
@@ -878,23 +855,18 @@ const STYLE_KEYS = [
 ];
 
 function pickStyleKeys( treeToPickFrom: any ): any {
-	return pickStyleAndPseudoKeys( treeToPickFrom );
+	return pickStyleAndStateKeys( treeToPickFrom );
 }
 
-function pickStyleAndPseudoKeys(
-	treeToPickFrom: any,
-	blockName?: string
-): any {
+function pickStyleAndStateKeys( treeToPickFrom: any, blockName?: string ): any {
 	if ( ! treeToPickFrom ) {
 		return {};
 	}
 	const entries = Object.entries( treeToPickFrom );
-	const allowedPseudoSelectors = blockName
-		? getBlockPseudoStates( blockName )
-		: [];
+	const allowedStateKeys = blockName ? getBlockStates( blockName ) : [];
 	const pickedEntries = entries.filter(
 		( [ key ] ) =>
-			STYLE_KEYS.includes( key ) || allowedPseudoSelectors.includes( key )
+			STYLE_KEYS.includes( key ) || allowedStateKeys.includes( key )
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -904,7 +876,7 @@ function pickStyleAndPseudoKeys(
 	return Object.fromEntries( clonedEntries );
 }
 
-function appendPseudoSelectorStyles(
+function appendStateStyles(
 	styles: Record< string, any >,
 	selector: string,
 	ruleset: string,
@@ -916,75 +888,75 @@ function appendPseudoSelectorStyles(
 	blockName: string | undefined,
 	styleVariationSelector?: string
 ): string {
-	const pseudoSelectorStyles = Object.entries( styles ).filter( ( [ key ] ) =>
+	// Currently only 'append' type states (pseudo-selectors starting with ':')
+	// are handled in the JS rendering path. 'wrap' type states (e.g. '@current')
+	// require custom selector lookups from block.json which are handled in PHP.
+	// TODO: Extend for responsive/wrap states when needed.
+	const stateStyles = Object.entries( styles ).filter( ( [ key ] ) =>
 		key.startsWith( ':' )
 	);
 
-	if ( ! pseudoSelectorStyles.length ) {
+	if ( ! stateStyles.length ) {
 		return ruleset;
 	}
 
-	pseudoSelectorStyles.forEach( ( [ pseudoKey, pseudoStyle ] ) => {
-		if ( ! pseudoStyle || typeof pseudoStyle !== 'object' ) {
+	stateStyles.forEach( ( [ stateKey, stateStyle ] ) => {
+		if ( ! stateStyle || typeof stateStyle !== 'object' ) {
 			return;
 		}
 
-		const remainingPseudoStyles = JSON.parse(
-			JSON.stringify( pseudoStyle )
-		);
+		const remainingStateStyles = JSON.parse( JSON.stringify( stateStyle ) );
 
 		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
-			let pseudoFeatureDeclarations = getFeatureDeclarations(
+			let stateFeatureDeclarations = getFeatureDeclarations(
 				featureSelectors,
-				remainingPseudoStyles
+				remainingStateStyles
 			);
 
-			pseudoFeatureDeclarations = updateParagraphTextIndentSelector(
-				pseudoFeatureDeclarations,
+			stateFeatureDeclarations = updateParagraphTextIndentSelector(
+				stateFeatureDeclarations,
 				treeSettings,
 				blockName
 			);
 
-			pseudoFeatureDeclarations = updateButtonWidthDeclarations(
-				pseudoFeatureDeclarations,
+			stateFeatureDeclarations = updateButtonWidthDeclarations(
+				stateFeatureDeclarations,
 				treeSettings
 			);
 
-			Object.entries( pseudoFeatureDeclarations ).forEach(
+			Object.entries( stateFeatureDeclarations ).forEach(
 				( [ baseSelector, declarations ] ) => {
 					if ( ! declarations.length ) {
 						return;
 					}
-					const pseudoFeatureSelector = appendToSelector(
+					const stateFeatureSelector = appendToSelector(
 						baseSelector,
-						pseudoKey
+						stateKey
 					);
 					const cssSelector = styleVariationSelector
 						? concatFeatureVariationSelectorString(
-								pseudoFeatureSelector,
+								stateFeatureSelector,
 								styleVariationSelector
 						  )
-						: pseudoFeatureSelector;
+						: stateFeatureSelector;
 					const rules = declarations.join( ';' );
 					ruleset += `:root :where(${ cssSelector }){${ rules };}`;
 				}
 			);
 		}
 
-		const pseudoDeclarations = getStylesDeclarations(
-			remainingPseudoStyles
-		);
+		const stateDeclarations = getStylesDeclarations( remainingStateStyles );
 
-		if ( ! pseudoDeclarations.length ) {
+		if ( ! stateDeclarations.length ) {
 			return;
 		}
 
-		const pseudoSelector = appendToSelector( selector, pseudoKey );
-		const pseudoRule = `:root :where(${ pseudoSelector }){${ pseudoDeclarations.join(
+		const stateSelector = appendToSelector( selector, stateKey );
+		const stateRule = `:root :where(${ stateSelector }){${ stateDeclarations.join(
 			';'
 		) };}`;
 
-		ruleset += pseudoRule;
+		ruleset += stateRule;
 	} );
 
 	return ruleset;
@@ -1041,7 +1013,7 @@ export const getNodesWithStyles = (
 	// Iterate over blocks: they can have styles & elements.
 	Object.entries( tree.styles?.blocks ?? {} ).forEach(
 		( [ blockName, node ] ) => {
-			const blockStyles = pickStyleAndPseudoKeys( node, blockName );
+			const blockStyles = pickStyleAndStateKeys( node, blockName );
 			const typedNode = node as BlockNode;
 
 			// Store variation data for later processing, but don't add to nodes yet.
@@ -1053,7 +1025,7 @@ export const getNodesWithStyles = (
 				Object.entries( typedNode.variations ).forEach(
 					( [ variationName, variation ] ) => {
 						const typedVariation = variation as BlockVariation;
-						variations[ variationName ] = pickStyleAndPseudoKeys(
+						variations[ variationName ] = pickStyleAndStateKeys(
 							typedVariation,
 							blockName
 						);
@@ -1125,7 +1097,7 @@ export const getNodesWithStyles = (
 										: undefined;
 
 								const variationBlockStyleNodes =
-									pickStyleAndPseudoKeys(
+									pickStyleAndStateKeys(
 										variationBlockStyles,
 										variationBlockName
 									);
@@ -1689,7 +1661,7 @@ export const transformToStyles = (
 									);
 								}
 
-								ruleset = appendPseudoSelectorStyles(
+								ruleset = appendStateStyles(
 									styleVariations,
 									styleVariationSelector as string,
 									ruleset,
@@ -1720,7 +1692,7 @@ export const transformToStyles = (
 					);
 				}
 
-				ruleset = appendPseudoSelectorStyles(
+				ruleset = appendStateStyles(
 					styles,
 					selector,
 					ruleset,

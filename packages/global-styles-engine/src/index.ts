@@ -29,6 +29,16 @@ export {
 	getResolvedValue,
 } from './utils/common';
 
+// State definitions
+export {
+	STATE_GROUPS,
+	BLOCK_STATE_SUPPORT,
+	ELEMENT_STATE_SUPPORT,
+	getBlockStates,
+	getElementStates,
+} from './core/states';
+export type { StateGroupDefinition } from './core/states';
+
 // Types
 export type * from './types';
 
