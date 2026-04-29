@@ -1,0 +1,348 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect, useState } from '@wordpress/element';
+import * as Combobox from '../index';
+import { ITEMS, type FixtureItem } from './fixtures';
+
+const meta: Meta< typeof Combobox.Root > = {
+	title: 'Design System/Components/Form/Primitives/Combobox',
+	component: Combobox.Root,
+	subcomponents: {
+		Trigger: Combobox.Trigger,
+		Portal: Combobox.Portal,
+		Popup: Combobox.Popup,
+		Input: Combobox.Input,
+		List: Combobox.List,
+		ListBody: Combobox.ListBody,
+		ListFooter: Combobox.ListFooter,
+		Collection: Combobox.Collection,
+		Item: Combobox.Item,
+		Value: Combobox.Value,
+		Chips: Combobox.Chips,
+		ChipWithRemove: Combobox.ChipWithRemove,
+		Empty: Combobox.Empty,
+		Clear: Combobox.Clear,
+	},
+};
+export default meta;
+
+type Story = StoryObj< typeof Combobox.Root >;
+
+export const Default: Story = {
+	args: {
+		defaultValue: ITEMS[ 0 ],
+		items: ITEMS,
+		children: (
+			<>
+				<Combobox.Trigger />
+				<Combobox.Popup>
+					<div style={ { padding: '8px 8px 4px' } }>
+						<Combobox.Input placeholder="Search" />
+					</div>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * For certain multiple select use cases, it may be better to design a custom
+ * selection state UI, rather than using a chip-based selection state UI like `SearchableChipSelect`.
+ * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
+ *
+ * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
+ */
+export const DetachedInline: Story = {
+	args: {
+		items: ITEMS,
+		multiple: true,
+		inline: true,
+		children: (
+			<>
+				<Combobox.Input placeholder="Search" />
+				<div
+					style={ {
+						minHeight: '200px',
+						maxHeight: '200px',
+						marginTop: 8,
+						overflow: 'auto',
+					} }
+				>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item key={ item.id } value={ item }>
+									{ item.value }
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.List>
+				</div>
+			</>
+		),
+	},
+};
+
+export const Creatable: Story = {
+	render: function Template( args ) {
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ value, setValue ] = useState( ITEMS[ 0 ] );
+		const hasNoExactMatch =
+			inputValue.length > 0 &&
+			! ITEMS.some( ( item ) => item.value === inputValue.trim() );
+		const creatableItem = {
+			id: 'create',
+			value:
+				'Create new item' + ( inputValue ? `: ${ inputValue }` : '' ),
+		};
+
+		return (
+			<Combobox.Root
+				{ ...args }
+				inputValue={ inputValue }
+				onInputValueChange={ setInputValue }
+				value={ value }
+				onValueChange={ ( newValue, event ) => {
+					const typedValue = newValue as FixtureItem;
+					if ( typedValue.id === 'create' ) {
+						// eslint-disable-next-line no-alert
+						alert( 'Show dialog to create new item!' );
+					} else {
+						setValue( typedValue );
+					}
+					args.onValueChange?.( newValue, event );
+				} }
+				items={
+					! inputValue || hasNoExactMatch
+						? [ ...ITEMS, creatableItem ]
+						: ITEMS
+				}
+			>
+				<Combobox.Trigger />
+				<Combobox.Popup>
+					<div style={ { padding: '8px 8px 4px' } }>
+						<Combobox.Input placeholder="Search" />
+					</div>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) =>
+									item.id !== creatableItem.id && (
+										<Combobox.Item
+											key={ item.id }
+											value={ item }
+										>
+											{ item.value }
+										</Combobox.Item>
+									)
+								}
+							</Combobox.Collection>
+						</Combobox.ListBody>
+						<Combobox.ListFooter>
+							<Combobox.Item
+								variant="creatable"
+								value={ creatableItem }
+								key={ creatableItem.id }
+							>
+								{ creatableItem.value }
+							</Combobox.Item>
+						</Combobox.ListFooter>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
+	},
+};
+
+export const AsyncItems: Story = {
+	render: function Template( args ) {
+		const LOADING_ITEM = {
+			id: 'loading',
+			value: 'Loading...',
+		};
+		const [ items, setItems ] = useState( [ LOADING_ITEM ] );
+		const [ value, setValue ] = useState< unknown >( LOADING_ITEM );
+
+		useEffect( () => {
+			const timeout = setTimeout( () => {
+				setItems( ITEMS );
+				setValue( ITEMS[ 0 ] );
+			}, 3000 );
+
+			return () => clearTimeout( timeout );
+		}, [] );
+
+		return (
+			<Combobox.Root
+				{ ...args }
+				items={ items }
+				value={ value }
+				onValueChange={ setValue }
+			>
+				<Combobox.Trigger />
+				<Combobox.Popup>
+					<div style={ { padding: '8px 8px 4px' } }>
+						<Combobox.Input placeholder="Search" />
+					</div>
+					<Combobox.Empty>No results found.</Combobox.Empty>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+										disabled={ item.id === 'loading' }
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
+	},
+};
+
+/**
+ * For custom needs, a `Combobox.Trigger` can take a custom render function as its children,
+ * while `Select.Item` can take arbitrary content as children.
+ *
+ * In this example, some extra information is added to each list item as an ARIA description.
+ */
+export const WithCustomTriggerAndItem: Story = {
+	args: {
+		items: ITEMS,
+		defaultValue: ITEMS[ 0 ],
+		children: (
+			<>
+				<Combobox.Trigger>
+					{ ( item: FixtureItem ) => (
+						<span
+							style={ {
+								display: 'flex',
+								alignItems: 'center',
+								gap: 8,
+							} }
+						>
+							<img
+								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.id }` }
+								alt=""
+								width="20"
+								style={ {
+									borderRadius: '50%',
+								} }
+							/>
+							{ item.value }
+						</span>
+					) }
+				</Combobox.Trigger>
+				<Combobox.Popup>
+					<div style={ { padding: '8px 8px 4px' } }>
+						<Combobox.Input placeholder="Search" />
+					</div>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+										aria-describedby={ `description-${ item.id }` }
+									>
+										<div
+											style={ {
+												display: 'flex',
+												alignItems: 'center',
+												justifyContent: 'space-between',
+												flexGrow: 1,
+											} }
+										>
+											<span>{ item.value }</span>
+											<span
+												id={ `description-${ item.id }` }
+												aria-hidden="true"
+											>
+												99 in stock
+											</span>
+										</div>
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</>
+		),
+	},
+};
+
+/**
+ * Popovers in Gutenberg are managed with explicit z-index values, which can create
+ * situations where a popover renders below another popover, when you want it to be rendered above.
+ *
+ * The `--wp-ui-combobox-z-index` CSS variable controls the z-index of the
+ * `Combobox` positioner. Override it either:
+ *
+ * - **Globally**, by setting the variable on `:root` or `body` (raises every
+ *   `Combobox` popup in the page), or
+ * - **Per instance**, by passing a `Combobox.Portal` with a `style` (or
+ *   `className`) to `Combobox.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
+ */
+export const WithCustomZIndex: Story = {
+	name: 'With Custom z-index',
+	args: {
+		defaultValue: ITEMS[ 0 ],
+		items: ITEMS,
+		children: (
+			<>
+				<Combobox.Trigger />
+				<Combobox.Popup
+					portal={
+						<Combobox.Portal
+							style={ {
+								'--wp-ui-combobox-z-index': '1000001',
+							} }
+						/>
+					}
+				>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) => (
+									<Combobox.Item
+										key={ item.id }
+										value={ item }
+									>
+										{ item.value }
+									</Combobox.Item>
+								) }
+							</Combobox.Collection>
+						</Combobox.ListBody>
+					</Combobox.List>
+				</Combobox.Popup>
+			</>
+		),
+	},
+};
