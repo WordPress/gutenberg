@@ -156,6 +156,7 @@ export default function MediaEditorToolbar( {
 			{ /* onPointerUp / onKeyUp reset the gesture flag so the next
 			     drag or keyboard interaction creates a fresh undo entry. */ }
 			<div
+				role="presentation"
 				className="media-editor-toolbar__rotation-slider"
 				onPointerUp={ commitHistory }
 				onKeyUp={ commitHistory }
