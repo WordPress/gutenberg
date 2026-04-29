@@ -19,7 +19,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { getAvatarBorderColor } from './utils';
 
-function CommentAuthorInfo( { avatar, name, date, userId } ) {
+export function NoteByline( { avatar, name, date, userId } ) {
 	const hasAvatar = !! avatar;
 	const dateSettings = getDateSettings();
 	const {
@@ -108,5 +108,3 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 		</>
 	);
 }
-
-export default CommentAuthorInfo;

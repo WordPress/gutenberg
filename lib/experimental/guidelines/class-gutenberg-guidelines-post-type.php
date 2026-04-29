@@ -36,15 +36,6 @@ class Gutenberg_Guidelines_Post_Type {
 	const TERM_CONTENT = 'content';
 
 	/**
-	 * Neutral default term slug for manually-created guidelines whose type
-	 * hasn't been chosen yet. The REST controller that owns the content
-	 * singleton always writes its own term explicitly.
-	 *
-	 * @var string
-	 */
-	const TERM_ARTIFACT = 'artifact';
-
-	/**
 	 * The standard guideline category meta keys.
 	 *
 	 * @var array
@@ -91,46 +82,66 @@ class Gutenberg_Guidelines_Post_Type {
 	/**
 	 * Register the custom post type.
 	 */
-	public static function register() {
+	public static function register(): void {
 		if ( post_type_exists( self::POST_TYPE ) ) {
 			return;
 		}
 
-		$args = array(
-			'labels'                          => array(
-				'name'          => __( 'Guidelines', 'gutenberg' ),
-				'singular_name' => __( 'Guidelines', 'gutenberg' ),
-			),
-			'public'                          => false,
-			'publicly_queryable'              => false,
-			'show_ui'                         => true,
-			'show_in_menu'                    => false,
-			'show_in_rest'                    => true,
-			'rest_base'                       => 'guidelines',
-			'rest_controller_class'           => 'Gutenberg_Guidelines_REST_Controller',
-			'revisions_rest_controller_class' => 'Gutenberg_Guidelines_Revisions_Controller',
-			'capability_type'                 => 'post',
-			'capabilities'                    => array(
-				'read'                   => 'edit_posts',
-				'create_posts'           => 'manage_options',
-				'edit_posts'             => 'manage_options',
-				'edit_published_posts'   => 'manage_options',
-				'delete_posts'           => 'manage_options',
-				'delete_published_posts' => 'manage_options',
-				'edit_others_posts'      => 'manage_options',
-				'delete_others_posts'    => 'manage_options',
-				'publish_posts'          => 'manage_options',
-			),
-			'map_meta_cap'                    => true,
-			'supports'                        => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
-			'hierarchical'                    => false,
-			'has_archive'                     => false,
-			'rewrite'                         => false,
-			'query_var'                       => false,
-			'can_export'                      => true,
+		register_post_type(
+			self::POST_TYPE,
+			array(
+				'labels'             => array(
+					'name'                     => _x( 'Guidelines', 'post type general name', 'gutenberg' ),
+					'singular_name'            => _x( 'Guideline', 'post type singular name', 'gutenberg' ),
+					'add_new'                  => __( 'Add Guideline', 'gutenberg' ),
+					'add_new_item'             => __( 'Add Guideline', 'gutenberg' ),
+					'all_items'                => __( 'All Guidelines', 'gutenberg' ),
+					'edit_item'                => __( 'Edit Guideline', 'gutenberg' ),
+					'filter_items_list'        => __( 'Filter guidelines list', 'gutenberg' ),
+					'item_published'           => __( 'Guideline published.', 'gutenberg' ),
+					'item_published_privately' => __( 'Guideline published privately.', 'gutenberg' ),
+					'item_reverted_to_draft'   => __( 'Guideline reverted to draft.', 'gutenberg' ),
+					'item_scheduled'           => __( 'Guideline scheduled.', 'gutenberg' ),
+					'item_updated'             => __( 'Guideline updated.', 'gutenberg' ),
+					'items_list'               => __( 'Guidelines list', 'gutenberg' ),
+					'items_list_navigation'    => __( 'Guidelines list navigation', 'gutenberg' ),
+					'new_item'                 => __( 'New Guideline', 'gutenberg' ),
+					'not_found'                => __( 'No guidelines found.', 'gutenberg' ),
+					'not_found_in_trash'       => __( 'No guidelines found in Trash.', 'gutenberg' ),
+					'search_items'             => __( 'Search Guidelines', 'gutenberg' ),
+					'view_item'                => __( 'View Guideline', 'gutenberg' ),
+					'view_items'               => __( 'View Guidelines', 'gutenberg' ),
+				),
+				'public'             => false,
+				'publicly_queryable' => false,
+				'show_ui'            => true,
+				'show_in_menu'       => false,
+				'show_in_rest'       => true,
+				'rest_base'          => 'guidelines',
+				'capability_type'    => 'guideline',
+				'map_meta_cap'       => true,
+				'capabilities'       => array(
+					'read'                   => 'edit_posts',
+					'create_posts'           => 'publish_posts',
+					'edit_posts'             => 'edit_posts',
+					'publish_posts'          => 'publish_posts',
+					'read_private_posts'     => 'read_private_posts',
+					'edit_private_posts'     => 'edit_private_posts',
+					'edit_published_posts'   => 'edit_published_posts',
+					'delete_private_posts'   => 'delete_private_posts',
+					'delete_published_posts' => 'delete_published_posts',
+					'delete_posts'           => 'delete_posts',
+					'edit_others_posts'      => 'edit_others_posts',
+					'delete_others_posts'    => 'delete_others_posts',
+				),
+				'supports'           => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
+				'hierarchical'       => false,
+				'has_archive'        => false,
+				'rewrite'            => false,
+				'query_var'          => false,
+				'can_export'         => true,
+			)
 		);
-
-		register_post_type( self::POST_TYPE, $args );
 
 		register_taxonomy(
 			self::TAXONOMY,
@@ -140,8 +151,28 @@ class Gutenberg_Guidelines_Post_Type {
 				'publicly_queryable' => false,
 				'hierarchical'       => true,
 				'labels'             => array(
-					'name'          => __( 'Guideline Types', 'gutenberg' ),
-					'singular_name' => __( 'Guideline Type', 'gutenberg' ),
+					'name'                  => _x( 'Guideline Types', 'taxonomy general name', 'gutenberg' ),
+					'singular_name'         => _x( 'Guideline Type', 'taxonomy singular name', 'gutenberg' ),
+					'add_new_item'          => __( 'Add Guideline Type', 'gutenberg' ),
+					'add_or_remove_items'   => __( 'Add or remove guideline types', 'gutenberg' ),
+					'back_to_items'         => __( '&larr; Go to Guideline Types', 'gutenberg' ),
+					'edit_item'             => __( 'Edit Guideline Type', 'gutenberg' ),
+					'item_link'             => __( 'Guideline Type Link', 'gutenberg' ),
+					'item_link_description' => __( 'A link to a guideline type.', 'gutenberg' ),
+					'items_list'            => __( 'Guideline Types list', 'gutenberg' ),
+					'items_list_navigation' => __( 'Guideline Types list navigation', 'gutenberg' ),
+					'new_item_name'         => __( 'New Guideline Type Name', 'gutenberg' ),
+					'no_terms'              => __( 'No guideline types', 'gutenberg' ),
+					'not_found'             => __( 'No guideline types found.', 'gutenberg' ),
+					'search_items'          => __( 'Search Guideline Types', 'gutenberg' ),
+					'update_item'           => __( 'Update Guideline Type', 'gutenberg' ),
+					'view_item'             => __( 'View Guideline Type', 'gutenberg' ),
+				),
+				'capabilities'       => array(
+					'manage_terms' => 'manage_categories',
+					'edit_terms'   => 'edit_posts',
+					'delete_terms' => 'delete_categories',
+					'assign_terms' => 'edit_posts',
 				),
 				'query_var'          => false,
 				'rewrite'            => false,
@@ -152,38 +183,8 @@ class Gutenberg_Guidelines_Post_Type {
 			)
 		);
 
-		add_action( 'save_post_' . self::POST_TYPE, array( __CLASS__, 'ensure_default_type_term' ) );
-	}
-
-	/**
-	 * Ensures a guideline post always has a type term.
-	 *
-	 * Assigns the `artifact` fallback when the post was saved without one.
-	 * The REST controller sets `content` explicitly for the singleton, so
-	 * this only applies to posts inserted through other paths.
-	 *
-	 * The taxonomy intentionally does not use `default_term` at registration
-	 * time: on multisite installations with many sites, that triggers cache
-	 * clearing work across sites even for taxonomies with zero posts.
-	 *
-	 * @param int $post_id Post ID.
-	 */
-	public static function ensure_default_type_term( $post_id ) {
-		if ( wp_is_post_revision( $post_id ) ) {
-			return;
-		}
-
-		$terms = get_the_terms( $post_id, self::TAXONOMY );
-		if ( is_wp_error( $terms ) || ! empty( $terms ) ) {
-			return;
-		}
-
-		$term_id = self::get_or_create_term_id( self::TERM_ARTIFACT, __( 'Artifact', 'gutenberg' ) );
-		if ( is_wp_error( $term_id ) ) {
-			return;
-		}
-
-		wp_set_object_terms( $post_id, array( $term_id ), self::TAXONOMY );
+		add_action( 'save_post_' . self::POST_TYPE, '_wp_guidelines_ensure_default_type_term' );
+		add_filter( 'wp_insert_term_data', '_wp_guidelines_maybe_map_term_label', 10, 2 );
 	}
 
 	/**
@@ -193,7 +194,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $name Human-readable term name, used when creating.
 	 * @return int|WP_Error Term ID on success, WP_Error on failure.
 	 */
-	public static function get_or_create_term_id( $slug, $name ) {
+	public static function get_or_create_term_id( string $slug, string $name ) {
 		$term = get_term_by( 'slug', $slug, self::TAXONOMY );
 		if ( $term ) {
 			return (int) $term->term_id;
@@ -213,15 +214,40 @@ class Gutenberg_Guidelines_Post_Type {
 	}
 
 	/**
+	 * Determines whether a guideline post belongs to the content singleton.
+	 *
+	 * Used by the /wp/v2/content-guidelines route to reject non-content-typed
+	 * posts addressed by ID — those belong to the standard /wp/v2/guidelines
+	 * collection.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool True if the post has the `content` term.
+	 */
+	public static function is_content_guideline( $post_id ) {
+		$terms = get_the_terms( $post_id, self::TAXONOMY );
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return false;
+		}
+
+		foreach ( $terms as $term ) {
+			if ( self::TERM_CONTENT === $term->slug ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Register post meta fields with revision support.
 	 */
-	public static function register_post_meta() {
+	public static function register_post_meta(): void {
 		$meta_args = array(
 			'show_in_rest'      => true,
 			'single'            => true,
 			'type'              => 'string',
 			'revisions_enabled' => true,
-			'auth_callback'     => function () {
+			'auth_callback'     => function (): bool {
 				return current_user_can( 'manage_options' );
 			},
 			'sanitize_callback' => 'sanitize_textarea_field',
@@ -243,7 +269,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 *
 	 * @return array Block names with content role.
 	 */
-	public static function get_content_blocks() {
+	public static function get_content_blocks(): array {
 		$content_blocks = array();
 		$registry       = WP_Block_Type_Registry::get_instance();
 
@@ -262,7 +288,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param WP_Block_Type $block_type The block type to check.
 	 * @return bool True if block has content role attribute.
 	 */
-	private static function block_has_content_role( $block_type ) {
+	private static function block_has_content_role( WP_Block_Type $block_type ): bool {
 		if ( empty( $block_type->attributes ) ) {
 			return false;
 		}
@@ -282,7 +308,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $block_name The block name (e.g., 'core/paragraph').
 	 * @return string The meta key (e.g., '_guideline_block_core_paragraph').
 	 */
-	public static function block_name_to_meta_key( $block_name ) {
+	public static function block_name_to_meta_key( string $block_name ): string {
 		// Replace '/' with '_' to create a valid meta key.
 		$sanitized = str_replace( '/', '_', $block_name );
 		return self::BLOCK_META_PREFIX . $sanitized;
@@ -294,7 +320,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $meta_key The meta key (e.g., '_guideline_block_core_paragraph').
 	 * @return string The block name (e.g., 'core/paragraph').
 	 */
-	public static function meta_key_to_block_name( $meta_key ) {
+	public static function meta_key_to_block_name( string $meta_key ): string {
 		// Remove prefix and convert first '_' back to '/'.
 		$without_prefix = str_replace( self::BLOCK_META_PREFIX, '', $meta_key );
 		// Replace first underscore with '/' (namespace separator).
@@ -307,7 +333,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param string $meta_key The meta key to check.
 	 * @return bool True if it's a block guideline meta key.
 	 */
-	public static function is_block_meta_key( $meta_key ) {
+	public static function is_block_meta_key( string $meta_key ): bool {
 		return strpos( $meta_key, self::BLOCK_META_PREFIX ) === 0;
 	}
 
@@ -319,7 +345,7 @@ class Gutenberg_Guidelines_Post_Type {
 	 * @param int $post_id Post ID (can be a post or revision ID).
 	 * @return array Guideline categories.
 	 */
-	public static function get_guideline_categories_from_meta( $post_id ) {
+	public static function get_guideline_categories_from_meta( int $post_id ): array {
 		$category_labels = array(
 			'copy'       => __( 'Copy Guidelines', 'gutenberg' ),
 			'images'     => __( 'Image Guidelines', 'gutenberg' ),
