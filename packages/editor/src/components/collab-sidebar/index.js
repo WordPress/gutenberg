@@ -26,7 +26,7 @@ import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { useGlobalStylesContext } from '../global-styles-provider';
 import { useNoteThreads, useEnableFloatingSidebar } from './hooks';
-import { focusNoteThread, getNoteIdsFromMetadata } from './utils';
+import { getNoteIdsFromMetadata } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -125,13 +125,10 @@ function NotesSidebar( { postId } ) {
 		// When addNewNote is true, always open the new note form.
 		// Otherwise, select the existing thread or open new.
 		const shouldAddNew = addNewNote || ! currentThread;
-		selectNote( shouldAddNew ? 'new' : currentThread.id );
-		focusNoteThread(
-			shouldAddNew ? undefined : currentThread?.id,
-			sidebarRef.current,
-			shouldAddNew ? 'textarea' : undefined
-		);
 		toggleBlockSpotlight( clientId, true );
+		selectNote( shouldAddNew ? 'new' : currentThread.id, {
+			focus: true,
+		} );
 	}
 
 	if ( isDistractionFree ) {
