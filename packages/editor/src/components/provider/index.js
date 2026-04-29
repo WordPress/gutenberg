@@ -48,6 +48,7 @@ import TemplatePartMenuItems from '../template-part-menu-items';
 import {
 	SuggestionOverlayProvider,
 	SuggestionAutoSave,
+	SuggestionStoreInterceptor,
 	registerSuggestionOverlayFilter,
 } from '../suggestion-mode';
 
@@ -476,6 +477,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<StartTemplateOptions />
 										<PatternRenameModal />
 										<PatternDuplicateModal />
+										<SuggestionStoreInterceptor />
 										<SuggestionAutoSave />
 									</>
 								) }
