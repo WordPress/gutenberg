@@ -18,25 +18,20 @@ const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
-	function Popup(
-		{ className, portal, children, style, ...restProps },
-		ref
-	) {
+	function Popup( { className, portal, children, ...restProps }, ref ) {
 		const portalChildren = (
 			<_Select.Positioner
 				{ ...ITEM_POPUP_POSITIONER_PROPS }
 				alignItemWithTrigger={ false }
-				style={ style }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
-					styles.positioner,
-					className
+					styles.positioner
 				) }
 			>
 				<ThemeProvider>
 					<_Select.Popup
 						ref={ ref }
-						className={ itemPopupStyles.popup }
+						className={ clsx( itemPopupStyles.popup, className ) }
 						{ ...restProps }
 					>
 						<_Select.List className={ itemPopupStyles.list }>

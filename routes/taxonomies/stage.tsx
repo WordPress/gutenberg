@@ -2,30 +2,31 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { Button } from '@wordpress/components';
 import { DataViews, type View } from '@wordpress/dataviews';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useNavigate } from '@wordpress/route';
+import {
+	hierarchicalField,
+	publicField,
+	statusField,
+	titleField,
+	toFormData,
+	useObjectTypeField,
+	useSlugField,
+	activateAction,
+	deactivateAction,
+	deleteTaxonomyAction,
+	type TaxonomyRecord,
+} from '@wordpress/user-taxonomies';
 
 /**
  * Internal dependencies
  */
-import AddTaxonomy from './add-taxonomy';
-import {
-	deleteTaxonomyAction,
-	editTaxonomyAction,
-	toggleActiveAction,
-} from './actions';
-import {
-	titleField,
-	statusField,
-	publicField,
-	hierarchicalField,
-	useSlugField,
-	useObjectTypeField,
-} from './fields';
-import { toFormData } from './utils';
-import type { TaxonomyRecord } from './types';
+import { quickEditTaxonomyAction, useEditTaxonomyAction } from './actions';
+import './style.scss';
 
 const defaultLayouts = {
 	table: {},
@@ -41,10 +42,18 @@ const DEFAULT_VIEW: View = {
 };
 
 function TaxonomiesPage() {
+	const navigate = useNavigate();
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const editAction = useEditTaxonomyAction();
 	const taxonomyActions = useMemo(
-		() => [ editTaxonomyAction, toggleActiveAction, deleteTaxonomyAction ],
-		[]
+		() => [
+			editAction,
+			quickEditTaxonomyAction,
+			activateAction,
+			deactivateAction,
+			deleteTaxonomyAction,
+		],
+		[ editAction ]
 	);
 	const slugField = useSlugField();
 	const objectTypeField = useObjectTypeField();
@@ -63,6 +72,9 @@ function TaxonomiesPage() {
 		const statusFilter = view.filters?.find(
 			( filter ) => filter.field === 'status'
 		);
+		const objectTypeFilter = view.filters?.find(
+			( filter ) => filter.field === 'object_type'
+		);
 		return {
 			per_page: view.perPage,
 			page: view.page,
@@ -71,6 +83,7 @@ function TaxonomiesPage() {
 			orderby: view.sort?.field,
 			search: view.search,
 			status: statusFilter?.value ?? [ 'publish', 'draft' ],
+			object_type: objectTypeFilter?.value,
 		};
 	}, [ view ] );
 	const { records, isResolving, hasResolved, totalItems, totalPages } =
@@ -91,7 +104,21 @@ function TaxonomiesPage() {
 		[ totalItems, totalPages ]
 	);
 	return (
-		<Page title={ __( 'Taxonomies' ) } actions={ <AddTaxonomy /> }>
+		<Page
+			title={ __( 'Taxonomies' ) }
+			className="taxonomies-page"
+			hasPadding={ false }
+			actions={
+				<Button
+					variant="primary"
+					size="compact"
+					__next40pxDefaultSize
+					onClick={ () => navigate( { to: '/edit/new' } ) }
+				>
+					{ __( 'Add taxonomy' ) }
+				</Button>
+			}
+		>
 			<DataViews
 				data={ data }
 				fields={ fields }
@@ -102,6 +129,10 @@ function TaxonomiesPage() {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item ) => String( item.id ) }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) =>
+					navigate( { to: `/edit/${ item.id }` } )
+				}
 			/>
 		</Page>
 	);
