@@ -1,10 +1,12 @@
 <?php
 /**
- * Guidelines REST API Controller.
+ * Content Guidelines REST API Controller.
  *
- * Extends WP_REST_Posts_Controller to inherit standard WordPress CRUD behavior,
- * permission checks, and response formatting. Follows the pattern used by
- * WP_REST_Global_Styles_Controller.
+ * Specialized controller for the site-wide "content" guideline singleton.
+ * Exposes a flat `/wp/v2/content-guidelines` endpoint that always reads,
+ * creates, and updates a single post tagged with the `content` term in
+ * the `wp_guideline_type` taxonomy. Other guideline posts (artifacts) are
+ * served by the standard `/wp/v2/guidelines` collection.
  *
  * @package gutenberg
  */
@@ -14,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * REST API controller for Guidelines.
+ * REST API controller for the site-wide content guidelines singleton.
  */
-class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
+class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Maximum length for guideline text strings.
@@ -33,14 +35,49 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	const MAX_LABEL_LENGTH = 200;
 
 	/**
+	 * REST base for the singleton route.
+	 *
+	 * @var string
+	 */
+	const REST_BASE = 'content-guidelines';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		parent::__construct( Gutenberg_Guidelines_Post_Type::POST_TYPE );
+		$this->rest_base = self::REST_BASE;
 	}
 
 	/**
-	 * Registers the routes for guidelines.
+	 * Resolves a post ID to a content-typed guideline post.
+	 *
+	 * Restricts /wp/v2/content-guidelines/{id} to posts tagged with the
+	 * `content` term. Other guideline types are addressable only via the
+	 * standard /wp/v2/guidelines collection.
+	 *
+	 * @param int $id Post ID.
+	 * @return WP_Post|WP_Error Post object on success, WP_Error on failure.
+	 */
+	protected function get_post( $id ) {
+		$post = parent::get_post( $id );
+		if ( is_wp_error( $post ) ) {
+			return $post;
+		}
+
+		if ( ! Gutenberg_Guidelines_Post_Type::is_content_guideline( $post->ID ) ) {
+			return new WP_Error(
+				'rest_post_invalid_id',
+				__( 'Invalid post ID.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $post;
+	}
+
+	/**
+	 * Registers the routes for the content guidelines singleton.
 	 *
 	 * Calls parent to register standard /{id} CRUD routes, then overrides the
 	 * collection route with a singleton GET endpoint.
@@ -206,9 +243,10 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Creates guidelines.
+	 * Creates the content guidelines singleton.
 	 *
-	 * Enforces singleton pattern — only one guidelines post per site.
+	 * Enforces the singleton constraint — only one post tagged with the
+	 * `content` term may exist.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
@@ -265,7 +303,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Updates guidelines.
+	 * Updates the content guidelines singleton.
 	 *
 	 * Saves guideline categories to meta before updating the post so that
 	 * the revision captures the updated meta values.
@@ -568,7 +606,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Gets the single guidelines post.
+	 * Gets the single content guidelines post.
 	 *
 	 * @param string|null $status_filter Optional. Filter by status ('publish' or 'draft').
 	 * @return WP_Post|null The guidelines post or null if not found.
@@ -613,7 +651,7 @@ class Gutenberg_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'guidelines',
+			'title'      => 'content-guidelines',
 			'type'       => 'object',
 			'properties' => array(
 				'id'                   => array(

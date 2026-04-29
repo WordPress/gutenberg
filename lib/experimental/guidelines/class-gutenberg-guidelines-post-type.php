@@ -90,7 +90,7 @@ class Gutenberg_Guidelines_Post_Type {
 		register_post_type(
 			self::POST_TYPE,
 			array(
-				'labels'                          => array(
+				'labels'             => array(
 					'name'                     => _x( 'Guidelines', 'post type general name', 'gutenberg' ),
 					'singular_name'            => _x( 'Guideline', 'post type singular name', 'gutenberg' ),
 					'add_new'                  => __( 'Add Guideline', 'gutenberg' ),
@@ -112,32 +112,34 @@ class Gutenberg_Guidelines_Post_Type {
 					'view_item'                => __( 'View Guideline', 'gutenberg' ),
 					'view_items'               => __( 'View Guidelines', 'gutenberg' ),
 				),
-				'public'                          => false,
-				'publicly_queryable'              => false,
-				'show_ui'                         => true,
-				'show_in_menu'                    => false,
-				'show_in_rest'                    => true,
-				'rest_base'                       => 'guidelines',
-				'rest_controller_class'           => 'Gutenberg_Guidelines_REST_Controller',
-				'revisions_rest_controller_class' => 'Gutenberg_Guidelines_Revisions_Controller',
-				'capability_type'                 => 'guideline',
-				'map_meta_cap'                    => true,
-				'capabilities'                    => array(
+				'public'             => false,
+				'publicly_queryable' => false,
+				'show_ui'            => true,
+				'show_in_menu'       => false,
+				'show_in_rest'       => true,
+				'rest_base'          => 'guidelines',
+				'capability_type'    => 'guideline',
+				'map_meta_cap'       => true,
+				'capabilities'       => array(
 					'read'                   => 'edit_posts',
 					'create_posts'           => 'publish_posts',
 					'edit_posts'             => 'edit_posts',
+					'publish_posts'          => 'publish_posts',
+					'read_private_posts'     => 'read_private_posts',
+					'edit_private_posts'     => 'edit_private_posts',
 					'edit_published_posts'   => 'edit_published_posts',
+					'delete_private_posts'   => 'delete_private_posts',
 					'delete_published_posts' => 'delete_published_posts',
 					'delete_posts'           => 'delete_posts',
 					'edit_others_posts'      => 'edit_others_posts',
 					'delete_others_posts'    => 'delete_others_posts',
 				),
-				'supports'                        => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
-				'hierarchical'                    => false,
-				'has_archive'                     => false,
-				'rewrite'                         => false,
-				'query_var'                       => false,
-				'can_export'                      => true,
+				'supports'           => array( 'title', 'editor', 'excerpt', 'author', 'revisions' ),
+				'hierarchical'       => false,
+				'has_archive'        => false,
+				'rewrite'            => false,
+				'query_var'          => false,
+				'can_export'         => true,
 			)
 		);
 
@@ -209,6 +211,31 @@ class Gutenberg_Guidelines_Post_Type {
 		}
 
 		return (int) $inserted['term_id'];
+	}
+
+	/**
+	 * Determines whether a guideline post belongs to the content singleton.
+	 *
+	 * Used by the /wp/v2/content-guidelines route to reject non-content-typed
+	 * posts addressed by ID — those belong to the standard /wp/v2/guidelines
+	 * collection.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool True if the post has the `content` term.
+	 */
+	public static function is_content_guideline( $post_id ) {
+		$terms = get_the_terms( $post_id, self::TAXONOMY );
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return false;
+		}
+
+		foreach ( $terms as $term ) {
+			if ( self::TERM_CONTENT === $term->slug ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
