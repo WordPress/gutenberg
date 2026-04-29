@@ -16,15 +16,14 @@
 	display: flex;
 	flex-direction: column;
 
-	// Center the loading spinner in the modal body while media data is
-	// resolving, before the InterfaceSkeleton mounts. The wrapper sits
-	// inside `.components-modal__children-container`, which isn't a flex
-	// container — `height: 100%` (rather than `flex: 1`) makes it fill
-	// the body so the inner flex can center the spinner.
+	// Center the loading spinner wherever it appears. `height: 100%` fills
+	// the modal body before the InterfaceSkeleton mounts (its parent isn't
+	// a flex container); `flex: 1` fills the canvas area when it is.
 	.media-editor-modal__loading {
-		height: 100%;
-		display: flex;
 		align-items: center;
+		display: flex;
+		flex: 1;
+		height: 100%;
 		justify-content: center;
 	}
 
@@ -89,14 +88,6 @@
 			max-height: 100%;
 			object-fit: contain;
 		}
-	}
-
-	.media-editor-modal__loading {
-		align-items: center;
-		display: flex;
-		flex: 1;
-		height: 100%;
-		justify-content: center;
 	}
 
 	.media-editor-modal__loading--overlay {
