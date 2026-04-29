@@ -873,6 +873,188 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns the state group type ('append' or 'wrap') for a given state key and block.
+	 *
+	 * Looks up which group the state belongs to in the block's BLOCK_STATE_SUPPORT
+	 * and returns the type from STATE_GROUPS.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $state      The state key (e.g. ':hover', '@current').
+	 * @param string $block_name The block name (e.g. 'core/button').
+	 * @return string|null The group type ('append' or 'wrap'), or null if not found.
+	 */
+	protected static function get_state_type( $state, $block_name ) {
+		if ( ! isset( static::BLOCK_STATE_SUPPORT[ $block_name ] ) ) {
+			return null;
+		}
+		foreach ( static::BLOCK_STATE_SUPPORT[ $block_name ] as $group_name => $states ) {
+			if ( in_array( $state, $states, true ) && isset( static::STATE_GROUPS[ $group_name ] ) ) {
+				return static::STATE_GROUPS[ $group_name ]['type'];
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Resolves the CSS selector for a state key based on its type.
+	 *
+	 * For 'append' states, appends the state key to the base selector.
+	 * For 'wrap' states, looks up the custom selector from block metadata.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $state          The state key (e.g. ':hover', '@current').
+	 * @param string $base_selector  The base CSS selector to append to (for 'append' type).
+	 * @param string $block_name     The block name.
+	 * @param array  $block_metadata Block metadata containing state selectors.
+	 * @return string|null The resolved CSS selector, or null if the state cannot be resolved.
+	 */
+	protected static function resolve_state_selector( $state, $base_selector, $block_name, $block_metadata = array() ) {
+		$type = static::get_state_type( $state, $block_name );
+		if ( null === $type ) {
+			return null;
+		}
+
+		if ( 'append' === $type ) {
+			return static::append_to_selector( $base_selector, $state );
+		}
+
+		// 'wrap' type: look up custom selector from block metadata.
+		if ( isset( $block_metadata['states'][ $state ] ) ) {
+			return $block_metadata['states'][ $state ];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Builds a nested schema for states, recursively allowing deeper nesting.
+	 *
+	 * For each state, creates a schema that allows style properties. For 'wrap'
+	 * type states, the schema also allows further nested states inside it.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $block_name           The block name.
+	 * @param array  $states               The state keys to include at this level.
+	 * @param array  $nested_styles_schema  The base style schema for non-top-level nodes.
+	 * @param array  $block_groups         All block groups from get_state_groups_for_block().
+	 * @return array Associative array of state key => schema.
+	 */
+	protected static function build_state_schema( $block_name, $states, $nested_styles_schema, $block_groups ) {
+		$schema = array();
+		foreach ( $states as $state ) {
+			$state_type = static::get_state_type( $state, $block_name );
+			if ( null === $state_type ) {
+				continue;
+			}
+
+			$state_schema = $nested_styles_schema;
+
+			if ( 'wrap' === $state_type ) {
+				// Find the group for this state to compute its nested states.
+				foreach ( $block_groups as $group ) {
+					if ( in_array( $state, $group['states'], true ) ) {
+						$nested_states = static::get_nested_states_for_group( $block_name, $group );
+						if ( ! empty( $nested_states ) ) {
+							$nested_schema = static::build_state_schema( $block_name, $nested_states, $nested_styles_schema, $block_groups );
+							$state_schema  = array_merge( $state_schema, $nested_schema );
+						}
+						break;
+					}
+				}
+			}
+
+			$schema[ $state ] = $state_schema;
+		}
+		return $schema;
+	}
+
+	/**
+	 * Recursively generates block nodes for nested states.
+	 *
+	 * For each nested state that exists in the node data, resolves the CSS
+	 * selector based on the state's type and creates a node entry. For 'wrap'
+	 * type nested states, further nested states are processed recursively.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array  $nodes              Reference to the nodes array to append to.
+	 * @param array  $nested_states      The state keys to check for at this nesting level.
+	 * @param array  $node_data          The theme.json data at the current nesting level.
+	 * @param array  $parent_path        The path to the parent node in theme.json.
+	 * @param string $parent_selector    The CSS selector of the parent state.
+	 * @param string $block_name         The block name.
+	 * @param array  $selectors          The block selectors metadata.
+	 * @param array  $feature_selectors  Feature selectors for the block.
+	 * @param string $duotone_selector   Duotone selector for the block.
+	 * @param array  $variation_selectors Variation selectors for the block.
+	 * @param array  $block_groups       All block groups from get_state_groups_for_block().
+	 */
+	private static function get_nested_state_nodes(
+		&$nodes,
+		$nested_states,
+		$node_data,
+		$parent_path,
+		$parent_selector,
+		$block_name,
+		$selectors,
+		$feature_selectors,
+		$duotone_selector,
+		$variation_selectors,
+		$block_groups
+	) {
+		foreach ( $nested_states as $nested ) {
+			if ( ! isset( $node_data[ $nested ] ) ) {
+				continue;
+			}
+
+			$nested_selector = static::resolve_state_selector( $nested, $parent_selector, $block_name, $selectors[ $block_name ] ?? array() );
+			if ( null === $nested_selector ) {
+				continue;
+			}
+
+			$nested_path = array_merge( $parent_path, array( $nested ) );
+			$nodes[]     = array(
+				'name'       => $block_name,
+				'path'       => $nested_path,
+				'selector'   => $nested_selector,
+				'selectors'  => $feature_selectors,
+				'duotone'    => $duotone_selector,
+				'variations' => $variation_selectors,
+				'css'        => $nested_selector,
+			);
+
+			// If this nested state is a 'wrap' type, recursively process its nested states.
+			$nested_type = static::get_state_type( $nested, $block_name );
+			if ( 'wrap' === $nested_type ) {
+				foreach ( $block_groups as $group ) {
+					if ( in_array( $nested, $group['states'], true ) ) {
+						$deeper_states = static::get_nested_states_for_group( $block_name, $group );
+						if ( ! empty( $deeper_states ) ) {
+							static::get_nested_state_nodes(
+								$nodes,
+								$deeper_states,
+								$node_data[ $nested ],
+								$nested_path,
+								$nested_selector,
+								$block_name,
+								$selectors,
+								$feature_selectors,
+								$duotone_selector,
+								$variation_selectors,
+								$block_groups
+							);
+						}
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	/**
 	 * Processes block state styles for any node (block or variation).
 	 *
 	 * Iterates over all valid state groups for the given block and computes
@@ -916,18 +1098,89 @@ class WP_Theme_JSON_Gutenberg {
 				$declarations                          = static::compute_style_properties( $node[ $state ], $settings, null, null );
 				$state_declarations[ $state_selector ] = $declarations;
 
-				// Process nested states within this state.
-				foreach ( $nested_states as $nested ) {
-					if ( isset( $node[ $state ][ $nested ] ) ) {
-						$compound_selector                        = static::append_to_selector( $state_selector, $nested );
-						$nested_declarations                      = static::compute_style_properties( $node[ $state ][ $nested ], $settings, null, null );
-						$state_declarations[ $compound_selector ] = $nested_declarations;
-					}
+				// Recursively process nested states within this state.
+				if ( ! empty( $nested_states ) ) {
+					static::process_nested_state_declarations(
+						$state_declarations,
+						$nested_states,
+						$node[ $state ],
+						$state_selector,
+						$settings,
+						$block_name,
+						$block_metadata,
+						$block_groups
+					);
 				}
 			}
 		}
 
 		return $state_declarations;
+	}
+
+	/**
+	 * Recursively processes nested state declarations.
+	 *
+	 * For each nested state that exists in the node data, resolves the CSS
+	 * selector based on its type and computes style declarations. For 'wrap'
+	 * type nested states, further nesting is processed recursively.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array  $state_declarations Reference to the declarations array to append to.
+	 * @param array  $nested_states      The state keys to check at this level.
+	 * @param array  $node_data          The theme.json data at the current nesting level.
+	 * @param string $parent_selector    The CSS selector of the parent state.
+	 * @param array  $settings           The theme settings.
+	 * @param string $block_name         The block name.
+	 * @param array  $block_metadata     Block metadata for custom selector lookups.
+	 * @param array  $block_groups       All block groups from get_state_groups_for_block().
+	 */
+	private static function process_nested_state_declarations(
+		&$state_declarations,
+		$nested_states,
+		$node_data,
+		$parent_selector,
+		$settings,
+		$block_name,
+		$block_metadata,
+		$block_groups
+	) {
+		foreach ( $nested_states as $nested ) {
+			if ( ! isset( $node_data[ $nested ] ) ) {
+				continue;
+			}
+
+			$nested_selector = static::resolve_state_selector( $nested, $parent_selector, $block_name, $block_metadata );
+			if ( null === $nested_selector ) {
+				continue;
+			}
+
+			$declarations                           = static::compute_style_properties( $node_data[ $nested ], $settings, null, null );
+			$state_declarations[ $nested_selector ] = $declarations;
+
+			// If this nested state is a 'wrap' type, recursively process its nested states.
+			$nested_type = static::get_state_type( $nested, $block_name );
+			if ( 'wrap' === $nested_type ) {
+				foreach ( $block_groups as $group ) {
+					if ( in_array( $nested, $group['states'], true ) ) {
+						$deeper_states = static::get_nested_states_for_group( $block_name, $group );
+						if ( ! empty( $deeper_states ) ) {
+							static::process_nested_state_declarations(
+								$state_declarations,
+								$deeper_states,
+								$node_data[ $nested ],
+								$nested_selector,
+								$settings,
+								$block_name,
+								$block_metadata,
+								$block_groups
+							);
+						}
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -1207,13 +1460,13 @@ class WP_Theme_JSON_Gutenberg {
 		 * Some styles are only meant to be available at the top-level (e.g.: blockGap),
 		 * hence, the schema for blocks & elements should not have them.
 		 */
-		$styles_non_top_level = static::VALID_STYLES;
-		foreach ( array_keys( $styles_non_top_level ) as $section ) {
+		$nested_styles_schema = static::VALID_STYLES;
+		foreach ( array_keys( $nested_styles_schema ) as $section ) {
 			// array_key_exists() needs to be used instead of isset() because the value can be null.
-			if ( array_key_exists( $section, $styles_non_top_level ) && is_array( $styles_non_top_level[ $section ] ) ) {
-				foreach ( array_keys( $styles_non_top_level[ $section ] ) as $prop ) {
-					if ( 'top' === $styles_non_top_level[ $section ][ $prop ] ) {
-						unset( $styles_non_top_level[ $section ][ $prop ] );
+			if ( array_key_exists( $section, $nested_styles_schema ) && is_array( $nested_styles_schema[ $section ] ) ) {
+				foreach ( array_keys( $nested_styles_schema[ $section ] ) as $prop ) {
+					if ( 'top' === $nested_styles_schema[ $section ][ $prop ] ) {
+						unset( $nested_styles_schema[ $section ][ $prop ] );
 					}
 				}
 			}
@@ -1231,10 +1484,10 @@ class WP_Theme_JSON_Gutenberg {
 		 * - block level elements: `$schema['styles']['blocks']['core/button']['elements']['link'][':hover']`.
 		 */
 		foreach ( $valid_element_names as $element ) {
-			$schema_styles_elements[ $element ] = $styles_non_top_level;
+			$schema_styles_elements[ $element ] = $nested_styles_schema;
 
 			foreach ( static::get_element_states( $element ) as $state ) {
-				$schema_styles_elements[ $element ][ $state ] = $styles_non_top_level;
+				$schema_styles_elements[ $element ][ $state ] = $nested_styles_schema;
 			}
 		}
 
@@ -1253,22 +1506,17 @@ class WP_Theme_JSON_Gutenberg {
 		 */
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
-			$schema_styles_blocks[ $block ]             = $styles_non_top_level;
+			$schema_styles_blocks[ $block ]             = $nested_styles_schema;
 			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
 
-			// Add state selectors for blocks, iterating groups by order.
-			// 'wrap' groups can contain nested states from higher-order 'wrap'
-			// groups and all 'append' groups.
-			$block_groups = static::get_state_groups_for_block( $block );
-			foreach ( $block_groups as $group ) {
-				$nested_states = static::get_nested_states_for_group( $block, $group );
-				foreach ( $group['states'] as $state ) {
-					$state_schema = $styles_non_top_level;
-					foreach ( $nested_states as $nested ) {
-						$state_schema[ $nested ] = $styles_non_top_level;
-					}
-					$schema_styles_blocks[ $block ][ $state ] = $state_schema;
-				}
+			// Add state selectors for blocks. The schema is built recursively
+			// so that wrap states can contain nested states which themselves
+			// can contain further nested states (e.g. @mobile > @current > :hover).
+			$block_groups  = static::get_state_groups_for_block( $block );
+			$all_states    = static::get_block_states( $block );
+			$state_schemas = static::build_state_schema( $block, $all_states, $nested_styles_schema, $block_groups );
+			foreach ( $state_schemas as $state => $state_schema ) {
+				$schema_styles_blocks[ $block ][ $state ] = $state_schema;
 			}
 		}
 
@@ -1296,16 +1544,11 @@ class WP_Theme_JSON_Gutenberg {
 					$variation_schema = $block_style_variation_styles;
 
 					// Add state selectors to variations for blocks that support them.
-					$block_groups = static::get_state_groups_for_block( $block );
-					foreach ( $block_groups as $group ) {
-						$nested_states = static::get_nested_states_for_group( $block, $group );
-						foreach ( $group['states'] as $state ) {
-							$state_schema = $styles_non_top_level;
-							foreach ( $nested_states as $nested ) {
-								$state_schema[ $nested ] = $styles_non_top_level;
-							}
-							$variation_schema[ $state ] = $state_schema;
-						}
+					$block_groups  = static::get_state_groups_for_block( $block );
+					$all_states    = static::get_block_states( $block );
+					$state_schemas = static::build_state_schema( $block, $all_states, $nested_styles_schema, $block_groups );
+					foreach ( $state_schemas as $state => $state_schema ) {
+						$variation_schema[ $state ] = $state_schema;
 					}
 
 					$schema_styles_variations[ $variation_name ] = $variation_schema;
@@ -3327,20 +3570,21 @@ class WP_Theme_JSON_Gutenberg {
 							);
 
 							// Check for nested states within this wrap state.
-							foreach ( $nested_states as $nested ) {
-								if ( isset( $theme_json['styles']['blocks'][ $name ][ $state ][ $nested ] ) ) {
-									$compound_css_selector = static::append_to_selector( $state_css_selector, $nested );
-									$nodes[]               = array(
-										'name'       => $name,
-										'path'       => array( 'styles', 'blocks', $name, $state, $nested ),
-										'selector'   => $compound_css_selector,
-										'selectors'  => $feature_selectors,
-										'duotone'    => $duotone_selector,
-										'variations' => $variation_selectors,
-										'css'        => $compound_css_selector,
-									);
-								}
-							}
+							// Each nested state's selector is resolved based on its type,
+							// and further nesting is processed recursively.
+							static::get_nested_state_nodes(
+								$nodes,
+								$nested_states,
+								$theme_json['styles']['blocks'][ $name ][ $state ],
+								array( 'styles', 'blocks', $name, $state ),
+								$state_css_selector,
+								$name,
+								$selectors,
+								$feature_selectors,
+								$duotone_selector,
+								$variation_selectors,
+								$block_groups
+							);
 						}
 					}
 				}
