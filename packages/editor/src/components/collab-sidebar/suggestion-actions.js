@@ -4,12 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import {
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
+	__experimentalText as WCText,
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
 } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -114,22 +113,26 @@ export default function SuggestionActions( { thread } ) {
 		: undefined;
 
 	return (
-		<VStack spacing="2" className="editor-collab-sidebar-panel__suggestion">
+		<Stack
+			direction="column"
+			gap="sm"
+			className="editor-collab-sidebar-panel__suggestion"
+		>
 			<SuggestionDiff operations={ payload.operations } />
 			{ isResolved ? (
-				<Text variant="muted" size="12px">
+				<WCText variant="muted" size="12px">
 					{ suggestionStatus === APPLIED
 						? __( 'Applied' )
 						: __( 'Rejected' ) }
-				</Text>
+				</WCText>
 			) : (
 				<>
 					{ applyDisabledReason && (
-						<Text variant="muted" size="12px">
+						<WCText variant="muted" size="12px">
 							{ applyDisabledReason }
-						</Text>
+						</WCText>
 					) }
-					<HStack spacing="2" justify="flex-start">
+					<Stack direction="row" gap="sm" justify="flex-start">
 						<Button
 							variant="primary"
 							size="small"
@@ -148,7 +151,7 @@ export default function SuggestionActions( { thread } ) {
 						>
 							{ __( 'Reject' ) }
 						</Button>
-					</HStack>
+					</Stack>
 				</>
 			) }
 			{ showStaleDialog && (
@@ -166,6 +169,6 @@ export default function SuggestionActions( { thread } ) {
 					) }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
