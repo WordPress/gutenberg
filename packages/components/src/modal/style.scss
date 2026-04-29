@@ -12,7 +12,10 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background-color: rgba($black, 0.35);
+	// 75% alpha matches the Dialog/Drawer/Popover backdrop opacity. Baked
+	// into the color (instead of the `opacity` property) so the fade-in
+	// animation below still ramps from 0 → fully opaque token color.
+	background-color: color-mix(in srgb, var(--wpds-color-bg-surface-neutral-weak), transparent 25%);
 	z-index: z-index(".components-modal__screen-overlay");
 	display: flex;
 	// This animates the appearance of the backdrop.

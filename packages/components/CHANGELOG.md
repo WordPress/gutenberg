@@ -7,6 +7,7 @@
 -   `Menu`: Remove `cursor: not-allowed` and added pointer styles to menu ([#70412](https://github.com/WordPress/gutenberg/pull/70412))
 -   `FormToggle`: Add stacking context isolation ([#77619](https://github.com/WordPress/gutenberg/pull/77619)).
 -   `FormTokenField`: Add `help` prop to render additional help text below the field, and deprecate the `__experimentalShowHowTo` prop in favor of it. The `help` prop now defaults to the previous how-to text; pass an empty string to hide it ([#77552](https://github.com/WordPress/gutenberg/pull/77552)).
+-   `Modal`: Render the backdrop with the `--wpds-color-bg-surface-neutral-weak` system token instead of a hardcoded black, and bump the alpha to 75% so the lighter token retains comparable presence — matching the Dialog/Drawer/Popover backdrop styling.
 
 ### Deprecations
 
