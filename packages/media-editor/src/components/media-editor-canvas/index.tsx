@@ -10,8 +10,8 @@ export interface MediaEditorCanvasProps {
 	aspectRatio?: number;
 	/** Enable freeform crop mode (resize handles). */
 	freeformCrop?: boolean;
-	/** Whether an external placement control should reveal the grid. */
-	isPlacementControlActive?: boolean;
+	/** Whether external placement activity should reveal the grid. */
+	isPlacementActive?: boolean;
 }
 
 /**
@@ -24,12 +24,12 @@ export interface MediaEditorCanvasProps {
  * @param props
  * @param props.aspectRatio
  * @param props.freeformCrop
- * @param props.isPlacementControlActive
+ * @param props.isPlacementActive
  */
 export default function MediaEditorCanvas( {
 	aspectRatio,
 	freeformCrop,
-	isPlacementControlActive = false,
+	isPlacementActive = false,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
@@ -49,7 +49,7 @@ export default function MediaEditorCanvas( {
 				aspectRatio={ aspectRatio }
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
-				isPlacementControlActive={ isPlacementControlActive }
+				isPlacementActive={ isPlacementActive }
 			/>
 		</div>
 	);

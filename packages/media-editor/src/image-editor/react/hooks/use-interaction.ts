@@ -29,7 +29,7 @@ export interface UseInteractionReturn {
 	/** Whether a double-tap zoom animation is in progress. */
 	isZooming: boolean;
 	/** Whether the user is currently performing a placement interaction. */
-	isPlacementInteracting: boolean;
+	isPlacementActive: boolean;
 }
 
 /**
@@ -91,7 +91,7 @@ export function useInteraction(
 ): UseInteractionReturn {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isZooming, setIsZooming ] = useState( false );
-	const [ isGestureInteracting, setIsGestureInteracting ] = useState( false );
+	const [ isGestureActive, setIsGestureActive ] = useState( false );
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
 	const keyboardInteractionTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
@@ -111,10 +111,10 @@ export function useInteraction(
 
 	const controllerRef = useRef< InteractionController | null >( null );
 	const startPlacementGesture = useCallback( () => {
-		setIsGestureInteracting( true );
+		setIsGestureActive( true );
 	}, [] );
 	const stopPlacementGesture = useCallback( () => {
-		setIsGestureInteracting( false );
+		setIsGestureActive( false );
 	}, [] );
 	const signalKeyboardPlacement = useCallback( () => {
 		setIsKeyboardPanning( true );
@@ -218,7 +218,6 @@ export function useInteraction(
 		onWheelNative,
 		isDragging,
 		isZooming,
-		isPlacementInteracting:
-			isGestureInteracting || isKeyboardPanning || isZooming,
+		isPlacementActive: isGestureActive || isKeyboardPanning || isZooming,
 	};
 }

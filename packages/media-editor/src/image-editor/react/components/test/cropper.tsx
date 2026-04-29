@@ -127,7 +127,7 @@ describe( 'Cropper grid visibility classes', () => {
 				controller={ createController() }
 				showGrid="interactive"
 				showDimming={ false }
-				isPlacementControlActive
+				isPlacementActive
 			/>
 		);
 

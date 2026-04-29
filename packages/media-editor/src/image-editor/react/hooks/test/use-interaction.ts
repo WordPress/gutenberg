@@ -113,7 +113,7 @@ describe( 'useInteraction grid placement signal', () => {
 		jest.useRealTimers();
 	} );
 
-	it( 'sets isPlacementInteracting during keyboard pan, then clears it after idle', () => {
+	it( 'sets isPlacementActive during keyboard pan, then clears it after idle', () => {
 		jest.useFakeTimers();
 		const { result } = renderHook( () =>
 			useInteraction(
@@ -130,17 +130,17 @@ describe( 'useInteraction grid placement signal', () => {
 			);
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( true );
+		expect( result.current.isPlacementActive ).toBe( true );
 
 		act( () => {
 			jest.advanceTimersByTime( 300 );
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( false );
+		expect( result.current.isPlacementActive ).toBe( false );
 	} );
 
 	it.each( [ '+', '-', 'r' ] )(
-		'does not set isPlacementInteracting for non-placement key %s',
+		'does not set isPlacementActive for non-placement key %s',
 		( key ) => {
 			const { result } = renderHook( () =>
 				useInteraction(
@@ -155,11 +155,11 @@ describe( 'useInteraction grid placement signal', () => {
 				result.current.handlers.onKeyDown( createKeyboardEvent( key ) );
 			} );
 
-			expect( result.current.isPlacementInteracting ).toBe( false );
+			expect( result.current.isPlacementActive ).toBe( false );
 		}
 	);
 
-	it( 'sets isPlacementInteracting during wheel zoom, then clears it after the wheel debounce', () => {
+	it( 'sets isPlacementActive during wheel zoom, then clears it after the wheel debounce', () => {
 		jest.useFakeTimers();
 		const { result } = renderHook( () =>
 			useInteraction(
@@ -176,16 +176,16 @@ describe( 'useInteraction grid placement signal', () => {
 			);
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( true );
+		expect( result.current.isPlacementActive ).toBe( true );
 
 		act( () => {
 			jest.advanceTimersByTime( 300 );
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( false );
+		expect( result.current.isPlacementActive ).toBe( false );
 	} );
 
-	it( 'sets isPlacementInteracting during pinch zoom, then clears it on touch end', () => {
+	it( 'sets isPlacementActive during pinch zoom, then clears it on touch end', () => {
 		const doc = createTouchDocument();
 		const target = createTouchTarget( doc );
 		const { result } = renderHook( () =>
@@ -207,12 +207,12 @@ describe( 'useInteraction grid placement signal', () => {
 			} as unknown as React.TouchEvent );
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( true );
+		expect( result.current.isPlacementActive ).toBe( true );
 
 		act( () => {
 			doc._fire( 'touchend', createTouchEvent( [] ) );
 		} );
 
-		expect( result.current.isPlacementInteracting ).toBe( false );
+		expect( result.current.isPlacementActive ).toBe( false );
 	} );
 } );

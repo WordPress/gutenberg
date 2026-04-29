@@ -233,8 +233,7 @@ function MediaEditorModalContent( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
-	const [ isPlacementControlActive, setIsPlacementControlActive ] =
-		useState( false );
+	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -242,10 +241,10 @@ function MediaEditorModalContent( {
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
 
 	const signalPlacementControlInteraction = useCallback( () => {
-		setIsPlacementControlActive( true );
+		setIsPlacementActive( true );
 		clearTimeout( placementControlTimerRef.current );
 		placementControlTimerRef.current = setTimeout( () => {
-			setIsPlacementControlActive( false );
+			setIsPlacementActive( false );
 		}, PLACEMENT_CONTROL_IDLE_MS );
 	}, [] );
 
@@ -516,8 +515,8 @@ function MediaEditorModalContent( {
 												imageAspectRatio
 											) }
 											freeformCrop={ freeformCrop }
-											isPlacementControlActive={
-												isPlacementControlActive
+											isPlacementActive={
+												isPlacementActive
 											}
 										/>
 									) : (
