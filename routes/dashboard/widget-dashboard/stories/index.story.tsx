@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { home } from '@wordpress/icons';
+import { brush, home } from '@wordpress/icons';
 import { EmptyState } from '@wordpress/ui';
 
 /**
@@ -247,16 +247,26 @@ export const EditMode: Story = {
 export const NoWidgets: Story = {
 	args: {
 		layout: [],
+	},
+};
+
+export const NoWidgetsCustom: Story = {
+	args: {
+		layout: [],
 		children: (
 			<>
 				<WidgetDashboard.NoWidgetsState>
 					<EmptyState.Root>
-						<EmptyState.Icon icon={ home } />
+						<EmptyState.Icon icon={ brush } />
 						<EmptyState.Title>
-							Your dashboard is empty
+							Make this dashboard yours
 						</EmptyState.Title>
 						<EmptyState.Description>
-							Add widgets to start customizing your dashboard.
+							<a href="https://developer.wordpress.org/">
+								Pass any children
+							</a>{ ' ' }
+							to <code>NoWidgetsState</code> to replace the
+							built-in placeholder.
 						</EmptyState.Description>
 					</EmptyState.Root>
 				</WidgetDashboard.NoWidgetsState>
