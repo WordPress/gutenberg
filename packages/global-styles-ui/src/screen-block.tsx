@@ -346,14 +346,6 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					stateParam && stateParam.length > 0 ? style : undefined
 				}
 			/>
-			<BlockPreviewPanel
-				name={ name }
-				variation={ variation }
-				selectedState={ selectedState }
-				stateStyles={
-					stateParam && stateParam.length > 0 ? style : undefined
-				}
-			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
 					<VStack spacing={ 3 }>
