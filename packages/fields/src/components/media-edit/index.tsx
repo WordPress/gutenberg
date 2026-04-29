@@ -11,13 +11,12 @@ import {
 	DropZone,
 	Icon,
 	Spinner,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	BaseControl,
 	Tooltip,
-	VisuallyHidden,
 } from '@wordpress/components';
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
@@ -42,6 +41,7 @@ import {
 	chevronLeft,
 	chevronRight,
 } from '@wordpress/icons';
+import { VisuallyHidden } from '@wordpress/ui';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -914,7 +914,7 @@ export default function MediaEdit< Item >( {
 							<VStack spacing={ 2 }>
 								{ field.label &&
 									( hideLabelFromVision ? (
-										<VisuallyHidden as="legend">
+										<VisuallyHidden render={ <legend /> }>
 											{ field.label }
 										</VisuallyHidden>
 									) : (
@@ -937,12 +937,12 @@ export default function MediaEdit< Item >( {
 									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
-									<Text
+									<WCText
 										variant="muted"
 										className="fields__media-edit-description"
 									>
 										{ field.description }
-									</Text>
+									</WCText>
 								) }
 							</VStack>
 						);

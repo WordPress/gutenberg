@@ -17,6 +17,7 @@ import type { ComponentProps } from 'react';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+import { logged } from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -122,6 +123,14 @@ function unescapeAndFormatSpaces( str: string ) {
 }
 
 describe( 'FormTokenField', () => {
+	afterEach( () => {
+		// `@wordpress/deprecated` caches each warning message after the first
+		// log; reset it so multiple tests can assert the same deprecation.
+		for ( const key in logged ) {
+			delete logged[ key ];
+		}
+	} );
+
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();
@@ -582,18 +591,17 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
-		it( 'should show extra instructions when the `__experimentalShowHowTo` prop  is set to `true`', () => {
+		it( 'should show the default how-to text via the `help` prop by default', () => {
 			const instructionsTokenizeSpace =
 				'Separate with commas, spaces, or the Enter key.';
 			const instructionsDefault =
 				'Separate with commas or the Enter key.';
 
-			// The __experimentalShowHowTo prop is `true` by default
 			const { rerender } = render( <FormTokenFieldWithState /> );
 
 			expect( screen.getByText( instructionsDefault ) ).toBeVisible();
 
-			// The "show how to" text is used to aria-describedby the input
+			// The default how-to text is used to aria-describedby the input.
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsDefault );
@@ -604,27 +612,79 @@ describe( 'FormTokenField', () => {
 				screen.getByText( instructionsTokenizeSpace )
 			).toBeVisible();
 
-			// The "show how to" text is used to aria-describedby the input
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( instructionsTokenizeSpace );
+		} );
 
-			rerender(
-				<FormTokenFieldWithState
-					tokenizeOnSpace
-					__experimentalShowHowTo={ false }
-				/>
-			);
+		it( 'should allow hiding the help text by passing an empty string', () => {
+			render( <FormTokenFieldWithState help="" /> );
 
 			expect(
-				screen.queryByText( instructionsDefault )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByText( instructionsTokenizeSpace )
+				screen.queryByText( 'Separate with commas or the Enter key.' )
 			).not.toBeInTheDocument();
 			expect(
 				screen.getByRole( 'combobox' )
 			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should associate the `help` text with the input accessibly', () => {
+			render( <FormTokenFieldWithState help="Help text" /> );
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			// The default how-to text should no longer be rendered.
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should warn and hide the default text when `__experimentalShowHowTo` is `false`', () => {
+			render(
+				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
+			);
+
+			expect( console ).toHaveWarnedWith(
+				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
+			);
+
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'combobox' )
+			).not.toHaveAccessibleDescription();
+		} );
+
+		it( 'should warn and prefer `help` over `__experimentalShowHowTo` when both are provided', () => {
+			const { rerender } = render(
+				<FormTokenFieldWithState
+					__experimentalShowHowTo={ false }
+					help="Help text"
+				/>
+			);
+
+			expect( console ).toHaveWarned();
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<FormTokenFieldWithState
+					__experimentalShowHowTo
+					help="Help text"
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox' )
+			).toHaveAccessibleDescription( 'Help text' );
+			expect(
+				screen.queryByText( 'Separate with commas or the Enter key.' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( "should use the value of the `placeholder` prop as the input's placeholder only when there are no tokens", async () => {

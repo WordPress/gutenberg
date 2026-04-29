@@ -15,6 +15,7 @@ import { useState } from '@wordpress/element';
 import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Selection & Input/Common/CustomSelectControl',
 	component: CustomSelectControl,
 	id: 'components-customselectcontrol',
