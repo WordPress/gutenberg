@@ -58,7 +58,7 @@ export default function StateControl( {
 				iconPosition: 'right',
 			} }
 		>
-			{ ( { onClose } ) => (
+			{ () => (
 				<>
 					{ stateGroups.map( ( group ) => (
 						<MenuGroup key={ group.name } label={ group.label }>
@@ -67,13 +67,6 @@ export default function StateControl( {
 									const newValue = { ...value };
 									delete newValue[ group.name ];
 									onChange( newValue );
-									if (
-										stateGroups.every(
-											( g ) => ! newValue[ g.name ]
-										)
-									) {
-										onClose();
-									}
 								} }
 								icon={ ! value[ group.name ] ? check : null }
 							>
