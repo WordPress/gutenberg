@@ -498,7 +498,9 @@ function MediaEditorModalContent( {
 				settings={ { fields } }
 			>
 				{ ! media ? (
-					<Spinner />
+					<div className="media-editor-modal__loading">
+						<Spinner />
+					</div>
 				) : (
 					<>
 						<Tabs>
@@ -616,11 +618,12 @@ export function MediaEditorModal( {
 	// just a `useReducer` with no side effects — so the inner component
 	// can read `isDirty` for images without forking on media type. The
 	// `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Today the modal always
-	// closes between edits so this is belt-and-braces, but it guards
-	// against future flows that swap `id` in the store without closing.
+	// discarding the previous cropper state. Keying on `id` (rather than
+	// `media?.id`) avoids a remount when `media` resolves from `null` to
+	// the loaded record on open — that flip would otherwise re-run the
+	// modal's entry animation and cause a visible flicker.
 	return (
-		<CropperProvider key={ media?.id ?? 'none' }>
+		<CropperProvider key={ id }>
 			<MediaEditorModalContent
 				fields={ fields }
 				id={ id }
