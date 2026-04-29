@@ -444,7 +444,7 @@ class Gutenberg_Content_Guidelines_REST_Controller_Test extends WP_Test_REST_Pos
 	 */
 	private function create_artifact_post() {
 		$artifact_term_id = Gutenberg_Guidelines_Post_Type::get_or_create_term_id(
-			Gutenberg_Guidelines_Post_Type::TERM_ARTIFACT,
+			'artifact',
 			'Artifact'
 		);
 
