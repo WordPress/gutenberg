@@ -12,6 +12,7 @@
 
 -   Add `Drawer` primitive ([#76690](https://github.com/WordPress/gutenberg/pull/76690)).
 -   Add `Autocomplete` primitive ([#77642](https://github.com/WordPress/gutenberg/pull/77642)).
+-   Add `SelectControl` component ([#77809](https://github.com/WordPress/gutenberg/pull/77809)).
 
 ### Documentation
 

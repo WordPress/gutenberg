@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import { SelectControl } from '../index';
@@ -11,18 +11,20 @@ describe( 'SelectControl', () => {
 		{ value: 'option3', label: 'Option 3' },
 	];
 
-	it( 'forwards ref', () => {
-		const ref = createRef< HTMLInputElement >();
+	it( 'forwards ref to the visible trigger', () => {
+		const ref = createRef< HTMLButtonElement >();
 
 		render(
-			<SelectControl
-				ref={ ref }
-				label="Select an option"
-				items={ mockItems }
-			/>
+			<SelectControl ref={ ref } label="Country" items={ mockItems } />
 		);
 
-		expect( ref.current ).toBeInstanceOf( HTMLInputElement );
+		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
+
+		expect( ref.current ).toBe( trigger );
+		act( () => {
+			ref.current?.focus();
+		} );
+		expect( trigger ).toHaveFocus();
 	} );
 
 	it( 'renders accessible label and description', () => {
