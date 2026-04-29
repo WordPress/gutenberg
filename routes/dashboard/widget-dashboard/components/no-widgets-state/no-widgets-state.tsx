@@ -8,7 +8,6 @@ import type { ReactNode } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { widget } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- EmptyState promotion tracked separately.
 import { EmptyState, Stack } from '@wordpress/ui';
 
 /**
