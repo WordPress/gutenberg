@@ -119,7 +119,10 @@ export function getNoteIdsFromMetadata( metadata ) {
  */
 export function addNoteIdToMetadata( metadata, noteId ) {
 	const existingIds = getNoteIdsFromMetadata( metadata );
-	if ( existingIds.includes( noteId ) ) {
+	// Compare as strings so a string-typed legacy id (e.g. '5') and a numeric
+	// id (5) are treated as duplicates.
+	const noteIdKey = String( noteId );
+	if ( existingIds.some( ( id ) => String( id ) === noteIdKey ) ) {
 		return metadata;
 	}
 	return {
@@ -137,7 +140,10 @@ export function addNoteIdToMetadata( metadata, noteId ) {
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
 	const existingIds = getNoteIdsFromMetadata( metadata );
-	const newIds = existingIds.filter( ( id ) => id !== noteId );
+	// Compare as strings so a string-typed legacy id (e.g. '5') matches a
+	// numeric id (5) when removing.
+	const noteIdKey = String( noteId );
+	const newIds = existingIds.filter( ( id ) => String( id ) !== noteIdKey );
 	return {
 		...metadata,
 		noteId: newIds.length > 0 ? newIds : undefined,
