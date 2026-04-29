@@ -190,7 +190,7 @@ export default function MediaEditorCropPanel( {
 					/>
 				</Stack>
 			</div>
-			{ canRestoreOriginal && (
+			{ canRestoreOriginal && onRestoreOriginal && (
 				<div className="media-editor-crop-panel__footer">
 					<Button
 						__next40pxDefaultSize

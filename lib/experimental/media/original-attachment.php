@@ -32,7 +32,7 @@
  */
 function gutenberg_record_original_attachment_id( $new_image_meta, $new_attachment_id, $attachment_id ) {
 	$parent_meta = wp_get_attachment_metadata( $attachment_id );
-	$original_id = ! empty( $parent_meta['original_attachment_id'] )
+	$original_id = is_array( $parent_meta ) && ! empty( $parent_meta['original_attachment_id'] )
 		? (int) $parent_meta['original_attachment_id']
 		: (int) $attachment_id;
 
@@ -62,7 +62,7 @@ function gutenberg_add_original_attachment_to_response( $response, $post ) {
 	}
 
 	$meta = wp_get_attachment_metadata( $post->ID );
-	if ( empty( $meta['original_attachment_id'] ) ) {
+	if ( ! is_array( $meta ) || empty( $meta['original_attachment_id'] ) ) {
 		return $response;
 	}
 
@@ -71,9 +71,17 @@ function gutenberg_add_original_attachment_to_response( $response, $post ) {
 		return $response;
 	}
 
+	// Skip when the original is unreachable (deleted, missing file).
+	// Emitting `source_url: false` would feed a non-string to the
+	// client cropper.
+	$source_url = wp_get_attachment_url( $original_id );
+	if ( ! is_string( $source_url ) || '' === $source_url ) {
+		return $response;
+	}
+
 	$data['media_details']['original_attachment'] = array(
 		'attachment_id' => $original_id,
-		'source_url'    => wp_get_attachment_url( $original_id ),
+		'source_url'    => $source_url,
 	);
 	$response->set_data( $data );
 
