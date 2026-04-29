@@ -52,6 +52,9 @@ export default function StateControl( {
 				getDropdownLabel()
 			) }
 			text={ getDropdownLabel() }
+			popoverProps={ {
+				placement: 'right-start',
+			} }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
