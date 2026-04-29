@@ -32,17 +32,17 @@ const DEFAULT_INIT_WINDOW_SIZE = 30;
 
 /**
  *
- * @param {React.RefObject<HTMLElement>} elementRef Used to find the closest scroll container that contains element.
- * @param { number }                     itemHeight Fixed item height in pixels
- * @param { number }                     totalItems Total items in list
- * @param { WPFixedWindowListOptions }   [options]  Options object
- * @return {[ WPFixedWindowList, setFixedListWindow:(nextWindow:WPFixedWindowList)=>void]} Array with the fixed window list and setter
+ * @param elementRef Used to find the closest scroll container that contains element.
+ * @param itemHeight Fixed item height in pixels
+ * @param totalItems Total items in list
+ * @param [options]  Options object
+ * @return Array with the fixed window list and setter
  */
 export default function useFixedWindowList(
-	elementRef,
-	itemHeight,
-	totalItems,
-	options
+	elementRef: React.RefObject< HTMLElement >,
+	itemHeight: number,
+	totalItems: number,
+	options?: any
 ) {
 	const initWindowSize = options?.initWindowSize ?? DEFAULT_INIT_WINDOW_SIZE;
 	const useWindowing = options?.useWindowing ?? true;

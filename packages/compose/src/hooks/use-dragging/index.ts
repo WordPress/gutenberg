@@ -8,18 +8,35 @@ import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
  */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 
-// Event handlers that are triggered from `document` listeners accept a MouseEvent,
-// while those triggered from React listeners accept a React.MouseEvent.
+interface DraggingProps {
+	onDragStart?: ( e: React.MouseEvent ) => void;
+	onDragMove?: ( e: MouseEvent ) => void;
+	onDragEnd?: ( e?: MouseEvent ) => void;
+}
+
+interface DraggingReturn {
+	startDrag: ( e: React.MouseEvent ) => void;
+	endDrag: ( e?: MouseEvent ) => void;
+	isDragging: boolean;
+}
+
 /**
- * @param {Object}                        props
- * @param {(e: React.MouseEvent) => void} props.onDragStart
- * @param {(e: MouseEvent) => void}       props.onDragMove
- * @param {(e?: MouseEvent) => void}      props.onDragEnd
+ * Hook to manage drag events with proper event handling
+ *
+ * @param props             Drag handlers
+ * @param props.onDragStart
+ * @param props.onDragMove
+ * @param props.onDragEnd
+ * @return Drag state and handlers
  */
-export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
+export default function useDragging( {
+	onDragStart,
+	onDragMove,
+	onDragEnd,
+}: DraggingProps ): DraggingReturn {
 	const [ isDragging, setIsDragging ] = useState( false );
 
-	const eventsRef = useRef( {
+	const eventsRef = useRef< DraggingProps >( {
 		onDragStart,
 		onDragMove,
 		onDragEnd,
@@ -30,27 +47,19 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		eventsRef.current.onDragEnd = onDragEnd;
 	}, [ onDragStart, onDragMove, onDragEnd ] );
 
-	/** @type {(e: MouseEvent) => void} */
-	const onMouseMove = useCallback(
-		( event ) =>
-			eventsRef.current.onDragMove &&
-			eventsRef.current.onDragMove( event ),
-		[]
-	);
-	/** @type {(e?: MouseEvent) => void} */
-	const endDrag = useCallback( ( event ) => {
-		if ( eventsRef.current.onDragEnd ) {
-			eventsRef.current.onDragEnd( event );
-		}
+	const onMouseMove = useCallback( ( event: MouseEvent ): void => {
+		eventsRef.current.onDragMove?.( event );
+	}, [] );
+
+	const endDrag = useCallback( ( event?: MouseEvent ): void => {
+		eventsRef.current.onDragEnd?.( event );
 		document.removeEventListener( 'mousemove', onMouseMove );
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
-	/** @type {(e: React.MouseEvent) => void} */
-	const startDrag = useCallback( ( event ) => {
-		if ( eventsRef.current.onDragStart ) {
-			eventsRef.current.onDragStart( event );
-		}
+
+	const startDrag = useCallback( ( event: React.MouseEvent ): void => {
+		eventsRef.current.onDragStart?.( event );
 		document.addEventListener( 'mousemove', onMouseMove );
 		document.addEventListener( 'mouseup', endDrag );
 		setIsDragging( true );
