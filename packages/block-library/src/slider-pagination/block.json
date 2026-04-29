@@ -13,10 +13,16 @@
 			"type": "string",
 			"enum": [ "chevron", "arrow" ],
 			"default": "chevron"
+		},
+		"indicatorStyle": {
+			"type": "string",
+			"enum": [ "dot", "line" ],
+			"default": "dot"
 		}
 	},
 	"providesContext": {
-		"arrowIcon": "arrowIcon"
+		"arrowIcon": "arrowIcon",
+		"indicatorStyle": "indicatorStyle"
 	},
 	"allowedBlocks": [
 		"core/slider-pagination-button",

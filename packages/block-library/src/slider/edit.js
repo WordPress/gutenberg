@@ -49,7 +49,7 @@ const SLIDER_TEMPLATE = [
 						'core/cover',
 						{
 							dimRatio: 100,
-							overlayColor: 'cyan-bluish-gray',
+							overlayColor: 'black',
 							minHeight: 300,
 							minHeightUnit: 'px',
 						},

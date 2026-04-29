@@ -8,6 +8,7 @@
 	"category": "design",
 	"textdomain": "default",
 	"ancestor": [ "core/slider-pagination" ],
+	"usesContext": [ "indicatorStyle" ],
 	"supports": {
 		"anchor": false,
 		"html": false,

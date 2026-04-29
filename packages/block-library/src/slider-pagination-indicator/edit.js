@@ -4,8 +4,11 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 
-export default function Edit() {
-	const blockProps = useBlockProps();
+export default function Edit( { context } ) {
+	const indicatorStyle = context?.indicatorStyle ?? 'dot';
+	const blockProps = useBlockProps( {
+		className: `is-style-${ indicatorStyle }`,
+	} );
 
 	// Render a static 3-dot preview in the editor; actual dots are
 	// generated at runtime by the Interactivity API from `state.dots`.

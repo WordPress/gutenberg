@@ -990,7 +990,7 @@ Container for slider controls and indicators. ([Source](https://github.com/WordP
 -	**Ancestor:** core/slider
 -	**Allowed Blocks:** core/slider-pagination-button, core/slider-pagination-indicator
 -	**Supports:** color (background, text), layout (default), spacing (blockGap, margin, padding), ~~anchor~~, ~~html~~, ~~reusable~~
--	**Attributes:** arrowIcon
+-	**Attributes:** arrowIcon, indicatorStyle
 
 ## Slider Pagination Button
 

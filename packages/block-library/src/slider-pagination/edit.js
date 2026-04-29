@@ -15,7 +15,10 @@ import {
 /**
  * Internal dependencies
  */
-import { SliderPaginationArrowControls } from './slider-pagination-arrow-controls';
+import {
+	SliderPaginationArrowControls,
+	SliderPaginationIndicatorControls,
+} from './slider-pagination-icon-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const PAGINATION_TEMPLATE = [
@@ -24,7 +27,10 @@ const PAGINATION_TEMPLATE = [
 	[ 'core/slider-pagination-button', { type: 'next' } ],
 ];
 
-export default function Edit( { attributes: { arrowIcon }, setAttributes } ) {
+export default function Edit( {
+	attributes: { arrowIcon, indicatorStyle },
+	setAttributes,
+} ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -36,13 +42,18 @@ export default function Edit( { attributes: { arrowIcon }, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={ __( 'Icon' ) }
-					resetAll={ () => setAttributes( { arrowIcon: 'chevron' } ) }
+					label={ __( 'Icons' ) }
+					resetAll={ () =>
+						setAttributes( {
+							arrowIcon: 'chevron',
+							indicatorStyle: 'dot',
+						} )
+					}
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
 						hasValue={ () => arrowIcon !== 'chevron' }
-						label={ __( 'Arrow' ) }
+						label={ __( 'Button icon' ) }
 						onDeselect={ () =>
 							setAttributes( { arrowIcon: 'chevron' } )
 						}
@@ -52,6 +63,21 @@ export default function Edit( { attributes: { arrowIcon }, setAttributes } ) {
 							value={ arrowIcon }
 							onChange={ ( value ) =>
 								setAttributes( { arrowIcon: value } )
+							}
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => indicatorStyle !== 'dot' }
+						label={ __( 'Indicator icon' ) }
+						onDeselect={ () =>
+							setAttributes( { indicatorStyle: 'dot' } )
+						}
+						isShownByDefault
+					>
+						<SliderPaginationIndicatorControls
+							value={ indicatorStyle }
+							onChange={ ( value ) =>
+								setAttributes( { indicatorStyle: value } )
 							}
 						/>
 					</ToolsPanelItem>

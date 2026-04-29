@@ -10,6 +10,7 @@
 	color: currentColor;
 
 	&__dot {
+		position: relative;
 		display: block;
 		color: inherit;
 		width: 8px;
@@ -22,6 +23,16 @@
 		transition: background 0.2s ease, transform 0.2s ease;
 		flex-shrink: 0;
 
+		/* Increase the clickable area of the indicator. */
+		&::after {
+			content: "";
+			position: absolute;
+			top: -10px;
+			bottom: -10px;
+			left: 0;
+			right: 0;
+		}
+
 		&[aria-current="true"],
 		&.is-active {
 			background: currentColor;
@@ -31,6 +42,39 @@
 		&:focus-visible {
 			outline: 2px solid currentColor;
 			outline-offset: 2px;
+		}
+	}
+
+	&.is-style-line &__dot {
+		width: 26px;
+		height: 2px;
+		border: none;
+		border-radius: 0;
+		background: currentColor;
+		opacity: 0.35;
+		transform: none;
+
+		&[aria-current="true"],
+		&.is-active {
+			opacity: 1;
+			transform: none;
+		}
+
+		&:focus-visible {
+			outline: 2px solid currentColor;
+			outline-offset: 2px;
+		}
+	}
+
+	.wp-block-slider-pagination.is-vertical &.is-style-line &__dot {
+		width: 2px;
+		height: 26px;
+
+		&::after {
+			top: 0;
+			bottom: 0;
+			left: -10px;
+			right: -10px;
 		}
 	}
 }

@@ -16,14 +16,17 @@
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider_pagination_indicator( $attributes, $content ) {
+function render_block_core_slider_pagination_indicator( $attributes, $content, $block ) {
 	if ( empty( $content ) ) {
 		return '';
 	}
 
+	$indicator_style = $block->context['indicatorStyle'] ?? 'dot';
+
 	$p = new WP_HTML_Tag_Processor( $content );
 	if ( $p->next_tag( array( 'class_name' => 'wp-block-slider-pagination-indicator' ) ) ) {
 		$p->set_attribute( 'data-wp-interactive', 'core/slider' );
+		$p->add_class( 'is-style-' . $indicator_style );
 	}
 
 	return $p->get_updated_html();
