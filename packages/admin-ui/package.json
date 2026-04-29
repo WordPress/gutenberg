@@ -45,7 +45,6 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
-		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",

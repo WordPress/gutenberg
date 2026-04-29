@@ -4,12 +4,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
-	blockCommentUtils: async ( { page, editor }, use ) => {
-		await use( new BlockCommentUtils( { page, editor } ) );
+	blockNoteUtils: async ( { page, editor }, use ) => {
+		await use( new BlockNoteUtils( { page, editor } ) );
 	},
 } );
 
-test.describe( 'Block Comments', () => {
+test.describe( 'Block Notes', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -21,9 +21,9 @@ test.describe( 'Block Comments', () => {
 	test( 'should move focus to add a new note form', async ( {
 		editor,
 		page,
-		blockCommentUtils,
+		blockNoteUtils,
 	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Howdy!' },
 			comment: 'Test comment',
@@ -48,7 +48,7 @@ test.describe( 'Block Comments', () => {
 		await expect( form ).toBeFocused();
 	} );
 
-	test( 'can add a comment to a block', async ( { editor, page } ) => {
+	test( 'can add a note to a block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
@@ -71,22 +71,19 @@ test.describe( 'Block Comments', () => {
 			} );
 
 		await expect( thread ).toBeVisible();
-		// Should focus the newly added comment thread.
+		// Should focus the newly added note thread.
 		await expect( thread ).toBeFocused();
 	} );
 
-	test( 'can reply to a block comment', async ( {
-		page,
-		blockCommentUtils,
-	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+	test( 'can reply to a block note', async ( { page, blockNoteUtils } ) => {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment',
 		} );
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
 		const commentText = page
-			.locator( '.editor-collab-sidebar-panel__user-comment' )
+			.locator( '.editor-collab-sidebar-panel__note-content' )
 			.last();
 
 		await commentForm.fill( 'Test reply' );
@@ -102,13 +99,13 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 	} );
 
-	test( 'can edit a block comment', async ( { page, blockCommentUtils } ) => {
-		await blockCommentUtils.addBlockWithComment( {
+	test( 'can edit a block note', async ( { page, blockNoteUtils } ) => {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Testing block comments' },
 			comment: 'test comment before edit',
 		} );
-		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 		await page
 			.getByRole( 'textbox', { name: 'Note' } )
 			.first()
@@ -119,7 +116,7 @@ test.describe( 'Block Comments', () => {
 			.click();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__user-comment' )
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
 		).toHaveText( 'Test comment after edit.' );
 		await expect(
 			page
@@ -128,23 +125,20 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 	} );
 
-	test( 'can delete a block comment', async ( {
-		page,
-		blockCommentUtils,
-	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+	test( 'can delete a block note', async ( { page, blockNoteUtils } ) => {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to delete.',
 		} );
-		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
 		await page
 			.getByRole( 'dialog' )
 			.getByRole( 'button', { name: 'Delete' } )
 			.click();
 
 		await expect(
-			page.locator( '.editor-collab-sidebar-panel__user-comment' )
+			page.locator( '.editor-collab-sidebar-panel__note-content' )
 		).toBeHidden();
 		await expect(
 			page
@@ -153,16 +147,16 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 	} );
 
-	test( 'can resolve and reopen a block comment', async ( {
+	test( 'can resolve and reopen a block note', async ( {
 		page,
-		blockCommentUtils,
+		blockNoteUtils,
 	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
 		} );
-		await blockCommentUtils.openBlockCommentSidebar();
+		await blockNoteUtils.openBlockNoteSidebar();
 
 		const thread = page
 			.getByRole( 'region', { name: 'Editor settings' } )
@@ -185,7 +179,7 @@ test.describe( 'Block Comments', () => {
 		await thread.click();
 		await expect( resolveButton ).toBeDisabled();
 
-		await blockCommentUtils.clickBlockCommentActionMenuItem( 'Reopen' );
+		await blockNoteUtils.clickBlockNoteActionMenuItem( 'Reopen' );
 		await expect( resolveButton ).toBeEnabled();
 		await expect(
 			page
@@ -194,11 +188,11 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 	} );
 
-	test( 'can reopen a resolved comment when adding a reply', async ( {
+	test( 'can reopen a resolved note when adding a reply', async ( {
 		page,
-		blockCommentUtils,
+		blockNoteUtils,
 	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Testing block comments' },
 			comment: 'Test comment to resolve.',
@@ -212,7 +206,7 @@ test.describe( 'Block Comments', () => {
 				.filter( { hasText: 'Note marked as resolved.' } )
 		).toBeVisible();
 
-		await blockCommentUtils.openBlockCommentSidebar();
+		await blockNoteUtils.openBlockNoteSidebar();
 		await page.locator( '.editor-collab-sidebar-panel__thread' ).click();
 		await expect( resolveButton ).toBeDisabled();
 		const commentForm = page.getByRole( 'textbox', { name: 'Reply to' } );
@@ -230,23 +224,23 @@ test.describe( 'Block Comments', () => {
 		).toBeVisible();
 	} );
 
-	test( 'selecting a block or comment marks it as an active', async ( {
+	test( 'selecting a block or note marks it as an active', async ( {
 		editor,
 		page,
-		blockCommentUtils,
+		blockNoteUtils,
 	} ) => {
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'First block' },
 			comment: 'First block comment',
 		} );
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/paragraph',
 			attributes: { content: 'Second block' },
 			comment: 'Second block comment',
 		} );
 		await editor.insertBlock( { name: 'core/spacer' } );
-		await blockCommentUtils.addBlockWithComment( {
+		await blockNoteUtils.addBlockWithNote( {
 			type: 'core/heading',
 			attributes: { content: 'Third block' },
 			comment: 'Third block comment',
@@ -265,16 +259,16 @@ test.describe( 'Block Comments', () => {
 			name: 'Reply to',
 		} );
 
-		// Comment and reply textbox should active for last inserter block.
+		// Note and reply textbox should be active for the last inserted block.
 		await expect( activeThread ).toContainText( 'Third block comment' );
 		await expect( replyTextbox ).toBeVisible();
 
-		// Clicking on a block comment should make it active.
+		// Clicking on a block note should make it active.
 		await threads.last().click();
 		await expect( activeThread ).toContainText( 'Third block comment' );
 		await expect( replyTextbox ).toBeVisible();
 
-		// Clicking on a block in canvas should make its comment active.
+		// Clicking on a block in canvas should make its note active.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.click();
@@ -297,18 +291,18 @@ test.describe( 'Block Comments', () => {
 		];
 		KEY_COMBINATIONS.forEach(
 			( { keyToExpand, keyToCollapse, keyName } ) => {
-				test( `should expand or collapse a comment with ${ keyName } key`, async ( {
+				test( `should expand or collapse a note with ${ keyName } key`, async ( {
 					page,
 					editor,
-					blockCommentUtils,
+					blockNoteUtils,
 				} ) => {
-					await blockCommentUtils.addBlockWithComment( {
+					await blockNoteUtils.addBlockWithNote( {
 						type: 'core/heading',
 						attributes: { content: 'Testing block comments' },
 						comment: 'Test comment',
 					} );
 
-					// Click on the title field to deselect the block and the comment.
+					// Click on the title field to deselect the block and the note.
 					await editor.canvas
 						.getByRole( 'textbox', { name: 'Add title' } )
 						.focus();
@@ -321,40 +315,40 @@ test.describe( 'Block Comments', () => {
 							name: 'Note: Test comment',
 						} );
 
-					// Expand the comment with the specified key.
+					// Expand the note with the specified key.
 					await thread.focus();
 					await page.keyboard.press( keyToExpand );
 					await expect(
 						thread,
-						'comment should be expanded with $keyToExpand key'
+						'note should be expanded with $keyToExpand key'
 					).toHaveAttribute( 'aria-expanded', 'true' );
 
-					// The related block should be selected, but the focus should remain on the comment.
+					// The related block should be selected, but the focus should remain on the note.
 					await expect(
 						editor.canvas.getByText( 'Testing block comments' )
 					).toHaveClass( /is-selected/ );
 					await expect( thread ).toBeFocused();
 
-					// Collapse the comment with the specified key.
+					// Collapse the note with the specified key.
 					await page.keyboard.press( keyToCollapse );
 					await expect(
 						thread,
-						'comment should be collapsed with $keyToCollapse key'
+						'note should be collapsed with $keyToCollapse key'
 					).toHaveAttribute( 'aria-expanded', 'false' );
 				} );
 			}
 		);
 
-		test( 'should move to the adjacent comment with arrow keys', async ( {
+		test( 'should move to the adjacent note with arrow keys', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'One',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Two',
@@ -383,21 +377,21 @@ test.describe( 'Block Comments', () => {
 			await expect( firstThread ).toBeFocused();
 		} );
 
-		test( 'should move to the first or last comment with Home or End keys', async ( {
+		test( 'should move to the first or last note with Home or End keys', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'One',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Two',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Three',
@@ -426,11 +420,11 @@ test.describe( 'Block Comments', () => {
 			await expect( firstThread ).toBeFocused();
 		} );
 
-		test( 'should collapse a comment with Escape key', async ( {
+		test( 'should collapse a note with Escape key', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment escape',
@@ -447,16 +441,16 @@ test.describe( 'Block Comments', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			// Collapse the comment with Escape key.
+			// Collapse the note with Escape key.
 			await page.keyboard.press( 'Escape' );
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 		} );
 
-		test( 'should collapse a comment after canceling comment form', async ( {
+		test( 'should collapse a note after canceling note form', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -477,11 +471,11 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toBeFocused();
 		} );
 
-		test( 'should collapse a comment when the focus moves outside the note', async ( {
+		test( 'should collapse a note when the focus moves outside the note', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -502,11 +496,11 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 		} );
 
-		test( 'should have accessible name for the comment threads', async ( {
+		test( 'should have accessible name for the note threads', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -526,9 +520,9 @@ test.describe( 'Block Comments', () => {
 		test( 'should expand and focus the thread after clicking the "x more replies" button', async ( {
 			editor,
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -550,7 +544,7 @@ test.describe( 'Block Comments', () => {
 					.filter( { hasText: 'Reply added.' } )
 			).toHaveCount( 2 );
 
-			// Click on the title field to deselect the block and the comment.
+			// Click on the title field to deselect the block and the note.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.focus();
@@ -570,22 +564,22 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toBeFocused();
 		} );
 
-		test( 'should focus appropriate element when comment is deleted', async ( {
+		test( 'should focus appropriate element when note is deleted', async ( {
 			page,
 			editor,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'First block content' },
 				comment: 'First block comment',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Second block content' },
 				comment: 'Second block comment',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Third block content' },
 				comment: 'Third block comment',
@@ -607,29 +601,29 @@ test.describe( 'Block Comments', () => {
 				} );
 
 			await firstThread.click();
-			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
 			await page
 				.getByRole( 'dialog' )
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			await expect(
 				secondThread,
-				'focus should move to the next comment if there is one'
+				'focus should move to the next note if there is one'
 			).toBeFocused();
 
 			await thirdThread.click();
-			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
 			await page
 				.getByRole( 'dialog' )
 				.getByRole( 'button', { name: 'Delete' } )
 				.click();
 			await expect(
 				secondThread,
-				"focus should move to the previous comment if there isn't a next one"
+				"focus should move to the previous note if there isn't a next one"
 			).toBeFocused();
 
 			await secondThread.click();
-			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Delete' );
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
 			await page
 				.getByRole( 'dialog' )
 				.getByRole( 'button', { name: 'Delete' } )
@@ -641,20 +635,20 @@ test.describe( 'Block Comments', () => {
 				.nth( 1 );
 			await expect(
 				secondBlock,
-				"focus should move to the block if there isn't a next or previous comment"
+				"focus should move to the block if there isn't a next or previous note"
 			).toBeFocused();
 		} );
 
-		test( 'should focus comment thread when reply is deleted', async ( {
+		test( 'should focus note thread when reply is deleted', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test note',
 			} );
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -667,10 +661,7 @@ test.describe( 'Block Comments', () => {
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Reply', exact: true } )
 				.click();
-			await blockCommentUtils.clickBlockCommentActionMenuItem(
-				'Delete',
-				1
-			);
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete', 1 );
 			await page
 				.getByRole( 'dialog' )
 				.getByRole( 'button', { name: 'Delete' } )
@@ -684,11 +675,11 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toBeFocused();
 		} );
 
-		test( 'should focus comment form after clicking "Add new comment" skip link button', async ( {
+		test( 'should focus note form after clicking "Add new reply" skip link button', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -718,9 +709,9 @@ test.describe( 'Block Comments', () => {
 		test( 'should focus block after clicking "Back to block" skip link button', async ( {
 			editor,
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/paragraph',
 				attributes: { content: 'Testing block comments' },
 				comment: 'Test comment',
@@ -753,18 +744,18 @@ test.describe( 'Block Comments', () => {
 			).toBeFocused();
 		} );
 
-		test( 'should focus action button when comment editing is cancelled or comment is updated', async ( {
+		test( 'should focus action button when note editing is cancelled or note is updated', async ( {
 			page,
-			blockCommentUtils,
+			blockNoteUtils,
 		} ) => {
-			await blockCommentUtils.addBlockWithComment( {
+			await blockNoteUtils.addBlockWithNote( {
 				type: 'core/heading',
 				attributes: { content: 'Testing block comments' },
 				comment: 'test comment before edit',
 			} );
 
-			// Test focus on action button when comment editing is cancelled.
-			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
+			// Test focus on action button when note editing is cancelled.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
 				.getByRole( 'button', { name: 'Cancel' } )
@@ -777,8 +768,8 @@ test.describe( 'Block Comments', () => {
 					.getByRole( 'button', { name: 'Actions' } )
 			).toBeFocused();
 
-			// Test focus on action button when comment is updated.
-			await blockCommentUtils.clickBlockCommentActionMenuItem( 'Edit' );
+			// Test focus on action button when note is updated.
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
 			await page
 				.getByRole( 'textbox', { name: 'Note' } )
 				.first()
@@ -826,7 +817,7 @@ test.describe( 'Block Comments', () => {
 			await pageUtils.pressKeys( 'primary+Enter' );
 
 			await expect( thread ).toBeVisible();
-			// Should focus the newly added comment thread.
+			// Should focus the newly added note thread.
 			await expect( thread ).toBeFocused();
 		} );
 
@@ -859,7 +850,7 @@ test.describe( 'Block Comments', () => {
 	} );
 } );
 
-class BlockCommentUtils {
+class BlockNoteUtils {
 	/** @type {import('@playwright/test').Page} */
 	#page;
 	/** @type {import('@wordpress/e2e-test-utils-playwright').Editor} */
@@ -870,7 +861,7 @@ class BlockCommentUtils {
 		this.#editor = editor;
 	}
 
-	async openBlockCommentSidebar() {
+	async openBlockNoteSidebar() {
 		const toggleButton = this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'button', { name: 'All notes', exact: true } );
@@ -889,9 +880,9 @@ class BlockCommentUtils {
 		return toggleButton;
 	}
 
-	async addBlockWithComment( { type, attributes = {}, comment } ) {
+	async addBlockWithNote( { type, attributes = {}, comment } ) {
 		await test.step(
-			`Insert a ${ type } block with a comment`,
+			`Insert a ${ type } block with a note`,
 			async () => {
 				await this.#editor.insertBlock( {
 					name: type,
@@ -922,7 +913,7 @@ class BlockCommentUtils {
 		);
 	}
 
-	async clickBlockCommentActionMenuItem( actionName, index = 0 ) {
+	async clickBlockNoteActionMenuItem( actionName, index = 0 ) {
 		await this.#page
 			.getByRole( 'region', { name: 'Editor settings' } )
 			.getByRole( 'button', { name: 'Actions' } )

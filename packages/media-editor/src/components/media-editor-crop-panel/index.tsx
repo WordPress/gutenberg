@@ -34,6 +34,8 @@ export interface MediaEditorCropPanelProps {
 	freeformCrop: boolean;
 	/** Setter for freeform mode. */
 	onFreeformChange: ( value: boolean ) => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
 	/**
 	 * Fixed aspect-ratio presets to display after Free and Original. When
 	 * omitted, the media editor's default fixed-ratio presets are used.
@@ -75,6 +77,7 @@ export function resolveAspectRatio(
  * @param props.onAspectRatioChange
  * @param props.freeformCrop
  * @param props.onFreeformChange
+ * @param props.onPlacementControlInteraction
  * @param props.aspectRatioPresets
  */
 export default function MediaEditorCropPanel( {
@@ -82,6 +85,7 @@ export default function MediaEditorCropPanel( {
 	onAspectRatioChange,
 	freeformCrop,
 	onFreeformChange,
+	onPlacementControlInteraction,
 	aspectRatioPresets,
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
@@ -101,9 +105,10 @@ export default function MediaEditorCropPanel( {
 				max={ MAX_ZOOM }
 				step={ 0.1 }
 				value={ state.zoom }
-				onChange={ ( value ) =>
-					setZoom( typeof value === 'number' ? value : MIN_ZOOM )
-				}
+				onChange={ ( value ) => {
+					onPlacementControlInteraction?.();
+					setZoom( typeof value === 'number' ? value : MIN_ZOOM );
+				} }
 				renderTooltipContent={ ( value ) => {
 					const zoom = typeof value === 'number' ? value : MIN_ZOOM;
 					return sprintf(
