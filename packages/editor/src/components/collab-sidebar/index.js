@@ -33,19 +33,21 @@ import { unlock } from '../../lock-unlock';
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockSpotlight, selectBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const sidebarRef = useRef( null );
 
-	const { clientId, rawNoteId, isClassicBlock } = useSelect( ( select ) => {
+	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			rawNoteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId ?? null
+			noteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
 				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
@@ -53,7 +55,7 @@ function NotesSidebar( { postId } ) {
 		};
 	}, [] );
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId: rawNoteId } );
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -125,6 +127,10 @@ function NotesSidebar( { postId } ) {
 		// When addNewNote is true, always open the new note form.
 		// Otherwise, select the existing thread or open new.
 		const shouldAddNew = addNewNote || ! currentThread;
+		// A special case for the List View, where block selection isn't
+		// required to trigger the action. The action is a no-op when the
+		// block is already selected.
+		selectBlock( clientId, null );
 		toggleBlockSpotlight( clientId, true );
 		selectNote( shouldAddNew ? 'new' : currentThread.id, {
 			focus: true,
