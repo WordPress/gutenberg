@@ -96,7 +96,7 @@ export function AutocompleterUI( {
 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
 	const useItems =
 		autocompleter.useItems ?? getDefaultUseItems( autocompleter );
-	// eslint-disable-next-line react-compiler/react-compiler
+	// eslint-disable-next-line react-hooks/react-compiler
 	const [ items ] = useItems( filterValue );
 	const popoverAnchor = useAnchor( {
 		editableContentElement: contentRef.current,

@@ -7,7 +7,7 @@ import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
-import reactCompilerPlugin from 'eslint-plugin-react-compiler';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
@@ -283,7 +283,7 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
-			'react-compiler/react-compiler': [
+			'react-hooks/react-compiler': [
 				'error',
 				{
 					environment: {
@@ -294,7 +294,7 @@ export default dedupePlugins( [
 			],
 		},
 		plugins: {
-			'react-compiler': reactCompilerPlugin,
+			'react-hooks': reactHooksPlugin,
 			'@typescript-eslint': tseslint.plugin,
 		},
 	},
@@ -339,7 +339,7 @@ export default dedupePlugins( [
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
-			'react-compiler/react-compiler': 'off',
+			'react-hooks/react-compiler': 'off',
 		},
 	},
 
@@ -775,11 +775,10 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Interactivity packages — disable react-compiler, require react import.
+	// Override: Interactivity packages — require react import.
 	{
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
-			'react-compiler/react-compiler': 'off',
 			'react/react-in-jsx-scope': 'error',
 		},
 	},

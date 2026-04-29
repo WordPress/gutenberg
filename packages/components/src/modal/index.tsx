@@ -121,7 +121,7 @@ function UnforwardedModal(
 	const onRequestCloseRef =
 		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
 	useEffect( () => {
-		// eslint-disable-next-line react-compiler/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
+		// eslint-disable-next-line react-hooks/react-compiler -- false positive, see https://github.com/facebook/react/issues/29196
 		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
 
