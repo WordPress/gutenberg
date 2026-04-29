@@ -95,6 +95,11 @@
 		 * Hint compositing while the popup is in motion (opening, swiping,
 		 * or closing). Scoping `will-change` to these states avoids
 		 * retaining a transform layer while the drawer is fully idle.
+		 *
+		 * Limited to `transform` because that's the only animated property
+		 * the compositor can take off the main thread; `box-shadow` (also
+		 * transitioned below) is repainted on the main thread regardless,
+		 * so listing it here would just bloat the layer.
 		 */
 		&[data-open],
 		&[data-swiping],
@@ -110,6 +115,11 @@
 		 * appearing as a faint halo at mount/unmount instead of fading
 		 * with the slide. `box-shadow: none` interpolates against the
 		 * resolved token value as a list of zero-shadow layers.
+		 *
+		 * Kept outside the `prefers-reduced-motion` guard below so the
+		 * popup still mounts / unmounts without a stray shadow when
+		 * transitions are disabled — the value flips instantly to `none`
+		 * at the offscreen states, matching the instantaneous transform.
 		 */
 		&[data-starting-style],
 		&[data-ending-style] {
