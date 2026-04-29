@@ -28,7 +28,7 @@ export interface UseInteractionReturn {
 	isDragging: boolean;
 	/** Whether a double-tap zoom animation is in progress. */
 	isZooming: boolean;
-	/** Whether the user is currently panning the image for placement. */
+	/** Whether the user is currently performing a placement interaction. */
 	isPlacementInteracting: boolean;
 }
 
@@ -91,6 +91,7 @@ export function useInteraction(
 ): UseInteractionReturn {
 	const [ isDragging, setIsDragging ] = useState( false );
 	const [ isZooming, setIsZooming ] = useState( false );
+	const [ isGestureInteracting, setIsGestureInteracting ] = useState( false );
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
 	const keyboardInteractionTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
@@ -109,6 +110,12 @@ export function useInteraction(
 	actionsRef.current = actions;
 
 	const controllerRef = useRef< InteractionController | null >( null );
+	const startPlacementGesture = useCallback( () => {
+		setIsGestureInteracting( true );
+	}, [] );
+	const stopPlacementGesture = useCallback( () => {
+		setIsGestureInteracting( false );
+	}, [] );
 	const signalKeyboardPlacement = useCallback( () => {
 		setIsKeyboardPanning( true );
 		clearTimeout( keyboardInteractionTimerRef.current );
@@ -153,8 +160,14 @@ export function useInteraction(
 			get doubleTapZoom() {
 				return optionsRef.current?.doubleTapZoom;
 			},
-			onGestureStart: () => optionsRef.current?.onGestureStart?.(),
-			onGestureEnd: () => optionsRef.current?.onGestureEnd?.(),
+			onGestureStart: () => {
+				startPlacementGesture();
+				optionsRef.current?.onGestureStart?.();
+			},
+			onGestureEnd: () => {
+				stopPlacementGesture();
+				optionsRef.current?.onGestureEnd?.();
+			},
 			onStatusChange: ( status ) => {
 				setIsDragging( status.isDragging );
 				setIsZooming( status.isZooming );
@@ -165,7 +178,7 @@ export function useInteraction(
 			controller.destroy();
 			controllerRef.current = null;
 		};
-	}, [] );
+	}, [ startPlacementGesture, stopPlacementGesture ] );
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		const el = e.currentTarget as HTMLElement;
@@ -205,6 +218,7 @@ export function useInteraction(
 		onWheelNative,
 		isDragging,
 		isZooming,
-		isPlacementInteracting: isDragging || isKeyboardPanning,
+		isPlacementInteracting:
+			isGestureInteracting || isKeyboardPanning || isZooming,
 	};
 }

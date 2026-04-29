@@ -49,6 +49,7 @@ export function GridOverlay( {
 	return (
 		<div
 			className="wp-media-editor-image-editor__grid"
+			data-testid="cropper-grid"
 			style={ {
 				left,
 				top,
