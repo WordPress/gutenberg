@@ -11,7 +11,7 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { check, close } from '@wordpress/icons';
+import { check, closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -177,7 +177,7 @@ export function SuggestionActionButtons( { thread } ) {
 			/>
 			<Button
 				size="compact"
-				icon={ close }
+				icon={ closeSmall }
 				iconSize={ 24 }
 				label={ __( 'Reject suggestion' ) }
 				showTooltip
