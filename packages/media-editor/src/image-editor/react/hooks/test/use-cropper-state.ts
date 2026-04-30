@@ -827,6 +827,178 @@ describe( 'useCropperState', () => {
 		} );
 	} );
 
+	describe( 'undo/redo history', () => {
+		const DEBOUNCE_MS = 300;
+
+		beforeEach( () => jest.useFakeTimers() );
+		afterEach( () => jest.useRealTimers() );
+
+		// --- debounce batching ---
+
+		it( 'does not create a history entry before the debounce fires', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'creates one history entry after the debounce settles', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 2 );
+				result.current.setZoom( 3 );
+				result.current.setZoom( 4 );
+			} );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- commitHistory flush ---
+
+		it( 'commitHistory flushes the pending entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			// Separate act() calls are required: setZoom dispatches a reducer
+			// action that React processes when act() flushes. If commitHistory
+			// runs in the same act(), stateRef.current hasn't updated yet and
+			// the flush sees no change.
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'commitHistory is a no-op when state has not changed', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.commitHistory();
+			} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- discrete actions ---
+
+		it( 'setFlip creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setFlip( { horizontal: true, vertical: false } );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'snapRotate90 creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.snapRotate90( 1 );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		it( 'applyOperation creates a history entry immediately', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.applyOperation( { type: 'zoom', factor: 3 } );
+			} );
+			expect( result.current.hasUndo ).toBe( true );
+		} );
+
+		// --- undo / redo round-trip ---
+
+		it( 'undo restores the previous state and enables redo', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+				result.current.commitHistory();
+			} );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'redo re-applies the undone state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+				result.current.commitHistory();
+			} );
+			act( () => result.current.undo() );
+			act( () => result.current.redo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+			expect( result.current.hasRedo ).toBe( false );
+		} );
+
+		// --- undo/redo with a pending gesture ---
+
+		it( 'undo flushes a pending gesture before undoing', () => {
+			const { result } = renderHook( () => useCropperState() );
+			// Commit one step, then start a second change without committing.
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			act( () => result.current.setZoom( 5 ) );
+			// Undo should flush zoom=5 first, then undo back to zoom=3.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'undo with no prior history flushes and undoes the pending gesture', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			// Undo before the debounce fires — flush saves the change, then
+			// immediately undoes it.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+
+		// --- setImage and reset do not pollute history ---
+
+		it( 'setImage does not create a history entry', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 100,
+					naturalHeight: 100,
+				} );
+			} );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'reset clears the undo history', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.reset() );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		// --- discrete action flushes a concurrent continuous gesture ---
+
+		it( 'discrete action saves the pending gesture as a separate undo step', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			act( () => {
+				result.current.setFlip( { horizontal: true, vertical: false } );
+			} );
+			// First undo removes the flip.
+			act( () => result.current.undo() );
+			expect( result.current.state.flip.horizontal ).toBe( false );
+			expect( result.current.state.zoom ).toBe( 3 );
+			// Second undo removes the zoom gesture.
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+	} );
+
 	describe( 'public controller contract', () => {
 		it( 'does not expose the raw reducer dispatch', () => {
 			const { result } = renderHook( () => useCropperState() );
