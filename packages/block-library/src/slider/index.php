@@ -26,6 +26,11 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		++$slide_count;
 	}
 
+	// If there are no slides, do not render the slider block.
+	if ( $slide_count === 0 ) {
+		return '';
+	}
+
 	$context = array(
 		'currentIndex' => 0,
 		'totalSlides'  => $slide_count,
