@@ -1,3 +1,14 @@
+/**
+ * Store
+ */
 export { store } from './store';
-export { useWidgetTypes } from './use-widget-types';
+
+/**
+ * Hooks
+ */
+export { useWidgetTypes } from './hooks';
+
+/**
+ * Types
+ */
 export type { WidgetName, WidgetTypeMetadata, WidgetType } from './types';
