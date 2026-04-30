@@ -14,7 +14,8 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useState, useRef, RawHTML } from '@wordpress/element';
+import ServerSideRender from '@wordpress/server-side-render';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
 
@@ -59,7 +60,11 @@ export default function FreeformEdit( {
 			</BlockControls>
 			<div { ...useBlockProps() }>
 				{ content ? (
-					<RawHTML>{ content }</RawHTML>
+					<ServerSideRender
+						block="core/freeform"
+						attributes={ attributes }
+						httpMethod="POST"
+					/>
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }
