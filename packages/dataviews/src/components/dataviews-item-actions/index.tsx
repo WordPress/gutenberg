@@ -11,7 +11,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -24,6 +24,7 @@ import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
  */
 import { unlock } from '../../lock-unlock';
 import type { Action, ActionModal as ActionModalType } from '../../types';
+import useMapFocusOnMount from '../../hooks/use-map-focus-on-mount';
 
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
@@ -114,37 +115,6 @@ function mapModalSize(
 		return 'stretch';
 	}
 	return size ?? 'medium';
-}
-
-const FIRST_INPUT_SELECTOR =
-	'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
-
-function useMapFocusOnMount(
-	focusOnMount: ActionModalType< unknown >[ 'modalFocusOnMount' ],
-	contentRef: React.RefObject< HTMLElement | null >
-) {
-	const focusFirstInput = useCallback( () => {
-		if ( contentRef.current ) {
-			const target =
-				contentRef.current.querySelector< HTMLElement >(
-					FIRST_INPUT_SELECTOR
-				);
-			if ( target ) {
-				return target;
-			}
-		}
-		return true as const;
-	}, [ contentRef ] );
-
-	if ( focusOnMount === false ) {
-		return false;
-	}
-	if ( focusOnMount === 'firstInputElement' ) {
-		return focusFirstInput;
-	}
-	// 'firstContentElement', true, 'firstElement' — Dialog's smart default
-	// already skips the close icon and focuses the first content tabbable.
-	return true;
 }
 
 export function ActionModal< Item >( {

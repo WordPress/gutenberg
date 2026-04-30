@@ -26,6 +26,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
+import useMapFocusOnMount from '../../../hooks/use-map-focus-on-mount';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
@@ -100,6 +101,11 @@ function ModalContent< Item >( {
 	// trigger reportValidity to show field-level errors.
 	useReportValidity( contentRef, touched );
 
+	// Preserve the legacy `Modal.focusOnMount: 'firstInputElement'` behaviour
+	// by mapping it onto Base UI's `initialFocus`. PanelModal opens to edit a
+	// single field, so focusing the first input is a sensible default.
+	const initialFocus = useMapFocusOnMount( 'firstInputElement', contentRef );
+
 	return (
 		<Dialog.Root
 			open
@@ -109,12 +115,12 @@ function ModalContent< Item >( {
 				}
 			} }
 		>
-			<Dialog.Popup size="medium">
+			<Dialog.Popup size="medium" initialFocus={ initialFocus }>
 				<Dialog.Header>
 					<Dialog.Title>{ fieldLabel }</Dialog.Title>
 					<Dialog.CloseIcon />
 				</Dialog.Header>
-				<div ref={ contentRef }>
+				<Dialog.Content ref={ contentRef }>
 					<DataFormLayout
 						data={ modalData }
 						form={ form }
@@ -138,7 +144,7 @@ function ModalContent< Item >( {
 							/>
 						) }
 					</DataFormLayout>
-				</div>
+				</Dialog.Content>
 				<Dialog.Footer>
 					<Button
 						variant="tertiary"
