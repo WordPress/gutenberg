@@ -295,9 +295,6 @@ export default dedupePlugins( [
 					},
 				},
 			],
-			// TODO: Re-enable after fixing existing violations across the codebase.
-			// 'react-hooks/immutability': 'off',
-			// 'react-hooks/refs': 'off',
 		},
 		plugins: {
 			'react-hooks': reactHooksPlugin,
@@ -345,6 +342,19 @@ export default dedupePlugins( [
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
+		},
+	},
+
+	// Override: React Native files — disable React Compiler rules until
+	// the native codebase's legacy patterns are migrated.
+	{
+		files: [
+			'**/*.@(android|ios|native).js',
+			'packages/react-native-*/**/*.js',
+		],
+		rules: {
+			'react-hooks/immutability': 'off',
+			'react-hooks/refs': 'off',
 		},
 	},
 
