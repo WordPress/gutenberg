@@ -1,16 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useId } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
-import { Card, Link, Stack, Text } from '@wordpress/ui';
+import { __, sprintf } from '@wordpress/i18n';
+import { close } from '@wordpress/icons';
+import {
+	type ThemeProvider as ThemeProviderType,
+	privateApis as themePrivateApis,
+} from '@wordpress/theme';
+// Dashboard is still experimental.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Card, IconButton, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import styles from './style.module.css';
+
+const ThemeProvider: typeof ThemeProviderType =
+	unlock( themePrivateApis ).ThemeProvider;
 
 // ─── Icons ────────────────────────────────────────────────────────────────────
 
@@ -242,6 +253,7 @@ function DashboardBackground() {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Welcome() {
+	const displayVersion = '7.0';
 	const currentTheme = useSelect(
 		( select ) => ( select( coreStore ) as any ).getCurrentTheme(),
 		[]
@@ -255,24 +267,43 @@ export default function Welcome() {
 	);
 
 	const isBlockTheme = !! currentTheme?.is_block_theme;
+	const [ isDismissed, setIsDismissed ] = useState( false );
+
+	if ( isDismissed ) {
+		return null;
+	}
 
 	return (
-		<div className={ styles.panel }>
-			<Card.FullBleed className={ styles.headerWrap }>
-				<div className={ styles.headerImage } aria-hidden="true">
-					<DashboardBackground />
-				</div>
-				<div className={ styles.header }>
-					<Text variant="heading-xl" render={ <h2 /> }>
-						{ __( 'Welcome to WordPress!' ) }
-					</Text>
-					<Text variant="body-md" render={ <p /> }>
-						<Link href="about.php">
-							{ __( 'Learn more about this version.' ) }
-						</Link>
-					</Text>
-				</div>
-			</Card.FullBleed>
+		<>
+			<ThemeProvider color={ { bg: '#000000' } }>
+				<Card.FullBleed className={ styles.headerWrap }>
+					<div className={ styles.headerImage } aria-hidden="true">
+						<DashboardBackground />
+					</div>
+					<div className={ styles.header }>
+						<IconButton
+							className={ styles.dismissButton }
+							variant="unstyled"
+							size="compact"
+							icon={ close }
+							label={ __( 'Dismiss welcome panel' ) }
+							onClick={ () => setIsDismissed( true ) }
+						/>
+						<Text variant="heading-2xl" render={ <h2 /> }>
+							{ __( 'Welcome to WordPress!' ) }
+						</Text>
+						<Text variant="body-lg" render={ <p /> }>
+							<Link href="about.php">
+								{ sprintf(
+									/* translators: %s: Current WordPress version. */
+									__( 'Learn more about the %s version.' ),
+									displayVersion
+								) }
+							</Link>
+						</Text>
+					</div>
+				</Card.FullBleed>
+			</ThemeProvider>
 
 			<Stack
 				className={ styles.columns }
@@ -381,6 +412,6 @@ export default function Welcome() {
 					</div>
 				</Stack>
 			</Stack>
-		</div>
+		</>
 	);
 }

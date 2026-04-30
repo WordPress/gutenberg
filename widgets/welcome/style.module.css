@@ -1,10 +1,5 @@
-.panel {
-	overflow: hidden;
-}
-
 .headerWrap {
 	position: relative;
-	background: var(--wpds-color-bg-interactive-neutral-strong);
 	overflow: hidden;
 	min-height: 120px;
 }
@@ -24,13 +19,15 @@
 	position: relative;
 	z-index: 1;
 	padding: 28px 24px 24px;
-	color: var(--wpds-color-fg-interactive-neutral-strong);
+}
+
+.dismissButton {
+	position: absolute;
+	inset-block-start: 12px;
+	inset-inline-end: 12px;
 }
 
 .header h2 {
-	font-size: 20px;
-	font-weight: 600;
-	color: var(--wpds-color-fg-interactive-neutral-strong);
 	margin: 0 0 6px;
 }
 
@@ -38,19 +35,8 @@
 	margin: 0;
 }
 
-.header a {
-	color: color-mix(in oklch, var(--wpds-color-fg-interactive-neutral-strong) 75%, transparent);
-	font-size: 13px;
-	text-decoration: none;
-}
-
-.header a:hover {
-	color: var(--wpds-color-fg-interactive-neutral-strong);
-	text-decoration: underline;
-}
-
 .columns {
-	padding: 24px;
+	padding-top: var(--wp-ui-card-padding);
 }
 
 @media (max-width: 782px) {
