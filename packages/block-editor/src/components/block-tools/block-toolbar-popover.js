@@ -52,7 +52,6 @@ export default function BlockToolbarPopover( {
 	const clientIdToPositionOver = capturingClientId || clientId;
 
 	const popoverProps = useBlockToolbarPopoverProps( {
-		contentElement: __unstableContentRef?.current,
 		clientId: clientIdToPositionOver,
 	} );
 

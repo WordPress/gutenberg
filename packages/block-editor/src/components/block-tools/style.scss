@@ -105,8 +105,6 @@
 	// Position the block toolbar.
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
-		margin-top: $grid-unit-10;
-		margin-bottom: $grid-unit-10;
 		border: $border-width solid $gray-900;
 		border-radius: $radius-small;
 		overflow: visible; // allow the parent selector to be visible
