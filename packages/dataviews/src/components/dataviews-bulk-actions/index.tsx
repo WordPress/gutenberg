@@ -49,9 +49,10 @@ function ActionWithModal< Item >( {
 		<>
 			<ActionTriggerComponent { ...actionTriggerProps } />
 			<ActionModal
-				action={ isModalOpen ? action : null }
+				action={ action }
 				items={ items }
-				closeModal={ () => setIsModalOpen( false ) }
+				open={ isModalOpen }
+				onOpenChange={ setIsModalOpen }
 			/>
 		</>
 	);

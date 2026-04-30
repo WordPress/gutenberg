@@ -109,9 +109,10 @@ function PrimaryActionGridCell< Item >( {
 				}
 			>
 				<ActionModal< Item >
-					action={ isModalOpen ? primaryAction : null }
+					action={ primaryAction }
 					items={ [ item ] }
-					closeModal={ () => setIsModalOpen( false ) }
+					open={ isModalOpen }
+					onOpenChange={ setIsModalOpen }
 				/>
 			</Composite.Item>
 		</div>
@@ -181,7 +182,7 @@ function ListItem< Item >( {
 		}
 	}, [ isSelected ] );
 
-	const { primaryAction, eligibleActions } = useMemo( () => {
+	const { primaryAction, eligibleActions, modalActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
 		const _eligibleActions = actions.filter(
@@ -190,9 +191,14 @@ function ListItem< Item >( {
 		const _primaryActions = _eligibleActions.filter(
 			( action ) => action.isPrimary
 		);
+		const _modalActions = _eligibleActions.filter(
+			( action ): action is ActionModalType< Item > =>
+				'RenderModal' in action
+		);
 		return {
 			primaryAction: _primaryActions[ 0 ],
 			eligibleActions: _eligibleActions,
+			modalActions: _modalActions,
 		};
 	}, [ actions, item ] );
 
@@ -264,11 +270,19 @@ function ListItem< Item >( {
 							/>
 						</Menu.Popover>
 					</Menu>
-					<ActionModal
-						action={ activeModalAction }
-						items={ [ item ] }
-						closeModal={ () => setActiveModalAction( null ) }
-					/>
+					{ modalActions.map( ( action ) => (
+						<ActionModal
+							key={ action.id }
+							action={ action }
+							items={ [ item ] }
+							open={ activeModalAction?.id === action.id }
+							onOpenChange={ ( isOpen ) => {
+								if ( ! isOpen ) {
+									setActiveModalAction( null );
+								}
+							} }
+						/>
+					) ) }
 				</div>
 			) }
 		</Stack>
