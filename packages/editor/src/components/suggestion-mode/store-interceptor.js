@@ -96,6 +96,14 @@ function shallowAttributeEquals( a, b ) {
 	if ( aKeys.length !== bKeys.length ) {
 		return false;
 	}
+	// Wrapper objects like `RichTextData` hold their content in private
+	// class fields, so `Object.keys()` returns an empty array regardless
+	// of the text or formatting they wrap. Without a string fallback the
+	// loop below is vacuously equal and two different RichTextData values
+	// look identical to the interceptor.
+	if ( aKeys.length === 0 ) {
+		return String( a ) === String( b );
+	}
 	for ( const key of aKeys ) {
 		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
 			return false;
