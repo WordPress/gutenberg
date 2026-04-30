@@ -76,6 +76,34 @@ describe( 'SelectControl', () => {
 		).toBeVisible();
 	} );
 
+	it( 'passes the current value to custom trigger content', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<SelectControl
+				label="Country"
+				items={ mockItems }
+				defaultValue="option1"
+				triggerContent={ ( value ) => `Selected ${ value }` }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', {
+			name: 'Country',
+		} );
+
+		expect( trigger ).toHaveTextContent( 'Selected option1' );
+
+		await user.click( trigger );
+		await user.click(
+			await screen.findByRole( 'option', {
+				name: 'Option 2',
+			} )
+		);
+
+		expect( trigger ).toHaveTextContent( 'Selected option2' );
+	} );
+
 	describe( 'Form data behavior', () => {
 		it( 'submits correct form data when option is selected with custom name', async () => {
 			const user = userEvent.setup();
