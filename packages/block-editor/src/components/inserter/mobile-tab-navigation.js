@@ -8,12 +8,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
-	__experimentalHeading as Heading,
 	__experimentalView as View,
 	Navigator,
 	FlexBlock,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import { Text } from '@wordpress/ui';
 
 function ScreenHeader( { title } ) {
 	return (
@@ -32,7 +32,9 @@ function ScreenHeader( { title } ) {
 							label={ __( 'Back' ) }
 						/>
 						<Spacer>
-							<Heading level={ 5 }>{ title }</Heading>
+							<Text variant="heading-sm" render={ <h5 /> }>
+								{ title }
+							</Text>
 						</Spacer>
 					</HStack>
 				</Spacer>
