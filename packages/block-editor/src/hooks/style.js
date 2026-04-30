@@ -29,7 +29,7 @@ import {
 } from './dimensions';
 import {
 	shouldSkipSerialization,
-	useStyleOverride,
+	usePrivateStyleOverride,
 	useBlockSettings,
 } from './utils';
 import { scopeSelector } from '../components/global-styles/utils';
@@ -460,7 +460,7 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( { clientId, name, style } ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
 		'wp-elements'
@@ -475,7 +475,15 @@ function useBlockProps( { name, style } ) {
 		[ baseElementSelector, blockElementStyles, name ]
 	);
 
-	useStyleOverride( { css: styles } );
+	usePrivateStyleOverride(
+		clientId
+			? {
+					id: `elements-${ clientId }`,
+					css: styles,
+					clientId,
+			  }
+			: { css: styles }
+	);
 
 	return addSaveProps(
 		{ className: blockElementsContainerIdentifier },
