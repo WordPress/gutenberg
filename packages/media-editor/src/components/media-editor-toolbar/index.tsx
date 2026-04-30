@@ -17,6 +17,7 @@ import {
  * Internal dependencies
  */
 import { useCropper } from '../../image-editor';
+import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 
 export interface MediaEditorToolbarProps {
@@ -54,8 +55,8 @@ export default function MediaEditorToolbar( {
 		hasRedo,
 		undo: undoCrop,
 		redo: redoCrop,
-		commitHistory,
 	} = useCropper();
+	const rotationGestureHandlers = useCropGestureHandlers();
 
 	const handleReset = () => {
 		reset();
@@ -153,13 +154,10 @@ export default function MediaEditorToolbar( {
 					} )
 				}
 			/>
-			{ /* onPointerUp / onKeyUp reset the gesture flag so the next
-			     drag or keyboard interaction creates a fresh undo entry. */ }
 			<div
 				role="presentation"
 				className="media-editor-toolbar__rotation-slider"
-				onPointerUp={ commitHistory }
-				onKeyUp={ commitHistory }
+				{ ...rotationGestureHandlers }
 			>
 				<RangeControl
 					__next40pxDefaultSize

@@ -52,6 +52,7 @@ import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import { buildModifiers } from './build-modifiers';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
@@ -462,19 +463,23 @@ function MediaEditorModalContent( {
 			isDismissible={ false }
 			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
-				// Undo / Redo — only when a text input is not focused so
-				// browser-native field undo (Details tab) is preserved.
+				// Undo / Redo — skip when a metadata text field is focused
+				// so the browser's native field undo (Details tab) is
+				// preserved. Inputs inside a crop control wrapper are
+				// intentionally included — the wrapper's data attribute
+				// signals that custom undo/redo should handle them.
 				if (
 					( event.metaKey || event.ctrlKey ) &&
-					event.key === 'z' &&
+					event.key.toLowerCase() === 'z' &&
 					isImage
 				) {
 					const target = event.target as HTMLElement;
-					const isTextField =
-						target.tagName === 'INPUT' ||
-						target.tagName === 'TEXTAREA' ||
-						target.isContentEditable;
-					if ( ! isTextField ) {
+					const isMetadataField =
+						( target.tagName === 'INPUT' ||
+							target.tagName === 'TEXTAREA' ||
+							target.isContentEditable ) &&
+						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
+					if ( ! isMetadataField ) {
 						event.preventDefault();
 						if ( event.shiftKey ) {
 							cropper.redo();

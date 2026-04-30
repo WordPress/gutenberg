@@ -132,14 +132,18 @@ export function useCropperState(
 	// Tracks whether a continuous gesture (e.g. rotation slider drag) is
 	// in progress so we only push one history entry per gesture.
 	const isGestureRef = useRef( false );
+	// Snapshot of state at gesture start for lazy history push.
+	const gestureSnapshotRef = useRef< CropperState | null >( null );
 
-	const pushToHistory = useCallback( () => {
-		const current = stateRef.current;
-		// Skip duplicate pushes (e.g. rapid discrete action on unchanged state).
-		if ( historyRef.current[ historyRef.current.length - 1 ] === current ) {
+	// Pushes `entry` (defaults to current state) onto the undo stack and
+	// clears the redo stack. Skips if `entry` is already the last item,
+	// so rapid discrete actions on unchanged state don't create duplicates.
+	const pushToHistory = useCallback( ( entry?: CropperState ) => {
+		const target = entry ?? stateRef.current;
+		if ( historyRef.current[ historyRef.current.length - 1 ] === target ) {
 			return;
 		}
-		historyRef.current = [ ...historyRef.current, current ];
+		historyRef.current = [ ...historyRef.current, target ];
 		redoStackRef.current = [];
 		setHasUndo( true );
 		setHasRedo( false );
@@ -152,6 +156,7 @@ export function useCropperState(
 		}
 		redoStackRef.current = [ stateRef.current, ...redoStackRef.current ];
 		historyRef.current = historyRef.current.slice( 0, -1 );
+		gestureSnapshotRef.current = null;
 		isGestureRef.current = false;
 		setHasUndo( historyRef.current.length > 0 );
 		setHasRedo( true );
@@ -165,6 +170,7 @@ export function useCropperState(
 		}
 		historyRef.current = [ ...historyRef.current, stateRef.current ];
 		redoStackRef.current = redoStackRef.current.slice( 1 );
+		gestureSnapshotRef.current = null;
 		isGestureRef.current = false;
 		setHasUndo( true );
 		setHasRedo( redoStackRef.current.length > 0 );
@@ -174,17 +180,26 @@ export function useCropperState(
 	const beginGesture = useCallback( () => {
 		if ( ! isGestureRef.current ) {
 			isGestureRef.current = true;
-			pushToHistory();
+			// Capture state now but defer the history push until commitHistory
+			// so we only record an entry when something actually changed.
+			gestureSnapshotRef.current = stateRef.current;
 		}
-	}, [ pushToHistory ] );
+	}, [] );
 
 	const commitHistory = useCallback( () => {
+		const snapshot = gestureSnapshotRef.current;
+		// Only push if the gesture produced a real state change.
+		if ( snapshot !== null && snapshot !== stateRef.current ) {
+			pushToHistory( snapshot );
+		}
+		gestureSnapshotRef.current = null;
 		isGestureRef.current = false;
-	}, [] );
+	}, [ pushToHistory ] );
 
 	const clearHistory = useCallback( () => {
 		historyRef.current = [];
 		redoStackRef.current = [];
+		gestureSnapshotRef.current = null;
 		isGestureRef.current = false;
 		setHasUndo( false );
 		setHasRedo( false );
@@ -231,16 +246,9 @@ export function useCropperState(
 
 	const setRotation = useCallback(
 		( rotation: number ) => {
-			// The rotation slider fires many onChange events during a single
-			// drag gesture. Only push one history entry at the start of each
-			// gesture; commitHistory() resets the flag on pointer/key release.
-			if ( ! isGestureRef.current ) {
-				isGestureRef.current = true;
-				pushToHistory();
-			}
 			dispatch( { type: 'SET_ROTATION', payload: rotation } );
 		},
-		[ dispatch, pushToHistory ]
+		[ dispatch ]
 	);
 
 	const setFlip = useCallback(
