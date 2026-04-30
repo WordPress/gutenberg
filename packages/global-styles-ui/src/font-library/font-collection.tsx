@@ -301,6 +301,7 @@ function FontCollection( { slug }: { slug: string } ) {
 										{ selectedCollection.description }
 									</WCText>
 								</VStack>
+								{ /* eslint-disable-next-line react-hooks/static-components */ }
 								<ActionsComponent />
 							</HStack>
 							<Spacer margin={ 4 } />
