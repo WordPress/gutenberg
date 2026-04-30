@@ -16,7 +16,8 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 	 *     List of properties for the icon.
 	 *
 	 *     @type string $label      Required. A human-readable label for the icon.
-	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
+	 *     @type string $collection Optional. The slug of a registered icon collection that this icon belongs to.
+	 *                              Defaults to "core" when omitted.
 	 *     @type string $content    Optional. SVG markup for the icon.
 	 *                              If not provided, the content will be retrieved from the `filePath` if set.
 	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
@@ -68,10 +69,12 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 			}
 		}
 
-		if ( ! isset( $icon_properties['collection'] ) || ! is_string( $icon_properties['collection'] ) ) {
+		if ( ! isset( $icon_properties['collection'] ) ) {
+			$icon_properties['collection'] = 'core';
+		} elseif ( ! is_string( $icon_properties['collection'] ) ) {
 			_doing_it_wrong(
 				__METHOD__,
-				__( 'Icon collection is required and must be a string.', 'gutenberg' ),
+				__( 'Icon collection must be a string.', 'gutenberg' ),
 				'7.1.0'
 			);
 			return false;

@@ -136,19 +136,18 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should fail when `collection` is missing.
-	 *
-	 * @expectedIncorrectUsage WP_Icons_Registry_Gutenberg::register
+	 * Should default `collection` to "core" when omitted.
 	 */
-	public function test_register_requires_collection() {
+	public function test_register_defaults_collection_to_core() {
 		$result = $this->register(
-			'my-icon',
+			'defaulted-icon',
 			array(
 				'label'   => 'Icon',
 				'content' => '<svg></svg>',
 			)
 		);
-		$this->assertFalse( $result );
+		$this->assertTrue( $result );
+		$this->assertTrue( $this->registry->is_registered( 'core/defaulted-icon' ) );
 	}
 
 	/**

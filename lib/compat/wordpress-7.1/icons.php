@@ -44,7 +44,8 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	 *     List of properties for the icon.
 	 *
 	 *     @type string $label      Required. A human-readable label for the icon.
-	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
+	 *     @type string $collection Optional. The slug of a registered icon collection that this icon belongs to.
+	 *                              Defaults to "core" when omitted.
 	 *     @type string $content    Optional. SVG markup for the icon.
 	 *                              If not provided, the content will be retrieved from the `filePath` if set.
 	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
