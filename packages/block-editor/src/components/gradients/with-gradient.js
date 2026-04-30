@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { __experimentalUseGradient } from './use-gradient';
+import { useGradient } from './use-gradient';
 
 export const withGradient = ( WrappedComponent ) =>
 	function WithGradient( props ) {
-		const { gradientValue } = __experimentalUseGradient();
+		const { gradientValue } = useGradient();
 		return (
 			<WrappedComponent { ...props } gradientValue={ gradientValue } />
 		);
