@@ -24,4 +24,11 @@
 		flex-shrink: 0;
 		display: block;
 	}
+
+	[dir="rtl"] & {
+		.wp-block-slider-pagination-button__icon,
+		svg {
+			transform: scaleX(-1);
+		}
+	}
 }
