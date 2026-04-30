@@ -72,6 +72,56 @@ export const Default: Story = {
 };
 
 /**
+ * `Card.FullBleed` as the sole child of `Card.Content` spans edge-to-edge
+ * with no padding around it.
+ */
+export const FullBleedOnly: Story = {
+	args: {
+		children: (
+			<Card.Content>
+				<Card.FullBleed>
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
+				</Card.FullBleed>
+			</Card.Content>
+		),
+	},
+};
+
+/**
+ * When `Card.FullBleed` is the sole child of `Card.Content` and a
+ * `Card.Header` sits above it, the image bumps against the card's side and
+ * bottom edges while the header retains its normal padding.
+ */
+export const FullBleedContentWithHeader: Story = {
+	args: {
+		children: (
+			<>
+				<Card.Header>
+					<Card.Title>Card title</Card.Title>
+				</Card.Header>
+				<Card.Content>
+					<Card.FullBleed>
+						<div
+							style={ {
+								height: 180,
+								background:
+									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+							} }
+						/>
+					</Card.FullBleed>
+				</Card.Content>
+			</>
+		),
+	},
+};
+
+/**
  * `Card.FullBleed` breaks out of the card's padding to span
  * edge-to-edge. Useful for images, dividers, or embedded content.
  */

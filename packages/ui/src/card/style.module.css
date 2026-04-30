@@ -53,4 +53,18 @@
 	.header > .fullbleed:first-child:not(:last-child) {
 		margin-block-end: var(--wp-ui-card-padding);
 	}
+
+	/* When FullBleed is the only child of Content and Content is the first
+	 * child of the card, extend FullBleed flush to the card's top edge.
+	 */
+	.content:first-child > .fullbleed:only-child {
+		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+	}
+
+	/* When FullBleed is the only child of Content and Content is the last
+	 * child of the card, extend FullBleed flush to the card's bottom edge.
+	 */
+	.content:last-child > .fullbleed:only-child {
+		margin-block-end: calc(-1 * var(--wp-ui-card-padding));
+	}
 }
