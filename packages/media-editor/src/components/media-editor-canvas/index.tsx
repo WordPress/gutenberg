@@ -50,6 +50,7 @@ export default function MediaEditorCanvas( {
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				onGestureStart={ controller.commitHistory }
 				onGestureEnd={ controller.commitHistory }
 			/>
 		</div>
