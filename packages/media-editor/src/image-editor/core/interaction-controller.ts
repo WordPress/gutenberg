@@ -361,6 +361,10 @@ export class InteractionController {
 	handleWheel( e: WheelEvent ): void {
 		e.preventDefault();
 
+		if ( this.drag ) {
+			return;
+		}
+
 		// Debounced gesture boundaries for wheel zoom.
 		// Start on first wheel event, end after 300ms of no events.
 		if ( ! this.wheelGestureActive ) {

@@ -465,6 +465,31 @@ describe( 'InteractionController', () => {
 			expect( setZoomCall![ 0 ] ).toBe( 4 );
 		} );
 
+		it( 'does not zoom while pointer pan is active', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const el = createMockElement();
+
+			controller.handlePointerDown(
+				createPointerEvent( { clientX: 100, clientY: 100 } ),
+				el
+			);
+
+			jest.clearAllMocks();
+
+			const wheelEvent = createWheelEvent( {
+				deltaY: -100,
+				currentTarget: null,
+			} );
+			controller.handleWheel( wheelEvent );
+
+			expect( wheelEvent.preventDefault ).toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+
+			el._fire( 'pointerup', createPointerEvent() );
+		} );
+
 		it( 'calls onGestureStart on first wheel, onGestureEnd after debounce', () => {
 			jest.useFakeTimers( {
 				doNotFake: [ 'requestAnimationFrame', 'cancelAnimationFrame' ],
