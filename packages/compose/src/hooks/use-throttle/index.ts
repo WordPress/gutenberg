@@ -12,7 +12,8 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { throttle } from '../../utils/throttle';
-import type { ThrottleOptions, DebouncedFunc } from '../../utils/throttle';
+import type { ThrottleOptions } from '../../utils/throttle';
+import type { DebouncedFunc } from '../../utils/debounce';
 
 /**
  * Throttles a function similar to Lodash's `throttle`. A new throttled function will
