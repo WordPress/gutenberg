@@ -19,6 +19,7 @@ import type {
 	BlockStyle,
 	BlockBindingsSource,
 	Icon,
+	BlockConfiguration,
 } from '../types';
 
 function isObject( object: unknown ): object is Record< string, unknown > {
@@ -125,9 +126,23 @@ function getBlockSettingsFromMetadata( {
  * @return The block, if it has been successfully registered;
  *         otherwise `undefined`.
  */
-export function registerBlockType(
-	blockNameOrMetadata: string | Record< string, unknown >,
-	settings: Partial< BlockType >
+export function registerBlockType<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+>(
+	blockNameOrMetadata: BlockConfiguration< Attributes >,
+	settings?: Partial< BlockConfiguration< Attributes > >
+): BlockType | undefined;
+export function registerBlockType<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+>(
+	blockNameOrMetadata: string,
+	settings: BlockConfiguration< Attributes >
+): BlockType | undefined;
+export function registerBlockType<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+>(
+	blockNameOrMetadata: string | BlockConfiguration< Attributes >,
+	settings?: Partial< BlockConfiguration< Attributes > >
 ): BlockType | undefined {
 	const name = isObject( blockNameOrMetadata )
 		? blockNameOrMetadata.name
@@ -662,9 +677,15 @@ export const getBlockVariations = (
  */
 export const registerBlockVariation = (
 	blockName: string,
-	variation: BlockVariation
+	variation: BlockVariation | BlockVariation[]
 ): void => {
-	if ( typeof variation.name !== 'string' ) {
+	if ( Array.isArray( variation ) ) {
+		for ( const v of variation ) {
+			if ( typeof v.name !== 'string' ) {
+				warning( 'Variation names must be unique strings.' );
+			}
+		}
+	} else if ( typeof variation.name !== 'string' ) {
 		warning( 'Variation names must be unique strings.' );
 	}
 
@@ -698,7 +719,7 @@ export const registerBlockVariation = (
  */
 export const unregisterBlockVariation = (
 	blockName: string,
-	variationName: string
+	variationName: string | string[]
 ): void => {
 	dispatch( blocksStore ).removeBlockVariations( blockName, variationName );
 };

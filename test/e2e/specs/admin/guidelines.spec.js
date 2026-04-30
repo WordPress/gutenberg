@@ -121,11 +121,10 @@ test.describe( 'Guidelines', () => {
 			.getByRole( 'link', { name: 'Guidelines' } )
 			.click();
 
-		// The page layout renders the "Guidelines" title as an h2 (the
-		// Page component defaults headingLevel to 2) and the category
-		// accordions load once the initial fetch resolves.
+		// The page layout renders the "Guidelines" title as an h1 and
+		// the category accordions load once the initial fetch resolves.
 		await expect(
-			page.getByRole( 'heading', { name: 'Guidelines', level: 2 } )
+			page.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
 		).toBeVisible();
 		await expect(
 			page.getByRole( 'button', { name: 'Expand Copy guidelines' } )

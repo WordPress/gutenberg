@@ -115,3 +115,21 @@
 		padding-right: $grid-unit-30;
 	}
 }
+
+// Show button text labels when preference is enabled.
+.show-icon-labels {
+	.edit-site-patterns__button.has-icon {
+		width: auto;
+		padding: 0 var(--wpds-dimension-padding-xs);
+
+		// Hide the button icons when labels are set to display...
+		svg {
+			display: none;
+		}
+		// ... and display labels.
+		&::after {
+			content: attr(aria-label);
+			font-size: var(--wpds-typography-font-size-sm);
+		}
+	}
+}

@@ -46,26 +46,14 @@
 	}
 
 	/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
-	 * Twemoji replacement and text-selection issues. Root <a> gets
-	 * text-decoration:none; the link-contents span re-applies it.
-	 * text-underline-offset is inherited and propagates from .link
-	 * automatically. text-decoration-thickness and text-decoration-color
-	 * are NOT inherited, so they are explicitly redeclared on
-	 * .link-contents (the latter via `inherit` to carry the neutral
-	 * tone's custom color token through). */
-	.has-link-icon {
-		text-decoration: none;
-	}
-
-	.link-contents {
-		text-decoration: underline;
-		text-decoration-color: inherit;
-		text-decoration-thickness: 0.5px;
-	}
+	 * Twemoji replacement and text-selection issues. The icon is an
+	 * inline-block so the link underline stays scoped to the text. */
 
 	.link-icon {
+		display: inline-block;
 		margin-inline-start: var(--wpds-dimension-padding-xs);
 		font-weight: var(--wpds-typography-font-weight-regular);
+		text-decoration: none;
 	}
 
 	.link-icon::after {

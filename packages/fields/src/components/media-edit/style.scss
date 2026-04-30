@@ -103,7 +103,7 @@ fieldset.fields__media-edit {
 		border-radius: $radius-small;
 		padding: $grid-unit-05 $grid-unit-10;
 		min-height: $grid-unit-50;
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 		min-width: 0;
 
 		&:not(.has-attachment) {

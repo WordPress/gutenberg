@@ -70,9 +70,12 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
-const { DimensionsTool, ResolutionTool, mediaEditKey } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	DimensionsTool,
+	ResolutionTool,
+	mediaEditKey,
+	openMediaEditorModalKey,
+} = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
 	{
@@ -362,27 +365,6 @@ export default function Image( {
 		[ id, isSingleSelected ]
 	);
 
-	// If the image has an id but the attachment doesn't exist on this site,
-	// clear the id so Gutenberg treats the image as external.
-	// This handles content copied between WordPress sites.
-	//
-	// Known limitation: if a different attachment with the same id happens to
-	// exist on the destination site, the lookup will succeed and the wrong
-	// local image will be used. URL matching could address this in a follow-up.
-	// See: https://github.com/WordPress/gutenberg/issues/74156
-	useEffect( () => {
-		if ( ! id || ! isSingleSelected ) {
-			return;
-		}
-		// Only clear for confirmed 404s. apiFetch throws the Response object
-		// for HTTP errors, so checking .status === 404 avoids incorrectly
-		// clearing the id on 403, 500, or network failures, which would
-		// cause data loss for valid local attachments.
-		if ( attachmentResolutionError?.status === 404 ) {
-			setAttributes( { id: undefined } );
-		}
-	}, [ id, isSingleSelected, attachmentResolutionError, setAttributes ] );
-
 	const {
 		canInsertCover,
 		imageEditing,
@@ -411,9 +393,27 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
-	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
+	const settings = getSettings();
+	const { onNavigateToEntityRecord } = settings;
+	const openMediaEditorModal = settings[ openMediaEditorModalKey ];
 
-	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
+	const handleMediaUpdate = useCallback(
+		( { id: newId, url: newUrl } ) => {
+			if ( typeof newId === 'number' && newId !== id ) {
+				setAttributes( {
+					id: newId,
+					url: newUrl ?? url,
+				} );
+			}
+		},
+		[ id, url, setAttributes ]
+	);
+
+	const {
+		replaceBlocks,
+		toggleSelection,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
@@ -443,6 +443,34 @@ export default function Image( {
 			( { slug } ) => image?.media_details?.sizes?.[ slug ]?.source_url
 		)
 		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
+
+	// If the image has an id but the attachment doesn't exist on this site,
+	// clear the id so Gutenberg treats the image as external.
+	// This handles content copied between WordPress sites.
+	//
+	// Known limitation: if a different attachment with the same id happens to
+	// exist on the destination site, the lookup will succeed and the wrong
+	// local image will be used. URL matching could address this in a follow-up.
+	// See: https://github.com/WordPress/gutenberg/issues/74156
+	useEffect( () => {
+		if ( ! id || ! isSingleSelected ) {
+			return;
+		}
+		// Only clear for confirmed 404s. apiFetch throws the Response object
+		// for HTTP errors, so checking .status === 404 avoids incorrectly
+		// clearing the id on 403, 500, or network failures, which would
+		// cause data loss for valid local attachments.
+		if ( attachmentResolutionError?.status === 404 ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { id: undefined } );
+		}
+	}, [
+		id,
+		isSingleSelected,
+		attachmentResolutionError,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -864,7 +892,15 @@ export default function Image( {
 					) }
 					{ allowCrop && (
 						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
+							onClick={
+								openMediaEditorModal && id
+									? () =>
+											openMediaEditorModal( {
+												id,
+												onUpdate: handleMediaUpdate,
+											} )
+									: () => setIsEditingImage( true )
+							}
 							icon={ crop }
 							label={ __( 'Crop' ) }
 						/>

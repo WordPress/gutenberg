@@ -1,0 +1,17 @@
+{
+	"name": "@wordpress/dashboard-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": [
+			"dashboard"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
+		"@wordpress/element": "file:../../packages/element",
+		"@wordpress/i18n": "file:../../packages/i18n"
+	}
+}

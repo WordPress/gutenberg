@@ -13,13 +13,21 @@ type AutocompleteMatch = {
 	filterValue: string;
 };
 
+type AutocompleteMatchOptions = {
+	matchCount: number;
+	isBackspacing: boolean;
+	getTextAfterSelection: () => string;
+	lastCompletion?: { name: string; value: string } | null;
+};
+
 export function getAutocompleteMatch(
 	textContent: string,
 	completers: WPCompleter[],
-	filteredOptionsLength: number,
-	isBackspacing: boolean,
-	getTextAfterSelection: () => string
+	options: AutocompleteMatchOptions
 ): AutocompleteMatch | null {
+	const { matchCount, isBackspacing, getTextAfterSelection, lastCompletion } =
+		options;
+
 	if ( ! textContent ) {
 		return null;
 	}
@@ -58,6 +66,7 @@ export function getAutocompleteMatch(
 	}
 
 	const { allowContext, triggerPrefix } = completer;
+
 	const textWithoutTrigger = textContent.slice(
 		triggerIndex + triggerPrefix.length
 	);
@@ -71,7 +80,7 @@ export function getAutocompleteMatch(
 		return null;
 	}
 
-	const mismatch = filteredOptionsLength === 0;
+	const mismatch = matchCount === 0;
 	const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
 
 	// Allow matching when typing a trigger + the match string or when
@@ -104,6 +113,18 @@ export function getAutocompleteMatch(
 	if (
 		/^\s/.test( textWithoutTrigger ) ||
 		/\s\s+$/.test( textWithoutTrigger )
+	) {
+		return null;
+	}
+
+	// After a completion whose value starts with the trigger prefix
+	// (e.g. @username), the trigger remains in the text and would
+	// re-activate the autocompleter. Suppress the match when the
+	// filter value still corresponds to the recently completed text.
+	if (
+		lastCompletion &&
+		lastCompletion.name === completer.name &&
+		textWithoutTrigger.trimEnd() === lastCompletion.value
 	) {
 		return null;
 	}
