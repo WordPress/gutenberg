@@ -151,16 +151,19 @@ export function QuickEditModal( {
 		} else {
 			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
-		closeModal?.();
+		closeModal();
 	};
 
 	return (
 		<Drawer.Root
 			open
+			// Physical direction. Quick Edit anchors to the right edge of the
+			// viewport in both LTR and RTL — matching the previous Modal-based
+			// implementation.
 			swipeDirection="right"
 			onOpenChange={ ( open ) => {
 				if ( ! open ) {
-					closeModal?.();
+					closeModal();
 				}
 			} }
 		>
@@ -180,14 +183,16 @@ export function QuickEditModal( {
 					onClose={ closeModal }
 					hideActions
 				/>
-				{ hasFinishedResolution && (
-					<DataForm
-						data={ { ...record, ...localEdits } }
-						fields={ fields }
-						form={ form }
-						onChange={ onChange }
-					/>
-				) }
+				<Drawer.Content>
+					{ hasFinishedResolution && (
+						<DataForm
+							data={ { ...record, ...localEdits } }
+							fields={ fields }
+							form={ form }
+							onChange={ onChange }
+						/>
+					) }
+				</Drawer.Content>
 				<Drawer.Footer>
 					<Drawer.Action __next40pxDefaultSize variant="secondary">
 						{ __( 'Cancel' ) }
