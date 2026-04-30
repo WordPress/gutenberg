@@ -861,7 +861,8 @@ export default dedupePlugins( [
 	},
 
 	// Override: Files with pre-existing exhaustive-deps warnings that cannot use
-	// inline eslint-disable comments (react-compiler flags those as errors).
+	// inline eslint-disable comments because the React Compiler rules in
+	// `react-hooks` flag those as errors.
 	{
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
