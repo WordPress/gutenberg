@@ -55,12 +55,20 @@ export interface UseInteractionOptions {
 /** How long keyboard placement stays active after the latest handled key. */
 const KEYBOARD_INTERACTION_IDLE_MS = 300;
 
-function isHandledKeyboardInteraction( event: KeyboardEvent ): boolean {
+function isHandledKeyboardPan( event: KeyboardEvent ): boolean {
 	switch ( event.key ) {
 		case 'ArrowUp':
 		case 'ArrowDown':
 		case 'ArrowLeft':
 		case 'ArrowRight':
+			return true;
+		default:
+			return false;
+	}
+}
+
+function isHandledKeyboardZoom( event: KeyboardEvent ): boolean {
+	switch ( event.key ) {
 		case '+':
 		case '=':
 		case '-':
@@ -123,14 +131,13 @@ export function useInteraction(
 	const stopPlacementGesture = useCallback( () => {
 		setIsGestureActive( false );
 	}, [] );
-	const signalKeyboardPlacement = useCallback( () => {
-		// Fire onGestureStart once at the beginning of each keyboard gesture
-		// so the undo system captures a history entry for the whole sequence.
+	// Shared timer logic for any keyboard gesture (pan or zoom): fires
+	// onGestureStart once per burst and onGestureEnd after the idle window.
+	const signalKeyboardGesture = useCallback( () => {
 		if ( ! isKeyboardGestureActiveRef.current ) {
 			isKeyboardGestureActiveRef.current = true;
 			optionsRef.current?.onGestureStart?.();
 		}
-		setIsKeyboardPanning( true );
 		clearTimeout( keyboardInteractionTimerRef.current );
 		keyboardInteractionTimerRef.current = setTimeout( () => {
 			isKeyboardGestureActiveRef.current = false;
@@ -212,12 +219,15 @@ export function useInteraction(
 
 	const onKeyDown = useCallback(
 		( e: React.KeyboardEvent ) => {
-			if ( isHandledKeyboardInteraction( e.nativeEvent ) ) {
-				signalKeyboardPlacement();
+			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
+				setIsKeyboardPanning( true );
+				signalKeyboardGesture();
+			} else if ( isHandledKeyboardZoom( e.nativeEvent ) ) {
+				signalKeyboardGesture();
 			}
 			controllerRef.current?.handleKeyDown( e.nativeEvent );
 		},
-		[ signalKeyboardPlacement ]
+		[ signalKeyboardGesture ]
 	);
 
 	const onWheelNative = useCallback( ( e: WheelEvent ) => {
