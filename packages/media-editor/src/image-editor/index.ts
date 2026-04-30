@@ -8,9 +8,18 @@
  */
 
 // React surface.
-export { useCropperState } from './react/hooks';
+export { useCropperState, useCropGeometry } from './react/hooks';
 export { Cropper, CropperProvider, useCropper } from './react/components';
-export type { UseCropperStateReturn } from './react/hooks';
+export type {
+	UseCropperStateReturn,
+	UseCropGeometryReturn,
+	CropGeometryApplyOperation,
+	CropGeometryCapabilities,
+	CropGeometryOperation,
+	CropGeometryOptions,
+	CropGeometryRange,
+	CropPixelRect,
+} from './react/hooks';
 export type { CropperProps } from './react/components';
 
 // State and extension types.

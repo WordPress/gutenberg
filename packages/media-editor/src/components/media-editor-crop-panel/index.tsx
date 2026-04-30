@@ -21,6 +21,7 @@ import {
 	ORIGINAL_ASPECT_RATIO,
 } from '../../image-editor/core/constants';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import CropAdvancedPanel from './crop-advanced-panel';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -91,6 +92,13 @@ export default function MediaEditorCropPanel( {
 }: MediaEditorCropPanelProps ) {
 	const { state, setZoom } = useCropper();
 	const zoomGestureHandlers = useCropGestureHandlers();
+	const imageAspectRatio = state.image
+		? state.image.naturalWidth / state.image.naturalHeight
+		: null;
+	const resolvedAspectRatio = resolveAspectRatio(
+		aspectRatioValue,
+		imageAspectRatio
+	);
 	const aspectRatioOptions = [
 		...DEFAULT_ASPECT_RATIOS.filter( ( preset ) => preset.value <= 0 ),
 		...( aspectRatioPresets ??
@@ -150,6 +158,11 @@ export default function MediaEditorCropPanel( {
 					} }
 				/>
 			</div>
+			<CropAdvancedPanel
+				aspectRatio={ resolvedAspectRatio }
+				freeformCrop={ freeformCrop }
+				onPlacementControlInteraction={ onPlacementControlInteraction }
+			/>
 		</Stack>
 	);
 }

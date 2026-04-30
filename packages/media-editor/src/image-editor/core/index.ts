@@ -25,6 +25,27 @@ export type { AspectRatioPreset } from './constants';
 export { getSourceRegion, getSourceRegionPercent } from './source-region';
 export type { SourceRegion, SourceRegionPercent } from './source-region';
 
+// Crop geometry
+export {
+	applyCropGeometryOperation,
+	cropPixelRectToNormalizedRect,
+	getCropGeometryCapabilities,
+	getCropGeometryRange,
+	getCropGeometrySourceRegion,
+	getCropPixelRect,
+	isCropGeometryReady,
+} from './crop-geometry';
+export type {
+	CropGeometryApplyOperation,
+	CropGeometryCapabilities,
+	CropGeometryInput,
+	CropGeometryOperation,
+	CropGeometryOptions,
+	CropGeometryRange,
+	CropPixelRect,
+	CropperLayoutGeometry,
+} from './crop-geometry';
+
 // Pipeline
 export {
 	applyOperationToState,

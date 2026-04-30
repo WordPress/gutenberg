@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -11,6 +16,7 @@ import {
 	type UseCropperStateReturn,
 } from '../hooks/use-cropper-state';
 import type { CropperState } from '../../core/types';
+import type { CropperLayoutGeometry } from '../../core/crop-geometry';
 
 /**
  * The context value type for the CropperProvider.
@@ -19,6 +25,20 @@ import type { CropperState } from '../../core/types';
 type CropperContextValue = UseCropperStateReturn | null;
 
 const CropperContext = createContext< CropperContextValue >( null );
+
+type CropperGeometryContextValue = {
+	geometry: CropperLayoutGeometry | null;
+	setGeometry: React.Dispatch<
+		React.SetStateAction< CropperLayoutGeometry | null >
+	>;
+} | null;
+
+const CropperGeometryContext =
+	createContext< CropperGeometryContextValue >( null );
+
+const noopSetGeometry: React.Dispatch<
+	React.SetStateAction< CropperLayoutGeometry | null >
+> = () => {};
 
 /**
  * Props for the CropperProvider component.
@@ -46,10 +66,19 @@ export function CropperProvider( {
 	children,
 }: CropperProviderProps ) {
 	const cropperReturn = useCropperState( initialState );
+	const [ geometry, setGeometry ] = useState< CropperLayoutGeometry | null >(
+		null
+	);
+	const geometryContextValue = useMemo(
+		() => ( { geometry, setGeometry } ),
+		[ geometry ]
+	);
 
 	return (
 		<CropperContext.Provider value={ cropperReturn }>
-			{ children }
+			<CropperGeometryContext.Provider value={ geometryContextValue }>
+				{ children }
+			</CropperGeometryContext.Provider>
 		</CropperContext.Provider>
 	);
 }
@@ -70,4 +99,54 @@ export function useCropper(): UseCropperStateReturn {
 	}
 
 	return context;
+}
+
+/**
+ * Hook to consume the measured cropper layout geometry.
+ *
+ * @return Measured cropper geometry, or null before the Cropper publishes it.
+ */
+export function useCropperGeometry(): CropperLayoutGeometry | null {
+	const context = useContext( CropperGeometryContext );
+
+	if ( ! context ) {
+		throw new Error(
+			'useCropperGeometry must be used within a CropperProvider.'
+		);
+	}
+
+	return context.geometry;
+}
+
+/**
+ * Hook to publish measured cropper layout geometry.
+ *
+ * @return Setter for measured cropper geometry.
+ */
+export function useSetCropperGeometry(): React.Dispatch<
+	React.SetStateAction< CropperLayoutGeometry | null >
+> {
+	const context = useContext( CropperGeometryContext );
+
+	if ( ! context ) {
+		throw new Error(
+			'useSetCropperGeometry must be used within a CropperProvider.'
+		);
+	}
+
+	return context.setGeometry;
+}
+
+/**
+ * Hook to optionally publish measured geometry when a CropperProvider exists.
+ * Standalone Cropper usage remains supported and simply skips publication.
+ *
+ * @return Geometry setter, or a no-op outside CropperProvider.
+ */
+export function useOptionalSetCropperGeometry(): React.Dispatch<
+	React.SetStateAction< CropperLayoutGeometry | null >
+> {
+	const context = useContext( CropperGeometryContext );
+
+	return context?.setGeometry ?? noopSetGeometry;
 }
