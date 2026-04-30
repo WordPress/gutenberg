@@ -299,7 +299,6 @@ export default dedupePlugins( [
 			'react-hooks/immutability': 'off',
 			'react-hooks/refs': 'off',
 			'react-hooks/static-components': 'off',
-			'react-hooks/purity': 'off',
 		},
 		plugins: {
 			'react-hooks': reactHooksPlugin,
