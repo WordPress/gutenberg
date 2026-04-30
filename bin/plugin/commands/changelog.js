@@ -1086,7 +1086,7 @@ async function getReleaseChangelog( options ) {
 	} );
 }
 
-/** @type {NodeJS.Module} */ module.exports = {
+module.exports = {
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
 	createOmitByTitlePrefix,
