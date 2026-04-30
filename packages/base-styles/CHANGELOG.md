@@ -4,7 +4,9 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+    -   `.edit-site-sidebar-navigation-screen__title-icon`
+    -   `.edit-site-templates__dataviews-list-pagination`
     -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
     -   `.wp-block-cover__inner-container`
     -   `.wp-block-cover.has-background-dim::before`
