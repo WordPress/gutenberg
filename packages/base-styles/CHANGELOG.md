@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753)):
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
+    -   `.wp-block-cover__inner-container`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__video-background`
+
 ## 7.0.0 (2026-04-29)
 
 ### Breaking Changes
