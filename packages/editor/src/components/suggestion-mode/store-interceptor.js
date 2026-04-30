@@ -63,10 +63,11 @@ function shallowAttributeEquals( a, b ) {
 	if ( aKeys.length !== bKeys.length ) {
 		return false;
 	}
-	// When both sides are objects with 0 enumerable keys (e.g. _RichTextData
-	// instances whose content lives on internal non-enumerable slots), fall
-	// back to string comparison so identical wrappers are treated as equal
-	// and changed wrappers are detected as different.
+	// Wrapper objects like `RichTextData` hold their content in private
+	// class fields, so `Object.keys()` returns an empty array regardless
+	// of the text or formatting they wrap. Without a string fallback the
+	// loop below is vacuously equal and two different RichTextData values
+	// look identical to the interceptor.
 	if ( aKeys.length === 0 ) {
 		return String( a ) === String( b );
 	}
