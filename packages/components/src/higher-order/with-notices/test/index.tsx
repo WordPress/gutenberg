@@ -93,6 +93,7 @@ describe( 'withNotices return type', () => {
 describe( 'withNotices operations', () => {
 	let handle: React.RefObject< any >;
 	const Handle = ( props: any ) => {
+		// eslint-disable-next-line react-hooks/globals
 		handle = useRef( null );
 		return <TestNoticeOperations { ...props } ref={ handle } />;
 	};
