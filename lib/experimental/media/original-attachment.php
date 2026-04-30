@@ -51,11 +51,21 @@ add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id
  * `media_details.original_attachment`. Absent for attachments with
  * no edit lineage.
  *
+ * Only emitted in the `edit` context: the lineage is an editor
+ * concern (the Restore-original action), and scoping it here avoids
+ * disclosing chain relationships to unauthenticated readers and
+ * embed consumers.
+ *
  * @param WP_REST_Response $response REST response.
  * @param WP_Post          $post     Attachment post.
+ * @param WP_REST_Request  $request  REST request.
  * @return WP_REST_Response
  */
-function gutenberg_add_original_attachment_to_response( $response, $post ) {
+function gutenberg_add_original_attachment_to_response( $response, $post, $request ) {
+	if ( 'edit' !== $request['context'] ) {
+		return $response;
+	}
+
 	$data = $response->get_data();
 	if ( empty( $data['media_details'] ) || ! is_array( $data['media_details'] ) ) {
 		return $response;
@@ -87,4 +97,4 @@ function gutenberg_add_original_attachment_to_response( $response, $post ) {
 
 	return $response;
 }
-add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_response', 10, 2 );
+add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_response', 10, 3 );

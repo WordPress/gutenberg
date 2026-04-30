@@ -47,8 +47,9 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		return $id;
 	}
 
-	private function get_response_data( $id ) {
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/media/' . $id );
+	private function get_response_data( $id, $context = 'edit' ) {
+		$request = new WP_REST_Request( 'GET', '/wp/v2/media/' . $id );
+		$request->set_param( 'context', $context );
 		$response = rest_do_request( $request );
 		return $response->get_data();
 	}
@@ -70,6 +71,14 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 			wp_get_attachment_url( $original ),
 			$data['media_details']['original_attachment']['source_url']
 		);
+	}
+
+	public function test_view_context_omits_field() {
+		$original = $this->make_attachment();
+		$child    = $this->make_attachment( $original );
+
+		$data = $this->get_response_data( $child, 'view' );
+		$this->assertArrayNotHasKey( 'original_attachment', $data['media_details'] );
 	}
 
 	public function test_self_referencing_original_id_is_omitted() {
