@@ -29,8 +29,7 @@ const globalTips = [
 ];
 
 function Tips() {
-	const [ randomIndex ] = useState(
-		// eslint-disable-next-line react-hooks/purity
+	const [ randomIndex ] = useState( () =>
 		Math.floor( Math.random() * globalTips.length )
 	);
 
