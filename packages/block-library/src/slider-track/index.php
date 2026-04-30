@@ -45,7 +45,7 @@ function render_block_core_slider_track( $attributes, $content, $block ) {
 			'aria-label',
 			sprintf(
 				/* translators: 1: Slide number, 2: Total number of slides. */
-				__( '%1$d of %2$d' ),
+				__( 'Slide %1$d of %2$d' ),
 				$slide_index,
 				$slide_count
 			)
