@@ -4,7 +4,20 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+    -   `.edit-site-sidebar-navigation-screen__title-icon`
+    -   `.edit-site-templates__dataviews-list-pagination`
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
+    -   `.wp-block-cover__inner-container`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__video-background`
+
+## 7.0.0 (2026-04-29)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
     -   `.block-editor-block-list__block::before`
@@ -30,9 +43,7 @@
     -   `.components-resizable-box__corner-handle`
     -   `.dataviews-action-modal__quick-edit`
     -   `.edit-site-editor__toggle-save-panel`
-    -   `.edit-site-sidebar-navigation-screen__title-icon`
     -   `.edit-site-template-panel__replace-template-modal`
-    -   `.edit-site-templates__dataviews-list-pagination`
     -   `.edit-widgets-header`
     -   `.edit-widgets-sidebar {greater than small}`
     -   `.interface-complementary-area .components-panel`
