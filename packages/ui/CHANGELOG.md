@@ -25,7 +25,7 @@
 
 ### New Features
 
--   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions:
+-   `Card`: `Card.FullBleed` now supports edge-bumping in additional positions ([#77856](https://github.com/WordPress/gutenberg/pull/77856)):
     -   As the **first child of `Card.Header`**, it extends flush to the card's top and side edges — ideal for hero images. Any siblings that follow (e.g. `Card.Title`) retain normal padding above them.
     -   As the **sole child of `Card.Content`**, it extends flush to the card's side edges and additionally to the top edge when `Content` is the first card child, or the bottom edge when it is the last. This enables full-bleed content panels with or without a header above them.
     -   The card's existing `overflow: clip` and `border-radius` handle rounded-corner clipping in all cases.
