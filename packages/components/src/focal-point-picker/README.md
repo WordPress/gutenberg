@@ -1,9 +1,11 @@
 # FocalPointPicker
 
-Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image. It addresses two common issues in responsive image rendering. First, large background images are often cropped in undesirable ways, especially on smaller viewports such as mobile devices. Second, the CSS aspect-ratio property can inadvertently crop out the area of highest visual interest. This component allows the selection of the point with the most important visual information and returns it as a pair of numbers between 0 and 1. The output value can be applied to either CSS `background-position` (for elements with `background-image`) or `object-position` (for `<img>` / `<video>` elements rendered with `object-fit: cover`).
+Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image.
 
--   Example focal point picker value: `{ x: 0.5, y: 0.1 };`
--   Corresponding CSS: `object-position: 50% 10%;`
+It addresses two common issues when displaying images in cropped containers. First, large background images can be cropped in undesirable ways, especially on smaller viewports such as mobile devices. Second, the CSS aspect-ratio property can inadvertently crop out the area of highest visual interest. This component allows the selection of the point with the most important visual information and returns it as a pair of numbers between 0 and 1. The output value can be applied to either CSS `background-position` (for elements with `background-image`) or `object-position` (for `<img>` / `<video>` elements rendered with `object-fit: cover`).
+
+-   Example focal point picker value: `{ x: 0.5, y: 0.1 }`;
+-   Corresponding CSS: `object-position: 50% 10%`;
 
 ## Usage
 
