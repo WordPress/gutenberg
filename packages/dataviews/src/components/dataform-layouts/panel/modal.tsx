@@ -7,13 +7,7 @@ import deepMerge from 'deepmerge';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Dialog } from '@wordpress/ui';
 
@@ -37,14 +31,13 @@ import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
-function ModalPopup< Item >( {
+function PanelModalSession< Item >( {
 	data,
 	field,
 	onChange,
 	fieldLabel,
 	onClose,
 	touched,
-	isOpen,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -52,21 +45,12 @@ function ModalPopup< Item >( {
 	onClose: () => void;
 	fieldLabel: string;
 	touched: boolean;
-	isOpen: boolean;
 } ) {
 	const { openAs } = field.layout as NormalizedPanelLayout;
 	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 
-	// `Dialog.Root` stays mounted in the React tree, so reset the in-progress
-	// edits whenever the dialog closes — otherwise they would leak into the
-	// next opening of the modal.
-	useEffect( () => {
-		if ( ! isOpen ) {
-			setChanges( {} );
-		}
-	}, [ isOpen ] );
 	const modalData = useMemo( () => {
 		return deepMerge( data, changes, {
 			arrayMerge: ( target, source ) => source,
@@ -182,6 +166,14 @@ function PanelModal< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
 	const [ isOpen, setIsOpen ] = useState( false );
+	// `Dialog.Root` stays mounted across opens, so the session component
+	// holding the in-progress `changes` state would also persist by default.
+	// Bump `sessionKey` on `onOpenChangeComplete` (when the exit animation
+	// finishes) to force-remount `<PanelModalSession>` between sessions —
+	// this preserves the existing "Cancel/close always wipes the draft"
+	// semantic without disturbing the form contents during the exit
+	// animation itself.
+	const [ sessionKey, setSessionKey ] = useState( 0 );
 
 	const { fieldDefinition, fieldLabel, summaryFields } =
 		useFieldFromFormField( field );
@@ -214,15 +206,20 @@ function PanelModal< Item >( {
 						handleClose();
 					}
 				} }
+				onOpenChangeComplete={ ( open ) => {
+					if ( ! open ) {
+						setSessionKey( ( k ) => k + 1 );
+					}
+				} }
 			>
-				<ModalPopup
+				<PanelModalSession
+					key={ sessionKey }
 					data={ data }
 					field={ field }
 					onChange={ onChange }
 					fieldLabel={ fieldLabel ?? '' }
 					onClose={ handleClose }
 					touched={ touched }
-					isOpen={ isOpen }
 				/>
 			</Dialog.Root>
 		</>
