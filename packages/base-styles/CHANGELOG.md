@@ -4,14 +4,17 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+    -   `.block-library-query-pattern__selection-search`
+    -   `.block-library-template-part__selection-search`
     -   `.edit-site-sidebar-navigation-screen__title-icon`
     -   `.edit-site-templates__dataviews-list-pagination`
-    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
-    -   `.wp-block-cover__inner-container`
-    -   `.wp-block-cover.has-background-dim::before`
+    -   `.editor-post-template__swap-template-search`
     -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__inner-container`
     -   `.wp-block-cover__video-background`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
 
 ## 7.0.0 (2026-04-29)
 
