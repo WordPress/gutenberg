@@ -10,7 +10,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import {
 	forwardRef,
-	useCallback,
 	useMemo,
 	useReducer,
 	useLayoutEffect,
@@ -53,10 +52,6 @@ function BlockPopover(
 		0
 	);
 
-	const debouncedRecompute = useCallback( () => {
-		window.requestAnimationFrame( () => forceRecomputePopoverDimensions() );
-	}, [ forceRecomputePopoverDimensions ] );
-
 	// When blocks are moved up/down, they are animated to their new position by
 	// updating the `transform` property manually (i.e. without using CSS
 	// transitions or animations). The animation, which can also scroll the block
@@ -69,13 +64,17 @@ function BlockPopover(
 			return;
 		}
 
-		const observer = new window.MutationObserver( debouncedRecompute );
+		const observer = new window.MutationObserver( () =>
+			window.requestAnimationFrame( () =>
+				forceRecomputePopoverDimensions()
+			)
+		);
 		observer.observe( selectedElement, { attributes: true } );
 
 		return () => {
 			observer.disconnect();
 		};
-	}, [ selectedElement, debouncedRecompute ] );
+	}, [ selectedElement ] );
 
 	const popoverAnchor = useMemo( () => {
 		if (
