@@ -4,11 +4,23 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77753](https://github.com/WordPress/gutenberg/pull/77753)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753)):
+    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
+    -   `.wp-block-cover__inner-container`
+    -   `.wp-block-cover.has-background-dim::before`
+    -   `.wp-block-cover__image-background`
+    -   `.wp-block-cover__video-background`
+
+## 7.0.0 (2026-04-29)
+
+### Breaking Changes
+
+-   Remove the following entries from the `z-index()` helper ([#77619](https://github.com/WordPress/gutenberg/pull/77619), [#77620](https://github.com/WordPress/gutenberg/pull/77620), [#77621](https://github.com/WordPress/gutenberg/pull/77621), [#77714](https://github.com/WordPress/gutenberg/pull/77714), [#77715](https://github.com/WordPress/gutenberg/pull/77715), [#77717](https://github.com/WordPress/gutenberg/pull/77717), [#77774](https://github.com/WordPress/gutenberg/pull/77774)):
     -   `.block-editor-block-contextual-toolbar`
     -   `.block-editor-block-list__block {core/image aligned wide or fullwide}`
     -   `.block-editor-block-list__block::before`
     -   `.block-editor-block-list__block.has-block-overlay`
+    -   `.block-editor-block-list__block .reusable-block-edit-panel *`
     -   `.block-editor-block-list__insertion-point`
     -   `.block-editor-block-switcher__arrow`
     -   `.block-editor-url-input__suggestions`
@@ -34,11 +46,6 @@
     -   `.edit-widgets-sidebar {greater than small}`
     -   `.interface-complementary-area .components-panel`
     -   `.interface-complementary-area .components-panel__header`
-    -   `.wp-block-cover.is-placeholder .components-placeholder.is-large`
-    -   `.wp-block-cover__inner-container`
-    -   `.wp-block-cover.has-background-dim::before`
-    -   `.wp-block-cover__image-background`
-    -   `.wp-block-cover__video-background`
     -   `.wp-block-template-part__placeholder-preview-filter-input`
 
 ## 6.20.0 (2026-04-15)

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2026-04-29)
+
 ### Enhancements
 
 -   `Page`: Keep the header row at a consistent height regardless of whether actions are present, and stop rendering an empty actions container when no actions are provided [#76683](https://github.com/WordPress/gutenberg/pull/76683).

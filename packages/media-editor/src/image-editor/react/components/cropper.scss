@@ -58,6 +58,17 @@ $handle-touch-target-size: 44px;
 		position: absolute;
 		pointer-events: none;
 		overflow: hidden;
+		transition: opacity 0.15s ease;
+	}
+
+	&__canvas--grid-interactive &__grid {
+		opacity: 0;
+		transition-delay: 0.1s;
+	}
+
+	&__canvas--show-grid &__grid {
+		opacity: 1;
+		transition-delay: 0s;
 	}
 
 	&__grid-line {
