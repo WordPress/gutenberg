@@ -123,11 +123,6 @@ $z-layers: (
 	// Show tooltips above NUX tips, wp-admin menus, submenus, and sidebar:
 	".components-tooltip": 1000002,
 
-	// Make sure block manager sticky category titles appear above the options
-	".block-editor-block-manager__category-title": 1,
-	// And block manager sticky disabled block count is higher still
-	".block-editor-block-manager__disabled-blocks-count": 2,
-
 	// Appear under the customizer heading UI, but over anything else.
 	".customize-widgets__topbar": 8,
 

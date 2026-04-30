@@ -4,7 +4,9 @@
 
 ### Breaking Changes
 
--   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+-   Remove the following entries from the `z-index()` helper ([#77753](https://github.com/WordPress/gutenberg/pull/77753), [#77759](https://github.com/WordPress/gutenberg/pull/77759), [#77806](https://github.com/WordPress/gutenberg/pull/77806), [#77808](https://github.com/WordPress/gutenberg/pull/77808)):
+    -   `.block-editor-block-manager__category-title`
+    -   `.block-editor-block-manager__disabled-blocks-count`
     -   `.block-library-query-pattern__selection-search`
     -   `.block-library-template-part__selection-search`
     -   `.edit-site-sidebar-navigation-screen__title-icon`
