@@ -12,6 +12,12 @@ export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 10;
 
 /**
+ * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
+ * This could be made configurable as a prop to the Cropper component.
+ */
+export const DEFAULT_WHEEL_ZOOM_SPEED = 0.0025;
+
+/**
  * Maximum free-rotation offset in degrees from the nearest 90° step.
  * The rotation slider allows ±45° around the current cardinal angle.
  */

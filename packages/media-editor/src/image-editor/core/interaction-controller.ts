@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { CropperState, NormalizedPoint, Size } from './types';
-import { MIN_ZOOM, MAX_ZOOM } from './constants';
+import { DEFAULT_WHEEL_ZOOM_SPEED, MIN_ZOOM, MAX_ZOOM } from './constants';
 import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
@@ -84,7 +84,7 @@ export interface InteractionControllerOptions {
 	minZoom?: number;
 	/** Maximum zoom level. Defaults to MAX_ZOOM. Read lazily. */
 	maxZoom?: number;
-	/** Zoom speed multiplier for wheel events. Defaults to 0.01. Read lazily. */
+	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. Read lazily. */
 	zoomSpeed?: number;
 	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. Read lazily. */
 	keyboardStep?: number;
@@ -200,7 +200,7 @@ export class InteractionController {
 
 	/** Read zoomSpeed lazily so option changes take effect immediately. */
 	private get zoomSpeed(): number {
-		return this.options.zoomSpeed ?? 0.01;
+		return this.options.zoomSpeed ?? DEFAULT_WHEEL_ZOOM_SPEED;
 	}
 
 	/** Read keyboardStep lazily so option changes take effect immediately. */

@@ -6,7 +6,12 @@ import {
 	type CropperInteractionActions,
 } from '../interaction-controller';
 import type { CropperState, Size } from '../types';
-import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../constants';
+import {
+	DEFAULT_STATE,
+	DEFAULT_WHEEL_ZOOM_SPEED,
+	MIN_ZOOM,
+	MAX_ZOOM,
+} from '../constants';
 
 // The test environment is Node (not jsdom), so DOM globals like HTMLElement
 // and Element are not available. Provide minimal stubs so that `instanceof`
@@ -379,8 +384,10 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).toHaveBeenCalled();
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// deltaY=-100, zoomSpeed=0.01, delta = 1, newZoom = 2+1 = 3.
-			expect( setZoomCall![ 0 ] ).toBe( 3 );
+			// deltaY=-100, default zoomSpeed = 0.0025, delta = 0.25.
+			expect( setZoomCall![ 0 ] ).toBe(
+				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
+			);
 		} );
 
 		it( 'calls setZoomAtPoint on wheel with currentTarget element', () => {
@@ -409,7 +416,9 @@ describe( 'InteractionController', () => {
 			);
 
 			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
-			expect( actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ] ).toBe( 3 );
+			expect( actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ] ).toBe(
+				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
+			);
 		} );
 
 		it( 'clamps to maxZoom on large positive wheel', () => {
@@ -421,7 +430,7 @@ describe( 'InteractionController', () => {
 			);
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// 9 + 5 = 14, clamped to MAX_ZOOM (10).
+			// 9 + 1.25 = 10.25, clamped to MAX_ZOOM (10).
 			expect( setZoomCall![ 0 ] ).toBe( MAX_ZOOM );
 		} );
 
@@ -434,7 +443,7 @@ describe( 'InteractionController', () => {
 			);
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// 2 + (-5) = -3, clamped to MIN_ZOOM (1).
+			// 2 + (-1.25) = 0.75, clamped to MIN_ZOOM (1).
 			expect( setZoomCall![ 0 ] ).toBe( MIN_ZOOM );
 		} );
 
