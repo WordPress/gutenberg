@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { EDITOR_STORE_NAME } from './constants';
+import { useSuggestionOverlay } from './overlay-context';
 
 /**
  * @typedef {Object} SuggestionOperation
@@ -263,6 +264,7 @@ export function useSuggestionsProvider() {
 		getBlockAttributes: selectBlockAttributes,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
 	} = useSelect( blockEditorStore );
+	const { requestInterceptorBypass, clearOverlay } = useSuggestionOverlay();
 
 	const createSuggestion = useCallback(
 		async ( { clientId, blockName, operations } ) => {
@@ -485,6 +487,15 @@ export function useSuggestionsProvider() {
 			}
 
 			try {
+				// Bypass the suggest-mode interceptor for this dispatch so
+				// the applied attributes actually land on the live block
+				// instead of being reverted into the overlay. Clearing the
+				// overlay entry resets the per-block suggestion tracking,
+				// so any subsequent user edit captures a fresh baseline
+				// from the post-apply attributes. Outside Suggest mode the
+				// interceptor isn't running and these calls are no-ops.
+				requestInterceptorBypass( targetClientId );
+				clearOverlay( targetClientId );
 				updateBlockAttributes( targetClientId, newAttributes );
 
 				await saveEntityRecord(
@@ -505,6 +516,7 @@ export function useSuggestionsProvider() {
 			} catch ( error ) {
 				// Roll back the block change so the UI isn't left in a
 				// half-applied state if the server rejected the update.
+				requestInterceptorBypass( targetClientId );
 				updateBlockAttributes( targetClientId, rollbackPayload );
 				createNotice(
 					'error',
@@ -519,6 +531,8 @@ export function useSuggestionsProvider() {
 			selectBlockAttributes,
 			selectClientIdsWithDescendants,
 			createNotice,
+			requestInterceptorBypass,
+			clearOverlay,
 		]
 	);
 
