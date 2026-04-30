@@ -24,6 +24,8 @@ export interface MediaEditorToolbarProps {
 	 * controller.
 	 */
 	onReset?: () => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
 }
 
 /**
@@ -33,9 +35,11 @@ export interface MediaEditorToolbarProps {
  * and freeform toggle live in the Crop sidebar tab instead.
  * @param props
  * @param props.onReset
+ * @param props.onPlacementControlInteraction
  */
 export default function MediaEditorToolbar( {
 	onReset,
+	onPlacementControlInteraction,
 }: MediaEditorToolbarProps ) {
 	const { state, setRotation, setFlip, snapRotate90, reset, isDirty } =
 		useCropper();
@@ -65,6 +69,7 @@ export default function MediaEditorToolbar( {
 			-MAX_ROTATION_OFFSET + EPS,
 			Math.min( MAX_ROTATION_OFFSET - EPS, value )
 		);
+		onPlacementControlInteraction?.();
 		setRotation( baseAngle + clamped * visualDir );
 	};
 
