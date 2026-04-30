@@ -209,6 +209,22 @@ test.describe( 'data-wp-bind', () => {
 					number: [ '10', undefined ],
 				},
 			},
+			{
+				testid: 'popover',
+				name: 'popover',
+				values: {
+					false: [ null, null ],
+					true: [ '', 'auto' ],
+					null: [ null, null ],
+					undef: [ null, null ],
+					emptyString: [ '', 'auto' ],
+					anyString: [ 'any', 'manual' ],
+					number: [ '10', 'manual' ],
+					auto: [ 'auto', 'auto' ],
+					manual: [ 'manual', 'manual' ],
+					hint: [ 'hint', 'hint' ],
+				},
+			},
 		];
 
 		for ( const { testid, name, values } of matrix ) {
@@ -271,49 +287,6 @@ test.describe( 'data-wp-bind', () => {
 				}
 			} );
 		}
-
-		test( 'popover is correctly hydrated for different values', async ( {
-			page,
-		} ) => {
-			const values: Record< string, string | null > = {
-				true: '',
-				false: null,
-				null: null,
-				undef: null,
-				auto: 'auto',
-				manual: 'manual',
-				hint: 'hint',
-			};
-
-			// Ensure hydration has happened.
-			const checkbox = page.getByTestId(
-				'add missing checked at hydration'
-			);
-			await expect( checkbox ).toBeChecked();
-
-			for ( const type in values ) {
-				const attrValue = values[ type ];
-				const container = page.getByTestId(
-					`hydrating popover ${ type }`
-				);
-				const el = container.getByTestId( 'popover' );
-				const toggle = container.getByTestId( 'toggle value' );
-
-				const hydratedAttr = await el.getAttribute( 'popover' );
-				expect( [ type, hydratedAttr ] ).toEqual( [ type, attrValue ] );
-
-				await toggle.click( { clickCount: 2 } );
-
-				// Ensure values have been updated after toggling.
-				await expect( toggle ).toHaveAttribute(
-					'data-toggle-count',
-					'2'
-				);
-
-				const renderedAttr = await el.getAttribute( 'popover' );
-				expect( [ type, renderedAttr ] ).toEqual( [ type, attrValue ] );
-			}
-		} );
 	} );
 
 	test( 'should ignore unique ids', async ( { page } ) => {
