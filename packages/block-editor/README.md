@@ -1122,10 +1122,6 @@ _Returns_
 
 -   `any`: value
 
-### useGradient
-
-Undocumented declaration.
-
 ### useHasRecursion
 
 A React hook for keeping track of blocks previously rendered up in the block tree. Blocks susceptible to recursion can use this hook in their `Edit` function to prevent said recursion.

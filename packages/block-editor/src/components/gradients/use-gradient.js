@@ -54,7 +54,7 @@ export function getGradientSlugByValue( gradients, value ) {
 	return gradient && gradient.slug;
 }
 
-export function useGradient( {
+function useGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
 } = {} ) {
