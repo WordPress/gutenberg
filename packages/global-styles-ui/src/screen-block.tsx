@@ -196,6 +196,8 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const shouldShowFiltersPanel =
+		hasFiltersPanel && selectedViewport === 'default';
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
 		name,
 		userSettings,
@@ -410,7 +412,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 					settings={ settings }
 				/>
 			) }
-			{ hasFiltersPanel && (
+			{ shouldShowFiltersPanel && (
 				<StylesFiltersPanel
 					inheritedValue={ inheritedStyleWithLayout }
 					value={ styleWithLayout }
