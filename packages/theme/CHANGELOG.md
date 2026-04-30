@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.11.0 (2026-04-15)
+
 ### Breaking changes
 
 -   Renamed typography tokens from `--wpds-font-*` to `--wpds-typography-*`. Sub-groups that correspond to CSS `font-*` properties retain the `font-` prefix; `line-height` does not. To migrate:

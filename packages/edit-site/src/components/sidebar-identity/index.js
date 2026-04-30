@@ -74,7 +74,7 @@ export default function SidebarIdentity() {
 	};
 
 	return (
-		<Page title={ __( 'Identity' ) } hasPadding>
+		<Page title={ __( 'Identity' ) } headingLevel={ 2 } hasPadding>
 			<DataForm
 				data={ data }
 				fields={ fields }

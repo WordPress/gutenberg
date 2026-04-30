@@ -1,18 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { combineReducers } from '@wordpress/data';
+import { combineReducers, keyedReducer } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import {
-	conservativeMapItem,
-	ifMatchingAction,
-	replaceAction,
-	onSubKey,
-} from '../utils';
+import { conservativeMapItem, ifMatchingAction, replaceAction } from '../utils';
 import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
@@ -221,11 +216,11 @@ const receiveQueries = compose( [
 	// an unhandled action.
 	ifMatchingAction( ( action ) => 'query' in action ),
 
-	// Inject query parts into action for use both in `onSubKey` and reducer.
+	// Inject query parts into action for use both in `keyedReducer` and reducer.
 	replaceAction( ( action ) => {
 		// `ifMatchingAction` still passes on initialization, where state is
 		// undefined and a query is not assigned. Avoid attempting to parse
-		// parts. `onSubKey` will omit by lack of `stableKey`.
+		// parts. `keyedReducer` will omit by lack of `stableKey`.
 		if ( action.query ) {
 			return {
 				...action,
@@ -236,11 +231,11 @@ const receiveQueries = compose( [
 		return action;
 	} ),
 
-	onSubKey( 'context' ),
+	keyedReducer( 'context' ),
 
 	// Queries shape is shared, but keyed by query `stableKey` part. Original
 	// reducer tracks only a single query object.
-	onSubKey( 'stableKey' ),
+	keyedReducer( 'stableKey' ),
 ] )( ( state = {}, action ) => {
 	if ( action.type !== 'RECEIVE_ITEMS' ) {
 		return state;

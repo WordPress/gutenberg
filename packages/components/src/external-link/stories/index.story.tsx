@@ -9,6 +9,7 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
+	tags: [ 'manifest' ],
 	component: ExternalLink,
 	title: 'Components/Navigation/ExternalLink',
 	id: 'components-externallink',

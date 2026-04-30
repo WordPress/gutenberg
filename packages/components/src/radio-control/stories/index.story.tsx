@@ -14,6 +14,7 @@ import { useState } from '@wordpress/element';
 import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
+	tags: [ 'manifest' ],
 	component: RadioControl,
 	title: 'Components/Selection & Input/Common/RadioControl',
 	id: 'components-radiocontrol',

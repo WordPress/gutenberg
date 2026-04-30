@@ -116,7 +116,11 @@ export default function PostTemplateEdit( {
 	attributes: { layout },
 	__unstableLayoutClassNames,
 } ) {
-	const { type: layoutType, columnCount = 3 } = layout || {};
+	const {
+		type: layoutType,
+		columnCount = 3,
+		minimumColumnWidth,
+	} = layout || {};
 	const [ activeBlockContextId, setActiveBlockContextId ] = useState();
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -281,6 +285,8 @@ export default function PostTemplateEdit( {
 		className: clsx( __unstableLayoutClassNames, {
 			[ `columns-${ columnCount }` ]:
 				layoutType === 'grid' && columnCount, // Ensure column count is flagged via classname for backwards compatibility.
+			'has-native-responsive-grid':
+				layoutType === 'grid' && columnCount && minimumColumnWidth, // Flag native responsive grid when minimum column width is provided.
 		} ),
 	} );
 
