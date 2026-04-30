@@ -36,8 +36,8 @@ function gutenberg_initialize_experiments_settings() {
 				),
 				array(
 					'id'          => 'gutenberg-no-tinymce',
-					'label'       => __( 'Disable TinyMCE and Classic block', 'gutenberg' ),
-					'description' => __( 'Disables the TinyMCE and Classic block.', 'gutenberg' ),
+					'label'       => __( 'Disable Classic block', 'gutenberg' ),
+					'description' => __( 'Hides the Classic block from any inserters in the block editor.', 'gutenberg' ),
 				),
 			),
 		),
