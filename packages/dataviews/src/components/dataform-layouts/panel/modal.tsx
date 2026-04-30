@@ -31,7 +31,7 @@ import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
-function ModalContent< Item >( {
+function ModalPopup< Item >( {
 	data,
 	field,
 	onChange,
@@ -107,62 +107,53 @@ function ModalContent< Item >( {
 	const initialFocus = useMapFocusOnMount( 'firstInputElement', contentRef );
 
 	return (
-		<Dialog.Root
-			open
-			onOpenChange={ ( open ) => {
-				if ( ! open ) {
-					onClose();
-				}
-			} }
-		>
-			<Dialog.Popup size="medium" initialFocus={ initialFocus }>
-				<Dialog.Header>
-					<Dialog.Title>{ fieldLabel }</Dialog.Title>
-					<Dialog.CloseIcon />
-				</Dialog.Header>
-				<Dialog.Content ref={ contentRef }>
-					<DataFormLayout
-						data={ modalData }
-						form={ form }
-						onChange={ handleOnChange }
-						validity={ validity }
-					>
-						{ (
-							FieldLayout,
-							childField,
-							childFieldValidity,
-							markWhenOptional
-						) => (
-							<FieldLayout
-								key={ childField.id }
-								data={ modalData }
-								field={ childField }
-								onChange={ handleOnChange }
-								hideLabelFromVision={ form.fields.length < 2 }
-								markWhenOptional={ markWhenOptional }
-								validity={ childFieldValidity }
-							/>
-						) }
-					</DataFormLayout>
-				</Dialog.Content>
-				<Dialog.Footer>
-					<Button
-						variant="tertiary"
-						onClick={ onClose }
-						__next40pxDefaultSize
-					>
-						{ cancelLabel }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ onApply }
-						__next40pxDefaultSize
-					>
-						{ applyLabel }
-					</Button>
-				</Dialog.Footer>
-			</Dialog.Popup>
-		</Dialog.Root>
+		<Dialog.Popup size="medium" initialFocus={ initialFocus }>
+			<Dialog.Header>
+				<Dialog.Title>{ fieldLabel }</Dialog.Title>
+				<Dialog.CloseIcon />
+			</Dialog.Header>
+			<Dialog.Content ref={ contentRef }>
+				<DataFormLayout
+					data={ modalData }
+					form={ form }
+					onChange={ handleOnChange }
+					validity={ validity }
+				>
+					{ (
+						FieldLayout,
+						childField,
+						childFieldValidity,
+						markWhenOptional
+					) => (
+						<FieldLayout
+							key={ childField.id }
+							data={ modalData }
+							field={ childField }
+							onChange={ handleOnChange }
+							hideLabelFromVision={ form.fields.length < 2 }
+							markWhenOptional={ markWhenOptional }
+							validity={ childFieldValidity }
+						/>
+					) }
+				</DataFormLayout>
+			</Dialog.Content>
+			<Dialog.Footer>
+				<Button
+					variant="tertiary"
+					onClick={ onClose }
+					__next40pxDefaultSize
+				>
+					{ cancelLabel }
+				</Button>
+				<Button
+					variant="primary"
+					onClick={ onApply }
+					__next40pxDefaultSize
+				>
+					{ applyLabel }
+				</Button>
+			</Dialog.Footer>
+		</Dialog.Popup>
 	);
 }
 
@@ -175,6 +166,14 @@ function PanelModal< Item >( {
 	const [ touched, setTouched ] = useState( false );
 
 	const [ isOpen, setIsOpen ] = useState( false );
+	// Keep `Dialog.Root` always mounted in the React tree so Base UI sees the
+	// `false → true` transition and plays the entry animation. The popup
+	// contents stay rendered while the dialog is open or transitioning closed,
+	// then unmount once `onOpenChangeComplete` fires.
+	const [ renderPopup, setRenderPopup ] = useState( false );
+	if ( isOpen && ! renderPopup ) {
+		setRenderPopup( true );
+	}
 
 	const { fieldDefinition, fieldLabel, summaryFields } =
 		useFieldFromFormField( field );
@@ -200,16 +199,30 @@ function PanelModal< Item >( {
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
 			/>
-			{ isOpen && (
-				<ModalContent
-					data={ data }
-					field={ field }
-					onChange={ onChange }
-					fieldLabel={ fieldLabel ?? '' }
-					onClose={ handleClose }
-					touched={ touched }
-				/>
-			) }
+			<Dialog.Root
+				open={ isOpen }
+				onOpenChange={ ( open ) => {
+					if ( ! open ) {
+						handleClose();
+					}
+				} }
+				onOpenChangeComplete={ ( open ) => {
+					if ( ! open ) {
+						setRenderPopup( false );
+					}
+				} }
+			>
+				{ renderPopup && (
+					<ModalPopup
+						data={ data }
+						field={ field }
+						onChange={ onChange }
+						fieldLabel={ fieldLabel ?? '' }
+						onClose={ handleClose }
+						touched={ touched }
+					/>
+				) }
+			</Dialog.Root>
 		</>
 	);
 }

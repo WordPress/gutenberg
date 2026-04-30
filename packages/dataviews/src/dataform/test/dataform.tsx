@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
@@ -354,8 +354,15 @@ describe( 'DataForm component', () => {
 			} );
 			await user.click( cancelButton );
 
-			// Modal should be closed
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// Modal should be closed once the exit transition completes.
+			// `Dialog.Root` stays mounted in the React tree and the popup
+			// unmounts asynchronously after Base UI's animation tracking
+			// resolves.
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
 		} );
 
 		it( 'should apply changes and close modal when apply button is clicked', async () => {
@@ -398,8 +405,15 @@ describe( 'DataForm component', () => {
 			} );
 			await user.click( applyButton );
 
-			// Modal should be closed and onChange should be called
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// Modal should be closed once the exit transition completes.
+			// `Dialog.Root` stays mounted in the React tree and the popup
+			// unmounts asynchronously after Base UI's animation tracking
+			// resolves.
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'dialog' )
+				).not.toBeInTheDocument();
+			} );
 			expect( onChange ).toHaveBeenCalledWith( { title: 'New Title' } );
 		} );
 
