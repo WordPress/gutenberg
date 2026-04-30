@@ -30,6 +30,13 @@ const { store } = unlock( connectorsPrivateApis );
 // Register built-in connectors
 registerDefaultConnectors();
 
+type RenderableConnectorConfig = ConnectorConfig &
+	Required< Pick< ConnectorConfig, 'render' > >;
+
+const isRenderableConnector = (
+	connector: ConnectorConfig
+): connector is RenderableConnectorConfig => !! connector.render;
+
 function ConnectorsPage() {
 	const { connectors, canInstallPlugins } = useSelect(
 		( select ) => ( {
@@ -42,9 +49,7 @@ function ConnectorsPage() {
 		[]
 	);
 
-	const renderableConnectors = connectors.filter(
-		( connector: ConnectorConfig ) => connector.render
-	);
+	const renderableConnectors = connectors.filter( isRenderableConnector );
 	const isEmpty = renderableConnectors.length === 0;
 
 	return (
@@ -82,28 +87,31 @@ function ConnectorsPage() {
 				) : (
 					<VStack spacing={ 3 }>
 						<AiPluginCallout />
-						<VStack spacing={ 3 } role="list">
-							{ connectors.map(
+						<VStack
+							spacing={ 3 }
+							role="list"
+							aria-label={ __( 'Available connectors' ) }
+						>
+							{ renderableConnectors.map(
 								( connector: ConnectorConfig ) => {
-									if ( connector.render ) {
-										return (
-											<connector.render
-												key={ connector.slug }
-												slug={ connector.slug }
-												name={ connector.name }
-												description={
-													connector.description
-												}
-												type={ connector.type }
-												logo={ connector.logo }
-												authentication={
-													connector.authentication
-												}
-												plugin={ connector.plugin }
-											/>
-										);
-									}
-									return null;
+									const Connector = connector.render;
+
+									return (
+										<Connector
+											key={ connector.slug }
+											slug={ connector.slug }
+											name={ connector.name }
+											description={
+												connector.description
+											}
+											type={ connector.type }
+											logo={ connector.logo }
+											authentication={
+												connector.authentication
+											}
+											plugin={ connector.plugin }
+										/>
+									);
 								}
 							) }
 						</VStack>
