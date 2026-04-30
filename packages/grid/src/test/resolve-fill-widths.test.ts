@@ -183,4 +183,68 @@ describe( 'resolveFillWidths', () => {
 		const result = resolveFillWidths( [], new Map(), 6 );
 		expect( result.size ).toBe( 0 );
 	} );
+
+	describe( 'with multi-row items (height > 1)', () => {
+		it( 'accounts for the shadow of a tall tile on the left', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 2 },
+				{ key: 'header', width: 9, height: 1 },
+				{ key: 'sub', width: 3, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12
+			);
+			expect( result.get( 'fill' ) ).toBe( 6 );
+		} );
+
+		it( 'accounts for the shadow of a tall tile in the middle', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'a', width: 3, height: 1 },
+				{ key: 'b', width: 3, height: 2 },
+				{ key: 'c', width: 6, height: 1 },
+				{ key: 'd', width: 3, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12
+			);
+			expect( result.get( 'fill' ) ).toBe( 6 );
+		} );
+
+		it( 'accounts for the shadow of a tall tile on the right', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'a', width: 3, height: 1 },
+				{ key: 'b', width: 6, height: 1 },
+				{ key: 'c', width: 3, height: 2 },
+				{ key: 'd', width: 6, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12
+			);
+			expect( result.get( 'fill' ) ).toBe( 3 );
+		} );
+
+		it( 'tracks shadow across multiple rows for height > 2', () => {
+			const items: DashboardGridLayoutItem[] = [
+				{ key: 'tall', width: 3, height: 3 },
+				{ key: 'a', width: 9, height: 1 },
+				{ key: 'b', width: 9, height: 1 },
+				{ key: 'fill', width: 'fill', height: 1 },
+			];
+			const result = resolveFillWidths(
+				keys( items ),
+				makeMap( items ),
+				12
+			);
+			expect( result.get( 'fill' ) ).toBe( 9 );
+		} );
+	} );
 } );

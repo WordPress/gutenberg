@@ -9,7 +9,6 @@ import type { Meta, StoryFn } from '@storybook/react-vite';
 import ExternalLink from '..';
 
 const meta: Meta< typeof ExternalLink > = {
-	tags: [ 'manifest' ],
 	component: ExternalLink,
 	title: 'Components/Navigation/ExternalLink',
 	id: 'components-externallink',
@@ -22,8 +21,9 @@ const meta: Meta< typeof ExternalLink > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use `Link` from `@wordpress/ui` instead, with the `openInNewTab` prop set.',
 		},
 	},
 };
