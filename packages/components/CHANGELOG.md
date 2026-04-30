@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+
 ## 33.0.0 (2026-04-29)
 
 ### Enhancements
