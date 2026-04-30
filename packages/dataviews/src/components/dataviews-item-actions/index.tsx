@@ -108,15 +108,12 @@ function mapModalSize(
 ): 'small' | 'medium' | 'large' | 'stretch' | 'full' {
 	if ( size === 'fill' ) {
 		deprecated( "modalSize: 'fill'", {
-			since: '7.8',
+			since: '15.0.0',
 			alternative: "'stretch'",
 		} );
 		return 'stretch';
 	}
-	return (
-		( size as 'small' | 'medium' | 'large' | 'stretch' | 'full' ) ??
-		'medium'
-	);
+	return size ?? 'medium';
 }
 
 const FIRST_INPUT_SELECTOR =
@@ -186,7 +183,7 @@ export function ActionModal< Item >( {
 					action.id
 				) }` }
 				portal={
-					<Dialog.Portal className="dataviews-action-modal-portal" />
+					<Dialog.Portal className="dataviews-action-modal__portal" />
 				}
 				initialFocus={ initialFocus }
 				{ ...( action.hideModalHeader && {
@@ -203,12 +200,12 @@ export function ActionModal< Item >( {
 						<Dialog.CloseIcon />
 					</Dialog.Header>
 				) }
-				<div ref={ contentRef }>
+				<Dialog.Content ref={ contentRef }>
 					<action.RenderModal
 						items={ items }
 						closeModal={ closeModal }
 					/>
-				</div>
+				</Dialog.Content>
 			</Dialog.Popup>
 		</Dialog.Root>
 	);

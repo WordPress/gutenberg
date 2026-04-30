@@ -79,7 +79,7 @@ describe( 'ActionModal', () => {
 		} );
 
 		expect( console ).toHaveWarnedWith(
-			"modalSize: 'fill' is deprecated since version 7.8. Please use 'stretch' instead."
+			"modalSize: 'fill' is deprecated since version 15.0.0. Please use 'stretch' instead."
 		);
 	} );
 
