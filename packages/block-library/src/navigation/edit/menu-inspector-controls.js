@@ -19,7 +19,7 @@ import { unlock } from '../../lock-unlock';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
-import { NavigationLinkUI } from './navigation-link-ui';
+import { NavigationListViewAdditionalContent } from './navigation-list-view-additional-content';
 import NavigationListViewHeader from './navigation-list-view-header';
 
 const actionLabel =
@@ -86,7 +86,7 @@ const MainContent = ( {
 				description={ description }
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
-				additionalBlockContent={ NavigationLinkUI }
+				additionalBlockContent={ NavigationListViewAdditionalContent }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>

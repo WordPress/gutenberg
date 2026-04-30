@@ -635,6 +635,33 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-left: 24px;
 }
 
+/**
+ * Invalid/Draft status indicators in the navigation list view.
+ *
+ * These mirror the in-canvas indicators shown in the Navigation block's
+ * canvas representation, ensuring consistent feedback in both editing modes.
+ */
+.wp-block-navigation-link__list-view-status {
+	display: inline-flex;
+	align-items: center;
+	flex-shrink: 0;
+	font-size: $default-font-size;
+	font-style: italic;
+	color: $gray-700;
+	white-space: nowrap;
+	margin-left: $grid-unit-05;
+
+	span {
+		text-decoration: wavy underline;
+		text-decoration-skip-ink: none;
+		text-underline-offset: 0.25rem;
+	}
+
+	&.is-invalid span {
+		color: $alert-red;
+	}
+}
+
 .editor-sidebar__panel .wp-block-navigation__submenu-header {
 	margin-top: 0;
 	margin-bottom: 0;
