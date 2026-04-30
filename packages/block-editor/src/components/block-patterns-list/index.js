@@ -154,7 +154,10 @@ function BlockPattern( {
 											/>
 										</div>
 									) }
-									<Text className="block-editor-block-patterns-list__item-title">
+									<Text
+										render={ <div /> }
+										className="block-editor-block-patterns-list__item-title"
+									>
 										{ pattern.title }
 									</Text>
 								</HStack>
