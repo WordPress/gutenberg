@@ -27,23 +27,15 @@ export function QuickEditModal( {
 	closeModal,
 	quickEditForm,
 } ) {
-	// Keep `Drawer.Root` always mounted in the React tree and toggle `open` so
-	// Base UI sees the `false → true` transition and plays the entry animation.
-	// The popup contents stay rendered while the drawer is open or transitioning
-	// closed, then unmount once `onOpenChangeComplete` fires.
-	const [ renderPopup, setRenderPopup ] = useState( false );
-	if ( open && ! renderPopup ) {
-		setRenderPopup( true );
-	}
-
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
 	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
-			// Skip data resolution while the drawer isn't (or was never) open
-			// to avoid spurious entity-record requests on every page render.
-			if ( ! renderPopup || postId.length === 0 ) {
+			// Skip data resolution while the drawer is closed to avoid
+			// triggering an entity-record fetch for every selection change
+			// when the user isn't quick-editing.
+			if ( ! open || postId.length === 0 ) {
 				return {
 					record: null,
 					hasFinishedResolution: false,
@@ -85,7 +77,7 @@ export function QuickEditModal( {
 				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
-		[ renderPopup, postType, postId, isBulk ]
+		[ open, postType, postId, isBulk ]
 	);
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
@@ -186,56 +178,46 @@ export function QuickEditModal( {
 					closeModal();
 				}
 			} }
-			onOpenChangeComplete={ ( isOpen ) => {
-				if ( ! isOpen ) {
-					setRenderPopup( false );
-				}
-			} }
 		>
-			{ renderPopup && (
-				<Drawer.Popup>
-					<VisuallyHidden
-						render={
-							<Drawer.Title>
-								{ isBulk
-									? __( 'Bulk quick edit' )
-									: __( 'Quick edit' ) }
-							</Drawer.Title>
-						}
-					/>
-					<PostCardPanel
-						postType={ postType }
-						postId={ postId }
-						onClose={ closeModal }
-						hideActions
-					/>
-					<Drawer.Content>
-						{ hasFinishedResolution && (
-							<DataForm
-								data={ { ...record, ...localEdits } }
-								fields={ fields }
-								form={ form }
-								onChange={ onChange }
-							/>
-						) }
-					</Drawer.Content>
-					<Drawer.Footer>
-						<Drawer.Action
-							__next40pxDefaultSize
-							variant="secondary"
-						>
-							{ __( 'Cancel' ) }
-						</Drawer.Action>
-						<Button
-							__next40pxDefaultSize
-							variant="primary"
-							onClick={ onSave }
-						>
-							{ __( 'Done' ) }
-						</Button>
-					</Drawer.Footer>
-				</Drawer.Popup>
-			) }
+			<Drawer.Popup>
+				<VisuallyHidden
+					render={
+						<Drawer.Title>
+							{ isBulk
+								? __( 'Bulk quick edit' )
+								: __( 'Quick edit' ) }
+						</Drawer.Title>
+					}
+				/>
+				<PostCardPanel
+					postType={ postType }
+					postId={ postId }
+					onClose={ closeModal }
+					hideActions
+				/>
+				<Drawer.Content>
+					{ hasFinishedResolution && (
+						<DataForm
+							data={ { ...record, ...localEdits } }
+							fields={ fields }
+							form={ form }
+							onChange={ onChange }
+						/>
+					) }
+				</Drawer.Content>
+				<Drawer.Footer>
+					<Drawer.Action __next40pxDefaultSize variant="secondary">
+						{ __( 'Cancel' ) }
+					</Drawer.Action>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ onSave }
+					>
+						{ __( 'Done' ) }
+					</Button>
+				</Drawer.Footer>
+			</Drawer.Popup>
 		</Drawer.Root>
 	);
 }
