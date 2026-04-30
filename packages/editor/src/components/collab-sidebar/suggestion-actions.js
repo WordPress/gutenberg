@@ -153,6 +153,8 @@ export function SuggestionActionButtons( { thread } ) {
 		return null;
 	}
 
+	const { showStaleDialog, dismissStaleDialog, confirmStaleApply } = decision;
+
 	return (
 		<Stack
 			direction="row"
@@ -185,15 +187,35 @@ export function SuggestionActionButtons( { thread } ) {
 				accessibleWhenDisabled
 				onClick={ decision.onReject }
 			/>
+			{ /*
+				Render the staleness dialog from the same hook instance that
+				owns the click handlers — `SuggestionActionButtons` and
+				`SuggestionActions` each call `useSuggestionDecision`, so
+				their `showStaleDialog` states are independent. Keeping the
+				dialog colocated with the buttons ensures the click that
+				opens it and the dialog itself share state.
+			*/ }
+			{ showStaleDialog && (
+				<ConfirmDialog
+					isOpen
+					onConfirm={ confirmStaleApply }
+					onCancel={ dismissStaleDialog }
+					confirmButtonText={ __( 'Apply anyway' ) }
+				>
+					{ __(
+						'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
+					) }
+				</ConfirmDialog>
+			) }
 		</Stack>
 	);
 }
 
 /**
  * Body for a note that carries a suggestion payload: the compact
- * Add/Delete/Formatting summary, a resolved-state label if applicable, and
- * the staleness confirm dialog. Accept/Reject themselves live in the
- * header slot via `SuggestionActionButtons`.
+ * Add/Delete/Formatting summary and a resolved-state label if applicable.
+ * Accept/Reject and the staleness dialog live in the header slot via
+ * `SuggestionActionButtons` so the click and the dialog share state.
  *
  * @param {{ thread: Object }} props
  */
@@ -203,15 +225,8 @@ export default function SuggestionActions( { thread } ) {
 		return null;
 	}
 
-	const {
-		payload,
-		suggestionStatus,
-		isResolved,
-		applyDisabledReason,
-		showStaleDialog,
-		dismissStaleDialog,
-		confirmStaleApply,
-	} = decision;
+	const { payload, suggestionStatus, isResolved, applyDisabledReason } =
+		decision;
 
 	return (
 		<Stack
@@ -231,18 +246,6 @@ export default function SuggestionActions( { thread } ) {
 				<WCText variant="muted" size="12px">
 					{ applyDisabledReason }
 				</WCText>
-			) }
-			{ showStaleDialog && (
-				<ConfirmDialog
-					isOpen
-					onConfirm={ confirmStaleApply }
-					onCancel={ dismissStaleDialog }
-					confirmButtonText={ __( 'Apply anyway' ) }
-				>
-					{ __(
-						'This block has changed since the suggestion was made. Applying it will overwrite the newer edit. Continue?'
-					) }
-				</ConfirmDialog>
 			) }
 		</Stack>
 	);

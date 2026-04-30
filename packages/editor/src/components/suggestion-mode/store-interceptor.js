@@ -63,6 +63,13 @@ function shallowAttributeEquals( a, b ) {
 	if ( aKeys.length !== bKeys.length ) {
 		return false;
 	}
+	// When both sides are objects with 0 enumerable keys (e.g. _RichTextData
+	// instances whose content lives on internal non-enumerable slots), fall
+	// back to string comparison so identical wrappers are treated as equal
+	// and changed wrappers are detected as different.
+	if ( aKeys.length === 0 ) {
+		return String( a ) === String( b );
+	}
 	for ( const key of aKeys ) {
 		if ( ! Object.prototype.hasOwnProperty.call( b, key ) ) {
 			return false;

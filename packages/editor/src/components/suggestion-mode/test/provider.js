@@ -221,6 +221,31 @@ describe( 'hasAttributeConflict', () => {
 		expect( hasAttributeConflict( {}, undefined ) ).toBe( false );
 		expect( hasAttributeConflict( {}, [] ) ).toBe( false );
 	} );
+
+	it( 'compares string baselines against wrapper-object live values via toString', () => {
+		// Regression: rich-text attributes are stored on a block as
+		// `RichTextData` instances but serialize into the suggestion payload
+		// as plain strings. Without a string-vs-wrapper fallback,
+		// `hasAttributeConflict` flagged every content suggestion as stale
+		// because `typeof string` !== `typeof object`, which short-circuited
+		// the apply flow into a never-visible "Apply anyway" dialog.
+		const wrapper = {
+			toString() {
+				return 'Hello';
+			},
+		};
+		const wrapperOther = {
+			toString() {
+				return 'Hola';
+			},
+		};
+		expect(
+			hasAttributeConflict( { content: wrapper }, [ CONTENT_OP ] )
+		).toBe( false );
+		expect(
+			hasAttributeConflict( { content: wrapperOther }, [ CONTENT_OP ] )
+		).toBe( true );
+	} );
 } );
 
 describe( 'parseSuggestionPayload', () => {
