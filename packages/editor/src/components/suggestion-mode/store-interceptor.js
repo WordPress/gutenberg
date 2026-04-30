@@ -13,6 +13,17 @@ import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
 
 /**
+ * Keys under `metadata` that are programmatic linkages set by editor-internal
+ * code (the suggestion provider writes `metadata.noteId` after creating a
+ * note comment to link the block back to its note). These must persist on
+ * the live block — without the linkage, `useNoteThreads` can't resolve a
+ * note's `blockClientId` and the note appears orphaned. The interceptor
+ * folds changes to these keys into its snapshot before diffing so they are
+ * never reverted and never routed into the user-pending overlay.
+ */
+const SYSTEM_METADATA_KEYS = new Set( [ 'noteId' ] );
+
+/**
  * Compare two attribute values structurally. Mirrors `isAttributeEqual` in
  * provider.js — kept as a private helper here so this module doesn't pull
  * in the provider's hooks just for the comparison.
@@ -104,6 +115,86 @@ function diffAttributes( previous, current ) {
 }
 
 /**
+ * Fold the values of system-managed metadata keys from `current` into a copy
+ * of `previous`. The result is used as the snapshot baseline for the next
+ * diff so a programmatic update to (e.g.) `metadata.noteId` is invisible to
+ * the diff and the revert payload preserves the new value.
+ *
+ * Returns `previous` unchanged when no system key has drifted.
+ *
+ * @param {Object} previous Snapshot attributes.
+ * @param {Object} current  Live attributes.
+ * @return {Object} Snapshot attributes with system metadata adopted.
+ */
+function adoptSystemMetadata( previous, current ) {
+	const previousMeta = previous?.metadata ?? {};
+	const currentMeta = current?.metadata ?? {};
+	let nextMeta = previousMeta;
+	let touched = false;
+	for ( const key of SYSTEM_METADATA_KEYS ) {
+		const prevValue = previousMeta[ key ];
+		const currValue = currentMeta[ key ];
+		if ( prevValue === currValue ) {
+			continue;
+		}
+		if ( ! touched ) {
+			nextMeta = { ...previousMeta };
+			touched = true;
+		}
+		if ( currValue === undefined ) {
+			delete nextMeta[ key ];
+		} else {
+			nextMeta[ key ] = currValue;
+		}
+	}
+	if ( ! touched ) {
+		return previous;
+	}
+	return {
+		...previous,
+		metadata: nextMeta,
+	};
+}
+
+/**
+ * Strip system-managed metadata keys from a `changed` payload destined for
+ * the suggestion overlay. The overlay represents user-pending edits; system
+ * fields such as `metadata.noteId` must never appear there because they are
+ * not part of the user's suggestion and would otherwise leak into the
+ * persisted suggestion operations.
+ *
+ * Drops the `metadata` key entirely when no non-system fields remain.
+ *
+ * @param {Object} changed `delta.changed` from `diffAttributes`.
+ * @return {Object} Filtered payload safe for the overlay.
+ */
+function stripSystemMetadata( changed ) {
+	const meta = changed?.metadata;
+	if ( ! meta || typeof meta !== 'object' ) {
+		return changed;
+	}
+	let stripped = meta;
+	let touched = false;
+	for ( const key of SYSTEM_METADATA_KEYS ) {
+		if ( Object.prototype.hasOwnProperty.call( meta, key ) ) {
+			if ( ! touched ) {
+				stripped = { ...meta };
+				touched = true;
+			}
+			delete stripped[ key ];
+		}
+	}
+	if ( ! touched ) {
+		return changed;
+	}
+	if ( Object.keys( stripped ).length === 0 ) {
+		const { metadata: _drop, ...rest } = changed;
+		return rest;
+	}
+	return { ...changed, metadata: stripped };
+}
+
+/**
  * Invisible component that catches block-attribute mutations dispatched
  * directly to the block-editor store while the editor is in Suggest intent.
  *
@@ -185,7 +276,7 @@ export default function SuggestionStoreInterceptor() {
 			const live = new Set( liveClientIds );
 
 			for ( const clientId of liveClientIds ) {
-				const previous = snapshot.get( clientId );
+				let previous = snapshot.get( clientId );
 				const current = blockEditor.getBlockAttributes( clientId );
 
 				if ( previous === undefined ) {
@@ -200,6 +291,18 @@ export default function SuggestionStoreInterceptor() {
 					// untouched blocks, so this short-circuit covers the
 					// common case cheaply.
 					continue;
+				}
+
+				// Programmatic linkage updates (e.g. `metadata.noteId` set by
+				// the suggestion provider after creating the note comment)
+				// must persist on the live block. Folding them into the
+				// snapshot before diffing makes them invisible to the diff,
+				// keeps the revert payload from clobbering them, and prevents
+				// them from leaking into the user's overlay.
+				const adopted = adoptSystemMetadata( previous, current );
+				if ( adopted !== previous ) {
+					snapshot.set( clientId, adopted );
+					previous = adopted;
 				}
 
 				const delta = diffAttributes( previous, current );
@@ -223,8 +326,13 @@ export default function SuggestionStoreInterceptor() {
 
 				// Route the changes into the overlay so the user still sees
 				// their edit, then revert the underlying store back to the
-				// snapshot so the post itself isn't actually modified.
-				setOverlayAttributesRef.current( clientId, delta.changed );
+				// snapshot so the post itself isn't actually modified. System
+				// metadata is filtered out of the overlay payload — it isn't
+				// a user edit, and `delta.restore` already preserves it.
+				const overlayChanged = stripSystemMetadata( delta.changed );
+				if ( Object.keys( overlayChanged ).length > 0 ) {
+					setOverlayAttributesRef.current( clientId, overlayChanged );
+				}
 
 				isReverting = true;
 				try {
@@ -256,4 +364,9 @@ export default function SuggestionStoreInterceptor() {
 	return null;
 }
 
-export { diffAttributes, shallowAttributeEquals };
+export {
+	diffAttributes,
+	shallowAttributeEquals,
+	adoptSystemMetadata,
+	stripSystemMetadata,
+};
