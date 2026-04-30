@@ -39,12 +39,8 @@ register_deactivation_hook(
 add_filter(
 	'map_meta_cap',
 	static function ( $caps, $cap ) {
-		// Skip the restriction during REST requests to the plugins endpoint.
-		// The Connectors page checks capabilities via PHP `current_user_can`,
-		// not via `/wp/v2/plugins`, so the test assertions remain valid. But
-		// the test runner uses that endpoint to activate/deactivate plugins,
-		// and a leaked restriction blocking `activate_plugins` would prevent
-		// cleanup, persisting the option and breaking unrelated specs.
+		// Always allow /wp/v2/plugins so the e2e cleanup can deactivate
+		// this plugin even when the restriction would otherwise block it.
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $GLOBALS['wp']->query_vars['rest_route'] ) ) {
 			$route = (string) $GLOBALS['wp']->query_vars['rest_route'];
 			if ( 0 === strpos( $route, '/wp/v2/plugins' ) ) {
