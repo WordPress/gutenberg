@@ -40,7 +40,7 @@ async function visitTaxonomyEdit( admin, id ) {
 	);
 }
 
-test.describe( 'Taxonomies', () => {
+test.describe( 'User taxonomies', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.setGutenbergExperiments( [
 			'gutenberg-content-types',
@@ -73,10 +73,13 @@ test.describe( 'Taxonomies', () => {
 		// The slug field runs an async uniqueness check; the form's
 		// `isValid` stays false while it's in flight, so wait for the
 		// REST call to settle before submitting.
+		// The button doesn't reflect form validity, so a UI-only wait
+		// isn't possible.
+		// TODO: expolore disabling the button based on the form validity.
 		await Promise.all( [
 			page.waitForResponse(
 				( resp ) =>
-					resp.url().includes( `/${ TAXONOMIES_REST_BASE }?` ) &&
+					resp.url().includes( `/${ TAXONOMIES_REST_BASE }` ) &&
 					resp.url().includes( 'slug=genre' )
 			),
 			page
@@ -176,7 +179,7 @@ test.describe( 'Taxonomies', () => {
 
 			await page.getByRole( 'button', { name: 'Save' } ).click();
 
-			await expect( page.getByTestId( 'snackbar' ) ).toContainText(
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
 				'"Genres" taxonomy updated.'
 			);
 
