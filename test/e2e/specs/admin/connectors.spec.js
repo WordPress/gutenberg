@@ -92,6 +92,20 @@ test.describe( 'Connectors', () => {
 			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 
+		const connectorsList = page.getByRole( 'list', {
+			name: 'Available connectors',
+		} );
+		await expect( connectorsList ).toBeVisible();
+		await expect( connectorsList.getByRole( 'listitem' ) ).toHaveCount(
+			CONNECTORS.length
+		);
+
+		// The callout is not a connector card and should remain outside
+		// the list used to group connector list items.
+		await expect(
+			connectorsList.locator( '.ai-plugin-callout' )
+		).toHaveCount( 0 );
+
 		// Verify the plugin directory search link is present.
 		await expect(
 			page.getByRole( 'link', {
