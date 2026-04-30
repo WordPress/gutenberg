@@ -17,18 +17,10 @@ declare global {
 	}
 }
 
-interface ResolverApi {
-	dispatch: {
-		registerWidgetType: (
-			name: WidgetName,
-			settings: Partial< WidgetType >
-		) => void;
-	};
-}
-
 export const getWidgetTypes =
 	() =>
-	async ( { dispatch }: ResolverApi ): Promise< void > => {
+	// @ts-expect-error - registry types are not yet available
+	async ( { dispatch } ) => {
 		const registered = window.__registeredWidgetTypes ?? [];
 
 		const results = await Promise.all(
@@ -64,14 +56,9 @@ export const getWidgetTypes =
 		}
 	};
 
-interface ForwardResolverApi {
-	resolveSelect: {
-		getWidgetTypes: () => Promise< WidgetType[] >;
-	};
-}
-
 export const getWidgetType =
 	() =>
-	async ( { resolveSelect }: ForwardResolverApi ): Promise< void > => {
+	// @ts-expect-error - registry types are not yet available
+	async ( { resolveSelect } ) => {
 		await resolveSelect.getWidgetTypes();
 	};
