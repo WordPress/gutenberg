@@ -19,7 +19,6 @@ declare global {
 
 export const getWidgetTypes =
 	() =>
-	// @ts-expect-error - registry types are not yet available
 	async ( { dispatch } ) => {
 		const registered = window.__registeredWidgetTypes ?? [];
 
@@ -58,7 +57,6 @@ export const getWidgetTypes =
 
 export const getWidgetType =
 	() =>
-	// @ts-expect-error - registry types are not yet available
 	async ( { resolveSelect } ) => {
 		await resolveSelect.getWidgetTypes();
 	};
