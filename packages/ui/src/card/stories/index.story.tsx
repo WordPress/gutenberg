@@ -113,6 +113,38 @@ export const HeaderOnly: Story = {
 };
 
 /**
+ * When `Card.FullBleed` is the **first child** of `Card.Header`, it extends
+ * flush to the card's top and side edges — ideal for hero images. Content
+ * that follows inside the header is padded normally.
+ */
+export const FullBleedInHeader: Story = {
+	args: {
+		children: (
+			<>
+				<Card.Header>
+					<Card.FullBleed>
+						<div
+							style={ {
+								height: 180,
+								background:
+									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+							} }
+						/>
+					</Card.FullBleed>
+					<Card.Title>Hero image card</Card.Title>
+				</Card.Header>
+				<Card.Content>
+					<Text>
+						The image above bleeds to the card&apos;s top and side
+						edges.
+					</Text>
+				</Card.Content>
+			</>
+		),
+	},
+};
+
+/**
  * Use the `render` prop to change the underlying HTML elements for
  * better semantics. Here, `Card.Root` renders as a `<section>` and
  * `Card.Title` renders as an `<h2>`.

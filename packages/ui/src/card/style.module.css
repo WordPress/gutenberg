@@ -38,4 +38,12 @@
 		margin-inline: calc(-1 * var(--wp-ui-card-padding));
 		width: calc(100% + 2 * var(--wp-ui-card-padding));
 	}
+
+	/* When FullBleed is the first child of Header, extend it flush to the
+	 * card's top edge (the card's overflow:clip + border-radius handle
+	 * the rounded corner clipping).
+	 */
+	.header > .fullbleed:first-child {
+		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+	}
 }
