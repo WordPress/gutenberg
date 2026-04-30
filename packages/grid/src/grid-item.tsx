@@ -17,6 +17,21 @@ import ResizeHandle from './resize-handle';
 import type { DashboardGridLayoutItem } from './types';
 import styles from './grid-item.module.css';
 
+function getItemCursor(
+	disabled: boolean,
+	interacting: boolean
+): React.CSSProperties[ 'cursor' ] {
+	if ( disabled ) {
+		return 'default';
+	}
+
+	if ( interacting ) {
+		return undefined;
+	}
+
+	return 'grab';
+}
+
 type GridItemProps = {
 	/**
 	 * The layout item containing grid positioning information.
@@ -132,7 +147,12 @@ export function GridItem( {
 				  )
 		}`,
 		gridRowEnd: `span ${ item.height || 1 }`,
-		cursor: disabled ? 'default' : 'grab',
+
+		// Suppress the grab hint while any gesture is active so the
+		// inline `cursor` on the tile doesn't override the gesture's
+		// document-level cursor (e.g. the resize lock). Setting
+		// `undefined` leaves the property off the DOM.
+		cursor: getItemCursor( disabled, interacting ),
 	};
 
 	const itemClassName = clsx(

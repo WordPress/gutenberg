@@ -6,6 +6,8 @@
 
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
 
+## 33.0.0 (2026-04-29)
+
 ### Enhancements
 
 -   `ExternalLink`: Align appearance with `Link` from `@wordpress/ui` (brand color, underline thickness/offset, focus ring, and external-link icon spacing) ([#77790](https://github.com/WordPress/gutenberg/pull/77790)).
