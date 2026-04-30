@@ -1,0 +1,144 @@
+.section {
+	padding: 16px 20px;
+}
+
+.section + .section {
+	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+/* ── Location bar ──────────────────────────────────────────────────────────── */
+
+.locationBar {
+	margin-block-end: 12px;
+}
+
+.locationForm {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.locationInput {
+	flex: 1;
+	min-inline-size: 120px;
+}
+
+.linkButton {
+	background: none;
+	border: none;
+	padding: 0;
+	color: var(--wpds-color-fg-interactive-brand);
+	cursor: var(--wpds-cursor-control);
+	font: inherit;
+	text-decoration: underline;
+}
+
+.linkButton:hover {
+	color: var(--wpds-color-fg-interactive-brand-active);
+}
+
+/* ── Events list ───────────────────────────────────────────────────────────── */
+
+.eventsList {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.event {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 12px;
+	padding-block: 8px;
+}
+
+.event + .event {
+	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.eventInfo {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	flex: 1;
+}
+
+.eventTitle {
+	font-weight: 500;
+	color: var(--wpds-color-fg-interactive-brand);
+	text-decoration: none;
+}
+
+.eventTitle:hover {
+	text-decoration: underline;
+}
+
+.eventMeta {
+	font-size: 12px;
+	color: var(--wpds-color-fg-content-neutral-weak);
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.metaSeparator {
+	color: var(--wpds-color-fg-interactive-neutral-disabled);
+}
+
+.eventDateTime {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+	font-size: 12px;
+	color: var(--wpds-color-fg-content-neutral-weak);
+	white-space: nowrap;
+	flex-shrink: 0;
+}
+
+.eventNone {
+	padding-block: 8px;
+	font-size: 12px;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+/* ── News feeds ────────────────────────────────────────────────────────────── */
+
+.newsFeed {
+	padding-block-end: 0;
+}
+
+.newsFeed + .newsFeed {
+	margin-block-start: 16px;
+}
+
+.newsList {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+/* ── Shared states ─────────────────────────────────────────────────────────── */
+
+.statusText {
+	color: var(--wpds-color-fg-content-neutral-weak);
+	margin: 0;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+
+.footer {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 12px 20px;
+	margin: 0;
+	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+	font-size: 12px;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
