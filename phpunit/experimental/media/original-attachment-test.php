@@ -112,4 +112,42 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$new_meta = gutenberg_record_original_attachment_id( array(), 999, $parent );
 		$this->assertSame( $parent, $new_meta['original_attachment_id'] );
 	}
+
+	public function test_delete_clears_original_attachment_id_on_descendants() {
+		$original = $this->make_attachment();
+		$child    = $this->make_attachment( $original );
+
+		// Sanity: child currently points at original.
+		$child_meta = wp_get_attachment_metadata( $child );
+		$this->assertSame( $original, (int) $child_meta['original_attachment_id'] );
+
+		// Delete the original; expect the descendant's pointer to be
+		// cleared. We pass force=true so the deletion runs immediately
+		// without going through the trash.
+		wp_delete_attachment( $original, true );
+		// Stop tear_down from trying to delete it again.
+		$this->created_ids = array_diff( $this->created_ids, array( $original ) );
+
+		$child_meta = wp_get_attachment_metadata( $child );
+		$this->assertArrayNotHasKey( 'original_attachment_id', $child_meta );
+	}
+
+	public function test_delete_leaves_unrelated_descendants_alone() {
+		// Two independent chains. Deleting one's original must not
+		// touch the other's pointer.
+		$original_a = $this->make_attachment();
+		$child_a    = $this->make_attachment( $original_a );
+
+		$original_b = $this->make_attachment();
+		$child_b    = $this->make_attachment( $original_b );
+
+		wp_delete_attachment( $original_a, true );
+		$this->created_ids = array_diff( $this->created_ids, array( $original_a ) );
+
+		$child_b_meta = wp_get_attachment_metadata( $child_b );
+		$this->assertSame( $original_b, (int) $child_b_meta['original_attachment_id'] );
+
+		$child_a_meta = wp_get_attachment_metadata( $child_a );
+		$this->assertArrayNotHasKey( 'original_attachment_id', $child_a_meta );
+	}
 }

@@ -98,3 +98,58 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 	return $response;
 }
 add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_response', 10, 3 );
+
+/**
+ * Clear `original_attachment_id` from descendants when their original
+ * is deleted.
+ *
+ * Without this, descendants would carry a dangling pointer at a
+ * recycled attachment id. The REST filter already skips emitting the
+ * field when the URL doesn't resolve, but cleaning up the stored meta
+ * keeps the database accurate and prevents the field from
+ * resurrecting if the deleted id is later reused.
+ *
+ * @param int $attachment_id Attachment id being deleted.
+ */
+function gutenberg_clear_original_attachment_id_on_delete( $attachment_id ) {
+	$attachment_id = (int) $attachment_id;
+	if ( $attachment_id <= 0 ) {
+		return;
+	}
+
+	// `original_attachment_id` lives inside the serialized
+	// `_wp_attachment_metadata` blob, so we can't query it directly.
+	// LIKE narrows the candidate set; the per-row check below is the
+	// real authority and rejects false positives (other places where
+	// the same id happens to appear in the blob, e.g. `parent_image`).
+	$candidates = get_posts(
+		array(
+			'post_type'      => 'attachment',
+			'post_status'    => 'inherit',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_query'     => array(
+				array(
+					'key'     => '_wp_attachment_metadata',
+					'value'   => sprintf( 'i:%d;', $attachment_id ),
+					'compare' => 'LIKE',
+				),
+			),
+			'no_found_rows'  => true,
+			'orderby'        => 'none',
+		)
+	);
+
+	foreach ( $candidates as $candidate_id ) {
+		$meta = wp_get_attachment_metadata( $candidate_id );
+		if ( ! is_array( $meta ) || empty( $meta['original_attachment_id'] ) ) {
+			continue;
+		}
+		if ( (int) $meta['original_attachment_id'] !== $attachment_id ) {
+			continue;
+		}
+		unset( $meta['original_attachment_id'] );
+		wp_update_attachment_metadata( $candidate_id, $meta );
+	}
+}
+add_action( 'delete_attachment', 'gutenberg_clear_original_attachment_id_on_delete' );
