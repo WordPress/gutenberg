@@ -286,9 +286,6 @@ export function useScaleCanvas( {
 
 		iframeDocument.documentElement.classList.remove( 'zoom-out-animation' );
 
-		// Disable reason: Eslint isn't smart enough to know that this is a
-		// DOM element. https://github.com/facebook/react/issues/31483
-		// eslint-disable-next-line react-hooks/react-compiler
 		iframeDocument.documentElement.scrollTop =
 			transitionToRef.current.scrollTop;
 
