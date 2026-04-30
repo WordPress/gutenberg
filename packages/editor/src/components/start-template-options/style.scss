@@ -16,6 +16,7 @@ $actions-height: 92px;
 		padding-left: $grid-unit-40;
 		padding-right: $grid-unit-40;
 		border-top: 1px solid $gray-300;
+		// Ensure modal footer actions appear above the modal's scrolling content.
 		z-index: 1;
 	}
 
