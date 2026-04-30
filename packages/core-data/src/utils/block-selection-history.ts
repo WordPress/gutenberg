@@ -9,10 +9,7 @@ import { Y } from '@wordpress/sync';
 /**
  * Internal dependencies
  */
-import {
-	findBlockByClientIdInDoc,
-	richTextOffsetToHtmlIndex,
-} from './crdt-utils';
+import { findBlockByClientIdInDoc } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 // Default size for selection history (not including current selection)
@@ -166,7 +163,7 @@ function convertWPBlockSelectionToSelection(
 	const offset = selection.offset ?? 0;
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		changedYText,
-		richTextOffsetToHtmlIndex( changedYText.toString(), offset )
+		offset
 	);
 
 	return {

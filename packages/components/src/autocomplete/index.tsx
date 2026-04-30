@@ -338,41 +338,17 @@ export function useAutocomplete( {
 	};
 }
 
-/**
- * Checks whether two records represent the same user-visible state
- * (same text content and cursor position).
- */
-function recordValuesMatch(
-	a: UseAutocompleteProps[ 'record' ],
-	b: UseAutocompleteProps[ 'record' ]
-) {
-	return a.text === b.text && a.start === b.start && a.end === b.end;
-}
+function useLastDifferentValue( value: UseAutocompleteProps[ 'record' ] ) {
+	const history = useRef< Set< typeof value > >( new Set() );
 
-/**
- * Tracks the last record whose value differed from the current one.
- * Used to determine whether the user has actually typed something
- */
-export function useLastDifferentValue(
-	value: UseAutocompleteProps[ 'record' ]
-) {
-	const history = useRef< Array< typeof value > >( [] );
-
-	const lastEntry = history.current[ history.current.length - 1 ];
-
-	// Only add to history if the value is meaningfully different from
-	// the most recent entry (analogous to Set.add being a no-op for
-	// duplicate references in the original implementation).
-	if ( ! lastEntry || ! recordValuesMatch( value, lastEntry ) ) {
-		history.current.push( value );
-	}
+	history.current.add( value );
 
 	// Keep the history size to 2.
-	if ( history.current.length > 2 ) {
-		history.current.shift();
+	if ( history.current.size > 2 ) {
+		history.current.delete( Array.from( history.current )[ 0 ] );
 	}
 
-	return history.current[ 0 ];
+	return Array.from( history.current )[ 0 ];
 }
 
 export function useAutocompleteProps( options: UseAutocompleteProps ) {

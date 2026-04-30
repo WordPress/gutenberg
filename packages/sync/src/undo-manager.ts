@@ -138,13 +138,5 @@ export function createUndoManager(): SyncUndoManager {
 		hasRedo(): boolean {
 			return yUndoManager.canRedo();
 		},
-
-		/**
-		 * Stop capturing changes into the current undo item.
-		 * The next change will create a new undo item.
-		 */
-		stopCapturing(): void {
-			yUndoManager.stopCapturing();
-		},
 	};
 }

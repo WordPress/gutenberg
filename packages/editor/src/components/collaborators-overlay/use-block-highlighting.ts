@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
 import { useDebouncedRecompute } from './use-debounced-recompute';
 
@@ -138,10 +137,8 @@ export function useBlockHighlighting(
 				);
 
 				if ( blockElement ) {
-					blockElement.classList.remove( 'is-collaborator-selected' );
-					blockElement.style.removeProperty(
-						'--collaborator-outline-color'
-					);
+					blockElement.style.boxShadow = '';
+					blockElement.style.borderRadius = '';
 				}
 
 				currentHighlightedIds.delete( blockId );
@@ -153,7 +150,6 @@ export function useBlockHighlighting(
 		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
 
 		blocksToHighlight.forEach( ( block ) => {
-			const { color, blockId, userName, avatarUrl } = block;
 			const blockElement = getBlockElementById(
 				blockEditorDocument,
 				blockId
@@ -164,11 +160,8 @@ export function useBlockHighlighting(
 			}
 
 			blockElement.classList.add( 'is-collaborator-selected' );
-			blockElement.style.setProperty(
-				'--collaborator-outline-color',
-				color
-			);
-			currentHighlightedIds.add( blockId );
+				blockElement.style.boxShadow = `${ color } 0 0 0 2px`;
+				blockElement.style.borderRadius = '4px';
 
 			if ( overlayRect ) {
 				const blockRect = blockElement.getBoundingClientRect();

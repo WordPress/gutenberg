@@ -27,7 +27,6 @@ import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
 import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
-import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -127,10 +126,6 @@ export default function EditorInterface( {
 		};
 	}, [] );
 	const { setShowRevisionDiff } = unlock( useDispatch( editorStore ) );
-
-	// Runs unconditionally so join/leave/save notifications are dispatched
-	// regardless of viewport width or whether the header centre area is visible.
-	useCollaboratorNotifications( postId, postType );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened

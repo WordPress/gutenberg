@@ -55,25 +55,20 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
+	const showBlockBreadcrumbsOption = useSelect(
 		( select ) => {
-			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
-				select( editorStore );
+			const { getEditorSettings } = select( editorStore );
 			const { get } = select( preferencesStore );
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return {
-				showBlockBreadcrumbsOption:
-					! isDistractionFreeEnabled &&
-					isLargeViewport &&
-					isRichEditingEnabled,
-				showCollaborationOptions:
-					isCollaborationEnabledForCurrentPost(),
-			};
+			return (
+				! isDistractionFreeEnabled &&
+				isLargeViewport &&
+				isRichEditingEnabled
+			);
 		},
 		[ isLargeViewport ]
 	);
-
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -125,30 +120,24 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
-								{ showCollaborationOptions && (
-									<>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationCursor"
-											help={ __(
-												'Show your own avatar inside blocks during collaborative editing sessions.'
-											) }
-											label={ __(
-												'Show avatar in blocks'
-											) }
-										/>
-										<PreferenceToggleControl
-											scope="core"
-											featureName="showCollaborationNotifications"
-											help={ __(
-												'Show notifications when collaborators join, leave, or save the post.'
-											) }
-											label={ __(
-												'Show collaboration notifications'
-											) }
-										/>
-									</>
-								) }
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationCursor"
+									help={ __(
+										'Show your own avatar inside blocks during collaborative editing sessions.'
+									) }
+									label={ __( 'Show avatar in blocks' ) }
+								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="showCollaborationNotifications"
+									help={ __(
+										'Show notifications when collaborators join, leave, or save the post.'
+									) }
+									label={ __(
+										'Show collaboration notifications'
+									) }
+								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
@@ -361,7 +350,6 @@ function PreferencesModalContents( { extraSections = {} } ) {
 			].filter( Boolean ),
 		[
 			showBlockBreadcrumbsOption,
-			showCollaborationOptions,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

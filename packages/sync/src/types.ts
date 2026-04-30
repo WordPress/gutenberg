@@ -7,12 +7,6 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
  * External dependencies
  */
 import type * as Y from 'yjs';
-import type { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
-import type { ConnectionError } from './errors';
 
 /* globalThis */
 declare global {
@@ -73,21 +67,10 @@ export interface ConnectionStatusConnecting {
 
 export interface ConnectionStatusDisconnected {
 	status: 'disconnected';
-
 	/** Optional error information. */
 	error?: ConnectionError;
-
-	/** Whether the error condition is retryable via user action. */
-	canManuallyRetry?: boolean;
-
-	/** Number of consecutive poll failures since the last successful connection. */
-	consecutiveFailures?: number;
-
-	/** Whether the background retry schedule has been exhausted without a successful connection. */
-	backgroundRetriesFailed?: boolean;
-
-	/** Milliseconds until the next automatic retry attempt (triggered by the provider). */
-	willAutoRetryInMs?: number;
+	/** Milliseconds until the next automatic retry attempt. */
+	retryInMs?: number;
 }
 
 export type ConnectionStatus =
@@ -110,7 +93,6 @@ export interface ProviderCreatorOptions {
 }
 
 export type ProviderCreator = (
-	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
@@ -131,7 +113,6 @@ export interface RecordHandlers {
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	onStatusChange: OnStatusChangeCallback;
-	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 }
@@ -150,17 +131,13 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	getPersistedCRDTDoc?: ( record: ObjectData ) => string | null;
-	shouldSync?: (
-		objectType: ObjectType,
-		objectId: ObjectID | null
-	) => boolean;
 }
 
 export interface SyncManager {
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => Promise< string | null >;
+	) => string | null;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
@@ -185,7 +162,7 @@ export interface SyncManager {
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		options?: SyncManagerUpdateOptions
+		isSave?: boolean
 	) => void;
 }
 
@@ -194,5 +171,4 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 		ymap: Y.Map< any >,
 		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 	) => void;
-	stopCapturing: () => void;
 }

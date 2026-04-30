@@ -315,16 +315,6 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 }
 
 /**
- * Returns whether collaboration is supported.
- *
- * @param state Data state.
- * @return Whether collaboration is supported.
- */
-export function isCollaborationSupported( state: State ): boolean {
-	return state.collaborationSupported;
-}
-
-/**
  * Returns the view configuration for the given entity type.
  *
  * @param state Data state.

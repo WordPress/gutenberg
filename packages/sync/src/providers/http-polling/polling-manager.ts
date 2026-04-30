@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { applyFilters } from '@wordpress/hooks';
-
-/**
  * External dependencies
  */
 import * as Y from 'yjs';
@@ -16,19 +11,8 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
-import {
-	DEFAULT_CLIENT_LIMIT_PER_ROOM,
-	ERROR_RETRY_DELAYS_SOLO_MS,
-	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
+	MAX_ERROR_BACKOFF_IN_MS,
 	MAX_ROOMS_PER_REQUEST,
-	MAX_UPDATE_SIZE_IN_BYTES,
-	POLLING_INTERVAL_IN_MS,
-	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
-	POLLING_INTERVAL_BACKGROUND_TAB_IN_MS,
-	DISCONNECT_DIALOG_RETRY_MS,
-	MANUAL_RETRY_INTERVAL_MS,
-} from './config';
-import { ConnectionError, ConnectionErrorCode } from '../../errors';
 import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
@@ -42,7 +26,6 @@ import {
 	base64ToUint8Array,
 	createSyncUpdate,
 	createUpdateQueue,
-	intValueOrDefault,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
 	rotateWindow,
@@ -60,10 +43,7 @@ type LogFunction = (
 interface PollingManager {
 	registerRoom: ( options: RegisterRoomOptions ) => void;
 	retryNow: () => void;
-	unregisterRoom: (
-		room: string,
-		options?: { sendDisconnectSignal?: boolean }
-	) => void;
+	unregisterRoom: ( room: string ) => void;
 }
 
 interface RegisterRoomOptions {
@@ -77,135 +57,15 @@ interface RegisterRoomOptions {
 
 interface RoomState {
 	clientId: number;
-	createCompactionUpdate: () => SyncUpdate;
 	endCursor: number;
-	isPrimaryRoom: boolean;
+	enforceConnectionLimit: boolean;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
-	room: string;
 	unregister: () => void;
 	updateQueue: UpdateQueue;
-}
-
-/**
- * Minimal shape of a WordPress REST API error as it arrives on the client
- * via apiFetch. WP_Error is serialized to JSON with a `data.status` field
- * containing the HTTP status code; `code` and `message` are best-effort.
- */
-interface WPRestError {
-	code?: string;
-	message?: string;
-	data: { status: number };
-}
-
-/**
- * Check if an error is a forbidden (403) response from the WordPress REST
- * API. These errors have a `data.status` property set by WP_Error.
- *
- * @param error The caught error to inspect.
- */
-function isForbiddenError( error: unknown ): error is WPRestError {
-	return ( error as WPRestError | undefined )?.data?.status === 403;
-}
-
-/**
- * Try to identify which room caused a forbidden error by checking if any
- * room name from the request appears in the error message. The WordPress
- * REST API includes the room name in per-entity permission errors (e.g.
- * "You do not have permission to sync this entity: postType/post:123.").
- * Room names are never translated, so substring matching is reliable.
- *
- * Returns the room name if found, or null for generic auth failures
- * (e.g. "not logged in") where no specific room is identified.
- *
- * @param error The forbidden error, narrowed via isForbiddenError.
- * @param rooms The room names from the request payload.
- */
-function identifyForbiddenRoom(
-	error: WPRestError,
-	rooms: string[]
-): string | null {
-	const message = typeof error.message === 'string' ? error.message : '';
-
-	// Sort rooms by length descending so the longest match wins. Room names
-	// embed numeric IDs (e.g. "postType/post:1", "postType/post:10"), and a
-	// shorter name can be a substring of a longer one. Without sorting, the
-	// iteration order is the room registration order, so a 403 referencing
-	// "postType/post:10" could incorrectly match "postType/post:1" first.
-	const sortedRooms = [ ...rooms ].sort( ( a, b ) => b.length - a.length );
-
-	for ( const room of sortedRooms ) {
-		if ( message.includes( room ) ) {
-			return room;
-		}
-	}
-
-	return null;
-}
-
-/**
- * Handle a 403 from the sync endpoint. Silently unregisters the affected
- * rooms, and restores pending updates for the remaining rooms so they retry on
- * the next poll cycle.
- *
- * @param error          The forbidden error, narrowed via isForbiddenError.
- * @param requestedRooms The rooms that were in the failing request.
- */
-function handleForbiddenError(
-	error: WPRestError,
-	requestedRooms: SyncPayload[ 'rooms' ]
-): void {
-	const forbiddenRoom = identifyForbiddenRoom(
-		error,
-		requestedRooms.map( ( r ) => r.room )
-	);
-
-	if ( forbiddenRoom ) {
-		// A specific room was denied — unregister only that room.
-		const state = roomStates.get( forbiddenRoom );
-		if ( state ) {
-			state.log(
-				'Permission denied, unregistering room',
-				{ error },
-				'error',
-				true // force
-			);
-			unregisterRoom( forbiddenRoom, { sendDisconnectSignal: false } );
-		}
-
-		// Restore updates for remaining rooms so they can be retried on
-		// the next poll cycle.
-		for ( const room of requestedRooms ) {
-			if (
-				room.room === forbiddenRoom ||
-				! roomStates.has( room.room )
-			) {
-				continue;
-			}
-			const remainingState = roomStates.get( room.room )!;
-			if ( room.updates.length > 0 ) {
-				remainingState.updateQueue.restore( room.updates );
-			}
-		}
-	} else {
-		// Generic auth failure (e.g. not logged in) — unregister all rooms.
-		const rooms = [ ...roomStates.keys() ];
-		for ( const room of rooms ) {
-			const state = roomStates.get( room );
-			if ( state ) {
-				state.log(
-					'Permission denied, unregistering room',
-					{ error },
-					'error',
-					true // force
-				);
-				unregisterRoom( room, { sendDisconnectSignal: false } );
-			}
-		}
-	}
 }
 
 const roomStates: Map< string, RoomState > = new Map();
@@ -215,11 +75,9 @@ const roomStates: Map< string, RoomState > = new Map();
  * the original operation metadata (client IDs, logical clocks) so that
  * Yjs deduplication works correctly when the compaction is applied.
  *
- * Deprecated: The server is moving towards full state updates for compaction.
- *
  * @param updates The updates to merge
  */
-function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
+function createCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
 	// Extract only compaction and update types for merging (skip sync-step updates).
 	// Decode base64 updates to Uint8Array for merging.
 	const mergeable = updates
@@ -288,9 +146,7 @@ function processAwarenessUpdate(
 
 	// Removed clients are missing from the server state.
 	const removed = new Set< number >(
-		Array.from( currentStates.keys() ).filter(
-			( clientId ) => ! state[ clientId ]
-		)
+		currentStates.keys().filter( ( clientId ) => ! state[ clientId ] )
 	);
 
 	Object.entries( state ).forEach( ( [ clientIdString, awarenessState ] ) => {
@@ -387,79 +243,20 @@ function processDocUpdate(
 	}
 }
 
-/**
- * Check whether the awareness state exceeds the configured connection limit.
- *
- * @param awareness The awareness state from the server response.
- * @param roomState The room state corresponding to the awareness state
- * @return True if a peer limit has been exceeded.
- */
-function checkConnectionLimit(
-	awareness: AwarenessState,
-	roomState: RoomState
-): boolean {
-	if ( ! roomState.isPrimaryRoom || hasCheckedConnectionLimit ) {
-		return false;
-	}
-
-	// Limits are only enforced on the initial connection.
-	hasCheckedConnectionLimit = true;
-
-	const maxClientsPerRoom = applyFilters(
-		'sync.pollingProvider.maxClientsPerRoom',
-		DEFAULT_CLIENT_LIMIT_PER_ROOM,
-		roomState.room
-	);
-
-	const clientCount = Object.keys( awareness ).length;
-	const validatedLimit = intValueOrDefault(
-		maxClientsPerRoom,
-		DEFAULT_CLIENT_LIMIT_PER_ROOM
-	);
-
-	if ( clientCount > validatedLimit ) {
-		roomState.log( 'Connection limit exceeded', {
-			clientCount,
-			maxClientsPerRoom: validatedLimit,
-			room: roomState.room,
-		} );
-
-		return true;
-	}
-
-	return false;
-}
-
+	if ( ! roomState.enforceConnectionLimit ) {
+	roomState.enforceConnectionLimit = false;
 let areListenersRegistered = false;
-let consecutiveFailures = 0;
-let hasCheckedConnectionLimit = false;
-let isManualRetry = false;
 let hasCollaborators = false;
 let isActiveBrowser = 'visible' === document.visibilityState;
 let isPolling = false;
-let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
-
 // When more rooms are registered than the server allows per request
 // (MAX_ROOMS_PER_REQUEST), the primary room is sent every poll and the
 // remaining "overflow" rooms are rotated across polls. This offset
 // points into the overflow list at the next room to include.
 let roomOverflowOffset = 0;
 
-/**
- * Mark that a page unload has been requested. This fires on
- * `beforeunload` which happens before the browser aborts in-flight
- * fetches, allowing us to distinguish poll failures caused by
- * navigation from genuine server errors in the catch block.
- *
- * If the user cancels the unload (e.g. by dismissing a "Save Changes?" dialog),
- * the flag is reset at the start of the next poll cycle so that polling can
- * resume.
- */
-function handleBeforeUnload(): void {
-	isUnloadPending = true;
-}
 
 /**
  * Send a disconnect signal for all registered rooms when the page is
@@ -500,15 +297,9 @@ function handleVisibilityChange() {
 		/*
 		 * Remove scheduled polling and repoll immediately when reactivated.
 		 *
-		 * This ensures that any updates by collaborators are immediately
-		 * reflected in the document once the browser tab becomes active.
-		 * Otherwise there would be a delay of up to 30 seconds before the
-		 * updates came through.
-		 *
-		 * Only repoll if we cleared a pending timeout, meaning the poll loop
-		 * was idle between cycles. If no timeout is pending, a poll request
-		 * is already in-flight and will pick up the updated isActiveBrowser
-		 * value when it schedules the next cycle.
+		 * This ensures that any updates by collaborators are immediately reflected
+		 * in the document once the browser tab becomes active. Otherwise there would
+		 * be a delay of 30 seconds before the updates came through.
 		 */
 		if ( pollingTimeoutId ) {
 			clearTimeout( pollingTimeoutId );
@@ -571,11 +362,6 @@ function poll(): void {
 			return;
 		}
 
-		// Reset the unloading flag at the start of each poll cycle so
-		// it doesn't permanently suppress disconnect after the user
-		// cancels a beforeunload dialog.
-		isUnloadPending = false;
-
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
 		// withhold our own updates until we detect another collaborator using the
@@ -601,8 +387,6 @@ function poll(): void {
 			const { rooms } = await postSyncUpdate( payload );
 
 			// Emit 'connected' status.
-			consecutiveFailures = 0;
-			isManualRetry = false;
 			roomsInRequest.forEach( ( state ) => {
 				// Skip rooms unregistered during the await (e.g. the
 				// size-limit handler in onDocUpdate). Their terminal
@@ -614,9 +398,6 @@ function poll(): void {
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
-			// Reset before checking each room
-			hasCollaborators = false;
-
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
 					return;
@@ -625,36 +406,15 @@ function poll(): void {
 				const roomState = roomStates.get( room.room )!;
 				roomState.endCursor = room.end_cursor;
 
-				// If a limit is exceeded, disconnect immediately without processing updates.
-				if ( checkConnectionLimit( room.awareness, roomState ) ) {
-					roomState.onStatusChange( {
-						status: 'disconnected',
-						error: new ConnectionError(
-							ConnectionErrorCode.CONNECTION_LIMIT_EXCEEDED,
-							'Connection limit exceeded'
-						),
-					} );
-					unregisterRoom( room.room );
-					return;
-				}
-
 				// Process awareness update.
 				roomState.processAwarenessUpdate( room.awareness );
 
-				// If there is another collaborator on the primary entity,
-				// resume all room queues for the next poll and increase
-				// polling frequency. We only check the primary room to
-				// avoid false positives from shared collection rooms
-				// (e.g. taxonomy/category), but resume all queues so
-				// collection rooms (e.g. root/comment) can also sync.
-				if (
-					roomState.isPrimaryRoom &&
-					Object.keys( room.awareness ).length > 1
-				) {
+				// If there is another collaborator, resume the queue for the next poll
+				// resume the queue for the next poll and increase polling
+				// frequency. We only check the primary room to avoid false
+				// positives from shared collection rooms (e.g. taxonomy/category).
 					hasCollaborators = true;
-					roomStates.forEach( ( state ) => {
-						state.updateQueue.resume();
-					} );
+					roomState.updateQueue.resume();
 				}
 
 				// Process each incoming update and collect any responses.
@@ -678,21 +438,11 @@ function poll(): void {
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
-				// client at a time to compact (lowest active client ID). We encode our
-				// full document state to replace all prior updates on the server.
-				if ( room.should_compact ) {
-					roomState.log( 'Server requested compaction update' );
-					roomState.updateQueue.clear();
+				// client at a time to compact (lowest active client ID). We merge the
+				// received updates (the server has given us everything it has).
+				if ( room.compaction_request ) {
 					roomState.updateQueue.add(
-						roomState.createCompactionUpdate()
-					);
-				} else if ( room.compaction_request ) {
-					// Deprecated
-					roomState.log( 'Server requested (old) compaction update' );
-					roomState.updateQueue.add(
-						createDeprecatedCompactionUpdate(
-							room.compaction_request
-						)
+						createCompactionUpdate( room.compaction_request )
 					);
 				}
 			} );
@@ -706,93 +456,54 @@ function poll(): void {
 				pollInterval = POLLING_INTERVAL_BACKGROUND_TAB_IN_MS;
 			}
 		} catch ( error ) {
-			// A 403 response means the user does not have permission to
-			// sync a specific entity. Silently unregister the affected
-			// room(s) and let polling continue for the rest.
-			if ( isForbiddenError( error ) ) {
-				handleForbiddenError( error, payload.rooms );
+			// Use the explicit retry delay schedule for backoff.
+			consecutiveFailures++;
+			const retrySchedule = hasCollaborators
+				? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
+				: ERROR_RETRY_DELAYS_SOLO_MS;
+			if ( consecutiveFailures <= retrySchedule.length ) {
+				pollInterval = retrySchedule[ consecutiveFailures - 1 ];
+				pollInterval = DISCONNECT_DIALOG_RETRY_MS;
+			}
 
-				// If every room was unregistered, stop the poll loop
-				// instead of scheduling another tick. Reset isPolling
-				// so a future registerRoom() call can restart it.
-				if ( roomStates.size === 0 ) {
-					isPolling = false;
-					return;
-				}
-			} else {
-				// Use the explicit retry delay schedule for backoff.
-				consecutiveFailures++;
-				const retrySchedule = hasCollaborators
-					? ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS
-					: ERROR_RETRY_DELAYS_SOLO_MS;
-				if ( consecutiveFailures <= retrySchedule.length ) {
-					pollInterval = retrySchedule[ consecutiveFailures - 1 ];
-				} else {
-					pollInterval = DISCONNECT_DIALOG_RETRY_MS;
+			// After a manual retry, use a shorter interval for one cycle.
+			if ( isManualRetry ) {
+				pollInterval = MANUAL_RETRY_INTERVAL_MS;
+				isManualRetry = false;
+			}
+
 				}
 
-				// After a manual retry, use a shorter interval for one cycle.
-				if ( isManualRetry ) {
-					pollInterval = MANUAL_RETRY_INTERVAL_MS;
-					isManualRetry = false;
+				const state = roomStates.get( room.room )!;
+
+				if ( room.updates.length > 0 && state.endCursor > 0 ) {
+					state.updateQueue.clear();
 				}
 
-				// Recover from the failed request. We don't know whether the server stored
-				// our updates before the error occurred (e.g. a network timeout after a
-				// successful write). Re-sending the same updates via restore() would
-				// duplicate them on the server and cause unbounded storage growth.
-				//
-				// Instead, for rooms that had outgoing updates, replace the queue with a
-				// single compaction (full document state). This is idempotent: if the
-				// server already stored the updates, the compaction safely supersedes
-				// them; if it didn't, the compaction includes them. Updates not seen by
-				// this client are preserved in both cases.
-				for ( const room of payload.rooms ) {
-					if ( ! roomStates.has( room.room ) ) {
-						continue;
-					}
+				state.log(
+					'Error posting sync update, will retry with backoff',
+					{ error, nextPoll: pollInterval },
+					'error',
+					true // force
+				);
+			}
 
-					const state = roomStates.get( room.room )!;
-
-					if ( room.updates.length > 0 && state.endCursor > 0 ) {
-						state.updateQueue.clear();
-						state.updateQueue.add( state.createCompactionUpdate() );
-					} else if ( room.updates.length > 0 ) {
-						state.updateQueue.restore( room.updates );
-					}
-
-					state.log(
-						'Error posting sync update, will retry with backoff',
-						{ error, nextPoll: pollInterval },
-						'error',
-						true // force
-					);
-				}
-
-				// Don't report disconnected status when the request was aborted
-				// due to page unload (e.g. during a refresh) to avoid briefly
-				// flashing the disconnect dialog before the new page loads.
-				if ( ! isUnloadPending ) {
-					const backgroundRetriesFailed =
-						consecutiveFailures > retrySchedule.length;
-
-					roomsInRequest.forEach( ( state ) => {
+			// Don't report disconnected status when the request was aborted
+				roomStates.forEach( ( state ) => {
+					state.onStatusChange( {
+						status: 'disconnected',
+						canManuallyRetry: true,
+						consecutiveFailures,
+						backgroundRetriesFailed,
+						willAutoRetryInMs: pollInterval,
 						// Skip rooms unregistered during the await so
 						// their terminal status isn't overwritten.
 						if ( roomStates.get( state.room ) !== state ) {
 							return;
 						}
 
-						state.onStatusChange( {
-							status: 'disconnected',
-							canManuallyRetry: true,
-							consecutiveFailures,
-							backgroundRetriesFailed,
-							willAutoRetryInMs: pollInterval,
-						} );
 					} );
-				}
-			}
+				} );
 		}
 
 		pollingTimeoutId = setTimeout( poll, pollInterval );
@@ -801,7 +512,6 @@ function poll(): void {
 	// Start polling.
 	void start();
 }
-
 function registerRoom( {
 	room,
 	doc,
@@ -817,39 +527,7 @@ function registerRoom( {
 	// Note: Queue is initially paused. Call .resume() to unpause.
 	const updateQueue = createUpdateQueue( [ createSyncStep1Update( doc ) ] );
 
-	/**
-	 * Connection limits are enforced on the first entity to be loaded for sync.
-	 * This is an inelegant solution to a hard problem: This sync provider and the
-	 * sync package in general intentionally have no knowledge of the individual
-	 * entities being synced.
-	 *
-	 * Let's say a user opens a document (Entity A) for editing. If you asked the
-	 * user what they are doing, they would reply "I'm editing Entity A." You might
-	 * say that Entity A is "primary."
-	 *
-	 * However, the action of editing Entity A also triggers the loading of a
-	 * collection of document categories (Entity B) and another document (Entity C)
-	 * that is embedded in Entity A. You might therefore say that Entity B and
-	 * Entity C are "secondary" in this session.
-	 *
-	 * Meanwhile, a different user opens Entity C for editing, which also triggers
-	 * the loading of Entity B. In this session, Entity C is "primary" and Entity B
-	 * is "secondary."
-	 *
-	 * How do we enforce limits? The intuitive answer is that we only want to count
-	 * connections when the entity is "primary." However, we have no ability to
-	 * detect this. A document might be loaded as a primary entity in one session
-	 * and a secondary entity in another.
-	 *
-	 * In practice, we can consider the first-loaded entity as "primary" and use it
-	 * to enforce our connection limit. This is an imperfect assumption of consumer
-	 * behavior.
-	 *
-	 * How might this approach be improved? We could develop some way to annotate
-	 * entity loading so that the consumer can indicate which entity is primary.
-	 */
-	const isPrimaryRoom = 0 === roomStates.size;
-
+	const enforceConnectionLimit = 0 === roomStates.size;
 	function onAwarenessUpdate(): void {
 		roomState.localAwarenessState = awareness.getLocalState() ?? {};
 	}
@@ -857,29 +535,6 @@ function registerRoom( {
 	function onDocUpdate( update: Uint8Array, origin: unknown ): void {
 		if ( POLLING_MANAGER_ORIGIN === origin ) {
 			return;
-		}
-
-		if ( update.byteLength > MAX_UPDATE_SIZE_IN_BYTES ) {
-			const state = roomStates.get( room );
-			if ( ! state ) {
-				return;
-			}
-
-			state.log( 'Document size limit exceeded', {
-				maxUpdateSizeInBytes: MAX_UPDATE_SIZE_IN_BYTES,
-				updateSizeInBytes: update.byteLength,
-			} );
-
-			state.onStatusChange( {
-				status: 'disconnected',
-				error: new ConnectionError(
-					ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED,
-					'Document size limit exceeded'
-				),
-			} );
-
-			// This is an unrecoverable error. Unregister the room to prevent syncing.
-			unregisterRoom( room );
 		}
 
 		// Tag local document changes as 'update' type.
@@ -894,13 +549,8 @@ function registerRoom( {
 
 	const roomState: RoomState = {
 		clientId: doc.clientID,
-		createCompactionUpdate: () =>
-			createSyncUpdate(
-				Y.encodeStateAsUpdateV2( doc ),
-				SyncUpdateType.COMPACTION
-			),
 		endCursor: 0,
-		isPrimaryRoom,
+		enforceConnectionLimit,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
 		onStatusChange,
@@ -908,7 +558,6 @@ function registerRoom( {
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>
 			processDocUpdate( update, doc, onSync ),
-		room,
 		unregister,
 		updateQueue,
 	};
@@ -918,7 +567,6 @@ function registerRoom( {
 	roomStates.set( room, roomState );
 
 	if ( ! areListenersRegistered ) {
-		window.addEventListener( 'beforeunload', handleBeforeUnload );
 		window.addEventListener( 'pagehide', handlePageHide );
 		document.addEventListener( 'visibilitychange', handleVisibilityChange );
 		areListenersRegistered = true;
@@ -929,54 +577,44 @@ function registerRoom( {
 	}
 }
 
-function unregisterRoom(
-	room: string,
-	{ sendDisconnectSignal = true }: { sendDisconnectSignal?: boolean } = {}
-): void {
+function unregisterRoom( room: string ): void {
 	const state = roomStates.get( room );
 	if ( state ) {
-		if ( sendDisconnectSignal ) {
-			// Send a disconnect signal so the server removes this client's
-			// awareness entry immediately instead of waiting for the timeout.
-			const rooms = [
-				{
-					after: 0,
-					awareness: null,
-					client_id: state.clientId,
-					room,
-					updates: [],
-				},
-			];
+		// Send a disconnect signal so the server removes this client's
+		// awareness entry immediately instead of waiting for the timeout.
+		const rooms = [
+			{
+				after: 0,
+				awareness: null,
+				client_id: state.clientId,
+				room,
+				updates: [],
+			},
+		];
 
-			postSyncUpdateNonBlocking( { rooms } );
-		}
-
+		postSyncUpdateNonBlocking( { rooms } );
 		state.unregister();
 		roomStates.delete( room );
 	}
 
 	if ( 0 === roomStates.size && areListenersRegistered ) {
-		window.removeEventListener( 'beforeunload', handleBeforeUnload );
 		window.removeEventListener( 'pagehide', handlePageHide );
 		document.removeEventListener(
 			'visibilitychange',
 			handleVisibilityChange
 		);
 		areListenersRegistered = false;
-		hasCheckedConnectionLimit = false;
-		consecutiveFailures = 0;
 		roomOverflowOffset = 0;
 	}
 }
 
 /**
- * Immediately retry the sync connection by cancelling any pending
- * timeout and triggering a new poll. If the retry fails, the next
- * auto-retry waits 15s (MANUAL_RETRY_INTERVAL_MS) instead of the
- * usual 30s, then falls back to 30s for subsequent auto-retries.
+ * Immediately retry the sync connection by cancelling any pending backoff
+ * timeout and triggering a new poll. If a request is already in-flight,
+ * the backoff interval is reset so the next scheduled poll fires sooner.
  */
 function retryNow(): void {
-	isManualRetry = true;
+	pollInterval = POLLING_INTERVAL_IN_MS * 2;
 
 	if ( pollingTimeoutId ) {
 		clearTimeout( pollingTimeoutId );

@@ -32,10 +32,7 @@ function mergeMetaboxes( metaboxes = [], newMetaboxes ) {
 			( box ) => box.id === metabox.id
 		);
 		if ( existing !== -1 ) {
-			mergedMetaboxes[ existing ] = {
-				...mergedMetaboxes[ existing ],
-				...metabox,
-			};
+			mergedMetaboxes[ existing ] = metabox;
 		} else {
 			mergedMetaboxes.push( metabox );
 		}

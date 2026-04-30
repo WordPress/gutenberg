@@ -73,7 +73,6 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
-		showCollaborationNotifications: true,
 	} );
 
 	if ( window.__clientSideMediaProcessing ) {

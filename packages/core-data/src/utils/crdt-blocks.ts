@@ -15,21 +15,20 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
-import { getCachedRichTextData } from './crdt-text';
 import { Delta } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
 }
 
-interface BlockAttributeSchema {
+interface BlockAttributeType {
 	role?: string;
 	type?: string;
-	query?: Record< string, BlockAttributeSchema >;
+	query?: Record< string, BlockAttributeType >;
 }
 
 interface BlockType {
-	attributes?: Record< string, BlockAttributeSchema >;
+	attributes?: Record< string, BlockAttributeType >;
 	name: string;
 }
 
@@ -63,37 +62,6 @@ export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
-/**
- * Recursively walk an attribute value and convert any RichTextData instances
- * to their string (HTML) representation. This is necessary for array-type and
- * object-type attributes, which can contain nested RichTextData.
- *
- * @param value The attribute value to serialize.
- * @return The value with all RichTextData instances replaced by strings.
- */
-function serializeAttributeValue( value: unknown ): unknown {
-	if ( value instanceof RichTextData ) {
-		return value.valueOf();
-	}
-
-	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
-	if ( Array.isArray( value ) ) {
-		return value.map( serializeAttributeValue );
-	}
-
-	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
-	if ( value && typeof value === 'object' ) {
-		const result: Record< string, unknown > = {};
-
-		for ( const [ k, v ] of Object.entries( value ) ) {
-			result[ k ] = serializeAttributeValue( v );
-		}
-		return result;
-	}
-
-	return value;
-}
-
 function makeBlockAttributesSerializable(
 	blockName: string,
 	attributes: BlockAttributes
@@ -105,7 +73,7 @@ function makeBlockAttributesSerializable(
 			continue;
 		}
 
-		newAttributes[ key ] = serializeAttributeValue( value );
+		if ( value instanceof RichTextData ) {
 	}
 	return newAttributes;
 }
@@ -119,85 +87,8 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 			name,
 			attributes: makeBlockAttributesSerializable( name, attributes ),
 			innerBlocks: makeBlocksSerializable( innerBlocks ),
-		};
-	} );
-}
-
-/**
- * Recursively walk an attribute value and convert any strings that correspond
- * to rich-text schema nodes into RichTextData instances. This is the inverse
- * of serializeAttributeValue and handles nested structures like table cells.
- *
- * @param schema The attribute type definition for this value.
- * @param value  The attribute value from CRDT (toJSON).
- * @return The value with rich-text strings replaced by RichTextData.
- */
-function deserializeAttributeValue(
-	schema: BlockAttributeSchema | undefined,
-	value: unknown
-): unknown {
-	if ( schema?.type === 'rich-text' && typeof value === 'string' ) {
-		return getCachedRichTextData( value );
-	}
-
-	// e.g. core/table `body`: [ { cells: [ { content: RichTextData } ] } ]
-	if ( Array.isArray( value ) ) {
-		return value.map( ( item ) =>
-			deserializeAttributeValue( schema, item )
-		);
-	}
-
-	// e.g. a single row inside core/table `body`: { cells: [ ... ] }
-	if ( value && typeof value === 'object' ) {
-		const result: Record< string, unknown > = {};
-
-		for ( const [ key, innerValue ] of Object.entries(
-			value as Record< string, unknown >
-		) ) {
-			result[ key ] = deserializeAttributeValue(
-				schema?.query?.[ key ],
-				innerValue
-			);
-		}
-
-		return result;
-	}
-
-	return value;
-}
-
-/**
- * Convert blocks from their CRDT-serialized form back to the runtime form
- * expected by the block editor. Rich-text attributes are stored as Y.Text in
- * the CRDT document, which serializes to plain strings via toJSON(). This
- * function restores them to RichTextData instances so that block edit
- * components that rely on RichTextData methods (e.g. `.text`) work correctly.
- *
- * @param blocks Blocks as extracted from the CRDT document via toJSON().
- * @return Blocks with rich-text attributes restored to RichTextData.
- */
-export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
-	return blocks.map( ( block: Block ) => {
-		const { name, innerBlocks, attributes, ...rest } = block;
-
-		const newAttributes = { ...attributes };
-
-		for ( const [ key, value ] of Object.entries( attributes ) ) {
-			const schema = getBlockAttributeSchema( name, key );
-
-			if ( schema ) {
-				newAttributes[ key ] = deserializeAttributeValue(
-					schema,
-					value
-				);
-			}
-		}
-
-		return {
-			...rest,
-			name,
-			attributes: newAttributes,
-			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
+	schema: BlockAttributeType | undefined,
+			const schema = getBlockAttributeType( name, key );
 		};
 	} );
 }
@@ -254,89 +145,14 @@ function createNewYAttributeValue(
 	blockName: string,
 	attributeName: string,
 	attributeValue: unknown
-): Y.Text | Y.Array< unknown > | Y.Map< unknown > | unknown {
-	const schema = getBlockAttributeSchema( blockName, attributeName );
-	return createYValueFromSchema( schema, attributeValue );
-}
+): Y.Text | unknown {
+	const isRichText = isRichTextAttribute( blockName, attributeName );
 
-/**
- * Recursively create the appropriate Y.js type for a value based on its
- * block-attribute schema.
- *
- * - `rich-text`          -> Y.Text
- * - `array`  with query  -> Y.Array of Y.Maps
- * - `object` with query  -> Y.Map
- * - anything else        -> plain value (unchanged)
- *
- * @param schema The attribute type definition.
- * @param value  The plain JS value to convert.
- * @return A Y.js type or the original value.
- */
-function createYValueFromSchema(
-	schema: BlockAttributeSchema | undefined,
-	value: unknown
-): Y.Text | Y.Array< unknown > | Y.Map< unknown > | unknown {
-	if ( ! schema ) {
-		return value;
+	if ( isRichText ) {
+		return new Y.Text( attributeValue?.toString() ?? '' );
 	}
 
-	if ( schema.type === 'rich-text' ) {
-		return new Y.Text( value?.toString() ?? '' );
-	}
-
-	if ( schema.type === 'array' && schema.query && Array.isArray( value ) ) {
-		const query = schema.query;
-		const yArray = new Y.Array< Y.Map< unknown > >();
-
-		yArray.insert(
-			0,
-			value.map( ( item ) => createYMapFromQuery( query, item ) )
-		);
-
-		return yArray;
-	}
-
-	if ( schema.type === 'object' && schema.query && isRecord( value ) ) {
-		return createYMapFromQuery( schema.query, value );
-	}
-
-	return value;
-}
-
-/**
- * Type guard that narrows `unknown` to `Record< string, unknown >`.
- *
- * @param value Value to check.
- * @return True if `value` is a non-null, non-array object.
- */
-function isRecord( value: unknown ): value is Record< string, unknown > {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
-}
-
-/**
- * Create a Y.Map from a plain object, using a query schema to decide which
- * properties should become nested Y.js types (Y.Text, Y.Array, Y.Map).
- *
- * @param query The query schema defining the properties.
- * @param obj   The plain object to convert.
- * @return A Y.Map with typed values.
- */
-function createYMapFromQuery(
-	query: Record< string, BlockAttributeSchema >,
-	obj: unknown
-): Y.Map< unknown > {
-	if ( ! isRecord( obj ) ) {
-		return new Y.Map();
-	}
-
-	const entries: [ string, unknown ][] = Object.entries( obj ).map(
-		( [ key, val ] ): [ string, unknown ] => {
-			const subSchema = query[ key ];
-			return [ key, createYValueFromSchema( subSchema, val ) ];
-		}
-	);
-
-	return new Y.Map( entries );
+	return attributeValue;
 }
 
 function createNewYBlock( block: Block ): YBlock {
@@ -457,7 +273,6 @@ export function mergeCrdtBlocks(
 	for ( let i = 0; i < numOfUpdatesNeeded; i++, left++ ) {
 		const block = blocksToSync[ left ];
 		const yblock = yblocks.get( left );
-
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
@@ -483,16 +298,8 @@ export function mergeCrdtBlocks(
 								currentAttribute
 							);
 
-							// Y types (Y.Text, Y.Array, Y.Map) cannot be
-							// compared with fastDeepEqual against plain values.
-							// Delegate to mergeYValue which handles no-op
-							// detection at the edges.
-							const isYType =
-								currentAttribute instanceof Y.AbstractType;
-
 							const isAttributeChanged =
 								! isExpectedType ||
-								isYType ||
 								! fastDeepEqual(
 									currentAttribute,
 									attributeValue
@@ -582,218 +389,31 @@ export function mergeCrdtBlocks(
 }
 
 /**
- * Compare a plain array element against a Y.Map element for equality.
- * Used by the left-right sweep diff in mergeYArray.
- *
- * @param newElement The plain object from the incoming array.
- * @param yElement   The Y.Map element from the existing Y.Array.
- * @return True if the elements are deeply equal.
- */
-function areArrayElementsEqual(
-	newElement: unknown,
-	yElement: unknown
-): boolean {
-	if ( yElement instanceof Y.Map && isRecord( newElement ) ) {
-		return fastDeepEqual( newElement, yElement.toJSON() );
-	}
-
-	return fastDeepEqual( newElement, yElement );
-}
-
-/**
- * Merge an incoming plain array into an existing Y.Array in-place.
- *
- * Uses the same left-right sweep diff approach as mergeCrdtBlocks:
- * equal elements are skipped from both ends, then the middle section
- * is updated, deleted, or inserted as needed. This preserves existing
- * Y.Map/Y.Text objects for unchanged elements, so concurrent edits
- * to those elements are not lost.
- *
- * @param yArray         The existing Y.Array to update.
- * @param newValue       The new plain array to merge into the Y.Array.
- * @param schema         The attribute schema (must have `query`).
- * @param cursorPosition The local cursor position for rich-text delta merges.
- */
-function mergeYArray(
-	yArray: Y.Array< unknown >,
-	newValue: unknown[],
-	schema: BlockAttributeSchema,
-	cursorPosition: number | null
-): void {
-	if ( ! schema.query ) {
-		return;
-	}
-
-	const query = schema.query;
-	const numOfCommonEntries = Math.min( newValue.length, yArray.length );
-
-	let left = 0;
-	let right = 0;
-
-	// Skip equal elements from left.
-	for (
-		;
-		left < numOfCommonEntries &&
-		areArrayElementsEqual( newValue[ left ], yArray.get( left ) );
-		left++
-	) {
-		/* nop */
-	}
-
-	// Skip equal elements from right.
-	for (
-		;
-		right < numOfCommonEntries - left &&
-		areArrayElementsEqual(
-			newValue[ newValue.length - right - 1 ],
-			yArray.get( yArray.length - right - 1 )
-		);
-		right++
-	) {
-		/* nop */
-	}
-
-	// Updates: merge changed elements in-place.
-	const numOfUpdatesNeeded = numOfCommonEntries - left - right;
-
-	for ( let i = 0; i < numOfUpdatesNeeded; i++ ) {
-		const currentElement = yArray.get( left + i );
-		const newElement = newValue[ left + i ];
-
-		if ( currentElement instanceof Y.Map && isRecord( newElement ) ) {
-			mergeYMapValues(
-				currentElement,
-				newElement,
-				query,
-				cursorPosition
-			);
-		} else {
-			// Element is the wrong type (e.g. partial migration) or the
-			// incoming value is not an object. Rebuild the entire array.
-			yArray.delete( 0, yArray.length );
-			yArray.insert(
-				0,
-				newValue.map( ( item ) => createYMapFromQuery( query, item ) )
-			);
-			return;
-		}
-	}
-
-	// Deletes.
-	const numOfDeletionsNeeded = Math.max( 0, yArray.length - newValue.length );
-
-	if ( numOfDeletionsNeeded > 0 ) {
-		yArray.delete( left + numOfUpdatesNeeded, numOfDeletionsNeeded );
-	}
-
-	// Inserts.
-	const numOfInsertionsNeeded = Math.max(
-		0,
-		newValue.length - yArray.length
-	);
-
-	if ( numOfInsertionsNeeded > 0 ) {
-		const insertAt = left + numOfUpdatesNeeded;
-		const itemsToInsert: Y.Map< unknown >[] = new Array(
-			numOfInsertionsNeeded
-		);
-
-		for ( let i = 0; i < numOfInsertionsNeeded; i++ ) {
-			itemsToInsert[ i ] = createYMapFromQuery(
-				query,
-				newValue[ insertAt + i ]
-			);
-		}
-
-		yArray.insert( insertAt, itemsToInsert );
-	}
-}
-
-/**
- * Merge a single value into a Y.Map entry, using the attribute schema to
- * decide how to merge.
- *
- * If the current value is already a matching Y.js type (Y.Text, Y.Array,
- * Y.Map), the update is merged in-place so concurrent edits are preserved.
- * Otherwise the value is replaced wholesale.
- *
- * @param schema         The attribute type definition for this value.
- * @param newVal         The new value to merge into the Y.Map entry.
- * @param yMap           The Y.Map that owns this entry.
- * @param key            The key of this entry in the Y.Map.
- * @param cursorPosition The local cursor position for rich-text delta merges.
- */
-function mergeYValue(
-	schema: BlockAttributeSchema | undefined,
-	newVal: unknown,
-	yMap: Y.Map< unknown >,
-	key: string,
-	cursorPosition: number | null
-): void {
-	const currentVal = yMap.get( key );
-	if (
-		schema?.type === 'rich-text' &&
-		typeof newVal === 'string' &&
-		currentVal instanceof Y.Text
-	) {
-		mergeRichTextUpdate( currentVal, newVal, cursorPosition );
-	} else if (
-		schema?.type === 'array' &&
-		schema.query &&
-		Array.isArray( newVal ) &&
-		currentVal instanceof Y.Array
-	) {
-		mergeYArray( currentVal, newVal, schema, cursorPosition );
-	} else if (
-		schema?.type === 'object' &&
-		schema.query &&
-		isRecord( newVal ) &&
-		currentVal instanceof Y.Map
-	) {
-		mergeYMapValues( currentVal, newVal, schema.query, cursorPosition );
-	} else {
-		const newYValue = createYValueFromSchema( schema, newVal );
-
-		// If createYValueFromSchema wrapped the value into a Y type, the
-		// current value is the wrong type and needs upgrading. Otherwise,
-		// only replace if the raw value actually changed.
-		if ( newYValue !== newVal || ! fastDeepEqual( currentVal, newVal ) ) {
-			yMap.set( key, newYValue );
-		}
-	}
-}
-
-/**
- * Merge an incoming plain object into an existing Y.Map in-place, using
- * the query schema to decide how each property should be merged.
- *
- * Properties present in the Y.Map but absent from `newObj` are deleted.
- *
- * @param yMap           The existing Y.Map to update.
- * @param newObj         The new plain object to merge into the Y.Map.
- * @param query          The query schema defining property types.
- * @param cursorPosition The local cursor position for rich-text delta merges.
- */
-function mergeYMapValues(
-	yMap: Y.Map< unknown >,
-	newObj: Record< string, unknown >,
-	query: Record< string, BlockAttributeSchema >,
-	cursorPosition: number | null
-): void {
-	for ( const [ key, newVal ] of Object.entries( newObj ) ) {
-		mergeYValue( query[ key ], newVal, yMap, key, cursorPosition );
-	}
-
-	// Delete properties absent from the incoming object.
-	for ( const key of yMap.keys() ) {
-		if ( ! Object.hasOwn( newObj, key ) ) {
-			yMap.delete( key );
-		}
-	}
-}
-
-/**
  * Update a single attribute on a Yjs block attributes map (currentAttributes).
+ *
+ * When the array length is unchanged (stable structure), each element is
+ * merged individually via `mergeYMapValues`, preserving concurrent edits to
+ * different elements. When the length changes (structural edit such as row
+ * insertion/deletion), the Y.Array is rebuilt from scratch.
+	if ( yArray.length === newValue.length ) {
+		// Same length: update each element in-place.
+			if ( currentElement instanceof Y.Map && isRecord( newElement ) ) {
+				mergeYMapValues(
+					currentElement,
+					newElement,
+					query,
+					cursorPosition
+				);
+			} else {
+				// Element is the wrong type (e.g. partial migration) or the
+				// incoming value is not an object. Rebuild the entire array.
+				yArray.delete( 0, yArray.length );
+				yArray.insert(
+					0,
+					newValue.map( ( item ) =>
+						createYMapFromQuery( query, item )
+					)
+				);
  *
  * @param blockName         The block type name, e.g. 'core/paragraph'.
  * @param attributeName     The name of the attribute to update, e.g. 'content'.
@@ -808,22 +428,19 @@ function updateYBlockAttribute(
 	currentAttributes: YBlockAttributes,
 	cursorPosition: number | null
 ): void {
-	const schema = getBlockAttributeSchema( blockName, attributeName );
+	const isRichText = isRichTextAttribute( blockName, attributeName );
 
-	mergeYValue(
-		schema,
-		attributeValue,
-		currentAttributes,
-		attributeName,
-		cursorPosition
-	);
+	if (
+		isRichText &&
+		'string' === typeof attributeValue &&
+		currentAttributes.has( attributeName ) &&
+		currentAttribute instanceof Y.Text
+	) {
+		// Rich text values are stored as persistent Y.Text instances.
 }
 
 // Cached block attribute types, populated once from getBlockTypes().
-let cachedBlockAttributeSchemas: Map<
-	string,
-	Map< string, BlockAttributeSchema >
->;
+let cachedBlockAttributeTypes: Map< string, Map< string, BlockAttributeType > >;
 
 /**
  * Get the attribute type definition for a block attribute.
@@ -832,22 +449,22 @@ let cachedBlockAttributeSchemas: Map<
  * @param attributeName The name of the attribute, e.g. 'content'.
  * @return The type definition of the attribute.
  */
-function getBlockAttributeSchema(
+function getBlockAttributeType(
 	blockName: string,
 	attributeName: string
-): BlockAttributeSchema | undefined {
-	if ( ! cachedBlockAttributeSchemas ) {
+): BlockAttributeType | undefined {
+	if ( ! cachedBlockAttributeTypes ) {
 		// Parse the attributes for all blocks once.
-		cachedBlockAttributeSchemas = new Map();
+		cachedBlockAttributeTypes = new Map();
 
 		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			cachedBlockAttributeSchemas.set(
+			cachedBlockAttributeTypes.set(
 				blockType.name,
-				new Map< string, BlockAttributeSchema >(
+				new Map< string, BlockAttributeType >(
 					Object.entries( blockType.attributes ?? {} ).map(
 						( [ name, definition ] ) => {
-							const { role, type, query } = definition;
-							return [ name, { role, type, query } ];
+							const { role, type } = definition;
+							return [ name, { role, type } ];
 						}
 					)
 				)
@@ -855,7 +472,7 @@ function getBlockAttributeSchema(
 		}
 	}
 
-	return cachedBlockAttributeSchemas.get( blockName )?.get( attributeName );
+	return cachedBlockAttributeTypes.get( blockName )?.get( attributeName );
 }
 
 /**
@@ -871,24 +488,17 @@ function isExpectedAttributeType(
 	attributeName: string,
 	attributeValue: unknown
 ): boolean {
-	const schema = getBlockAttributeSchema( blockName, attributeName );
+	const expectedAttributeType = getBlockAttributeType(
 
-	if ( schema?.type === 'rich-text' ) {
+	if ( expectedAttributeType === 'rich-text' ) {
 		return attributeValue instanceof Y.Text;
 	}
 
-	if ( schema?.type === 'string' ) {
+	if ( expectedAttributeType === 'string' ) {
 		return typeof attributeValue === 'string';
 	}
 
-	if ( schema?.type === 'array' && schema.query ) {
-		return attributeValue instanceof Y.Array;
-	}
-
-	if ( schema?.type === 'object' && schema.query ) {
-		return attributeValue instanceof Y.Map;
-	}
-
+	// No other types comparisons use special logic.
 	return true;
 }
 
@@ -902,7 +512,7 @@ function isExpectedAttributeType(
  */
 function isLocalAttribute( blockName: string, attributeName: string ): boolean {
 	return (
-		'local' === getBlockAttributeSchema( blockName, attributeName )?.role
+		'rich-text' === getBlockAttributeType( blockName, attributeName )?.type
 	);
 }
 

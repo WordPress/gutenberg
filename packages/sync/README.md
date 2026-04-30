@@ -30,7 +30,6 @@ Private @wordpress/sync APIs.
 
 ### Y
 
-Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future. However, in order to allow third-party plugins to provide their own Yjs providers / sync transport, they must import and consume **our instance** of Yjs due to this bug / feature:
 
 <https://github.com/yjs/yjs/issues/438>
 
