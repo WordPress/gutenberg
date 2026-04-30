@@ -107,6 +107,15 @@ function ResizeHandle( {
  * via `onResize`, throttled to one animation frame so the grid
  * commit loop runs at most once per paint.
  *
+ * Auto-scroll is disabled on this context: a resize is a magnitude
+ * gesture (delta in pixels), not a navigation to a drop target, so
+ * scrolling the document does not help the user. With auto-scroll
+ * enabled, dragging near the viewport edge scrolls the page, which
+ * inflates dnd-kit's `delta` (it is in document coordinates) and
+ * advances additional row steps without further cursor movement,
+ * producing a runaway loop where the tile and the page grow in
+ * lockstep.
+ *
  * @param props Component props.
  */
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
@@ -142,7 +151,11 @@ export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	};
 
 	return (
-		<DndContext onDragMove={ handleDragMove } onDragEnd={ handleDragEnd }>
+		<DndContext
+			autoScroll={ false }
+			onDragMove={ handleDragMove }
+			onDragEnd={ handleDragEnd }
+		>
 			<ResizeHandle { ...props } />
 		</DndContext>
 	);
