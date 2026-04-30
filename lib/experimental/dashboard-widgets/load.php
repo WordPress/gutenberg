@@ -14,6 +14,8 @@ add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_quick_draft_
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_quick_draft_widget' );
 add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_site_preview_widget' );
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_site_preview_widget' );
+add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_welcome_widget' );
+add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_welcome_widget' );
 
 /**
  * Wires the `site-health` widget as a dynamic dep of the dashboard module so it
@@ -92,5 +94,21 @@ function gutenberg_dashboard_widgets_register_activity_widget() {
 
 	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
 		gutenberg_register_dashboard_wp_admin_route( '/__widget_activity', $widget_module );
+	}
+}
+
+/**
+ * Wires the `welcome` widget as a dynamic dep of the dashboard module so it
+ * lands in the import map and React.lazy in the dashboard stage can resolve it.
+ */
+function gutenberg_dashboard_widgets_register_welcome_widget() {
+	$widget_module = 'wp/widgets/welcome/render';
+
+	if ( function_exists( 'gutenberg_register_dashboard_route' ) ) {
+		gutenberg_register_dashboard_route( '/__widget_welcome', $widget_module );
+	}
+
+	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
+		gutenberg_register_dashboard_wp_admin_route( '/__widget_welcome', $widget_module );
 	}
 }
