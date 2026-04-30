@@ -20,22 +20,29 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-export function QuickEditModal( {
-	open,
-	postType,
-	postId,
-	closeModal,
-	quickEditForm,
-} ) {
+/**
+ * Renders the editable form portion of the Quick Edit drawer.
+ *
+ * Mounted only while `Drawer.Popup` is on screen — Base UI's portal returns
+ * `null` once the drawer's exit animation completes — so the entity-record
+ * subscription via `useSelect` and the local edits state are naturally tied
+ * to the drawer's open lifecycle: they engage on open, stay alive through
+ * the exit animation (so the form keeps rendering while the drawer slides
+ * out), and tear down once the drawer is fully closed.
+ *
+ * @param {Object}   props
+ * @param {string}   props.postType      The post type slug.
+ * @param {Array}    props.postId        Array of post ids being edited.
+ * @param {Function} props.closeModal    Callback to close the drawer.
+ * @param {Object}   props.quickEditForm The form definition for Quick Edit.
+ */
+function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
 	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
-			// Skip data resolution while the drawer is closed to avoid
-			// triggering an entity-record fetch for every selection change
-			// when the user isn't quick-editing.
-			if ( ! open || postId.length === 0 ) {
+			if ( postId.length === 0 ) {
 				return {
 					record: null,
 					hasFinishedResolution: false,
@@ -77,7 +84,7 @@ export function QuickEditModal( {
 				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
-		[ open, postType, postId, isBulk ]
+		[ postType, postId, isBulk ]
 	);
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
@@ -167,6 +174,43 @@ export function QuickEditModal( {
 	};
 
 	return (
+		<>
+			<Drawer.Content>
+				{ hasFinishedResolution && (
+					<DataForm
+						data={ { ...record, ...localEdits } }
+						fields={ fields }
+						form={ form }
+						onChange={ onChange }
+					/>
+				) }
+			</Drawer.Content>
+			<Drawer.Footer>
+				<Drawer.Action __next40pxDefaultSize variant="secondary">
+					{ __( 'Cancel' ) }
+				</Drawer.Action>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={ onSave }
+				>
+					{ __( 'Done' ) }
+				</Button>
+			</Drawer.Footer>
+		</>
+	);
+}
+
+export function QuickEditModal( {
+	open,
+	postType,
+	postId,
+	closeModal,
+	quickEditForm,
+} ) {
+	const isBulk = postId.length > 1;
+
+	return (
 		<Drawer.Root
 			open={ open }
 			// Physical direction. Quick Edit anchors to the right edge of the
@@ -195,28 +239,12 @@ export function QuickEditModal( {
 					onClose={ closeModal }
 					hideActions
 				/>
-				<Drawer.Content>
-					{ hasFinishedResolution && (
-						<DataForm
-							data={ { ...record, ...localEdits } }
-							fields={ fields }
-							form={ form }
-							onChange={ onChange }
-						/>
-					) }
-				</Drawer.Content>
-				<Drawer.Footer>
-					<Drawer.Action __next40pxDefaultSize variant="secondary">
-						{ __( 'Cancel' ) }
-					</Drawer.Action>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						onClick={ onSave }
-					>
-						{ __( 'Done' ) }
-					</Button>
-				</Drawer.Footer>
+				<QuickEditSession
+					postType={ postType }
+					postId={ postId }
+					closeModal={ closeModal }
+					quickEditForm={ quickEditForm }
+				/>
 			</Drawer.Popup>
 		</Drawer.Root>
 	);
