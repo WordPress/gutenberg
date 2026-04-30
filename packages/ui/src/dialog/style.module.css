@@ -44,6 +44,7 @@
 		max-height: calc(100dvh - 2 * var(--viewport-inset));
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-lg);
 		overflow: hidden;
 		font-family: var(--wpds-typography-font-family-body);
@@ -96,6 +97,34 @@
 			 * The max-{width,height} properties will make sure some padding is shown.
 			 */
 			height: 100dvh;
+		}
+	}
+
+	/*
+	 * When a backdrop is rendered alongside the popup (modal mode),
+	 * hide the regular-mode border. The backdrop already provides
+	 * visual containment, so the border becomes redundant noise.
+	 * `transparent` (not `none`) keeps popup geometry identical
+	 * across modal/non-modal — `box-sizing: border-box` absorbs the
+	 * 1px into the existing box.
+	 */
+	.backdrop ~ * .popup {
+		border-color: transparent;
+	}
+
+	/*
+	 * Forced-colors mode strips `box-shadow` and substitutes
+	 * `background-color` with `Canvas` (the page background), so the
+	 * boundary depends entirely on the border. Set `CanvasText`
+	 * explicitly for both modal and non-modal popups: `transparent`
+	 * is not substituted by the UA, and being explicit also removes
+	 * any reliance on UA color-substitution behavior for the
+	 * non-modal case.
+	 */
+	@media (forced-colors: active) {
+		.popup,
+		.backdrop ~ * .popup {
+			border-color: CanvasText;
 		}
 	}
 
