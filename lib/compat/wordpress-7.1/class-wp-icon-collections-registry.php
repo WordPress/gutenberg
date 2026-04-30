@@ -67,7 +67,7 @@ if ( ! class_exists( 'WP_Icon_Collections_Registry' ) ) {
 
 			$allowed_keys = array( 'label', 'description' );
 			foreach ( array_keys( $collection_properties ) as $key ) {
-				if ( ! in_array( $key, $allowed_keys ) ) {
+				if ( ! in_array( $key, $allowed_keys, true ) ) {
 					_doing_it_wrong(
 						__METHOD__,
 						sprintf(
