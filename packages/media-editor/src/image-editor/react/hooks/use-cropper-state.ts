@@ -84,8 +84,13 @@ export interface UseCropperStateReturn {
 	redo: () => void;
 	/**
 	 * Flush the pending history entry immediately, bypassing the debounce
-	 * timer. Call this on pointer-up or key-up to give an instant commit
-	 * rather than waiting for the debounce window to expire.
+	 * timer. Useful in two situations:
+	 *
+	 * - **Pointer-up / key-up**: commit as soon as the user releases so the
+	 *   undo button lights up without waiting for the debounce window.
+	 * - **Gesture start**: pass to `onGestureStart` on the `Cropper` so any
+	 *   pending sidebar interaction is committed before a new canvas gesture
+	 *   begins, keeping the two interactions as separate undo steps.
 	 */
 	commitHistory: () => void;
 	/**

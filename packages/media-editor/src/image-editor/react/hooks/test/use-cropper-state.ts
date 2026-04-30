@@ -908,10 +908,8 @@ describe( 'useCropperState', () => {
 
 		it( 'undo restores the previous state and enables redo', () => {
 			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 3 );
-				result.current.commitHistory();
-			} );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
 			act( () => result.current.undo() );
 			expect( result.current.state.zoom ).toBe( 1 );
 			expect( result.current.hasUndo ).toBe( false );
@@ -920,10 +918,8 @@ describe( 'useCropperState', () => {
 
 		it( 'redo re-applies the undone state', () => {
 			const { result } = renderHook( () => useCropperState() );
-			act( () => {
-				result.current.setZoom( 3 );
-				result.current.commitHistory();
-			} );
+			act( () => result.current.setZoom( 3 ) );
+			act( () => result.current.commitHistory() );
 			act( () => result.current.undo() );
 			act( () => result.current.redo() );
 			expect( result.current.state.zoom ).toBe( 3 );
