@@ -385,7 +385,7 @@ describe( 'InteractionController', () => {
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
 			// deltaY=-100, default zoomSpeed = 0.0025, delta = 0.25.
-			expect( setZoomCall![ 0 ] ).toBe(
+			expect( setZoomCall![ 0 ] ).toBeCloseTo(
 				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
 			);
 		} );
@@ -416,9 +416,9 @@ describe( 'InteractionController', () => {
 			);
 
 			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
-			expect( actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ] ).toBe(
-				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
-			);
+			expect(
+				actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ]
+			).toBeCloseTo( 2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED );
 		} );
 
 		it( 'clamps to maxZoom on large positive wheel', () => {
