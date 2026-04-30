@@ -74,6 +74,7 @@ export const publicField: Field< TaxonomyFormData > = {
 	id: 'public',
 	label: __( 'Public' ),
 	type: 'boolean',
+	Edit: 'toggle',
 	description: __(
 		'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.'
 	),
@@ -89,6 +90,7 @@ export const hierarchicalField: Field< TaxonomyFormData > = {
 	id: 'hierarchical',
 	label: __( 'Hierarchical' ),
 	type: 'boolean',
+	Edit: 'toggle',
 	description: __(
 		'When on, terms behave like categories with parent-child relationships. When off, terms behave like tags.'
 	),
@@ -249,16 +251,13 @@ export const defaultForm: Form = {
 	],
 };
 
-export const generalForm: Form = {
-	layout: { type: 'regular' },
-	fields: [
-		'plural_name',
-		'singular_name',
-		'slug',
-		'description',
-		'object_type',
-		'public',
-		'hierarchical',
-		'status',
-	],
-};
+export const generalFormFields: Form[ 'fields' ] = [
+	'plural_name',
+	'singular_name',
+	'slug',
+	'description',
+	'object_type',
+	'public',
+	'hierarchical',
+	'status',
+];

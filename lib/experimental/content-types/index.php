@@ -280,11 +280,26 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 		'labels'       => $labels,
 		'public'       => ! empty( $config['public'] ),
 		'hierarchical' => ! empty( $config['hierarchical'] ),
-		'show_in_rest' => true,
 	);
 
 	if ( ! empty( $config['description'] ) ) {
 		$args['description'] = (string) $config['description'];
+	}
+
+	$bool_keys = array(
+		'publicly_queryable',
+		'show_ui',
+		'show_in_menu',
+		'show_in_nav_menus',
+		'show_tagcloud',
+		'show_in_quick_edit',
+		'show_admin_column',
+		'show_in_rest',
+	);
+	foreach ( $bool_keys as $key ) {
+		if ( array_key_exists( $key, $config ) ) {
+			$args[ $key ] = (bool) $config[ $key ];
+		}
 	}
 
 	return array( $slug, $object_type, $args );

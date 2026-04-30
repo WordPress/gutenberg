@@ -23,6 +23,7 @@ async function createUserTaxonomy( requestUtils, overrides = {} ) {
 				public: true,
 				hierarchical: false,
 				labels: { singular_name: 'Genre' },
+				show_in_rest: true,
 			},
 			...overrides,
 		},
