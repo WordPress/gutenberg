@@ -69,6 +69,25 @@ function textSimilarity( text1, text2 ) {
 }
 
 /**
+ * Gets comparable text for a raw block.
+ * Prefers innerHTML, but falls back to common content attributes.
+ *
+ * @param {Object} rawBlock Raw block.
+ * @return {string} Text used for similarity comparisons.
+ */
+function getRawBlockText( rawBlock ) {
+	if ( rawBlock?.innerHTML ) {
+		return rawBlock.innerHTML;
+	}
+
+	if ( typeof rawBlock?.attrs?.content === 'string' ) {
+		return rawBlock.attrs.content;
+	}
+
+	return '';
+}
+
+/**
  * Post-process diff result to pair similar removed/added blocks as modifications.
  * This catches modifications that LCS missed due to content changes.
  *
@@ -112,8 +131,8 @@ function pairSimilarBlocks( blocks ) {
 			}
 
 			const score = textSimilarity(
-				rem.block.innerHTML || '',
-				add.block.innerHTML || ''
+				getRawBlockText( rem.block ),
+				getRawBlockText( add.block )
 			);
 			// If content is identical (score=1), only pair if attrs differ.
 			// Otherwise identical blocks are just position swaps, not modifications.
