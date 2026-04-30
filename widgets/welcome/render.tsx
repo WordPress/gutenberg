@@ -5,7 +5,7 @@ import { useId } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-import { Link } from '@wordpress/ui';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -258,67 +258,76 @@ export default function Welcome() {
 
 	return (
 		<div className={ styles.panel }>
-			<div className={ styles.headerWrap }>
+			<Card.FullBleed className={ styles.headerWrap }>
 				<div className={ styles.headerImage } aria-hidden="true">
 					<DashboardBackground />
 				</div>
 				<div className={ styles.header }>
-					<h2>{ __( 'Welcome to WordPress!' ) }</h2>
-					<p>
+					<Text variant="heading-xl" render={ <h2 /> }>
+						{ __( 'Welcome to WordPress!' ) }
+					</Text>
+					<Text variant="body-md" render={ <p /> }>
 						<Link href="about.php">
 							{ __( 'Learn more about this version.' ) }
 						</Link>
-					</p>
+					</Text>
 				</div>
-			</div>
+			</Card.FullBleed>
 
-			<div className={ styles.columns }>
-				<div className={ styles.column }>
+			<Stack
+				className={ styles.columns }
+				direction="row"
+				gap="lg"
+				wrap="wrap"
+			>
+				<Stack gap="sm" className={ styles.column }>
 					<IconBlocks />
 					<div className={ styles.columnContent }>
-						<h3>
+						<Text variant="heading-sm" render={ <h3 /> }>
 							{ __(
 								'Author rich content with blocks and patterns'
 							) }
-						</h3>
-						<p>
+						</Text>
+						<Text variant="body-md" render={ <p /> }>
 							{ __(
 								'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
 							) }
-						</p>
+						</Text>
 						<Link href="post-new.php?post_type=page">
 							{ __( 'Add a new page' ) }
 						</Link>
 					</div>
-				</div>
+				</Stack>
 
-				<div className={ styles.column }>
+				<Stack gap="sm" className={ styles.column }>
 					<IconLayout />
 					<div className={ styles.columnContent }>
 						{ isBlockTheme ? (
 							<>
-								<h3>
+								<Text variant="heading-sm" render={ <h3 /> }>
 									{ __(
 										'Customize your entire site with block themes'
 									) }
-								</h3>
-								<p>
+								</Text>
+								<Text variant="body-md" render={ <p /> }>
 									{ __(
 										'Design everything on your site \u2014 from the header down to the footer, all using blocks and patterns.'
 									) }
-								</p>
+								</Text>
 								<Link href="site-editor.php">
 									{ __( 'Open site editor' ) }
 								</Link>
 							</>
 						) : (
 							<>
-								<h3>{ __( 'Start Customizing' ) }</h3>
-								<p>
+								<Text variant="heading-sm" render={ <h3 /> }>
+									{ __( 'Start Customizing' ) }
+								</Text>
+								<Text variant="body-md" render={ <p /> }>
 									{ __(
 										'Configure your site\u2019s logo, header, menus, and more in the Customizer.'
 									) }
-								</p>
+								</Text>
 								{ canCustomize && (
 									<Link href="customize.php">
 										{ __( 'Open the Customizer' ) }
@@ -327,47 +336,51 @@ export default function Welcome() {
 							</>
 						) }
 					</div>
-				</div>
+				</Stack>
 
-				<div className={ styles.column }>
+				<Stack gap="sm" className={ styles.column }>
 					<IconStyles />
 					<div className={ styles.columnContent }>
 						{ isBlockTheme ? (
 							<>
-								<h3>
+								<Text variant="heading-sm" render={ <h3 /> }>
 									{ __(
 										'Switch up your site\u2019s look & feel with Styles'
 									) }
-								</h3>
-								<p>
+								</Text>
+								<Text variant="body-md" render={ <p /> }>
 									{ __(
 										'Tweak your site, or give it a whole new look! Get creative \u2014 how about a new color palette or font?'
 									) }
-								</p>
+								</Text>
 								<Link href="site-editor.php?p=%2Fstyles">
 									{ __( 'Edit styles' ) }
 								</Link>
 							</>
 						) : (
 							<>
-								<h3>
+								<Text variant="heading-sm" render={ <h3 /> }>
 									{ __(
 										'Discover a new way to build your site.'
 									) }
-								</h3>
-								<p>
+								</Text>
+								<Text variant="body-md" render={ <p /> }>
 									{ __(
 										'There is a new kind of WordPress theme, called a block theme, that lets you build the site you\u2019ve always wanted \u2014 with blocks and styles.'
 									) }
-								</p>
-								<Link href="https://wordpress.org/documentation/article/block-themes/">
+								</Text>
+								<Link
+									href={ __(
+										'https://wordpress.org/documentation/article/block-themes/'
+									) }
+								>
 									{ __( 'Learn about block themes' ) }
 								</Link>
 							</>
 						) }
 					</div>
-				</div>
-			</div>
+				</Stack>
+			</Stack>
 		</div>
 	);
 }

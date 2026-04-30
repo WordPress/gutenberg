@@ -4,7 +4,7 @@
 
 .headerWrap {
 	position: relative;
-	background: #151515;
+	background: var(--wpds-color-bg-interactive-neutral-strong);
 	overflow: hidden;
 	min-height: 120px;
 }
@@ -24,13 +24,13 @@
 	position: relative;
 	z-index: 1;
 	padding: 28px 24px 24px;
-	color: #fff;
+	color: var(--wpds-color-fg-interactive-neutral-strong);
 }
 
 .header h2 {
 	font-size: 20px;
 	font-weight: 600;
-	color: #fff;
+	color: var(--wpds-color-fg-interactive-neutral-strong);
 	margin: 0 0 6px;
 }
 
@@ -39,32 +39,28 @@
 }
 
 .header a {
-	color: rgba(255, 255, 255, 0.75);
+	color: color-mix(in oklch, var(--wpds-color-fg-interactive-neutral-strong) 75%, transparent);
 	font-size: 13px;
 	text-decoration: none;
 }
 
 .header a:hover {
-	color: #fff;
+	color: var(--wpds-color-fg-interactive-neutral-strong);
 	text-decoration: underline;
 }
 
 .columns {
-	display: grid;
-	grid-template-columns: repeat(3, 1fr);
-	gap: 0;
 	padding: 24px;
 }
 
 @media (max-width: 782px) {
 	.columns {
-		grid-template-columns: 1fr;
+		flex-direction: column;
 	}
 }
 
 .column {
-	display: flex;
-	gap: 14px;
+	flex: 1;
 	padding-inline-end: 20px;
 }
 
