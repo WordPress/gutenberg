@@ -65,9 +65,13 @@ function render_block_core_slider_pagination_button( $attributes, $content, $blo
 
 	// Compose the button markup.
 	$button_classes = 'wp-block-slider-pagination-button is-type-' . esc_attr( $type ) . ' is-icon-' . esc_attr( $arrow_icon );
-	$button_type = 'button';
+	$button_type_attr = 'button';
 
-	$button_attrs = 'class="' . $button_classes . '" type="' . $button_type . '" aria-label="' . esc_attr( $label ) . '" data-wp-interactive="core/slider"';
+	// Only add aria-label if button is icon-only (no visible text)
+	$button_attrs = 'class="' . $button_classes . '" type="' . $button_type_attr . '" data-wp-interactive="core/slider"';
+	if ( 'icon' === $button_type ) {
+		$button_attrs .= ' aria-label="' . esc_attr( $label ) . '"';
+	}
 	if ( $is_previous ) {
 		$button_attrs .= ' data-wp-on--click="actions.prevSlide" data-wp-bind--aria-disabled="state.isAtStart"';
 	} else {
