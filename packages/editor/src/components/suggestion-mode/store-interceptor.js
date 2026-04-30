@@ -249,8 +249,12 @@ function stripSystemMetadata( changed ) {
  * @return {null} Renders nothing.
  */
 export default function SuggestionStoreInterceptor() {
-	const { entries, captureBaseline, setOverlayAttributes } =
-		useSuggestionOverlay();
+	const {
+		entries,
+		captureBaseline,
+		setOverlayAttributes,
+		consumeInterceptorBypass,
+	} = useSuggestionOverlay();
 	const registry = useRegistry();
 
 	const isSuggestMode = useSelect(
@@ -269,6 +273,9 @@ export default function SuggestionStoreInterceptor() {
 
 	const setOverlayAttributesRef = useRef( setOverlayAttributes );
 	setOverlayAttributesRef.current = setOverlayAttributes;
+
+	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
+	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
 
 	useEffect( () => {
 		if ( ! isSuggestMode ) {
@@ -311,6 +318,15 @@ export default function SuggestionStoreInterceptor() {
 			for ( const clientId of liveClientIds ) {
 				let previous = snapshot.get( clientId );
 				const current = blockEditor.getBlockAttributes( clientId );
+
+				// Apply-suggestion flow: the provider opts the next mutation
+				// out of interception so the applied attributes land on the
+				// live block. Adopt `current` as the new baseline so the
+				// next user edit diffs against the post-apply state.
+				if ( consumeInterceptorBypassRef.current?.( clientId ) ) {
+					snapshot.set( clientId, current );
+					continue;
+				}
 
 				if ( previous === undefined ) {
 					// New block (inserted after Suggest activated). Track it
