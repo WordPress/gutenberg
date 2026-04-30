@@ -401,6 +401,33 @@ describe( 'cropperReducer — SETTLE_CROP', () => {
 		expect( regionAfter.minY ).toBeCloseTo( regionBefore.minY, 1 );
 	} );
 
+	it( 'snaps sub-pixel pan drift to zero after settle', () => {
+		// A crop whose centre is within half a pixel of the visual midpoint
+		// produces raw pan values below the snap threshold. Without snapping,
+		// those values would raise minLeft / minTop above 0 in the Advanced
+		// panel even though the image is not intentionally panned.
+		//
+		// subPixelOffset is smaller than the 0.5/IMAGE.width threshold, so
+		// the raw pan produced by settle must be snapped to exactly 0.
+		const subPixelOffset = 0.5 / IMAGE.width / 4; // well within threshold
+		const state = makeState( {
+			cropRect: {
+				// crop centre at (0.5 + subPixelOffset, 0.5)
+				x: 0.5 - 0.25 + subPixelOffset,
+				y: 0.25,
+				width: 0.5,
+				height: 0.5,
+			},
+			zoom: 1,
+			pan: { x: 0, y: 0 },
+		} );
+		const settled = cropperReducer( state, { type: 'SETTLE_CROP' } );
+
+		expect( settled.pan.x ).toBe( 0 );
+		// Framing should still be preserved within tolerance.
+		expectSameVisibleRegion( state, settled );
+	} );
+
 	it( 'diagonal drag to very small crop does not over-zoom', () => {
 		// Extreme case: 10% crop. Zoom should be ~10x (or capped at MAX_ZOOM).
 		const afterDrag = enforceContainment(

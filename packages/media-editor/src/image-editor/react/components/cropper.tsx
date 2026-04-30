@@ -221,14 +221,23 @@ function CropperInner(
 		[ canvasSize, naturalWidth, naturalHeight, state.rotation ]
 	);
 
-	// In fixed-crop mode, auto-size the crop rect to fill the visual area
-	// while respecting the aspect ratio. The crop is always centered.
+	// In fixed-crop mode, auto-size the crop rect when the aspect ratio or
+	// visual size changes. Skipped when transitioning from freeform to fixed
+	// so that a custom crop set in freeform mode is preserved on toggle.
+	const prevFreeformCropRef = useRef( freeformCrop );
 	useEffect( () => {
+		const prevFreeform = prevFreeformCropRef.current;
+		prevFreeformCropRef.current = freeformCrop;
+
 		if (
 			freeformCrop ||
 			visualSize.width === 0 ||
 			visualSize.height === 0
 		) {
+			return;
+		}
+		// Preserve the crop when the user toggles freeform off.
+		if ( prevFreeform ) {
 			return;
 		}
 		const rect = computeInscribedRect( aspectRatio, visualSize );
@@ -297,6 +306,11 @@ function CropperInner(
 	// preventDefault works. React's onWheel registers as passive. Bound
 	// to the canvas (not the root) so pointer geometry inside the handler
 	// resolves against the canvas box.
+	//
+	// Skip zoom when an input or textarea has focus. The user may be
+	// editing a value in the Advanced panel while their cursor drifts
+	// over the canvas; zooming would change the coordinate context and
+	// make the in-flight draft value incorrect on commit.
 	useEffect( () => {
 		const el = canvasRef.current;
 		if ( ! el ) {
@@ -305,6 +319,11 @@ function CropperInner(
 		const handleWheel = ( event: WheelEvent ) => {
 			if ( isResizingRef.current ) {
 				event.preventDefault();
+				return;
+			}
+			if (
+				el.ownerDocument.activeElement?.matches( 'input, textarea' )
+			) {
 				return;
 			}
 			onWheelNative( event );

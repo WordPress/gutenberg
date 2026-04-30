@@ -130,8 +130,8 @@ export default function CropAdvancedPanel( {
 			y: Math.round( raw.y ),
 			width: Math.round( raw.width ),
 			height: Math.round( raw.height ),
-			minLeft: Math.max( 0, Math.floor( reach.minLeft ) ),
-			minTop: Math.max( 0, Math.floor( reach.minTop ) ),
+			minLeft: Math.max( 0, Math.floor( reach.minLeft - 0.5 ) ),
+			minTop: Math.max( 0, Math.floor( reach.minTop - 0.5 ) ),
 			maxRight: Math.floor( reach.maxRight ),
 			maxBottom: Math.floor( reach.maxBottom ),
 		};
