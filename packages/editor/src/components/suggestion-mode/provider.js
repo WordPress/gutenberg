@@ -108,7 +108,17 @@ function isAttributeEqual( a, b ) {
 	if ( a === null || a === undefined || b === null || b === undefined ) {
 		return false;
 	}
-	if ( typeof a !== 'object' || typeof b !== 'object' ) {
+	// One side is a primitive (typically a string from a JSON-deserialized
+	// suggestion payload) and the other is a wrapper object (typically a
+	// `RichTextData` instance from the live block-editor store). Compare
+	// their string representations so the same logical content reads as
+	// equal across the serialization boundary.
+	const aIsObject = typeof a === 'object';
+	const bIsObject = typeof b === 'object';
+	if ( aIsObject !== bIsObject ) {
+		return String( a ) === String( b );
+	}
+	if ( ! aIsObject ) {
 		return false;
 	}
 	const aIsArray = Array.isArray( a );
