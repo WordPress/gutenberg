@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Drawer`: Restore the slide-out animation when the popup closes via close button, Escape, or backdrop click. The popup `transform` transition was previously gated on `[data-open]`, which is removed at the start of the close sequence, so the popup snapped to its closed offset instead of animating ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+
+### Enhancements
+
+-   `Drawer`: Fade the popup elevation shadow alongside the slide instead of painting it instantly at mount/unmount, so the shadow no longer pops in or out at the screen edge ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+-   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter. Base UI's drawer carves out `[data-drawer-content]` from mouse-drag swipe so text selection inside the body keeps working; previously that meant the entire popup body — including the visual gutter — was undraggable on desktop. `Drawer.Content` now scopes that marker tightly around its children, so the gutter region falls outside it and engages swipe like the chrome does. The shared scroll-container layout pairs each existing direct-child non-pinned-chrome rule with a `[data-drawer-content]`-aware variant that fires one level deeper through the new wrapper; `Dialog` and `AlertDialog` still match by direct child only, so their layout is byte-identical ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+
 ## 0.12.0 (2026-04-29)
 
 ### Breaking Changes
@@ -28,7 +37,6 @@
 -   `CollapsibleCard`: Fix missing keyboard focus ring on the header chevron icon when rendered inside wp-admin ([#77468](https://github.com/WordPress/gutenberg/pull/77468)).
 -   `CollapsibleCard`: Prevent the focus ring of focusable descendants from being clipped by the panel's overflow once the panel is fully expanded ([#77667](https://github.com/WordPress/gutenberg/pull/77667)).
 -   `Tabs`: Fix missing keyboard focus ring on the panel in Windows High Contrast mode when rendered inside wp-admin ([#77469](https://github.com/WordPress/gutenberg/pull/77469)).
--   `Drawer`: Restore the slide-out animation when the popup closes via close button, Escape, or backdrop click. The popup `transform` transition was previously gated on `[data-open]`, which is removed at the start of the close sequence, so the popup snapped to its closed offset instead of animating ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
 ### Enhancements
 
@@ -41,8 +49,6 @@
 -   `Dialog`, `Drawer`, `Popover`: Align title and description colors across all three overlay primitives. Title color is now authored explicitly (resilient to global CSS defenses), and description color now inherits from the popup foreground token instead of overriding to the weak variant ([#77692](https://github.com/WordPress/gutenberg/pull/77692)).
 -   `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `Select`, `Tooltip`: Unify the hairline border across overlay popups. Popups without a backdrop show a token-colored border in regular mode; popups with a backdrop hide the border (which would be redundant with the backdrop's containment); all popups show a `CanvasText` border in forced-colors mode ([#77691](https://github.com/WordPress/gutenberg/pull/77691)).
 -   `Link`: Use `text-decoration-thickness: from-font` so the underline honors the font's metrics, instead of a fixed sub-pixel value that renders inconsistently across device pixel ratios ([#77790](https://github.com/WordPress/gutenberg/pull/77790)).
--   `Drawer`: Fade the popup elevation shadow alongside the slide instead of painting it instantly at mount/unmount, so the shadow no longer pops in or out at the screen edge ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
--   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter. Base UI's drawer carves out `[data-drawer-content]` from mouse-drag swipe so text selection inside the body keeps working; previously that meant the entire popup body — including the visual gutter — was undraggable on desktop. `Drawer.Content` now scopes that marker tightly around its children, so the gutter region falls outside it and engages swipe like the chrome does. The shared scroll-container layout pairs each existing direct-child non-pinned-chrome rule with a `[data-drawer-content]`-aware variant that fires one level deeper through the new wrapper; `Dialog` and `AlertDialog` still match by direct child only, so their layout is byte-identical ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
 ### Internal
 
