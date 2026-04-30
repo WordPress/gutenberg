@@ -42,10 +42,6 @@ function get_slider_pagination_button_icon_path( $arrow_icon, $is_previous ) {
  * @return string Returns the block markup.
  */
 function render_block_core_slider_pagination_button( $attributes, $content, $block ) {
-	if ( empty( $content ) ) {
-		return '';
-	}
-
 	$type        = $attributes['type'] ?? 'previous';
 	$is_previous = 'previous' === $type;
 	$arrow_icon  = $block->context['arrowIcon'] ?? 'chevron';
