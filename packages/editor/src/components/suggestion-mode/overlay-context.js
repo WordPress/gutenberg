@@ -8,6 +8,7 @@ import {
 	useEffect,
 	useMemo,
 	useReducer,
+	useRef,
 } from '@wordpress/element';
 import { useRegistry, useSelect } from '@wordpress/data';
 
@@ -51,6 +52,8 @@ const OverlayContext = createContext( {
 	setOverlayAttributes: () => {},
 	clearOverlay: () => {},
 	hasOverlay: () => false,
+	requestInterceptorBypass: () => {},
+	consumeInterceptorBypass: () => false,
 } );
 
 /**
@@ -173,6 +176,30 @@ export function SuggestionOverlayProvider( { children } ) {
 		[ entries ]
 	);
 
+	// Tracks clientIds whose next block-attribute mutation should bypass the
+	// store interceptor. The accept-suggestion flow uses this to land applied
+	// attributes on the live block — without it, the interceptor would treat
+	// the apply as just another user edit and revert it into the overlay.
+	// A ref-set rather than reducer state because the value is consumed
+	// inside `registry.subscribe` (which doesn't react to React state) and
+	// must clear synchronously when the dispatch is processed.
+	const bypassClientIdsRef = useRef( new Set() );
+
+	const requestInterceptorBypass = useCallback( ( clientId ) => {
+		if ( clientId ) {
+			bypassClientIdsRef.current.add( clientId );
+		}
+	}, [] );
+
+	const consumeInterceptorBypass = useCallback( ( clientId ) => {
+		const set = bypassClientIdsRef.current;
+		if ( ! set.has( clientId ) ) {
+			return false;
+		}
+		set.delete( clientId );
+		return true;
+	}, [] );
+
 	// Prune overlay entries whose block was removed from the editor. This
 	// prevents stale baselines from persisting after a block is deleted.
 	// The block-count subscription only runs when there are entries to
@@ -215,6 +242,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			setOverlayAttributes,
 			clearOverlay,
 			hasOverlay,
+			requestInterceptorBypass,
+			consumeInterceptorBypass,
 		} ),
 		[
 			entries,
@@ -222,6 +251,8 @@ export function SuggestionOverlayProvider( { children } ) {
 			setOverlayAttributes,
 			clearOverlay,
 			hasOverlay,
+			requestInterceptorBypass,
+			consumeInterceptorBypass,
 		]
 	);
 
