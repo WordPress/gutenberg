@@ -1,25 +1,30 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import {
 	Button,
 	Flex,
 	Modal,
 	Spinner,
+	__experimentalConfirmDialog as ConfirmDialog,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
+	createPortal,
+	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { close, drawerRight } from '@wordpress/icons';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
 	ComplementaryArea,
@@ -42,9 +47,32 @@ import MediaEditorCropPanel, {
 } from '../media-editor-crop-panel';
 import MediaForm from '../media-form';
 import { store as mediaEditorStore } from '../../store';
+import type { MediaEditorModalUpdate } from '../../store/actions';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
+import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { buildModifiers } from './build-modifiers';
+
+// Details-tab edits the modal bundles into a transformed `/edit` request.
+// Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
+// — that endpoint's arg schema explicitly whitelists only these fields
+// (title / caption / description / alt_text / post), so forwarding any
+// others would fail REST validation with `rest_invalid_param`. Staged
+// edits to fields outside this list are not forwarded; a follow-up could
+// persist them via a separate `saveEditedEntityRecord` call.
+const METADATA_EDIT_KEYS = [
+	'title',
+	'caption',
+	'description',
+	'alt_text',
+	'post',
+] as const;
+
+// Scope save-failure snackbars to this modal so they don't leak into the
+// host editor's notices tray (and vice versa).
+const NOTICES_CONTEXT = 'media-editor';
+const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -56,6 +84,11 @@ interface MediaEditorModalProps {
 	 * since `@wordpress/media-editor` cannot depend on `@wordpress/editor`.
 	 */
 	fields?: Field< Media >[];
+	/**
+	 * Fixed aspect-ratio presets for image cropping. Free and Original are
+	 * always provided by the modal.
+	 */
+	aspectRatioPresets?: AspectRatioPreset[];
 }
 
 interface ModalTab {
@@ -113,7 +146,7 @@ function MediaEditorModalSidebar( { tabs }: { tabs: ModalTab[] } ) {
 interface HeaderActionsProps {
 	isSaving: boolean;
 	hasMedia: boolean;
-	hasEdits: boolean;
+	hasChanges: boolean;
 	onCancel: () => void;
 	onSave: () => void;
 }
@@ -121,12 +154,11 @@ interface HeaderActionsProps {
 function HeaderActions( {
 	isSaving,
 	hasMedia,
-	hasEdits,
+	hasChanges,
 	onCancel,
 	onSave,
 }: HeaderActionsProps ) {
-	const { isDirty } = useCropper();
-	const saveDisabled = isSaving || ! hasMedia || ( ! isDirty && ! hasEdits );
+	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -154,72 +186,73 @@ function HeaderActions( {
 			>
 				{ __( 'Save' ) }
 			</Button>
+			<Button
+				size="compact"
+				icon={ close }
+				label={ __( 'Close' ) }
+				onClick={ onCancel }
+				disabled={ isSaving }
+				accessibleWhenDisabled
+			/>
 		</Flex>
 	);
 }
 
-export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
-		return {
-			isModalOpen: isOpen(),
-			id: getId(),
-			onUpdate: getOnUpdate(),
-		};
-	}, [] );
+interface MediaEditorModalContentProps {
+	fields: Field< Media >[];
+	id: number;
+	media: Media | null;
+	hasEdits: boolean;
+	aspectRatioPresets?: AspectRatioPreset[];
+	onUpdate: ( ( updated: MediaEditorModalUpdate ) => void ) | null;
+}
 
-	const { media, hasEdits } = useSelect(
-		( select ) => {
-			if ( ! id ) {
-				return { media: null, hasEdits: false };
-			}
-			const { getEditedEntityRecord, hasEditsForEntityRecord } =
-				select( coreStore );
-			return {
-				media: getEditedEntityRecord(
-					'postType',
-					'attachment',
-					id
-				) as Media,
-				hasEdits: hasEditsForEntityRecord(
-					'postType',
-					'attachment',
-					id
-				),
-			};
-		},
-		[ id ]
-	);
+// Inner component rendered inside `CropperProvider` so it can read
+// `isDirty` from the cropper. The outer `MediaEditorModal` keeps the
+// store reads and provider tree above this.
+function MediaEditorModalContent( {
+	fields,
+	id,
+	media,
+	hasEdits,
+	aspectRatioPresets,
+	onUpdate,
+}: MediaEditorModalContentProps ) {
+	const cropper = useCropper();
+	const hasChanges = cropper.isDirty || hasEdits;
 
-	const { editEntityRecord, saveEditedEntityRecord } =
-		useDispatch( coreStore );
+	const registry = useRegistry();
+	const {
+		clearEntityRecordEdits,
+		editEntityRecord,
+		receiveEntityRecords,
+		saveEditedEntityRecord,
+	} = useDispatch( coreStore );
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
+	const { createErrorNotice, removeAllNotices } = useDispatch( noticesStore );
 
 	const [ isSaving, setIsSaving ] = useState( false );
-
-	// Snapshot the original values for fields the modal edits, so Cancel can
-	// restore them. Captured once per open.
-	const originalFieldValuesRef = useRef< Record< string, unknown > | null >(
-		null
-	);
-	useEffect( () => {
-		if ( ! isModalOpen ) {
-			originalFieldValuesRef.current = null;
-			return;
-		}
-		if ( ! originalFieldValuesRef.current && media ) {
-			const snapshot: Record< string, unknown > = {};
-			fields.forEach( ( field ) => {
-				snapshot[ field.id ] = ( media as Record< string, unknown > )[
-					field.id
-				];
-			} );
-			originalFieldValuesRef.current = snapshot;
-		}
-	}, [ isModalOpen, media, fields ] );
+	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
+	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const placementControlTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	const signalPlacementControlInteraction = useCallback( () => {
+		setIsPlacementActive( true );
+		clearTimeout( placementControlTimerRef.current );
+		placementControlTimerRef.current = setTimeout( () => {
+			setIsPlacementActive( false );
+		}, PLACEMENT_CONTROL_IDLE_MS );
+	}, [] );
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( placementControlTimerRef.current );
+		};
+	}, [] );
 
 	// Reset aspect-ratio / freeform state when the media changes, so the
 	// next image starts from the defaults.
@@ -279,128 +312,326 @@ export function MediaEditorModal( { fields = [] }: MediaEditorModalProps ) {
 							onAspectRatioChange={ setAspectRatioValue }
 							freeformCrop={ freeformCrop }
 							onFreeformChange={ setFreeformCrop }
+							onPlacementControlInteraction={
+								signalPlacementControlInteraction
+							}
+							aspectRatioPresets={ aspectRatioPresets }
 						/>
 					</Stack>
 				),
 			},
 			detailsTab,
 		];
-	}, [ isImage, aspectRatioValue, freeformCrop ] );
-
-	if ( ! isModalOpen || ! id ) {
-		return null;
-	}
+	}, [
+		isImage,
+		aspectRatioValue,
+		freeformCrop,
+		aspectRatioPresets,
+		signalPlacementControlInteraction,
+	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
 	};
 
-	const handleCancel = () => {
-		if ( originalFieldValuesRef.current ) {
-			editEntityRecord(
-				'postType',
-				'attachment',
-				id,
-				originalFieldValuesRef.current
-			);
-		}
+	const discardAndClose = () => {
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
+		clearEntityRecordEdits( 'postType', 'attachment', id );
 		closeMediaEditorModal();
 	};
 
+	const handleRequestClose = () => {
+		// Disallow closing while a save is in flight so the in-progress
+		// request can settle without the modal unmounting under it.
+		if ( isSaving ) {
+			return;
+		}
+		if ( hasChanges ) {
+			setIsDiscardDialogOpen( true );
+			return;
+		}
+		discardAndClose();
+	};
+
 	const handleSave = async () => {
+		// Clear any prior failure snackbar so a successful retry doesn't
+		// leave a stale "Could not save image" hovering.
+		removeAllNotices( 'snackbar', NOTICES_CONTEXT );
 		setIsSaving( true );
 		try {
-			const saved = ( await saveEditedEntityRecord(
-				'postType',
-				'attachment',
-				id
-			) ) as Media | undefined;
+			let saved: Media | null | undefined;
+
+			const modifiers =
+				cropper.isDirty && cropper.state.image
+					? buildModifiers( cropper.state, {
+							width: cropper.state.image.naturalWidth,
+							height: cropper.state.image.naturalHeight,
+					  } )
+					: [];
+
+			if ( modifiers.length > 0 ) {
+				// Bundle staged Details-tab edits into the same /edit
+				// request. Transformed saves duplicate the attachment,
+				// and the prior core-data edits were staged against the
+				// old id — if we don't forward them here they'd be
+				// silently lost. Core's `edit_media_item` honors these
+				// keys via `prepare_item_for_database` and `alt_text`.
+				const pendingEdits = registry
+					.select( coreStore )
+					.getEntityRecordNonTransientEdits(
+						'postType',
+						'attachment',
+						id
+					) as Record< string, unknown > | undefined;
+				const metadataEdits: Record< string, unknown > = {};
+				for ( const key of METADATA_EDIT_KEYS ) {
+					if ( pendingEdits && key in pendingEdits ) {
+						metadataEdits[ key ] = pendingEdits[ key ];
+					}
+				}
+
+				saved = ( await apiFetch( {
+					path: `/wp/v2/media/${ id }/edit`,
+					method: 'POST',
+					data: {
+						src: media?.source_url,
+						modifiers,
+						...metadataEdits,
+					},
+				} ) ) as Media;
+
+				if ( saved ) {
+					// Put the newly-created attachment into the core-data
+					// cache so downstream consumers see it without an
+					// extra fetch round-trip.
+					receiveEntityRecords(
+						'postType',
+						'attachment',
+						saved,
+						undefined,
+						true
+					);
+				}
+			} else {
+				saved = ( await saveEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) ) as Media | undefined;
+			}
 
 			const next = ( saved ?? media ) as Media | null;
+
+			// A transformed save creates a new attachment; clear staged
+			// edits on the old record so it doesn't appear dirty in the
+			// Media Library afterwards.
+			if ( next && next.id !== id ) {
+				clearEntityRecordEdits( 'postType', 'attachment', id );
+			}
+
 			if ( next && next.id && onUpdate ) {
 				// Normalize to the public callback shape — see
 				// `MediaEditorModalUpdate` in `../../store/actions.ts`.
 				onUpdate( { id: next.id, url: next.source_url } );
 			}
 			closeMediaEditorModal();
+		} catch ( error ) {
+			const message =
+				error instanceof Error
+					? error.message
+					: ( error as { message?: string } )?.message ??
+					  __( 'An unknown error occurred.' );
+			createErrorNotice(
+				sprintf(
+					/* translators: %s: Error message. */
+					__( 'Could not save image. %s' ),
+					message
+				),
+				{ type: 'snackbar', context: NOTICES_CONTEXT }
+			);
 		} finally {
 			setIsSaving( false );
 		}
 	};
 
-	// `CropperProvider` is always mounted — it's just a `useReducer` with
-	// no side effects — so the header actions can read `isDirty` for
-	// images without the JSX forking on media type. React context flows
-	// through `<Modal>`'s portal to the `headerActions` slot.
-	//
-	// The `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Today the modal always
-	// closes between edits so this is belt-and-braces, but it guards
-	// against future flows that swap `id` in the store without closing.
 	return (
-		<CropperProvider key={ media?.id ?? 'none' }>
-			<Modal
-				className="media-editor-modal"
-				title={ __( 'Edit media' ) }
-				size="fill"
-				onRequestClose={ handleCancel }
-				headerActions={
-					<HeaderActions
-						isSaving={ isSaving }
-						hasMedia={ !! media }
-						hasEdits={ hasEdits }
-						onCancel={ handleCancel }
-						onSave={ handleSave }
-					/>
+		<Modal
+			className="media-editor-modal"
+			title={ __( 'Edit media' ) }
+			size="fill"
+			isDismissible={ false }
+			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
+			onKeyDown={ ( event ) => {
+				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
+					return;
 				}
+				// While saving, swallow ESC so the in-progress request
+				// can settle without the modal closing under it.
+				if ( isSaving ) {
+					event.preventDefault();
+					return;
+				}
+				// When there are pending changes, intercept ESC and
+				// open the confirm dialog ourselves. `preventDefault`
+				// short-circuits Modal's own ESC-to-close handler on
+				// the overlay so the modal doesn't animate out before
+				// the dialog appears.
+				if ( hasChanges ) {
+					event.preventDefault();
+					setIsDiscardDialogOpen( true );
+				}
+			} }
+			onRequestClose={ handleRequestClose }
+			headerActions={
+				<HeaderActions
+					isSaving={ isSaving }
+					hasMedia={ !! media }
+					hasChanges={ hasChanges }
+					onCancel={ handleRequestClose }
+					onSave={ handleSave }
+				/>
+			}
+		>
+			<MediaEditorProvider
+				value={ media ?? undefined }
+				onChange={ handleChange }
+				settings={ { fields } }
 			>
-				<MediaEditorProvider
-					value={ media ?? undefined }
-					onChange={ handleChange }
-					settings={ { fields } }
-				>
-					{ ! media ? (
+				{ ! media ? (
+					<div className="media-editor-modal__loading">
 						<Spinner />
-					) : (
-						<>
-							<Tabs>
-								<MediaEditorModalSidebar tabs={ tabs } />
-							</Tabs>
-							<InterfaceSkeleton
-								className="media-editor-modal__skeleton"
-								content={
-									<div className="media-editor-modal__canvas">
-										{ isImage ? (
-											<MediaEditorCanvas
-												aspectRatio={ resolveAspectRatio(
-													aspectRatioValue,
-													imageAspectRatio
-												) }
-												freeformCrop={ freeformCrop }
-											/>
-										) : (
-											<MediaPreview />
-										) }
-									</div>
-								}
-								footer={
-									isImage ? (
-										<MediaEditorToolbar
-											onReset={ () => {
-												setAspectRatioValue( '0' );
-												setFreeformCrop( true );
-											} }
+					</div>
+				) : (
+					<>
+						<Tabs>
+							<MediaEditorModalSidebar tabs={ tabs } />
+						</Tabs>
+						<InterfaceSkeleton
+							className="media-editor-modal__skeleton"
+							content={
+								<div className="media-editor-modal__canvas">
+									{ isImage ? (
+										<MediaEditorCanvas
+											aspectRatio={ resolveAspectRatio(
+												aspectRatioValue,
+												imageAspectRatio
+											) }
+											freeformCrop={ freeformCrop }
+											isPlacementActive={
+												isPlacementActive
+											}
 										/>
-									) : undefined
-								}
-								sidebar={
-									<ComplementaryArea.Slot scope="media-editor" />
-								}
-							/>
-						</>
+									) : (
+										<MediaPreview />
+									) }
+								</div>
+							}
+							footer={
+								isImage ? (
+									<MediaEditorToolbar
+										onReset={ () => {
+											setAspectRatioValue( '0' );
+											setFreeformCrop( true );
+										} }
+										onPlacementControlInteraction={
+											signalPlacementControlInteraction
+										}
+									/>
+								) : undefined
+							}
+							sidebar={
+								<ComplementaryArea.Slot scope="media-editor" />
+							}
+						/>
+					</>
+				) }
+				{ /* Rendered inside the parent Modal so it's tracked as
+					 a nested dismisser. As a top-level sibling it would,
+					 on mount, request the parent Modal close. */ }
+				<ConfirmDialog
+					isOpen={ isDiscardDialogOpen }
+					confirmButtonText={ __( 'Discard' ) }
+					cancelButtonText={ __( 'Keep editing' ) }
+					onCancel={ () => setIsDiscardDialogOpen( false ) }
+					onConfirm={ () => {
+						setIsDiscardDialogOpen( false );
+						discardAndClose();
+					} }
+				>
+					{ __(
+						'Are you sure you want to discard your unsaved changes?'
 					) }
-				</MediaEditorProvider>
-			</Modal>
+				</ConfirmDialog>
+			</MediaEditorProvider>
+			{ createPortal(
+				<SnackbarNotices
+					className="media-editor-modal__snackbar"
+					context={ NOTICES_CONTEXT }
+				/>,
+				document.body
+			) }
+		</Modal>
+	);
+}
+
+export function MediaEditorModal( {
+	fields = [],
+	aspectRatioPresets,
+}: MediaEditorModalProps ) {
+	const { isModalOpen, id, onUpdate } = useSelect( ( select ) => {
+		const { isOpen, getId, getOnUpdate } = select( mediaEditorStore );
+		return {
+			isModalOpen: isOpen(),
+			id: getId(),
+			onUpdate: getOnUpdate(),
+		};
+	}, [] );
+
+	const { media, hasEdits } = useSelect(
+		( select ) => {
+			if ( ! id ) {
+				return { media: null, hasEdits: false };
+			}
+			const { getEditedEntityRecord, hasEditsForEntityRecord } =
+				select( coreStore );
+			return {
+				media: getEditedEntityRecord(
+					'postType',
+					'attachment',
+					id
+				) as Media,
+				hasEdits: hasEditsForEntityRecord(
+					'postType',
+					'attachment',
+					id
+				),
+			};
+		},
+		[ id ]
+	);
+
+	if ( ! isModalOpen || ! id ) {
+		return null;
+	}
+
+	// `CropperProvider` is always mounted while the modal is open — it's
+	// just a `useReducer` with no side effects — so the inner component
+	// can read `isDirty` for images without forking on media type. The
+	// `key` remounts the provider when the edited attachment changes,
+	// discarding the previous cropper state. Keying on `id` (rather than
+	// `media?.id`) avoids a remount when `media` resolves from `null` to
+	// the loaded record on open — that flip would otherwise re-run the
+	// modal's entry animation and cause a visible flicker.
+	return (
+		<CropperProvider key={ id }>
+			<MediaEditorModalContent
+				fields={ fields }
+				id={ id }
+				media={ media }
+				hasEdits={ hasEdits }
+				aspectRatioPresets={ aspectRatioPresets }
+				onUpdate={ onUpdate }
+			/>
 		</CropperProvider>
 	);
 }

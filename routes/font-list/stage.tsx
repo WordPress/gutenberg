@@ -73,11 +73,7 @@ function FontLibraryPage() {
 	}
 
 	return (
-		<Page
-			headingLevel={ 1 }
-			title={ __( 'Fonts' ) }
-			className="font-library-page"
-		>
+		<Page title={ __( 'Fonts' ) } className="font-library-page">
 			<Tabs
 				selectedTabId={ activeTab }
 				onSelect={ ( tabId: string ) => setActiveTab( tabId ) }

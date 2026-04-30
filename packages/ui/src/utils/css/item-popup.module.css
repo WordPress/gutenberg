@@ -13,7 +13,7 @@
 		min-width: var(--anchor-width);
 		max-width: var(--available-width);
 		border-radius: var(--wpds-border-radius-md);
-		border: 1px solid var(--wpds-color-stroke-surface-neutral);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		font-family: var(--wpds-typography-font-family-body);
@@ -45,7 +45,7 @@
 		padding-block: var(--wp-ui-popup-padding);
 
 		.list-scrollable-container:not(:empty) + & {
-			border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 	}
 

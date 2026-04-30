@@ -11,6 +11,9 @@ import type { FooterProps } from './types';
  * Defaults to a native `<footer>` element for richer semantics (contentinfo
  * landmark navigation where screen readers expose landmarks nested in
  * dialogs). Pass `render` to opt out of the default tag.
+ *
+ * The footer is pinned to the bottom of the popup by default. To let it
+ * scroll with the body instead, render it *inside* `Drawer.Content`.
  */
 const Footer = forwardRef< HTMLElement, FooterProps >( function DrawerFooter(
 	{ className, render, ...props },
