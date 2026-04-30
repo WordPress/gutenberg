@@ -99,7 +99,7 @@ function gutenberg_register_block_library_script_special_case( $scripts ) {
 	$script = $scripts->query( $handle, 'registered' );
 	if (
 		! gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ||
-		gutenberg_post_being_edited_requires_classic_block()
+		gutenberg_classic_block_supports_inserter()
 	) {
 		if ( ! in_array( 'editor', $script->deps, true ) ) {
 			$script->deps[] = 'editor';
