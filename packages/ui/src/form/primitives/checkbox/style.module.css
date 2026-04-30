@@ -1,0 +1,87 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.root {
+		--wp-ui-checkbox-size: 20px;
+
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		inline-size: var(--wp-ui-checkbox-size);
+		block-size: var(--wp-ui-checkbox-size);
+		padding: 0;
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-interactive-neutral);
+		border-radius: var(--wpds-border-radius-xs);
+		color: var(--wpds-color-fg-interactive-brand-strong);
+		line-height: 0;
+		vertical-align: middle;
+		user-select: none;
+		cursor: var(--wpds-cursor-control);
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				background-color 0.1s ease-in-out,
+				border-color 0.1s ease-in-out;
+		}
+
+		&:hover:not([data-disabled], [data-readonly], [data-checked], [data-indeterminate]) {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		}
+
+		&[data-checked],
+		&[data-indeterminate] {
+			background-color: var(--wpds-color-bg-interactive-brand-strong);
+			border-color: var(--wpds-color-stroke-interactive-brand);
+		}
+
+		&:hover:is([data-checked], [data-indeterminate]):not([data-disabled], [data-readonly]) {
+			background-color: var(--wpds-color-bg-interactive-brand-strong-active);
+			border-color: var(--wpds-color-stroke-interactive-brand-active);
+		}
+
+		&[data-disabled] {
+			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+			color: var(--wpds-color-fg-interactive-neutral-disabled);
+			cursor: default;
+
+			@media (forced-colors: active) {
+				border-color: GrayText;
+				color: GrayText;
+			}
+		}
+
+		&[data-readonly] {
+			cursor: default;
+		}
+	}
+
+	.indicator {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 100%;
+		block-size: 100%;
+		line-height: 1;
+		pointer-events: none;
+	}
+
+	.indicator-icon {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+
+	.indeterminate-icon {
+		display: none;
+	}
+
+	.root[data-indeterminate] .checked-icon {
+		display: none;
+	}
+
+	.root[data-indeterminate] .indeterminate-icon {
+		display: block;
+	}
+}
