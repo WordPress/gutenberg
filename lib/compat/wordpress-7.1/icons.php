@@ -39,21 +39,20 @@ if ( ! function_exists( 'wp_register_icon' ) ) {
 	/**
 	 * Registers a new icon.
 	 *
-	 * @param string $icon_name  Icon name (e.g. "arrow-left").
-	 * @param string $collection Slug of a registered icon collection that this icon belongs to.
+	 * @param string $icon_name Icon name (e.g. "arrow-left").
 	 * @param array  $args {
 	 *     List of properties for the icon.
 	 *
-	 *     @type string $label    Required. A human-readable label for the icon.
-	 *     @type string $content  Optional. SVG markup for the icon.
-	 *                            If not provided, the content will be retrieved from the `filePath` if set.
-	 *                            If both `content` and `filePath` are not set, the icon will not be registered.
-	 *     @type string $filePath Optional. The full path to the file containing the icon content.
+	 *     @type string $label      Required. A human-readable label for the icon.
+	 *     @type string $collection Required. The slug of a registered icon collection that this icon belongs to.
+	 *     @type string $content    Optional. SVG markup for the icon.
+	 *                              If not provided, the content will be retrieved from the `filePath` if set.
+	 *                              If both `content` and `filePath` are not set, the icon will not be registered.
+	 *     @type string $filePath   Optional. The full path to the file containing the icon content.
 	 * }
 	 * @return bool True if the icon was registered successfully, else false.
 	 */
-	function wp_register_icon( $icon_name, $collection, $args ) {
-		$args['collection'] = $collection;
+	function wp_register_icon( $icon_name, $args ) {
 		return WP_Icons_Registry::get_instance()->register( $icon_name, $args );
 	}
 }
@@ -130,10 +129,10 @@ function gutenberg_register_default_icons() {
 
 		wp_register_icon(
 			$icon_name,
-			'core',
 			array(
-				'label'    => $icon_data['label'],
-				'filePath' => $icons_directory . $icon_data['filePath'],
+				'label'      => $icon_data['label'],
+				'filePath'   => $icons_directory . $icon_data['filePath'],
+				'collection' => 'core',
 			)
 		);
 	}
