@@ -110,8 +110,7 @@
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
 		"uuid": "9.0.1",
-		"wait-on": "8.0.1",
-		"zod": "^4.0.0"
+		"wait-on": "8.0.1"
 	},
 	"overrides": {
 		"jsdom": "26.1.0"
