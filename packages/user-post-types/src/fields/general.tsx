@@ -208,7 +208,7 @@ export function useSlugField(
 	currentValue?: string
 ): Field< PostTypeFormData > {
 	const registeredPostTypes = useSelect(
-		( select ) => select( coreStore ).getPostTypes( { per_page: -1 } ),
+		( select ) => select( coreStore ).getPostTypes(),
 		[]
 	);
 	const showRenameWarning =
