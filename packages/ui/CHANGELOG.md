@@ -4,12 +4,12 @@
 
 ### Bug Fixes
 
--   `Drawer`: Restore the slide-out animation when the popup closes via close button, Escape, or backdrop click. The popup `transform` transition was previously gated on `[data-open]`, which is removed at the start of the close sequence, so the popup snapped to its closed offset instead of animating ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+-   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
 ### Enhancements
 
--   `Drawer`: Fade the popup elevation shadow alongside the slide instead of painting it instantly at mount/unmount, so the shadow no longer pops in or out at the screen edge ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
--   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter. Base UI's drawer carves out `[data-drawer-content]` from mouse-drag swipe so text selection inside the body keeps working; previously that meant the entire popup body — including the visual gutter — was undraggable on desktop. `Drawer.Content` now scopes that marker tightly around its children, so the gutter region falls outside it and engages swipe like the chrome does. The shared scroll-container layout pairs each existing direct-child non-pinned-chrome rule with a `[data-drawer-content]`-aware variant that fires one level deeper through the new wrapper; `Dialog` and `AlertDialog` still match by direct child only, so their layout is byte-identical ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+-   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+-   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 
 ## 0.12.0 (2026-04-29)
 
