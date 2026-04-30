@@ -296,8 +296,8 @@ export default dedupePlugins( [
 				},
 			],
 			// TODO: Re-enable after fixing existing violations across the codebase.
-			'react-hooks/immutability': 'off',
-			'react-hooks/refs': 'off',
+			// 'react-hooks/immutability': 'off',
+			// 'react-hooks/refs': 'off',
 		},
 		plugins: {
 			'react-hooks': reactHooksPlugin,
