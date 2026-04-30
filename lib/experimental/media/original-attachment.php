@@ -3,11 +3,12 @@
  * Records and exposes the lineage root for attachments edited via
  * `/wp/v2/media/{id}/edit`.
  *
- * Each call to core's `edit_media_item` creates a new child attachment
- * and writes `parent_image` to its metadata. We piggy-back on that path
- * to also write `original_attachment_id` — the id at the top of the
- * lineage — so the Media Editor modal can offer a "Restore original"
- * action without walking the chain on every read.
+ * Each call to core's `edit_media_item` creates a new child attachment.
+ * On that path, we record the id at the top of the lineage in a
+ * dedicated postmeta key (`_wp_attachment_original_id`) so the Media
+ * Editor modal can offer a "Restore original" action without walking
+ * the chain on every read, and so cleanup on parent delete can use
+ * an indexed query.
  *
  * No backfill: this is tied to the (unreleased) media editor cropper,
  * so anything edited before this code lands is intentionally out of
@@ -17,26 +18,41 @@
  */
 
 /**
+ * Postmeta key for the lineage root id.
+ *
+ * Underscore-prefixed so it's treated as private/internal and not
+ * exposed by the default postmeta REST surface.
+ */
+const GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY = '_wp_attachment_original_id';
+
+/**
  * Persist the original attachment id when /edit creates a new edited
  * attachment.
  *
  * Hooks `wp_edited_image_metadata` (fired by core inside
- * `WP_REST_Attachments_Controller::edit_media_item`). The new child's
- * original attachment is its parent's original attachment if the
+ * `WP_REST_Attachments_Controller::edit_media_item`, after the new
+ * attachment id has been inserted but before its image metadata is
+ * stored). The new child's original is its parent's original if the
  * parent has one, otherwise the parent itself.
  *
- * @param array $new_image_meta    Metadata for the new edited attachment.
+ * @param array $new_image_meta    Metadata for the new edited attachment (unused).
  * @param int   $new_attachment_id The new attachment id.
  * @param int   $attachment_id     The parent (source) attachment id.
- * @return array Filtered metadata.
+ * @return array Filtered metadata (unchanged).
  */
 function gutenberg_record_original_attachment_id( $new_image_meta, $new_attachment_id, $attachment_id ) {
-	$parent_meta = wp_get_attachment_metadata( $attachment_id );
-	$original_id = is_array( $parent_meta ) && ! empty( $parent_meta['original_attachment_id'] )
-		? (int) $parent_meta['original_attachment_id']
-		: (int) $attachment_id;
+	$parent_original = (int) get_post_meta(
+		$attachment_id,
+		GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+		true
+	);
+	$original_id     = $parent_original > 0 ? $parent_original : (int) $attachment_id;
 
-	$new_image_meta['original_attachment_id'] = $original_id;
+	update_post_meta(
+		$new_attachment_id,
+		GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+		$original_id
+	);
 
 	return $new_image_meta;
 }
@@ -45,7 +61,7 @@ add_filter( 'wp_edited_image_metadata', 'gutenberg_record_original_attachment_id
 /**
  * Filter `rest_prepare_attachment` to expose the original attachment.
  *
- * Reads `original_attachment_id` from metadata (written by the
+ * Reads `_wp_attachment_original_id` postmeta (written by the
  * `wp_edited_image_metadata` hook above) and adds the resolved
  * attachment id and URL to the response under
  * `media_details.original_attachment`. Absent for attachments with
@@ -71,13 +87,12 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 		return $response;
 	}
 
-	$meta = wp_get_attachment_metadata( $post->ID );
-	if ( ! is_array( $meta ) || empty( $meta['original_attachment_id'] ) ) {
-		return $response;
-	}
-
-	$original_id = (int) $meta['original_attachment_id'];
-	if ( $original_id === (int) $post->ID || $original_id <= 0 ) {
+	$original_id = (int) get_post_meta(
+		$post->ID,
+		GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+		true
+	);
+	if ( $original_id <= 0 || $original_id === (int) $post->ID ) {
 		return $response;
 	}
 
@@ -100,8 +115,8 @@ function gutenberg_add_original_attachment_to_response( $response, $post, $reque
 add_filter( 'rest_prepare_attachment', 'gutenberg_add_original_attachment_to_response', 10, 3 );
 
 /**
- * Clear `original_attachment_id` from descendants when their original
- * is deleted.
+ * Clear `_wp_attachment_original_id` from descendants when their
+ * original is deleted.
  *
  * Without this, descendants would carry a dangling pointer at a
  * recycled attachment id. The REST filter already skips emitting the
@@ -117,39 +132,14 @@ function gutenberg_clear_original_attachment_id_on_delete( $attachment_id ) {
 		return;
 	}
 
-	// `original_attachment_id` lives inside the serialized
-	// `_wp_attachment_metadata` blob, so we can't query it directly.
-	// LIKE narrows the candidate set; the per-row check below is the
-	// real authority and rejects false positives (other places where
-	// the same id happens to appear in the blob, e.g. `parent_image`).
-	$candidates = get_posts(
-		array(
-			'post_type'      => 'attachment',
-			'post_status'    => 'inherit',
-			'posts_per_page' => -1,
-			'fields'         => 'ids',
-			'meta_query'     => array(
-				array(
-					'key'     => '_wp_attachment_metadata',
-					'value'   => sprintf( 'i:%d;', $attachment_id ),
-					'compare' => 'LIKE',
-				),
-			),
-			'no_found_rows'  => true,
-			'orderby'        => 'none',
-		)
+	// Indexed lookup on (meta_key, meta_value) — fast at any library
+	// size, no serialized-blob LIKE.
+	delete_metadata(
+		'post',
+		0,
+		GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+		$attachment_id,
+		true
 	);
-
-	foreach ( $candidates as $candidate_id ) {
-		$meta = wp_get_attachment_metadata( $candidate_id );
-		if ( ! is_array( $meta ) || empty( $meta['original_attachment_id'] ) ) {
-			continue;
-		}
-		if ( (int) $meta['original_attachment_id'] !== $attachment_id ) {
-			continue;
-		}
-		unset( $meta['original_attachment_id'] );
-		wp_update_attachment_metadata( $candidate_id, $meta );
-	}
 }
 add_action( 'delete_attachment', 'gutenberg_clear_original_attachment_id_on_delete' );

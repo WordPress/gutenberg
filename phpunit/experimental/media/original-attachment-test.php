@@ -39,9 +39,11 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$this->created_ids[] = $id;
 
 		if ( null !== $original_attachment_id ) {
-			$meta                           = wp_get_attachment_metadata( $id );
-			$meta['original_attachment_id'] = (int) $original_attachment_id;
-			wp_update_attachment_metadata( $id, $meta );
+			update_post_meta(
+				$id,
+				GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+				(int) $original_attachment_id
+			);
 		}
 
 		return $id;
@@ -82,10 +84,8 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 	}
 
 	public function test_self_referencing_original_id_is_omitted() {
-		$id                             = $this->make_attachment();
-		$meta                           = wp_get_attachment_metadata( $id );
-		$meta['original_attachment_id'] = $id;
-		wp_update_attachment_metadata( $id, $meta );
+		$id = $this->make_attachment();
+		update_post_meta( $id, GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY, $id );
 
 		$data = $this->get_response_data( $id );
 		$this->assertArrayNotHasKey( 'original_attachment', $data['media_details'] );
@@ -93,24 +93,42 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 
 	public function test_edit_hook_inherits_grandparent_original() {
 		// Simulate the chain that `/edit` would produce: the
-		// grandparent is the original, the parent has
-		// `original_attachment_id` set to the grandparent, and a fresh
-		// edit off the parent should inherit that same original.
+		// grandparent is the original, the parent has its postmeta
+		// pointing at the grandparent, and a fresh edit off the parent
+		// should inherit that same original.
 		$grandparent = $this->make_attachment();
 		$parent      = $this->make_attachment( $grandparent );
+		$new_child   = $this->make_attachment();
 
-		$new_meta = gutenberg_record_original_attachment_id( array(), 999, $parent );
-		$this->assertSame( $grandparent, $new_meta['original_attachment_id'] );
+		gutenberg_record_original_attachment_id( array(), $new_child, $parent );
+
+		$this->assertSame(
+			$grandparent,
+			(int) get_post_meta(
+				$new_child,
+				GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+				true
+			)
+		);
 	}
 
 	public function test_edit_hook_uses_parent_when_parent_has_no_original() {
 		// First edit off an unedited upload: the parent has no
-		// `original_attachment_id`, so the new child's original is the
-		// parent itself.
-		$parent = $this->make_attachment();
+		// `_wp_attachment_original_id`, so the new child's original
+		// is the parent itself.
+		$parent    = $this->make_attachment();
+		$new_child = $this->make_attachment();
 
-		$new_meta = gutenberg_record_original_attachment_id( array(), 999, $parent );
-		$this->assertSame( $parent, $new_meta['original_attachment_id'] );
+		gutenberg_record_original_attachment_id( array(), $new_child, $parent );
+
+		$this->assertSame(
+			$parent,
+			(int) get_post_meta(
+				$new_child,
+				GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+				true
+			)
+		);
 	}
 
 	public function test_delete_clears_original_attachment_id_on_descendants() {
@@ -118,23 +136,25 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		$child    = $this->make_attachment( $original );
 
 		// Sanity: child currently points at original.
-		$child_meta = wp_get_attachment_metadata( $child );
-		$this->assertSame( $original, (int) $child_meta['original_attachment_id'] );
+		$this->assertSame(
+			$original,
+			(int) get_post_meta(
+				$child,
+				GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+				true
+			)
+		);
 
-		// Delete the original; expect the descendant's pointer to be
-		// cleared. We pass force=true so the deletion runs immediately
-		// without going through the trash.
 		wp_delete_attachment( $original, true );
-		// Stop tear_down from trying to delete it again.
 		$this->created_ids = array_diff( $this->created_ids, array( $original ) );
 
-		$child_meta = wp_get_attachment_metadata( $child );
-		$this->assertArrayNotHasKey( 'original_attachment_id', $child_meta );
+		$this->assertSame(
+			'',
+			get_post_meta( $child, GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY, true )
+		);
 	}
 
 	public function test_delete_leaves_unrelated_descendants_alone() {
-		// Two independent chains. Deleting one's original must not
-		// touch the other's pointer.
 		$original_a = $this->make_attachment();
 		$child_a    = $this->make_attachment( $original_a );
 
@@ -144,10 +164,20 @@ class Gutenberg_Original_Attachment_Filter_Test extends WP_UnitTestCase {
 		wp_delete_attachment( $original_a, true );
 		$this->created_ids = array_diff( $this->created_ids, array( $original_a ) );
 
-		$child_b_meta = wp_get_attachment_metadata( $child_b );
-		$this->assertSame( $original_b, (int) $child_b_meta['original_attachment_id'] );
+		// child_b's pointer untouched.
+		$this->assertSame(
+			$original_b,
+			(int) get_post_meta(
+				$child_b,
+				GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY,
+				true
+			)
+		);
 
-		$child_a_meta = wp_get_attachment_metadata( $child_a );
-		$this->assertArrayNotHasKey( 'original_attachment_id', $child_a_meta );
+		// child_a's pointer cleared.
+		$this->assertSame(
+			'',
+			get_post_meta( $child_a, GUTENBERG_ORIGINAL_ATTACHMENT_ID_META_KEY, true )
+		);
 	}
 }
