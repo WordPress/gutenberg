@@ -13,9 +13,7 @@ describe( 'Select', () => {
 
 		render(
 			<Select.Root defaultValue={ users[ 0 ] } items={ users }>
-				<Select.Trigger< ( typeof users )[ number ] >>
-					{ ( value ) => value?.label }
-				</Select.Trigger>
+				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
 				<Select.Popup>
 					{ users.map( ( option ) => (
 						<Select.Item
@@ -52,8 +50,10 @@ describe( 'Select', () => {
 			<Select.Root>
 				<Select.Trigger ref={ triggerRef } />
 				<Select.Popup ref={ popupRef }>
-					<Select.Item ref={ itemRef } value="Item 1" />
-					<Select.Item value="Item 2" />
+					<Select.Item ref={ itemRef } value="Item 1">
+						Item 1
+					</Select.Item>
+					<Select.Item value="Item 2">Item 2</Select.Item>
 				</Select.Popup>
 			</Select.Root>
 		);
@@ -87,7 +87,7 @@ describe( 'Select', () => {
 								<Select.Portal container={ containerRef } />
 							}
 						>
-							<Select.Item value="Item 1" />
+							<Select.Item value="Item 1">Item 1</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>
@@ -113,7 +113,7 @@ describe( 'Select', () => {
 					<Select.Root>
 						<Select.Trigger />
 						<Select.Popup>
-							<Select.Item value="Item 1" />
+							<Select.Item value="Item 1">Item 1</Select.Item>
 						</Select.Popup>
 					</Select.Root>
 				</div>
