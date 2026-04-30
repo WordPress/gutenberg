@@ -2,12 +2,13 @@ import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
+import type { ReactElement, RefAttributes } from 'react';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import { Icon } from '../../../icon';
 import type { SelectItemProps } from './types';
 
-export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
+export const Item = forwardRef< HTMLDivElement, SelectItemProps< unknown > >(
 	function Item(
 		{ className, value, size = 'default', children = value, ...restProps },
 		ref
@@ -35,4 +36,6 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 			</_Select.Item>
 		);
 	}
-);
+) as < Value = string >(
+	props: SelectItemProps< Value > & RefAttributes< HTMLDivElement >
+) => ReactElement | null;

@@ -1,5 +1,5 @@
 import type { Select as _Select } from '@base-ui/react/select';
-import type { ComponentPropsWithoutRef, ReactElement } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 
 import type { ComponentProps } from '../../../utils/types';
 import type { InputLayoutProps } from '../input-layout/types';
@@ -7,12 +7,15 @@ import type { InputLayoutProps } from '../input-layout/types';
 export type PortalProps = ComponentPropsWithoutRef< typeof _Select.Portal >;
 
 // The second type parameter is the `multiple` flag (currently disabled).
-export type SelectRootProps = Omit<
-	_Select.Root.Props< string, false >,
+export type SelectRootProps< Value = string > = Omit<
+	_Select.Root.Props< Value, false >,
 	'multiple'
 >;
 
-export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
+export type SelectTriggerProps< Value = string > = Omit<
+	ComponentProps< typeof _Select.Trigger >,
+	'children'
+> & {
 	/**
 	 * The size of the trigger.
 	 *
@@ -29,14 +32,14 @@ export type SelectTriggerProps = ComponentProps< typeof _Select.Trigger > & {
 	 * A function that gets called with the current value as an argument.
 	 * Use this to customize the trigger content.
 	 */
-	children?: _Select.Value.Props[ 'children' ];
+	children?: ReactNode | ( ( value: Value | null ) => ReactNode );
 };
 
 export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	/**
 	 * The content to be rendered inside the popup.
 	 */
-	children?: React.ReactNode;
+	children?: ReactNode;
 	/**
 	 * Optional portal element, typically `<Select.Portal />` with custom
 	 * `container`. When omitted, `Select.Popup` uses `Select.Portal` with
@@ -46,14 +49,14 @@ export type SelectPopupProps = ComponentProps< typeof _Select.Popup > & {
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 };
 
-export type SelectItemProps = Omit<
+export type SelectItemProps< Value = string > = Omit<
 	ComponentProps< typeof _Select.Item >,
-	'value'
+	'value' | 'children'
 > & {
 	/**
 	 * A unique value that identifies this select item.
 	 */
-	value?: string;
+	value?: Value;
 	/**
 	 * The size of the item.
 	 *
@@ -65,5 +68,5 @@ export type SelectItemProps = Omit<
 	 *
 	 * @default `value`
 	 */
-	children?: _Select.Item.Props[ 'children' ];
+	children?: ReactNode;
 };
