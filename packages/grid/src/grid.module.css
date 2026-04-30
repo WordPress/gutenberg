@@ -1,0 +1,21 @@
+.grid {
+	display: grid;
+}
+
+/*
+ * The drag preview clones the active tile inside `<DragOverlay>` and
+ * follows the cursor. The scale and shadow make it visually stand
+ * out from the placeholder left behind in the grid.
+ */
+.drag-preview {
+	height: 100%;
+	transform: scale(1.05);
+	box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+	cursor: grabbing;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.drag-preview {
+		transform: none;
+	}
+}

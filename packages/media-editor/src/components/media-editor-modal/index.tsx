@@ -15,9 +15,11 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
+	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -70,6 +72,7 @@ const METADATA_EDIT_KEYS = [
 // Scope save-failure snackbars to this modal so they don't leak into the
 // host editor's notices tray (and vice versa).
 const NOTICES_CONTEXT = 'media-editor';
+const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -230,9 +233,26 @@ function MediaEditorModalContent( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
+	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const placementControlTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	const signalPlacementControlInteraction = useCallback( () => {
+		setIsPlacementActive( true );
+		clearTimeout( placementControlTimerRef.current );
+		placementControlTimerRef.current = setTimeout( () => {
+			setIsPlacementActive( false );
+		}, PLACEMENT_CONTROL_IDLE_MS );
+	}, [] );
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( placementControlTimerRef.current );
+		};
+	}, [] );
 
 	// Reset aspect-ratio / freeform state when the media changes, so the
 	// next image starts from the defaults.
@@ -292,6 +312,9 @@ function MediaEditorModalContent( {
 							onAspectRatioChange={ setAspectRatioValue }
 							freeformCrop={ freeformCrop }
 							onFreeformChange={ setFreeformCrop }
+							onPlacementControlInteraction={
+								signalPlacementControlInteraction
+							}
 							aspectRatioPresets={ aspectRatioPresets }
 						/>
 					</Stack>
@@ -299,7 +322,13 @@ function MediaEditorModalContent( {
 			},
 			detailsTab,
 		];
-	}, [ isImage, aspectRatioValue, freeformCrop, aspectRatioPresets ] );
+	}, [
+		isImage,
+		aspectRatioValue,
+		freeformCrop,
+		aspectRatioPresets,
+		signalPlacementControlInteraction,
+	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
@@ -469,7 +498,9 @@ function MediaEditorModalContent( {
 				settings={ { fields } }
 			>
 				{ ! media ? (
-					<Spinner />
+					<div className="media-editor-modal__loading">
+						<Spinner />
+					</div>
 				) : (
 					<>
 						<Tabs>
@@ -486,6 +517,9 @@ function MediaEditorModalContent( {
 												imageAspectRatio
 											) }
 											freeformCrop={ freeformCrop }
+											isPlacementActive={
+												isPlacementActive
+											}
 										/>
 									) : (
 										<MediaPreview />
@@ -499,6 +533,9 @@ function MediaEditorModalContent( {
 											setAspectRatioValue( '0' );
 											setFreeformCrop( true );
 										} }
+										onPlacementControlInteraction={
+											signalPlacementControlInteraction
+										}
 									/>
 								) : undefined
 							}
@@ -581,11 +618,12 @@ export function MediaEditorModal( {
 	// just a `useReducer` with no side effects — so the inner component
 	// can read `isDirty` for images without forking on media type. The
 	// `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Today the modal always
-	// closes between edits so this is belt-and-braces, but it guards
-	// against future flows that swap `id` in the store without closing.
+	// discarding the previous cropper state. Keying on `id` (rather than
+	// `media?.id`) avoids a remount when `media` resolves from `null` to
+	// the loaded record on open — that flip would otherwise re-run the
+	// modal's entry animation and cause a visible flicker.
 	return (
-		<CropperProvider key={ media?.id ?? 'none' }>
+		<CropperProvider key={ id }>
 			<MediaEditorModalContent
 				fields={ fields }
 				id={ id }
