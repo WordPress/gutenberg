@@ -226,6 +226,7 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 	require __DIR__ . '/experimental/content-types/load.php';
 	require __DIR__ . '/experimental/content-types/index.php';
+	require __DIR__ . '/experimental/content-types/post-types.php';
 }
 
 // Dashboard Widgets (only load when experiment is enabled).
