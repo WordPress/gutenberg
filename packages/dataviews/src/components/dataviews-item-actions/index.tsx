@@ -38,14 +38,15 @@ export interface ActionTriggerProps< Item > {
 
 export interface ActionModalProps< Item > {
 	/**
-	 * The action whose modal should be rendered. When `null`, the underlying
-	 * `Dialog.Root` stays mounted with `open={ false }` so its exit animation
-	 * can play; the popup contents are unmounted once the dialog has finished
-	 * closing.
+	 * The action whose modal should be rendered. Stable for the lifetime of
+	 * this `ActionModal` instance — the parent renders one `ActionModal` per
+	 * modal action and toggles the `open` prop, rather than swapping the
+	 * action on a single shared instance.
 	 */
-	action: ActionModalType< Item > | null;
+	action: ActionModalType< Item >;
 	items: Item[];
-	closeModal: () => void;
+	open: boolean;
+	onOpenChange: ( open: boolean ) => void;
 }
 
 interface ActionsMenuGroupProps< Item > {
@@ -126,91 +127,70 @@ function mapModalSize(
 export function ActionModal< Item >( {
 	action,
 	items,
-	closeModal,
+	open,
+	onOpenChange,
 }: ActionModalProps< Item > ) {
-	// Keep `Dialog.Root` always mounted in the React tree and toggle `open` so
-	// Base UI sees the `false → true` transition and plays the entry animation.
-	// `renderedAction` retains the last non-null action through the exit
-	// animation; it's cleared once the dialog has finished closing via
-	// `onOpenChangeComplete`.
-	const [ renderedAction, setRenderedAction ] =
-		useState< ActionModalType< Item > | null >( action );
-	if ( action && action !== renderedAction ) {
-		setRenderedAction( action );
-	}
-	const open = action !== null;
+	// Each `ActionModal` instance owns one specific action for its lifetime,
+	// so the popup contents never need to "remember" the previous action
+	// through the exit animation: when the parent toggles `open` to `false`,
+	// only the `open` prop changes — the `action` prop stays stable, the
+	// popup unmounts asynchronously after Base UI's exit animation
+	// completes, and there's no risk of rendering a stale or null action.
+	const closeModal = () => onOpenChange( false );
 
 	const contentRef = useRef< HTMLDivElement >( null );
 	const initialFocus = useMapFocusOnMount(
-		renderedAction?.modalFocusOnMount ?? true,
+		action.modalFocusOnMount ?? true,
 		contentRef
 	);
 
-	const getLabel = () => {
-		if ( ! renderedAction ) {
-			return '';
-		}
-		return typeof renderedAction.label === 'string'
-			? renderedAction.label
-			: renderedAction.label( items );
-	};
-	const getModalHeader = () => {
-		if ( ! renderedAction ) {
-			return undefined;
-		}
-		return typeof renderedAction.modalHeader === 'function'
-			? renderedAction.modalHeader( items )
-			: renderedAction.modalHeader;
-	};
-	const title = getModalHeader() || getLabel();
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
+	const title = modalHeader || label;
 
 	return (
 		<Dialog.Root
 			open={ open }
-			onOpenChange={ ( isOpen ) => {
-				if ( ! isOpen ) {
-					closeModal();
-				}
-			} }
-			onOpenChangeComplete={ ( isOpen ) => {
-				if ( ! isOpen ) {
-					setRenderedAction( null );
-				}
-			} }
-			disablePointerDismissal={ renderedAction?.hideModalHeader }
+			// Wrap to drop Base UI's `eventDetails` second argument: callers
+			// only need `(open: boolean) => void` and shouldn't depend on
+			// Base UI internals leaking through.
+			onOpenChange={ ( isOpen ) => onOpenChange( isOpen ) }
+			disablePointerDismissal={ action.hideModalHeader }
 		>
-			{ renderedAction && (
-				<Dialog.Popup
-					size={ mapModalSize( renderedAction.modalSize ) }
-					className={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-						renderedAction.id
-					) }` }
-					portal={
-						<Dialog.Portal className="dataviews-action-modal__portal" />
-					}
-					initialFocus={ initialFocus }
-					{ ...( renderedAction.hideModalHeader && {
-						role: 'alertdialog' as const,
-					} ) }
-				>
-					{ renderedAction.hideModalHeader ? (
-						<VisuallyHidden
-							render={ <Dialog.Title>{ title }</Dialog.Title> }
-						/>
-					) : (
-						<Dialog.Header>
-							<Dialog.Title>{ title }</Dialog.Title>
-							<Dialog.CloseIcon />
-						</Dialog.Header>
-					) }
-					<Dialog.Content ref={ contentRef }>
-						<renderedAction.RenderModal
-							items={ items }
-							closeModal={ closeModal }
-						/>
-					</Dialog.Content>
-				</Dialog.Popup>
-			) }
+			<Dialog.Popup
+				size={ mapModalSize( action.modalSize ) }
+				className={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+					action.id
+				) }` }
+				portal={
+					<Dialog.Portal className="dataviews-action-modal__portal" />
+				}
+				initialFocus={ initialFocus }
+				{ ...( action.hideModalHeader && {
+					role: 'alertdialog' as const,
+				} ) }
+			>
+				{ action.hideModalHeader ? (
+					<VisuallyHidden
+						render={ <Dialog.Title>{ title }</Dialog.Title> }
+					/>
+				) : (
+					<Dialog.Header>
+						<Dialog.Title>{ title }</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+				) }
+				<Dialog.Content ref={ contentRef }>
+					<action.RenderModal
+						items={ items }
+						closeModal={ closeModal }
+					/>
+				</Dialog.Content>
+			</Dialog.Popup>
 		</Dialog.Root>
 	);
 }
@@ -333,6 +313,14 @@ function CompactItemActions< Item >( {
 	const [ activeModalAction, setActiveModalAction ] = useState(
 		null as ActionModalType< Item > | null
 	);
+	const modalActions = useMemo(
+		() =>
+			actions.filter(
+				( action ): action is ActionModalType< Item > =>
+					'RenderModal' in action
+			),
+		[ actions ]
+	);
 	return (
 		<>
 			<Menu placement="bottom-end">
@@ -357,11 +345,19 @@ function CompactItemActions< Item >( {
 					/>
 				</Menu.Popover>
 			</Menu>
-			<ActionModal
-				action={ activeModalAction }
-				items={ [ item ] }
-				closeModal={ () => setActiveModalAction( null ) }
-			/>
+			{ modalActions.map( ( action ) => (
+				<ActionModal
+					key={ action.id }
+					action={ action }
+					items={ [ item ] }
+					open={ activeModalAction?.id === action.id }
+					onOpenChange={ ( isOpen ) => {
+						if ( ! isOpen ) {
+							setActiveModalAction( null );
+						}
+					} }
+				/>
+			) ) }
 		</>
 	);
 }
@@ -372,8 +368,20 @@ export function PrimaryActions< Item >( {
 	registry,
 	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
-	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
+	const [ activeModalAction, setActiveModalAction ] = useState(
+		null as ActionModalType< Item > | null
+	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const modalActions = useMemo(
+		() =>
+			Array.isArray( actions )
+				? actions.filter(
+						( action ): action is ActionModalType< Item > =>
+							'RenderModal' in action
+				  )
+				: [],
+		[ actions ]
+	);
 
 	if ( isMobileViewport ) {
 		return null;
@@ -399,11 +407,19 @@ export function PrimaryActions< Item >( {
 					variant={ buttonVariant }
 				/>
 			) ) }
-			<ActionModal
-				action={ activeModalAction }
-				items={ [ item ] }
-				closeModal={ () => setActiveModalAction( null ) }
-			/>
+			{ modalActions.map( ( action ) => (
+				<ActionModal
+					key={ action.id }
+					action={ action }
+					items={ [ item ] }
+					open={ activeModalAction?.id === action.id }
+					onOpenChange={ ( isOpen ) => {
+						if ( ! isOpen ) {
+							setActiveModalAction( null );
+						}
+					} }
+				/>
+			) ) }
 		</>
 	);
 }

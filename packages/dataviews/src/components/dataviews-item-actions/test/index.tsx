@@ -36,7 +36,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -52,7 +53,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -70,7 +72,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -99,7 +102,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -125,7 +129,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -143,7 +148,8 @@ describe( 'ActionModal', () => {
 				<ActionModal
 					action={ action }
 					items={ [ { id: 1, title: 'Item' } ] }
-					closeModal={ jest.fn() }
+					open
+					onOpenChange={ jest.fn() }
 				/>
 			);
 
@@ -159,7 +165,8 @@ describe( 'ActionModal', () => {
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ jest.fn() }
+				open
+				onOpenChange={ jest.fn() }
 			/>
 		);
 
@@ -177,33 +184,35 @@ describe( 'ActionModal', () => {
 
 	it( 'closes when the user presses Escape', async () => {
 		const user = userEvent.setup();
-		const closeModal = jest.fn();
+		const onOpenChange = jest.fn();
 		const action = createAction();
 
 		render(
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ closeModal }
+				open
+				onOpenChange={ onOpenChange }
 			/>
 		);
 
 		await screen.findByRole( 'dialog' );
 		await user.keyboard( '{Escape}' );
 
-		expect( closeModal ).toHaveBeenCalledTimes( 1 );
+		expect( onOpenChange ).toHaveBeenCalledWith( false );
 	} );
 
 	it( 'closes when the user clicks the backdrop by default', async () => {
 		const user = userEvent.setup();
-		const closeModal = jest.fn();
+		const onOpenChange = jest.fn();
 		const action = createAction();
 
 		render(
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ closeModal }
+				open
+				onOpenChange={ onOpenChange }
 			/>
 		);
 
@@ -211,19 +220,20 @@ describe( 'ActionModal', () => {
 		const backdrop = screen.getByTestId( 'dialog-backdrop' );
 		await user.click( backdrop );
 
-		expect( closeModal ).toHaveBeenCalledTimes( 1 );
+		expect( onOpenChange ).toHaveBeenCalledWith( false );
 	} );
 
 	it( 'does not close on backdrop click for alert dialogs (hideModalHeader)', async () => {
 		const user = userEvent.setup();
-		const closeModal = jest.fn();
+		const onOpenChange = jest.fn();
 		const action = createAction( { hideModalHeader: true } );
 
 		render(
 			<ActionModal
 				action={ action }
 				items={ [ { id: 1, title: 'Item' } ] }
-				closeModal={ closeModal }
+				open
+				onOpenChange={ onOpenChange }
 			/>
 		);
 
@@ -231,6 +241,26 @@ describe( 'ActionModal', () => {
 		const backdrop = screen.getByTestId( 'dialog-backdrop' );
 		await user.click( backdrop );
 
-		expect( closeModal ).not.toHaveBeenCalled();
+		expect( onOpenChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'invokes onOpenChange(false) when the RenderModal calls closeModal', async () => {
+		const user = userEvent.setup();
+		const onOpenChange = jest.fn();
+		const action = createAction();
+
+		render(
+			<ActionModal
+				action={ action }
+				items={ [ { id: 1, title: 'Item' } ] }
+				open
+				onOpenChange={ onOpenChange }
+			/>
+		);
+
+		await screen.findByRole( 'dialog' );
+		await user.click( screen.getByRole( 'button', { name: /done/i } ) );
+
+		expect( onOpenChange ).toHaveBeenCalledWith( false );
 	} );
 } );
