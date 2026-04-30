@@ -257,26 +257,8 @@ function FontCollection( { slug }: { slug: string } ) {
 		return <GoogleFontsConfirmDialog />;
 	}
 
-	const ActionsComponent = () => {
-		if ( slug !== 'google-fonts' || renderConfirmDialog || selectedFont ) {
-			return null;
-		}
-		return (
-			<DropdownMenu
-				icon={ moreVertical }
-				label={ __( 'Actions' ) }
-				popoverProps={ {
-					position: 'bottom left',
-				} }
-				controls={ [
-					{
-						title: __( 'Revoke access to Google Fonts' ),
-						onClick: revokeAccess,
-					},
-				] }
-			/>
-		);
-	};
+	const showActions =
+		slug === 'google-fonts' && ! renderConfirmDialog && ! selectedFont;
 
 	return (
 		<div className="font-library__tabpanel-layout">
@@ -301,8 +283,23 @@ function FontCollection( { slug }: { slug: string } ) {
 										{ selectedCollection.description }
 									</WCText>
 								</VStack>
-								{ /* eslint-disable-next-line react-hooks/static-components */ }
-								<ActionsComponent />
+								{ showActions && (
+									<DropdownMenu
+										icon={ moreVertical }
+										label={ __( 'Actions' ) }
+										popoverProps={ {
+											position: 'bottom left',
+										} }
+										controls={ [
+											{
+												title: __(
+													'Revoke access to Google Fonts'
+												),
+												onClick: revokeAccess,
+											},
+										] }
+									/>
+								) }
 							</HStack>
 							<Spacer margin={ 4 } />
 							<HStack spacing={ 4 } justify="space-between">
