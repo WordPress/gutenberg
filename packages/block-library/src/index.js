@@ -296,8 +296,12 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	// Register the classic block if the current post contains a classic block
-	if ( window?.wp?.oldEditor && window?.wp?.needsClassicBlock ) {
+	// Register the classic block if it's needed or the experiment to disable TinyMCE is not active
+	if (
+		window?.wp?.oldEditor &&
+		( window?.wp?.needsClassicBlock ||
+			! window?.__experimentalDisableTinymce )
+	) {
 		blocks.push( classic );
 	}
 
