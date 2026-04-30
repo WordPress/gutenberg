@@ -36,17 +36,18 @@ export const SelectControl = forwardRef<
 				</Select.Trigger>
 				<Select.Popup>
 					<SelectControlSizeContext.Provider value={ size }>
-						{ children ||
-							items?.map( ( item ) => (
-								<Item
-									key={ item.value }
-									value={ item.value }
-									label={ item.label }
-									disabled={ item.disabled }
-								>
-									{ item.label }
-								</Item>
-							) ) }
+						{ children !== undefined
+							? children
+							: items?.map( ( item ) => (
+									<Item
+										key={ item.value }
+										value={ item.value }
+										label={ item.label }
+										disabled={ item.disabled }
+									>
+										{ item.label }
+									</Item>
+							  ) ) }
 					</SelectControlSizeContext.Provider>
 				</Select.Popup>
 			</Select.Root>
