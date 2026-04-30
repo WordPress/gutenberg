@@ -12,6 +12,7 @@
 		.components-placeholder {
 			&.is-large {
 				justify-content: flex-start;
+				// Lift the resizer UI above the surrounding placeholder content.
 				z-index: 1;
 			}
 		}
