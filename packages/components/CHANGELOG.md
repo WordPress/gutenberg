@@ -35,6 +35,7 @@
 -   `FormTokenField`: Fix disabled styles. [#77137](https://github.com/WordPress/gutenberg/pull/77137)
 -   `Textarea`: Fix disabled styles [#77129](https://github.com/WordPress/gutenberg/pull/77129).
 -   `DateCalendar`: Fix disabled selected day having darker background than other disabled controls [#77138](https://github.com/WordPress/gutenberg/pull/77138).
+-   `Autocomplete`: Fix value comparison to avoid resetting block inserter in RTC ([#76980](https://github.com/WordPress/gutenberg/pull/76980)).
 -   `ValidatedRangeControl`: Fix `aria-label` rendered as `[object Object]` when `required` or `markWhenOptional` is set ([#77042](https://github.com/WordPress/gutenberg/pull/77042)).
 -   `Autocomplete`: Fix matching logic to prefer longest overlapping trigger ([#77018](https://github.com/WordPress/gutenberg/pull/77018)).
 -   `Autocomplete`: Skip stale triggers from completed mentions ([#77185](https://github.com/WordPress/gutenberg/pull/77185)).
@@ -49,6 +50,7 @@
 ### Internal
 
 -   `Autocomplete`: Refactor `useAutocomplete` to use `useReducer` ([#77020](https://github.com/WordPress/gutenberg/pull/77020)).
+-   `Button`: Remove obsolete Safari + VoiceOver workaround for visually hidden text ([#77107](https://github.com/WordPress/gutenberg/pull/77107)).
 -   `BoxControl`: Remove unused state for icon side ([#77143](https://github.com/WordPress/gutenberg/pull/77143)).
 -   `Autocomplete`: Remove `getAutoCompleterUI` factory pattern ([#77048](https://github.com/WordPress/gutenberg/pull/77048)).
 -   `CustomSelectControl`, `Sandbox`: Rename internal React function names ([#77148](https://github.com/WordPress/gutenberg/pull/77148)).
@@ -141,6 +143,7 @@
 
 ### Internal
 
+-   Add `Avatar` and `AvatarGroup` components as private APIs ([#75595](https://github.com/WordPress/gutenberg/pull/75595)).
 -   Remove `Picker` from private APIs ([#75394](https://github.com/WordPress/gutenberg/pull/75394)).
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
 -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).

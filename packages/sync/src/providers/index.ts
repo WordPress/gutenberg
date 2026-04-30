@@ -12,13 +12,13 @@ import type { ProviderCreator } from '../types';
 let providerCreators: ProviderCreator[] | null = null;
 
 /**
- * Returns provider creators for IndexedDB and WebRTC with HTTP signaling. These
- * are the current default providers.
+ * Returns the defeault provider creators. HTTP polling is the current default
+ * provider.
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
 export function getDefaultProviderCreators(): ProviderCreator[] {
-	const signalingUrl = window?.wp?.ajax?.settings?.url;
+	return [ createHttpPollingProvider() ];
 }
 
 /**

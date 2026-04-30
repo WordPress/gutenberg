@@ -11,19 +11,27 @@ import { useEffect, useState } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 import { unlock } from '../../lock-unlock';
+import { getAvatarUrl } from './get-avatar-url';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { computeSelectionVisual } from './compute-selection';
 import { useDebouncedRecompute } from './use-debounced-recompute';
+import type { SelectionRect } from './cursor-dom-utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+
+export type { SelectionRect };
 
 export interface CursorData {
 	userName: string;
 	clientId: number;
 	color: string;
+	avatarUrl?: string;
 	x: number;
 	y: number;
 	height: number;
 	isMe?: boolean;
+	selectionRects?: SelectionRect[];
 }
 
 /**
@@ -73,6 +81,13 @@ export function useRenderCursors(
 			return;
 		}
 
+		// Pre-compute the overlay rect once, same for every user.
+		const overlayRect = overlayElement.getBoundingClientRect();
+		const overlayContext = {
+			editorDocument: blockEditorDocument,
+			overlayRect,
+		};
+
 		const results: CursorData[] = [];
 
 		const hasOtherCollaborators = sortedUsers.some(
@@ -88,46 +103,68 @@ export function useRenderCursors(
 				type: SelectionType.None,
 			};
 
-			let coords: {
-				textIndex: null,
-				y: number;
-				height: number;
-			} | null = null;
+			let start: ResolvedSelection = {
+				richTextOffset: null,
+				localClientId: null,
+			};
+			let end: ResolvedSelection | undefined;
 
-			if ( selection.type === SelectionType.None ) {
-					const { textIndex, localClientId } =
+			if ( selection.type === SelectionType.Cursor ) {
+				try {
+					start = resolveSelection( selection );
 				} catch {
 					// Selection may reference a stale Yjs position.
+					return;
 				}
 			} else if (
 				selection.type === SelectionType.SelectionInOneBlock ||
 				selection.type === SelectionType.SelectionInMultipleBlocks
 			) {
 				try {
-					const { textIndex, localClientId } = resolveSelection( {
+					start = resolveSelection( {
 						type: SelectionType.Cursor,
 						cursorPosition: selection.cursorStartPosition,
 					} );
-					if ( localClientId ) {
-						coords = getCursorPosition(
-							textIndex,
-							localClientId,
-							blockEditorDocument,
+
+					end = resolveSelection( {
+						type: SelectionType.Cursor,
+						cursorPosition: selection.cursorEndPosition,
+					} );
 				} catch {
 					// Selection may reference a stale Yjs position.
+					return;
 				}
 			}
 
-			if ( coords ) {
-				results.push( {
+			const userName = user.collaboratorInfo.name;
+			const clientId = user.clientId;
+			const color = user.isMe
 				? 'var(--wp-admin-theme-color)'
 				: getAvatarBorderColor( user.collaboratorInfo.id );
+			const avatarUrl = getAvatarUrl( user.collaboratorInfo.avatar_urls );
+
+			const selectionVisual = computeSelectionVisual(
+				selection,
+				start,
+				end,
+				overlayContext
+			);
+
+			if ( selectionVisual.coords ) {
+				const cursorData: CursorData = {
 					userName,
 					clientId,
 					color,
+					avatarUrl,
 					isMe: user.isMe,
-					...coords,
-				} );
+					...selectionVisual.coords,
+				};
+
+				if ( selectionVisual.selectionRects ) {
+					cursorData.selectionRects = selectionVisual.selectionRects;
+				}
+
+				results.push( cursorData );
 			}
 		} );
 

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { type ConnectionError } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 
 // These error codes are defined in the sync package:
@@ -11,15 +12,20 @@ export const CONNECTION_LIMIT_EXCEEDED = 'connection-limit-exceeded';
 export const DOCUMENT_SIZE_LIMIT_EXCEEDED = 'document-size-limit-exceeded';
 export const UNKNOWN_ERROR = 'unknown-error';
 
+interface ConnectionErrorMessages {
+	description: string;
+	title: string;
+}
+
 /**
  * Default error messages for known error codes.
  */
-const ERROR_MESSAGES = {
+const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 	[ AUTHENTICATION_FAILED ]: {
 		title: __( 'Unable to connect' ),
 		description: __(
 			"Real-time collaboration couldn't verify your permissions. " +
-				'Check that you have access to edit this post, or contact your site administrator.'
+				'Check that you have access to edit this post or contact your site administrator.'
 		),
 	},
 	[ CONNECTION_EXPIRED ]: {
@@ -52,11 +58,13 @@ const ERROR_MESSAGES = {
  *
  * Provides default messages based on error.code.
  *
- * @param {Object} error - Connection error object.
- * @return {Object} Object with title, description, and canRetry flag.
+ * @param error - Connection error.
+ * @return Object with title, description, and canRetry flag.
  */
-export function getSyncErrorMessages( error ) {
-	if ( ERROR_MESSAGES[ error?.code ] ) {
+export function getSyncErrorMessages(
+	error?: ConnectionError
+): ConnectionErrorMessages {
+	if ( error?.code && ERROR_MESSAGES[ error?.code ] ) {
 		return ERROR_MESSAGES[ error.code ];
 	}
 

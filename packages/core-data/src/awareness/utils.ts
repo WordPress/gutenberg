@@ -89,13 +89,13 @@ export function areCollaboratorInfosEqual(
 }
 
 /**
- * Generate a collaborator info object from a current collaborator and a list of existing colors.
+ * Generate a collaborator info object from a current collaborator.
  *
  * @param currentCollaborator - The current collaborator.
  * @return The collaborator info object.
  */
 export function generateCollaboratorInfo(
-	currentCollaborator: User< 'view' >,
+	currentCollaborator: User< 'view' >
 ): CollaboratorInfo {
 	// eslint-disable-next-line camelcase
 	const { avatar_urls, id, name, slug } = currentCollaborator;

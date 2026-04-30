@@ -317,7 +317,8 @@ describe( 'editEntityRecord', () => {
 						newKey: 'newValue',
 					},
 				},
-				'local-editor'
+				'local-editor',
+				{ isNewUndoLevel: true }
 			);
 		} );
 
@@ -358,7 +359,8 @@ describe( 'editEntityRecord', () => {
 						key2: 'value2',
 					},
 				},
-				'local-editor'
+				'local-editor',
+				{ isNewUndoLevel: true }
 			);
 
 			// But the local store dispatch should still receive undefined for the cleaned edit
@@ -413,7 +415,8 @@ describe( 'editEntityRecord', () => {
 						newKey: 'newValue',
 					},
 				},
-				'local-editor'
+				'local-editor',
+				{ isNewUndoLevel: true }
 			);
 		} );
 

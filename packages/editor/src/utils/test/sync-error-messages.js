@@ -8,15 +8,16 @@ describe( 'getSyncErrorMessages', () => {
 		'authentication-failed',
 		'connection-expired',
 		'connection-limit-exceeded',
+		'document-size-limit-exceeded',
 		'unknown-error',
-	] )(
-		'should return title, description, and canRetry for "%s"',
-		( code ) => {
-			const result = getSyncErrorMessages( { code } );
-			expect( result ).toEqual(
-				expect.objectContaining( {
-					title: expect.any( String ),
-					description: expect.any( String ),
+	] )( 'should return title and description for "%s"', ( code ) => {
+		const result = getSyncErrorMessages( { code } );
+		expect( result ).toEqual(
+			expect.objectContaining( {
+				title: expect.any( String ),
+				description: expect.any( String ),
+			} )
+		);
 	} );
 
 	it( 'should fall back to unknown-error for unrecognized codes', () => {

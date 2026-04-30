@@ -17,6 +17,7 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultCollectionSyncConfig,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -143,6 +144,7 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
+		syncConfig: defaultCollectionSyncConfig,
 	},
 	{
 		name: 'menu',
@@ -245,7 +247,7 @@ export const rootEntitiesConfig = [
 		key: 'name',
 		supportsPagination: false,
 	},
-].map( ( entity ) => {
+];
 
 export const deprecatedEntities = {
 	root: {
@@ -277,9 +279,9 @@ export const additionalEntityConfigLoaders = [
  * @param {Object}  edits           Edits.
  * @param {string}  name            Post type name.
  * @param {boolean} isTemplate      Whether the post type is a template.
- * @return {Object} Updated edits.
+ * @return {Promise< Object >} Updated edits.
  */
-export const prePersistPostType = (
+export const prePersistPostType = async (
 	persistedRecord,
 	edits,
 	name,
@@ -308,7 +310,7 @@ export const prePersistPostType = (
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 			objectType,
 			objectId
 		);
@@ -330,14 +332,41 @@ export const prePersistPostType = (
  * @return {Promise} Entities promise
  */
 async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( {
-		path: '/wp/v2/types?context=view',
-	} );
+	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
+	const taxonomiesPromise = window._wpCollaborationEnabled
+		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
+		: Promise.resolve( {} );
+	const [ postTypes, taxonomies ] = await Promise.all( [
+		postTypesPromise,
+		taxonomiesPromise,
+	] );
+
 	return Object.entries( postTypes ?? {} ).map( ( [ name, postType ] ) => {
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
+
+		const syncedProperties = new Set( [
+			'author',
+			'blocks',
+			'content',
+			'comment_status',
+			'date',
+			'excerpt',
+			'featured_media',
+			'format',
+			'meta',
+			'ping_status',
+			'slug',
+			'status',
+			'sticky',
+			'template',
+			'title',
+			...( postType.taxonomies
+				?.map( ( taxonomy ) => taxonomies?.[ taxonomy ]?.rest_base )
+				?.filter( Boolean ) ?? [] ),
+		] );
 
 		const entity = {
 			kind: 'postType',
@@ -386,7 +415,7 @@ async function loadPostTypeEntities() {
 			 * @return {void}
 			 */
 			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
 
 			/**
 			 * Create the awareness instance for the entity's CRDT document.
@@ -410,7 +439,11 @@ async function loadPostTypeEntities() {
 			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
 			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
+				getPostChangesFromCRDTDoc(
+					crdtDoc,
+					editedRecord,
+					syncedProperties
+				),
 
 			/**
 			 * Extract changes from a CRDT document that can be used to update the
@@ -421,7 +454,7 @@ async function loadPostTypeEntities() {
 			 */
 			getPersistedCRDTDoc: ( record ) => {
 				return (
-					record?.meta[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
+					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
 					null
 				);
 			},

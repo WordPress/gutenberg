@@ -164,12 +164,12 @@ describe( 'BaseAwarenessState', () => {
 			expect( resolveSelect ).toHaveBeenCalledWith( 'core' );
 		} );
 
-		test( 'should exclude own color from available colors', async () => {
+		test( 'should set collaboratorInfo for other users', async () => {
 			// Set up another user state first
 			const doc2 = new Y.Doc();
 			const awareness = new TestBaseAwarenessState( doc );
 
-			// Manually add another user's state with a specific color
+			// Manually add another user's state
 			awareness.setLocalStateField( 'collaboratorInfo', {
 				id: 2,
 				name: 'Other User',

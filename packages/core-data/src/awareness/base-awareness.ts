@@ -24,7 +24,7 @@ export abstract class BaseAwarenessState<
 	 */
 	private async setCurrentCollaboratorInfo(): Promise< void > {
 		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
-		const collaboratorInfo = generateCollaboratorInfo(
+		const collaboratorInfo = generateCollaboratorInfo( currentUser );
 		this.setLocalStateField( 'collaboratorInfo', collaboratorInfo );
 	}
 }

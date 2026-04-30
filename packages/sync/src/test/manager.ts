@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import { Awareness } from 'y-protocols/awareness';
 import * as fun from 'lib0/function';
 import {
 	describe,
@@ -53,6 +54,7 @@ describe( 'SyncManager', () => {
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
+			meta: {},
 		};
 
 		mockProviderResult = {
@@ -95,6 +97,7 @@ describe( 'SyncManager', () => {
 				Promise.resolve( mockRecord )
 			),
 			onStatusChange: jest.fn(),
+			persistCRDTDoc: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
 		};
@@ -135,7 +138,7 @@ describe( 'SyncManager', () => {
 
 			await manager.load(
 				mockSyncConfig,
-				'post',
+				'postType/post',
 				'123',
 				mockRecord,
 				mockHandlers
@@ -143,9 +146,10 @@ describe( 'SyncManager', () => {
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
 			expect( mockProviderCreator ).toHaveBeenCalledWith( {
-				'post',
+				objectType: 'postType/post',
 				objectId: '123',
-				expect.any( Y.Doc )
+				ydoc: expect.any( Y.Doc ),
+				awareness: expect.any( Awareness ),
 			} );
 		} );
 
@@ -262,8 +266,10 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
 			} );
 
 			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
@@ -297,9 +303,9 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify no save operation occurred
+				// Verify that the CRDT doc was persisted.
 				expect( mockHandlers.editRecord ).not.toHaveBeenCalled();
-				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
+				expect( mockHandlers.persistCRDTDoc ).not.toHaveBeenCalled();
 			} );
 
 			it( 'applies a persisted CRDT doc with invalidated fields, then applies changes', async () => {
@@ -343,8 +349,10 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.getChangesFromCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify that the CRDT doc was persisted.
+				expect( mockHandlers.persistCRDTDoc ).toHaveBeenCalledTimes(
+					1
+				);
 			} );
 		} );
 	} );
@@ -556,7 +564,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
 
-			manager.update( 'post', '123', changes, 'local-editor', true );
+			manager.update( 'post', '123', changes, 'local-editor', {
+				isSave: true,
+			} );
 
 			// Wait a tick for yieldToEventLoop.
 			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
@@ -574,6 +584,138 @@ describe( 'SyncManager', () => {
 				now
 			);
 			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+		} );
+	} );
+
+	describe( 'shouldSync', () => {
+		it( 'skips loading entity when shouldSync returns false', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => false );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'post',
+				'123'
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).not.toHaveBeenCalled();
+			expect( mockProviderCreator ).not.toHaveBeenCalled();
+		} );
+
+		it( 'loads entity when shouldSync returns true', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => true );
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'post',
+				'123'
+			);
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledTimes( 1 );
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'loads entity when shouldSync is not defined', async () => {
+			const manager = createSyncManager();
+
+			delete mockSyncConfig.shouldSync;
+
+			await manager.load(
+				mockSyncConfig,
+				'post',
+				'123',
+				mockRecord,
+				mockHandlers
+			);
+
+			expect(
+				mockSyncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledTimes( 1 );
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'skips loading collection when shouldSync returns false', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => false );
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'comment',
+				null
+			);
+			expect( mockProviderCreator ).not.toHaveBeenCalled();
+		} );
+
+		it( 'loads collection when shouldSync returns true', async () => {
+			const manager = createSyncManager();
+
+			mockSyncConfig.shouldSync = jest.fn( () => true );
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockSyncConfig.shouldSync ).toHaveBeenCalledWith(
+				'comment',
+				null
+			);
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'loads collection when shouldSync is not defined', async () => {
+			const manager = createSyncManager();
+
+			delete mockSyncConfig.shouldSync;
+
+			const mockCollectionHandlers = {
+				onStatusChange: jest.fn(),
+				refetchRecords: jest.fn( async () => Promise.resolve() ),
+			};
+
+			await manager.loadCollection(
+				mockSyncConfig,
+				'comment',
+				mockCollectionHandlers
+			);
+
+			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
