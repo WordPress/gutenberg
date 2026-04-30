@@ -20,6 +20,7 @@ import {
 	DEFAULT_CLIENT_LIMIT_PER_ROOM,
 	ERROR_RETRY_DELAYS_SOLO_MS,
 	ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS,
+	MAX_ROOMS_PER_REQUEST,
 	MAX_UPDATE_SIZE_IN_BYTES,
 	POLLING_INTERVAL_IN_MS,
 	POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS,
@@ -44,6 +45,7 @@ import {
 	intValueOrDefault,
 	postSyncUpdate,
 	postSyncUpdateNonBlocking,
+	rotateWindow,
 } from './utils';
 
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
@@ -439,6 +441,12 @@ let isUnloadPending = false;
 let pollInterval = POLLING_INTERVAL_IN_MS;
 let pollingTimeoutId: ReturnType< typeof setTimeout > | null = null;
 
+// When more rooms are registered than the server allows per request
+// (MAX_ROOMS_PER_REQUEST), the primary room is sent every poll and the
+// remaining "overflow" rooms are rotated across polls. This offset
+// points into the overflow list at the next room to include.
+let roomOverflowOffset = 0;
+
 /**
  * Mark that a page unload has been requested. This fires on
  * `beforeunload` which happens before the browser aborts in-flight
@@ -468,7 +476,11 @@ function handlePageHide(): void {
 		} )
 	);
 
-	postSyncUpdateNonBlocking( { rooms } );
+	for ( let i = 0; i < rooms.length; i += MAX_ROOMS_PER_REQUEST ) {
+		postSyncUpdateNonBlocking( {
+			rooms: rooms.slice( i, i + MAX_ROOMS_PER_REQUEST ),
+		} );
+	}
 }
 
 /**
@@ -506,6 +518,49 @@ function handleVisibilityChange() {
 	}
 }
 
+/**
+ * Select which rooms to include in the next sync request.
+ *
+ * The server caps requests at MAX_ROOMS_PER_REQUEST rooms. When fewer rooms are
+ * registered than the cap, every room is included on every poll. When the cap
+ * is exceeded, the primary room is sent on every poll (so the main document
+ * stays fully synced) and the remaining overflow rooms are rotated across
+ * successive polls so each one is included (at a reduced frequency).
+ *
+ * Rooms that are skipped on a given poll keep their queued updates; the updates
+ * are drained on the next poll that includes them.
+ *
+ * @return The RoomStates to include in this request, in send order.
+ */
+function selectRoomsForRequest(): RoomState[] {
+	const allRooms = Array.from( roomStates.values() );
+
+	// Fast path: everything fits in a single request.
+	if ( allRooms.length <= MAX_ROOMS_PER_REQUEST ) {
+		return allRooms;
+	}
+
+	// Rotation path: pin the primary room to every request (if one exists)
+	// and rotate the remaining overflow rooms across successive polls.
+	const primaryRoom = allRooms.find( ( state ) => state.isPrimaryRoom );
+	const overflowRooms = allRooms.filter( ( state ) => state !== primaryRoom );
+	const overflowSlotsPerRequest =
+		MAX_ROOMS_PER_REQUEST - ( primaryRoom ? 1 : 0 );
+
+	const { window: overflowSlice, nextOffset } = rotateWindow(
+		overflowRooms,
+		roomOverflowOffset,
+		overflowSlotsPerRequest
+	);
+	roomOverflowOffset = nextOffset;
+
+	if ( primaryRoom ) {
+		return [ primaryRoom, ...overflowSlice ];
+	}
+
+	return overflowSlice;
+}
+
 function poll(): void {
 	isPolling = true;
 	pollingTimeoutId = null;
@@ -521,26 +576,26 @@ function poll(): void {
 		// cancels a beforeunload dialog.
 		isUnloadPending = false;
 
-		// Emit 'connecting' status.
-		roomStates.forEach( ( state ) => {
-			state.onStatusChange( { status: 'connecting' } );
-		} );
-
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
 		// withhold our own updates until we detect another collaborator using the
 		// queue's pause / resume mechanism.
+		const roomsInRequest = selectRoomsForRequest();
 		const payload: SyncPayload = {
-			rooms: Array.from( roomStates.entries() ).map(
-				( [ room, state ] ) => ( {
-					after: state.endCursor ?? 0,
-					awareness: state.localAwarenessState,
-					client_id: state.clientId,
-					room,
-					updates: state.updateQueue.get(),
-				} )
-			),
+			rooms: roomsInRequest.map( ( state ) => ( {
+				after: state.endCursor ?? 0,
+				awareness: state.localAwarenessState,
+				client_id: state.clientId,
+				room: state.room,
+				updates: state.updateQueue.get(),
+			} ) ),
 		};
+
+		// Emit 'connecting' status only for rooms in this request. Rooms
+		// rotated out of this poll keep their prior status.
+		roomsInRequest.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
 
 		try {
 			const { rooms } = await postSyncUpdate( payload );
@@ -548,7 +603,14 @@ function poll(): void {
 			// Emit 'connected' status.
 			consecutiveFailures = 0;
 			isManualRetry = false;
-			roomStates.forEach( ( state ) => {
+			roomsInRequest.forEach( ( state ) => {
+				// Skip rooms unregistered during the await (e.g. the
+				// size-limit handler in onDocUpdate). Their terminal
+				// status was already set by whatever unregistered them.
+				if ( roomStates.get( state.room ) !== state ) {
+					return;
+				}
+
 				state.onStatusChange( { status: 'connected' } );
 			} );
 
@@ -714,7 +776,13 @@ function poll(): void {
 					const backgroundRetriesFailed =
 						consecutiveFailures > retrySchedule.length;
 
-					roomStates.forEach( ( state ) => {
+					roomsInRequest.forEach( ( state ) => {
+						// Skip rooms unregistered during the await so
+						// their terminal status isn't overwritten.
+						if ( roomStates.get( state.room ) !== state ) {
+							return;
+						}
+
 						state.onStatusChange( {
 							status: 'disconnected',
 							canManuallyRetry: true,
@@ -897,6 +965,7 @@ function unregisterRoom(
 		areListenersRegistered = false;
 		hasCheckedConnectionLimit = false;
 		consecutiveFailures = 0;
+		roomOverflowOffset = 0;
 	}
 }
 

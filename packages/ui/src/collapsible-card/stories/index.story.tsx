@@ -26,6 +26,7 @@ function Text( { children }: { children: React.ReactNode } ) {
 }
 
 const meta: Meta< typeof CollapsibleCard.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/CollapsibleCard',
 	component: CollapsibleCard.Root,
 	subcomponents: {
