@@ -317,6 +317,71 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			getOverlay().entries[ clientId ]?.overlayAttributes?.content
 		).toBe( 'Edited' );
 	} );
+
+	it( 'lands an apply-style mutation on the live block when bypass is requested', async () => {
+		// The accept/reject suggestion flow calls `updateBlockAttributes`
+		// directly on the block-editor store. Without an explicit bypass
+		// the interceptor would mistake the apply for a user edit and
+		// revert it — so "Accept suggestion" would silently no-op while
+		// in Suggest mode. The provider opts into a bypass for the apply
+		// dispatch and clears the overlay so the new attributes become
+		// the new baseline.
+		const { registry, clientId, getOverlay } = setup();
+
+		// User had a pending suggestion overlay on this block.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Suggested' } );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the user-style edit was reverted into the overlay.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.content
+		).toBe( 'Hello' );
+
+		// Now run the apply path the way the provider will: ask the
+		// interceptor to bypass the next dispatch, drop the overlay, and
+		// write the applied attributes.
+		await act( async () => {
+			getOverlay().requestInterceptorBypass( clientId );
+			getOverlay().clearOverlay( clientId );
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Applied' } );
+		} );
+		await flushSubscribers();
+
+		const liveAttributes = registry
+			.select( blockEditorStore )
+			.getBlockAttributes( clientId );
+
+		// The applied attributes land on the live block — they aren't
+		// reverted to baseline.
+		expect( liveAttributes?.content ).toBe( 'Applied' );
+		// The overlay entry is gone, so future edits start from a fresh
+		// baseline that reflects the applied state.
+		expect( getOverlay().entries[ clientId ] ).toBeUndefined();
+
+		// A subsequent user-style edit is still intercepted normally and
+		// rebaselines against the post-apply attributes.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'After apply' } );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( clientId )
+				?.content
+		).toBe( 'Applied' );
+		expect(
+			getOverlay().entries[ clientId ]?.overlayAttributes?.content
+		).toBe( 'After apply' );
+	} );
 } );
 
 describe( 'stripSystemMetadata', () => {
