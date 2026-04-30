@@ -8,7 +8,8 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useThrottle } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
+import { useMergeRefs, useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -57,14 +58,38 @@ function ResizeHandle( {
 	itemId,
 	verticalResizable = true,
 }: ResizeHandleProps ) {
-	const { attributes, listeners, setNodeRef } = useDraggable( {
+	const { attributes, listeners, setNodeRef, isDragging } = useDraggable( {
 		id: 'draggable',
 		data: { itemId },
 	} );
 
+	// Track the rendered node so we can resolve `ownerDocument` for the
+	// cursor lock — needed when the grid lives inside an iframe (e.g.
+	// the block-editor canvas).
+	const nodeRef = useRef< HTMLElement | null >( null );
+	const mergedRef = useMergeRefs( [ nodeRef, setNodeRef ] );
+
+	// Lock the document cursor while the gesture is active. Without
+	// this, the OS pointer reverts to the default arrow as soon as it
+	// leaves the handle's hit area, even though the resize is still
+	// in progress.
+	useEffect( () => {
+		if ( ! isDragging ) {
+			return;
+		}
+		const cursor = verticalResizable ? 'nwse-resize' : 'ew-resize';
+		const root = ( nodeRef.current?.ownerDocument ?? document )
+			.documentElement;
+		const previous = root.style.cursor;
+		root.style.cursor = cursor;
+		return () => {
+			root.style.cursor = previous;
+		};
+	}, [ isDragging, verticalResizable ] );
+
 	return (
 		<div
-			ref={ setNodeRef }
+			ref={ mergedRef }
 			className={ clsx(
 				styles[ 'resize-handle' ],
 				! verticalResizable && styles[ 'is-horizontal-only' ],

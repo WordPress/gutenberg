@@ -296,19 +296,11 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	// When in a WordPress context, conditionally
-	// add the classic block and TinyMCE editor
-	// under any of the following conditions:
-	//   - the current post contains a classic block
-	//   - the experiment to disable TinyMCE isn't active.
-	//   - a query argument specifies that TinyMCE should be loaded
+	// Register the classic block if it's needed or the experiment to disable TinyMCE is not active
 	if (
 		window?.wp?.oldEditor &&
 		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
-				'requiresTinymce'
-			) )
+			! window?.__experimentalDisableTinymce )
 	) {
 		blocks.push( classic );
 	}
