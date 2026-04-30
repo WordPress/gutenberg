@@ -47,7 +47,7 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/rich-text": "file:../rich-text",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

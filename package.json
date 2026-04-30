@@ -61,7 +61,6 @@
 		"@types/react-dom": "^18.3.1",
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
-		"@types/uuid": "8.3.1",
 		"@typescript/native-preview": "7.0.0-dev.20260423.1",
 		"@wordpress/build": "file:./packages/wp-build",
 		"@wordpress/eslint-tools": "file:./tools/eslint",
@@ -110,7 +109,7 @@
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
-		"uuid": "9.0.1",
+		"uuid": "11.1.1",
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
