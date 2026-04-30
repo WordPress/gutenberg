@@ -14,6 +14,7 @@ const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const { ValidationError } = require( './validate-config' );
 const postProcessConfig = require( './post-process-config' );
 const { createPortResolver } = require( '../resolve-available-ports' );
+const { setCache } = require( '../cache' );
 
 /**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
@@ -72,6 +73,20 @@ module.exports = async function loadConfig(
 		await getCacheDirectory(),
 		md5( configFilePath )
 	);
+
+	// Retroactively record the project path in the cache so that `wp-env prune`
+	// can later identify which environments belong to which project directories.
+	// Only update if the cache directory already exists (i.e. the environment
+	// has been initialised before) so we never accidentally create it here.
+	try {
+		await fs.stat( cacheDirectoryPath );
+		await setCache( 'configPath', configDirectoryPath, {
+			workDirectoryPath: cacheDirectoryPath,
+		} );
+	} catch {
+		// Cache directory does not exist yet; metadata will be written by
+		// `wp-env start` once the environment is first initialised.
+	}
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.

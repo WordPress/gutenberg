@@ -9,6 +9,7 @@ const clean = require( './clean' );
 const run = require( './run' );
 const destroy = require( './destroy' );
 const cleanup = require( './cleanup' );
+const prune = require( './prune' );
 const logs = require( './logs' );
 const status = require( './status' );
 
@@ -20,6 +21,7 @@ module.exports = {
 	run,
 	destroy,
 	cleanup,
+	prune,
 	logs,
 	status,
 };
