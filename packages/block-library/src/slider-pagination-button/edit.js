@@ -19,8 +19,10 @@ const iconMap = {
 function Edit( { attributes, context } ) {
 	const { type } = attributes;
 	const arrowIcon = context?.arrowIcon ?? 'chevron';
+	const navigationButtonType = context?.navigationButtonType ?? 'icon';
 	const isPrevious = type === 'previous';
 
+	const buttonText = isPrevious ? __( 'Previous' ) : __( 'Next' );
 	const label = isPrevious ? __( 'Previous slide' ) : __( 'Next slide' );
 	const icons = iconMap[ arrowIcon ] ?? iconMap.chevron;
 	const icon = isPrevious ? icons.previous : icons.next;
@@ -31,11 +33,36 @@ function Edit( { attributes, context } ) {
 		'aria-label': label,
 	} );
 
-	return (
-		<button { ...blockProps }>
-			<Icon icon={ icon } />
-		</button>
-	);
+	let buttonInner;
+	if ( navigationButtonType === 'icon' ) {
+		buttonInner = <Icon icon={ icon } />;
+	} else if ( navigationButtonType === 'text' ) {
+		buttonInner = (
+			<span className="wp-block-slider-pagination-button__text">
+				{ buttonText }
+			</span>
+		);
+	} else if ( isPrevious ) {
+		buttonInner = (
+			<>
+				<Icon icon={ icon } />
+				<span className="wp-block-slider-pagination-button__text">
+					{ buttonText }
+				</span>
+			</>
+		);
+	} else {
+		buttonInner = (
+			<>
+				<span className="wp-block-slider-pagination-button__text">
+					{ buttonText }
+				</span>
+				<Icon icon={ icon } />
+			</>
+		);
+	}
+
+	return <button { ...blockProps }>{ buttonInner }</button>;
 }
 
 export default Edit;

@@ -15,7 +15,7 @@
 			"default": "previous"
 		}
 	},
-	"usesContext": [ "arrowIcon" ],
+	"usesContext": [ "arrowIcon", "navigationButtonType" ],
 	"supports": {
 		"anchor": false,
 		"html": false,

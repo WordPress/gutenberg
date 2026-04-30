@@ -18,6 +18,7 @@ import {
 import {
 	SliderPaginationArrowControls,
 	SliderPaginationIndicatorControls,
+	SliderPaginationNavigationButtonTypeControls,
 } from './slider-pagination-icon-controls';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -27,10 +28,12 @@ const PAGINATION_TEMPLATE = [
 	[ 'core/slider-pagination-button', { type: 'next' } ],
 ];
 
-export default function Edit( {
-	attributes: { arrowIcon, indicatorStyle },
-	setAttributes,
-} ) {
+export default function Edit( { attributes, setAttributes } ) {
+	const {
+		arrowIcon,
+		indicatorStyle,
+		navigationButtonType = 'icon',
+	} = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -42,15 +45,31 @@ export default function Edit( {
 		<>
 			<InspectorControls>
 				<ToolsPanel
-					label={ __( 'Icons' ) }
+					label={ __( 'Buttons' ) }
 					resetAll={ () =>
 						setAttributes( {
 							arrowIcon: 'chevron',
 							indicatorStyle: 'dot',
+							navigationButtonType: 'icon',
 						} )
 					}
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						label={ __( 'Type' ) }
+						isShownByDefault
+						hasValue={ () => navigationButtonType !== 'icon' }
+						onDeselect={ () =>
+							setAttributes( { navigationButtonType: 'icon' } )
+						}
+					>
+						<SliderPaginationNavigationButtonTypeControls
+							value={ navigationButtonType }
+							onChange={ ( value ) =>
+								setAttributes( { navigationButtonType: value } )
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						hasValue={ () => arrowIcon !== 'chevron' }
 						label={ __( 'Button icon' ) }

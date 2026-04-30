@@ -49,34 +49,36 @@ function render_block_core_slider_pagination_button( $attributes, $content, $blo
 	$type        = $attributes['type'] ?? 'previous';
 	$is_previous = 'previous' === $type;
 	$arrow_icon  = $block->context['arrowIcon'] ?? 'chevron';
+	$button_type = $block->context['navigationButtonType'] ?? 'icon';
+	$button_text = $is_previous ? __( 'Previous' ) : __( 'Next' );
+	$label       = $is_previous ? __( 'Previous slide' ) : __( 'Next slide' );
 
-	$p = new WP_HTML_Tag_Processor( $content );
+	// Build the button inner HTML based on navigationButtonType.
+	$icon_svg  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" class="wp-block-slider-pagination-button__icon"><path d="' . esc_attr( get_slider_pagination_button_icon_path( $arrow_icon, $is_previous ) ) . '" /></svg>';
+	$text_span = '<span class="wp-block-slider-pagination-button__text">' . esc_html( $button_text ) . '</span>';
 
-	$label = $is_previous
-		? __( 'Previous slide' )
-		: __( 'Next slide' );
-
-	// The button is the root element. Add the interactive namespace,
-	// translated label, ARIA attributes, and Interactivity API directives.
-	if ( $p->next_tag( array( 'class_name' => 'wp-block-slider-pagination-button' ) ) ) {
-		$p->set_attribute( 'data-wp-interactive', 'core/slider' );
-		$p->set_attribute( 'aria-label', $label );
-
-		if ( $is_previous ) {
-			$p->set_attribute( 'data-wp-on--click', 'actions.prevSlide' );
-			$p->set_attribute( 'data-wp-bind--aria-disabled', 'state.isAtStart' );
-		} else {
-			$p->set_attribute( 'data-wp-on--click', 'actions.nextSlide' );
-			$p->set_attribute( 'data-wp-bind--aria-disabled', 'state.isAtEnd' );
-		}
+	if ( 'icon' === $button_type ) {
+		$button_inner = $icon_svg;
+	} elseif ( 'text' === $button_type ) {
+		$button_inner = $text_span;
+	} elseif ( $is_previous ) {
+		$button_inner = $icon_svg . $text_span;
+	} else {
+		$button_inner = $text_span . $icon_svg;
 	}
 
-	// Replace the SVG path to match the selected arrow icon style.
-	if ( 'chevron' !== $arrow_icon && $p->next_tag( 'path' ) ) {
-		$p->set_attribute( 'd', get_slider_pagination_button_icon_path( $arrow_icon, $is_previous ) );
+	// Compose the button markup.
+	$button_classes = 'wp-block-slider-pagination-button is-type-' . esc_attr( $type ) . ' is-icon-' . esc_attr( $arrow_icon );
+	$button_type = 'button';
+
+	$button_attrs = 'class="' . $button_classes . '" type="' . $button_type . '" aria-label="' . esc_attr( $label ) . '" data-wp-interactive="core/slider"';
+	if ( $is_previous ) {
+		$button_attrs .= ' data-wp-on--click="actions.prevSlide" data-wp-bind--aria-disabled="state.isAtStart"';
+	} else {
+		$button_attrs .= ' data-wp-on--click="actions.nextSlide" data-wp-bind--aria-disabled="state.isAtEnd"';
 	}
 
-	return $p->get_updated_html();
+	return '<button ' . $button_attrs . '>' . $button_inner . '</button>';
 }
 
 /**

@@ -18,11 +18,17 @@
 			"type": "string",
 			"enum": [ "dot", "line" ],
 			"default": "dot"
+		},
+		"navigationButtonType": {
+			"type": "string",
+			"default": "icon",
+			"enum": [ "icon", "text", "both" ]
 		}
 	},
 	"providesContext": {
 		"arrowIcon": "arrowIcon",
-		"indicatorStyle": "indicatorStyle"
+		"indicatorStyle": "indicatorStyle",
+		"navigationButtonType": "navigationButtonType"
 	},
 	"allowedBlocks": [
 		"core/slider-pagination-button",

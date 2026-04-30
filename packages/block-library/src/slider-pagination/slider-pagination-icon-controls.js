@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import {
 	chevronLeft,
@@ -12,6 +13,26 @@ import {
 	moreHorizontal,
 	lineSolid,
 } from '@wordpress/icons';
+
+export function SliderPaginationNavigationButtonTypeControls( {
+	value,
+	onChange,
+} ) {
+	return (
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			label={ __( 'Type' ) }
+			value={ value }
+			onChange={ onChange }
+			isBlock
+			help={ __( 'Adjust the appearance of buttons in the slider.' ) }
+		>
+			<ToggleGroupControlOption value="icon" label={ __( 'Icon' ) } />
+			<ToggleGroupControlOption value="text" label={ __( 'Text' ) } />
+			<ToggleGroupControlOption value="both" label={ __( 'Both' ) } />
+		</ToggleGroupControl>
+	);
+}
 
 export function SliderPaginationArrowControls( { value, onChange } ) {
 	return (
