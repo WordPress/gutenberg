@@ -562,6 +562,15 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: Storybook story files — disable rules-of-hooks for the
+	// `render` method pattern, which calls hooks in a lowercase function.
+	{
+		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
+		rules: {
+			'react-hooks/rules-of-hooks': 'off',
+		},
+	},
+
 	// Override: Storybook + components — enforce JSX file extensions.
 	{
 		files: [
