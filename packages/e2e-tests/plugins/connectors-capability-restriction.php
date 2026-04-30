@@ -39,15 +39,6 @@ register_deactivation_hook(
 add_filter(
 	'map_meta_cap',
 	static function ( $caps, $cap ) {
-		// Always allow /wp/v2/plugins so the e2e cleanup can deactivate
-		// this plugin even when the restriction would otherwise block it.
-		if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $GLOBALS['wp']->query_vars['rest_route'] ) ) {
-			$route = (string) $GLOBALS['wp']->query_vars['rest_route'];
-			if ( 0 === strpos( $route, '/wp/v2/plugins' ) ) {
-				return $caps;
-			}
-		}
-
 		$restriction = get_option( 'gutenberg_test_cap_restriction', '' );
 
 		if ( empty( $restriction ) ) {

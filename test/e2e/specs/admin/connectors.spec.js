@@ -457,12 +457,26 @@ test.describe( 'Connectors', () => {
 
 	test.describe( 'Connectors page capability checks', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-capability-restriction';
+		const clearCapabilityRestriction = async ( requestUtils ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					gutenberg_test_cap_restriction: '',
+				},
+			} );
+		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin( PLUGIN_SLUG );
 		} );
 
+		test.afterEach( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
+		} );
+
 		test.afterAll( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
 			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
 		} );
 
