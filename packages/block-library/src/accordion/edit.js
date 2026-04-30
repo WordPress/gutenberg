@@ -38,6 +38,7 @@ export default function Edit( {
 	attributes: {
 		autoclose,
 		iconPosition,
+		iconType,
 		showIcon,
 		headingLevel,
 		levelOptions,
@@ -127,6 +128,7 @@ export default function Edit( {
 							autoclose: false,
 							showIcon: true,
 							iconPosition: 'right',
+							iconType: 'plus',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -199,6 +201,39 @@ export default function Edit( {
 								<ToggleGroupControlOption
 									label={ __( 'Right' ) }
 									value="right"
+								/>
+							</ToggleGroupControl>
+						</ToolsPanelItem>
+					) }
+					{ showIcon && (
+						<ToolsPanelItem
+							label={ __( 'Icon style' ) }
+							isShownByDefault
+							hasValue={ () => iconType !== 'plus' }
+							onDeselect={ () =>
+								setAttributes( { iconType: 'plus' } )
+							}
+						>
+							<ToggleGroupControl
+								__next40pxDefaultSize
+								isBlock
+								label={ __( 'Icon style' ) }
+								value={ iconType }
+								onChange={ ( value ) => {
+									setAttributes( { iconType: value } );
+								} }
+							>
+								<ToggleGroupControlOption
+									label={ __( 'Plus' ) }
+									value="plus"
+								/>
+								<ToggleGroupControlOption
+									label={ __( 'Chevron' ) }
+									value="chevron"
+								/>
+								<ToggleGroupControlOption
+									label={ __( 'Arrow' ) }
+									value="arrow"
 								/>
 							</ToggleGroupControl>
 						</ToolsPanelItem>

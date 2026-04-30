@@ -8,6 +8,7 @@
 	"parent": [ "core/accordion-item" ],
 	"usesContext": [
 		"core/accordion-icon-position",
+		"core/accordion-icon-type",
 		"core/accordion-show-icon",
 		"core/accordion-heading-level"
 	],
@@ -88,6 +89,11 @@
 		"showIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"iconType": {
+			"type": "string",
+			"default": "plus",
+			"enum": [ "plus", "chevron", "arrow" ]
 		}
 	},
 	"textdomain": "default"

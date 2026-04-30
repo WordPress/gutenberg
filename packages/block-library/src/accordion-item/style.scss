@@ -1,6 +1,17 @@
 .wp-block-accordion-item {
-	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon {
+	// Plus icon: rotates 45deg to become ×
+	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon.is-icon-plus {
 		transform: rotate(45deg);
+	}
+
+	// Chevron icon: rotates 90deg to point down
+	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon.is-icon-chevron {
+		transform: rotate(90deg);
+	}
+
+	// Arrow icon: rotates 180deg to point up
+	&.is-open > .wp-block-accordion-heading .wp-block-accordion-heading__toggle-icon.is-icon-arrow {
+		transform: rotate(180deg);
 	}
 
 	/* Add transitions only for users who do not prefer reduced motion */

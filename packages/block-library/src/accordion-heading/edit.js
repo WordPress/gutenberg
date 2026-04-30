@@ -13,10 +13,16 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import getIconContent from './get-icon-content';
+
 export default function Edit( { attributes, setAttributes, context } ) {
 	const { title } = attributes;
 	const {
 		'core/accordion-icon-position': iconPosition,
+		'core/accordion-icon-type': iconType,
 		'core/accordion-show-icon': showIcon,
 		'core/accordion-heading-level': headingLevel,
 	} = context;
@@ -31,10 +37,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			setAttributes( {
 				iconPosition,
 				showIcon,
+				iconType: iconType || 'plus',
 			} );
 		}
 	}, [
 		iconPosition,
+		iconType,
 		showIcon,
 		setAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
@@ -56,6 +64,8 @@ export default function Edit( { attributes, setAttributes, context } ) {
 	const blockProps = useBlockProps();
 	const spacingProps = useSpacingProps( attributes );
 
+	const iconContent = getIconContent( iconType );
+
 	return (
 		<TagName { ...blockProps }>
 			<button
@@ -65,10 +75,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
-						className="wp-block-accordion-heading__toggle-icon"
+						className={ `wp-block-accordion-heading__toggle-icon is-icon-${
+							iconType || 'plus'
+						}` }
 						aria-hidden="true"
 					>
-						+
+						{ iconContent }
 					</span>
 				) }
 				<RichText
@@ -88,10 +100,12 @@ export default function Edit( { attributes, setAttributes, context } ) {
 				/>
 				{ showIcon && iconPosition === 'right' && (
 					<span
-						className="wp-block-accordion-heading__toggle-icon"
+						className={ `wp-block-accordion-heading__toggle-icon is-icon-${
+							iconType || 'plus'
+						}` }
 						aria-hidden="true"
 					>
-						+
+						{ iconContent }
 					</span>
 				) }
 			</button>

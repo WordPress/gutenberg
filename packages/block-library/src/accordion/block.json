@@ -63,6 +63,11 @@
 			"type": "string",
 			"default": "right"
 		},
+		"iconType": {
+			"type": "string",
+			"default": "plus",
+			"enum": [ "plus", "chevron", "arrow" ]
+		},
 		"showIcon": {
 			"type": "boolean",
 			"default": true
@@ -81,6 +86,7 @@
 	},
 	"providesContext": {
 		"core/accordion-icon-position": "iconPosition",
+		"core/accordion-icon-type": "iconType",
 		"core/accordion-show-icon": "showIcon",
 		"core/accordion-heading-level": "headingLevel"
 	},

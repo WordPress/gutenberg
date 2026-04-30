@@ -16,7 +16,7 @@ Displays a foldable layout that groups content in collapsible sections. ([Source
 -	**Category:** design
 -	**Allowed Blocks:** core/accordion-item
 -	**Supports:** align (full, wide), anchor, ariaLabel, background (backgroundImage, backgroundSize), color (background, gradients, text), contentRole, interactivity, layout, listView, shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** autoclose, headingLevel, iconPosition, levelOptions, showIcon
+-	**Attributes:** autoclose, headingLevel, iconPosition, iconType, levelOptions, showIcon
 
 ## Accordion Heading
 
@@ -26,7 +26,7 @@ Displays a heading that toggles the accordion panel. ([Source](https://github.co
 -	**Category:** design
 -	**Parent:** core/accordion-item
 -	**Supports:** anchor, color (background, gradients, text), interactivity, shadow, spacing (padding), typography (fontSize), ~~align~~, ~~lock~~, ~~visibility~~
--	**Attributes:** iconPosition, level, openByDefault, showIcon, title
+-	**Attributes:** iconPosition, iconType, level, openByDefault, showIcon, title
 
 ## Accordion Item
 

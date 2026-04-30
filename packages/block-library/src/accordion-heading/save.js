@@ -8,13 +8,20 @@ import {
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import getIconContent from './get-icon-content';
+
 export default function save( { attributes } ) {
-	const { level, title, iconPosition, showIcon } = attributes;
+	const { level, title, iconPosition, iconType, showIcon } = attributes;
 	const TagName = 'h' + ( level || 3 );
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 
 	const blockProps = useBlockProps.save();
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+
+	const iconContent = getIconContent( iconType );
 
 	return (
 		<TagName { ...blockProps }>
@@ -25,10 +32,12 @@ export default function save( { attributes } ) {
 			>
 				{ showIcon && iconPosition === 'left' && (
 					<span
-						className="wp-block-accordion-heading__toggle-icon"
+						className={ `wp-block-accordion-heading__toggle-icon is-icon-${
+							iconType || 'plus'
+						}` }
 						aria-hidden="true"
 					>
-						+
+						{ iconContent }
 					</span>
 				) }
 				<RichText.Content
@@ -42,10 +51,12 @@ export default function save( { attributes } ) {
 				/>
 				{ showIcon && iconPosition === 'right' && (
 					<span
-						className="wp-block-accordion-heading__toggle-icon"
+						className={ `wp-block-accordion-heading__toggle-icon is-icon-${
+							iconType || 'plus'
+						}` }
 						aria-hidden="true"
 					>
-						+
+						{ iconContent }
 					</span>
 				) }
 			</button>
