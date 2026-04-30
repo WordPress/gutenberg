@@ -29,7 +29,7 @@ function gutenberg_classic_block_supports_inserter() {
 		! empty( $_GET['action'] ) &&
 		'edit' === $_GET['action']
 	) {
-		$post = get_post( absint( $_GET['post'] ) ) ?: null;
+		$post = get_post( absint( $_GET['post'] ) );
 	}
 
 	/**
