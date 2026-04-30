@@ -252,20 +252,19 @@ export const WithCustomTriggerAndItem: Story = {
 
 /**
  * Popovers in Gutenberg are managed with explicit z-index values, which can
- * create situations where a popover renders below another popover, when you
- * want it to be rendered above.
+ * create situations where a select popup renders below another popover when
+ * you want it above.
  *
- * The `--wp-ui-select-z-index` CSS variable is an escape hatch for that
- * case. Override it either:
+ * The `--wp-ui-select-z-index` CSS variable controls the z-index of the
+ * `Select` positioner. Override it either:
  *
  * - **Globally**, by setting the variable on `:root` or `body` (raises every
- *   `Select` popover in the page),
- * - **Per instance on the popup**, by setting the variable via `style` on
- *   `Select.Popup` (as this story does), or
- * - **Per instance on the portal**, by passing a `Select.Portal` with a
- *   `style` (or `className`) to `Select.Popup`'s `portal` prop. The
- *   variable then cascades from the portal wrapper to everything rendered
- *   inside it.
+ *   `Select` popover in the page), or
+ * - **Per instance**, by passing a `Select.Portal` with a `style` (or
+ *   `className`) to `Select.Popup`'s `portal` prop. The variable cascades
+ *   from the portal wrapper to everything rendered inside it.
+ *
+ * This story demonstrates the per-instance approach.
  */
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
@@ -273,7 +272,13 @@ export const WithCustomZIndex: Story = {
 		children: (
 			<>
 				<Select.Trigger />
-				<Select.Popup style={ { '--wp-ui-select-z-index': '1000001' } }>
+				<Select.Popup
+					portal={
+						<Select.Portal
+							style={ { '--wp-ui-select-z-index': '9999' } }
+						/>
+					}
+				>
 					<Select.Item value="Item 1" />
 					<Select.Item value="Item 2" />
 				</Select.Popup>
