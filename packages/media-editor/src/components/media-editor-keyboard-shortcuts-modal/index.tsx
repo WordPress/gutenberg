@@ -2,46 +2,119 @@
  * WordPress dependencies
  */
 import { Modal } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	displayShortcutList,
+	shortcutAriaLabel,
+	type WPKeycodeModifier,
+} from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
 
+interface KeyCombination {
+	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
+	modifier?: WPKeycodeModifier;
+	/** The key character(s) to display. */
+	character: string;
+	/** Optional aria-label override (used when character is a symbol). */
+	ariaLabel?: string;
+}
+
 interface ShortcutEntry {
-	keys: string[];
 	description: string;
-	keysAriaLabel?: string;
+	keyCombination: KeyCombination;
 }
 
 const SHORTCUTS: ShortcutEntry[] = [
 	{
-		keys: [ '↑', '↓', '←', '→' ],
-		keysAriaLabel: __( 'Arrow keys' ),
+		description: __( 'Undo' ),
+		keyCombination: { modifier: 'primary', character: 'z' },
+	},
+	{
+		description: __( 'Redo' ),
+		keyCombination: { modifier: 'primaryShift', character: 'z' },
+	},
+	{
 		description: __( 'Pan' ),
+		keyCombination: {
+			character: '↑↓←→',
+			ariaLabel: __( 'Arrow keys' ),
+		},
 	},
 	{
-		keys: [ '+' ],
 		description: __( 'Zoom in' ),
+		keyCombination: { character: '+' },
 	},
 	{
-		keys: [ '-' ],
 		description: __( 'Zoom out' ),
+		keyCombination: { character: '-' },
 	},
 	{
-		keys: [ 'R' ],
 		description: __( 'Rotate 90° clockwise' ),
+		keyCombination: { character: 'R' },
 	},
 	{
-		keys: [ 'H' ],
 		description: __( 'Flip horizontal' ),
+		keyCombination: { character: 'H' },
 	},
 	{
-		keys: [ 'V' ],
 		description: __( 'Flip vertical' ),
+		keyCombination: { character: 'V' },
+	},
+	{
+		description: __( 'Resize crop (large step)' ),
+		keyCombination: {
+			modifier: 'shift',
+			character: '↑↓←→',
+			ariaLabel: __( 'Shift + Arrow keys' ),
+		},
 	},
 ];
+
+function KeyCombinationDisplay( {
+	keyCombination,
+}: {
+	keyCombination: KeyCombination;
+} ) {
+	const { modifier, character, ariaLabel } = keyCombination;
+
+	const keys: string[] = modifier
+		? displayShortcutList[ modifier ]( character )
+		: [ character ];
+
+	let label: string;
+	if ( ariaLabel ) {
+		label = ariaLabel;
+	} else if ( modifier ) {
+		label = shortcutAriaLabel[ modifier ]( character );
+	} else {
+		label = character;
+	}
+
+	return (
+		<kbd
+			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+			aria-label={ label }
+		>
+			{ keys.map( ( key, index ) =>
+				key === '+' ? (
+					<Fragment key={ index }>{ key }</Fragment>
+				) : (
+					<kbd
+						key={ index }
+						className="media-editor-keyboard-shortcuts-modal__shortcut-key"
+					>
+						{ key }
+					</kbd>
+				)
+			) }
+		</kbd>
+	);
+}
 
 interface MediaEditorKeyboardShortcutsModalProps {
 	onClose: () => void;
@@ -66,7 +139,7 @@ export default function MediaEditorKeyboardShortcutsModal( {
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map( ( { keys, keysAriaLabel, description } ) => (
+				{ SHORTCUTS.map( ( { description, keyCombination } ) => (
 					<li
 						key={ description }
 						className="media-editor-keyboard-shortcuts-modal__shortcut"
@@ -74,19 +147,9 @@ export default function MediaEditorKeyboardShortcutsModal( {
 						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
 							{ description }
 						</span>
-						<kbd
-							className="media-editor-keyboard-shortcuts-modal__shortcut-term"
-							aria-label={ keysAriaLabel }
-						>
-							{ keys.map( ( key ) => (
-								<kbd
-									key={ key }
-									className="media-editor-keyboard-shortcuts-modal__shortcut-key"
-								>
-									{ key }
-								</kbd>
-							) ) }
-						</kbd>
+						<KeyCombinationDisplay
+							keyCombination={ keyCombination }
+						/>
 					</li>
 				) ) }
 			</ul>
