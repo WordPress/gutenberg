@@ -6,6 +6,7 @@
 
 -   Remove CSS overrides targeting `.components-modal__frame` and `[role="document"]` for duplicate template part and duplicate pattern modals, replaced by declarative `modalSize` prop. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 -   Migrate the Quick Edit panel from `@wordpress/components` `Modal` (with custom drawer-like CSS) to the new `@wordpress/ui` `Drawer` primitive. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+-   Migrate the registered-template duplicate dialog in Page Templates from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 
 ## 6.45.0 (2026-04-29)
 
