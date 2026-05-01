@@ -37,7 +37,7 @@ const { BlockCanvasCover } = unlock( privateApis );
 const { retrySyncConnection } = unlock( coreDataPrivateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
-const INITIAL_DISCONNECTED_DEBOUNCE_MS = 20000;
+const INITIAL_DISCONNECTED_DEBOUNCE_MS = 2000;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -239,8 +239,13 @@ export function SyncConnectionErrorModal() {
 							copyButtonRef={ copyButtonRef }
 							manualRetry={ manualRetry }
 							isRetrying={ isRetrying }
-							onEditAnyway={ () =>
-								setView( ModalView.ConfirmOfflineEdit )
+							onEditAnyway={
+								messages.canEditOffline
+									? () =>
+											setView(
+												ModalView.ConfirmOfflineEdit
+											)
+									: undefined
 							}
 						/>
 					) : (

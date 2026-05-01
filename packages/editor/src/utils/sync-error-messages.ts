@@ -15,6 +15,10 @@ export const UNKNOWN_ERROR = 'unknown-error';
 interface ConnectionErrorMessages {
 	description: string;
 	title: string;
+	// Whether to offer the Edit Anyway flow. Reserved for true disconnection
+	// states where local editing is safe; suppressed for errors that imply
+	// active concurrent editors or missing permissions.
+	canEditOffline: boolean;
 }
 
 /**
@@ -27,6 +31,7 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			"Real-time collaboration couldn't verify your permissions. " +
 				'Check that you have access to edit this post or contact your site administrator.'
 		),
+		canEditOffline: false,
 	},
 	[ CONNECTION_EXPIRED ]: {
 		title: __( 'Connection expired' ),
@@ -34,6 +39,7 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'Your connection to real-time collaboration has timed out. ' +
 				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canEditOffline: false,
 	},
 	[ CONNECTION_LIMIT_EXCEEDED ]: {
 		title: __( 'Too many editors connected' ),
@@ -41,6 +47,7 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'Real-time collaboration has reached its connection limit. ' +
 				'Try again later or contact your site administrator.'
 		),
+		canEditOffline: false,
 	},
 	// DOCUMENT_SIZE_LIMIT_EXCEEDED is not included here because it results in
 	// collaboration being disabled entirely.
@@ -50,6 +57,7 @@ const ERROR_MESSAGES: Record< string, ConnectionErrorMessages > = {
 			'The connection to real-time collaboration was interrupted. ' +
 				'Editing is paused to prevent conflicts with other editors.'
 		),
+		canEditOffline: true,
 	},
 };
 

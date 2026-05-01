@@ -684,11 +684,6 @@
 			"count": 2
 		}
 	},
-	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
 	"packages/editor/src/components/template-actions-panel/block-theme-content.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 2

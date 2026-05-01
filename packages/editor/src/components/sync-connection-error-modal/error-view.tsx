@@ -18,7 +18,7 @@ type ErrorViewProps = {
 	copyButtonRef: Ref< HTMLButtonElement >;
 	manualRetry?: () => void;
 	isRetrying: boolean;
-	onEditAnyway: () => void;
+	onEditAnyway?: () => void;
 };
 
 // Body of the sync connection error modal when the user first sees the
@@ -62,13 +62,15 @@ export default function ErrorView( {
 				>
 					{ __( 'Copy Post Content' ) }
 				</Button>
-				<Button
-					__next40pxDefaultSize
-					variant={ manualRetry ? 'secondary' : 'primary' }
-					onClick={ onEditAnyway }
-				>
-					{ __( 'Edit Anyway' ) }
-				</Button>
+				{ onEditAnyway && (
+					<Button
+						__next40pxDefaultSize
+						variant={ manualRetry ? 'secondary' : 'primary' }
+						onClick={ onEditAnyway }
+					>
+						{ __( 'Edit Anyway' ) }
+					</Button>
+				) }
 				{ manualRetry && (
 					<Button
 						__next40pxDefaultSize
