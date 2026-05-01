@@ -7,6 +7,7 @@ import { render, act } from '@testing-library/react';
  * WordPress dependencies
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -54,6 +55,7 @@ afterEach( () => {
 function renderInSuggestMode( ui ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
+	registry.register( coreStore );
 	registry.register( editorStore );
 	registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
 
@@ -64,6 +66,15 @@ function renderInSuggestMode( ui ) {
 	);
 
 	return { registry, ...render( ui, { wrapper } ) };
+}
+
+// Seed a comment record so `getEntityRecord( 'root', 'comment', id )` resolves
+// without an HTTP fetch — mirrors what `useNoteThreads`'s entity query would
+// have populated by the time a suggestion is in flight.
+function seedComment( registry, comment ) {
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( 'root', 'comment', [ comment ] );
 }
 
 // Test harness exposes the overlay API via a render-prop ref so tests can
@@ -278,6 +289,119 @@ describe( 'SuggestionAutoSave', () => {
 					} ),
 				] ),
 			} )
+		);
+	} );
+
+	it( 'creates a fresh suggestion when the linked note has been resolved', async () => {
+		// First create resolves; second create resolves with a different id so
+		// we can assert the overlay's commentId rotated.
+		createSuggestion
+			.mockResolvedValueOnce( { id: 42 } )
+			.mockResolvedValueOnce( { id: 43 } );
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { registry } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		// User A's first edit: bold suggestion. Auto-save creates note 42.
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+
+		// User B accepts note 42 — server flips status to 'approved'. Seed
+		// the resolved comment in the registry so the next sync sees it.
+		seedComment( registry, { id: 42, status: 'approved' } );
+
+		// User A keeps editing the same block (different attribute change).
+		act( () => {
+			overlayHandle.setOverlayAttributes( 'a', {
+				content: 'Hello world',
+			} );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		// The new edit must NOT update the resolved note 42 — it must spawn
+		// a fresh note that coexists with the resolved one.
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		expect( createSuggestion ).toHaveBeenLastCalledWith(
+			expect.objectContaining( {
+				clientId: 'a',
+				operations: expect.arrayContaining( [
+					expect.objectContaining( {
+						attribute: 'content',
+						after: 'Hello world',
+					} ),
+				] ),
+			} )
+		);
+	} );
+
+	it( 'continues to update the linked note while it is still pending', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+		updateSuggestion.mockResolvedValue( { id: 42 } );
+
+		const { registry } = renderInSuggestMode(
+			<>
+				<CaptureOverlay />
+				<SuggestionAutoSave />
+			</>
+		);
+
+		act( () => {
+			overlayHandle.captureBaseline( 'a', 'core/paragraph', {
+				content: 'Hi',
+			} );
+			overlayHandle.setOverlayAttributes( 'a', { content: 'Hello' } );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		// Note exists in the cache but is still pending — same as the
+		// real-world case where the comments query has run but no one has
+		// resolved the note yet.
+		seedComment( registry, { id: 42, status: 'hold' } );
+
+		act( () => {
+			overlayHandle.setOverlayAttributes( 'a', {
+				content: 'Hello world',
+			} );
+		} );
+
+		await act( async () => {
+			jest.advanceTimersByTime( 1500 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( updateSuggestion ).toHaveBeenCalledWith(
+			expect.objectContaining( { commentId: 42 } )
 		);
 	} );
 

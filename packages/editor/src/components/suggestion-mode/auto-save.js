@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -42,6 +43,7 @@ export default function SuggestionAutoSave() {
 	const { entries, setCommentId, setSyncedOpsKey } = useSuggestionOverlay();
 	const { createSuggestion, updateSuggestion, deleteSuggestion } =
 		useSuggestionsProvider();
+	const registry = useRegistry();
 
 	const isSuggestMode = useSelect(
 		( select ) =>
@@ -78,51 +80,72 @@ export default function SuggestionAutoSave() {
 	// during a slow network call.
 	const queuesRef = useRef( new Map() );
 
-	const syncOnce = useCallback( async ( clientId ) => {
-		const entry = entriesRef.current[ clientId ];
-		if ( ! entry ) {
-			return;
-		}
-		const operations = operationsFromOverlay(
-			entry.baselineAttributes,
-			entry.overlayAttributes
-		);
-		const fingerprint = fingerprintOperations( operations );
-		if ( fingerprint === entry.syncedOpsKey ) {
-			return;
-		}
+	const syncOnce = useCallback(
+		async ( clientId ) => {
+			const entry = entriesRef.current[ clientId ];
+			if ( ! entry ) {
+				return;
+			}
+			const operations = operationsFromOverlay(
+				entry.baselineAttributes,
+				entry.overlayAttributes
+			);
+			const fingerprint = fingerprintOperations( operations );
+			if ( fingerprint === entry.syncedOpsKey ) {
+				return;
+			}
 
-		try {
-			if ( operations.length === 0 ) {
-				if ( entry.commentId ) {
-					await deleteRef.current( {
-						commentId: entry.commentId,
-					} );
+			// The overlay's `commentId` reference can outlive the note it
+			// points at: another collaborator may have accepted or rejected
+			// the suggestion mid-session, flipping the comment's status from
+			// `hold` to `approved`. Updating that comment would clobber its
+			// payload (and the resolved status header) with the user's new,
+			// unrelated edit. Treat a resolved link as if there were none so
+			// the next save creates a fresh note that coexists with the
+			// resolved one — this only works because PR #75147 lets a block
+			// hold multiple note ids in `metadata.noteId`.
+			let commentId = entry.commentId;
+			if ( commentId ) {
+				const linkedComment = registry
+					.select( coreStore )
+					.getEntityRecord( 'root', 'comment', commentId );
+				if ( linkedComment && linkedComment.status !== 'hold' ) {
+					commentId = null;
 					setCommentIdRef.current( clientId, null );
 				}
-			} else if ( entry.commentId ) {
-				await updateRef.current( {
-					commentId: entry.commentId,
-					blockName: entry.blockName,
-					operations,
-				} );
-			} else {
-				const saved = await createRef.current( {
-					clientId,
-					blockName: entry.blockName,
-					operations,
-				} );
-				if ( saved?.id ) {
-					setCommentIdRef.current( clientId, saved.id );
-				}
 			}
-			setSyncedOpsKeyRef.current( clientId, fingerprint );
-		} catch {
-			// Error notice is surfaced inside the provider. The next overlay
-			// change will re-enqueue a sync, so transient failures recover
-			// on their own.
-		}
-	}, [] );
+
+			try {
+				if ( operations.length === 0 ) {
+					if ( commentId ) {
+						await deleteRef.current( { commentId } );
+						setCommentIdRef.current( clientId, null );
+					}
+				} else if ( commentId ) {
+					await updateRef.current( {
+						commentId,
+						blockName: entry.blockName,
+						operations,
+					} );
+				} else {
+					const saved = await createRef.current( {
+						clientId,
+						blockName: entry.blockName,
+						operations,
+					} );
+					if ( saved?.id ) {
+						setCommentIdRef.current( clientId, saved.id );
+					}
+				}
+				setSyncedOpsKeyRef.current( clientId, fingerprint );
+			} catch {
+				// Error notice is surfaced inside the provider. The next overlay
+				// change will re-enqueue a sync, so transient failures recover
+				// on their own.
+			}
+		},
+		[ registry ]
+	);
 
 	const enqueueSync = useCallback(
 		( clientId ) => {
