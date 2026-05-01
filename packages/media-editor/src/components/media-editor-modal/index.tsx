@@ -23,7 +23,8 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { close, drawerRight } from '@wordpress/icons';
+import { close, drawerRight, keyboard } from '@wordpress/icons';
+import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
@@ -52,7 +53,9 @@ import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import { buildModifiers } from './build-modifiers';
+import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -159,6 +162,7 @@ function HeaderActions( {
 	onSave,
 }: HeaderActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -166,6 +170,12 @@ function HeaderActions( {
 			expanded={ false }
 			gap={ 2 }
 		>
+			<Button
+				size="compact"
+				icon={ keyboard }
+				label={ __( 'Keyboard shortcuts' ) }
+				onClick={ () => setIsShortcutsModalOpen( true ) }
+			/>
 			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
@@ -194,6 +204,11 @@ function HeaderActions( {
 				disabled={ isSaving }
 				accessibleWhenDisabled
 			/>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
 		</Flex>
 	);
 }
@@ -462,6 +477,33 @@ function MediaEditorModalContent( {
 			isDismissible={ false }
 			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
+				// Undo / Redo — skip when a metadata text field is focused
+				// so the browser's native field undo/redo (Details tab) is
+				// preserved. Inputs inside a crop control wrapper are
+				// intentionally included — the wrapper's data attribute
+				// signals that custom undo/redo should handle them.
+				const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
+				const isRedoShortcut =
+					isKeyboardEvent.primaryShift( event, 'z' ) ||
+					( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
+				if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
+					const target = event.target as HTMLElement;
+					const isMetadataField =
+						( target.tagName === 'INPUT' ||
+							target.tagName === 'TEXTAREA' ||
+							target.isContentEditable ) &&
+						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
+					if ( ! isMetadataField ) {
+						event.preventDefault();
+						if ( isRedoShortcut ) {
+							cropper.redo();
+						} else {
+							cropper.undo();
+						}
+						return;
+					}
+				}
+
 				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
 					return;
 				}
@@ -508,6 +550,13 @@ function MediaEditorModalContent( {
 						</Tabs>
 						<InterfaceSkeleton
 							className="media-editor-modal__skeleton"
+							labels={ {
+								body: isImage
+									? __( 'Image editor' )
+									: __( 'Media preview' ),
+								sidebar: __( 'Media details' ),
+								footer: __( 'Image editing tools' ),
+							} }
 							content={
 								<div className="media-editor-modal__canvas">
 									{ isImage ? (

@@ -160,20 +160,37 @@
 	 * between the chrome and any preceding / following siblings inside
 	 * `.content`. No border — the separator is specific to the pinned
 	 * case.
+	 *
+	 * Each rule is duplicated with `> [data-drawer-content] >` so it
+	 * also fires for `Drawer`, where `Drawer.Content` renders an outer
+	 * wrapper around Base UI's `_Drawer.Content` marker (so the popup-
+	 * edge gutter falls outside `[data-drawer-content]` and stays
+	 * mouse-draggable for swipe-dismiss). The marker is a transparent
+	 * one-level wrapper, so mirroring each direct-child rule one level
+	 * deeper through it preserves the same intent: chrome sitting at
+	 * the scroll body's true visual edge collapses its popup-edge
+	 * padding; chrome wrapped in arbitrary consumer-supplied
+	 * intermediate elements keeps its own padding. `Dialog` and
+	 * `AlertDialog` have no such wrapper, so the `[data-drawer-content]`
+	 * variants never match for them.
 	 */
-	.content > .header {
+	.content > .header,
+	.content > [data-drawer-content] > .header {
 		padding-inline: 0;
 	}
 
-	.content > .header:first-child {
+	.content > .header:first-child,
+	.content > [data-drawer-content] > .header:first-child {
 		padding-block-start: 0;
 	}
 
-	.content > .footer {
+	.content > .footer,
+	.content > [data-drawer-content] > .footer {
 		padding-inline: 0;
 	}
 
-	.content > .footer:last-child {
+	.content > .footer:last-child,
+	.content > [data-drawer-content] > .footer:last-child {
 		padding-block-end: 0;
 	}
 
