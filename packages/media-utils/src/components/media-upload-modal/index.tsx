@@ -466,6 +466,12 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ removeAllNotices, onClose ] );
 
+	useEffect( () => {
+		if ( ! isOpen ) {
+			setQueryParams( defaultQueryParams );
+		}
+	}, [ isOpen ] );
+
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 

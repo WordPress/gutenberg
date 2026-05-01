@@ -44,22 +44,37 @@ jest.mock( '@wordpress/core-data', () => {
 const mockUseEntityRecordsWithPermissions = unlock( coreDataPrivateApis )
 	.useEntityRecordsWithPermissions as jest.Mock;
 
-function renderModal() {
+function renderModal( { isOpen = true } = {} ) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( preferencesStore );
 
+	const onSelect = jest.fn();
+	const onClose = jest.fn();
+
 	const view = render(
 		<RegistryProvider value={ registry }>
 			<MediaUploadModal
-				isOpen
-				onSelect={ jest.fn() }
-				onClose={ jest.fn() }
+				isOpen={ isOpen }
+				onSelect={ onSelect }
+				onClose={ onClose }
 			/>
 		</RegistryProvider>
 	);
 
-	return { ...view, registry };
+	const rerender = ( props: { isOpen: boolean } ) => {
+		view.rerender(
+			<RegistryProvider value={ registry }>
+				<MediaUploadModal
+					{ ...props }
+					onSelect={ onSelect }
+					onClose={ onClose }
+				/>
+			</RegistryProvider>
+		);
+	};
+
+	return { ...view, registry, rerender };
 }
 
 describe( 'MediaUploadModal', () => {
@@ -74,6 +89,39 @@ describe( 'MediaUploadModal', () => {
 
 	afterEach( () => {
 		jest.clearAllMocks();
+	} );
+
+	it( 'resets page and search when the modal is closed and reopened', async () => {
+		const user = userEvent.setup();
+		const { rerender } = renderModal();
+
+		await user.click( screen.getByRole( 'button', { name: 'Next page' } ) );
+
+		await waitFor( () => {
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.objectContaining( { page: 2 } )
+			);
+		} );
+
+		// Close the modal.
+		rerender( { isOpen: false } );
+
+		// Reopen the modal.
+		rerender( { isOpen: true } );
+
+		await waitFor( () => {
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.objectContaining( { page: 1, search: '' } )
+			);
+		} );
 	} );
 
 	it( 'updates the media query when the picker changes page', async () => {
