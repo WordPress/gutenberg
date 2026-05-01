@@ -77,6 +77,8 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
+		wp_deregister_style( 'block-style-variation-styles' );
+
 		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
@@ -260,5 +262,111 @@ class WP_Block_Supports_Block_Style_Variations_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSameSetsWithIndex( $expected, $variation_data, 'Variation data with resolved ref values does not match' );
+	}
+
+	/**
+	 * Tests that block-level feature selectors for Button style variations use the
+	 * generated variation instance class.
+	 */
+	public function test_block_style_variation_support_styles_scope_button_feature_selector() {
+		$filter = function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/button' => array(
+								'variations' => array(
+									'outline' => array(
+										'dimensions' => array(
+											'width' => '25%',
+										),
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_user', $filter );
+		_gutenberg_clean_theme_json_caches();
+
+		$parsed_block = array(
+			'blockName'    => 'core/button',
+			'attrs'        => array(
+				'className' => 'is-style-outline',
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '<div class="wp-block-button is-style-outline"><a class="wp-block-button__link">Text</a></div>',
+			'innerContent' => array(),
+		);
+
+		$parsed_block = gutenberg_render_block_style_variation_support_styles( $parsed_block );
+		$styles       = implode( '', wp_styles()->registered['block-style-variation-styles']->extra['after'] ?? array() );
+
+		remove_filter( 'wp_theme_json_data_user', $filter );
+		_gutenberg_clean_theme_json_caches();
+
+		preg_match( '/is-style-outline--\d+/', $parsed_block['attrs']['className'], $matches );
+		$variation_instance_class = $matches[0] ?? '';
+
+		$this->assertNotEmpty( $variation_instance_class );
+		$this->assertMatchesRegularExpression( "/:root :where\\(\\.wp-block-button\\.$variation_instance_class\\s*\\)\\{width: 25%;\\}/", $styles );
+		$this->assertStringNotContainsString( ':root :where(){', $styles );
+	}
+
+	/**
+	 * Tests that block-level feature selectors for Table style variations use the
+	 * generated variation instance class.
+	 */
+	public function test_block_style_variation_support_styles_scope_table_feature_selector() {
+		$filter = function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/table' => array(
+								'variations' => array(
+									'stripes' => array(
+										'spacing' => array(
+											'padding' => '40px',
+										),
+									),
+								),
+							),
+						),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_user', $filter );
+		_gutenberg_clean_theme_json_caches();
+
+		$parsed_block = array(
+			'blockName'    => 'core/table',
+			'attrs'        => array(
+				'className' => 'is-style-stripes',
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '<figure class="wp-block-table is-style-stripes"><table></table></figure>',
+			'innerContent' => array(),
+		);
+
+		$parsed_block = gutenberg_render_block_style_variation_support_styles( $parsed_block );
+		$styles       = implode( '', wp_styles()->registered['block-style-variation-styles']->extra['after'] ?? array() );
+
+		remove_filter( 'wp_theme_json_data_user', $filter );
+		_gutenberg_clean_theme_json_caches();
+
+		preg_match( '/is-style-stripes--\d+/', $parsed_block['attrs']['className'], $matches );
+		$variation_instance_class = $matches[0] ?? '';
+
+		$this->assertNotEmpty( $variation_instance_class );
+		$this->assertStringContainsString( ":root :where(.wp-block-table.$variation_instance_class){padding: 40px;}", $styles );
+		$this->assertStringNotContainsString( ':root :where(){', $styles );
 	}
 }

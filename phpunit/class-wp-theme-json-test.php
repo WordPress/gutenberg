@@ -4545,6 +4545,47 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( $expected, $actual_styles );
 	}
 
+	public function test_get_styles_for_block_with_table_style_variation_spacing_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/table' => array(
+							'variations' => array(
+								'stripes' => array(
+									'spacing' => array(
+										'padding' => '40px',
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$metadata = array(
+			'name'       => 'core/table',
+			'path'       => array( 'styles', 'blocks', 'core/table' ),
+			'selector'   => '.wp-block-table > table',
+			'selectors'  => array(
+				'spacing' => '.wp-block-table',
+			),
+			'variations' => array(
+				array(
+					'path'     => array( 'styles', 'blocks', 'core/table', 'variations', 'stripes' ),
+					'selector' => '.wp-block-table.is-style-stripes > table',
+				),
+			),
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$expected      = ':root :where(.wp-block-table.is-style-stripes){padding: 40px;}';
+
+		$this->assertSameCSS( $expected, $actual_styles );
+	}
+
 	public function test_get_styles_for_block_with_style_variations_and_block_gap() {
 		register_block_style(
 			'core/group',
