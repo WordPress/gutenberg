@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { Button } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Drawer, VisuallyHidden } from '@wordpress/ui';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -30,13 +29,12 @@ const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
  * the exit animation (so the form keeps rendering while the drawer slides
  * out), and tear down once the drawer is fully closed.
  *
- * @param {Object}   props
- * @param {string}   props.postType      The post type slug.
- * @param {Array}    props.postId        Array of post ids being edited.
- * @param {Function} props.closeModal    Callback to close the drawer.
- * @param {Object}   props.quickEditForm The form definition for Quick Edit.
+ * @param {Object} props
+ * @param {string} props.postType      The post type slug.
+ * @param {Array}  props.postId        Array of post ids being edited.
+ * @param {Object} props.quickEditForm The form definition for Quick Edit.
  */
-function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
+function QuickEditSession( { postType, postId, quickEditForm } ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
@@ -156,21 +154,22 @@ function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 		setLocalEdits( {} );
 	}, [ postId ] );
 
-	const onSave = async () => {
+	// `Drawer.Action` synchronously closes the drawer through Base UI's
+	// `Drawer.Close`, then the save runs in the background. The drawer
+	// dismisses immediately for a more responsive feel; entity-record
+	// failures surface through core-data's standard error notices.
+	const onSave = () => {
 		for ( const id of postId ) {
 			editEntityRecord( 'postType', postType, id, localEdits );
 		}
 
 		if ( isBulk ) {
-			await Promise.allSettled(
-				postId.map( ( id ) =>
-					saveEditedEntityRecord( 'postType', postType, id )
-				)
+			postId.forEach( ( id ) =>
+				saveEditedEntityRecord( 'postType', postType, id )
 			);
 		} else {
-			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
+			saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
-		closeModal();
 	};
 
 	return (
@@ -186,16 +185,12 @@ function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 				) }
 			</Drawer.Content>
 			<Drawer.Footer>
-				<Drawer.Action __next40pxDefaultSize variant="secondary">
+				<Drawer.Action variant="outline">
 					{ __( 'Cancel' ) }
 				</Drawer.Action>
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					onClick={ onSave }
-				>
+				<Drawer.Action onClick={ onSave }>
 					{ __( 'Done' ) }
-				</Button>
+				</Drawer.Action>
 			</Drawer.Footer>
 		</>
 	);
@@ -224,25 +219,37 @@ export function QuickEditModal( {
 			} }
 		>
 			<Drawer.Popup>
-				<VisuallyHidden
-					render={
-						<Drawer.Title>
-							{ isBulk
-								? __( 'Bulk quick edit' )
-								: __( 'Quick edit' ) }
-						</Drawer.Title>
-					}
-				/>
-				<PostCardPanel
-					postType={ postType }
-					postId={ postId }
-					onClose={ closeModal }
-					hideActions
-				/>
+				<Drawer.Header>
+					{ /*
+					 * `PostCardPanel` provides the visible header content
+					 * (post title, icon, bulk-edit hint). Render it inside
+					 * `Drawer.Header` so it gets the popup's pinned-top
+					 * positioning and the scroll-edge separator the
+					 * primitive ships. The `Drawer.Title` lives here too
+					 * — visually hidden because PostCardPanel already
+					 * displays a heading — so the drawer has an explicit
+					 * accessible name (Base UI wires `aria-labelledby`
+					 * automatically).
+					 */ }
+					<VisuallyHidden
+						render={
+							<Drawer.Title>
+								{ isBulk
+									? __( 'Bulk quick edit' )
+									: __( 'Quick edit' ) }
+							</Drawer.Title>
+						}
+					/>
+					<PostCardPanel
+						postType={ postType }
+						postId={ postId }
+						hideActions
+					/>
+					<Drawer.CloseIcon />
+				</Drawer.Header>
 				<QuickEditSession
 					postType={ postType }
 					postId={ postId }
-					closeModal={ closeModal }
 					quickEditForm={ quickEditForm }
 				/>
 			</Drawer.Popup>
