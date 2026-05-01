@@ -13,6 +13,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { EDITOR_STORE_NAME } from './constants';
 import { useSuggestionOverlay } from './overlay-context';
+import {
+	addNoteIdToMetadata,
+	getNoteIdsFromMetadata,
+} from '../collab-sidebar/utils';
 
 /**
  * @typedef {Object} SuggestionOperation
@@ -323,16 +327,18 @@ export function useSuggestionsProvider() {
 				);
 
 				if ( savedRecord?.id ) {
-					// Merge into existing metadata rather than replacing so
-					// other fields like bindings, name, and block identifiers
-					// are preserved.
+					// Append to the noteId array so a fresh suggestion on a
+					// block whose previous note(s) have been applied or
+					// rejected coexists with them rather than overwriting
+					// the link. Other metadata fields like bindings and name
+					// are preserved by `addNoteIdToMetadata`.
 					const existingMeta =
 						selectBlockAttributes( clientId )?.metadata ?? {};
 					updateBlockAttributes( clientId, {
-						metadata: {
-							...existingMeta,
-							noteId: savedRecord.id,
-						},
+						metadata: addNoteIdToMetadata(
+							existingMeta,
+							savedRecord.id
+						),
 					} );
 				}
 
@@ -444,15 +450,18 @@ export function useSuggestionsProvider() {
 			// author reloaded before the save landed — the metadata linkage
 			// won't exist yet and the caller will pass `clientId: undefined`.
 			// Fall back to scanning the live block tree for a block whose
-			// `metadata.noteId` matches the comment id.
+			// `metadata.noteId` includes the comment id (the field is an
+			// array post-#75147 to support multiple notes per block, so use
+			// the shared normalization helper instead of strict equality).
 			let targetClientId = clientId;
 			if ( ! targetClientId ) {
 				const liveIds = selectClientIdsWithDescendants?.() ?? [];
+				const commentIdKey = String( commentId );
 				for ( const id of liveIds ) {
-					if (
-						selectBlockAttributes( id )?.metadata?.noteId ===
-						commentId
-					) {
+					const ids = getNoteIdsFromMetadata(
+						selectBlockAttributes( id )?.metadata
+					);
+					if ( ids.some( ( n ) => String( n ) === commentIdKey ) ) {
 						targetClientId = id;
 						break;
 					}
