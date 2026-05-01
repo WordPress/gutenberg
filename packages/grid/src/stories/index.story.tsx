@@ -9,13 +9,16 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
-import { IconButton, Stack } from '@wordpress/ui';
+import { Icon, IconButton, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { DashboardGrid } from '../grid';
-import type { DashboardGridLayoutItem } from '../types';
+import type {
+	DashboardGridLayoutItem,
+	ResizeHandleRenderProps,
+} from '../types';
 
 const meta: Meta< typeof DashboardGrid > = {
 	title: 'Grid/DashboardGrid',
@@ -658,6 +661,117 @@ export const EditMode: Story = {
 					tone={ previewLayout ? 'warning' : 'success' }
 				/>
 			</Stack>
+		);
+	},
+};
+
+/**
+ * Custom corner-resize glyph: a diagonal line plus a filled triangle,
+ * both leaning toward the bottom-right corner of the tile.
+ */
+const resizeCornerSE = (
+	<svg
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		aria-hidden="true"
+	>
+		<path
+			d="M0 24L24 0"
+			stroke="currentColor"
+			strokeWidth="3"
+			strokeLinecap="round"
+			fill="none"
+		/>
+
+		<polygon points="24,24 10,24 24,10" fill="currentColor" />
+	</svg>
+);
+
+/**
+ * Override the default corner-triangle resize handle with a custom
+ * element via `renderResizeHandle`. The grid keeps the gesture
+ * machinery (dnd-kit context, throttled delta loop) and passes the
+ * wiring (`ref`, `listeners`, `attributes`) to the consumer — so the
+ * custom visual still drives the same resize behavior.
+ */
+function CustomResizeHandle( {
+	ref,
+	listeners,
+	attributes,
+	isResizing,
+}: ResizeHandleRenderProps ) {
+	return (
+		<div
+			ref={ ref }
+			{ ...listeners }
+			{ ...attributes }
+			style={ {
+				position: 'absolute',
+				bottom: 0,
+				insetInlineEnd: 0,
+				display: 'flex',
+				cursor: 'nwse-resize',
+				opacity: isResizing ? 0.5 : 1,
+				transition: 'opacity 120ms ease',
+			} }
+		>
+			<Icon icon={ resizeCornerSE } size={ 16 } />
+		</div>
+	);
+}
+
+export const CustomResizeHandleStory: Story = {
+	name: 'Custom Resize Handle',
+	args: {
+		columns: 6,
+		spacing: 2,
+		rowHeight: 80,
+		editMode: true,
+		layout: [
+			{ key: 'a', width: 2, height: 1 },
+			{ key: 'b', width: 4, height: 1 },
+			{ key: 'c', width: 3, height: 2 },
+			{ key: 'd', width: 3, height: 1 },
+			{ key: 'e', width: 3, height: 1 },
+		],
+	},
+	render: function CustomResizeHandleRender( args ) {
+		const [ layout, setLayout ] = useState< DashboardGridLayoutItem[] >(
+			args.layout
+		);
+
+		const tiles = useMemo(
+			() => [
+				<Tile key="a" tone="brand">
+					A
+				</Tile>,
+				<Tile key="b" tone="info">
+					B
+				</Tile>,
+				<Tile key="c" tone="success">
+					C
+				</Tile>,
+				<Tile key="d" tone="warning">
+					D
+				</Tile>,
+				<Tile key="e" tone="error">
+					E
+				</Tile>,
+			],
+			[]
+		);
+
+		return (
+			<DashboardGrid
+				{ ...args }
+				layout={ layout }
+				onChangeLayout={ setLayout }
+				renderResizeHandle={ ( props ) => (
+					<CustomResizeHandle { ...props } />
+				) }
+			>
+				{ tiles }
+			</DashboardGrid>
 		);
 	},
 };
