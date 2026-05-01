@@ -3,10 +3,11 @@ export type { UseCropperStateReturn } from './use-cropper-state';
 export { useCropGeometry } from './use-crop-geometry';
 export type {
 	UseCropGeometryReturn,
-	CropGeometryApplyOperation,
-	CropGeometryCapabilities,
-	CropGeometryOperation,
-	CropGeometryOptions,
-	CropGeometryRange,
+	CropGeometryInput,
+	CropGeometrySnapshot,
+	CropPixelBounds,
 	CropPixelRect,
+	CropPixelRectValidationResult,
+	CropPixelRectViolation,
+	CropperLayoutGeometry,
 } from './use-crop-geometry';

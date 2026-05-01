@@ -1,72 +1,50 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import {
-	applyCropGeometryOperation,
-	getCropGeometryCapabilities,
-	getCropGeometryRange,
-	getCropGeometrySourceRegion,
-	getCropPixelRect,
-	isCropGeometryReady,
-	type CropGeometryApplyOperation,
-	type CropGeometryCapabilities,
-	type CropGeometryOperation,
-	type CropGeometryOptions,
-	type CropGeometryRange,
+	getCropGeometrySnapshot,
+	type CropGeometryInput,
+	type CropGeometrySnapshot,
+	type CropPixelBounds,
 	type CropPixelRect,
+	type CropPixelRectValidationResult,
+	type CropPixelRectViolation,
+	type CropperLayoutGeometry,
 } from '../../core/crop-geometry';
 import type { SourceRegion } from '../../core/source-region';
 import { useCropperGeometry, useCropper } from '../components/cropper-provider';
 
 export type {
-	CropGeometryApplyOperation,
-	CropGeometryCapabilities,
-	CropGeometryOperation,
-	CropGeometryOptions,
-	CropGeometryRange,
+	CropGeometryInput,
+	CropGeometrySnapshot,
+	CropPixelBounds,
 	CropPixelRect,
+	CropPixelRectValidationResult,
+	CropPixelRectViolation,
+	CropperLayoutGeometry,
 };
 
 export interface UseCropGeometryReturn {
 	isReady: boolean;
 	rect: CropPixelRect | null;
+	bounds: CropPixelBounds | null;
 	sourceRegion: SourceRegion | null;
-	capabilities: CropGeometryCapabilities;
-	getRange: ( operation: CropGeometryOperation ) => CropGeometryRange;
-	applyGeometryOperation: ( operation: CropGeometryApplyOperation ) => void;
+	snapshot: CropGeometrySnapshot | null;
 }
 
-const EMPTY_CAPABILITIES: CropGeometryCapabilities = {
-	canMoveX: false,
-	canMoveY: false,
-	canResizeWidth: false,
-	canResizeHeight: false,
-	hasLockedAspectRatio: false,
-};
-
-const EMPTY_RANGE: CropGeometryRange = {
-	minValue: 0,
-	maxValue: 0,
-	minDelta: 0,
-	maxDelta: 0,
-	canApply: false,
-};
-
 /**
- * Expose current crop geometry and operation-aware constraints to controls,
- * automation, and AI workflows.
+ * Expose the current crop geometry snapshot to controls, automation, and AI
+ * workflows. This hook intentionally reports facts about the current cropper
+ * state; consumers derive operation-specific field behavior themselves.
  *
- * @param options Crop mode options not stored in CropperState.
- * @return Current crop geometry, capabilities, and constrained operations.
+ * @return Current crop geometry, bounds, and source region.
  */
-export function useCropGeometry(
-	options: CropGeometryOptions = {}
-): UseCropGeometryReturn {
+export function useCropGeometry(): UseCropGeometryReturn {
 	const cropper = useCropper();
 	const geometry = useCropperGeometry();
 	const imageSize = useMemo(
@@ -80,64 +58,22 @@ export function useCropGeometry(
 		[ cropper.state.image ]
 	);
 
-	const input = useMemo( () => {
+	const snapshot = useMemo( () => {
 		if ( ! geometry ) {
 			return null;
 		}
-		return {
+		return getCropGeometrySnapshot( {
 			state: cropper.state,
 			imageSize,
 			geometry,
-			freeformCrop: options.freeformCrop,
-			aspectRatio: options.aspectRatio,
-		};
-	}, [
-		cropper.state,
-		geometry,
-		imageSize,
-		options.freeformCrop,
-		options.aspectRatio,
-	] );
-
-	const isReady = !! input && isCropGeometryReady( input );
-	const rect =
-		isReady && input ? getCropPixelRect( input.state, imageSize ) : null;
-	const sourceRegion =
-		isReady && input ? getCropGeometrySourceRegion( input ) : null;
-	const capabilities =
-		isReady && input
-			? getCropGeometryCapabilities( input )
-			: EMPTY_CAPABILITIES;
-
-	const getRange = useCallback(
-		( operation: CropGeometryOperation ): CropGeometryRange => {
-			if ( ! input || ! isCropGeometryReady( input ) ) {
-				return EMPTY_RANGE;
-			}
-			return getCropGeometryRange( input, operation );
-		},
-		[ input ]
-	);
-
-	const applyGeometryOperation = useCallback(
-		( operation: CropGeometryApplyOperation ) => {
-			if ( ! input || ! isCropGeometryReady( input ) ) {
-				return;
-			}
-			const nextRect = applyCropGeometryOperation( input, operation );
-			if ( nextRect ) {
-				cropper.setCropRect( nextRect );
-			}
-		},
-		[ cropper, input ]
-	);
+		} );
+	}, [ cropper.state, geometry, imageSize ] );
 
 	return {
-		isReady,
-		rect,
-		sourceRegion,
-		capabilities,
-		getRange,
-		applyGeometryOperation,
+		isReady: !! snapshot,
+		rect: snapshot?.rect ?? null,
+		bounds: snapshot?.bounds ?? null,
+		sourceRegion: snapshot?.sourceRegion ?? null,
+		snapshot,
 	};
 }

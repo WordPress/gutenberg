@@ -31,43 +31,48 @@ export interface CropPixelRect {
 	bottom: number;
 }
 
-export interface CropGeometryCapabilities {
-	canMoveX: boolean;
-	canMoveY: boolean;
-	canResizeWidth: boolean;
-	canResizeHeight: boolean;
-	hasLockedAspectRatio: boolean;
+/**
+ * Current crop limits expressed in the same snap-rotation pixel space as
+ * `CropPixelRect`.
+ */
+export interface CropPixelBounds {
+	minLeft: number;
+	minTop: number;
+	maxRight: number;
+	maxBottom: number;
+	minWidth: number;
+	minHeight: number;
+	maxWidth: number;
+	maxHeight: number;
 }
 
-export type CropGeometryOperation =
-	| { type: 'move-x' }
-	| { type: 'move-y' }
-	| { type: 'resize-width' }
-	| { type: 'resize-height' };
-
-export interface CropGeometryRange {
-	minValue: number;
-	maxValue: number;
-	minDelta: number;
-	maxDelta: number;
-	canApply: boolean;
-}
-
-export type CropGeometryApplyOperation =
-	| { type: 'move-x'; value: number }
-	| { type: 'move-y'; value: number }
-	| { type: 'resize-width'; value: number }
-	| { type: 'resize-height'; value: number };
-
-export interface CropGeometryOptions {
-	freeformCrop?: boolean;
-	aspectRatio?: number;
-}
-
-export interface CropGeometryInput extends CropGeometryOptions {
+export interface CropGeometryInput {
 	state: CropperState;
 	imageSize: Size;
 	geometry: CropperLayoutGeometry;
+}
+
+export interface CropGeometrySnapshot {
+	rect: CropPixelRect;
+	bounds: CropPixelBounds;
+	sourceRegion: SourceRegion;
+}
+
+export type CropPixelRectViolation =
+	| 'non-finite'
+	| 'left-out-of-bounds'
+	| 'top-out-of-bounds'
+	| 'right-out-of-bounds'
+	| 'bottom-out-of-bounds'
+	| 'width-too-small'
+	| 'width-too-large'
+	| 'height-too-small'
+	| 'height-too-large';
+
+export interface CropPixelRectValidationResult {
+	isValid: boolean;
+	rect: CropPixelRect;
+	violations: CropPixelRectViolation[];
 }
 
 interface SnapGeometry {
@@ -82,6 +87,10 @@ function clamp( value: number, min: number, max: number ): number {
 		return min;
 	}
 	return Math.min( max, Math.max( min, value ) );
+}
+
+function isClose( a: number, b: number ): boolean {
+	return Math.abs( a - b ) < EPSILON;
 }
 
 function getSnapGeometry( state: CropperState, imageSize: Size ): SnapGeometry {
@@ -163,35 +172,19 @@ function pixelHeightToNormalized(
 	return ( height / snap.height ) * state.zoom;
 }
 
-function getNormalizedAspectRatio(
-	aspectRatio: number | undefined,
-	visualSize: Size
-): number | undefined {
-	if (
-		! aspectRatio ||
-		aspectRatio <= 0 ||
-		visualSize.width <= 0 ||
-		visualSize.height <= 0
-	) {
-		return undefined;
-	}
-	return ( aspectRatio * visualSize.height ) / visualSize.width;
-}
-
-function makeRange(
-	minValue: number,
-	maxValue: number,
-	currentValue: number,
-	canApply: boolean
-): CropGeometryRange {
-	const min = Math.min( minValue, maxValue );
-	const max = Math.max( minValue, maxValue );
+function toCropPixelRect( pixels: {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+} ): CropPixelRect {
 	return {
-		minValue: min,
-		maxValue: max,
-		minDelta: min - currentValue,
-		maxDelta: max - currentValue,
-		canApply: canApply && max - min > EPSILON,
+		left: pixels.left,
+		top: pixels.top,
+		width: pixels.width,
+		height: pixels.height,
+		right: pixels.left + pixels.width,
+		bottom: pixels.top + pixels.height,
 	};
 }
 
@@ -208,14 +201,12 @@ export function getCropPixelRect(
 	imageSize: Size
 ): CropPixelRect {
 	if ( imageSize.width === 0 || imageSize.height === 0 ) {
-		return {
+		return toCropPixelRect( {
 			left: 0,
 			top: 0,
 			width: 0,
 			height: 0,
-			right: 0,
-			bottom: 0,
-		};
+		} );
 	}
 	const snap = getSnapGeometry( state, imageSize );
 	const { cropRect } = state;
@@ -224,14 +215,7 @@ export function getCropPixelRect(
 	const width = normalizedWidthToPixel( cropRect.width, state, snap );
 	const height = normalizedHeightToPixel( cropRect.height, state, snap );
 
-	return {
-		left,
-		top,
-		width,
-		height,
-		right: left + width,
-		bottom: top + height,
-	};
+	return toCropPixelRect( { left, top, width, height } );
 }
 
 /**
@@ -247,6 +231,10 @@ export function cropPixelRectToNormalizedRect(
 	state: CropperState,
 	imageSize: Size
 ): NormalizedRect {
+	if ( imageSize.width === 0 || imageSize.height === 0 ) {
+		return { x: 0, y: 0, width: 0, height: 0 };
+	}
+
 	const snap = getSnapGeometry( state, imageSize );
 	return {
 		x: pixelXToNormalized( pixels.left, state, snap ),
@@ -257,10 +245,11 @@ export function cropPixelRectToNormalizedRect(
 }
 
 /**
- * Whether a crop geometry input has enough measured information for ranges.
+ * Whether a crop geometry input has enough measured information for geometry
+ * snapshots and validation bounds.
  *
  * @param input Crop geometry input.
- * @return True when operation geometry can be computed.
+ * @return True when crop geometry can be computed.
  */
 export function isCropGeometryReady( input: CropGeometryInput ): boolean {
 	return (
@@ -277,246 +266,183 @@ export function isCropGeometryReady( input: CropGeometryInput ): boolean {
 }
 
 /**
- * Get the source-region data for AI and external image-processing consumers.
+ * Get the current crop limits in snap-rotation pixel space. These are edge
+ * constraints for a complete crop rectangle; callers may derive field-level
+ * ranges from them according to their own UI semantics.
  *
  * @param input Crop geometry input.
- * @return Source region or null when geometry is not ready.
+ * @return Crop pixel bounds, or null when geometry is not ready.
  */
-export function getCropGeometrySourceRegion(
+export function getCropPixelBounds(
 	input: CropGeometryInput
-): SourceRegion | null {
+): CropPixelBounds | null {
 	if ( ! isCropGeometryReady( input ) ) {
 		return null;
-	}
-	return getSourceRegion( input.state, input.imageSize );
-}
-
-/**
- * Get the allowed value range for a crop geometry operation.
- *
- * @param input     Crop geometry input.
- * @param operation Operation to query.
- * @return Operation range in snap-rotation pixels.
- */
-export function getCropGeometryRange(
-	input: CropGeometryInput,
-	operation: CropGeometryOperation
-): CropGeometryRange {
-	if ( ! isCropGeometryReady( input ) ) {
-		return {
-			minValue: 0,
-			maxValue: 0,
-			minDelta: 0,
-			maxDelta: 0,
-			canApply: false,
-		};
-	}
-
-	const { state, imageSize, freeformCrop } = input;
-
-	if ( operation.type === 'move-x' ) {
-		const bounds = input.geometry.cropBounds as CropBounds;
-		const snap = getSnapGeometry( state, imageSize );
-		const rect = getCropPixelRect( state, imageSize );
-		const cropRect = state.cropRect;
-		const minX = bounds.minX;
-		const maxX = Math.max( minX, bounds.maxX - cropRect.width );
-		return makeRange(
-			normalizedXToPixel( minX, state, snap ),
-			normalizedXToPixel( maxX, state, snap ),
-			rect.left,
-			true
-		);
-	}
-
-	if ( operation.type === 'move-y' ) {
-		const bounds = input.geometry.cropBounds as CropBounds;
-		const snap = getSnapGeometry( state, imageSize );
-		const rect = getCropPixelRect( state, imageSize );
-		const cropRect = state.cropRect;
-		const minY = bounds.minY;
-		const maxY = Math.max( minY, bounds.maxY - cropRect.height );
-		return makeRange(
-			normalizedYToPixel( minY, state, snap ),
-			normalizedYToPixel( maxY, state, snap ),
-			rect.top,
-			true
-		);
-	}
-
-	if ( operation.type === 'resize-width' ) {
-		const rect = getCropPixelRect( state, imageSize );
-		if ( ! freeformCrop ) {
-			return makeRange( rect.width, rect.width, rect.width, false );
-		}
-		const bounds = input.geometry.cropBounds as CropBounds;
-		const snap = getSnapGeometry( state, imageSize );
-		const cropRect = state.cropRect;
-		const normalizedRatio = getNormalizedAspectRatio(
-			input.aspectRatio,
-			input.geometry.visualSize
-		);
-		const centerX = cropRect.x + cropRect.width / 2;
-		const centerY = cropRect.y + cropRect.height / 2;
-		const maxWidthFromX =
-			Math.min( centerX - bounds.minX, bounds.maxX - centerX ) * 2;
-		let minWidth = MIN_CROP_SIZE;
-		let maxWidth = Math.max( 0, maxWidthFromX );
-
-		if ( normalizedRatio ) {
-			const maxHeightFromY =
-				Math.min( centerY - bounds.minY, bounds.maxY - centerY ) * 2;
-			maxWidth = Math.min(
-				maxWidth,
-				Math.max( 0, maxHeightFromY ) * normalizedRatio
-			);
-			minWidth = Math.max( minWidth, MIN_CROP_SIZE * normalizedRatio );
-		}
-
-		minWidth = Math.min( minWidth, maxWidth );
-		return makeRange(
-			normalizedWidthToPixel( minWidth, state, snap ),
-			normalizedWidthToPixel( maxWidth, state, snap ),
-			rect.width,
-			true
-		);
-	}
-
-	const rect = getCropPixelRect( state, imageSize );
-	if ( ! freeformCrop ) {
-		return makeRange( rect.height, rect.height, rect.height, false );
-	}
-	const bounds = input.geometry.cropBounds as CropBounds;
-	const snap = getSnapGeometry( state, imageSize );
-	const cropRect = state.cropRect;
-	const normalizedRatio = getNormalizedAspectRatio(
-		input.aspectRatio,
-		input.geometry.visualSize
-	);
-	const centerX = cropRect.x + cropRect.width / 2;
-	const centerY = cropRect.y + cropRect.height / 2;
-	const maxHeightFromY =
-		Math.min( centerY - bounds.minY, bounds.maxY - centerY ) * 2;
-	let minHeight = MIN_CROP_SIZE;
-	let maxHeight = Math.max( 0, maxHeightFromY );
-
-	if ( normalizedRatio ) {
-		const maxWidthFromX =
-			Math.min( centerX - bounds.minX, bounds.maxX - centerX ) * 2;
-		maxHeight = Math.min(
-			maxHeight,
-			Math.max( 0, maxWidthFromX ) / normalizedRatio
-		);
-		minHeight = Math.max( minHeight, MIN_CROP_SIZE / normalizedRatio );
-	}
-
-	minHeight = Math.min( minHeight, maxHeight );
-	return makeRange(
-		normalizedHeightToPixel( minHeight, state, snap ),
-		normalizedHeightToPixel( maxHeight, state, snap ),
-		rect.height,
-		true
-	);
-}
-
-/**
- * Compute a constrained crop rect for a geometry operation.
- *
- * @param input     Crop geometry input.
- * @param operation Operation to apply.
- * @return Next normalized crop rectangle, or null when unavailable.
- */
-export function applyCropGeometryOperation(
-	input: CropGeometryInput,
-	operation: CropGeometryApplyOperation
-): NormalizedRect | null {
-	if ( ! isCropGeometryReady( input ) ) {
-		return null;
-	}
-
-	const range = getCropGeometryRange( input, { type: operation.type } );
-
-	if ( ! range.canApply ) {
-		return { ...input.state.cropRect };
 	}
 
 	const { state, imageSize } = input;
+	const bounds = input.geometry.cropBounds as CropBounds;
 	const snap = getSnapGeometry( state, imageSize );
-	const cropRect = state.cropRect;
-	const value = clamp( operation.value, range.minValue, range.maxValue );
-
-	if ( operation.type === 'move-x' ) {
-		return {
-			...cropRect,
-			x: pixelXToNormalized( value, state, snap ),
-		};
-	}
-
-	if ( operation.type === 'move-y' ) {
-		return {
-			...cropRect,
-			y: pixelYToNormalized( value, state, snap ),
-		};
-	}
-
-	if ( operation.type === 'resize-width' ) {
-		const normalizedRatio = getNormalizedAspectRatio(
-			input.aspectRatio,
-			input.geometry.visualSize
-		);
-		const centerX = cropRect.x + cropRect.width / 2;
-		const centerY = cropRect.y + cropRect.height / 2;
-		const width = pixelWidthToNormalized( value, state, snap );
-		const height = normalizedRatio
-			? width / normalizedRatio
-			: cropRect.height;
-		return {
-			x: centerX - width / 2,
-			y: normalizedRatio ? centerY - height / 2 : cropRect.y,
-			width,
-			height,
-		};
-	}
-
-	const normalizedRatio = getNormalizedAspectRatio(
-		input.aspectRatio,
-		input.geometry.visualSize
+	const minLeft = normalizedXToPixel( bounds.minX, state, snap );
+	const minTop = normalizedYToPixel( bounds.minY, state, snap );
+	const maxRight = normalizedXToPixel( bounds.maxX, state, snap );
+	const maxBottom = normalizedYToPixel( bounds.maxY, state, snap );
+	const maxWidth = Math.max( 0, maxRight - minLeft );
+	const maxHeight = Math.max( 0, maxBottom - minTop );
+	const minWidth = Math.min(
+		normalizedWidthToPixel( MIN_CROP_SIZE, state, snap ),
+		maxWidth
 	);
-	const centerX = cropRect.x + cropRect.width / 2;
-	const centerY = cropRect.y + cropRect.height / 2;
-	const height = pixelHeightToNormalized( value, state, snap );
-	const width = normalizedRatio ? height * normalizedRatio : cropRect.width;
+	const minHeight = Math.min(
+		normalizedHeightToPixel( MIN_CROP_SIZE, state, snap ),
+		maxHeight
+	);
+
 	return {
-		x: normalizedRatio ? centerX - width / 2 : cropRect.x,
-		y: centerY - height / 2,
-		width,
-		height,
+		minLeft,
+		minTop,
+		maxRight,
+		maxBottom,
+		minWidth,
+		minHeight,
+		maxWidth,
+		maxHeight,
 	};
 }
 
 /**
- * Get operation capabilities for current crop geometry.
+ * Fit a complete crop rectangle inside crop pixel bounds. This is deliberately
+ * rectangle-level logic rather than an operation API: callers decide whether a
+ * width change is left-anchored, center-anchored, aspect-ratio locked, etc.,
+ * then validate the resulting rectangle here.
  *
- * @param input Crop geometry input.
- * @return Operation capability flags.
+ * @param rect   Candidate crop rectangle in snap-rotation pixels.
+ * @param bounds Current crop pixel bounds.
+ * @return Clamped crop rectangle in snap-rotation pixels.
  */
-export function getCropGeometryCapabilities(
-	input: CropGeometryInput
-): CropGeometryCapabilities {
-	const moveX = getCropGeometryRange( input, { type: 'move-x' } );
-	const moveY = getCropGeometryRange( input, { type: 'move-y' } );
-	const resizeWidth = getCropGeometryRange( input, {
-		type: 'resize-width',
-	} );
-	const resizeHeight = getCropGeometryRange( input, {
-		type: 'resize-height',
+export function clampCropPixelRect(
+	rect: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >,
+	bounds: CropPixelBounds
+): CropPixelRect {
+	const fallback = {
+		left: bounds.minLeft,
+		top: bounds.minTop,
+		width: bounds.minWidth,
+		height: bounds.minHeight,
+	};
+	const candidate = {
+		left: Number.isFinite( rect.left ) ? rect.left : fallback.left,
+		top: Number.isFinite( rect.top ) ? rect.top : fallback.top,
+		width: Number.isFinite( rect.width ) ? rect.width : fallback.width,
+		height: Number.isFinite( rect.height ) ? rect.height : fallback.height,
+	};
+	const width = clamp( candidate.width, bounds.minWidth, bounds.maxWidth );
+	const height = clamp(
+		candidate.height,
+		bounds.minHeight,
+		bounds.maxHeight
+	);
+	const left = clamp(
+		candidate.left,
+		bounds.minLeft,
+		bounds.maxRight - width
+	);
+	const top = clamp(
+		candidate.top,
+		bounds.minTop,
+		bounds.maxBottom - height
+	);
+
+	return toCropPixelRect( { left, top, width, height } );
+}
+
+/**
+ * Validate a candidate crop rectangle against current crop pixel bounds.
+ *
+ * @param rect   Candidate crop rectangle in snap-rotation pixels.
+ * @param bounds Current crop pixel bounds.
+ * @return Validation result with a clamped rectangle.
+ */
+export function validateCropPixelRect(
+	rect: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >,
+	bounds: CropPixelBounds
+): CropPixelRectValidationResult {
+	const violations = new Set< CropPixelRectViolation >();
+
+	if (
+		! Number.isFinite( rect.left ) ||
+		! Number.isFinite( rect.top ) ||
+		! Number.isFinite( rect.width ) ||
+		! Number.isFinite( rect.height )
+	) {
+		violations.add( 'non-finite' );
+	}
+
+	const candidate = toCropPixelRect( {
+		left: rect.left,
+		top: rect.top,
+		width: rect.width,
+		height: rect.height,
 	} );
 
+	if ( candidate.left < bounds.minLeft - EPSILON ) {
+		violations.add( 'left-out-of-bounds' );
+	}
+	if ( candidate.top < bounds.minTop - EPSILON ) {
+		violations.add( 'top-out-of-bounds' );
+	}
+	if ( candidate.right > bounds.maxRight + EPSILON ) {
+		violations.add( 'right-out-of-bounds' );
+	}
+	if ( candidate.bottom > bounds.maxBottom + EPSILON ) {
+		violations.add( 'bottom-out-of-bounds' );
+	}
+	if ( candidate.width < bounds.minWidth - EPSILON ) {
+		violations.add( 'width-too-small' );
+	}
+	if ( candidate.width > bounds.maxWidth + EPSILON ) {
+		violations.add( 'width-too-large' );
+	}
+	if ( candidate.height < bounds.minHeight - EPSILON ) {
+		violations.add( 'height-too-small' );
+	}
+	if ( candidate.height > bounds.maxHeight + EPSILON ) {
+		violations.add( 'height-too-large' );
+	}
+
+	const clamped = clampCropPixelRect( rect, bounds );
+	const matchesClamped =
+		isClose( candidate.left, clamped.left ) &&
+		isClose( candidate.top, clamped.top ) &&
+		isClose( candidate.width, clamped.width ) &&
+		isClose( candidate.height, clamped.height );
+
 	return {
-		canMoveX: moveX.canApply,
-		canMoveY: moveY.canApply,
-		canResizeWidth: resizeWidth.canApply,
-		canResizeHeight: resizeHeight.canApply,
-		hasLockedAspectRatio: !! ( input.aspectRatio && input.aspectRatio > 0 ),
+		isValid: violations.size === 0 && matchesClamped,
+		rect: clamped,
+		violations: Array.from( violations ),
+	};
+}
+
+/**
+ * Get current crop geometry and source-region data for controls, automation,
+ * and AI workflows.
+ *
+ * @param input Crop geometry input.
+ * @return Crop geometry snapshot, or null when geometry is not ready.
+ */
+export function getCropGeometrySnapshot(
+	input: CropGeometryInput
+): CropGeometrySnapshot | null {
+	const bounds = getCropPixelBounds( input );
+
+	if ( ! bounds ) {
+		return null;
+	}
+
+	return {
+		rect: getCropPixelRect( input.state, input.imageSize ),
+		bounds,
+		sourceRegion: getSourceRegion( input.state, input.imageSize ),
 	};
 }

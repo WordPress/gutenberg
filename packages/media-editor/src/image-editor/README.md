@@ -106,6 +106,24 @@ Converts crop state to source-pixel coordinates: `{ x, y, width, height, rotatio
 
 Same as `getSourceRegion` but returns percentages (0–100): `{ x, y, width, height }`. Compatible with the WordPress REST API attachments `/edit` endpoint.
 
+### Crop geometry
+
+#### `useCropGeometry(): UseCropGeometryReturn`
+
+Returns the current crop pixel rectangle, crop pixel bounds, and source region once the cropper has loaded image and layout geometry. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
+
+#### `getCropPixelRect( state, imageSize ): CropPixelRect`
+
+Converts `state.cropRect` to snap-rotation pixel coordinates: `{ left, top, width, height, right, bottom }`.
+
+#### `getCropPixelBounds( input ): CropPixelBounds | null`
+
+Returns current crop edge constraints in the same pixel space as `CropPixelRect`. Consumers can derive their own field ranges from these bounds.
+
+#### `validateCropPixelRect( rect, bounds ): CropPixelRectValidationResult`
+
+Checks a complete crop pixel rectangle against current bounds and returns `{ isValid, rect, violations }`, where `rect` is clamped into the valid range.
+
 ### Export
 
 #### `exportCroppedImage( src, state, mimeType?, quality? ): Promise<Blob>`
@@ -149,6 +167,9 @@ Applies a single operation to an existing state.
 | `Flip`                  | `{ horizontal: boolean, vertical: boolean }`                                      |
 | `SourceRegion`          | `{ x, y, width, height, rotation, flip, zoom }` in source pixels                  |
 | `SourceRegionPercent`   | `{ x, y, width, height }` as percentages (0–100)                                  |
+| `CropGeometryInput`     | Cropper state, image size, and measured layout geometry for pure geometry helpers |
+| `CropPixelRect`         | `{ left, top, width, height, right, bottom }` in snap-rotation pixels             |
+| `CropPixelBounds`       | Current edge and size limits in snap-rotation pixels                              |
 | `AspectRatioPreset`     | `{ label: string, value: number }`                                                |
 
 `CropperAction` (the reducer's action union) is internal. Drive state through the named setters on the controller object.

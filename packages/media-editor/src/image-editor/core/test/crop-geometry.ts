@@ -3,9 +3,12 @@
  */
 import { DEFAULT_STATE } from '../constants';
 import {
-	applyCropGeometryOperation,
-	getCropGeometryRange,
+	clampCropPixelRect,
+	cropPixelRectToNormalizedRect,
+	getCropGeometrySnapshot,
+	getCropPixelBounds,
 	getCropPixelRect,
+	validateCropPixelRect,
 	type CropGeometryInput,
 	type CropperLayoutGeometry,
 } from '../crop-geometry';
@@ -40,155 +43,156 @@ function makeInput(
 		} ),
 		imageSize: IMAGE,
 		geometry: GEOMETRY,
-		freeformCrop: true,
 		...overrides,
 	};
 }
 
-describe( 'crop geometry ranges', () => {
-	it( 'computes move-x ranges from the current crop bounds', () => {
-		const range = getCropGeometryRange( makeInput(), { type: 'move-x' } );
+describe( 'crop pixel geometry', () => {
+	it( 'converts cropper state to snap-rotation pixels', () => {
+		const rect = getCropPixelRect( makeInput().state, IMAGE );
 
-		expect( range.minValue ).toBeCloseTo( 0 );
-		expect( range.maxValue ).toBeCloseTo( 600 );
-		expect( range.minDelta ).toBeCloseTo( -200 );
-		expect( range.maxDelta ).toBeCloseTo( 400 );
-		expect( range.canApply ).toBe( true );
+		expect( rect.left ).toBeCloseTo( 200 );
+		expect( rect.top ).toBeCloseTo( 100 );
+		expect( rect.width ).toBeCloseTo( 400 );
+		expect( rect.height ).toBeCloseTo( 200 );
+		expect( rect.right ).toBeCloseTo( 600 );
+		expect( rect.bottom ).toBeCloseTo( 300 );
 	} );
 
-	it( 'computes move-y ranges from the current crop bounds', () => {
-		const range = getCropGeometryRange( makeInput(), { type: 'move-y' } );
+	it( 'round-trips pixel rectangles through normalized cropper space', () => {
+		const state = makeInput().state;
+		const rect = getCropPixelRect( state, IMAGE );
+		const normalized = cropPixelRectToNormalizedRect( rect, state, IMAGE );
 
-		expect( range.minValue ).toBeCloseTo( 0 );
-		expect( range.maxValue ).toBeCloseTo( 300 );
-		expect( range.minDelta ).toBeCloseTo( -100 );
-		expect( range.maxDelta ).toBeCloseTo( 200 );
-		expect( range.canApply ).toBe( true );
+		expect( normalized.x ).toBeCloseTo( state.cropRect.x );
+		expect( normalized.y ).toBeCloseTo( state.cropRect.y );
+		expect( normalized.width ).toBeCloseTo( state.cropRect.width );
+		expect( normalized.height ).toBeCloseTo( state.cropRect.height );
 	} );
 
-	it( 'keeps move-x applicable at a boundary when movement remains possible in the other direction', () => {
-		const input = makeInput( {
-			state: makeState( {
-				cropRect: { x: 0, y: 0.2, width: 0.4, height: 0.4 },
-			} ),
-		} );
-		const range = getCropGeometryRange( input, { type: 'move-x' } );
+	it( 'computes current edge bounds in crop pixels', () => {
+		const bounds = getCropPixelBounds( makeInput() );
 
-		expect( range.minDelta ).toBeCloseTo( 0 );
-		expect( range.maxDelta ).toBeGreaterThan( 0 );
-		expect( range.canApply ).toBe( true );
+		expect( bounds?.minLeft ).toBeCloseTo( 0 );
+		expect( bounds?.minTop ).toBeCloseTo( 0 );
+		expect( bounds?.maxRight ).toBeCloseTo( 1000 );
+		expect( bounds?.maxBottom ).toBeCloseTo( 500 );
+		expect( bounds?.minWidth ).toBeCloseTo( 50 );
+		expect( bounds?.minHeight ).toBeCloseTo( 25 );
+		expect( bounds?.maxWidth ).toBeCloseTo( 1000 );
+		expect( bounds?.maxHeight ).toBeCloseTo( 500 );
 	} );
 
-	it( 'keeps move-x applicable at the max boundary when movement remains possible in the other direction', () => {
-		const input = makeInput( {
-			state: makeState( {
-				cropRect: { x: 0.6, y: 0.2, width: 0.4, height: 0.4 },
-			} ),
+	it( 'returns null bounds before geometry is ready', () => {
+		const bounds = getCropPixelBounds( {
+			...makeInput(),
+			geometry: {
+				...GEOMETRY,
+				cropBounds: undefined,
+			},
 		} );
-		const range = getCropGeometryRange( input, { type: 'move-x' } );
 
-		expect( range.minDelta ).toBeLessThan( 0 );
-		expect( range.maxDelta ).toBeCloseTo( 0 );
-		expect( range.canApply ).toBe( true );
+		expect( bounds ).toBeNull();
 	} );
 
-	it( 'computes center-anchored width ranges without aspect-ratio lock', () => {
-		const range = getCropGeometryRange( makeInput(), {
-			type: 'resize-width',
-		} );
+	it( 'returns a full geometry snapshot when geometry is ready', () => {
+		const snapshot = getCropGeometrySnapshot( makeInput() );
 
-		expect( range.minValue ).toBeCloseTo( 50 );
-		expect( range.maxValue ).toBeCloseTo( 800 );
-		expect( range.minDelta ).toBeCloseTo( -350 );
-		expect( range.maxDelta ).toBeCloseTo( 400 );
-		expect( range.canApply ).toBe( true );
-	} );
-
-	it( 'computes center-anchored height ranges without aspect-ratio lock', () => {
-		const range = getCropGeometryRange( makeInput(), {
-			type: 'resize-height',
-		} );
-
-		expect( range.minValue ).toBeCloseTo( 25 );
-		expect( range.maxValue ).toBeCloseTo( 400 );
-		expect( range.minDelta ).toBeCloseTo( -175 );
-		expect( range.maxDelta ).toBeCloseTo( 200 );
-		expect( range.canApply ).toBe( true );
-	} );
-
-	it( 'constrains center-anchored width ranges by the paired axis when aspect-ratio locked', () => {
-		const input = makeInput( {
-			aspectRatio: 1,
-			state: makeState( {
-				cropRect: { x: 0.2, y: 0.1, width: 0.4, height: 0.8 },
-			} ),
-		} );
-		const range = getCropGeometryRange( input, {
-			type: 'resize-width',
-		} );
-
-		expect( range.minValue ).toBeCloseTo( 50 );
-		expect( range.maxValue ).toBeCloseTo( 500 );
-		expect( range.canApply ).toBe( true );
-	} );
-
-	it( 'constrains center-anchored height ranges by the paired axis when aspect-ratio locked', () => {
-		const input = makeInput( {
-			aspectRatio: 1,
-			state: makeState( {
-				cropRect: { x: 0.2, y: 0.1, width: 0.4, height: 0.8 },
-			} ),
-		} );
-		const range = getCropGeometryRange( input, {
-			type: 'resize-height',
-		} );
-
-		expect( range.minValue ).toBeCloseTo( 50 );
-		expect( range.maxValue ).toBeCloseTo( 500 );
-		expect( range.canApply ).toBe( true );
-	} );
-
-	it( 'disables resize ranges when freeform crop is off', () => {
-		const input = makeInput( { freeformCrop: false } );
-		const range = getCropGeometryRange( input, {
-			type: 'resize-width',
-		} );
-
-		expect( range.minValue ).toBeCloseTo( 400 );
-		expect( range.maxValue ).toBeCloseTo( 400 );
-		expect( range.canApply ).toBe( false );
+		expect( snapshot?.rect.left ).toBeCloseTo( 200 );
+		expect( snapshot?.bounds.maxRight ).toBeCloseTo( 1000 );
+		expect( snapshot?.sourceRegion.width ).toBeCloseTo( 400 );
 	} );
 } );
 
-describe( 'applyCropGeometryOperation', () => {
-	it( 'clamps out-of-range move values before applying them', () => {
-		const input = makeInput();
-		const nextRect = applyCropGeometryOperation( input, {
-			type: 'move-x',
-			value: -999,
-		} );
+describe( 'validateCropPixelRect', () => {
+	const bounds = getCropPixelBounds( makeInput() )!;
 
-		expect( nextRect?.x ).toBeCloseTo( 0 );
-		expect( nextRect?.width ).toBeCloseTo( input.state.cropRect.width );
+	it( 'accepts rectangles within the current bounds', () => {
+		const result = validateCropPixelRect(
+			{ left: 100, top: 50, width: 400, height: 200 },
+			bounds
+		);
+
+		expect( result.isValid ).toBe( true );
+		expect( result.rect ).toEqual( {
+			left: 100,
+			top: 50,
+			width: 400,
+			height: 200,
+			right: 500,
+			bottom: 250,
+		} );
+		expect( result.violations ).toEqual( [] );
 	} );
 
-	it( 'applies center-anchored resize while preserving aspect ratio', () => {
-		const input = makeInput( {
-			aspectRatio: 1,
-			state: makeState( {
-				cropRect: { x: 0.2, y: 0.1, width: 0.4, height: 0.8 },
-			} ),
-		} );
-		const nextRect = applyCropGeometryOperation( input, {
-			type: 'resize-width',
-			value: 500,
-		} );
-		const nextState = { ...input.state, cropRect: nextRect! };
-		const pixels = getCropPixelRect( nextState, IMAGE );
+	it( 'reports and clamps rectangles outside the current bounds', () => {
+		const result = validateCropPixelRect(
+			{ left: -20, top: 10, width: 1200, height: 600 },
+			bounds
+		);
 
-		expect( pixels.width ).toBeCloseTo( 500 );
-		expect( pixels.height ).toBeCloseTo( 500 );
-		expect( nextRect?.x + nextRect!.width / 2 ).toBeCloseTo( 0.4 );
-		expect( nextRect?.y + nextRect!.height / 2 ).toBeCloseTo( 0.5 );
+		expect( result.isValid ).toBe( false );
+		expect( result.violations ).toEqual(
+			expect.arrayContaining( [
+				'left-out-of-bounds',
+				'right-out-of-bounds',
+				'bottom-out-of-bounds',
+				'width-too-large',
+				'height-too-large',
+			] )
+		);
+		expect( result.rect ).toEqual( {
+			left: 0,
+			top: 0,
+			width: 1000,
+			height: 500,
+			right: 1000,
+			bottom: 500,
+		} );
+	} );
+
+	it( 'reports and clamps rectangles smaller than the stencil minimum', () => {
+		const result = validateCropPixelRect(
+			{ left: 100, top: 50, width: 10, height: 10 },
+			bounds
+		);
+
+		expect( result.isValid ).toBe( false );
+		expect( result.violations ).toEqual(
+			expect.arrayContaining( [ 'width-too-small', 'height-too-small' ] )
+		);
+		expect( result.rect.width ).toBeCloseTo( bounds.minWidth );
+		expect( result.rect.height ).toBeCloseTo( bounds.minHeight );
+	} );
+
+	it( 'sanitizes non-finite values while reporting them', () => {
+		const result = validateCropPixelRect(
+			{ left: Number.NaN, top: 10, width: 100, height: Infinity },
+			bounds
+		);
+
+		expect( result.isValid ).toBe( false );
+		expect( result.violations ).toContain( 'non-finite' );
+		expect( result.rect.left ).toBe( bounds.minLeft );
+		expect( result.rect.height ).toBe( bounds.minHeight );
+	} );
+} );
+
+describe( 'clampCropPixelRect', () => {
+	it( 'fits a rectangle into the current bounds', () => {
+		const bounds = getCropPixelBounds( makeInput() )!;
+		const rect = clampCropPixelRect(
+			{ left: 900, top: 450, width: 200, height: 100 },
+			bounds
+		);
+
+		expect( rect ).toEqual( {
+			left: 800,
+			top: 400,
+			width: 200,
+			height: 100,
+			right: 1000,
+			bottom: 500,
+		} );
 	} );
 } );

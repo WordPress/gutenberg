@@ -16,9 +16,12 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import {
+	cropPixelRectToNormalizedRect,
 	useCropGeometry,
-	type CropGeometryRange,
-	type CropGeometryApplyOperation,
+	useCropper,
+	validateCropPixelRect,
+	type CropPixelBounds,
+	type CropPixelRect,
 } from '../../image-editor';
 
 interface CropAdvancedPanelProps {
@@ -27,24 +30,92 @@ interface CropAdvancedPanelProps {
 	onPlacementControlInteraction?: () => void;
 }
 
+interface CropInputRange {
+	minValue: number;
+	maxValue: number;
+	canApply: boolean;
+}
+
 interface CropInputProps {
 	label: string;
 	'aria-label'?: string;
 	value: number;
-	range: CropGeometryRange;
+	range: CropInputRange;
 	disabled?: boolean;
 	onCommit: ( value: number ) => void;
 }
 
+const EPSILON = 1e-9;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
 
-function getInputBounds( value: number, range: CropGeometryRange ) {
+function makeRange(
+	minValue: number,
+	maxValue: number,
+	canApply = true
+): CropInputRange {
+	const max = Math.max( minValue, maxValue );
+	return {
+		minValue,
+		maxValue: max,
+		canApply: canApply && max - minValue > EPSILON,
+	};
+}
+
+function getInputBounds( value: number, range: CropInputRange ) {
 	const rounded = Math.round( value );
 	return {
 		value: rounded,
 		min: Math.min( rounded, Math.floor( range.minValue ) ),
 		max: Math.max( rounded, Math.ceil( range.maxValue ) ),
 	};
+}
+
+function getWidthRange(
+	rect: CropPixelRect,
+	bounds: CropPixelBounds,
+	aspectRatio: number | undefined,
+	freeformCrop: boolean
+): CropInputRange {
+	if ( ! freeformCrop ) {
+		return makeRange( rect.width, rect.width, false );
+	}
+
+	let minWidth = bounds.minWidth;
+	let maxWidth = bounds.maxRight - rect.left;
+
+	if ( aspectRatio && aspectRatio > 0 ) {
+		minWidth = Math.max( minWidth, bounds.minHeight * aspectRatio );
+		maxWidth = Math.min(
+			maxWidth,
+			( bounds.maxBottom - rect.top ) * aspectRatio
+		);
+	}
+
+	return makeRange( minWidth, maxWidth );
+}
+
+function getHeightRange(
+	rect: CropPixelRect,
+	bounds: CropPixelBounds,
+	aspectRatio: number | undefined,
+	freeformCrop: boolean
+): CropInputRange {
+	if ( ! freeformCrop ) {
+		return makeRange( rect.height, rect.height, false );
+	}
+
+	let minHeight = bounds.minHeight;
+	let maxHeight = bounds.maxBottom - rect.top;
+
+	if ( aspectRatio && aspectRatio > 0 ) {
+		minHeight = Math.max( minHeight, bounds.minWidth / aspectRatio );
+		maxHeight = Math.min(
+			maxHeight,
+			( bounds.maxRight - rect.left ) / aspectRatio
+		);
+	}
+
+	return makeRange( minHeight, maxHeight );
 }
 
 // Shows a live draft while the user types, then snaps to the committed
@@ -127,22 +198,66 @@ export default function CropAdvancedPanel( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
-	const { isReady, rect, capabilities, getRange, applyGeometryOperation } =
-		useCropGeometry( { aspectRatio, freeformCrop } );
+	const { state, setCropRect } = useCropper();
+	const { isReady, rect, bounds } = useCropGeometry();
 
-	if ( ! isReady || ! rect ) {
+	if ( ! isReady || ! rect || ! bounds || ! state.image ) {
 		return null;
 	}
 
-	const commitOperation = ( operation: CropGeometryApplyOperation ) => {
-		applyGeometryOperation( operation );
+	const imageSize = {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
+	};
+
+	const commitRect = (
+		candidate: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >
+	) => {
+		const { rect: clampedRect } = validateCropPixelRect(
+			candidate,
+			bounds
+		);
+		setCropRect(
+			cropPixelRectToNormalizedRect( clampedRect, state, imageSize )
+		);
 		onPlacementControlInteraction?.();
 	};
 
-	const leftRange = getRange( { type: 'move-x' } );
-	const topRange = getRange( { type: 'move-y' } );
-	const widthRange = getRange( { type: 'resize-width' } );
-	const heightRange = getRange( { type: 'resize-height' } );
+	const handleApply =
+		( field: 'left' | 'top' | 'width' | 'height' ) => ( value: number ) => {
+			const candidate = {
+				left: rect.left,
+				top: rect.top,
+				width: rect.width,
+				height: rect.height,
+			};
+
+			if ( field === 'width' ) {
+				candidate.width = value;
+				if ( aspectRatio && aspectRatio > 0 ) {
+					candidate.height = Math.max( 1, value / aspectRatio );
+				}
+			} else if ( field === 'height' ) {
+				candidate.height = value;
+				if ( aspectRatio && aspectRatio > 0 ) {
+					candidate.width = Math.max( 1, value * aspectRatio );
+				}
+			} else {
+				candidate[ field ] = value;
+			}
+
+			commitRect( candidate );
+		};
+
+	const leftRange = makeRange( bounds.minLeft, bounds.maxRight - rect.width );
+	const topRange = makeRange( bounds.minTop, bounds.maxBottom - rect.height );
+	const widthRange = getWidthRange( rect, bounds, aspectRatio, freeformCrop );
+	const heightRange = getHeightRange(
+		rect,
+		bounds,
+		aspectRatio,
+		freeformCrop
+	);
 
 	return (
 		<PanelBody
@@ -158,10 +273,8 @@ export default function CropAdvancedPanel( {
 							aria-label={ __( 'Crop left position' ) }
 							value={ rect.left }
 							range={ leftRange }
-							disabled={ ! capabilities.canMoveX }
-							onCommit={ ( value ) =>
-								commitOperation( { type: 'move-x', value } )
-							}
+							disabled={ ! leftRange.canApply }
+							onCommit={ handleApply( 'left' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -170,10 +283,8 @@ export default function CropAdvancedPanel( {
 							aria-label={ __( 'Crop top position' ) }
 							value={ rect.top }
 							range={ topRange }
-							disabled={ ! capabilities.canMoveY }
-							onCommit={ ( value ) =>
-								commitOperation( { type: 'move-y', value } )
-							}
+							disabled={ ! topRange.canApply }
+							onCommit={ handleApply( 'top' ) }
 						/>
 					</FlexItem>
 				</Flex>
@@ -183,13 +294,8 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Width' ) }
 							value={ rect.width }
 							range={ widthRange }
-							disabled={ ! capabilities.canResizeWidth }
-							onCommit={ ( value ) =>
-								commitOperation( {
-									type: 'resize-width',
-									value,
-								} )
-							}
+							disabled={ ! widthRange.canApply }
+							onCommit={ handleApply( 'width' ) }
 						/>
 					</FlexItem>
 					<FlexItem isBlock>
@@ -197,13 +303,8 @@ export default function CropAdvancedPanel( {
 							label={ __( 'Height' ) }
 							value={ rect.height }
 							range={ heightRange }
-							disabled={ ! capabilities.canResizeHeight }
-							onCommit={ ( value ) =>
-								commitOperation( {
-									type: 'resize-height',
-									value,
-								} )
-							}
+							disabled={ ! heightRange.canApply }
+							onCommit={ handleApply( 'height' ) }
 						/>
 					</FlexItem>
 				</Flex>
