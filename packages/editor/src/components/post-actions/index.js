@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
 	Button,
-	Modal,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, VisuallyHidden } from '@wordpress/ui';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -21,8 +22,6 @@ import { usePostActions } from './actions';
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
-	const [ activeModalAction, setActiveModalAction ] = useState( null );
-
 	const { item, permissions } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, getEntityRecordPermissions } =
@@ -55,36 +54,26 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 	}, [ allActions, itemWithPermissions ] );
 
 	return (
-		<>
-			<Menu placement="bottom-end">
-				<Menu.TriggerButton
-					render={
-						<Button
-							size="small"
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-							disabled={ ! actions.length }
-							accessibleWhenDisabled
-							className="editor-all-actions-button"
-						/>
-					}
-				/>
-				<Menu.Popover>
-					<ActionsDropdownMenuGroup
-						actions={ actions }
-						items={ [ itemWithPermissions ] }
-						setActiveModalAction={ setActiveModalAction }
+		<Menu placement="bottom-end">
+			<Menu.TriggerButton
+				render={
+					<Button
+						size="small"
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						disabled={ ! actions.length }
+						accessibleWhenDisabled
+						className="editor-all-actions-button"
 					/>
-				</Menu.Popover>
-			</Menu>
-			{ !! activeModalAction && (
-				<ActionModal
-					action={ activeModalAction }
+				}
+			/>
+			<Menu.Popover>
+				<ActionsDropdownMenuGroup
+					actions={ actions }
 					items={ [ itemWithPermissions ] }
-					closeModal={ () => setActiveModalAction( null ) }
 				/>
-			) }
-		</>
+			</Menu.Popover>
+		</Menu>
 	);
 }
 
@@ -103,39 +92,92 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 	);
 }
 
-export function ActionModal( { action, items, closeModal } ) {
+// Wraps a single modal action as a menu item that opens the action's
+// dialog. Owns the dialog's open state locally so each modal action is
+// self-contained: the surrounding parent doesn't need a "which action is
+// active" piece of state. Mirrors `ModalActionMenuItem` in
+// `@wordpress/dataviews`.
+function ModalActionMenuItem( { action, items } ) {
+	const [ open, setOpen ] = useState( false );
+	const closeModal = useCallback( () => setOpen( false ), [] );
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Modal
-			title={ action.modalHeader || label }
-			__experimentalHideHeader={ !! action.hideModalHeader }
-			onRequestClose={ closeModal ?? ( () => {} ) }
-			focusOnMount="firstContentElement"
-			size="medium"
-			overlayClassName={ `editor-action-modal editor-action-modal__${ kebabCase(
-				action.id
-			) }` }
+		<Dialog.Root
+			open={ open }
+			onOpenChange={ setOpen }
+			disablePointerDismissal={ action.hideModalHeader }
 		>
-			<action.RenderModal items={ items } closeModal={ closeModal } />
-		</Modal>
+			<Menu.Item render={ <Dialog.Trigger /> }>
+				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+			</Menu.Item>
+			<ActionModal
+				action={ action }
+				items={ items }
+				closeModal={ closeModal }
+			/>
+		</Dialog.Root>
 	);
 }
 
-function ActionsDropdownMenuGroup( { actions, items, setActiveModalAction } ) {
+// Renders the popup half of a post-actions modal. Must be wrapped in a
+// `<Dialog.Root>` that owns the open lifecycle (paired with
+// `<Dialog.Trigger>` at the call site, e.g. `ModalActionMenuItem`).
+export function ActionModal( { action, items, closeModal } ) {
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
+	const title = modalHeader || label;
+	return (
+		<Dialog.Popup
+			size="medium"
+			className={ `editor-action-modal editor-action-modal__${ kebabCase(
+				action.id
+			) }` }
+			portal={ <Dialog.Portal className="editor-action-modal__portal" /> }
+			{ ...( action.hideModalHeader && {
+				role: 'alertdialog',
+			} ) }
+		>
+			{ action.hideModalHeader ? (
+				<VisuallyHidden
+					render={ <Dialog.Title>{ title }</Dialog.Title> }
+				/>
+			) : (
+				<Dialog.Header>
+					<Dialog.Title>{ title }</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+			) }
+			<Dialog.Content>
+				<action.RenderModal items={ items } closeModal={ closeModal } />
+			</Dialog.Content>
+		</Dialog.Popup>
+	);
+}
+
+function ActionsDropdownMenuGroup( { actions, items } ) {
 	const registry = useRegistry();
 	return (
 		<Menu.Group>
 			{ actions.map( ( action ) => {
+				if ( 'RenderModal' in action ) {
+					return (
+						<ModalActionMenuItem
+							key={ action.id }
+							action={ action }
+							items={ items }
+						/>
+					);
+				}
 				return (
 					<DropdownMenuItemTrigger
 						key={ action.id }
 						action={ action }
 						onClick={ () => {
-							if ( 'RenderModal' in action ) {
-								setActiveModalAction( action );
-								return;
-							}
 							action.callback( items, { registry } );
 						} }
 						items={ items }
