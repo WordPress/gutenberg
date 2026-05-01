@@ -3,7 +3,20 @@
  */
 import { __ } from '@wordpress/i18n';
 import { check, chevronDown } from '@wordpress/icons';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 /**
  * State control for managing viewport and pseudo-state styles.
@@ -47,65 +60,114 @@ export default function StateControl( {
 
 	const hasViewportOptions = viewportStates.length > 0;
 	const hasPseudoStateOptions = pseudoStates.length > 0;
-	const triggerLabel = __( 'Properties' );
+	const triggerLabel = __( 'States' );
+	const activeStates = [];
+
+	if ( hasViewportOptions && viewportValue !== 'default' ) {
+		const selectedViewport = viewportOptions.find(
+			( option ) => option.value === viewportValue
+		);
+
+		if ( selectedViewport ) {
+			activeStates.push( {
+				key: `viewport-${ selectedViewport.value }`,
+				label: selectedViewport.label,
+			} );
+		}
+	}
+
+	if ( hasPseudoStateOptions && pseudoStateValue !== 'default' ) {
+		const selectedPseudoState = pseudoStateOptions.find(
+			( option ) => option.value === pseudoStateValue
+		);
+
+		if ( selectedPseudoState ) {
+			activeStates.push( {
+				key: `pseudo-${ selectedPseudoState.value }`,
+				label: selectedPseudoState.label,
+			} );
+		}
+	}
 
 	return (
-		<DropdownMenu
-			icon={ chevronDown }
-			label={ triggerLabel }
-			text={ triggerLabel }
-			toggleProps={ {
-				size: 'compact',
-				variant: 'tertiary',
-				iconPosition: 'right',
-			} }
+		<Stack
+			direction="column"
+			gap="sm"
+			align="flex-end"
+			className="block-editor-global-styles-state-control"
 		>
-			{ ( { onClose } ) => (
-				<>
-					{ hasViewportOptions && (
-						<MenuGroup label={ __( 'Viewport' ) }>
-							{ viewportOptions.map( ( option ) => (
-								<MenuItem
-									key={ `viewport-${ option.value }` }
-									onClick={ () => {
-										onChangeViewport?.( option.value );
-										if ( ! hasPseudoStateOptions ) {
-											onClose();
+			<DropdownMenu
+				icon={ chevronDown }
+				label={ triggerLabel }
+				text={ triggerLabel }
+				toggleProps={ {
+					size: 'compact',
+					variant: 'tertiary',
+					iconPosition: 'right',
+				} }
+			>
+				{ ( { onClose } ) => (
+					<>
+						{ hasViewportOptions && (
+							<MenuGroup label={ __( 'Viewport' ) }>
+								{ viewportOptions.map( ( option ) => (
+									<MenuItem
+										key={ `viewport-${ option.value }` }
+										onClick={ () => {
+											onChangeViewport?.( option.value );
+											if ( ! hasPseudoStateOptions ) {
+												onClose();
+											}
+										} }
+										icon={
+											viewportValue === option.value
+												? check
+												: null
 										}
-									} }
-									icon={
-										viewportValue === option.value
-											? check
-											: null
-									}
-								>
-									{ option.label }
-								</MenuItem>
-							) ) }
-						</MenuGroup>
-					) }
-					{ hasPseudoStateOptions && (
-						<MenuGroup label={ __( 'Pseudo state' ) }>
-							{ pseudoStateOptions.map( ( option ) => (
-								<MenuItem
-									key={ `pseudo-${ option.value }` }
-									onClick={ () => {
-										onChangePseudoState?.( option.value );
-										onClose();
-									} }
-									icon={
-										pseudoStateValue === option.value
-											? check
-											: null
-									}
-								>
-									{ option.label }
-								</MenuItem>
-							) ) }
-						</MenuGroup>
-					) }
-				</>
-			) }
-		</DropdownMenu>
+									>
+										{ option.label }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						) }
+						{ hasPseudoStateOptions && (
+							<MenuGroup label={ __( 'Pseudo state' ) }>
+								{ pseudoStateOptions.map( ( option ) => (
+									<MenuItem
+										key={ `pseudo-${ option.value }` }
+										onClick={ () => {
+											onChangePseudoState?.(
+												option.value
+											);
+											onClose();
+										} }
+										icon={
+											pseudoStateValue === option.value
+												? check
+												: null
+										}
+									>
+										{ option.label }
+									</MenuItem>
+								) ) }
+							</MenuGroup>
+						) }
+					</>
+				) }
+			</DropdownMenu>
+			<Stack
+				className="block-editor-global-styles-state-control__badges"
+				direction="row"
+				justify="flex-start"
+				gap="xs"
+				wrap="wrap"
+			>
+				{ activeStates.map( ( activeState ) => (
+					<WCBadge key={ activeState.key } intent="info">
+						{ activeState.label }
+					</WCBadge>
+				) ) }
+			</Stack>
+		</Stack>
 	);
 }

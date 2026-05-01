@@ -51,7 +51,7 @@ export function ScreenHeader( {
 			<View>
 				<Spacer marginBottom={ 0 } paddingX={ 4 } paddingY={ 3 }>
 					<VStack spacing={ 2 }>
-						<HStack spacing={ 2 }>
+						<HStack spacing={ 2 } alignment="top">
 							<Navigator.BackButton
 								icon={ isRTL() ? chevronRight : chevronLeft }
 								size="small"
@@ -59,10 +59,7 @@ export function ScreenHeader( {
 								onClick={ onBack }
 							/>
 							<Spacer>
-								<HStack
-									justify="space-between"
-									alignment="center"
-								>
+								<HStack justify="space-between" alignment="top">
 									<Heading
 										className="global-styles-ui-header"
 										level={ 2 }
