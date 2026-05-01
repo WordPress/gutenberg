@@ -6,7 +6,6 @@ import deepMerge from 'deepmerge';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Dialog } from '@wordpress/ui';
@@ -36,13 +35,11 @@ function PanelModalSession< Item >( {
 	field,
 	onChange,
 	fieldLabel,
-	onClose,
 	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( data: Partial< Item > ) => void;
-	onClose: () => void;
 	fieldLabel: string;
 	touched: boolean;
 } ) {
@@ -82,11 +79,6 @@ function PanelModalSession< Item >( {
 		},
 	} ) );
 	const { validity } = useFormValidity( modalData, fieldsAsFieldType, form );
-
-	const onApply = () => {
-		onChange( changes );
-		onClose();
-	};
 
 	const handleOnChange = ( newValue: Partial< Item > ) => {
 		setChanges( ( prev ) =>
@@ -139,20 +131,22 @@ function PanelModalSession< Item >( {
 				</DataFormLayout>
 			</Dialog.Content>
 			<Dialog.Footer>
-				<Button
-					variant="tertiary"
-					onClick={ onClose }
-					__next40pxDefaultSize
-				>
-					{ cancelLabel }
-				</Button>
-				<Button
-					variant="primary"
-					onClick={ onApply }
-					__next40pxDefaultSize
-				>
+				{ /*
+				 * Cancel: a propless `Dialog.Action` is enough — it closes
+				 * via the dialog primitive, and `setTouched` runs through
+				 * the parent's `onOpenChange` callback as a side effect of
+				 * the close.
+				 */ }
+				<Dialog.Action variant="outline">{ cancelLabel }</Dialog.Action>
+				{ /*
+				 * Apply: the `onClick` runs synchronously before Base UI
+				 * fires the close, so `onChange( changes )` lands first;
+				 * then the dialog closes and `onOpenChange` flips
+				 * `setTouched` in the parent.
+				 */ }
+				<Dialog.Action onClick={ () => onChange( changes ) }>
 					{ applyLabel }
-				</Button>
+				</Dialog.Action>
 			</Dialog.Footer>
 		</Dialog.Popup>
 	);
@@ -181,11 +175,6 @@ function PanelModal< Item >( {
 		return null;
 	}
 
-	const handleClose = () => {
-		setIsOpen( false );
-		setTouched( true );
-	};
-
 	return (
 		<>
 			<SummaryButton
@@ -202,8 +191,13 @@ function PanelModal< Item >( {
 			<Dialog.Root
 				open={ isOpen }
 				onOpenChange={ ( open ) => {
+					setIsOpen( open );
 					if ( ! open ) {
-						handleClose();
+						// Mark the field as "touched" once the dialog has
+						// been opened and dismissed at least once, so
+						// validation messages on the summary trigger the
+						// next time the user opens it.
+						setTouched( true );
 					}
 				} }
 				onOpenChangeComplete={ ( open ) => {
@@ -218,7 +212,6 @@ function PanelModal< Item >( {
 					field={ field }
 					onChange={ onChange }
 					fieldLabel={ fieldLabel ?? '' }
-					onClose={ handleClose }
 					touched={ touched }
 				/>
 			</Dialog.Root>
