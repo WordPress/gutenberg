@@ -9,6 +9,10 @@
 	"textdomain": "default",
 	"allowedBlocks": [ "core/slider-pagination" ],
 	"attributes": {
+		"slidesToShow": {
+			"type": "integer",
+			"default": 1
+		},
 		"loop": {
 			"type": "boolean",
 			"default": true
@@ -16,6 +20,7 @@
 	},
 	"supports": {
 		"align": true,
+		"ariaLabel": true,
 		"html": false,
 		"interactivity": true,
 		"layout": {

@@ -32,12 +32,31 @@ const debouncedUpdates = new WeakMap();
 const touchStartData = new WeakMap();
 const touchHandlers = new WeakMap();
 
-function clampIndex( index, totalSlides ) {
+function normalizeSlidesToShow( slidesToShow, totalSlides ) {
+	const parsedSlidesToShow = Number.parseInt( slidesToShow, 10 );
+
+	if ( Number.isNaN( parsedSlidesToShow ) ) {
+		return 1;
+	}
+
+	return Math.min(
+		Math.max( 1, parsedSlidesToShow ),
+		Math.max( 1, totalSlides )
+	);
+}
+
+function getMaxStartIndex( totalSlides, slidesToShow ) {
+	return Math.max( 0, totalSlides - slidesToShow );
+}
+
+function clampIndex( index, totalSlides, slidesToShow ) {
 	if ( totalSlides <= 0 ) {
 		return 0;
 	}
 
-	return Math.max( 0, Math.min( index, totalSlides - 1 ) );
+	const maxStartIndex = getMaxStartIndex( totalSlides, slidesToShow );
+
+	return Math.max( 0, Math.min( index, maxStartIndex ) );
 }
 
 function getSlideLabel( index, totalSlides ) {
@@ -53,13 +72,17 @@ function getSlides( track ) {
 	);
 }
 
-function updateSlideInert( slides, currentIndex ) {
+function updateSlideInert( slides, currentIndex, slidesToShow ) {
 	const hasPaginationInSlides = slides.some( ( slide ) =>
 		slide.querySelector( '.wp-block-slider-pagination' )
 	);
+	const lastVisibleIndex = currentIndex + slidesToShow - 1;
 
 	slides.forEach( ( slide, index ) => {
-		if ( hasPaginationInSlides || index === currentIndex ) {
+		if (
+			hasPaginationInSlides ||
+			( index >= currentIndex && index <= lastVisibleIndex )
+		) {
 			slide.removeAttribute( 'inert' );
 		} else {
 			slide.setAttribute( 'inert', '' );
@@ -67,15 +90,9 @@ function updateSlideInert( slides, currentIndex ) {
 	} );
 }
 
-function getDirectSlidesTrack( slider ) {
-	return Array.from( slider?.children ?? [] ).find( ( child ) =>
-		child.classList.contains( 'wp-block-slider-track' )
-	);
-}
-
 function getSliderElements( ref ) {
 	const slider = ref.closest( '.wp-block-slider' );
-	const track = getDirectSlidesTrack( slider );
+	const track = slider?.querySelector( '.wp-block-slider-track' ) ?? null;
 
 	if ( ! slider || ! track ) {
 		return {
@@ -99,10 +116,15 @@ function scrollToSlide( ref, index ) {
 	}
 
 	const context = getContext();
-	const nextIndex = clampIndex( index, slides.length );
+	const visibleSlides = normalizeSlidesToShow(
+		context.slidesToShow,
+		slides.length
+	);
+	const nextIndex = clampIndex( index, slides.length, visibleSlides );
 	context.currentIndex = nextIndex;
 	context.totalSlides = slides.length;
-	updateSlideInert( slides, nextIndex );
+	context.slidesToShow = visibleSlides;
+	updateSlideInert( slides, nextIndex, visibleSlides );
 
 	/*
 	 * Use getBoundingClientRect() to compute the scrollTo target so the same
@@ -147,11 +169,20 @@ function moveSlide( ref, direction ) {
 	}
 
 	const context = getContext();
+	const visibleSlides = normalizeSlidesToShow(
+		context.slidesToShow,
+		slides.length
+	);
+	const maxStartIndex = getMaxStartIndex( slides.length, visibleSlides );
 
 	// Read ground-truth index directly from the DOM scroll position so that
 	// a drag/swipe that settled visually but hasn't yet updated context is
 	// accounted for before we compute the next index.
-	const domIndex = getClosestSlideIndex( track, slides );
+	const domIndex = clampIndex(
+		getClosestSlideIndex( track, slides ),
+		slides.length,
+		visibleSlides
+	);
 	if ( domIndex !== context.currentIndex ) {
 		context.currentIndex = domIndex;
 	}
@@ -159,9 +190,9 @@ function moveSlide( ref, direction ) {
 	let nextIndex = context.currentIndex + direction;
 
 	if ( nextIndex < 0 ) {
-		nextIndex = context.loop ? slides.length - 1 : 0;
-	} else if ( nextIndex > slides.length - 1 ) {
-		nextIndex = context.loop ? 0 : slides.length - 1;
+		nextIndex = context.loop ? maxStartIndex : 0;
+	} else if ( nextIndex > maxStartIndex ) {
+		nextIndex = context.loop ? 0 : maxStartIndex;
 	}
 
 	scrollToSlide( ref, nextIndex );
@@ -205,12 +236,21 @@ function getDebouncedUpdate( trackElement ) {
 			if ( slides.length === 0 ) {
 				return;
 			}
+			const visibleSlides = normalizeSlidesToShow(
+				context.slidesToShow,
+				slides.length
+			);
 
-			const currentIndex = getClosestSlideIndex( ref, slides );
+			const currentIndex = clampIndex(
+				getClosestSlideIndex( ref, slides ),
+				slides.length,
+				visibleSlides
+			);
 
 			context.currentIndex = currentIndex;
 			context.totalSlides = slides.length;
-			updateSlideInert( slides, currentIndex );
+			context.slidesToShow = visibleSlides;
+			updateSlideInert( slides, currentIndex, visibleSlides );
 		}, 150 );
 		debouncedUpdates.set( trackElement, debouncedFn );
 	}
@@ -221,25 +261,48 @@ store( 'core/slider', {
 	state: {
 		get isAtStart() {
 			const context = getContext();
+			const slidesToShow = normalizeSlidesToShow(
+				context.slidesToShow,
+				context.totalSlides
+			);
+			const maxStartIndex = getMaxStartIndex(
+				context.totalSlides,
+				slidesToShow
+			);
 			return (
-				context.totalSlides <= 1 ||
+				maxStartIndex === 0 ||
 				( ! context.loop && context.currentIndex === 0 )
 			);
 		},
 		get isAtEnd() {
 			const context = getContext();
+			const slidesToShow = normalizeSlidesToShow(
+				context.slidesToShow,
+				context.totalSlides
+			);
+			const maxStartIndex = getMaxStartIndex(
+				context.totalSlides,
+				slidesToShow
+			);
 			return (
-				context.totalSlides <= 1 ||
-				( ! context.loop &&
-					context.currentIndex >= context.totalSlides - 1 )
+				maxStartIndex === 0 ||
+				( ! context.loop && context.currentIndex >= maxStartIndex )
 			);
 		},
 		get ariaLive() {
 			return getContext().hasFocus ? 'polite' : 'off';
 		},
 		get dots() {
-			const { totalSlides } = getContext();
-			return Array.from( { length: totalSlides }, ( _, i ) => i );
+			const { totalSlides, slidesToShow } = getContext();
+			const normalizedSlidesToShow = normalizeSlidesToShow(
+				slidesToShow,
+				totalSlides
+			);
+			const maxStartIndex = getMaxStartIndex(
+				totalSlides,
+				normalizedSlidesToShow
+			);
+			return Array.from( { length: maxStartIndex + 1 }, ( _, i ) => i );
 		},
 		get isDotActive() {
 			const { item, currentIndex } = getContext();
@@ -298,11 +361,20 @@ store( 'core/slider', {
 			// Update totalSlides from actual DOM (in case it differs from PHP count)
 			const slides = getSlides( ref );
 			context.totalSlides = slides.length;
-			context.currentIndex = clampIndex(
-				context.currentIndex,
+			context.slidesToShow = normalizeSlidesToShow(
+				context.slidesToShow,
 				context.totalSlides
 			);
-			updateSlideInert( slides, context.currentIndex );
+			context.currentIndex = clampIndex(
+				context.currentIndex,
+				context.totalSlides,
+				context.slidesToShow
+			);
+			updateSlideInert(
+				slides,
+				context.currentIndex,
+				context.slidesToShow
+			);
 
 			// Clean up previous touch listeners if initTrack runs again.
 			const prev = touchHandlers.get( ref );

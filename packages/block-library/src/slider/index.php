@@ -31,9 +31,13 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$slides_to_show = isset( $attributes['slidesToShow'] ) ? (int) $attributes['slidesToShow'] : 1;
+	$slides_to_show = max( 1, min( $slides_to_show, $slide_count ) );
+
 	$context = array(
 		'currentIndex' => 0,
 		'totalSlides'  => $slide_count,
+		'slidesToShow' => $slides_to_show,
 		'hasFocus'     => false,
 		'loop'         => isset( $attributes['loop'] ) ? (bool) $attributes['loop'] : true,
 	);
@@ -46,15 +50,18 @@ function render_block_core_slider( $attributes, $content, $block ) {
 		)
 	);
 
+	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Slider' );
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'data-wp-interactive'  => 'core/slider',
 			'data-wp-context'      => wp_json_encode( $context ),
 			'data-wp-on--focusin'  => 'actions.handleFocusIn',
 			'data-wp-on--focusout' => 'actions.handleFocusOut',
+			'style'                => "--wp--slider-slides-to-show: {$slides_to_show}",
 			'role'                 => 'region',
 			'aria-roledescription' => 'carousel',
-			'aria-label'           => __( 'Slider' ),
+			'aria-label'           => $aria_label,
 		)
 	);
 

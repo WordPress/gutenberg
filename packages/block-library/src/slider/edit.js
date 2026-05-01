@@ -5,9 +5,11 @@ import {
 	useBlockProps,
 	useInnerBlocksProps,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { PanelBody, ToggleControl } from '@wordpress/components';
+import { PanelBody, ToggleControl, RangeControl } from '@wordpress/components';
 
 const SLIDER_TEMPLATE = [
 	[ 'core/slider-pagination' ],
@@ -71,10 +73,47 @@ const SLIDER_TEMPLATE = [
 	],
 ];
 
-function SliderEdit( { attributes, setAttributes } ) {
-	const { loop } = attributes;
+function normalizeSlidesToShow( slidesToShow, maxSlidesToShow = Infinity ) {
+	const parsedSlidesToShow = Number.parseInt( slidesToShow, 10 );
 
-	const blockProps = useBlockProps();
+	if ( Number.isNaN( parsedSlidesToShow ) ) {
+		return 1;
+	}
+
+	return Math.min( maxSlidesToShow, Math.max( 1, parsedSlidesToShow ) );
+}
+
+function SliderEdit( { attributes, setAttributes, clientId } ) {
+	const totalSlides = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const sliderChildren = getBlocks( clientId );
+			const trackBlock = sliderChildren.find(
+				( childBlock ) => childBlock.name === 'core/slider-track'
+			);
+
+			if ( ! trackBlock ) {
+				return 0;
+			}
+
+			return trackBlock.innerBlocks.filter(
+				( innerBlock ) => innerBlock.name === 'core/slide'
+			).length;
+		},
+		[ clientId ]
+	);
+	const maxSlidesToShow = Math.max( 1, totalSlides );
+	const { loop, slidesToShow } = attributes;
+	const normalizedSlidesToShow = normalizeSlidesToShow(
+		slidesToShow,
+		maxSlidesToShow
+	);
+
+	const blockProps = useBlockProps( {
+		style: {
+			'--wp--slider-slides-to-show': normalizedSlidesToShow,
+		},
+	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		template: SLIDER_TEMPLATE,
@@ -83,7 +122,27 @@ function SliderEdit( { attributes, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Loop' ) }>
+				<PanelBody title={ __( 'Slider settings' ) }>
+					<RangeControl
+						__next40pxDefaultSize
+						label={ __( 'Slides to show' ) }
+						help={ __(
+							'Number of slides visible at the same time.'
+						) }
+						value={ normalizedSlidesToShow }
+						min={ 1 }
+						max={ maxSlidesToShow }
+						step={ 1 }
+						withInputField
+						onChange={ ( value ) =>
+							setAttributes( {
+								slidesToShow: normalizeSlidesToShow(
+									value,
+									maxSlidesToShow
+								),
+							} )
+						}
+					/>
 					<ToggleControl
 						label={ __( 'Loop' ) }
 						help={ __( 'Loop back to the first or last slide.' ) }

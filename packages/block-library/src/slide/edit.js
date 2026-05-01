@@ -24,7 +24,7 @@ function SlideEdit( { clientId, isSelected } ) {
 					hasSelectedInnerBlock,
 				} = select( blockEditorStore );
 
-				// Get the slider-track parent
+				// Get the slider-track parent.
 				const trackClientId = getBlockRootClientId( clientId );
 
 				return {
@@ -33,7 +33,7 @@ function SlideEdit( { clientId, isSelected } ) {
 						clientId,
 						true
 					),
-					// Check if any slide in the track is selected (not controls)
+					// Check if any slide in the track is selected (not controls).
 					trackHasSelectedInnerBlock: hasSelectedInnerBlock(
 						trackClientId,
 						true
@@ -54,7 +54,6 @@ function SlideEdit( { clientId, isSelected } ) {
 		className: clsx( 'wp-block-slide', {
 			'is-selected-slide': isSelectedSlide,
 		} ),
-		hidden: ! isSelectedSlide,
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {

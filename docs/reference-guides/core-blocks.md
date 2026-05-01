@@ -977,8 +977,8 @@ Display content in a scrolling slider. ([Source](https://github.com/WordPress/gu
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/slider-pagination
--	**Supports:** align, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
--	**Attributes:** loop
+-	**Supports:** align, ariaLabel, color (background, gradients, ~~text~~), interactivity, layout (allowOrientation, default, ~~allowJustification~~), spacing (margin, padding), ~~html~~
+-	**Attributes:** loop, slidesToShow
 
 ## Slider Pagination
 
