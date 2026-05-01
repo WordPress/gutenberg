@@ -99,7 +99,7 @@ export default function MediaEditorCropPanel( {
 
 	return (
 		<Stack direction="column" gap="md">
-			<VisuallyHidden render={ <h3 /> }>
+			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
 			<div role="presentation" { ...zoomGestureHandlers }>
