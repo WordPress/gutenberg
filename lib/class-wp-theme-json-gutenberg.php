@@ -3163,7 +3163,6 @@ class WP_Theme_JSON_Gutenberg {
 							'selector'    => $selector,
 							'selectors'   => $feature_selectors,
 							'elements'    => $selectors[ $name ]['elements'] ?? array(),
-							'duotone'     => $duotone_selector,
 							'variations'  => $variation_selectors,
 							'css'         => $selector,
 						);
@@ -3216,7 +3215,6 @@ class WP_Theme_JSON_Gutenberg {
 										'selector'    => static::append_to_selector( $selector, $pseudo_selector ),
 										'selectors'   => $pseudo_feature_selectors,
 										'elements'    => $selectors[ $name ]['elements'] ?? array(),
-										'duotone'     => $duotone_selector,
 										'variations'  => $variation_selectors,
 										'css'         => static::append_to_selector( $selector, $pseudo_selector ),
 									);
