@@ -48,21 +48,7 @@ import {
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
-/**
- * A block selection object.
- *
- * @typedef {Object} WPBlockSelection
- *
- * @property {string} clientId     A block client ID.
- * @property {string} attributeKey A block attribute key.
- * @property {number} offset       An attribute value offset, based on the rich
- *                                 text value. See `wp.richText.create`.
- *
- * This type is duplicated to avoid creating circular dependencies.
- * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
- * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
- * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
- */
+/** @typedef {import('./types').WPBlockSelection} WPBlockSelection */
 
 // Module constants.
 const MILLISECONDS_PER_HOUR = 3600 * 1000;

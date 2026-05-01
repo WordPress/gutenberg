@@ -1250,21 +1250,7 @@ export const isEditorPanelOpened = createRegistrySelector(
 	}
 );
 
-/**
- * A block selection object.
- *
- * @typedef {Object} WPBlockSelection
- *
- * @property {string} clientId     A block client ID.
- * @property {string} attributeKey A block attribute key.
- * @property {number} offset       An attribute value offset, based on the rich
- *                                 text value. See `wp.richText.create`.
- *
- * This type is duplicated to avoid creating circular dependencies.
- * @see {import("@wordpress/block-editor/src/store/actions").WPBlockSelection}
- * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
- * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
- */
+/** @typedef {import('@wordpress/block-editor/src/store/types').WPBlockSelection} WPBlockSelection */
 
 /**
  * Returns the current selection start.

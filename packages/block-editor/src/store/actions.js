@@ -85,30 +85,7 @@ export const validateBlocksToTemplate =
 		}
 	};
 
-/**
- * A block selection object.
- *
- * @typedef {Object} WPBlockSelection
- *
- * @property {string} clientId     A block client ID.
- * @property {string} attributeKey A block attribute key.
- * @property {number} offset       An attribute value offset, based on the rich
- *                                 text value. See `wp.richText.create`.
- *
- * This type is duplicated to avoid creating circular dependencies.
- * @see {import("@wordpress/core-data/src/types").WPBlockSelection}
- * @see {import("@wordpress/block-editor/src/store/selectors").WPBlockSelection}
- * @see {import("@wordpress/editor/src/store/selectors").WPBlockSelection}
- */
-
-/**
- * A selection object.
- *
- * @typedef {Object} WPSelection
- *
- * @property {WPBlockSelection} start The selection start.
- * @property {WPBlockSelection} end   The selection end.
- */
+/** @typedef {import('./types').WPBlockSelection} WPBlockSelection */
 
 /**
  * Returns an action object used in signalling that selection state should be
@@ -1532,7 +1509,7 @@ export function exitFormattedText() {
 /**
  * Action that changes the position of the user caret.
  *
- * @param {string|WPSelection} clientId     The selected block client ID.
+ * @param {string|{start: WPBlockSelection, end: WPBlockSelection}} clientId     The selected block client ID.
  * @param {string}             attributeKey The selected block attribute key.
  * @param {number}             startOffset  The start offset.
  * @param {number}             endOffset    The end offset.
