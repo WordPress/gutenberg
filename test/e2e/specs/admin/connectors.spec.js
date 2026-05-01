@@ -53,7 +53,7 @@ test.describe( 'Connectors', () => {
 		);
 	} );
 
-	test( 'should display default providers with install buttons', async ( {
+	test( 'should display default providers with setup buttons', async ( {
 		page,
 		admin,
 	} ) => {
@@ -66,7 +66,7 @@ test.describe( 'Connectors', () => {
 		} );
 		await expect( pageTitle ).toBeVisible();
 
-		// Verify each connector card shows name as heading, description, and Install button.
+		// Verify each connector card shows name as heading, description, and Set up button.
 		for ( const { slug, name, description } of CONNECTORS ) {
 			const card = page.locator( `.connector-item--${ slug }` );
 			await expect( card ).toBeVisible();
@@ -86,9 +86,9 @@ test.describe( 'Connectors', () => {
 				headingId
 			);
 
-			const button = card.getByRole( 'button', { name: 'Install' } );
+			const button = card.getByRole( 'button', { name: 'Set up' } );
 			await expect( button ).toBeVisible();
-			// Install button should not have aria-expanded.
+			// Set up button should not have aria-expanded until expanded.
 			await expect( button ).not.toHaveAttribute( 'aria-expanded' );
 		}
 
@@ -457,12 +457,36 @@ test.describe( 'Connectors', () => {
 
 	test.describe( 'Connectors page capability checks', () => {
 		const PLUGIN_SLUG = 'gutenberg-test-connectors-capability-restriction';
+		const installRequiredConnector = {
+			slug: 'gutenberg-test-connectors-never-installed',
+			name: 'Test Install Required Connector',
+			action: 'Install',
+		};
+		const activateRequiredConnector = {
+			slug: 'hello',
+			name: 'Test Activate Required Connector',
+			action: 'Activate',
+		};
+		const clearCapabilityRestriction = async ( requestUtils ) => {
+			await requestUtils.rest( {
+				path: '/wp/v2/settings',
+				method: 'POST',
+				data: {
+					gutenberg_test_cap_restriction: '',
+				},
+			} );
+		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin( PLUGIN_SLUG );
 		} );
 
+		test.afterEach( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
+		} );
+
 		test.afterAll( async ( { requestUtils } ) => {
+			await clearCapabilityRestriction( requestUtils );
 			await requestUtils.deactivatePlugin( PLUGIN_SLUG );
 		} );
 
@@ -477,7 +501,7 @@ test.describe( 'Connectors', () => {
 		];
 
 		capabilities.forEach( ( [ restriction, label ] ) => {
-			test( `should show "Not available" when ${ label }`, async ( {
+			test( `should show unavailable connector actions when ${ label }`, async ( {
 				page,
 				admin,
 				requestUtils,
@@ -495,23 +519,23 @@ test.describe( 'Connectors', () => {
 					CONNECTORS_PAGE_QUERY
 				);
 
-				// AI plugin callout banner should be hidden when user lacks permissions.
-				await expect(
-					page.locator( '.ai-plugin-callout' )
-				).toBeHidden();
-
-				for ( const { slug } of CONNECTORS ) {
+				for ( const { slug, name, action } of [
+					installRequiredConnector,
+					activateRequiredConnector,
+				] ) {
 					const card = page.locator( `.connector-item--${ slug }` );
 					await expect( card ).toBeVisible();
+					await expect(
+						card.getByRole( 'heading', { name, level: 2 } )
+					).toBeVisible();
 					await expect(
 						card.getByText( 'Not available' )
 					).toBeVisible();
 					await expect(
-						card.getByRole( 'button', { name: 'Install' } )
+						card.getByRole( 'button', { name: action } )
 					).toBeHidden();
 				}
 
-				// Plugin directory link should be hidden.
 				await expect(
 					page.getByRole( 'link', {
 						name: 'search the plugin directory',
