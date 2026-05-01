@@ -174,4 +174,6 @@ export interface StencilProps {
 	};
 	/** Called when Escape is pressed on a resize handle. */
 	onEscape?: () => void;
+	/** Called when any resize handle gains (true) or loses (false) hover or keyboard focus. */
+	onHandleActiveChange?: ( isActive: boolean ) => void;
 }
