@@ -2,7 +2,13 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import type { KeyboardEvent, MouseEvent, TouchEvent, FocusEvent } from 'react';
+import type {
+	KeyboardEvent,
+	MouseEvent,
+	TouchEvent,
+	FocusEvent,
+	ReactNode,
+} from 'react';
 
 /**
  * WordPress dependencies
@@ -12,6 +18,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce, useInstanceId, usePrevious } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -70,10 +77,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		__experimentalRenderItem,
 		__experimentalExpandOnFocus = false,
 		__experimentalValidateInput = () => true,
-		__experimentalShowHowTo = true,
+		__experimentalShowHowTo,
 		__next40pxDefaultSize = false,
 		__experimentalAutoSelectFirstMatch = false,
 		tokenizeOnBlur = false,
+		help,
 	} = useDeprecated36pxDefaultSizeProp< FormTokenFieldProps >( props );
 
 	maybeWarnDeprecated36pxSize( {
@@ -81,6 +89,27 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 		size: undefined,
 		__next40pxDefaultSize,
 	} );
+
+	const defaultHelp = tokenizeOnSpace
+		? __( 'Separate with commas, spaces, or the Enter key.' )
+		: __( 'Separate with commas or the Enter key.' );
+
+	let computedHelp: ReactNode = help !== undefined ? help : defaultHelp;
+
+	if ( typeof __experimentalShowHowTo === 'boolean' ) {
+		deprecated(
+			'`__experimentalShowHowTo` prop in wp.components.FormTokenField',
+			{
+				since: '7.1',
+				alternative: '`help` prop',
+				hint: 'The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.',
+			}
+		);
+
+		if ( __experimentalShowHowTo === false && help === undefined ) {
+			computedHelp = '';
+		}
+	}
 
 	const instanceId = useInstanceId( FormTokenField );
 
@@ -655,6 +684,10 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	}
 
 	function renderInput() {
+		const describedById = computedHelp
+			? `components-form-token-input-${ instanceId }__help`
+			: undefined;
+
 		const inputProps = {
 			instanceId,
 			autoCapitalize,
@@ -665,6 +698,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			onBlur,
 			isExpanded,
 			selectedSuggestionIndex,
+			'aria-describedby': describedById,
 		};
 
 		return (
@@ -749,16 +783,12 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 					/>
 				) }
 			</div>
-			{ __experimentalShowHowTo && (
+			{ computedHelp && (
 				<StyledHelp
-					id={ `components-form-token-suggestions-howto-${ instanceId }` }
+					id={ `components-form-token-input-${ instanceId }__help` }
 					className="components-form-token-field__help"
 				>
-					{ tokenizeOnSpace
-						? __(
-								'Separate with commas, spaces, or the Enter key.'
-						  )
-						: __( 'Separate with commas or the Enter key.' ) }
+					{ computedHelp }
 				</StyledHelp>
 			) }
 		</div>

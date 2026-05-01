@@ -2,6 +2,16 @@
 /**
  * Adds media-related functionality for client-side media processing.
  *
+ * This file is structured in two tiers:
+ *
+ * 1. HEIC infrastructure — loaded whenever the feature filter is enabled.
+ *    Browsers like Safari can decode HEIC via createImageBitmap() even
+ *    without VIPS/SharedArrayBuffer, so HEIC MIME types, the custom REST
+ *    controller, and REST field/index registrations are always needed.
+ *
+ * 2. Full VIPS/WASM processing — loaded only when the feature filter is
+ *    enabled AND requires cross-origin isolation (DIP) at runtime.
+ *
  * @package gutenberg
  */
 
@@ -14,97 +24,26 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
-/**
- * Sets a global JS variable to indicate that client-side media processing is enabled.
- */
-function gutenberg_set_client_side_media_processing_flag() {
-	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
-		return;
-	}
-	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-}
-add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
+// ── Tier 1: HEIC infrastructure (always loaded) ─────────────────────
 
 /**
- * Returns a list of all available image sizes.
+ * Registers HEIC/HEIF as allowed upload MIME types.
  *
- * @return array Existing image sizes.
- */
-function gutenberg_get_all_image_sizes(): array {
-	$sizes = wp_get_registered_image_subsizes();
-
-	foreach ( $sizes as $name => &$size ) {
-		$size['height'] = (int) $size['height'];
-		$size['width']  = (int) $size['width'];
-		$size['name']   = $name;
-	}
-	unset( $size );
-
-	return $sizes;
-}
-
-/**
- * Returns the default output format mapping for the supported image formats.
+ * HEIC images can be decoded in the browser (via canvas/VideoDecoder).
+ * Registering these MIME types ensures the file picker's accept attribute
+ * includes them, preventing macOS from silently converting HEIC to JPEG
+ * on selection.
  *
- * @return array<string,string> Map of input formats to output formats.
+ * @param array $mimes Allowed MIME types (extension => type).
+ * @return array Modified MIME types.
  */
-function gutenberg_get_default_image_output_formats() {
-	$input_formats = array(
-		'image/jpeg',
-		'image/png',
-		'image/gif',
-		'image/webp',
-		'image/avif',
-		'image/heic',
-	);
-
-	$output_formats = array();
-
-	foreach ( $input_formats as $mime_type ) {
-		/** This filter is documented in wp-includes/media.php */
-		$output_formats = apply_filters(
-			'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-			$output_formats,
-			'',
-			$mime_type
-		);
-	}
-
-	return $output_formats;
+function gutenberg_add_heic_upload_mimes( array $mimes ): array {
+	$mimes['heic'] = 'image/heic';
+	$mimes['heif'] = 'image/heif';
+	return $mimes;
 }
 
-/**
- * Filters the REST API root index data to add custom settings.
- *
- * @param WP_REST_Response $response Response data.
- */
-function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
-	/** This filter is documented in wp-admin/includes/images.php */
-	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
-	$default_image_output_formats = gutenberg_get_default_image_output_formats();
-
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$jpeg_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/jpeg' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$png_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/png' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-	/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
-	$gif_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/gif' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-
-	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold'] = $image_size_threshold;
-		$response->data['image_output_formats'] = (object) $default_image_output_formats;
-		$response->data['jpeg_interlaced']      = $jpeg_interlaced;
-		$response->data['png_interlaced']       = $png_interlaced;
-		$response->data['gif_interlaced']       = $gif_interlaced;
-	}
-
-	return $response;
-}
-
-add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
-
+add_filter( 'upload_mimes', 'gutenberg_add_heic_upload_mimes' );
 
 /**
  * Overrides the REST controller for the attachment post type.
@@ -124,7 +63,6 @@ function gutenberg_filter_attachment_post_type_args( array $args, string $post_t
 }
 
 add_filter( 'register_post_type_args', 'gutenberg_filter_attachment_post_type_args', 10, 2 );
-
 
 /**
  * Registers additional REST fields for attachments.
@@ -205,6 +143,103 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
 
 	return null;
 }
+
+/**
+ * Returns a list of all available image sizes.
+ *
+ * @return array Existing image sizes.
+ */
+function gutenberg_get_all_image_sizes(): array {
+	$sizes = wp_get_registered_image_subsizes();
+
+	foreach ( $sizes as $name => &$size ) {
+		$size['height'] = (int) $size['height'];
+		$size['width']  = (int) $size['width'];
+		$size['name']   = $name;
+	}
+	unset( $size );
+
+	return $sizes;
+}
+
+/**
+ * Filters the REST API root index data to add custom settings.
+ *
+ * @param WP_REST_Response $response Response data.
+ */
+function gutenberg_media_processing_filter_rest_index( WP_REST_Response $response ) {
+	/** This filter is documented in wp-admin/includes/images.php */
+	$image_size_threshold = (int) apply_filters( 'big_image_size_threshold', 2560, array( 0, 0 ), '', 0 ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+	if ( current_user_can( 'upload_files' ) ) {
+		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold'] = $image_size_threshold;
+	}
+
+	return $response;
+}
+
+add_filter( 'rest_index', 'gutenberg_media_processing_filter_rest_index' );
+
+/**
+ * Sets a global JS variable to indicate that HEIC canvas-based upload support is available.
+ *
+ * This flag is set whenever the media processing feature is enabled,
+ * regardless of whether the browser supports full VIPS-based processing.
+ * Browsers like Safari can use createImageBitmap() to decode HEIC images
+ * and convert them to JPEG for server-side sub-size generation.
+ */
+function gutenberg_set_heic_upload_support_flag() {
+	wp_add_inline_script( 'wp-block-editor', 'window.__heicUploadSupport = true', 'before' );
+}
+add_action( 'admin_init', 'gutenberg_set_heic_upload_support_flag' );
+
+/**
+ * Deletes the HEIC companion file when its attachment is deleted.
+ *
+ * The HEIC is sideloaded alongside a JPEG derivative and recorded in
+ * $metadata['original']. WordPress core's wp_delete_attachment_files()
+ * only knows about 'original_image', so without this hook the HEIC
+ * would linger on disk after the attachment is deleted.
+ *
+ * @param int $post_id Attachment ID being deleted.
+ */
+function gutenberg_delete_heic_companion_file( int $post_id ): void {
+	$metadata = wp_get_attachment_metadata( $post_id, true );
+
+	if ( empty( $metadata['original'] ) ) {
+		return;
+	}
+
+	$attached_file = get_attached_file( $post_id, true );
+
+	if ( ! $attached_file ) {
+		return;
+	}
+
+	$heic_path = path_join( dirname( $attached_file ), $metadata['original'] );
+
+	if ( file_exists( $heic_path ) ) {
+		wp_delete_file( $heic_path );
+	}
+}
+
+add_action( 'delete_attachment', 'gutenberg_delete_heic_companion_file' );
+
+// ── Tier 2: Full client-side processing (VIPS/WASM) ─────────────────
+// Everything below requires cross-origin isolation (Document-Isolation-Policy)
+// and SharedArrayBuffer support, which is only available in Chromium 137+.
+
+/**
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
+ */
+function gutenberg_set_client_side_media_processing_flag() {
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+}
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Filters the list of rewrite rules formatted for output to an .htaccess file.

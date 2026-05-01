@@ -7,9 +7,9 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as InputControl,
 	CheckboxControl,
-	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * CSSClassesSettingComponent
@@ -55,7 +55,9 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 
 	return (
 		<fieldset>
-			<VisuallyHidden as="legend">{ setting.title }</VisuallyHidden>
+			<VisuallyHidden render={ <legend /> }>
+				{ setting.title }
+			</VisuallyHidden>
 			<VStack spacing={ 3 }>
 				<CheckboxControl
 					label={ setting.title }

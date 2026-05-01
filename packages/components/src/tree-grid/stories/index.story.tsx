@@ -24,7 +24,7 @@ const meta: Meta< typeof TreeGrid > = {
 	argTypes: {
 		children: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	args: {
 		onExpandRow: fn(),
 		onCollapseRow: fn(),

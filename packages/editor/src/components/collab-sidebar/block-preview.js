@@ -6,7 +6,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { getCommentExcerpt } from './utils';
+import { getNoteExcerpt } from './utils';
 
 const NOTE_PREVIEW_IMAGE_GETTERS = {
 	'core/image': ( attributes ) => {
@@ -41,7 +41,7 @@ function normalizePreviewText( text ) {
 		return null;
 	}
 
-	return getCommentExcerpt( normalizedText, 10 );
+	return getNoteExcerpt( normalizedText, 10 );
 }
 
 /**

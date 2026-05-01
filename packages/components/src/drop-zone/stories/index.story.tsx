@@ -17,6 +17,7 @@ import DropZone from '..';
 const ICONS = { upload, media };
 
 const meta: Meta< typeof DropZone > = {
+	tags: [ 'manifest' ],
 	component: DropZone,
 	id: 'components-dropzone',
 	title: 'Components/Selection & Input/File Upload/DropZone',
