@@ -76,7 +76,7 @@ export default function MediaForm( {
 	return (
 		<div className="media-editor-form">
 			<VStack spacing={ 4 }>
-				<VisuallyHidden render={ <h3 /> }>
+				<VisuallyHidden render={ <h2 /> }>
 					{ __( 'Media details' ) }
 				</VisuallyHidden>
 				{ header }
