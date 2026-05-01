@@ -258,6 +258,8 @@ export default dedupePlugins( [
 				{
 					'@wordpress/components': {
 						__experimentalText: 'WCText',
+						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
+						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
 					},
 				},
@@ -809,9 +811,9 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Storybook stories — disable use-recommended-components.
+	// Override: Components package and root Storybook stories — disable use-recommended-components.
 	{
-		files: [ 'storybook/stories/**' ],
+		files: [ 'packages/components/**', 'storybook/stories/**' ],
 		rules: {
 			'@wordpress/use-recommended-components': 'off',
 		},

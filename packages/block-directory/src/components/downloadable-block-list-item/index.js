@@ -7,16 +7,12 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	Tooltip,
-	Spinner,
-	VisuallyHidden,
-	Composite,
-} from '@wordpress/components';
+import { Tooltip, Spinner, Composite } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies

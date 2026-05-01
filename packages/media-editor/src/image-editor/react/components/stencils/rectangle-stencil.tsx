@@ -9,8 +9,13 @@ import { __ } from '@wordpress/i18n';
  */
 import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
+	DEFAULT_KEYBOARD_STEP,
+	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+} from '../../../core/constants';
+import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
+	computeShiftLockedResizeRect,
 	type HandlePosition,
 	type CropBounds,
 	type ResizeDragState,
@@ -18,21 +23,23 @@ import {
 
 /**
  * Corner handle positions only — used when aspect ratio is locked.
+ * Ordered clockwise from top-left for logical tab order.
  */
-const CORNER_POSITIONS: HandlePosition[] = [ 'nw', 'ne', 'sw', 'se' ];
+const CORNER_POSITIONS: HandlePosition[] = [ 'nw', 'ne', 'se', 'sw' ];
 
 /**
  * All handle positions rendered by the stencil.
+ * Ordered clockwise from top-left for logical tab order.
  */
 const ALL_POSITIONS: HandlePosition[] = [
-	'n',
-	's',
-	'e',
-	'w',
 	'nw',
+	'n',
 	'ne',
-	'sw',
+	'e',
 	'se',
+	's',
+	'sw',
+	'w',
 ];
 
 /**
@@ -62,11 +69,6 @@ function getHandleLabel( pos: HandlePosition ): string {
 	}
 }
 
-/**
- * Step size for keyboard-driven handle resize, in normalized coordinates.
- */
-const KEYBOARD_STEP = 0.02;
-
 /** Delay before keyboard resize triggers settle (ms). */
 const KEYBOARD_SETTLE_DELAY = 500;
 
@@ -93,6 +95,7 @@ type RectangleStencilProps = StencilProps;
  * @param props.freeformCrop      Whether resize handles are shown.
  * @param props.stencilTransition CSS transition string for settle animation.
  * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -106,6 +109,7 @@ export function RectangleStencil( {
 	freeformCrop = false,
 	stencilTransition,
 	cropBounds,
+	onEscape,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -122,6 +126,7 @@ export function RectangleStencil( {
 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const keyboardResizeActiveRef = useRef( false );
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -129,6 +134,7 @@ export function RectangleStencil( {
 	useEffect( () => {
 		return () => {
 			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		};
 	}, [] );
 
@@ -146,6 +152,11 @@ export function RectangleStencil( {
 			clientY: number
 		) => NormalizedRect;
 		computeFreeRect: (
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		) => NormalizedRect;
+		computeShiftLockedRect: (
 			drag: ResizeDragState,
 			clientX: number,
 			clientY: number
@@ -192,7 +203,7 @@ export function RectangleStencil( {
 				ownerDoc.activeElement.blur();
 			}
 			// Capture pointer so drag works across iframe boundaries.
-			const el = event.currentTarget;
+			const el = event.currentTarget as HTMLButtonElement;
 			el.setPointerCapture( event.pointerId );
 
 			const drag: ResizeDragState = {
@@ -210,11 +221,13 @@ export function RectangleStencil( {
 			let rafId = 0;
 			let latestX = event.clientX;
 			let latestY = event.clientY;
+			let latestShift = event.shiftKey;
 
 			const onMove = ( e: Event ) => {
 				const pe = e as PointerEvent;
 				latestX = pe.clientX;
 				latestY = pe.clientY;
+				latestShift = pe.shiftKey;
 				if ( rafId ) {
 					return;
 				}
@@ -224,9 +237,18 @@ export function RectangleStencil( {
 					if ( ! h ) {
 						return;
 					}
-					const newRect = h.hasLockedRatio
-						? h.computeLockedRect( drag, latestX, latestY )
-						: h.computeFreeRect( drag, latestX, latestY );
+					let newRect: NormalizedRect;
+					if ( h.hasLockedRatio ) {
+						newRect = h.computeLockedRect( drag, latestX, latestY );
+					} else if ( latestShift ) {
+						newRect = h.computeShiftLockedRect(
+							drag,
+							latestX,
+							latestY
+						);
+					} else {
+						newRect = h.computeFreeRect( drag, latestX, latestY );
+					}
 					h.onCropChange( newRect );
 				} );
 			};
@@ -247,6 +269,11 @@ export function RectangleStencil( {
 				el.removeEventListener( 'pointerup', onEnd );
 				el.removeEventListener( 'lostpointercapture', onEnd );
 				latestHandlersRef.current?.onResizeEnd?.();
+				// Restore focus to the handle so arrow keys work
+				// immediately after a mouse drag. Browsers suppress
+				// :focus-visible after pointer interactions, so the
+				// focus ring stays hidden until the user presses a key.
+				el.focus( { preventScroll: true } );
 			};
 
 			el.addEventListener( 'pointermove', onMove );
@@ -254,6 +281,11 @@ export function RectangleStencil( {
 			el.addEventListener( 'lostpointercapture', onEnd );
 
 			onResizeStart?.();
+			// Cancel any pending keyboard settle so it can't fire onResizeEnd
+			// mid-drag if the user switches from keyboard to pointer within
+			// the settle window.
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		},
 		[ cropRect, onResizeStart ]
 	);
@@ -293,21 +325,51 @@ export function RectangleStencil( {
 		[ imageSize, bounds, normalizedRatio ]
 	);
 
+	/**
+	 * Compute the new crop rect when Shift is held during a freeform
+	 * resize — preserves the start rect's aspect ratio.
+	 */
+	const computeShiftLockedRect = useCallback(
+		(
+			drag: ResizeDragState,
+			clientX: number,
+			clientY: number
+		): NormalizedRect =>
+			computeShiftLockedResizeRect(
+				drag,
+				clientX,
+				clientY,
+				imageSize,
+				bounds
+			),
+		[ imageSize, bounds ]
+	);
+
 	latestHandlersRef.current = {
 		hasLockedRatio,
 		computeLockedRect,
 		computeFreeRect,
+		computeShiftLockedRect,
 		onCropChange,
 		onResizeEnd,
 	};
 
 	/**
-	 * Handle keyboard arrow keys on a resize handle.
-	 * Moves the corresponding edge(s) by KEYBOARD_STEP in normalized space.
+	 * Handle keyboard events on a resize handle.
+	 * Arrow keys resize; Escape returns focus to the canvas.
+	 * Shift multiplies the step size by 10 for coarser movement.
 	 */
 	const handleKeyDown = useCallback(
 		( handle: HandlePosition, event: React.KeyboardEvent ) => {
 			const key = event.key;
+
+			if ( key === 'Escape' ) {
+				event.preventDefault();
+				event.stopPropagation();
+				onEscape?.();
+				return;
+			}
+
 			if (
 				key !== 'ArrowUp' &&
 				key !== 'ArrowDown' &&
@@ -320,20 +382,37 @@ export function RectangleStencil( {
 			event.preventDefault();
 			event.stopPropagation();
 
+			if ( ! keyboardResizeActiveRef.current ) {
+				keyboardResizeActiveRef.current = true;
+				onResizeStart?.();
+			}
+
+			const scheduleKeyboardResizeEnd = () => {
+				clearTimeout( keyboardSettleTimerRef.current );
+				keyboardSettleTimerRef.current = setTimeout( () => {
+					keyboardResizeActiveRef.current = false;
+					onResizeEnd?.();
+				}, KEYBOARD_SETTLE_DELAY );
+			};
+
+			const step = event.shiftKey
+				? DEFAULT_KEYBOARD_STEP * KEYBOARD_SHIFT_STEP_MULTIPLIER
+				: DEFAULT_KEYBOARD_STEP;
+
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
 			let dy = 0;
 			if ( key === 'ArrowLeft' ) {
-				dx = -KEYBOARD_STEP;
+				dx = -step;
 			}
 			if ( key === 'ArrowRight' ) {
-				dx = KEYBOARD_STEP;
+				dx = step;
 			}
 			if ( key === 'ArrowUp' ) {
-				dy = -KEYBOARD_STEP;
+				dy = -step;
 			}
 			if ( key === 'ArrowDown' ) {
-				dy = KEYBOARD_STEP;
+				dy = step;
 			}
 
 			if ( hasLockedRatio ) {
@@ -350,10 +429,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeLockedRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			} else {
 				// For freeform resize, synthesize a drag via computeFreeRect.
 				const syntheticDrag: ResizeDragState = {
@@ -367,10 +443,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeFreeRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			}
 		},
 		[
@@ -381,7 +454,9 @@ export function RectangleStencil( {
 			computeLockedRect,
 			computeFreeRect,
 			onCropChange,
+			onResizeStart,
 			onResizeEnd,
+			onEscape,
 		]
 	);
 
