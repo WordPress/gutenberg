@@ -62,6 +62,8 @@ export interface CropperInteractionActions {
 	setZoomAtPoint: ( zoom: number, pan: NormalizedPoint ) => void;
 	/** Snap rotate by 90 degrees. */
 	snapRotate90: ( direction: 1 | -1 ) => void;
+	/** Toggle flip on the given axis. */
+	flip: ( direction: 'horizontal' | 'vertical' ) => void;
 }
 
 /**
@@ -874,6 +876,24 @@ export class InteractionController {
 				}
 				e.preventDefault();
 				this.options.actions.snapRotate90( 1 );
+				break;
+			}
+			case 'h':
+			case 'H': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
+				e.preventDefault();
+				this.options.actions.flip( 'horizontal' );
+				break;
+			}
+			case 'v':
+			case 'V': {
+				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+					break;
+				}
+				e.preventDefault();
+				this.options.actions.flip( 'vertical' );
 				break;
 			}
 		}

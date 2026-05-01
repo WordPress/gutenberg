@@ -23,7 +23,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { close, drawerRight } from '@wordpress/icons';
+import { close, drawerRight, keyboard } from '@wordpress/icons';
 import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
@@ -55,6 +55,7 @@ import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import { buildModifiers } from './build-modifiers';
+import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -161,6 +162,7 @@ function HeaderActions( {
 	onSave,
 }: HeaderActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -168,6 +170,12 @@ function HeaderActions( {
 			expanded={ false }
 			gap={ 2 }
 		>
+			<Button
+				size="compact"
+				icon={ keyboard }
+				label={ __( 'Keyboard shortcuts' ) }
+				onClick={ () => setIsShortcutsModalOpen( true ) }
+			/>
 			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
@@ -196,6 +204,11 @@ function HeaderActions( {
 				disabled={ isSaving }
 				accessibleWhenDisabled
 			/>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
 		</Flex>
 	);
 }
