@@ -1,3 +1,13 @@
+// Side-effect import: registers the inline RichText format types used to
+// render proposed adds and deletes inside the editor canvas. Phase A of
+// #77867; consumers of those formats land in subsequent phases.
+import './inline-formats';
+
+export {
+	SUGGESTED_DELETION_FORMAT,
+	SUGGESTED_ADDITION_FORMAT,
+	registerSuggestionFormats,
+} from './inline-formats';
 export {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
