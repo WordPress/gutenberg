@@ -3276,8 +3276,8 @@ class WP_Theme_JSON_Gutenberg {
 						 * Feature selector is block-level (e.g. `.wp-block-button` for
 						 * dimensions/width) — apply the variation class directly to it.
 						 */
-						$feature_element_selector = str_replace( $shortened_selector, '', $clean_style_variation_selector );
-						$combined_selectors       = str_replace( $feature_element_selector, '', $clean_style_variation_selector );
+						$combined_selectors = explode( ' ', $clean_style_variation_selector )[0];
+
 					} else {
 						// Prepend the variation selector to the current selector.
 						$split_selectors    = explode( ',', $shortened_selector );
