@@ -278,7 +278,6 @@ function CropperInner(
 	}, [ state, elementSize, visualSize, canvasSize ] );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
-	const [ isHandleActive, setIsHandleActive ] = useState( false );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -381,7 +380,6 @@ function CropperInner(
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
 		setIsResizing( true );
-		setIsHandleActive( false );
 		onGestureStart?.();
 	}, [ onGestureStart ] );
 
@@ -506,19 +504,7 @@ function CropperInner(
 					freeformCrop={ freeformCrop }
 					stencilTransition={ settleStencilTransition }
 					cropBounds={ cropBounds }
-					onHandleActiveChange={ setIsHandleActive }
 				/>
-
-				{ /* Shift-to-lock hint — shown on handle hover/focus in
-				     freeform mode with no fixed aspect ratio. */ }
-				{ isHandleActive && freeformCrop && ! aspectRatio && (
-					<div
-						className="wp-media-editor-image-editor__shift-hint"
-						aria-hidden="true"
-					>
-						{ __( 'Hold ⇧ to lock aspect ratio' ) }
-					</div>
-				) }
 
 				{ /* Rule-of-thirds grid */ }
 				{ ( showGrid === true || isInteractiveGrid ) && (

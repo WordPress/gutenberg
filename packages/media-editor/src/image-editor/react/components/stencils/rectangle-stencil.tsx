@@ -86,19 +86,18 @@ type RectangleStencilProps = StencilProps;
  * crop pass through to the container for image panning. The crop
  * auto-centers after resize via SETTLE_CROP.
  *
- * @param props                      Component props implementing StencilProps.
- * @param props.cropRect             The crop rectangle in normalized coordinates.
- * @param props.containerSize        The container element dimensions in pixels.
- * @param props.imageSize            The rendered image dimensions in pixels.
- * @param props.onCropChange         Callback fired when the crop rect changes.
- * @param props.onResizeStart        Callback fired when a resize drag starts.
- * @param props.onResizeEnd          Callback fired when a resize drag ends (mouseup).
- * @param props.aspectRatio          Optional fixed aspect ratio (width / height).
- * @param props.freeformCrop         Whether resize handles are shown.
- * @param props.stencilTransition    CSS transition string for settle animation.
- * @param props.cropBounds           Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape             Called when Escape is pressed on a resize handle.
- * @param props.onHandleActiveChange Called when any handle gains or loses hover or focus.
+ * @param props                   Component props implementing StencilProps.
+ * @param props.cropRect          The crop rectangle in normalized coordinates.
+ * @param props.containerSize     The container element dimensions in pixels.
+ * @param props.imageSize         The rendered image dimensions in pixels.
+ * @param props.onCropChange      Callback fired when the crop rect changes.
+ * @param props.onResizeStart     Callback fired when a resize drag starts.
+ * @param props.onResizeEnd       Callback fired when a resize drag ends (mouseup).
+ * @param props.aspectRatio       Optional fixed aspect ratio (width / height).
+ * @param props.freeformCrop      Whether resize handles are shown.
+ * @param props.stencilTransition CSS transition string for settle animation.
+ * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
+ * @param props.onEscape          Called when Escape is pressed on a resize handle.
  * @return The rectangle stencil element.
  */
 export function RectangleStencil( {
@@ -113,7 +112,6 @@ export function RectangleStencil( {
 	stencilTransition,
 	cropBounds,
 	onEscape,
-	onHandleActiveChange,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -507,10 +505,6 @@ export function RectangleStencil( {
 						}
 						onTouchStart={ ( event ) => event.stopPropagation() }
 						onKeyDown={ ( event ) => handleKeyDown( pos, event ) }
-						onPointerEnter={ () => onHandleActiveChange?.( true ) }
-						onPointerLeave={ () => onHandleActiveChange?.( false ) }
-						onFocus={ () => onHandleActiveChange?.( true ) }
-						onBlur={ () => onHandleActiveChange?.( false ) }
 						aria-label={ getHandleLabel( pos ) }
 					/>
 				) ) }
