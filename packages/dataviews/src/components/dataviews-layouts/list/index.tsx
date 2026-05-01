@@ -24,7 +24,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack, VisuallyHidden } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -38,7 +39,6 @@ import type {
 	NormalizedField,
 	ViewList as ViewListType,
 	ViewListProps,
-	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 
@@ -83,6 +83,7 @@ function PrimaryActionGridCell< Item >( {
 } ) {
 	const registry = useRegistry();
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const closeModal = useCallback( () => setIsModalOpen( false ), [] );
 
 	const compositeItemId = generatePrimaryActionCompositeId(
 		idPrefix,
@@ -94,29 +95,43 @@ function PrimaryActionGridCell< Item >( {
 			? primaryAction.label
 			: primaryAction.label( [ item ] );
 
-	return 'RenderModal' in primaryAction ? (
-		<div role="gridcell" key={ primaryAction.id }>
-			<Composite.Item
-				id={ compositeItemId }
-				render={
-					<Button
-						disabled={ !! primaryAction.disabled }
-						accessibleWhenDisabled
-						text={ label }
-						size="small"
-						onClick={ () => setIsModalOpen( true ) }
-					/>
-				}
-			>
-				<ActionModal< Item >
-					action={ primaryAction }
-					items={ [ item ] }
+	if ( 'RenderModal' in primaryAction ) {
+		// Compose `Composite.Item` (Ariakit) → `Dialog.Trigger` (Base UI)
+		// → `Button` so all three layers' props merge onto the same DOM
+		// button: composite-item navigation, dialog-trigger ARIA, and
+		// the visual `Button` styling.
+		return (
+			<div role="gridcell" key={ primaryAction.id }>
+				<Dialog.Root
 					open={ isModalOpen }
 					onOpenChange={ setIsModalOpen }
-				/>
-			</Composite.Item>
-		</div>
-	) : (
+					disablePointerDismissal={ primaryAction.hideModalHeader }
+				>
+					<Composite.Item
+						id={ compositeItemId }
+						render={
+							<Dialog.Trigger
+								render={
+									<Button
+										disabled={ !! primaryAction.disabled }
+										accessibleWhenDisabled
+										text={ label }
+										size="small"
+									/>
+								}
+							/>
+						}
+					/>
+					<ActionModal< Item >
+						action={ primaryAction }
+						items={ [ item ] }
+						closeModal={ closeModal }
+					/>
+				</Dialog.Root>
+			</div>
+		);
+	}
+	return (
 		<div role="gridcell" key={ primaryAction.id }>
 			<Composite.Item
 				id={ compositeItemId }
@@ -163,9 +178,6 @@ function ListItem< Item >( {
 
 	const registry = useRegistry();
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ activeModalAction, setActiveModalAction ] = useState(
-		null as ActionModalType< Item > | null
-	);
 	const handleHover: React.MouseEventHandler = ( { type } ) => {
 		const isHover = type === 'mouseenter';
 		setIsHovered( isHover );
@@ -182,7 +194,7 @@ function ListItem< Item >( {
 		}
 	}, [ isSelected ] );
 
-	const { primaryAction, eligibleActions, modalActions } = useMemo( () => {
+	const { primaryAction, eligibleActions } = useMemo( () => {
 		// If an action is eligible for all items, doesn't need
 		// to provide the `isEligible` function.
 		const _eligibleActions = actions.filter(
@@ -191,14 +203,9 @@ function ListItem< Item >( {
 		const _primaryActions = _eligibleActions.filter(
 			( action ) => action.isPrimary
 		);
-		const _modalActions = _eligibleActions.filter(
-			( action ): action is ActionModalType< Item > =>
-				'RenderModal' in action
-		);
 		return {
 			primaryAction: _primaryActions[ 0 ],
 			eligibleActions: _eligibleActions,
-			modalActions: _modalActions,
 		};
 	}, [ actions, item ] );
 
@@ -266,23 +273,9 @@ function ListItem< Item >( {
 								actions={ eligibleActions }
 								item={ item }
 								registry={ registry }
-								setActiveModalAction={ setActiveModalAction }
 							/>
 						</Menu.Popover>
 					</Menu>
-					{ modalActions.map( ( action ) => (
-						<ActionModal
-							key={ action.id }
-							action={ action }
-							items={ [ item ] }
-							open={ activeModalAction?.id === action.id }
-							onOpenChange={ ( isOpen ) => {
-								if ( ! isOpen ) {
-									setActiveModalAction( null );
-								}
-							} }
-						/>
-					) ) }
 				</div>
 			) }
 		</Stack>
