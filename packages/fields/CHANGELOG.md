@@ -6,6 +6,10 @@
 
 -   Set `modalSize: 'small'` on `duplicateTemplatePart` and `duplicatePattern` actions to replace CSS-based width overrides. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 
+### Code Quality
+
+-   Migrate the Cancel button in `RenderModal` implementations (delete, permanently delete, trash, reset, rename, reorder, duplicate-post) from a tertiary `Button` to `@wordpress/ui` `Dialog.Action`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 0.37.0 (2026-04-29)
 
 ## 0.36.0 (2026-04-15)

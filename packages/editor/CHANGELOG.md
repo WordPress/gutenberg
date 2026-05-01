@@ -5,6 +5,7 @@
 ### Code Quality
 
 -   Migrate the post-actions modal from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog`, hoisting `Dialog.Root` / `Dialog.Trigger` to each menu item to drop the parent-owned active-action state. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+-   Migrate the Cancel button in the "Set as homepage" / "Set as posts page" modals from a tertiary `Button` to `Dialog.Action`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 
 ## 14.45.0 (2026-04-29)
 

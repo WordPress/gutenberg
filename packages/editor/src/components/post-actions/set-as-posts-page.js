@@ -9,6 +9,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -90,17 +92,9 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 			<VStack spacing="5">
 				<WCText>{ modalText }</WCText>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal?.();
-						} }
-						disabled={ isSaving }
-						accessibleWhenDisabled
-					>
+					<Dialog.Action variant="outline" disabled={ isSaving }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"

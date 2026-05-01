@@ -12,6 +12,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -111,15 +113,9 @@ function ReorderModal( {
 					} }
 				/>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ () => {
-							closeModal?.();
-						} }
-					>
+					<Dialog.Action variant="outline">
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
