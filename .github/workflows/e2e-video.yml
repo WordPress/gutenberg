@@ -17,7 +17,7 @@ permissions: {}
 env:
     E2E_SPEC_FILE: test/e2e/specs/editor/various/new-post.spec.js
     E2E_VIDEO_COMMENT_IDENTIFIER: '<!-- gutenberg-e2e-video-comment -->'
-    E2E_VIDEO_ARTIFACT_NAME: e2e-video-${{ github.run_id }}-${{ github.run_attempt }}
+    E2E_VIDEO_UPLOAD_LIMIT: 10
     WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
     WORKFLOW_JOB_NAME: Record video
 
@@ -78,7 +78,7 @@ jobs:
                         `| Details | ${ process.env.COMMENT_DETAILS } |`,
                         `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
                         `| Workflow job | [View job](${ jobUrl }) |`,
-                        '| Video artifact | Not available yet |',
+                        '| Video artifacts | Not available yet |',
                         '',
                         `Last updated: ${ new Date().toISOString() }`,
                       ].join( '\n' );
@@ -174,7 +174,7 @@ jobs:
                         `| Details | ${ process.env.COMMENT_DETAILS } |`,
                         `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
                         `| Workflow job | [View job](${ jobUrl }) |`,
-                        '| Video artifact | Not available yet |',
+                        '| Video artifacts | Not available yet |',
                         '',
                         `Last updated: ${ new Date().toISOString() }`,
                       ].join( '\n' );
@@ -227,13 +227,136 @@ jobs:
                   SPEC_FILE="${E2E_SPEC_FILE#test/e2e/}"
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- "$SPEC_FILE"
 
-            - name: Archive test videos
-              id: upload-video
-              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+            - name: Prepare test videos
+              id: prepare-videos
               if: ${{ always() }}
+              run: |
+                  VIDEO_UPLOAD_DIR="$WP_ARTIFACTS_PATH/e2e-video-uploads"
+                  rm -rf "$VIDEO_UPLOAD_DIR"
+                  mkdir -p "$VIDEO_UPLOAD_DIR"
+
+                  mapfile -d '' VIDEOS < <(find "$WP_ARTIFACTS_PATH/test-results" -type f -name '*.webm' -print0 | sort -z)
+                  VIDEO_COUNT="${#VIDEOS[@]}"
+                  echo "count=$VIDEO_COUNT" >> "$GITHUB_OUTPUT"
+
+                  if (( VIDEO_COUNT == 0 )); then
+                      echo "::error::No Playwright videos were created."
+                      exit 1
+                  fi
+
+                  if (( VIDEO_COUNT > E2E_VIDEO_UPLOAD_LIMIT )); then
+                      echo "::warning::Found $VIDEO_COUNT videos. Uploading the first $E2E_VIDEO_UPLOAD_LIMIT."
+                  fi
+
+                  for SLOT in $(seq 1 "$E2E_VIDEO_UPLOAD_LIMIT"); do
+                      VIDEO_PATH="$VIDEO_UPLOAD_DIR/video-$SLOT.webm"
+                      VIDEO_INDEX=$((SLOT - 1))
+                      if (( VIDEO_INDEX < VIDEO_COUNT )); then
+                          cp "${VIDEOS[$VIDEO_INDEX]}" "$VIDEO_PATH"
+                          echo "video_${SLOT}_path=$VIDEO_PATH" >> "$GITHUB_OUTPUT"
+                          continue
+                      fi
+
+                      echo "video_${SLOT}_path=" >> "$GITHUB_OUTPUT"
+                  done
+
+            - name: Upload test video 1
+              id: upload-video-1
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_1_path != '' }}
               with:
-                  name: ${{ env.E2E_VIDEO_ARTIFACT_NAME }}
-                  path: ${{ env.WP_ARTIFACTS_PATH }}/test-results/**/*.webm
+                  path: ${{ steps.prepare-videos.outputs.video_1_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 2
+              id: upload-video-2
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_2_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_2_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 3
+              id: upload-video-3
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_3_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_3_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 4
+              id: upload-video-4
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_4_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_4_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 5
+              id: upload-video-5
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_5_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_5_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 6
+              id: upload-video-6
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_6_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_6_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 7
+              id: upload-video-7
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_7_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_7_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 8
+              id: upload-video-8
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_8_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_8_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 9
+              id: upload-video-9
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_9_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_9_path }}
+                  archive: false
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Upload test video 10
+              id: upload-video-10
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() && steps.prepare-videos.outputs.video_10_path != '' }}
+              with:
+                  path: ${{ steps.prepare-videos.outputs.video_10_path }}
+                  archive: false
                   if-no-files-found: error
                   retention-days: 14
 
@@ -244,7 +367,17 @@ jobs:
               env:
                   TEST_OUTCOME: ${{ steps.run-tests.outcome }}
                   JOB_STATUS: ${{ job.status }}
-                  VIDEO_ARTIFACT_URL: ${{ steps.upload-video.outputs.artifact-url }}
+                  VIDEO_COUNT: ${{ steps.prepare-videos.outputs.count }}
+                  VIDEO_ARTIFACT_URL_1: ${{ steps.upload-video-1.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_2: ${{ steps.upload-video-2.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_3: ${{ steps.upload-video-3.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_4: ${{ steps.upload-video-4.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_5: ${{ steps.upload-video-5.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_6: ${{ steps.upload-video-6.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_7: ${{ steps.upload-video-7.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_8: ${{ steps.upload-video-8.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_9: ${{ steps.upload-video-9.outputs.artifact-url }}
+                  VIDEO_ARTIFACT_URL_10: ${{ steps.upload-video-10.outputs.artifact-url }}
               with:
                   script: |
                       const pullRequest = context.payload.pull_request;
@@ -276,10 +409,20 @@ jobs:
 
                       const testOutcome = process.env.TEST_OUTCOME || 'skipped';
                       const jobStatus = process.env.JOB_STATUS || testOutcome;
-                      const artifactUrl = process.env.VIDEO_ARTIFACT_URL;
-                      const artifact = artifactUrl
-                        ? `[Download video artifact](${ artifactUrl })`
+                      const videoCount = process.env.VIDEO_COUNT || '0';
+                      const videoCountNumber = Number.parseInt( videoCount, 10 ) || 0;
+                      const artifactUrls = Array.from( { length: 10 }, ( _, index ) =>
+                        process.env[ `VIDEO_ARTIFACT_URL_${ index + 1 }` ]
+                      ).filter( Boolean );
+                      const artifact = artifactUrls.length
+                        ? `${ artifactUrls.length } of ${ videoCountNumber || artifactUrls.length } unzipped video artifact(s) uploaded.`
                         : 'No video artifact was created. Check the workflow job logs.';
+                      const artifactEmbeds = artifactUrls.flatMap( ( artifactUrl, index ) => [
+                        `#### Video ${ index + 1 }`,
+                        `[Open video artifact ${ index + 1 }](${ artifactUrl })`,
+                        `![](${ artifactUrl })`,
+                        '',
+                      ] );
 
                       const body = [
                         marker,
@@ -292,8 +435,10 @@ jobs:
                         `| Details | Test outcome: ${ testOutcome } |`,
                         `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
                         `| Workflow job | [View job](${ jobUrl }) |`,
-                        `| Video artifact | ${ artifact } |`,
+                        `| Video artifacts | ${ artifact } |`,
+                        `| Videos found | ${ videoCount } |`,
                         '',
+                        ...artifactEmbeds,
                         `Last updated: ${ new Date().toISOString() }`,
                       ].join( '\n' );
 
