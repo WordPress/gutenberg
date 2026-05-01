@@ -1640,10 +1640,18 @@ export const transformToStyles = (
 										] ) => {
 											if ( declarations.length ) {
 												const cssSelector =
-													concatFeatureVariationSelectorString(
-														baseSelector,
-														styleVariationSelector as string
-													);
+													! selector ||
+													baseSelector.includes(
+														selector
+													)
+														? concatFeatureVariationSelectorString(
+																baseSelector,
+																styleVariationSelector as string
+														  )
+														: getBlockStyleVariationSelector(
+																styleVariationName,
+																baseSelector
+														  );
 												const rules =
 													declarations.join( ';' );
 												ruleset += `:root :where(${ cssSelector }){${ rules };}`;
