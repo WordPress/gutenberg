@@ -50,6 +50,19 @@ export interface UseInteractionOptions {
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointer release). */
 	onGestureEnd?: () => void;
+	/**
+	 * Current viewport zoom level. Used to de-scale pointer deltas so
+	 * a screen drag of N px moves N/viewportZoom canvas-space px.
+	 */
+	viewportZoom?: number;
+	/** Current viewport pan offset in CSS pixels (for snapshot at drag start). */
+	viewportPan?: { x: number; y: number };
+	/**
+	 * Callback to pan the viewport camera (display-only, does not affect crop).
+	 * When provided, dragging outside the crop area pans the viewport instead
+	 * of the image.
+	 */
+	setViewportPan?: ( pan: { x: number; y: number } ) => void;
 }
 
 /** How long keyboard placement stays active after the latest handled key. */
@@ -124,6 +137,10 @@ export function useInteraction(
 	const actionsRef = useRef( actions );
 	actionsRef.current = actions;
 
+	// Snapshot of the canvas element — captured on every pointerdown so
+	// isOutsideCrop can call getBoundingClientRect() in the same frame.
+	const canvasElRef = useRef< HTMLElement | null >( null );
+
 	const controllerRef = useRef< InteractionController | null >( null );
 	const startPlacementGesture = useCallback( () => {
 		setIsGestureActive( true );
@@ -166,6 +183,8 @@ export function useInteraction(
 					actionsRef.current.snapRotate90( direction ),
 				toggleFlip: ( direction ) =>
 					actionsRef.current.toggleFlip?.( direction ),
+				setViewportPan: ( pan ) =>
+					optionsRef.current?.setViewportPan?.( pan ),
 			},
 			getContainerSize: () => containerSizeRef.current,
 			getImageSize: () => imageSizeRef.current,
@@ -183,6 +202,54 @@ export function useInteraction(
 			},
 			get doubleTapZoom() {
 				return optionsRef.current?.doubleTapZoom;
+			},
+			getViewportZoom: () => optionsRef.current?.viewportZoom ?? 1,
+			getViewportPan: () =>
+				optionsRef.current?.viewportPan ?? { x: 0, y: 0 },
+			isOutsideCrop: ( e: PointerEvent ) => {
+				// Only route to viewport pan when a setViewportPan handler is
+				// available — otherwise there's nothing to pan.
+				if ( ! optionsRef.current?.setViewportPan ) {
+					return false;
+				}
+				const el = canvasElRef.current;
+				if ( ! el ) {
+					return false;
+				}
+				const imgSize = imageSizeRef.current;
+				if ( ! imgSize ) {
+					return false;
+				}
+				const rect = el.getBoundingClientRect();
+				const s = stateRef.current;
+				const vz = optionsRef.current?.viewportZoom ?? 1;
+				// Canvas centre in screen space (getBoundingClientRect
+				// already accounts for the viewport CSS transform).
+				const cx = rect.left + rect.width / 2;
+				const cy = rect.top + rect.height / 2;
+				// Stencil bounds in screen space.
+				const left =
+					cx +
+					( s.cropRect.x * imgSize.width - imgSize.width / 2 ) * vz;
+				const right =
+					cx +
+					( ( s.cropRect.x + s.cropRect.width ) * imgSize.width -
+						imgSize.width / 2 ) *
+						vz;
+				const top =
+					cy +
+					( s.cropRect.y * imgSize.height - imgSize.height / 2 ) * vz;
+				const bottom =
+					cy +
+					( ( s.cropRect.y + s.cropRect.height ) * imgSize.height -
+						imgSize.height / 2 ) *
+						vz;
+				return (
+					e.clientX < left ||
+					e.clientX > right ||
+					e.clientY < top ||
+					e.clientY > bottom
+				);
 			},
 			onGestureStart: () => {
 				startPlacementGesture();
@@ -206,6 +273,9 @@ export function useInteraction(
 
 	const onPointerDown = useCallback( ( e: React.PointerEvent ) => {
 		const el = e.currentTarget as HTMLElement;
+		// Snapshot the canvas element so isOutsideCrop can call
+		// getBoundingClientRect() synchronously during the same event.
+		canvasElRef.current = el;
 		controllerRef.current?.handlePointerDown( e.nativeEvent, el );
 	}, [] );
 

@@ -11,6 +11,9 @@ import type { NormalizedRect, Flip, CropperState } from './types';
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 10;
 
+export const MIN_VIEWPORT_ZOOM = 0.1;
+export const MAX_VIEWPORT_ZOOM = 4;
+
 /**
  * Wheel zoom sensitivity. A deltaY of 100 changes zoom by 0.25.
  * This could be made configurable as a prop to the Cropper component.

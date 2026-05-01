@@ -1,0 +1,33 @@
+.media-editor-navigator {
+	&__thumbnail {
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+		background: #1e1e1e;
+		border-radius: 2px;
+		cursor: grab;
+		user-select: none;
+		touch-action: none;
+		aspect-ratio: 16 / 9;
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
+	&__thumbnail-img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: contain;
+		pointer-events: none;
+	}
+
+	&__viewport-rect {
+		position: absolute;
+		border: 1px solid rgba(255, 255, 255, 0.8);
+		box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.4);
+		box-sizing: border-box;
+		pointer-events: none;
+	}
+}

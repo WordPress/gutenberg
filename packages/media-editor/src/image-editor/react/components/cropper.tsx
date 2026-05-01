@@ -35,6 +35,7 @@ import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
+import { useViewportOptional } from './viewport-provider';
 import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
@@ -169,6 +170,9 @@ function CropperInner(
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const { state, setImage, setCropRect, settleCrop } = controller;
+	// Viewport camera — null when used outside a ViewportProvider.
+	const viewport = useViewportOptional();
+
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -291,6 +295,9 @@ function CropperInner(
 		maxZoom,
 		onGestureStart,
 		onGestureEnd,
+		viewportZoom: viewport?.viewport.zoom,
+		viewportPan: viewport?.viewport.pan,
+		setViewportPan: viewport?.setViewportPan,
 	} );
 
 	// Register wheel handler natively with { passive: false } so
@@ -467,6 +474,17 @@ function CropperInner(
 					showInteractiveGrid &&
 						'wp-media-editor-image-editor__canvas--show-grid'
 				) }
+				style={
+					viewport &&
+					( viewport.viewport.zoom !== 1 ||
+						viewport.viewport.pan.x !== 0 ||
+						viewport.viewport.pan.y !== 0 )
+						? {
+								transform: `translate(${ viewport.viewport.pan.x }px, ${ viewport.viewport.pan.y }px) scale(${ viewport.viewport.zoom })`,
+								transformOrigin: 'center center',
+						  }
+						: undefined
+				}
 				tabIndex={ 0 }
 				role="group"
 				aria-label={ __( 'Image editor' ) }

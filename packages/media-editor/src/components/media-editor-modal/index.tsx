@@ -52,6 +52,7 @@ import type { MediaEditorModalUpdate } from '../../store/actions';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
+import { ViewportProvider } from '../../image-editor/react/components/viewport-provider';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import { buildModifiers } from './build-modifiers';
@@ -666,14 +667,16 @@ export function MediaEditorModal( {
 	// modal's entry animation and cause a visible flicker.
 	return (
 		<CropperProvider key={ id }>
-			<MediaEditorModalContent
-				fields={ fields }
-				id={ id }
-				media={ media }
-				hasEdits={ hasEdits }
-				aspectRatioPresets={ aspectRatioPresets }
-				onUpdate={ onUpdate }
-			/>
+			<ViewportProvider>
+				<MediaEditorModalContent
+					fields={ fields }
+					id={ id }
+					media={ media }
+					hasEdits={ hasEdits }
+					aspectRatioPresets={ aspectRatioPresets }
+					onUpdate={ onUpdate }
+				/>
+			</ViewportProvider>
 		</CropperProvider>
 	);
 }

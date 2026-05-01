@@ -14,6 +14,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import { useCropper } from '../../image-editor';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
+import MediaEditorNavigator from '../media-editor-navigator';
 import {
 	DEFAULT_ASPECT_RATIOS,
 	MAX_ZOOM,
@@ -99,11 +100,12 @@ export default function MediaEditorCropPanel( {
 
 	return (
 		<Stack direction="column" gap="md">
+			<MediaEditorNavigator />
 			<div role="presentation" { ...zoomGestureHandlers }>
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom
-					label={ __( 'Zoom' ) }
+					label={ __( 'Image zoom' ) }
 					min={ MIN_ZOOM }
 					max={ MAX_ZOOM }
 					step={ 0.1 }

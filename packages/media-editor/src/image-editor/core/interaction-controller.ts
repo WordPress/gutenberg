@@ -64,6 +64,8 @@ export interface CropperInteractionActions {
 	snapRotate90: ( direction: 1 | -1 ) => void;
 	/** Toggle flip on the given axis. */
 	toggleFlip?: ( direction: 'horizontal' | 'vertical' ) => void;
+	/** Set the viewport pan offset in CSS pixels (display-only, does not affect crop). */
+	setViewportPan?: ( pan: { x: number; y: number } ) => void;
 }
 
 /**
@@ -86,6 +88,22 @@ export interface InteractionControllerOptions {
 	minZoom?: number;
 	/** Maximum zoom level. Defaults to MAX_ZOOM. Read lazily. */
 	maxZoom?: number;
+	/**
+	 * Returns the current viewport zoom level. Used to de-scale pointer
+	 * deltas so a drag of N screen pixels moves N/viewportZoom canvas pixels.
+	 * Defaults to 1 (no viewport zoom). Read lazily.
+	 */
+	getViewportZoom?: () => number;
+	/**
+	 * Returns the current viewport pan offset in CSS pixels.
+	 * Snapshotted at drag start for viewport pan mode.
+	 */
+	getViewportPan?: () => { x: number; y: number };
+	/**
+	 * Returns true if a pointer event originates outside the crop stencil.
+	 * When true, pointer drags pan the viewport instead of the image.
+	 */
+	isOutsideCrop?: ( e: PointerEvent ) => boolean;
 	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. Read lazily. */
 	zoomSpeed?: number;
 	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. Read lazily. */
@@ -131,6 +149,11 @@ export class InteractionController {
 		startY: number;
 		startPanX: number;
 		startPanY: number;
+		/** Whether this drag is panning the viewport (outside crop area). */
+		isViewportPan: boolean;
+		/** Viewport pan at drag start (for viewport pan mode). */
+		startViewportPanX: number;
+		startViewportPanY: number;
 	} | null = null;
 
 	/** Active touch state during touch interactions. */
@@ -215,6 +238,11 @@ export class InteractionController {
 		return this.options.doubleTapZoom ?? 2;
 	}
 
+	/** Read viewport zoom lazily so option changes take effect immediately. */
+	private get viewportZoom(): number {
+		return this.options.getViewportZoom?.() ?? 1;
+	}
+
 	/**
 	 * Update the drag/zoom status and notify via callback if changed.
 	 *
@@ -282,11 +310,21 @@ export class InteractionController {
 		this.options.onGestureStart?.();
 
 		const currentState = this.options.getState();
+		const isViewportPan =
+			!! this.options.isOutsideCrop?.( e ) &&
+			!! this.options.actions.setViewportPan;
+		const currentViewportPan = this.options.getViewportPan?.() ?? {
+			x: 0,
+			y: 0,
+		};
 		this.drag = {
 			startX: e.clientX,
 			startY: e.clientY,
 			startPanX: currentState.pan.x,
 			startPanY: currentState.pan.y,
+			isViewportPan,
+			startViewportPanX: currentViewportPan.x,
+			startViewportPanY: currentViewportPan.y,
 		};
 
 		const onPointerMove = ( moveEvent: Event ) => {
@@ -298,17 +336,33 @@ export class InteractionController {
 
 			cancelAnimationFrame( this.rafId );
 			this.rafId = requestAnimationFrame( () => {
+				if ( drag.isViewportPan ) {
+					// Panning the viewport: screen deltas map 1:1 to CSS px offsets.
+					this.options.actions.setViewportPan?.( {
+						x:
+							drag.startViewportPanX +
+							( pe.clientX - drag.startX ),
+						y:
+							drag.startViewportPanY +
+							( pe.clientY - drag.startY ),
+					} );
+					return;
+				}
+
 				const s = this.options.getState();
+				const vz = this.viewportZoom;
 				const imgSize = this.options.getImageSize();
 				const containerSize = this.options.getContainerSize();
 				const panSize = imgSize ?? containerSize;
+				// Divide by viewport zoom so a screen drag of N px moves
+				// N/vz canvas-space px.
 				const deltaX =
 					panSize.width > 0
-						? ( pe.clientX - drag.startX ) / panSize.width
+						? ( pe.clientX - drag.startX ) / ( panSize.width * vz )
 						: 0;
 				const deltaY =
 					panSize.height > 0
-						? ( pe.clientY - drag.startY ) / panSize.height
+						? ( pe.clientY - drag.startY ) / ( panSize.height * vz )
 						: 0;
 
 				const { pan: newCrop } = restrictPanZoom(
@@ -400,8 +454,13 @@ export class InteractionController {
 				? target.getBoundingClientRect()
 				: undefined;
 		if ( visSize.width > 0 && visSize.height > 0 && rect ) {
-			const fx = e.clientX - rect.left - containerSize.width / 2;
-			const fy = e.clientY - rect.top - containerSize.height / 2;
+			// Use the visual centre of the (possibly viewport-zoomed) canvas
+			// as the reference point, then de-scale to canvas space.
+			const vz = this.viewportZoom;
+			const cx = rect.left + rect.width / 2;
+			const cy = rect.top + rect.height / 2;
+			const fx = ( e.clientX - cx ) / vz;
+			const fy = ( e.clientY - cy ) / vz;
 
 			const zoomRatio = 1 - newZoom / s.zoom;
 			const focalNormX = fx / visSize.width;

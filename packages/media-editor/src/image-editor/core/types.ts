@@ -143,6 +143,25 @@ export type CropperAction =
 	| { type: 'RESET'; payload?: Partial< CropperState > };
 
 /**
+ * Viewport (navigator) camera state.
+ *
+ * Controls how the canvas is displayed in the container without
+ * affecting the crop area or the exported image. Zoom > 1 magnifies
+ * the canvas; pan shifts it in CSS pixels from the canvas centre.
+ */
+export interface ViewportState {
+	/** Viewport zoom level. 1 = canvas fills container normally. */
+	zoom: number;
+	/** Pan offset in CSS pixels from the canvas centre. */
+	pan: { x: number; y: number };
+}
+
+export type ViewportAction =
+	| { type: 'SET_VIEWPORT_ZOOM'; payload: number }
+	| { type: 'SET_VIEWPORT_PAN'; payload: { x: number; y: number } }
+	| { type: 'RESET_VIEWPORT' };
+
+/**
  * The contract for a pluggable stencil component.
  * Stencils render the crop area overlay and handle resize interactions.
  */
