@@ -16,6 +16,110 @@ import { addFilter } from '@wordpress/hooks';
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { markContentDiff, stripSuggestionMarks } from './inline-formats';
+
+const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
+
+/**
+ * Block attribute keys whose values are RichText content and therefore
+ * benefit from inline diff marking. Marking primitive attributes like
+ * `align: 'left'` would leak `<del>left</del><ins>right</ins>` into a
+ * className/string slot, so this set is intentionally narrow. Most of the
+ * golden-path scenarios this PR covers (paragraph text edits, heading
+ * text edits, bolding a word) live on the `content` attribute; richer
+ * block coverage lands in subsequent phases.
+ */
+const RICH_TEXT_ATTRIBUTE_KEYS = new Set( [ 'content' ] );
+
+function isStringLike( value ) {
+	if ( typeof value === 'string' ) {
+		return true;
+	}
+	// `RichTextData` is an object that stringifies to its HTML form; check
+	// for a usable `toString` rather than instanceof so we don't take a
+	// hard dependency on the rich-text package's internal class.
+	return (
+		value !== null &&
+		value !== undefined &&
+		typeof value.toString === 'function' &&
+		value.toString !== Object.prototype.toString
+	);
+}
+
+/**
+ * Walk the merged attribute set and replace each rich-text value with its
+ * baseline-vs-proposed marked diff. Skips attributes whose value matches
+ * the baseline (no change to mark) or whose baseline is missing (the
+ * suggestion has nothing to diff against).
+ *
+ * @param {Object} merged   Output of `mergeOverlayAttributes`.
+ * @param {Object} baseline Baseline attributes captured when the suggestion
+ *                          began.
+ * @return {Object} `merged` with rich-text attributes replaced by marked
+ * HTML, or `merged` unchanged when nothing was eligible.
+ */
+function applyDiffMarks( merged, baseline ) {
+	if ( ! merged || ! baseline ) {
+		return merged;
+	}
+	let result = null;
+	for ( const key of RICH_TEXT_ATTRIBUTE_KEYS ) {
+		if ( ! Object.prototype.hasOwnProperty.call( merged, key ) ) {
+			continue;
+		}
+		const proposed = merged[ key ];
+		const original = baseline[ key ];
+		if ( ! isStringLike( proposed ) || ! isStringLike( original ) ) {
+			continue;
+		}
+		const proposedStr = String( proposed );
+		const originalStr = String( original );
+		if ( proposedStr === originalStr ) {
+			continue;
+		}
+		if ( ! result ) {
+			result = { ...merged };
+		}
+		result[ key ] = markContentDiff( originalStr, proposedStr );
+	}
+	return result ?? merged;
+}
+
+/**
+ * Strip suggestion marks from incoming `setAttributes` payloads. RichText
+ * round-trips its `value` prop through serialization on every keystroke,
+ * so a previously-marked render would otherwise come back into the overlay
+ * as marked HTML and the next mark pass would double up. Stripping at the
+ * intercept keeps the overlay holding the "proposed" value rather than the
+ * marked rendering.
+ *
+ * @param {Object} nextAttributes Incoming attribute payload.
+ * @return {Object} Payload with rich-text values normalized.
+ */
+function stripMarksFromIncoming( nextAttributes ) {
+	if ( ! nextAttributes ) {
+		return nextAttributes;
+	}
+	let result = null;
+	for ( const key of RICH_TEXT_ATTRIBUTE_KEYS ) {
+		if ( ! Object.prototype.hasOwnProperty.call( nextAttributes, key ) ) {
+			continue;
+		}
+		const value = nextAttributes[ key ];
+		if ( ! isStringLike( value ) ) {
+			continue;
+		}
+		const stripped = stripSuggestionMarks( String( value ) );
+		if ( stripped === String( value ) ) {
+			continue;
+		}
+		if ( ! result ) {
+			result = { ...nextAttributes };
+		}
+		result[ key ] = stripped;
+	}
+	return result ?? nextAttributes;
+}
 
 /**
  * Attribute keys whose values are known to be object-valued and therefore
@@ -72,29 +176,57 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 	const attributesRef = useRef( attributes );
 	attributesRef.current = attributes;
 
-	const overlayAttributes = entries[ clientId ]?.overlayAttributes ?? null;
+	const overlayEntry = entries[ clientId ];
+	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
+	const baselineAttributes = overlayEntry?.baselineAttributes ?? null;
+
+	// Whether this block is the currently selected one. While selected, we
+	// skip applying inline diff marks so RichText's value-prop reconciliation
+	// doesn't fight the user's caret on every keystroke. Marks reappear as
+	// soon as the user clicks/tabs away. Defaults to `true` so any
+	// environment without the block-editor store registered (unit tests of
+	// this HOC) skips marking too — production always has the store.
+	const isSelected = useSelect(
+		( select ) => {
+			const blockEditor = select( BLOCK_EDITOR_STORE_NAME );
+			if ( ! blockEditor?.isBlockSelected ) {
+				return true;
+			}
+			return blockEditor.isBlockSelected( clientId );
+		},
+		[ clientId ]
+	);
 
 	// Does an overlay entry currently exist for this block? This is the
 	// source of truth; `captureBaseline` only creates an entry when there
 	// isn't one, so we can skip the dispatch when we already know there is.
 	// Relying on a local ref was fragile — it didn't reset after the entry
 	// was cleared (auto-save trash, orphan prune, intent-switch).
-	const entryExists = !! entries[ clientId ];
+	const entryExists = !! overlayEntry;
 
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
 			if ( ! entryExists ) {
 				captureBaseline( clientId, name, attributesRef.current );
 			}
-			setOverlayAttributes( clientId, nextAttributes );
+			// Strip any suggestion marks RichText round-tripped from a
+			// previously marked render before storing in the overlay; see
+			// `stripMarksFromIncoming` for the rationale.
+			setOverlayAttributes(
+				clientId,
+				stripMarksFromIncoming( nextAttributes )
+			);
 		},
 		[ clientId, name, captureBaseline, setOverlayAttributes, entryExists ]
 	);
 
-	const mergedAttributes = useMemo(
-		() => mergeOverlayAttributes( attributes, overlayAttributes ),
-		[ attributes, overlayAttributes ]
-	);
+	const mergedAttributes = useMemo( () => {
+		const merged = mergeOverlayAttributes( attributes, overlayAttributes );
+		if ( isSelected ) {
+			return merged;
+		}
+		return applyDiffMarks( merged, baselineAttributes );
+	}, [ attributes, overlayAttributes, baselineAttributes, isSelected ] );
 
 	return (
 		<BlockEdit
@@ -198,5 +330,5 @@ export function registerSuggestionOverlayFilter() {
 	);
 }
 
-export { mergeOverlayAttributes };
+export { mergeOverlayAttributes, applyDiffMarks, stripMarksFromIncoming };
 export default withSuggestionOverlay;
