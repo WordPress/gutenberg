@@ -9,6 +9,7 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -25,6 +26,97 @@ import {
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+const POST_TYPES_WITH_STALE_SAVE_PROTECTION = new Set( [ 'post', 'page' ] );
+
+function getRawPostValue( value ) {
+	return value && typeof value === 'object' && 'raw' in value
+		? value.raw
+		: value;
+}
+
+function getSerializedBlockValue( block ) {
+	return __unstableSerializeAndClean( [ block ] ).trim();
+}
+
+function mergeStaleSerializedBlockContent(
+	baseContent,
+	latestContent,
+	localContent
+) {
+	if (
+		typeof baseContent !== 'string' ||
+		typeof latestContent !== 'string' ||
+		typeof localContent !== 'string'
+	) {
+		return;
+	}
+
+	const baseBlocks = parse( baseContent );
+	const latestBlocks = parse( latestContent );
+	const localBlocks = parse( localContent );
+
+	if (
+		! baseBlocks.length ||
+		! latestBlocks.length ||
+		! localBlocks.length
+	) {
+		return;
+	}
+
+	if (
+		latestBlocks.length > localBlocks.length &&
+		baseBlocks.length === latestBlocks.length
+	) {
+		for ( let index = 0; index < localBlocks.length; index++ ) {
+			if ( localBlocks[ index ].name !== latestBlocks[ index ].name ) {
+				return;
+			}
+		}
+
+		return __unstableSerializeAndClean( [
+			...localBlocks,
+			...latestBlocks.slice( localBlocks.length ),
+		] );
+	}
+
+	if (
+		baseBlocks.length !== latestBlocks.length ||
+		baseBlocks.length !== localBlocks.length
+	) {
+		return;
+	}
+
+	const mergedBlocks = [];
+
+	for ( let index = 0; index < baseBlocks.length; index++ ) {
+		const baseBlock = baseBlocks[ index ];
+		const latestBlock = latestBlocks[ index ];
+		const localBlock = localBlocks[ index ];
+
+		if (
+			baseBlock.name !== latestBlock.name ||
+			baseBlock.name !== localBlock.name
+		) {
+			return;
+		}
+
+		const baseValue = getSerializedBlockValue( baseBlock );
+		const latestValue = getSerializedBlockValue( latestBlock );
+		const localValue = getSerializedBlockValue( localBlock );
+
+		if ( localValue === latestValue ) {
+			mergedBlocks.push( localBlock );
+		} else if ( localValue === baseValue ) {
+			mergedBlocks.push( latestBlock );
+		} else if ( latestValue === baseValue ) {
+			mergedBlocks.push( localBlock );
+		} else {
+			return;
+		}
+	}
+
+	return __unstableSerializeAndClean( mergedBlocks );
+}
 
 const blocksTransientEdits = {
 	blocks: {
@@ -289,15 +381,31 @@ export const additionalEntityConfigLoaders = [
  * @param {Object}  edits           Edits.
  * @param {string}  name            Post type name.
  * @param {boolean} isTemplate      Whether the post type is a template.
+ * @param {string}  baseURL         REST base URL for the post type.
  * @return {Promise< Object >} Updated edits.
  */
 export const prePersistPostType = async (
 	persistedRecord,
 	edits,
 	name,
-	isTemplate
+	isTemplate,
+	baseURL
 ) => {
 	const newEdits = {};
+	const objectType = `postType/${ name }`;
+	const objectId = persistedRecord?.id;
+	let syncManager;
+	let serializedDoc;
+	let hasSerializedDoc = false;
+	const editedSavedFields = POST_RAW_ATTRIBUTES.filter(
+		( key ) => key in edits
+	);
+	const locallyChangedSavedFields = editedSavedFields.filter(
+		( key ) =>
+			getRawPostValue( edits[ key ] ) !==
+			getRawPostValue( persistedRecord?.[ key ] )
+	);
+	const locallyChangedSavedFieldSet = new Set( locallyChangedSavedFields );
 
 	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -316,17 +424,121 @@ export const prePersistPostType = async (
 		}
 	}
 
+	if (
+		window._wpCollaborationEnabled &&
+		POST_TYPES_WITH_STALE_SAVE_PROTECTION.has( name ) &&
+		baseURL &&
+		objectId &&
+		editedSavedFields.length
+	) {
+		try {
+			syncManager = getSyncManager();
+			serializedDoc = await syncManager?.createPersistedCRDTDoc(
+				objectType,
+				objectId
+			);
+			hasSerializedDoc = !! serializedDoc;
+			const latestRecord = await apiFetch( {
+				path: addQueryArgs( `${ baseURL }/${ objectId }`, {
+					context: 'edit',
+				} ),
+			} );
+			const serverChangedSavedFields = editedSavedFields.filter(
+				( key ) =>
+					getRawPostValue( latestRecord?.[ key ] ) !==
+					getRawPostValue( persistedRecord?.[ key ] )
+			);
+			for ( const key of serverChangedSavedFields ) {
+				if (
+					! locallyChangedSavedFieldSet.has( key ) &&
+					key in ( latestRecord ?? {} )
+				) {
+					newEdits[ key ] = getRawPostValue( latestRecord[ key ] );
+				}
+			}
+
+			const hasLatestPersistedCRDTDoc = Boolean(
+				latestRecord?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]
+			);
+			const shouldApplyLatestCRDTDoc =
+				hasLatestPersistedCRDTDoc || locallyChangedSavedFields.length;
+			const didApplyLatestCRDTDoc = shouldApplyLatestCRDTDoc
+				? ( await syncManager?.applyPersistedCRDTDoc?.(
+						objectType,
+						objectId,
+						latestRecord
+				  ) ) ?? false
+				: false;
+
+			if (
+				didApplyLatestCRDTDoc ||
+				( hasLatestPersistedCRDTDoc && serverChangedSavedFields.length )
+			) {
+				serializedDoc = await syncManager?.createPersistedCRDTDoc(
+					objectType,
+					objectId
+				);
+				hasSerializedDoc = !! serializedDoc;
+
+				if (
+					hasLatestPersistedCRDTDoc &&
+					locallyChangedSavedFields.length
+				) {
+					const crdtRecord = syncManager?.getCRDTRecordData?.(
+						objectType,
+						objectId
+					);
+
+					for ( const key of locallyChangedSavedFields ) {
+						if ( key in ( crdtRecord ?? {} ) ) {
+							const crdtValue = getRawPostValue(
+								crdtRecord[ key ]
+							);
+
+							if (
+								crdtValue !==
+								getRawPostValue( latestRecord?.[ key ] )
+							) {
+								newEdits[ key ] = crdtValue;
+							}
+						}
+					}
+				}
+			}
+
+			if (
+				locallyChangedSavedFieldSet.has( 'content' ) &&
+				! ( 'content' in newEdits )
+			) {
+				const mergedContent = mergeStaleSerializedBlockContent(
+					getRawPostValue( persistedRecord?.content ),
+					getRawPostValue( latestRecord?.content ),
+					getRawPostValue( edits.content )
+				);
+
+				if (
+					mergedContent !== undefined &&
+					mergedContent !== getRawPostValue( edits.content )
+				) {
+					newEdits.content = mergedContent;
+				}
+			}
+		} catch {
+			// A failed freshness check should not block saving. The request itself
+			// will still surface any real save errors to the editor.
+		}
+	}
+
 	// Add meta for the persisted CRDT document during real post saves so the
 	// saved post and CRDT snapshot are committed in the same request. We don't
 	// want a post save to fail but a CRDT update to succeed or vice versa.
 	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
 	if ( persistedRecord ) {
-		const objectType = `postType/${ name }`;
-		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
-			objectType,
-			objectId
-		);
+		if ( ! hasSerializedDoc ) {
+			serializedDoc = await (
+				syncManager ?? getSyncManager()
+			)?.createPersistedCRDTDoc( objectType, objectId );
+		}
 
 		if ( serializedDoc ) {
 			newEdits.meta = {
@@ -400,7 +612,13 @@ async function loadPostTypeEntities() {
 					? capitalCase( record.slug ?? '' )
 					: String( record.id ) ),
 			__unstablePrePersist: ( persistedRecord, edits ) =>
-				prePersistPostType( persistedRecord, edits, name, isTemplate ),
+				prePersistPostType(
+					persistedRecord,
+					edits,
+					name,
+					isTemplate,
+					`/${ namespace }/${ postType.rest_base }`
+				),
 			__unstable_rest_base: postType.rest_base,
 			supportsPagination: true,
 			getRevisionsUrl: ( parentId, revisionId ) =>
