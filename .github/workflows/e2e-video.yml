@@ -1,0 +1,332 @@
+name: End-to-End Test Video
+
+on:
+    pull_request:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+env:
+    E2E_SPEC_FILE: test/e2e/specs/editor/various/new-post.spec.js
+    E2E_VIDEO_COMMENT_IDENTIFIER: '<!-- gutenberg-e2e-video-comment -->'
+    E2E_VIDEO_ARTIFACT_NAME: e2e-video-${{ github.run_id }}-${{ github.run_attempt }}
+    WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
+    WORKFLOW_JOB_NAME: Record video
+
+jobs:
+    e2e-video:
+        name: Record video
+        runs-on: 'ubuntu-24.04'
+        timeout-minutes: 30
+        permissions:
+            actions: read
+            contents: read
+            issues: write
+            pull-requests: write
+
+        steps:
+            - name: Update PR comment - queued
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+              continue-on-error: true
+              env:
+                  COMMENT_STATUS: Queued
+                  COMMENT_DETAILS: The workflow job has started and the selected spec is waiting for setup.
+              with:
+                  script: |
+                      const pullRequest = context.payload.pull_request;
+                      if ( ! pullRequest ) {
+                        core.info( 'No pull request found in the event payload.' );
+                        return;
+                      }
+
+                      const marker = process.env.E2E_VIDEO_COMMENT_IDENTIFIER;
+                      const runMarker = `<!-- gutenberg-e2e-video-run:${ context.runId }-${ process.env.GITHUB_RUN_ATTEMPT } -->`;
+                      const runUrl = `${ context.serverUrl }/${ context.repo.owner }/${ context.repo.repo }/actions/runs/${ context.runId }`;
+                      let jobUrl = runUrl;
+
+                      try {
+                        const { data } = await github.rest.actions.listJobsForWorkflowRunAttempt( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          run_id: context.runId,
+                          attempt_number: Number( process.env.GITHUB_RUN_ATTEMPT ),
+                        } );
+                        const job = data.jobs.find(
+                          ( candidate ) => candidate.name === process.env.WORKFLOW_JOB_NAME
+                        );
+                        jobUrl = job?.html_url ?? jobUrl;
+                      } catch ( error ) {
+                        core.info( `Unable to find workflow job URL: ${ error.message }` );
+                      }
+
+                      const body = [
+                        marker,
+                        runMarker,
+                        '### E2E Test Video',
+                        '',
+                        '| Item | Details |',
+                        '| --- | --- |',
+                        `| Status | ${ process.env.COMMENT_STATUS } |`,
+                        `| Details | ${ process.env.COMMENT_DETAILS } |`,
+                        `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
+                        `| Workflow job | [View job](${ jobUrl }) |`,
+                        '| Video artifact | Not available yet |',
+                        '',
+                        `Last updated: ${ new Date().toISOString() }`,
+                      ].join( '\n' );
+
+                      const comments = await github.paginate( github.rest.issues.listComments, {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                      } );
+                      const comment = comments.find( ( candidate ) =>
+                        candidate.body?.includes( marker )
+                      );
+
+                      if ( comment ) {
+                        await github.rest.issues.updateComment( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: comment.id,
+                          body,
+                        } );
+                        return;
+                      }
+
+                      await github.rest.issues.createComment( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                        body,
+                      } );
+
+            - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
+
+            - name: Npm build
+              run: npm run build -- --skip-types
+
+            - name: Install Playwright dependencies
+              run: |
+                  npx playwright install chromium firefox webkit --with-deps
+
+            - name: Install WordPress and start the server
+              run: |
+                  npm run wp-env-test start
+
+            - name: Update PR comment - running
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+              continue-on-error: true
+              env:
+                  COMMENT_STATUS: Running
+                  COMMENT_DETAILS: The selected spec is running with Playwright video capture enabled.
+              with:
+                  script: |
+                      const pullRequest = context.payload.pull_request;
+                      if ( ! pullRequest ) {
+                        core.info( 'No pull request found in the event payload.' );
+                        return;
+                      }
+
+                      const marker = process.env.E2E_VIDEO_COMMENT_IDENTIFIER;
+                      const runMarkerPrefix = '<!-- gutenberg-e2e-video-run:';
+                      const runMarker = `${ runMarkerPrefix }${ context.runId }-${ process.env.GITHUB_RUN_ATTEMPT } -->`;
+                      const runUrl = `${ context.serverUrl }/${ context.repo.owner }/${ context.repo.repo }/actions/runs/${ context.runId }`;
+                      let jobUrl = runUrl;
+
+                      try {
+                        const { data } = await github.rest.actions.listJobsForWorkflowRunAttempt( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          run_id: context.runId,
+                          attempt_number: Number( process.env.GITHUB_RUN_ATTEMPT ),
+                        } );
+                        const job = data.jobs.find(
+                          ( candidate ) => candidate.name === process.env.WORKFLOW_JOB_NAME
+                        );
+                        jobUrl = job?.html_url ?? jobUrl;
+                      } catch ( error ) {
+                        core.info( `Unable to find workflow job URL: ${ error.message }` );
+                      }
+
+                      const body = [
+                        marker,
+                        runMarker,
+                        '### E2E Test Video',
+                        '',
+                        '| Item | Details |',
+                        '| --- | --- |',
+                        `| Status | ${ process.env.COMMENT_STATUS } |`,
+                        `| Details | ${ process.env.COMMENT_DETAILS } |`,
+                        `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
+                        `| Workflow job | [View job](${ jobUrl }) |`,
+                        '| Video artifact | Not available yet |',
+                        '',
+                        `Last updated: ${ new Date().toISOString() }`,
+                      ].join( '\n' );
+
+                      const comments = await github.paginate( github.rest.issues.listComments, {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                      } );
+                      const comment = comments.find( ( candidate ) =>
+                        candidate.body?.includes( marker )
+                      );
+
+                      if ( comment ) {
+                        if (
+                          comment.body?.includes( runMarkerPrefix ) &&
+                          ! comment.body?.includes( runMarker )
+                        ) {
+                          core.info( 'A newer workflow run owns the PR comment. Skipping update.' );
+                          return;
+                        }
+
+                        await github.rest.issues.updateComment( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: comment.id,
+                          body,
+                        } );
+                        return;
+                      }
+
+                      await github.rest.issues.createComment( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                        body,
+                      } );
+
+            - name: Run selected E2E spec
+              id: run-tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  PLAYWRIGHT_VIDEO: on
+              run: |
+                  if [[ ! -f "$E2E_SPEC_FILE" ]]; then
+                      echo "::error::E2E_SPEC_FILE does not exist: $E2E_SPEC_FILE"
+                      exit 1
+                  fi
+
+                  SPEC_FILE="${E2E_SPEC_FILE#test/e2e/}"
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- "$SPEC_FILE"
+
+            - name: Archive test videos
+              id: upload-video
+              uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+              if: ${{ always() }}
+              with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_NAME }}
+                  path: ${{ env.WP_ARTIFACTS_PATH }}/test-results/**/*.webm
+                  if-no-files-found: error
+                  retention-days: 14
+
+            - name: Update PR comment - completed
+              uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8.0.0
+              if: ${{ always() }}
+              continue-on-error: true
+              env:
+                  TEST_OUTCOME: ${{ steps.run-tests.outcome }}
+                  JOB_STATUS: ${{ job.status }}
+                  VIDEO_ARTIFACT_URL: ${{ steps.upload-video.outputs.artifact-url }}
+              with:
+                  script: |
+                      const pullRequest = context.payload.pull_request;
+                      if ( ! pullRequest ) {
+                        core.info( 'No pull request found in the event payload.' );
+                        return;
+                      }
+
+                      const marker = process.env.E2E_VIDEO_COMMENT_IDENTIFIER;
+                      const runMarkerPrefix = '<!-- gutenberg-e2e-video-run:';
+                      const runMarker = `${ runMarkerPrefix }${ context.runId }-${ process.env.GITHUB_RUN_ATTEMPT } -->`;
+                      const runUrl = `${ context.serverUrl }/${ context.repo.owner }/${ context.repo.repo }/actions/runs/${ context.runId }`;
+                      let jobUrl = runUrl;
+
+                      try {
+                        const { data } = await github.rest.actions.listJobsForWorkflowRunAttempt( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          run_id: context.runId,
+                          attempt_number: Number( process.env.GITHUB_RUN_ATTEMPT ),
+                        } );
+                        const job = data.jobs.find(
+                          ( candidate ) => candidate.name === process.env.WORKFLOW_JOB_NAME
+                        );
+                        jobUrl = job?.html_url ?? jobUrl;
+                      } catch ( error ) {
+                        core.info( `Unable to find workflow job URL: ${ error.message }` );
+                      }
+
+                      const testOutcome = process.env.TEST_OUTCOME || 'skipped';
+                      const jobStatus = process.env.JOB_STATUS || testOutcome;
+                      const artifactUrl = process.env.VIDEO_ARTIFACT_URL;
+                      const artifact = artifactUrl
+                        ? `[Download video artifact](${ artifactUrl })`
+                        : 'No video artifact was created. Check the workflow job logs.';
+
+                      const body = [
+                        marker,
+                        runMarker,
+                        '### E2E Test Video',
+                        '',
+                        '| Item | Details |',
+                        '| --- | --- |',
+                        `| Status | Completed (${ jobStatus }) |`,
+                        `| Details | Test outcome: ${ testOutcome } |`,
+                        `| Spec | \`${ process.env.E2E_SPEC_FILE }\` |`,
+                        `| Workflow job | [View job](${ jobUrl }) |`,
+                        `| Video artifact | ${ artifact } |`,
+                        '',
+                        `Last updated: ${ new Date().toISOString() }`,
+                      ].join( '\n' );
+
+                      const comments = await github.paginate( github.rest.issues.listComments, {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                      } );
+                      const comment = comments.find( ( candidate ) =>
+                        candidate.body?.includes( marker )
+                      );
+
+                      if ( comment ) {
+                        if (
+                          comment.body?.includes( runMarkerPrefix ) &&
+                          ! comment.body?.includes( runMarker )
+                        ) {
+                          core.info( 'A newer workflow run owns the PR comment. Skipping update.' );
+                          return;
+                        }
+
+                        await github.rest.issues.updateComment( {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          comment_id: comment.id,
+                          body,
+                        } );
+                        return;
+                      }
+
+                      await github.rest.issues.createComment( {
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: pullRequest.number,
+                        body,
+                      } );

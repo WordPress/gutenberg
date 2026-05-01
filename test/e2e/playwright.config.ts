@@ -10,6 +10,16 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
+const videoModes = [
+	'off',
+	'on',
+	'retain-on-failure',
+	'on-first-retry',
+] as const;
+const video =
+	videoModes.find( ( mode ) => mode === process.env.PLAYWRIGHT_VIDEO ) ??
+	baseConfig.use.video;
+
 const config = defineConfig( {
 	...baseConfig,
 	webServer: {
@@ -23,6 +33,10 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
+	use: {
+		...baseConfig.use,
+		video,
+	},
 	projects: [
 		{
 			name: 'chromium',
