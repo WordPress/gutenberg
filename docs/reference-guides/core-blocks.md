@@ -967,7 +967,7 @@ A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/slider-track
--	**Supports:** anchor, color (background, gradients, text), shadow, spacing (blockGap, padding, ~~margin~~), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, gradients, text), shadow, spacing (padding, ~~margin~~), ~~html~~, ~~reusable~~
 
 ## Slider
 

@@ -13,7 +13,6 @@
 		"html": false,
 		"reusable": false,
 		"spacing": {
-			"blockGap": true,
 			"padding": true,
 			"margin": false
 		},
