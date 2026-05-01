@@ -8,13 +8,12 @@
 /**
  * Renders the `core/slider` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider( $attributes, $content, $block ) {
+function render_block_core_slider( $attributes, $content ) {
 	/*
 	 * Count slides from the rendered markup. Empty slides return ''
 	 * from their render callback, so only non-empty slides are present
@@ -27,7 +26,7 @@ function render_block_core_slider( $attributes, $content, $block ) {
 	}
 
 	// If there are no slides, do not render the slider block.
-	if ( $slide_count === 0 ) {
+	if ( 0 === $slide_count ) {
 		return '';
 	}
 

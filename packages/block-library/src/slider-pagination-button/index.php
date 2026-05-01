@@ -14,7 +14,7 @@
  * @param bool   $is_previous True for the previous (left-pointing) button.
  * @return string SVG path data.
  */
-function get_slider_pagination_button_icon_path( $arrow_icon, $is_previous ) {
+function block_core_slider_pagination_button_get_icon_path( $arrow_icon, $is_previous ) {
 	$paths = array(
 		'chevron' => array(
 			'previous' => 'M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z',
@@ -50,7 +50,7 @@ function render_block_core_slider_pagination_button( $attributes, $content, $blo
 	$label       = $is_previous ? __( 'Previous slide' ) : __( 'Next slide' );
 
 	// Build the button inner HTML based on navigationButtonType.
-	$icon_svg  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" class="wp-block-slider-pagination-button__icon"><path d="' . esc_attr( get_slider_pagination_button_icon_path( $arrow_icon, $is_previous ) ) . '" /></svg>';
+	$icon_svg  = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false" class="wp-block-slider-pagination-button__icon"><path d="' . esc_attr( block_core_slider_pagination_button_get_icon_path( $arrow_icon, $is_previous ) ) . '" /></svg>';
 	$text_span = '<span class="wp-block-slider-pagination-button__text">' . esc_html( $button_text ) . '</span>';
 
 	if ( 'icon' === $button_type ) {
@@ -65,14 +65,14 @@ function render_block_core_slider_pagination_button( $attributes, $content, $blo
 
 	// Compose the button markup.
 	$wrapper_attributes = array(
-		'class'                      => sprintf(
+		'class'                       => sprintf(
 			'is-type-%s is-icon-%s',
 			sanitize_html_class( $type ),
 			sanitize_html_class( $arrow_icon )
 		),
-		'type'                       => 'button',
-		'data-wp-interactive'        => 'core/slider',
-		'data-wp-on--click'          => $is_previous ? 'actions.prevSlide' : 'actions.nextSlide',
+		'type'                        => 'button',
+		'data-wp-interactive'         => 'core/slider',
+		'data-wp-on--click'           => $is_previous ? 'actions.prevSlide' : 'actions.nextSlide',
 		'data-wp-bind--aria-disabled' => $is_previous ? 'state.isAtStart' : 'state.isAtEnd',
 	);
 

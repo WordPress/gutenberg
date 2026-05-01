@@ -13,7 +13,7 @@
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider_track( $attributes, $content, $block ) {
+function render_block_core_slider_track( $attributes, $content ) {
 	$p           = new WP_HTML_Tag_Processor( $content );
 	$slide_count = 0;
 
