@@ -144,7 +144,6 @@ class Inserter extends Component {
 			clientId,
 			isAppender,
 			showInserterHelpPanel,
-
 			// This prop is experimental to give some time for the quick inserter to mature
 			// Feel free to make them stable after a few releases.
 			__experimentalIsQuick: isQuick,
@@ -194,13 +193,13 @@ class Inserter extends Component {
 		const {
 			position,
 			hasSingleBlockType,
-			directInsertBlock,
+			blockToInsert,
 			insertOnlyAllowedBlock,
 			__experimentalIsQuick: isQuick,
 			onSelectOrClose,
 		} = this.props;
 
-		if ( hasSingleBlockType || directInsertBlock ) {
+		if ( hasSingleBlockType || blockToInsert ) {
 			return this.renderToggle( { onToggle: insertOnlyAllowedBlock } );
 		}
 
@@ -232,7 +231,6 @@ export default compose( [
 				getDirectInsertBlock,
 				getBlockListSettings,
 			} = select( blockEditorStore );
-
 			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			rootClientId =
@@ -247,21 +245,19 @@ export default compose( [
 				allowedBlocks?.length === 1 &&
 				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
 					?.length === 0;
+			const allowedBlockType = hasSingleBlockType
+				? allowedBlocks[ 0 ]
+				: null;
 
-			let allowedBlockType = false;
-			if ( hasSingleBlockType ) {
-				allowedBlockType = allowedBlocks[ 0 ];
-			}
-
-			// The block this appender will insert when in single-click mode.
-			// Prefer the registered `defaultBlock`; fall back to the only allowed
-			// block when the parent restricts inner blocks to a single type.
+			// Single-block-type parents get adjacent-attribute copying
+			// without needing to set `directInsert: true`.
 			let blockToInsert = directInsertBlock || null;
-			if ( ! blockToInsert && hasSingleBlockType ) {
-				blockToInsert =
-					defaultBlock?.name === allowedBlockType.name
-						? defaultBlock
-						: { name: allowedBlockType.name };
+			if (
+				! blockToInsert &&
+				hasSingleBlockType &&
+				defaultBlock?.name === allowedBlockType.name
+			) {
+				blockToInsert = defaultBlock;
 			}
 
 			const defaultBlockType = directInsertBlock
@@ -277,7 +273,6 @@ export default compose( [
 				hasSingleBlockType,
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
-				directInsertBlock,
 				blockToInsert,
 				appenderLabel,
 				rootClientId,
@@ -291,68 +286,59 @@ export default compose( [
 					rootClientId,
 					clientId,
 					isAppender,
+					hasSingleBlockType,
 					allowedBlockType,
 					blockToInsert,
 					onSelectOrClose,
 					selectBlockOnInsert,
 				} = ownProps;
 
-				if ( ! blockToInsert ) {
+				if ( ! hasSingleBlockType && ! blockToInsert ) {
 					return;
 				}
 
-				function getAdjacentBlockAttributes( attributesToCopy ) {
-					const { getBlock, getPreviousBlockClientId } =
-						select( blockEditorStore );
+				const blockName = blockToInsert?.name ?? allowedBlockType.name;
 
-					if (
-						! attributesToCopy ||
-						( ! clientId && ! rootClientId )
-					) {
+				function getAdjacentBlockAttributes( attributesToCopy ) {
+					if ( ! attributesToCopy?.length ) {
 						return {};
 					}
 
-					const result = {};
-					let adjacentAttributes = {};
+					const { getBlock, getPreviousBlockClientId } =
+						select( blockEditorStore );
 
-					// If there is no clientId, then attempt to get attributes
-					// from the last block within innerBlocks of the root block.
-					if ( ! clientId ) {
-						const parentBlock = getBlock( rootClientId );
-
-						if ( parentBlock?.innerBlocks?.length ) {
-							const lastInnerBlock =
-								parentBlock.innerBlocks[
-									parentBlock.innerBlocks.length - 1
-								];
-
-							if ( blockToInsert.name === lastInnerBlock.name ) {
-								adjacentAttributes = lastInnerBlock.attributes;
-							}
-						}
-					} else {
-						// Otherwise, attempt to get attributes from the
-						// previous block relative to the current clientId.
+					// Find the adjacent block of the same type whose attributes
+					// should be copied: previous sibling when inserting next to
+					// an existing block, otherwise the last child of the root.
+					let adjacentAttributes;
+					if ( clientId ) {
 						const currentBlock = getBlock( clientId );
 						const previousBlock = getBlock(
 							getPreviousBlockClientId( clientId )
 						);
-
 						if ( currentBlock?.name === previousBlock?.name ) {
-							adjacentAttributes =
-								previousBlock?.attributes || {};
+							adjacentAttributes = previousBlock?.attributes;
+						}
+					} else if ( rootClientId ) {
+						const lastInnerBlock =
+							getBlock( rootClientId )?.innerBlocks?.at( -1 );
+						if ( lastInnerBlock?.name === blockName ) {
+							adjacentAttributes = lastInnerBlock.attributes;
 						}
 					}
 
-					// Copy over only those attributes flagged to be copied.
-					attributesToCopy.forEach( ( attribute ) => {
-						if ( adjacentAttributes.hasOwnProperty( attribute ) ) {
-							result[ attribute ] =
-								adjacentAttributes[ attribute ];
-						}
-					} );
+					if ( ! adjacentAttributes ) {
+						return {};
+					}
 
-					return result;
+					return Object.fromEntries(
+						attributesToCopy
+							.filter( ( attr ) => attr in adjacentAttributes )
+							.map( ( attr ) => [
+								attr,
+								adjacentAttributes[ attr ],
+							] )
+					);
 				}
 
 				function getInsertionIndex() {
@@ -388,11 +374,11 @@ export default compose( [
 				// This ensures styling from nearby blocks is preserved in the newly inserted block.
 				// See: https://github.com/WordPress/gutenberg/issues/37904
 				const newAttributes = getAdjacentBlockAttributes(
-					blockToInsert.attributesToCopy
+					blockToInsert?.attributesToCopy
 				);
 
-				const newBlock = createBlock( blockToInsert.name, {
-					...( blockToInsert.attributes || {} ),
+				const newBlock = createBlock( blockName, {
+					...( blockToInsert?.attributes || {} ),
 					...newAttributes,
 				} );
 
