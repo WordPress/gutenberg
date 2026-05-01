@@ -111,12 +111,18 @@ test.describe( 'Collaboration - auto-draft autosave retention', () => {
 		);
 
 		const post = await requestUtils.rest< RestPost >( {
-			path: `/wp/v2/posts/${ postId }?context=edit`,
+			path: `/wp/v2/posts/${ postId }`,
+			params: {
+				context: 'edit',
+			},
 		} );
 		const drafts = await requestUtils.rest< RestPost[] >( {
-			path: `/wp/v2/posts?context=edit&status=draft&search=${ encodeURIComponent(
-				title
-			) }`,
+			path: '/wp/v2/posts',
+			params: {
+				context: 'edit',
+				status: 'draft',
+				search: title,
+			},
 		} );
 
 		expect( post.status ).toBe( 'draft' );
