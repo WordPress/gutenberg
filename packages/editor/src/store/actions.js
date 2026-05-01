@@ -32,6 +32,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 
 const { fetchServerCRDTChanges } = unlock( coreDataPrivateApis );
@@ -198,7 +199,7 @@ export const savePost =
 
 		if (
 			isCollaborationEnabled &&
-			unlock( select ).hasPendingServerCRDTMerge()
+			unlock( registry.select( STORE_NAME ) ).hasPendingServerCRDTMerge()
 		) {
 			// Block saves while the merge confirmation dialog is open in RTC.
 			return;
@@ -259,7 +260,9 @@ export const savePost =
 					);
 
 					if ( hasChanges ) {
-						unlock( dispatch ).setPendingServerCRDTMerge( true );
+						unlock(
+							registry.dispatch( STORE_NAME )
+						).setPendingServerCRDTMerge( true );
 						dispatch( {
 							type: 'REQUEST_POST_UPDATE_FINISH',
 							options,
