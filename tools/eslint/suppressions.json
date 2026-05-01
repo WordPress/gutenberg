@@ -1444,6 +1444,11 @@
 			"count": 13
 		}
 	},
+	"packages/grid/src/resize-handle.tsx": {
+		"react-hooks/immutability": {
+			"count": 1
+		}
+	},
 	"packages/image-cropper/src/stories/index.story.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
