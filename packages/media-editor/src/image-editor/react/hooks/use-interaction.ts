@@ -40,7 +40,7 @@ export interface UseInteractionOptions {
 	minZoom?: number;
 	/** Maximum zoom level. Defaults to MAX_ZOOM. */
 	maxZoom?: number;
-	/** Zoom speed multiplier for wheel events. Defaults to 0.01. */
+	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. */
 	zoomSpeed?: number;
 	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. */
 	keyboardStep?: number;
