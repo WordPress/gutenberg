@@ -18,6 +18,9 @@ env:
     E2E_SPEC_FILE: test/e2e/specs/editor/various/new-post.spec.js
     E2E_VIDEO_COMMENT_IDENTIFIER: '<!-- gutenberg-e2e-video-comment -->'
     E2E_VIDEO_ARTIFACT_PREFIX: e2e-video-${{ github.run_id }}-${{ github.run_attempt }}
+    E2E_VIDEO_LOG_FILE: ${{ github.workspace }}/artifacts/e2e-video-test.log
+    E2E_VIDEO_METADATA_FILE: ${{ github.workspace }}/artifacts/e2e-video-metadata.json
+    E2E_VIDEO_RESULTS_FILE: ${{ github.workspace }}/artifacts/e2e-video-results.json
     E2E_VIDEO_UPLOAD_LIMIT: 10
     WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
     WORKFLOW_JOB_NAME: Record video
@@ -227,6 +230,7 @@ jobs:
               id: run-tests
               env:
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ env.E2E_VIDEO_RESULTS_FILE }}
                   PLAYWRIGHT_VIDEO: on
               run: |
                   if [[ ! -f "$E2E_SPEC_FILE" ]]; then
@@ -234,16 +238,23 @@ jobs:
                       exit 1
                   fi
 
+                  mkdir -p "$WP_ARTIFACTS_PATH"
                   SPEC_FILE="${E2E_SPEC_FILE#test/e2e/}"
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- "$SPEC_FILE"
+                  set +e
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- "$SPEC_FILE" 2>&1 | tee "$E2E_VIDEO_LOG_FILE"
+                  TEST_STATUS="${PIPESTATUS[0]}"
+                  set -e
+                  exit "$TEST_STATUS"
 
             - name: Prepare test videos
               id: prepare-videos
               if: ${{ always() }}
               run: |
                   VIDEO_UPLOAD_DIR="$WP_ARTIFACTS_PATH/e2e-video-uploads"
+                  VIDEO_MAP="$VIDEO_UPLOAD_DIR/video-map.tsv"
                   rm -rf "$VIDEO_UPLOAD_DIR"
                   mkdir -p "$VIDEO_UPLOAD_DIR"
+                  : > "$VIDEO_MAP"
 
                   mapfile -d '' VIDEOS < <(find "$WP_ARTIFACTS_PATH/test-results" -type f -name '*.webm' -print0 | sort -z)
                   VIDEO_COUNT="${#VIDEOS[@]}"
@@ -272,11 +283,217 @@ jobs:
                               -movflags +faststart \
                               "$VIDEO_PATH"
                           echo "video_${SLOT}_path=$VIDEO_PATH" >> "$GITHUB_OUTPUT"
+                          printf '%s\t%s\t%s\n' "$SLOT" "${VIDEOS[$VIDEO_INDEX]}" "$VIDEO_PATH" >> "$VIDEO_MAP"
                           continue
                       fi
 
                       echo "video_${SLOT}_path=" >> "$GITHUB_OUTPUT"
                   done
+
+                  node <<'NODE'
+                  const fs = require( 'fs' );
+                  const path = require( 'path' );
+
+                  const workspace = process.env.GITHUB_WORKSPACE || process.cwd();
+                  const logPath = process.env.E2E_VIDEO_LOG_FILE;
+                  const metadataPath = process.env.E2E_VIDEO_METADATA_FILE;
+                  const reportPath = process.env.E2E_VIDEO_RESULTS_FILE;
+                  const videoMapPath = path.join(
+                    process.env.WP_ARTIFACTS_PATH,
+                    'e2e-video-uploads',
+                    'video-map.tsv'
+                  );
+
+                  const stripAnsi = ( text ) =>
+                    text.replace(
+                      // eslint-disable-next-line no-control-regex
+                      /[\u001B\u009B][[\]()#;?]*(?:[a-zA-Z\d]*(?:;[a-zA-Z\d]*)*)?\u0007|(?:\d{1,4}(?:;\d{0,4})*)?[\dA-PR-TZcf-nq-uy=><~]/g,
+                      ''
+                    );
+                  const truncate = ( text, limit = 1200 ) => {
+                    const cleanText = stripAnsi( String( text || '' ) ).trim();
+                    return cleanText.length > limit
+                      ? `${ cleanText.slice( 0, limit - 3 ) }...`
+                      : cleanText;
+                  };
+                  const resolvePath = ( filePath ) =>
+                    path.resolve(
+                      path.isAbsolute( filePath )
+                        ? filePath
+                        : path.join( workspace, filePath )
+                    );
+                  const relativePath = ( filePath ) =>
+                    path.relative( workspace, resolvePath( filePath ) );
+
+                  const videoMap = fs
+                    .readFileSync( videoMapPath, 'utf8' )
+                    .trim()
+                    .split( '\n' )
+                    .filter( Boolean )
+                    .map( ( line ) => {
+                      const [ slot, source, output ] = line.split( '\t' );
+                      return {
+                        slot: Number( slot ),
+                        source,
+                        output,
+                      };
+                    } );
+
+                  let report = null;
+                  let logText = '';
+                  try {
+                    report = JSON.parse( fs.readFileSync( reportPath, 'utf8' ) );
+                  } catch ( error ) {
+                    console.log(
+                      `Unable to read Playwright JSON report: ${ error.message }`
+                    );
+                  }
+                  try {
+                    logText = fs.readFileSync( logPath, 'utf8' );
+                  } catch ( error ) {
+                    console.log(
+                      `Unable to read Playwright log: ${ error.message }`
+                    );
+                  }
+
+                  const failureFromLog = () => {
+                    const lines = stripAnsi( logText )
+                      .split( '\n' )
+                      .filter( ( line ) =>
+                        /(^\s*\d+\)|Error:|Timeout|expect\(|failed|FAIL)/i.test(
+                          line
+                        )
+                      )
+                      .slice( 0, 20 )
+                      .join( '\n' );
+                    return truncate( lines );
+                  };
+
+                  const failureFromResult = ( result ) => {
+                    const messages = [];
+                    if ( result?.error?.message ) {
+                      messages.push( result.error.message );
+                    }
+                    if ( result?.error?.stack ) {
+                      messages.push( result.error.stack );
+                    }
+                    for ( const error of result?.errors || [] ) {
+                      if ( error?.message ) {
+                        messages.push( error.message );
+                      } else if ( error?.stack ) {
+                        messages.push( error.stack );
+                      }
+                    }
+                    return truncate( messages.join( '\n\n' ) );
+                  };
+
+                  const failureFromContext = ( videoPath ) => {
+                    const contextPath = path.join(
+                      path.dirname( resolvePath( videoPath ) ),
+                      'error-context.md'
+                    );
+                    try {
+                      return truncate( fs.readFileSync( contextPath, 'utf8' ) );
+                    } catch {
+                      return '';
+                    }
+                  };
+
+                  const describeFromPath = ( videoPath ) =>
+                    path
+                      .basename( path.dirname( videoPath ) )
+                      .replace( /-/g, ' ' )
+                      .trim() || 'Unknown test';
+
+                  const byVideoPath = new Map();
+                  const visitSuite = ( suite, parents = [] ) => {
+                    const suitePath = suite.title
+                      ? [ ...parents, suite.title ]
+                      : parents;
+
+                    for ( const childSuite of suite.suites || [] ) {
+                      visitSuite( childSuite, suitePath );
+                    }
+
+                    for ( const spec of suite.specs || [] ) {
+                      const testTitle = [ ...suitePath, spec.title ]
+                        .filter( Boolean )
+                        .join( ' > ' );
+
+                      for ( const test of spec.tests || [] ) {
+                        for ( const [ resultIndex, result ] of (
+                          test.results || []
+                        ).entries() ) {
+                          for ( const attachment of result.attachments || [] ) {
+                            if (
+                              attachment.name !== 'video' ||
+                              ! attachment.path
+                            ) {
+                              continue;
+                            }
+
+                            const failure =
+                              failureFromResult( result ) ||
+                              failureFromContext( attachment.path );
+                            byVideoPath.set( resolvePath( attachment.path ), {
+                              test: testTitle || spec.title || 'Unknown test',
+                              project:
+                                test.projectName || test.projectId || 'unknown',
+                              status:
+                                result.status ||
+                                test.status ||
+                                ( spec.ok ? 'passed' : 'unknown' ),
+                              retry:
+                                typeof result.retry === 'number'
+                                  ? result.retry
+                                  : resultIndex,
+                              duration:
+                                typeof result.duration === 'number'
+                                  ? `${ Math.round( result.duration / 1000 ) }s`
+                                  : '',
+                              failure:
+                                failure ||
+                                ( result.status === 'passed'
+                                  ? 'None.'
+                                  : 'No failure details were found in the JSON report. Check the workflow logs.' ),
+                            } );
+                          }
+                        }
+                      }
+                    }
+                  };
+
+                  for ( const suite of report?.suites || [] ) {
+                    visitSuite( suite );
+                  }
+
+                  const videos = videoMap.map( ( video ) => {
+                    const match = byVideoPath.get( resolvePath( video.source ) );
+                    return {
+                      slot: video.slot,
+                      source: relativePath( video.source ),
+                      output: relativePath( video.output ),
+                      test: match?.test || describeFromPath( video.source ),
+                      project: match?.project || 'unknown',
+                      status: match?.status || 'unknown',
+                      retry:
+                        match?.retry === undefined || match?.retry === ''
+                          ? ''
+                          : String( match.retry ),
+                      duration: match?.duration || '',
+                      failure:
+                        match?.failure ||
+                        failureFromContext( video.source ) ||
+                        failureFromLog() ||
+                        'No failure details were found. Check the workflow logs.',
+                    };
+                  } );
+
+                  fs.writeFileSync(
+                    metadataPath,
+                    JSON.stringify( { videos }, null, 2 )
+                  );
+                  NODE
 
             - name: Upload test video 1
               id: upload-video-1
@@ -396,6 +613,7 @@ jobs:
                   TEST_OUTCOME: ${{ steps.run-tests.outcome }}
                   JOB_STATUS: ${{ job.status }}
                   VIDEO_COUNT: ${{ steps.prepare-videos.outputs.count }}
+                  VIDEO_METADATA_FILE: ${{ env.E2E_VIDEO_METADATA_FILE }}
                   VIDEO_ARTIFACT_URL_1: ${{ steps.upload-video-1.outputs.artifact-url }}
                   VIDEO_ARTIFACT_URL_2: ${{ steps.upload-video-2.outputs.artifact-url }}
                   VIDEO_ARTIFACT_URL_3: ${{ steps.upload-video-3.outputs.artifact-url }}
@@ -408,6 +626,8 @@ jobs:
                   VIDEO_ARTIFACT_URL_10: ${{ steps.upload-video-10.outputs.artifact-url }}
               with:
                   script: |
+                      const fs = require( 'fs' );
+
                       const pullRequest = context.payload.pull_request;
                       if ( ! pullRequest ) {
                         core.info( 'No pull request found in the event payload.' );
@@ -442,15 +662,62 @@ jobs:
                       const artifactUrls = Array.from( { length: 10 }, ( _, index ) =>
                         process.env[ `VIDEO_ARTIFACT_URL_${ index + 1 }` ]
                       ).filter( Boolean );
+                      let videoMetadata = [];
+                      try {
+                        videoMetadata =
+                          JSON.parse(
+                            fs.readFileSync(
+                              process.env.VIDEO_METADATA_FILE,
+                              'utf8'
+                            )
+                          ).videos || [];
+                      } catch ( error ) {
+                        core.info( `Unable to read video metadata: ${ error.message }` );
+                      }
                       const artifact = artifactUrls.length
                         ? `${ artifactUrls.length } of ${ videoCountNumber || artifactUrls.length } H.264 MP4 video artifact(s) uploaded.`
                         : 'No video artifact was created. Check the workflow job logs.';
-                      const artifactEmbeds = artifactUrls.flatMap( ( artifactUrl, index ) => [
-                        `#### Video ${ index + 1 }`,
-                        `[Open video artifact ${ index + 1 }](${ artifactUrl })`,
-                        `![](${ artifactUrl })`,
-                        '',
-                      ] );
+                      const codeBlock = ( text ) =>
+                        String( text || '' ).replace( /```/g, "'''" );
+                      const artifactEmbeds = artifactUrls.flatMap(
+                        ( artifactUrl, index ) => {
+                          const video = videoMetadata[ index ] || {};
+                          const statusDetails = [
+                            video.status && `status: ${ video.status }`,
+                            video.project && `project: ${ video.project }`,
+                            video.retry !== undefined &&
+                              video.retry !== '' &&
+                              `retry: ${ video.retry }`,
+                            video.duration && `duration: ${ video.duration }`,
+                          ].filter( Boolean );
+                          const failure =
+                            video.failure || 'No failure details were found.';
+                          const failureBlock =
+                            failure === 'None.'
+                              ? [ '**Failure:** None.' ]
+                              : [
+                                  '<details>',
+                                  '<summary>Failure</summary>',
+                                  '',
+                                  '```text',
+                                  codeBlock( failure ),
+                                  '```',
+                                  '</details>',
+                                ];
+
+                          return [
+                            `#### Video ${ index + 1 }`,
+                            `**Test:** ${ video.test || 'Unknown test' }`,
+                            statusDetails.length
+                              ? `**Run:** ${ statusDetails.join( ', ' ) }`
+                              : '',
+                            ...failureBlock,
+                            `[Open H.264 MP4 artifact ${ index + 1 }](${ artifactUrl })`,
+                            `![](${ artifactUrl })`,
+                            '',
+                          ].filter( Boolean );
+                        }
+                      );
 
                       const body = [
                         marker,

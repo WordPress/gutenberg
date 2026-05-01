@@ -27,7 +27,22 @@ const config = defineConfig( {
 		command: 'npm run --prefix ../.. wp-env-test -- start',
 	},
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ], [ 'blob' ] ]
+		? [
+				[ 'github' ],
+				[ './config/flaky-tests-reporter.ts' ],
+				[ 'blob' ],
+				...( process.env.PLAYWRIGHT_JSON_OUTPUT_FILE
+					? [
+							[
+								'json',
+								{
+									outputFile:
+										process.env.PLAYWRIGHT_JSON_OUTPUT_FILE,
+								},
+							],
+					  ]
+					: [] ),
+		  ]
 		: 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(
