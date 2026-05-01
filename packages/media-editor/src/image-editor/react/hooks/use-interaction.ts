@@ -164,7 +164,8 @@ export function useInteraction(
 					actionsRef.current.setZoomAtPoint( zoom, pan ),
 				snapRotate90: ( direction ) =>
 					actionsRef.current.snapRotate90( direction ),
-				flip: ( direction ) => actionsRef.current.flip?.( direction ),
+				toggleFlip: ( direction ) =>
+					actionsRef.current.toggleFlip?.( direction ),
 			},
 			getContainerSize: () => containerSizeRef.current,
 			getImageSize: () => imageSizeRef.current,

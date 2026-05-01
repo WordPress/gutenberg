@@ -237,7 +237,7 @@ describe( 'InteractionController', () => {
 			setZoom: jest.fn(),
 			setZoomAtPoint: jest.fn(),
 			snapRotate90: jest.fn(),
-			flip: jest.fn(),
+			toggleFlip: jest.fn(),
 		};
 	} );
 
@@ -635,7 +635,9 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'h' ) );
 
-			expect( actionMocks.flip ).toHaveBeenCalledWith( 'horizontal' );
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
 		} );
 
 		it( 'calls flip horizontal on H key', () => {
@@ -644,7 +646,9 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'H' ) );
 
-			expect( actionMocks.flip ).toHaveBeenCalledWith( 'horizontal' );
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
 		} );
 
 		it( 'calls flip vertical on v key', () => {
@@ -653,7 +657,7 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'v' ) );
 
-			expect( actionMocks.flip ).toHaveBeenCalledWith( 'vertical' );
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
 		} );
 
 		it( 'calls flip vertical on V key', () => {
@@ -662,7 +666,7 @@ describe( 'InteractionController', () => {
 
 			controller.handleKeyDown( createKeyboardEvent( 'V' ) );
 
-			expect( actionMocks.flip ).toHaveBeenCalledWith( 'vertical' );
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
 		} );
 
 		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
@@ -675,7 +679,7 @@ describe( 'InteractionController', () => {
 					createKeyboardEvent( 'h', { [ modifier ]: true } )
 				);
 
-				expect( actionMocks.flip ).not.toHaveBeenCalled();
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 			}
 		);
 
@@ -689,7 +693,7 @@ describe( 'InteractionController', () => {
 					createKeyboardEvent( 'v', { [ modifier ]: true } )
 				);
 
-				expect( actionMocks.flip ).not.toHaveBeenCalled();
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 			}
 		);
 
@@ -720,7 +724,7 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
 			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
 			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
-			expect( actionMocks.flip ).not.toHaveBeenCalled();
+			expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 		} );
 	} );
 

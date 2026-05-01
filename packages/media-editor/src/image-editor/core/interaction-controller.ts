@@ -63,7 +63,7 @@ export interface CropperInteractionActions {
 	/** Snap rotate by 90 degrees. */
 	snapRotate90: ( direction: 1 | -1 ) => void;
 	/** Toggle flip on the given axis. */
-	flip?: ( direction: 'horizontal' | 'vertical' ) => void;
+	toggleFlip?: ( direction: 'horizontal' | 'vertical' ) => void;
 }
 
 /**
@@ -884,7 +884,7 @@ export class InteractionController {
 					break;
 				}
 				e.preventDefault();
-				this.options.actions.flip?.( 'horizontal' );
+				this.options.actions.toggleFlip?.( 'horizontal' );
 				break;
 			}
 			case 'v':
@@ -893,7 +893,7 @@ export class InteractionController {
 					break;
 				}
 				e.preventDefault();
-				this.options.actions.flip?.( 'vertical' );
+				this.options.actions.toggleFlip?.( 'vertical' );
 				break;
 			}
 		}

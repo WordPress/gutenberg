@@ -55,7 +55,7 @@ export interface UseCropperStateReturn {
 	/** Set the flip state. */
 	setFlip: ( flip: Flip ) => void;
 	/** Toggle flip on the given axis. */
-	flip: ( direction: 'horizontal' | 'vertical' ) => void;
+	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
 	/** Snap rotate 90° preserving the image selection (Google Photos style). */
 	snapRotate90: ( direction: 1 | -1 ) => void;
 	/** Set the crop rectangle in normalized coordinates. */
@@ -341,7 +341,7 @@ export function useCropperState(
 		[ dispatch, pushToHistory, commitHistory ]
 	);
 
-	const flip = useCallback(
+	const toggleFlip = useCallback(
 		( direction: 'horizontal' | 'vertical' ) => {
 			setFlip( {
 				...stateRef.current.flip,
@@ -439,7 +439,7 @@ export function useCropperState(
 		setZoomAtPoint,
 		setRotation,
 		setFlip,
-		flip,
+		toggleFlip,
 		snapRotate90,
 		setCropRect,
 		settleCrop,
