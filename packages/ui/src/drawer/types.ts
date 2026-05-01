@@ -101,7 +101,7 @@ export interface HeaderProps extends ComponentProps< 'header' > {
 
 export interface ContentProps extends ComponentProps< 'div' > {
 	/**
-	 * The body content to be rendered inside the scroll container.
+	 * The body content to be rendered inside the scroll region.
 	 */
 	children?: ReactNode;
 	/**

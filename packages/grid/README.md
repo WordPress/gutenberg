@@ -110,6 +110,7 @@ interface DashboardGridLayoutItem {
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
+| `renderResizeHandle` | `( props ) => ReactNode` | — | Override the default corner-triangle resize handle with a custom element. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `disabled`, `verticalResizable`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
 | `className` | `string` | — | Extra class on the grid root. |
 
 `DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
@@ -205,6 +206,62 @@ keyboard sensor:
 - `Space` to drop, or `Escape` to cancel.
 
 Resize handles are currently pointer-only.
+
+## Custom resize handle
+
+The default handle is a small corner triangle on the bottom-right of
+each tile. To swap it for a custom element (icon, button, branded
+shape…), pass `renderResizeHandle`. The grid still owns the gesture
+— `<DndContext>`, throttled delta loop, step-to-grid logic — and
+passes the wiring to your render prop. Spread `listeners` and
+`attributes` and assign `ref` on the element that should receive
+pointer events.
+
+```jsx
+import { Icon } from '@wordpress/ui';
+import { resizeCornerNE } from '@wordpress/icons';
+
+<DashboardGrid
+	layout={ layout }
+	editMode
+	renderResizeHandle={ ( {
+		ref,
+		listeners,
+		attributes,
+		verticalResizable,
+	} ) => (
+		<div
+			ref={ ref }
+			{ ...listeners }
+			{ ...attributes }
+			style={ {
+				position: 'absolute',
+				bottom: 4,
+				insetInlineEnd: 4,
+				cursor: verticalResizable ? 'nwse-resize' : 'ew-resize',
+			} }
+		>
+			<Icon icon={ resizeCornerNE } size={ 16 } />
+		</div>
+	) }
+>
+	{ tiles }
+</DashboardGrid>;
+```
+
+The render prop receives:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
+| `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
+| `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
+| `verticalResizable` | `boolean` | False when `rowHeight: 'auto'` — useful for adapting cursor or visual cue. |
+| `isResizing` | `boolean` | True while the user is actively dragging this handle. Use it to swap colors, icons, or transforms during the gesture. |
+| `itemId` | `string` | Owning tile's `key`. |
+
+The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
+so the consumer's render prop never has to short-circuit on a disabled state.
 
 ## Contributing to this package
 
