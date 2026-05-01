@@ -24,6 +24,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { close, drawerRight } from '@wordpress/icons';
+import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
@@ -464,15 +465,15 @@ function MediaEditorModalContent( {
 			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
 				// Undo / Redo — skip when a metadata text field is focused
-				// so the browser's native field undo (Details tab) is
+				// so the browser's native field undo/redo (Details tab) is
 				// preserved. Inputs inside a crop control wrapper are
 				// intentionally included — the wrapper's data attribute
 				// signals that custom undo/redo should handle them.
-				if (
-					( event.metaKey || event.ctrlKey ) &&
-					event.key.toLowerCase() === 'z' &&
-					isImage
-				) {
+				const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
+				const isRedoShortcut =
+					isKeyboardEvent.primaryShift( event, 'z' ) ||
+					( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
+				if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
 					const target = event.target as HTMLElement;
 					const isMetadataField =
 						( target.tagName === 'INPUT' ||
@@ -481,7 +482,7 @@ function MediaEditorModalContent( {
 						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 					if ( ! isMetadataField ) {
 						event.preventDefault();
-						if ( event.shiftKey ) {
+						if ( isRedoShortcut ) {
 							cropper.redo();
 						} else {
 							cropper.undo();

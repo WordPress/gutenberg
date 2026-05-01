@@ -4,6 +4,7 @@
 import { Button, RangeControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import {
 	rotateLeft,
 	rotateRight,
@@ -101,6 +102,7 @@ export default function MediaEditorToolbar( {
 				icon={ undo }
 				label={ __( 'Undo' ) }
 				showTooltip
+				shortcut={ displayShortcut.primary( 'z' ) }
 				disabled={ ! hasUndo }
 				accessibleWhenDisabled
 				onClick={ undoCrop }
@@ -110,6 +112,11 @@ export default function MediaEditorToolbar( {
 				icon={ redo }
 				label={ __( 'Redo' ) }
 				showTooltip
+				shortcut={
+					isAppleOS()
+						? displayShortcut.primaryShift( 'z' )
+						: displayShortcut.primary( 'y' )
+				}
 				disabled={ ! hasRedo }
 				accessibleWhenDisabled
 				onClick={ redoCrop }

@@ -857,6 +857,14 @@ describe( 'useCropperState', () => {
 			expect( result.current.hasUndo ).toBe( false );
 		} );
 
+		it( 'does not create a history entry for a no-op round trip', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => result.current.setZoom( 2 ) );
+			act( () => result.current.setZoom( 1 ) );
+			act( () => jest.advanceTimersByTime( DEBOUNCE_MS ) );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
 		// --- commitHistory flush ---
 
 		it( 'commitHistory flushes the pending entry immediately', () => {
@@ -966,11 +974,21 @@ describe( 'useCropperState', () => {
 			expect( result.current.hasUndo ).toBe( false );
 		} );
 
-		it( 'reset clears the undo history', () => {
+		it( 'reset is undoable and restores a clean current state', () => {
 			const { result } = renderHook( () => useCropperState() );
 			act( () => result.current.setZoom( 3 ) );
 			act( () => result.current.commitHistory() );
 			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.reset() );
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.isDirty ).toBe( false );
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.zoom ).toBe( 3 );
+		} );
+
+		it( 'reset does not create a history entry when already clean', () => {
+			const { result } = renderHook( () => useCropperState() );
 			act( () => result.current.reset() );
 			expect( result.current.hasUndo ).toBe( false );
 		} );
@@ -992,6 +1010,40 @@ describe( 'useCropperState', () => {
 			// Second undo removes the zoom gesture.
 			act( () => result.current.undo() );
 			expect( result.current.state.zoom ).toBe( 1 );
+		} );
+
+		it( 'settleCrop is grouped into the resize undo step', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
+				} );
+			} );
+			const initialCropRect = result.current.state.cropRect;
+
+			act( () => {
+				result.current.setCropRect( {
+					x: 0.25,
+					y: 0.25,
+					width: 0.5,
+					height: 0.5,
+				} );
+			} );
+			act( () => result.current.settleCrop() );
+			const settledState = result.current.state;
+
+			expect( result.current.hasUndo ).toBe( true );
+			act( () => result.current.undo() );
+			expect( result.current.state.cropRect ).toEqual( initialCropRect );
+			expect( result.current.hasUndo ).toBe( false );
+
+			act( () => result.current.redo() );
+			expect( result.current.state.cropRect ).toEqual(
+				settledState.cropRect
+			);
+			expect( result.current.state.zoom ).toBe( settledState.zoom );
 		} );
 	} );
 

@@ -63,9 +63,8 @@ export interface UseCropperStateReturn {
 	 * available visual area while preserving the framed image region.
 	 * Typically called from a stencil's `onResizeEnd` callback.
 	 *
-	 * History is recorded automatically by the state-change debounce.
-	 * For programmatic crop changes that need an immediate history entry,
-	 * call `commitHistory()` afterwards or use `applyOperation` instead.
+	 * Flushes the pending resize history before dispatching, then suppresses
+	 * the settle dispatch itself so resizing and settling undo as one step.
 	 */
 	settleCrop: () => void;
 	/** Apply a transform operation through the pipeline. */
@@ -104,6 +103,26 @@ export interface UseCropperStateReturn {
 
 /** Milliseconds of inactivity after which a continuous interaction is committed to history. */
 const HISTORY_DEBOUNCE_MS = 300;
+
+function areHistoryStatesEqual( a: CropperState, b: CropperState ): boolean {
+	const aImage = a.image;
+	const bImage = b.image;
+	return (
+		aImage?.src === bImage?.src &&
+		aImage?.naturalWidth === bImage?.naturalWidth &&
+		aImage?.naturalHeight === bImage?.naturalHeight &&
+		a.pan.x === b.pan.x &&
+		a.pan.y === b.pan.y &&
+		a.zoom === b.zoom &&
+		a.rotation === b.rotation &&
+		a.flip.horizontal === b.flip.horizontal &&
+		a.flip.vertical === b.flip.vertical &&
+		a.cropRect.x === b.cropRect.x &&
+		a.cropRect.y === b.cropRect.y &&
+		a.cropRect.width === b.cropRect.width &&
+		a.cropRect.height === b.cropRect.height
+	);
+}
 
 /**
  * Reducer-based state management hook for the image editor.
@@ -149,21 +168,20 @@ export function useCropperState(
 	// Debounce-based history: tracks the last committed state and a pending
 	// timer. Any state change resets the timer; when it expires the
 	// pre-change state is pushed to history.
-	const lastCommittedStateRef = useRef< CropperState | null >( null );
+	const lastCommittedStateRef = useRef< CropperState | null >( state );
 	const debounceTimerRef = useRef< ReturnType< typeof setTimeout > >();
 	// Set to true before dispatching actions that must not produce a debounce
 	// history entry (undo, redo, reset, setImage, discrete actions).
 	const suppressDebounceRef = useRef( false );
-	// Used to sync lastCommittedStateRef to the actual initial state on the
-	// first useEffect run, before any user interaction.
-	const isMountedRef = useRef( false );
 
 	// Pushes `entry` (defaults to current state) onto the undo stack and
 	// clears the redo stack. Skips if `entry` is already the last item,
 	// so rapid discrete actions on unchanged state don't create duplicates.
 	const pushToHistory = useCallback( ( entry?: CropperState ) => {
 		const target = entry ?? stateRef.current;
-		if ( historyRef.current[ historyRef.current.length - 1 ] === target ) {
+		const previousEntry =
+			historyRef.current[ historyRef.current.length - 1 ];
+		if ( previousEntry && areHistoryStatesEqual( previousEntry, target ) ) {
 			return;
 		}
 		historyRef.current = [ ...historyRef.current, target ];
@@ -176,14 +194,6 @@ export function useCropperState(
 	// timer; once the state has settled for HISTORY_DEBOUNCE_MS the
 	// pre-change snapshot is pushed to the undo stack.
 	useEffect( () => {
-		// First run: capture the actual initial state reference from
-		// useReducer (a separate enforceContainment call would give a
-		// different object reference) so the first real change is detected.
-		if ( ! isMountedRef.current ) {
-			isMountedRef.current = true;
-			lastCommittedStateRef.current = stateRef.current;
-			return;
-		}
 		// Suppress flag: undo/redo/reset/setImage/discrete actions set this
 		// to opt out of the debounce for their own state changes.
 		if ( suppressDebounceRef.current ) {
@@ -191,13 +201,26 @@ export function useCropperState(
 			lastCommittedStateRef.current = stateRef.current;
 			return;
 		}
+		if (
+			lastCommittedStateRef.current !== null &&
+			areHistoryStatesEqual(
+				lastCommittedStateRef.current,
+				stateRef.current
+			)
+		) {
+			lastCommittedStateRef.current = stateRef.current;
+			return;
+		}
 		clearTimeout( debounceTimerRef.current );
 		debounceTimerRef.current = setTimeout( () => {
 			const snapshot = lastCommittedStateRef.current;
-			if ( snapshot !== null && snapshot !== stateRef.current ) {
+			if (
+				snapshot !== null &&
+				! areHistoryStatesEqual( snapshot, stateRef.current )
+			) {
 				pushToHistory( snapshot );
-				lastCommittedStateRef.current = stateRef.current;
 			}
+			lastCommittedStateRef.current = stateRef.current;
 		}, HISTORY_DEBOUNCE_MS );
 		return () => clearTimeout( debounceTimerRef.current );
 	}, [ state, pushToHistory ] );
@@ -209,10 +232,13 @@ export function useCropperState(
 	const commitHistory = useCallback( () => {
 		clearTimeout( debounceTimerRef.current );
 		const snapshot = lastCommittedStateRef.current;
-		if ( snapshot !== null && snapshot !== stateRef.current ) {
+		if (
+			snapshot !== null &&
+			! areHistoryStatesEqual( snapshot, stateRef.current )
+		) {
 			pushToHistory( snapshot );
-			lastCommittedStateRef.current = stateRef.current;
 		}
+		lastCommittedStateRef.current = stateRef.current;
 	}, [ pushToHistory ] );
 
 	const undo = useCallback( () => {
@@ -247,14 +273,6 @@ export function useCropperState(
 		setHasRedo( redoStackRef.current.length > 0 );
 		dispatch( { type: 'RESET', payload: next } );
 	}, [ dispatch, commitHistory ] );
-
-	const clearHistory = useCallback( () => {
-		historyRef.current = [];
-		redoStackRef.current = [];
-		clearTimeout( debounceTimerRef.current );
-		setHasUndo( false );
-		setHasRedo( false );
-	}, [] );
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
@@ -335,8 +353,10 @@ export function useCropperState(
 	);
 
 	const settleCrop = useCallback( () => {
+		commitHistory();
+		suppressDebounceRef.current = true;
 		dispatch( { type: 'SETTLE_CROP' } );
-	}, [ dispatch ] );
+	}, [ dispatch, commitHistory ] );
 
 	const applyOperation = useCallback(
 		( op: TransformOperation ) => {
@@ -350,7 +370,17 @@ export function useCropperState(
 
 	const reset = useCallback(
 		( resetState?: Partial< CropperState > ) => {
-			clearHistory();
+			commitHistory();
+			const nextInitialState = enforceContainment( {
+				...DEFAULT_STATE,
+				image: stateRef.current.image,
+				...resetState,
+			} );
+			if (
+				! areHistoryStatesEqual( stateRef.current, nextInitialState )
+			) {
+				pushToHistory();
+			}
 			suppressDebounceRef.current = true;
 			dispatch( { type: 'RESET', payload: resetState } );
 			// Mirror the reducer's RESET exactly so isDirty stays in
@@ -358,13 +388,9 @@ export function useCropperState(
 			// containment step can tweak pan/zoom/cropRect by float ulp,
 			// which we must fold into the "initial" snapshot or isDirty
 			// would report true after a reset.
-			initialRef.current = enforceContainment( {
-				...DEFAULT_STATE,
-				image: stateRef.current.image,
-				...resetState,
-			} );
+			initialRef.current = nextInitialState;
 		},
-		[ dispatch, clearHistory ]
+		[ dispatch, pushToHistory, commitHistory ]
 	);
 
 	const isDirty = isStateDirty( state, initialRef.current );
