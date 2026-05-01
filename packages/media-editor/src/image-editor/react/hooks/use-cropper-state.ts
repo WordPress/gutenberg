@@ -343,15 +343,12 @@ export function useCropperState(
 
 	const flip = useCallback(
 		( direction: 'horizontal' | 'vertical' ) => {
-			dispatch( {
-				type: 'SET_FLIP',
-				payload: {
-					...stateRef.current.flip,
-					[ direction ]: ! stateRef.current.flip[ direction ],
-				},
+			setFlip( {
+				...stateRef.current.flip,
+				[ direction ]: ! stateRef.current.flip[ direction ],
 			} );
 		},
-		[ dispatch ]
+		[ setFlip ]
 	);
 
 	const snapRotate90 = useCallback(

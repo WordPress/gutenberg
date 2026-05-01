@@ -237,6 +237,7 @@ describe( 'InteractionController', () => {
 			setZoom: jest.fn(),
 			setZoomAtPoint: jest.fn(),
 			snapRotate90: jest.fn(),
+			flip: jest.fn(),
 		};
 	} );
 
@@ -628,6 +629,70 @@ describe( 'InteractionController', () => {
 			}
 		);
 
+		it( 'calls flip horizontal on h key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'h' ) );
+
+			expect( actionMocks.flip ).toHaveBeenCalledWith( 'horizontal' );
+		} );
+
+		it( 'calls flip horizontal on H key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'H' ) );
+
+			expect( actionMocks.flip ).toHaveBeenCalledWith( 'horizontal' );
+		} );
+
+		it( 'calls flip vertical on v key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'v' ) );
+
+			expect( actionMocks.flip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it( 'calls flip vertical on V key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'V' ) );
+
+			expect( actionMocks.flip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with h',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'h', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.flip ).not.toHaveBeenCalled();
+			}
+		);
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with v',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'v', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.flip ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'respects custom keyboardStep (read lazily)', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller, opts } = createController( state, {
@@ -655,6 +720,7 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
 			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
 			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			expect( actionMocks.flip ).not.toHaveBeenCalled();
 		} );
 	} );
 

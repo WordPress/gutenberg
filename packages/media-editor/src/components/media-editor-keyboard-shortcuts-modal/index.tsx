@@ -134,14 +134,18 @@ export default function MediaEditorKeyboardShortcutsModal( {
 					'These shortcuts work when the image editor has focus.'
 				) }
 			</p>
+			{ /*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */ }
 			{ /* eslint-disable jsx-a11y/no-redundant-roles */ }
 			<ul
 				className="media-editor-keyboard-shortcuts-modal__shortcut-list"
 				role="list"
 			>
-				{ SHORTCUTS.map( ( { description, keyCombination } ) => (
+				{ SHORTCUTS.map( ( { description, keyCombination }, index ) => (
 					<li
-						key={ description }
+						key={ index }
 						className="media-editor-keyboard-shortcuts-modal__shortcut"
 					>
 						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
