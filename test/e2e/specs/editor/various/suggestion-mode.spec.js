@@ -88,6 +88,133 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
+	test( 'shows appended text wrapped in <ins> after the block deselects', async ( {
+		editor,
+		page,
+	} ) => {
+		// Golden-path text addition: type at the end of a paragraph, blur
+		// the block, and reviewers should see the new run highlighted with
+		// the addition format. While the block is selected the overlay
+		// renders the plain proposed value so RichText's caret isn't
+		// disrupted by value-prop reconciliation; the marks appear after
+		// blur.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		// Auto-save fires after the debounce; deselect so the inline marks
+		// render in place of the plain proposed value.
+		await waitForSuggestionSaved( page );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
+		// `wordDiff` tokenizes on whitespace runs, so " " and "world" each
+		// land in their own addition span. Filter to the word-bearing run.
+		await expect(
+			paragraph
+				.locator( 'ins.has-suggestion-addition' )
+				.filter( { hasText: 'world' } )
+		).toBeVisible();
+
+		// Sanity: the original text still reads as part of the paragraph.
+		await expect( paragraph ).toContainText( 'Hello' );
+	} );
+
+	test( 'shows deleted text wrapped in <del> after the block deselects', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Golden-path text deletion: select a trailing word and press
+		// Backspace. The deleted run survives in the suggestion preview as
+		// a struck-through fragment so the reviewer can see what the
+		// suggester wants to remove.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		// Select " world" (six characters) then delete.
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await page.keyboard.press( 'Backspace' );
+
+		await waitForSuggestionSaved( page );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
+		// The deleted run tokenizes into " " + "world"; filter to the word
+		// so the assertion reads precisely against the text we removed.
+		await expect(
+			paragraph
+				.locator( 'del.has-suggestion-deletion' )
+				.filter( { hasText: 'world' } )
+		).toBeVisible();
+	} );
+
+	test( 'shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Golden-path inline-format change: select a word, press Cmd/Ctrl+B
+		// to bold it, and the suggestion preview should mark the run as
+		// added (so it reads as both bold AND highlighted) without losing
+		// the underlying <strong> markup. The diff sees the bare token
+		// replaced by the wrapped one, so it surfaces as a delete + insert
+		// pair around the styled run.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello world' },
+		} );
+
+		await switchIntent( page, 'Suggest' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 5 } );
+		await pageUtils.pressKeys( 'primary+b' );
+
+		await waitForSuggestionSaved( page );
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
+		// The bolded run is wrapped in `<ins>` so it picks up the addition
+		// color treatment, with `<strong>` preserved inside so it still
+		// renders as bold.
+		await expect(
+			paragraph.locator( 'ins.has-suggestion-addition strong' )
+		).toContainText( 'world' );
+
+		// And the bare-text version is shown as a deletion so the reviewer
+		// can see what the run looked like before the suggestion.
+		await expect(
+			paragraph.locator( 'del.has-suggestion-deletion' )
+		).toContainText( 'world' );
+	} );
+
 	test( 'captures a heading-level change made via the block-switcher variation picker', async ( {
 		editor,
 		page,
