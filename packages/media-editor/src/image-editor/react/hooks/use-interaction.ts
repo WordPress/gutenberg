@@ -67,6 +67,18 @@ function isHandledKeyboardPan( event: KeyboardEvent ): boolean {
 	}
 }
 
+function isHandledKeyboardZoom( event: KeyboardEvent ): boolean {
+	switch ( event.key ) {
+		case '+':
+		case '=':
+		case '-':
+		case '_':
+			return true;
+		default:
+			return false;
+	}
+}
+
 /**
  * Mouse, touch, and keyboard event handling for pan, zoom,
  * and crop manipulation.
@@ -95,6 +107,9 @@ export function useInteraction(
 	const [ isKeyboardPanning, setIsKeyboardPanning ] = useState( false );
 	const keyboardInteractionTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
+	// Tracks whether a keyboard gesture (pan or zoom) is currently active so
+	// onGestureStart is only fired once per gesture, not on every key repeat.
+	const isKeyboardGestureActiveRef = useRef( false );
 
 	// Keep mutable refs so the controller always reads fresh values
 	// without needing to be recreated.
@@ -116,11 +131,18 @@ export function useInteraction(
 	const stopPlacementGesture = useCallback( () => {
 		setIsGestureActive( false );
 	}, [] );
-	const signalKeyboardPlacement = useCallback( () => {
-		setIsKeyboardPanning( true );
+	// Shared timer logic for any keyboard gesture (pan or zoom): fires
+	// onGestureStart once per burst and onGestureEnd after the idle window.
+	const signalKeyboardGesture = useCallback( () => {
+		if ( ! isKeyboardGestureActiveRef.current ) {
+			isKeyboardGestureActiveRef.current = true;
+			optionsRef.current?.onGestureStart?.();
+		}
 		clearTimeout( keyboardInteractionTimerRef.current );
 		keyboardInteractionTimerRef.current = setTimeout( () => {
+			isKeyboardGestureActiveRef.current = false;
 			setIsKeyboardPanning( false );
+			optionsRef.current?.onGestureEnd?.();
 		}, KEYBOARD_INTERACTION_IDLE_MS );
 	}, [] );
 
@@ -198,11 +220,14 @@ export function useInteraction(
 	const onKeyDown = useCallback(
 		( e: React.KeyboardEvent ) => {
 			if ( isHandledKeyboardPan( e.nativeEvent ) ) {
-				signalKeyboardPlacement();
+				setIsKeyboardPanning( true );
+				signalKeyboardGesture();
+			} else if ( isHandledKeyboardZoom( e.nativeEvent ) ) {
+				signalKeyboardGesture();
 			}
 			controllerRef.current?.handleKeyDown( e.nativeEvent );
 		},
-		[ signalKeyboardPlacement ]
+		[ signalKeyboardGesture ]
 	);
 
 	const onWheelNative = useCallback( ( e: WheelEvent ) => {
