@@ -8,17 +8,23 @@ export const DEFAULT_CLIENT_LIMIT_PER_ROOM = 3;
 // Retry delays after poll failures.
 // The disconnect dialog shows after all retries are exhausted, then retries
 // continue at DISCONNECT_DIALOG_RETRY_MS.
-export const ERROR_RETRY_DELAYS_SOLO_MS = [
-	2000, 4000, 8000, 12000,
+export const ERROR_RETRY_DELAYS_SOLO_MS = applyFilters(
+	'sync.pollingManager.errorRetryDelaysSolo',
 	// Solo: 26s total retry time solo before dialog
-];
-export const ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS = [
-	1000, 2000, 4000, 8000,
+	[ 2000, 4000, 8000, 12000 ]
+) as number[];
+
+export const ERROR_RETRY_DELAYS_WITH_COLLABORATORS_MS = applyFilters(
+	'sync.pollingManager.errorRetryDelaysWithCollaborators',
 	// With collaborators: 15s total retry time before dialog
-];
+	[ 1000, 2000, 4000, 8000 ]
+) as number[];
 
 // How often to automatically retry the connection when in the disconnect dialog.
-export const DISCONNECT_DIALOG_RETRY_MS = 30000;
+export const DISCONNECT_DIALOG_RETRY_MS = applyFilters(
+	'sync.pollingManager.disconnectDialogRetryMs',
+	30000
+) as number;
 
 // When a user manually retries on the disconnection dialog, the amount of time
 // until the next automatic retry attempt.

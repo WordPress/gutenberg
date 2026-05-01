@@ -87,17 +87,30 @@ export default class CollaborationUtils {
 	 *
 	 * Can be called multiple times to add N users to a session.
 	 *
-	 * @param postId The post ID to open.
-	 * @param user   Credentials for the user to join.
+	 * @param postId                         The post ID to open.
+	 * @param user                           Credentials for the user to join.
+	 * @param [options]                      Optional settings.
+	 * @param [options.applyFastSyncTimings] Apply
+	 *                                       {@link applyFastSyncTimings} to the new
+	 *                                       context before any navigation. Defaults to
+	 *                                       false.
 	 * @return The joined user's page and editor.
 	 */
 	async joinUser(
 		postId: number,
-		user: UserCredentials
+		user: UserCredentials,
+		{
+			applyFastSyncTimings: shouldApplyFastSyncTimings = false,
+		}: { applyFastSyncTimings?: boolean } = {}
 	): Promise< { page: Page; editor: Editor } > {
 		const context = await this.admin.browser.newContext( {
 			baseURL: BASE_URL,
 		} );
+
+		if ( shouldApplyFastSyncTimings ) {
+			await applyFastSyncTimings( context );
+		}
+
 		const newPage = await context.newPage();
 
 		// Log in via the WordPress login form.
@@ -413,6 +426,94 @@ export default class CollaborationUtils {
 		this.sessions = [];
 		await this.requestUtils.deleteAllUsers();
 	}
+}
+
+/**
+ * Register `@wordpress/sync` polling-manager filters that shorten the
+ * retry / dialog timing constants. The init script runs before any
+ * WordPress JS executes, installs a property trap on `window.wp` and
+ * `window.wp.hooks`, and registers the filters the moment
+ * `@wordpress/hooks` is assigned. By the time `@wordpress/sync`'s
+ * polling manager evaluates `applyFilters(...)` at module-init time,
+ * the filters are present.
+ *
+ * Use only in tests that need to surface the disconnect dialog quickly
+ * or reconnect immediately after `unroute`. Production code should not
+ * register these filters.
+ *
+ * @param context Browser context to apply the timings to.
+ */
+export async function applyFastSyncTimings(
+	context: BrowserContext
+): Promise< void > {
+	await context.addInitScript( () => {
+		const wireHooks = ( hooks: {
+			addFilter: ( hook: string, ns: string, cb: () => unknown ) => void;
+		} ) => {
+			hooks.addFilter(
+				'sync.pollingManager.errorRetryDelaysSolo',
+				'rtc-test',
+				() => [ 50, 50 ]
+			);
+			hooks.addFilter(
+				'sync.pollingManager.errorRetryDelaysWithCollaborators',
+				'rtc-test',
+				() => [ 50, 50 ]
+			);
+			hooks.addFilter(
+				'sync.pollingManager.disconnectDialogRetryMs',
+				'rtc-test',
+				() => 200
+			);
+			hooks.addFilter(
+				'sync.pollingManager.pollingInterval',
+				'rtc-test',
+				() => 250
+			);
+			hooks.addFilter(
+				'sync.pollingManager.pollingIntervalWithCollaborators',
+				'rtc-test',
+				() => 250
+			);
+		};
+
+		const trapHooksOn = ( wp: Record< string, unknown > ) => {
+			if ( wp.hooks ) {
+				wireHooks( wp.hooks as Parameters< typeof wireHooks >[ 0 ] );
+				return;
+			}
+
+			let _hooks: unknown;
+			Object.defineProperty( wp, 'hooks', {
+				configurable: true,
+				get() {
+					return _hooks;
+				},
+				set( value: unknown ) {
+					_hooks = value;
+					wireHooks( value as Parameters< typeof wireHooks >[ 0 ] );
+				},
+			} );
+		};
+
+		const existingWp = ( window as unknown as { wp?: object } ).wp;
+		if ( existingWp ) {
+			trapHooksOn( existingWp as Record< string, unknown > );
+			return;
+		}
+
+		let _wp: Record< string, unknown > | undefined;
+		Object.defineProperty( window, 'wp', {
+			configurable: true,
+			get() {
+				return _wp;
+			},
+			set( value: Record< string, unknown > ) {
+				_wp = value;
+				trapHooksOn( value );
+			},
+		} );
+	} );
 }
 
 /**
