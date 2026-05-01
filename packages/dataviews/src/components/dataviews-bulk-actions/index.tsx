@@ -1,18 +1,20 @@
 /**
- * External dependencies
- */
-import type { ReactElement } from 'react';
-
-/**
  * WordPress dependencies
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useRef, useContext } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useRef,
+	useContext,
+} from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog, Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -27,34 +29,51 @@ import getFooterMessage from '../../utils/get-footer-message';
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
 	items: Item[];
-	ActionTriggerComponent: (
-		props: ActionTriggerProps< Item >
-	) => ReactElement;
 }
 
 function ActionWithModal< Item >( {
 	action,
 	items,
-	ActionTriggerComponent,
 }: ActionWithModalProps< Item > ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const actionTriggerProps = {
-		action,
-		onClick: () => {
-			setIsModalOpen( true );
-		},
-		items,
-	};
+	const closeModal = useCallback( () => setIsModalOpen( false ), [] );
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	const isMobile = useViewportMatch( 'medium', '<' );
+
+	// `Dialog.Trigger` renders into a real `Button` element here (rather
+	// than delegating to a custom component), so Base UI's merged props
+	// — `onClick`, `aria-haspopup="dialog"`, `aria-expanded`,
+	// `aria-controls` — flow straight through and the dialog opens
+	// without any imperative state plumbing in this component.
 	return (
-		<>
-			<ActionTriggerComponent { ...actionTriggerProps } />
+		<Dialog.Root
+			open={ isModalOpen }
+			onOpenChange={ setIsModalOpen }
+			disablePointerDismissal={ action.hideModalHeader }
+		>
+			<Dialog.Trigger
+				render={
+					isMobile ? (
+						<Button
+							accessibleWhenDisabled
+							label={ label }
+							icon={ action.icon }
+							size="compact"
+						/>
+					) : (
+						<Button accessibleWhenDisabled size="compact">
+							{ label }
+						</Button>
+					)
+				}
+			/>
 			<ActionModal
 				action={ action }
 				items={ items }
-				open={ isModalOpen }
-				onOpenChange={ setIsModalOpen }
+				closeModal={ closeModal }
 			/>
-		</>
+		</Dialog.Root>
 	);
 }
 
@@ -234,7 +253,6 @@ function ActionButton< Item >( {
 				key={ action.id }
 				action={ action }
 				items={ selectedEligibleItems }
-				ActionTriggerComponent={ ActionTrigger }
 			/>
 		);
 	}

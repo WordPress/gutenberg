@@ -11,7 +11,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -39,21 +39,29 @@ export interface ActionTriggerProps< Item > {
 export interface ActionModalProps< Item > {
 	/**
 	 * The action whose modal should be rendered. Stable for the lifetime of
-	 * this `ActionModal` instance — the parent renders one `ActionModal` per
-	 * modal action and toggles the `open` prop, rather than swapping the
-	 * action on a single shared instance.
+	 * this `ActionModal` instance — the parent renders one `ActionModal`
+	 * per modal action; opening/closing happens through the surrounding
+	 * `<Dialog.Root>` (controlled or uncontrolled) rather than props on
+	 * this component.
 	 */
 	action: ActionModalType< Item >;
 	items: Item[];
-	open: boolean;
-	onOpenChange: ( open: boolean ) => void;
+	/**
+	 * Imperative close callback exposed to the action's `RenderModal`
+	 * implementation as `closeModal`. The wrapping component (e.g.
+	 * `ModalActionMenuItem` / `ModalActionInlineButton`) owns the
+	 * dialog's open state and supplies a setter that toggles it back to
+	 * `false`. Public `RenderModalProps` consumers may call this from
+	 * async code (e.g. after a network request) — that's why a callback
+	 * is required even though the dialog's primitives can also close it.
+	 */
+	closeModal: () => void;
 }
 
 interface ActionsMenuGroupProps< Item > {
 	actions: Action< Item >[];
 	item: Item;
 	registry: ReturnType< typeof useRegistry >;
-	setActiveModalAction: ( action: ActionModalType< Item > | null ) => void;
 }
 
 interface ItemActionsProps< Item > {
@@ -124,20 +132,15 @@ function mapModalSize(
 	return size ?? 'medium';
 }
 
+// Renders the popup half of a dataviews action modal. Must be wrapped
+// in a `<Dialog.Root>` that owns the open lifecycle (paired with
+// `<Dialog.Trigger>` at the call site, e.g. `ModalActionMenuItem` or
+// `ModalActionInlineButton`).
 export function ActionModal< Item >( {
 	action,
 	items,
-	open,
-	onOpenChange,
+	closeModal,
 }: ActionModalProps< Item > ) {
-	// Each `ActionModal` instance owns one specific action for its lifetime,
-	// so the popup contents never need to "remember" the previous action
-	// through the exit animation: when the parent toggles `open` to `false`,
-	// only the `open` prop changes — the `action` prop stays stable, the
-	// popup unmounts asynchronously after Base UI's exit animation
-	// completes, and there's no risk of rendering a stale or null action.
-	const closeModal = () => onOpenChange( false );
-
 	const contentRef = useRef< HTMLDivElement >( null );
 	const initialFocus = useMapFocusOnMount(
 		action.modalFocusOnMount ?? true,
@@ -153,44 +156,114 @@ export function ActionModal< Item >( {
 	const title = modalHeader || label;
 
 	return (
+		<Dialog.Popup
+			size={ mapModalSize( action.modalSize ) }
+			className={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
+				action.id
+			) }` }
+			portal={
+				<Dialog.Portal className="dataviews-action-modal__portal" />
+			}
+			initialFocus={ initialFocus }
+			{ ...( action.hideModalHeader && {
+				role: 'alertdialog' as const,
+			} ) }
+		>
+			{ action.hideModalHeader ? (
+				<VisuallyHidden
+					render={ <Dialog.Title>{ title }</Dialog.Title> }
+				/>
+			) : (
+				<Dialog.Header>
+					<Dialog.Title>{ title }</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+			) }
+			<Dialog.Content ref={ contentRef }>
+				<action.RenderModal items={ items } closeModal={ closeModal } />
+			</Dialog.Content>
+		</Dialog.Popup>
+	);
+}
+
+// Wraps a single modal action as a menu item that opens the action's
+// dialog. Owns the dialog's open state locally so each modal action is
+// self-contained: the surrounding parent doesn't need a "which action is
+// active" piece of state.
+function ModalActionMenuItem< Item >( {
+	action,
+	items,
+}: {
+	action: ActionModalType< Item >;
+	items: Item[];
+} ) {
+	const [ open, setOpen ] = useState( false );
+	// Stable reference so consumer `RenderModal` implementations can pass
+	// `closeModal` to event handlers / effects without remounting on every
+	// keystroke.
+	const closeModal = useCallback( () => setOpen( false ), [] );
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	return (
 		<Dialog.Root
 			open={ open }
-			// Wrap to drop Base UI's `eventDetails` second argument: callers
-			// only need `(open: boolean) => void` and shouldn't depend on
-			// Base UI internals leaking through.
-			onOpenChange={ ( isOpen ) => onOpenChange( isOpen ) }
+			onOpenChange={ setOpen }
 			disablePointerDismissal={ action.hideModalHeader }
 		>
-			<Dialog.Popup
-				size={ mapModalSize( action.modalSize ) }
-				className={ `dataviews-action-modal dataviews-action-modal__${ kebabCase(
-					action.id
-				) }` }
-				portal={
-					<Dialog.Portal className="dataviews-action-modal__portal" />
-				}
-				initialFocus={ initialFocus }
-				{ ...( action.hideModalHeader && {
-					role: 'alertdialog' as const,
-				} ) }
+			<Menu.Item
+				disabled={ action.disabled }
+				render={ <Dialog.Trigger /> }
 			>
-				{ action.hideModalHeader ? (
-					<VisuallyHidden
-						render={ <Dialog.Title>{ title }</Dialog.Title> }
+				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+			</Menu.Item>
+			<ActionModal
+				action={ action }
+				items={ items }
+				closeModal={ closeModal }
+			/>
+		</Dialog.Root>
+	);
+}
+
+// Wraps a single modal action as an inline button that opens the
+// action's dialog. Same self-contained-state contract as
+// `ModalActionMenuItem`.
+function ModalActionInlineButton< Item >( {
+	action,
+	items,
+	variant,
+}: {
+	action: ActionModalType< Item >;
+	items: Item[];
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
+} ) {
+	const [ open, setOpen ] = useState( false );
+	const closeModal = useCallback( () => setOpen( false ), [] );
+	const label =
+		typeof action.label === 'string' ? action.label : action.label( items );
+	return (
+		<Dialog.Root
+			open={ open }
+			onOpenChange={ setOpen }
+			disablePointerDismissal={ action.hideModalHeader }
+		>
+			<Dialog.Trigger
+				render={
+					<Button
+						disabled={ !! action.disabled }
+						accessibleWhenDisabled
+						size="compact"
+						variant={ variant }
 					/>
-				) : (
-					<Dialog.Header>
-						<Dialog.Title>{ title }</Dialog.Title>
-						<Dialog.CloseIcon />
-					</Dialog.Header>
-				) }
-				<Dialog.Content ref={ contentRef }>
-					<action.RenderModal
-						items={ items }
-						closeModal={ closeModal }
-					/>
-				</Dialog.Content>
-			</Dialog.Popup>
+				}
+			>
+				{ label }
+			</Dialog.Trigger>
+			<ActionModal
+				action={ action }
+				items={ items }
+				closeModal={ closeModal }
+			/>
 		</Dialog.Root>
 	);
 }
@@ -199,7 +272,6 @@ export function ActionsMenuGroup< Item >( {
 	actions,
 	item,
 	registry,
-	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
 	const { primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
@@ -218,20 +290,22 @@ export function ActionsMenuGroup< Item >( {
 	}, [ actions ] );
 
 	const renderActionGroup = ( actionList: Action< Item >[] ) =>
-		actionList.map( ( action ) => (
-			<MenuItemTrigger
-				key={ action.id }
-				action={ action }
-				onClick={ () => {
-					if ( 'RenderModal' in action ) {
-						setActiveModalAction( action );
-						return;
-					}
-					action.callback( [ item ], { registry } );
-				} }
-				items={ [ item ] }
-			/>
-		) );
+		actionList.map( ( action ) =>
+			'RenderModal' in action ? (
+				<ModalActionMenuItem
+					key={ action.id }
+					action={ action }
+					items={ [ item ] }
+				/>
+			) : (
+				<MenuItemTrigger
+					key={ action.id }
+					action={ action }
+					onClick={ () => action.callback( [ item ], { registry } ) }
+					items={ [ item ] }
+				/>
+			)
+		);
 
 	return (
 		<Menu.Group>
@@ -310,55 +384,28 @@ function CompactItemActions< Item >( {
 	isSmall,
 	registry,
 }: CompactItemActionsProps< Item > ) {
-	const [ activeModalAction, setActiveModalAction ] = useState(
-		null as ActionModalType< Item > | null
-	);
-	const modalActions = useMemo(
-		() =>
-			actions.filter(
-				( action ): action is ActionModalType< Item > =>
-					'RenderModal' in action
-			),
-		[ actions ]
-	);
 	return (
-		<>
-			<Menu placement="bottom-end">
-				<Menu.TriggerButton
-					render={
-						<Button
-							size={ isSmall ? 'small' : 'compact' }
-							icon={ moreVertical }
-							label={ __( 'Actions' ) }
-							accessibleWhenDisabled
-							disabled={ ! actions.length }
-							className="dataviews-all-actions-button"
-						/>
-					}
-				/>
-				<Menu.Popover>
-					<ActionsMenuGroup
-						actions={ actions }
-						item={ item }
-						registry={ registry }
-						setActiveModalAction={ setActiveModalAction }
+		<Menu placement="bottom-end">
+			<Menu.TriggerButton
+				render={
+					<Button
+						size={ isSmall ? 'small' : 'compact' }
+						icon={ moreVertical }
+						label={ __( 'Actions' ) }
+						accessibleWhenDisabled
+						disabled={ ! actions.length }
+						className="dataviews-all-actions-button"
 					/>
-				</Menu.Popover>
-			</Menu>
-			{ modalActions.map( ( action ) => (
-				<ActionModal
-					key={ action.id }
-					action={ action }
-					items={ [ item ] }
-					open={ activeModalAction?.id === action.id }
-					onOpenChange={ ( isOpen ) => {
-						if ( ! isOpen ) {
-							setActiveModalAction( null );
-						}
-					} }
+				}
+			/>
+			<Menu.Popover>
+				<ActionsMenuGroup
+					actions={ actions }
+					item={ item }
+					registry={ registry }
 				/>
-			) ) }
-		</>
+			</Menu.Popover>
+		</Menu>
 	);
 }
 
@@ -368,20 +415,7 @@ export function PrimaryActions< Item >( {
 	registry,
 	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
-	const [ activeModalAction, setActiveModalAction ] = useState(
-		null as ActionModalType< Item > | null
-	);
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const modalActions = useMemo(
-		() =>
-			Array.isArray( actions )
-				? actions.filter(
-						( action ): action is ActionModalType< Item > =>
-							'RenderModal' in action
-				  )
-				: [],
-		[ actions ]
-	);
 
 	if ( isMobileViewport ) {
 		return null;
@@ -392,34 +426,26 @@ export function PrimaryActions< Item >( {
 	}
 	return (
 		<>
-			{ actions.map( ( action ) => (
-				<ButtonTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => {
-						if ( 'RenderModal' in action ) {
-							setActiveModalAction( action );
-							return;
+			{ actions.map( ( action ) =>
+				'RenderModal' in action ? (
+					<ModalActionInlineButton
+						key={ action.id }
+						action={ action }
+						items={ [ item ] }
+						variant={ buttonVariant }
+					/>
+				) : (
+					<ButtonTrigger
+						key={ action.id }
+						action={ action }
+						onClick={ () =>
+							action.callback( [ item ], { registry } )
 						}
-						action.callback( [ item ], { registry } );
-					} }
-					items={ [ item ] }
-					variant={ buttonVariant }
-				/>
-			) ) }
-			{ modalActions.map( ( action ) => (
-				<ActionModal
-					key={ action.id }
-					action={ action }
-					items={ [ item ] }
-					open={ activeModalAction?.id === action.id }
-					onOpenChange={ ( isOpen ) => {
-						if ( ! isOpen ) {
-							setActiveModalAction( null );
-						}
-					} }
-				/>
-			) ) }
+						items={ [ item ] }
+						variant={ buttonVariant }
+					/>
+				)
+			) }
 		</>
 	);
 }

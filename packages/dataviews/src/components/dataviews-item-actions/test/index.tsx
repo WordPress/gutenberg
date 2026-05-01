@@ -5,6 +5,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 /**
+ * WordPress dependencies
+ */
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
+
+/**
  * Internal dependencies
  */
 import { ActionModal } from '../index';
@@ -28,18 +34,49 @@ function createAction(
 	};
 }
 
+// Renders an `<ActionModal>` inside a controlled `<Dialog.Root>` so each
+// test can drive the open state through `onOpenChange` (mirroring how
+// the dataviews call sites — `ModalActionMenuItem`,
+// `ModalActionInlineButton`, `PrimaryActionGridCell`, `ActionWithModal`
+// — own the dialog state).
+function renderActionModal( {
+	action,
+	items,
+	open = true,
+	onOpenChange = jest.fn(),
+}: {
+	action: ActionModalType< TestItem >;
+	items: TestItem[];
+	open?: boolean;
+	onOpenChange?: ( open: boolean ) => void;
+} ) {
+	const closeModal = () => onOpenChange( false );
+	return render(
+		<Dialog.Root
+			open={ open }
+			// Wrap to drop Base UI's `eventDetails` second argument so
+			// tests can assert `toHaveBeenCalledWith( false )` against the
+			// caller-provided mock without coupling to Base UI internals.
+			onOpenChange={ ( isOpen ) => onOpenChange( isOpen ) }
+			disablePointerDismissal={ action.hideModalHeader }
+		>
+			<ActionModal
+				action={ action }
+				items={ items }
+				closeModal={ closeModal }
+			/>
+		</Dialog.Root>
+	);
+}
+
 describe( 'ActionModal', () => {
 	it( 'renders with a dialog role by default', async () => {
 		const action = createAction();
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		await waitFor( () => {
 			expect( screen.getByRole( 'dialog' ) ).toBeVisible();
@@ -49,14 +86,10 @@ describe( 'ActionModal', () => {
 	it( 'renders with an alertdialog role when hideModalHeader is true', async () => {
 		const action = createAction( { hideModalHeader: true } );
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		await waitFor( () => {
 			expect( screen.getByRole( 'alertdialog' ) ).toBeVisible();
@@ -68,14 +101,10 @@ describe( 'ActionModal', () => {
 			modalSize: 'fill',
 		} );
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		await waitFor( () => {
 			expect( screen.getByRole( 'dialog' ) ).toBeVisible();
@@ -98,14 +127,10 @@ describe( 'ActionModal', () => {
 			),
 		} );
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		await waitFor( () => {
 			expect( screen.getByTestId( 'first-input' ) ).toHaveFocus();
@@ -125,14 +150,10 @@ describe( 'ActionModal', () => {
 			),
 		} );
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		await waitFor( () => {
 			expect( screen.getByTestId( 'content-button' ) ).toHaveFocus();
@@ -144,14 +165,10 @@ describe( 'ActionModal', () => {
 		async ( modalSize ) => {
 			const action = createAction( { modalSize } );
 
-			render(
-				<ActionModal
-					action={ action }
-					items={ [ { id: 1, title: 'Item' } ] }
-					open
-					onOpenChange={ jest.fn() }
-				/>
-			);
+			renderActionModal( {
+				action,
+				items: [ { id: 1, title: 'Item' } ],
+			} );
 
 			await screen.findByRole( 'dialog' );
 			expect( console ).not.toHaveWarned();
@@ -161,14 +178,10 @@ describe( 'ActionModal', () => {
 	it( 'renders the popup inside the dataviews-action-modal__portal element', async () => {
 		const action = createAction();
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ jest.fn() }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+		} );
 
 		const dialog = await screen.findByRole( 'dialog' );
 		// The portal is a structural CSS wrapper with no semantic role, so
@@ -187,14 +200,11 @@ describe( 'ActionModal', () => {
 		const onOpenChange = jest.fn();
 		const action = createAction();
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ onOpenChange }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+			onOpenChange,
+		} );
 
 		await screen.findByRole( 'dialog' );
 		await user.keyboard( '{Escape}' );
@@ -207,14 +217,11 @@ describe( 'ActionModal', () => {
 		const onOpenChange = jest.fn();
 		const action = createAction();
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ onOpenChange }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+			onOpenChange,
+		} );
 
 		await screen.findByRole( 'dialog' );
 		const backdrop = screen.getByTestId( 'dialog-backdrop' );
@@ -228,14 +235,11 @@ describe( 'ActionModal', () => {
 		const onOpenChange = jest.fn();
 		const action = createAction( { hideModalHeader: true } );
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ onOpenChange }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+			onOpenChange,
+		} );
 
 		await screen.findByRole( 'alertdialog' );
 		const backdrop = screen.getByTestId( 'dialog-backdrop' );
@@ -249,14 +253,11 @@ describe( 'ActionModal', () => {
 		const onOpenChange = jest.fn();
 		const action = createAction();
 
-		render(
-			<ActionModal
-				action={ action }
-				items={ [ { id: 1, title: 'Item' } ] }
-				open
-				onOpenChange={ onOpenChange }
-			/>
-		);
+		renderActionModal( {
+			action,
+			items: [ { id: 1, title: 'Item' } ],
+			onOpenChange,
+		} );
 
 		await screen.findByRole( 'dialog' );
 		await user.click( screen.getByRole( 'button', { name: /done/i } ) );
