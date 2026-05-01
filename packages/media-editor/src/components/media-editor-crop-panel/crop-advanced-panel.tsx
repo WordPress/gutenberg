@@ -16,6 +16,7 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useCropper } from '../../image-editor';
+import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import {
 	getCropPixels,
 	getReachableCropBoundsInPixels,
@@ -114,6 +115,7 @@ export default function CropAdvancedPanel( {
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
 	const { state, setCropRect } = useCropper();
+	const gestureHandlers = useCropGestureHandlers();
 
 	const pixels = useMemo( () => {
 		if ( ! state.image ) {
@@ -193,53 +195,58 @@ export default function CropAdvancedPanel( {
 			initialOpen={ false }
 			className="media-editor-crop-advanced-panel"
 		>
-			<Stack direction="column" gap="sm">
-				<Flex gap={ 2 } align="flex-start">
-					<FlexItem isBlock>
-						<CropInput
-							label={ __( 'Left' ) }
-							aria-label={ __( 'Crop left position' ) }
-							value={ pixels.x }
-							min={ minLeft }
-							max={ Math.max( minLeft, maxRight - pixels.width ) }
-							onCommit={ handleApply( 'x' ) }
-						/>
-					</FlexItem>
-					<FlexItem isBlock>
-						<CropInput
-							label={ __( 'Top' ) }
-							aria-label={ __( 'Crop top position' ) }
-							value={ pixels.y }
-							min={ minTop }
-							max={ Math.max(
-								minTop,
-								maxBottom - pixels.height
-							) }
-							onCommit={ handleApply( 'y' ) }
-						/>
-					</FlexItem>
-				</Flex>
-				<Flex gap={ 2 } align="flex-start">
-					<FlexItem isBlock>
-						<CropInput
-							label={ __( 'Width' ) }
-							value={ pixels.width }
-							min={ 1 }
-							max={ Math.max( 1, maxRight - pixels.x ) }
-							onCommit={ handleApply( 'width' ) }
-						/>
-					</FlexItem>
-					<FlexItem isBlock>
-						<CropInput
-							label={ __( 'Height' ) }
-							value={ pixels.height }
-							min={ 1 }
-							max={ Math.max( 1, maxBottom - pixels.y ) }
-							onCommit={ handleApply( 'height' ) }
-						/>
-					</FlexItem>
-				</Flex>
-			</Stack>
+			<div role="presentation" { ...gestureHandlers }>
+				<Stack direction="column" gap="sm">
+					<Flex gap={ 2 } align="flex-start">
+						<FlexItem isBlock>
+							<CropInput
+								label={ __( 'Left' ) }
+								aria-label={ __( 'Crop left position' ) }
+								value={ pixels.x }
+								min={ minLeft }
+								max={ Math.max(
+									minLeft,
+									maxRight - pixels.width
+								) }
+								onCommit={ handleApply( 'x' ) }
+							/>
+						</FlexItem>
+						<FlexItem isBlock>
+							<CropInput
+								label={ __( 'Top' ) }
+								aria-label={ __( 'Crop top position' ) }
+								value={ pixels.y }
+								min={ minTop }
+								max={ Math.max(
+									minTop,
+									maxBottom - pixels.height
+								) }
+								onCommit={ handleApply( 'y' ) }
+							/>
+						</FlexItem>
+					</Flex>
+					<Flex gap={ 2 } align="flex-start">
+						<FlexItem isBlock>
+							<CropInput
+								label={ __( 'Width' ) }
+								value={ pixels.width }
+								min={ 1 }
+								max={ Math.max( 1, maxRight - pixels.x ) }
+								onCommit={ handleApply( 'width' ) }
+							/>
+						</FlexItem>
+						<FlexItem isBlock>
+							<CropInput
+								label={ __( 'Height' ) }
+								value={ pixels.height }
+								min={ 1 }
+								max={ Math.max( 1, maxBottom - pixels.y ) }
+								onCommit={ handleApply( 'height' ) }
+							/>
+						</FlexItem>
+					</Flex>
+				</Stack>
+			</div>
 		</PanelBody>
 	);
 }
