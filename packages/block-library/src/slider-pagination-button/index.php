@@ -64,19 +64,24 @@ function render_block_core_slider_pagination_button( $attributes, $content, $blo
 	}
 
 	// Compose the button markup.
-	$button_classes = 'wp-block-slider-pagination-button is-type-' . esc_attr( $type ) . ' is-icon-' . esc_attr( $arrow_icon );
-	$button_type_attr = 'button';
+	$wrapper_attributes = array(
+		'class'                      => sprintf(
+			'is-type-%s is-icon-%s',
+			sanitize_html_class( $type ),
+			sanitize_html_class( $arrow_icon )
+		),
+		'type'                       => 'button',
+		'data-wp-interactive'        => 'core/slider',
+		'data-wp-on--click'          => $is_previous ? 'actions.prevSlide' : 'actions.nextSlide',
+		'data-wp-bind--aria-disabled' => $is_previous ? 'state.isAtStart' : 'state.isAtEnd',
+	);
 
-	// Only add aria-label if button is icon-only (no visible text)
-	$button_attrs = 'class="' . $button_classes . '" type="' . $button_type_attr . '" data-wp-interactive="core/slider"';
 	if ( 'icon' === $button_type ) {
-		$button_attrs .= ' aria-label="' . esc_attr( $label ) . '"';
+		// Only add aria-label if button is icon-only (no visible text).
+		$wrapper_attributes['aria-label'] = $label;
 	}
-	if ( $is_previous ) {
-		$button_attrs .= ' data-wp-on--click="actions.prevSlide" data-wp-bind--aria-disabled="state.isAtStart"';
-	} else {
-		$button_attrs .= ' data-wp-on--click="actions.nextSlide" data-wp-bind--aria-disabled="state.isAtEnd"';
-	}
+
+	$button_attrs = get_block_wrapper_attributes( $wrapper_attributes );
 
 	return '<button ' . $button_attrs . '>' . $button_inner . '</button>';
 }
