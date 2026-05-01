@@ -537,6 +537,13 @@ function MediaEditorModalContent( {
 						</Tabs>
 						<InterfaceSkeleton
 							className="media-editor-modal__skeleton"
+							labels={ {
+								body: isImage
+									? __( 'Image editor' )
+									: __( 'Media preview' ),
+								sidebar: __( 'Media details' ),
+								footer: __( 'Image editing tools' ),
+							} }
 							content={
 								<div className="media-editor-modal__canvas">
 									{ isImage ? (
