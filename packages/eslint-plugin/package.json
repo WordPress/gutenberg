@@ -57,7 +57,7 @@
 		"eslint-plugin-playwright": "^2.1.0",
 		"eslint-plugin-prettier": "^5.0.0",
 		"eslint-plugin-react": "^7.37.0",
-		"eslint-plugin-react-hooks": "^5.0.0",
+		"eslint-plugin-react-hooks": "7.1.1",
 		"globals": "^16.0.0",
 		"requireindex": "^1.2.0",
 		"typescript-eslint": "^8.0.0"

@@ -7,7 +7,7 @@ import { fixupPluginRules } from '@eslint/compat';
 import globals from 'globals';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
-import reactCompilerPlugin from 'eslint-plugin-react-compiler';
+import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import rawJestDomPlugin from 'eslint-plugin-jest-dom';
 import rawTestingLibraryPlugin from 'eslint-plugin-testing-library';
 import jestPlugin from 'eslint-plugin-jest';
@@ -220,6 +220,9 @@ export default dedupePlugins( [
 	// Storybook recommended (array of 3).
 	...storybookPlugin.configs[ 'flat/recommended' ],
 
+	// React Hooks recommended-latest (includes React Compiler rules).
+	reactHooksPlugin.configs.flat[ 'recommended-latest' ],
+
 	// Global settings applicable to all files.
 	{
 		languageOptions: {
@@ -283,7 +286,7 @@ export default dedupePlugins( [
 					definedTags: [ 'jest-environment' ],
 				},
 			],
-			'react-compiler/react-compiler': [
+			'react-hooks/config': [
 				'error',
 				{
 					environment: {
@@ -294,7 +297,7 @@ export default dedupePlugins( [
 			],
 		},
 		plugins: {
-			'react-compiler': reactCompilerPlugin,
+			'react-hooks': reactHooksPlugin,
 			'@typescript-eslint': tseslint.plugin,
 		},
 	},
@@ -339,7 +342,19 @@ export default dedupePlugins( [
 			'import/no-unresolved': 'off',
 			'import/named': 'off',
 			'@wordpress/data-no-store-string-literals': 'off',
-			'react-compiler/react-compiler': 'off',
+		},
+	},
+
+	// Override: React Native files — disable React Compiler rules until
+	// the native codebase's legacy patterns are migrated.
+	{
+		files: [
+			'**/*.@(android|ios|native).js',
+			'packages/react-native-*/**/*.js',
+		],
+		rules: {
+			'react-hooks/immutability': 'off',
+			'react-hooks/refs': 'off',
 		},
 	},
 
@@ -553,6 +568,17 @@ export default dedupePlugins( [
 		rules: {
 			'jsdoc/no-undefined-types': 'off',
 			'jsdoc/valid-types': 'off',
+		},
+	},
+
+	// Override: Storybook story files — disable rules-of-hooks for the
+	// `render` method pattern (hooks in a lowercase function) and
+	// static-components for inline factories used in story setup.
+	{
+		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
+		rules: {
+			'react-hooks/rules-of-hooks': 'off',
+			'react-hooks/static-components': 'off',
 		},
 	},
 
@@ -775,11 +801,10 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Interactivity packages — disable react-compiler, require react import.
+	// Override: Interactivity packages — require react import.
 	{
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
-			'react-compiler/react-compiler': 'off',
 			'react/react-in-jsx-scope': 'error',
 		},
 	},
@@ -845,21 +870,9 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Files with __unstable/__experimental prefixed functions that use hooks.
-	// react-hooks v5 rejects hook calls in functions not matching useX or PascalCase naming.
-	// These are known legacy patterns being phased out.
-	{
-		files: [
-			'packages/block-editor/src/components/block-variation-transforms/index.js',
-			'packages/block-editor/src/components/gradients/use-gradient.js',
-		],
-		rules: {
-			'react-hooks/rules-of-hooks': 'off',
-		},
-	},
-
 	// Override: Files with pre-existing exhaustive-deps warnings that cannot use
-	// inline eslint-disable comments (react-compiler flags those as errors).
+	// inline eslint-disable comments because the React Compiler rules in
+	// `react-hooks` flag those as errors.
 	{
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
