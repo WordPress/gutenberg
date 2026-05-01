@@ -230,6 +230,7 @@ export default compose( [
 				hasInserterItems,
 				getAllowedBlocks,
 				getDirectInsertBlock,
+				getBlockListSettings,
 			} = select( blockEditorStore );
 
 			const { getBlockVariations, getBlockType } = select( blocksStore );
@@ -238,9 +239,9 @@ export default compose( [
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 			const allowedBlocks = getAllowedBlocks( rootClientId );
-
 			const directInsertBlock =
 				shouldDirectInsert && getDirectInsertBlock( rootClientId );
+			const { defaultBlock } = getBlockListSettings( rootClientId ) ?? {};
 
 			const hasSingleBlockType =
 				allowedBlocks?.length === 1 &&
@@ -250,6 +251,17 @@ export default compose( [
 			let allowedBlockType = false;
 			if ( hasSingleBlockType ) {
 				allowedBlockType = allowedBlocks[ 0 ];
+			}
+
+			// The block this appender will insert when in single-click mode.
+			// Prefer the registered `defaultBlock`; fall back to the only allowed
+			// block when the parent restricts inner blocks to a single type.
+			let blockToInsert = directInsertBlock || null;
+			if ( ! blockToInsert && hasSingleBlockType ) {
+				blockToInsert =
+					defaultBlock?.name === allowedBlockType.name
+						? defaultBlock
+						: { name: allowedBlockType.name };
 			}
 
 			const defaultBlockType = directInsertBlock
@@ -266,6 +278,7 @@ export default compose( [
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
 				directInsertBlock,
+				blockToInsert,
 				appenderLabel,
 				rootClientId,
 			};
@@ -278,14 +291,13 @@ export default compose( [
 					rootClientId,
 					clientId,
 					isAppender,
-					hasSingleBlockType,
 					allowedBlockType,
-					directInsertBlock,
+					blockToInsert,
 					onSelectOrClose,
 					selectBlockOnInsert,
 				} = ownProps;
 
-				if ( ! hasSingleBlockType && ! directInsertBlock ) {
+				if ( ! blockToInsert ) {
 					return;
 				}
 
@@ -314,10 +326,7 @@ export default compose( [
 									parentBlock.innerBlocks.length - 1
 								];
 
-							if (
-								directInsertBlock &&
-								directInsertBlock?.name === lastInnerBlock.name
-							) {
+							if ( blockToInsert.name === lastInnerBlock.name ) {
 								adjacentAttributes = lastInnerBlock.attributes;
 							}
 						}
@@ -375,33 +384,27 @@ export default compose( [
 
 				const { insertBlock } = dispatch( blockEditorStore );
 
-				let blockToInsert;
-
-				// Attempt to augment the directInsertBlock with attributes from an adjacent block.
+				// Attempt to augment the inserted block with attributes from an adjacent block.
 				// This ensures styling from nearby blocks is preserved in the newly inserted block.
 				// See: https://github.com/WordPress/gutenberg/issues/37904
-				if ( directInsertBlock ) {
-					const newAttributes = getAdjacentBlockAttributes(
-						directInsertBlock.attributesToCopy
-					);
+				const newAttributes = getAdjacentBlockAttributes(
+					blockToInsert.attributesToCopy
+				);
 
-					blockToInsert = createBlock( directInsertBlock.name, {
-						...( directInsertBlock.attributes || {} ),
-						...newAttributes,
-					} );
-				} else {
-					blockToInsert = createBlock( allowedBlockType.name );
-				}
+				const newBlock = createBlock( blockToInsert.name, {
+					...( blockToInsert.attributes || {} ),
+					...newAttributes,
+				} );
 
 				insertBlock(
-					blockToInsert,
+					newBlock,
 					getInsertionIndex(),
 					rootClientId,
 					selectBlockOnInsert
 				);
 
 				if ( onSelectOrClose ) {
-					onSelectOrClose( blockToInsert );
+					onSelectOrClose( newBlock );
 				}
 
 				const message = sprintf(
