@@ -17,6 +17,7 @@ permissions: {}
 env:
     E2E_SPEC_FILE: test/e2e/specs/editor/various/new-post.spec.js
     E2E_VIDEO_COMMENT_IDENTIFIER: '<!-- gutenberg-e2e-video-comment -->'
+    E2E_VIDEO_ARTIFACT_PREFIX: e2e-video-${{ github.run_id }}-${{ github.run_attempt }}
     E2E_VIDEO_UPLOAD_LIMIT: 10
     WP_ARTIFACTS_PATH: ${{ github.workspace }}/artifacts
     WORKFLOW_JOB_NAME: Record video
@@ -123,6 +124,15 @@ jobs:
             - name: Install Playwright dependencies
               run: |
                   npx playwright install chromium firefox webkit --with-deps
+
+            - name: Install FFmpeg
+              run: |
+                  if ! command -v ffmpeg > /dev/null 2>&1; then
+                      sudo apt-get update
+                      sudo apt-get install -y ffmpeg
+                  fi
+
+                  ffmpeg -version
 
             - name: Install WordPress and start the server
               run: |
@@ -249,10 +259,18 @@ jobs:
                   fi
 
                   for SLOT in $(seq 1 "$E2E_VIDEO_UPLOAD_LIMIT"); do
-                      VIDEO_PATH="$VIDEO_UPLOAD_DIR/video-$SLOT.webm"
+                      VIDEO_PATH="$VIDEO_UPLOAD_DIR/video-$SLOT.mp4"
                       VIDEO_INDEX=$((SLOT - 1))
                       if (( VIDEO_INDEX < VIDEO_COUNT )); then
-                          cp "${VIDEOS[$VIDEO_INDEX]}" "$VIDEO_PATH"
+                          ffmpeg -y -i "${VIDEOS[$VIDEO_INDEX]}" \
+                              -an \
+                              -c:v libx264 \
+                              -preset veryfast \
+                              -crf 23 \
+                              -pix_fmt yuv420p \
+                              -vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" \
+                              -movflags +faststart \
+                              "$VIDEO_PATH"
                           echo "video_${SLOT}_path=$VIDEO_PATH" >> "$GITHUB_OUTPUT"
                           continue
                       fi
@@ -265,6 +283,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_1_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-1
                   path: ${{ steps.prepare-videos.outputs.video_1_path }}
                   archive: false
                   if-no-files-found: error
@@ -275,6 +294,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_2_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-2
                   path: ${{ steps.prepare-videos.outputs.video_2_path }}
                   archive: false
                   if-no-files-found: error
@@ -285,6 +305,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_3_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-3
                   path: ${{ steps.prepare-videos.outputs.video_3_path }}
                   archive: false
                   if-no-files-found: error
@@ -295,6 +316,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_4_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-4
                   path: ${{ steps.prepare-videos.outputs.video_4_path }}
                   archive: false
                   if-no-files-found: error
@@ -305,6 +327,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_5_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-5
                   path: ${{ steps.prepare-videos.outputs.video_5_path }}
                   archive: false
                   if-no-files-found: error
@@ -315,6 +338,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_6_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-6
                   path: ${{ steps.prepare-videos.outputs.video_6_path }}
                   archive: false
                   if-no-files-found: error
@@ -325,6 +349,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_7_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-7
                   path: ${{ steps.prepare-videos.outputs.video_7_path }}
                   archive: false
                   if-no-files-found: error
@@ -335,6 +360,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_8_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-8
                   path: ${{ steps.prepare-videos.outputs.video_8_path }}
                   archive: false
                   if-no-files-found: error
@@ -345,6 +371,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_9_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-9
                   path: ${{ steps.prepare-videos.outputs.video_9_path }}
                   archive: false
                   if-no-files-found: error
@@ -355,6 +382,7 @@ jobs:
               uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
               if: ${{ always() && steps.prepare-videos.outputs.video_10_path != '' }}
               with:
+                  name: ${{ env.E2E_VIDEO_ARTIFACT_PREFIX }}-10
                   path: ${{ steps.prepare-videos.outputs.video_10_path }}
                   archive: false
                   if-no-files-found: error
@@ -415,7 +443,7 @@ jobs:
                         process.env[ `VIDEO_ARTIFACT_URL_${ index + 1 }` ]
                       ).filter( Boolean );
                       const artifact = artifactUrls.length
-                        ? `${ artifactUrls.length } of ${ videoCountNumber || artifactUrls.length } unzipped video artifact(s) uploaded.`
+                        ? `${ artifactUrls.length } of ${ videoCountNumber || artifactUrls.length } H.264 MP4 video artifact(s) uploaded.`
                         : 'No video artifact was created. Check the workflow job logs.';
                       const artifactEmbeds = artifactUrls.flatMap( ( artifactUrl, index ) => [
                         `#### Video ${ index + 1 }`,
