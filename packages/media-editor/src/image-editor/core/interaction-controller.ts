@@ -2,7 +2,13 @@
  * Internal dependencies
  */
 import type { CropperState, NormalizedPoint, Size } from './types';
-import { DEFAULT_WHEEL_ZOOM_SPEED, MIN_ZOOM, MAX_ZOOM } from './constants';
+import {
+	DEFAULT_KEYBOARD_STEP,
+	DEFAULT_WHEEL_ZOOM_SPEED,
+	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+	MIN_ZOOM,
+	MAX_ZOOM,
+} from './constants';
 import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
@@ -88,7 +94,10 @@ export interface InteractionControllerOptions {
 	maxZoom?: number;
 	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. Read lazily. */
 	zoomSpeed?: number;
-	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. Read lazily. */
+	/**
+	 * Pan step size in normalized coords for keyboard events.
+	 * Defaults to 0.01. Read lazily. Shift multiplies it by 10.
+	 */
 	keyboardStep?: number;
 	/** Zoom level for double-tap zoom. Defaults to 2. Read lazily. */
 	doubleTapZoom?: number;
@@ -207,7 +216,19 @@ export class InteractionController {
 
 	/** Read keyboardStep lazily so option changes take effect immediately. */
 	private get keyboardStep(): number {
-		return this.options.keyboardStep ?? 0.05;
+		return this.options.keyboardStep ?? DEFAULT_KEYBOARD_STEP;
+	}
+
+	/**
+	 * Get the keyboard pan step, including modifier-based coarse movement.
+	 *
+	 * @param event The native KeyboardEvent.
+	 * @return The normalized pan step.
+	 */
+	private getKeyboardStep( event: KeyboardEvent ): number {
+		return event.shiftKey
+			? this.keyboardStep * KEYBOARD_SHIFT_STEP_MULTIPLIER
+			: this.keyboardStep;
 	}
 
 	/** Read doubleTapZoom lazily so option changes take effect immediately. */
@@ -787,12 +808,13 @@ export class InteractionController {
 		switch ( e.key ) {
 			case 'ArrowUp': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y + this.keyboardStep,
+							y: currentState.pan.y + keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -803,12 +825,13 @@ export class InteractionController {
 			}
 			case 'ArrowDown': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
 							x: currentState.pan.x,
-							y: currentState.pan.y - this.keyboardStep,
+							y: currentState.pan.y - keyboardStep,
 						},
 					},
 					getImageSizeFromState( currentState ),
@@ -819,11 +842,12 @@ export class InteractionController {
 			}
 			case 'ArrowLeft': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x + this.keyboardStep,
+							x: currentState.pan.x + keyboardStep,
 							y: currentState.pan.y,
 						},
 					},
@@ -835,11 +859,12 @@ export class InteractionController {
 			}
 			case 'ArrowRight': {
 				e.preventDefault();
+				const keyboardStep = this.getKeyboardStep( e );
 				const { pan: newCrop } = restrictPanZoom(
 					{
 						...currentState,
 						pan: {
-							x: currentState.pan.x - this.keyboardStep,
+							x: currentState.pan.x - keyboardStep,
 							y: currentState.pan.y,
 						},
 					},

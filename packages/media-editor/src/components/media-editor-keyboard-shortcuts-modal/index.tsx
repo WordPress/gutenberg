@@ -66,7 +66,7 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: { character: 'V' },
 	},
 	{
-		description: __( 'Resize crop (large step)' ),
+		description: __( 'Pan or resize crop (large step)' ),
 		keyCombination: {
 			modifier: 'shift',
 			character: [ '↑', '↓', '←', '→' ],
