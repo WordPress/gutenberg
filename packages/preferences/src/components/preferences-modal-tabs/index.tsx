@@ -110,10 +110,10 @@ export default function PreferencesModalTabs( {
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
-										// @ts-expect-error: Navigator.Button is currently typed in a way that prevents Item from being passed in
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
+											// @ts-expect-error: Navigator.Button is currently typed in a way that prevents Item from being passed in
 											as={ Item }
 											isAction
 										>
