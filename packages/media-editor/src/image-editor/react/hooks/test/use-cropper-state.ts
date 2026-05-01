@@ -934,6 +934,29 @@ describe( 'useCropperState', () => {
 			expect( result.current.hasRedo ).toBe( false );
 		} );
 
+		it( 'undo after redo returns to a clean initial state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
+				} );
+			} );
+			act( () => result.current.snapRotate90( 1 ) );
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => result.current.undo() );
+			expect( result.current.isDirty ).toBe( false );
+
+			act( () => result.current.redo() );
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => result.current.undo() );
+			expect( result.current.state.rotation ).toBe( 0 );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
 		// --- undo/redo with a pending gesture ---
 
 		it( 'undo flushes a pending gesture before undoing', () => {

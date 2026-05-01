@@ -104,6 +104,13 @@ export interface UseCropperStateReturn {
 /** Milliseconds of inactivity after which a continuous interaction is committed to history. */
 const HISTORY_DEBOUNCE_MS = 300;
 
+/** Small tolerance for cropper floating-point comparisons. */
+const HISTORY_EPSILON = 1e-6;
+
+function nearlyEqual( a: number, b: number ): boolean {
+	return Math.abs( a - b ) < HISTORY_EPSILON;
+}
+
 function areHistoryStatesEqual( a: CropperState, b: CropperState ): boolean {
 	const aImage = a.image;
 	const bImage = b.image;
@@ -111,16 +118,16 @@ function areHistoryStatesEqual( a: CropperState, b: CropperState ): boolean {
 		aImage?.src === bImage?.src &&
 		aImage?.naturalWidth === bImage?.naturalWidth &&
 		aImage?.naturalHeight === bImage?.naturalHeight &&
-		a.pan.x === b.pan.x &&
-		a.pan.y === b.pan.y &&
-		a.zoom === b.zoom &&
-		a.rotation === b.rotation &&
+		nearlyEqual( a.pan.x, b.pan.x ) &&
+		nearlyEqual( a.pan.y, b.pan.y ) &&
+		nearlyEqual( a.zoom, b.zoom ) &&
+		nearlyEqual( a.rotation, b.rotation ) &&
 		a.flip.horizontal === b.flip.horizontal &&
 		a.flip.vertical === b.flip.vertical &&
-		a.cropRect.x === b.cropRect.x &&
-		a.cropRect.y === b.cropRect.y &&
-		a.cropRect.width === b.cropRect.width &&
-		a.cropRect.height === b.cropRect.height
+		nearlyEqual( a.cropRect.x, b.cropRect.x ) &&
+		nearlyEqual( a.cropRect.y, b.cropRect.y ) &&
+		nearlyEqual( a.cropRect.width, b.cropRect.width ) &&
+		nearlyEqual( a.cropRect.height, b.cropRect.height )
 	);
 }
 
