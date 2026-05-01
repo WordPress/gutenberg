@@ -16,6 +16,8 @@ import {
 	SUGGESTED_DELETION_FORMAT,
 	SUGGESTED_ADDITION_FORMAT,
 	registerSuggestionFormats,
+	markContentDiff,
+	stripSuggestionMarks,
 } from '../inline-formats';
 
 describe( 'suggestion inline formats', () => {
@@ -94,5 +96,118 @@ describe( 'suggestion inline formats', () => {
 			'H<del class="has-suggestion-deletion">ello</del>' +
 				'<ins class="has-suggestion-addition">i</ins>'
 		);
+	} );
+} );
+
+describe( 'markContentDiff', () => {
+	it( 'returns the proposed value untouched when both sides are identical', () => {
+		expect( markContentDiff( 'Hello world', 'Hello world' ) ).toBe(
+			'Hello world'
+		);
+	} );
+
+	it( 'wraps appended text in <ins class="has-suggestion-addition">', () => {
+		// Pure end-of-string addition: "Hello" → "Hello world". The added
+		// space and word each surface as their own insert segments because
+		// `wordDiff` tokenizes on whitespace runs.
+		expect( markContentDiff( 'Hello', 'Hello world' ) ).toBe(
+			'Hello' +
+				'<ins class="has-suggestion-addition"> </ins>' +
+				'<ins class="has-suggestion-addition">world</ins>'
+		);
+	} );
+
+	it( 'wraps removed text in <del class="has-suggestion-deletion">', () => {
+		// Pure end-of-string deletion: "Hello world" → "Hello". Mirrors the
+		// addition case but in the delete direction.
+		expect( markContentDiff( 'Hello world', 'Hello' ) ).toBe(
+			'Hello' +
+				'<del class="has-suggestion-deletion"> </del>' +
+				'<del class="has-suggestion-deletion">world</del>'
+		);
+	} );
+
+	it( 'marks a mid-string replacement as paired delete + insert runs', () => {
+		// "Hello world" → "Hello there": shared "Hello ", then `world`
+		// becomes `there`. Reviewers see both states adjacent so they can
+		// read the change at a glance.
+		expect( markContentDiff( 'Hello world', 'Hello there' ) ).toBe(
+			'Hello ' +
+				'<del class="has-suggestion-deletion">world</del>' +
+				'<ins class="has-suggestion-addition">there</ins>'
+		);
+	} );
+
+	it( 'marks an inline format addition as a delete + insert pair around the styled run', () => {
+		// Bolding "world": "Hello world" → "Hello <strong>world</strong>".
+		// The diff sees the bare token replaced by the wrapped one. The
+		// `<strong>` survives inside the `<ins>` so the suggestion both
+		// reads as bold and shows in the addition color treatment.
+		expect(
+			markContentDiff( 'Hello world', 'Hello <strong>world</strong>' )
+		).toBe(
+			'Hello ' +
+				'<del class="has-suggestion-deletion">world</del>' +
+				'<ins class="has-suggestion-addition"><strong>world</strong></ins>'
+		);
+	} );
+
+	it( 'coerces null and undefined inputs to empty strings', () => {
+		// Defensive — overlay payloads can carry `undefined` for an
+		// attribute that is being introduced for the first time.
+		expect( markContentDiff( null, 'New' ) ).toBe(
+			'<ins class="has-suggestion-addition">New</ins>'
+		);
+		expect( markContentDiff( 'Old', undefined ) ).toBe(
+			'<del class="has-suggestion-deletion">Old</del>'
+		);
+	} );
+} );
+
+describe( 'stripSuggestionMarks', () => {
+	it( 'is a no-op when the value contains no suggestion classes', () => {
+		// Fast-path that lets the common edit case skip the DOM parse.
+		expect( stripSuggestionMarks( 'Hello world' ) ).toBe( 'Hello world' );
+		expect( stripSuggestionMarks( 'Hello <strong>world</strong>' ) ).toBe(
+			'Hello <strong>world</strong>'
+		);
+	} );
+
+	it( 'removes deletion runs entirely', () => {
+		// The deleted text is the suggester's "remove this" — accepting
+		// strips it, so this is the value the overlay should store after
+		// the round-trip through RichText.
+		expect(
+			stripSuggestionMarks(
+				'Hello' + '<del class="has-suggestion-deletion"> world</del>'
+			)
+		).toBe( 'Hello' );
+	} );
+
+	it( 'unwraps addition runs to their inner content', () => {
+		// Additions are the suggester's "keep this" — accepting unwraps
+		// them so the inner content (any markup included) is preserved.
+		expect(
+			stripSuggestionMarks(
+				'Hello ' +
+					'<ins class="has-suggestion-addition"><strong>world</strong></ins>'
+			)
+		).toBe( 'Hello <strong>world</strong>' );
+	} );
+
+	it( 'round-trips a marked diff back to the proposed value', () => {
+		// `markContentDiff` then `stripSuggestionMarks` should land back at
+		// `proposed`. This is the contract the overlay relies on so a re-
+		// edit (which feeds the marked HTML back through `setAttributes`)
+		// doesn't double up the marks on the next render.
+		const baseline = 'Hello world';
+		const proposed = 'Hello there';
+		const marked = markContentDiff( baseline, proposed );
+		expect( stripSuggestionMarks( marked ) ).toBe( proposed );
+	} );
+
+	it( 'passes null and undefined through untouched', () => {
+		expect( stripSuggestionMarks( null ) ).toBeNull();
+		expect( stripSuggestionMarks( undefined ) ).toBeUndefined();
 	} );
 } );

@@ -5,6 +5,11 @@ import { registerFormatType } from '@wordpress/rich-text';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { wordDiff } from './suggestion-diff';
+
+/**
  * Inline RichText format types used by Suggest mode to render proposed text
  * changes within a block, alongside the sidebar diff summary.
  *
@@ -63,3 +68,134 @@ export function registerSuggestionFormats() {
 // package (editor bootstrap, e2e harness, integration tests) ends up with
 // the format types available without needing a separate init call.
 registerSuggestionFormats();
+
+const DELETION_CLASS = 'has-suggestion-deletion';
+const ADDITION_CLASS = 'has-suggestion-addition';
+
+/**
+ * Wrap a chunk of HTML in the suggested-deletion `<del>`. Used when an
+ * incoming run was present in the baseline but absent from the proposed
+ * value, so reviewers see what the suggester wants to remove.
+ *
+ * @param {string} value Run content (already-serialized HTML or plain text).
+ * @return {string} Wrapped run.
+ */
+function wrapDeletion( value ) {
+	return `<del class="${ DELETION_CLASS }">${ value }</del>`;
+}
+
+/**
+ * Wrap a chunk of HTML in the suggested-addition `<ins>`. Used when an
+ * incoming run is present in the proposed value but absent from the
+ * baseline, so reviewers see what the suggester wants to add.
+ *
+ * @param {string} value Run content (already-serialized HTML or plain text).
+ * @return {string} Wrapped run.
+ */
+function wrapAddition( value ) {
+	return `<ins class="${ ADDITION_CLASS }">${ value }</ins>`;
+}
+
+/**
+ * Build a marked HTML preview of `proposed` relative to `baseline`. Equal
+ * runs pass through unchanged, runs that exist only in the baseline are
+ * wrapped in `<del class="has-suggestion-deletion">`, and runs that exist
+ * only in the proposed value are wrapped in `<ins class="has-suggestion-
+ * addition">`. The result is what gets fed back into the block's RichText
+ * during overlay render so reviewers see deletions struck through and
+ * additions highlighted inline.
+ *
+ * Tokenization is intentionally word-and-whitespace level (delegated to
+ * `wordDiff`), which is good enough for the golden-path scenarios this PR
+ * covers — pure text additions, pure text deletions, mid-string
+ * replacements, and inline-format additions like wrapping a word in
+ * `<strong>`. A whole-token format change (e.g. `world` →
+ * `<strong>world</strong>`) surfaces as a delete-then-insert pair, which
+ * intentionally renders both states so the reviewer can see what changed.
+ * Edge cases (partial-tag overlap, mixed nested formatting) are out of
+ * scope here and land in subsequent phases.
+ *
+ * Identical inputs short-circuit so the common no-op overlay render
+ * (e.g. baseline === proposed during an attribute-only suggestion) costs
+ * nothing.
+ *
+ * @param {string|null|undefined} baseline Original attribute value.
+ * @param {string|null|undefined} proposed Suggested attribute value.
+ * @return {string} Marked HTML representing the diff.
+ */
+export function markContentDiff( baseline, proposed ) {
+	const beforeHtml =
+		baseline === null || baseline === undefined ? '' : String( baseline );
+	const afterHtml =
+		proposed === null || proposed === undefined ? '' : String( proposed );
+
+	if ( beforeHtml === afterHtml ) {
+		return afterHtml;
+	}
+
+	const segments = wordDiff( beforeHtml, afterHtml );
+	let result = '';
+	for ( const seg of segments ) {
+		if ( seg.type === 'equal' ) {
+			result += seg.value;
+		} else if ( seg.type === 'insert' ) {
+			result += wrapAddition( seg.value );
+		} else {
+			result += wrapDeletion( seg.value );
+		}
+	}
+	return result;
+}
+
+/**
+ * Reverse `markContentDiff`: drop deletion runs entirely (the suggester
+ * wants them gone) and unwrap addition runs (the suggester wants their
+ * inner content to remain). Used on incoming `setAttributes` payloads from
+ * the block's RichText so the overlay always stores the "proposed" value
+ * and never the marked rendering — without this, the next render would
+ * diff baseline against an already-marked value and double up the marks.
+ *
+ * Falls back to a string-untouched return when the input contains no
+ * suggestion classes, so the common edit path doesn't pay the parse cost.
+ *
+ * @param {string|null|undefined} marked Possibly-marked HTML.
+ * @return {string|null|undefined} HTML with suggestion marks removed.
+ */
+export function stripSuggestionMarks( marked ) {
+	if ( marked === null || marked === undefined ) {
+		return marked;
+	}
+	const html = String( marked );
+	if (
+		! html.includes( DELETION_CLASS ) &&
+		! html.includes( ADDITION_CLASS )
+	) {
+		return html;
+	}
+
+	// Use the DOM rather than regex so nested tags (an addition wrapping a
+	// `<strong>`, or a deletion containing arbitrary inline markup) round-
+	// trip cleanly. Wrapping in a single root element gives us a stable
+	// `innerHTML` to read back without losing leading/trailing text nodes.
+	const doc = new window.DOMParser().parseFromString(
+		`<div>${ html }</div>`,
+		'text/html'
+	);
+	const root = doc.body.firstElementChild;
+	if ( ! root ) {
+		return html;
+	}
+
+	for ( const el of root.querySelectorAll( `.${ DELETION_CLASS }` ) ) {
+		el.remove();
+	}
+	for ( const el of root.querySelectorAll( `.${ ADDITION_CLASS }` ) ) {
+		const parent = el.parentNode;
+		while ( el.firstChild ) {
+			parent.insertBefore( el.firstChild, el );
+		}
+		parent.removeChild( el );
+	}
+
+	return root.innerHTML;
+}
