@@ -21,7 +21,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { getRenderingMode, getCurrentPost } from './selectors';
+import {
+	getRenderingMode,
+	getCurrentPost,
+	getEditorSettings,
+} from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
@@ -297,6 +301,11 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			'core',
 			'renderingModes'
 		)?.[ theme ]?.[ postType ];
+
+		if ( RENDERING_MODES.includes( defaultModePreference ) ) {
+			return defaultModePreference;
+		}
+
 		const postTypeDefaultMode = Array.isArray(
 			postTypeEntity?.supports?.editor
 		)
@@ -305,14 +314,18 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			  )?.[ 'default-mode' ]
 			: undefined;
 
-		const defaultMode = defaultModePreference || postTypeDefaultMode;
-
-		// Fallback gracefully to 'post-only' when rendering mode is not supported.
-		if ( ! RENDERING_MODES.includes( defaultMode ) ) {
-			return 'post-only';
+		if ( RENDERING_MODES.includes( postTypeDefaultMode ) ) {
+			return postTypeDefaultMode;
 		}
 
-		return defaultMode;
+		const settingsDefaultMode =
+			getEditorSettings( state ).defaultRenderingMode;
+
+		if ( RENDERING_MODES.includes( settingsDefaultMode ) ) {
+			return settingsDefaultMode;
+		}
+
+		return 'post-only';
 	}
 );
 
