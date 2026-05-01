@@ -1066,11 +1066,12 @@ class WP_Theme_JSON_Gutenberg {
 		$schema_styles_elements = array();
 
 		/*
-		 * Set allowed element pseudo selectors based on per element allow list.
+		 * Set allowed element pseudo selectors and responsive breakpoint states.
 		 * Target data structure in schema:
 		 * e.g.
 		 * - top level elements: `$schema['styles']['elements']['link'][':hover']`.
 		 * - block level elements: `$schema['styles']['blocks']['core/button']['elements']['link'][':hover']`.
+		 * - block responsive elements: `$schema['styles']['blocks']['core/button']['tablet']['elements']['link'][':hover']`.
 		 */
 		foreach ( $valid_element_names as $element ) {
 			$schema_styles_elements[ $element ] = $styles_non_top_level;
@@ -1092,13 +1093,13 @@ class WP_Theme_JSON_Gutenberg {
 
 		/*
 		 * Generate a schema for blocks.
-		 * - Block styles can contain `elements` & `variations` definitions.
+		 * - Block styles can contain `elements`, `variations`, and responsive breakpoint state definitions.
 		 * - Variations definitions cannot be nested.
-		 * - Variations can contain styles for inner `blocks`.
-		 * - Variation inner `blocks` styles can contain `elements`.
+		 * - Variations can contain styles for inner `blocks`, `elements`, and responsive breakpoint states.
+		 * - Variation inner `blocks` styles can contain `elements` and responsive breakpoint states.
 		 *
-		 * As each variation needs a `blocks` schema but further nested
-		 * inner `blocks`, the overall schema will be generated in multiple passes.
+		 * As each variation needs both a `blocks` schema and responsive `blocks` schemas
+		 * for further nested inner `blocks`, the overall schema is generated in multiple passes.
 		 */
 		foreach ( $valid_block_names as $block ) {
 			$schema_settings_blocks[ $block ]           = static::VALID_SETTINGS;
