@@ -91,6 +91,66 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
+ * Normalizes noteId metadata to always return an array.
+ * Handles both scalar (legacy) and array (new) noteId values.
+ *
+ * @param {Object} metadata Block metadata object
+ * @return {number[]} Array of note IDs (may be empty)
+ */
+export function getNoteIdsFromMetadata( metadata ) {
+	if ( ! metadata || metadata.noteId === null ) {
+		return [];
+	}
+	// New format: noteId is an array.
+	if ( Array.isArray( metadata.noteId ) ) {
+		return metadata.noteId.filter( Boolean );
+	}
+	// Legacy format: noteId is a scalar.
+	return metadata.noteId ? [ metadata.noteId ] : [];
+}
+
+/**
+ * Adds a note ID to the metadata.
+ * Converts scalar to array if needed, otherwise appends.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to add
+ * @return {Object} Updated metadata object
+ */
+export function addNoteIdToMetadata( metadata, noteId ) {
+	const existingIds = getNoteIdsFromMetadata( metadata );
+	// Compare as strings so a string-typed legacy id (e.g. '5') and a numeric
+	// id (5) are treated as duplicates.
+	const noteIdKey = String( noteId );
+	if ( existingIds.some( ( id ) => String( id ) === noteIdKey ) ) {
+		return metadata;
+	}
+	return {
+		...metadata,
+		noteId: [ ...existingIds, noteId ],
+	};
+}
+
+/**
+ * Removes a note ID from the metadata.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to remove
+ * @return {Object} Updated metadata object
+ */
+export function removeNoteIdFromMetadata( metadata, noteId ) {
+	const existingIds = getNoteIdsFromMetadata( metadata );
+	// Compare as strings so a string-typed legacy id (e.g. '5') matches a
+	// numeric id (5) when removing.
+	const noteIdKey = String( noteId );
+	const newIds = existingIds.filter( ( id ) => String( id ) !== noteIdKey );
+	return {
+		...metadata,
+		noteId: newIds.length > 0 ? newIds : undefined,
+	};
+}
+
+/**
  * Calculate final top positions for all floating note threads in the
  * editor's content coordinate space. Adjusts positions to prevent overlapping
  * by pushing threads above the selected one upward and threads below it downward.

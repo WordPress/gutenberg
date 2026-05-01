@@ -848,6 +848,419 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Multiple notes per block', () => {
+		test( 'can add multiple notes to the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			// Add a block with the first note.
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with multiple notes' },
+				comment: 'First note on block',
+			} );
+
+			// Dismiss the first "Note added." snackbar so it won't interfere
+			// with the second note's snackbar check.
+			await page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+				.click();
+
+			// Click "Add note" again to add a second note.
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+			// Verify the new note form is shown (not the reply form).
+			const newNoteForm = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			await expect( newNoteForm ).toBeFocused();
+
+			// Add the second note.
+			await newNoteForm.fill( 'Second note on block' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+
+			// Verify both notes are visible as separate threads.
+			const firstThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', { name: 'Note: First note on block' } );
+			const secondThread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Second note on block',
+				} );
+
+			await expect( firstThread ).toBeVisible();
+			await expect( secondThread ).toBeVisible();
+
+			// Verify "Note added." (not "Reply added.").
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+		} );
+
+		test( 'multiple notes on same block are stored as array in metadata', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with multiple notes' },
+				comment: 'First note',
+			} );
+			// Dismiss the first "Note added." so the second toast can be asserted.
+			await blockNoteUtils.dismissSnackbar( 'Note added.' );
+
+			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			// Verify noteId is an array with 2 elements.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+
+			expect( Array.isArray( noteIds ) ).toBe( true );
+			expect( noteIds ).toHaveLength( 2 );
+		} );
+
+		test( 'deleting one note preserves the other notes on the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes to delete' },
+				comment: 'Note to keep',
+			} );
+			await blockNoteUtils.dismissSnackbar( 'Note added.' );
+
+			await blockNoteUtils.addAnotherNoteToCurrentBlock(
+				'Note to delete'
+			);
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			// Both notes should be visible.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Note to delete',
+				} )
+			).toBeVisible();
+
+			// Delete the second note.
+			const secondThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Note to delete',
+			} );
+			await secondThread.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note deleted.' } )
+			).toBeVisible();
+
+			// First note should still be visible; second should be gone.
+			await expect(
+				settings.getByRole( 'treeitem', { name: 'Note: Note to keep' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Note to delete',
+				} )
+			).toBeHidden();
+
+			// Metadata should still have one noteId remaining.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 1 );
+		} );
+
+		test( 'resolving one note does not affect sibling notes on the same block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with notes to resolve' },
+				comment: 'Note A',
+			} );
+			await blockNoteUtils.dismissSnackbar( 'Note added.' );
+
+			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Note B' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Resolve Note A.
+			const threadA = settings.getByRole( 'treeitem', {
+				name: 'Note: Note A',
+			} );
+			await threadA.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			// Note B should still be visible and unresolved (expanded).
+			const threadB = settings.getByRole( 'treeitem', {
+				name: 'Note: Note B',
+			} );
+			await expect( threadB ).toBeVisible();
+
+			// Both notes should still exist in metadata.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+			expect( noteIds ).toHaveLength( 2 );
+		} );
+
+		test( 'auto-selects first unresolved note when clicking a block with multiple notes', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block for auto-select' },
+				comment: 'First note',
+			} );
+			await blockNoteUtils.dismissSnackbar( 'Note added.' );
+
+			await blockNoteUtils.addAnotherNoteToCurrentBlock( 'Second note' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// Resolve the first note.
+			const firstThread = settings.getByRole( 'treeitem', {
+				name: 'Note: First note',
+			} );
+			await firstThread.click();
+			await page.getByRole( 'button', { name: 'Resolve' } ).click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note marked as resolved.' } )
+			).toBeVisible();
+
+			// Click the title to deselect the block and its comment.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			// Click back on the original block.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.filter( { hasText: 'Block for auto-select' } )
+				.click();
+
+			// The second (unresolved) note should be the active one.
+			const secondThread = settings.getByRole( 'treeitem', {
+				name: 'Note: Second note',
+			} );
+			await expect( secondThread ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+		} );
+
+		test( 'metadata noteId is cleaned up when all notes are deleted from a block', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block to clear notes' },
+				comment: 'Only note',
+			} );
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const thread = settings.getByRole( 'treeitem', {
+				name: 'Note: Only note',
+			} );
+			await thread.click();
+			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Delete' );
+			await page
+				.getByRole( 'dialog' )
+				.getByRole( 'button', { name: 'Delete' } )
+				.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note deleted.' } )
+			).toBeVisible();
+
+			// noteId should be cleaned up from metadata entirely.
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			expect(
+				paragraphBlock?.attributes?.metadata?.noteId
+			).toBeUndefined();
+		} );
+
+		test( 'lazy-migrates a legacy scalar noteId to an array when a second note is added', async ( {
+			editor,
+			page,
+		} ) => {
+			// Insert a block whose metadata already carries a scalar noteId, the
+			// shape produced by older code before multi-note support shipped. The
+			// orphan id (999) does not correspond to a real thread; the test
+			// asserts that the lazy migration in addNoteIdToMetadata preserves it
+			// rather than silently dropping it on first write.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Block with legacy scalar noteId',
+					metadata: { noteId: 999 },
+				},
+			} );
+
+			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await page
+				.getByRole( 'textbox', { name: 'New note', exact: true } )
+				.fill( 'New multi-note era note' );
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Add note', exact: true } )
+				.click();
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			const blocks = await editor.getBlocks();
+			const paragraphBlock = blocks.find(
+				( b ) => b.name === 'core/paragraph'
+			);
+			const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+
+			expect( Array.isArray( noteIds ) ).toBe( true );
+			expect( noteIds ).toHaveLength( 2 );
+			// Legacy id is preserved as the first entry; the new note id is appended.
+			expect( noteIds[ 0 ] ).toBe( 999 );
+			expect( typeof noteIds[ 1 ] ).toBe( 'number' );
+			expect( noteIds[ 1 ] ).not.toBe( 999 );
+		} );
+
+		test( 'multi-note metadata persists across save and reload', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			await blockNoteUtils.addBlockWithNote( {
+				type: 'core/paragraph',
+				attributes: { content: 'Block with persisted notes' },
+				comment: 'Persisted note A',
+			} );
+			await blockNoteUtils.dismissSnackbar( 'Note added.' );
+
+			await blockNoteUtils.addAnotherNoteToCurrentBlock(
+				'Persisted note B'
+			);
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Note added.' } )
+			).toBeVisible();
+
+			const beforeIds = ( await editor.getBlocks() ).find(
+				( b ) => b.name === 'core/paragraph'
+			)?.attributes?.metadata?.noteId;
+			expect( beforeIds ).toHaveLength( 2 );
+
+			await editor.saveDraft();
+			await page.reload();
+
+			// The pinned notes sidebar isn't restored on reload, so open it
+			// explicitly before asserting the threads are visible.
+			await blockNoteUtils.openBlockNoteSidebar();
+
+			// After reload, both threads should reattach to the block.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Persisted note A',
+				} )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'treeitem', {
+					name: 'Note: Persisted note B',
+				} )
+			).toBeVisible();
+
+			// Metadata should still be in array form, with the same ids in the
+			// same order — the round-trip through serialize/parse must not lose
+			// or reorder the array.
+			const afterIds = ( await editor.getBlocks() ).find(
+				( b ) => b.name === 'core/paragraph'
+			)?.attributes?.metadata?.noteId;
+			expect( Array.isArray( afterIds ) ).toBe( true );
+			expect( afterIds ).toEqual( beforeIds );
+		} );
+	} );
 } );
 
 class BlockNoteUtils {
@@ -920,5 +1333,23 @@ class BlockNoteUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
+	}
+
+	async dismissSnackbar( text ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: text } )
+			.click();
+	}
+
+	async addAnotherNoteToCurrentBlock( content ) {
+		await this.#editor.clickBlockOptionsMenuItem( 'Add note' );
+		await this.#page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( content );
+		await this.#page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
 	}
 }
