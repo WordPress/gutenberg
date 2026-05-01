@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import type { CropperState, NormalizedPoint, Size } from './types';
-import { MIN_ZOOM, MAX_ZOOM } from './constants';
+import { DEFAULT_WHEEL_ZOOM_SPEED, MIN_ZOOM, MAX_ZOOM } from './constants';
 import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
@@ -84,7 +84,7 @@ export interface InteractionControllerOptions {
 	minZoom?: number;
 	/** Maximum zoom level. Defaults to MAX_ZOOM. Read lazily. */
 	maxZoom?: number;
-	/** Zoom speed multiplier for wheel events. Defaults to 0.01. Read lazily. */
+	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. Read lazily. */
 	zoomSpeed?: number;
 	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. Read lazily. */
 	keyboardStep?: number;
@@ -200,7 +200,7 @@ export class InteractionController {
 
 	/** Read zoomSpeed lazily so option changes take effect immediately. */
 	private get zoomSpeed(): number {
-		return this.options.zoomSpeed ?? 0.01;
+		return this.options.zoomSpeed ?? DEFAULT_WHEEL_ZOOM_SPEED;
 	}
 
 	/** Read keyboardStep lazily so option changes take effect immediately. */
@@ -360,6 +360,10 @@ export class InteractionController {
 	 */
 	handleWheel( e: WheelEvent ): void {
 		e.preventDefault();
+
+		if ( this.drag ) {
+			return;
+		}
 
 		// Debounced gesture boundaries for wheel zoom.
 		// Start on first wheel event, end after 300ms of no events.
@@ -731,6 +735,11 @@ export class InteractionController {
 			this.setStatus( { isZooming: false } );
 		}, ZOOM_ANIMATION_DURATION );
 
+		// Double-tap bypasses the normal handleTouchStart gesture path so
+		// onGestureStart/End are never called — fire them here so undo
+		// receives a proper boundary around this discrete zoom action.
+		this.options.onGestureStart?.();
+
 		if ( visSize.width > 0 && visSize.height > 0 ) {
 			const fx = tapX - containerRect.left - containerSize.width / 2;
 			const fy = tapY - containerRect.top - containerSize.height / 2;
@@ -758,6 +767,8 @@ export class InteractionController {
 		} else {
 			this.options.actions.setZoom( targetZoom );
 		}
+
+		this.options.onGestureEnd?.();
 		return true;
 	}
 
