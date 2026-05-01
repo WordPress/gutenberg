@@ -526,6 +526,143 @@ The build system generates:
 
 The boot package in Gutenberg will automatically use these routes and make them available.
 
+## Widgets (Experimental)
+
+> [!NOTE]
+> Widgets are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
+Widgets provide a file-based discovery system for building self-contained UI components that are registered as WordPress script modules. Each widget lives in its own directory under `widgets/` at the repository root.
+
+### Structure
+
+```
+widgets/
+  hello-world/
+    widget.json     # Static discovery metadata (required)
+    widget.ts       # Runtime schema entry point (optional)
+    render.tsx      # UI component entry point (optional)
+    render.scss     # Optional styles (bundled inline when imported from render.tsx)
+```
+
+### Why two entries?
+
+Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata between `block.json` and `edit.js`:
+
+| Concern | Lives in | Reason |
+|---|---|---|
+| Identity (`name`) | both (must match) | server needs it to register; client uses it to resolve the runtime entry |
+| Static metadata (`title`, `description`, `category`) | `widget.json` | plain JSON the host can read without a JS runtime |
+| Translated title / labels (`__()`) | `widget.ts` | i18n calls need a JS runtime; JSON can only carry static strings |
+| Attribute schema (types, options) | `widget.ts` | needs TypeScript coupling with `render` props; may include translated `elements`/labels |
+| `example` | `widget.ts` | co-located with the attribute schema it shapes |
+
+Rule of thumb: anything expressible as plain JSON goes in `widget.json`. Anything that needs types, i18n, or runtime logic goes in `widget.ts`. The generated `build/widgets/registry.php` currently exposes only `name`, `dir_name`, and which entry files exist; forwarding the rest of `widget.json` to PHP is a follow-up.
+
+### `widget.json` — static discovery metadata
+
+```json
+{
+	"name": "my-plugin/hello-world",
+	"title": "Hello World",
+	"description": "A simple example widget.",
+	"category": "demo"
+}
+```
+
+**Fields:**
+- **`name`** (required): Namespaced identifier (e.g., `"my-plugin/hello-world"`)
+- **`title`** (optional): Human-readable title
+- **`description`** (optional): Short description for listings
+- **`category`** (optional): Grouping category for filtering
+
+### `widget.ts` — runtime schema
+
+Exports a default object that describes the widget's runtime contract: typed attributes, translated labels, example data. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
+
+```ts
+import { __ } from '@wordpress/i18n';
+
+type HelloWorldAttributes = {
+	greeting: string;
+	showDate: boolean;
+};
+
+const widget = {
+	name: 'my-plugin/hello-world',
+	title: __( 'Hello World', 'my-plugin' ),
+	attributes: [
+		{
+			id: 'greeting',
+			type: 'text',
+			label: __( 'Greeting', 'my-plugin' ),
+		},
+		{
+			id: 'showDate',
+			type: 'boolean',
+			label: __( 'Show current date', 'my-plugin' ),
+		},
+	],
+	example: {
+		greeting: 'World',
+		showDate: true,
+	},
+};
+
+export default widget;
+```
+
+The same `HelloWorldAttributes` type is consumed by `render.tsx`, giving the author a single source of truth for the data contract.
+
+### `render.tsx` — UI component
+
+The render entry receives `attributes` matching the schema declared in `widget.ts`. It is bundled with CSS support (import `.scss` / `.css` directly).
+
+```tsx
+interface HelloWorldRenderProps {
+	attributes: {
+		greeting?: string;
+		showDate?: boolean;
+	};
+}
+
+export default function HelloWorld( { attributes }: HelloWorldRenderProps ) {
+	return (
+		<div>
+			Hello, { attributes.greeting ?? 'World' }!
+			{ attributes.showDate && <time>{ new Date().toLocaleDateString() }</time> }
+		</div>
+	);
+}
+```
+
+All non-JSON entries are optional. The build system checks for files with extensions in priority order: `.tsx`, `.ts`, `.jsx`, `.js`, `.mjs`.
+
+### Build Output
+
+The build system generates:
+
+- `build/widgets/{widget-name}/render.min.js` + `render.js` — Bundled UI component (ESM)
+- `build/widgets/{widget-name}/render.min.asset.php` — Asset metadata for render module
+- `build/widgets/{widget-name}/widget.min.js` + `widget.js` — Bundled metadata (ESM)
+- `build/widgets/{widget-name}/widget.min.asset.php` — Asset metadata for widget module
+- `build/widgets/registry.php` — Widget registry data
+- `build/widgets.php` — Script module registration logic
+
+### PHP Registration
+
+The generated `widgets.php` registers each widget's entries as script modules via `wp_register_script_module()`. Module handles follow the pattern:
+
+```
+{handlePrefix}/widgets/{widget-dir-name}/render
+{handlePrefix}/widgets/{widget-dir-name}/widget
+```
+
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+
+### Watch Mode
+
+In development (`wp-build --watch`), widget source files are watched for changes. When a file inside `widgets/{name}/` changes, only that widget is rebuilt.
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose.
