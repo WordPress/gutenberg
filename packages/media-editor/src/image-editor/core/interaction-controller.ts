@@ -884,7 +884,7 @@ export class InteractionController {
 					break;
 				}
 				e.preventDefault();
-				this.options.actions.flip( 'horizontal' );
+				this.options.actions.flip?.( 'horizontal' );
 				break;
 			}
 			case 'v':
@@ -893,7 +893,7 @@ export class InteractionController {
 					break;
 				}
 				e.preventDefault();
-				this.options.actions.flip( 'vertical' );
+				this.options.actions.flip?.( 'vertical' );
 				break;
 			}
 		}

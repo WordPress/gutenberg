@@ -101,7 +101,7 @@ function KeyCombinationDisplay( {
 			aria-label={ label }
 		>
 			{ keys.map( ( key, index ) =>
-				key === '+' ? (
+				key === '+' && modifier ? (
 					<Fragment key={ index }>{ key }</Fragment>
 				) : (
 					<kbd
