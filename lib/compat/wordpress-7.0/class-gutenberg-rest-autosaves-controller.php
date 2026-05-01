@@ -73,8 +73,9 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		$post_lock = wp_check_post_lock( $post->ID );
-		$is_draft  = 'draft' === $post->post_status || 'auto-draft' === $post->post_status;
+		$post_lock     = wp_check_post_lock( $post->ID );
+		$is_auto_draft = 'auto-draft' === $post->post_status;
+		$is_draft      = 'draft' === $post->post_status || $is_auto_draft;
 
 		/**
 		 * In the context of real-time collaboration, all peers are effectively
@@ -103,10 +104,20 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		 */
 		$is_collaboration_enabled = wp_is_collaboration_enabled();
 
-		if ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock && ! $is_collaboration_enabled ) {
+		if (
+			$is_draft &&
+			(int) $post->post_author === $user_id &&
+			! $post_lock &&
+			( ! $is_collaboration_enabled || $is_auto_draft )
+		) {
 			/*
 			 * Draft posts for the same author: autosaving updates the post and does not create a revision.
 			 * Convert the post object to an array and add slashes, wp_update_post() expects escaped array.
+			 *
+			 * Auto-drafts must still be promoted to drafts when collaboration is
+			 * enabled so that a new post survives URL loss and appears in Drafts.
+			 * Regular draft autosaves remain revisions under collaboration to keep
+			 * the saved post from diverging from the persisted CRDT document.
 			 */
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
 		} else {
