@@ -16,7 +16,8 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Modal } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -54,6 +55,7 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
+	const [ isDuplicateOpen, setIsDuplicateOpen ] = useState( false );
 	const defaultView = DEFAULT_VIEW;
 	const activeViewOverrides = useMemo(
 		() => getActiveViewOverridesForTab( activeView ),
@@ -342,6 +344,7 @@ export default function PageTemplates() {
 				onClickItem={ ( item ) => {
 					if ( typeof item.id === 'string' ) {
 						setSelectedRegisteredTemplate( item );
+						setIsDuplicateOpen( true );
 					} else {
 						history.navigate(
 							`/${ item.type }/${ item.id }?canvas=edit`
@@ -359,17 +362,37 @@ export default function PageTemplates() {
 						: false
 				}
 			/>
-			{ selectedRegisteredTemplate && duplicateAction && (
-				<Modal
-					title={ __( 'Duplicate' ) }
-					onRequestClose={ () => setSelectedRegisteredTemplate() }
-					size="small"
+			{ duplicateAction && (
+				<Dialog.Root
+					open={ isDuplicateOpen }
+					onOpenChange={ setIsDuplicateOpen }
+					onOpenChangeComplete={ ( isOpen ) => {
+						if ( ! isOpen ) {
+							// Clear the cached template only after the exit
+							// animation finishes — keeps the modal contents
+							// rendered while the dialog slides out so the
+							// inner DataForm doesn't flash empty.
+							setSelectedRegisteredTemplate( false );
+						}
+					} }
 				>
-					<duplicateAction.RenderModal
-						items={ [ selectedRegisteredTemplate ] }
-						closeModal={ () => setSelectedRegisteredTemplate() }
-					/>
-				</Modal>
+					<Dialog.Popup size="small">
+						<Dialog.Header>
+							<Dialog.Title>{ __( 'Duplicate' ) }</Dialog.Title>
+							<Dialog.CloseIcon />
+						</Dialog.Header>
+						<Dialog.Content>
+							{ selectedRegisteredTemplate && (
+								<duplicateAction.RenderModal
+									items={ [ selectedRegisteredTemplate ] }
+									closeModal={ () =>
+										setIsDuplicateOpen( false )
+									}
+								/>
+							) }
+						</Dialog.Content>
+					</Dialog.Popup>
+				</Dialog.Root>
 			) }
 		</Page>
 	);
