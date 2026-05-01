@@ -40,6 +40,18 @@ export interface WPBlockSelection {
 	 * maps back to a block's attribute, e.g. a paragraph block's `content`
 	 * attribute, this will hold the attribute key for that associated
 	 * block attribute.
+	 *
+	 * An attribute key is mostly the same as an attribute name, but in some
+	 * circumstances, such as in a multiline attribute, there can be multiple
+	 * RichText instances associated with a given attribute. The key will
+	 * usually be the attribute name verbatim, but in these cases, an index
+	 * will be appended to differentiate the multiple RichText instances
+	 * associated with the array-like attribute.
+	 *
+	 * Technically, the `attributeKey` is the value stored in the DOM node
+	 * for a RichText instance in the `data-wp-block-attribute-key` attribute.
+	 * This "key" links the actual instance with the block attribute, provided
+	 * by the `identifier` React prop when creating a `<RichText>` element.
 	 */
 	attributeKey?: string;
 
