@@ -11,14 +11,19 @@ import {
 // Debounce utility for scroll handling
 function debounce( func, wait ) {
 	let timeout;
-	return function ( ...args ) {
+	function debounced( ...args ) {
 		const later = () => {
-			clearTimeout( timeout );
+			timeout = null;
 			func( ...args );
 		};
 		clearTimeout( timeout );
 		timeout = setTimeout( later, wait );
+	}
+	debounced.cancel = () => {
+		clearTimeout( timeout );
+		timeout = null;
 	};
+	return debounced;
 }
 
 const debouncedUpdates = new WeakMap();
@@ -99,20 +104,58 @@ function scrollToSlide( ref, index ) {
 	context.totalSlides = slides.length;
 	updateSlideInert( slides, nextIndex );
 
+	/*
+	 * Use getBoundingClientRect() to compute the scrollTo target so the same
+	 * arithmetic works in both LTR and RTL without special-casing either one.
+	 *
+	 * slideRect.left - trackRect.left is the pixel offset of the slide's left
+	 * edge from the track's currently-visible left edge.  Adding that delta to
+	 * track.scrollLeft yields the exact scrollLeft value that places the slide
+	 * flush with the left of the viewport.  Because scrollLeft in RTL is 0 or
+	 * negative and getBoundingClientRect uses the same sign convention as the
+	 * viewport, the delta naturally comes out negative for slides that are to
+	 * the left of the viewport in RTL, producing the correct negative target.
+	 */
 	const targetSlide = slides[ nextIndex ];
+	const trackRect = track.getBoundingClientRect();
+	const slideRect = targetSlide.getBoundingClientRect();
 	track.scrollTo( {
-		left: targetSlide.offsetLeft - track.offsetLeft,
+		left: track.scrollLeft + ( slideRect.left - trackRect.left ),
 		behavior: 'smooth',
 	} );
 }
 
 function moveSlide( ref, direction ) {
-	const { slides } = getSliderElements( ref );
+	const { track, slides } = getSliderElements( ref );
 	if ( slides.length === 0 ) {
 		return;
 	}
 
+	/*
+	 * Cancel any pending debounced scroll update so it cannot overwrite the
+	 * index we are about to set.  This is necessary because a touch-drag or
+	 * mouse-wheel scroll moves the track DOM position without going through
+	 * moveSlide, leaving context.currentIndex stale until the 150 ms debounce
+	 * fires.  If the user clicks a button before that timer expires we must
+	 * read the real scroll position from the DOM rather than the stale context
+	 * value, and we must prevent the pending debounce from overwriting our
+	 * new value afterward.
+	 */
+	const pendingUpdate = debouncedUpdates.get( track );
+	if ( pendingUpdate ) {
+		pendingUpdate.cancel();
+	}
+
 	const context = getContext();
+
+	// Read ground-truth index directly from the DOM scroll position so that
+	// a drag/swipe that settled visually but hasn't yet updated context is
+	// accounted for before we compute the next index.
+	const domIndex = getClosestSlideIndex( track, slides );
+	if ( domIndex !== context.currentIndex ) {
+		context.currentIndex = domIndex;
+	}
+
 	let nextIndex = context.currentIndex + direction;
 
 	if ( nextIndex < 0 ) {
@@ -126,17 +169,26 @@ function moveSlide( ref, direction ) {
 
 /**
  * Determines the closest slide index based on the current scroll position.
+ *
+ * Uses getBoundingClientRect() instead of offsetLeft/scrollLeft arithmetic
+ * so the result is correct in both LTR and RTL without any special-casing.
+ * slideRect.left - trackRect.left is the distance of each slide's left edge
+ * from the track's visible left edge regardless of scroll direction or writing
+ * mode, because both rects are in the same viewport coordinate space.
+ *
  * @param {HTMLElement}   track  The track element containing the slides.
  * @param {HTMLElement[]} slides The array of slide elements.
+ * @return {number} Zero-based index of the slide closest to the viewport.
  */
 function getClosestSlideIndex( track, slides ) {
-	const scrollLeft = track.scrollLeft;
-	const trackLeft = track.offsetLeft;
+	const trackRect = track.getBoundingClientRect();
 	let closestIndex = 0;
 	let closestDistance = Infinity;
 
 	slides.forEach( ( slide, index ) => {
-		const distance = Math.abs( slide.offsetLeft - trackLeft - scrollLeft );
+		const distance = Math.abs(
+			slide.getBoundingClientRect().left - trackRect.left
+		);
 		if ( distance < closestDistance ) {
 			closestDistance = distance;
 			closestIndex = index;
@@ -148,21 +200,19 @@ function getClosestSlideIndex( track, slides ) {
 
 function getDebouncedUpdate( trackElement ) {
 	if ( ! debouncedUpdates.has( trackElement ) ) {
-		debouncedUpdates.set(
-			trackElement,
-			debounce( ( ref, context ) => {
-				const slides = getSlides( ref );
-				if ( slides.length === 0 ) {
-					return;
-				}
+		const debouncedFn = debounce( ( ref, context ) => {
+			const slides = getSlides( ref );
+			if ( slides.length === 0 ) {
+				return;
+			}
 
-				const currentIndex = getClosestSlideIndex( ref, slides );
+			const currentIndex = getClosestSlideIndex( ref, slides );
 
-				context.currentIndex = currentIndex;
-				context.totalSlides = slides.length;
-				updateSlideInert( slides, currentIndex );
-			}, 150 )
-		);
+			context.currentIndex = currentIndex;
+			context.totalSlides = slides.length;
+			updateSlideInert( slides, currentIndex );
+		}, 150 );
+		debouncedUpdates.set( trackElement, debouncedFn );
 	}
 	return debouncedUpdates.get( trackElement );
 }
@@ -318,6 +368,15 @@ store( 'core/slider', {
 				ref.removeEventListener( 'touchend', onTouchEnd );
 				touchHandlers.delete( ref );
 				touchStartData.delete( ref );
+
+				// Cancel any pending debounced scroll update so the timer
+				// closure cannot fire after the track is torn down and
+				// mutate stale context or hold the ref in memory.
+				const pendingUpdate = debouncedUpdates.get( ref );
+				if ( pendingUpdate ) {
+					pendingUpdate.cancel();
+					debouncedUpdates.delete( ref );
+				}
 			};
 		},
 	},
