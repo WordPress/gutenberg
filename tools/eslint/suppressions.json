@@ -1596,7 +1596,7 @@
 	},
 	"routes/guidelines/components/guideline-accordion.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 5
+			"count": 2
 		}
 	},
 	"routes/guidelines/components/guideline-actions-section.tsx": {
