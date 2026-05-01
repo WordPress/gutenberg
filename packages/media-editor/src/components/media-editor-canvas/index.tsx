@@ -50,6 +50,11 @@ export default function MediaEditorCanvas( {
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				// Flush on gesture start so any pending sidebar interaction
+				// (e.g. zoom slider debounce) is committed as its own undo
+				// step before the canvas gesture begins.
+				onGestureStart={ controller.commitHistory }
+				onGestureEnd={ controller.commitHistory }
 			/>
 		</div>
 	);

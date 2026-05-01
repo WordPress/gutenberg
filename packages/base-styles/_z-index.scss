@@ -134,10 +134,6 @@ $z-layers: (
 	".edit-site-layout__sidebar": 1,
 	".edit-site-layout__canvas-container.is-resizing::after": 100,
 
-	// Ensure modal footer actions appear above modal contents
-	".editor-start-template-options__modal__actions": 1,
-	".editor-start-page-options__modal__actions": 1,
-
 	// Ensure checkbox + actions don't overlap table header
 	".dataviews-view-table thead": 1,
 
