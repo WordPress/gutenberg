@@ -6,7 +6,7 @@ import {
 	SelectControl,
 	ToggleControl,
 } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { Stack, VisuallyHidden } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -99,6 +99,9 @@ export default function MediaEditorCropPanel( {
 
 	return (
 		<Stack direction="column" gap="md">
+			<VisuallyHidden render={ <h2 /> }>
+				{ __( 'Crop options' ) }
+			</VisuallyHidden>
 			<div role="presentation" { ...zoomGestureHandlers }>
 				<RangeControl
 					__next40pxDefaultSize

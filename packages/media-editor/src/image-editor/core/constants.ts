@@ -17,6 +17,12 @@ export const MAX_ZOOM = 10;
  */
 export const DEFAULT_WHEEL_ZOOM_SPEED = 0.0025;
 
+/** Fine step for keyboard-driven cropper movement, in normalized coordinates. */
+export const DEFAULT_KEYBOARD_STEP = 0.01;
+
+/** Coarse keyboard movement multiplier when Shift is held. */
+export const KEYBOARD_SHIFT_STEP_MULTIPLIER = 10;
+
 /**
  * Maximum free-rotation offset in degrees from the nearest 90° step.
  * The rotation slider allows ±45° around the current cardinal angle.

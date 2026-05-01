@@ -10,6 +10,10 @@
 
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
 
+### Internal
+
+-   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+
 ## 33.0.0 (2026-04-29)
 
 ### Enhancements

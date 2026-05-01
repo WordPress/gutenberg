@@ -14,49 +14,13 @@ import { useMergeRefs, useThrottle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import type { ResizeDelta, ResizeHandleProps } from './types';
 import styles from './resize-handle.module.css';
 
-interface ResizeHandleProps {
-	/**
-	 * Whether the handle is inert. When true, it renders muted and
-	 * does not respond to pointer events.
-	 *
-	 * @default false
-	 */
-	disabled?: boolean;
-
-	/**
-	 * Owning grid item's `key`. Forwarded as `data.itemId` on the
-	 * draggable so the parent can correlate the gesture with a tile
-	 * if needed.
-	 */
-	itemId?: string;
-
-	/**
-	 * Whether the handle should track vertical movement. When false,
-	 * the handle still appears but only emits horizontal deltas, and
-	 * the cursor is constrained to the column resize axis.
-	 *
-	 * @default true
-	 */
-	verticalResizable?: boolean;
-
-	/**
-	 * Callback fired while the handle is being dragged. Receives the
-	 * cursor offset from the gesture start in pixels.
-	 */
-	onResize?: ( delta: { width: number; height: number } ) => void;
-
-	/**
-	 * Callback fired when the gesture ends.
-	 */
-	onResizeEnd?: () => void;
-}
-
 function ResizeHandle( {
-	disabled = false,
 	itemId,
 	verticalResizable = true,
+	renderResizeHandle,
 }: ResizeHandleProps ) {
 	const { attributes, listeners, setNodeRef, isDragging } = useDraggable( {
 		id: 'draggable',
@@ -87,13 +51,23 @@ function ResizeHandle( {
 		};
 	}, [ isDragging, verticalResizable ] );
 
+	if ( renderResizeHandle ) {
+		return renderResizeHandle( {
+			ref: mergedRef,
+			listeners,
+			attributes,
+			verticalResizable,
+			isResizing: isDragging,
+			itemId,
+		} );
+	}
+
 	return (
 		<div
 			ref={ mergedRef }
 			className={ clsx(
 				styles[ 'resize-handle' ],
-				! verticalResizable && styles[ 'is-horizontal-only' ],
-				disabled && styles[ 'is-disabled' ]
+				! verticalResizable && styles[ 'is-horizontal-only' ]
 			) }
 			{ ...listeners }
 			{ ...attributes }
@@ -111,14 +85,11 @@ function ResizeHandle( {
  */
 export default function ResizeHandleWrapper( props: ResizeHandleProps ) {
 	const throttleDelay = 16;
-	const throttledResize = useThrottle(
-		( delta: { width: number; height: number } ) => {
-			if ( props.onResize ) {
-				props.onResize( delta );
-			}
-		},
-		throttleDelay
-	);
+	const throttledResize = useThrottle( ( delta: ResizeDelta ) => {
+		if ( props.onResize ) {
+			props.onResize( delta );
+		}
+	}, throttleDelay );
 
 	// `event.delta` is the cursor offset from the gesture start —
 	// not from the handle's current position — so it stays stable
