@@ -18,8 +18,8 @@ import './style.scss';
 interface KeyCombination {
 	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
 	modifier?: WPKeycodeModifier;
-	/** The key character(s) to display. */
-	character: string;
+	/** The key character(s) to display. Pass an array to render each as its own key. */
+	character: string | string[];
 	/** Optional aria-label override (used when character is a symbol). */
 	ariaLabel?: string;
 }
@@ -41,7 +41,7 @@ const SHORTCUTS: ShortcutEntry[] = [
 	{
 		description: __( 'Pan' ),
 		keyCombination: {
-			character: '↑↓←→',
+			character: [ '↑', '↓', '←', '→' ],
 			ariaLabel: __( 'Arrow keys' ),
 		},
 	},
@@ -69,7 +69,7 @@ const SHORTCUTS: ShortcutEntry[] = [
 		description: __( 'Resize crop (large step)' ),
 		keyCombination: {
 			modifier: 'shift',
-			character: '↑↓←→',
+			character: [ '↑', '↓', '←', '→' ],
 			ariaLabel: __( 'Shift + Arrow keys' ),
 		},
 	},
@@ -82,17 +82,32 @@ function KeyCombinationDisplay( {
 } ) {
 	const { modifier, character, ariaLabel } = keyCombination;
 
-	const keys: string[] = modifier
-		? displayShortcutList[ modifier ]( character )
-		: [ character ];
+	let keys: string[];
+	if ( Array.isArray( character ) ) {
+		if ( modifier ) {
+			// Get the modifier prefix (e.g. ['⇧', '+']) from the first char,
+			// then replace the last element with all the individual chars.
+			const sample = displayShortcutList[ modifier ]( character[ 0 ] );
+			keys = [ ...sample.slice( 0, -1 ), ...character ];
+		} else {
+			keys = character;
+		}
+	} else {
+		keys = modifier
+			? displayShortcutList[ modifier ]( character )
+			: [ character ];
+	}
 
+	const charString = Array.isArray( character )
+		? character.join( '' )
+		: character;
 	let label: string;
 	if ( ariaLabel ) {
 		label = ariaLabel;
 	} else if ( modifier ) {
-		label = shortcutAriaLabel[ modifier ]( character );
+		label = shortcutAriaLabel[ modifier ]( charString );
 	} else {
-		label = character;
+		label = charString;
 	}
 
 	return (
