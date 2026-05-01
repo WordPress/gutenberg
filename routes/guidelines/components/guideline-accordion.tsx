@@ -3,7 +3,7 @@
  */
 import {
 	Icon,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalHeading as Heading,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -63,7 +63,7 @@ export default function GuidelineAccordion( {
 						>
 							{ title }
 						</Heading>
-						<Text
+						<WCText
 							id={ descriptionId }
 							className="guidelines__accordion-description"
 							size={ 13 }
@@ -71,7 +71,7 @@ export default function GuidelineAccordion( {
 							variant="muted"
 						>
 							{ description }
-						</Text>
+						</WCText>
 					</VStack>
 					<Icon
 						icon={ chevronDown }

@@ -45,7 +45,7 @@
 
 		// Animation
 		@media not (prefers-reduced-motion) {
-			transition: all 0.1s linear;
+			transition: height 0.1s linear;
 		}
 	}
 
@@ -74,7 +74,7 @@
 
 		// Animation
 		@media not (prefers-reduced-motion) {
-			transition: all 0.1s linear;
+			transition: box-shadow 0.1s linear;
 		}
 	}
 

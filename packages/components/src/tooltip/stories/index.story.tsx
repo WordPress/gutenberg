@@ -15,6 +15,7 @@ import Tooltip from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Overlays/Tooltip',
 	id: 'components-tooltip',
 	component: Tooltip,

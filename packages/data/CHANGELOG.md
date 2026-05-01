@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.45.0 (2026-04-29)
+
 ### New Features
 
 -   Export `keyedReducer` higher-order reducer helper, consolidating duplicated copies previously maintained in `@wordpress/core-data` and `@wordpress/notices` ([#77364](https://github.com/WordPress/gutenberg/pull/77364)).
