@@ -6,7 +6,12 @@ import {
 	type CropperInteractionActions,
 } from '../interaction-controller';
 import type { CropperState, Size } from '../types';
-import { DEFAULT_STATE, MIN_ZOOM, MAX_ZOOM } from '../constants';
+import {
+	DEFAULT_STATE,
+	DEFAULT_WHEEL_ZOOM_SPEED,
+	MIN_ZOOM,
+	MAX_ZOOM,
+} from '../constants';
 
 // The test environment is Node (not jsdom), so DOM globals like HTMLElement
 // and Element are not available. Provide minimal stubs so that `instanceof`
@@ -232,6 +237,7 @@ describe( 'InteractionController', () => {
 			setZoom: jest.fn(),
 			setZoomAtPoint: jest.fn(),
 			snapRotate90: jest.fn(),
+			toggleFlip: jest.fn(),
 		};
 	} );
 
@@ -379,8 +385,10 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).toHaveBeenCalled();
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// deltaY=-100, zoomSpeed=0.01, delta = 1, newZoom = 2+1 = 3.
-			expect( setZoomCall![ 0 ] ).toBe( 3 );
+			// deltaY=-100, default zoomSpeed = 0.0025, delta = 0.25.
+			expect( setZoomCall![ 0 ] ).toBeCloseTo(
+				2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED
+			);
 		} );
 
 		it( 'calls setZoomAtPoint on wheel with currentTarget element', () => {
@@ -409,7 +417,9 @@ describe( 'InteractionController', () => {
 			);
 
 			expect( actionMocks.setZoomAtPoint ).toHaveBeenCalled();
-			expect( actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ] ).toBe( 3 );
+			expect(
+				actionMocks.setZoomAtPoint.mock.calls[ 0 ][ 0 ]
+			).toBeCloseTo( 2 + 100 * DEFAULT_WHEEL_ZOOM_SPEED );
 		} );
 
 		it( 'clamps to maxZoom on large positive wheel', () => {
@@ -421,7 +431,7 @@ describe( 'InteractionController', () => {
 			);
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// 9 + 5 = 14, clamped to MAX_ZOOM (10).
+			// 9 + 1.25 = 10.25, clamped to MAX_ZOOM (10).
 			expect( setZoomCall![ 0 ] ).toBe( MAX_ZOOM );
 		} );
 
@@ -434,7 +444,7 @@ describe( 'InteractionController', () => {
 			);
 
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
-			// 2 + (-5) = -3, clamped to MIN_ZOOM (1).
+			// 2 + (-1.25) = 0.75, clamped to MIN_ZOOM (1).
 			expect( setZoomCall![ 0 ] ).toBe( MIN_ZOOM );
 		} );
 
@@ -454,6 +464,31 @@ describe( 'InteractionController', () => {
 			const setZoomCall = actionMocks.setZoom.mock.calls[ 0 ];
 			// deltaY=-100, zoomSpeed=0.02, delta = 2, zoom = 2+2 = 4.
 			expect( setZoomCall![ 0 ] ).toBe( 4 );
+		} );
+
+		it( 'does not zoom while pointer pan is active', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+			const el = createMockElement();
+
+			controller.handlePointerDown(
+				createPointerEvent( { clientX: 100, clientY: 100 } ),
+				el
+			);
+
+			jest.clearAllMocks();
+
+			const wheelEvent = createWheelEvent( {
+				deltaY: -100,
+				currentTarget: null,
+			} );
+			controller.handleWheel( wheelEvent );
+
+			expect( wheelEvent.preventDefault ).toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
+
+			el._fire( 'pointerup', createPointerEvent() );
 		} );
 
 		it( 'calls onGestureStart on first wheel, onGestureEnd after debounce', () => {
@@ -594,6 +629,74 @@ describe( 'InteractionController', () => {
 			}
 		);
 
+		it( 'calls flip horizontal on h key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'h' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip horizontal on H key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'H' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith(
+				'horizontal'
+			);
+		} );
+
+		it( 'calls flip vertical on v key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'v' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it( 'calls flip vertical on V key', () => {
+			const state = makeState();
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'V' ) );
+
+			expect( actionMocks.toggleFlip ).toHaveBeenCalledWith( 'vertical' );
+		} );
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with h',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'h', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
+			}
+		);
+
+		it.each( [ 'metaKey', 'ctrlKey', 'altKey', 'shiftKey' ] )(
+			'does not flip when %s is held with v',
+			( modifier ) => {
+				const state = makeState();
+				const { controller } = createController( state );
+
+				controller.handleKeyDown(
+					createKeyboardEvent( 'v', { [ modifier ]: true } )
+				);
+
+				expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'respects custom keyboardStep (read lazily)', () => {
 			const state = makeState( { zoom: 2 } );
 			const { controller, opts } = createController( state, {
@@ -611,6 +714,42 @@ describe( 'InteractionController', () => {
 			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
 		} );
 
+		it( 'uses fine keyboardStep by default for arrow key panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown( createKeyboardEvent( 'ArrowRight' ) );
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.01 );
+		} );
+
+		it( 'uses a 10x larger keyboardStep when Shift is held while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
+			);
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.1 );
+		} );
+
+		it( 'applies the Shift multiplier to custom keyboardStep while panning', () => {
+			const state = makeState( { zoom: 2 } );
+			const { controller } = createController( state, {
+				keyboardStep: 0.02,
+			} );
+
+			controller.handleKeyDown(
+				createKeyboardEvent( 'ArrowRight', { shiftKey: true } )
+			);
+
+			const call = actionMocks.setPan.mock.calls[ 0 ];
+			expect( call![ 0 ].x ).toBeCloseTo( -0.2 );
+		} );
+
 		it( 'does not dispatch on unhandled keys', () => {
 			const state = makeState();
 			const { controller } = createController( state );
@@ -621,6 +760,7 @@ describe( 'InteractionController', () => {
 			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
 			expect( actionMocks.setZoomAtPoint ).not.toHaveBeenCalled();
 			expect( actionMocks.snapRotate90 ).not.toHaveBeenCalled();
+			expect( actionMocks.toggleFlip ).not.toHaveBeenCalled();
 		} );
 	} );
 
