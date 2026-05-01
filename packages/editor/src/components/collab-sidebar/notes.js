@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
@@ -146,22 +146,29 @@ export function Notes( { notes, sidebarRef, isFloating = false, styles } ) {
 		return unresolved?.id ?? first?.id;
 	}, [ blockNoteIds, notes ] );
 
-	// Auto-select the related note thread when a block is selected. Bails
-	// out when the user has explicitly opened the new note form, or when
-	// the user has already picked a thread on this block — so an explicit
-	// thread choice within a block isn't clobbered.
+	// Track selectedNote in a ref so the auto-select effect can read its
+	// latest value without re-firing when the user explicitly collapses or
+	// changes a note (e.g., Escape, Cancel, Shift-Tab). Updated inside an
+	// effect to avoid writes during render.
+	const selectedNoteRef = useRef( selectedNote );
 	useEffect( () => {
-		if ( selectedNote === 'new' ) {
+		selectedNoteRef.current = selectedNote;
+	}, [ selectedNote ] );
+
+	// Auto-select the related note thread when the block context changes.
+	// Bails out when the user has explicitly opened the new note form, or
+	// when the user has already picked a thread on this block — so an
+	// explicit thread choice within a block isn't clobbered.
+	useEffect( () => {
+		const current = selectedNoteRef.current;
+		if ( current === 'new' ) {
 			return;
 		}
-		if (
-			typeof selectedNote === 'number' &&
-			blockNoteIds.includes( selectedNote )
-		) {
+		if ( typeof current === 'number' && blockNoteIds.includes( current ) ) {
 			return;
 		}
 		selectNote( targetNoteId );
-	}, [ targetNoteId, selectedNote, blockNoteIds, selectNote ] );
+	}, [ targetNoteId, blockNoteIds, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
