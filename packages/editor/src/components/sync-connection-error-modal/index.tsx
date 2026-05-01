@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, select } from '@wordpress/data';
+import { useSelect, useDispatch, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 // @ts-ignore No exported types.
 import { serialize } from '@wordpress/blocks';
@@ -12,12 +12,8 @@ import {
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 // prettier-ignore
 import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	Button,
-	Modal,
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Modal } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { applyFilters } from '@wordpress/hooks';
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -29,6 +25,13 @@ import { getSyncErrorMessages } from '../../utils/sync-error-messages';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useRetryCountdown } from './use-retry-countdown';
+import ErrorView from './error-view';
+import ConfirmOfflineEditView from './confirm-offline-edit-view';
+
+enum ModalView {
+	Error = 'error',
+	ConfirmOfflineEdit = 'confirm-offline-edit',
+}
 
 const { BlockCanvasCover } = unlock( privateApis );
 const { retrySyncConnection } = unlock( coreDataPrivateApis );
@@ -47,25 +50,32 @@ export function SyncConnectionErrorModal() {
 	const [ showModal, setShowModal ] = useState( false );
 	const [ isManualRetryAvailable, setIsManualRetryAvailable ] =
 		useState( false );
+	const [ view, setView ] = useState< ModalView >( ModalView.Error );
 
-	const { connectionStatus, isCollaborationEnabled, postType } = useSelect(
-		( selectFn ) => {
-			const currentPostType =
-				selectFn( editorStore ).getCurrentPostType();
-			return {
-				connectionStatus:
-					selectFn( coreDataStore ).getSyncConnectionStatus() || null,
-				isCollaborationEnabled:
-					selectFn(
-						editorStore
-					).isCollaborationEnabledForCurrentPost(),
-				postType: currentPostType
-					? selectFn( coreDataStore ).getPostType( currentPostType )
-					: null,
-			};
-		},
-		[]
-	);
+	const {
+		connectionStatus,
+		isCollaborationEnabled,
+		isEditingWhileDisconnected,
+		isPublished,
+		postType,
+	} = useSelect( ( selectFn ) => {
+		const editorSelect = selectFn( editorStore );
+		const coreDataSelect = selectFn( coreDataStore );
+		const currentPostType = editorSelect.getCurrentPostType();
+		return {
+			connectionStatus: coreDataSelect.getSyncConnectionStatus() || null,
+			isCollaborationEnabled:
+				editorSelect.isCollaborationEnabledForCurrentPost(),
+			isEditingWhileDisconnected:
+				unlock( coreDataSelect ).isEditingWhileDisconnected(),
+			isPublished: editorSelect.isCurrentPostPublished(),
+			postType: currentPostType
+				? coreDataSelect.getPostType( currentPostType )
+				: null,
+		};
+	}, [] );
+
+	const coreDataDispatch = useDispatch( coreDataStore );
 
 	const { onManualRetry, secondsRemaining } =
 		useRetryCountdown( connectionStatus );
@@ -113,6 +123,9 @@ export function SyncConnectionErrorModal() {
 	useEffect( () => {
 		if ( 'connected' === connectionStatus?.status ) {
 			setShowModal( false );
+			// Reset to the error view so a future disconnect doesn't flash
+			// the confirm warning the user had previously navigated to.
+			setView( ModalView.Error );
 			return;
 		}
 
@@ -125,7 +138,12 @@ export function SyncConnectionErrorModal() {
 		}
 	}, [ connectionStatus, canRetry ] );
 
-	if ( ! isCollaborationEnabled || ! hasInitialized || ! showModal ) {
+	if (
+		! isCollaborationEnabled ||
+		! hasInitialized ||
+		! showModal ||
+		isEditingWhileDisconnected
+	) {
 		return null;
 	}
 
@@ -203,50 +221,40 @@ export function SyncConnectionErrorModal() {
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
 				size="medium"
-				title={ messages.title }
+				title={
+					view === ModalView.ConfirmOfflineEdit
+						? __( 'Edit while disconnected?' )
+						: messages.title
+				}
 			>
-				<VStack spacing={ 6 }>
-					<p>{ messages.description }</p>
-					{ retryCountdownText && (
-						<p className="editor-sync-connection-error-modal__retry-countdown">
-							{ retryCountdownText }
-						</p>
-					) }
-					<HStack justify="right">
-						<Button
-							__next40pxDefaultSize
-							href={ editPostHref }
-							isDestructive
-							variant="tertiary"
-						>
-							{ sprintf(
-								/* translators: %s: Post type name (e.g., "Posts", "Pages"). */
-								__( 'Back to %s' ),
+				<Stack direction="column" gap="xl">
+					{ view === ModalView.Error ? (
+						<ErrorView
+							description={ messages.description }
+							retryCountdownText={ retryCountdownText }
+							editPostHref={ editPostHref }
+							postTypeLabel={
 								postType?.labels?.name ?? __( 'Posts' )
-							) }
-						</Button>
-						<Button
-							__next40pxDefaultSize
-							ref={ copyButtonRef }
-							variant={ manualRetry ? 'secondary' : 'primary' }
-						>
-							{ __( 'Copy Post Content' ) }
-						</Button>
-						{ manualRetry && (
-							<Button
-								__next40pxDefaultSize
-								accessibleWhenDisabled
-								aria-disabled={ isRetrying }
-								disabled={ isRetrying }
-								isBusy={ isRetrying }
-								variant="primary"
-								onClick={ manualRetry }
-							>
-								{ __( 'Retry' ) }
-							</Button>
-						) }
-					</HStack>
-				</VStack>
+							}
+							copyButtonRef={ copyButtonRef }
+							manualRetry={ manualRetry }
+							isRetrying={ isRetrying }
+							onEditAnyway={ () =>
+								setView( ModalView.ConfirmOfflineEdit )
+							}
+						/>
+					) : (
+						<ConfirmOfflineEditView
+							isPublished={ isPublished }
+							onCancel={ () => setView( ModalView.Error ) }
+							onConfirm={ () =>
+								unlock(
+									coreDataDispatch
+								).confirmEditWhileDisconnected()
+							}
+						/>
+					) }
+				</Stack>
 			</Modal>
 		</BlockCanvasCover.Fill>
 	);

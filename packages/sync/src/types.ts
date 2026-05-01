@@ -165,6 +165,11 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => State | undefined;
+	hasPersistedCRDTDocChanges: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -177,6 +182,11 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
+	mergePersistedCRDTDoc: (
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	) => boolean;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;

@@ -468,6 +468,24 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking whether a save was interrupted because the server-side
+ * CRDT has changes the user hasn't seen yet. When true the merge
+ * confirmation dialog is displayed.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function pendingServerCRDTMerge( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_PENDING_SERVER_CRDT_MERGE':
+			return action.isPending;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -492,5 +510,6 @@ export default combineReducers( {
 	revisionId,
 	showRevisionDiff,
 	selectedNote,
+	pendingServerCRDTMerge,
 	dataviews: dataviewsReducer,
 } );

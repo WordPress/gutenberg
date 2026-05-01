@@ -10,7 +10,10 @@ import {
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
-import { store as coreStore } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	privateApis as coreDataPrivateApis,
+} from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	applyFilters,
@@ -30,6 +33,8 @@ import {
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 import { unlock } from '../lock-unlock';
+
+const { fetchServerCRDTChanges } = unlock( coreDataPrivateApis );
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
@@ -188,6 +193,17 @@ export const savePost =
 			return;
 		}
 
+		const isCollaborationEnabled =
+			select.isCollaborationEnabledForCurrentPost();
+
+		if (
+			isCollaborationEnabled &&
+			unlock( select ).hasPendingServerCRDTMerge()
+		) {
+			// Block saves while the merge confirmation dialog is open in RTC.
+			return;
+		}
+
 		const content = select.getEditedPostContent();
 		dispatch.editPost( { content }, { undoIgnore: true } );
 
@@ -214,6 +230,44 @@ export const savePost =
 			);
 		} catch ( err ) {
 			error = err;
+		}
+
+		// When editing while disconnected from RTC, check whether the
+		// server-side CRDT has changes we haven't seen. If so, interrupt
+		// the save and show a merge confirmation dialog instead.
+		if ( isCollaborationEnabled ) {
+			const isEditingWhileDisconnected = unlock(
+				registry.select( coreStore )
+			).isEditingWhileDisconnected();
+
+			if (
+				! error &&
+				isEditingWhileDisconnected &&
+				! options.isAutosave &&
+				! options.overwriteServerCRDT
+			) {
+				const entityConfig = registry
+					.select( coreStore )
+					.getEntityConfig( 'postType', previousRecord.type );
+
+				if ( entityConfig?.baseURL ) {
+					const { hasChanges } = await fetchServerCRDTChanges(
+						'postType',
+						previousRecord.type,
+						previousRecord.id,
+						entityConfig.baseURL
+					);
+
+					if ( hasChanges ) {
+						unlock( dispatch ).setPendingServerCRDTMerge( true );
+						dispatch( {
+							type: 'REQUEST_POST_UPDATE_FINISH',
+							options,
+						} );
+						return;
+					}
+				}
+			}
 		}
 
 		if ( ! error ) {

@@ -30,6 +30,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
+import SyncDisconnectedIndicator from '../sync-disconnected-indicator';
 import { unlock } from '../../lock-unlock';
 
 function Header( {
@@ -127,6 +128,7 @@ function Header( {
 			center={
 				hasCenter ? (
 					<>
+						<SyncDisconnectedIndicator />
 						<CollaboratorsPresence
 							postType={ postType }
 							postId={ postId }

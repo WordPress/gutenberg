@@ -662,6 +662,94 @@ export function createSyncManager( debug = false ): SyncManager {
 		return serializeCrdtDoc( entityState.ydoc );
 	}
 
+	/**
+	 * Apply a serialized persisted CRDT document to the live in-memory Y.Doc
+	 * for the given entity. Used before saving while the sync transport is
+	 * disconnected so that concurrent changes on the server can be merged in
+	 * before this client overwrites the persisted doc.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {string}     serialized Serialized CRDT document from the server.
+	 * @return {boolean} True if the merge was applied, false otherwise.
+	 */
+	function mergePersistedCRDTDoc(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	): boolean {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState?.ydoc ) {
+			log( 'mergePersistedCRDTDoc', 'no entity state', entityId );
+			return false;
+		}
+
+		const tempDoc = deserializeCrdtDoc( serialized );
+		if ( ! tempDoc ) {
+			log( 'mergePersistedCRDTDoc', 'deserialize failed', entityId );
+			return false;
+		}
+
+		// IMPORTANT: Do not wrap in a local-origin transaction. Mirrors
+		// `_applyPersistedCrdtDoc` to avoid advancing this client's state
+		// vector in a way that would make Yjs treat us as a different peer.
+		const update = Y.encodeStateAsUpdateV2( tempDoc );
+		Y.applyUpdateV2( entityState.ydoc, update );
+		tempDoc.destroy();
+		return true;
+	}
+
+	/**
+	 * Check whether a serialized persisted CRDT document from the server
+	 * contains changes not yet present in the local in-memory Y.Doc.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {string}     serialized Serialized CRDT document from the server.
+	 * @return {boolean} True if the server doc has changes the local doc lacks.
+	 */
+	function hasPersistedCRDTDocChanges(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		serialized: string
+	): boolean {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState?.ydoc ) {
+			log( 'hasPersistedCRDTDocChanges', 'no entity state', entityId );
+			return false;
+		}
+
+		const tempDoc = deserializeCrdtDoc( serialized );
+		if ( ! tempDoc ) {
+			log( 'hasPersistedCRDTDocChanges', 'deserialize failed', entityId );
+			return false;
+		}
+
+		const localSV = Y.decodeStateVector(
+			Y.encodeStateVector( entityState.ydoc )
+		);
+		const serverSV = Y.decodeStateVector( Y.encodeStateVector( tempDoc ) );
+
+		tempDoc.destroy();
+
+		// A Y.js state vector is a Map<clientId, clock> summarizing which
+		// changes a document has seen. If any client in the server's vector
+		// has a higher clock than what our local doc knows about (or is
+		// absent locally), the server has changes we haven't incorporated.
+		for ( const [ clientId, clock ] of serverSV ) {
+			const localClock = localSV.get( clientId );
+			if ( localClock === undefined || localClock < clock ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	// Collect internal functions so that they can be wrapped before calling.
 	const internal = {
 		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
@@ -672,8 +760,10 @@ export function createSyncManager( debug = false ): SyncManager {
 	return {
 		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
+		hasPersistedCRDTDocChanges: debugWrap( hasPersistedCRDTDocChanges ),
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
+		mergePersistedCRDTDoc: debugWrap( mergePersistedCRDTDoc ),
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;
