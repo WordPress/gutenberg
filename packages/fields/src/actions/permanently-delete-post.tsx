@@ -14,6 +14,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -64,15 +66,9 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 						  ) }
 				</WCText>
 				<HStack justify="right">
-					<Button
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-						__next40pxDefaultSize
-					>
+					<Dialog.Action variant="outline" disabled={ isBusy }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						variant="primary"
 						onClick={ async () => {

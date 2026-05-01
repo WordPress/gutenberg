@@ -12,6 +12,8 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -165,13 +167,9 @@ const duplicatePost: Action< BasePost > = {
 						}
 					/>
 					<HStack spacing={ 2 } justify="end">
-						<Button
-							variant="tertiary"
-							onClick={ closeModal }
-							__next40pxDefaultSize
-						>
+						<Dialog.Action variant="outline">
 							{ __( 'Cancel' ) }
-						</Button>
+						</Dialog.Action>
 						<Button
 							variant="primary"
 							type="submit"

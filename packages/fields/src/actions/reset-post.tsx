@@ -15,6 +15,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { Dialog } from '@wordpress/ui';
 import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
@@ -277,15 +279,9 @@ const resetPostAction: Action< Template | TemplatePart > = {
 					{ __( 'Reset to default and clear all customizations?' ) }
 				</WCText>
 				<HStack justify="right">
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						onClick={ closeModal }
-						disabled={ isBusy }
-						accessibleWhenDisabled
-					>
+					<Dialog.Action variant="outline" disabled={ isBusy }>
 						{ __( 'Cancel' ) }
-					</Button>
+					</Dialog.Action>
 					<Button
 						__next40pxDefaultSize
 						variant="primary"

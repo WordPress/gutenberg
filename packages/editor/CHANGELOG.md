@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Code Quality
+
+-   Migrate the Cancel button in the "Set as homepage" / "Set as posts page" modals from a tertiary `Button` to `Dialog.Action`. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 14.45.0 (2026-04-29)
 
 ## 14.44.0 (2026-04-15)
