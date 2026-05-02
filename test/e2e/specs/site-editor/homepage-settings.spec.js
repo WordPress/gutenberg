@@ -3,9 +3,20 @@
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const getPageRowByTitle = ( page, title ) =>
+	page.getByRole( 'row' ).filter( {
+		has: page.getByRole( 'gridcell' ).getByLabel( title, { exact: true } ),
+	} );
+
 test.describe( 'Homepage Settings via Editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'posts',
+			page_on_front: 0,
+			page_for_posts: 0,
+		} );
+		await requestUtils.deleteAllPages();
 		await requestUtils.createPage( {
 			title: 'Homepage',
 			status: 'publish',
@@ -26,25 +37,18 @@ test.describe( 'Homepage Settings via Editor', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.deleteAllPages(),
-			requestUtils.updateSiteSettings( {
-				show_on_front: 'posts',
-				page_on_front: 0,
-				page_for_posts: 0,
-			} ),
-		] );
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'posts',
+			page_on_front: 0,
+			page_for_posts: 0,
+		} );
+		await requestUtils.deleteAllPages();
 	} );
 
 	test( 'should not show "Set as homepage" and "Set as posts page" action on pages with `draft` status', async ( {
 		page,
 	} ) => {
-		const draftPage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Draft page' );
-		const draftPageRow = page
-			.getByRole( 'row' )
-			.filter( { has: draftPage } );
+		const draftPageRow = getPageRowByTitle( page, 'Draft page' );
 		await draftPageRow.hover();
 		await draftPageRow
 			.getByRole( 'button', {
@@ -62,14 +66,9 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test( 'should show correct homepage actions based on current homepage or posts page', async ( {
 		page,
 	} ) => {
-		const samplePage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Homepage' );
-		const samplePageRow = page
-			.getByRole( 'row' )
-			.filter( { has: samplePage } );
-		await samplePageRow.click();
-		await samplePageRow
+		const homepageRow = getPageRowByTitle( page, 'Homepage' );
+		await homepageRow.click();
+		await homepageRow
 			.getByRole( 'button', {
 				name: 'Actions',
 			} )
@@ -83,15 +82,10 @@ test.describe( 'Homepage Settings via Editor', () => {
 			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
 		).toBeHidden();
 
-		const samplePageTwo = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Sample page' );
-		const samplePageTwoRow = page
-			.getByRole( 'row' )
-			.filter( { has: samplePageTwo } );
+		const samplePageRow = getPageRowByTitle( page, 'Sample page' );
 		// eslint-disable-next-line playwright/no-force-option
-		await samplePageTwoRow.click( { force: true } );
-		await samplePageTwoRow
+		await samplePageRow.click( { force: true } );
+		await samplePageRow
 			.getByRole( 'button', {
 				name: 'Actions',
 			} )

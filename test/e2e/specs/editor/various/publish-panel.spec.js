@@ -29,7 +29,12 @@ test.describe( 'Post publish panel', () => {
 			'role=region[name="Editor publish"i] >> role=button[name="Cancel"i]'
 		);
 
-		// Test focus is moved back to the Publish panel toggle button.
+		// Wait for the close transition before checking focus return.
+		await expect( publishPanelToggleButton ).toHaveAttribute(
+			'aria-expanded',
+			'false'
+		);
+
 		await expect( publishPanelToggleButton ).toBeFocused();
 	} );
 
