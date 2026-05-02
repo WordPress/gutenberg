@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 /**
@@ -20,7 +20,7 @@ function Edit( props ) {
 					href="#comment-reply-pseudo-link"
 					onClick={ ( event ) => event.preventDefault() }
 				>
-					{ __( 'Reply' ) }
+					{ _x( 'Reply', 'verb' ) }
 				</a>
 			</div>
 		</>
