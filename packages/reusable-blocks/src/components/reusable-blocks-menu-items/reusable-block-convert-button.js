@@ -18,6 +18,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -38,7 +39,8 @@ export default function ReusableBlockConvertButton( {
 	rootClientId,
 	onClose,
 } ) {
-	const [ syncType, setSyncType ] = useState( undefined );
+	const defaultSyncType = applyFilters( 'blocks.syncType', undefined );
+	const [ syncType, setSyncType ] = useState( defaultSyncType );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const canConvert = useSelect(
