@@ -2017,6 +2017,53 @@ describe( 'FormTokenField', () => {
 			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
 			expectTokensNotToBeInTheDocument( [ 'banana' ] );
 		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
+		} );
+
+		it( 'should not leave a duplicate of an existing token in the input when pasting comma-separated values with `__experimentalValidateInput`', async () => {
+			const user = userEvent.setup();
+
+			const onChangeSpy = jest.fn();
+			const startsWithCapitalLetter = ( tokenText: string ) =>
+				/^[A-Z]/.test( tokenText );
+
+			render(
+				<FormTokenFieldWithState
+					onChange={ onChangeSpy }
+					initialValue={ [ 'Apple' ] }
+					__experimentalValidateInput={ startsWithCapitalLetter }
+				/>
+			);
+
+			const input = screen.getByRole( 'combobox' );
+
+			await user.click( input );
+			await user.paste( 'Apple,Cherry,' );
+
+			expect( onChangeSpy ).toHaveBeenCalledWith( [ 'Apple', 'Cherry' ] );
+			expectTokensToBeInTheDocument( [ 'Apple', 'Cherry' ] );
+			expect( input ).toHaveValue( '' );
+		} );
 	} );
 
 	describe( 'maxLength', () => {

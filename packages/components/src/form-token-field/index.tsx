@@ -325,12 +325,23 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			const tokensToProcess = items.slice( 0, -1 );
 			const addedTokens = addNewTokens( tokensToProcess );
 
-			// Keep tokens that were not accepted (invalid,
-			// duplicate, or empty after transform) in the input
-			// so the user can see what was rejected and fix it.
+			// Keep segments that failed validation in the input so the user can
+			// fix them. Skip empty-after-transform tokens, segments already merged
+			// in this batch (`addedTokens`), and duplicates of the current
+			// selection — those are omitted from `tokensToAdd` intentionally, not as
+			// validation failures.
 			const failedTokens = tokensToProcess.filter( ( token ) => {
 				const transformed = saveTransform( token );
-				return transformed && ! addedTokens.has( transformed );
+				if ( ! transformed ) {
+					return false;
+				}
+				if ( addedTokens.has( transformed ) ) {
+					return false;
+				}
+				if ( valueContainsToken( transformed ) ) {
+					return false;
+				}
+				return ! __experimentalValidateInput( transformed );
 			} );
 
 			if ( failedTokens.length > 0 ) {
