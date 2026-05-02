@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	useRefEffect,
-	useMergeRefs,
+	useEvent,
 } from '@wordpress/compose';
 import { isKeyboardEvent } from '@wordpress/keycodes';
 import type { WPKeycodeModifier } from '@wordpress/keycodes';
+
+type Shortcut = { modifier: WPKeycodeModifier; character: string };
+type Shortcuts = { previous: readonly Shortcut[]; next: readonly Shortcut[] };
 
 const defaultShortcuts = {
 	previous: [
@@ -37,43 +40,63 @@ const defaultShortcuts = {
 	] as const,
 };
 
-type Shortcuts = {
-	previous: readonly { modifier: WPKeycodeModifier; character: string }[];
-	next: readonly { modifier: WPKeycodeModifier; character: string }[];
+const getShortcutSign = (
+	event: React.KeyboardEvent< HTMLElement > | KeyboardEvent,
+	shortcuts: Shortcuts
+) => {
+	const isMatch = ( { modifier, character }: Shortcut ) =>
+		isKeyboardEvent[ modifier ]( event, character );
+	if ( shortcuts.previous.some( isMatch ) ) {
+		return -1;
+	} else if ( shortcuts.next.some( isMatch ) ) {
+		return 1;
+	}
+	return 0;
 };
 
-export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
-	const ref = useRef< HTMLDivElement >( null );
-	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+const regionsSelector = '[role="region"][tabindex="-1"]';
 
-	function focusRegion( offset: number ) {
-		const regions = Array.from(
-			ref.current?.querySelectorAll< HTMLElement >(
-				'[role="region"][tabindex="-1"]'
-			) ?? []
-		);
-		if ( ! regions.length ) {
-			return;
-		}
-		let nextRegion = regions[ 0 ];
-		// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
-		const wrappingRegion =
-			ref.current?.ownerDocument?.activeElement?.closest< HTMLElement >(
-				'[role="region"][tabindex="-1"]'
-			);
-		const selectedIndex = wrappingRegion
-			? regions.indexOf( wrappingRegion )
-			: -1;
-		if ( selectedIndex !== -1 ) {
-			let nextIndex = selectedIndex + offset;
-			nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
-			nextIndex = nextIndex === regions.length ? 0 : nextIndex;
-			nextRegion = regions[ nextIndex ];
-		}
-
-		nextRegion.focus();
-		setIsFocusingRegions( true );
+const focusRegion = ( root: HTMLElement, offset: number ) => {
+	const regions = root.querySelectorAll< HTMLElement >( regionsSelector );
+	if ( ! regions.length ) {
+		return;
 	}
+	let nextRegion = regions[ 0 ];
+	const { activeElement } = root.ownerDocument;
+	// Based off the current element, use closest to determine the wrapping region since this operates up the DOM. Also, match tabindex to avoid edge cases with regions we do not want.
+	const wrappingRegion =
+		activeElement?.closest< HTMLElement >( regionsSelector );
+	const selectedIndex = wrappingRegion
+		? [ ...regions ].indexOf( wrappingRegion )
+		: -1;
+	if ( selectedIndex !== -1 ) {
+		let nextIndex = selectedIndex + offset;
+		nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;
+		nextIndex = nextIndex === regions.length ? 0 : nextIndex;
+		nextRegion = regions[ nextIndex ];
+	}
+
+	nextRegion.focus();
+};
+
+export function useNavigateRegions(
+	options: Shortcuts | { shortcuts: Shortcuts; isGlobal: boolean }
+) {
+	let shortcuts: Shortcuts = defaultShortcuts;
+	let isGlobal = false;
+	if ( options ) {
+		if ( 'previous' in options && 'next' in options ) {
+			shortcuts = options;
+		} else {
+			if ( 'shortcuts' in options ) {
+				( { shortcuts } = options );
+			}
+			if ( 'isGlobal' in options ) {
+				( { isGlobal } = options );
+			}
+		}
+	}
+	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
 
 	const clickRef = useRefEffect(
 		( element ) => {
@@ -90,25 +113,55 @@ export function useNavigateRegions( shortcuts: Shortcuts = defaultShortcuts ) {
 		[ setIsFocusingRegions ]
 	);
 
-	return {
-		ref: useMergeRefs( [ ref, clickRef ] ),
-		className: isFocusingRegions ? 'is-focusing-regions' : '',
-		onKeyDown( event: React.KeyboardEvent< HTMLDivElement > ) {
-			if (
-				shortcuts.previous.some( ( { modifier, character } ) => {
-					return isKeyboardEvent[ modifier ]( event, character );
-				} )
-			) {
-				focusRegion( -1 );
-			} else if (
-				shortcuts.next.some( ( { modifier, character } ) => {
-					return isKeyboardEvent[ modifier ]( event, character );
-				} )
-			) {
-				focusRegion( 1 );
+	const navigate = useEvent(
+		(
+			event: KeyboardEvent | React.KeyboardEvent< HTMLElement >,
+			root: HTMLElement
+		) => {
+			const sign = getShortcutSign( event, shortcuts );
+			if ( sign ) {
+				focusRegion( root, sign );
+				if ( isGlobal ) {
+					root.classList.add( 'is-focusing-regions' );
+				} else {
+					setIsFocusingRegions( true );
+				}
 			}
+		}
+	);
+
+	const globalEffect = useRefEffect< HTMLElement >(
+		( node ) => {
+			const { ownerDocument } = node;
+			if ( ! ownerDocument ) {
+				return;
+			}
+			const onKeyDown = ( event: KeyboardEvent ) =>
+				navigate( event, node );
+			const onPointerDown = () => {
+				node.classList.remove( 'is-focusing-regions' );
+			};
+			ownerDocument.addEventListener( 'keydown', onKeyDown );
+			ownerDocument.addEventListener( 'pointerdown', onPointerDown );
+			return () => {
+				ownerDocument.removeEventListener( 'keydown', onKeyDown );
+				ownerDocument.removeEventListener(
+					'pointerdown',
+					onPointerDown
+				);
+			};
 		},
-	};
+		[ navigate ]
+	);
+
+	return isGlobal
+		? globalEffect
+		: {
+				ref: clickRef,
+				className: isFocusingRegions ? 'is-focusing-regions' : '',
+				onKeyDown: ( event: React.KeyboardEvent< HTMLElement > ) =>
+					navigate( event, event.currentTarget ),
+		  };
 }
 
 /**
