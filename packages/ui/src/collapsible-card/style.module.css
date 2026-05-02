@@ -28,7 +28,7 @@
 	}
 
 	.header-trigger {
-		@media not (prefers-reduced-motion) {
+		@media not ( prefers-reduced-motion ) {
 			transition: rotate 0.15s ease-out;
 		}
 	}
@@ -44,8 +44,17 @@
 
 	.content {
 		height: var(--collapsible-panel-height);
-		overflow: hidden;
 		margin-block-start: var(--wp-ui-card-header-content-margin);
+
+		/* Clip while collapsed or transitioning so the panel collapses
+		   cleanly. The `overflowVisible` class is set once the open
+		   transition has settled, dropping the clip so descendant
+		   focus rings aren't cut off. */
+		overflow: hidden;
+
+		&.overflowVisible {
+			overflow: visible;
+		}
 
 		&[hidden]:not([hidden="until-found"]) {
 			display: none;
@@ -56,15 +65,18 @@
 			height: 0;
 		}
 
-		@media not (prefers-reduced-motion) {
+		@media not ( prefers-reduced-motion ) {
 			transition: all 150ms ease-out;
 		}
 	}
-
 }
 
 @layer wp-ui-compositions {
 	.content-inner {
+		/* Card.Content's `.header + .content` selector doesn't match here
+		   because Collapsible.Panel sits between Card.Header and Card.Content.
+		   Re-apply the zero top padding manually so the header/content gap
+		   matches Card. */
 		padding-block-start: 0;
 	}
 
