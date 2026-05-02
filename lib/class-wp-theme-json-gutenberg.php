@@ -3195,12 +3195,6 @@ class WP_Theme_JSON_Gutenberg {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
 							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
 								$node_path = array( 'styles', 'blocks', $name, 'elements', $element );
-								if ( $include_node_paths_only ) {
-									$nodes[] = array(
-										'path' => $node_path,
-									);
-									continue;
-								}
 
 								$nodes[] = array(
 									'path'     => $node_path,
