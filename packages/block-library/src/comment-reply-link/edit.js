@@ -20,7 +20,10 @@ function Edit( props ) {
 					href="#comment-reply-pseudo-link"
 					onClick={ ( event ) => event.preventDefault() }
 				>
-					{ _x( 'Reply', 'verb' ) }
+					{
+						/* translators: Comment reply button text. */
+						_x( 'Reply', 'verb' )
+					}
 				</a>
 			</div>
 		</>

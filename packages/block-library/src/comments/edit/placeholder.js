@@ -109,8 +109,10 @@ export default function PostCommentsPlaceholder( { postType, postId } ) {
 									'Reply to A WordPress Commenter'
 								) }
 							>
-								/* translators: Comment reply button text. */
-								_x( 'Reply', 'verb' )
+								{
+									/* translators: Comment reply button text. */
+									_x( 'Reply', 'verb' )
+								}
 							</a>
 						</div>
 					</article>
