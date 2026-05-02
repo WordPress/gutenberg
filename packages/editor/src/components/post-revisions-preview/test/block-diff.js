@@ -11,6 +11,7 @@ import {
 import { RichTextData } from '@wordpress/rich-text';
 import * as paragraphBlock from '@wordpress/block-library/src/paragraph';
 import * as groupBlock from '@wordpress/block-library/src/group';
+import * as freeformBlock from '@wordpress/block-library/src/freeform';
 
 /**
  * Internal dependencies
@@ -65,6 +66,12 @@ describe( 'diffRevisionContent', () => {
 				groupBlock.settings
 			);
 		}
+		if ( ! getBlockType( 'core/freeform' ) ) {
+			registerBlockType(
+				{ name: freeformBlock.name, ...freeformBlock.metadata },
+				freeformBlock.settings
+			);
+		}
 
 		registerDiffFormatTypes();
 	} );
@@ -75,6 +82,9 @@ describe( 'diffRevisionContent', () => {
 		}
 		if ( getBlockType( 'core/group' ) ) {
 			unregisterBlockType( 'core/group' );
+		}
+		if ( getBlockType( 'core/freeform' ) ) {
+			unregisterBlockType( 'core/freeform' );
 		}
 
 		unregisterDiffFormatTypes();
@@ -146,6 +156,34 @@ describe( 'diffRevisionContent', () => {
 				attributes: {
 					__revisionDiffStatus: {
 						status: 'modified',
+					},
+				},
+			},
+		] );
+	} );
+
+	it( 'pairs changed classic block content as modified', () => {
+		const previous = serialize( [
+			createBlock( 'core/freeform', {
+				content: '<p>Original classic block content</p>',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/freeform', {
+				content: '<p>Updated classic block content with edits</p>',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/freeform',
+				attributes: {
+					__revisionDiffStatus: {
+						status: 'modified',
+						changedAttributes: {
+							content: expect.any( Array ),
+						},
 					},
 				},
 			},
