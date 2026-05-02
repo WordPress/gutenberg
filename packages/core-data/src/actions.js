@@ -30,6 +30,13 @@ function addTitleToAutoDraft( record ) {
 	return record.status === 'auto-draft' ? { ...record, title: '' } : record;
 }
 
+function isStaleCRDTDocumentError( error ) {
+	return (
+		error?.code === 'rest_crdt_document_stale' &&
+		error?.data?.status === 409
+	);
+}
+
 /**
  * Returns an action object used in signalling that authors have been received.
  * Ignored from documentation as it's internal to the data store.
@@ -769,21 +776,80 @@ export const saveEntityRecord =
 						);
 					}
 				} else {
-					let edits = record;
-					if ( entityConfig.__unstablePrePersist ) {
-						edits = {
-							...edits,
-							...( await entityConfig.__unstablePrePersist(
-								persistedRecord,
-								edits
-							) ),
-						};
+					const prepareEdits = async (
+						baseRecord,
+						recordToPersist
+					) => {
+						let edits = recordToPersist;
+						if ( entityConfig.__unstablePrePersist ) {
+							edits = {
+								...edits,
+								...( await entityConfig.__unstablePrePersist(
+									baseRecord,
+									edits
+								) ),
+							};
+						}
+						return edits;
+					};
+
+					let edits = await prepareEdits(
+						persistedRecord,
+						record
+					);
+					try {
+						updatedRecord = await __unstableFetch( {
+							path,
+							method: recordId ? 'PUT' : 'POST',
+							data: edits,
+						} );
+					} catch ( _error ) {
+						const syncManager = getSyncManager();
+						if (
+							! recordId ||
+							! entityConfig.syncConfig ||
+							! isStaleCRDTDocumentError( _error ) ||
+							! syncManager?.applyPersistedCRDTDoc
+						) {
+							throw _error;
+						}
+
+						const latestRecordPath = entityConfig.baseURLParams
+							? addQueryArgs( path, entityConfig.baseURLParams )
+							: path;
+						const latestRecord = await __unstableFetch( {
+							path: latestRecordPath,
+						} );
+						dispatch.receiveEntityRecords(
+							kind,
+							name,
+							latestRecord,
+							undefined,
+							true
+						);
+
+						await syncManager.applyPersistedCRDTDoc(
+							`${ kind }/${ name }`,
+							recordId,
+							latestRecord
+						);
+
+						const mergedRecord =
+							select.getEditedEntityRecord?.(
+								kind,
+								name,
+								recordId
+							) || record;
+						edits = await prepareEdits(
+							latestRecord,
+							mergedRecord
+						);
+						updatedRecord = await __unstableFetch( {
+							path,
+							method: 'PUT',
+							data: edits,
+						} );
 					}
-					updatedRecord = await __unstableFetch( {
-						path,
-						method: recordId ? 'PUT' : 'POST',
-						data: edits,
-					} );
 					dispatch.receiveEntityRecords(
 						kind,
 						name,
