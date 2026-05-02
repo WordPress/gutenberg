@@ -242,7 +242,7 @@ export function useSuggestionsProvider() {
 					} );
 				}
 
-				createNotice( 'snackbar', __( 'Suggestion submitted.' ), {
+				createNotice( 'success', __( 'Suggestion submitted.' ), {
 					type: 'snackbar',
 					isDismissible: true,
 				} );
