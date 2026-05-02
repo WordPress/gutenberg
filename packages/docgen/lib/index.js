@@ -93,6 +93,9 @@ const runCustomFormatter = (
 };
 
 // To keep track of file being processed.
+/**
+ * @type {string[]} the stack of files currently being processed
+ */
 const currentFileStack = [];
 
 module.exports = ( sourceFile, options ) => {
