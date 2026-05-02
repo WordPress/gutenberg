@@ -159,7 +159,8 @@ export interface SyncConfig {
 export interface SyncManager {
 	createPersistedCRDTDoc: (
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		baseVersion?: number
 	) => Promise< string | null >;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,

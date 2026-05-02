@@ -637,15 +637,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		handlers.editRecord( changes );
 	}
 
+	/* eslint-disable-next-line jsdoc/check-line-alignment */
 	/**
 	 * Create object meta to persist the CRDT document in the entity record.
 	 *
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {number}     [baseVersion=0] Base version from the server.
 	 */
 	async function createPersistedCRDTDoc(
 		objectType: ObjectType,
-		objectId: ObjectID
+		objectId: ObjectID,
+		baseVersion: number = 0
 	): Promise< string | null > {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -659,7 +662,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// before we serialize the document.
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
-		return serializeCrdtDoc( entityState.ydoc );
+		return serializeCrdtDoc( entityState.ydoc, baseVersion );
 	}
 
 	// Collect internal functions so that they can be wrapped before calling.

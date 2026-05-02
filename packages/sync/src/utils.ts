@@ -67,9 +67,13 @@ function pseudoRandomID(): number {
 	return Math.floor( Math.random() * 1000000000 );
 }
 
-export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
+export function serializeCrdtDoc(
+	crdtDoc: CRDTDoc,
+	baseVersion: number = 0
+): string {
 	return JSON.stringify( {
 		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		baseVersion,
 		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }

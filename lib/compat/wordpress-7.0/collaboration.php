@@ -98,6 +98,124 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
+if ( ! function_exists( 'gutenberg_crdt_intercept_post_meta_update' ) ) {
+	/**
+	 * Intercepts post meta updates for the persisted CRDT document to
+	 * implement optimistic concurrency control.  Clients embed a `baseVersion`
+	 * field in the serialized document.  Before writing, this filter checks
+	 * that the client's base version matches the version currently stored on
+	 * the server.  When versions match the write proceeds and the version is
+	 * incremented atomically using a compare-and-swap on the database row.
+	 *
+	 * When the stored version does not match the client's base version the
+	 * write is rejected — another client has already updated the document.
+	 * The rejected client will retry after receiving the latest version
+	 * through the next server response.
+	 *
+	 * @param mixed  $check      Whether to allow the update.  Returning a
+	 *                           non-null value short-circuits update_metadata().
+	 * @param int    $object_id  Post ID.
+	 * @param string $meta_key   Meta key being updated.
+	 * @param mixed  $meta_value New meta value (JSON string).
+	 * @return mixed Null to allow WordPress to proceed, false to reject, true
+	 *               when the write was handled directly.
+	 */
+	function gutenberg_crdt_intercept_post_meta_update( $check, $object_id, $meta_key, $meta_value ) {
+		if ( '_crdt_document' !== $meta_key ) {
+			return $check;
+		}
+
+		$incoming = json_decode( $meta_value, true );
+		if ( ! is_array( $incoming ) ) {
+			return $check;
+		}
+
+		$base_version = (int) ( $incoming['baseVersion'] ?? 0 );
+
+		global $wpdb;
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				"SELECT meta_id, meta_value FROM $wpdb->postmeta
+				WHERE post_id = %d AND meta_key = %s",
+				$object_id,
+				'_crdt_document'
+			)
+		);
+
+		if ( $row ) {
+			// Existing meta — check version before writing.
+			$current = json_decode( $row->meta_value, true );
+			$current_version = (int) ( is_array( $current ) ? ( $current['baseVersion'] ?? 0 ) : 0 );
+
+			if ( $current_version !== $base_version ) {
+				return false; // Stale — client's base version does not match the server.
+			}
+
+			$incoming['baseVersion'] = $current_version + 1;
+			$new_value = wp_json_encode( $incoming );
+
+			// Atomic compare-and-swap: only update if the row hasn't changed
+			// since we last read it.
+			$affected = $wpdb->update(
+				$wpdb->postmeta,
+				array( 'meta_value' => $new_value ),
+				array(
+					'meta_id'    => $row->meta_id,
+					'meta_value' => $row->meta_value,
+				)
+			);
+
+			if ( 0 === $affected ) {
+				return false; // Lost the race — another request updated first.
+			}
+
+			wp_cache_delete( $object_id, 'post_meta' );
+
+			/**
+			 * Fires immediately after a CRDT-document post meta row is updated.
+			 * Mirrors WordPress Core's `updated_post_meta` action to keep
+			 * caches and hooks consistent.
+			 *
+			 * @param int    $meta_id    Meta ID.
+			 * @param int    $object_id  Post ID.
+			 * @param string $meta_key   Meta key.
+			 * @param mixed  $meta_value Meta value.
+			 */
+			do_action( 'updated_post_meta', $row->meta_id, $object_id, $meta_key, $meta_value );
+
+			return true; // Handled — short-circuit WordPress.
+		}
+
+		// First-time write: no stored row yet.  Let WordPress do the INSERT.
+		// The `pre_update_post__crdt_document` filter will inject
+		// baseVersion=1 before the row is created.
+		return $check;
+	}
+	add_filter( 'update_post_metadata', 'gutenberg_crdt_intercept_post_meta_update', 10, 4 );
+}
+
+if ( ! function_exists( 'gutenberg_crdt_set_initial_base_version' ) ) {
+	/**
+	 * Sets the initial `baseVersion` on the first write of a persisted CRDT
+	 * document.  WordPress's `update_post_metadata` filter cannot modify the
+	 * value for INSERTs (only short-circuit them), so this companion filter
+	 * injects `baseVersion=1` when the stored row doesn't exist yet.
+	 *
+	 * @param mixed $meta_value New meta value (JSON string).
+	 * @return mixed Modified meta value with baseVersion set, or the original.
+	 */
+	function gutenberg_crdt_set_initial_base_version( $meta_value ) {
+		$decoded = json_decode( $meta_value, true );
+		if ( is_array( $decoded ) && empty( $decoded['baseVersion'] ) ) {
+			$decoded['baseVersion'] = 1;
+			return wp_json_encode( $decoded );
+		}
+		return $meta_value;
+	}
+	add_filter( 'pre_update_post__crdt_document', 'gutenberg_crdt_set_initial_base_version', 10, 1 );
+}
+
 if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
 	 * Registers the real-time collaboration setting.
