@@ -52,14 +52,17 @@ function ResizeHandle( {
 	}, [ isDragging, verticalResizable ] );
 
 	if ( renderResizeHandle ) {
-		return renderResizeHandle( {
-			ref: mergedRef,
-			listeners,
-			attributes,
-			verticalResizable,
-			isResizing: isDragging,
-			itemId,
-		} );
+		const RenderResizeHandle = renderResizeHandle;
+		return (
+			<RenderResizeHandle
+				ref={ mergedRef }
+				listeners={ listeners }
+				attributes={ attributes }
+				verticalResizable={ verticalResizable }
+				isResizing={ isDragging }
+				itemId={ itemId }
+			/>
+		);
 	}
 
 	return (
