@@ -9,7 +9,7 @@
  * Render a variable that we'll use to declare that the editor will need the classic block.
  */
 function gutenberg_declare_classic_block_necessary() {
-	if ( ! gutenberg_post_being_edited_requires_classic_block() ) {
+	if ( ! gutenberg_classic_block_supports_inserter() ) {
 		return;
 	}
 	echo '<script type="text/javascript">window.wp.needsClassicBlock = true;</script>';
@@ -17,46 +17,28 @@ function gutenberg_declare_classic_block_necessary() {
 add_action( 'admin_print_footer_scripts', 'gutenberg_declare_classic_block_necessary', 20 );
 
 /**
- * Whether the current editor contains a classic block instance.
+ * Whether the Classic block should be available in the inserter.
  *
- * @return bool True if the editor contains a classic block, false otherwise.
+ * @return bool True if the Classic block should be in the inserter.
  */
-function gutenberg_post_being_edited_requires_classic_block() {
-	if ( ! is_admin() ) {
-		return false;
-	}
-
-	// Continue only if we're in the post editor.
-	if ( empty( $_GET['post'] ) || empty( $_GET['action'] ) || 'edit' !== $_GET['action'] ) {
-		return false;
-	}
-
-	// Bail if for some reason the post isn't found.
-	$current_post = get_post( absint( $_GET['post'] ) );
-	if ( ! $current_post ) {
-		return false;
-	}
-
-	// Check if block editor is disabled by "Classic Editor" or another plugin.
+function gutenberg_classic_block_supports_inserter() {
+	$post = null;
 	if (
-		function_exists( 'use_block_editor_for_post_type' ) &&
-		! use_block_editor_for_post_type( $current_post->post_type )
+		is_admin() &&
+		! empty( $_GET['post'] ) &&
+		! empty( $_GET['action'] ) &&
+		'edit' === $_GET['action']
 	) {
-		return true;
+		$post = get_post( absint( $_GET['post'] ) );
 	}
 
-	$content = $current_post->post_content;
-	if ( empty( $content ) ) {
-		return false;
-	}
-
-	$parsed_blocks = parse_blocks( $content );
-	foreach ( $parsed_blocks as $block ) {
-		$is_freeform_block = empty( $block['blockName'] ) || 'core/freeform' === $block['blockName'];
-		if ( $is_freeform_block && strlen( trim( $block['innerHTML'] ) ) > 0 ) {
-			return true;
-		}
-	}
-
-	return false;
+	/**
+	 * Filters whether the Classic block should be available in the inserter.
+	 *
+	 * Defaults to false. Use this filter to opt in (globally or per post).
+	 *
+	 * @param bool         $supports_inserter Whether the Classic block is available in the inserter.
+	 * @param WP_Post|null $post              The post being edited, or null if not in the post editor.
+	 */
+	return (bool) apply_filters( 'gutenberg_classic_block_supports_inserter', false, $post );
 }
