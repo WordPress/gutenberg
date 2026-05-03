@@ -175,6 +175,11 @@ function QuickEditSession( { postType, postId, quickEditForm } ) {
 	return (
 		<>
 			<Drawer.Content>
+				<PostCardPanel
+					postType={ postType }
+					postId={ postId }
+					hideActions
+				/>
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
@@ -221,29 +226,28 @@ export function QuickEditModal( {
 			<Drawer.Popup>
 				<Drawer.Header>
 					{ /*
-					 * `PostCardPanel` provides the visible header content
-					 * (post title, icon, bulk-edit hint). Render it inside
-					 * `Drawer.Header` so it gets the popup's pinned-top
-					 * positioning and the scroll-edge separator the
-					 * primitive ships. The `Drawer.Title` lives here too
-					 * — visually hidden because PostCardPanel already
-					 * displays a heading — so the drawer has an explicit
-					 * accessible name (Base UI wires `aria-labelledby`
-					 * automatically).
+					 * `PostCardPanel` is the visible "header" content for
+					 * Quick Edit (post title, icon, bulk-edit hint), but it
+					 * already renders its own `<h2>` heading and is laid out
+					 * as a vertical stack — both at odds with `Drawer.Header`,
+					 * which expects a single inline title row. As a
+					 * short-term measure we render `PostCardPanel` inside
+					 * `Drawer.Content` instead and keep the header itself
+					 * minimal: a visually-hidden `Drawer.Title` (rendered as
+					 * a `<span>` so we don't introduce a second `<h2>` that
+					 * would compete with PostCardPanel's heading) plus the
+					 * close icon. Base UI still wires `aria-labelledby`
+					 * automatically. Tracked follow-up: integrate
+					 * `PostCardPanel` properly with `Drawer.Header`.
 					 */ }
 					<VisuallyHidden
 						render={
-							<Drawer.Title>
+							<Drawer.Title render={ <span /> }>
 								{ isBulk
 									? __( 'Bulk quick edit' )
 									: __( 'Quick edit' ) }
 							</Drawer.Title>
 						}
-					/>
-					<PostCardPanel
-						postType={ postType }
-						postId={ postId }
-						hideActions
 					/>
 					<Drawer.CloseIcon />
 				</Drawer.Header>
