@@ -207,6 +207,10 @@ const resetPostAction: Action< Template | TemplatePart > = {
 	supportsBulk: true,
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 

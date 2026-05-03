@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- DataViews: `Action.RenderModal` host contract refinement — implementations are now expected to be rendered inside a `@wordpress/ui` `Dialog.Root` ancestor. All in-tree DataViews item-action and DataForm panel-modal hosts already provide one, but custom hosts (e.g. plugins that consume registered entity actions through their own UI shell) that render `RenderModal` outside a `Dialog.Root` will crash with "Dialog parts must be placed within `<Dialog.Root>`" if the body uses Dialog parts such as `Dialog.Action`. The implicit pre-migration contract was "render inside any modal-like host" (`<Modal>` or `<Dialog>` both qualified); the new contract narrows that to "Dialog-shaped host". External callers must wrap their custom host in `<Dialog.Root>`, or migrate to using the in-tree DataViews/editor surfaces. See the `RenderModalProps` JSDoc for details. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements

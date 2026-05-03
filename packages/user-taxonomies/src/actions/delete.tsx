@@ -171,6 +171,11 @@ const deleteTaxonomyAction: Action< TaxonomyFormData > = {
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',
 	modalSize: 'small',
+	// `DeleteTaxonomyModal` uses `Dialog.Action`, so it requires a
+	// `@wordpress/ui` `Dialog.Root` ancestor at render time. Every
+	// in-tree consumer of `Action.RenderModal` provides one; external
+	// hosts rendering it outside `Dialog.Root` will crash. See
+	// `RenderModalProps` JSDoc.
 	RenderModal: DeleteTaxonomyModal,
 };
 
