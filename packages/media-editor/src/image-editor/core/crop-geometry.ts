@@ -7,6 +7,7 @@ import { getSourceRegion, type SourceRegion } from './source-region';
 import { MIN_CROP_SIZE, type CropBounds } from './stencil-math';
 
 const EPSILON = 1e-9;
+declare const cropPixelRectBrand: unique symbol;
 
 /**
  * Measured cropper layout geometry. Published by the Cropper component so
@@ -20,16 +21,32 @@ export interface CropperLayoutGeometry {
 }
 
 /**
- * Crop rectangle expressed in snap-rotation crop pixels.
+ * Candidate crop rectangle expressed in snap-rotation crop pixels.
+ *
+ * This is the shape consumers provide for validation or conversion. Derived
+ * `right` / `bottom` edges are intentionally not accepted from consumers.
  */
-export interface CropPixelRect {
+export interface CropPixelRectInput {
 	left: number;
 	top: number;
 	width: number;
 	height: number;
-	right: number;
-	bottom: number;
 }
+
+/**
+ * Crop rectangle expressed in snap-rotation crop pixels.
+ *
+ * `right` and `bottom` are derived from `left + width` and `top + height`.
+ * Use the exported helpers to create this type; accept consumer-proposed
+ * rectangles as `CropPixelRectInput`.
+ */
+export type CropPixelRect = CropPixelRectInput & {
+	/** Derived right edge, equal to `left + width`. */
+	readonly right: number;
+	/** Derived bottom edge, equal to `top + height`. */
+	readonly bottom: number;
+	readonly [ cropPixelRectBrand ]: true;
+};
 
 /**
  * Current crop limits expressed in the same snap-rotation pixel space as
@@ -172,12 +189,7 @@ function pixelHeightToNormalized(
 	return ( height / snap.height ) * state.zoom;
 }
 
-function toCropPixelRect( pixels: {
-	left: number;
-	top: number;
-	width: number;
-	height: number;
-} ): CropPixelRect {
+function toCropPixelRect( pixels: CropPixelRectInput ): CropPixelRect {
 	return {
 		left: pixels.left,
 		top: pixels.top,
@@ -185,7 +197,7 @@ function toCropPixelRect( pixels: {
 		height: pixels.height,
 		right: pixels.left + pixels.width,
 		bottom: pixels.top + pixels.height,
-	};
+	} as CropPixelRect;
 }
 
 /**
@@ -227,7 +239,7 @@ export function getCropPixelRect(
  * @return Normalized crop rectangle.
  */
 export function cropPixelRectToNormalizedRect(
-	pixels: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >,
+	pixels: CropPixelRectInput,
 	state: CropperState,
 	imageSize: Size
 ): NormalizedRect {
@@ -321,7 +333,7 @@ export function getCropPixelBounds(
  * @return Clamped crop rectangle in snap-rotation pixels.
  */
 export function clampCropPixelRect(
-	rect: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >,
+	rect: CropPixelRectInput,
 	bounds: CropPixelBounds
 ): CropPixelRect {
 	const fallback = {
@@ -364,7 +376,7 @@ export function clampCropPixelRect(
  * @return Validation result with a clamped rectangle.
  */
 export function validateCropPixelRect(
-	rect: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >,
+	rect: CropPixelRectInput,
 	bounds: CropPixelBounds
 ): CropPixelRectValidationResult {
 	const violations = new Set< CropPixelRectViolation >();

@@ -306,7 +306,47 @@ const aiRequest = {
 };
 ```
 
-### 6. Multi-step editing pipelines
+### 6. Crop geometry for controls and automation
+
+Use crop geometry when a consumer needs to read or validate crop values without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
+
+`CropPixelRectInput`, `CropPixelRect`, and `CropPixelBounds` are in snap-rotation pixels. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
+
+```tsx
+import {
+  cropPixelRectToNormalizedRect,
+  useCropGeometry,
+  useCropper,
+  validateCropPixelRect,
+} from '../image-editor';
+
+function ApplySuggestedCrop( { suggestion } ) {
+  const { state, setCropRect } = useCropper();
+  const { rect, bounds } = useCropGeometry();
+
+  if ( ! state.image || ! rect || ! bounds ) {
+    return null;
+  }
+
+  const apply = () => {
+    const result = validateCropPixelRect( suggestion, bounds );
+    if ( ! result.isValid ) {
+      console.warn( 'Adjusted crop suggestion:', result.violations );
+    }
+
+    setCropRect(
+      cropPixelRectToNormalizedRect( result.rect, state, {
+        width: state.image.naturalWidth,
+        height: state.image.naturalHeight,
+      } )
+    );
+  };
+
+  return <button onClick={ apply }>Apply suggestion</button>;
+}
+```
+
+### 7. Multi-step editing pipelines
 
 `applyToCanvas()` applies the cropper's transform to an existing canvas or image source. This enables multi-step editing where an upstream tool (brightness, color, filters) has already processed the image.
 
@@ -329,7 +369,7 @@ const blob = await canvasToBlob( finalCanvas, 'image/jpeg', 0.9 );
 
 Accepts any `CanvasImageSource`: `HTMLImageElement`, `HTMLCanvasElement`, `OffscreenCanvas`, `ImageBitmap`, `HTMLVideoElement`.
 
-### 7. State change notifications
+### 8. State change notifications
 
 The `Cropper` component provides two notification mechanisms:
 
@@ -355,7 +395,7 @@ The `Cropper` component provides two notification mechanisms:
 />
 ```
 
-### 8. Theming and styling
+### 9. Theming and styling
 
 The component uses BEM-style CSS classes that themes can override:
 

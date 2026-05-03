@@ -8,7 +8,7 @@ import {
 	FlexItem,
 	PanelBody,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
@@ -22,6 +22,7 @@ import {
 	validateCropPixelRect,
 	type CropPixelBounds,
 	type CropPixelRect,
+	type CropPixelRectInput,
 } from '../../image-editor';
 
 interface CropAdvancedPanelProps {
@@ -45,7 +46,6 @@ interface CropInputProps {
 	onCommit: ( value: number ) => void;
 }
 
-const EPSILON = 1e-9;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
 
 function makeRange(
@@ -57,16 +57,27 @@ function makeRange(
 	return {
 		minValue,
 		maxValue: max,
-		canApply: canApply && max - minValue > EPSILON,
+		canApply: canApply && max > minValue,
 	};
 }
 
 function getInputBounds( value: number, range: CropInputRange ) {
 	const rounded = Math.round( value );
+	const min = Math.ceil( range.minValue );
+	const max = Math.floor( range.maxValue );
+
+	if ( max < min ) {
+		return {
+			value: rounded,
+			min: rounded,
+			max: rounded,
+		};
+	}
+
 	return {
 		value: rounded,
-		min: Math.min( rounded, Math.floor( range.minValue ) ),
-		max: Math.max( rounded, Math.ceil( range.maxValue ) ),
+		min: Math.min( rounded, min ),
+		max: Math.max( rounded, max ),
 	};
 }
 
@@ -118,8 +129,8 @@ function getHeightRange(
 	return makeRange( minHeight, maxHeight );
 }
 
-// Shows a live draft while the user types, then snaps to the committed
-// cropper value when the field blurs or Enter is pressed.
+// Shows the user's in-flight text while typing. Valid numeric drafts are
+// committed on blur or Enter; Escape discards the draft.
 function CropInput( {
 	label,
 	'aria-label': ariaLabel,
@@ -130,6 +141,7 @@ function CropInput( {
 }: CropInputProps ) {
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( '' );
+	const skipBlurCommitRef = useRef( false );
 	const bounds = getInputBounds( value, range );
 
 	const commitValue = ( nextValue: string ) => {
@@ -140,7 +152,8 @@ function CropInput( {
 		if ( ! Number.isFinite( parsed ) ) {
 			return;
 		}
-		onCommit( parsed );
+		const rounded = Math.round( parsed );
+		onCommit( Math.max( bounds.min, Math.min( rounded, bounds.max ) ) );
 	};
 
 	const handleFocus = () => {
@@ -149,13 +162,15 @@ function CropInput( {
 	};
 
 	const handleChange = ( nextValue: string | undefined ) => {
-		const valueToCommit = nextValue ?? '';
-		setDraft( valueToCommit );
-		commitValue( valueToCommit );
+		setDraft( nextValue ?? '' );
 	};
 
 	const handleBlur = () => {
 		setFocused( false );
+		if ( skipBlurCommitRef.current ) {
+			skipBlurCommitRef.current = false;
+			return;
+		}
 		commitValue( draft );
 	};
 
@@ -164,11 +179,13 @@ function CropInput( {
 	) => {
 		if ( event.key === 'Enter' ) {
 			event.preventDefault();
+			skipBlurCommitRef.current = true;
 			setFocused( false );
 			commitValue( draft );
 			event.currentTarget.blur();
 		} else if ( event.key === 'Escape' ) {
 			event.preventDefault();
+			skipBlurCommitRef.current = true;
 			setFocused( false );
 			event.currentTarget.blur();
 		}
@@ -210,9 +227,7 @@ export default function CropAdvancedPanel( {
 		height: state.image.naturalHeight,
 	};
 
-	const commitRect = (
-		candidate: Pick< CropPixelRect, 'left' | 'top' | 'width' | 'height' >
-	) => {
+	const commitRect = ( candidate: CropPixelRectInput ) => {
 		const { rect: clampedRect } = validateCropPixelRect(
 			candidate,
 			bounds
@@ -258,6 +273,7 @@ export default function CropAdvancedPanel( {
 		aspectRatio,
 		freeformCrop
 	);
+	const canMoveCropRect = freeformCrop;
 
 	return (
 		<PanelBody
@@ -273,7 +289,9 @@ export default function CropAdvancedPanel( {
 							aria-label={ __( 'Crop left position' ) }
 							value={ rect.left }
 							range={ leftRange }
-							disabled={ ! leftRange.canApply }
+							disabled={
+								! canMoveCropRect || ! leftRange.canApply
+							}
 							onCommit={ handleApply( 'left' ) }
 						/>
 					</FlexItem>
@@ -283,7 +301,9 @@ export default function CropAdvancedPanel( {
 							aria-label={ __( 'Crop top position' ) }
 							value={ rect.top }
 							range={ topRange }
-							disabled={ ! topRange.canApply }
+							disabled={
+								! canMoveCropRect || ! topRange.canApply
+							}
 							onCommit={ handleApply( 'top' ) }
 						/>
 					</FlexItem>

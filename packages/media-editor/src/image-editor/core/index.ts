@@ -40,6 +40,7 @@ export type {
 	CropGeometryInput,
 	CropPixelBounds,
 	CropPixelRect,
+	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
 	CropperLayoutGeometry,

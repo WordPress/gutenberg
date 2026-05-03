@@ -122,7 +122,7 @@ Returns current crop edge constraints in the same pixel space as `CropPixelRect`
 
 #### `validateCropPixelRect( rect, bounds ): CropPixelRectValidationResult`
 
-Checks a complete crop pixel rectangle against current bounds and returns `{ isValid, rect, violations }`, where `rect` is clamped into the valid range.
+Checks a complete `CropPixelRectInput` against current bounds and returns `{ isValid, rect, violations }`, where `rect` is a clamped `CropPixelRect`.
 
 ### Export
 
@@ -169,6 +169,7 @@ Applies a single operation to an existing state.
 | `SourceRegionPercent`   | `{ x, y, width, height }` as percentages (0–100)                                  |
 | `CropGeometryInput`     | Cropper state, image size, and measured layout geometry for pure geometry helpers |
 | `CropPixelRect`         | `{ left, top, width, height, right, bottom }` in snap-rotation pixels             |
+| `CropPixelRectInput`    | Consumer-proposed `{ left, top, width, height }` before derived edges are added   |
 | `CropPixelBounds`       | Current edge and size limits in snap-rotation pixels                              |
 | `AspectRatioPreset`     | `{ label: string, value: number }`                                                |
 
