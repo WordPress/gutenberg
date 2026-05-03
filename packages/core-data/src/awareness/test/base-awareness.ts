@@ -164,26 +164,24 @@ describe( 'BaseAwarenessState', () => {
 			expect( resolveSelect ).toHaveBeenCalledWith( 'core' );
 		} );
 
-		test( 'should exclude own color from available colors', async () => {
+		test( 'should set collaboratorInfo for other users', async () => {
 			// Set up another user state first
 			const doc2 = new Y.Doc();
 			const awareness = new TestBaseAwarenessState( doc );
 
-			// Manually add another user's state with a specific color
+			// Manually add another user's state
 			awareness.setLocalStateField( 'collaboratorInfo', {
 				id: 2,
 				name: 'Other User',
 				slug: 'other-user',
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Firefox',
-				color: '#3858E9', // blueberry
 				enteredAt: 1704067200000,
 			} );
 
 			awareness.setUp();
 			await Promise.resolve();
 
-			// The new user should get a different color if possible
 			const collaboratorInfo =
 				awareness.getLocalStateField( 'collaboratorInfo' );
 			expect( collaboratorInfo ).toBeDefined();
@@ -221,7 +219,6 @@ describe( 'BaseAwarenessState', () => {
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Safari',
-				color: '#E33184',
 				enteredAt: 1704067200000,
 			};
 
@@ -243,7 +240,6 @@ describe( 'BaseAwarenessState', () => {
 				slug: 'custom-user',
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Safari',
-				color: '#E33184',
 				enteredAt: 1704067200000,
 			};
 

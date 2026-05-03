@@ -9,34 +9,40 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import Controls from './controls';
+import useTabListSync from './use-tab-list-sync';
+
+const EMPTY_ARRAY = [];
 
 const TABS_TEMPLATE = [
 	[
-		'core/tabs-menu',
-		{
-			lock: {
-				remove: true,
-			},
-		},
+		'core/tab-list',
+		{},
+		[
+			[ 'core/tab', {} ],
+			[ 'core/tab', {} ],
+		],
 	],
 	[
-		'core/tab-panel',
-		{
-			lock: {
-				remove: true,
-			},
-		},
+		'core/tab-panels',
+		{},
 		[
 			[
-				'core/tab',
+				'core/tab-panel',
 				{
-					anchor: 'tab-1',
-					label: 'Tab 1',
+					label: __( 'Tab' ),
+				},
+				[ [ 'core/paragraph' ] ],
+			],
+			[
+				'core/tab-panel',
+				{
+					label: __( 'Tab' ),
 				},
 				[ [ 'core/paragraph' ] ],
 			],
@@ -44,12 +50,7 @@ const TABS_TEMPLATE = [
 	],
 ];
 
-function Edit( {
-	clientId,
-	attributes,
-	setAttributes,
-	__unstableLayoutClassNames: layoutClassNames,
-} ) {
+function Edit( { clientId, attributes, setAttributes } ) {
 	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
 
 	/**
@@ -62,29 +63,34 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	/**
-	 * Construct a list of core/tab blocks, used to create tabs-list context.
-	 */
-	const tabs = useSelect(
+	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panel block and extract tab data
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
+			const tabPanelBlocks = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
+			);
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
 			);
 
-			if ( ! tabPanel ) {
-				return [];
-			}
-
-			return tabPanel.innerBlocks.filter(
-				( block ) => block.name === 'core/tab'
-			);
+			return {
+				tabPanels: tabPanelBlocks?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanelsClientId: tabPanelBlocks?.clientId ?? null,
+				tabs: tabList?.innerBlocks ?? EMPTY_ARRAY,
+				tabListClientId: tabList?.clientId ?? null,
+			};
 		},
 		[ clientId ]
 	);
+
+	useTabListSync( {
+		tabPanels,
+		tabs,
+		tabPanelsClientId,
+		tabListClientId,
+	} );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
@@ -93,9 +99,9 @@ function Edit( {
 		/**
 		 * Compute tabs list from innerblocks to provide via context.
 		 * This traverses the tab-panel block to find all tab blocks
-		 * and extracts their label and anchor for the tabs-menu to consume.
+		 * and extracts their label and anchor for the tab-list to consume.
 		 */
-		const tabList = tabs.map( ( tab, index ) => ( {
+		const tabList = tabPanels.map( ( tab, index ) => ( {
 			id: tab.attributes.anchor || `tab-${ index }`,
 			label: tab.attributes.label || '',
 			clientId: tab.clientId,
@@ -108,22 +114,14 @@ function Edit( {
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		};
-	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
+	}, [ tabPanels, anchor, activeTabIndex, editorActiveTabIndex ] );
 
-	/**
-	 * Block props for the tabs container.
-	 */
-	const blockProps = useBlockProps( {
-		className: layoutClassNames,
-	} );
+	const blockProps = useBlockProps();
 
-	/**
-	 * Innerblocks props for the tabs container.
-	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
-		templateLock: false,
+		templateLock: 'all',
 		renderAppender: false,
 	} );
 

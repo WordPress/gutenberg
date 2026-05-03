@@ -32,10 +32,10 @@ const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 function collectDiffBlocks( blocks ) {
 	const result = [];
 	for ( const block of blocks ) {
-		if ( block.__revisionDiffStatus ) {
+		if ( block.__revisionDiffStatus?.status ) {
 			result.push( {
 				clientId: block.clientId,
-				status: block.__revisionDiffStatus,
+				status: block.__revisionDiffStatus.status,
 			} );
 		}
 		if ( block.innerBlocks?.length ) {
@@ -73,7 +73,7 @@ function calculatePosition( el ) {
  * @param {string}   props.clientId  The block client ID.
  * @param {string}   props.status    The diff status (added/removed/modified).
  * @param {Function} props.subscribe Function to subscribe to position updates.
- * @return {JSX.Element|null} The diff marker button or null if position not calculated.
+ * @return {React.JSX.Element} The diff marker button or null if position not calculated.
  */
 function DiffMarkerButton( { clientId, status, subscribe } ) {
 	const blockRef = useRef();
@@ -145,7 +145,7 @@ export function useDiffMarkers() {
 			key="diff-markers"
 			className="revision-diff-markers"
 			role="navigation"
-			aria-label={ __( 'Diff markers' ) }
+			aria-label={ __( 'Document changes' ) }
 		>
 			{ isMounted &&
 				diffBlocks.map( ( { clientId, status } ) => (

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/ui';
 import { _x, sprintf } from '@wordpress/i18n';
 
 export default function ResponsiveBlockControlLabel( {
@@ -27,7 +27,10 @@ export default function ResponsiveBlockControlLabel( {
 			<span aria-describedby={ `rbc-desc-${ instanceId }` }>
 				{ viewport.label }
 			</span>
-			<VisuallyHidden as="span" id={ `rbc-desc-${ instanceId }` }>
+			<VisuallyHidden
+				id={ `rbc-desc-${ instanceId }` }
+				render={ <span /> }
+			>
 				{ accessibleLabel }
 			</VisuallyHidden>
 		</>

@@ -124,16 +124,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		try {
 			plainText = clipboardData.getData( 'text/plain' );
 			html = clipboardData.getData( 'text/html' );
-		} catch ( error ) {
+		} catch {
 			// Some browsers like UC Browser paste plain text by default and
 			// don't support clipboardData at all, so allow default
 			// behaviour.
 			return;
 		}
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
 
 		const content = pasteHandler( {
 			HTML: html,
@@ -185,7 +181,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const style = isEditingContentOnlySection ? { opacity: 0.2 } : undefined;
 
 	return (
-		/* eslint-disable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
 			ref={ useMergeRefs( [ richTextRef, focusRef ] ) }
 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
@@ -199,7 +195,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			onPaste={ onPaste }
 			style={ style }
 		/>
-		/* eslint-enable jsx-a11y/heading-has-content, jsx-a11y/no-noninteractive-element-to-interactive-role */
+		/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	);
 } );
 

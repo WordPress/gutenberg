@@ -15,5 +15,6 @@ interface ThemeContextType {
 export const ThemeContext = createContext< ThemeContextType >( {
 	resolvedSettings: {
 		color: {},
+		cursor: undefined,
 	},
 } );

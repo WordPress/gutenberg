@@ -218,7 +218,7 @@ If provided, renders `a` instead of `button`.
 
 ### `icon`
 
--   Type: `JSX.Element`
+-   Type: `React.JSX.Element`
 -   Required: No
 
 If no `children` are passed, this prop allows to specify a custom icon for the menu item.

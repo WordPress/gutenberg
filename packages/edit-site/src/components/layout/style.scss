@@ -273,10 +273,6 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	}
 }
 
-.edit-site .components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
+.edit-site-layout__snackbar {
+	@include snackbar-container();
 }

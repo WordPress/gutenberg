@@ -17,6 +17,7 @@ import PanelBody from '../body';
 import InputControl from '../../input-control';
 
 const meta: Meta< typeof Panel > = {
+	tags: [ 'manifest' ],
 	title: 'Components/Containers/Panel',
 	id: 'components-panel',
 	component: Panel,

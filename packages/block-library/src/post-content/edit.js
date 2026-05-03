@@ -183,7 +183,7 @@ function RecursionError() {
  * @param {Function} props.onSelectTagName onChange function for the SelectControl.
  * @param {string}   props.clientId        The client ID of the current block.
  *
- * @return {JSX.Element}                The control group.
+ * @return {React.JSX.Element}                The control group.
  */
 function PostContentEditControls( { tagName, onSelectTagName, clientId } ) {
 	return (

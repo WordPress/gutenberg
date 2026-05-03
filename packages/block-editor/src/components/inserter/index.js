@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getAppenderLabel } from './get-appender-label';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -28,6 +29,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
+	appenderLabel,
 	toggleProps = {},
 } ) => {
 	const {
@@ -38,11 +40,14 @@ const defaultRenderToggle = ( {
 	} = toggleProps;
 
 	let label = labelProp;
-	if ( ! label && hasSingleBlockType ) {
+	if ( ! label && appenderLabel ) {
+		// Block returns the full label; use directly (consistent with getBlockLabel).
+		label = appenderLabel;
+	} else if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
-			blockTitle
+			blockTitle.toLowerCase()
 		);
 	} else if ( ! label ) {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
@@ -107,7 +112,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
+			appenderLabel,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -119,7 +124,7 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
+			appenderLabel,
 			toggleProps,
 		} );
 	}
@@ -227,7 +232,7 @@ export default compose( [
 				getDirectInsertBlock,
 			} = select( blockEditorStore );
 
-			const { getBlockVariations } = select( blocksStore );
+			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			rootClientId =
 				rootClientId || getBlockRootClientId( clientId ) || undefined;
@@ -247,12 +252,21 @@ export default compose( [
 				allowedBlockType = allowedBlocks[ 0 ];
 			}
 
+			const defaultBlockType = directInsertBlock
+				? getBlockType( directInsertBlock.name )
+				: null;
+			const appenderLabel = getAppenderLabel(
+				directInsertBlock,
+				defaultBlockType
+			);
+
 			return {
 				hasItems: hasInserterItems( rootClientId ),
 				hasSingleBlockType,
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
 				directInsertBlock,
+				appenderLabel,
 				rootClientId,
 			};
 		}

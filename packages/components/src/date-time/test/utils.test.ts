@@ -1,17 +1,14 @@
-/**
- * External dependencies
- */
 import timezoneMock from 'timezone-mock';
-
-/**
- * WordPress dependencies
- */
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
+import { inputToDate, getDaysInMonth } from '../utils';
 
-/**
- * Internal dependencies
- */
-import { inputToDate } from '../utils';
+describe( 'getDaysInMonth', () => {
+	it( 'should return the number of days in the month', () => {
+		expect( getDaysInMonth( 2026, 0 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2026, 1 ) ).toBe( 28 );
+		expect( getDaysInMonth( 2028, 1 ) ).toBe( 29 );
+	} );
+} );
 
 describe( 'inputToDate', () => {
 	let originalSettings: DateSettings;

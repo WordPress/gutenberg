@@ -113,7 +113,7 @@ export type SlotFillProviderProps = {
 };
 
 export type SlotFillInstance = {};
-export type SlotRef = RefObject< HTMLElement >;
+export type SlotRef = RefObject< HTMLElement | null >;
 export type SlotRecord = { instance: SlotFillInstance } & (
 	| { type: 'children' }
 	| { type: 'portal'; ref: SlotRef; fillProps: FillProps }

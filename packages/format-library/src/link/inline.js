@@ -5,7 +5,7 @@ import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { Popover } from '@wordpress/components';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 import {
 	create,
 	insert,
@@ -122,7 +122,7 @@ function InlineLinkUI( {
 			...nextValue,
 		};
 
-		const newUrl = prependHTTP( nextValue.url );
+		const newUrl = prependHTTPS( nextValue.url );
 		const linkFormat = createLinkFormat( {
 			url: newUrl,
 			type: nextValue.type,

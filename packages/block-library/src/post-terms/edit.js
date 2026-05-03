@@ -1,19 +1,11 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
-	AlignmentToolbar,
 	InspectorControls,
-	BlockControls,
 	useBlockProps,
 	useBlockDisplayInformation,
 	RichText,
-	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import { Spinner, TextControl } from '@wordpress/components';
@@ -45,10 +37,8 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, textAlign, separator, prefix, suffix } = attributes;
+	const { term, separator, prefix, suffix } = attributes;
 	const { postId, postType } = context;
-	const blockEditingMode = useBlockEditingMode();
-	const showControls = blockEditingMode === 'default';
 
 	const selectedTerm = useSelect(
 		( select ) => {
@@ -68,24 +58,11 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: clsx( {
-			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term }` ]: term,
-		} ),
+		className: term && `taxonomy-${ term }`,
 	} );
 
 	return (
 		<>
-			{ showControls && (
-				<BlockControls>
-					<AlignmentToolbar
-						value={ textAlign }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { textAlign: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-			) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize

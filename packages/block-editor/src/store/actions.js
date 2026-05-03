@@ -1616,16 +1616,17 @@ export function updateSettings( settings ) {
  * Action that signals that a temporary reusable block has been saved
  * in order to switch its temporary id with the real id.
  *
- * @param {string} id        Reusable block's id.
- * @param {string} updatedId Updated block's id.
- *
- * @return {Object} Action object.
+ * @deprecated
  */
-export function __unstableSaveReusableBlock( id, updatedId ) {
+export function __unstableSaveReusableBlock() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).__unstableSaveReusableBlock',
+		{
+			since: '7.1',
+		}
+	);
 	return {
-		type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-		id,
-		updatedId,
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -1767,10 +1768,6 @@ export const insertBeforeBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const directInsertBlock = rootClientId
@@ -1810,10 +1807,6 @@ export const insertAfterBlock =
 			return;
 		}
 		const rootClientId = select.getBlockRootClientId( clientId );
-		const isLocked = select.getTemplateLock( rootClientId );
-		if ( isLocked ) {
-			return;
-		}
 
 		const blockIndex = select.getBlockIndex( clientId );
 		const directInsertBlock = rootClientId
@@ -2186,6 +2179,11 @@ export function __unstableToggleListViewPanel( clientId, isOpen ) {
 
 /**
  * Increments the List View expand revision to force re-render.
+ *
+ * This action increments a counter that is used in the ListView component's key prop.
+ * When the key changes, the component will remount with a fresh expanded state,
+ * ensuring parent blocks show their children. For example, after click-through
+ * navigation.
  *
  * @return {Object} Action object.
  */

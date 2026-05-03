@@ -106,7 +106,7 @@ function parseSourceString( sourceString, { cacheDirectoryPath } ) {
 				basename,
 			};
 		}
-	} catch ( err ) {}
+	} catch {}
 
 	const gitHubFields = sourceString.match(
 		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/

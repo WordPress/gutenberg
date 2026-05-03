@@ -29,6 +29,22 @@ import { unlock } from '../../lock-unlock';
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
 /**
+ * Safely stringifies a value for display and comparison.
+ *
+ * @param {*} value The value to stringify.
+ * @return {string} The stringified value.
+ */
+function stringifyValue( value ) {
+	if ( value === null || value === undefined ) {
+		return '';
+	}
+	if ( typeof value === 'object' ) {
+		return JSON.stringify( value, null, 2 );
+	}
+	return String( value );
+}
+
+/**
  * Calculate text similarity using word diff (semantically meaningful).
  * Returns ratio of unchanged words to total words.
  *
@@ -65,7 +81,7 @@ function pairSimilarBlocks( blocks ) {
 
 	// Separate blocks by status, tracking original indices.
 	blocks.forEach( ( block, index ) => {
-		const status = block.__revisionDiffStatus;
+		const status = block.__revisionDiffStatus?.status;
 		if ( status === 'removed' ) {
 			removed.push( { block, index } );
 		} else if ( status === 'added' ) {
@@ -120,7 +136,7 @@ function pairSimilarBlocks( blocks ) {
 			// Create modified block with previous content stored.
 			modifications.set( bestMatch.index, {
 				...bestMatch.block,
-				__revisionDiffStatus: 'modified',
+				__revisionDiffStatus: { status: 'modified' },
 				__previousRawBlock: rem.block,
 			} );
 		}
@@ -176,14 +192,14 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
 					...currentRaw[ currIdx++ ],
-					__revisionDiffStatus: 'added',
+					__revisionDiffStatus: { status: 'added' },
 				} );
 			}
 		} else if ( part.removed ) {
 			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
 					...previousRaw[ prevIdx++ ],
-					__revisionDiffStatus: 'removed',
+					__revisionDiffStatus: { status: 'removed' },
 				} );
 			}
 		} else {
@@ -481,26 +497,28 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 }
 
 /**
- * Apply rich text diff to all rich-text attributes of a block.
- * Compares each rich-text attribute between current and previous parsed blocks.
+ * Apply diffs to a modified block's attributes.
+ * - Rich-text attributes: applies inline diff formatting (ins/del marks).
+ * - Other attributes: computes word-level diffs for the sidebar panel.
  *
  * @param {Object} currentBlock  Current parsed block.
  * @param {Object} previousBlock Previous parsed block.
+ * @param {Object} diffStatus    The __revisionDiffStatus object to attach changedAttributes to.
  */
-function applyRichTextDiffToBlock( currentBlock, previousBlock ) {
+function applyDiffToBlock( currentBlock, previousBlock, diffStatus ) {
 	const blockType = getBlockType( currentBlock.name );
 	if ( ! blockType ) {
 		return;
 	}
 
-	// Find rich-text attributes and compare
+	const changedAttributes = {};
+
 	for ( const [ attrName, attrDef ] of Object.entries(
 		blockType.attributes
 	) ) {
 		if ( attrDef.source === 'rich-text' ) {
 			const currentRichText = currentBlock.attributes[ attrName ];
 			const previousRichText = previousBlock.attributes[ attrName ];
-
 			if (
 				currentRichText instanceof RichTextData &&
 				previousRichText instanceof RichTextData
@@ -510,7 +528,21 @@ function applyRichTextDiffToBlock( currentBlock, previousBlock ) {
 					previousRichText
 				);
 			}
+		} else {
+			const currStr = stringifyValue(
+				currentBlock.attributes[ attrName ]
+			);
+			const prevStr = stringifyValue(
+				previousBlock.attributes[ attrName ]
+			);
+			if ( currStr !== prevStr ) {
+				changedAttributes[ attrName ] = diffWords( prevStr, currStr );
+			}
 		}
+	}
+
+	if ( Object.keys( changedAttributes ).length > 0 ) {
+		diffStatus.changedAttributes = changedAttributes;
 	}
 }
 
@@ -525,18 +557,25 @@ function applyRichTextDiffToBlock( currentBlock, previousBlock ) {
 function applyDiffRecursively( parsedBlock, rawBlock ) {
 	// Copy diff status from raw block to parsed block.
 	if ( rawBlock.__revisionDiffStatus ) {
-		parsedBlock.__revisionDiffStatus = rawBlock.__revisionDiffStatus;
-	}
-
-	// Apply rich text diff if this block is modified and has a previous raw block.
-	if (
-		rawBlock.__revisionDiffStatus === 'modified' &&
-		rawBlock.__previousRawBlock
-	) {
-		const previousParsed = parseRawBlock( rawBlock.__previousRawBlock );
-		if ( previousParsed ) {
-			applyRichTextDiffToBlock( parsedBlock, previousParsed );
+		// Apply diffs if this block is modified and has a previous raw block.
+		if (
+			rawBlock.__revisionDiffStatus.status === 'modified' &&
+			rawBlock.__previousRawBlock
+		) {
+			const previousParsed = parseRawBlock( rawBlock.__previousRawBlock );
+			if ( previousParsed ) {
+				applyDiffToBlock(
+					parsedBlock,
+					previousParsed,
+					rawBlock.__revisionDiffStatus
+				);
+			}
 		}
+
+		parsedBlock.__revisionDiffStatus = rawBlock.__revisionDiffStatus;
+		// Also store in attributes so it survives block-editor store normalization.
+		parsedBlock.attributes.__revisionDiffStatus =
+			rawBlock.__revisionDiffStatus;
 	}
 
 	// Recursively process inner blocks.

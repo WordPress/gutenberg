@@ -26,12 +26,7 @@ function UnforwardedExternalLink(
 	const { href, children, className, rel = '', ...additionalProps } = props;
 	const optimizedRel = [
 		...new Set(
-			[
-				...rel.split( ' ' ),
-				'external',
-				'noreferrer',
-				'noopener',
-			].filter( Boolean )
+			[ ...rel.split( ' ' ), 'external', 'noopener' ].filter( Boolean )
 		),
 	].join( ' ' );
 	const classes = clsx( 'components-external-link', className );
@@ -67,7 +62,11 @@ function UnforwardedExternalLink(
 				{ children }
 			</span>
 			<span
-				className="components-external-link__icon"
+				className={ clsx(
+					'components-external-link__icon',
+					// This class prevents the arrow from being replaced by a Twemoji image.
+					'wp-exclude-emoji'
+				) }
 				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )

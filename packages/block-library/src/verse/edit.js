@@ -34,8 +34,8 @@ export default function VerseEdit( props ) {
 					content: nextContent,
 				} );
 			} }
-			aria-label={ __( 'Verse text' ) }
-			placeholder={ __( 'Write verse…' ) }
+			aria-label={ __( 'Poetry text' ) }
+			placeholder={ __( 'Write poetry…' ) }
 			onRemove={ onRemove }
 			onMerge={ mergeBlocks }
 			{ ...blockProps }

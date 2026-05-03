@@ -6,4 +6,11 @@
 		--wp-ui-button-padding-inline: 0;
 		--wp-ui-button-min-width: unset;
 	}
+
+	.icon {
+		/* Compensate for the button's 1px border so the icon extends
+			 edge-to-edge and doesn't inflate the button's dimensions
+			 (e.g. 24px icon inside a 24px-tall small button). */
+		margin: -1px;
+	}
 }

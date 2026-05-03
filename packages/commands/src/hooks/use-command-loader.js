@@ -54,6 +54,7 @@ import { store as commandsStore } from '../store';
  *                     ? record.title?.rendered
  *                     : __( '(no title)' ),
  *                 icon: page,
+ *                 category: 'edit',
  *                 callback: ( { close } ) => {
  *                     const args = {
  * 							p: '/page',
@@ -89,6 +90,7 @@ export default function useCommandLoader( loader ) {
 			name: loader.name,
 			hook: loader.hook,
 			context: loader.context,
+			category: loader.category,
 		} );
 		return () => {
 			unregisterCommandLoader( loader.name );
@@ -97,6 +99,7 @@ export default function useCommandLoader( loader ) {
 		loader.name,
 		loader.hook,
 		loader.context,
+		loader.category,
 		loader.disabled,
 		registerCommandLoader,
 		unregisterCommandLoader,

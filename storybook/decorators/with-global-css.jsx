@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { useEffect } from '@wordpress/element';
 import basicStyles from '../global-basic.scss?inline';
 import wordPressStyles from '../global-wordpress.scss?inline';
+import { useSharedStyle } from './utils/use-shared-style';
 
 /**
  * A Storybook decorator to inject global CSS.
@@ -42,12 +42,7 @@ export const WithGlobalCSS = ( Story, context ) => {
 	const { lazyStyles, externalStyles, classes } =
 		config[ context.globals.css ];
 
-	useEffect( () => {
-		const style = document.createElement( 'style' );
-		style.textContent = lazyStyles.join( '\n' );
-		document.head.appendChild( style );
-		return () => document.head.removeChild( style );
-	}, [ context.globals.css, lazyStyles ] );
+	useSharedStyle( lazyStyles.join( '\n' ) );
 
 	return (
 		<div className={ clsx( classes ) }>

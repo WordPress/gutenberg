@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
 
 const meta: Meta< typeof Stack > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
 };
@@ -21,7 +22,7 @@ type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
 	args: {
-		gap: 'sm',
+		gap: 'md',
 		children: (
 			<>
 				<DemoBox />
@@ -90,7 +91,7 @@ export const Nested: Story = {
 		children: (
 			<>
 				<DemoBox variant="lg" />
-				<Stack gap="md">
+				<Stack gap="lg">
 					<DemoBox />
 					<DemoBox />
 				</Stack>

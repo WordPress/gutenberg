@@ -15,6 +15,92 @@ import path from 'path';
 import esbuild from 'esbuild';
 
 /**
+ * Creates an esbuild plugin that redirects module loads based on filename patterns.
+ *
+ * This is useful when bundling workers for Blob URL contexts where certain
+ * ES module entry points use `import.meta.url` (which resolves to an invalid
+ * `blob:` URL at runtime). By redirecting to an alternative entry point
+ * (e.g., a CommonJS version), the issue is avoided.
+ *
+ * Packages declare redirects in their `wpWorkers` config:
+ *
+ *   "wpWorkers": {
+ *     "./worker": {
+ *       "entry": "./src/worker.ts",
+ *       "resolve": {
+ *         "vips-es6.js": "vips.js"
+ *       }
+ *     }
+ *   }
+ *
+ * @param {Object} resolveMap An object mapping source filenames to target
+ *                            filenames. When esbuild loads a file whose path
+ *                            ends with a source key, the plugin rewrites it
+ *                            to re-export from the corresponding target file
+ *                            in the same directory.
+ * @return {Object} An esbuild plugin.
+ */
+function createModuleRedirectPlugin( resolveMap ) {
+	// Build a single regex that matches any of the source filenames.
+	const escapedKeys = Object.keys( resolveMap ).map( ( key ) =>
+		key.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' )
+	);
+	const pattern = new RegExp( `(${ escapedKeys.join( '|' ) })$` );
+
+	return {
+		name: 'module-redirect',
+		setup( build ) {
+			build.onLoad( { filter: pattern }, ( args ) => {
+				// Find which key matched.
+				const matchedKey = Object.keys( resolveMap ).find( ( key ) =>
+					args.path.endsWith( key )
+				);
+				const targetPath = args.path.replace(
+					matchedKey,
+					resolveMap[ matchedKey ]
+				);
+				return {
+					contents: `export { default } from ${ JSON.stringify(
+						targetPath
+					) };`,
+					loader: 'js',
+				};
+			} );
+		},
+	};
+}
+
+/**
+ * Extracts the entry path from a wpWorkers config value.
+ *
+ * Supports both the string shorthand and the object format:
+ *   - String: "./src/worker.ts"
+ *   - Object: { "entry": "./src/worker.ts", "resolve": { ... } }
+ *
+ * @param {string|Object} workerConfig The worker configuration value.
+ * @return {string} The entry file path.
+ */
+function getWorkerEntryPath( workerConfig ) {
+	if ( typeof workerConfig === 'string' ) {
+		return workerConfig;
+	}
+	return workerConfig.entry;
+}
+
+/**
+ * Extracts the resolve map from a wpWorkers config value, if present.
+ *
+ * @param {string|Object} workerConfig The worker configuration value.
+ * @return {Object|undefined} The resolve map, or undefined if not configured.
+ */
+function getWorkerResolveMap( workerConfig ) {
+	if ( typeof workerConfig === 'string' ) {
+		return undefined;
+	}
+	return workerConfig.resolve;
+}
+
+/**
  * Generate placeholder worker-code.ts for packages with wpWorkers.
  *
  * This must run before transpilation since worker files import worker-code.ts.
@@ -78,7 +164,9 @@ export async function buildWorkers(
 			? Object.entries( packageJson.wpWorkers )
 			: [];
 
-	for ( const [ outputName, entryPath ] of workerEntries ) {
+	for ( const [ outputName, workerConfig ] of workerEntries ) {
+		const entryPath = getWorkerEntryPath( workerConfig );
+		const resolveMap = getWorkerResolveMap( workerConfig );
 		const workerEntryPoint = path.join( packageDir, entryPath );
 		const workerOutputName = outputName.replace( /^\.\//, '' );
 
@@ -98,7 +186,12 @@ export async function buildWorkers(
 					sourcemap: true,
 					// Bundle everything - workers need to be self-contained.
 					external: [],
-					plugins: [ wasmInlinePlugin ],
+					plugins: [
+						wasmInlinePlugin,
+						...( resolveMap
+							? [ createModuleRedirectPlugin( resolveMap ) ]
+							: [] ),
+					],
 					define: {
 						'process.env.NODE_ENV': JSON.stringify(
 							process.env.NODE_ENV || 'production'

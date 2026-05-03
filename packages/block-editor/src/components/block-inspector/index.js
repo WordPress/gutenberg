@@ -54,6 +54,7 @@ function StyleInspectorSlots( {
 			<InspectorControls.Slot
 				group="background"
 				label={ __( 'Background image' ) }
+				className="background-block-support-panel__inner-wrapper"
 			/>
 			<InspectorControls.Slot
 				group="typography"
@@ -334,7 +335,9 @@ const BlockInspectorSingleBlock = ( {
 			{ hasParentChildBlockCards && (
 				<BlockCard
 					{ ...parentBlockInformation }
-					className={ parentBlockInformation.isSynced && 'is-synced' }
+					className={
+						parentBlockInformation?.isSynced && 'is-synced'
+					}
 					parentClientId={ editedContentOnlySection }
 				/>
 			) }

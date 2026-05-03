@@ -10,6 +10,7 @@ import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { unlock } from '../../lock-unlock';
+import { isThemeDataLoaded } from './utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -29,8 +30,10 @@ export const navigationRoute = {
 	path: '/navigation',
 	areas: {
 		sidebar( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return null;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<SidebarNavigationScreenNavigationMenus backPath="/" />
 			) : (
 				<SidebarNavigationScreenUnsupported />
@@ -41,8 +44,10 @@ export const navigationRoute = {
 			return isBlockTheme ? <Editor /> : undefined;
 		},
 		mobile( { siteData } ) {
-			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? (
+			if ( ! isThemeDataLoaded( siteData ) ) {
+				return <></>;
+			}
+			return siteData.currentTheme.is_block_theme ? (
 				<MobileNavigationView />
 			) : (
 				<SidebarNavigationScreenUnsupported />

@@ -28,6 +28,7 @@ const getViewSiteCommand = () =>
 					name: 'core/view-site',
 					label: __( 'View site' ),
 					icon: external,
+					category: 'view',
 					callback: ( { close } ) => {
 						close();
 						window.open( homeUrl, '_blank' );
@@ -54,6 +55,7 @@ export function useAdminNavigationCommands( menuCommands ) {
 				name: menuCommand.name,
 				label,
 				searchLabel: label,
+				category: 'view',
 				callback: ( { close } ) => {
 					document.location = menuCommand.url;
 					close();

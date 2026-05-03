@@ -1,9 +1,10 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "../../../dataviews/style" as *;
 
 .dataviews-view-activity {
 	margin: 0 0 auto;
-	padding: $grid-unit-10 $grid-unit-30;
+	padding: 0 $grid-unit-30;
 
 	.dataviews-view-activity__group-header {
 		font-size: $font-size-large;
@@ -34,7 +35,7 @@
 			overflow: hidden;
 
 			&--clickable {
-				cursor: pointer;
+				cursor: var(--wpds-cursor-control);
 
 				&:focus-visible {
 					outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
@@ -103,7 +104,7 @@
 	.dataviews-view-activity__item {
 		&.is-compact {
 			.dataviews-view-activity__item-type {
-				width: $grid-unit-10;
+				width: $grid-unit-15;
 
 				&::before {
 					height: $grid-unit-15;
@@ -209,6 +210,10 @@
 			content: "";
 			background-color: $gray-300;
 		}
+	}
+
+	&.is-refreshing {
+		@include dataviews-refreshing();
 	}
 
 	& + .dataviews-pagination {

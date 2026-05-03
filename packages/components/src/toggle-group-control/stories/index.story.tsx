@@ -33,7 +33,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
@@ -90,6 +90,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };

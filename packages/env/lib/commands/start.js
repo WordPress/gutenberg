@@ -22,14 +22,15 @@ const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
  * Starts the development server.
  *
  * @param {Object}      options
- * @param {Object}      options.spinner A CLI spinner which indicates progress.
- * @param {boolean}     options.update  If true, update sources.
- * @param {string}      options.xdebug  The Xdebug mode to set.
- * @param {string}      options.spx     The SPX mode to set.
- * @param {boolean}     options.scripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean}     options.debug   True if debug mode is enabled.
- * @param {string}      options.runtime The runtime to use ('docker' or 'playground').
- * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
+ * @param {Object}      options.spinner  A CLI spinner which indicates progress.
+ * @param {boolean}     options.update   If true, update sources.
+ * @param {string}      options.xdebug   The Xdebug mode to set.
+ * @param {string}      options.spx      The SPX mode to set.
+ * @param {boolean}     options.scripts  Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.debug    True if debug mode is enabled.
+ * @param {string}      options.runtime  The runtime to use ('docker' or 'playground').
+ * @param {boolean}     options.autoPort If true, automatically find available ports when configured ports are busy.
+ * @param {string|null} options.config   Path to a custom .wp-env.json configuration file.
  */
 module.exports = async function start( {
 	spinner,
@@ -39,6 +40,7 @@ module.exports = async function start( {
 	scripts,
 	debug,
 	runtime: runtimeName = 'docker',
+	autoPort,
 	config: customConfigPath,
 } ) {
 	spinner.text = 'Reading configuration.';
@@ -50,8 +52,14 @@ module.exports = async function start( {
 		await checkForLegacyInstall( spinner );
 	}
 
-	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
+		resolvePorts: true,
+		autoPort,
+		spinner,
+	} );
 	config.debug = debug;
+	config.xdebug = xdebug;
+	config.spx = spx;
 
 	// Check if switching runtimes and prompt user to destroy old environment first.
 	const savedRuntime = await getSavedRuntime( config.workDirectoryPath );
@@ -93,10 +101,13 @@ module.exports = async function start( {
 		spinner.start();
 	}
 
-	// Display Playground limitations info
-	if ( runtimeName === 'playground' ) {
-		spinner.info(
-			'Note: Playground runtime does not support a separate tests environment. Only the development environment will be started.\n'
+	if ( config.testsEnvironment !== false ) {
+		spinner.warn(
+			'Warning: wp-env starts both development and tests environments by default.\n' +
+				'This behavior is deprecated and will be removed in a future version.\n' +
+				'To avoid this warning, add "testsEnvironment": false to your .wp-env.json.\n' +
+				'The "env", "testsPort", and "testsEnvironment" options are also deprecated.\n' +
+				'Use the --config option with a separate config file for test environments instead.\n'
 		);
 		spinner.start();
 	}
@@ -106,9 +117,6 @@ module.exports = async function start( {
 		result = await runtime.start( config, {
 			spinner,
 			update,
-			xdebug,
-			spx,
-			debug,
 		} );
 
 		// Save the runtime type after successful start.

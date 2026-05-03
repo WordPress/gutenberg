@@ -13,6 +13,36 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
+### Using Design Tokens
+
+Design tokens are delivered as CSS custom properties (e.g. `var(--wpds-color-fg-content-neutral)`). To use them, a stylesheet defining the token values must be loaded on the page.
+
+The [`ThemeProvider`](#theme-provider) component can be used to customize token values like colors and density for a specific part of your application.
+
+#### Within WordPress
+
+Stylesheets are managed on your behalf in a WordPress context, so you don't need to worry about loading them yourself.
+
+#### Outside WordPress
+
+Outside of WordPress, you will need to install and load the design tokens stylesheet to support the full range of theming capabilities:
+
+```
+npm install @wordpress/theme
+```
+
+```js
+import '@wordpress/theme/design-tokens.css';
+```
+
+This stylesheet is universal and does not have a separate RTL version.
+
+### Developer Tools
+
+For the best development experience, we recommend configuring the [build plugins](#build-plugins) and [Stylelint rules](#stylelint-plugins) provided by this package. The build plugins automatically inject fallback values into `var(--wpds-*)` references so components render correctly even when the tokens stylesheet is not yet loaded, and will raise an error if a reference does not match a known token. The Stylelint rules catch typos, unknown tokens, and other discouraged patterns during development.
+
+If you use `@wordpress/build` to build your scripts, the build plugins are already enabled by default.
+
 ### Architecture
 
 Internally, the design system uses a tiered token architecture:
@@ -52,27 +82,29 @@ Semantic tokens follow a consistent naming pattern:
 
 **Type** indicates what kind of value it represents, usually mapping to a DTCG token type.
 
-| Value       | Description                                                                    |
-| ----------- | ------------------------------------------------------------------------------ |
-| `color`     | Color values for backgrounds, foregrounds, and strokes                         |
-| `dimension` | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
-| `border`    | Border properties like radius and width                                        |
-| `elevation` | Shadow definitions for layering and depth                                      |
-| `font`      | Typography properties like family, size, and line-height                       |
+| Value        | Description                                                                    |
+| ------------ | ------------------------------------------------------------------------------ |
+| `color`      | Color values for backgrounds, foregrounds, and strokes                         |
+| `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
+| `border`     | Border properties like radius and width                                        |
+| `elevation`  | Shadow definitions for layering and depth                                      |
+| `typography` | Typography properties like font family, font size, and line-height             |
 
 **Property** is the specific design property being defined.
 
-| Value     | Description                        |
-| --------- | ---------------------------------- |
-| `bg`      | Background color                   |
-| `fg`      | Foreground color (text and icons)  |
-| `stroke`  | Border and outline color           |
-| `padding` | Internal spacing within an element |
-| `gap`     | Spacing between elements           |
-| `radius`  | Border radius for rounded corners  |
-| `width`   | Border width                       |
-| `size`    | Font size                          |
-| `family`  | Font family                        |
+| Value         | Description                        |
+| ------------- | ---------------------------------- |
+| `bg`          | Background color                   |
+| `fg`          | Foreground color (text and icons)  |
+| `stroke`      | Border and outline color           |
+| `padding`     | Internal spacing within an element |
+| `gap`         | Spacing between elements           |
+| `radius`      | Border radius for rounded corners  |
+| `width`       | Border width                       |
+| `font-size`   | Font size                          |
+| `font-family` | Font family                        |
+| `font-weight` | Font weight                        |
+| `line-height` | Line height                        |
 
 **Target** is the component or element type the token applies to.
 
@@ -87,8 +119,8 @@ Semantic tokens follow a consistent naming pattern:
 
 **Modifier** is an optional size or intensity modifier.
 
-| Value                               | Description          |
-| ----------------------------------- | -------------------- |
+| Value                                      | Description          |
+| ------------------------------------------ | -------------------- |
 | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
@@ -111,9 +143,7 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 | `warning` | Higher-severity or time-sensitive issues that require user attention but are not errors |
 | `error`   | Blocking issues, validation failures, or destructive actions                            |
 
-> [!NOTE]
-> `caution` and `warning` represent two escalation levels of non-error severity.
-> Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
+Note: `caution` and `warning` represent two escalation levels of non-error severity. Use **`caution`** for guidance or minor risks, and **`warning`** when the user must act to prevent an error.
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
@@ -152,6 +182,10 @@ The `color` prop accepts an object with the following optional properties:
 
 Both properties accept any valid CSS color value. The theme system automatically generates appropriate color ramps and determines light/dark mode based on these seed colors.
 
+The `cursor` prop accepts an object with the following optional properties:
+
+-   `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
+
 The `density` prop controls the spacing scale throughout the UI:
 
 -   `'default'`: Standard spacing for general use.
@@ -160,7 +194,7 @@ The `density` prop controls the spacing scale throughout the UI:
 
 The density setting adjusts dimension tokens like gaps and paddings to maintain consistent spacing throughout the UI. Changing the density automatically updates spacing of all components that use these tokens.
 
-When the `color` or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
+When the `color`, `cursor`, or `density` prop is omitted, the theme inherits the value from the closest parent `ThemeProvider`, or uses the default value if none is inherited.
 
 ### Nesting Providers
 
@@ -204,11 +238,13 @@ This package provides Stylelint plugins to help enforce consistent usage of desi
 {
 	"plugins": [
 		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
-		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties",
+		"@wordpress/theme/stylelint-plugins/no-token-fallback-values"
 	],
 	"rules": {
 		"plugin-wpds/no-unknown-ds-tokens": true,
-		"plugin-wpds/no-setting-wpds-custom-properties": true
+		"plugin-wpds/no-setting-wpds-custom-properties": true,
+		"plugin-wpds/no-token-fallback-values": true
 	}
 }
 ```
@@ -220,12 +256,12 @@ This rule reports an error when a CSS value references a `--wpds-*` custom prope
 ```css
 /* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
 .example {
-	color: var(--wpds-unknown-token);
+	color: var( --wpds-unknown-token );
 }
 
 /* ✓ OK */
 .example {
-	color: var(--wpds-color-fg-content-neutral);
+	color: var( --wpds-color-fg-content-neutral );
 }
 ```
 
@@ -248,6 +284,84 @@ This rule reports an error when a CSS declaration sets (defines) a custom proper
 .example {
 	--my-custom-token: red;
 }
+```
+
+### `plugin-wpds/no-token-fallback-values`
+
+This rule reports an error when a `var()` call for a `--wpds-*` token includes a manual fallback value. Fallback values for design tokens are injected automatically at build time by the [build plugins](#build-plugins), so manual fallbacks in source are redundant and can drift out of sync with the token definitions.
+
+```css
+/* ✗ Error: Do not add a fallback value for Design System token '--wpds-color-fg-content-neutral' */
+.example {
+	color: var( --wpds-color-fg-content-neutral, #1e1e1e );
+}
+
+/* ✓ OK */
+.example {
+	color: var( --wpds-color-fg-content-neutral );
+}
+
+/* ✓ OK: Non-wpds custom properties are not checked */
+.example {
+	color: var( --my-custom-color, red );
+}
+```
+
+## Build Plugins
+
+This package provides build plugins that inject fallback values into bare `var(--wpds-*)` references at build time. This ensures components render correctly even when a `ThemeProvider` or design tokens stylesheet is not present — for example, `var(--wpds-color-fg-content-neutral)` becomes `var(--wpds-color-fg-content-neutral, #1e1e1e)`.
+
+`@wordpress/build` already applies these plugins automatically when `@wordpress/theme` is installed. You only need to configure them manually for custom build setups.
+
+Three plugin variants are available, covering common build tool setups:
+
+| Export                                                        | Tool    | Scope |
+| ------------------------------------------------------------- | ------- | ----- |
+| `@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks` | PostCSS | CSS   |
+| `@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks` | esbuild | JS/TS |
+| `@wordpress/theme/vite-plugins/vite-ds-token-fallbacks`       | Vite    | JS/TS |
+
+All three plugins skip files that don't contain `--wpds-` references, so there is zero overhead on unrelated modules.
+
+### PostCSS
+
+```js
+// postcss.config.mjs
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+
+export default {
+	plugins: [ dsTokenFallbacks ],
+};
+```
+
+### esbuild
+
+```js
+import dsTokenFallbacks from '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks';
+
+await esbuild.build( {
+	plugins: [ dsTokenFallbacks ],
+	// …
+} );
+```
+
+### Vite
+
+The Vite setup uses both the Vite plugin (for JS/TS) and the PostCSS plugin (for CSS):
+
+```ts
+// vite.config.ts
+import dsTokenFallbacks from '@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks';
+import dsTokenFallbacksJs from '@wordpress/theme/vite-plugins/vite-ds-token-fallbacks';
+
+export default defineConfig( {
+	plugins: [ dsTokenFallbacksJs() ],
+	css: {
+		postcss: {
+			plugins: [ dsTokenFallbacks ],
+		},
+	},
+} );
 ```
 
 ## Contributing to this package

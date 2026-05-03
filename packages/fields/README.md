@@ -63,6 +63,10 @@ Duplicate action for BasePost.
 
 Duplicate action for TemplatePart.
 
+### excerptField
+
+Excerpt field for BasePost.
+
 ### exportPattern
 
 Export action as JSON for Pattern.
@@ -70,6 +74,10 @@ Export action as JSON for Pattern.
 ### featuredImageField
 
 Featured Image field for BasePostWithEmbeddedFeaturedMedia.
+
+### formatField
+
+Format field for BasePost.
 
 ### MediaEdit
 
@@ -99,14 +107,14 @@ _Parameters_
 -   _props.data_ `Item`: - The item being edited.
 -   _props.field_ `Object`: - The field configuration with getValue and setValue methods.
 -   _props.onChange_ `Function`: - Callback function when the media selection changes.
--   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Default `['image']`.
+-   _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
 -   _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
 -   _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
 -   _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
 
 _Returns_
 
--   `JSX.Element`: The media edit control component.
+-   `React.JSX.Element`: The media edit control component.
 
 ### MediaEditProps
 
@@ -148,6 +156,10 @@ Delete action for PostWithPermissions.
 
 Ping status field for BasePost.
 
+### postContentInfoField
+
+Post content information field for BasePost.
+
 ### PostType
 
 Undocumented declaration.
@@ -168,6 +180,10 @@ Reset action for Template and TemplatePart.
 
 Restore action for PostWithPermissions.
 
+### scheduledDateField
+
+ScheduledDate Field.
+
 ### slugField
 
 Slug field for BasePost.
@@ -175,6 +191,10 @@ Slug field for BasePost.
 ### statusField
 
 Status field for BasePost.
+
+### stickyField
+
+Sticky field for BasePost.
 
 ### templateField
 

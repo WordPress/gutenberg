@@ -51,7 +51,7 @@ interface OperatorSelectorProps {
 }
 
 interface FilterProps extends OperatorSelectorProps {
-	addFilterRef: RefObject< HTMLButtonElement >;
+	addFilterRef: RefObject< HTMLButtonElement | null >;
 	openedFilter: string | null;
 	fields: NormalizedField< any >[];
 }

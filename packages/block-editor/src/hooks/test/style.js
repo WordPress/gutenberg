@@ -25,6 +25,7 @@ describe( 'getInlineStyles', () => {
 				},
 				dimensions: {
 					minHeight: '50vh',
+					minWidth: '200px',
 				},
 				spacing: {
 					blockGap: '1em',
@@ -44,6 +45,7 @@ describe( 'getInlineStyles', () => {
 			fontSize: 10,
 			marginBottom: '15px',
 			minHeight: '50vh',
+			minWidth: '200px',
 			paddingTop: '10px',
 		} );
 	} );

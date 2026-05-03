@@ -79,6 +79,8 @@ zip --recurse-paths --no-dir-entries \
 	gutenberg.php \
 	lib \
 	packages/block-serialization-default-parser/*.php \
+	packages/icons/src/manifest.php \
+	packages/icons/src/library/*.svg \
 	post-content.php \
 	build \
 	build-module \

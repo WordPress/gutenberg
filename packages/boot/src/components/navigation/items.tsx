@@ -16,7 +16,7 @@ import type { IconType } from '../../store/types';
  *
  * @param element - The element to check
  */
-function isSvg( element: unknown ): element is JSX.Element {
+function isSvg( element: unknown ): element is React.JSX.Element {
 	return (
 		isValidElement( element ) &&
 		( element.type === SVG || element.type === 'svg' )

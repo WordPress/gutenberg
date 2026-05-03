@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-const path = require( 'path' );
-
-/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -29,7 +24,7 @@ test.describe( 'changing image size', () => {
 		requestUtils,
 	} ) => {
 		const fileName = '1024x768_e2e_test_image_size.jpeg';
-		const filePath = path.join( './test/e2e/assets', fileName );
+		const filePath = `./assets/${ fileName }`;
 
 		await admin.createNewPost();
 		const media = await requestUtils.uploadMedia( filePath );

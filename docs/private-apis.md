@@ -122,7 +122,7 @@ Private exports:
 - `PrivatePublishDateTimePicker`: version of public `PublishDateTimePicker` that has two extra props: `isCompact` and `showPopoverHeaderActions`.
 - `useSpacingSizes`
 - `useBlockDisplayTitle`
-- `__unstableBlockStyleVariationOverridesWithConfig`
+- `BlockStyleVariationOverridesWithConfig`
 - `setBackgroundStyleDefaults`
 - `sectionRootClientIdKey`
 - `__unstableCommentIconFill`
@@ -133,12 +133,14 @@ Private exports:
 Private actions:
 - `__experimentalUpdateSettings`: version of public `updateSettings` action that filters out some private/experimental settings.
 - `clearBlockRemovalPrompt`
+- `clearRequestedInspectorTab`
 - `deleteStyleOverride`
 - `ensureDefaultBlock`
 - `expandBlock`
 - `hideBlockInterface`
 - `modifyContentLockBlock`
 - `privateRemoveBlocks`
+- `requestInspectorTab`
 - `resetZoomLevel`
 - `setBlockRemovalRules`
 - `setInsertionPoint`
@@ -172,6 +174,7 @@ Private selectors:
 - `getPatternBySlug`
 - `getRegisteredInserterMediaCategories`
 - `getRemovalPromptData`
+- `getRequestedInspectorTab`
 - `getReusableBlocks`
 - `getSectionRootClientId`
 - `getStyleOverrides`

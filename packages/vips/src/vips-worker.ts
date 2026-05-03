@@ -43,7 +43,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 			type: 'application/javascript',
 		} );
 		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
+		worker = new Worker( workerBlobUrl, { type: 'module' } );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;
@@ -108,6 +108,7 @@ export async function vipsCompressImage(
  * @param type      Mime type.
  * @param resize    Resize options.
  * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
+ * @param quality   Desired quality (0-1). Defaults to 0.82.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function vipsResizeImage(
@@ -115,7 +116,8 @@ export async function vipsResizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false
+	smartCrop = false,
+	quality = 0.82
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -124,7 +126,51 @@ export async function vipsResizeImage(
 	originalHeight: number;
 } > {
 	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, smartCrop );
+	return api.resizeImage( id, buffer, type, resize, smartCrop, quality );
+}
+
+/**
+ * Resizes an image into multiple sizes in a single pass using a worker.
+ *
+ * Decodes the source once and uses copyMemory() + thumbnailImage()
+ * to avoid re-decoding for each sub-size.
+ *
+ * @param id         Item ID.
+ * @param buffer     Original file buffer.
+ * @param inputType  Input mime type.
+ * @param outputType Output mime type for all results.
+ * @param resizes    Array of resize configurations.
+ * @param smartCrop  Whether to use smart cropping.
+ * @return Array of processed results.
+ */
+export async function vipsBatchResizeImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	inputType: string,
+	outputType: string,
+	resizes: Array< {
+		resize: ImageSizeCrop;
+		quality: number;
+	} >,
+	smartCrop = false
+): Promise<
+	Array< {
+		buffer: ArrayBuffer | ArrayBufferLike;
+		width: number;
+		height: number;
+		originalWidth: number;
+		originalHeight: number;
+	} >
+> {
+	const api = getWorkerAPI();
+	return api.batchResizeImage(
+		id,
+		buffer,
+		inputType,
+		outputType,
+		resizes,
+		smartCrop
+	);
 }
 
 /**
@@ -138,6 +184,29 @@ export async function vipsHasTransparency(
 ): Promise< boolean > {
 	const api = getWorkerAPI();
 	return api.hasTransparency( buffer );
+}
+
+/**
+ * Rotates an image based on EXIF orientation using vips in a worker.
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function vipsRotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.rotateImage( id, buffer, type, orientation );
 }
 
 /**

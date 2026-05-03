@@ -19,7 +19,7 @@ The block editor introduces a modular approach to pages and posts: each piece of
 
 The block editor first became available in December 2018, and we're still hard at work refining the experience, creating more and better blocks, and laying the groundwork for the next three phases of work. The Gutenberg plugin gives you the latest version of the block editor, so you can join us in testing bleeding-edge features, start playing with blocks, and maybe get inspired to build your own.
 
-Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/)
+Check out the [Keeping up with Gutenberg Index](https://make.wordpress.org/core/handbook/references/keeping-up-with-gutenberg-index/).
 
 ## Getting Started
 

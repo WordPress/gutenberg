@@ -458,4 +458,235 @@ describe( 'Delta.diffWithCursor', () => {
 			expect( diff.ops ).toEqual( [ { retain: 3 }, { insert: 'd' } ] );
 		} );
 	} );
+
+	describe( 'emoji and surrogate pair handling', () => {
+		// Emoji like 😀 (U+1F600) are represented as surrogate pairs in UTF-16,
+		// so '😀'.length === 2 in JavaScript. The diff engine must handle these
+		// correctly without splitting surrogate pairs.
+
+		it( 'should handle diff with emoji in unchanged prefix', () => {
+			// '😀' -> '😀x' — append 'x' after emoji
+			const oldDelta = new Delta().insert( '😀' );
+			const newDelta = new Delta().insert( '😀x' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 😀 is 2 UTF-16 code units, so retain 2, insert 'x'
+			expect( diff.ops ).toEqual( [ { retain: 2 }, { insert: 'x' } ] );
+		} );
+
+		it( 'should handle diff replacing text after emoji', () => {
+			// 'a😀b' -> 'a😀c'
+			const oldDelta = new Delta().insert( 'a😀b' );
+			const newDelta = new Delta().insert( 'a😀c' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// retain 3 (a + 😀 = 1 + 2), then replace b with c
+			expect( diff.ops ).toEqual( [
+				{ retain: 3 },
+				{ insert: 'c' },
+				{ delete: 1 },
+			] );
+		} );
+
+		it( 'should handle diffWithCursor inserting text after emoji', () => {
+			// 'a😀b' -> 'a😀xb' with cursor at 4 (a=1, 😀=2, x=1)
+			const oldDelta = new Delta().insert( 'a😀b' );
+			const newDelta = new Delta().insert( 'a😀xb' );
+			const cursor = 4;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursor );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 3 }, // a(1) + 😀(2)
+				{ insert: 'x' },
+			] );
+		} );
+
+		it( 'should handle diffWithCursor inserting an emoji', () => {
+			// 'ab' -> 'a😀b' with cursor at 3 (a=1, 😀=2)
+			const oldDelta = new Delta().insert( 'ab' );
+			const newDelta = new Delta().insert( 'a😀b' );
+			const cursor = 3;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursor );
+
+			expect( diff.ops ).toEqual( [ { retain: 1 }, { insert: '😀' } ] );
+		} );
+
+		it( 'should handle diffWithCursor deleting an emoji', () => {
+			// 'a😀b' -> 'ab' with cursor at 1 (after 'a', emoji deleted)
+			const oldDelta = new Delta().insert( 'a😀b' );
+			const newDelta = new Delta().insert( 'ab' );
+			const cursor = 1;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursor );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 1 },
+				{ delete: 2 }, // 😀 is 2 UTF-16 code units
+			] );
+		} );
+
+		it( 'should handle inserting between two emoji', () => {
+			// '😀😀' -> '😀x😀' with cursor at 3 (😀=2, x=1)
+			const oldDelta = new Delta().insert( '😀😀' );
+			const newDelta = new Delta().insert( '😀x😀' );
+			const cursor = 3;
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursor );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 2 }, // first 😀
+				{ insert: 'x' },
+			] );
+		} );
+
+		it( 'should handle diff with emoji-only strings', () => {
+			// '😀🎉' -> '😀🚀🎉' — insert 🚀 between two emoji
+			const oldDelta = new Delta().insert( '😀🎉' );
+			const newDelta = new Delta().insert( '😀🚀🎉' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 2 }, // 😀
+				{ insert: '🚀' },
+			] );
+		} );
+
+		it( 'should preserve emoji when diffing identical strings', () => {
+			const oldDelta = new Delta().insert( 'Hello 😀 World' );
+			const newDelta = new Delta().insert( 'Hello 😀 World' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			expect( diff.ops ).toEqual( [] );
+		} );
+
+		it( 'should handle diff with mixed emoji and regular text changes', () => {
+			// 'Hello 😀 World' -> 'Hello 😀 Beautiful World'
+			const oldDelta = new Delta().insert( 'Hello 😀 World' );
+			const newDelta = new Delta().insert( 'Hello 😀 Beautiful World' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 'Hello 😀 ' is 6+2+1 = 9 UTF-16 code units
+			expect( diff.ops ).toEqual( [
+				{ retain: 9 },
+				{ insert: 'Beautiful ' },
+			] );
+		} );
+
+		it( 'should handle compound emoji (flag emoji)', () => {
+			// Flag emoji like 🏳️‍🌈 are compound and has .length === 6 in JavaScript
+			const oldDelta = new Delta().insert( 'a🏳️‍🌈b' );
+			const newDelta = new Delta().insert( 'a🏳️‍🌈xb' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// a(1) + 🏳️‍🌈 (6) = 7 code units to retain
+			expect( diff.ops ).toEqual( [ { retain: 7 }, { insert: 'x' } ] );
+		} );
+
+		it( 'should handle emoji with skin tone modifier', () => {
+			// 👋🏽 is base emoji + skin tone modifier, .length === 4
+			const oldDelta = new Delta().insert( 'Hi 👋🏽' );
+			const newDelta = new Delta().insert( 'Hi 👋🏽!' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 'Hi '(3) + '👋🏽'(4) = 7 code units to retain
+			expect( diff.ops ).toEqual( [ { retain: 7 }, { insert: '!' } ] );
+		} );
+	} );
+
+	describe( 'supplementary plane characters (non-emoji)', () => {
+		// Characters in the supplementary Unicode planes (U+10000+) are stored
+		// as surrogate pairs in UTF-16, so .length === 2 per character. The
+		// diff library v8 counts them as 1 grapheme cluster via Intl.Segmenter,
+		// causing the same mismatch as emoji.
+
+		it( 'should handle CJK Extension B characters (rare kanji)', () => {
+			// 𠮷 (U+20BB7) is a real kanji used in Japanese names (𠮷野家).
+			// It's in the supplementary plane: .length === 2 (surrogate pair).
+			const oldDelta = new Delta().insert( '𠮷野家' );
+			const newDelta = new Delta().insert( '𠮷野家は美味しい' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// '𠮷'(2) + '野'(1) + '家'(1) = 4 code units to retain
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: 'は美味しい' },
+			] );
+		} );
+
+		it( 'should handle diffWithCursor inserting after CJK Extension B character', () => {
+			// 'a𠮷b' -> 'a𠮷xb'
+			const oldDelta = new Delta().insert( 'a𠮷b' );
+			const newDelta = new Delta().insert( 'a𠮷xb' );
+			const cursor = 4; // a(1) + 𠮷(2) + x(1)
+
+			const diff = oldDelta.diffWithCursor( newDelta, cursor );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 3 }, // a(1) + 𠮷(2)
+				{ insert: 'x' },
+			] );
+		} );
+
+		it( 'should handle mathematical symbols from supplementary plane', () => {
+			// 𝐀 (U+1D400, Mathematical Bold Capital A) — .length === 2
+			const oldDelta = new Delta().insert( 'Let 𝐀 be a matrix' );
+			const newDelta = new Delta().insert( 'Let 𝐀 be a square matrix' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 'Let 𝐀 be a ' = L(1)+e(1)+t(1)+' '(1)+𝐀(2)+' '(1)+b(1)+e(1)+' '(1)+a(1)+' '(1) = 12
+			expect( diff.ops ).toEqual( [
+				{ retain: 12 },
+				{ insert: 'square ' },
+			] );
+		} );
+
+		it( 'should handle mixed surrogate pairs and BMP text', () => {
+			// Mix of supplementary plane characters in one string.
+			// '𠮷' (CJK Ext B, surrogate pair) + '😀' (emoji, surrogate pair)
+			const oldDelta = new Delta().insert( '𠮷😀' );
+			const newDelta = new Delta().insert( '𠮷😀!' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 𠮷(2) + 😀(2) = 4 code units
+			expect( diff.ops ).toEqual( [ { retain: 4 }, { insert: '!' } ] );
+		} );
+
+		it( 'should handle musical symbols', () => {
+			// 𝄞 (U+1D11E, Musical Symbol G Clef) — .length === 2
+			const oldDelta = new Delta().insert( 'Play 𝄞 in C' );
+			const newDelta = new Delta().insert( 'Play 𝄞 in D' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// 'Play 𝄞 in ' = P(1)+l(1)+a(1)+y(1)+' '(1)+𝄞(2)+' '(1)+i(1)+n(1)+' '(1) = 11
+			expect( diff.ops ).toEqual( [
+				{ retain: 11 },
+				{ insert: 'D' },
+				{ delete: 1 },
+			] );
+		} );
+
+		it( 'should handle ancient script characters (Egyptian hieroglyphs)', () => {
+			// 𓀀 (U+13000, Egyptian Hieroglyph A001) — .length === 2
+			const oldDelta = new Delta().insert( 'a𓀀b' );
+			const newDelta = new Delta().insert( 'a𓀀xb' );
+
+			const diff = oldDelta.diff( newDelta );
+
+			// a(1) + 𓀀(2) = 3 code units to retain
+			expect( diff.ops ).toEqual( [ { retain: 3 }, { insert: 'x' } ] );
+		} );
+	} );
 } );

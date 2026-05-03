@@ -1,7 +1,10 @@
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
-	plugins: [ 'stylelint-plugin-logical-css' ],
+	plugins: [
+		'stylelint-plugin-logical-css',
+		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+	],
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -18,10 +21,15 @@ module.exports = {
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [ '/--wp-components-color-/' ],
+				cursor: [ 'pointer' ],
 			},
 			{
-				message: ( property, value ) =>
-					`Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`,
+				message: ( property, value ) => {
+					if ( property === 'cursor' ) {
+						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					}
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+				},
 			},
 		],
 		'font-weight-notation': null,
@@ -48,10 +56,11 @@ module.exports = {
 		'scss/at-else-empty-line-before': null,
 		'scss/at-if-closing-brace-space-after': null,
 		'no-invalid-position-at-import-rule': null,
+		'plugin-wpds/no-token-fallback-values': true,
 	},
 	overrides: [
 		{
-			files: [ '**/*.module.css' ],
+			files: [ '**/*.module.{css,scss}' ],
 			rules: {
 				'function-no-unknown': [
 					true,

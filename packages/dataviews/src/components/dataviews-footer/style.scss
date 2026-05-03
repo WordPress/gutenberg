@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/z-index" as *;
+@use "../../dataviews/style" as *;
 
 .dataviews-footer {
 	position: sticky;
@@ -16,10 +17,14 @@
 	}
 
 	z-index: z-index(".dataviews-footer");
+
+	.is-refreshing {
+		@include dataviews-refreshing();
+	}
 }
 
 @container (max-width: 560px) {
-	.dataviews-footer {
+	.dataviews-footer__content {
 		flex-direction: column !important;
 
 		.dataviews-bulk-actions-footer__container {

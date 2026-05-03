@@ -22,8 +22,8 @@ import type { IconKey as DashiconIconKey } from '../dashicon/types';
 export type IconType =
 	| DashiconIconKey
 	| ComponentType< { size?: number } >
-	| ( ( props: { size?: number } ) => JSX.Element )
-	| JSX.Element;
+	| ( ( props: { size?: number } ) => React.JSX.Element )
+	| React.JSX.Element;
 
 type AdditionalProps< T > = T extends ComponentType< infer U >
 	? U

@@ -5,7 +5,6 @@ import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
 	Popover,
 	Button,
-	VisuallyHidden,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -20,13 +19,15 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { VisuallyHidden } from '@wordpress/ui';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding } from '../shared/use-entity-binding';
+import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -71,12 +72,37 @@ export function getSuggestionsQuery( type, kind ) {
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+
+	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
+
+	const { image, badges } = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding,
+		isEntityAvailable,
+	} );
+
 	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	// Stable initial value for LinkControl's uncontrolled inputValue prop.
+	// We track the search with the searchInputValueRef, then update the
+	// initialSearchValue state with the observed searchInputValueRef
+	// when mounting the LinkControl. If LinkControl becomes a fully
+	// controlled component, then we can remove this extra complexity.
+	const [ initialSearchValue, setInitialSearchValue ] = useState( '' );
+	// Tracks the live search input between renders without causing re-renders.
+	const searchInputValueRef = useRef( '' );
+	// Call this instead of setting searchInputValueRef.current and
+	// setInitialSearchValue separately, to keep both in sync.
+	const updateSearchValue = ( value ) => {
+		searchInputValueRef.current = value;
+		setInitialSearchValue( value );
+	};
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
@@ -98,11 +124,24 @@ function UnforwardedLinkUI( props, ref ) {
 			url,
 			opensInNewTab,
 			title: label && stripHTML( label ),
+			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
 			kind,
 			type,
 			id,
+			image,
+			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id ]
+		[
+			label,
+			opensInNewTab,
+			url,
+			kind,
+			type,
+			id,
+			image,
+			badges,
+			entityRecord,
+		]
 	);
 
 	const handlePageCreated = ( pageLink ) => {
@@ -111,6 +150,8 @@ function UnforwardedLinkUI( props, ref ) {
 		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
 		setShouldFocusPane( true );
+		// Clear search input value
+		updateSearchValue( '' );
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -180,6 +221,12 @@ function UnforwardedLinkUI( props, ref ) {
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
+						onInputChange={ ( value ) => {
+							// Observe the input value so we can pass the value to the page creator
+							// and restore it on back button click
+							searchInputValueRef.current = value;
+						} }
+						inputValue={ initialSearchValue }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
@@ -220,6 +267,7 @@ function UnforwardedLinkUI( props, ref ) {
 					onBack={ () => {
 						setAddingBlock( false );
 						setShouldFocusPane( addBlockButtonRef );
+						updateSearchValue( searchInputValueRef.current );
 					} }
 					onBlockInsert={ props?.onBlockInsert }
 				/>
@@ -231,9 +279,15 @@ function UnforwardedLinkUI( props, ref ) {
 					onBack={ () => {
 						setAddingPage( false );
 						setShouldFocusPane( addPageButtonRef );
+						updateSearchValue( searchInputValueRef.current );
 					} }
 					onPageCreated={ handlePageCreated }
-					initialTitle={ link?.url || '' }
+					initialTitle={
+						searchInputValueRef.current &&
+						! isURL( searchInputValueRef.current )
+							? searchInputValueRef.current
+							: ''
+					}
 				/>
 			) }
 		</Popover>

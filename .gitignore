@@ -44,6 +44,7 @@ junit.xml
 
 # Local overrides
 .wp-env.override.json
+.wp-env.test.override.json
 playwright.config.override.ts
 phpcs.xml
 phpunit.xml

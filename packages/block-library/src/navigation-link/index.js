@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
@@ -27,7 +27,23 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'list-view' ) {
+			return attributes?.label;
+		}
+
+		if ( context === 'appender' ) {
+			const type = attributes?.type || 'link';
+			return sprintf(
+				/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+				_x( 'Add %s', 'add default block type' ),
+				type
+			);
+		}
+
+		// Backwards compatibility - return label for unknown contexts
+		return attributes?.label;
+	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {

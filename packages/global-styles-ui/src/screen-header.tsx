@@ -7,22 +7,38 @@ import {
 	__experimentalSpacer as Spacer,
 	__experimentalHeading as Heading,
 	__experimentalView as View,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Navigator,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
+// @ts-expect-error: Not typed yet.
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import type { StateDefinition } from './utils';
+import { unlock } from './lock-unlock';
+
+const { StateControl } = unlock( blockEditorPrivateApis );
 
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
 	onBack?: () => void;
+	states?: StateDefinition[];
+	selectedState?: string;
+	onChangeState?: ( value: string ) => void;
 }
 
 export function ScreenHeader( {
 	title,
 	description,
 	onBack,
+	states,
+	selectedState = 'default',
+	onChangeState,
 }: ScreenHeaderProps ) {
 	return (
 		<VStack spacing={ 0 }>
@@ -37,19 +53,29 @@ export function ScreenHeader( {
 								onClick={ onBack }
 							/>
 							<Spacer>
-								<Heading
-									className="global-styles-ui-header"
-									level={ 2 }
-									size={ 13 }
+								<HStack
+									justify="space-between"
+									alignment="center"
 								>
-									{ title }
-								</Heading>
+									<Heading
+										className="global-styles-ui-header"
+										level={ 2 }
+										size={ 13 }
+									>
+										{ title }
+									</Heading>
+									<StateControl
+										states={ states }
+										value={ selectedState }
+										onChange={ onChangeState }
+									/>
+								</HStack>
 							</Spacer>
 						</HStack>
 						{ description && (
-							<Text className="global-styles-ui-header__description">
+							<WCText className="global-styles-ui-header__description">
 								{ description }
-							</Text>
+							</WCText>
 						) }
 					</VStack>
 				</Spacer>

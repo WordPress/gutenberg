@@ -26,6 +26,25 @@ import { compose } from '@wordpress/compose';
 import migrateFontFamily from '../utils/migrate-font-family';
 import migrateTextAlign from '../utils/migrate-text-align';
 
+const migrateWidth = ( attributes ) => {
+	const { width, ...otherAttributes } = attributes;
+
+	if ( ! width ) {
+		return otherAttributes;
+	}
+
+	return {
+		...otherAttributes,
+		style: {
+			...otherAttributes.style,
+			dimensions: {
+				...otherAttributes.style?.dimensions,
+				width: `${ width }%`,
+			},
+		},
+	};
+};
+
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
 	// We have to check old property `borderRadius` and if
@@ -134,6 +153,211 @@ const blockAttributes = {
 		source: 'html',
 		selector: 'a',
 	},
+};
+
+const v14 = {
+	attributes: {
+		tagName: {
+			type: 'string',
+			enum: [ 'a', 'button' ],
+			default: 'a',
+		},
+		type: {
+			type: 'string',
+			default: 'button',
+		},
+		url: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'href',
+			role: 'content',
+		},
+		title: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a,button',
+			attribute: 'title',
+			role: 'content',
+		},
+		text: {
+			type: 'rich-text',
+			source: 'rich-text',
+			selector: 'a,button',
+			role: 'content',
+		},
+		linkTarget: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'target',
+			role: 'content',
+		},
+		rel: {
+			type: 'string',
+			source: 'attribute',
+			selector: 'a',
+			attribute: 'rel',
+			role: 'content',
+		},
+		placeholder: {
+			type: 'string',
+		},
+		backgroundColor: {
+			type: 'string',
+		},
+		textColor: {
+			type: 'string',
+		},
+		gradient: {
+			type: 'string',
+		},
+		width: {
+			type: 'number',
+		},
+	},
+	supports: {
+		anchor: true,
+		splitting: true,
+		align: false,
+		alignWide: false,
+		color: {
+			__experimentalSkipSerialization: true,
+			gradients: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		typography: {
+			__experimentalSkipSerialization: [
+				'fontSize',
+				'lineHeight',
+				'textAlign',
+				'fontFamily',
+				'fontWeight',
+				'fontStyle',
+				'textTransform',
+				'textDecoration',
+				'letterSpacing',
+			],
+			fontSize: true,
+			lineHeight: true,
+			textAlign: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalWritingMode: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+			},
+		},
+		reusable: false,
+		shadow: {
+			__experimentalSkipSerialization: true,
+		},
+		spacing: {
+			__experimentalSkipSerialization: true,
+			padding: [ 'horizontal', 'vertical' ],
+			__experimentalDefaultControls: {
+				padding: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalSkipSerialization: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		interactivity: {
+			clientNavigation: true,
+		},
+	},
+	selectors: {
+		root: '.wp-block-button .wp-block-button__link',
+		typography: {
+			writingMode: '.wp-block-button',
+		},
+	},
+	save( { attributes, className } ) {
+		const {
+			tagName,
+			type,
+			fontSize,
+			linkTarget,
+			rel,
+			style,
+			text,
+			title,
+			url,
+			width,
+		} = attributes;
+
+		const TagName = tagName || 'a';
+		const isButtonTag = 'button' === TagName;
+		const buttonType = type || 'button';
+		const borderProps = getBorderClassesAndStyles( attributes );
+		const colorProps = getColorClassesAndStyles( attributes );
+		const spacingProps = getSpacingClassesAndStyles( attributes );
+		const shadowProps = getShadowClassesAndStyles( attributes );
+		const typographyProps = getTypographyClassesAndStyles( attributes );
+		const buttonClasses = clsx(
+			'wp-block-button__link',
+			colorProps.className,
+			borderProps.className,
+			typographyProps.className,
+			{
+				// For backwards compatibility add style that isn't
+				// provided via block support.
+				'no-border-radius': style?.border?.radius === 0,
+				[ `has-custom-font-size` ]:
+					fontSize || style?.typography?.fontSize,
+			},
+			__experimentalGetElementClassName( 'button' )
+		);
+		const buttonStyle = {
+			...borderProps.style,
+			...colorProps.style,
+			...spacingProps.style,
+			...shadowProps.style,
+			...typographyProps.style,
+			writingMode: undefined,
+		};
+
+		const wrapperClasses = clsx( className, {
+			[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		} );
+
+		return (
+			<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+				<RichText.Content
+					tagName={ TagName }
+					type={ isButtonTag ? buttonType : null }
+					className={ buttonClasses }
+					href={ isButtonTag ? null : url }
+					title={ title }
+					style={ buttonStyle }
+					value={ text }
+					target={ isButtonTag ? null : linkTarget }
+					rel={ isButtonTag ? null : rel }
+				/>
+			</div>
+		);
+	},
+	isEligible( attributes ) {
+		return typeof attributes.width === 'number';
+	},
+	migrate: migrateWidth,
 };
 
 const v13 = {
@@ -317,10 +541,6 @@ const v13 = {
 			writingMode: undefined,
 		};
 
-		// The use of a `title` attribute here is soft-deprecated, but still applied
-		// if it had already been assigned, for the sake of backward-compatibility.
-		// A title will no longer be assigned for new or updated button block links.
-
 		const wrapperClasses = clsx( className, {
 			[ `has-custom-width wp-block-button__width-${ width }` ]: width,
 		} );
@@ -342,9 +562,9 @@ const v13 = {
 		);
 	},
 	isEligible( attributes ) {
-		return !! attributes.textAlign;
+		return !! attributes.textAlign || typeof attributes.width === 'number';
 	},
-	migrate: migrateTextAlign,
+	migrate: compose( migrateWidth, migrateTextAlign ),
 };
 
 const v12 = {
@@ -531,6 +751,10 @@ const v12 = {
 			</div>
 		);
 	},
+	isEligible( attributes ) {
+		return typeof attributes.width === 'number';
+	},
+	migrate: migrateWidth,
 };
 
 const v11 = {
@@ -793,13 +1017,14 @@ const v10 = {
 			</div>
 		);
 	},
-	migrate: migrateFontFamily,
-	isEligible( { style } ) {
-		return style?.typography?.fontFamily;
+	migrate: compose( migrateWidth, migrateFontFamily ),
+	isEligible( { style, width } ) {
+		return style?.typography?.fontFamily || typeof width === 'number';
 	},
 };
 
 const deprecated = [
+	v14,
 	v13,
 	v12,
 	v11,
@@ -908,7 +1133,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateWidth,
+			migrateFontFamily,
+			migrateBorderRadius
+		),
 	},
 	{
 		supports: {
@@ -996,7 +1225,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateWidth,
+			migrateFontFamily,
+			migrateBorderRadius
+		),
 	},
 	{
 		supports: {
@@ -1084,7 +1317,11 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: compose( migrateFontFamily, migrateBorderRadius ),
+		migrate: compose(
+			migrateWidth,
+			migrateFontFamily,
+			migrateBorderRadius
+		),
 	},
 	{
 		supports: {
@@ -1148,7 +1385,7 @@ const deprecated = [
 				/>
 			);
 		},
-		migrate: migrateBorderRadius,
+		migrate: compose( migrateWidth, migrateBorderRadius ),
 	},
 	{
 		supports: {
@@ -1200,6 +1437,7 @@ const deprecated = [
 			!! attributes.customGradient ||
 			!! attributes.align,
 		migrate: compose(
+			migrateWidth,
 			migrateBorderRadius,
 			migrateCustomColorsAndGradients,
 			migrateAlign
@@ -1394,7 +1632,7 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( migrateWidth, oldColorsMigration ),
 		save( { attributes } ) {
 			const {
 				url,
@@ -1477,7 +1715,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( migrateWidth, oldColorsMigration ),
 	},
 	{
 		attributes: {
@@ -1511,7 +1749,7 @@ const deprecated = [
 				</div>
 			);
 		},
-		migrate: oldColorsMigration,
+		migrate: compose( migrateWidth, oldColorsMigration ),
 	},
 ];
 

@@ -17,18 +17,18 @@ test.describe( 'Dataviews List Layout', () => {
 		} );
 	} );
 
+	test.beforeEach( async ( { admin, page } ) => {
+		// Go to the pages page, as it has the list layout enabled by default.
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	} );
+
 	test.afterAll( async ( { requestUtils } ) => {
 		// Go back to the default theme.
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
 		] );
-	} );
-
-	test.beforeEach( async ( { admin, page } ) => {
-		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
 	} );
 
 	test( 'Items list is reachable via TAB', async ( { page } ) => {
@@ -155,6 +155,34 @@ test.describe( 'Dataviews List Layout', () => {
 
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect( page.getByLabel( 'Privacy Policy' ) ).toBeFocused();
+	} );
+
+	test( 'Search input retains focus while typing', async ( { page } ) => {
+		const searchBox = page.getByRole( 'searchbox', { name: 'Search' } );
+		const grid = page.getByRole( 'grid' );
+
+		// Wait for Ariakit to auto-activate the first composite item.
+		await expect( grid.locator( '[data-active-item]' ) ).toBeVisible();
+
+		// Determine which item is active so we can search for the other one,
+		// forcing the active item to be filtered out of the list.
+		const activeRow = grid.locator(
+			'[role="row"]:has([data-active-item])'
+		);
+		const activeRowText = await activeRow.textContent();
+		const searchTerm = activeRowText.includes( 'Privacy' )
+			? 'Sample'
+			: 'Privacy';
+
+		// Type a query that filters out the auto-activated item.
+		await searchBox.click();
+		await searchBox.fill( searchTerm );
+
+		// Wait for the debounced search to filter the list.
+		await expect( grid.getByRole( 'row' ) ).toHaveCount( 1 );
+
+		// Focus should still be on the search input, not stolen by the list.
+		await expect( searchBox ).toBeFocused();
 	} );
 
 	test( 'Navigates the list via UP/DOWN arrow keys from action buttons', async ( {

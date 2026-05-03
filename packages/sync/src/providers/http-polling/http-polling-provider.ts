@@ -8,7 +8,11 @@ import { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { ProviderCreator, ProviderCreatorResult } from '../../types';
+import type {
+	ConnectionStatus,
+	ProviderCreator,
+	ProviderCreatorResult,
+} from '../../types';
 import { pollingManager } from './polling-manager';
 
 export interface ProviderOptions {
@@ -18,24 +22,25 @@ export interface ProviderOptions {
 	ydoc: Y.Doc;
 }
 
-type EventTypes = Record< string, ( ...args: any[] ) => void >;
-
-interface BaseEventTypes extends EventTypes {
-	status: ( ...args: any[] ) => void;
-	synced: ( event: { synced: boolean } ) => void;
-}
+/**
+ * Event types for HttpPollingProvider.
+ * ObservableV2 expects event handlers as functions.
+ */
+type HttpPollingEvents = {
+	status: ( status: ConnectionStatus ) => void;
+};
 
 /**
  * Yjs provider that uses HTTP polling for real-time synchronization. It manages
  * document updates and awareness states through a central sync server.
  */
-class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
+class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
+	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
 	protected synced = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
-
 		this.log( 'Initializing', { room: options.room } );
 
 		this.awareness = options.awareness ?? new Awareness( options.ydoc );
@@ -48,14 +53,14 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 	public connect(): void {
 		this.log( 'Connecting' );
 
-		pollingManager.registerRoom(
-			this.options.room,
-			this.options.ydoc,
-			this.awareness,
-			this.onSync,
-			this.log
-		);
-		this.emitStatus( 'connected' );
+		pollingManager.registerRoom( {
+			room: this.options.room,
+			doc: this.options.ydoc,
+			awareness: this.awareness,
+			log: this.log,
+			onStatusChange: this.emitStatus,
+			onSync: this.onSync,
+		} );
 	}
 
 	/**
@@ -73,32 +78,61 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 		this.log( 'Disconnecting' );
 
 		pollingManager.unregisterRoom( this.options.room );
-		this.emitStatus( 'disconnected' );
+		this.emitStatus( { status: 'disconnected' } );
 	}
 
 	/**
-	 * Emit connection status.
+	 * Emit connection status, passing the full object through so that
+	 * additional fields (e.g. `willAutoRetryInMs`) are preserved for consumers.
 	 *
-	 * @param status The connection status
+	 * @param connectionStatus The connection status object
 	 */
-	protected emitStatus( status: 'connected' | 'disconnected' ): void {
-		this.emit( 'status', [ { status } ] );
-	}
+	protected emitStatus = ( connectionStatus: ConnectionStatus ): void => {
+		const { status } = connectionStatus;
+		const error =
+			status === 'disconnected' ? connectionStatus.error : undefined;
+
+		if ( this.status === status && ! error ) {
+			return;
+		}
+
+		// Only emit 'connecting' status if transitioning from 'disconnected'.
+		if ( status === 'connecting' && this.status !== 'disconnected' ) {
+			return;
+		}
+
+		this.log( 'Status change', { status, error } );
+
+		// ObservableV2 expects arguments as an array
+		this.status = status;
+		this.emit( 'status', [ connectionStatus ] );
+	};
 
 	/**
 	 * Log debug messages if debugging is enabled.
 	 *
-	 * @param message The debug message
-	 * @param debug   Additional debug information
+	 * @param message    The debug message
+	 * @param debug      Additional debug information
+	 * @param errorLevel The console method to use for logging
+	 * @param force      Whether to force logging regardless of debug setting
 	 */
-	protected log = ( message: string, debug: object = {} ): void => {
-		if ( this.options.debug ) {
-			// eslint-disable-next-line no-console
-			console.log( `[${ this.constructor.name }]: ${ message }`, {
-				room: this.options.room,
-				...debug,
-			} );
+	protected log = (
+		message: string,
+		debug: object = {},
+		errorLevel: 'log' | 'warn' | 'error' = 'log',
+		force = false
+	): void => {
+		if ( ! this.options.debug && ! force ) {
+			return;
 		}
+
+		// eslint-disable-next-line no-console
+		const logFn = console[ errorLevel ] || console.log;
+
+		logFn( `[${ this.constructor.name }]: ${ message }`, {
+			room: this.options.room,
+			...debug,
+		} );
 	};
 
 	/**
@@ -108,7 +142,6 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 		if ( ! this.synced ) {
 			this.synced = true;
 			this.log( 'Synced' );
-			this.emit( 'synced', [ { synced: true } ] );
 		}
 	};
 }
@@ -134,6 +167,11 @@ export function createHttpPollingProvider(): ProviderCreator {
 
 		return {
 			destroy: () => provider.destroy(),
+			// Adapter: ObservableV2.on is compatible with ProviderOn
+			// The callback receives data as the first parameter
+			on: ( event, callback ) => {
+				provider.on( event, callback );
+			},
 		};
 	};
 }

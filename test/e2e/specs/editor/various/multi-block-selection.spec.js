@@ -1372,6 +1372,31 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
 	} );
+
+	test( 'should select all with formatting', async ( {
+		pageUtils,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>a</strong>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>b</strong>' },
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
 } );
 
 class MultiBlockSelectionUtils {
@@ -1441,6 +1466,7 @@ class MultiBlockSelectionUtils {
 		const endBlock = this.#editor.canvas.locator(
 			`[data-block="${ selectionEnd }"]`
 		);
+		/* eslint-disable playwright/no-standalone-expect */
 
 		expect(
 			await selection.evaluate( ( _selection ) => _selection.rangeCount ),
@@ -1490,5 +1516,6 @@ class MultiBlockSelectionUtils {
 				'Expected selection to start and end in the selected block'
 			).toBe( true );
 		}
+		/* eslint-enable playwright/no-standalone-expect */
 	};
 }

@@ -16,7 +16,7 @@ export type DraggableProps = {
 		 * `onDragEnd` handler.
 		 */
 		onDraggableEnd: ( event: DragEvent ) => void;
-	} ) => JSX.Element | null;
+	} ) => React.JSX.Element | null;
 	/**
 	 * Whether to append the cloned element to the `ownerDocument` body.
 	 * By default, elements sourced by id are appended to the element's wrapper.

@@ -72,5 +72,5 @@ export type SuffixItemProps = Pick<
 	SearchControlProps,
 	'value' | 'onChange' | 'onClose'
 > & {
-	searchRef: React.RefObject< HTMLInputElement >;
+	searchRef: React.RefObject< HTMLInputElement | null >;
 };

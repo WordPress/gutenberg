@@ -16,7 +16,7 @@ import { safeHTML } from '@wordpress/dom';
  * @param {Object} props.wrapperProps - The props to merge with the root element.
  *                                    className and style are merged with the parsed HTML attributes.
  * @param {string} props.html         - The HTML content to render.
- * @return {JSX.Element} The rendered React elements.
+ * @return {React.JSX.Element} The rendered React elements.
  */
 const HtmlRenderer = ( { wrapperProps = {}, html = '' } ) => {
 	const options = {

@@ -14,7 +14,6 @@ export type CollaboratorInfo = Pick<
 	'id' | 'name' | 'slug' | 'avatar_urls'
 > & {
 	browserType: string;
-	color: string;
 	enteredAt: number;
 };
 
@@ -31,7 +30,7 @@ export interface BaseState {
  * The editor state includes information about the collaborator's current selection.
  */
 export interface EditorState {
-	selection: SelectionState;
+	selection?: SelectionState;
 }
 
 /**
@@ -95,3 +94,9 @@ export type EqualityFieldCheck< State, FieldName extends keyof State > = (
 	value1?: State[ FieldName ],
 	value2?: State[ FieldName ]
 ) => boolean;
+
+export interface PostSaveEvent {
+	savedAt: number;
+	savedByClientId: number;
+	postStatus: string | undefined;
+}

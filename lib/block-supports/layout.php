@@ -6,6 +6,35 @@
  */
 
 /**
+ * Get the first style variation name from a className string that matches a registered style.
+ *
+ * @param string                              $class_name        CSS class string for a block.
+ * @param array<string, array<string, mixed>> $registered_styles Currently registered block styles.
+ * @return string|null The name of the first registered variation, or null if none found.
+ */
+function gutenberg_get_block_style_variation_name_from_registered_style( string $class_name, array $registered_styles = array() ): ?string {
+	if ( ! $class_name ) {
+		return null;
+	}
+
+	$registered_names = array_filter( array_column( $registered_styles, 'name' ) );
+
+	$prefix = 'is-style-';
+	$length = strlen( $prefix );
+
+	foreach ( explode( ' ', $class_name ) as $class ) {
+		if ( str_starts_with( $class, $prefix ) ) {
+			$variation = substr( $class, $length );
+			if ( 'default' !== $variation && in_array( $variation, $registered_names, true ) ) {
+				return $variation;
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
  * Returns layout definitions, keyed by layout type.
  *
  * Provides a common definition of slugs, classnames, base styles, and spacing styles for each layout type.
@@ -898,12 +927,26 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		$has_block_gap_support = isset( $block_gap );
 
 		// Get default blockGap value from global styles for use in layouts like grid.
-		// Check block-specific styles first, then fall back to root styles.
+		// Check style variation first, then block-specific styles, then fall back to root styles.
 		$block_name = $block['blockName'] ?? '';
 		if ( null === $global_styles ) {
 			$global_styles = gutenberg_get_global_styles();
 		}
-		$global_block_gap_value = $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? ( $global_styles['spacing']['blockGap'] ?? null );
+
+		// Check if the block has an active style variation with a blockGap value.
+		// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
+		$variation_block_gap_value = null;
+		$block_class_name          = $block['attrs']['className'] ?? '';
+		if ( $block_class_name && str_contains( $block_class_name, 'is-style-' ) && $block_name ) {
+			$styles_registry   = WP_Block_Styles_Registry::get_instance();
+			$registered_styles = $styles_registry->get_registered_styles_for_block( $block_name );
+			$variation_name    = gutenberg_get_block_style_variation_name_from_registered_style( $block_class_name, $registered_styles );
+			if ( $variation_name ) {
+				$variation_block_gap_value = $global_styles['blocks'][ $block_name ]['variations'][ $variation_name ]['spacing']['blockGap'] ?? null;
+			}
+		}
+
+		$global_block_gap_value = $variation_block_gap_value ?? $global_styles['blocks'][ $block_name ]['spacing']['blockGap'] ?? $global_styles['spacing']['blockGap'] ?? null;
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
@@ -1007,10 +1050,29 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$first_chunk                 = $block['innerContent'][0] ?? null;
 	if ( is_string( $first_chunk ) && count( $block['innerContent'] ) > 1 ) {
 		$first_chunk_processor = new WP_HTML_Tag_Processor( $first_chunk );
-		while ( $first_chunk_processor->next_tag() ) {
-			$class_attribute = $first_chunk_processor->get_attribute( 'class' );
+		/*
+		 * Use a stack to track open elements as tags are visited. Void elements
+		 * (those without a matching closing tag) are excluded so they don't
+		 * accumulate on the stack. At the end of the chunk, every element still
+		 * on the stack is unclosed — meaning its closing tag lives in a later
+		 * innerContent entry alongside the inner blocks, which makes it the
+		 * inner-block container. Elements that open and close within this chunk
+		 * are siblings that precede the inner blocks and should be ignored.
+		 * The last unclosed element with a class attribute is the best candidate
+		 * for the inner-block wrapper.
+		 */
+		$tag_stack = array();
+		while ( $first_chunk_processor->next_tag( array( 'tag_closers' => 'visit' ) ) ) {
+			if ( $first_chunk_processor->is_tag_closer() ) {
+				array_pop( $tag_stack );
+			} elseif ( ! WP_HTML_Processor::is_void( $first_chunk_processor->get_tag() ) ) {
+				$tag_stack[] = $first_chunk_processor->get_attribute( 'class' );
+			}
+		}
+		foreach ( array_reverse( $tag_stack ) as $class_attribute ) {
 			if ( is_string( $class_attribute ) && ! empty( $class_attribute ) ) {
 				$inner_block_wrapper_classes = $class_attribute;
+				break;
 			}
 		}
 	}

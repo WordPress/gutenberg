@@ -88,6 +88,8 @@ function getMounts(
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
+	const testsEnabled = config.testsEnvironment !== false;
+
 	// Since we are mounting files from the host operating system
 	// we want to create the host user in some of our containers.
 	// This ensures ownership parity and lets us access files
@@ -99,12 +101,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.development,
 		hostUser.name
 	);
-	const testsMounts = getMounts(
-		config.workDirectoryPath,
-		config.env.tests,
-		hostUser.name,
-		'tests-wordpress'
-	);
+	const testsMounts = testsEnabled
+		? getMounts(
+				config.workDirectoryPath,
+				config.env.tests,
+				hostUser.name,
+				'tests-wordpress'
+		  )
+		: [];
 
 	// We use a custom Dockerfile in order to make sure that
 	// the current host user exists inside the container.
@@ -135,6 +139,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 	//
 	// https://github.com/WordPress/gutenberg/issues/21164
 	if (
+		testsEnabled &&
 		config.env.development.coreSource &&
 		hasSameCoreSource( [ config.env.development, config.env.tests ] )
 	) {
@@ -169,16 +174,9 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
 		config.env.development.mysqlPort ?? ''
 	}}:3306`;
-	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
-	const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
-		config.env.tests.mysqlPort ?? ''
-	}}:3306`;
 
 	const developmentPhpmyadminPorts = `\${WP_ENV_PHPMYADMIN_PORT:-${
 		config.env.development.phpmyadminPort ?? ''
-	}}:80`;
-	const testsPhpmyadminPorts = `\${WP_ENV_TESTS_PHPMYADMIN_PORT:-${
-		config.env.tests.phpmyadminPort ?? ''
 	}}:80`;
 
 	// MySQL healthcheck using MariaDB's official healthcheck.sh script.
@@ -194,140 +192,154 @@ module.exports = function buildDockerComposeConfig( config ) {
 		start_period: '60s',
 	};
 
-	return {
-		services: {
-			mysql: {
-				image: 'mariadb:lts',
-				ports: [ developmentMysqlPorts ],
-				environment: {
-					MYSQL_ROOT_HOST: '%',
-					MYSQL_ROOT_PASSWORD:
-						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
-					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
-					// Ensures healthcheck user is created for existing installations.
-					MARIADB_AUTO_UPGRADE: '1',
-				},
-				volumes: [ 'mysql:/var/lib/mysql' ],
-				healthcheck: mysqlHealthcheck,
+	// Build the services object, conditionally including tests services.
+	const services = {
+		mysql: {
+			image: 'mariadb:lts',
+			ports: [ developmentMysqlPorts ],
+			environment: {
+				MYSQL_ROOT_HOST: '%',
+				MYSQL_ROOT_PASSWORD: dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+				MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
+				// Ensures healthcheck user is created for existing installations.
+				MARIADB_AUTO_UPGRADE: '1',
 			},
-			'tests-mysql': {
-				image: 'mariadb:lts',
-				ports: [ testsMysqlPorts ],
-				environment: {
-					MYSQL_ROOT_HOST: '%',
-					MYSQL_ROOT_PASSWORD:
-						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
-					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
-					// Ensures healthcheck user is created for existing installations.
-					MARIADB_AUTO_UPGRADE: '1',
-				},
-				volumes: [ 'mysql-test:/var/lib/mysql' ],
-				healthcheck: mysqlHealthcheck,
-			},
-			wordpress: {
-				depends_on: {
-					mysql: {
-						condition: 'service_healthy',
-					},
-				},
-				build: {
-					context: '.',
-					dockerfile: 'WordPress.Dockerfile',
-					args: imageBuildArgs,
-				},
-				ports: [ developmentPorts ],
-				environment: {
-					APACHE_RUN_USER: '#' + hostUser.uid,
-					APACHE_RUN_GROUP: '#' + hostUser.gid,
-					...dbEnv.credentials,
-					...dbEnv.development,
-					WP_TESTS_DIR: '/wordpress-phpunit',
-				},
-				volumes: developmentMounts,
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
-			'tests-wordpress': {
-				depends_on: {
-					'tests-mysql': {
-						condition: 'service_healthy',
-					},
-				},
-				build: {
-					context: '.',
-					dockerfile: 'Tests-WordPress.Dockerfile',
-					args: imageBuildArgs,
-				},
-				ports: [ testsPorts ],
-				environment: {
-					APACHE_RUN_USER: '#' + hostUser.uid,
-					APACHE_RUN_GROUP: '#' + hostUser.gid,
-					...dbEnv.credentials,
-					...dbEnv.tests,
-					WP_TESTS_DIR: '/wordpress-phpunit',
-				},
-				volumes: testsMounts,
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
-			cli: {
-				depends_on: [ 'wordpress' ],
-				build: {
-					context: '.',
-					dockerfile: 'CLI.Dockerfile',
-					args: imageBuildArgs,
-				},
-				volumes: developmentMounts,
-				user: hostUser.fullUser,
-				environment: {
-					...dbEnv.credentials,
-					...dbEnv.development,
-					WP_TESTS_DIR: '/wordpress-phpunit',
-				},
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
-			'tests-cli': {
-				depends_on: [ 'tests-wordpress' ],
-				build: {
-					context: '.',
-					dockerfile: 'Tests-CLI.Dockerfile',
-					args: imageBuildArgs,
-				},
-				volumes: testsMounts,
-				user: hostUser.fullUser,
-				environment: {
-					...dbEnv.credentials,
-					...dbEnv.tests,
-					WP_TESTS_DIR: '/wordpress-phpunit',
-				},
-				extra_hosts: [ 'host.docker.internal:host-gateway' ],
-			},
-			phpmyadmin: {
-				image: 'phpmyadmin',
-				ports: [ developmentPhpmyadminPorts ],
-				environment: {
-					PMA_PORT: 3306,
-					PMA_HOST: 'mysql',
-					PMA_USER: 'root',
-					PMA_PASSWORD: 'password',
-				},
-			},
-			'tests-phpmyadmin': {
-				image: 'phpmyadmin',
-				ports: [ testsPhpmyadminPorts ],
-				environment: {
-					PMA_PORT: 3306,
-					PMA_HOST: 'tests-mysql',
-					PMA_USER: 'root',
-					PMA_PASSWORD: 'password',
-				},
-			},
+			volumes: [ 'mysql:/var/lib/mysql' ],
+			healthcheck: mysqlHealthcheck,
 		},
-		volumes: {
-			...( ! config.env.development.coreSource && { wordpress: {} } ),
-			...( ! config.env.tests.coreSource && { 'tests-wordpress': {} } ),
-			mysql: {},
-			'mysql-test': {},
-			'user-home': {},
-			'tests-user-home': {},
+		wordpress: {
+			depends_on: {
+				mysql: {
+					condition: 'service_healthy',
+				},
+			},
+			build: {
+				context: '.',
+				dockerfile: 'WordPress.Dockerfile',
+				args: imageBuildArgs,
+			},
+			ports: [ developmentPorts ],
+			environment: {
+				APACHE_RUN_USER: '#' + hostUser.uid,
+				APACHE_RUN_GROUP: '#' + hostUser.gid,
+				...dbEnv.credentials,
+				...dbEnv.development,
+				WP_TESTS_DIR: '/wordpress-phpunit',
+			},
+			volumes: developmentMounts,
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		},
+		cli: {
+			depends_on: [ 'wordpress' ],
+			build: {
+				context: '.',
+				dockerfile: 'CLI.Dockerfile',
+				args: imageBuildArgs,
+			},
+			volumes: developmentMounts,
+			user: hostUser.fullUser,
+			environment: {
+				...dbEnv.credentials,
+				...dbEnv.development,
+				WP_TESTS_DIR: '/wordpress-phpunit',
+			},
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		},
+		phpmyadmin: {
+			image: 'phpmyadmin',
+			ports: [ developmentPhpmyadminPorts ],
+			environment: {
+				PMA_PORT: 3306,
+				PMA_HOST: 'mysql',
+				PMA_USER: 'root',
+				PMA_PASSWORD: 'password',
+			},
 		},
 	};
+
+	const volumes = {
+		...( ! config.env.development.coreSource && { wordpress: {} } ),
+		mysql: {},
+		'user-home': {},
+	};
+
+	if ( testsEnabled ) {
+		const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
+		const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
+			config.env.tests.mysqlPort ?? ''
+		}}:3306`;
+		const testsPhpmyadminPorts = `\${WP_ENV_TESTS_PHPMYADMIN_PORT:-${
+			config.env.tests.phpmyadminPort ?? ''
+		}}:80`;
+
+		services[ 'tests-mysql' ] = {
+			image: 'mariadb:lts',
+			ports: [ testsMysqlPorts ],
+			environment: {
+				MYSQL_ROOT_HOST: '%',
+				MYSQL_ROOT_PASSWORD: dbEnv.credentials.WORDPRESS_DB_PASSWORD,
+				MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
+				// Ensures healthcheck user is created for existing installations.
+				MARIADB_AUTO_UPGRADE: '1',
+			},
+			volumes: [ 'mysql-test:/var/lib/mysql' ],
+			healthcheck: mysqlHealthcheck,
+		};
+		services[ 'tests-wordpress' ] = {
+			depends_on: {
+				'tests-mysql': {
+					condition: 'service_healthy',
+				},
+			},
+			build: {
+				context: '.',
+				dockerfile: 'Tests-WordPress.Dockerfile',
+				args: imageBuildArgs,
+			},
+			ports: [ testsPorts ],
+			environment: {
+				APACHE_RUN_USER: '#' + hostUser.uid,
+				APACHE_RUN_GROUP: '#' + hostUser.gid,
+				...dbEnv.credentials,
+				...dbEnv.tests,
+				WP_TESTS_DIR: '/wordpress-phpunit',
+			},
+			volumes: testsMounts,
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		};
+		services[ 'tests-cli' ] = {
+			depends_on: [ 'tests-wordpress' ],
+			build: {
+				context: '.',
+				dockerfile: 'Tests-CLI.Dockerfile',
+				args: imageBuildArgs,
+			},
+			volumes: testsMounts,
+			user: hostUser.fullUser,
+			environment: {
+				...dbEnv.credentials,
+				...dbEnv.tests,
+				WP_TESTS_DIR: '/wordpress-phpunit',
+			},
+			extra_hosts: [ 'host.docker.internal:host-gateway' ],
+		};
+		services[ 'tests-phpmyadmin' ] = {
+			image: 'phpmyadmin',
+			ports: [ testsPhpmyadminPorts ],
+			environment: {
+				PMA_PORT: 3306,
+				PMA_HOST: 'tests-mysql',
+				PMA_USER: 'root',
+				PMA_PASSWORD: 'password',
+			},
+		};
+
+		if ( ! config.env.tests.coreSource ) {
+			volumes[ 'tests-wordpress' ] = {};
+		}
+		volumes[ 'mysql-test' ] = {};
+		volumes[ 'tests-user-home' ] = {};
+	}
+
+	return { services, volumes };
 };
