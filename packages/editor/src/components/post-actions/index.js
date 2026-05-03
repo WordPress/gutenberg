@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -12,6 +12,7 @@ import {
 import { Dialog, VisuallyHidden } from '@wordpress/ui';
 import { moreVertical } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -20,6 +21,9 @@ import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
 
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
+
+const FIRST_INPUT_SELECTOR =
+	'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])';
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const { item, permissions } = useSelect(
@@ -77,16 +81,20 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 	);
 }
 
-// From now on all the functions on this file are copied as from the dataviews packages,
-// The editor packages should not be using the dataviews packages directly,
-// and the dataviews package should not be using the editor packages directly,
-// so duplicating the code here seems like the least bad option.
+// The remaining helpers in this file (`DropdownMenuItemTrigger`,
+// `ModalActionMenuItem`, `ActionModal`, `ActionsDropdownMenuGroup`,
+// `mapModalSize`, `useMapFocusOnMount`) are intentionally duplicated from
+// `@wordpress/dataviews` (`packages/dataviews/src/components/dataviews-item-actions/`
+// and `packages/dataviews/src/hooks/use-map-focus-on-mount.ts`). The editor
+// package can't depend on dataviews and dataviews can't depend on the editor,
+// so duplication is the least-bad option until the action-modal API is
+// extracted to a neutral package — a tracked follow-up on the parent PR.
 
 function DropdownMenuItemTrigger( { action, onClick, items } ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
-		<Menu.Item onClick={ onClick }>
+		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
 			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
@@ -108,7 +116,10 @@ function ModalActionMenuItem( { action, items } ) {
 			onOpenChange={ setOpen }
 			disablePointerDismissal={ action.hideModalHeader }
 		>
-			<Menu.Item render={ <Dialog.Trigger /> }>
+			<Menu.Item
+				disabled={ action.disabled }
+				render={ <Dialog.Trigger /> }
+			>
 				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
 			</Menu.Item>
 			<ActionModal
@@ -120,10 +131,60 @@ function ModalActionMenuItem( { action, items } ) {
 	);
 }
 
+// Mirrors `mapModalSize` in `@wordpress/dataviews` — translates the public
+// `action.modalSize` value (including the deprecated `'fill'`) into the
+// `Dialog.Popup` size prop.
+function mapModalSize( size ) {
+	if ( size === 'fill' ) {
+		deprecated( "modalSize: 'fill'", {
+			since: '15.0.0',
+			alternative: "'stretch'",
+		} );
+		return 'stretch';
+	}
+	return size ?? 'medium';
+}
+
+// Mirrors `useMapFocusOnMount` in `@wordpress/dataviews` — translates the
+// legacy `action.modalFocusOnMount` values onto Base UI's `initialFocus`
+// prop. Smart-default behavior (skip the close icon, focus the first
+// content tabbable) covers `'firstElement'` and `'firstContentElement'`;
+// `'firstInputElement'` resolves to the first focusable input/select/textarea
+// inside `contentRef`.
+function useMapFocusOnMount( focusOnMount, contentRef ) {
+	const focusFirstInput = useCallback( () => {
+		if ( contentRef.current ) {
+			const target =
+				contentRef.current.querySelector( FIRST_INPUT_SELECTOR );
+			if ( target ) {
+				return target;
+			}
+		}
+		return true;
+	}, [ contentRef ] );
+
+	if ( focusOnMount === false ) {
+		return false;
+	}
+	if ( focusOnMount === 'firstInputElement' ) {
+		return focusFirstInput;
+	}
+	return true;
+}
+
 // Renders the popup half of a post-actions modal. Must be wrapped in a
 // `<Dialog.Root>` that owns the open lifecycle (paired with
 // `<Dialog.Trigger>` at the call site, e.g. `ModalActionMenuItem`).
+//
+// Mirrors `ActionModal` in `@wordpress/dataviews` — see comment block
+// above `DropdownMenuItemTrigger` for the duplication rationale.
 export function ActionModal( { action, items, closeModal } ) {
+	const contentRef = useRef( null );
+	const initialFocus = useMapFocusOnMount(
+		action.modalFocusOnMount ?? true,
+		contentRef
+	);
+
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	const modalHeader =
@@ -133,11 +194,12 @@ export function ActionModal( { action, items, closeModal } ) {
 	const title = modalHeader || label;
 	return (
 		<Dialog.Popup
-			size="medium"
+			size={ mapModalSize( action.modalSize ) }
 			className={ `editor-action-modal editor-action-modal__${ kebabCase(
 				action.id
 			) }` }
 			portal={ <Dialog.Portal className="editor-action-modal__portal" /> }
+			initialFocus={ initialFocus }
 			{ ...( action.hideModalHeader && {
 				role: 'alertdialog',
 			} ) }
@@ -152,7 +214,7 @@ export function ActionModal( { action, items, closeModal } ) {
 					<Dialog.CloseIcon />
 				</Dialog.Header>
 			) }
-			<Dialog.Content>
+			<Dialog.Content ref={ contentRef }>
 				<action.RenderModal items={ items } closeModal={ closeModal } />
 			</Dialog.Content>
 		</Dialog.Popup>
