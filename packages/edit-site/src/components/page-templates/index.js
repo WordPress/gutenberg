@@ -371,8 +371,14 @@ export default function PageTemplates() {
 							// Clear the cached template only after the exit
 							// animation finishes — keeps the modal contents
 							// rendered while the dialog slides out so the
-							// inner DataForm doesn't flash empty.
-							setSelectedRegisteredTemplate( false );
+							// inner DataForm doesn't flash empty. The
+							// functional setter guards against a stale
+							// "complete" callback firing after the user has
+							// already re-opened the dialog with a different
+							// template (mid-animation re-open race).
+							setSelectedRegisteredTemplate( ( prev ) =>
+								isDuplicateOpen ? prev : false
+							);
 						}
 					} }
 				>
@@ -383,7 +389,14 @@ export default function PageTemplates() {
 						</Dialog.Header>
 						<Dialog.Content>
 							{ selectedRegisteredTemplate && (
+								// Keying on the template id ensures the
+								// RenderModal remounts with a fresh internal
+								// `useState` initializer if the user clicks a
+								// different row while the dialog is still
+								// closing — otherwise the previous template's
+								// title would persist into the new session.
 								<duplicateAction.RenderModal
+									key={ selectedRegisteredTemplate.id }
 									items={ [ selectedRegisteredTemplate ] }
 									closeModal={ () =>
 										setIsDuplicateOpen( false )
