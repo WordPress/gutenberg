@@ -78,7 +78,7 @@ const pct = getSourceRegionPercent( state, { width: naturalWidth, height: natura
 
 ## Architecture overview
 
-```
+```text
 Consumer (plugin/theme/AI agent)
     |
     v
@@ -399,7 +399,7 @@ The `Cropper` component provides two notification mechanisms:
 
 The component uses BEM-style CSS classes that themes can override:
 
-```
+```text
 .wp-media-editor-image-editor                -- Container (cursor: grab)
 .wp-media-editor-image-editor--dragging      -- Applied during image pan drag (cursor: grabbing)
 .wp-media-editor-image-editor__image         -- The image element
@@ -525,6 +525,7 @@ The package is designed to be one step in a broader image editing pipeline. Key 
 ### Crop as a step (Google Photos style)
 
 The state is external and serializable. You can:
+
 1. Mount the Cropper, let the user crop
 2. Snapshot `state` (it's a plain object)
 3. Switch to a brightness/color tab (unmount Cropper, the state persists)
@@ -687,6 +688,7 @@ function ImageEditorWithUndo( { src }: { src: string } ) {
 The cropper is keyboard-accessible and screen-reader friendly:
 
 **Keyboard controls:**
+
 - **Arrow keys** on the container: pan the image (Shift for larger jumps)
 - **+/-** on the container: zoom in/out
 - **R** on the container: snap rotate 90°
@@ -694,11 +696,13 @@ The cropper is keyboard-accessible and screen-reader friendly:
 - Aspect ratio lock is respected during keyboard resize
 
 **Screen reader support:**
+
 - Container is a focusable `role="group"` with `aria-label="Image editor"`. We deliberately avoid `role="application"` because it disables the screen reader's default keybindings — too heavy for a single widget.
 - Resize handles are native `<button>` elements with descriptive `aria-label` (e.g., "Resize top-left corner"). Native buttons give correct focus behavior and announcements without extra ARIA.
 - An ARIA live region announces state changes (zoom, rotation, crop dimensions) with 300ms debounce.
 
 **For theme/plugin developers:**
+
 - Custom stencils should preserve `tabIndex`, `role`, and `aria-*` attributes on interactive elements
 - Use `aria-live="polite"` for any custom state announcements
 - Ensure custom overlays don't trap keyboard focus
@@ -736,6 +740,7 @@ npx playwright test test/storybook-playwright/specs/image-editor.spec.ts --updat
 ### What the tests cover
 
 **Export matrix verification** (`core/export/test/canvas-renderer.ts`):
+
 - Identity state produces a 1:1 scale mapping with no rotation components
 - 90-degree rotation encodes rotation in the off-diagonal matrix values (a,d near zero; b,c non-zero with opposite signs)
 - Zoom 2x doubles the scale components relative to zoom 1x
@@ -743,11 +748,13 @@ npx playwright test test/storybook-playwright/specs/image-editor.spec.ts --updat
 - `applyToCanvas` creates a canvas with correct dimensions and calls `setTransform`
 
 **Containment invariant** (`core/test/camera.ts`):
+
 - Verifies the image fully covers the crop area across multiple rotation and zoom combinations
 - Tests `restrictPanZoom` and `restrictCropRect` boundary enforcement
 - Run after any changes to camera restriction logic
 
 **Visual regression** (`test/storybook-playwright/specs/image-editor.spec.ts`):
+
 - Screenshots the Default and WithControls stories
 - Catches unintended visual changes to the cropper UI
 

@@ -84,7 +84,8 @@ export type CropPixelRectViolation =
 	| 'width-too-small'
 	| 'width-too-large'
 	| 'height-too-small'
-	| 'height-too-large';
+	| 'height-too-large'
+	| 'precision-clamped';
 
 export interface CropPixelRectValidationResult {
 	isValid: boolean;
@@ -429,8 +430,12 @@ export function validateCropPixelRect(
 		isClose( candidate.width, clamped.width ) &&
 		isClose( candidate.height, clamped.height );
 
+	if ( ! matchesClamped && violations.size === 0 ) {
+		violations.add( 'precision-clamped' );
+	}
+
 	return {
-		isValid: violations.size === 0 && matchesClamped,
+		isValid: violations.size === 0,
 		rect: clamped,
 		violations: Array.from( violations ),
 	};

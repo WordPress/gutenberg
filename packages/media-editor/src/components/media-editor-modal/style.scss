@@ -26,25 +26,12 @@
 	flex-direction: column;
 }
 
-// The Advanced panel is a PanelBody nested inside the already-padded
-// `.media-editor-modal__panel`. Pull it flush to the panel edges so the
-// toggle button spans the full width, then re-apply horizontal padding
-// inside the content area.
-.media-editor-crop-advanced-panel.components-panel__body {
+// The Advanced panel is nested inside the already-padded
+// `.media-editor-modal__panel`. Pull its root flush to the panel edges
+// while relying on PanelBody's own content padding.
+.media-editor-crop-advanced-panel {
 	margin-left: -$grid-unit-20;
 	margin-right: -$grid-unit-20;
-
-	.components-panel__body-title {
-		button.components-panel__body-toggle {
-			padding-left: $grid-unit-20;
-			padding-right: $grid-unit-20;
-		}
-	}
-
-	.components-panel__body-content {
-		padding-left: $grid-unit-20;
-		padding-right: $grid-unit-20;
-	}
 }
 
 // `<SnackbarNotices>` renders `.components-snackbar-list` with

@@ -176,6 +176,17 @@ describe( 'validateCropPixelRect', () => {
 		expect( result.rect.left ).toBe( bounds.minLeft );
 		expect( result.rect.height ).toBe( bounds.minHeight );
 	} );
+
+	it( 'reports a catch-all violation when precision-only clamping is required', () => {
+		const result = validateCropPixelRect(
+			{ left: bounds.minLeft - 1e-9, top: 50, width: 400, height: 200 },
+			bounds
+		);
+
+		expect( result.isValid ).toBe( false );
+		expect( result.violations ).toEqual( [ 'precision-clamped' ] );
+		expect( result.rect.left ).toBe( bounds.minLeft );
+	} );
 } );
 
 describe( 'clampCropPixelRect', () => {

@@ -18,7 +18,10 @@ import {
 	type CropperLayoutGeometry,
 } from '../../core/crop-geometry';
 import type { SourceRegion } from '../../core/source-region';
-import { useCropperGeometry, useCropper } from '../components/cropper-provider';
+import {
+	useCropperLayoutGeometry,
+	useCropper,
+} from '../components/cropper-provider';
 
 export type {
 	CropGeometryInput,
@@ -48,7 +51,7 @@ export interface UseCropGeometryReturn {
  */
 export function useCropGeometry(): UseCropGeometryReturn {
 	const cropper = useCropper();
-	const geometry = useCropperGeometry();
+	const geometry = useCropperLayoutGeometry();
 	const imageSize = useMemo(
 		() =>
 			cropper.state.image

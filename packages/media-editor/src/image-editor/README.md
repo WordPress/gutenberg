@@ -112,6 +112,10 @@ Same as `getSourceRegion` but returns percentages (0–100): `{ x, y, width, hei
 
 Returns the current crop pixel rectangle, crop pixel bounds, and source region once the cropper has loaded image and layout geometry. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
 
+#### `getCropGeometrySnapshot( input ): CropGeometrySnapshot | null`
+
+Pure helper behind `useCropGeometry()`. Returns `{ rect, bounds, sourceRegion }`, or `null` when image/layout geometry is not ready.
+
 #### `getCropPixelRect( state, imageSize ): CropPixelRect`
 
 Converts `state.cropRect` to snap-rotation pixel coordinates: `{ left, top, width, height, right, bottom }`.
@@ -120,9 +124,17 @@ Converts `state.cropRect` to snap-rotation pixel coordinates: `{ left, top, widt
 
 Returns current crop edge constraints in the same pixel space as `CropPixelRect`. Consumers can derive their own field ranges from these bounds.
 
+#### `clampCropPixelRect( rect, bounds ): CropPixelRect`
+
+Fits a complete `CropPixelRectInput` inside current bounds and returns a `CropPixelRect` with derived edges.
+
 #### `validateCropPixelRect( rect, bounds ): CropPixelRectValidationResult`
 
-Checks a complete `CropPixelRectInput` against current bounds and returns `{ isValid, rect, violations }`, where `rect` is a clamped `CropPixelRect`.
+Checks a complete `CropPixelRectInput` against current bounds and returns `{ isValid, rect, violations }`, where `rect` is a clamped `CropPixelRect`. A `precision-clamped` violation is returned when numeric tolerance alone requires clamping.
+
+#### `cropPixelRectToNormalizedRect( rect, state, imageSize ): NormalizedRect`
+
+Converts snap-rotation crop pixels back to normalized cropper space for `setCropRect()`.
 
 ### Export
 
@@ -158,6 +170,7 @@ Applies a single operation to an existing state.
 | ----------------------- | --------------------------------------------------------------------------------- |
 | `CropperState`          | `{ image, pan, zoom, rotation, flip, cropRect, basePan, baseZoom, baseRotation }` |
 | `UseCropperStateReturn` | The full shape returned by `useCropperState()`: state + setters                   |
+| `UseCropGeometryReturn` | Current crop geometry hook result: readiness, rect, bounds, source region, snapshot |
 | `CropperProps`          | Props for the `<Cropper>` component                                               |
 | `StencilProps`          | Contract for pluggable stencil components                                         |
 | `TransformOperation`    | `{ type: 'crop' \| 'rotate' \| 'flip' \| 'zoom', ... }`                           |
@@ -168,9 +181,12 @@ Applies a single operation to an existing state.
 | `SourceRegion`          | `{ x, y, width, height, rotation, flip, zoom }` in source pixels                  |
 | `SourceRegionPercent`   | `{ x, y, width, height }` as percentages (0–100)                                  |
 | `CropGeometryInput`     | Cropper state, image size, and measured layout geometry for pure geometry helpers |
+| `CropGeometrySnapshot`  | `{ rect, bounds, sourceRegion }` for current crop geometry                        |
 | `CropPixelRect`         | `{ left, top, width, height, right, bottom }` in snap-rotation pixels             |
 | `CropPixelRectInput`    | Consumer-proposed `{ left, top, width, height }` before derived edges are added   |
 | `CropPixelBounds`       | Current edge and size limits in snap-rotation pixels                              |
+| `CropPixelRectValidationResult` | `{ isValid, rect, violations }` returned by crop pixel validation         |
+| `CropPixelRectViolation` | String reason returned by crop pixel validation, including `precision-clamped`   |
 | `AspectRatioPreset`     | `{ label: string, value: number }`                                                |
 
 `CropperAction` (the reducer's action union) is internal. Drive state through the named setters on the controller object.

@@ -16,7 +16,7 @@ import type { CropperState } from '../../../core/types';
 import type { CropperLayoutGeometry } from '../../../core/crop-geometry';
 import {
 	CropperProvider,
-	useSetCropperGeometry,
+	useSetCropperLayoutGeometry,
 } from '../../components/cropper-provider';
 import { useCropGeometry } from '../use-crop-geometry';
 
@@ -43,7 +43,7 @@ function GeometryPublisher( {
 }: {
 	geometry: CropperLayoutGeometry;
 } ) {
-	const setGeometry = useSetCropperGeometry();
+	const setGeometry = useSetCropperLayoutGeometry();
 
 	useEffect( () => {
 		setGeometry( geometry );
@@ -90,7 +90,7 @@ describe( 'useCropGeometry', () => {
 		expect( result.current.snapshot ).toBeNull();
 	} );
 
-	it( 'returns not ready before cropper geometry is published', () => {
+	it( 'returns not ready before cropper layout geometry is published', () => {
 		const { result } = renderHook( () => useCropGeometry(), {
 			wrapper: createWrapper(),
 		} );

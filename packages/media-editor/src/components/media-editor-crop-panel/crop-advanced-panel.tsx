@@ -8,7 +8,7 @@ import {
 	FlexItem,
 	PanelBody,
 } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
@@ -37,6 +37,12 @@ interface CropInputRange {
 	canApply: boolean;
 }
 
+interface CropInputBounds {
+	value: number;
+	min: number;
+	max: number;
+}
+
 interface CropInputProps {
 	label: string;
 	'aria-label'?: string;
@@ -46,6 +52,7 @@ interface CropInputProps {
 	onCommit: ( value: number ) => void;
 }
 
+const INPUT_PREVIEW_DEBOUNCE_MS = 250;
 const pxSuffix = <InputControlSuffixWrapper>px</InputControlSuffixWrapper>;
 
 function makeRange(
@@ -61,7 +68,10 @@ function makeRange(
 	};
 }
 
-function getInputBounds( value: number, range: CropInputRange ) {
+function getInputBounds(
+	value: number,
+	range: CropInputRange
+): CropInputBounds {
 	const rounded = Math.round( value );
 	const min = Math.ceil( range.minValue );
 	const max = Math.floor( range.maxValue );
@@ -79,6 +89,23 @@ function getInputBounds( value: number, range: CropInputRange ) {
 		min: Math.min( rounded, min ),
 		max: Math.max( rounded, max ),
 	};
+}
+
+function getInputCommitValue(
+	nextValue: string,
+	bounds: CropInputBounds
+): number | null {
+	if ( nextValue.trim() === '' ) {
+		return null;
+	}
+
+	const parsed = Number( nextValue );
+	if ( ! Number.isFinite( parsed ) ) {
+		return null;
+	}
+
+	const rounded = Math.round( parsed );
+	return Math.max( bounds.min, Math.min( rounded, bounds.max ) );
 }
 
 function getWidthRange(
@@ -129,8 +156,8 @@ function getHeightRange(
 	return makeRange( minHeight, maxHeight );
 }
 
-// Shows the user's in-flight text while typing. Valid numeric drafts are
-// committed on blur or Enter; Escape discards the draft.
+// Shows the user's in-flight text while typing. Valid numeric drafts preview
+// after a short pause, flush on blur/Enter, and Escape discards the draft.
 function CropInput( {
 	label,
 	'aria-label': ariaLabel,
@@ -142,27 +169,75 @@ function CropInput( {
 	const [ focused, setFocused ] = useState( false );
 	const [ draft, setDraft ] = useState( '' );
 	const skipBlurCommitRef = useRef( false );
+	const previewDelayRef = useRef< ReturnType< typeof setTimeout > >();
+	const initialValueRef = useRef( value );
+	const previewedValueRef = useRef< number | null >( null );
 	const bounds = getInputBounds( value, range );
+	const boundsRef = useRef( bounds );
+	const onCommitRef = useRef( onCommit );
 
-	const commitValue = ( nextValue: string ) => {
-		if ( nextValue.trim() === '' ) {
+	boundsRef.current = bounds;
+	onCommitRef.current = onCommit;
+
+	useEffect( () => {
+		return () => {
+			if ( previewDelayRef.current ) {
+				clearTimeout( previewDelayRef.current );
+			}
+		};
+	}, [] );
+
+	const cancelPreview = () => {
+		if ( previewDelayRef.current ) {
+			clearTimeout( previewDelayRef.current );
+			previewDelayRef.current = undefined;
+		}
+	};
+
+	const commitValue = ( nextValue: string ): boolean => {
+		const commitValueCandidate = getInputCommitValue(
+			nextValue,
+			boundsRef.current
+		);
+		if ( commitValueCandidate === null ) {
+			return false;
+		}
+
+		onCommitRef.current( commitValueCandidate );
+		previewedValueRef.current = commitValueCandidate;
+		return true;
+	};
+
+	const schedulePreview = ( nextValue: string ) => {
+		cancelPreview();
+		const previewValue = getInputCommitValue(
+			nextValue,
+			boundsRef.current
+		);
+		if ( previewValue === null ) {
 			return;
 		}
-		const parsed = Number( nextValue );
-		if ( ! Number.isFinite( parsed ) ) {
-			return;
-		}
-		const rounded = Math.round( parsed );
-		onCommit( Math.max( bounds.min, Math.min( rounded, bounds.max ) ) );
+
+		previewDelayRef.current = setTimeout( () => {
+			if ( previewedValueRef.current !== previewValue ) {
+				onCommitRef.current( previewValue );
+				previewedValueRef.current = previewValue;
+			}
+			previewDelayRef.current = undefined;
+		}, INPUT_PREVIEW_DEBOUNCE_MS );
 	};
 
 	const handleFocus = () => {
+		initialValueRef.current = bounds.value;
+		previewedValueRef.current = null;
 		setFocused( true );
 		setDraft( String( bounds.value ) );
 	};
 
 	const handleChange = ( nextValue: string | undefined ) => {
-		setDraft( nextValue ?? '' );
+		const nextDraft = nextValue ?? '';
+		setDraft( nextDraft );
+		schedulePreview( nextDraft );
 	};
 
 	const handleBlur = () => {
@@ -171,6 +246,7 @@ function CropInput( {
 			skipBlurCommitRef.current = false;
 			return;
 		}
+		cancelPreview();
 		commitValue( draft );
 	};
 
@@ -181,12 +257,18 @@ function CropInput( {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
+			cancelPreview();
 			commitValue( draft );
 			event.currentTarget.blur();
 		} else if ( event.key === 'Escape' ) {
 			event.preventDefault();
 			skipBlurCommitRef.current = true;
 			setFocused( false );
+			cancelPreview();
+			if ( previewedValueRef.current !== null ) {
+				onCommitRef.current( initialValueRef.current );
+				previewedValueRef.current = null;
+			}
 			event.currentTarget.blur();
 		}
 	};
