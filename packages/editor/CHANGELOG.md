@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The `RenderModal` implementations registered by this package (`useSetAsHomepageAction`, `useSetAsPostsPageAction`) now use `@wordpress/ui` `Dialog.Action` for their Cancel buttons and therefore require a `Dialog.Root` ancestor at render time. The editor's own `PostActions` component (which is the only in-tree consumer) supplies one. Plugins or custom UIs that consume these action objects and render `Action.RenderModal` outside a `Dialog.Root` will crash with "Dialog parts must be placed within `<Dialog.Root>`". Wrap the rendered output in `<Dialog.Root>` or render through the editor's `PostActions` component. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+
 ### Bug Fixes
 
 -   Post-actions confirmations registered with `hideModalHeader` (e.g. trash) now use `role="alertdialog"` and no longer dismiss on backdrop click — matching their alert semantics and bringing parity with the equivalent dataviews flow. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))

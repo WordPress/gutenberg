@@ -155,6 +155,11 @@ export const useSetAsHomepageAction = () => {
 				return true;
 			},
 			modalFocusOnMount: 'firstContentElement',
+			// `SetAsHomepageModal` uses `Dialog.Action`, so it requires a
+			// `@wordpress/ui` `Dialog.Root` ancestor at render time. Every
+			// in-tree consumer of `Action.RenderModal` provides one; external
+			// hosts rendering it outside `Dialog.Root` will crash. See
+			// `RenderModalProps` JSDoc in `@wordpress/dataviews`.
 			RenderModal: SetAsHomepageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

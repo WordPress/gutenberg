@@ -152,6 +152,11 @@ export const useSetAsPostsPageAction = () => {
 				return true;
 			},
 			modalFocusOnMount: 'firstContentElement',
+			// `SetAsPostsPageModal` uses `Dialog.Action`, so it requires a
+			// `@wordpress/ui` `Dialog.Root` ancestor at render time. Every
+			// in-tree consumer of `Action.RenderModal` provides one; external
+			// hosts rendering it outside `Dialog.Root` will crash. See
+			// `RenderModalProps` JSDoc in `@wordpress/dataviews`.
 			RenderModal: SetAsPostsPageModal,
 		} ),
 		[ pageForPosts, pageOnFront ]

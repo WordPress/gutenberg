@@ -82,6 +82,10 @@ const renamePost: Action< PostWithPermissions > = {
 
 		return post.type === PATTERN_TYPES.user && post.permissions?.update;
 	},
+	// `Dialog.Action` (used inside this body) requires a `@wordpress/ui`
+	// `Dialog.Root` ancestor at render time. Every in-tree consumer of
+	// `Action.RenderModal` provides one; external hosts rendering it
+	// outside `Dialog.Root` will crash. See `RenderModalProps` JSDoc.
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item ] = items;
 		const [ title, setTitle ] = useState( () => getItemTitle( item, '' ) );
