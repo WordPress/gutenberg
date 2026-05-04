@@ -1089,6 +1089,11 @@
 			"count": 2
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
+		"react-hooks/refs": {
+			"count": 4
+		}
+	},
 	"packages/editor/src/components/suggestion-mode/suggestion-diff.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
