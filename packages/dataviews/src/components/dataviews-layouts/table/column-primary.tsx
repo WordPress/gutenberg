@@ -7,7 +7,7 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { _n, sprintf } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
+import { Stack, Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -92,7 +92,8 @@ function ColumnPrimary< Item >( {
 						) }
 						<titleField.render item={ item } field={ titleField } />
 						{ showHierarchyBadge && !! childCount && (
-							<span
+							<Badge
+								intent="none"
 								className="dataviews-view-table__hierarchy-badge"
 								aria-label={ sprintf(
 									// translators: %d: Number of direct child items.
@@ -100,8 +101,8 @@ function ColumnPrimary< Item >( {
 									childCount
 								) }
 							>
-								{ childCount }
-							</span>
+								{ childCount.toString() }
+							</Badge>
 						) }
 					</ItemClickWrapper>
 				) }

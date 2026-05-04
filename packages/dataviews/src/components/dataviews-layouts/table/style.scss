@@ -58,11 +58,6 @@
 
 		&.dataviews-view-table__hierarchy-column {
 			padding-right: 0;
-
-			.dataviews-view-table__cell-content-wrapper {
-				max-width: none;
-				min-width: auto;
-			}
 		}
 	}
 	tr {
@@ -255,19 +250,8 @@
 		white-space: nowrap;
 	}
 
-	.dataviews-view-table__col-hierarchy {
-		width: $grid-unit-30;
-	}
-
-	.dataviews-view-table__hierarchy-column {
-		width: $grid-unit-30;
-	}
-
 	.dataviews-view-table__hierarchy-toggle.components-button.has-icon {
 		min-width: $grid-unit-30;
-		width: $grid-unit-30;
-		height: $grid-unit-30;
-		padding: 0;
 	}
 
 	.dataviews-view-table__hierarchy-toggle-placeholder {
@@ -278,18 +262,7 @@
 	}
 
 	.dataviews-view-table__hierarchy-badge {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		min-width: $grid-unit-30;
-		height: $grid-unit-30;
-		margin-left: $grid-unit-05;
-		padding: 0 $grid-unit-05;
-		border: $border-width solid $gray-200;
-		border-radius: $radius-small;
-		color: $gray-700;
-		font-size: 12px;
-		line-height: 1;
+		margin-left: 8px;
 	}
 
 	// Density style overrides.
@@ -374,11 +347,6 @@
 		min-width: 15ch;
 		max-width: 80ch;
 	}
-}
-
-.dataviews-view-table__cell-content-wrapper.dataviews-view-table__hierarchy-cell {
-	min-width: auto;
-	max-width: none;
 }
 
 .dataviews-view-table__group-header-row {
