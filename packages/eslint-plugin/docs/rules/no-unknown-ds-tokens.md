@@ -6,6 +6,8 @@ Additionally, token names must not be dynamically constructed (e.g. via template
 
 Tokens must also be wrapped in `var()` syntax (e.g. `var(--wpds-color-fg-content-neutral)`). The build tooling relies on this pattern to inject fallback values so that components render correctly without a ThemeProvider. Bare token references like `'--wpds-color-fg-content-neutral'` will not receive fallbacks.
 
+When a token name appears on the left-hand side of a CSS declaration (for example, `'--wpds-color-fg-content-neutral: red;'`), the bare token check is skipped for that occurrence. Those cases are instead reported by [`no-setting-ds-tokens`](./no-setting-ds-tokens.md).
+
 This rule lints all string literals and template literals in JavaScript/TypeScript files. For CSS files, use the [corresponding Stylelint rule](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/#stylelint-plugins) from the `@wordpress/theme` package.
 
 ## Rule details

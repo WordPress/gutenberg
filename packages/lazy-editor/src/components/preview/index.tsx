@@ -6,7 +6,6 @@ import { useId, useMemo } from '@wordpress/element';
 // @ts-expect-error Block Editor not fully typed yet.
 import { BlockPreview, BlockEditorProvider } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-// @ts-expect-error Blocks not fully typed yet.
 import { parse } from '@wordpress/blocks';
 
 /**
@@ -34,7 +33,7 @@ function PreviewContent( {
 	const actualBlocks = useMemo( () => {
 		return (
 			blocks ??
-			parse( content, {
+			parse( content!, {
 				__unstableSkipMigrationLogs: true,
 			} )
 		);

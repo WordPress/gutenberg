@@ -18,12 +18,12 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test( 'should be inserted', async ( { editor, page } ) => {
@@ -142,7 +142,7 @@ test.describe( 'Classic', () => {
 		await expect( classicBlock ).toBeVisible();
 		await classicBlock.click();
 
-		expect( errors.length ).toBe( 0 );
+		expect( errors ).toHaveLength( 0 );
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
 } );

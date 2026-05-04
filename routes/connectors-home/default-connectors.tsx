@@ -2,20 +2,23 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
 	__experimentalDefaultConnectorSettings as DefaultConnectorSettings,
+	privateApis as connectorsPrivateApis,
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
+import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Badge } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { useConnectorPlugin } from './use-connector-plugin';
 import {
 	OpenAILogo,
@@ -24,6 +27,8 @@ import {
 	AkismetLogo,
 	DefaultConnectorLogo,
 } from './logos';
+
+const { store: connectorsStore } = unlock( connectorsPrivateApis );
 
 interface ConnectorData {
 	name: string;
@@ -149,22 +154,6 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after async actions complete.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
-
-	const handleActionClick = () => {
-		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
-			pendingFocusRef.current = true;
-		}
-		handleButtonClick();
-	};
 
 	return (
 		<ConnectorItem
@@ -187,9 +176,10 @@ function ApiKeyConnector( {
 									: 'secondary'
 							}
 							size="compact"
-							onClick={ handleActionClick }
+							onClick={ handleButtonClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
+							accessibleWhenDisabled
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -213,18 +203,14 @@ function ApiKeyConnector( {
 						isExternallyConfigured
 							? undefined
 							: async () => {
-									pendingFocusRef.current = true;
-									try {
-										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
+									await removeApiKey();
+									actionButtonRef.current?.focus();
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
 						setIsExpanded( false );
+						actionButtonRef.current?.focus();
 					} }
 				/>
 			) }
@@ -256,7 +242,14 @@ export function registerDefaultConnectors() {
 			authentication,
 			plugin: data.plugin,
 		};
-		if ( authentication.method === 'api_key' ) {
+
+		// Preserve a render that was already registered for this slug by
+		// another caller. Omitting `render` from `args` leaves the existing
+		// render in place while the server-side metadata still merges on top.
+		const existing = unlock( select( connectorsStore ) ).getConnector(
+			connectorName
+		);
+		if ( authentication.method === 'api_key' && ! existing?.render ) {
 			args.render = ApiKeyConnector;
 		}
 

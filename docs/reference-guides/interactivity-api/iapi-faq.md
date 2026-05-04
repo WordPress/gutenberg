@@ -4,18 +4,18 @@
 
 Its three main components are:
 
-- [Preact](https://preactjs.com/) combined with [Preact Signals](https://preactjs.com/guide/v10/signals/) for hydration, client logic, and client-side navigation.
-- HTML Directives that can be understood by both the client and server.
-- Server-side logic, handled by the [HTML_Tag_Processor](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/).
+-   [Preact](https://preactjs.com/) combined with [Preact Signals](https://preactjs.com/guide/v10/signals/) for hydration, client logic, and client-side navigation.
+-   HTML Directives that can be understood by both the client and server.
+-   Server-side logic, handled by the [HTML_Tag_Processor](https://make.wordpress.org/core/2023/03/07/introducing-the-html-api-in-wordpress-6-2/).
 
 ## Why Preact to build the directives system? Why not React or another JavaScript framework?
 
 Preact has a number of advantages over React and other JavaScript frameworks like Vue, Svelte, or Solid in the context of the frontend (which is the focus of the Interactivity API):
 
-- It’s small: 8kB, including [hooks](https://preactjs.com/guide/v10/hooks/) and [signals](https://preactjs.com/blog/introducing-signals/).
-- It gives us DOM diffing out of the box.
-- It’s extremely extensible through their Option Hooks. They use that extensibility for the hooks (preact/hooks), compatibility with React (preact/compat) and their signals (@preact/signals). Basically, everything but the DOM diffing algorithm.
-- Its core team has been great and very helpful. They are also interested in enhancing this “island-based” usage of Preact.
+-   It’s small: 8kB, including [hooks](https://preactjs.com/guide/v10/hooks/) and [signals](https://preactjs.com/blog/introducing-signals/).
+-   It gives us DOM diffing out of the box.
+-   It’s extremely extensible through their Option Hooks. They use that extensibility for the hooks (preact/hooks), compatibility with React (preact/compat) and their signals (@preact/signals). Basically, everything but the DOM diffing algorithm.
+-   Its core team has been great and very helpful. They are also interested in enhancing this “island-based” usage of Preact.
 
 ## Is Gutenberg going to move from React to Preact since the Interactivity API uses it?
 
@@ -33,7 +33,7 @@ React was considered first because Gutenberg developers are familiar with it. Ot
 
 Alpine.js is a great framework, and it inspired a lot of functionality in the Interactivity API. However, it doesn’t support server-side rendering of its [directives](https://github.com/alpinejs/alpine/tree/d7f9d641f7a763c56c598d118bd189a406a22383/packages/docs/src/en/directives), and having a similar system tailored for WordPress blocks has many benefits.
 
-Preact was chosen instead of Alpine.js for numerous reasons, such as its smaller size, its better performance (especially with the addition of [signals](https://preactjs.com/guide/v10/signals/)), the fact that custom directives are written with Preact’s declarative syntax and tooling (hooks, signals), it’s more battle-tested and has a larger community than Alpine.js. It’s also compatible with React (for sharing client-side rendered components from the Editor), and it provides to the Interactivity API the fastest DOM diffing algorithm out of the box, including UI state preservation.
+Preact was chosen instead of Alpine.js for numerous reasons. It has a smaller size, better performance (especially with the addition of [signals](https://preactjs.com/guide/v10/signals/)), and custom directives are written with Preact’s declarative syntax and tooling (hooks, signals). Preact is also more battle-tested and has a larger community than Alpine.js. Additionally, it is compatible with React (for sharing client-side rendered components from the Editor) and provides the fastest DOM diffing algorithm out of the box, including UI state preservation.
 
 Furthermore, with Preact operating in the background, the Interactivity API manages "the final layer" so it can be better adapted to WordPress requirements. For example, JavaScript expressions are not allowed inside directives to avoid security risks and ensure compliance with strict security policies, and all WordPress directives are spec-compliant HTML attributes.
 
@@ -41,10 +41,9 @@ Furthermore, with Preact operating in the background, the Interactivity API mana
   Have a look at the conversation at <a href="https://github.com/WordPress/gutenberg/discussions/53022#discussioncomment-4696611">"Why Preact instead of Alpine?"</a> to learn more about this.
 </div>
 
-
 ### Plain JavaScript
 
-See the answer below. 
+See the answer below.
 
 ### Template DSL
 
@@ -52,7 +51,7 @@ The possibility of creating a [DSL](https://en.wikipedia.org/wiki/Domain-specifi
 
 ## Why should I, as a block developer, use the Interactivity API rather than React?
 
-Using React on the frontend doesn’t work smoothly with server rendering in PHP. Every approach that uses React to render blocks has to load content using client-side JavaScript. If you only render your blocks on the client, it typically results in a poor user experience because the user stares at empty placeholders and spinners while waiting for content to load. 
+Using React on the frontend doesn’t work smoothly with server rendering in PHP. Every approach that uses React to render blocks has to load content using client-side JavaScript. If you only render your blocks on the client, it typically results in a poor user experience because the user stares at empty placeholders and spinners while waiting for content to load.
 
 Using JS in PHP extensions (like v8js) is also possible, but unfortunately PHP extensions are not backward compatible and can only be used when there's a PHP fallback.
 
@@ -64,16 +63,15 @@ On the other hand, the Interactivity API is designed to work perfectly with Word
 
 To summarize, using the Interactivity API rather than just using React comes with these benefits:
 
-- If you use React, your interactive blocks must generate the same markup on the client as they do on the server in PHP. Using the Interactivity API, there is no such requirement as directives are added to server-rendered HTML.
-- The Interactivity API is PHP-friendlier. It works out of the box with WordPress hooks or other server functionalities such as internationalization. For example, with React, you can’t know which hooks are applied on the server, and their modifications would be overwritten after hydration.
-- All the benefits of [using a standard](/docs/reference-guides/interactivity-api/iapi-about.md#why-a-standard).
-
+-   If you use React, your interactive blocks must generate the same markup on the client as they do on the server in PHP. Using the Interactivity API, there is no such requirement as directives are added to server-rendered HTML.
+-   The Interactivity API is PHP-friendlier. It works out of the box with WordPress hooks or other server functionalities such as internationalization. For example, with React, you can’t know which hooks are applied on the server, and their modifications would be overwritten after hydration.
+-   All the benefits of [using a standard](/docs/reference-guides/interactivity-api/iapi-about.md#why-a-standard).
 
 ## What are the benefits of Interactivity API over just using jQuery or vanilla JavaScript?
 
-The main difference is that the Interactivity API is **declarative and reactive**, so writing and maintaining complex interactive experiences should become way easier. Additionally, it has been **specially designed to work with blocks**, providing a standard that comes with the benefits mentioned above, like inter-block communication, compatibility, or site-wide features such as [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md).
+The main difference is that the Interactivity API is **declarative and reactive**, so writing and maintaining complex interactive experiences should become much easier. Additionally, it has been **specially designed to work with blocks**, providing a standard that comes with the benefits mentioned above, like inter-block communication, compatibility, or site-wide features such as [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md).
 
-Finally, comparing it with jQuery, **the Interactivity API runtime is ~10kb**, which is much more lightweight. Actually, there is an ongoing effort to remove heavy frameworks like jQuery across the WordPress ecosystem, and this would help in this regard.
+Finally, comparing it with jQuery, **the Interactivity API runtime is ~10 KB**, which is much more lightweight. Actually, there is an ongoing effort to remove heavy frameworks like jQuery across the WordPress ecosystem, and this would help in this regard.
 
 ## Do I need to know React, PHP, and this Interactivity API?
 
@@ -93,18 +91,18 @@ See the [`wp_interactivity_process_directives` function](https://developer.wordp
 
 No. Blocks outside the Interactivity API can coexist with blocks using it. However, as explained above, keep in mind that there are some benefits for blocks that use the API:
 
-- **Blocks can communicate with each other easily**. With a standard, this communication is handled by default. When different blocks use different approaches to frontend interactivity, inter-block communication becomes more complex and gets almost impossible when separate developers create blocks.
-- **Composability and compatibility**: You can combine interactive blocks, nest them in structures with defined behaviors, and, thanks to following the same standard, they are fully cross-compatible. If each block were to use a different approach to interactivity, they would likely break.
-- **Fewer KBs will be sent to the browser**. If each plugin author uses a different JS framework, more code will be loaded in the frontend. If all the blocks use the same one, the code is reused.
-- If all the blocks on a page use this standard, site-wide features like client-side navigation can be enabled.
+-   **Blocks can communicate with each other easily**. With a standard, this communication is handled by default. When different blocks use different approaches to frontend interactivity, inter-block communication becomes more complex and gets almost impossible when separate developers create blocks.
+-   **Composability and compatibility**: You can combine interactive blocks, nest them in structures with defined behaviors, and, thanks to following the same standard, they are fully cross-compatible. If each block were to use a different approach to interactivity, they would likely break.
+-   **Fewer KBs will be sent to the browser**. If each plugin author uses a different JS framework, more code will be loaded in the frontend. If all the blocks use the same one, the code is reused.
+-   If all the blocks on a page use this standard, site-wide features like client-side navigation can be enabled.
 
 ## What are the performance implications of using this API? Is it worth loading the Interactivity API for very simple use cases?
 
 The API has been designed with performance in mind, so it shouldn’t be a problem:
 
-- **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
-- **All the script modules that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
-- There are [ongoing explorations](https://github.com/WordPress/gutenberg/discussions/52723) about the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
+-   **The runtime code needed for the directives is just ~10 KB**, and it only needs to be loaded once for all the blocks.
+-   **All the script modules that belong to the Interactivity API (including the `view.js` files) will load without blocking the page rendering.**
+-   See [discussion #52723](https://github.com/WordPress/gutenberg/discussions/52723) for context on the possibility of **delaying the scripts loading once the block is in the viewport**. This way, the initial load would be optimized without affecting the user experience.
 
 ## Does it work with the Core Translation API?
 
@@ -120,7 +118,7 @@ wp_interactivity_state( 'favoriteMovies', array(
 ) );
 ```
 
-A translation API compatible with script modules (needed for the Interactivity API) is currently being worked on. Check [#60234](https://core.trac.wordpress.org/ticket/60234) to follow the progress on this work.
+A translation API compatible with script modules is needed for the Interactivity API. See [#60234](https://core.trac.wordpress.org/ticket/60234) for context on this effort.
 
 ## I’m concerned about XSS; can JavaScript be injected into directives?
 
@@ -133,4 +131,3 @@ Yes. The Interactivity API does not use [`eval()`](https://developer.mozilla.org
 ## Can you use directives to make AJAX/REST-API requests?
 
 Sure. Actions and callbacks called by directives can do anything a JavaScript function can, including making API requests.
-

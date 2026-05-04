@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { speak } from '@wordpress/a11y';
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -12,6 +11,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -23,6 +23,7 @@ import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
+const AI_PLUGIN_PAGE_SLUG = 'ai-wp-admin';
 const AI_PLUGIN_ID = 'ai/ai';
 const AI_PLUGIN_URL = 'https://wordpress.org/plugins/ai/';
 
@@ -123,6 +124,8 @@ export function AiPluginCallout() {
 	}, [] );
 
 	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
 
 	const installPlugin = async () => {
 		setIsBusy( true );
@@ -134,9 +137,18 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
-			speak( __( 'AI plugin installed and activated successfully.' ) );
+			createSuccessNotice(
+				__( 'AI plugin installed and activated successfully.' ),
+				{
+					id: 'ai-plugin-install-success',
+					type: 'snackbar',
+				}
+			);
 		} catch {
-			speak( __( 'Failed to install the AI plugin.' ), 'assertive' );
+			createErrorNotice( __( 'Failed to install the AI plugin.' ), {
+				id: 'ai-plugin-install-error',
+				type: 'snackbar',
+			} );
 		} finally {
 			setIsBusy( false );
 		}
@@ -152,9 +164,15 @@ export function AiPluginCallout() {
 				{ throwOnError: true }
 			);
 			setJustActivated( true );
-			speak( __( 'AI plugin activated successfully.' ) );
+			createSuccessNotice( __( 'AI plugin activated successfully.' ), {
+				id: 'ai-plugin-activate-success',
+				type: 'snackbar',
+			} );
 		} catch {
-			speak( __( 'Failed to activate the AI plugin.' ), 'assertive' );
+			createErrorNotice( __( 'Failed to activate the AI plugin.' ), {
+				id: 'ai-plugin-activate-error',
+				type: 'snackbar',
+			} );
 		} finally {
 			setIsBusy( false );
 		}
@@ -261,7 +279,7 @@ export function AiPluginCallout() {
 						variant="secondary"
 						size="compact"
 						href={ addQueryArgs( 'options-general.php', {
-							page: AI_PLUGIN_SLUG,
+							page: AI_PLUGIN_PAGE_SLUG,
 						} ) }
 					>
 						{ __( 'Control features in the AI plugin' ) }

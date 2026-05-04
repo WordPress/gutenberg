@@ -62,6 +62,7 @@ test.describe( 'Collaboration with large documents', () => {
 				window?.wp?.data
 					?.select( 'core/editor' )
 					?.isCollaborationEnabledForCurrentPost?.() === false,
+			undefined,
 			{ timeout: 15000 }
 		);
 

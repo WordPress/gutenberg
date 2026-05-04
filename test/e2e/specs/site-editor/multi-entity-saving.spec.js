@@ -11,19 +11,19 @@ test.describe( 'Site Editor - Multi-entity save flow', () => {
 		] );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllTemplates( 'wp_template' ),
-		] );
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllTemplates( 'wp_template' ),
+		] );
 	} );
 
 	test( 'save flow should work as expected', async ( { editor, page } ) => {

@@ -12,7 +12,7 @@ import { useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from '../autocompleter-ui';
+import { AutocompleterUI } from '../autocompleter-ui';
 import { useLastDifferentValue } from '..';
 
 type FruitOption = { visual: string; name: string; id: number };
@@ -166,8 +166,6 @@ describe( 'AutocompleterUI', () => {
 				},
 			};
 
-			const AutocompleterUI = getAutoCompleterUI( autocompleter );
-
 			const OtherElement = <div>Other Element</div>;
 
 			const Container = () => {
@@ -176,6 +174,7 @@ describe( 'AutocompleterUI', () => {
 				return (
 					<div>
 						<AutocompleterUI
+							autocompleter={ autocompleter }
 							className="test"
 							filterValue="Apple"
 							instanceId={ 1 }

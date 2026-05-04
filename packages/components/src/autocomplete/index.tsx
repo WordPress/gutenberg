@@ -22,7 +22,7 @@ import { isAppleOS } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { getAutoCompleterUI } from './autocompleter-ui';
+import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
@@ -107,16 +107,16 @@ export function useAutocomplete( {
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
 
-	const AutocompleterUI = useMemo(
-		() => ( autocompleter ? getAutoCompleterUI( autocompleter ) : null ),
-		[ autocompleter ]
-	);
-
 	const backspacingRef = useRef( false );
+	const prevRecordTextRef = useRef( '' );
+	const lastCompletionRef = useRef< {
+		name: string;
+		value: string;
+	} | null >( null );
 
 	function insertCompletion( replacement: React.ReactNode ) {
 		if ( autocompleter === null ) {
-			return;
+			return '';
 		}
 		const end = record.start;
 		const start =
@@ -124,27 +124,48 @@ export function useAutocomplete( {
 		const toInsert = create( { html: renderToString( replacement ) } );
 
 		onChange( insert( record, toInsert, start, end ) );
+		return getTextContent( toInsert );
 	}
 
 	function select( option: KeyedOption ) {
-		const { getOptionCompletion } = autocompleter || {};
-
-		if ( option.isDisabled ) {
+		if ( option.isDisabled || ! autocompleter ) {
 			return;
 		}
 
-		if ( getOptionCompletion ) {
-			const completionObject = getCompletionObject(
-				getOptionCompletion( option.value, filterValue )
-			);
+		const { getOptionCompletion } = autocompleter;
+		if ( ! getOptionCompletion ) {
+			dispatch( { type: 'RESET' } );
+			contentRef.current?.focus();
+			return;
+		}
 
-			if ( 'replace' === completionObject.action ) {
-				onReplace( [ completionObject.value ] );
-				// When replacing, the component will unmount, so don't reset
-				// state (below) on an unmounted component.
-				return;
-			} else if ( 'insert-at-caret' === completionObject.action ) {
-				insertCompletion( completionObject.value );
+		const completionObject = getCompletionObject(
+			getOptionCompletion( option.value, filterValue )
+		);
+
+		if ( 'replace' === completionObject.action ) {
+			onReplace( [ completionObject.value ] );
+			// When replacing, the component will unmount, so don't reset
+			// state (below) on an unmounted component.
+			return;
+		}
+
+		if ( 'insert-at-caret' === completionObject.action ) {
+			const completionText = insertCompletion( completionObject.value );
+			// When the completion value starts with the trigger prefix
+			// (e.g. @username), the trigger stays in the text and would
+			// re-activate the autocompleter. Store the completed text so
+			// the effect can suppress the stale re-match.
+			if ( completionText.startsWith( autocompleter.triggerPrefix ) ) {
+				const afterPrefix = completionText.slice(
+					autocompleter.triggerPrefix.length
+				);
+				if ( afterPrefix ) {
+					lastCompletionRef.current = {
+						name: autocompleter.name,
+						value: afterPrefix,
+					};
+				}
 			}
 		}
 
@@ -227,6 +248,9 @@ export function useAutocomplete( {
 	}, [ record ] );
 
 	useEffect( () => {
+		const isTextChange = record.text !== prevRecordTextRef.current;
+		prevRecordTextRef.current = record.text;
+
 		function getTextAfterSelection() {
 			return textContent
 				? getTextContent(
@@ -239,13 +263,12 @@ export function useAutocomplete( {
 				: '';
 		}
 
-		const match = getAutocompleteMatch(
-			textContent,
-			completers,
-			filteredOptions.length,
-			backspacingRef.current,
-			getTextAfterSelection
-		);
+		const match = getAutocompleteMatch( textContent, completers, {
+			matchCount: filteredOptions.length,
+			isBackspacing: backspacingRef.current,
+			getTextAfterSelection,
+			lastCompletion: lastCompletionRef.current,
+		} );
 
 		if ( ! match ) {
 			if ( autocompleter ) {
@@ -255,6 +278,26 @@ export function useAutocomplete( {
 		}
 
 		const { completer, filterValue: query } = match;
+
+		// Don't re-activate a dismissed autocompleter on cursor-only
+		// movement. `textContent` (text before cursor) changes with the
+		// caret, so the effect re-runs, but `record.text` does not.
+		// Complements the render-time `didUserInput` gate in
+		// `useAutocompleteProps` for callers using this hook directly.
+		if ( ! autocompleter && ! isTextChange ) {
+			return;
+		}
+
+		// Clear stale completion ref when the user types a new trigger
+		// for the same completer (the previous completion is no longer
+		// relevant). Must be after the cursor-only check so that mere
+		// cursor movement doesn't discard the suppression state.
+		if (
+			lastCompletionRef.current &&
+			lastCompletionRef.current.name === completer.name
+		) {
+			lastCompletionRef.current = null;
+		}
 
 		dispatch( { type: 'MATCH', completer, query } );
 		// We want to avoid introducing unexpected side effects.
@@ -271,7 +314,7 @@ export function useAutocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 	const hasSelection = record.start !== undefined;
-	const showPopover = !! textContent && hasSelection && !! AutocompleterUI;
+	const showPopover = !! textContent && hasSelection && !! autocompleter;
 
 	return {
 		listBoxId,
@@ -279,6 +322,8 @@ export function useAutocomplete( {
 		onKeyDown: withIgnoreIMEEvents( handleKeyDown ),
 		popover: showPopover && (
 			<AutocompleterUI
+				key={ autocompleter.name + autocompleter.triggerPrefix }
+				autocompleter={ autocompleter }
 				className={ className }
 				filterValue={ filterValue }
 				instanceId={ instanceId }
@@ -286,7 +331,6 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
-				value={ record }
 				contentRef={ contentRef }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>

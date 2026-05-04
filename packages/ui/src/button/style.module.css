@@ -20,7 +20,7 @@
 		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
 		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
-		--wp-ui-button-font-size: var(--wpds-font-size-md);
+		--wp-ui-button-font-size: var(--wpds-typography-font-size-md);
 		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 
 		/* by default, borders have the same color as the background */
@@ -28,7 +28,7 @@
 		--wp-ui-button-border-color-active: var(--wp-ui-button-background-color-active);
 		--wp-ui-button-border-color-disabled: var(--wp-ui-button-background-color-disabled);
 
-		--_gcd-button-font-family: var(--wpds-font-family-body);
+		--_gcd-button-font-family: var(--wpds-typography-font-family-body);
 		--_gcd-button-font-size: var(--wp-ui-button-font-size);
 		--_gcd-button-font-weight: var(--wp-ui-button-font-weight);
 
@@ -48,10 +48,10 @@
 		border-radius: var(--wpds-border-radius-sm);
 		background-color: var(--wp-ui-button-background-color);
 		background-clip: padding-box;
-		font-family: var(--wpds-font-family-body);
+		font-family: var(--wpds-typography-font-family-body);
 		font-size: var(--wp-ui-button-font-size);
 		font-weight: var(--wp-ui-button-font-weight);
-		line-height: var(--wpds-font-line-height-sm);
+		line-height: var(--wpds-typography-line-height-sm);
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
 		cursor: var(--wpds-cursor-control);

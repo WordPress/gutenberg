@@ -6,88 +6,88 @@
 	}
 
 	.heading-2xl {
-		--_gcd-heading-font-size: var(--wpds-font-size-2xl);
+		--_gcd-heading-font-size: var(--wpds-typography-font-size-2xl);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-2xl);
-		line-height: var(--wpds-font-line-height-2xl);
-		font-weight: var(--wpds-font-weight-medium);
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-2xl);
+		line-height: var(--wpds-typography-line-height-2xl);
+		font-weight: var(--wpds-typography-font-weight-medium);
 	}
 
 	.heading-xl {
-		--_gcd-heading-font-size: var(--wpds-font-size-xl);
+		--_gcd-heading-font-size: var(--wpds-typography-font-size-xl);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-xl);
-		line-height: var(--wpds-font-line-height-md);
-		font-weight: var(--wpds-font-weight-medium);
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-xl);
+		line-height: var(--wpds-typography-line-height-md);
+		font-weight: var(--wpds-typography-font-weight-medium);
 	}
 
 	.heading-lg {
-		--_gcd-heading-font-size: var(--wpds-font-size-lg);
+		--_gcd-heading-font-size: var(--wpds-typography-font-size-lg);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-lg);
-		line-height: var(--wpds-font-line-height-sm);
-		font-weight: var(--wpds-font-weight-medium);
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-lg);
+		line-height: var(--wpds-typography-line-height-sm);
+		font-weight: var(--wpds-typography-font-weight-medium);
 	}
 
 	.heading-md {
-		--_gcd-heading-font-size: var(--wpds-font-size-md);
+		--_gcd-heading-font-size: var(--wpds-typography-font-size-md);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-md);
-		line-height: var(--wpds-font-line-height-sm);
-		font-weight: var(--wpds-font-weight-medium);
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+		font-weight: var(--wpds-typography-font-weight-medium);
 	}
 
 	.heading-sm {
-		--_gcd-heading-font-size: var(--wpds-font-size-xs);
+		--_gcd-heading-font-size: var(--wpds-typography-font-size-xs);
 
-		font-family: var(--wpds-font-family-heading);
-		font-size: var(--wpds-font-size-xs);
-		line-height: var(--wpds-font-line-height-xs);
-		font-weight: var(--wpds-font-weight-medium);
+		font-family: var(--wpds-typography-font-family-heading);
+		font-size: var(--wpds-typography-font-size-xs);
+		line-height: var(--wpds-typography-line-height-xs);
+		font-weight: var(--wpds-typography-font-weight-medium);
 		text-transform: uppercase;
 	}
 
 	.body-xl {
-		--_gcd-p-font-size: var(--wpds-font-size-xl);
-		--_gcd-p-line-height: var(--wpds-font-line-height-xl);
+		--_gcd-p-font-size: var(--wpds-typography-font-size-xl);
+		--_gcd-p-line-height: var(--wpds-typography-line-height-xl);
 
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-xl);
-		line-height: var(--wpds-font-line-height-xl);
-		font-weight: var(--wpds-font-weight-regular);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-xl);
+		line-height: var(--wpds-typography-line-height-xl);
+		font-weight: var(--wpds-typography-font-weight-regular);
 	}
 
 	.body-lg {
-		--_gcd-p-font-size: var(--wpds-font-size-lg);
-		--_gcd-p-line-height: var(--wpds-font-line-height-md);
+		--_gcd-p-font-size: var(--wpds-typography-font-size-lg);
+		--_gcd-p-line-height: var(--wpds-typography-line-height-md);
 
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-lg);
-		line-height: var(--wpds-font-line-height-md);
-		font-weight: var(--wpds-font-weight-regular);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-lg);
+		line-height: var(--wpds-typography-line-height-md);
+		font-weight: var(--wpds-typography-font-weight-regular);
 	}
 
 	.body-md {
-		--_gcd-p-font-size: var(--wpds-font-size-md);
-		--_gcd-p-line-height: var(--wpds-font-line-height-sm);
+		--_gcd-p-font-size: var(--wpds-typography-font-size-md);
+		--_gcd-p-line-height: var(--wpds-typography-line-height-sm);
 
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-md);
-		line-height: var(--wpds-font-line-height-sm);
-		font-weight: var(--wpds-font-weight-regular);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+		font-weight: var(--wpds-typography-font-weight-regular);
 	}
 
 	.body-sm {
-		--_gcd-p-font-size: var(--wpds-font-size-sm);
-		--_gcd-p-line-height: var(--wpds-font-line-height-xs);
+		--_gcd-p-font-size: var(--wpds-typography-font-size-sm);
+		--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
 
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-sm);
-		line-height: var(--wpds-font-line-height-xs);
-		font-weight: var(--wpds-font-weight-regular);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-sm);
+		line-height: var(--wpds-typography-line-height-xs);
+		font-weight: var(--wpds-typography-font-weight-regular);
 	}
 }

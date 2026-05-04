@@ -155,6 +155,7 @@ export interface MediaEditProps< Item >
 	> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
+	 * Use ['*'] to allow all file types.
 	 *
 	 * @default ['image']
 	 */

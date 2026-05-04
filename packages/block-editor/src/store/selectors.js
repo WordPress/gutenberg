@@ -1992,9 +1992,9 @@ export function canRemoveBlock( state, clientId ) {
 			if ( defaultBlocks.length > 1 ) {
 				return true;
 			}
-		} else {
 			return false;
 		}
+		return false;
 	}
 
 	return rootBlockEditingMode !== 'disabled';
@@ -2636,7 +2636,7 @@ export function getDirectInsertBlock( state, rootClientId = null ) {
 		return;
 	}
 	const { defaultBlock, directInsert } =
-		state.blockListSettings[ rootClientId ] ?? {};
+		state.blockListSettings.get( rootClientId ) ?? {};
 	if ( ! defaultBlock || ! directInsert ) {
 		return;
 	}
@@ -2869,7 +2869,7 @@ export const __experimentalGetPatternTransformItems = createRegistrySelector(
  * @return {?Object} Block settings of the block if set.
  */
 export function getBlockListSettings( state, clientId ) {
-	return state.blockListSettings[ clientId ];
+	return state.blockListSettings.get( clientId );
 }
 
 /**
@@ -2907,16 +2907,14 @@ export function isLastBlockChangePersistent( state ) {
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
 	( state, clientIds = [] ) => {
-		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
-			if ( ! state.blockListSettings[ clientId ] ) {
-				return blockListSettingsForBlocks;
+		const blockListSettingsForBlocks = {};
+		for ( const clientId of clientIds ) {
+			const settings = getBlockListSettings( state, clientId );
+			if ( settings ) {
+				blockListSettingsForBlocks[ clientId ] = settings;
 			}
-
-			return {
-				...blockListSettingsForBlocks,
-				[ clientId ]: state.blockListSettings[ clientId ],
-			};
-		}, {} );
+		}
+		return blockListSettingsForBlocks;
 	},
 	( state ) => [ state.blockListSettings ]
 );

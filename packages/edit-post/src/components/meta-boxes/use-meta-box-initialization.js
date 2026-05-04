@@ -18,26 +18,35 @@ import { unlock } from '../../lock-unlock';
  * @param { boolean } enabled
  */
 export const useMetaBoxInitialization = ( enabled ) => {
-	const { isEnabledAndEditorReady, isCollaborationEnabled } = useSelect(
+	const {
+		isEnabledAndEditorReady,
+		isCollaborationEnabled,
+		hasIncompatibleMetaBoxes,
+	} = useSelect(
 		( select ) => ( {
 			isEnabledAndEditorReady:
 				enabled && select( editorStore ).__unstableIsEditorReady(),
 			isCollaborationEnabled:
 				select( editorStore ).isCollaborationEnabledForCurrentPost(),
+			hasIncompatibleMetaBoxes: enabled
+				? select( editPostStore )
+						.getAllMetaBoxes()
+						.some( ( metaBox ) => ! metaBox.__rtc_compatible )
+				: false,
 		} ),
 		[ enabled ]
 	);
 	const { setCollaborationSupported } = unlock( useDispatch( coreStore ) );
-
 	const { initializeMetaBoxes } = useDispatch( editPostStore );
+
 	// The effect has to rerun when the editor is ready because initializeMetaBoxes
 	// will noop until then.
 	useEffect( () => {
 		if ( isEnabledAndEditorReady ) {
 			initializeMetaBoxes();
 
-			// Disable real-time collaboration when legacy meta boxes are detected.
-			if ( isCollaborationEnabled ) {
+			// Disable real-time collaboration when incompatible meta boxes are detected.
+			if ( isCollaborationEnabled && hasIncompatibleMetaBoxes ) {
 				setCollaborationSupported( false );
 			}
 		}
@@ -46,5 +55,6 @@ export const useMetaBoxInitialization = ( enabled ) => {
 		initializeMetaBoxes,
 		isCollaborationEnabled,
 		setCollaborationSupported,
+		hasIncompatibleMetaBoxes,
 	] );
 };

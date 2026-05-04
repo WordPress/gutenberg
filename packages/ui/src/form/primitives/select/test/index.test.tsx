@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Select from '../index';
@@ -29,5 +29,68 @@ describe( 'Select', () => {
 		// Now test that the popup and item refs are also available
 		expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( itemRef.current ).toBeInstanceOf( HTMLDivElement );
+	} );
+
+	describe( 'portal', () => {
+		it( 'should render inside the portal container when a custom target is provided', async () => {
+			const user = userEvent.setup();
+			const containerRef = createRef< HTMLDivElement >();
+
+			render(
+				<div data-testid="wrapper">
+					<Select.Root>
+						<Select.Trigger />
+						<div
+							ref={ containerRef }
+							data-testid="custom-container"
+						/>
+						<Select.Popup
+							portal={
+								<Select.Portal container={ containerRef } />
+							}
+						>
+							<Select.Item value="Item 1" />
+						</Select.Popup>
+					</Select.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( screen.getByTestId( 'custom-container' ) ).toContainElement(
+				item
+			);
+		} );
+
+		it( 'should render with a portal by default', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<div data-testid="wrapper">
+					<Select.Root>
+						<Select.Trigger />
+						<Select.Popup>
+							<Select.Item value="Item 1" />
+						</Select.Popup>
+					</Select.Root>
+				</div>
+			);
+
+			await user.click( screen.getByRole( 'combobox' ) );
+
+			const item = await screen.findByRole( 'option', {
+				name: 'Item 1',
+			} );
+			expect( item ).toBeVisible();
+
+			expect( screen.getByTestId( 'wrapper' ) ).not.toContainElement(
+				item
+			);
+		} );
 	} );
 } );

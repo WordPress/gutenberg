@@ -89,6 +89,7 @@ test.describe( 'Big image size threshold', () => {
 				const items = uploadStore.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout: 120000 }
 		);
 
@@ -191,6 +192,7 @@ test.describe( 'Big image size threshold', () => {
 				const items = uploadStore.getItems();
 				return items.length === 0;
 			},
+			undefined,
 			{ timeout: 120000 }
 		);
 

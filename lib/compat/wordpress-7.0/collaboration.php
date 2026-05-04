@@ -200,6 +200,8 @@ if ( ! function_exists( 'wp_is_collaboration_allowed' ) ) {
 
 /**
  * Injects the real-time collaboration setting into a global variable.
+ *
+ * @global string $pagenow The filename of the current screen.
  */
 function gutenberg_inject_real_time_collaboration_setting() {
 	global $pagenow;
@@ -227,10 +229,13 @@ add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 
 /**
  * Core adds an option with the default value, so we need to set the option to
- * our intended default when the Gutenberg plugin is activated.
+ * our intended default when the Gutenberg plugin is activated, provided
+ * collaboration is allowed.
  */
 function gutenberg_set_collaboration_option_on_activation() {
-	update_option( 'wp_collaboration_enabled', '1' );
+	if ( wp_is_collaboration_allowed() ) {
+		update_option( 'wp_collaboration_enabled', '1' );
+	}
 }
 add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_option_on_activation' );
 
@@ -241,6 +246,8 @@ add_action( 'activate_gutenberg/gutenberg.php', 'gutenberg_set_collaboration_opt
  * user-specific lock text with "Currently being edited", changes the "Edit"
  * row action to "Join", and re-enables controls that core normally hides
  * for locked posts (since collaborative editing is possible).
+ *
+ * @global string $pagenow The filename of the current screen.
  */
 function gutenberg_post_list_collaboration_ui() {
 	global $pagenow;
