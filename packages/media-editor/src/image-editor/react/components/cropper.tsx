@@ -35,7 +35,7 @@ import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
-import { useViewportOptional } from './viewport-provider';
+import { ViewportProvider, useViewportOptional } from './viewport-provider';
 import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
@@ -591,6 +591,14 @@ function CropperInner(
 	);
 }
 
-export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
+const CropperInnerWithRef = forwardRef< HTMLDivElement, CropperProps >(
 	CropperInner
+);
+
+export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
+	( props, ref ) => (
+		<ViewportProvider>
+			<CropperInnerWithRef { ...props } ref={ ref } />
+		</ViewportProvider>
+	)
 );

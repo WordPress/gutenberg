@@ -4,7 +4,6 @@
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper, useCropper } from '../../image-editor';
-import { ViewportProvider } from '../../image-editor/react/components/viewport-provider';
 
 export interface MediaEditorCanvasProps {
 	/** Fixed aspect ratio (width / height). `undefined` means free. */
@@ -44,21 +43,19 @@ export default function MediaEditorCanvas( {
 
 	return (
 		<div className="media-editor-canvas">
-			<ViewportProvider>
-				<Cropper
-					src={ mediaUrl }
-					controller={ controller }
-					aspectRatio={ aspectRatio }
-					freeformCrop={ freeformCrop }
-					showGrid="interactive"
-					isPlacementActive={ isPlacementActive }
-					// Flush on gesture start so any pending sidebar interaction
-					// (e.g. zoom slider debounce) is committed as its own undo
-					// step before the canvas gesture begins.
-					onGestureStart={ controller.commitHistory }
-					onGestureEnd={ controller.commitHistory }
-				/>
-			</ViewportProvider>
+			<Cropper
+				src={ mediaUrl }
+				controller={ controller }
+				aspectRatio={ aspectRatio }
+				freeformCrop={ freeformCrop }
+				showGrid="interactive"
+				isPlacementActive={ isPlacementActive }
+				// Flush on gesture start so any pending sidebar interaction
+				// (e.g. zoom slider debounce) is committed as its own undo
+				// step before the canvas gesture begins.
+				onGestureStart={ controller.commitHistory }
+				onGestureEnd={ controller.commitHistory }
+			/>
 		</div>
 	);
 }
