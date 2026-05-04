@@ -103,7 +103,6 @@ if ( ! class_exists( 'WP_Connector_Registry' ) ) {
 		 *                                   'hello.php').
 		 *         @type callable $is_active Optional callback to determine whether the plugin
 		 *                                   is active. Receives no arguments and must return bool.
-		 *                                   Defaults to `__return_true`.
 		 *     }
 		 * }
 		 * @return array|null The registered connector data on success, null on failure.
