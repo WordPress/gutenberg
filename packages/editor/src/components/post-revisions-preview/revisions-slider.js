@@ -152,7 +152,7 @@ function RevisionsSlider() {
 	}
 
 	return (
-		<Stack direction="row" gap="sm" align="center">
+		<Stack direction="row" gap="sm" align="center" style={ { flex: 1 } }>
 			<Button
 				icon={ chevronLeft }
 				label={
