@@ -1,6 +1,31 @@
 <?php
 /**
- * A custom REST server for Gutenberg.
+ * REST controller overrides for `note`-type comments (block notes and
+ * suggestions).
+ *
+ * Default WordPress comment auth assumes the actor is a comment moderator —
+ * for example, `update_item` requires `edit_comment` on the target. That model
+ * is too restrictive for block notes: a post editor needs to read, accept, or
+ * reject notes left on a post they own, regardless of whether they have
+ * `moderate_comments`. The author of a note also needs to update its lifecycle
+ * fields without escalating to comment-moderator privileges.
+ *
+ * This subclass remaps the relevant permission checks for `type === 'note'`:
+ *   - `get_items` (edit context): note threads are visible to users with
+ *     `edit_post` on the parent post (not just comment moderators), so
+ *     authors can review notes left by collaborators.
+ *   - `create_item`: any user with `edit_post` can leave a note or attach a
+ *     suggestion; suggesting does not require `moderate_comments`.
+ *   - `update_item`: post editors can apply or reject suggestions on notes
+ *     they did not author, but only via `is_suggestion_lifecycle_update()` —
+ *     a strict allowlist limited to `status` and `meta._wp_suggestion_status`.
+ *     Any other field forces fallback to the core `edit_comment` check, so
+ *     the apply/reject path can never be used to rewrite another user's note.
+ *
+ * The subclass also enforces server-side payload-size validation: requests
+ * carrying a `_wp_suggestion` meta value larger than
+ * `GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` are rejected with HTTP 413 before
+ * the meta sanitize_callback can silently truncate them.
  *
  * @package gutenberg
  * @since   6.9.0
