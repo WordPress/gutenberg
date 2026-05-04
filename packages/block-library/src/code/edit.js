@@ -84,6 +84,7 @@ export default function CodeEdit( {
 							createBlock( getDefaultBlockName() )
 						)
 					}
+					style={ { whiteSpace: 'break-spaces' } }
 				/>
 			</pre>
 		</>
