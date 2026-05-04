@@ -1078,9 +1078,14 @@ export const switchEditorMode =
  * (`suggest`), or viewing the post in a read-only mode (`view`). It is
  * orthogonal to the `editorMode` preference (visual vs. code).
  *
- * The intent is *session-scoped* — reloading the editor always returns to
- * `edit`. Persisting suggest/view across reloads surprises users who don't
- * realize they left the editor in a non-default state.
+ * The intent is *session-scoped* — held in the editor reducer (not the
+ * preferences store), so reloading the editor always returns to `edit`.
+ * Persisting suggest/view across reloads surprises users who don't realize
+ * they left the editor in a non-default state.
+ *
+ * Unknown intents are silently rejected (no dispatch, no announcement) so
+ * typos from a bookmarklet, browser extension, or third-party plugin can't
+ * poison the editor state; valid values are listed in `EDITOR_INTENTS`.
  *
  * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
  */

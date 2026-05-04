@@ -1,4 +1,37 @@
 /**
+ * Store-level safety net for Suggest mode.
+ *
+ * `withSuggestionOverlay` already diverts attribute changes that go through a
+ * block's `setAttributes` prop. This file handles the other half: mutations
+ * that bypass the prop chain by dispatching `updateBlockAttributes` directly
+ * to the block-editor store. The block-switcher (heading variation H2 → H3)
+ * and any third-party code that uses the data store API land here.
+ *
+ * Strategy (see `SuggestionStoreInterceptor` for the fully-commented flow):
+ *   - On Suggest activation, snapshot every block's attributes.
+ *   - Subscribe to the registry. When a dispatch lands the subscribe fires;
+ *     diff the live attributes against the snapshot.
+ *   - For drift on a tracked block: route the changed attributes into the
+ *     overlay and dispatch a revert that restores the snapshot.
+ *   - The `isReverting` flag suppresses the recursive subscribe fire that
+ *     the revert dispatch itself would otherwise trigger.
+ *   - System-managed metadata (`metadata.noteId` written by the suggestion
+ *     provider after creating a note comment) is folded into the snapshot
+ *     before diffing so it's invisible to the diff and never leaks into the
+ *     user-pending overlay.
+ *
+ * Why subscribe rather than React state:
+ *   - The interceptor must run after the dispatch lands but before any
+ *     React re-render serializes the (now wrong) state. `registry.subscribe`
+ *     fires synchronously immediately after every store update.
+ *   - Subscribe also catches dispatches from non-React paths (CLI scripts,
+ *     keyboard handlers, external integrations) that wouldn't trigger a
+ *     `useSelect`-based watcher.
+ *
+ * New blocks (no snapshot entry) are tracked but not intercepted — inserting
+ * a block in Suggest mode is currently a real edit, not a suggestion.
+ */
+/**
  * WordPress dependencies
  */
 import { useRegistry, useSelect } from '@wordpress/data';
