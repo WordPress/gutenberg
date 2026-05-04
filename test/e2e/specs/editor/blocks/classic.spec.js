@@ -18,12 +18,12 @@ test.use( {
 } );
 
 test.describe( 'Classic', () => {
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-	} );
-
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
 	} );
 
 	test( 'should be inserted', async ( { editor, page } ) => {
@@ -142,7 +142,7 @@ test.describe( 'Classic', () => {
 		await expect( classicBlock ).toBeVisible();
 		await classicBlock.click();
 
-		expect( errors.length ).toBe( 0 );
+		expect( errors ).toHaveLength( 0 );
 		await expect.poll( editor.getEditedPostContent ).toBe( 'test' );
 	} );
 } );
@@ -151,14 +151,7 @@ class MediaUtils {
 	constructor( { page } ) {
 		this.page = page;
 
-		this.TEST_IMAGE_FILE_PATH = path.join(
-			__dirname,
-			'..',
-			'..',
-			'..',
-			'assets',
-			'10x10_e2e_test_image_z9T8jK.png'
-		);
+		this.TEST_IMAGE_FILE_PATH = './assets/10x10_e2e_test_image_z9T8jK.png';
 	}
 
 	async upload( inputElement ) {

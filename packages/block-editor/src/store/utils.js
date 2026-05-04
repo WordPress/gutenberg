@@ -138,7 +138,7 @@ export const getAllPatternsDependants = ( select ) => ( state ) => {
 
 export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 	return [
-		state.blockListSettings[ rootClientId ],
+		state.blockListSettings.get( rootClientId ),
 		state.blocks.byClientId.get( rootClientId ),
 		state.blocks.order.get( rootClientId || '' ),
 		state.settings.allowedBlockTypes,

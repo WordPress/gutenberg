@@ -147,8 +147,10 @@ test.describe( 'Post revisions', () => {
 		await page.keyboard.press( 'Home' );
 
 		// Verify the heading's clientId is preserved (prevents flashing).
-		const clientIdAfter = await headingBlock.getAttribute( 'data-block' );
-		expect( clientIdAfter ).toBe( clientIdBefore );
+		await expect( headingBlock ).toHaveAttribute(
+			'data-block',
+			clientIdBefore
+		);
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/75926
@@ -225,6 +227,40 @@ test.describe( 'Post revisions', () => {
 			editor.canvas.locator( '[data-type="test/selectors-in-revisions"]' )
 		).toHaveText( 'has-group-parent' );
 	} );
+
+	test( 'should not show warning for post title block in revisions', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/post-title' } );
+		await editor.saveDraft();
+
+		// Add a paragraph to create a second revision.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Some content' },
+		} );
+		await editor.saveDraft();
+
+		// Enter revisions mode.
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', { name: '2', exact: true } )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const titleBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Title',
+		} );
+		await expect( titleBlock ).toBeVisible();
+		await expect( titleBlock ).not.toHaveClass( /has-warning/ );
+	} );
 } );
 
 test.describe( 'Template and template part revisions', () => {
@@ -232,13 +268,13 @@ test.describe( 'Template and template part revisions', () => {
 		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-	} );
-
 	test.afterEach( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllTemplates( 'wp_template' );
 		await requestUtils.deleteAllTemplates( 'wp_template_part' );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	[

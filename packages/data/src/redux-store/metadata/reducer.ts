@@ -19,7 +19,8 @@ import type {
 /**
  * Internal dependencies
  */
-import { selectorArgsToStateKey, onSubKey } from './utils';
+import { keyedReducer } from '../keyed-reducer';
+import { selectorArgsToStateKey } from './utils';
 
 type Action =
 	| ReturnType< typeof startResolution >
@@ -46,10 +47,13 @@ export type State = EquivalentKeyMap< StateKey, StateValue >;
  *
  *  selectorName -> EquivalentKeyMap<Array,boolean>
  */
-const subKeysIsResolved: Reducer< Record< string, State >, Action > = onSubKey<
-	State,
+const subKeysIsResolved: Reducer<
+	Record< string, State >,
 	Action
->( 'selectorName' )( ( state = new EquivalentKeyMap(), action: Action ) => {
+> = keyedReducer< State, Action >( 'selectorName' )( (
+	state = new EquivalentKeyMap(),
+	action: Action
+) => {
 	switch ( action.type ) {
 		case 'START_RESOLUTION': {
 			const nextState = new EquivalentKeyMap( state );

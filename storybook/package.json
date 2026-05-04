@@ -19,15 +19,21 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"exports": {
+		"./main": "./main.ts",
+		"./preview": "./preview.jsx"
+	},
 	"devDependencies": {
 		"@storybook/addon-a11y": "^10.2.8",
 		"@storybook/addon-docs": "^10.2.8",
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.2.8",
+		"@vitejs/plugin-react": "^5.1.2",
 		"@wordpress/theme": "file:../packages/theme",
 		"storybook": "^10.2.8",
 		"storybook-addon-tag-badges": "^3.0.4",
-		"terser": "^5.37.0"
+		"terser": "^5.37.0",
+		"vite": "^7.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

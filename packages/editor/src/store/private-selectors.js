@@ -21,7 +21,11 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { getRenderingMode, getCurrentPost } from './selectors';
+import {
+	getRenderingMode,
+	getCurrentPost,
+	getEditorSettings,
+} from './selectors';
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
@@ -297,6 +301,11 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			'core',
 			'renderingModes'
 		)?.[ theme ]?.[ postType ];
+
+		if ( RENDERING_MODES.includes( defaultModePreference ) ) {
+			return defaultModePreference;
+		}
+
 		const postTypeDefaultMode = Array.isArray(
 			postTypeEntity?.supports?.editor
 		)
@@ -305,14 +314,18 @@ export const getDefaultRenderingMode = createRegistrySelector(
 			  )?.[ 'default-mode' ]
 			: undefined;
 
-		const defaultMode = defaultModePreference || postTypeDefaultMode;
-
-		// Fallback gracefully to 'post-only' when rendering mode is not supported.
-		if ( ! RENDERING_MODES.includes( defaultMode ) ) {
-			return 'post-only';
+		if ( RENDERING_MODES.includes( postTypeDefaultMode ) ) {
+			return postTypeDefaultMode;
 		}
 
-		return defaultMode;
+		const settingsDefaultMode =
+			getEditorSettings( state ).defaultRenderingMode;
+
+		if ( RENDERING_MODES.includes( settingsDefaultMode ) ) {
+			return settingsDefaultMode;
+		}
+
+		return 'post-only';
 	}
 );
 
@@ -334,16 +347,6 @@ export function getStylesPath( state ) {
  */
 export function getShowStylebook( state ) {
 	return state.showStylebook ?? false;
-}
-
-/**
- * Get the canvas minimum height.
- *
- * @param {Object} state Global application state.
- * @return {number} The canvas minimum height.
- */
-export function getCanvasMinHeight( state ) {
-	return state.canvasMinHeight;
 }
 
 /**
@@ -482,6 +485,8 @@ export const getPreviousRevision = createRegistrySelector(
 			{
 				per_page: -1,
 				context: 'edit',
+				orderby: 'date',
+				order: 'asc',
 				_fields: [
 					...new Set( [
 						'id',
@@ -501,25 +506,14 @@ export const getPreviousRevision = createRegistrySelector(
 			return null;
 		}
 
-		// Template revisions use the template REST API format, which exposes
-		// 'modified' instead of 'date'. Regular post revisions use 'date'.
-		const revisionDateField = revisionKey === 'wp_id' ? 'modified' : 'date';
-
-		// Sort by date ascending (oldest first).
-		const sortedRevisions = [ ...revisions ].sort(
-			( a, b ) =>
-				new Date( a[ revisionDateField ] ) -
-				new Date( b[ revisionDateField ] )
-		);
-
 		// Find current revision index.
-		const currentIndex = sortedRevisions.findIndex(
+		const currentIndex = revisions.findIndex(
 			( r ) => r[ revisionKey ] === currentRevisionId
 		);
 
 		// Return the previous revision (older one) if it exists.
 		if ( currentIndex > 0 ) {
-			return sortedRevisions[ currentIndex - 1 ];
+			return revisions[ currentIndex - 1 ];
 		}
 
 		return null;

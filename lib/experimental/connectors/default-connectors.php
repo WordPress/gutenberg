@@ -525,8 +525,22 @@ function _gutenberg_get_connector_script_module_data( array $data ): array {
 
 		if ( ! empty( $connector_data['plugin']['file'] ) ) {
 			$file         = $connector_data['plugin']['file'];
-			$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
-			$is_activated = $is_installed && is_plugin_active( $file );
+			$is_installed = false;
+			$is_activated = false;
+
+			if ( ! empty( $connector_data['plugin']['is_active'] ) && is_callable( $connector_data['plugin']['is_active'] ) ) {
+				$is_activated = (bool) call_user_func( $connector_data['plugin']['is_active'] );
+			}
+
+			if ( ! $is_activated ) {
+				$is_activated = is_plugin_active( $file );
+			}
+
+			if ( $is_activated ) {
+				$is_installed = true;
+			} else {
+				$is_installed = file_exists( WP_PLUGIN_DIR . '/' . $file );
+			}
 
 			$connector_out['plugin'] = array(
 				'file'        => $file,

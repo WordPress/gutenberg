@@ -114,8 +114,8 @@ export function createLinkFormat( {
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
 		format.attributes.rel = format.attributes.rel
-			? format.attributes.rel + ' noreferrer noopener'
-			: 'noreferrer noopener';
+			? format.attributes.rel + ' noopener'
+			: 'noopener';
 	}
 
 	if ( nofollow ) {

@@ -343,6 +343,7 @@ export function getViewConfig(
 			default_view: undefined,
 			default_layouts: undefined,
 			view_list: undefined,
+			form: undefined,
 		}
 	);
 }

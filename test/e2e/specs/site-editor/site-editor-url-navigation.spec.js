@@ -15,19 +15,19 @@ test.describe( 'Site editor url navigation', () => {
 		);
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
-	} );
-
 	test.beforeEach( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPosts(),
 			requestUtils.deleteAllTemplates( 'wp_template' ),
 			requestUtils.deleteAllTemplates( 'wp_template_part' ),
 		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'Redirection after template creation', async ( {

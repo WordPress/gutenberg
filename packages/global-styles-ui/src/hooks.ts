@@ -36,17 +36,21 @@ extend( [ a11yPlugin ] );
  * @param blockName          The name of the block, if applicable.
  * @param readFrom           Which source to read from: "base" (theme), "user" (customizations), or "merged" (final result).
  * @param shouldDecodeEncode Whether to decode and encode the style value.
+ * @param state              Optional pseudo-selector state (e.g. `:hover`, `:focus`). When provided,
+ *                           reads from and writes to the state sub-object automatically.
  * @return An array containing the style value and a function to set the style
  * value.
  *
  * @example
  * const [ color, setColor ] = useStyle<string>( 'color.text', 'core/button', 'merged' );
+ * const [ hoverColor, setHoverColor ] = useStyle<string>( 'color.text', 'core/button', 'user', true, ':hover' );
  */
 export function useStyle< T = any >(
 	path: string,
 	blockName?: string,
 	readFrom: 'base' | 'user' | 'merged' = 'merged',
-	shouldDecodeEncode: boolean = true
+	shouldDecodeEncode: boolean = true,
+	state?: string
 ) {
 	const { user, base, merged, onChange } = useContext( GlobalStylesContext );
 
@@ -57,22 +61,43 @@ export function useStyle< T = any >(
 		sourceValue = user;
 	}
 
-	const styleValue = useMemo(
-		() => getStyle< T >( sourceValue, path, blockName, shouldDecodeEncode ),
-		[ sourceValue, path, blockName, shouldDecodeEncode ]
-	);
+	const styleValue = useMemo( () => {
+		const rawValue = getStyle< T >(
+			sourceValue,
+			path,
+			blockName,
+			shouldDecodeEncode
+		);
+		if ( state ) {
+			return ( rawValue as any )?.[ state ] ?? {};
+		}
+		return rawValue;
+	}, [ sourceValue, path, blockName, shouldDecodeEncode, state ] );
 
 	const setStyleValue = useCallback(
 		( newValue: T | undefined ) => {
-			const newGlobalStyles = setStyle< T >(
+			let valueToSet: any = newValue;
+			if ( state ) {
+				const fullCurrentValue = getStyle(
+					user,
+					path,
+					blockName,
+					false
+				);
+				valueToSet = {
+					...( fullCurrentValue as object ),
+					[ state ]: newValue,
+				};
+			}
+			const newGlobalStyles = setStyle< any >(
 				user,
 				path,
-				newValue,
+				valueToSet,
 				blockName
 			);
 			onChange( newGlobalStyles );
 		},
-		[ user, onChange, path, blockName ]
+		[ user, onChange, path, blockName, state ]
 	);
 
 	return [ styleValue, setStyleValue ] as const;

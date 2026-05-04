@@ -1,6 +1,6 @@
+import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { forwardRef } from '@wordpress/element';
 
-import * as Dialog from '../dialog';
 import type { TriggerProps } from './types';
 
 /**
@@ -8,7 +8,7 @@ import type { TriggerProps } from './types';
  */
 const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 	function AlertDialogTrigger( props, ref ) {
-		return <Dialog.Trigger ref={ ref } { ...props } />;
+		return <_AlertDialog.Trigger ref={ ref } { ...props } />;
 	}
 );
 

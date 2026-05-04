@@ -182,7 +182,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -236,7 +236,7 @@ test.describe( 'Copy/cut/paste', () => {
 			() => window.e2eTestPasteOnce
 		);
 
-		expect( blocksUpdated.length ).toEqual( 1 );
+		expect( blocksUpdated ).toHaveLength( 1 );
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -374,7 +374,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should cut partial selection and merge like a normal `delete` - not forward ', async ( {
+	test( 'should cut partial selection and merge like a normal `delete` - not forward', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -405,7 +405,7 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	test( 'should paste plain text in plain text context when cross block selection is copied ', async ( {
+	test( 'should paste plain text in plain text context when cross block selection is copied', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -683,6 +683,29 @@ test.describe( 'Copy/cut/paste', () => {
 		await pageUtils.pressKeys( 'primary+v' );
 		expect( await editor.getBlocks() ).toMatchObject( [
 			{ name: 'core/embed' },
+		] );
+	} );
+
+	test( 'should undo embed on paste', async ( { pageUtils, editor } ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		pageUtils.setClipboardData( {
+			plainText: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+			html: 'https://www.youtube.com/watch?v=FcTLMTyD2DU',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{ name: 'core/embed' },
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://www.youtube.com/watch?v=FcTLMTyD2DU">https://www.youtube.com/watch?v=FcTLMTyD2DU</a>',
+				},
+			},
 		] );
 	} );
 

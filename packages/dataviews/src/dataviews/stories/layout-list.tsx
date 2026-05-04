@@ -63,13 +63,11 @@ export const LayoutTableComponent = ( {
 	}, [ view ] );
 	return (
 		<div
-			style={
-				{
-					height: '100%',
-					maxWidth: fullWidth ? undefined : '400px',
-					'--wp-dataviews-color-background': backgroundColor,
-				} as React.CSSProperties
-			}
+			style={ {
+				height: '100%',
+				maxWidth: fullWidth ? undefined : '400px',
+				'--wp-dataviews-color-background': backgroundColor,
+			} }
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
@@ -100,7 +98,7 @@ export const LayoutTableComponent = ( {
 				) }
 				isItemClickable={ () => hasClickableItems }
 				defaultLayouts={ {
-					[ LAYOUT_LIST ]: {},
+					[ LAYOUT_LIST ]: true,
 				} }
 				config={ { perPageSizes } }
 			/>
