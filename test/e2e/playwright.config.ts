@@ -10,6 +10,13 @@ import { defineConfig, devices } from '@playwright/test';
  */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
+const baseTestIgnore: Array< string | RegExp > = [];
+if ( Array.isArray( baseConfig.testIgnore ) ) {
+	baseTestIgnore.push( ...baseConfig.testIgnore );
+} else if ( baseConfig.testIgnore ) {
+	baseTestIgnore.push( baseConfig.testIgnore );
+}
+
 const config = defineConfig( {
 	...baseConfig,
 	webServer: {
@@ -23,6 +30,10 @@ const config = defineConfig( {
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
 	),
+	testIgnore: [
+		...baseTestIgnore,
+		'**/specs/editor/collaboration/websocket/**',
+	],
 	projects: [
 		{
 			name: 'chromium',

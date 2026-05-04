@@ -38,6 +38,7 @@ export const SECOND_USER: UserCredentials = {
 };
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
+const USE_TEST_WS_PROVIDER = process.env.GUTENBERG_RTC_TEST_WS_PROVIDER === '1';
 
 export default class CollaborationUtils {
 	private admin: Admin;
@@ -97,6 +98,9 @@ export default class CollaborationUtils {
 	): Promise< { page: Page; editor: Editor } > {
 		const context = await this.admin.browser.newContext( {
 			baseURL: BASE_URL,
+			...( USE_TEST_WS_PROVIDER
+				? { storageState: { cookies: [], origins: [] } }
+				: {} ),
 		} );
 		const newPage = await context.newPage();
 
@@ -150,15 +154,79 @@ export default class CollaborationUtils {
 		const pages = this.allPages;
 		const resolvedTimeout = timeout ?? 10000 + pages.length * 2500;
 
+		if ( USE_TEST_WS_PROVIDER ) {
+			const roomName = await this.getCurrentPostRoomName(
+				this.primaryPage
+			);
+			await Promise.all(
+				pages.map( ( pg ) =>
+					this.waitForTestWebSocketAwarenessPeerCount(
+						pg,
+						pages.length,
+						resolvedTimeout,
+						roomName
+					)
+				)
+			);
+		} else {
+			await Promise.all(
+				pages.map( ( pg ) =>
+					pg
+						.getByRole( 'button', {
+							name: /Collaborators list/,
+						} )
+						.waitFor( { timeout: resolvedTimeout } )
+				)
+			);
+		}
+
 		await Promise.all(
 			pages.map( ( pg ) =>
-				pg
-					.getByRole( 'button', { name: /Collaborators list/ } )
-					.waitFor( { timeout: resolvedTimeout } )
+				this.waitForSyncCycle( pg, 3, { timeout: resolvedTimeout } )
 			)
 		);
+	}
 
-		await Promise.all( pages.map( ( pg ) => this.waitForSyncCycle( pg ) ) );
+	async waitForTestWebSocketAwarenessPeerCount(
+		page: Page,
+		expectedPeerCount: number,
+		timeout: number,
+		roomName?: string
+	) {
+		await page.waitForFunction(
+			( { expected, room }: { expected: number; room?: string } ) => {
+				const state = ( window as any ).__gutenbergTestWebSocketSync;
+				const rooms = state?.rooms ?? {};
+				const matchingRoom = room
+					? rooms[ room ]
+					: Object.values( rooms ).find(
+							( candidate: any ) =>
+								candidate?.awarenessCount >= expected
+					  );
+
+				return (
+					matchingRoom?.status === 'connected' &&
+					matchingRoom?.awarenessCount >= expected
+				);
+			},
+			{ expected: expectedPeerCount, room: roomName },
+			{ timeout }
+		);
+	}
+
+	async getCurrentPostRoomName( page: Page ): Promise< string > {
+		const postId = await page.evaluate(
+			() =>
+				( window as any ).wp?.data
+					?.select( 'core/editor' )
+					?.getCurrentPostId?.()
+		);
+
+		if ( ! postId ) {
+			throw new Error( 'Current post ID is unavailable.' );
+		}
+
+		return `postType/post:${ postId }`;
 	}
 
 	/**
@@ -323,6 +391,22 @@ export default class CollaborationUtils {
 		cycles = 3,
 		{ timeout = 10000 }: { timeout?: number } = {}
 	) {
+		if ( USE_TEST_WS_PROVIDER ) {
+			await page.waitForFunction(
+				() => {
+					const state = ( window as any )
+						.__gutenbergTestWebSocketSync;
+					const rooms = Object.values( state?.rooms ?? {} );
+					return rooms.some(
+						( room: any ) => room?.status === 'connected'
+					);
+				},
+				undefined,
+				{ timeout }
+			);
+			return;
+		}
+
 		for ( let i = 0; i < cycles; i++ ) {
 			await page.waitForResponse(
 				( response ) =>

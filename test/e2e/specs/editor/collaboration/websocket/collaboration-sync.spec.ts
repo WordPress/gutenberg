@@ -1,0 +1,1 @@
+import '../collaboration-sync.spec';
