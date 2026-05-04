@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+/**
  * Internal dependencies
  */
 import { pxToValueDelta, clampValue, applyZeroSnap } from '../use-ruler-drag';
+import RotationRuler from '../index';
 
 describe( 'rotation-ruler math', () => {
 	describe( 'pxToValueDelta', () => {
@@ -44,5 +51,69 @@ describe( 'rotation-ruler math', () => {
 		it( 'is a no-op when window is 0', () => {
 			expect( applyZeroSnap( 0.1, 5, 0 ) ).toBe( 0.1 );
 		} );
+	} );
+} );
+
+describe( 'RotationRuler', () => {
+	it( 'renders the value on the underlying input and in aria-valuetext', () => {
+		render(
+			<RotationRuler
+				value={ -14 }
+				onChange={ () => {} }
+				label="Fine rotation"
+			/>
+		);
+		const input = screen.getByRole( 'slider', { name: 'Fine rotation' } );
+		expect( ( input as HTMLInputElement ).valueAsNumber ).toBe( -14 );
+		expect( input ).toHaveAttribute( 'aria-valuetext', '-14°' );
+	} );
+
+	it( 'fires onChange with value + step on ArrowRight', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<RotationRuler
+				value={ 0 }
+				onChange={ onChange }
+				label="Fine rotation"
+			/>
+		);
+		const input = screen.getByRole( 'slider', { name: 'Fine rotation' } );
+		input.focus();
+		await user.keyboard( '{ArrowRight}' );
+		expect( onChange ).toHaveBeenCalledWith( 1 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'fires onChange with value + step / 2 on Shift+ArrowRight', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<RotationRuler
+				value={ 0 }
+				onChange={ onChange }
+				label="Fine rotation"
+			/>
+		);
+		screen.getByRole( 'slider', { name: 'Fine rotation' } ).focus();
+		await user.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
+		expect( onChange ).toHaveBeenCalledWith( 0.5 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'does not fire onChange when disabled', async () => {
+		const user = userEvent.setup();
+		const onChange = jest.fn();
+		render(
+			<RotationRuler
+				value={ 0 }
+				onChange={ onChange }
+				label="Fine rotation"
+				disabled
+			/>
+		);
+		screen.getByRole( 'slider', { name: 'Fine rotation' } ).focus();
+		await user.keyboard( '{ArrowRight}' );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 } );

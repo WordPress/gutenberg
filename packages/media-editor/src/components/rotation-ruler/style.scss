@@ -1,0 +1,119 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.rotation-ruler {
+	position: relative;
+	min-width: 180px;
+	height: 56px;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	padding: $grid-unit-30 $grid-unit-10 $grid-unit-10;
+	box-sizing: border-box;
+	user-select: none;
+	touch-action: none;
+	// Always declare the container so the inline-size query below can
+	// match. Cheap; only affects layout if a child uses cqw/cqh.
+	container-type: inline-size;
+
+	&[data-disabled] {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	&:has(.rotation-ruler__input:focus-visible) {
+		outline: 2px solid var(--wp-admin-theme-color);
+		outline-offset: 2px;
+		border-radius: 4px;
+	}
+}
+
+// Visually hidden but kept in layout so it's focusable.
+.rotation-ruler__input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+	clip: rect(0 0 0 0);
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.rotation-ruler__strip {
+	position: absolute;
+	inset: $grid-unit-30 0 $grid-unit-10;
+	overflow: hidden;
+	cursor: ew-resize;
+}
+
+.rotation-ruler__ticks {
+	position: absolute;
+	left: 50%;
+	top: 0;
+	display: block;
+}
+
+.rotation-ruler__tick {
+	stroke: currentColor;
+	stroke-width: 1;
+
+	&--minor {
+		opacity: 0.35;
+	}
+
+	&--mid {
+		opacity: 0.6;
+	}
+
+	&--major {
+		opacity: 1;
+	}
+}
+
+.rotation-ruler__pointer {
+	position: absolute;
+	left: 50%;
+	bottom: $grid-unit-10;
+	width: 2px;
+	height: 28px;
+	background: var(--wp-admin-theme-color);
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
+.rotation-ruler__pointer::after {
+	content: "";
+	position: absolute;
+	top: -4px;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-bottom: 4px solid var(--wp-admin-theme-color);
+	transform: translateX(-50%);
+}
+
+.rotation-ruler__bubble {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 12px;
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+}
+
+// Below ~220px container width, fade out 1° ticks; mid/major remain.
+@container (max-width: 220px) {
+	.rotation-ruler__tick--minor {
+		opacity: 0;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.rotation-ruler__ticks {
+		transition: none;
+	}
+}
