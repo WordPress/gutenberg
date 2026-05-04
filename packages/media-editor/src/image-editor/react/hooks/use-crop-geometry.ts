@@ -8,7 +8,6 @@ import { useMemo } from '@wordpress/element';
  */
 import {
 	getCropGeometrySnapshot,
-	type CropGeometryInput,
 	type CropGeometrySnapshot,
 	type CropPixelLayoutBounds,
 	type CropPixelRect,
@@ -16,7 +15,6 @@ import {
 	type CropPixelRectBounds,
 	type CropPixelRectValidationResult,
 	type CropPixelRectViolation,
-	type CropperLayoutGeometry,
 } from '../../core/crop-geometry';
 import type { SourceRegion } from '../../core/source-region';
 import {
@@ -25,7 +23,6 @@ import {
 } from '../components/cropper-provider';
 
 export type {
-	CropGeometryInput,
 	CropGeometrySnapshot,
 	CropPixelLayoutBounds,
 	CropPixelRect,
@@ -33,7 +30,6 @@ export type {
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
-	CropperLayoutGeometry,
 };
 
 export interface UseCropGeometryReturn {

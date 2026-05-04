@@ -114,17 +114,9 @@ Validity is always relative to an explicit bounds object. `layoutBounds` answers
 
 Returns the current crop pixel rectangle, current-layout bounds, and source region once the cropper has loaded image and layout geometry. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
 
-#### `getCropGeometrySnapshot( input ): CropGeometrySnapshot | null`
-
-Pure helper behind `useCropGeometry()`. Returns `{ rect, layoutBounds, sourceRegion }`, or `null` when image/layout geometry is not ready.
-
 #### `getCropPixelRect( state, imageSize ): CropPixelRect`
 
 Converts `state.cropRect` to snap-rotation pixel coordinates: `{ left, top, width, height, right, bottom }`.
-
-#### `getCropPixelLayoutBounds( input ): CropPixelLayoutBounds | null`
-
-Returns current-layout crop edge constraints in the same pixel space as `CropPixelRect`. These bounds describe what fits without changing the cropper camera; they are not absolute source-image bounds.
 
 #### `clampCropPixelRectToBounds( rect, bounds ): CropPixelRect`
 
@@ -182,7 +174,6 @@ Applies a single operation to an existing state.
 | `Flip`                  | `{ horizontal: boolean, vertical: boolean }`                                      |
 | `SourceRegion`          | `{ x, y, width, height, rotation, flip, zoom }` in source pixels                  |
 | `SourceRegionPercent`   | `{ x, y, width, height }` as percentages (0–100)                                  |
-| `CropGeometryInput`     | Cropper state, image size, and measured layout geometry for pure geometry helpers |
 | `CropGeometrySnapshot`  | `{ rect, layoutBounds, sourceRegion }` for current crop geometry                  |
 | `CropPixelRect`         | `{ left, top, width, height, right, bottom }` in snap-rotation pixels             |
 | `CropPixelRectInput`    | Consumer-proposed `{ left, top, width, height }` before derived edges are added   |

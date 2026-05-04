@@ -14,14 +14,12 @@ export type {
 	UseCropperStateReturn,
 	UseCropGeometryReturn,
 	CropGeometrySnapshot,
-	CropGeometryInput,
 	CropPixelLayoutBounds,
 	CropPixelRect,
 	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
-	CropperLayoutGeometry,
 } from './react/hooks';
 export type { CropperProps } from './react/components';
 
@@ -45,8 +43,6 @@ export {
 	getSourceRegionPercent,
 	clampCropPixelRectToBounds,
 	cropPixelRectToNormalizedRect,
-	getCropGeometrySnapshot,
-	getCropPixelLayoutBounds,
 	getCropPixelRect,
 	validateCropPixelRectAgainstBounds,
 	applyOperationToState,
