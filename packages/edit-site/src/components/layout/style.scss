@@ -87,18 +87,6 @@
 	z-index: 2;
 	// When animating the frame size can exceed its container size.
 	overflow: visible;
-
-	&.is-resizing::after {
-		// This covers the whole content which ensures mouse up triggers
-		// even if the content is "inert".
-		position: absolute;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		content: "";
-		z-index: 100;
-	}
 }
 
 .edit-site-layout__canvas {
