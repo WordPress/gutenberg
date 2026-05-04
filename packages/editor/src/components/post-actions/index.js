@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	forwardRef,
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	privateApis as componentsPrivateApis,
@@ -90,15 +96,29 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 // so duplication is the least-bad option until the action-modal API is
 // extracted to a neutral package — a tracked follow-up on the parent PR.
 
-function DropdownMenuItemTrigger( { action, onClick, items } ) {
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
-	return (
-		<Menu.Item disabled={ action.disabled } onClick={ onClick }>
-			<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-		</Menu.Item>
-	);
-}
+// Forwards `ref` and unknown props onto `Menu.Item`, so the same
+// component works both as a direct callable (parent supplies `onClick`)
+// and as the body of a render-prop composition (e.g.
+// `<DropdownMenuItemTrigger render={ <Dialog.Trigger /> } />`). Mirrors
+// dataviews' `MenuItemTrigger`.
+const DropdownMenuItemTrigger = forwardRef(
+	( { action, items, render, ...rest }, ref ) => {
+		const label =
+			typeof action.label === 'string'
+				? action.label
+				: action.label( items );
+		return (
+			<Menu.Item
+				ref={ ref }
+				disabled={ action.disabled }
+				render={ render }
+				{ ...rest }
+			>
+				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
+			</Menu.Item>
+		);
+	}
+);
 
 // Wraps a single modal action as a menu item that opens the action's
 // dialog. Owns the dialog's open state locally so each modal action is
@@ -108,20 +128,17 @@ function DropdownMenuItemTrigger( { action, onClick, items } ) {
 function ModalActionMenuItem( { action, items } ) {
 	const [ open, setOpen ] = useState( false );
 	const closeModal = useCallback( () => setOpen( false ), [] );
-	const label =
-		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Dialog.Root
 			open={ open }
 			onOpenChange={ setOpen }
 			disablePointerDismissal={ action.hideModalHeader }
 		>
-			<Menu.Item
-				disabled={ action.disabled }
+			<DropdownMenuItemTrigger
+				action={ action }
+				items={ items }
 				render={ <Dialog.Trigger /> }
-			>
-				<Menu.ItemLabel>{ label }</Menu.ItemLabel>
-			</Menu.Item>
+			/>
 			<ActionModal
 				action={ action }
 				items={ items }
