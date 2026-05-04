@@ -305,6 +305,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 				getBlockRootClientId,
 				canInsertBlockType,
 			} = registry.select( blockEditorStore );
+			const { isSectionBlock, getEditedContentOnlySection } = unlock(
+				registry.select( blockEditorStore )
+			);
 
 			function switchToDefaultOrRemove() {
 				const block = getBlock( clientId );
@@ -359,7 +362,20 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, registry ) => {
 					blockOrder.length === 1 &&
 					isUnmodifiedBlock( getBlock( firstClientId ) )
 				) {
-					removeBlock( _clientId );
+					// Don't collapse entity-like wrappers (template parts,
+					// synced/unsynced patterns) when their single child is
+					// empty. Just remove the empty child so the wrapper
+					// falls back to its appender. For plain structural
+					// wrappers (e.g. Group), keep the historical "unwrap"
+					// behaviour.
+					const isEntityWrapper =
+						isSectionBlock( _clientId ) ||
+						getEditedContentOnlySection() === _clientId;
+					if ( isEntityWrapper ) {
+						removeBlock( firstClientId );
+					} else {
+						removeBlock( _clientId );
+					}
 				} else if ( isTextualWrapper ) {
 					registry.batch( () => {
 						if (

@@ -8,6 +8,7 @@ import {
 	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
+	isUnmodifiedBlock,
 	switchToBlockType,
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
@@ -46,7 +47,7 @@ import {
 	isContainerInsertableToInContentOnlyMode,
 } from './private-selectors';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { hasContentRoleSupport, isContentBlock } = unlock( blocksPrivateApis );
 
 /**
  * A block selection object.
@@ -1700,7 +1701,11 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const rootTemplateLock = getTemplateLock( state, rootClientId );
-	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
+	const rootSettings = getBlockListSettings( state, rootClientId );
+	if (
+		rootTemplateLock &&
+		( rootTemplateLock !== 'contentOnly' || ! rootSettings?.defaultBlock )
+	) {
 		return false;
 	}
 
@@ -1713,22 +1718,26 @@ const canInsertBlockTypeUnmemoized = (
 		: getParentSectionBlock( state, rootClientId );
 	const isWithinSection = !! sectionClientId;
 
-	// Disabled containers reject all blocks, with one exception: within a
-	// section, the default block (paragraph) is allowed through so it can
-	// reach the content-insertion logic further down (lines 1748-1772)
-	// which conditionally permits it where a sibling paragraph exists.
+	// Disabled containers reject all blocks, with two carve-outs inside a
+	// section so the content-aware logic further down (lines ~1765-1794) can
+	// decide:
+	// 1. The default block (paragraph) — for the existing "where a sibling
+	//    paragraph already exists" rule.
+	// 2. Content blocks — so contentRole containers (e.g. core/buttons,
+	//    core/list) can accept new content children even though they are
+	//    `disabled` themselves.
 	if (
 		blockEditingMode === 'disabled' &&
-		( ! isWithinSection || blockName !== getDefaultBlockName() )
+		( ! isWithinSection ||
+			( blockName !== getDefaultBlockName() &&
+				! isContentBlock( blockName ) ) )
 	) {
 		return false;
 	}
 
-	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-
 	// The parent block doesn't have settings indicating it doesn't support
 	// inner blocks, return false.
-	if ( rootClientId && parentBlockListSettings === undefined ) {
+	if ( rootClientId && rootSettings === undefined ) {
 		return false;
 	}
 
@@ -1804,7 +1813,7 @@ const canInsertBlockTypeUnmemoized = (
 
 	// The `allowedBlocks` block list setting can further limit which blocks are allowed children.
 	if ( hasParentAllowedBlock !== false ) {
-		const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
+		const parentAllowedBlocks = rootSettings?.allowedBlocks;
 		const hasParentListAllowedBlock = checkAllowList(
 			parentAllowedBlocks,
 			blockName
@@ -1935,7 +1944,11 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const rootTemplateLock = getTemplateLock( state, rootClientId );
-	if ( rootTemplateLock && rootTemplateLock !== 'contentOnly' ) {
+	const rootSettings = getBlockListSettings( state, rootClientId );
+	if (
+		rootTemplateLock &&
+		( rootTemplateLock !== 'contentOnly' || ! rootSettings?.defaultBlock )
+	) {
 		return false;
 	}
 
@@ -1965,6 +1978,19 @@ export function canRemoveBlock( state, clientId ) {
 	const blockName = getBlockName( state, clientId );
 	const defaultBlockName = getDefaultBlockName();
 
+	// Inside a section, contentRole containers (e.g. core/buttons, core/list)
+	// are themselves `disabled` but their children are still managed via the
+	// content-only rules. Treat the parent's effective mode as `contentOnly`
+	// for child operations so insertion/removal goes through the contentRole
+	// container gate rather than bailing on the parent's `disabled` mode.
+	const rootIsContentRoleContainer =
+		isWithinSection &&
+		rootBlockEditingMode === 'disabled' &&
+		hasContentRoleSupport( getBlockName( state, rootClientId ) );
+	const effectiveRootMode = rootIsContentRoleContainer
+		? 'contentOnly'
+		: rootBlockEditingMode;
+
 	// Check if the parent container allows insertion/removal in contentOnly
 	// mode. We need the `isParentSectionBlock` check because section blocks
 	// (synced patterns, contentOnly groups) have a `getBlockEditingMode` of
@@ -1974,30 +2000,27 @@ export function canRemoveBlock( state, clientId ) {
 		isWithinSection &&
 		( isParentSectionBlock ||
 			blockName === defaultBlockName ||
-			rootBlockEditingMode === 'contentOnly' ) &&
+			effectiveRootMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
-		// Allow removing the default block when other default blocks exist
-		// in contentOnly mode.
-		if ( blockName === defaultBlockName ) {
-			const existingBlocks = getBlockOrder( state, rootClientId );
-			const defaultBlocks = existingBlocks.filter(
-				( id ) => getBlockName( state, id ) === defaultBlockName
-			);
-			// Allow removal if there are other default blocks besides this one
-			if ( defaultBlocks.length > 1 ) {
-				return true;
-			}
-			return false;
+		// Always allow removing an unmodified default block (e.g. an empty
+		// paragraph). Empty placeholders don't need protection — if a user
+		// presses backspace on one, they expect it to go away, and the
+		// container will just show its default appender in its place.
+		if (
+			blockName === defaultBlockName &&
+			isUnmodifiedBlock( { name: blockName, attributes } )
+		) {
+			return true;
 		}
 		return false;
 	}
 
-	return rootBlockEditingMode !== 'disabled';
+	return effectiveRootMode !== 'disabled';
 }
 
 /**
@@ -2056,9 +2079,21 @@ export function canMoveBlock( state, clientId ) {
 	// 'contentOnly' mode is only set on their *children*.
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+
+	// contentRole containers are `disabled` themselves but their children
+	// are still movable via the content-only rules. Treat the parent's
+	// effective mode as `contentOnly` for child operations.
+	const rootIsContentRoleContainer =
+		isBlockWithinSection &&
+		rootBlockEditingMode === 'disabled' &&
+		hasContentRoleSupport( getBlockName( state, rootClientId ) );
+	const effectiveRootMode = rootIsContentRoleContainer
+		? 'contentOnly'
+		: rootBlockEditingMode;
+
 	if (
 		isBlockWithinSection &&
-		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		( isParentSectionBlock || effectiveRootMode === 'contentOnly' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
@@ -2068,7 +2103,7 @@ export function canMoveBlock( state, clientId ) {
 		return false;
 	}
 
-	return getBlockEditingMode( state, rootClientId ) !== 'disabled';
+	return effectiveRootMode !== 'disabled';
 }
 
 /**
@@ -3294,14 +3329,21 @@ export const isUngroupable = createRegistrySelector(
 					getBlockType( block.name )?.transforms?.ungroup ) &&
 				!! block.innerBlocks.length;
 
-			return _isUngroupable && canRemoveBlock( state, _clientId );
+			// Ungroup destroys the container and reparents its children, so
+			// gate on both remove (the container is deleted) and move (its
+			// position in the tree changes) permissions.
+			return (
+				_isUngroupable &&
+				canRemoveBlock( state, _clientId ) &&
+				canMoveBlock( state, _clientId )
+			);
 		}
 );
 
 /**
  * Indicates if the provided blocks(by client ids) are groupable.
  * We need to have at least one block, have a grouping block name set and
- * be able to remove these blocks.
+ * be able to move these blocks (grouping reparents into a new container).
  *
  * @param {Object}   state     Global application state.
  * @param {string[]} clientIds Block client ids. If not passed the selected blocks client ids will be used.
@@ -3324,7 +3366,10 @@ export const isGroupable = createRegistrySelector(
 				rootClientId
 			);
 			const _isGroupable = groupingBlockAvailable && _clientIds.length;
-			return _isGroupable && canRemoveBlocks( state, _clientIds );
+			// Gate on move (not remove): grouping reparents blocks into a new
+			// container rather than deleting them, so "Prevent deletion"
+			// shouldn't block it. "Lock in place" (move lock) should.
+			return _isGroupable && canMoveBlocks( state, _clientIds );
 		}
 );
 

@@ -26,7 +26,6 @@ import BlockParentSelector from '../block-parent-selector';
 import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
-import { BlockLockToolbar } from '../block-lock';
 import { ViewportVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
@@ -34,8 +33,6 @@ import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
-import ChangeDesign from './change-design';
-import SwitchSectionStyle from './switch-section-style';
 import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
@@ -61,7 +58,6 @@ export function PrivateBlockToolbar( {
 	variant = 'unstyled',
 } ) {
 	const {
-		blockClientId,
 		blockClientIds,
 		isDefaultEditingMode,
 		blockType,
@@ -71,16 +67,11 @@ export function PrivateBlockToolbar( {
 		isUsingBindings,
 		isSectionContainer,
 		hasContentOnlyLocking,
-		showShuffleButton,
 		showSlots,
 		showGroupButtons,
-		showLockButtons,
 		showBlockVisibilityButton,
-		showSwitchSectionStyleButton,
 		areSelectedBlocksHiddenOnViewport,
-		canEdit,
 	} = useSelect( ( select ) => {
-		const { canEditBlock } = select( blockEditorStore );
 		const {
 			getBlockName,
 			getBlockMode,
@@ -124,9 +115,6 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
-		const _canEditBlock = canEditBlock( selectedBlockClientId );
-		const _showSwitchSectionStyleButton =
-			_canEditBlock && ( _isZoomOut || _isSectionBlock );
 
 		const _currentDeviceType =
 			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
@@ -157,15 +145,11 @@ export function PrivateBlockToolbar( {
 			isUsingBindings: _isUsingBindings,
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
-			showShuffleButton: _isZoomOut,
 			showSlots: ! _isZoomOut,
 			showGroupButtons: ! _isZoomOut,
-			showLockButtons: ! _isZoomOut,
 			showBlockVisibilityButton: ! _isZoomOut,
-			showSwitchSectionStyleButton: _showSwitchSectionStyleButton,
 			areSelectedBlocksHiddenOnViewport:
 				_areSelectedBlocksHiddenOnViewport,
-			canEdit: _canEditBlock,
 		};
 	}, [] );
 
@@ -231,13 +215,6 @@ export function PrivateBlockToolbar( {
 										clientIds={ blockClientIds }
 									/>
 								) }
-							{ ! isMultiToolbar &&
-								isDefaultEditingMode &&
-								showLockButtons && (
-									<BlockLockToolbar
-										clientId={ blockClientId }
-									/>
-								) }
 							<BlockMover
 								clientIds={ blockClientIds }
 								hideDragHandle={ hideDragHandle }
@@ -250,16 +227,7 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				{ ! isMultiToolbar && canEdit && (
-					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
-				) }
-				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
-					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
-				) }
-				{ ! areSelectedBlocksHiddenOnViewport &&
-					showSwitchSectionStyleButton && (
-						<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
-					) }
+				{ ! isMultiToolbar && <EditSectionButton /> }
 				{ ! areSelectedBlocksHiddenOnViewport &&
 					shouldShowVisualToolbar &&
 					showSlots && (

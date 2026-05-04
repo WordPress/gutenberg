@@ -16,6 +16,7 @@ import {
 import {
 	Placeholder,
 	Spinner,
+	MenuItem,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -29,6 +30,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 	BlockControls,
+	BlockSettingsMenuControls,
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
@@ -41,6 +43,18 @@ import { unlock } from '../lock-unlock';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { isOverridableBlock } = unlock( patternsPrivateApis );
+
+function useIsEditingThis( clientId ) {
+	return useSelect(
+		( select ) => {
+			const { getEditedContentOnlySection } = unlock(
+				select( blockEditorStore )
+			);
+			return getEditedContentOnlySection() === clientId;
+		},
+		[ clientId ]
+	);
+}
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -84,8 +98,6 @@ function RecursionWarning() {
 	);
 }
 
-const NOOP = () => {};
-
 // Wrap the main Edit function for the pattern block with a recursion wrapper
 // that allows short-circuiting rendering as early as possible, before any
 // of the other effects in the block edit have run.
@@ -108,7 +120,8 @@ function ReusableBlockControl( {
 	recordId,
 	canOverrideBlocks,
 	hasContent,
-	handleEditOriginal,
+	isEditingThis,
+	onToggleEdit,
 	resetContent,
 } ) {
 	const canUserEdit = useSelect(
@@ -123,11 +136,11 @@ function ReusableBlockControl( {
 
 	return (
 		<>
-			{ canUserEdit && !! handleEditOriginal && (
+			{ canUserEdit && (
 				<BlockControls group="other">
 					<ToolbarGroup>
-						<ToolbarButton onClick={ handleEditOriginal }>
-							{ __( 'Edit original' ) }
+						<ToolbarButton onClick={ onToggleEdit }>
+							{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				</BlockControls>
@@ -156,15 +169,23 @@ function ReusableBlockEdit( {
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
+	clientId,
+	isSelected,
 } ) {
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
 	);
-	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
+	const isEditingThis = useIsEditingThis( clientId );
+	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isMissing = hasResolved && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
@@ -176,7 +197,6 @@ function ReusableBlockEdit( {
 		supportedBlockTypesRaw,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		// For editing link to the site editor if the theme and user permissions support it.
 		return {
 			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
 			hasPatternOverridesSource: !! getBlockBindingsSource(
@@ -217,12 +237,20 @@ function ReusableBlockEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		layout,
 		value: blocks,
-		onInput: NOOP,
-		onChange: NOOP,
+		onInput,
+		onChange,
 		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
+
+	const onToggleEdit = () => {
+		if ( isEditingThis ) {
+			stopEditingContentOnlySection();
+		} else {
+			editContentOnlySection( clientId );
+		}
+	};
 
 	const handleEditOriginal = () => {
 		onNavigateToEntityRecord( {
@@ -264,14 +292,28 @@ function ReusableBlockEdit( {
 					recordId={ ref }
 					canOverrideBlocks={ canOverrideBlocks }
 					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
+					isEditingThis={ isEditingThis }
+					onToggleEdit={ onToggleEdit }
 					resetContent={ resetContent }
 				/>
 			) }
+			{ isSelected &&
+				hasResolved &&
+				! isMissing &&
+				onNavigateToEntityRecord && (
+					<BlockSettingsMenuControls>
+						{ ( { onClose } ) => (
+							<MenuItem
+								onClick={ () => {
+									handleEditOriginal();
+									onClose?.();
+								} }
+							>
+								{ __( 'Edit original' ) }
+							</MenuItem>
+						) }
+					</BlockSettingsMenuControls>
+				) }
 
 			{ children === null ? (
 				<div { ...innerBlocksProps } />

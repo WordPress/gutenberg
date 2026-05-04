@@ -22,7 +22,7 @@ import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 
-const { isContentBlock } = unlock( blocksPrivateApis );
+const { hasContentRoleSupport, isContentBlock } = unlock( blocksPrivateApis );
 
 const identity = ( x ) => x;
 
@@ -2063,6 +2063,10 @@ export function editedContentOnlySection( state, action ) {
 		return action.clientId;
 	}
 
+	if ( action.type === 'STOP_EDITING_CONTENT_ONLY_SECTION' ) {
+		return undefined;
+	}
+
 	// Early return if there's no section being edited.
 	if ( ! state ) {
 		return state;
@@ -2475,39 +2479,53 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			syncedPatternClientIds.push( clientId );
 		}
 	} );
-	const contentOnlyTemplateLockedClientIds = Array.from(
+	// `templateLock: 'contentOnly'` can be supplied two ways:
+	//  - via the parent block's `<InnerBlocks templateLock />` (recorded in
+	//    `blockListSettings`), or
+	//  - via the block's own `attributes.templateLock` (e.g. stamped by
+	//    `parsePattern` on insert, or saved into the block's HTML).
+	// Both paths must surface as section candidates.
+	const contentOnlyFromListSettings = Array.from(
 		state.blockListSettings
 	).flatMap( ( [ clientId, listSettings ] ) =>
 		listSettings?.templateLock === 'contentOnly' ? [ clientId ] : []
 	);
+	const contentOnlyFromAttributes = Array.from(
+		state.blocks.attributes
+	).flatMap( ( [ clientId, attributes ] ) =>
+		attributes?.templateLock === 'contentOnly' ? [ clientId ] : []
+	);
+	const contentOnlyTemplateLockedClientIds = Array.from(
+		new Set( [
+			...contentOnlyFromListSettings,
+			...contentOnlyFromAttributes,
+		] )
+	);
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
-	// don't apply contentOnly mode to nested unsynced patterns or template parts.
+	// don't apply contentOnly mode to nested top-level blocks or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
-	const disableContentOnlyForUnsyncedPatterns =
-		state.settings?.disableContentOnlyForUnsyncedPatterns;
-
-	// Use array.from for better back compat. Older versions of the iterator returned
-	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds =
-		isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
-			? []
-			: Array.from( state.blocks.attributes.keys() ).filter(
-					( clientId ) =>
-						state.blocks.attributes.get( clientId )?.metadata
-							?.patternName
-			  );
 	const disableContentOnlyForTemplateParts =
 		state.settings?.disableContentOnlyForTemplateParts;
 
-	const contentOnlyParents = [
-		...contentOnlyTemplateLockedClientIds,
-		...unsyncedPatternClientIds,
-		...( isIsolatedEditor || disableContentOnlyForTemplateParts
+	// Section-locked behavior is opt-in via an explicit marker —
+	// `templateLock: 'contentOnly'` (handled here), `metadata.patternName`
+	// (handled via the explicit lock that `parsePattern` adds on insert),
+	// `core/template-part` and `core/block` (handled below). Position
+	// alone (top-level child of the section root) does not lock; a plain
+	// Group dropped at the page root behaves like any other Group.
+	const contentOnlyParents = contentOnlyTemplateLockedClientIds;
+
+	// Template parts behave like synced patterns (entity references): the
+	// inner blocks are fully locked by default, and the user has to opt in to
+	// editing via the "Edit" button (which sets `editedContentOnlySection`).
+	// Distinct from `contentOnlyParents`, where content blocks remain inline-
+	// editable.
+	const lockedSectionParents =
+		isIsolatedEditor || disableContentOnlyForTemplateParts
 			? []
-			: templatePartClientIds ),
-	];
+			: templatePartClientIds;
 
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
@@ -2532,14 +2550,27 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		// If the block already has an explicit block editing mode set,
-		// don't override it.
+		// don't override it — except when it's inside the edited content-only
+		// section. In that case, the explicit `contentOnly`/`disabled` (e.g.
+		// set by `DisableNonPageContentBlocks` in page context to lock down
+		// non-post content) needs to give way so the user can actually edit
+		// the section they just clicked into.
 		if ( state.blocks.blockEditingModes.has( clientId ) ) {
+			if (
+				hasEditedContentOnlySection &&
+				isWithinEditedContentOnlySection
+			) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+			}
 			return;
 		}
 
 		// Disabled explicit block editing modes are inherited by children.
 		// It's an expensive calculation, so only do it if there are disabled blocks.
-		if ( hasDisabledBlocks ) {
+		// Skip this when the block is inside the edited content-only section —
+		// otherwise descendants of an explicit-disabled ancestor would stay
+		// disabled even though the section above them was just opened for edit.
+		if ( hasDisabledBlocks && ! isWithinEditedContentOnlySection ) {
 			// Look through parents to find one with an explicit block editing mode.
 			let ancestorBlockEditingMode;
 			let parent = state.blocks.parents.get( clientId );
@@ -2565,6 +2596,15 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		}
 
 		if ( isZoomedOut ) {
+			// Template parts stay selectable in zoom-out so users can swap
+			// them. In page editing, `DisableNonPageContentBlocks` gives them
+			// an explicit `default` mode and they bypass this branch entirely;
+			// match that here so template editing behaves the same way.
+			if ( templatePartClientIds.includes( clientId ) ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
 			// If the root block is the section root set its editing mode to contentOnly.
 			if ( clientId === sectionRootClientId ) {
 				derivedBlockEditingModes.set( clientId, 'contentOnly' );
@@ -2615,29 +2655,40 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				syncedPatternClientIds
 			);
 			if ( parentSyncedPatternClientId ) {
-				// This is an inner block of a synced pattern that's nested in another synced pattern,
-				// disable its contents.
-				if (
-					findParentInClientIdsList(
-						state,
-						parentSyncedPatternClientId,
-						syncedPatternClientIds
-					)
-				) {
+				// If the containing synced pattern IS the edited content-only
+				// section, fall through to the edited-section override below
+				// so the inner blocks become freely editable (changes will
+				// propagate to the shared `wp_block` entity).
+				const isParentSyncedPatternEdited =
+					hasEditedContentOnlySection &&
+					parentSyncedPatternClientId ===
+						state.editedContentOnlySection;
+
+				if ( ! isParentSyncedPatternEdited ) {
+					// This is an inner block of a synced pattern that's nested in another synced pattern,
+					// disable its contents.
+					if (
+						findParentInClientIdsList(
+							state,
+							parentSyncedPatternClientId,
+							syncedPatternClientIds
+						)
+					) {
+						derivedBlockEditingModes.set( clientId, 'disabled' );
+						return;
+					}
+
+					if ( hasBindings( block ) ) {
+						derivedBlockEditingModes.set( clientId, 'contentOnly' );
+						return;
+					}
+
+					// Synced pattern content without a binding isn't editable
+					// from the instance, the user has to edit the pattern source,
+					// so return 'disabled'.
 					derivedBlockEditingModes.set( clientId, 'disabled' );
 					return;
 				}
-
-				if ( hasBindings( block ) ) {
-					derivedBlockEditingModes.set( clientId, 'contentOnly' );
-					return;
-				}
-
-				// Synced pattern content without a binding isn't editable
-				// from the instance, the user has to edit the pattern source,
-				// so return 'disabled'.
-				derivedBlockEditingModes.set( clientId, 'disabled' );
-				return;
 			}
 		}
 
@@ -2649,6 +2700,24 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			return;
 		}
 
+		// Template-part descendants are fully locked by default. The user
+		// has to opt in to editing via the "Edit" button, which is handled
+		// by the `editedContentOnlySection` override above. Checked before
+		// `contentOnlyParents` so that a content block inside a template
+		// part doesn't pick up the inline-editable behavior from a deeper
+		// `contentOnly` ancestor.
+		if (
+			lockedSectionParents.length &&
+			!! findParentInClientIdsList(
+				state,
+				clientId,
+				lockedSectionParents
+			)
+		) {
+			derivedBlockEditingModes.set( clientId, 'disabled' );
+			return;
+		}
+
 		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
 		if ( contentOnlyParents.length ) {
 			const hasContentOnlyParent = !! findParentInClientIdsList(
@@ -2657,7 +2726,21 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				contentOnlyParents
 			);
 			if ( hasContentOnlyParent ) {
-				if ( isContentBlock( blockName ) ) {
+				// Content-role containers with children (e.g. core/buttons,
+				// core/list) are transparent: the children are the user's
+				// selection target, so the container itself stays disabled.
+				// Children operations (insert/move/remove) are governed by
+				// the contentRole-container gates in selectors, not the
+				// container's editing mode. Leaf blocks that opt into
+				// `contentRole` (e.g. core/site-tagline) have nothing to be
+				// transparent over, so they fall through to `contentOnly`
+				// and stay directly editable.
+				const hasChildren =
+					!! state.blocks.order.get( clientId )?.length;
+				if (
+					isContentBlock( blockName ) &&
+					! ( hasContentRoleSupport( blockName ) && hasChildren )
+				) {
 					derivedBlockEditingModes.set( clientId, 'contentOnly' );
 				} else {
 					derivedBlockEditingModes.set( clientId, 'disabled' );
@@ -2801,75 +2884,12 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_BLOCK_ATTRIBUTES': {
-				// Handle unsynced patterns which indicate their contentOnly-ness via
-				// the `attributes.metadata.patternName` property.
-				// Check when this is added or removed and update blockEditingModes.
-				const disableContentOnlyForUnsyncedPatterns =
-					nextState.settings?.disableContentOnlyForUnsyncedPatterns;
-
-				if ( disableContentOnlyForUnsyncedPatterns ) {
-					break;
-				}
-
-				const addedBlocks = [];
-				const removedClientIds = [];
-
-				for ( const clientId of action?.clientIds ) {
-					const attributes = action.options?.uniqueByBlock
-						? action.attributes[ clientId ]
-						: action.attributes;
-
-					if ( ! attributes ) {
-						break;
-					}
-
-					if (
-						// patternName is switching from falsy to truthy, indicating
-						// this block is becoming an unsynced pattern.
-						attributes.metadata?.patternName &&
-						! state.blocks.attributes.get( clientId )?.metadata
-							?.patternName
-					) {
-						addedBlocks.push(
-							nextState.blocks.tree.get( clientId )
-						);
-					} else if (
-						// patternName is switching from truthy to falsy, this block is becoming
-						// a regular block but was an unsynced pattern.
-						// Check that `metadata` is part of the included attributes, as
-						// `updateBlockAttributes` merges attributes, if it isn't present
-						// the previous `metadata` would be retained.
-						attributes.metadata &&
-						! attributes.metadata?.patternName &&
-						state.blocks.attributes.get( clientId )?.metadata
-							?.patternName
-					) {
-						// Include it in 'removedClientIds'.
-						removedClientIds.push( clientId );
-					}
-				}
-
-				if ( ! addedBlocks?.length && ! removedClientIds?.length ) {
-					break;
-				}
-
-				const nextDerivedBlockEditingModes =
-					getDerivedBlockEditingModesUpdates( {
-						prevState: state,
-						nextState,
-						addedBlocks,
-						removedClientIds,
-					} );
-
-				if ( nextDerivedBlockEditingModes ) {
-					return {
-						...nextState,
-						derivedBlockEditingModes:
-							nextDerivedBlockEditingModes ??
-							state.derivedBlockEditingModes,
-					};
-				}
-
+				// Section membership is now driven entirely by explicit
+				// markers — `templateLock: 'contentOnly'` flows through
+				// `<InnerBlocks>` to `UPDATE_BLOCK_LIST_SETTINGS`, and the
+				// other markers (template part, synced pattern, pattern
+				// boundary) don't change on attribute updates. Move/add/
+				// remove actions handle structural changes elsewhere.
 				break;
 			}
 			case 'UPDATE_BLOCK_LIST_SETTINGS': {
@@ -3024,17 +3044,12 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root,
-				// the effective disableContentOnlyForUnsyncedPatterns value,
 				// the isIsolatedEditor value, or the
 				// disableContentOnlyForTemplateParts value changes.
 				// These are all values that affect the computation.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
-					!! state?.settings
-						?.disableContentOnlyForUnsyncedPatterns !==
-						!! nextState?.settings
-							?.disableContentOnlyForUnsyncedPatterns ||
 					!! state?.settings?.[ isIsolatedEditorKey ] !==
 						!! nextState?.settings?.[ isIsolatedEditorKey ] ||
 					!! state?.settings?.disableContentOnlyForTemplateParts !==
@@ -3051,6 +3066,7 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'RESET_BLOCKS':
 			case 'EDIT_CONTENT_ONLY_SECTION':
+			case 'STOP_EDITING_CONTENT_ONLY_SECTION':
 			case 'SET_EDITOR_MODE':
 			case 'RESET_ZOOM_LEVEL':
 			case 'SET_ZOOM_LEVEL': {

@@ -13,13 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	unseen,
-	symbol,
-} from '@wordpress/icons';
+import { Icon, lockSmall as lock, pinSmall, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
@@ -62,12 +56,11 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { hasPatternName, blockVisibility } = useSelect(
+	const { blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
 			const attributes = getBlockAttributes( clientId );
 			return {
-				hasPatternName: !! attributes?.metadata?.patternName,
 				blockVisibility: attributes?.metadata?.blockVisibility,
 			};
 		},
@@ -121,7 +114,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ hasPatternName ? symbol : blockInformation?.icon }
+				icon={ blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>

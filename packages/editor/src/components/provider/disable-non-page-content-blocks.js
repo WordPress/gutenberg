@@ -15,6 +15,19 @@ import usePostContentBlockTypes from './use-post-content-block-types';
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
+ *
+ * The root is set to `disabled` to prevent top-level structural edits, and
+ * each template part is explicitly set to `default` so it punches through
+ * the root's disabled cascade and stays selectable. The descendants of each
+ * template part are handled by the section-block inference, which fully
+ * locks them by default (matching synced-pattern behavior) until the user
+ * opts in via the "Edit" affordance.
+ *
+ * Note: zoom-out template-part visibility is also enforced by the reducer's
+ * zoom-out branch (template parts get `default` mode), so template editing
+ * matches this component's effect on List View even though this component
+ * isn't mounted there. See `derivedBlockEditingModes` in the block-editor
+ * reducer.
  */
 export default function DisableNonPageContentBlocks() {
 	const postContentBlockTypes = usePostContentBlockTypes();
@@ -29,28 +42,9 @@ export default function DisableNonPageContentBlocks() {
 		},
 		[ postContentBlockTypes ]
 	);
-	// This is a separate `useSelect` because `templatePartChildren` is
-	// derived via flatMap, which always produces a new array. Combining it
-	// with the above subscription causes an infinite render loop: the new
-	// array fails useSelect's shallow equality check → re-render → effect
-	// fires setBlockEditingMode → store changes → useSelect re-runs → …
-	const templatePartChildren = useSelect(
-		( select ) => {
-			const { getBlockOrder } = select( blockEditorStore );
-			return templateParts.flatMap( ( clientId ) =>
-				getBlockOrder( clientId )
-			);
-		},
-		[ templateParts ]
-	);
 
 	const registry = useRegistry();
 
-	// The effects below are split so that changes to one group of blocks
-	// don't cause unnecessary set/unset cycles for the others. For example,
-	// the root block ('') editing mode only needs to be set once.
-	// Child blocks of templates and templateParts are also loaded separately,
-	// so these are kept in separate effects.
 	useEffect( () => {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
@@ -68,7 +62,7 @@ export default function DisableNonPageContentBlocks() {
 
 		registry.batch( () => {
 			for ( const clientId of templateParts ) {
-				setBlockEditingMode( clientId, 'contentOnly' );
+				setBlockEditingMode( clientId, 'default' );
 			}
 		} );
 
@@ -85,16 +79,9 @@ export default function DisableNonPageContentBlocks() {
 		const { setBlockEditingMode, unsetBlockEditingMode } =
 			registry.dispatch( blockEditorStore );
 
-		const contentOnlySet = new Set( contentOnlyIds );
-
 		registry.batch( () => {
 			for ( const clientId of contentOnlyIds ) {
 				setBlockEditingMode( clientId, 'contentOnly' );
-			}
-			for ( const clientId of templatePartChildren ) {
-				if ( ! contentOnlySet.has( clientId ) ) {
-					setBlockEditingMode( clientId, 'disabled' );
-				}
 			}
 		} );
 
@@ -103,14 +90,9 @@ export default function DisableNonPageContentBlocks() {
 				for ( const clientId of contentOnlyIds ) {
 					unsetBlockEditingMode( clientId );
 				}
-				for ( const clientId of templatePartChildren ) {
-					if ( ! contentOnlySet.has( clientId ) ) {
-						unsetBlockEditingMode( clientId );
-					}
-				}
 			} );
 		};
-	}, [ contentOnlyIds, templatePartChildren, registry ] );
+	}, [ contentOnlyIds, registry ] );
 
 	return null;
 }

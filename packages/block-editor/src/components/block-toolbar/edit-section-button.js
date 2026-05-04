@@ -3,63 +3,90 @@
  */
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
+import { unlock } from '../../lock-unlock';
+import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 
-export default function EditSectionButton( { clientId } ) {
-	const {
-		isSectionBlock,
-		isEditingContentOnlySection,
-		editContentOnlySection,
-		stopEditingContentOnlySection,
-	} = useContentOnlySectionEdit( clientId );
+// Shows an Edit/Done button for any content-only locked block — including
+// patterns, which carry `templateLock: 'contentOnly'` after insertion.
+// Template parts and synced patterns are entity references with their own
+// "Edit original" affordance, so they're excluded.
+export default function EditSectionButton() {
+	const { clientId, show, isEditingThis } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientIds,
+			getBlockName,
+			getBlockAttributes,
+			canEditBlock,
+		} = select( blockEditorStore );
 
-	const blockType = useSelect(
-		( select ) => {
-			if ( ! clientId ) {
-				return null;
-			}
-			const { getBlockName } = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-			return blockName ? { name: blockName } : null;
-		},
-		[ clientId ]
+		const ids = getSelectedBlockClientIds();
+		if ( ids.length !== 1 ) {
+			return { show: false };
+		}
+
+		const selectedClientId = ids[ 0 ];
+		const blockName = getBlockName( selectedClientId );
+		const blockType = blockName ? { name: blockName } : null;
+
+		if ( isReusableBlock( blockType ) || isTemplatePart( blockType ) ) {
+			return { show: false };
+		}
+
+		if ( ! canEditBlock( selectedClientId ) ) {
+			return { show: false };
+		}
+
+		// The button is strictly tied to the block's `templateLock` attribute,
+		// which stays set during inline editing — `getTemplateLock` only
+		// overrides the runtime lock, not the attribute itself.
+		const attributes = getBlockAttributes( selectedClientId );
+		if ( attributes?.templateLock !== 'contentOnly' ) {
+			return { show: false };
+		}
+
+		const { getEditedContentOnlySection } = unlock(
+			select( blockEditorStore )
+		);
+		const _isEditingThis =
+			getEditedContentOnlySection() === selectedClientId;
+
+		return {
+			clientId: selectedClientId,
+			show: true,
+			isEditingThis: _isEditingThis,
+		};
+	}, [] );
+
+	const { editContentOnlySection, stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
-	// Don't show for synced patterns or template parts — they already have
-	// their own toolbar buttons ("Edit original").
-	// Note: isSectionBlock returns false while the section is being edited,
-	// so we also check isEditingContentOnlySection to show "Exit pattern".
-	if (
-		! clientId ||
-		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
-		isReusableBlock( blockType ) ||
-		isTemplatePart( blockType )
-	) {
+	if ( ! show ) {
 		return null;
 	}
 
-	const isEditing = isEditingContentOnlySection;
-
-	const handleClick = () => {
-		if ( isEditing ) {
-			stopEditingContentOnlySection();
-		} else {
-			editContentOnlySection( clientId );
-		}
-	};
-
 	return (
-		<ToolbarGroup>
-			<ToolbarButton onClick={ handleClick }>
-				{ isEditing ? __( 'Exit pattern' ) : __( 'Edit pattern' ) }
-			</ToolbarButton>
-		</ToolbarGroup>
+		<__unstableBlockToolbarLastItem>
+			<ToolbarGroup>
+				<ToolbarButton
+					onClick={ () => {
+						if ( isEditingThis ) {
+							stopEditingContentOnlySection();
+						} else {
+							editContentOnlySection( clientId );
+						}
+					} }
+				>
+					{ isEditingThis ? __( 'Done' ) : __( 'Edit' ) }
+				</ToolbarButton>
+			</ToolbarGroup>
+		</__unstableBlockToolbarLastItem>
 	);
 }

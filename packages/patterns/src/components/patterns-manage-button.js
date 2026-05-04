@@ -101,6 +101,12 @@ function PatternsManageButton( { clientId, onClose } ) {
 				attributes?.metadata ?? {};
 			updateBlockAttributes( clientId, {
 				metadata: attributesWithoutPatternName,
+				// Detach also clears the structural lock applied by the
+				// inserter, otherwise the wrapper remains content-only locked
+				// after losing its pattern identity.
+				...( attributes?.templateLock === 'contentOnly' && {
+					templateLock: undefined,
+				} ),
 			} );
 		}
 		onClose?.();

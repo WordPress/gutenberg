@@ -151,6 +151,27 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
 	] )
 );
 
+function getClientIdsTreeUnmemoized( state, rootClientId ) {
+	return getBlockOrder( state, rootClientId ).map( ( clientId ) => ( {
+		clientId,
+		innerBlocks: getClientIdsTreeUnmemoized( state, clientId ),
+	} ) );
+}
+
+/**
+ * Returns a tree of block objects with only clientID and innerBlocks set,
+ * including all blocks regardless of their editing mode.
+ *
+ * @param {Object}  state        Global application state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
+ */
+export const getClientIdsTree = createSelector(
+	getClientIdsTreeUnmemoized,
+	( state ) => [ state.blocks.order ]
+);
+
 /**
  * Returns a list of a given block's ancestors, from top to bottom. Blocks with
  * a 'disabled' editing mode are excluded.
@@ -491,24 +512,29 @@ function isSectionBlockCandidate( state, clientId ) {
 		return true;
 	}
 
-	const attributes = getBlockAttributes( state, clientId );
 	const isTemplatePart = blockName === 'core/template-part';
 
 	// When in an isolated editing context (e.g., editing a template part or pattern directly),
-	// don't treat nested unsynced patterns as section blocks.
+	// don't treat nested blocks as section blocks.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
-
-	const disableContentOnlyForUnsyncedPatterns =
-		state.settings?.disableContentOnlyForUnsyncedPatterns;
 
 	const disableContentOnlyForTemplateParts =
 		state.settings?.disableContentOnlyForTemplateParts;
 
+	// Sections are opt-in via an explicit marker: an entity reference
+	// (`core/block` handled above, `core/template-part` handled here) or
+	// `templateLock: 'contentOnly'` (handled below). `metadata.patternName`
+	// is identity, not a lock — a pattern is a section because the
+	// inserter writes `templateLock: 'contentOnly'` on it, not because it
+	// remembers its origin. `templateLock: false` is the user opt-out.
+	const attributes = getBlockAttributes( state, clientId );
+	if ( attributes?.templateLock === false ) {
+		return false;
+	}
 	if (
-		( ( ! disableContentOnlyForUnsyncedPatterns &&
-			attributes?.metadata?.patternName ) ||
-			( isTemplatePart && ! disableContentOnlyForTemplateParts ) ) &&
-		! isIsolatedEditor
+		! isIsolatedEditor &&
+		isTemplatePart &&
+		! disableContentOnlyForTemplateParts
 	) {
 		return true;
 	}
@@ -594,6 +620,15 @@ export function getEditedContentOnlySection( state ) {
 	return state.editedContentOnlySection;
 }
 
+/**
+ * Returns whether the given block is the currently-edited content-only
+ * section, or a descendant of it. Walks up the parent chain.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether the block is within the edited section.
+ */
 export function isWithinEditedContentOnlySection( state, clientId ) {
 	if ( ! state.editedContentOnlySection ) {
 		return false;
@@ -873,8 +908,11 @@ export const isBlockParentHiddenAtViewport = ( state, clientId, viewport ) => {
 /**
  * Returns true if there is a spotlighted block.
  *
- * The spotlight is also active when a contentOnly section is being edited, the selector
- * also returns true if this is the case.
+ * The spotlight is active whenever a content-only section is being edited
+ * inline — template parts, synced patterns, unsynced patterns, and blocks
+ * with a user-applied `templateLock: 'contentOnly'`. Stepping into any of
+ * these shifts the editing scope, so the canvas-wide fade reinforces that
+ * only the edited section is in play.
  *
  * @param {Object} state Global application state.
  *
@@ -968,6 +1006,25 @@ export function isRemoveLockedBlock( state, clientId ) {
 }
 
 /**
+ * Returns whether a block has a `templateLock` attribute set on itself that
+ * restricts its inner blocks (`"contentOnly"`, `"all"`, or `"insert"`).
+ *
+ * Unlike `isMoveLockedBlock`/`isRemoveLockedBlock`, this checks the block's
+ * own `templateLock` attribute (which constrains its children), not the
+ * parent's `templateLock` (which constrains this block). This is the signal
+ * that a user applied a structural lock via the block lock UI.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId ClientId of the block.
+ *
+ * @return {boolean} Whether the block has a structural lock on its children.
+ */
+export function isTemplateLockedBlock( state, clientId ) {
+	const attributes = getBlockAttributes( state, clientId );
+	return !! attributes?.templateLock;
+}
+
+/**
  * Returns whether a block is locked.
  *
  * This selector only reasons about templateLock and block lock, not associated features
@@ -986,7 +1043,8 @@ export function isLockedBlock( state, clientId ) {
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
-		isRemoveLockedBlock( state, clientId )
+		isRemoveLockedBlock( state, clientId ) ||
+		isTemplateLockedBlock( state, clientId )
 	);
 }
 

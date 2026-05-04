@@ -9,7 +9,6 @@ import {
 	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -94,10 +93,9 @@ export default function useBlockDisplayInformation( clientId ) {
 				const positionLabel = getPositionTypeLabel( attributes );
 				return {
 					isSynced: false,
-					title: __( 'Pattern' ),
-					icon: symbol,
-					description:
-						pattern?.description || __( 'A block pattern.' ),
+					title: blockType.title,
+					icon: blockType.icon,
+					description: blockType.description,
 					anchor: attributes?.anchor,
 					positionLabel,
 					positionType: attributes?.style?.position?.type,
