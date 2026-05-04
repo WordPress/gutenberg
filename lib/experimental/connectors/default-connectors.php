@@ -33,10 +33,7 @@ function _gutenberg_connectors_init(): void {
 			'plugin'         => array(
 				'file'      => 'akismet/akismet.php',
 				'is_active' => static function (): bool {
-					if ( ! function_exists( 'is_plugin_active' ) ) {
-						require_once ABSPATH . 'wp-admin/includes/plugin.php';
-					}
-					return is_plugin_active( 'akismet/akismet.php' );
+					return defined( 'AKISMET_VERSION' );
 				},
 			),
 			'authentication' => array(
