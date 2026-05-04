@@ -85,7 +85,7 @@ describe( 'useCropGeometry', () => {
 			expect( result.current.isReady ).toBe( false );
 		} );
 		expect( result.current.rect ).toBeNull();
-		expect( result.current.bounds ).toBeNull();
+		expect( result.current.layoutBounds ).toBeNull();
 		expect( result.current.sourceRegion ).toBeNull();
 		expect( result.current.snapshot ).toBeNull();
 	} );
@@ -97,10 +97,10 @@ describe( 'useCropGeometry', () => {
 
 		expect( result.current.isReady ).toBe( false );
 		expect( result.current.rect ).toBeNull();
-		expect( result.current.bounds ).toBeNull();
+		expect( result.current.layoutBounds ).toBeNull();
 	} );
 
-	it( 'returns the current crop pixels, bounds, and source region after geometry is published', async () => {
+	it( 'returns the current crop pixels, layout bounds, and source region after geometry is published', async () => {
 		const { result } = renderHook( () => useCropGeometry(), {
 			wrapper: createWrapper( { geometry: GEOMETRY } ),
 		} );
@@ -112,8 +112,8 @@ describe( 'useCropGeometry', () => {
 		expect( result.current.rect?.left ).toBeCloseTo( 200 );
 		expect( result.current.rect?.top ).toBeCloseTo( 100 );
 		expect( result.current.rect?.width ).toBeCloseTo( 400 );
-		expect( result.current.bounds?.maxRight ).toBeCloseTo( 1000 );
-		expect( result.current.bounds?.minWidth ).toBeCloseTo( 50 );
+		expect( result.current.layoutBounds?.maxRight ).toBeCloseTo( 1000 );
+		expect( result.current.layoutBounds?.minWidth ).toBeCloseTo( 50 );
 		expect( result.current.sourceRegion?.width ).toBeCloseTo( 400 );
 		expect( result.current.snapshot?.rect.left ).toBeCloseTo( 200 );
 	} );

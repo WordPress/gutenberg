@@ -308,28 +308,31 @@ const aiRequest = {
 
 ### 6. Crop geometry for controls and automation
 
-Use crop geometry when a consumer needs to read or validate crop values without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
+Use crop geometry when a consumer needs to read crop values or check them against explicit bounds without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
 
-`CropPixelRectInput`, `CropPixelRect`, and `CropPixelBounds` are in snap-rotation pixels. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
+`CropPixelRectInput`, `CropPixelRect`, and `CropPixelLayoutBounds` are in snap-rotation pixels. `layoutBounds` means current-layout bounds for the current zoom, pan, rotation, and measured canvas; it does not mean absolute source-image bounds. If a consumer only needs source-image containment, it can pass its own `CropPixelRectBounds` to the clamp/validation helpers. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
 
 ```tsx
 import {
   cropPixelRectToNormalizedRect,
   useCropGeometry,
   useCropper,
-  validateCropPixelRect,
+  validateCropPixelRectAgainstBounds,
 } from '../image-editor';
 
 function ApplySuggestedCrop( { suggestion } ) {
   const { state, setCropRect } = useCropper();
-  const { rect, bounds } = useCropGeometry();
+  const { rect, layoutBounds } = useCropGeometry();
 
-  if ( ! state.image || ! rect || ! bounds ) {
+  if ( ! state.image || ! rect || ! layoutBounds ) {
     return null;
   }
 
   const apply = () => {
-    const result = validateCropPixelRect( suggestion, bounds );
+    const result = validateCropPixelRectAgainstBounds(
+      suggestion,
+      layoutBounds
+    );
     if ( ! result.isValid ) {
       console.warn( 'Adjusted crop suggestion:', result.violations );
     }

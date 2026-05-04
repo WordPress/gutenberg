@@ -10,9 +10,10 @@ import {
 	getCropGeometrySnapshot,
 	type CropGeometryInput,
 	type CropGeometrySnapshot,
-	type CropPixelBounds,
+	type CropPixelLayoutBounds,
 	type CropPixelRect,
 	type CropPixelRectInput,
+	type CropPixelRectBounds,
 	type CropPixelRectValidationResult,
 	type CropPixelRectViolation,
 	type CropperLayoutGeometry,
@@ -26,8 +27,9 @@ import {
 export type {
 	CropGeometryInput,
 	CropGeometrySnapshot,
-	CropPixelBounds,
+	CropPixelLayoutBounds,
 	CropPixelRect,
+	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
@@ -37,7 +39,7 @@ export type {
 export interface UseCropGeometryReturn {
 	isReady: boolean;
 	rect: CropPixelRect | null;
-	bounds: CropPixelBounds | null;
+	layoutBounds: CropPixelLayoutBounds | null;
 	sourceRegion: SourceRegion | null;
 	snapshot: CropGeometrySnapshot | null;
 }
@@ -47,7 +49,7 @@ export interface UseCropGeometryReturn {
  * workflows. This hook intentionally reports facts about the current cropper
  * state; consumers derive operation-specific field behavior themselves.
  *
- * @return Current crop geometry, bounds, and source region.
+ * @return Current crop geometry, current-layout bounds, and source region.
  */
 export function useCropGeometry(): UseCropGeometryReturn {
 	const cropper = useCropper();
@@ -77,7 +79,7 @@ export function useCropGeometry(): UseCropGeometryReturn {
 	return {
 		isReady: !! snapshot,
 		rect: snapshot?.rect ?? null,
-		bounds: snapshot?.bounds ?? null,
+		layoutBounds: snapshot?.layoutBounds ?? null,
 		sourceRegion: snapshot?.sourceRegion ?? null,
 		snapshot,
 	};

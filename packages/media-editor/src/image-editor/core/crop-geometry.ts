@@ -11,7 +11,8 @@ declare const cropPixelRectBrand: unique symbol;
 
 /**
  * Measured cropper layout geometry. Published by the Cropper component so
- * external controls can use the same bounds as manual stencil interaction.
+ * external controls can use the same current-layout bounds as manual stencil
+ * interaction.
  */
 export interface CropperLayoutGeometry {
 	canvasSize: Size;
@@ -49,10 +50,10 @@ export type CropPixelRect = CropPixelRectInput & {
 };
 
 /**
- * Current crop limits expressed in the same snap-rotation pixel space as
- * `CropPixelRect`.
+ * Generic crop rectangle limits expressed in the same snap-rotation pixel
+ * space as `CropPixelRect`.
  */
-export interface CropPixelBounds {
+export interface CropPixelRectBounds {
 	minLeft: number;
 	minTop: number;
 	maxRight: number;
@@ -63,6 +64,12 @@ export interface CropPixelBounds {
 	maxHeight: number;
 }
 
+/**
+ * Current-layout crop limits for the cropper's current zoom, pan, rotation,
+ * and measured canvas. These are not absolute source-image bounds.
+ */
+export type CropPixelLayoutBounds = CropPixelRectBounds;
+
 export interface CropGeometryInput {
 	state: CropperState;
 	imageSize: Size;
@@ -71,7 +78,7 @@ export interface CropGeometryInput {
 
 export interface CropGeometrySnapshot {
 	rect: CropPixelRect;
-	bounds: CropPixelBounds;
+	layoutBounds: CropPixelLayoutBounds;
 	sourceRegion: SourceRegion;
 }
 
@@ -259,7 +266,7 @@ export function cropPixelRectToNormalizedRect(
 
 /**
  * Whether a crop geometry input has enough measured information for geometry
- * snapshots and validation bounds.
+ * snapshots and current-layout bounds.
  *
  * @param input Crop geometry input.
  * @return True when crop geometry can be computed.
@@ -279,16 +286,16 @@ export function isCropGeometryReady( input: CropGeometryInput ): boolean {
 }
 
 /**
- * Get the current crop limits in snap-rotation pixel space. These are edge
- * constraints for a complete crop rectangle; callers may derive field-level
- * ranges from them according to their own UI semantics.
+ * Get the current-layout crop limits in snap-rotation pixel space. These
+ * bounds describe what fits without changing the cropper camera (zoom/pan).
+ * They are not absolute source-image bounds.
  *
  * @param input Crop geometry input.
- * @return Crop pixel bounds, or null when geometry is not ready.
+ * @return Crop pixel layout bounds, or null when geometry is not ready.
  */
-export function getCropPixelBounds(
+export function getCropPixelLayoutBounds(
 	input: CropGeometryInput
-): CropPixelBounds | null {
+): CropPixelLayoutBounds | null {
 	if ( ! isCropGeometryReady( input ) ) {
 		return null;
 	}
@@ -324,18 +331,18 @@ export function getCropPixelBounds(
 }
 
 /**
- * Fit a complete crop rectangle inside crop pixel bounds. This is deliberately
- * rectangle-level logic rather than an operation API: callers decide whether a
- * width change is left-anchored, center-anchored, aspect-ratio locked, etc.,
- * then validate the resulting rectangle here.
+ * Fit a complete crop rectangle inside the provided bounds. This is
+ * deliberately rectangle-level logic rather than an operation API: callers
+ * decide whether a width change is left-anchored, center-anchored,
+ * aspect-ratio locked, etc., then clamp the resulting rectangle here.
  *
  * @param rect   Candidate crop rectangle in snap-rotation pixels.
- * @param bounds Current crop pixel bounds.
+ * @param bounds Crop pixel bounds to clamp against.
  * @return Clamped crop rectangle in snap-rotation pixels.
  */
-export function clampCropPixelRect(
+export function clampCropPixelRectToBounds(
 	rect: CropPixelRectInput,
-	bounds: CropPixelBounds
+	bounds: CropPixelRectBounds
 ): CropPixelRect {
 	const fallback = {
 		left: bounds.minLeft,
@@ -370,15 +377,17 @@ export function clampCropPixelRect(
 }
 
 /**
- * Validate a candidate crop rectangle against current crop pixel bounds.
+ * Validate a candidate crop rectangle against the provided crop pixel bounds.
+ * The result only answers whether `rect` fits those bounds. For example,
+ * current-layout bounds and absolute image bounds are separate concepts.
  *
  * @param rect   Candidate crop rectangle in snap-rotation pixels.
- * @param bounds Current crop pixel bounds.
+ * @param bounds Crop pixel bounds to validate against.
  * @return Validation result with a clamped rectangle.
  */
-export function validateCropPixelRect(
+export function validateCropPixelRectAgainstBounds(
 	rect: CropPixelRectInput,
-	bounds: CropPixelBounds
+	bounds: CropPixelRectBounds
 ): CropPixelRectValidationResult {
 	const violations = new Set< CropPixelRectViolation >();
 
@@ -423,7 +432,7 @@ export function validateCropPixelRect(
 		violations.add( 'height-too-large' );
 	}
 
-	const clamped = clampCropPixelRect( rect, bounds );
+	const clamped = clampCropPixelRectToBounds( rect, bounds );
 	const matchesClamped =
 		isClose( candidate.left, clamped.left ) &&
 		isClose( candidate.top, clamped.top ) &&
@@ -451,15 +460,15 @@ export function validateCropPixelRect(
 export function getCropGeometrySnapshot(
 	input: CropGeometryInput
 ): CropGeometrySnapshot | null {
-	const bounds = getCropPixelBounds( input );
+	const layoutBounds = getCropPixelLayoutBounds( input );
 
-	if ( ! bounds ) {
+	if ( ! layoutBounds ) {
 		return null;
 	}
 
 	return {
 		rect: getCropPixelRect( input.state, input.imageSize ),
-		bounds,
+		layoutBounds,
 		sourceRegion: getSourceRegion( input.state, input.imageSize ),
 	};
 }

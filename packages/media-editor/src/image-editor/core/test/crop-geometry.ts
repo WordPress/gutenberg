@@ -3,12 +3,12 @@
  */
 import { DEFAULT_STATE } from '../constants';
 import {
-	clampCropPixelRect,
+	clampCropPixelRectToBounds,
 	cropPixelRectToNormalizedRect,
 	getCropGeometrySnapshot,
-	getCropPixelBounds,
+	getCropPixelLayoutBounds,
 	getCropPixelRect,
-	validateCropPixelRect,
+	validateCropPixelRectAgainstBounds,
 	type CropGeometryInput,
 	type CropperLayoutGeometry,
 } from '../crop-geometry';
@@ -70,21 +70,21 @@ describe( 'crop pixel geometry', () => {
 		expect( normalized.height ).toBeCloseTo( state.cropRect.height );
 	} );
 
-	it( 'computes current edge bounds in crop pixels', () => {
-		const bounds = getCropPixelBounds( makeInput() );
+	it( 'computes current-layout edge bounds in crop pixels', () => {
+		const layoutBounds = getCropPixelLayoutBounds( makeInput() );
 
-		expect( bounds?.minLeft ).toBeCloseTo( 0 );
-		expect( bounds?.minTop ).toBeCloseTo( 0 );
-		expect( bounds?.maxRight ).toBeCloseTo( 1000 );
-		expect( bounds?.maxBottom ).toBeCloseTo( 500 );
-		expect( bounds?.minWidth ).toBeCloseTo( 50 );
-		expect( bounds?.minHeight ).toBeCloseTo( 25 );
-		expect( bounds?.maxWidth ).toBeCloseTo( 1000 );
-		expect( bounds?.maxHeight ).toBeCloseTo( 500 );
+		expect( layoutBounds?.minLeft ).toBeCloseTo( 0 );
+		expect( layoutBounds?.minTop ).toBeCloseTo( 0 );
+		expect( layoutBounds?.maxRight ).toBeCloseTo( 1000 );
+		expect( layoutBounds?.maxBottom ).toBeCloseTo( 500 );
+		expect( layoutBounds?.minWidth ).toBeCloseTo( 50 );
+		expect( layoutBounds?.minHeight ).toBeCloseTo( 25 );
+		expect( layoutBounds?.maxWidth ).toBeCloseTo( 1000 );
+		expect( layoutBounds?.maxHeight ).toBeCloseTo( 500 );
 	} );
 
-	it( 'returns null bounds before geometry is ready', () => {
-		const bounds = getCropPixelBounds( {
+	it( 'returns null layout bounds before geometry is ready', () => {
+		const layoutBounds = getCropPixelLayoutBounds( {
 			...makeInput(),
 			geometry: {
 				...GEOMETRY,
@@ -92,25 +92,25 @@ describe( 'crop pixel geometry', () => {
 			},
 		} );
 
-		expect( bounds ).toBeNull();
+		expect( layoutBounds ).toBeNull();
 	} );
 
 	it( 'returns a full geometry snapshot when geometry is ready', () => {
 		const snapshot = getCropGeometrySnapshot( makeInput() );
 
 		expect( snapshot?.rect.left ).toBeCloseTo( 200 );
-		expect( snapshot?.bounds.maxRight ).toBeCloseTo( 1000 );
+		expect( snapshot?.layoutBounds.maxRight ).toBeCloseTo( 1000 );
 		expect( snapshot?.sourceRegion.width ).toBeCloseTo( 400 );
 	} );
 } );
 
-describe( 'validateCropPixelRect', () => {
-	const bounds = getCropPixelBounds( makeInput() )!;
+describe( 'validateCropPixelRectAgainstBounds', () => {
+	const layoutBounds = getCropPixelLayoutBounds( makeInput() )!;
 
-	it( 'accepts rectangles within the current bounds', () => {
-		const result = validateCropPixelRect(
+	it( 'accepts rectangles within the provided bounds', () => {
+		const result = validateCropPixelRectAgainstBounds(
 			{ left: 100, top: 50, width: 400, height: 200 },
-			bounds
+			layoutBounds
 		);
 
 		expect( result.isValid ).toBe( true );
@@ -125,10 +125,10 @@ describe( 'validateCropPixelRect', () => {
 		expect( result.violations ).toEqual( [] );
 	} );
 
-	it( 'reports and clamps rectangles outside the current bounds', () => {
-		const result = validateCropPixelRect(
+	it( 'reports and clamps rectangles outside the provided bounds', () => {
+		const result = validateCropPixelRectAgainstBounds(
 			{ left: -20, top: 10, width: 1200, height: 600 },
-			bounds
+			layoutBounds
 		);
 
 		expect( result.isValid ).toBe( false );
@@ -152,49 +152,54 @@ describe( 'validateCropPixelRect', () => {
 	} );
 
 	it( 'reports and clamps rectangles smaller than the stencil minimum', () => {
-		const result = validateCropPixelRect(
+		const result = validateCropPixelRectAgainstBounds(
 			{ left: 100, top: 50, width: 10, height: 10 },
-			bounds
+			layoutBounds
 		);
 
 		expect( result.isValid ).toBe( false );
 		expect( result.violations ).toEqual(
 			expect.arrayContaining( [ 'width-too-small', 'height-too-small' ] )
 		);
-		expect( result.rect.width ).toBeCloseTo( bounds.minWidth );
-		expect( result.rect.height ).toBeCloseTo( bounds.minHeight );
+		expect( result.rect.width ).toBeCloseTo( layoutBounds.minWidth );
+		expect( result.rect.height ).toBeCloseTo( layoutBounds.minHeight );
 	} );
 
 	it( 'sanitizes non-finite values while reporting them', () => {
-		const result = validateCropPixelRect(
+		const result = validateCropPixelRectAgainstBounds(
 			{ left: Number.NaN, top: 10, width: 100, height: Infinity },
-			bounds
+			layoutBounds
 		);
 
 		expect( result.isValid ).toBe( false );
 		expect( result.violations ).toContain( 'non-finite' );
-		expect( result.rect.left ).toBe( bounds.minLeft );
-		expect( result.rect.height ).toBe( bounds.minHeight );
+		expect( result.rect.left ).toBe( layoutBounds.minLeft );
+		expect( result.rect.height ).toBe( layoutBounds.minHeight );
 	} );
 
 	it( 'reports a catch-all violation when precision-only clamping is required', () => {
-		const result = validateCropPixelRect(
-			{ left: bounds.minLeft - 1e-9, top: 50, width: 400, height: 200 },
-			bounds
+		const result = validateCropPixelRectAgainstBounds(
+			{
+				left: layoutBounds.minLeft - 1e-9,
+				top: 50,
+				width: 400,
+				height: 200,
+			},
+			layoutBounds
 		);
 
 		expect( result.isValid ).toBe( false );
 		expect( result.violations ).toEqual( [ 'precision-clamped' ] );
-		expect( result.rect.left ).toBe( bounds.minLeft );
+		expect( result.rect.left ).toBe( layoutBounds.minLeft );
 	} );
 } );
 
-describe( 'clampCropPixelRect', () => {
-	it( 'fits a rectangle into the current bounds', () => {
-		const bounds = getCropPixelBounds( makeInput() )!;
-		const rect = clampCropPixelRect(
+describe( 'clampCropPixelRectToBounds', () => {
+	it( 'fits a rectangle into the provided bounds', () => {
+		const layoutBounds = getCropPixelLayoutBounds( makeInput() )!;
+		const rect = clampCropPixelRectToBounds(
 			{ left: 900, top: 450, width: 200, height: 100 },
-			bounds
+			layoutBounds
 		);
 
 		expect( rect ).toEqual( {
