@@ -74,3 +74,27 @@ if ( did_action( 'init' ) ) {
 } else {
 	add_action( 'init', '{{PREFIX}}_register_widget_modules' );
 }
+
+/**
+ * Returns the widgets discovered by the build pipeline.
+ *
+ * Reads `build/widgets/registry.php` once and memoizes the result for the
+ * remainder of the request. Consumers should treat the array as read-only;
+ * authoring of widget types is build-driven via the `widgets/` folder.
+ *
+ * @return array<int, array<string, mixed>> List of widgets as emitted by the
+ *                                          build manifest.
+ */
+function {{PREFIX}}_get_registered_widget_modules() {
+	static $widgets = null;
+
+	if ( null === $widgets ) {
+		$registry_file = __DIR__ . '/widgets/registry.php';
+		$widgets       = file_exists( $registry_file ) ? require $registry_file : array();
+		if ( ! is_array( $widgets ) ) {
+			$widgets = array();
+		}
+	}
+
+	return $widgets;
+}
