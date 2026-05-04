@@ -123,25 +123,50 @@ function getVisibleHierarchyRows< Item >(
 	hierarchyRows: HierarchyRow< Item >[],
 	expandedItemIds: Set< string >
 ) {
-	let hiddenAncestorLevel: number | undefined;
+	const isCollapsedParent = ( hierarchyRow: HierarchyRow< Item > ) =>
+		hierarchyRow.childCount > 0 && ! expandedItemIds.has( hierarchyRow.id );
 
-	return hierarchyRows.filter( ( hierarchyRow ) => {
-		if ( hiddenAncestorLevel !== undefined ) {
-			if ( hierarchyRow.level > hiddenAncestorLevel ) {
-				return false;
+	const getClosestVisibleAncestor = (
+		visibleHierarchyRows: HierarchyRow< Item >[],
+		hierarchyRow: HierarchyRow< Item >
+	) =>
+		visibleHierarchyRows.findLast(
+			( visibleHierarchyRow ) =>
+				visibleHierarchyRow.level < hierarchyRow.level
+		);
+
+	const isHiddenByCollapsedAncestor = (
+		visibleHierarchyRows: HierarchyRow< Item >[],
+		hierarchyRow: HierarchyRow< Item >
+	) => {
+		const closestVisibleAncestor = getClosestVisibleAncestor(
+			visibleHierarchyRows,
+			hierarchyRow
+		);
+
+		return (
+			!! closestVisibleAncestor &&
+			isCollapsedParent( closestVisibleAncestor )
+		);
+	};
+
+	return hierarchyRows.reduce< HierarchyRow< Item >[] >(
+		( visibleHierarchyRows, hierarchyRow ) => {
+			if (
+				isHiddenByCollapsedAncestor(
+					visibleHierarchyRows,
+					hierarchyRow
+				)
+			) {
+				return visibleHierarchyRows;
 			}
-			hiddenAncestorLevel = undefined;
-		}
 
-		if (
-			hierarchyRow.childCount > 0 &&
-			! expandedItemIds.has( hierarchyRow.id )
-		) {
-			hiddenAncestorLevel = hierarchyRow.level;
-		}
+			visibleHierarchyRows.push( hierarchyRow );
 
-		return true;
-	} );
+			return visibleHierarchyRows;
+		},
+		[]
+	);
 }
 
 interface TableColumnFieldProps< Item > {
