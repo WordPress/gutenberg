@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { useEffect, useState } from '@wordpress/element';
+import { Suspense, type ComponentType } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -11,32 +11,81 @@ import { __ } from '@wordpress/i18n';
 import { useWidgetTypes } from './widget-types/hooks/use-widget-types';
 import type { WidgetType } from './widget-types/types';
 
-type Renderer = ( props: Record< string, unknown > ) => JSX.Element | null;
+function isValidWidgetModule(
+	module: unknown
+): module is { default: ComponentType } {
+	return (
+		typeof module === 'object' &&
+		module !== null &&
+		'default' in module &&
+		typeof ( module as { default: unknown } ).default === 'function'
+	);
+}
 
-function Widget( { widgetType }: { widgetType: WidgetType } ) {
-	const [ Renderer, setRenderer ] = useState< Renderer | null >( null );
+type WidgetModule = { default: ComponentType };
+type WidgetModuleResource =
+	| { status: 'pending'; promise: Promise< void > }
+	| { status: 'fulfilled'; module: WidgetModule }
+	| { status: 'rejected'; error: unknown };
 
-	useEffect( () => {
-		let active = true;
+const widgetModules = new Map< string, WidgetModuleResource >();
 
-		import( /* webpackIgnore: true */ widgetType.renderModule ).then(
-			( mod ) => {
-				if ( active && mod?.default ) {
-					setRenderer( () => mod.default as Renderer );
+function loadWidgetModule( renderModule: string ) {
+	let resource = widgetModules.get( renderModule );
+
+	if ( ! resource ) {
+		const promise = import( renderModule )
+			.then( ( module: unknown ) => {
+				if ( ! isValidWidgetModule( module ) ) {
+					throw new Error(
+						`Invalid widget module: ${ renderModule }`
+					);
 				}
-			}
-		);
 
-		return () => {
-			active = false;
-		};
-	}, [ widgetType.renderModule ] );
+				widgetModules.set( renderModule, {
+					status: 'fulfilled',
+					module,
+				} );
+			} )
+			.catch( ( error: unknown ) => {
+				widgetModules.set( renderModule, {
+					status: 'rejected',
+					error,
+				} );
+				throw error;
+			} );
 
-	if ( ! Renderer ) {
-		return null;
+		resource = { status: 'pending', promise };
+		widgetModules.set( renderModule, resource );
 	}
 
-	return <Renderer />;
+	return resource;
+}
+
+function getWidgetModule( renderModule: string ) {
+	const resource = loadWidgetModule( renderModule );
+
+	if ( resource.status === 'pending' ) {
+		throw resource.promise;
+	}
+
+	if ( resource.status === 'rejected' ) {
+		throw resource.error;
+	}
+
+	return resource.module;
+}
+
+type WidgetRenderProps = { widgetType: WidgetType };
+
+function WidgetRender( { widgetType }: WidgetRenderProps ) {
+	const WidgetComponent = getWidgetModule( widgetType.renderModule ).default;
+
+	return (
+		<Suspense fallback={ null }>
+			<WidgetComponent />
+		</Suspense>
+	);
 }
 
 function Dashboard() {
@@ -48,7 +97,7 @@ function Dashboard() {
 				{ widgetTypes
 					.filter( ( widgetType ) => widgetType.renderModule )
 					.map( ( widgetType ) => (
-						<Widget
+						<WidgetRender
 							key={ widgetType.name }
 							widgetType={ widgetType }
 						/>
