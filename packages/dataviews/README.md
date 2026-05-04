@@ -250,19 +250,25 @@ Properties:
 
 ##### Properties of `layout`
 
-| Props / Layout | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
-| -------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
-| `density`      | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
-| `enableMoving` | ✓       | ✓             |        |              |        |            |
-| `styles`       | ✓       | ✓             |        |              |        |            |
-| `badgeFields`  |         |               | ✓      | ✓            |        |            |
-| `previewSize`  |         |               | ✓      | ✓            |        |            |
+| Props / Layout       | `table` | `pickerTable` | `grid` | `pickerGrid` | `list` | `activity` |
+| -------------------- | ------- | ------------- | ------ | ------------ | ------ | ---------- |
+| `density`            | ✓       | ✓             | ✓      | ✓            | ✓      | ✓          |
+| `enableMoving`       | ✓       | ✓             |        |              |        |            |
+| `styles`             | ✓       | ✓             |        |              |        |            |
+| `hierarchyStyle`     | ✓       |               |        |              |        |            |
+| `showHierarchyBadge` | ✓       |               |        |              |        |            |
+| `expandChildren`     | ✓       |               |        |              |        |            |
+| `badgeFields`        |         |               | ✓      | ✓            |        |            |
+| `previewSize`        |         |               | ✓      | ✓            |        |            |
 
 `table` and `pickerTable` layouts:
 
 -   `density`: one of `comfortable`, `balanced`, or `compact`. Configures the size and spacing of the layout.
 -   `enableMoving`: whether the table columns should display moving controls.
 -   `styles`: additional `width`, `maxWidth`, `minWidth`, `align` styles for each field column. The `align` property accepts `'start'`, `'center'`, or `'end'`.
+-   `hierarchyStyle`: one of `text` or `tree`. `text` preserves the default dash indentation for hierarchical levels. `tree` displays chevrons that expand and collapse child rows.
+-   `showHierarchyBadge`: whether the `tree` hierarchy style should show a badge with the number of direct children. `true` by default.
+-   `expandChildren`: whether the `tree` hierarchy style should show child rows by default. `false` by default.
 
 **For column alignment (`align` property), follow these guidelines:**
 Right-align (`'end'`) whenever the cell value is fundamentally quantitative—numbers, decimals, currency, percentages—so that digits and decimal points line up, aiding comparison and calculation. Otherwise, default to left-alignment (`'start'`) for all other types (text, codes, labels, dates).
@@ -516,7 +522,7 @@ const { view, setView, isModified, resetToDefault } = useView( 'my-view-key' );
 	onChangeView={ setView }
 	onReset={ isModified ? resetToDefault : false }
 	// ...other props
-/>
+/>;
 ```
 
 ### Styling
@@ -1072,7 +1078,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: 'Trash'
+	label: 'Trash';
 }
 ```
 
@@ -2042,6 +2048,7 @@ Display format configuration for fields. Supported for `datetime`, `date`, `numb
 -   Optional.
 
 For `datetime` fields:
+
 -   Properties:
     -   `datetime`: The format string using PHP date format (e.g., `'M j, Y g:i a'` for `'Jan 1, 2021 2:30 pm'`). Optional, defaults to WordPress date format settings.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
@@ -2061,6 +2068,7 @@ Example:
 ```
 
 For `date` fields:
+
 -   Properties:
     -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).

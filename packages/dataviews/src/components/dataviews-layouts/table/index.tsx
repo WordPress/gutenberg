@@ -8,15 +8,21 @@ import type { ComponentProps, ReactElement } from 'react';
  * WordPress dependencies
  */
 import { __, sprintf, isRTL } from '@wordpress/i18n';
-import { Spinner, Popover } from '@wordpress/components';
+import { Button, Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
 	useEffect,
 	useId,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
+import {
+	chevronDownSmall,
+	chevronLeftSmall,
+	chevronRightSmall,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,6 +63,100 @@ function getEffectiveAlign(
 	return undefined;
 }
 
+interface HierarchyRow< Item > {
+	item: Item;
+	id: string;
+	level: number;
+	parentId?: string;
+	childCount: number;
+}
+
+interface TableRenderRow< Item > {
+	item: Item;
+	id: string;
+	level?: number;
+	hierarchyLevel?: number;
+	childCount?: number;
+	isExpanded?: boolean;
+}
+
+function getItemHierarchyLevel< Item >(
+	item: Item,
+	getItemLevel: ( item: Item ) => number
+) {
+	const level = getItemLevel( item );
+	return Number.isFinite( level ) ? Math.max( 0, level ) : 0;
+}
+
+function getHierarchyRows< Item >(
+	data: Item[],
+	getItemId: ( item: Item ) => string,
+	getItemLevel: ( item: Item ) => number
+) {
+	const hierarchyRows: HierarchyRow< Item >[] = [];
+	const hierarchyRowsById = new Map< string, HierarchyRow< Item > >();
+	const ancestors: HierarchyRow< Item >[] = [];
+
+	data.forEach( ( item, index ) => {
+		const id = getItemId( item ) || index.toString();
+		const level = getItemHierarchyLevel( item, getItemLevel );
+
+		while (
+			ancestors.length &&
+			ancestors[ ancestors.length - 1 ].level >= level
+		) {
+			ancestors.pop();
+		}
+
+		const parent = ancestors[ ancestors.length - 1 ];
+		const hierarchyRow = {
+			item,
+			id,
+			level,
+			parentId: parent?.id,
+			childCount: 0,
+		};
+
+		if ( parent ) {
+			const parentRow = hierarchyRowsById.get( parent.id );
+			if ( parentRow ) {
+				parentRow.childCount += 1;
+			}
+		}
+
+		hierarchyRows.push( hierarchyRow );
+		hierarchyRowsById.set( id, hierarchyRow );
+		ancestors.push( hierarchyRow );
+	} );
+
+	return hierarchyRows;
+}
+
+function getVisibleHierarchyRows< Item >(
+	hierarchyRows: HierarchyRow< Item >[],
+	expandedItemIds: Set< string >
+) {
+	let hiddenAncestorLevel: number | undefined;
+
+	return hierarchyRows.filter( ( hierarchyRow ) => {
+		if ( hiddenAncestorLevel !== undefined ) {
+			if ( hierarchyRow.level > hiddenAncestorLevel ) {
+				return false;
+			}
+			hiddenAncestorLevel = undefined;
+		}
+
+		if (
+			hierarchyRow.childCount > 0 &&
+			! expandedItemIds.has( hierarchyRow.id )
+		) {
+			hiddenAncestorLevel = hierarchyRow.level;
+		}
+
+		return true;
+	} );
+}
+
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
 	column: string;
@@ -87,6 +187,12 @@ interface TableRowProps< Item > {
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
 	posinset?: number;
+	isTreeHierarchy?: boolean;
+	hierarchyLevel?: number;
+	childCount?: number;
+	showHierarchyBadge?: boolean;
+	isExpanded?: boolean;
+	onToggleExpanded?: ( id: string ) => void;
 }
 
 function TableColumnField< Item >( {
@@ -132,6 +238,12 @@ function TableRow< Item >( {
 	onChangeSelection,
 	isActionsColumnSticky,
 	posinset,
+	isTreeHierarchy,
+	hierarchyLevel = 0,
+	childCount = 0,
+	showHierarchyBadge,
+	isExpanded,
+	onToggleExpanded,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
@@ -151,6 +263,27 @@ function TableRow< Item >( {
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
+	const itemTitle = titleField?.getValue?.( { item } );
+	const itemLabel =
+		typeof itemTitle === 'string' && itemTitle ? itemTitle : id;
+	const hasChildren = childCount > 0;
+	const hierarchyToggleLabel = isExpanded
+		? sprintf(
+				// translators: %s: The item title.
+				__( 'Collapse %s' ),
+				itemLabel
+		  )
+		: sprintf(
+				// translators: %s: The item title.
+				__( 'Expand %s' ),
+				itemLabel
+		  );
+	let hierarchyIcon = chevronRightSmall;
+	if ( isExpanded ) {
+		hierarchyIcon = chevronDownSmall;
+	} else if ( isRTL() ) {
+		hierarchyIcon = chevronLeftSmall;
+	}
 
 	return (
 		<tr
@@ -158,6 +291,14 @@ function TableRow< Item >( {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
 			} ) }
+			style={
+				isTreeHierarchy
+					? ( {
+							'--wp-dataviews-table-hierarchy-level':
+								hierarchyLevel,
+					  } as React.CSSProperties )
+					: undefined
+			}
 			onTouchStart={ () => {
 				isTouchDeviceRef.current = true;
 			} }
@@ -205,6 +346,32 @@ function TableRow< Item >( {
 				}
 			} }
 		>
+			{ isTreeHierarchy && (
+				<td className="dataviews-view-table__hierarchy-column">
+					<div className="dataviews-view-table__cell-content-wrapper dataviews-view-table__hierarchy-cell">
+						{ hasChildren ? (
+							<Button
+								className="dataviews-view-table__hierarchy-toggle"
+								icon={ hierarchyIcon }
+								label={ hierarchyToggleLabel }
+								aria-expanded={ isExpanded }
+								onClick={ (
+									event: React.MouseEvent< HTMLButtonElement >
+								) => {
+									event.stopPropagation();
+									onToggleExpanded?.( id );
+								} }
+								size="compact"
+							/>
+						) : (
+							<span
+								className="dataviews-view-table__hierarchy-toggle-placeholder"
+								aria-hidden="true"
+							/>
+						) }
+					</div>
+				</td>
+			) }
 			{ hasBulkActions && (
 				<td className="dataviews-view-table__checkbox-column">
 					<div className="dataviews-view-table__cell-content-wrapper">
@@ -224,6 +391,8 @@ function TableRow< Item >( {
 					<ColumnPrimary
 						item={ item }
 						level={ level }
+						childCount={ childCount }
+						showHierarchyBadge={ showHierarchyBadge }
 						titleField={ showTitle ? titleField : undefined }
 						mediaField={ showMedia ? mediaField : undefined }
 						descriptionField={
@@ -311,6 +480,22 @@ function ViewTable< Item >( {
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
 		getBoundingClientRect: () => DOMRect;
 	} | null >( null );
+	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
+		new Set()
+	);
+	const isTreeHierarchy = !! (
+		view.showLevels &&
+		typeof getItemLevel === 'function' &&
+		view.layout?.hierarchyStyle === 'tree'
+	);
+	const showHierarchyBadge =
+		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
+	const hierarchyRows = useMemo( () => {
+		if ( ! isTreeHierarchy || ! getItemLevel ) {
+			return [];
+		}
+		return getHierarchyRows( data, getItemId, getItemLevel );
+	}, [ data, getItemId, getItemLevel, isTreeHierarchy ] );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -318,6 +503,25 @@ function ViewTable< Item >( {
 			headerMenuToFocusRef.current = undefined;
 		}
 	} );
+
+	useEffect( () => {
+		if ( ! isTreeHierarchy ) {
+			setExpandedItemIds( new Set() );
+			return;
+		}
+
+		setExpandedItemIds(
+			new Set(
+				view.layout?.expandChildren
+					? hierarchyRows
+							.filter(
+								( hierarchyRow ) => hierarchyRow.childCount
+							)
+							.map( ( hierarchyRow ) => hierarchyRow.id )
+					: []
+			)
+		);
+	}, [ hierarchyRows, isTreeHierarchy, view.layout?.expandChildren ] );
 
 	const tableNoticeId = useId();
 
@@ -398,6 +602,39 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
+	const onToggleExpanded = ( itemId: string ) => {
+		setExpandedItemIds( ( previousExpandedItemIds ) => {
+			const nextExpandedItemIds = new Set( previousExpandedItemIds );
+			if ( nextExpandedItemIds.has( itemId ) ) {
+				nextExpandedItemIds.delete( itemId );
+			} else {
+				nextExpandedItemIds.add( itemId );
+			}
+			return nextExpandedItemIds;
+		} );
+	};
+	const getRowsToRender = ( items: Item[] ): TableRenderRow< Item >[] => {
+		if ( ! isTreeHierarchy || ! getItemLevel ) {
+			return items.map( ( item, index ) => ( {
+				item,
+				id: getItemId( item ) || index.toString(),
+				level:
+					view.showLevels && typeof getItemLevel === 'function'
+						? getItemHierarchyLevel( item, getItemLevel )
+						: undefined,
+			} ) );
+		}
+
+		return getVisibleHierarchyRows(
+			getHierarchyRows( items, getItemId, getItemLevel ),
+			expandedItemIds
+		).map( ( hierarchyRow ) => ( {
+			...hierarchyRow,
+			level: undefined,
+			hierarchyLevel: hierarchyRow.level,
+			isExpanded: expandedItemIds.has( hierarchyRow.id ),
+		} ) );
+	};
 	if ( ! hasData ) {
 		return (
 			<div
@@ -430,6 +667,9 @@ function ViewTable< Item >( {
 				inert={ ! isInfiniteScroll && isLoading ? 'true' : undefined }
 			>
 				<colgroup>
+					{ isTreeHierarchy && (
+						<col className="dataviews-view-table__col-hierarchy" />
+					) }
 					{ hasBulkActions && (
 						<col className="dataviews-view-table__col-checkbox" />
 					) }
@@ -470,6 +710,13 @@ function ViewTable< Item >( {
 					onContextMenu={ handleHeaderContextMenu }
 				>
 					<tr className="dataviews-view-table__row">
+						{ isTreeHierarchy && (
+							<th
+								className="dataviews-view-table__hierarchy-column"
+								scope="col"
+								onContextMenu={ handleHeaderContextMenu }
+							/>
+						) }
 						{ hasBulkActions && (
 							<th
 								className="dataviews-view-table__checkbox-column"
@@ -589,6 +836,7 @@ function ViewTable< Item >( {
 									<td
 										colSpan={
 											columns.length +
+											( isTreeHierarchy ? 1 : 0 ) +
 											( hasPrimaryColumn ? 1 : 0 ) +
 											( hasBulkActions ? 1 : 0 ) +
 											( actions?.length ? 1 : 0 )
@@ -605,58 +853,63 @@ function ViewTable< Item >( {
 											  ) }
 									</td>
 								</tr>
-								{ groupItems.map( ( item, index ) => (
-									<TableRow
-										key={ getItemId( item ) }
-										item={ item }
-										level={
-											view.showLevels &&
-											typeof getItemLevel === 'function'
-												? getItemLevel( item )
-												: undefined
-										}
-										hasBulkActions={ hasBulkActions }
-										actions={ actions }
-										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
-										view={ view }
-										titleField={ titleField }
-										mediaField={ mediaField }
-										descriptionField={ descriptionField }
-										selection={ selection }
-										getItemId={ getItemId }
-										onChangeSelection={ onChangeSelection }
-										onClickItem={ onClickItem }
-										renderItemLink={ renderItemLink }
-										isItemClickable={ isItemClickable }
-										isActionsColumnSticky={
-											! isHorizontalScrollEnd
-										}
-									/>
-								) ) }
+								{ getRowsToRender( groupItems ).map(
+									( row, index ) => (
+										<TableRow
+											key={ row.id }
+											item={ row.item }
+											level={ row.level }
+											hasBulkActions={ hasBulkActions }
+											actions={ actions }
+											fields={ fields }
+											id={ row.id || index.toString() }
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											onClickItem={ onClickItem }
+											renderItemLink={ renderItemLink }
+											isItemClickable={ isItemClickable }
+											isActionsColumnSticky={
+												! isHorizontalScrollEnd
+											}
+											isTreeHierarchy={ isTreeHierarchy }
+											hierarchyLevel={
+												row.hierarchyLevel
+											}
+											childCount={ row.childCount }
+											showHierarchyBadge={
+												showHierarchyBadge
+											}
+											isExpanded={ row.isExpanded }
+											onToggleExpanded={
+												onToggleExpanded
+											}
+										/>
+									)
+								) }
 							</tbody>
 						)
 					)
 				) : (
 					<tbody>
 						{ hasData &&
-							data.map( ( item, index ) => (
+							getRowsToRender( data ).map( ( row, index ) => (
 								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
+									key={ row.id }
+									item={ row.item }
+									level={ row.level }
 									hasBulkActions={ hasBulkActions }
 									actions={ actions }
 									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
+									id={ row.id || index.toString() }
 									view={ view }
 									titleField={ titleField }
 									mediaField={ mediaField }
@@ -673,6 +926,12 @@ function ViewTable< Item >( {
 									posinset={
 										isInfiniteScroll ? index + 1 : undefined
 									}
+									isTreeHierarchy={ isTreeHierarchy }
+									hierarchyLevel={ row.hierarchyLevel }
+									childCount={ row.childCount }
+									showHierarchyBadge={ showHierarchyBadge }
+									isExpanded={ row.isExpanded }
+									onToggleExpanded={ onToggleExpanded }
 								/>
 							) ) }
 					</tbody>

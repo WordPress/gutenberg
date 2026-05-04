@@ -6,6 +6,7 @@ import type { ComponentProps, ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
+import { _n, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -17,6 +18,8 @@ import { ItemClickWrapper } from '../utils/item-click-wrapper';
 function ColumnPrimary< Item >( {
 	item,
 	level,
+	childCount,
+	showHierarchyBadge,
 	titleField,
 	mediaField,
 	descriptionField,
@@ -26,6 +29,8 @@ function ColumnPrimary< Item >( {
 }: {
 	item: Item;
 	level?: number;
+	childCount?: number;
+	showHierarchyBadge?: boolean;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
@@ -38,7 +43,13 @@ function ColumnPrimary< Item >( {
 	isItemClickable: ( item: Item ) => boolean;
 } ) {
 	return (
-		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
+		<Stack
+			direction="row"
+			gap="md"
+			align="flex-start"
+			justify="flex-start"
+			className="dataviews-view-table__primary-column"
+		>
 			{ mediaField && (
 				<ItemClickWrapper
 					item={ item }
@@ -80,6 +91,18 @@ function ColumnPrimary< Item >( {
 							</span>
 						) }
 						<titleField.render item={ item } field={ titleField } />
+						{ showHierarchyBadge && !! childCount && (
+							<span
+								className="dataviews-view-table__hierarchy-badge"
+								aria-label={ sprintf(
+									// translators: %d: Number of direct child items.
+									_n( '%d child', '%d children', childCount ),
+									childCount
+								) }
+							>
+								{ childCount }
+							</span>
+						) }
 					</ItemClickWrapper>
 				) }
 				{ descriptionField && (

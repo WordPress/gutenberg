@@ -27,6 +27,7 @@ type Data = {
 	title: string;
 	author?: number;
 	order?: number;
+	level?: number;
 };
 
 const DEFAULT_VIEW = {
@@ -118,6 +119,34 @@ const data: Data[] = [
 		title: 'Posts',
 		author: 2,
 		order: 1,
+	},
+];
+
+const hierarchicalData: Data[] = [
+	{
+		id: 1,
+		title: 'Parent',
+		level: 0,
+	},
+	{
+		id: 2,
+		title: 'First child',
+		level: 1,
+	},
+	{
+		id: 3,
+		title: 'Second child',
+		level: 1,
+	},
+	{
+		id: 4,
+		title: 'Grandchild',
+		level: 2,
+	},
+	{
+		id: 5,
+		title: 'Another parent',
+		level: 0,
 	},
 ];
 
@@ -401,6 +430,212 @@ describe( 'DataViews component', () => {
 
 			// Don't keep the modifier pressed down, that's just mean.
 			await user.keyboard( '{/Control}' );
+		} );
+
+		it( 'preserves text hierarchy style by default', () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: 'Expand Parent' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'row', { name: /—\s*First child/ } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'starts tree hierarchy collapsed by default', () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect( screen.getByText( 'Parent' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Another parent' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'First child' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		it( 'supports expanding tree children by default', () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+							expandChildren: true,
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		it( 'expands and collapses tree hierarchy rows', async () => {
+			const user = userEvent.setup();
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			);
+
+			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Second child' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Grandchild' )
+			).not.toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
+			);
+
+			expect(
+				screen.queryByText( 'First child' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Second child' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'supports multiple tree nesting levels independently', async () => {
+			const user = userEvent.setup();
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			);
+			await user.click(
+				screen.getByRole( 'button', { name: 'Expand Second child' } )
+			);
+
+			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Collapse Second child' } )
+			);
+
+			expect(
+				screen.queryByText( 'Grandchild' )
+			).not.toBeInTheDocument();
+			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
+		} );
+
+		it( 'shows direct child count badges in tree hierarchy', async () => {
+			const user = userEvent.setup();
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect( screen.getByLabelText( '2 children' ) ).toHaveTextContent(
+				'2'
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			);
+
+			expect( screen.getByLabelText( '1 child' ) ).toHaveTextContent(
+				'1'
+			);
+		} );
+
+		it( 'can hide tree hierarchy badges', () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						layout: {
+							hierarchyStyle: 'tree',
+							showHierarchyBadge: false,
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect(
+				screen.queryByLabelText( '2 children' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 

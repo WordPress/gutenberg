@@ -254,6 +254,27 @@ export interface ViewTable extends ViewBase {
 		 * Whether the view allows column moving.
 		 */
 		enableMoving?: boolean;
+
+		/**
+		 * The style used to display hierarchical levels.
+		 *
+		 * @default 'text'
+		 */
+		hierarchyStyle?: 'text' | 'tree';
+
+		/**
+		 * Whether to show a badge with the number of direct children.
+		 *
+		 * @default true
+		 */
+		showHierarchyBadge?: boolean;
+
+		/**
+		 * Whether child rows should be expanded by default.
+		 *
+		 * @default false
+		 */
+		expandChildren?: boolean;
 	};
 }
 

@@ -58,19 +58,35 @@ const meta = {
 } as Meta< typeof DataViews >;
 export default meta;
 
+type LayoutTableArgs = Parameters< typeof LayoutTableComponent >[ 0 ] & {
+	hierarchyStyle: 'text' | 'tree';
+};
+
 export const LayoutTable = {
-	render: LayoutTableComponent,
+	render: ( { hierarchyStyle, ...args }: LayoutTableArgs ) => (
+		<LayoutTableComponent
+			{ ...args }
+			hierarchyStyle={ hierarchyStyle === 'tree' ? 'tree' : undefined }
+		/>
+	),
 	args: {
+		expandChildren: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
+		showHierarchyBadge: true,
 		showMedia: true,
+		version: 'text',
 	},
 	argTypes: {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		expandChildren: {
+			control: 'boolean',
+			description: 'Whether child rows are expanded by default',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -89,9 +105,19 @@ export const LayoutTable = {
 			control: 'object',
 			description: 'Array of available page sizes',
 		},
+		showHierarchyBadge: {
+			control: 'boolean',
+			description:
+				'Whether to show direct child count badges for tree hierarchy rows',
+		},
 		showMedia: {
 			control: 'boolean',
 			description: 'Whether to display the media field',
+		},
+		version: {
+			control: 'select',
+			description: 'Which table story variant to display',
+			options: [ 'default', 'tree-hierarchy' ],
 		},
 	},
 };
