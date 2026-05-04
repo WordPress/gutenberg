@@ -18,6 +18,7 @@ import RangeControl from '..';
 const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof RangeControl > = {
+	tags: [ 'manifest' ],
 	component: RangeControl,
 	title: 'Components/Selection & Input/Common/RangeControl',
 	id: 'components-rangecontrol',

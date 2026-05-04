@@ -1,6 +1,9 @@
-import type { ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ReactElement, ReactNode } from 'react';
 import type { Popover as _Popover } from '@base-ui/react/popover';
+
 import type { ComponentProps } from '../utils/types';
+
+export type PortalProps = ComponentPropsWithoutRef< typeof _Popover.Portal >;
 
 export interface RootProps
 	extends Pick<
@@ -22,16 +25,6 @@ export interface TriggerProps
 	children?: ReactNode;
 }
 
-/**
- * `Popover.Popup` maps to two Base UI elements internally: the
- * **Positioner** (outer, handles fixed positioning and z-index) and the
- * **Popup** (inner, holds content and visual styles).
- *
- * `style` and `className` are forwarded to the **Positioner** so that
- * z-index overrides (`--wp-ui-popover-z-index`) and Base UI CSS variables
- * (`--available-height`, `--available-width`) work correctly. All other
- * HTML attributes are forwarded to the inner **Popup** element.
- */
 export interface PopupProps
 	extends ComponentProps< 'div' >,
 		Pick<
@@ -64,12 +57,14 @@ export interface PopupProps
 	children?: ReactNode;
 
 	/**
-	 * A parent element to render the portal into.
+	 * Optional portal element, typically `<Popover.Portal />` with custom
+	 * `container` for cross-document rendering. Floating content is rendered
+	 * as this portal's children (do not pass `children` on the portal element;
+	 * they would be ignored).
 	 *
-	 * Useful for cross-document rendering, such as rendering a popover
-	 * in a parent document when the trigger is inside an iframe.
+	 * When omitted, `Popover.Popup` uses `Popover.Portal` with default props.
 	 */
-	container?: _Popover.Portal.Props[ 'container' ];
+	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
 	 * The visual style variant of the popup.

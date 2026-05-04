@@ -114,8 +114,12 @@ export function useConnectorPlugin( {
 
 			// Plugin data resolved — user has API permissions.
 			if ( plugin ) {
+				// Treat both single-site and network-active plugins as active.
+				const isPluginActive =
+					plugin.status === 'active' ||
+					plugin.status === 'network-active';
 				return {
-					derivedPluginStatus: ( plugin.status === 'active'
+					derivedPluginStatus: ( isPluginActive
 						? 'active'
 						: 'inactive' ) as PluginStatus,
 					canManagePlugins: true,

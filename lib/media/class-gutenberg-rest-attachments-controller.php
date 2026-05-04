@@ -20,18 +20,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		// Override the parent's sideload route so that 'scaled' is included
-		// in the image_size enum. Without the override, core's handler
-		// validates first and rejects 'scaled' before ours is tried.
-		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
-
-		// Special case to set 'original_image' in attachment metadata.
-		$valid_image_sizes[] = 'original';
-		// Client-side big image threshold: sideload the scaled version.
-		$valid_image_sizes[] = 'scaled';
-		// Used for PDF thumbnails.
-		$valid_image_sizes[] = 'full';
-
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
@@ -41,15 +29,62 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'sideload_item' ),
 					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
 					'args'                => array(
-						'id'         => array(
+						'id'                 => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
 						),
-						'image_size' => array(
-							'description' => __( 'Image size.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => $valid_image_sizes,
-							'required'    => true,
+						'image_size'         => array(
+							'description'       => __( 'Image size. Can be a single size name or an array of size names to register the same file under multiple sizes.', 'gutenberg' ),
+							'type'              => array( 'string', 'array' ),
+							'items'             => array(
+								'type' => 'string',
+							),
+							'required'          => true,
+							// A custom callback is used instead of the default `rest_validate_request_arg`
+							// because WordPress's `rest_is_array()` treats scalar strings as single-element
+							// lists (via wp_parse_list), so a oneOf with both a string and array schema
+							// matches a plain string twice and validation fails with "matches more than one
+							// of the expected formats". The callback validates the enum per-item using the
+							// current list of registered sizes, which reflects any sizes added after the
+							// route was registered (e.g. via add_image_size() in tests).
+							'validate_callback' => static function ( $value, $request, $param ) {
+								$valid_sizes   = array_keys( wp_get_registered_image_subsizes() );
+								$valid_sizes[] = 'original';
+								$valid_sizes[] = 'original-heic';
+								$valid_sizes[] = 'scaled';
+								$valid_sizes[] = 'full';
+
+								$items = is_string( $value ) ? array( $value ) : ( is_array( $value ) ? $value : null );
+								if ( null === $items ) {
+									return new WP_Error(
+										'rest_invalid_type',
+										/* translators: %s: Parameter name. */
+										sprintf( __( '%s must be a string or an array of strings.', 'gutenberg' ), $param )
+									);
+								}
+
+								foreach ( $items as $item ) {
+									if ( ! is_string( $item ) || ! in_array( $item, $valid_sizes, true ) ) {
+										return new WP_Error(
+											'rest_not_in_enum',
+											/* translators: %s: Parameter name. */
+											sprintf( __( '%s contains an invalid image size.', 'gutenberg' ), $param )
+										);
+									}
+								}
+
+								return true;
+							},
+						),
+						'generate_sub_sizes' => array(
+							'description' => __( 'Whether to generate image sub sizes from the sideloaded file.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => false,
+						),
+						'convert_format'     => array(
+							'description' => __( 'Whether to convert image formats.', 'gutenberg' ),
+							'type'        => 'boolean',
+							'default'     => true,
 						),
 					),
 				),
@@ -68,9 +103,54 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 					'callback'            => array( $this, 'finalize_item' ),
 					'permission_callback' => array( $this, 'edit_media_item_permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'        => array(
 							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
 							'type'        => 'integer',
+						),
+						'sub_sizes' => array(
+							'description' => __( 'Array of sub-size metadata collected from sideload responses.', 'gutenberg' ),
+							'type'        => 'array',
+							'default'     => array(),
+							'items'       => array(
+								'type'       => 'object',
+								'properties' => array(
+									'image_size'     => array(
+										// Uses a multi-type schema instead of `oneOf` because WordPress's
+										// `rest_is_array()` treats scalar strings as single-element lists,
+										// so both a `{type: string}` and `{type: array}` oneOf schema would
+										// match a plain string and trigger a "matches more than one"
+										// validation error.
+										'description' => __( 'Size name, or an array of size names when a single file is registered under multiple sizes with matching dimensions.', 'gutenberg' ),
+										'type'        => array( 'string', 'array' ),
+										'items'       => array(
+											'type' => 'string',
+										),
+										'required'    => true,
+									),
+									'width'          => array(
+										'type'    => 'integer',
+										'minimum' => 1,
+									),
+									'height'         => array(
+										'type'    => 'integer',
+										'minimum' => 1,
+									),
+									'file'           => array(
+										'type' => 'string',
+									),
+									'mime_type'      => array(
+										'type'    => 'string',
+										'pattern' => '^image/.*',
+									),
+									'filesize'       => array(
+										'type'    => 'integer',
+										'minimum' => 1,
+									),
+									'original_image' => array(
+										'type' => 'string',
+									),
+								),
+							),
 						),
 					),
 				),
@@ -90,13 +170,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if the request has access to create items, WP_Error object otherwise.
 	 */
 	public function create_item_permissions_check( $request ) {
-		if ( false === $request['generate_sub_sizes'] ) {
+		$bypass_mime_check = false === $request['generate_sub_sizes'];
+
+		if ( $bypass_mime_check ) {
 			add_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
 
 		$result = parent::create_item_permissions_check( $request );
 
-		if ( false === $request['generate_sub_sizes'] ) {
+		if ( $bypass_mime_check ) {
 			remove_filter( 'wp_prevent_unsupported_mime_type_uploads', '__return_false' );
 		}
 
@@ -147,6 +229,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			'readonly'    => true,
 		);
 
+		$schema['properties']['image_output_format'] = array(
+			'description' => __( 'The output MIME type this image should be converted to, based on the image_editor_output_format filter. Null if no conversion is needed.', 'gutenberg' ),
+			'type'        => array( 'string', 'null' ),
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		$schema['properties']['image_save_progressive'] = array(
+			'description' => __( 'Whether to use progressive/interlaced encoding when saving this image.', 'gutenberg' ),
+			'type'        => 'boolean',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
 		return $schema;
 	}
 
@@ -188,6 +284,39 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				}
 
 				$data['exif_orientation'] = $orientation;
+			}
+		}
+
+		// Add per-file output format for images.
+		if ( rest_is_field_included( 'image_output_format', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
+				$filename  = get_attached_file( $item->ID );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+
+				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
+				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
+			}
+		}
+
+		// Add progressive/interlaced encoding setting for images.
+		if ( rest_is_field_included( 'image_save_progressive', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$mime_type = get_post_mime_type( $item );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+				$data['image_save_progressive'] = (bool) apply_filters(
+					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					false,
+					$mime_type
+				);
 			}
 		}
 
@@ -272,6 +401,35 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
+		// Recompute image_output_format now that __return_empty_array is removed.
+		if ( ! is_wp_error( $response ) ) {
+			$data = $response->get_data();
+			if ( ! empty( $data['id'] ) && wp_attachment_is_image( $data['id'] ) ) {
+				$mime_type = get_post_mime_type( $data['id'] );
+				$filename  = get_attached_file( $data['id'] );
+
+				/** This filter is documented in wp-includes/class-wp-image-editor.php */
+				$output_formats = apply_filters(
+					'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					array( $mime_type => $mime_type ),
+					$filename ? $filename : '',
+					$mime_type
+				);
+
+				$output_mime                 = $output_formats[ $mime_type ] ?? $mime_type;
+				$data['image_output_format'] = ( $output_mime !== $mime_type ) ? $output_mime : null;
+
+				/** This filter is documented in wp-includes/class-wp-image-editor-imagick.php */
+				$data['image_save_progressive'] = (bool) apply_filters(
+					'image_save_progressive', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+					false,
+					$mime_type
+				);
+
+				$response->set_data( $data );
+			}
+		}
+
 		return $response;
 	}
 
@@ -298,6 +456,60 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if ( ! is_array( $metadata ) ) {
 			$metadata = array();
+		}
+
+		// Apply all sub-size metadata collected from sideload responses.
+		$sub_sizes = $request['sub_sizes'] ?? array();
+
+		foreach ( $sub_sizes as $sub_size ) {
+			$image_size = $sub_size['image_size'];
+
+			// When multiple size names share identical dimensions the client
+			// sends a single sub-size entry with an array of names. Register the
+			// same file under each name. Arrays only contain regular sizes.
+			if ( is_array( $image_size ) ) {
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				foreach ( $image_size as $name ) {
+					$metadata['sizes'][ $name ] = array(
+						'width'     => $sub_size['width'] ?? 0,
+						'height'    => $sub_size['height'] ?? 0,
+						'file'      => $sub_size['file'] ?? '',
+						'mime-type' => $sub_size['mime_type'] ?? '',
+						'filesize'  => $sub_size['filesize'] ?? 0,
+					);
+				}
+				continue;
+			}
+
+			if ( 'original' === $image_size ) {
+				$metadata['original_image'] = $sub_size['file'];
+			} elseif ( 'original-heic' === $image_size ) {
+				// HEIC companion original: stored under its own meta key so
+				// the scaled-sideload flow (which writes 'original_image')
+				// cannot clobber it. 'original_image' keeps pointing at the
+				// web-viewable JPEG derivative. Cleanup on attachment delete
+				// is handled by a delete_attachment hook that reads this key.
+				$metadata['original'] = $sub_size['file'];
+			} elseif ( 'scaled' === $image_size ) {
+				if ( ! empty( $sub_size['original_image'] ) ) {
+					$metadata['original_image'] = $sub_size['original_image'];
+				}
+				$metadata['width']    = $sub_size['width'] ?? 0;
+				$metadata['height']   = $sub_size['height'] ?? 0;
+				$metadata['filesize'] = $sub_size['filesize'] ?? 0;
+				$metadata['file']     = $sub_size['file'] ?? '';
+			} else {
+				$metadata['sizes'] = $metadata['sizes'] ?? array();
+
+				$metadata['sizes'][ $image_size ] = array(
+					'width'     => $sub_size['width'] ?? 0,
+					'height'    => $sub_size['height'] ?? 0,
+					'file'      => $sub_size['file'] ?? '',
+					'mime-type' => $sub_size['mime_type'] ?? '',
+					'filesize'  => $sub_size['filesize'] ?? 0,
+				);
+			}
 		}
 
 		/**
@@ -476,59 +688,57 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$image_size = $request['image_size'];
 
-		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		// Build sub-size data to return to the client.
+		// The client accumulates these and sends them all to the finalize endpoint.
+		// `image_size` may be a single string or an array of names that share the
+		// same dimensions and therefore reuse a single sideloaded file. Arrays
+		// only carry regular sub-sizes; the special keys below ('original',
+		// 'scaled', 'original-heic') are always scalar strings.
+		$sub_size_data = array(
+			'image_size' => $image_size,
+		);
 
-		if ( ! $metadata ) {
-			$metadata = array();
-		}
+		if ( is_array( $image_size ) ) {
+			$size = wp_getimagesize( $path );
 
-		if ( 'original' === $image_size ) {
-			$metadata['original_image'] = wp_basename( $path );
+			$sub_size_data['width']     = $size ? $size[0] : 0;
+			$sub_size_data['height']    = $size ? $size[1] : 0;
+			$sub_size_data['file']      = wp_basename( $path );
+			$sub_size_data['mime_type'] = $type;
+			$sub_size_data['filesize']  = wp_filesize( $path );
+		} elseif ( 'original' === $image_size ) {
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( 'original-heic' === $image_size ) {
+			// HEIC companion original. finalize_item() writes the filename to
+			// $metadata['original'] (separate from 'original_image', which the
+			// scaled-sideload flow owns). Cleanup on attachment delete is
+			// handled by a delete_attachment hook that reads this key.
+			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size ) {
-			// The current attached file is the original; record it as original_image.
-			$current_file               = get_attached_file( $attachment_id, true );
-			$metadata['original_image'] = wp_basename( $current_file );
+			// Record the current attached file as the original.
+			$current_file                    = get_attached_file( $attachment_id, true );
+			$sub_size_data['original_image'] = wp_basename( $current_file );
 
 			// Update the attached file to point to the scaled version.
+			// This writes to _wp_attached_file meta, not _wp_attachment_metadata.
 			update_attached_file( $attachment_id, $path );
 
 			$size = wp_getimagesize( $path );
 
-			$metadata['width']    = $size ? $size[0] : 0;
-			$metadata['height']   = $size ? $size[1] : 0;
-			$metadata['filesize'] = wp_filesize( $path );
-			$metadata['file']     = _wp_relative_upload_path( $path );
+			$sub_size_data['width']    = $size ? $size[0] : 0;
+			$sub_size_data['height']   = $size ? $size[1] : 0;
+			$sub_size_data['filesize'] = wp_filesize( $path );
+			$sub_size_data['file']     = _wp_relative_upload_path( $path );
 		} else {
-			$metadata['sizes'] = $metadata['sizes'] ?? array();
-
 			$size = wp_getimagesize( $path );
 
-			$metadata['sizes'][ $image_size ] = array(
-				'width'     => $size ? $size[0] : 0,
-				'height'    => $size ? $size[1] : 0,
-				'file'      => wp_basename( $path ),
-				'mime-type' => $type,
-				'filesize'  => wp_filesize( $path ),
-			);
+			$sub_size_data['width']     = $size ? $size[0] : 0;
+			$sub_size_data['height']    = $size ? $size[1] : 0;
+			$sub_size_data['file']      = wp_basename( $path );
+			$sub_size_data['mime_type'] = $type;
+			$sub_size_data['filesize']  = wp_filesize( $path );
 		}
 
-		wp_update_attachment_metadata( $attachment_id, $metadata );
-
-		$response_request = new WP_REST_Request(
-			WP_REST_Server::READABLE,
-			rest_get_route_for_post( $attachment_id )
-		);
-
-		$response_request['context'] = 'edit';
-
-		if ( isset( $request['_fields'] ) ) {
-			$response_request['_fields'] = $request['_fields'];
-		}
-
-		$response = $this->prepare_item_for_response( get_post( $attachment_id ), $response_request );
-
-		$response->header( 'Location', rest_url( rest_get_route_for_post( $attachment_id ) ) );
-
-		return $response;
+		return rest_ensure_response( $sub_size_data );
 	}
 }

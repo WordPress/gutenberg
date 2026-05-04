@@ -15,32 +15,32 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Controls from './controls';
-import useTabMenuSync from './use-tab-menu-sync';
+import useTabListSync from './use-tab-list-sync';
 
 const EMPTY_ARRAY = [];
 
 const TABS_TEMPLATE = [
 	[
-		'core/tabs-menu',
+		'core/tab-list',
 		{},
 		[
-			[ 'core/tabs-menu-item', {} ],
-			[ 'core/tabs-menu-item', {} ],
+			[ 'core/tab', {} ],
+			[ 'core/tab', {} ],
 		],
 	],
 	[
-		'core/tab-panel',
+		'core/tab-panels',
 		{},
 		[
 			[
-				'core/tab',
+				'core/tab-panel',
 				{
 					label: __( 'Tab' ),
 				},
 				[ [ 'core/paragraph' ] ],
 			],
 			[
-				'core/tab',
+				'core/tab-panel',
 				{
 					label: __( 'Tab' ),
 				},
@@ -63,29 +63,34 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
-	const { tabs, tabPanelClientId, menuItems, tabsMenuClientId } = useSelect(
+	const { tabPanels, tabPanelsClientId, tabs, tabListClientId } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			const tabPanel = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panel'
+			const tabPanelBlocks = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panels'
 			);
-			const tabsMenu = innerBlocks.find(
-				( block ) => block.name === 'core/tabs-menu'
+			const tabList = innerBlocks.find(
+				( block ) => block.name === 'core/tab-list'
 			);
 
 			return {
-				tabs: tabPanel?.innerBlocks ?? EMPTY_ARRAY,
-				tabPanelClientId: tabPanel?.clientId ?? null,
-				menuItems: tabsMenu?.innerBlocks ?? EMPTY_ARRAY,
-				tabsMenuClientId: tabsMenu?.clientId ?? null,
+				tabPanels: tabPanelBlocks?.innerBlocks ?? EMPTY_ARRAY,
+				tabPanelsClientId: tabPanelBlocks?.clientId ?? null,
+				tabs: tabList?.innerBlocks ?? EMPTY_ARRAY,
+				tabListClientId: tabList?.clientId ?? null,
 			};
 		},
 		[ clientId ]
 	);
 
-	useTabMenuSync( { tabs, menuItems, tabPanelClientId, tabsMenuClientId } );
+	useTabListSync( {
+		tabPanels,
+		tabs,
+		tabPanelsClientId,
+		tabListClientId,
+	} );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
@@ -94,9 +99,9 @@ function Edit( { clientId, attributes, setAttributes } ) {
 		/**
 		 * Compute tabs list from innerblocks to provide via context.
 		 * This traverses the tab-panel block to find all tab blocks
-		 * and extracts their label and anchor for the tabs-menu to consume.
+		 * and extracts their label and anchor for the tab-list to consume.
 		 */
-		const tabList = tabs.map( ( tab, index ) => ( {
+		const tabList = tabPanels.map( ( tab, index ) => ( {
 			id: tab.attributes.anchor || `tab-${ index }`,
 			label: tab.attributes.label || '',
 			clientId: tab.clientId,
@@ -109,7 +114,7 @@ function Edit( { clientId, attributes, setAttributes } ) {
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		};
-	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
+	}, [ tabPanels, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	const blockProps = useBlockProps();
 

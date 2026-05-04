@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
 
 const meta: Meta< typeof Stack > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/Stack',
 	component: Stack,
 };
