@@ -1,20 +1,10 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"compilerOptions": {
-		"allowJs": true,
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"isolatedModules": true,
 		"jsx": "react-jsx",
-		"lib": [ "DOM", "DOM.Iterable", "ESNext" ],
-		"module": "preserve",
-		"moduleResolution": "bundler",
 		"noEmit": true,
 		"resolveJsonModule": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"noImplicitAny": false,
-		"target": "esnext"
+		"noImplicitAny": false
 	},
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "**/test/**" ]
