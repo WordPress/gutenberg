@@ -284,7 +284,7 @@ export const WithCustomTriggerAndItem: Story = {
 		children: (
 			<>
 				<Select.Trigger>
-					{ ( value ) => (
+					{ ( item ) => (
 						<span
 							style={ {
 								display: 'flex',
@@ -293,14 +293,14 @@ export const WithCustomTriggerAndItem: Story = {
 							} }
 						>
 							<img
-								src={ `https://gravatar.com/avatar/?d=initials&name=${ value.label }` }
+								src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
 								alt=""
 								width="20"
 								style={ {
 									borderRadius: '50%',
 								} }
 							/>
-							{ value.label }
+							{ item.label }
 						</span>
 					) }
 				</Select.Trigger>
