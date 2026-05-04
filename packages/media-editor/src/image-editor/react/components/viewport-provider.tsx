@@ -11,9 +11,9 @@ import {
 	type UseViewportStateReturn,
 } from '../hooks/use-viewport-state';
 
-type ViewportContextValue = UseViewportStateReturn | null;
+type ViewportContextValue = UseViewportStateReturn;
 
-const ViewportContext = createContext< ViewportContextValue >( null );
+const ViewportContext = createContext< ViewportContextValue | null >( null );
 
 export function ViewportProvider( {
 	children,
@@ -28,9 +28,6 @@ export function ViewportProvider( {
 	);
 }
 
-/**
- * Returns the viewport context. Throws if used outside a ViewportProvider.
- */
 export function useViewport(): UseViewportStateReturn {
 	const context = useContext( ViewportContext );
 	if ( ! context ) {
@@ -39,12 +36,4 @@ export function useViewport(): UseViewportStateReturn {
 		);
 	}
 	return context;
-}
-
-/**
- * Returns the viewport context, or null when used outside a ViewportProvider.
- * Use this in components that work with or without a viewport.
- */
-export function useViewportOptional(): UseViewportStateReturn | null {
-	return useContext( ViewportContext );
 }

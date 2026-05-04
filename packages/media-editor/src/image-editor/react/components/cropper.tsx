@@ -35,7 +35,7 @@ import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
-import { ViewportProvider, useViewportOptional } from './viewport-provider';
+import { ViewportProvider, useViewport } from './viewport-provider';
 import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
@@ -170,7 +170,11 @@ function CropperInner(
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const { state, setImage, setCropRect, settleCrop } = controller;
-	const viewport = useViewportOptional();
+	const {
+		viewport: viewportState,
+		setViewportPan,
+		resetViewport,
+	} = useViewport();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -349,7 +353,7 @@ function CropperInner(
 			setCropRect( rect );
 			// During a resize drag, pan the viewport so the handle stays
 			// visible even when the crop extends beyond the canvas edge.
-			if ( isResizingRef.current && viewport && visualSize.width > 0 ) {
+			if ( isResizingRef.current && visualSize.width > 0 ) {
 				const offsetX = ( canvasSize.width - visualSize.width ) / 2;
 				const offsetY = ( canvasSize.height - visualSize.height ) / 2;
 				const rightOverflow = Math.max(
@@ -372,13 +376,13 @@ function CropperInner(
 					0,
 					-( offsetY + rect.y * visualSize.height )
 				);
-				viewport.setViewportPan( {
+				setViewportPan( {
 					x: -rightOverflow + leftOverflow,
 					y: -bottomOverflow + topOverflow,
 				} );
 			}
 		},
-		[ setCropRect, viewport, canvasSize, visualSize ]
+		[ setCropRect, setViewportPan, canvasSize, visualSize ]
 	);
 
 	// Settling animation: brief linear transition after resize end.
@@ -409,9 +413,9 @@ function CropperInner(
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
 		setIsResizing( true );
-		viewport?.resetViewport();
+		resetViewport();
 		onGestureStart?.();
-	}, [ onGestureStart, viewport ] );
+	}, [ onGestureStart, resetViewport ] );
 
 	/**
 	 * Handle resize end — settle the crop rect (re-center, fill height)
@@ -423,14 +427,14 @@ function CropperInner(
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
 		// with the settle animation on the image.
-		viewport?.resetViewport();
+		resetViewport();
 		settleCrop();
 		onGestureEnd?.();
 		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
 			setSettling( false );
 		}, 200 );
-	}, [ settleCrop, onGestureEnd, viewport ] );
+	}, [ settleCrop, onGestureEnd, resetViewport ] );
 
 	const imageTransition =
 		settling || isZooming ? 'transform 150ms linear' : undefined;
@@ -462,12 +466,9 @@ function CropperInner(
 	// Transitions back to zero during the settle animation.
 	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
 	let canvasStyle: React.CSSProperties | undefined;
-	if (
-		viewport &&
-		( viewport.viewport.pan.x !== 0 || viewport.viewport.pan.y !== 0 )
-	) {
+	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
 		canvasStyle = {
-			transform: `translate(${ viewport.viewport.pan.x }px, ${ viewport.viewport.pan.y }px)`,
+			transform: `translate(${ viewportState.pan.x }px, ${ viewportState.pan.y }px)`,
 			transition: settleTransition,
 		};
 	} else if ( settling ) {
