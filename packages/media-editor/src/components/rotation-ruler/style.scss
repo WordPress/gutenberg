@@ -1,13 +1,14 @@
 @use "@wordpress/base-styles/variables" as *;
 
+// Vertical layout (top → bottom):
+//   0–13: value bubble
+//   13–19: 6px upward-pointing triangle (the pointer)
+//   19–37: tick strip (18px)
 .rotation-ruler {
 	position: relative;
 	min-width: 180px;
-	height: 56px;
-	display: flex;
-	align-items: flex-end;
-	justify-content: center;
-	padding: $grid-unit-30 $grid-unit-10 $grid-unit-10;
+	height: 37px;
+	padding: 0 $grid-unit-10;
 	box-sizing: border-box;
 	user-select: none;
 	touch-action: none;
@@ -40,9 +41,38 @@
 	white-space: nowrap;
 }
 
+.rotation-ruler__bubble {
+	position: absolute;
+	top: 0;
+	left: 50%;
+	transform: translateX(-50%);
+	font-size: 11px;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+}
+
+// Single upward-pointing triangle below the bubble. Marks the centered
+// value cleanly without the vertical stem of a traditional pointer.
+.rotation-ruler__pointer {
+	position: absolute;
+	top: 13px;
+	left: 50%;
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-bottom: 6px solid var(--wp-admin-theme-color);
+	transform: translateX(-50%);
+	pointer-events: none;
+}
+
 .rotation-ruler__strip {
 	position: absolute;
-	inset: $grid-unit-30 0 $grid-unit-10;
+	left: 0;
+	right: 0;
+	top: 19px;
+	height: 18px;
 	overflow: hidden;
 	cursor: ew-resize;
 }
@@ -69,40 +99,6 @@
 	&--major {
 		opacity: 1;
 	}
-}
-
-.rotation-ruler__pointer {
-	position: absolute;
-	left: 50%;
-	bottom: $grid-unit-10;
-	width: 2px;
-	height: 28px;
-	background: var(--wp-admin-theme-color);
-	transform: translateX(-50%);
-	pointer-events: none;
-}
-
-.rotation-ruler__pointer::after {
-	content: "";
-	position: absolute;
-	top: -4px;
-	left: 50%;
-	width: 0;
-	height: 0;
-	border-left: 4px solid transparent;
-	border-right: 4px solid transparent;
-	border-bottom: 4px solid var(--wp-admin-theme-color);
-	transform: translateX(-50%);
-}
-
-.rotation-ruler__bubble {
-	position: absolute;
-	top: 0;
-	left: 50%;
-	transform: translateX(-50%);
-	font-size: 12px;
-	font-variant-numeric: tabular-nums;
-	pointer-events: none;
 }
 
 // Below ~220px container width, fade out 1° ticks; mid/major remain.

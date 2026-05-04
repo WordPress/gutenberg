@@ -29,6 +29,10 @@ export interface RotationRulerProps {
 }
 
 const PX_PER_UNIT = 6;
+const STRIP_HEIGHT = 18;
+const TICK_HEIGHT_MINOR = 4;
+const TICK_HEIGHT_MID = 8;
+const TICK_HEIGHT_MAJOR = 14;
 
 type TickKind = 'minor' | 'mid' | 'major';
 interface Tick {
@@ -48,13 +52,13 @@ function useTicks( min: number, max: number ): Tick[] {
 		const out: Tick[] = [];
 		for ( let v = Math.ceil( min ); v <= Math.floor( max ); v += 1 ) {
 			let kind: TickKind = 'minor';
-			let height = 6;
+			let height = TICK_HEIGHT_MINOR;
 			if ( v % 15 === 0 ) {
 				kind = 'major';
-				height = 18;
+				height = TICK_HEIGHT_MAJOR;
 			} else if ( v % 5 === 0 ) {
 				kind = 'mid';
-				height = 12;
+				height = TICK_HEIGHT_MID;
 			}
 			out.push( { value: v, kind, height } );
 		}
@@ -152,9 +156,16 @@ export default function RotationRuler( {
 
 	const display = `${ formatValue( value ) }${ unit }`;
 	const ticks = useTicks( min, max );
+	// `left: 50%` puts the SVG's left edge at the strip's centerline, so
+	// without an additional `-50%` self-offset all ticks would render to
+	// the right of the pointer. Combine the centering offset with the
+	// value-driven offset so value=0 lands the SVG's center on the
+	// pointer.
 	const stripStyle: CSSProperties = useMemo( () => {
 		const offset = -value * PX_PER_UNIT;
-		return { transform: `translateX(${ offset }px)` };
+		return {
+			transform: `translateX(calc(-50% + ${ offset }px))`,
+		};
 	}, [ value ] );
 
 	const wrapperClassName = [ 'rotation-ruler', className ]
@@ -195,10 +206,10 @@ export default function RotationRuler( {
 					className="rotation-ruler__ticks"
 					style={ stripStyle }
 					width={ ( max - min ) * PX_PER_UNIT }
-					height="32"
+					height={ STRIP_HEIGHT }
 					viewBox={ `${ min * PX_PER_UNIT } 0 ${
 						( max - min ) * PX_PER_UNIT
-					} 32` }
+					} ${ STRIP_HEIGHT }` }
 					preserveAspectRatio="xMidYMid meet"
 				>
 					{ ticks.map( ( tick ) => (
@@ -206,8 +217,8 @@ export default function RotationRuler( {
 							key={ tick.value }
 							x1={ tick.value * PX_PER_UNIT }
 							x2={ tick.value * PX_PER_UNIT }
-							y1={ 32 - tick.height }
-							y2={ 32 }
+							y1={ STRIP_HEIGHT - tick.height }
+							y2={ STRIP_HEIGHT }
 							className={ `rotation-ruler__tick rotation-ruler__tick--${ tick.kind }` }
 						/>
 					) ) }
