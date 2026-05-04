@@ -2975,13 +2975,13 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Updates the text indent selector for paragraph blocks based on the textIndent setting.
+	 * Updates text indent selectors based on the textIndent setting.
 	 *
 	 * The textIndent setting can be 'subsequent' (default), 'all', or false.
-	 * When set to 'all', the selector should be '.wp-block-paragraph' instead of
-	 * '.wp-block-paragraph + .wp-block-paragraph' to apply indent to all paragraphs.
+	 * When set to 'all', selectors are switched to apply indent to all paragraphs.
 	 *
 	 * @since 7.0.0
+	 * @since 7.1.0 Added support for core/post-content selector switching.
 	 *
 	 * @param array  $feature_declarations The feature declarations keyed by selector.
 	 * @param array  $settings             The theme.json settings.
@@ -2989,12 +2989,23 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The updated feature declarations.
 	 */
 	private static function update_paragraph_text_indent_selector( $feature_declarations, $settings, $block_name ) {
-		if ( 'core/paragraph' !== $block_name ) {
+		$selector_mappings = array(
+			'core/paragraph'    => array(
+				'old' => '.wp-block-paragraph + .wp-block-paragraph',
+				'new' => '.wp-block-paragraph',
+			),
+			'core/post-content' => array(
+				'old' => '.wp-block-post-content > .wp-block-paragraph + .wp-block-paragraph',
+				'new' => '.wp-block-post-content > .wp-block-paragraph',
+			),
+		);
+
+		if ( ! isset( $selector_mappings[ $block_name ] ) ) {
 			return $feature_declarations;
 		}
 
 		// Check block-level settings first, then fall back to global settings.
-		$block_settings      = $settings['blocks']['core/paragraph'] ?? null;
+		$block_settings      = $settings['blocks'][ $block_name ] ?? null;
 		$text_indent_setting = $block_settings['typography']['textIndent']
 			?? $settings['typography']['textIndent']
 			?? 'subsequent';
@@ -3004,8 +3015,8 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		// Look for the text indent selector and replace it.
-		$old_selector = '.wp-block-paragraph + .wp-block-paragraph';
-		$new_selector = '.wp-block-paragraph';
+		$old_selector = $selector_mappings[ $block_name ]['old'];
+		$new_selector = $selector_mappings[ $block_name ]['new'];
 
 		if ( isset( $feature_declarations[ $old_selector ] ) ) {
 			$declarations = $feature_declarations[ $old_selector ];

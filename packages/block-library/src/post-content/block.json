@@ -81,7 +81,7 @@
 	},
 	"selectors": {
 		"typography": {
-			"textIndent": ".wp-block-post-content > :where(p:first-of-type)"
+			"textIndent": ".wp-block-post-content > .wp-block-paragraph + .wp-block-paragraph"
 		}
 	},
 	"style": "wp-block-post-content",
