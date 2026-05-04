@@ -198,18 +198,17 @@ export function calculateNotePositions( {
 }
 
 /**
- * Shift focus to the note thread associated with a particular note ID.
- * If an additional selector is provided, the focus will be shifted to the element matching the selector.
+ * Resolve the DOM element for a note thread once it's mounted,
+ * or `null` if not found within 3 seconds.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {string}       noteId             The ID of the note thread to focus.
- * @param {?HTMLElement} container          The container element to search within.
- * @param {string}       additionalSelector The additional selector to focus on.
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ * @return {Promise<HTMLElement|null>} Resolved element, or `null` on timeout.
  */
-export function focusNoteThread( noteId, container, additionalSelector ) {
+function findNoteThread( noteId, container, additionalSelector ) {
 	if ( ! container ) {
-		return;
+		return Promise.resolve( null );
 	}
 
 	// A thread without a noteId is a new note thread.
@@ -236,15 +235,43 @@ export function focusNoteThread( noteId, container, additionalSelector ) {
 			}
 		} );
 
-		observer.observe( container, {
-			childList: true,
-			subtree: true,
-		} );
+		observer.observe( container, { childList: true, subtree: true } );
 
 		// Stop trying after 3 seconds.
 		timer = setTimeout( () => {
 			observer.disconnect();
 			resolve( null );
 		}, 3000 );
-	} ).then( ( element ) => element?.focus() );
+	} );
+}
+
+/**
+ * Focus a note thread (or a descendant) and scroll it into view.
+ *
+ * @param {string}       noteId             Note thread ID.
+ * @param {?HTMLElement} container          Container to search within.
+ * @param {string}       additionalSelector Optional descendant selector.
+ */
+export function focusNoteThread( noteId, container, additionalSelector ) {
+	return findNoteThread( noteId, container, additionalSelector ).then(
+		( element ) => {
+			if ( ! element ) {
+				return;
+			}
+			element.focus();
+			element.scrollIntoView( { block: 'nearest' } );
+		}
+	);
+}
+
+/**
+ * Scroll a note thread into view without changing focus.
+ *
+ * @param {string}       noteId    Note thread ID.
+ * @param {?HTMLElement} container Container to search within.
+ */
+export function scrollNoteThreadIntoView( noteId, container ) {
+	return findNoteThread( noteId, container ).then( ( element ) => {
+		element?.scrollIntoView( { block: 'nearest' } );
+	} );
 }

@@ -21,6 +21,14 @@ export const BLANK_RECORD: TaxonomyFormData = {
 		description: '',
 		public: true,
 		hierarchical: false,
+		publicly_queryable: true,
+		show_ui: true,
+		show_in_menu: true,
+		show_in_nav_menus: true,
+		show_tagcloud: true,
+		show_in_quick_edit: true,
+		show_admin_column: false,
+		show_in_rest: true,
 	},
 };
 
@@ -138,20 +146,27 @@ export function toFormData( row: TaxonomyRecord ): TaxonomyFormData {
 			labels[ key ] = value;
 		}
 	}
+	const formConfig: TaxonomyFormData[ 'config' ] = {
+		labels: { singular_name: '', ...labels },
+		object_type: Array.isArray( row.object_type ) ? row.object_type : [],
+		description: config.description ?? '',
+		public: config.public,
+		hierarchical: config.hierarchical,
+		publicly_queryable: config.publicly_queryable,
+		show_ui: config.show_ui,
+		show_in_menu: config.show_in_menu,
+		show_in_nav_menus: config.show_in_nav_menus,
+		show_tagcloud: config.show_tagcloud,
+		show_in_quick_edit: config.show_in_quick_edit,
+		show_admin_column: config.show_admin_column,
+		show_in_rest: config.show_in_rest,
+	};
 	return {
 		id: row.id,
 		slug: row.slug,
 		status: row.status,
 		title: { raw: row.title.raw },
-		config: {
-			labels: { singular_name: '', ...labels },
-			object_type: Array.isArray( row.object_type )
-				? row.object_type
-				: [],
-			description: config.description ?? '',
-			public: config.public ?? true,
-			hierarchical: config.hierarchical ?? false,
-		},
+		config: formConfig,
 	};
 }
 
@@ -180,6 +195,14 @@ export function serializeForSave( data: TaxonomyFormData ) {
 			labels,
 			public: config.public,
 			hierarchical: config.hierarchical,
+			publicly_queryable: config.publicly_queryable,
+			show_ui: config.show_ui,
+			show_in_menu: config.show_in_menu,
+			show_in_nav_menus: config.show_in_nav_menus,
+			show_tagcloud: config.show_tagcloud,
+			show_in_quick_edit: config.show_in_quick_edit,
+			show_admin_column: config.show_admin_column,
+			show_in_rest: config.show_in_rest,
 			...( description !== '' ? { description } : {} ),
 		},
 	};

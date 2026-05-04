@@ -766,9 +766,7 @@ export const CustomResizeHandleStory: Story = {
 				{ ...args }
 				layout={ layout }
 				onChangeLayout={ setLayout }
-				renderResizeHandle={ ( props ) => (
-					<CustomResizeHandle { ...props } />
-				) }
+				renderResizeHandle={ CustomResizeHandle }
 			>
 				{ tiles }
 			</DashboardGrid>

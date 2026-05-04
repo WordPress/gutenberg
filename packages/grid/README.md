@@ -110,7 +110,7 @@ interface DashboardGridLayoutItem {
 | `editMode` | `boolean` | `false` | Enables drag-to-reorder and resize handles. |
 | `onChangeLayout` | `( layout ) => void` | — | Fired when the user commits a drag or resize. |
 | `onPreviewLayout` | `( layout ) => void` | — | Fired continuously during a drag or resize with the in-progress layout. Use for live feedback; `onChangeLayout` still emits the committed result. |
-| `renderResizeHandle` | `( props ) => ReactNode` | — | Override the default corner-triangle resize handle with a custom element. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `disabled`, `verticalResizable`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
+| `renderResizeHandle` | `ComponentType< ResizeHandleRenderProps >` | — | Override the default corner-triangle resize handle with a custom component. Receives gesture wiring (`ref`, `listeners`, `attributes`) plus `verticalResizable`, `isResizing`, and `itemId`. The grid keeps ownership of the `<DndContext>` and the throttled delta loop. |
 | `className` | `string` | — | Extra class on the grid root. |
 
 `DashboardGrid` forwards refs to its root `<div>`, and standard `<div>`
@@ -211,9 +211,9 @@ Resize handles are currently pointer-only.
 
 The default handle is a small corner triangle on the bottom-right of
 each tile. To swap it for a custom element (icon, button, branded
-shape…), pass `renderResizeHandle`. The grid still owns the gesture
-— `<DndContext>`, throttled delta loop, step-to-grid logic — and
-passes the wiring to your render prop. Spread `listeners` and
+shape…), pass a component to `renderResizeHandle`. The grid still
+owns the gesture — `<DndContext>`, throttled delta loop, step-to-grid
+logic — and passes the wiring as props. Spread `listeners` and
 `attributes` and assign `ref` on the element that should receive
 pointer events.
 
@@ -221,15 +221,13 @@ pointer events.
 import { Icon } from '@wordpress/ui';
 import { resizeCornerNE } from '@wordpress/icons';
 
-<DashboardGrid
-	layout={ layout }
-	editMode
-	renderResizeHandle={ ( {
-		ref,
-		listeners,
-		attributes,
-		verticalResizable,
-	} ) => (
+function CustomResizeHandle( {
+	ref,
+	listeners,
+	attributes,
+	verticalResizable,
+} ) {
+	return (
 		<div
 			ref={ ref }
 			{ ...listeners }
@@ -243,16 +241,22 @@ import { resizeCornerNE } from '@wordpress/icons';
 		>
 			<Icon icon={ resizeCornerNE } size={ 16 } />
 		</div>
-	) }
+	);
+}
+
+<DashboardGrid
+	layout={ layout }
+	editMode
+	renderResizeHandle={ CustomResizeHandle }
 >
 	{ tiles }
 </DashboardGrid>;
 ```
 
-The render prop receives:
+The component receives:
 
-| Field | Type | Description |
-|-------|------|-------------|
+| Prop | Type | Description |
+|------|------|-------------|
 | `ref` | `( node ) => void` | dnd-kit ref; assign on the gesture-bearing element. |
 | `listeners` | `SyntheticListenerMap \| undefined` | Pointer/keyboard listeners; spread on the same element. |
 | `attributes` | `DraggableAttributes` | Accessibility/dnd-kit attributes; spread alongside `listeners`. |
@@ -261,7 +265,7 @@ The render prop receives:
 | `itemId` | `string` | Owning tile's `key`. |
 
 The handle is only mounted while the grid is in edit mode (`editMode={ true }`),
-so the consumer's render prop never has to short-circuit on a disabled state.
+so the custom component never has to short-circuit on a disabled state.
 
 ## Contributing to this package
 

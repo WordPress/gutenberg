@@ -58,6 +58,10 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: { character: 'R' },
 	},
 	{
+		description: __( 'Rotate 90° counter-clockwise' ),
+		keyCombination: { modifier: 'shift', character: 'R' },
+	},
+	{
 		description: __( 'Flip horizontal' ),
 		keyCombination: { character: 'H' },
 	},
