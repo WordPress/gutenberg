@@ -27,11 +27,7 @@ export const Default: Story = {
 				<Select.Trigger />
 				<Select.Popup>
 					{ defaultItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }
@@ -53,7 +49,6 @@ export const Compact: Story = {
 						<Select.Item
 							key={ item.value }
 							value={ item }
-							label={ item.label }
 							size="compact"
 						>
 							{ item.label }
@@ -84,7 +79,6 @@ export const Minimal: Story = {
 						<Select.Item
 							key={ item.value }
 							value={ item }
-							label={ item.label }
 							size="small"
 						>
 							{ item.label }
@@ -126,7 +120,6 @@ export const WithEmptyValueOption: Story = {
 						<Select.Item
 							key={ item.value }
 							value={ item }
-							label={ item.label }
 							disabled={ item.disabled }
 						>
 							{ item.label }
@@ -153,11 +146,7 @@ export const Labeling: Story = {
 				<Select.Trigger aria-label="User role" />
 				<Select.Popup>
 					{ defaultItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }
@@ -189,11 +178,7 @@ export const WithOverflow: Story = {
 				<Select.Trigger />
 				<Select.Popup>
 					{ overflowItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }
@@ -212,11 +197,7 @@ export const Disabled: Story = {
 				<Select.Trigger />
 				<Select.Popup>
 					{ defaultItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }
@@ -250,7 +231,6 @@ export const WithDisabledItem: Story = {
 						<Select.Item
 							key={ item.value }
 							value={ item }
-							label={ item.label }
 							disabled={ item.disabled }
 						>
 							{ item.label }
@@ -306,11 +286,7 @@ export const WithCustomTriggerAndItem: Story = {
 				</Select.Trigger>
 				<Select.Popup>
 					{ customOptions.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }
@@ -352,11 +328,7 @@ export const WithCustomZIndex: Story = {
 					}
 				>
 					{ defaultItems.map( ( item ) => (
-						<Select.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-						>
+						<Select.Item key={ item.value } value={ item }>
 							{ item.label }
 						</Select.Item>
 					) ) }

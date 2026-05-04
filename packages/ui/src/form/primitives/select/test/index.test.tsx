@@ -16,11 +16,7 @@ describe( 'Select', () => {
 				<Select.Trigger>{ ( value ) => value?.label }</Select.Trigger>
 				<Select.Popup>
 					{ users.map( ( option ) => (
-						<Select.Item
-							key={ option.value }
-							value={ option }
-							label={ option.label }
-						>
+						<Select.Item key={ option.value } value={ option }>
 							{ option.label }
 						</Select.Item>
 					) ) }
