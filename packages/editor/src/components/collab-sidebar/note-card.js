@@ -9,9 +9,17 @@ import { Stack } from '@wordpress/ui';
  */
 import { NoteByline } from './note-byline';
 
-export function NoteCard( { note, actions, className, children, ...props } ) {
+export function NoteCard( {
+	note,
+	actions,
+	preview,
+	className,
+	children,
+	...props
+} ) {
 	return (
 		<Stack direction="column" gap="sm" className={ className } { ...props }>
+			{ preview }
 			<Stack direction="row" align="center" justify="flex-start" gap="md">
 				<NoteByline
 					avatar={ note?.author_avatar_urls?.[ 48 ] }

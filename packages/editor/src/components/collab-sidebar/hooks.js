@@ -27,7 +27,7 @@ import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import { calculateNotePositions } from './utils';
-import { getNoteBlockPreview } from './block-preview';
+import { getNoteBlockPreview } from './note-block-preview-utils';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 

@@ -31,7 +31,7 @@ import { focusNoteThread, getNoteExcerpt } from './utils';
 import {
 	getNoteBlockPreview,
 	getNoteBlockPreviewFromMeta,
-} from './block-preview';
+} from './note-block-preview-utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 

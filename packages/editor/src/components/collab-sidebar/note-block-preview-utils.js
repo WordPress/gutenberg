@@ -47,11 +47,11 @@ function normalizePreviewText( text ) {
 /**
  * Derives a compact preview of the block linked to a note thread.
  *
- * @param {string} blockName       Block name.
- * @param {Object} [attributes={}] Block attributes.
+ * @param {string} blockName  Block name.
+ * @param {Object} attributes Block attributes.
  * @return {Object|null} A preview object or null when no preview can be derived.
  */
-export function getNoteBlockPreview( blockName, attributes = {} ) {
+export function getNoteBlockPreview( blockName, attributes ) {
 	if ( ! blockName || ! attributes ) {
 		return null;
 	}
