@@ -62,7 +62,12 @@ export default function MediaEditorToolbar( {
 		undo: undoCrop,
 		redo: redoCrop,
 	} = useCropper();
-	const rotationGestureHandlers = useCropGestureHandlers();
+	// `commitOnKeyUp: false` keeps rapid arrow-key adjustments coalesced
+	// into a single undo entry by the state-change debounce. Pointer-up
+	// still commits immediately so each drag is its own undo step.
+	const rotationGestureHandlers = useCropGestureHandlers( {
+		commitOnKeyUp: false,
+	} );
 
 	const handleReset = () => {
 		reset();
