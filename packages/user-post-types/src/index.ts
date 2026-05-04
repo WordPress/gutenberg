@@ -11,7 +11,6 @@ export {
 	BLANK_RECORD,
 	DEFAULT_SUPPORTS,
 	SUPPORT_FEATURES,
-	parseConfig,
 	serializeForSave,
 	toFormData,
 	usePublicTaxonomies,
