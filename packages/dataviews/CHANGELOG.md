@@ -5,6 +5,7 @@
 ### Enhancements
 
 - DataForm: Render field `description` as help text in the `array` control.[#77554](https://github.com/WordPress/gutenberg/pull/77554)
+- DataViews: Add tree hierarchy support to the table layout. [#77905](https://github.com/WordPress/gutenberg/pull/77905)
 
 ## 14.1.0 (2026-04-15)
 
