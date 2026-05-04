@@ -1,13 +1,13 @@
 @use "@wordpress/base-styles/variables" as *;
 
 // Vertical layout (top → bottom):
-//   0–13: value bubble
-//   13–19: 6px upward-pointing triangle (the pointer)
-//   19–37: tick strip (18px)
+//   0–10: value bubble
+//   10–28: tick strip (18px); the pointer triangle sits at the strip's
+//   bottom edge.
 .rotation-ruler {
 	position: relative;
 	min-width: 180px;
-	height: 37px;
+	height: 28px;
 	padding: 0 $grid-unit-10;
 	box-sizing: border-box;
 	user-select: none;
@@ -52,17 +52,18 @@
 	pointer-events: none;
 }
 
-// Single upward-pointing triangle below the bubble. Marks the centered
-// value cleanly without the vertical stem of a traditional pointer.
+// Upward-pointing triangle anchored to the bottom of the ruler. Marks
+// the centered value cleanly without the vertical stem of a
+// traditional pointer.
 .rotation-ruler__pointer {
 	position: absolute;
-	top: 13px;
+	bottom: 0;
 	left: 50%;
 	width: 0;
 	height: 0;
-	border-left: 5px solid transparent;
-	border-right: 5px solid transparent;
-	border-bottom: 6px solid var(--wp-admin-theme-color);
+	border-left: 6px solid transparent;
+	border-right: 6px solid transparent;
+	border-bottom: 9px solid var(--wp-admin-theme-color);
 	transform: translateX(-50%);
 	pointer-events: none;
 }
@@ -71,8 +72,8 @@
 	position: absolute;
 	left: 0;
 	right: 0;
-	top: 19px;
-	height: 18px;
+	top: 10px;
+	bottom: 0;
 	overflow: hidden;
 	cursor: ew-resize;
 }
