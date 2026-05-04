@@ -95,6 +95,21 @@ describe( 'crop pixel geometry', () => {
 		expect( layoutBounds ).toBeNull();
 	} );
 
+	it( 'uses published crop bounds without requiring raw layout sizes', () => {
+		const layoutBounds = getCropPixelLayoutBounds( {
+			...makeInput(),
+			geometry: {
+				canvasSize: { width: 0, height: 0 },
+				elementSize: { width: 0, height: 0 },
+				visualSize: { width: 0, height: 0 },
+				cropBounds: GEOMETRY.cropBounds,
+			},
+		} );
+
+		expect( layoutBounds?.maxRight ).toBeCloseTo( IMAGE.width );
+		expect( layoutBounds?.maxBottom ).toBeCloseTo( IMAGE.height );
+	} );
+
 	it( 'returns a full geometry snapshot when geometry is ready', () => {
 		const snapshot = getCropGeometrySnapshot( makeInput() );
 

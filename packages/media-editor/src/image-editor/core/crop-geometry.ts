@@ -268,6 +268,10 @@ export function cropPixelRectToNormalizedRect(
  * Whether a crop geometry input has enough measured information for geometry
  * snapshots and current-layout bounds.
  *
+ * `cropBounds` is the derived layout constraint consumed by the pixel helpers;
+ * the raw layout sizes document how that constraint was measured, but they are
+ * not read directly here.
+ *
  * @param input Crop geometry input.
  * @return True when crop geometry can be computed.
  */
@@ -275,12 +279,6 @@ export function isCropGeometryReady( input: CropGeometryInput ): boolean {
 	return (
 		input.imageSize.width > 0 &&
 		input.imageSize.height > 0 &&
-		input.geometry.canvasSize.width > 0 &&
-		input.geometry.canvasSize.height > 0 &&
-		input.geometry.elementSize.width > 0 &&
-		input.geometry.elementSize.height > 0 &&
-		input.geometry.visualSize.width > 0 &&
-		input.geometry.visualSize.height > 0 &&
 		!! input.geometry.cropBounds
 	);
 }
