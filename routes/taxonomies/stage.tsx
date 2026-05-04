@@ -19,6 +19,7 @@ import {
 	activateAction,
 	deactivateAction,
 	deleteTaxonomyAction,
+	duplicateTaxonomyAction,
 	type TaxonomyRecord,
 } from '@wordpress/user-taxonomies';
 
@@ -49,6 +50,7 @@ function TaxonomiesPage() {
 		() => [
 			editAction,
 			quickEditTaxonomyAction,
+			duplicateTaxonomyAction,
 			activateAction,
 			deactivateAction,
 			deleteTaxonomyAction,
