@@ -37,6 +37,5 @@
 			"width": true,
 			"style": true
 		}
-	},
-	"editorScript": "file:./index.js"
+	}
 }

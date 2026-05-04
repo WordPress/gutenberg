@@ -48,6 +48,5 @@
 	"providesContext": {
 		"core/tab-label": "label"
 	},
-	"editorScript": "file:./index.js",
-	"style": "file:./style-index.css"
+	"style": "wp-block-tab-panel"
 }

@@ -49,6 +49,5 @@
 				"blockGap": true
 			}
 		}
-	},
-	"editorScript": "file:./index.js"
+	}
 }
