@@ -45,11 +45,12 @@
 		"web-vitals": "^4.2.1"
 	},
 	"devDependencies": {
-		"@types/mime": "2.0.3"
+		"@types/mime": "2.0.3",
+		"@types/node": "^20.19.39"
 	},
 	"peerDependencies": {
 		"@playwright/test": ">=1",
-		"@types/node": "^20.19.39"
+		"@types/node": "^20.17.10"
 	},
 	"publishConfig": {
 		"access": "public"
