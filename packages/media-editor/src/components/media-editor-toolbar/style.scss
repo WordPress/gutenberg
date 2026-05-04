@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .media-editor-toolbar {
@@ -29,4 +30,20 @@
 .media-editor-toolbar__rotation-slider {
 	flex: 1 1 auto;
 	min-width: 0;
+}
+
+// Below the modal-sidebar full-page breakpoint, force a deterministic
+// two-row layout: rotate cluster on top, history/flip/reset cluster
+// beneath. Mirrors the InterfaceSkeleton's own side-by-side → stacked
+// flip at `break-medium`.
+@media (max-width: #{ $break-medium - 1 }) {
+	.media-editor-toolbar__rotate-cluster {
+		flex-basis: 100%;
+		max-width: none;
+	}
+
+	.media-editor-toolbar__primary-cluster {
+		flex-basis: 100%;
+		justify-content: center;
+	}
 }
