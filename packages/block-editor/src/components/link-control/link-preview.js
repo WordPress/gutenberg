@@ -36,7 +36,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { unlock } from '../../lock-unlock';
 import { ViewerSlot } from './viewer-slot';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 import useRichUrlData from './use-rich-url-data';
 
@@ -70,7 +70,9 @@ export default function LinkPreview( {
 
 	const displayTitle =
 		! isEmptyURL &&
-		stripHTML( richData?.title || value?.title || displayURL );
+		stripHTML(
+			value?.entityTitle || richData?.title || value?.title || displayURL
+		);
 
 	let icon;
 
@@ -162,12 +164,12 @@ export default function LinkPreview( {
 									>
 										{ value.badges.map(
 											( badge, index ) => (
-												<Badge
+												<WCBadge
 													key={ `${ badge.label }|${ badge.intent }|${ index }` }
 													intent={ badge.intent }
 												>
 													{ badge.label }
-												</Badge>
+												</WCBadge>
 											)
 										) }
 									</HStack>

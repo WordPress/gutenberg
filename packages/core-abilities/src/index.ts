@@ -142,5 +142,5 @@ async function initialize(): Promise< void > {
 	await initializeAbilities();
 }
 
-// Auto-initialize on import
-initialize();
+// Auto-initialize on import.
+export const ready: Promise< void > = initialize();

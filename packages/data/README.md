@@ -506,6 +506,32 @@ _Returns_
 
 -   `DispatchReturn< StoreNameOrDescriptor >`: Object containing the action creators.
 
+### keyedReducer
+
+Higher-order reducer creator which creates a combined reducer object, keyed by a property on the action object.
+
+_Usage_
+
+```js
+import { keyedReducer } from '@wordpress/data';
+
+const itemsByContext = keyedReducer( 'context' )( ( state = [], action ) => {
+	switch ( action.type ) {
+		case 'ADD_ITEM':
+			return [ ...state, action.item ];
+	}
+	return state;
+} );
+```
+
+_Parameters_
+
+-   _actionProperty_ `string`: Action property by which to key object.
+
+_Returns_
+
+-   Higher-order reducer.
+
 ### plugins
 
 Object of available plugins to use with a registry.

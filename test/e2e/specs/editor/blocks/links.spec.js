@@ -604,7 +604,7 @@ test.describe( 'Links', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener">Gutenberg</a>',
+						'This is <a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener">Gutenberg</a>',
 				},
 			},
 		] );
@@ -871,7 +871,7 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noreferrer noopener nofollow">Gutenberg</a>`,
+					content: `<a href="https://wordpress.org/gutenberg" target="_blank" rel="noopener nofollow">Gutenberg</a>`,
 				},
 			},
 		] );

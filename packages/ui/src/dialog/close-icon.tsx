@@ -22,6 +22,7 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 						{ ...props }
 						icon={ icon ?? close }
 						label={ label ?? __( 'Close' ) }
+						data-wp-ui-dialog-close-icon=""
 					/>
 				}
 			/>

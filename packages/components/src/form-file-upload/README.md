@@ -48,7 +48,7 @@ Children are passed as children of `Button`.
 
 ### `icon`
 
- - Type: `IconType`
+ - Type: `IconType | null`
  - Required: No
 
 The icon to render in the default button.
@@ -65,7 +65,7 @@ Whether to allow multiple selection of files or not.
 
 ### `onChange`
 
- - Type: `ChangeEventHandler<HTMLInputElement>`
+ - Type: `ChangeEventHandler<HTMLInputElement> | undefined`
  - Required: Yes
 
 Callback function passed directly to the `input` file element.
@@ -95,7 +95,7 @@ an empty string in the `onClick` function.
 
 ### `render`
 
- - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
+ - Type: `((arg: { openFileDialog: () => void; }) => ReactNode)`
  - Required: No
 
 Optional callback function used to render the UI.

@@ -8,7 +8,7 @@
  * External dependencies
  */
 import type { Change } from 'diff';
-import { diffChars } from 'diff';
+import { diffChars, diffLines } from 'diff';
 import { default as isEqual } from 'fast-deep-equal/es6';
 
 /**
@@ -23,6 +23,7 @@ function cloneDeep< T >( value: T ): T {
 }
 
 const NULL_CHARACTER = String.fromCharCode( 0 ); // Placeholder char for embed in diff()
+const STRING_TOO_LARGE_THRESHOLD = 10000; // If either string is larger than this, use a less precise diff algorithm optimized for large strings
 
 /**
  * Normalize diff changes so that `count` reflects UTF-16 code-unit length
@@ -623,12 +624,39 @@ class Delta {
 	diffWithCursor( other: Delta, cursorAfterChange: number | null ): Delta {
 		if ( this.ops === other.ops ) {
 			return new Delta();
-		} else if ( cursorAfterChange === null ) {
-			// If no cursor position is provided, do a regular diff.
-			return this.diff( other );
 		}
 
 		const strings = this.deltasToStrings( other );
+
+		// When large changes are pasted into the code editor, this can
+		// result in very long strings as a result of comparing the
+		// `content` of the code editor before and after the change.
+		// In this case, diffChars() can take a very long time to complete,
+		// which causes the editor to freeze.
+		// When we detect strings that are too long, use a less-precise diff
+		// method that is optimized for large inputs, at the cost of less
+		// accurate diffing and cursor placement.
+		const maxStringLength = Math.max(
+			...strings.map( ( str ) => str.length )
+		);
+
+		if ( maxStringLength > STRING_TOO_LARGE_THRESHOLD ) {
+			const diffResult = normalizeChangeCounts(
+				diffLines( strings[ 0 ], strings[ 1 ] )
+			);
+			const thisIterLarge = new OpIterator( this.ops );
+			const otherIterLarge = new OpIterator( other.ops );
+			return this.convertChangesToDelta(
+				diffResult,
+				thisIterLarge,
+				otherIterLarge
+			).chop();
+		} else if ( cursorAfterChange === null ) {
+			// If no cursor position is provided and the string
+			// is a reasonable length, do a regular diff.
+			return this.diff( other );
+		}
+
 		let diffs = normalizeChangeCounts(
 			diffChars( strings[ 0 ], strings[ 1 ] )
 		);

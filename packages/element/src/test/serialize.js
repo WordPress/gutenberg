@@ -183,7 +183,13 @@ describe( 'renderElement()', () => {
 	it( 'SVG attributes with dashes should be rendered as such - even with wrong casing', () => {
 		const result = renderElement(
 			<svg>
-				<rect x="0" y="0" strokeWidth="5" STROKELinejoin="miter"></rect>
+				<rect
+					x="0"
+					y="0"
+					strokeWidth="5"
+					// eslint-disable-next-line react/no-unknown-property
+					STROKELinejoin="miter"
+				></rect>
 			</svg>
 		);
 
@@ -194,7 +200,12 @@ describe( 'renderElement()', () => {
 
 	it( 'Case sensitive attributes should have the right casing - even with wrong casing', () => {
 		const result = renderElement(
-			<svg ViEWBOx="0 0 1 1" preserveAsPECTRatio="slice"></svg>
+			<svg
+				// eslint-disable-next-line react/no-unknown-property
+				ViEWBOx="0 0 1 1"
+				// eslint-disable-next-line react/no-unknown-property
+				preserveAsPECTRatio="slice"
+			></svg>
 		);
 
 		expect( result ).toBe(
@@ -206,6 +217,7 @@ describe( 'renderElement()', () => {
 		const result = renderElement(
 			<svg
 				viewBox="0 0 1 1"
+				// eslint-disable-next-line react/no-unknown-property
 				XLINKROLE="some-role"
 				xlinkShow="hello"
 			></svg>

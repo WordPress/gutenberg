@@ -366,7 +366,7 @@ test.describe( 'data-wp-context', () => {
 		await expect( isProxyPreservedOnCopy ).toHaveText( 'true' );
 	} );
 
-	test( 'objects referenced from the context inherit properties where they are originally defined ', async ( {
+	test( 'objects referenced from the context inherit properties where they are originally defined', async ( {
 		page,
 	} ) => {
 		await page.getByTestId( 'child copy obj' ).click();

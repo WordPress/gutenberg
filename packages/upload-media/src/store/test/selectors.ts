@@ -374,6 +374,18 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'removed selectors', () => {
+		it( 'isUploadingToPost is no longer exported', () => {
+			const privateSelectors = require( '../private-selectors' );
+			expect( privateSelectors.isUploadingToPost ).toBeUndefined();
+		} );
+
+		it( 'getPausedUploadForPost is no longer exported', () => {
+			const privateSelectors = require( '../private-selectors' );
+			expect( privateSelectors.getPausedUploadForPost ).toBeUndefined();
+		} );
+	} );
+
 	describe( 'hasPendingItemsByParentId', () => {
 		it( 'should return true if there are items with matching parent ID', () => {
 			const state: State = {

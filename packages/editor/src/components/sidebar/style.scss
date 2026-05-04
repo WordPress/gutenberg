@@ -28,3 +28,10 @@
 		font-size: $default-font-size;
 	}
 }
+
+// TODO: These styles should be absorbed by DataForm API.
+// @see https://github.com/WordPress/gutenberg/issues/75916
+.fields-controls__password {
+	border-top: $border-width solid $gray-200;
+	padding-top: $grid-unit-20;
+}

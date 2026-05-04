@@ -228,7 +228,7 @@ export function useThemeProviderStyles( {
 		} );
 	}, [ primary, bg ] );
 
-	const themeProviderStyles = useMemo(
+	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {
 			...colorStyles,
 			...( cursorControl && {

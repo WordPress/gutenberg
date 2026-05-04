@@ -419,21 +419,6 @@ export function showStylebook( state = false, action ) {
 }
 
 /**
- * Reducer for the canvas minimum height.
- *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
- */
-export function canvasMinHeight( state = 0, action ) {
-	switch ( action.type ) {
-		case 'SET_CANVAS_MIN_HEIGHT':
-			return action.minHeight;
-	}
-	return state;
-}
-
-/**
  * Reducer for the revisions preview mode.
  * Stores the current revision ID, or null if not in revisions mode.
  *
@@ -450,13 +435,6 @@ export function revisionId( state = null, action ) {
 }
 
 /**
- * Reducer returning the currently selected note and its options.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {Object} Updated state.
- */
-/**
  * Reducer for whether the revision diff is shown.
  * Resets to true when entering/exiting revisions mode.
  *
@@ -469,11 +447,19 @@ export function showRevisionDiff( state = true, action ) {
 		case 'SET_SHOW_REVISION_DIFF':
 			return action.showDiff;
 		case 'SET_CURRENT_REVISION_ID':
-			return true; // reset on enter/exit revisions
+			// Reset during the exit.
+			return ! action.revisionId ? true : state;
 	}
 	return state;
 }
 
+/**
+ * Reducer returning the currently selected note and its options.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {Object} Updated state.
+ */
 export function selectedNote( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SELECT_NOTE':
@@ -503,7 +489,6 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
-	canvasMinHeight,
 	revisionId,
 	showRevisionDiff,
 	selectedNote,

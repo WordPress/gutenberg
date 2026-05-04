@@ -62,6 +62,11 @@ function getFormatElement(
 
 	const selector = tagName + ( className ? '.' + className : '' );
 
+	// Element#matches will throw SyntaxError on an empty selector
+	if ( ! selector ) {
+		return;
+	}
+
 	if ( ! ( element instanceof window.HTMLElement ) ) {
 		return;
 	}
@@ -151,18 +156,14 @@ function getAnchor(
 		return;
 	}
 
-	const formatElement = getFormatElement(
-		range,
-		editableContentElement,
-		tagName,
-		className
-	);
-
-	if ( formatElement ) {
-		return formatElement;
+	if ( ! tagName && ! className ) {
+		return createVirtualAnchorElement( range, editableContentElement );
 	}
 
-	return createVirtualAnchorElement( range, editableContentElement );
+	return (
+		getFormatElement( range, editableContentElement, tagName, className ) ??
+		createVirtualAnchorElement( range, editableContentElement )
+	);
 }
 
 const DEFAULT_SETTINGS = {

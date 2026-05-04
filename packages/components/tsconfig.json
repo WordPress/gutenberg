@@ -5,8 +5,8 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-test-env",
-			"css-modules",
-			"jest"
+			"jest",
+			"style-imports"
 		]
 	},
 	"references": [

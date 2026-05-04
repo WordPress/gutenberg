@@ -170,6 +170,11 @@ export function createSyncManager( debug = false ): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		if ( false === syncConfig.shouldSync?.( objectType, objectId ) ) {
+			log( 'loadEntity', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
+		}
+
 		log( 'loadEntity', 'loading', entityId );
 
 		handlers = {
@@ -315,6 +320,11 @@ export function createSyncManager( debug = false ): SyncManager {
 		if ( collectionStates.has( objectType ) ) {
 			log( 'loadCollection', 'already loaded', entityId );
 			return; // Already loaded.
+		}
+
+		if ( false === syncConfig.shouldSync?.( objectType, null ) ) {
+			log( 'loadCollection', 'shouldSync false, skipping', entityId );
+			return; // Sync config indicates that this entity should not be synced.
 		}
 
 		log( 'loadCollection', 'loading', entityId );

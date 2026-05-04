@@ -5,7 +5,7 @@ import { Page } from '@wordpress/admin-ui';
 import {
 	Button,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import {
@@ -42,12 +42,14 @@ function ConnectorsPage() {
 		[]
 	);
 
-	const isEmpty = connectors.length === 0;
+	const renderableConnectors = connectors.filter(
+		( connector: ConnectorConfig ) => connector.render
+	);
+	const isEmpty = renderableConnectors.length === 0;
 
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
-			headingLevel={ 1 }
 			subTitle={ __(
 				'All of your API keys and credentials are stored here and shared across plugins. Configure once and use everywhere.'
 			) }
@@ -67,11 +69,11 @@ function ConnectorsPage() {
 							<Heading level={ 2 } size={ 15 } weight={ 600 }>
 								{ __( 'No connectors yet' ) }
 							</Heading>
-							<Text size={ 12 }>
+							<WCText size={ 12 }>
 								{ __(
 									'Connectors appear here when you install plugins that use external services. Each plugin registers the API keys it needs, and you manage them all in one place.'
 								) }
-							</Text>
+							</WCText>
 						</VStack>
 						<Button variant="secondary" href="plugin-install.php">
 							{ __( 'Learn more' ) }
@@ -80,20 +82,31 @@ function ConnectorsPage() {
 				) : (
 					<VStack spacing={ 3 }>
 						<AiPluginCallout />
-						{ connectors.map( ( connector: ConnectorConfig ) => {
-							if ( connector.render ) {
-								return (
-									<connector.render
-										key={ connector.slug }
-										slug={ connector.slug }
-										label={ connector.label }
-										description={ connector.description }
-										icon={ connector.icon }
-									/>
-								);
-							}
-							return null;
-						} ) }
+						<VStack spacing={ 3 } role="list">
+							{ connectors.map(
+								( connector: ConnectorConfig ) => {
+									if ( connector.render ) {
+										return (
+											<connector.render
+												key={ connector.slug }
+												slug={ connector.slug }
+												name={ connector.name }
+												description={
+													connector.description
+												}
+												type={ connector.type }
+												logo={ connector.logo }
+												authentication={
+													connector.authentication
+												}
+												plugin={ connector.plugin }
+											/>
+										);
+									}
+									return null;
+								}
+							) }
+						</VStack>
 					</VStack>
 				) }
 				{ canInstallPlugins && (

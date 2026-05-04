@@ -5,7 +5,6 @@ import { useEffect } from '@wordpress/element';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
-	// @ts-expect-error - No types available yet.
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
