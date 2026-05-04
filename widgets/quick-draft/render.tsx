@@ -6,11 +6,19 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
-import { TextControl, TextareaControl, Button } from '@wordpress/components';
+import {
+	SnackbarList,
+	TextareaControl,
+	TextControl,
+} from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import { postFeaturedImage } from '@wordpress/icons';
 
 // Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Link, Text } from '@wordpress/ui';
+/* eslint-disable @wordpress/use-recommended-components */
+import { Button, Icon, Link, Text, Stack, Tooltip } from '@wordpress/ui';
+/* eslint-enable @wordpress/use-recommended-components */
 import type { Post } from '@wordpress/core-data';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -99,10 +107,9 @@ export default function QuickDraft() {
 	const [ title, setTitle ] = useState( '' );
 	const [ content, setContent ] = useState( '' );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const [ notice, setNotice ] = useState< {
-		type: 'success' | 'error';
-		message: string;
-	} | null >( null );
+	const [ featuredImageId, setFeaturedImageId ] = useState< number | null >(
+		null
+	);
 
 	const currentUser = useSelect(
 		( select ) => select( coreStore ).getCurrentUser(),
@@ -132,6 +139,16 @@ export default function QuickDraft() {
 	);
 
 	const { saveEntityRecord, invalidateResolution } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const notices = useSelect(
+		( select ) => select( noticesStore ).getNotices(),
+		[]
+	);
+	const { removeNotice } = useDispatch( noticesStore );
+	const snackbarNotices = notices.filter(
+		( { type } ) => type === 'snackbar'
+	);
 
 	const handleSave = useCallback( async () => {
 		if ( ! title.trim() ) {
@@ -139,13 +156,15 @@ export default function QuickDraft() {
 		}
 
 		setIsSaving( true );
-		setNotice( null );
 
 		try {
 			await saveEntityRecord( 'postType', 'post', {
 				title,
 				content,
 				status: 'draft',
+				...( featuredImageId !== null && {
+					featured_media: featuredImageId,
+				} ),
 			} );
 
 			// Bust the drafts cache so the new post appears in the list.
@@ -164,11 +183,11 @@ export default function QuickDraft() {
 
 			setTitle( '' );
 			setContent( '' );
-			setNotice( { type: 'success', message: __( 'Draft saved.' ) } );
+			setFeaturedImageId( null );
+			createSuccessNotice( __( 'Draft saved.' ), { type: 'snackbar' } );
 		} catch {
-			setNotice( {
-				type: 'error',
-				message: __( 'An error occurred. Please try again.' ),
+			createErrorNotice( __( 'An error occurred. Please try again.' ), {
+				type: 'snackbar',
 			} );
 		} finally {
 			setIsSaving( false );
@@ -176,46 +195,82 @@ export default function QuickDraft() {
 	}, [
 		title,
 		content,
+		featuredImageId,
 		currentUser?.id,
 		saveEntityRecord,
 		invalidateResolution,
+		createSuccessNotice,
+		createErrorNotice,
 	] );
 
 	const hasDrafts = !! drafts && drafts.length > 0;
 
 	return (
-		<>
-			<TextControl
-				label={ __( 'Title' ) }
-				value={ title }
-				onChange={ setTitle }
-				autoComplete="off"
-				__nextHasNoMarginBottom
+		<Stack direction="column" gap="md" align="left">
+			<SnackbarList
+				notices={ snackbarNotices }
+				onRemove={ ( id ) => removeNotice( id ) }
 			/>
-			<TextareaControl
-				label={ __( 'Content' ) }
-				value={ content }
-				onChange={ setContent }
-				placeholder={ __( 'What\u2019s on your mind?' ) }
-				rows={ 3 }
-				__nextHasNoMarginBottom
-			/>
-
-			{ notice && <p aria-live="polite">{ notice.message }</p> }
-
-			<Button
-				variant="primary"
-				onClick={ handleSave }
-				isBusy={ isSaving }
-				disabled={ isSaving || ! title.trim() }
+			<Stack
+				aria-label={ __( 'Quick draft' ) }
+				direction="column"
+				gap="md"
+				render={ <section /> }
 			>
-				{ __( 'Save Draft' ) }
-			</Button>
+				<TextControl
+					label={ __( 'Title' ) }
+					value={ title }
+					onChange={ setTitle }
+					autoComplete="off"
+				/>
+				<TextareaControl
+					label={ __( 'Content' ) }
+					value={ content }
+					onChange={ setContent }
+					placeholder={ __( 'What\u2019s on your mind?' ) }
+					rows={ 3 }
+				/>
+
+				<Stack direction="row" justify="space-between" align="center">
+					<MediaUploadCheck>
+						<MediaUpload
+							onSelect={ ( media ) => {
+								setFeaturedImageId( media.id );
+							} }
+							allowedTypes={ [ 'image' ] }
+							value={ featuredImageId ?? undefined }
+							render={ ( { open } ) => (
+								<Tooltip.Root>
+									<Tooltip.Trigger
+										onClick={ open }
+										aria-label={ __(
+											'Add featured image'
+										) }
+									>
+										<Icon icon={ postFeaturedImage } />
+									</Tooltip.Trigger>
+									<Tooltip.Popup>
+										{ __( 'Add featured image' ) }
+									</Tooltip.Popup>
+								</Tooltip.Root>
+							) }
+						/>
+					</MediaUploadCheck>
+					<Button
+						variant="solid"
+						onClick={ handleSave }
+						loading={ isSaving }
+						disabled={ isSaving || ! title.trim() }
+					>
+						{ __( 'Save draft' ) }
+					</Button>
+				</Stack>
+			</Stack>
 
 			{ hasDrafts && (
 				<section aria-label={ __( 'Your Recent Drafts' ) }>
 					<Text variant="heading-md" render={ <h3 /> }>
-						{ __( 'Your Recent Drafts' ) }
+						{ __( 'Your recent drafts' ) }
 					</Text>
 					<p>
 						<Link href="edit.php?post_status=draft&post_type=post">
@@ -229,6 +284,6 @@ export default function QuickDraft() {
 					</ul>
 				</section>
 			) }
-		</>
+		</Stack>
 	);
 }
