@@ -34,7 +34,7 @@ function loadWidgetModule( renderModule: string ) {
 	let resource = widgetModules.get( renderModule );
 
 	if ( ! resource ) {
-		const promise = import( renderModule )
+		const promise = import( /* webpackIgnore: true */ renderModule )
 			.then( ( module: unknown ) => {
 				if ( ! isValidWidgetModule( module ) ) {
 					throw new Error(
