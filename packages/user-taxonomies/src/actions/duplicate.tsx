@@ -36,9 +36,13 @@ const duplicateForm: Form = {
 };
 
 function buildCopySlug( slug: string ): string {
-	const suffix = '_copy';
-	const base = slug.slice( 0, SLUG_MAX_LENGTH - suffix.length );
-	return `${ base }${ suffix }`;
+	const match = slug.match( /^(.*?)(\d+)$/ );
+	const base = match ? match[ 1 ] : slug;
+	const nextNumber = String( match ? parseInt( match[ 2 ], 10 ) + 1 : 2 );
+	return `${ base.slice(
+		0,
+		SLUG_MAX_LENGTH - nextNumber.length
+	) }${ nextNumber }`;
 }
 
 function DuplicateTaxonomyModal( {
