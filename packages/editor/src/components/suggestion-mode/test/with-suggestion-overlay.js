@@ -1,4 +1,19 @@
 /**
+ * Tests for `with-suggestion-overlay.js`. Coverage falls into three groups:
+ *
+ * 1. `withSuggestionOverlay` HOC — pass-through outside Suggest intent;
+ *    in Suggest intent, diversion of `setAttributes` into the overlay,
+ *    rendering the merged overlay-on-baseline value, surviving an overlay
+ *    clear-and-re-edit cycle.
+ * 2. `mergeOverlayAttributes` — replace-vs-deep-merge contract for
+ *    overlapping overlay keys, including the `style`/`metadata` deep merge
+ *    that keeps untouched fields alive.
+ * 3. `applyDiffMarks` / `stripMarksFromIncoming` — the diff/strip round-trip
+ *    that keeps the overlay storing the *clean* proposed value while the
+ *    rendered attributes carry marked HTML.
+ */
+
+/**
  * External dependencies
  */
 import { render, screen, act, fireEvent } from '@testing-library/react';

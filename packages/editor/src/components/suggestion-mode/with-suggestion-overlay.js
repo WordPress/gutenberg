@@ -1,4 +1,28 @@
 /**
+ * Suggest-mode overlay HOC.
+ *
+ * Data flow while the editor is in `suggest` intent:
+ *
+ *   BlockEdit
+ *     └─ wrappedSetAttributes        ── strip suggestion marks RichText
+ *                                       round-tripped from a previous
+ *                                       render, then store the *clean*
+ *                                       proposed value in the overlay
+ *        └─ overlay (proposed clean)
+ *           └─ SuggestingBlockEdit   ── merge baseline + overlay
+ *              └─ markContentDiff    ── compute marked HTML on each render
+ *                 └─ BlockEdit       ── render with deletions/additions visible
+ *
+ * The block-editor store stays at the baseline value the entire time the
+ * suggestion is open; only the rendered `attributes` prop carries the
+ * marked diff, gated on `! isBlockSelected` so RichText's caret is not
+ * disrupted while the user is typing into the block. Accept/Reject runs
+ * against the clean overlay value via the existing `attribute-set` path —
+ * no marked-value persistence, no schema migration. See #77867 for the
+ * tradeoff vs. edit-time interception.
+ */
+
+/**
  * External dependencies
  */
 import clsx from 'clsx';
@@ -31,13 +55,19 @@ const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
  */
 const RICH_TEXT_ATTRIBUTE_KEYS = new Set( [ 'content' ] );
 
+/**
+ * True for plain strings and for objects that stringify to a meaningful HTML
+ * form (the rich-text package's `RichTextData` is the case we care about).
+ * Duck-typed against `toString` rather than `instanceof RichTextData` so we
+ * don't take a hard dependency on the rich-text package's internal class.
+ *
+ * @param {*} value Candidate attribute value.
+ * @return {boolean} True when `String( value )` will produce useful HTML.
+ */
 function isStringLike( value ) {
 	if ( typeof value === 'string' ) {
 		return true;
 	}
-	// `RichTextData` is an object that stringifies to its HTML form; check
-	// for a usable `toString` rather than instanceof so we don't take a
-	// hard dependency on the rich-text package's internal class.
 	return (
 		value !== null &&
 		value !== undefined &&
@@ -129,6 +159,19 @@ function stripMarksFromIncoming( nextAttributes ) {
  */
 const DEEP_MERGE_KEYS = new Set( [ 'style', 'metadata' ] );
 
+/**
+ * Apply an overlay attribute set on top of the block's real attributes for
+ * rendering. Keys in `DEEP_MERGE_KEYS` (currently `style` and `metadata`)
+ * are one-level-merged so a partial overlay payload — e.g. tweaking
+ * `style.color` while leaving `style.typography` alone — preserves the
+ * untouched fields. Every other key is replaced wholesale, matching
+ * `setAttributes` semantics for primitive and array values.
+ *
+ * @param {Object}      base    Block's real attributes from the block-editor store.
+ * @param {Object|null} overlay Pending overlay attributes; `null` is a no-op.
+ * @return {Object} Merged attributes for rendering. Returns `base` by reference
+ * when there is no overlay to apply, so React's prop-identity bail-out fires.
+ */
 function mergeOverlayAttributes( base, overlay ) {
 	if ( ! overlay ) {
 		return base;
@@ -206,6 +249,11 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 
 	const wrappedSetAttributes = useCallback(
 		( nextAttributes ) => {
+			// First overlay write for this block snapshots the current
+			// attributes as the baseline; subsequent writes only record
+			// overlay deltas. This lets the diff renderer below compare
+			// "what the block looked like when the suggestion started"
+			// against "what the suggester is proposing now".
 			if ( ! entryExists ) {
 				captureBaseline( clientId, name, attributesRef.current );
 			}
@@ -222,6 +270,10 @@ function SuggestingBlockEdit( { BlockEdit, props } ) {
 
 	const mergedAttributes = useMemo( () => {
 		const merged = mergeOverlayAttributes( attributes, overlayAttributes );
+		// While the block is selected, hand back the plain proposed value so
+		// the user's caret doesn't fight RichText's value-prop reconciliation
+		// on every keystroke. The marks reappear as soon as focus moves away
+		// — see the `isSelected` `useSelect` above for the full rationale.
 		if ( isSelected ) {
 			return merged;
 		}

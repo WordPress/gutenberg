@@ -1,6 +1,7 @@
-// Side-effect import: registers the inline RichText format types used to
-// render proposed adds and deletes inside the editor canvas. Phase A of
-// #77867; consumers of those formats land in subsequent phases.
+// Side-effect import: registers the inline RichText format types
+// (`gutenberg/suggested-deletion`, `gutenberg/suggested-addition`) consumed
+// by `with-suggestion-overlay.js` to render proposed adds and deletes inside
+// the editor canvas. See #77867.
 import './inline-formats';
 
 export {

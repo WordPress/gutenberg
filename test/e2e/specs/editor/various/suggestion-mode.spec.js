@@ -1,4 +1,20 @@
 /**
+ * E2E coverage for Suggest mode (#77867). The diff-rendering scenarios below
+ * are the "golden paths" referenced in the PR description:
+ *
+ *   - `add — golden path`    : type a word, see it wrapped in
+ *                              `<ins class="has-suggestion-addition">`.
+ *   - `delete — golden path` : Backspace a word, see it survive in
+ *                              `<del class="has-suggestion-deletion">`.
+ *   - `style — golden path`  : Cmd/Ctrl+B a word, see it render bold AND
+ *                              wrapped in the addition format, with the
+ *                              pre-bold version surfacing as a paired `<del>`.
+ *
+ * Other tests in this file cover snackbar announcements, auto-save, and
+ * routing of block-switcher mutations through the store interceptor.
+ */
+
+/**
  * WordPress dependencies
  */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
@@ -88,7 +104,7 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toHaveClass( /is-suggestion-pending/ );
 	} );
 
-	test( 'shows appended text wrapped in <ins> after the block deselects', async ( {
+	test( 'add — golden path: shows appended text wrapped in <ins> after the block deselects', async ( {
 		editor,
 		page,
 	} ) => {
@@ -131,7 +147,7 @@ test.describe( 'Suggestion mode', () => {
 		await expect( paragraph ).toContainText( 'Hello' );
 	} );
 
-	test( 'shows deleted text wrapped in <del> after the block deselects', async ( {
+	test( 'delete — golden path: shows deleted text wrapped in <del> after the block deselects', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -170,7 +186,7 @@ test.describe( 'Suggestion mode', () => {
 		).toBeVisible();
 	} );
 
-	test( 'shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
+	test( 'style — golden path: shows a newly bolded word wrapped in <ins> with <strong> preserved', async ( {
 		editor,
 		page,
 		pageUtils,

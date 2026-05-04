@@ -14,13 +14,12 @@ import { wordDiff } from './suggestion-diff';
  * changes within a block, alongside the sidebar diff summary.
  *
  * Both formats are registered without an `edit` UI so they never appear in
- * the block toolbar — they are applied programmatically by the suggest-mode
- * interceptor (see #77867 Phase B) when a user types or deletes text in
- * Suggest mode. The persisted post is unaffected: while a suggestion is
- * open the formatted value lives in the in-memory overlay (the store
- * interceptor reverts the live block attribute), and on Accept the
- * strip-runs transform removes the deletion characters and unwraps the
- * addition format before the value is written back to the block.
+ * the block toolbar — they are applied programmatically by the overlay HOC
+ * (`with-suggestion-overlay.js`), which diffs baseline against proposed on
+ * each render and feeds the marked HTML back into the block. The persisted
+ * post is unaffected: the overlay stores the *clean* proposed value (marks
+ * are stripped at the intercept), and the existing Accept/Reject path keeps
+ * working unchanged because there is no marked value on the wire.
  *
  * `gutenberg/` rather than `core/` because these are suggest-mode-specific,
  * not a general-purpose rich-text primitive.
@@ -106,14 +105,13 @@ function wrapAddition( value ) {
  * additions highlighted inline.
  *
  * Tokenization is intentionally word-and-whitespace level (delegated to
- * `wordDiff`), which is good enough for the golden-path scenarios this PR
- * covers — pure text additions, pure text deletions, mid-string
- * replacements, and inline-format additions like wrapping a word in
- * `<strong>`. A whole-token format change (e.g. `world` →
- * `<strong>world</strong>`) surfaces as a delete-then-insert pair, which
- * intentionally renders both states so the reviewer can see what changed.
- * Edge cases (partial-tag overlap, mixed nested formatting) are out of
- * scope here and land in subsequent phases.
+ * `wordDiff`), which is good enough for the v1 scenarios listed in #77867
+ * — pure text additions, pure text deletions, mid-string replacements, and
+ * inline-format additions like wrapping a word in `<strong>`. A whole-token
+ * format change (e.g. `world` → `<strong>world</strong>`) surfaces as a
+ * delete-then-insert pair, which intentionally renders both states so the
+ * reviewer can see what changed. Edge cases (partial-tag overlap, mixed
+ * nested formatting) are tracked as the Phase D follow-up.
  *
  * Identical inputs short-circuit so the common no-op overlay render
  * (e.g. baseline === proposed during an attribute-only suggestion) costs
