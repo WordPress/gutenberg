@@ -1,6 +1,6 @@
 <?php
 /**
- * Experiment to disable the Classic block.
+ * Controls whether the Classic block is available in the inserter.
  *
  * @package gutenberg
  */

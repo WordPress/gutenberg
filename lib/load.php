@@ -99,6 +99,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 }
 
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
+require_once __DIR__ . '/classic-block.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 
@@ -137,10 +138,6 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
-}
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
