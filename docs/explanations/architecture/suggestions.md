@@ -58,6 +58,48 @@ When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverl
 
 Because the store is never touched, autosave, undo/redo, and RTC sync stay at the real baseline. On commit, the overlay is serialized into a suggestion payload and sent to the server as comment meta; on discard, the overlay is cleared.
 
+### Store interceptor
+
+The HOC only catches edits that flow through a block's own `setAttributes` prop. Some Gutenberg paths bypass the prop chain and dispatch `updateBlockAttributes` directly to the block-editor store — most notably the block-switcher's variation picker (e.g. swapping a heading from H2 → H3). Those mutations would otherwise land in the post unchanged, defeating Suggest mode.
+
+`SuggestionStoreInterceptor` is a companion subscriber that closes that gap:
+
+1. On Suggest activation it snapshots every block's attributes.
+2. It subscribes to the data registry. On every store update it diffs the live attributes against the snapshot.
+3. For drift on a tracked block it routes the changed attributes into the overlay and dispatches a revert that restores the snapshot. An `isReverting` flag suppresses the recursive subscribe fire that the revert itself triggers.
+4. New blocks (no snapshot entry) are tracked but not intercepted — inserting a block in Suggest mode is currently a real edit, not a suggestion.
+5. System-managed metadata (`metadata.noteId` written by the suggestion provider after creating a note comment) is folded into the snapshot before diffing so it's invisible to the diff and never leaks into the user-pending overlay.
+
+The interceptor uses `registry.subscribe` rather than a React `useSelect` because (a) it must run synchronously after each dispatch, before any re-render serializes the now-wrong state, and (b) `subscribe` also catches dispatches from non-React paths.
+
+### Apply-time bypass and the collaborative round-trip
+
+Apply is a deliberate exception to the "store is never written" rule: when the post author clicks **Apply**, the merged attributes do need to land on the live block. The provider opts the next dispatch out of interception via `requestInterceptorBypass(clientId)` — without it, the interceptor would treat the apply as a new user edit and revert it back into the overlay, producing a frustrating feedback loop.
+
+In real-time collaboration the same scenario plays out across peers. When peer A clicks Apply, the dispatched attribute change syncs to peer B (the original suggester). Peer B's interceptor sees a delta from its own snapshot and would revert it, which would then sync back to peer A and undo the apply on their screen. To prevent this the interceptor calls `isAcceptedSuggestionChange()`: for each note linked to the block via `metadata.noteId`, it consults the suggestion payload and checks whether every changed attribute lands on a payload's `after` value. If so, the interceptor adopts the new attributes as its baseline rather than reverting.
+
+The two halves are complementary — `requestInterceptorBypass` covers the local apply, `isAcceptedSuggestionChange` covers the synced apply on the other peer.
+
+### Implementation files
+
+The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-mode/`:
+
+| File | Role |
+|------|------|
+| `overlay-context.js`        | `SuggestionOverlayProvider`, `useSuggestionOverlay`. The in-memory overlay store and bypass refs. |
+| `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay. |
+| `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations; multi-peer accept logic. |
+| `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
+| `suggestion-diff.js`        | Sidebar diff preview (word-level for text attributes, label fallback otherwise). |
+| `commit-bar.js`             | "Submit suggestion" toolbar shown while editing in Suggest intent. |
+
+REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
+
+| File | Role |
+|------|------|
+| `block-comments.php`                              | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
+| `class-gutenberg-rest-comment-controller-6-9.php` | REST controller subclass remapping permissions for `note`-type comments (post editors get `edit_post`-based access; updates are gated by an allowlist of suggestion-lifecycle fields). |
+
 ## Suggestion Payload (v1)
 
 Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment:
@@ -133,6 +175,15 @@ When PR [#77005](https://github.com/WordPress/gutenberg/pull/77005) (Yjs v14 / `
 4. The overlay and diff UI remain unchanged — they consume operations, not storage details.
 
 Server-side persistence (comment meta) is still needed for users without RTC, so the comment-meta provider won't be fully retired — it becomes the fallback for non-collaborative sessions.
+
+## Implementation wrinkles worth knowing
+
+These are non-obvious quirks reviewers should keep in mind when reading the code:
+
+- **RichTextData / wrapper-vs-primitive comparison**: text-valued block attributes (notably `core/paragraph`'s `content`) are wrapped in `RichTextData` objects whose payload sits in private class fields. Plain `Object.keys()` reflection returns empty arrays for these wrappers, so a deep structural comparison would consider every wrapper "different from itself" after a JSON round-trip. The provider's `isAttributeEqual` and the interceptor's `shallowAttributeEquals` detect the wrapper-vs-primitive case and fall back to `String(a) === String(b)`. Without this, every suggestion would be flagged stale or trigger an apparent attribute conflict on apply.
+- **`DEEP_MERGE_KEYS` (object-valued attributes)**: `setAttributes({ style: { color: 'red' } })` semantically replaces the whole `style` object on the live block. The overlay HOC instead does a one-level-deep merge for keys in `DEEP_MERGE_KEYS` (`style`, `metadata`) so that editing `style.color` preserves untouched fields like `style.fontSize`. Other attribute types are replaced wholesale, matching core `setAttributes` semantics. Add a key to `DEEP_MERGE_KEYS` only when the attribute is reliably a flat object.
+- **Comment status vs. suggestion status**: a note comment's WP status (`hold` / `approved`) tracks whether the discussion is open or resolved. `_wp_suggestion_status` (`pending` / `applied` / `rejected`) is a parallel axis tracking the suggestion lifecycle. The two are independent: a resolved suggestion can leave its comment thread open for follow-up discussion.
+- **Payload size limit**: both the client (`PAYLOAD_MAX_BYTES` in `provider.js`) and the server (`GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES` in `block-comments.php`) cap payloads at 64 KB. The client check rejects oversized payloads before they leave the browser; the REST controller is the authoritative gate. The meta `sanitize_callback` rejects (rather than truncates) oversized values because mid-string truncation produces invalid JSON that `parseSuggestionPayload` would silently drop.
 
 ## Known Limitations
 
