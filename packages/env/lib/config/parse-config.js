@@ -493,6 +493,7 @@ async function parseEnvironmentConfig(
 			case 'testsPort':
 			case 'autoPort':
 			case 'testsEnvironment':
+			case 'runtime':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {

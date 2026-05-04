@@ -132,6 +132,7 @@ module.exports = async function loadConfig(
 			),
 		] ),
 		lifecycleScripts: config.lifecycleScripts,
+		runtime: config.runtime,
 		env: config.env,
 	};
 };
