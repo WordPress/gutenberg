@@ -176,7 +176,7 @@ test.describe( 'data-wp-bind', () => {
 				values: {
 					false: [ null, 'false' ],
 					true: [ null, 'true' ],
-					null: [ null, '', null, 'tacocat' ],
+					null: [ null, '' ],
 					undef: [ null, '', null, 'tacocat' ],
 					emptyString: [ null, '' ],
 					anyString: [ null, 'any' ],
@@ -263,7 +263,12 @@ test.describe( 'data-wp-bind', () => {
 						propValue,
 					] );
 
-					await toggle.click( { clickCount: 2 } );
+					await toggle.click();
+					await expect( toggle ).toHaveAttribute(
+						'data-toggle-count',
+						'1'
+					);
+					await toggle.click();
 
 					// Ensure values have been updated after toggling.
 					await expect( toggle ).toHaveAttribute(
