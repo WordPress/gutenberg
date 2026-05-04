@@ -387,6 +387,8 @@ Returns the current editor intent. The intent represents the user's editing purp
 
 The intent is orthogonal to the `editorMode` preference (visual vs. code).
 
+Storage: the value lives in the preferences store under (`core`, `editorIntent`). The per-app default is registered in `packages/edit-post/src/index.js` and `packages/edit-site/src/index.js`. If no value is set we fall back to `EDITOR_INTENT_EDIT` so callers can rely on a non-null result.
+
 _Parameters_
 
 -   _state_ `Object`: Global application state.
@@ -1514,6 +1516,8 @@ _Returns_
 Sets the current editor intent.
 
 The intent represents the user's editing purpose: directly editing content (`edit`), suggesting changes that the author can apply or reject (`suggest`), or viewing the post in a read-only mode (`view`). It is orthogonal to the `editorMode` preference (visual vs. code).
+
+The value persists via the preferences store so the intent survives reloads. Unknown intents are silently rejected (no dispatch, no announcement) to keep typos or stale values from corrupting the preference; valid values are listed in `EDITOR_INTENTS`.
 
 _Parameters_
 

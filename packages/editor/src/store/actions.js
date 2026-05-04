@@ -1078,11 +1078,19 @@ export const switchEditorMode =
  * (`suggest`), or viewing the post in a read-only mode (`view`). It is
  * orthogonal to the `editorMode` preference (visual vs. code).
  *
+ * The value persists via the preferences store so the intent survives
+ * reloads. Unknown intents are silently rejected (no dispatch, no
+ * announcement) to keep typos or stale values from corrupting the
+ * preference; valid values are listed in `EDITOR_INTENTS`.
+ *
  * @param {'edit'|'suggest'|'view'} intent The editor intent to set.
  */
 export const setEditorIntent =
 	( intent ) =>
 	( { registry } ) => {
+		// Reject unknown intents instead of throwing so a typo from a
+		// bookmarklet, browser extension, or third-party plugin can't poison
+		// the persisted preference.
 		if ( ! EDITOR_INTENTS.includes( intent ) ) {
 			return;
 		}

@@ -18,9 +18,21 @@ import {
 import PostTypeSupportCheck from '../post-type-support-check';
 
 /**
- * Set of available editor intent options.
+ * Available editor intent options surfaced in the more-menu mode picker.
  *
- * @type {Array}
+ * Each option is mirrored across three files; keep them in sync when adding
+ * or renaming an intent:
+ *   - This file: UI label, description, and shortcut hint.
+ *   - `../global-keyboard-shortcuts/register-shortcuts.js`: registers the
+ *     keyboard binding with `@wordpress/keyboard-shortcuts`.
+ *   - `../global-keyboard-shortcuts/index.js`: wires `useShortcut` so the
+ *     binding dispatches `setEditorIntent`.
+ *
+ * The `value` field must be one of the `EDITOR_INTENT_*` constants — the
+ * `setEditorIntent` action validates against `EDITOR_INTENTS` and silently
+ * ignores unknown values.
+ *
+ * @type {Array<{value: string, label: string, info: string, shortcut: string}>}
  */
 const INTENTS = [
 	{
