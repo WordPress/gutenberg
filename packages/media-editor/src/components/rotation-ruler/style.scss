@@ -85,6 +85,10 @@
 	bottom: 0;
 	overflow: hidden;
 	cursor: ew-resize;
+	// Fade ticks toward each edge so the strip looks like a continuous
+	// ruler running off-screen rather than a strip with hard cut-offs.
+	mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
+	-webkit-mask-image: linear-gradient(to right, transparent 0, #000 16px, #000 calc(100% - 16px), transparent 100%);
 }
 
 .rotation-ruler__ticks {
