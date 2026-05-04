@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	RangeControl,
-	Spinner,
-	Button,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
+import { RangeControl, Spinner, Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -156,7 +152,7 @@ function RevisionsSlider() {
 	}
 
 	return (
-		<HStack spacing={ 2 } expanded wrap={ false }>
+		<Stack direction="row" gap="sm" align="center">
 			<Button
 				icon={ chevronLeft }
 				label={
@@ -191,7 +187,7 @@ function RevisionsSlider() {
 				size="compact"
 				accessibleWhenDisabled
 			/>
-		</HStack>
+		</Stack>
 	);
 }
 
