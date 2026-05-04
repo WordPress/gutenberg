@@ -9,6 +9,10 @@ import { __ } from '@wordpress/i18n';
  */
 import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
+	DEFAULT_KEYBOARD_STEP,
+	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+} from '../../../core/constants';
+import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
 	computeShiftLockedResizeRect,
@@ -64,12 +68,6 @@ function getHandleLabel( pos: HandlePosition ): string {
 			return __( 'Resize bottom-right corner' );
 	}
 }
-
-/** Fine step for keyboard-driven handle resize, in normalized coordinates. */
-const KEYBOARD_STEP = 0.01;
-
-/** Coarse step when Shift is held — 10× the fine step. */
-const KEYBOARD_STEP_SHIFT = 0.1;
 
 /** Delay before keyboard resize triggers settle (ms). */
 const KEYBOARD_SETTLE_DELAY = 500;
@@ -128,6 +126,7 @@ export function RectangleStencil( {
 		[ boundsMinX, boundsMinY, boundsMaxX, boundsMaxY ]
 	);
 	const keyboardSettleTimerRef = useRef< ReturnType< typeof setTimeout > >();
+	const keyboardResizeActiveRef = useRef( false );
 	const hasLockedRatio = !! ( aspectRatio && aspectRatio > 0 );
 
 	// Clear the pending keyboard settle timer on unmount so it can't
@@ -135,6 +134,7 @@ export function RectangleStencil( {
 	useEffect( () => {
 		return () => {
 			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		};
 	}, [] );
 
@@ -281,6 +281,11 @@ export function RectangleStencil( {
 			el.addEventListener( 'lostpointercapture', onEnd );
 
 			onResizeStart?.();
+			// Cancel any pending keyboard settle so it can't fire onResizeEnd
+			// mid-drag if the user switches from keyboard to pointer within
+			// the settle window.
+			clearTimeout( keyboardSettleTimerRef.current );
+			keyboardResizeActiveRef.current = false;
 		},
 		[ cropRect, onResizeStart ]
 	);
@@ -377,7 +382,22 @@ export function RectangleStencil( {
 			event.preventDefault();
 			event.stopPropagation();
 
-			const step = event.shiftKey ? KEYBOARD_STEP_SHIFT : KEYBOARD_STEP;
+			if ( ! keyboardResizeActiveRef.current ) {
+				keyboardResizeActiveRef.current = true;
+				onResizeStart?.();
+			}
+
+			const scheduleKeyboardResizeEnd = () => {
+				clearTimeout( keyboardSettleTimerRef.current );
+				keyboardSettleTimerRef.current = setTimeout( () => {
+					keyboardResizeActiveRef.current = false;
+					onResizeEnd?.();
+				}, KEYBOARD_SETTLE_DELAY );
+			};
+
+			const step = event.shiftKey
+				? DEFAULT_KEYBOARD_STEP * KEYBOARD_SHIFT_STEP_MULTIPLIER
+				: DEFAULT_KEYBOARD_STEP;
 
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
@@ -409,10 +429,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeLockedRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			} else {
 				// For freeform resize, synthesize a drag via computeFreeRect.
 				const syntheticDrag: ResizeDragState = {
@@ -426,10 +443,7 @@ export function RectangleStencil( {
 				onCropChange(
 					computeFreeRect( syntheticDrag, clientX, clientY )
 				);
-				clearTimeout( keyboardSettleTimerRef.current );
-				keyboardSettleTimerRef.current = setTimeout( () => {
-					onResizeEnd?.();
-				}, KEYBOARD_SETTLE_DELAY );
+				scheduleKeyboardResizeEnd();
 			}
 		},
 		[
@@ -440,6 +454,7 @@ export function RectangleStencil( {
 			computeLockedRect,
 			computeFreeRect,
 			onCropChange,
+			onResizeStart,
 			onResizeEnd,
 			onEscape,
 		]
