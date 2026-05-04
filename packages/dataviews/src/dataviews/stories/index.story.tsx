@@ -74,10 +74,10 @@ export const LayoutTable = {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
+		hierarchyStyle: 'text',
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showHierarchyBadge: true,
 		showMedia: true,
-		version: 'text',
 	},
 	argTypes: {
 		backgroundColor: {
@@ -87,6 +87,7 @@ export const LayoutTable = {
 		expandChildren: {
 			control: 'boolean',
 			description: 'Whether child rows are expanded by default',
+			if: { arg: 'hierarchyStyle', eq: 'tree' },
 		},
 		groupBy: {
 			control: 'boolean',
@@ -101,6 +102,11 @@ export const LayoutTable = {
 			control: 'boolean',
 			description: 'Are the items clickable',
 		},
+		hierarchyStyle: {
+			control: 'select',
+			description: 'Which table story variant to display',
+			options: [ 'text', 'tree' ],
+		},
 		perPageSizes: {
 			control: 'object',
 			description: 'Array of available page sizes',
@@ -109,15 +115,11 @@ export const LayoutTable = {
 			control: 'boolean',
 			description:
 				'Whether to show direct child count badges for tree hierarchy rows',
+			if: { arg: 'hierarchyStyle', eq: 'tree' },
 		},
 		showMedia: {
 			control: 'boolean',
 			description: 'Whether to display the media field',
-		},
-		version: {
-			control: 'select',
-			description: 'Which table story variant to display',
-			options: [ 'default', 'tree-hierarchy' ],
 		},
 	},
 };
