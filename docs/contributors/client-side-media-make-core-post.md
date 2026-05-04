@@ -171,6 +171,32 @@ Failing any check causes a transparent fallback to server-side processing.
 - **2g / slow-2g / Save-Data**: Excluded because of the ~13 MB worker download.
 - **CSP restrictions**: Sites with `worker-src` directives that don't allow `blob:` fall back to server-side.
 
+## Frequently asked questions
+
+### Isn't this just a bandwidth optimization?
+
+The bigger win is **server CPU and memory relief**. Hosts no longer pay the GD/Imagick cost of generating sub-sizes on upload, which is one of the most common causes of PHP timeouts and memory-limit failures on shared hosting. Reduced upload bandwidth (when sub-sizes are smaller than the source the server would otherwise receive once) is a side effect, not the goal. See "Key benefits" above.
+
+### Doesn't the "never trust the client" rule apply here?
+
+Client-side processing is a **performance optimization, not a trust boundary**. The server still validates every uploaded file — MIME type, dimensions, capability checks, sanitization — exactly as before. Client-side code generates the bytes; the server still decides whether to accept them and runs the same `wp_generate_attachment_metadata` filter chain via the finalize step. If the browser can't or won't process the file, WordPress falls back to server-side processing transparently. The security model is unchanged.
+
+### What happens if the browser can't process the image?
+
+Server-side processing runs as before. The fallback is automatic and transparent to the user — no UI change, no error. The exact gating (browser features, device memory, CPU cores, network class, CSP) is described in "Feature detection thresholds" above.
+
+### Will my plugin's `wp_generate_attachment_metadata` hooks still run?
+
+Yes. After all client-side operations complete (including thumbnail sideloads), WordPress calls a finalize endpoint that re-runs `wp_generate_attachment_metadata` on the server, so watermarking, CDN sync, custom metadata processing, and similar plugins keep working without modification. See "Server-side hooks still fire" above.
+
+### Does this change the format my users upload?
+
+Only if `image_editor_output_format` says so — the existing filter is honored client-side. The one new behavior is HEIC: HEIC inputs are converted to JPEG before upload and the original is kept as a companion file. AVIF inputs upload as AVIF, even on hosts whose server-side image editor lacks AVIF support.
+
+### Why aren't Firefox and Safari supported?
+
+They don't ship `Document-Isolation-Policy`, which is what enables `SharedArrayBuffer` (required for the WASM pipeline). Users on those browsers get the existing server-side path — no regression. The HEIC canvas fallback still works in Safari for HEIC inputs.
+
 ## Testing and feedback
 
 We encourage plugin and theme developers to test client-side media processing with their products. In particular:
