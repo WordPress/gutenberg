@@ -46,9 +46,11 @@ import './cropper.scss';
 /** Threshold for comparing normalized crop rect values. */
 const CROP_RECT_EPSILON = 1e-6;
 
-// Largest rect of the given pixel aspect ratio that fits inside the visual
-// bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
-// rect (1×1) if `aspectRatio` is unset or non-positive.
+/*
+ * Largest rect of the given pixel aspect ratio that fits inside the visual
+ * bounds, centered in [0,1] × [0,1] normalized space. Returns a full-frame
+ * rect (1×1) if `aspectRatio` is unset or non-positive.
+ */
 function computeInscribedRect(
 	aspectRatio: number | undefined,
 	visualSize: Size
@@ -99,6 +101,11 @@ function areCropBoundsEqual(
 	);
 }
 
+/**
+ * Check whether the measured layout geometry has actually changed before
+ * publishing it to context. This prevents equivalent geometry objects from
+ * causing unnecessary `useCropGeometry` consumer updates.
+ */
 function areLayoutGeometriesEqual(
 	a: CropperLayoutGeometry | null,
 	b: CropperLayoutGeometry
