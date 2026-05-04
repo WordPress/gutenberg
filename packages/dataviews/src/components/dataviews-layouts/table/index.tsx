@@ -94,21 +94,13 @@ function getHierarchyRows< Item >(
 	getItemLevel: ( item: Item ) => number
 ) {
 	const hierarchyRows: HierarchyRow< Item >[] = [];
-	const hierarchyRowsById = new Map< string, HierarchyRow< Item > >();
-	const ancestors: HierarchyRow< Item >[] = [];
 
 	data.forEach( ( item, index ) => {
 		const id = getItemId( item ) || index.toString();
 		const level = getItemHierarchyLevel( item, getItemLevel );
-
-		while (
-			ancestors.length &&
-			ancestors[ ancestors.length - 1 ].level >= level
-		) {
-			ancestors.pop();
-		}
-
-		const parent = ancestors[ ancestors.length - 1 ];
+		const parent = hierarchyRows.findLast(
+			( hierarchyRow ) => hierarchyRow.level < level
+		);
 		const hierarchyRow = {
 			item,
 			id,
@@ -118,15 +110,10 @@ function getHierarchyRows< Item >(
 		};
 
 		if ( parent ) {
-			const parentRow = hierarchyRowsById.get( parent.id );
-			if ( parentRow ) {
-				parentRow.childCount += 1;
-			}
+			parent.childCount += 1;
 		}
 
 		hierarchyRows.push( hierarchyRow );
-		hierarchyRowsById.set( id, hierarchyRow );
-		ancestors.push( hierarchyRow );
 	} );
 
 	return hierarchyRows;
@@ -480,16 +467,12 @@ function ViewTable< Item >( {
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
 		getBoundingClientRect: () => DOMRect;
 	} | null >( null );
-	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
-		new Set()
-	);
+
 	const isTreeHierarchy = !! (
 		view.showLevels &&
 		typeof getItemLevel === 'function' &&
 		view.layout?.hierarchyStyle === 'tree'
 	);
-	const showHierarchyBadge =
-		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
 	const hierarchyRows = useMemo( () => {
 		if ( ! isTreeHierarchy || ! getItemLevel ) {
 			return [];
@@ -497,21 +480,13 @@ function ViewTable< Item >( {
 		return getHierarchyRows( data, getItemId, getItemLevel );
 	}, [ data, getItemId, getItemLevel, isTreeHierarchy ] );
 
-	useEffect( () => {
-		if ( headerMenuToFocusRef.current ) {
-			headerMenuToFocusRef.current.focus();
-			headerMenuToFocusRef.current = undefined;
-		}
-	} );
+	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
+		() => {
+			if ( ! isTreeHierarchy ) {
+				return new Set();
+			}
 
-	useEffect( () => {
-		if ( ! isTreeHierarchy ) {
-			setExpandedItemIds( new Set() );
-			return;
-		}
-
-		setExpandedItemIds(
-			new Set(
+			return new Set(
 				view.layout?.expandChildren
 					? hierarchyRows
 							.filter(
@@ -519,9 +494,19 @@ function ViewTable< Item >( {
 							)
 							.map( ( hierarchyRow ) => hierarchyRow.id )
 					: []
-			)
-		);
-	}, [ hierarchyRows, isTreeHierarchy, view.layout?.expandChildren ] );
+			);
+		}
+	);
+
+	const showHierarchyBadge =
+		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
+
+	useEffect( () => {
+		if ( headerMenuToFocusRef.current ) {
+			headerMenuToFocusRef.current.focus();
+			headerMenuToFocusRef.current = undefined;
+		}
+	} );
 
 	const tableNoticeId = useId();
 
@@ -854,7 +839,7 @@ function ViewTable< Item >( {
 									</td>
 								</tr>
 								{ getRowsToRender( groupItems ).map(
-									( row, index ) => (
+									( row ) => (
 										<TableRow
 											key={ row.id }
 											item={ row.item }
@@ -862,7 +847,7 @@ function ViewTable< Item >( {
 											hasBulkActions={ hasBulkActions }
 											actions={ actions }
 											fields={ fields }
-											id={ row.id || index.toString() }
+											id={ row.id }
 											view={ view }
 											titleField={ titleField }
 											mediaField={ mediaField }
