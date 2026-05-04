@@ -276,6 +276,8 @@ function CropperInner(
 		}
 		return getCropBounds( state, elementSize, visualSize, canvasSize );
 	}, [ state, elementSize, visualSize, canvasSize ] );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isResizingRef = useRef( false );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -300,11 +302,18 @@ function CropperInner(
 		if ( ! el ) {
 			return;
 		}
-		el.addEventListener( 'wheel', onWheelNative, {
+		const handleWheel = ( event: WheelEvent ) => {
+			if ( isResizingRef.current ) {
+				event.preventDefault();
+				return;
+			}
+			onWheelNative( event );
+		};
+		el.addEventListener( 'wheel', handleWheel, {
 			passive: false,
 		} );
 		return () => {
-			el.removeEventListener( 'wheel', onWheelNative );
+			el.removeEventListener( 'wheel', handleWheel );
 		};
 	}, [ onWheelNative ] );
 
@@ -355,7 +364,6 @@ function CropperInner(
 		};
 	}, [] );
 
-	const [ isResizing, setIsResizing ] = useState( false );
 	const isInteractiveGrid = showGrid === 'interactive';
 	const showInteractiveGrid =
 		isInteractiveGrid &&
@@ -370,6 +378,7 @@ function CropperInner(
 	}, [] );
 
 	const handleResizeStart = useCallback( () => {
+		isResizingRef.current = true;
 		setIsResizing( true );
 		onGestureStart?.();
 	}, [ onGestureStart ] );
@@ -378,6 +387,7 @@ function CropperInner(
 	 * Handle resize end — settle the crop rect (re-center, fill height).
 	 */
 	const handleResizeEnd = useCallback( () => {
+		isResizingRef.current = false;
 		setIsResizing( false );
 		setSettling( true );
 		settleCrop();

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+
+### Enhancements
+
+-   `Drawer`: Fade the popup elevation shadow alongside the slide ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+-   `Drawer`: Allow mouse-drag swipe-dismiss in the popup-edge padding gutter ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
+
 ## 0.12.0 (2026-04-29)
 
 ### Breaking Changes

@@ -9,6 +9,10 @@ import { __ } from '@wordpress/i18n';
  */
 import type { StencilProps, NormalizedRect } from '../../../core/types';
 import {
+	DEFAULT_KEYBOARD_STEP,
+	KEYBOARD_SHIFT_STEP_MULTIPLIER,
+} from '../../../core/constants';
+import {
 	computeFreeResizeRect,
 	computeLockedResizeRect,
 	computeShiftLockedResizeRect,
@@ -64,12 +68,6 @@ function getHandleLabel( pos: HandlePosition ): string {
 			return __( 'Resize bottom-right corner' );
 	}
 }
-
-/** Fine step for keyboard-driven handle resize, in normalized coordinates. */
-const KEYBOARD_STEP = 0.01;
-
-/** Coarse step when Shift is held — 10× the fine step. */
-const KEYBOARD_STEP_SHIFT = 0.1;
 
 /** Delay before keyboard resize triggers settle (ms). */
 const KEYBOARD_SETTLE_DELAY = 500;
@@ -397,7 +395,9 @@ export function RectangleStencil( {
 				}, KEYBOARD_SETTLE_DELAY );
 			};
 
-			const step = event.shiftKey ? KEYBOARD_STEP_SHIFT : KEYBOARD_STEP;
+			const step = event.shiftKey
+				? DEFAULT_KEYBOARD_STEP * KEYBOARD_SHIFT_STEP_MULTIPLIER
+				: DEFAULT_KEYBOARD_STEP;
 
 			// Determine the normalized delta from the arrow key.
 			let dx = 0;
