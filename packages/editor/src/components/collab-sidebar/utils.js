@@ -90,6 +90,20 @@ export function getNoteExcerpt( text, excerptLength = 10 ) {
 	return isTrimmed ? trimmedExcerpt + '…' : trimmedExcerpt;
 }
 
+/*
+ * Multi-noteId helpers
+ *
+ * Block notes were originally a single linkage: `metadata.noteId` was a
+ * scalar comment id. PR #75147 widened that to an array so a block can
+ * carry multiple coexisting notes (e.g. a resolved suggestion plus a
+ * pending discussion thread). The helpers below normalize both shapes —
+ * existing posts written before the migration still have scalar values —
+ * so callers never have to branch on the storage format. Add new accessors
+ * here rather than reading `metadata.noteId` directly, both to preserve
+ * compatibility and to handle the string/numeric id mismatch that legacy
+ * data sometimes contains.
+ */
+
 /**
  * Normalizes noteId metadata to always return an array.
  * Handles both scalar (legacy) and array (new) noteId values.

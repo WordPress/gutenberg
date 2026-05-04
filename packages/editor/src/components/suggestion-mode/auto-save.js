@@ -1,4 +1,40 @@
 /**
+ * Background auto-save for Suggest mode.
+ *
+ * Replaces the explicit "Submit suggestion" button (`commit-bar.js` in earlier
+ * phases) with a debounced background save so a suggester sees their pending
+ * change persist on its own after a short pause in typing — the same model
+ * Google Docs uses for Suggesting mode.
+ *
+ * Behavior summary:
+ *   - **Debounce**: per-block timer of `AUTOSAVE_DEBOUNCE_MS` (1500 ms).
+ *     Each new edit on a block clears that block's timer and starts a new
+ *     one; saves only fire during idle windows so a user typing through a
+ *     paragraph generates one save, not one per keystroke.
+ *   - **Per-block queue**: each `clientId` has a sequential promise chain
+ *     (`queuesRef`). Saves on the same block are linked end-to-end so a
+ *     slow network call doesn't race with a follow-up save and produce
+ *     duplicate POSTs or out-of-order writes. Different blocks have
+ *     independent queues and run concurrently.
+ *   - **Create vs update vs delete**: a fresh overlay creates a new note;
+ *     subsequent edits update the same note's `_wp_suggestion` meta; an
+ *     overlay reverted back to baseline (user undid their suggestion)
+ *     trashes the note.
+ *   - **Collaboration**: the linked comment can be resolved by another peer
+ *     mid-session (their accept/reject flips its `status`). Before each
+ *     update we re-read the comment via core-data; if the linkage is stale
+ *     we orphan it and create a fresh note. PR #75147 widened
+ *     `metadata.noteId` to an array so multiple notes can coexist on a block.
+ *
+ * Refs are used heavily because:
+ *   - The provider callbacks (`createSuggestion`, `updateSuggestion`,
+ *     `deleteSuggestion`) are recreated whenever `postModified` changes,
+ *     but in-flight saves always need the latest reference.
+ *   - The save functions run inside a `setTimeout` callback that doesn't
+ *     re-render, so reading the latest entries / callbacks via refs avoids
+ *     stale-closure bugs without resubscribing on every overlay change.
+ */
+/**
  * WordPress dependencies
  */
 import { useRegistry, useSelect } from '@wordpress/data';

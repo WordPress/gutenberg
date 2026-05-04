@@ -97,8 +97,9 @@ The Suggest-mode subsystem lives in `packages/editor/src/components/suggestion-m
 | `with-suggestion-overlay.js`| `editor.BlockEdit` HOC that diverts `setAttributes` into the overlay. |
 | `store-interceptor.js`      | Snapshot/diff/revert subscriber for store-level mutations; multi-peer accept logic. |
 | `provider.js`               | `useSuggestionsProvider` — the `createSuggestion` / `applySuggestion` / `rejectSuggestion` API. Owns `operationsFromOverlay`, `applyOperations`, `parseSuggestionPayload`, and the wrapper-aware equality check. |
-| `suggestion-diff.js`        | Sidebar diff preview (word-level for text attributes, label fallback otherwise). |
-| `commit-bar.js`             | "Submit suggestion" toolbar shown while editing in Suggest intent. |
+| `suggestion-diff.js`        | Inline diff preview rendered in a comment thread (word-level for text attributes, label fallback otherwise). |
+| `suggestion-summary.js`     | Compact sidebar summary ("Add: …", "Delete: …", "Format: …") used in collapsed thread lists. |
+| `auto-save.js`              | Debounced background persistence of pending overlays as note comments (replaces the explicit "Submit" affordance from earlier phases). |
 
 REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
 
