@@ -1,4 +1,11 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+
+// Default to WordPress core's admin theme blue when the host hasn't
+// set `--wp-admin-theme-color` (e.g. inside Storybook). Hosts that do
+// set it (the media modal, the editor) will override this with their
+// theme.
+$rotation-ruler-accent: var(--wp-admin-theme-color, #3858e9);
 
 // Vertical layout (top → bottom):
 //   0–10: value bubble
@@ -10,6 +17,8 @@
 	height: 28px;
 	padding: 0 $grid-unit-10;
 	box-sizing: border-box;
+	color: $gray-900;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	user-select: none;
 	touch-action: none;
 	// Always declare the container so the inline-size query below can
@@ -22,7 +31,7 @@
 	}
 
 	&:has(.rotation-ruler__input:focus-visible) {
-		outline: 2px solid var(--wp-admin-theme-color);
+		outline: 2px solid $rotation-ruler-accent;
 		outline-offset: 2px;
 		border-radius: 4px;
 	}
@@ -65,7 +74,7 @@
 	height: 0;
 	border-left: 6px solid transparent;
 	border-right: 6px solid transparent;
-	border-bottom: 9px solid var(--wp-admin-theme-color);
+	border-bottom: 9px solid $rotation-ruler-accent;
 	transform: translateX(-50%);
 	opacity: 0.5;
 	pointer-events: none;

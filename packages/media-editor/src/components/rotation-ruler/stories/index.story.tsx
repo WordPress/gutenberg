@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import RotationRuler from '../index';
+import '../style.scss';
 
 const meta: Meta< typeof RotationRuler > = {
 	title: 'MediaEditor/RotationRuler',
