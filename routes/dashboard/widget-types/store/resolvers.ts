@@ -1,3 +1,11 @@
+/**
+ * WordPress dependencies
+ */
+import warning from '@wordpress/warning';
+
+/**
+ * Internal dependencies
+ */
 import type { WidgetName, WidgetType } from '../types';
 
 /**
@@ -42,7 +50,10 @@ export const getWidgetTypes =
 						name: entry.name as WidgetName,
 						renderModule: entry.render_module ?? '',
 					};
-				} catch {
+				} catch ( e ) {
+					warning(
+						'Error importing widget module ' + entry.name + ': ' + e
+					);
 					return null;
 				}
 			} )
