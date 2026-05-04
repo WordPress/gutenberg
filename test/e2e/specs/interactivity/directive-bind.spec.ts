@@ -176,7 +176,7 @@ test.describe( 'data-wp-bind', () => {
 				values: {
 					false: [ null, 'false' ],
 					true: [ null, 'true' ],
-					null: [ null, '' ],
+					null: [ null, '', null, 'tacocat' ],
 					undef: [ null, '', null, 'tacocat' ],
 					emptyString: [ null, '' ],
 					anyString: [ null, 'any' ],
