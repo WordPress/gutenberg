@@ -111,92 +111,96 @@ export default function MediaEditorToolbar( {
 			gap="sm"
 			wrap="wrap"
 		>
-			<Button
-				size="compact"
-				icon={ undo }
-				label={ __( 'Undo' ) }
-				showTooltip
-				shortcut={ displayShortcut.primary( 'z' ) }
-				disabled={ isUndoRedoDisabled || ! hasUndo }
-				accessibleWhenDisabled
-				onClick={ handleUndo }
-			/>
-			<Button
-				size="compact"
-				icon={ redo }
-				label={ __( 'Redo' ) }
-				showTooltip
-				shortcut={
-					isAppleOS()
-						? displayShortcut.primaryShift( 'z' )
-						: displayShortcut.primary( 'y' )
-				}
-				disabled={ isUndoRedoDisabled || ! hasRedo }
-				accessibleWhenDisabled
-				onClick={ handleRedo }
-			/>
-			<Button
-				size="compact"
-				icon={ rotateLeft }
-				label={ __( 'Rotate 90° counter-clockwise' ) }
-				showTooltip
-				onClick={ () => snapRotate90( -1 ) }
-			/>
-			<Button
-				size="compact"
-				icon={ rotateRight }
-				label={ __( 'Rotate 90° clockwise' ) }
-				showTooltip
-				onClick={ () => snapRotate90( 1 ) }
-			/>
-			<Button
-				size="compact"
-				icon={ flipHorizontal }
-				label={ __( 'Flip horizontal' ) }
-				showTooltip
-				isPressed={ state.flip.horizontal }
-				onClick={ () =>
-					setFlip( {
-						horizontal: ! state.flip.horizontal,
-						vertical: state.flip.vertical,
-					} )
-				}
-			/>
-			<Button
-				size="compact"
-				icon={ flipVertical }
-				label={ __( 'Flip vertical' ) }
-				showTooltip
-				isPressed={ state.flip.vertical }
-				onClick={ () =>
-					setFlip( {
-						horizontal: state.flip.horizontal,
-						vertical: ! state.flip.vertical,
-					} )
-				}
-			/>
-			<div
-				role="presentation"
-				className="media-editor-toolbar__rotation-slider"
-				{ ...rotationGestureHandlers }
-			>
-				<RotationRuler
-					label={ __( 'Fine rotation' ) }
-					min={ -MAX_ROTATION_OFFSET }
-					max={ MAX_ROTATION_OFFSET }
-					value={ fineOffset }
-					onChange={ handleRotationSlider }
+			<div className="media-editor-toolbar__rotate-cluster">
+				<Button
+					size="compact"
+					icon={ rotateLeft }
+					label={ __( 'Rotate 90° counter-clockwise' ) }
+					showTooltip
+					onClick={ () => snapRotate90( -1 ) }
+				/>
+				<div
+					role="presentation"
+					className="media-editor-toolbar__rotation-slider"
+					{ ...rotationGestureHandlers }
+				>
+					<RotationRuler
+						label={ __( 'Fine rotation' ) }
+						min={ -MAX_ROTATION_OFFSET }
+						max={ MAX_ROTATION_OFFSET }
+						value={ fineOffset }
+						onChange={ handleRotationSlider }
+					/>
+				</div>
+				<Button
+					size="compact"
+					icon={ rotateRight }
+					label={ __( 'Rotate 90° clockwise' ) }
+					showTooltip
+					onClick={ () => snapRotate90( 1 ) }
 				/>
 			</div>
-			<Button
-				size="compact"
-				variant="tertiary"
-				disabled={ ! isDirty }
-				accessibleWhenDisabled
-				onClick={ handleReset }
-			>
-				{ __( 'Reset' ) }
-			</Button>
+			<div className="media-editor-toolbar__primary-cluster">
+				<Button
+					size="compact"
+					icon={ undo }
+					label={ __( 'Undo' ) }
+					showTooltip
+					shortcut={ displayShortcut.primary( 'z' ) }
+					disabled={ isUndoRedoDisabled || ! hasUndo }
+					accessibleWhenDisabled
+					onClick={ handleUndo }
+				/>
+				<Button
+					size="compact"
+					icon={ redo }
+					label={ __( 'Redo' ) }
+					showTooltip
+					shortcut={
+						isAppleOS()
+							? displayShortcut.primaryShift( 'z' )
+							: displayShortcut.primary( 'y' )
+					}
+					disabled={ isUndoRedoDisabled || ! hasRedo }
+					accessibleWhenDisabled
+					onClick={ handleRedo }
+				/>
+				<Button
+					size="compact"
+					icon={ flipHorizontal }
+					label={ __( 'Flip horizontal' ) }
+					showTooltip
+					isPressed={ state.flip.horizontal }
+					onClick={ () =>
+						setFlip( {
+							horizontal: ! state.flip.horizontal,
+							vertical: state.flip.vertical,
+						} )
+					}
+				/>
+				<Button
+					size="compact"
+					icon={ flipVertical }
+					label={ __( 'Flip vertical' ) }
+					showTooltip
+					isPressed={ state.flip.vertical }
+					onClick={ () =>
+						setFlip( {
+							horizontal: state.flip.horizontal,
+							vertical: ! state.flip.vertical,
+						} )
+					}
+				/>
+				<Button
+					size="compact"
+					variant="tertiary"
+					disabled={ ! isDirty }
+					accessibleWhenDisabled
+					onClick={ handleReset }
+				>
+					{ __( 'Reset' ) }
+				</Button>
+			</div>
 		</Stack>
 	);
 }

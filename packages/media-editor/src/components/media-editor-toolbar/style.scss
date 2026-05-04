@@ -3,9 +3,30 @@
 .media-editor-toolbar {
 	width: 100%;
 	padding: $grid-unit-10 $grid-unit-20;
+}
 
-	.media-editor-toolbar__rotation-slider {
-		flex: 1 1 auto;
-		max-width: 240px;
-	}
+// Two clusters wrap as units — at narrow widths the rotate cluster
+// (rotate-90, ruler, rotate+90) stacks on top of the rest. At wide
+// widths everything lives on a single row.
+.media-editor-toolbar__rotate-cluster,
+.media-editor-toolbar__primary-cluster {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+// Rotate cluster grows to absorb extra horizontal space (the ruler
+// inside it expands to fill). Capped so it doesn't dominate at very
+// wide viewports.
+.media-editor-toolbar__rotate-cluster {
+	flex: 1 1 280px;
+	min-width: 0;
+	max-width: 360px;
+	justify-content: center;
+}
+
+.media-editor-toolbar__rotation-slider {
+	flex: 1 1 auto;
+	min-width: 0;
 }
