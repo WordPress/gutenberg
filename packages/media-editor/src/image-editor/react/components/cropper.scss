@@ -12,6 +12,19 @@ $handle-touch-target-size: 44px;
 	user-select: none;
 	cursor: grab;
 
+	// Transparent overlay that sits behind the canvas and catches pointer
+	// events in empty root areas that the canvas no longer covers after a
+	// viewport pan/zoom transform. Enables pan-from-anywhere UX.
+	&__pan-backdrop {
+		position: absolute;
+		inset: 0;
+		cursor: grab;
+
+		&:active {
+			cursor: grabbing;
+		}
+	}
+
 	// Inner gutter for resize handles. Handles use negative offsets and a
 	// touch target that extends past the crop edge; the root clips overflow
 	// (required for the dimming overlay's box-shadow trick), so a flush

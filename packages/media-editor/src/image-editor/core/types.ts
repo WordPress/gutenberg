@@ -154,11 +154,23 @@ export interface ViewportState {
 	zoom: number;
 	/** Pan offset in CSS pixels from the canvas centre. */
 	pan: { x: number; y: number };
+	/**
+	 * Measured canvas element size in CSS pixels. Set by the Cropper
+	 * component; used by the navigator to compute an accurate viewport rect.
+	 */
+	canvasSize: Size | null;
 }
 
 export type ViewportAction =
 	| { type: 'SET_VIEWPORT_ZOOM'; payload: number }
+	/**
+	 * Zooms to a new level while keeping the current view centre stationary.
+	 * Pan is scaled by (newZoom / oldZoom) so the canvas point visible at the
+	 * root centre does not jump.
+	 */
+	| { type: 'SET_VIEWPORT_ZOOM_AT_CENTER'; payload: number }
 	| { type: 'SET_VIEWPORT_PAN'; payload: { x: number; y: number } }
+	| { type: 'SET_CANVAS_SIZE'; payload: Size }
 	| { type: 'RESET_VIEWPORT' };
 
 /**
@@ -193,4 +205,9 @@ export interface StencilProps {
 	};
 	/** Called when Escape is pressed on a resize handle. */
 	onEscape?: () => void;
+	/**
+	 * Current viewport zoom level. Used to counter-scale handles so they
+	 * remain the same visual size regardless of viewport zoom.
+	 */
+	viewportZoom?: number;
 }

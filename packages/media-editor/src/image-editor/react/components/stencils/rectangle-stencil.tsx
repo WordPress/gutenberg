@@ -79,27 +79,6 @@ const KEYBOARD_SETTLE_DELAY = 500;
  */
 type RectangleStencilProps = StencilProps;
 
-/**
- * A rectangular crop stencil with resize handles.
- *
- * In freeform mode, handles resize the crop area. Clicks inside the
- * crop pass through to the container for image panning. The crop
- * auto-centers after resize via SETTLE_CROP.
- *
- * @param props                   Component props implementing StencilProps.
- * @param props.cropRect          The crop rectangle in normalized coordinates.
- * @param props.containerSize     The container element dimensions in pixels.
- * @param props.imageSize         The rendered image dimensions in pixels.
- * @param props.onCropChange      Callback fired when the crop rect changes.
- * @param props.onResizeStart     Callback fired when a resize drag starts.
- * @param props.onResizeEnd       Callback fired when a resize drag ends (mouseup).
- * @param props.aspectRatio       Optional fixed aspect ratio (width / height).
- * @param props.freeformCrop      Whether resize handles are shown.
- * @param props.stencilTransition CSS transition string for settle animation.
- * @param props.cropBounds        Maximum crop rect bounds from camera (zoom/rotation-aware).
- * @param props.onEscape          Called when Escape is pressed on a resize handle.
- * @return The rectangle stencil element.
- */
 export function RectangleStencil( {
 	cropRect,
 	containerSize,
@@ -112,6 +91,7 @@ export function RectangleStencil( {
 	stencilTransition,
 	cropBounds,
 	onEscape,
+	viewportZoom = 1,
 }: RectangleStencilProps ) {
 	// Use cropBounds from the camera if available, otherwise default to [0,1].
 	const boundsMinX = cropBounds?.minX ?? 0;
@@ -478,7 +458,9 @@ export function RectangleStencil( {
 			} }
 		>
 			{ /* The crop rectangle border. pointer-events: none is set in
-				   CSS so clicks pass through to the container for panning. */ }
+				   CSS so clicks pass through to the container for panning.
+				   Counter-scale the border width so it stays 1px regardless
+				   of viewport zoom. */ }
 			<div
 				className="wp-media-editor-image-editor__stencil-rect"
 				style={ {
@@ -486,9 +468,18 @@ export function RectangleStencil( {
 					height: '100%',
 					top: 0,
 					left: 0,
+					borderWidth:
+						viewportZoom !== 1
+							? `${ 1 / viewportZoom }px`
+							: undefined,
 				} }
 			/>
 			{ /* Resize handles — only in freeform mode.
+				   Counter-scale each handle so its visual size stays constant
+				   regardless of viewport zoom. The transform-origin is 50%/50%
+				   (the handle centre), which sits on the crop edge corner, so
+				   the handle stays correctly positioned while shrinking to its
+				   intended 12 px visual size.
 				   Semantics: role="button" with aria-label describing
 				   which edge/corner. Arrow keys resize (onKeyDown).
 				   role="slider" would be more precise but requires
@@ -500,6 +491,11 @@ export function RectangleStencil( {
 						key={ pos }
 						type="button"
 						className={ `wp-media-editor-image-editor__handle wp-media-editor-image-editor__handle--${ pos }` }
+						style={
+							viewportZoom !== 1
+								? { transform: `scale(${ 1 / viewportZoom })` }
+								: undefined
+						}
 						onPointerDown={ ( event ) =>
 							handlePointerDown( pos, event )
 						}

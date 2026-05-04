@@ -177,7 +177,7 @@ function CropperInner(
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
 	const canvasRef = useRef< HTMLDivElement >( null );
-	const [ canvasSize, setCanvasSize ] = useState< Size >( {
+	const [ canvasSize, setCanvasSizeLocal ] = useState< Size >( {
 		width: 0,
 		height: 0,
 	} );
@@ -190,7 +190,7 @@ function CropperInner(
 		const observer = new ResizeObserver( ( entries ) => {
 			for ( const entry of entries ) {
 				const { width, height } = entry.contentRect;
-				setCanvasSize( ( prev ) => {
+				setCanvasSizeLocal( ( prev ) => {
 					if ( prev.width === width && prev.height === height ) {
 						return prev;
 					}
@@ -203,6 +203,14 @@ function CropperInner(
 			observer.disconnect();
 		};
 	}, [] );
+
+	// Report canvas size to the viewport context so the navigator can
+	// compute an accurate viewport rect.
+	useEffect( () => {
+		if ( viewport && canvasSize.width > 0 && canvasSize.height > 0 ) {
+			viewport.setCanvasSize( canvasSize );
+		}
+	}, [ viewport, canvasSize ] );
 
 	// Notify consumer of state changes.
 	useEffect( () => {
@@ -444,6 +452,50 @@ function CropperInner(
 		[ ref ]
 	);
 
+	// Backdrop viewport-pan drag: captures pointer events in empty areas
+	// of the root that are not covered by the canvas after transform.
+	const backdropDragRef = useRef< {
+		startX: number;
+		startY: number;
+		startPanX: number;
+		startPanY: number;
+	} | null >( null );
+
+	const handleBackdropPointerDown = useCallback(
+		( e: React.PointerEvent< HTMLDivElement > ) => {
+			if ( ! viewport ) {
+				return;
+			}
+			e.preventDefault();
+			e.currentTarget.setPointerCapture( e.pointerId );
+			backdropDragRef.current = {
+				startX: e.clientX,
+				startY: e.clientY,
+				startPanX: viewport.viewport.pan.x,
+				startPanY: viewport.viewport.pan.y,
+			};
+		},
+		[ viewport ]
+	);
+
+	const handleBackdropPointerMove = useCallback(
+		( e: React.PointerEvent< HTMLDivElement > ) => {
+			const drag = backdropDragRef.current;
+			if ( ! drag || ! viewport ) {
+				return;
+			}
+			viewport.setViewportPan( {
+				x: drag.startPanX + ( e.clientX - drag.startX ),
+				y: drag.startPanY + ( e.clientY - drag.startY ),
+			} );
+		},
+		[ viewport ]
+	);
+
+	const handleBackdropPointerUp = useCallback( () => {
+		backdropDragRef.current = null;
+	}, [] );
+
 	return (
 		<div
 			ref={ setContainerRef }
@@ -453,6 +505,22 @@ function CropperInner(
 				className
 			) }
 		>
+			{ /*
+			 * Transparent backdrop, below the canvas in stacking order. It
+			 * catches pointer events in empty areas of the root that the
+			 * canvas no longer covers when panned or zoomed, enabling the
+			 * user to start a viewport pan drag from anywhere in the editor.
+			 */ }
+			{ viewport && (
+				<div
+					className="wp-media-editor-image-editor__pan-backdrop"
+					onPointerDown={ handleBackdropPointerDown }
+					onPointerMove={ handleBackdropPointerMove }
+					onPointerUp={ handleBackdropPointerUp }
+					onPointerCancel={ handleBackdropPointerUp }
+					onLostPointerCapture={ handleBackdropPointerUp }
+				/>
+			) }
 			{ /*
 			 * The canvas is the interactive, inset surface. Handles and
 			 * the ARIA role/tabIndex live here so pointer geometry
@@ -522,6 +590,7 @@ function CropperInner(
 					freeformCrop={ freeformCrop }
 					stencilTransition={ settleStencilTransition }
 					cropBounds={ cropBounds }
+					viewportZoom={ viewport?.viewport.zoom ?? 1 }
 				/>
 
 				{ /* Rule-of-thirds grid */ }

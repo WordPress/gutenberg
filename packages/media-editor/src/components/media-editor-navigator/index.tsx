@@ -24,48 +24,78 @@ import {
 import { useMediaEditorContext } from '../media-editor-provider';
 import './style.scss';
 
-/**
- * Returns CSS position/size style for the viewport rect indicator
- * within the navigator thumbnail.
- *
- * @param vpZoom            Current viewport zoom level (> 1 = zoomed in).
- * @param vpPan             Current viewport pan offset in canvas CSS pixels.
- * @param vpPan.x           Pan offset on the X axis.
- * @param vpPan.y           Pan offset on the Y axis.
- * @param thumbSize         Navigator thumbnail dimensions in pixels.
- * @param thumbSize.width   Thumbnail width.
- * @param thumbSize.height  Thumbnail height.
- * @param canvasSize        Estimated canvas dimensions in pixels.
- * @param canvasSize.width  Canvas width.
- * @param canvasSize.height Canvas height.
- * @return Inline style for the viewport rect overlay element.
- */
 function getViewportRectStyle(
 	vpZoom: number,
 	vpPan: { x: number; y: number },
 	thumbSize: { width: number; height: number },
-	canvasSize: { width: number; height: number }
+	actualCanvasSize: { width: number; height: number },
+	imageNaturalSize: { width: number; height: number }
 ): React.CSSProperties {
-	if ( canvasSize.width === 0 || canvasSize.height === 0 ) {
+	if (
+		actualCanvasSize.width === 0 ||
+		actualCanvasSize.height === 0 ||
+		thumbSize.width === 0 ||
+		thumbSize.height === 0 ||
+		imageNaturalSize.width === 0 ||
+		imageNaturalSize.height === 0
+	) {
 		return {};
 	}
 
-	// At viewport zoom `vz`, the visible canvas region is (W/vz) × (H/vz).
-	const visibleW = canvasSize.width / vpZoom;
-	const visibleH = canvasSize.height / vpZoom;
+	const imageRatio = imageNaturalSize.width / imageNaturalSize.height;
+	const canvasRatio = actualCanvasSize.width / actualCanvasSize.height;
 
-	// Viewport pan shifts the canvas; visible region top-left in canvas pixels:
-	const visibleX = canvasSize.width / 2 - visibleW / 2 - vpPan.x / vpZoom;
-	const visibleY = canvasSize.height / 2 - visibleH / 2 - vpPan.y / vpZoom;
+	// Image size fitted into canvas space (aspect-ratio preserving).
+	let imageInCanvasW: number;
+	let imageInCanvasH: number;
+	if ( imageRatio > canvasRatio ) {
+		imageInCanvasW = actualCanvasSize.width;
+		imageInCanvasH = actualCanvasSize.width / imageRatio;
+	} else {
+		imageInCanvasH = actualCanvasSize.height;
+		imageInCanvasW = actualCanvasSize.height * imageRatio;
+	}
 
-	// Map canvas coords to thumbnail coords.
-	const scaleX = thumbSize.width / canvasSize.width;
-	const scaleY = thumbSize.height / canvasSize.height;
+	// Image size fitted into thumbnail space (same logic — matches the <img>
+	// element's object-fit:contain rendering).
+	const thumbRatio = thumbSize.width / thumbSize.height;
+	let thumbImageW: number;
+	let thumbImageH: number;
+	if ( imageRatio > thumbRatio ) {
+		thumbImageW = thumbSize.width;
+		thumbImageH = thumbSize.width / imageRatio;
+	} else {
+		thumbImageH = thumbSize.height;
+		thumbImageW = thumbSize.height * imageRatio;
+	}
 
-	const left = Math.max( 0, visibleX * scaleX );
-	const top = Math.max( 0, visibleY * scaleY );
-	const width = Math.min( thumbSize.width - left, visibleW * scaleX );
-	const height = Math.min( thumbSize.height - top, visibleH * scaleY );
+	// Scale from canvas pixels to thumbnail pixels (via image dimensions).
+	const canvasToThumb = thumbImageW / imageInCanvasW;
+
+	// Visible canvas region in canvas pixels.
+	const visW = actualCanvasSize.width / vpZoom;
+	const visH = actualCanvasSize.height / vpZoom;
+	const visLeft = actualCanvasSize.width / 2 - vpPan.x / vpZoom - visW / 2;
+	const visTop = actualCanvasSize.height / 2 - vpPan.y / vpZoom - visH / 2;
+
+	// Image top-left offset within canvas space.
+	const imageLeft = ( actualCanvasSize.width - imageInCanvasW ) / 2;
+	const imageTop = ( actualCanvasSize.height - imageInCanvasH ) / 2;
+
+	// Image top-left offset within thumbnail space (letterbox offset).
+	const thumbImageLeft = ( thumbSize.width - thumbImageW ) / 2;
+	const thumbImageTop = ( thumbSize.height - thumbImageH ) / 2;
+
+	// Map visible canvas region into thumbnail coordinates.
+	const rawLeft = thumbImageLeft + ( visLeft - imageLeft ) * canvasToThumb;
+	const rawTop = thumbImageTop + ( visTop - imageTop ) * canvasToThumb;
+	const rawRight = rawLeft + visW * canvasToThumb;
+	const rawBottom = rawTop + visH * canvasToThumb;
+
+	const left = Math.max( 0, Math.min( rawLeft, thumbSize.width ) );
+	const top = Math.max( 0, Math.min( rawTop, thumbSize.height ) );
+	const width = Math.max( 0, Math.min( rawRight, thumbSize.width ) - left );
+	const height = Math.max( 0, Math.min( rawBottom, thumbSize.height ) - top );
 
 	return { left, top, width, height };
 }
@@ -80,7 +110,7 @@ function getViewportRectStyle(
  */
 export default function MediaEditorNavigator() {
 	const { state } = useCropper();
-	const { viewport, setViewportZoom, setViewportPan } = useViewport();
+	const { viewport, setViewportZoomAtCenter, setViewportPan } = useViewport();
 	const { media } = useMediaEditorContext();
 
 	const src = media?.source_url ?? state.image?.src ?? '';
@@ -110,26 +140,10 @@ export default function MediaEditorNavigator() {
 		};
 	}, [] );
 
-	// Estimate canvas size from the image aspect ratio fitted into the thumbnail.
 	const naturalW = state.image?.naturalWidth ?? 1;
 	const naturalH = state.image?.naturalHeight ?? 1;
-	const canvasSize = useMemo( () => {
-		if ( thumbSize.width === 0 || thumbSize.height === 0 ) {
-			return { width: naturalW, height: naturalH };
-		}
-		const ratio = naturalW / naturalH;
-		const thumbRatio = thumbSize.width / thumbSize.height;
-		if ( ratio > thumbRatio ) {
-			return {
-				width: thumbSize.width,
-				height: thumbSize.width / ratio,
-			};
-		}
-		return {
-			width: thumbSize.height * ratio,
-			height: thumbSize.height,
-		};
-	}, [ naturalW, naturalH, thumbSize ] );
+	const actualCanvasW = viewport.canvasSize?.width ?? 0;
+	const actualCanvasH = viewport.canvasSize?.height ?? 0;
 
 	const viewportRectStyle = useMemo(
 		() =>
@@ -137,9 +151,18 @@ export default function MediaEditorNavigator() {
 				viewport.zoom,
 				viewport.pan,
 				thumbSize,
-				canvasSize
+				{ width: actualCanvasW, height: actualCanvasH },
+				{ width: naturalW, height: naturalH }
 			),
-		[ viewport.zoom, viewport.pan, thumbSize, canvasSize ]
+		[
+			viewport.zoom,
+			viewport.pan,
+			thumbSize,
+			actualCanvasW,
+			actualCanvasH,
+			naturalW,
+			naturalH,
+		]
 	);
 
 	// Drag-to-pan: dragging the thumbnail moves the viewport.
@@ -167,19 +190,19 @@ export default function MediaEditorNavigator() {
 	const handleThumbPointerMove = useCallback(
 		( e: React.PointerEvent< HTMLDivElement > ) => {
 			const drag = dragRef.current;
-			if ( ! drag || thumbSize.width === 0 ) {
+			if ( ! drag || thumbSize.width === 0 || actualCanvasW === 0 ) {
 				return;
 			}
 			// Thumbnail scale: thumb px → canvas px. Dragging left in the
 			// thumbnail pans the viewport left (negate the delta).
-			const scaleX = canvasSize.width / thumbSize.width;
-			const scaleY = canvasSize.height / thumbSize.height;
+			const scaleX = actualCanvasW / thumbSize.width;
+			const scaleY = actualCanvasH / thumbSize.height;
 			setViewportPan( {
 				x: drag.startPanX - ( e.clientX - drag.startX ) * scaleX,
 				y: drag.startPanY - ( e.clientY - drag.startY ) * scaleY,
 			} );
 		},
-		[ canvasSize, thumbSize, setViewportPan ]
+		[ actualCanvasW, actualCanvasH, thumbSize, setViewportPan ]
 	);
 
 	const handleThumbPointerUp = useCallback( () => {
@@ -199,6 +222,8 @@ export default function MediaEditorNavigator() {
 				onPointerDown={ handleThumbPointerDown }
 				onPointerMove={ handleThumbPointerMove }
 				onPointerUp={ handleThumbPointerUp }
+				onPointerCancel={ handleThumbPointerUp }
+				onLostPointerCapture={ handleThumbPointerUp }
 			>
 				<img
 					className="media-editor-navigator__thumbnail-img"
@@ -224,7 +249,9 @@ export default function MediaEditorNavigator() {
 				step={ 0.05 }
 				value={ viewport.zoom }
 				onChange={ ( value ) => {
-					setViewportZoom( typeof value === 'number' ? value : 1 );
+					setViewportZoomAtCenter(
+						typeof value === 'number' ? value : 1
+					);
 				} }
 				renderTooltipContent={ ( value ) => {
 					const zoom = typeof value === 'number' ? value : 1;
