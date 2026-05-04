@@ -1399,6 +1399,12 @@ export const getEditorMode = createRegistrySelector(
  *
  * The intent is orthogonal to the `editorMode` preference (visual vs. code).
  *
+ * Storage: the value lives in the preferences store under
+ * (`core`, `editorIntent`). The per-app default is registered in
+ * `packages/edit-post/src/index.js` and `packages/edit-site/src/index.js`.
+ * If no value is set we fall back to `EDITOR_INTENT_EDIT` so callers can
+ * rely on a non-null result.
+ *
  * @param {Object} state Global application state.
  *
  * @return {string} The current editor intent. One of `edit`, `suggest`, `view`.
