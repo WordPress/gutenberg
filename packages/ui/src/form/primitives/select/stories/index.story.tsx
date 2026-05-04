@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps } from 'react';
 import * as Select from '../';
 
 const meta: Meta< typeof Select.Root > = {
@@ -14,33 +13,11 @@ const meta: Meta< typeof Select.Root > = {
 export default meta;
 
 type Story = StoryObj< typeof Select.Root >;
-type ItemSize = ComponentProps< typeof Select.Item >[ 'size' ];
-type SelectStoryItem = {
-	value: string;
-	label: string;
-	disabled?: boolean;
-};
 
-const createItems = ( count: number ) =>
-	Array.from( { length: count }, ( _, index ) => ( {
-		value: `item-${ index + 1 }`,
-		label: `Item ${ index + 1 }`,
-	} ) );
-
-const defaultItems = createItems( 6 );
-
-const renderItems = ( items: SelectStoryItem[], size?: ItemSize ) =>
-	items.map( ( item ) => (
-		<Select.Item
-			key={ item.value }
-			value={ item }
-			label={ item.label }
-			disabled={ item.disabled }
-			size={ size }
-		>
-			{ item.label }
-		</Select.Item>
-	) );
+const defaultItems = Array.from( { length: 6 }, ( _, index ) => ( {
+	value: `item-${ index + 1 }`,
+	label: `Item ${ index + 1 }`,
+} ) );
 
 export const Default: Story = {
 	args: {
@@ -48,7 +25,17 @@ export const Default: Story = {
 		children: (
 			<>
 				<Select.Trigger />
-				<Select.Popup>{ renderItems( defaultItems ) }</Select.Popup>
+				<Select.Popup>
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
 			</>
 		),
 		defaultValue: defaultItems[ 0 ],
@@ -57,16 +44,24 @@ export const Default: Story = {
 
 export const Compact: Story = {
 	args: {
-		items: defaultItems,
+		...Default.args,
 		children: (
 			<>
 				<Select.Trigger size="compact" />
 				<Select.Popup>
-					{ renderItems( defaultItems, 'compact' ) }
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+							size="compact"
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
 				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 	},
 };
 
@@ -80,16 +75,24 @@ export const Compact: Story = {
  */
 export const Minimal: Story = {
 	args: {
-		items: defaultItems,
+		...Default.args,
 		children: (
 			<>
 				<Select.Trigger size="small" variant="minimal" />
 				<Select.Popup>
-					{ renderItems( defaultItems, 'small' ) }
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+							size="small"
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
 				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 	},
 };
 
@@ -119,7 +122,16 @@ export const WithEmptyValueOption: Story = {
 			<>
 				<Select.Trigger />
 				<Select.Popup>
-					{ renderItems( withEmptyOptionItems ) }
+					{ withEmptyOptionItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+							disabled={ item.disabled }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
 				</Select.Popup>
 			</>
 		),
@@ -135,14 +147,23 @@ export const WithEmptyValueOption: Story = {
  */
 export const Labeling: Story = {
 	args: {
-		items: defaultItems,
+		...Default.args,
 		children: (
 			<>
 				<Select.Trigger aria-label="User role" />
-				<Select.Popup>{ renderItems( defaultItems ) }</Select.Popup>
+				<Select.Popup>
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 	},
 };
 
@@ -166,7 +187,17 @@ export const WithOverflow: Story = {
 		children: (
 			<>
 				<Select.Trigger />
-				<Select.Popup>{ renderItems( overflowItems ) }</Select.Popup>
+				<Select.Popup>
+					{ overflowItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
 			</>
 		),
 		defaultValue: overflowItems[ 0 ],
@@ -175,14 +206,23 @@ export const WithOverflow: Story = {
 
 export const Disabled: Story = {
 	args: {
-		items: defaultItems,
+		...Default.args,
 		children: (
 			<>
 				<Select.Trigger />
-				<Select.Popup>{ renderItems( defaultItems ) }</Select.Popup>
+				<Select.Popup>
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 		disabled: true,
 	},
 };
@@ -206,7 +246,16 @@ export const WithDisabledItem: Story = {
 			<>
 				<Select.Trigger />
 				<Select.Popup>
-					{ renderItems( disabledItemItems ) }
+					{ disabledItemItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+							disabled={ item.disabled }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
 				</Select.Popup>
 			</>
 		),
@@ -291,7 +340,7 @@ export const WithCustomTriggerAndItem: Story = {
 export const WithCustomZIndex: Story = {
 	name: 'With Custom z-index',
 	args: {
-		items: defaultItems,
+		...Default.args,
 		children: (
 			<>
 				<Select.Trigger />
@@ -302,10 +351,17 @@ export const WithCustomZIndex: Story = {
 						/>
 					}
 				>
-					{ renderItems( defaultItems ) }
+					{ defaultItems.map( ( item ) => (
+						<Select.Item
+							key={ item.value }
+							value={ item }
+							label={ item.label }
+						>
+							{ item.label }
+						</Select.Item>
+					) ) }
 				</Select.Popup>
 			</>
 		),
-		defaultValue: defaultItems[ 0 ],
 	},
 };
