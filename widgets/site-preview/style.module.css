@@ -1,5 +1,12 @@
 .container {
-	height: 250px;
+	/**
+	 * Negative top/bottom margins to bump against top/bottom borders.
+	 * Remove when Card supports this natively:
+	 * https://github.com/WordPress/gutenberg/pull/77856
+	 */
+	margin-top: calc(-1 * var(--wp-ui-card-padding));
+	margin-bottom: calc(-1 * var(--wp-ui-card-padding));
+	height: 300px;
 	overflow: hidden;
 }
 
