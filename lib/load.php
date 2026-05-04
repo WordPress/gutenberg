@@ -99,7 +99,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 }
 
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
-require_once __DIR__ . '/classic-block.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 
@@ -122,6 +121,9 @@ require __DIR__ . '/compat/wordpress-7.0/media.php';
 require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
+
+// WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

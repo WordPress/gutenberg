@@ -1,6 +1,7 @@
 <?php
 /**
- * Controls whether the Classic block is available in the inserter.
+ * WordPress 7.1 compatibility: controls whether the Classic block
+ * is available in the inserter.
  *
  * @package gutenberg
  */
