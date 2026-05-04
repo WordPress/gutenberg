@@ -11,7 +11,8 @@ import {
 	type ConnectorConfig,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+import { select, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Badge } from '@wordpress/ui';
 
@@ -57,6 +58,17 @@ export function getConnectorData(): Record< string, ConnectorData > {
 	} catch {
 		return {};
 	}
+}
+
+function isVersionLessThan( a: string, b: string ): boolean {
+	const pa = a.split( '.' ).map( ( n ) => parseInt( n, 10 ) || 0 );
+	const pb = b.split( '.' ).map( ( n ) => parseInt( n, 10 ) || 0 );
+	for ( let i = 0; i < Math.max( pa.length, pb.length ); i++ ) {
+		if ( ( pa[ i ] ?? 0 ) !== ( pb[ i ] ?? 0 ) ) {
+			return ( pa[ i ] ?? 0 ) < ( pb[ i ] ?? 0 );
+		}
+	}
+	return false;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
@@ -146,6 +158,21 @@ function ApiKeyConnector( {
 		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,
 	} );
+
+	const akismetVersion = useSelect(
+		( s ) =>
+			pluginFile && 'akismet' === pluginSlug
+				? (
+						s( coreStore ).getEntityRecord(
+							'root',
+							'plugin',
+							pluginFile
+						) as { version?: string } | undefined
+				   )?.version
+				: undefined,
+		[ pluginFile, pluginSlug ]
+	);
+
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
 	const showUnavailableBadge =
@@ -154,6 +181,17 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
+
+	// Hide Akismet when REST tells us its installed version is < 5.7.
+	// The connector works on older versions, but does not contain
+	// the improvement added in 5.7 that validates the API key before saving it.
+	if (
+		pluginSlug === 'akismet' &&
+		( ! plugin?.isInstalled ||
+			( akismetVersion && isVersionLessThan( akismetVersion, '5.7' ) ) )
+	) {
+		return null;
+	}
 
 	return (
 		<ConnectorItem
@@ -225,12 +263,6 @@ export function registerDefaultConnectors() {
 	const sanitize = ( s: string ) => s.replace( /[^a-z0-9-_]/gi, '-' );
 
 	for ( const [ connectorId, data ] of Object.entries( connectors ) ) {
-		// Special case: Hide Akismet unless it is already installed.
-		// See https://core.trac.wordpress.org/ticket/65012
-		if ( connectorId === 'akismet' && ! data.plugin?.isInstalled ) {
-			continue;
-		}
-
 		const { authentication } = data;
 
 		const connectorName = sanitize( connectorId );
