@@ -103,8 +103,25 @@ function longestCommonSubsequence( a, b ) {
  * deletions (red strikethrough). Non-text attributes show a before → after
  * label.
  *
+ * Operations are expected to come from `parseSuggestionPayload(...)`. Each
+ * operation has the shape `{ type: 'attribute-set', attribute, before, after }`.
+ *
+ * Edge cases:
+ *   - When either side is too large (`>= MAX_DIFF_LENGTH` chars), the
+ *     component falls back to an attribute-level label rather than a word
+ *     diff to avoid the LCS dominating the render time.
+ *   - When `before` or `after` is a wrapper object (e.g. `RichTextData`),
+ *     `isTextValue` returns false and the component renders the
+ *     attribute-level label. The provider has already serialized wrapper
+ *     boundaries to strings before this layer in normal flow.
+ *
  * @param {Object}                                     props
- * @param {import('./provider').SuggestionOperation[]} props.operations
+ * @param {import('./provider').SuggestionOperation[]} props.operations Suggestion
+ *                                                                      operations,
+ *                                                                      typically the
+ *                                                                      `operations`
+ *                                                                      array from a
+ *                                                                      parsed payload.
  */
 export default function SuggestionDiff( { operations } ) {
 	if ( ! operations || operations.length === 0 ) {
