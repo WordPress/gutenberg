@@ -1911,26 +1911,18 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		return;
 	}
 
-	// Generate PHP array entries with file availability and module handles.
+	// Generate PHP array entries with file availability.
 	// Sort by dirName to keep registry output deterministic across platforms.
 	const widgetEntries = [ ...widgets ]
 		.sort( ( a, b ) => a.dirName.localeCompare( b.dirName ) )
 		.map( ( widget ) => {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
-			const renderModule = widget.hasRender
-				? `'${ HANDLE_PREFIX }/widgets/${ widget.dirName }/render'`
-				: 'null';
-			const widgetModule = widget.hasWidget
-				? `'${ HANDLE_PREFIX }/widgets/${ widget.dirName }/widget'`
-				: 'null';
 			return `\tarray(
-		'name'          => '${ widget.name }',
-		'dir_name'      => '${ widget.dirName }',
-		'has_render'    => ${ hasRenderStr },
-		'has_widget'    => ${ hasWidgetStr },
-		'render_module' => ${ renderModule },
-		'widget_module' => ${ widgetModule },
+		'name'       => '${ widget.name }',
+		'dir_name'   => '${ widget.dirName }',
+		'has_render' => ${ hasRenderStr },
+		'has_widget' => ${ hasWidgetStr },
 	)`;
 		} )
 		.join( ',\n' );

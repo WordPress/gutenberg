@@ -74,24 +74,40 @@ if ( did_action( 'init' ) ) {
 }
 
 /**
- * Returns the widgets discovered by the build pipeline.
+ * Returns the widgets discovered by the build pipeline, with their
+ * script-module handles resolved.
  *
  * Reads `build/widgets/registry.php` once and memoizes the result for the
- * remainder of the request. Consumers should treat the array as read-only;
- * authoring of widget types is build-driven via the `widgets/` folder.
+ * remainder of the request. Each entry is augmented with `render_module`
+ * and `widget_module` (the script-module handles), kept null when the
+ * corresponding source file was not present at build time. Consumers
+ * should treat the array as read-only; authoring of widget types is
+ * build-driven via the `widgets/` folder.
  *
- * @return array<int, array<string, mixed>> List of widgets as emitted by the
- *                                          build manifest.
+ * @return array<int, array<string, mixed>> List of widgets with resolved
+ *                                          module handles.
  */
 function {{PREFIX}}_get_registered_widget_modules() {
 	static $widgets = null;
 
 	if ( null === $widgets ) {
 		$registry_file = __DIR__ . '/widgets/registry.php';
-		$widgets       = file_exists( $registry_file ) ? require $registry_file : array();
-		if ( ! is_array( $widgets ) ) {
-			$widgets = array();
+		$raw           = file_exists( $registry_file ) ? require $registry_file : array();
+		if ( ! is_array( $raw ) ) {
+			$raw = array();
 		}
+		$widgets = array_map(
+			static function ( $widget ) {
+				$widget['render_module'] = ! empty( $widget['has_render'] )
+					? '{{HANDLE_PREFIX}}/widgets/' . $widget['dir_name'] . '/render'
+					: null;
+				$widget['widget_module'] = ! empty( $widget['has_widget'] )
+					? '{{HANDLE_PREFIX}}/widgets/' . $widget['dir_name'] . '/widget'
+					: null;
+				return $widget;
+			},
+			$raw
+		);
 	}
 
 	return $widgets;
