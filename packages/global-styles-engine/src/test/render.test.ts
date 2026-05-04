@@ -652,6 +652,127 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should scope block-level feature selector to variation class when root selector is a compound selector', () => {
+			/*
+			 * Mirrors the PHP test test_block_style_variation_support_styles_scope_button_feature_selector.
+			 * core/button has a compound root selector (.wp-block-button .wp-block-button__link)
+			 * but its spacing feature targets only the outer wrapper (.wp-block-button).
+			 * The fix ensures the variation CSS uses .wp-block-button.is-style-outline
+			 * rather than incorrectly concatenating the full compound variation selector
+			 * onto the block-level feature selector.
+			 */
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/button': {
+							variations: {
+								outline: {
+									spacing: {
+										padding: '10px',
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button .wp-block-button__link',
+					featureSelectors: {
+						spacing: '.wp-block-button',
+					},
+					styleVariationSelectors: {
+						outline:
+							'.wp-block-button.is-style-outline .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button.is-style-outline){padding: 10px;}'
+			);
+		} );
+
+		it( 'should scope block-level feature selector to variation class when root selector uses a child combinator', () => {
+			/*
+			 * Mirrors the PHP test test_block_style_variation_support_styles_scope_table_feature_selector.
+			 * core/table has a child-combinator root selector (.wp-block-table > table)
+			 * but its spacing feature targets only the block wrapper (.wp-block-table).
+			 * The fix ensures the variation CSS uses .wp-block-table.is-style-stripes
+			 * rather than incorrectly appending the block wrapper selector to the
+			 * compound variation selector.
+			 */
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/table': {
+							variations: {
+								stripes: {
+									spacing: {
+										padding: '40px',
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/table': {
+					selector: '.wp-block-table > table',
+					featureSelectors: {
+						spacing: '.wp-block-table',
+					},
+					styleVariationSelectors: {
+						stripes: '.wp-block-table.is-style-stripes > table',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					blockGap: false,
+					blockStyles: true,
+					layoutStyles: false,
+					marginReset: false,
+					presets: false,
+					rootPadding: false,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-table.is-style-stripes){padding: 40px;}'
+			);
+		} );
+
 		it( 'should handle block pseudo selectors', () => {
 			const tree = {
 				styles: {
