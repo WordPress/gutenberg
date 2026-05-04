@@ -54,7 +54,9 @@
 
 // Upward-pointing triangle anchored to the bottom of the ruler. Marks
 // the centered value cleanly without the vertical stem of a
-// traditional pointer.
+// traditional pointer. Resting state is translucent; on hover/focus
+// (which also covers active drag, since pointerdown focuses the input)
+// it goes full color.
 .rotation-ruler__pointer {
 	position: absolute;
 	bottom: 0;
@@ -65,7 +67,14 @@
 	border-right: 6px solid transparent;
 	border-bottom: 9px solid var(--wp-admin-theme-color);
 	transform: translateX(-50%);
+	opacity: 0.5;
 	pointer-events: none;
+	transition: opacity 100ms ease-out;
+}
+
+.rotation-ruler:hover .rotation-ruler__pointer,
+.rotation-ruler:focus-within .rotation-ruler__pointer {
+	opacity: 1;
 }
 
 .rotation-ruler__strip {
@@ -110,7 +119,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.rotation-ruler__ticks {
+	.rotation-ruler__ticks,
+	.rotation-ruler__pointer {
 		transition: none;
 	}
 }
