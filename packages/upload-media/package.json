@@ -58,7 +58,7 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
 		"@wordpress/vips": "file:../vips",
-		"uuid": "^9.0.1"
+		"uuid": "^14.0.0"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
