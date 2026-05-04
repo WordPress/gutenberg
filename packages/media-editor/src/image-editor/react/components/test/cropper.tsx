@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -41,10 +41,28 @@ function createController(): UseCropperStateReturn {
 	};
 }
 
-describe( 'Cropper grid visibility classes', () => {
+describe( 'Cropper', () => {
 	const originalResizeObserver = globalThis.ResizeObserver;
 
 	beforeAll( () => {
+		if ( ! HTMLElement.prototype.setPointerCapture ) {
+			HTMLElement.prototype.setPointerCapture = jest.fn();
+		}
+		if ( ! HTMLElement.prototype.releasePointerCapture ) {
+			HTMLElement.prototype.releasePointerCapture = jest.fn();
+		}
+		if ( typeof ( globalThis as any ).PointerEvent === 'undefined' ) {
+			( globalThis as any ).PointerEvent = class PointerEvent extends (
+				MouseEvent
+			) {
+				pointerId: number;
+				constructor( type: string, init: PointerEventInit = {} ) {
+					super( type, init );
+					this.pointerId = init.pointerId ?? 0;
+				}
+			};
+		}
+
 		globalThis.ResizeObserver = class ResizeObserver {
 			private callback: ResizeObserverCallback;
 
@@ -136,5 +154,44 @@ describe( 'Cropper grid visibility classes', () => {
 		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'ignores wheel zoom while a crop resize is active', async () => {
+		const controller = createController();
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const resizeHandle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+
+		fireEvent.pointerDown( resizeHandle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+
+		const wheelEvent = new WheelEvent( 'wheel', {
+			bubbles: true,
+			cancelable: true,
+			clientX: 300,
+			clientY: 200,
+			deltaY: -100,
+		} );
+		fireEvent( canvas, wheelEvent );
+
+		expect( wheelEvent.defaultPrevented ).toBe( true );
+		expect( controller.setZoom ).not.toHaveBeenCalled();
+		expect( controller.setZoomAtPoint ).not.toHaveBeenCalled();
+
+		fireEvent.pointerUp( resizeHandle, { pointerId: 1 } );
 	} );
 } );

@@ -101,13 +101,13 @@ export interface WidgetTypeMetadata {
  * Runtime widget type consumed by surfaces.
  *
  * Extends `WidgetTypeMetadata` (the authoring shape of `widget.json`) with
- * runtime-only fields produced by the build pipeline — notably
+ * runtime-only fields produced by the build pipeline. Notably
  * `renderModule`, which maps each widget to its discovered script-module
  * entry point.
  *
  * The PHP layer (`widget-types.php`) emits this data in snake_case
- * (`render_module`); `bootstrapWidgetTypes()` is the single boundary that
- * maps it to the camelCase shape consumed throughout JS/TS.
+ * (`render_module`). The `getWidgetTypes` resolver is the single boundary
+ * that maps it to the camelCase shape consumed throughout JS/TS.
  */
 export interface WidgetType extends WidgetTypeMetadata {
 	/**

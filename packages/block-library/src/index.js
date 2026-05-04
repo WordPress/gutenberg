@@ -296,14 +296,9 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	// Register the classic block if it's needed or the experiment to disable TinyMCE is not active
-	if (
-		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce )
-	) {
-		blocks.push( classic );
-	}
+	// Always register the classic block. Inserter availability is controlled
+	// by the block's `supports.inserter` value in `freeform/init`.
+	blocks.push( classic );
 
 	return blocks.filter( Boolean );
 };
