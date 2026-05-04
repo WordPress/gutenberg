@@ -31,16 +31,15 @@ function {{PREFIX}}_register_widget_modules() {
 		$widget_name = $widget['dir_name'];
 
 		// Register render script module if built.
-		if ( $widget['has_render'] ) {
+		if ( ! empty( $widget['render_module'] ) ) {
 			$render_asset_path = __DIR__ . "/widgets/{$widget_name}/render.min.asset.php";
 			if ( file_exists( $render_asset_path ) ) {
-				$render_asset  = require $render_asset_path;
-				$render_handle = '{{HANDLE_PREFIX}}/widgets/' . $widget_name . '/render';
+				$render_asset = require $render_asset_path;
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
-				wp_deregister_script_module( $render_handle );
+				wp_deregister_script_module( $widget['render_module'] );
 				wp_register_script_module(
-					$render_handle,
+					$widget['render_module'],
 					$build_constants['build_url'] . 'widgets/' . $widget_name . '/render' . $extension,
 					$render_asset['module_dependencies'] ?? array(),
 					$render_asset['version'] ?? false
@@ -49,16 +48,15 @@ function {{PREFIX}}_register_widget_modules() {
 		}
 
 		// Register widget metadata script module if built.
-		if ( $widget['has_widget'] ) {
+		if ( ! empty( $widget['widget_module'] ) ) {
 			$widget_asset_path = __DIR__ . "/widgets/{$widget_name}/widget.min.asset.php";
 			if ( file_exists( $widget_asset_path ) ) {
-				$widget_asset  = require $widget_asset_path;
-				$widget_handle = '{{HANDLE_PREFIX}}/widgets/' . $widget_name . '/widget';
+				$widget_asset = require $widget_asset_path;
 				// Deregister first to override any previously registered version
 				// (e.g., Core's default modules when running as a plugin).
-				wp_deregister_script_module( $widget_handle );
+				wp_deregister_script_module( $widget['widget_module'] );
 				wp_register_script_module(
-					$widget_handle,
+					$widget['widget_module'],
 					$build_constants['build_url'] . 'widgets/' . $widget_name . '/widget' . $extension,
 					$widget_asset['module_dependencies'] ?? array(),
 					$widget_asset['version'] ?? false

@@ -13,46 +13,36 @@
  */
 
 /**
- * Builds the bootstrap entries from the build manifest.
- *
- * @return array<int, array{ name: string, render_module?: string, widget_module?: string }>
- */
-function gutenberg_get_widget_types_bootstrap_entries() {
-	if ( ! function_exists( 'gutenberg_get_registered_widget_modules' ) ) {
-		return array();
-	}
-
-	$widgets = gutenberg_get_registered_widget_modules();
-	$entries = array();
-
-	foreach ( $widgets as $widget ) {
-		if ( empty( $widget['name'] ) || empty( $widget['dir_name'] ) ) {
-			continue;
-		}
-
-		$entry = array( 'name' => $widget['name'] );
-
-		if ( ! empty( $widget['has_render'] ) ) {
-			$entry['render_module'] = 'wp/widgets/' . $widget['dir_name'] . '/render';
-		}
-		if ( ! empty( $widget['has_widget'] ) ) {
-			$entry['widget_module'] = 'wp/widgets/' . $widget['dir_name'] . '/widget';
-		}
-
-		$entries[] = $entry;
-	}
-
-	return $entries;
-}
-
-/**
  * Prints the inline script that exposes the widget types as a global.
  *
  * Consumers should read widget types through the `core/widget-types` data
  * store, not by reaching into the global directly.
  */
 function gutenberg_print_widget_types_bootstrap() {
-	$entries = gutenberg_get_widget_types_bootstrap_entries();
+	if ( ! function_exists( 'gutenberg_get_registered_widget_modules' ) ) {
+		return;
+	}
+
+	$entries = array_values(
+		array_filter(
+			array_map(
+				static function ( $widget ) {
+					if ( empty( $widget['name'] ) ) {
+						return null;
+					}
+					return array_filter(
+						array(
+							'name'          => $widget['name'],
+							'render_module' => $widget['render_module'] ?? null,
+							'widget_module' => $widget['widget_module'] ?? null,
+						)
+					);
+				},
+				gutenberg_get_registered_widget_modules()
+			)
+		)
+	);
+
 	if ( empty( $entries ) ) {
 		return;
 	}
