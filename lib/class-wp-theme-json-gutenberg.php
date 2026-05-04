@@ -3763,8 +3763,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 8. Wrap the entire block output in a media query if this is a responsive node.
 		// Responsive nodes are created by get_block_nodes() for each breakpoint and carry
-		// a 'media_query' key. This replaces the previous manual responsive sections that
-		// duplicated rendering logic for each breakpoint.
+		// a 'media_query' key.
 		if ( $media_query && ! empty( $block_rules ) ) {
 			$block_rules = $media_query . '{' . $block_rules . '}';
 		}
