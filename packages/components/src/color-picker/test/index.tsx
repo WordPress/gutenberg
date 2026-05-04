@@ -95,7 +95,7 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
@@ -126,7 +126,7 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 		} );
 	} );
