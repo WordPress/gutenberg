@@ -18,13 +18,12 @@
  *   {{HANDLE_PREFIX}}/widgets/{widget-dir-name}/widget
  */
 function {{PREFIX}}_register_widget_modules() {
-	$registry_file = __DIR__ . '/widgets/registry.php';
-	if ( ! file_exists( $registry_file ) ) {
+	$widgets = {{PREFIX}}_get_registered_widget_modules();
+	if ( empty( $widgets ) ) {
 		return;
 	}
 
 	$build_constants = require __DIR__ . '/constants.php';
-	$widgets         = require $registry_file;
 	$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 	foreach ( $widgets as $widget ) {
