@@ -148,10 +148,10 @@ function TaxonomyPage( {
 			slugField,
 			descriptionField,
 			objectTypeField,
-			publicField,
 			hierarchicalField,
 			statusField,
 			// Visibility
+			publicField,
 			showInRestField,
 			publiclyQueryableField,
 			showUiField,

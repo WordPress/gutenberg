@@ -277,9 +277,7 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	}
 
 	$args = array(
-		'labels'       => $labels,
-		'public'       => ! empty( $config['public'] ),
-		'hierarchical' => ! empty( $config['hierarchical'] ),
+		'labels' => $labels,
 	);
 
 	if ( ! empty( $config['description'] ) ) {
@@ -287,6 +285,8 @@ function gutenberg_build_user_taxonomy_args( WP_Post $record ) {
 	}
 
 	$bool_keys = array(
+		'public',
+		'hierarchical',
 		'publicly_queryable',
 		'show_ui',
 		'show_in_menu',

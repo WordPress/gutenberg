@@ -14,6 +14,7 @@ import { Badge, Notice, Stack } from '@wordpress/ui';
  */
 import { usePublicPostTypes } from '../utils';
 import type { TaxonomyFormData } from '../types';
+import { booleanField } from './utils';
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
@@ -70,37 +71,15 @@ export const descriptionField: Field< TaxonomyFormData > = {
 	enableSorting: false,
 };
 
-export const publicField: Field< TaxonomyFormData > = {
-	id: 'public',
-	label: __( 'Public' ),
-	type: 'boolean',
-	Edit: 'toggle',
-	description: __(
-		'Whether a taxonomy is intended for use publicly either via the admin interface or by front-end users.'
-	),
-	getValue: ( { item } ) => item.config.public,
-	setValue: ( { item, value } ) => ( {
-		config: { ...item.config, public: !! value },
-	} ),
-	filterBy: false,
-	enableSorting: false,
-};
-
-export const hierarchicalField: Field< TaxonomyFormData > = {
-	id: 'hierarchical',
-	label: __( 'Hierarchical' ),
-	type: 'boolean',
-	Edit: 'toggle',
-	description: __(
-		'When on, terms behave like categories with parent-child relationships. When off, terms behave like tags.'
-	),
-	getValue: ( { item } ) => item.config.hierarchical,
-	setValue: ( { item, value } ) => ( {
-		config: { ...item.config, hierarchical: !! value },
-	} ),
-	filterBy: false,
-	enableSorting: false,
-};
+export const hierarchicalField = booleanField(
+	'hierarchical',
+	__( 'Hierarchical' ),
+	{
+		description: __(
+			'When on, terms behave like categories with parent-child relationships. When off, terms behave like tags.'
+		),
+	}
+);
 
 export const statusField: Field< TaxonomyFormData > = {
 	id: 'status',
@@ -245,7 +224,6 @@ export const defaultForm: Form = {
 		'singular_name',
 		'slug',
 		'object_type',
-		'public',
 		'hierarchical',
 		'status',
 	],
@@ -255,9 +233,8 @@ export const generalFormFields: Form[ 'fields' ] = [
 	'plural_name',
 	'singular_name',
 	'slug',
-	'description',
 	'object_type',
-	'public',
+	'description',
 	'hierarchical',
 	'status',
 ];

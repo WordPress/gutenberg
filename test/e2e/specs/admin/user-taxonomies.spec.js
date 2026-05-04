@@ -236,6 +236,7 @@ test.describe( 'User taxonomies', () => {
 			page,
 			requestUtils,
 		} ) => {
+			await page.getByRole( 'button', { name: 'Visibility' } ).click();
 			await page
 				.getByRole( 'checkbox', { name: 'Public', exact: true } )
 				.click();
