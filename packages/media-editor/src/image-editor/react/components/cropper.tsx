@@ -105,6 +105,10 @@ function areCropBoundsEqual(
  * Check whether the measured layout geometry has actually changed before
  * publishing it to context. This prevents equivalent geometry objects from
  * causing unnecessary `useCropGeometry` consumer updates.
+ *
+ * @param a Current published layout geometry, if any.
+ * @param b Next measured layout geometry.
+ * @return Whether both layout geometries represent the same values.
  */
 function areLayoutGeometriesEqual(
 	a: CropperLayoutGeometry | null,
