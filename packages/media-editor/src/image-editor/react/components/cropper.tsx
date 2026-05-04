@@ -286,8 +286,8 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize, canvasSize );
-	}, [ state, elementSize, visualSize, canvasSize ] );
+		return getCropBounds( state, elementSize, visualSize );
+	}, [ state, elementSize, visualSize ] );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
 

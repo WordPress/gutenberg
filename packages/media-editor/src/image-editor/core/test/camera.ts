@@ -548,12 +548,11 @@ describe( 'getSourceRegionPercent', () => {
 } );
 
 describe( 'getCropBounds', () => {
-	it( 'allows crop handle to reach container edge when 4:3 image is zoomed in 3:2 container', () => {
-		// MtBlanc1.jpg is 500×375 (4:3) in a 600×400 container (3:2).
-		// At zoom=1, the image is 533×400 — 33px padding on each side.
-		// At zoom=1.75, the image fills the container. The crop handle
-		// should be able to reach the container left edge (pixel 0),
-		// which is at normalized x = -0.0625.
+	it( 'returns the image AABB — not clipped to the container — when 4:3 image is zoomed in 3:2 container', () => {
+		// 500×375 (4:3) in a 600×400 container (3:2).
+		// At zoom=1 the fitted element is 533×400 (letterboxed horizontally).
+		// At zoom=1.75 the image overflows the container on all sides; bounds
+		// should track the image corners, not the container edges.
 		const nat: Size = { width: 500, height: 375 };
 		const container: Size = { width: 600, height: 400 };
 		const { elementSize, visualSize } = getImageFit( container, nat, 0 );
@@ -571,23 +570,14 @@ describe( 'getCropBounds', () => {
 			rotation: 0,
 		} );
 
-		const bounds = getCropBounds(
-			state,
-			elementSize,
-			visualSize,
-			container
-		);
+		const bounds = getCropBounds( state, elementSize, visualSize );
 
-		// boundsMinX should be negative (crop can extend left of visual image origin).
-		expect( bounds.minX ).toBeLessThan( 0 );
-		// The pixel position of boundsMinX should be the container left edge (pixel 0).
-		const offsetX = ( container.width - visualSize.width ) / 2;
-		const pixelLeft = offsetX + bounds.minX * visualSize.width;
-		expect( pixelLeft ).toBeCloseTo( 0, 0 );
-
-		// boundsMaxX should be > 1 (crop can extend right of visual image).
-		expect( bounds.maxX ).toBeGreaterThan( 1 );
-		const pixelRight = offsetX + bounds.maxX * visualSize.width;
-		expect( pixelRight ).toBeCloseTo( container.width, 0 );
+		// With zoom=1.75 the image extends well outside the container, so
+		// the bounds should be the image corners in normalized space (≈ ±0.375),
+		// not clipped to the container edges (which would be ≈ ±0.0625).
+		expect( bounds.minX ).toBeLessThan( -0.3 );
+		expect( bounds.maxX ).toBeGreaterThan( 1.3 );
+		expect( bounds.minY ).toBeLessThan( -0.3 );
+		expect( bounds.maxY ).toBeGreaterThan( 1.3 );
 	} );
 } );
