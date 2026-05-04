@@ -56,7 +56,7 @@
 		}
 
 		&.is-modified {
-			background: #dba617;
+			background: repeating-linear-gradient(-45deg, #dba617, #dba617 3px, rgba(219, 166, 23, 0.45) 3px, rgba(219, 166, 23, 0.45) 6px);
 		}
 
 		&:hover {
