@@ -543,7 +543,12 @@ function ViewTable< Item >( {
 			} ) );
 		}
 
-		return getVisibleHierarchyRows( hierarchyRows, expandedItemIds ).map(
+		const rows =
+			items === data
+				? hierarchyRows
+				: getHierarchyRows( items, getItemId, getItemLevel );
+
+		return getVisibleHierarchyRows( rows, expandedItemIds ).map(
 			( hierarchyRow ) => ( {
 				...hierarchyRow,
 				level: undefined,

@@ -126,26 +126,31 @@ const hierarchicalData: Data[] = [
 	{
 		id: 1,
 		title: 'Parent',
+		author: 1,
 		level: 0,
 	},
 	{
 		id: 2,
 		title: 'First child',
+		author: 1,
 		level: 1,
 	},
 	{
 		id: 3,
 		title: 'Second child',
+		author: 2,
 		level: 1,
 	},
 	{
 		id: 4,
 		title: 'Grandchild',
+		author: 2,
 		level: 2,
 	},
 	{
 		id: 5,
 		title: 'Another parent',
+		author: 2,
 		level: 0,
 	},
 ];
@@ -635,6 +640,35 @@ describe( 'DataViews component', () => {
 
 			expect(
 				screen.queryByLabelText( '2 children' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'limits tree hierarchy rows to the current group', () => {
+			render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ {
+						...DEFAULT_VIEW,
+						fields: [],
+						titleField: 'title',
+						showLevels: true,
+						groupBy: {
+							field: 'author',
+							direction: 'asc',
+						},
+						layout: {
+							hierarchyStyle: 'tree',
+						},
+					} }
+					getItemLevel={ ( item ) => item.level ?? 0 }
+				/>
+			);
+
+			expect( screen.getAllByText( 'Parent' ) ).toHaveLength( 1 );
+			expect( screen.getAllByText( 'Another parent' ) ).toHaveLength( 1 );
+			expect( screen.getByText( 'Second child' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'First child' )
 			).not.toBeInTheDocument();
 		} );
 	} );
