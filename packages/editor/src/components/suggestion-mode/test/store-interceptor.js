@@ -25,6 +25,7 @@ import SuggestionStoreInterceptor, {
 	shallowAttributeEquals,
 	adoptSystemMetadata,
 	stripSystemMetadata,
+	isAcceptedSuggestionChange,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -381,6 +382,163 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			getOverlay().entries[ clientId ]?.overlayAttributes?.content
 		).toBe( 'After apply' );
+	} );
+} );
+
+describe( 'isAcceptedSuggestionChange', () => {
+	function makeCoreSelect( comments ) {
+		return {
+			getEntityRecord: ( _kind, _name, id ) =>
+				comments[ String( id ) ] ?? null,
+		};
+	}
+
+	function makePayload( operations ) {
+		return {
+			meta: {
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 1,
+					operations,
+				} ),
+			},
+		};
+	}
+
+	it( 'returns false when the block has no linked notes', () => {
+		const coreSelect = makeCoreSelect( {} );
+		const delta = { changed: { content: 'Edited' }, restore: {} };
+		expect(
+			isAcceptedSuggestionChange(
+				coreSelect,
+				{ content: 'Edited' },
+				delta
+			)
+		).toBe( false );
+	} );
+
+	it( 'returns false when the change does not match any suggestion `after`', () => {
+		const coreSelect = makeCoreSelect( {
+			42: makePayload( [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					after: 'Suggested',
+				},
+			] ),
+		} );
+		const current = { content: 'Edited', metadata: { noteId: [ 42 ] } };
+		const delta = { changed: { content: 'Edited' }, restore: {} };
+		expect( isAcceptedSuggestionChange( coreSelect, current, delta ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns true when the change matches a suggestion `after` value', () => {
+		const coreSelect = makeCoreSelect( {
+			42: makePayload( [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					after: 'Suggested',
+				},
+			] ),
+		} );
+		const current = { content: 'Suggested', metadata: { noteId: [ 42 ] } };
+		const delta = { changed: { content: 'Suggested' }, restore: {} };
+		expect( isAcceptedSuggestionChange( coreSelect, current, delta ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'matches across multiple notes and multiple changed keys', () => {
+		const coreSelect = makeCoreSelect( {
+			42: makePayload( [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					after: 'Suggested',
+				},
+			] ),
+			43: makePayload( [
+				{ type: 'attribute-set', attribute: 'level', after: 3 },
+			] ),
+		} );
+		const current = {
+			content: 'Suggested',
+			level: 3,
+			metadata: { noteId: [ 42, 43 ] },
+		};
+		const delta = {
+			changed: { content: 'Suggested', level: 3 },
+			restore: {},
+		};
+		expect( isAcceptedSuggestionChange( coreSelect, current, delta ) ).toBe(
+			true
+		);
+	} );
+
+	it( 'returns false when only some changed keys are matched', () => {
+		const coreSelect = makeCoreSelect( {
+			42: makePayload( [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					after: 'Suggested',
+				},
+			] ),
+		} );
+		const current = {
+			content: 'Suggested',
+			level: 3,
+			metadata: { noteId: [ 42 ] },
+		};
+		const delta = {
+			changed: { content: 'Suggested', level: 3 },
+			restore: {},
+		};
+		expect( isAcceptedSuggestionChange( coreSelect, current, delta ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'returns false when the core-data selectors are unavailable', () => {
+		const current = { content: 'Suggested', metadata: { noteId: [ 42 ] } };
+		const delta = { changed: { content: 'Suggested' }, restore: {} };
+		expect( isAcceptedSuggestionChange( null, current, delta ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'matches across the wrapper/string boundary (RichTextData vs JSON)', () => {
+		// Mimic a RichTextData wrapper: an object with no enumerable keys
+		// whose `String()` projection equals the JSON-decoded `after` value.
+		class FakeRichTextData {
+			constructor( text ) {
+				Object.defineProperty( this, '_text', {
+					value: text,
+					enumerable: false,
+				} );
+			}
+			toString() {
+				return this._text;
+			}
+		}
+		const coreSelect = makeCoreSelect( {
+			42: makePayload( [
+				{ type: 'attribute-set', attribute: 'content', after: 'Hello' },
+			] ),
+		} );
+		const current = {
+			content: new FakeRichTextData( 'Hello' ),
+			metadata: { noteId: [ 42 ] },
+		};
+		const delta = {
+			changed: { content: new FakeRichTextData( 'Hello' ) },
+			restore: {},
+		};
+		expect( isAcceptedSuggestionChange( coreSelect, current, delta ) ).toBe(
+			true
+		);
 	} );
 } );
 

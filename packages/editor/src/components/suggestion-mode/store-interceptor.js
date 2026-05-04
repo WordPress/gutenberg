@@ -36,14 +36,38 @@
  */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useSuggestionOverlay } from './overlay-context';
 import { EDITOR_STORE_NAME, SUGGEST_INTENT } from './constants';
+import { parseSuggestionPayload } from './provider';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
+
+/**
+ * Read note IDs from a block's `metadata.noteId`. Originally a scalar; the
+ * multi-note threads change (issue #75147) widens it to an array. Inlined
+ * here so this module doesn't depend on a helper that lands in a later
+ * stack PR — it accepts either shape and returns a normalized array.
+ *
+ * @param {Object|undefined} metadata Block metadata.
+ * @return {Array<number|string>} Normalized note ids (empty when none).
+ */
+function readNoteIds( metadata ) {
+	const value = metadata?.noteId;
+	if ( Array.isArray( value ) ) {
+		return value.filter(
+			( id ) => id !== null && id !== undefined && id !== ''
+		);
+	}
+	if ( value === null || value === undefined || value === '' ) {
+		return [];
+	}
+	return [ value ];
+}
 
 /**
  * Keys under `metadata` that are programmatic linkages set by editor-internal
@@ -72,7 +96,16 @@ function shallowAttributeEquals( a, b ) {
 	if ( a === null || a === undefined || b === null || b === undefined ) {
 		return false;
 	}
-	if ( typeof a !== 'object' || typeof b !== 'object' ) {
+	const aIsObject = typeof a === 'object';
+	const bIsObject = typeof b === 'object';
+	if ( aIsObject !== bIsObject ) {
+		// One side is a wrapper (e.g. RichTextData) and the other is a
+		// primitive (e.g. a string from a JSON-decoded suggestion payload).
+		// Compare their string projections so the two sides of that
+		// serialization boundary read as equal when their content matches.
+		return String( a ) === String( b );
+	}
+	if ( ! aIsObject ) {
 		return false;
 	}
 	const aIsArray = Array.isArray( a );
@@ -236,6 +269,74 @@ function stripSystemMetadata( changed ) {
 }
 
 /**
+ * Detect whether a delta represents the acceptance of a known suggestion that
+ * has been propagated to this client — most often, another peer clicked
+ * "Apply suggestion" and the resulting block-attribute change arrived through
+ * the sync layer. For each note linked to the block via `metadata.noteId`,
+ * the comment's `_wp_suggestion` payload is consulted; when every changed
+ * attribute lands on an `after` value declared by one of those payloads, the
+ * change is treated as an apply and the interceptor adopts `current` as the
+ * new baseline rather than reverting.
+ *
+ * Without this check the interceptor — running on the suggester's side —
+ * reverts the incoming applied attributes, then propagates that revert back
+ * through the sync layer, which undoes the apply on the accepter's screen
+ * a moment after they clicked.
+ *
+ * @param {Object|null} coreSelect        Selectors for the core-data store,
+ *                                        or `null` when the store isn't
+ *                                        registered (e.g. unit tests).
+ * @param {Object}      currentAttributes Block attributes after the mutation.
+ * @param {Object}      delta             Output of `diffAttributes`.
+ * @return {boolean} True when every changed key matches a suggestion's `after`.
+ */
+function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
+	if ( ! coreSelect?.getEntityRecord ) {
+		return false;
+	}
+	const noteIds = readNoteIds( currentAttributes?.metadata );
+	if ( noteIds.length === 0 ) {
+		return false;
+	}
+	const changedKeys = Object.keys( delta.changed );
+	if ( changedKeys.length === 0 ) {
+		return false;
+	}
+
+	const matched = new Set();
+	for ( const noteId of noteIds ) {
+		const comment = coreSelect.getEntityRecord( 'root', 'comment', noteId );
+		const payload = parseSuggestionPayload( comment?.meta?._wp_suggestion );
+		if ( ! payload ) {
+			continue;
+		}
+		for ( const op of payload.operations ) {
+			if ( op.type !== 'attribute-set' ) {
+				continue;
+			}
+			if (
+				! Object.prototype.hasOwnProperty.call(
+					delta.changed,
+					op.attribute
+				)
+			) {
+				continue;
+			}
+			if (
+				shallowAttributeEquals(
+					op.after,
+					currentAttributes?.[ op.attribute ]
+				)
+			) {
+				matched.add( op.attribute );
+			}
+		}
+	}
+
+	return changedKeys.every( ( key ) => matched.has( key ) );
+}
+
+/**
  * Invisible component that catches block-attribute mutations dispatched
  * directly to the block-editor store while the editor is in Suggest intent.
  *
@@ -297,6 +398,10 @@ export default function SuggestionStoreInterceptor() {
 		if ( ! blockEditor || ! blockEditorDispatch ) {
 			return undefined;
 		}
+
+		// `coreStore` may be unregistered in unit tests; the helper that
+		// reads suggestion comments handles a `null` selector defensively.
+		const coreSelect = registry.select( coreStore );
 
 		// Snapshot of every block's attributes at the moment Suggest mode
 		// activated. New blocks added during the session are slotted in as
@@ -368,6 +473,19 @@ export default function SuggestionStoreInterceptor() {
 					continue;
 				}
 
+				// Remote sync of a suggestion accepted on another client:
+				// when every changed attribute matches the `after` value of
+				// a suggestion attached to this block, adopt the change as
+				// the new baseline. Without this branch the interceptor
+				// reverts the apply, and the revert round-trips back through
+				// the sync layer, undoing the apply on the accepter's screen.
+				if (
+					isAcceptedSuggestionChange( coreSelect, current, delta )
+				) {
+					snapshot.set( clientId, current );
+					continue;
+				}
+
 				// Capture a baseline if one isn't already set. The HOC's
 				// own captureBaseline only fires for `setAttributes` calls;
 				// for store-level mutations we have to seed one here.
@@ -426,4 +544,5 @@ export {
 	shallowAttributeEquals,
 	adoptSystemMetadata,
 	stripSystemMetadata,
+	isAcceptedSuggestionChange,
 };
