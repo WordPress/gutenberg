@@ -55,7 +55,7 @@
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
 		"@testing-library/jest-dom": "6.9.1",
-		"@types/node": "^20.17.10",
+		"@types/node": "^20.19.39",
 		"@types/prettier": "2.4.4",
 		"@types/react": "^18.3.27",
 		"@types/react-dom": "^18.3.1",
