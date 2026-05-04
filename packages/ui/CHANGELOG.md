@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Select`: `Select.Item` no longer renders its `value` as fallback item content. Pass item content explicitly as `children` ([#77861](https://github.com/WordPress/gutenberg/pull/77861)).
+
 ### Bug Fixes
 
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
