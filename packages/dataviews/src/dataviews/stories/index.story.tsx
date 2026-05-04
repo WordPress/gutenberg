@@ -58,15 +58,20 @@ const meta = {
 } as Meta< typeof DataViews >;
 export default meta;
 
-type LayoutTableArgs = Parameters< typeof LayoutTableComponent >[ 0 ] & {
-	hierarchyStyle: 'text' | 'tree';
+type LayoutTableArgs = Omit<
+	Parameters< typeof LayoutTableComponent >[ 0 ],
+	'hierarchyStyle'
+> & {
+	hierarchyStyle: 'none' | 'text' | 'tree';
 };
 
 export const LayoutTable = {
 	render: ( { hierarchyStyle, ...args }: LayoutTableArgs ) => (
 		<LayoutTableComponent
 			{ ...args }
-			hierarchyStyle={ hierarchyStyle === 'tree' ? 'tree' : undefined }
+			hierarchyStyle={
+				hierarchyStyle === 'none' ? undefined : hierarchyStyle
+			}
 		/>
 	),
 	args: {
@@ -74,7 +79,7 @@ export const LayoutTable = {
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
-		hierarchyStyle: 'text',
+		hierarchyStyle: 'none',
 		perPageSizes: [ 10, 25, 50, 100 ],
 		showHierarchyBadge: true,
 		showMedia: true,
@@ -104,8 +109,8 @@ export const LayoutTable = {
 		},
 		hierarchyStyle: {
 			control: 'select',
-			description: 'Which table story variant to display',
-			options: [ 'text', 'tree' ],
+			description: 'Which table hierarchy variant to display',
+			options: [ 'none', 'text', 'tree' ],
 		},
 		perPageSizes: {
 			control: 'object',
