@@ -283,7 +283,8 @@ export default function Welcome() {
 					<div className={ styles.header }>
 						<IconButton
 							className={ styles.dismissButton }
-							variant="unstyled"
+							variant="minimal"
+							tone="neutral"
 							size="compact"
 							icon={ close }
 							label={ __( 'Dismiss welcome panel' ) }
@@ -292,7 +293,7 @@ export default function Welcome() {
 						<Text variant="heading-2xl" render={ <h2 /> }>
 							{ __( 'Welcome to WordPress!' ) }
 						</Text>
-						<Text variant="body-lg" render={ <p /> }>
+						<Text variant="body-xl" render={ <p /> }>
 							<Link href="about.php">
 								{ sprintf(
 									/* translators: %s: Current WordPress version. */
