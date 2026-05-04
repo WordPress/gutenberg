@@ -154,6 +154,14 @@ export function useRulerDrag(
 			);
 			const next = clampValue( snapped, min, max );
 			if ( next !== latestRef.current.value ) {
+				// Update the ref synchronously so consecutive pointermove
+				// events that fire before React commits still see the
+				// last *emitted* value as `previous` for the next snap
+				// calculation. Without this, dragging through 0 keeps
+				// re-snapping back to 0 on every event until the commit
+				// catches up — the "sticky zero" the snap is designed
+				// to avoid.
+				latestRef.current.value = next;
 				onChange( next );
 			}
 		},

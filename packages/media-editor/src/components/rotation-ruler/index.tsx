@@ -28,7 +28,6 @@ export interface RotationRulerProps {
 	disabled?: boolean;
 }
 
-const PX_PER_UNIT = 6;
 const STRIP_HEIGHT = 18;
 const TICK_HEIGHT_MINOR = 4;
 const TICK_HEIGHT_MID = 8;
@@ -136,8 +135,14 @@ export default function RotationRuler( {
 	} );
 
 	const handleKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
-		if ( event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' ) {
-			// Home / End / PageUp / PageDown fall through to native input.
+		// WAI-ARIA slider keyboard pattern: Up/Right increment,
+		// Down/Left decrement. Home / End / PageUp / PageDown fall
+		// through to native input.
+		const isIncrement =
+			event.key === 'ArrowRight' || event.key === 'ArrowUp';
+		const isDecrement =
+			event.key === 'ArrowLeft' || event.key === 'ArrowDown';
+		if ( ! isIncrement && ! isDecrement ) {
 			return;
 		}
 		// Always prevent default so the native input's own arrow-key
@@ -146,7 +151,7 @@ export default function RotationRuler( {
 		if ( disabled ) {
 			return;
 		}
-		const direction = event.key === 'ArrowRight' ? 1 : -1;
+		const direction = isIncrement ? 1 : -1;
 		const magnitude = event.shiftKey ? step / 2 : step;
 		const next = clampValue( value + direction * magnitude, min, max );
 		if ( next !== value ) {
@@ -156,17 +161,23 @@ export default function RotationRuler( {
 
 	const display = `${ formatValue( value ) }${ unit }`;
 	const ticks = useTicks( min, max );
+	// Visual scale is locked to the gesture: 1 step of pointer travel
+	// (`pixelsPerStep`) maps to `step` value units, so 1 value unit
+	// renders at `pixelsPerStep / step` CSS pixels. This keeps the
+	// ticks moving in lock-step with the pointer no matter what the
+	// caller chooses for `pixelsPerStep` and `step`.
+	const pxPerUnit = pixelsPerStep / step;
 	// `left: 50%` puts the SVG's left edge at the strip's centerline, so
 	// without an additional `-50%` self-offset all ticks would render to
 	// the right of the pointer. Combine the centering offset with the
 	// value-driven offset so value=0 lands the SVG's center on the
 	// pointer.
 	const stripStyle: CSSProperties = useMemo( () => {
-		const offset = -value * PX_PER_UNIT;
+		const offset = -value * pxPerUnit;
 		return {
 			transform: `translateX(calc(-50% + ${ offset }px))`,
 		};
-	}, [ value ] );
+	}, [ value, pxPerUnit ] );
 
 	const wrapperClassName = [ 'rotation-ruler', className ]
 		.filter( Boolean )
@@ -205,18 +216,18 @@ export default function RotationRuler( {
 				<svg
 					className="rotation-ruler__ticks"
 					style={ stripStyle }
-					width={ ( max - min ) * PX_PER_UNIT }
+					width={ ( max - min ) * pxPerUnit }
 					height={ STRIP_HEIGHT }
-					viewBox={ `${ min * PX_PER_UNIT } 0 ${
-						( max - min ) * PX_PER_UNIT
+					viewBox={ `${ min * pxPerUnit } 0 ${
+						( max - min ) * pxPerUnit
 					} ${ STRIP_HEIGHT }` }
 					preserveAspectRatio="xMidYMid meet"
 				>
 					{ ticks.map( ( tick ) => (
 						<line
 							key={ tick.value }
-							x1={ tick.value * PX_PER_UNIT }
-							x2={ tick.value * PX_PER_UNIT }
+							x1={ tick.value * pxPerUnit }
+							x2={ tick.value * pxPerUnit }
 							y1={ STRIP_HEIGHT - tick.height }
 							y2={ STRIP_HEIGHT }
 							className={ `rotation-ruler__tick rotation-ruler__tick--${ tick.kind }` }
