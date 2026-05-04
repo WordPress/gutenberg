@@ -275,10 +275,7 @@ function TableRow< Item >( {
 								icon={ hierarchyIcon }
 								label={ hierarchyToggleLabel }
 								aria-expanded={ isExpanded }
-								onClick={ (
-									event: React.MouseEvent< HTMLButtonElement >
-								) => {
-									event.stopPropagation();
+								onClick={ () => {
 									onToggleExpanded?.( id );
 								} }
 								size="compact"

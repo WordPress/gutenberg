@@ -98,7 +98,6 @@ export const LayoutTableComponent = ( {
 	} );
 
 	useEffect( () => {
-		// @ts-expect-error - Need to verify type of layout based on hierarchyStyle
 		setView( ( prevView ) => {
 			return {
 				...prevView,
@@ -119,11 +118,11 @@ export const LayoutTableComponent = ( {
 								hierarchyStyle,
 								showHierarchyBadge,
 								expandChildren,
+								density: prevView.layout?.density || 'balanced',
 						  }
 						: {
-								hierarchyStyle: undefined,
-								showHierarchyBadge: undefined,
-								expandChildren: undefined,
+								hierarchyStyle: 'text',
+								density: prevView.layout?.density || 'balanced',
 						  } ),
 				},
 				showMedia,
