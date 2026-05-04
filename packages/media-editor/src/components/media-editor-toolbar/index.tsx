@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, RangeControl } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
@@ -20,6 +20,7 @@ import {
 import { useCropper } from '../../image-editor';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
+import RotationRuler from '../rotation-ruler';
 
 export interface MediaEditorToolbarProps {
 	/**
@@ -88,10 +89,7 @@ export default function MediaEditorToolbar( {
 	const visualDir = singleFlip ? -1 : 1;
 	const fineOffset = ( state.rotation - baseAngle ) * visualDir;
 
-	const handleRotationSlider = ( value: number | undefined ) => {
-		if ( value === undefined ) {
-			return;
-		}
+	const handleRotationSlider = ( value: number ) => {
 		// Clamp strictly inside [-MAX, MAX). Exactly ±MAX lands state on a
 		// 90° midpoint and flips the derived baseAngle on the next render,
 		// causing subsequent events to spiral.
@@ -182,17 +180,12 @@ export default function MediaEditorToolbar( {
 				className="media-editor-toolbar__rotation-slider"
 				{ ...rotationGestureHandlers }
 			>
-				<RangeControl
-					__next40pxDefaultSize
-					__nextHasNoMarginBottom
+				<RotationRuler
 					label={ __( 'Fine rotation' ) }
-					hideLabelFromVision
 					min={ -MAX_ROTATION_OFFSET }
 					max={ MAX_ROTATION_OFFSET }
-					step={ 0.5 }
 					value={ fineOffset }
 					onChange={ handleRotationSlider }
-					showTooltip={ false }
 				/>
 			</div>
 			<Button
