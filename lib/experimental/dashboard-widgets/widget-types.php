@@ -116,6 +116,13 @@ function gutenberg_get_widget_module_dependencies( $widget_names = null ) {
 /**
  * Adds widget script-module dependencies to the dashboard page.
  *
+ * Transitional: every registered widget is appended to the dashboard,
+ * regardless of whether it is meant to live there. The forthcoming
+ * widget-to-page declarative assignment (a `widget.page` field on
+ * `widgets/<name>/package.json`, parallel to `routes/<name>/package.json`)
+ * will replace this with a filtered call that returns only the widgets
+ * declared for the current page.
+ *
  * @param array $dependencies Existing dependencies.
  * @return array
  */
