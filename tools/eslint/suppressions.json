@@ -1128,6 +1128,16 @@
 			"count": 3
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/test/with-suggestion-overlay.js": {
+		"react-hooks/globals": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/suggestion-mode/with-suggestion-overlay.js": {
+		"react-hooks/refs": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
