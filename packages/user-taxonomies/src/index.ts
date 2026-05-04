@@ -8,7 +8,6 @@ export type {
 
 export {
 	BLANK_RECORD,
-	parseConfig,
 	serializeForSave,
 	toFormData,
 	usePublicPostTypes,

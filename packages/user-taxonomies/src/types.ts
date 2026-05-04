@@ -4,7 +4,8 @@ export interface TaxonomyRecord {
 	slug: string;
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
-	content: { raw: string; rendered: string };
+	config: StoredConfig;
+	object_type: string[];
 }
 
 export interface StoredLabels {
@@ -29,7 +30,6 @@ export interface StoredLabels {
 
 export interface StoredConfig {
 	labels?: StoredLabels;
-	object_type?: string[];
 	description?: string;
 	public?: boolean;
 	hierarchical?: boolean;
@@ -38,8 +38,9 @@ export interface StoredConfig {
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
- * the save payload via `serializeForSave`, so fields never have to JSON
- * round-trip `content.raw` on every keystroke.
+ * the save payload via `serializeForSave`. `object_type` lives inside
+ * `config` here even though the wire format keeps it at the top level —
+ * keeps the form components free of split state.
  */
 export interface TaxonomyFormData {
 	id?: number;

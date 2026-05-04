@@ -6,6 +6,13 @@ import { DEFAULT_STATE, MAX_ZOOM } from './constants';
 import { normalizeRotation, degreesToRadians } from './math/rotation';
 import { restrictPanZoom, restrictCropRect } from './containment';
 
+/** Small tolerance for cropper floating-point comparisons. */
+const STATE_EPSILON = 1e-6;
+
+function nearlyEqual( a: number, b: number ): boolean {
+	return Math.abs( a - b ) < STATE_EPSILON;
+}
+
 /**
  * Translate a pipeline transform operation into the equivalent
  * reducer action. Pipeline ops aren't 1:1 with reducer actions —
@@ -414,15 +421,15 @@ export function isStateDirty(
 	initial: CropperState
 ): boolean {
 	return (
-		current.pan.x !== initial.pan.x ||
-		current.pan.y !== initial.pan.y ||
-		current.zoom !== initial.zoom ||
-		current.rotation !== initial.rotation ||
+		! nearlyEqual( current.pan.x, initial.pan.x ) ||
+		! nearlyEqual( current.pan.y, initial.pan.y ) ||
+		! nearlyEqual( current.zoom, initial.zoom ) ||
+		! nearlyEqual( current.rotation, initial.rotation ) ||
 		current.flip.horizontal !== initial.flip.horizontal ||
 		current.flip.vertical !== initial.flip.vertical ||
-		current.cropRect.x !== initial.cropRect.x ||
-		current.cropRect.y !== initial.cropRect.y ||
-		current.cropRect.width !== initial.cropRect.width ||
-		current.cropRect.height !== initial.cropRect.height
+		! nearlyEqual( current.cropRect.x, initial.cropRect.x ) ||
+		! nearlyEqual( current.cropRect.y, initial.cropRect.y ) ||
+		! nearlyEqual( current.cropRect.width, initial.cropRect.width ) ||
+		! nearlyEqual( current.cropRect.height, initial.cropRect.height )
 	);
 }
