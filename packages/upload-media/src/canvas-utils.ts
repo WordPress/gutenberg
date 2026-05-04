@@ -46,7 +46,7 @@ export async function canvasConvertToJpeg(
 				quality,
 			} );
 
-			return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+			return new File( [ jpegBlob ], `${ baseName }.jpg`, {
 				type: 'image/jpeg',
 			} );
 		} finally {
@@ -87,7 +87,7 @@ export async function canvasConvertToJpeg(
 						quality,
 					} );
 
-					return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+					return new File( [ jpegBlob ], `${ baseName }.jpg`, {
 						type: 'image/jpeg',
 					} );
 				} finally {
@@ -147,7 +147,7 @@ export async function canvasConvertToJpeg(
 					quality,
 				} );
 
-				return new File( [ jpegBlob ], `${ baseName }.jpeg`, {
+				return new File( [ jpegBlob ], `${ baseName }.jpg`, {
 					type: 'image/jpeg',
 				} );
 			}

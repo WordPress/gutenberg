@@ -3,39 +3,36 @@
  */
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { Cropper, useCropperState } from '../../image-editor';
+import { Cropper, useCropper } from '../../image-editor';
 
-/**
- * Props for MediaEditorCanvas.
- */
 export interface MediaEditorCanvasProps {
-	/**
-	 * Called on each cropper gesture end with the current dirty state.
-	 *
-	 * The modal captures this so a later save-path PR can react without
-	 * re-plumbing. Not used to drive UI in this PR.
-	 */
-	onDirtyChange?: ( isDirty: boolean ) => void;
+	/** Fixed aspect ratio (width / height). `undefined` means free. */
+	aspectRatio?: number;
+	/** Enable freeform crop mode (resize handles). */
+	freeformCrop?: boolean;
+	/** Whether external placement activity should reveal the grid. */
+	isPlacementActive?: boolean;
 }
 
 /**
- * Editing surface for image media in the media editor modal.
+ * Editing surface for image media in the media editor modal. Pulls its
+ * cropper controller from the surrounding `<CropperProvider>` so the
+ * bottom bar and Crop sidebar tab share the same state.
  *
- * Sibling to `MediaPreview`: `MediaPreview` is a passive viewer, this is the
- * interactive editor. The modal decides which to render based on media type.
- *
- * Returns `null` for missing or non-image media so the modal's outer guards
- * can render a spinner or fall through to `<MediaPreview>` respectively.
- *
- * @param props               Component props.
- * @param props.onDirtyChange Called on each cropper gesture end with the
- *                            current dirty state.
+ * Returns `null` for missing or non-image media so the modal's outer
+ * guards can render a spinner or fall through to `<MediaPreview>`.
+ * @param props
+ * @param props.aspectRatio
+ * @param props.freeformCrop
+ * @param props.isPlacementActive
  */
 export default function MediaEditorCanvas( {
-	onDirtyChange,
+	aspectRatio,
+	freeformCrop,
+	isPlacementActive = false,
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
-	const controller = useCropperState();
+	const controller = useCropper();
 
 	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
@@ -49,7 +46,15 @@ export default function MediaEditorCanvas( {
 			<Cropper
 				src={ mediaUrl }
 				controller={ controller }
-				onGestureEnd={ () => onDirtyChange?.( controller.isDirty ) }
+				aspectRatio={ aspectRatio }
+				freeformCrop={ freeformCrop }
+				showGrid="interactive"
+				isPlacementActive={ isPlacementActive }
+				// Flush on gesture start so any pending sidebar interaction
+				// (e.g. zoom slider debounce) is committed as its own undo
+				// step before the canvas gesture begins.
+				onGestureStart={ controller.commitHistory }
+				onGestureEnd={ controller.commitHistory }
 			/>
 		</div>
 	);

@@ -13,8 +13,11 @@ const ALLOWLIST = {
 			'Card',
 			'Collapsible',
 			'CollapsibleCard',
+			'EmptyState',
+			'Link',
 			'Stack',
 			'Text',
+			'VisuallyHidden',
 		],
 		message:
 			'`{{ name }}` from `{{ source }}` is not yet recommended for use in a WordPress environment.',
@@ -31,6 +34,8 @@ const ALLOWLIST = {
  */
 const DENYLIST = {
 	'@wordpress/components': {
+		ExternalLink:
+			'Use `Link` from `@wordpress/ui` with the `openInNewTab` prop instead.',
 		__experimentalHeading: 'Use `Text` from `@wordpress/ui` instead.',
 		__experimentalHStack: 'Use `Stack` from `@wordpress/ui` instead.',
 		__experimentalText: 'Use `Text` from `@wordpress/ui` instead.',
@@ -44,6 +49,7 @@ const DENYLIST = {
 		CardHeader:
 			'Use `Card.Header` (and optionally `Card.Title`) from `@wordpress/ui` instead.',
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
+		VisuallyHidden: 'Use `{{ name }}` from `@wordpress/ui` instead.',
 	},
 };
 

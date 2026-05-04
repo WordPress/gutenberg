@@ -47,7 +47,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 		side = 'bottom',
 		sideOffset = 8,
 		sticky,
-		style,
 		variant = 'default',
 		...props
 	},
@@ -55,7 +54,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 ) {
 	const { resolvedInitialFocus, popupRef } = useDeprioritizedInitialFocus( {
 		initialFocus,
-		deprioritizedAttribute: CLOSE_ATTR,
+		deprioritizedAttributes: [ CLOSE_ATTR ],
 	} );
 	const mergedPopupRef = useMergeRefs( [ ref, popupRef ] );
 
@@ -75,12 +74,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 			side={ side }
 			sideOffset={ sideOffset }
 			sticky={ sticky }
-			style={ style }
-			className={ clsx(
-				resetStyles[ 'box-sizing' ],
-				styles.positioner,
-				className
-			) }
+			className={ clsx( resetStyles[ 'box-sizing' ], styles.positioner ) }
 		>
 			<ThemeProvider>
 				<_Popover.Popup
@@ -88,8 +82,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 					initialFocus={ resolvedInitialFocus }
 					finalFocus={ finalFocus }
 					className={ clsx(
-						styles.popup,
-						variant !== 'unstyled' && styles.default
+						variant !== 'unstyled' && styles.popup,
+						className
 					) }
 					{ ...props }
 				>
