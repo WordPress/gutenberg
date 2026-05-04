@@ -5,10 +5,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-
-// Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Link } from '@wordpress/ui';
+import { Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -117,11 +114,12 @@ function CircleProgress( {
 	return (
 		<div className={ `${ styles.circle } ${ styles[ `is-${ tone }` ] }` }>
 			<svg
-				aria-hidden="true"
 				focusable="false"
 				viewBox="0 0 200 200"
 				width="100%"
 				height="100%"
+				role="img"
+				aria-label={ `${ percentage }%` }
 			>
 				<circle
 					r={ RADIUS }
@@ -139,6 +137,15 @@ function CircleProgress( {
 					strokeDasharray={ CIRCUMFERENCE }
 					strokeDashoffset={ offset }
 				/>
+				<text
+					x="100"
+					y="100"
+					textAnchor="middle"
+					dominantBaseline="middle"
+					className={ styles.percentage }
+				>
+					{ percentage }%
+				</text>
 			</svg>
 		</div>
 	);
@@ -188,34 +195,29 @@ export default function SiteHealth() {
 	const tone = toneForPercentage( percentage );
 
 	return (
-		<div className={ styles.widget }>
-			<div
-				className={ `${ styles.header } ${ styles[ `is-${ tone }` ] }` }
+		<Stack direction="column" gap="md" align="center">
+			<Stack
+				direction="column"
+				align="center"
+				justify="center"
+				className={ `${ styles.indicator } ${
+					styles[ `is-${ tone }` ]
+				}` }
 			>
 				<CircleProgress percentage={ percentage } tone={ tone } />
-				<span className={ styles.percentage }>{ percentage }%</span>
-			</div>
+			</Stack>
 
-			<div className={ styles.details }>
-				<p>{ statusMessage( counts ) }</p>
+			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
 
-				{ issuesTotal > 0 && (
-					<p>
-						{ sprintf(
-							/* translators: %d: Number of issues to address. */
-							_n(
-								'There is %d item to review.',
-								'There are %d items to review.',
-								issuesTotal
-							),
-							issuesTotal
-						) }{ ' ' }
-						<Link href="site-health.php">
-							{ __( 'Open Site Health' ) }
-						</Link>
-					</p>
-				) }
-			</div>
-		</div>
+			{ issuesTotal > 0 && (
+				<Link href="site-health.php">
+					{ sprintf(
+						/* translators: %d: Number of issues to address. */
+						_n( 'Review %d item', 'Review %d items', issuesTotal ),
+						issuesTotal
+					) }
+				</Link>
+			) }
+		</Stack>
 	);
 }
