@@ -41,7 +41,27 @@ export const DESIGN_POST_TYPES = [
 /**
  * Editor intent values. The intent represents the user's current editing
  * purpose (edit the post directly, suggest changes, or view in read-only).
- * It is orthogonal to the `editorMode` preference (visual vs. code).
+ *
+ * Orthogonal to the `editorMode` preference (visual vs. code): a user can
+ * be in `suggest` intent in either visual or code mode.
+ *
+ * Storage and defaults:
+ *   - Persisted via `@wordpress/preferences` under (`core`, `editorIntent`),
+ *     so the intent survives reloads.
+ *   - The per-app default is registered in `packages/edit-post/src/index.js`
+ *     and `packages/edit-site/src/index.js` (both default to `'edit'`).
+ *   - `getEditorIntent` falls back to `EDITOR_INTENT_EDIT` when no value
+ *     is set, so consumers can rely on a non-null result.
+ *
+ * Suggest Mode context:
+ * Phase 1 of the Suggest Mode feature only wires the intent state and the
+ * UI surface (menu + keyboard shortcuts). Subsequent phases use the
+ * `suggest` intent to capture edits as in-memory overlays, render them as
+ * suggestions, and let other users apply or reject them. Adding a new
+ * intent here also requires updates to:
+ *   - packages/editor/src/components/intent-switcher/index.js (UI choices)
+ *   - packages/editor/src/components/global-keyboard-shortcuts/* (shortcut
+ *     registration and dispatch)
  */
 export const EDITOR_INTENT_EDIT = 'edit';
 export const EDITOR_INTENT_SUGGEST = 'suggest';
