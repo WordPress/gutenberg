@@ -1123,6 +1123,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/suggestion-mode/store-interceptor.js": {
+		"react-hooks/refs": {
+			"count": 3
+		}
+	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
