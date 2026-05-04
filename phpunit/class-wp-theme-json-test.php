@@ -986,7 +986,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$metadata = array(
+		$base_metadata = array(
 			'name'      => 'test/responsive-feature',
 			'path'      => array( 'styles', 'blocks', 'test/responsive-feature' ),
 			'selector'  => '.wp-block-test-responsive-feature',
@@ -995,7 +995,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$mobile_metadata = array(
+			'name'        => 'test/responsive-feature',
+			'path'        => array( 'styles', 'blocks', 'test/responsive-feature', 'mobile' ),
+			'selector'    => '.wp-block-test-responsive-feature',
+			'selectors'   => array(
+				'color' => '.wp-block-test-responsive-feature .color-target',
+			),
+			'media_query' => '@media (width <= 480px)',
+		);
+
+		$actual_styles  = $theme_json->get_styles_for_block( $base_metadata );
+		$actual_styles .= $theme_json->get_styles_for_block( $mobile_metadata );
 
 		unregister_block_type( 'test/responsive-feature' );
 
@@ -1035,14 +1046,23 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$metadata = array(
+		$base_metadata = array(
 			'name'     => 'core/group',
 			'path'     => array( 'styles', 'blocks', 'core/group' ),
 			'selector' => '.wp-block-group',
 			'css'      => '.wp-block-group',
 		);
 
-		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$mobile_metadata = array(
+			'name'        => 'core/group',
+			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile' ),
+			'selector'    => '.wp-block-group',
+			'css'         => '.wp-block-group',
+			'media_query' => '@media (width <= 480px)',
+		);
+
+		$actual_styles  = $theme_json->get_styles_for_block( $base_metadata );
+		$actual_styles .= $theme_json->get_styles_for_block( $mobile_metadata );
 
 		$default_gap = ':root :where(.wp-block-group-is-layout-flex){gap: 5rem;}';
 		$mobile_gap  = ':root :where(.wp-block-group-is-layout-flex){gap: 2rem;}';
@@ -1092,17 +1112,35 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
+		$link_selector = '.wp-block-group a:where(:not(.wp-element-button))';
+
+		// Nodes are assembled in cascade order: default → responsive → pseudo → responsive pseudo.
 		$link_node = array(
 			'path'     => array( 'styles', 'blocks', 'core/group', 'elements', 'link' ),
-			'selector' => '.wp-block-group a:where(:not(.wp-element-button))',
+			'selector' => $link_selector,
+		);
+
+		$mobile_link_node = array(
+			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile', 'elements', 'link' ),
+			'selector'    => $link_selector,
+			'media_query' => '@media (width <= 480px)',
 		);
 
 		$hover_node = array(
 			'path'     => array( 'styles', 'blocks', 'core/group', 'elements', 'link' ),
-			'selector' => '.wp-block-group a:where(:not(.wp-element-button)):hover',
+			'selector' => $link_selector . ':hover',
 		);
 
-		$actual_styles = $theme_json->get_styles_for_block( $link_node ) . $theme_json->get_styles_for_block( $hover_node );
+		$mobile_hover_node = array(
+			'path'        => array( 'styles', 'blocks', 'core/group', 'mobile', 'elements', 'link' ),
+			'selector'    => $link_selector . ':hover',
+			'media_query' => '@media (width <= 480px)',
+		);
+
+		$actual_styles  = $theme_json->get_styles_for_block( $link_node );
+		$actual_styles .= $theme_json->get_styles_for_block( $mobile_link_node );
+		$actual_styles .= $theme_json->get_styles_for_block( $hover_node );
+		$actual_styles .= $theme_json->get_styles_for_block( $mobile_hover_node );
 
 		$default_link = ':root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}';
 		$mobile_link  = '@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}';
@@ -1209,13 +1247,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$metadata = array(
-			'name'     => 'test/tablet-only',
-			'path'     => array( 'styles', 'blocks', 'test/tablet-only' ),
-			'selector' => '.wp-block-test-tablet-only',
+		$tablet_metadata = array(
+			'name'        => 'test/tablet-only',
+			'path'        => array( 'styles', 'blocks', 'test/tablet-only', 'tablet' ),
+			'selector'    => '.wp-block-test-tablet-only',
+			'media_query' => '@media (480px < width <= 782px)',
 		);
 
-		$actual_styles = $theme_json->get_styles_for_block( $metadata );
+		$actual_styles = $theme_json->get_styles_for_block( $tablet_metadata );
 
 		unregister_block_type( 'test/tablet-only' );
 

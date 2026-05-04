@@ -3151,20 +3151,28 @@ class WP_Theme_JSON_Gutenberg {
 					'css'        => $selector,
 				);
 
+				// Responsive block nodes: emit one node per breakpoint that has styles.
+				// These are rendered immediately after the base block node so that
+				// the cascade order is: .block{} → @media{.block{}}
+				foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+					if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ] ) ) {
+						$nodes[] = array(
+							'name'        => $name,
+							'path'        => array( 'styles', 'blocks', $name, $breakpoint ),
+							'media_query' => static::RESPONSIVE_BREAKPOINTS[ $breakpoint ],
+							'selector'    => $selector,
+							'selectors'   => $feature_selectors,
+							'elements'    => $selectors[ $name ]['elements'] ?? array(),
+							'variations'  => $variation_selectors,
+							'css'         => $selector,
+						);
+					}
+				}
+
 				// Handle any pseudo selectors for the block.
 				if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS[ $name ] as $pseudo_selector ) {
-						// Create a node if default pseudo styles exist OR if any responsive breakpoint
-						// has pseudo styles — so the pseudo node is always present to handle cascade ordering.
 						$has_pseudo = isset( $theme_json['styles']['blocks'][ $name ][ $pseudo_selector ] );
-						if ( ! $has_pseudo ) {
-							foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $bp ) {
-								if ( isset( $theme_json['styles']['blocks'][ $name ][ $bp ][ $pseudo_selector ] ) ) {
-									$has_pseudo = true;
-									break;
-								}
-							}
-						}
 						if ( $has_pseudo ) {
 							/*
 							 * Append the pseudo-selector to each feature selector so that
@@ -3194,6 +3202,24 @@ class WP_Theme_JSON_Gutenberg {
 								'variations' => $variation_selectors,
 								'css'        => static::append_to_selector( $selector, $pseudo_selector ),
 							);
+
+							// Responsive pseudo nodes: emit one node per breakpoint that has
+							// this pseudo state, immediately after the default pseudo node.
+							// Cascade order: .block:hover{} → @media{.block:hover{}}
+							foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+								if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ][ $pseudo_selector ] ) ) {
+									$nodes[] = array(
+										'name'        => $name,
+										'path'        => array( 'styles', 'blocks', $name, $breakpoint, $pseudo_selector ),
+										'media_query' => static::RESPONSIVE_BREAKPOINTS[ $breakpoint ],
+										'selector'    => static::append_to_selector( $selector, $pseudo_selector ),
+										'selectors'   => $pseudo_feature_selectors,
+										'elements'    => $selectors[ $name ]['elements'] ?? array(),
+										'variations'  => $variation_selectors,
+										'css'         => static::append_to_selector( $selector, $pseudo_selector ),
+									);
+								}
+							}
 						}
 					}
 				}
@@ -3241,35 +3267,73 @@ class WP_Theme_JSON_Gutenberg {
 			}
 			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
 				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
-					$node_path = array( 'styles', 'blocks', $name, 'elements', $element );
+					$element_path = array( 'styles', 'blocks', $name, 'elements', $element );
 					if ( $include_node_paths_only ) {
 						$nodes[] = array(
-							'path' => $node_path,
+							'path' => $element_path,
 						);
 						continue;
 					}
 
+					$element_selector = $selectors[ $name ]['elements'][ $element ];
+
 					$nodes[] = array(
-						'path'     => $node_path,
-						'selector' => $selectors[ $name ]['elements'][ $element ],
+						'path'     => $element_path,
+						'selector' => $element_selector,
 					);
+
+					// Responsive element nodes: one node per breakpoint that has
+					// styles for this element. Cascade: a{} → @media{a{}}
+					foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+						if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ] ) ) {
+							$nodes[] = array(
+								'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
+								'selector'    => $element_selector,
+								'media_query' => static::RESPONSIVE_BREAKPOINTS[ $breakpoint ],
+							);
+						}
+					}
 
 					// Handle any pseudo selectors for the element.
 					if ( isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] ) ) {
 						foreach ( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $element ] as $pseudo_selector ) {
-							if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] ) ) {
-								$node_path = array( 'styles', 'blocks', $name, 'elements', $element );
+							// Create element pseudo node if default or any responsive breakpoint has the pseudo.
+							$has_element_pseudo = isset( $theme_json['styles']['blocks'][ $name ]['elements'][ $element ][ $pseudo_selector ] );
+							if ( ! $has_element_pseudo ) {
+								foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $bp ) {
+									if ( isset( $theme_json['styles']['blocks'][ $name ][ $bp ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+										$has_element_pseudo = true;
+										break;
+									}
+								}
+							}
+
+							if ( $has_element_pseudo ) {
+								$element_pseudo_path = array( 'styles', 'blocks', $name, 'elements', $element );
 								if ( $include_node_paths_only ) {
 									$nodes[] = array(
-										'path' => $node_path,
+										'path' => $element_pseudo_path,
 									);
 									continue;
 								}
 
 								$nodes[] = array(
-									'path'     => $node_path,
-									'selector' => static::append_to_selector( $selectors[ $name ]['elements'][ $element ], $pseudo_selector ),
+									'path'     => $element_pseudo_path,
+									'selector' => static::append_to_selector( $element_selector, $pseudo_selector ),
 								);
+
+								// Responsive element pseudo nodes: one node per breakpoint
+								// that has this pseudo state for this element.
+								// Cascade: a:hover{} → @media{a:hover{}}
+								foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
+									if ( isset( $theme_json['styles']['blocks'][ $name ][ $breakpoint ]['elements'][ $element ][ $pseudo_selector ] ) ) {
+										$nodes[] = array(
+											'path'        => array( 'styles', 'blocks', $name, $breakpoint, 'elements', $element ),
+											'selector'    => static::append_to_selector( $element_selector, $pseudo_selector ),
+											'media_query' => static::RESPONSIVE_BREAKPOINTS[ $breakpoint ],
+										);
+									}
+								}
 							}
 						}
 					}
@@ -3296,6 +3360,7 @@ class WP_Theme_JSON_Gutenberg {
 		$selector         = $block_metadata['selector'];
 		$settings         = $this->theme_json['settings'] ?? null;
 		$is_root_selector = static::ROOT_BLOCK_SELECTOR === $selector;
+		$media_query      = $block_metadata['media_query'] ?? null;
 
 		$feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $node );
 
@@ -3308,11 +3373,13 @@ class WP_Theme_JSON_Gutenberg {
 		$feature_declarations = static::update_button_width_declarations( $feature_declarations, $settings );
 
 		// If there are style variations, generate the declarations for them, including any feature selectors the block may have.
+		// Responsive nodes (those with a media_query) do not process variations — variation responsive
+		// CSS is handled by the variation's own responsive nodes or the existing variation loop.
 		$style_variation_declarations    = array();
 		$style_variation_custom_css      = array();
 		$style_variation_responsive_css  = array();
 		$style_variation_layout_metadata = array();
-		if ( ! empty( $block_metadata['variations'] ) ) {
+		if ( ! $media_query && ! empty( $block_metadata['variations'] ) ) {
 			foreach ( $block_metadata['variations'] as $style_variation ) {
 				$style_variation_node           = _wp_array_get( $this->theme_json, $style_variation['path'], array() );
 				$clean_style_variation_selector = trim( $style_variation['selector'] );
@@ -3694,167 +3761,11 @@ class WP_Theme_JSON_Gutenberg {
 			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
 		}
 
-		// 8. Generate and append responsive breakpoint rules.
-		if ( ! $is_root_selector ) {
-			$responsive_feature_css = '';
-
-			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
-				if ( ! isset( $node[ $breakpoint ] ) ) {
-					continue;
-				}
-
-				$breakpoint_node                 = $node[ $breakpoint ];
-				$breakpoint_media                = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
-				$breakpoint_feature_declarations = static::get_feature_declarations_for_node( $block_metadata, $breakpoint_node );
-				$breakpoint_feature_declarations = static::update_paragraph_text_indent_selector( $breakpoint_feature_declarations, $settings, $block_name );
-				$breakpoint_feature_declarations = static::update_button_width_declarations( $breakpoint_feature_declarations, $settings );
-
-				foreach ( $breakpoint_feature_declarations as $feature_selector => $individual_feature_declarations ) {
-					$feature_ruleset         = static::to_ruleset( ":root :where($feature_selector)", $individual_feature_declarations );
-					$responsive_feature_css .= $breakpoint_media . '{' . $feature_ruleset . '}';
-				}
-
-				// Emit base responsive declarations using the already-stripped $breakpoint_node
-				// (get_feature_declarations_for_node removes feature props by reference, so only
-				// non-feature properties remain here, matching non-responsive cascade behaviour).
-				$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, null );
-				if ( ! empty( $breakpoint_declarations ) ) {
-					$responsive_feature_css .= $breakpoint_media . '{' . static::to_ruleset( ":root :where($selector)", $breakpoint_declarations ) . '}';
-				}
-
-				// Responsive pseudo-selector styles are emitted in section 8b below,
-				// after the pseudo node's default styles, to preserve cascade order:
-				//   .block{} → @media{.block{}} → .block:hover{} → @media{.block:hover{}}
-
-				if ( isset( $breakpoint_node['css'] ) ) {
-					$breakpoint_custom_css   = static::process_blocks_custom_css( $breakpoint_node['css'], $css_selector );
-					$responsive_feature_css .= $breakpoint_media . '{' . $breakpoint_custom_css . '}';
-				}
-
-				// Process blockGap responsive layout styles.
-				if ( ! empty( $block_metadata['name'] ) ) {
-					$responsive_feature_css .= $this->get_layout_styles(
-						$block_metadata,
-						array(
-							'node'        => $breakpoint_node,
-							'media_query' => $breakpoint_media,
-						)
-					);
-				}
-			}
-
-			$block_rules .= $responsive_feature_css;
-		}
-
-		// 8b. When processing a block pseudo-selector node (e.g. ':hover'), emit responsive
-		// breakpoint overrides immediately after the default pseudo styles so media queries
-		// always follow the non-media rules they override.
-		//
-		// Each pseudo-state has two node passes in the style_nodes list:
-		//   (a) base node   (selector = ".block")       → emits base + base-responsive styles
-		//   (b) pseudo node (selector = ".block:hover") → emits default pseudo + responsive pseudo
-		//
-		// Splitting the work this way preserves cascade order:
-		//   .block{} → @media{.block{}} → .block:hover{} → @media{.block:hover{}}
-		$block_path       = $block_metadata['path'];
-		$block_path_count = count( $block_path );
-
-		if (
-			! $is_root_selector
-			&& ! $is_processing_element
-			&& $block_path_count >= 4
-			&& in_array( 'blocks', $block_path, true )
-			&& $block_name
-			&& isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] )
-		) {
-			$pseudo_state_key = $block_path[ $block_path_count - 1 ];
-			if ( in_array( $pseudo_state_key, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
-				$parent_block_path = array_slice( $block_path, 0, $block_path_count - 1 );
-
-				foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
-					$responsive_pseudo_path = array_merge( $parent_block_path, array( $breakpoint, $pseudo_state_key ) );
-					$responsive_pseudo_node = _wp_array_get( $this->theme_json, $responsive_pseudo_path, null );
-
-					if ( empty( $responsive_pseudo_node ) ) {
-						continue;
-					}
-
-					$breakpoint_media_8b    = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
-					$pseudo_bp_declarations = static::compute_style_properties( $responsive_pseudo_node, $settings, null, null );
-					if ( ! empty( $pseudo_bp_declarations ) ) {
-						$block_rules .= $breakpoint_media_8b . '{' . static::to_ruleset( ":root :where($selector)", $pseudo_bp_declarations ) . '}';
-					}
-
-					if ( isset( $responsive_pseudo_node['css'] ) ) {
-						$pseudo_bp_custom_css = static::process_blocks_custom_css( $responsive_pseudo_node['css'], $selector );
-						$block_rules         .= $breakpoint_media_8b . '{' . $pseudo_bp_custom_css . '}';
-					}
-				}
-			}
-		}
-
-		// 9. When processing a block element node, emit responsive breakpoint overrides
-		// immediately after that node's default styles so media queries always follow the
-		// non-media rules they override.
-		//
-		// Each element has two node passes in the style_nodes list:
-		//   (a) base node  (selector = "a")       → emits base responsive styles only
-		//   (b) pseudo node (selector = "a:hover") → emits that pseudo's responsive styles only
-		//
-		// Splitting the work this way preserves cascade order:
-		//   a {}  →  @media{ a{} }  →  a:hover {}  →  @media{ a:hover{} }
-		$path       = $block_metadata['path'];
-		$path_count = count( $path );
-
-		$is_block_element_node = $is_processing_element
-			&& $path_count >= 5
-			&& 'elements' === $path[ $path_count - 2 ]
-			&& in_array( 'blocks', $path, true );
-
-		if ( $is_block_element_node ) {
-			$parent_block_path = array_slice( $path, 0, $path_count - 2 );
-
-			foreach ( array_keys( static::RESPONSIVE_BREAKPOINTS ) as $breakpoint ) {
-				$responsive_element_path = array_merge( $parent_block_path, array( $breakpoint, 'elements', $current_element ) );
-				$responsive_element_node = _wp_array_get( $this->theme_json, $responsive_element_path, null );
-
-				if ( empty( $responsive_element_node ) ) {
-					continue;
-				}
-
-				$breakpoint_media = static::RESPONSIVE_BREAKPOINTS[ $breakpoint ];
-
-				if ( $pseudo_selector ) {
-					// Pseudo-selector node: only emit styles for this specific pseudo-state.
-					if ( ! isset( $responsive_element_node[ $pseudo_selector ] ) ) {
-						continue;
-					}
-
-					$pseudo_declarations = static::compute_style_properties( $responsive_element_node[ $pseudo_selector ], $settings, null, $this->theme_json );
-					if ( ! empty( $pseudo_declarations ) ) {
-						$pseudo_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $pseudo_declarations );
-						$block_rules   .= $breakpoint_media . '{' . $pseudo_ruleset . '}';
-					}
-
-					if ( isset( $responsive_element_node[ $pseudo_selector ]['css'] ) ) {
-						$pseudo_css   = static::process_blocks_custom_css( $responsive_element_node[ $pseudo_selector ]['css'], $selector );
-						$block_rules .= $breakpoint_media . '{' . $pseudo_css . '}';
-					}
-				} else {
-					// Base element node: only emit base responsive styles.
-					// Pseudo-selector responsive styles are handled by their own node pass above.
-					$element_declarations = static::compute_style_properties( $responsive_element_node, $settings, null, $this->theme_json );
-					if ( ! empty( $element_declarations ) ) {
-						$element_ruleset = static::to_ruleset( ':root :where(' . $selector . ')', $element_declarations );
-						$block_rules    .= $breakpoint_media . '{' . $element_ruleset . '}';
-					}
-
-					if ( isset( $responsive_element_node['css'] ) ) {
-						$element_custom_css = static::process_blocks_custom_css( $responsive_element_node['css'], $selector );
-						$block_rules       .= $breakpoint_media . '{' . $element_custom_css . '}';
-					}
-				}
-			}
+		// 8. Wrap the entire block output in a media query if this is a responsive node.
+		// Responsive nodes are created by get_block_nodes() for each breakpoint and carry
+		// a 'media_query' key.
+		if ( $media_query && ! empty( $block_rules ) ) {
+			$block_rules = $media_query . '{' . $block_rules . '}';
 		}
 
 		return $block_rules;
