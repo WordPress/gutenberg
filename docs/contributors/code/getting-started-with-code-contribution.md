@@ -208,6 +208,13 @@ You can also test Storybook for the current `trunk` branch on GitHub Pages: [htt
 
 We recommend configuring your editor to automatically check for syntax and lint errors. This will help you save time as you develop by automatically fixing minor formatting issues. Here are some directions for setting up Visual Studio Code, a popular editor used by many of the core developers, these tools are also available for other editors.
 
+### VS Code workspace settings
+
+If you use Visual Studio Code, the repository ships a managed workspace configuration so you don't have to wire up the recommended extensions and settings by hand. The first time you open the folder, VS Code prompts you to install the recommended extensions and to allow an automatic task that copies the recommended settings into place. Allow both and you're set up.
+
+The installer will NOT overwrite a `settings.json` you have customised, and you can re-run it manually at any time from the Command Palette via **Tasks: Run Task → Install VS Code settings**.
+
+
 ### EditorConfig
 
 [EditorConfig](https://editorconfig.org/) defines a standard configuration for setting up your editor, for example using tabs instead of spaces. You should install the [EditorConfig for VS Code](https://marketplace.visualstudio.com/items?itemName=editorconfig.editorconfig) extension and it will automatically configure your editor to match the rules defined in [.editorconfig](https://github.com/WordPress/gutenberg/blob/HEAD/.editorconfig).
