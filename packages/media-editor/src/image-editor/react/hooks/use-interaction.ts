@@ -42,7 +42,10 @@ export interface UseInteractionOptions {
 	maxZoom?: number;
 	/** Zoom speed multiplier for wheel events. Defaults to 0.0025. */
 	zoomSpeed?: number;
-	/** Pan step size in normalized coords for keyboard events. Defaults to 0.05. */
+	/**
+	 * Pan step size in normalized coords for keyboard events.
+	 * Defaults to 0.01. Shift multiplies it by 10.
+	 */
 	keyboardStep?: number;
 	/** Zoom level for double-tap zoom. Defaults to 2. */
 	doubleTapZoom?: number;

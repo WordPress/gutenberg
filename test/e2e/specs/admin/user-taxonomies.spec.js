@@ -10,7 +10,11 @@ const TAXONOMIES_REST_BASE = 'user-taxonomies';
 // TODO: once the user-taxonomies feature stabilizes, promote this seeding
 // helper into packages/e2e-test-utils-playwright/src/request-utils/ alongside
 // createPost / createPage so other specs can reuse it.
-async function createUserTaxonomy( requestUtils, overrides = {} ) {
+// Seeds all visibility booleans so the form's `toFormData` reads each toggle
+// as a defined value — the form contract requires every flag present, to
+// avoid passing `undefined` for unchecked toggles and relying on defaults
+// in register_taxonomy.
+async function createUserTaxonomy( requestUtils ) {
 	return requestUtils.rest( {
 		path: `/wp/v2/${ TAXONOMIES_REST_BASE }`,
 		method: 'POST',
@@ -20,11 +24,18 @@ async function createUserTaxonomy( requestUtils, overrides = {} ) {
 			status: 'publish',
 			object_type: [ 'post' ],
 			config: {
+				labels: { singular_name: 'Genre' },
 				public: true,
 				hierarchical: false,
-				labels: { singular_name: 'Genre' },
+				publicly_queryable: true,
+				show_ui: true,
+				show_in_menu: true,
+				show_in_nav_menus: true,
+				show_tagcloud: true,
+				show_in_quick_edit: true,
+				show_admin_column: false,
+				show_in_rest: true,
 			},
-			...overrides,
 		},
 	} );
 }
@@ -158,7 +169,7 @@ test.describe( 'User taxonomies', () => {
 			await visitTaxonomyEdit( admin, created.id );
 		} );
 
-		test( 'changing post types updates the saved taxonomy', async ( {
+		test( 'editing a taxonomy persists changes to the registered taxonomy', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -177,17 +188,69 @@ test.describe( 'User taxonomies', () => {
 				} )
 			).toBeVisible();
 
-			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await page.getByRole( 'button', { name: 'Visibility' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Show admin column' } )
+				.click();
+			await page
+				.getByRole( 'checkbox', { name: 'Publicly queryable' } )
+				.click();
 
+			await page.getByRole( 'button', { name: 'Save' } ).click();
 			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
 				'"Genres" taxonomy updated.'
 			);
 
 			const registered = await requestUtils.rest( {
-				path: '/wp/v2/taxonomies/genre',
+				path: '/wp/v2/taxonomies/genre?context=edit',
 				method: 'GET',
 			} );
 			expect( registered.types ).toEqual( [ 'page' ] );
+			expect( registered.visibility.show_admin_column ).toBe( true );
+			expect( registered.visibility.publicly_queryable ).toBe( false );
+		} );
+
+		test( 'turning `Show in REST API` off blocks the taxonomy from the REST API', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Visibility' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Show in REST API' } )
+				.click();
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+				'"Genres" taxonomy updated.'
+			);
+
+			const result = await requestUtils
+				.rest( {
+					path: '/wp/v2/taxonomies/genre',
+					method: 'GET',
+				} )
+				.catch( ( error ) => error );
+			expect( result.code ).toBe( 'rest_forbidden' );
+		} );
+
+		test( 'turning `Public` off does not cascade to `Show admin UI` or REST exposure', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			await page.getByRole( 'button', { name: 'Visibility' } ).click();
+			await page
+				.getByRole( 'checkbox', { name: 'Public', exact: true } )
+				.click();
+			await page.getByRole( 'button', { name: 'Save' } ).click();
+			await expect( page.getByTestId( 'snackbar' ).last() ).toContainText(
+				'"Genres" taxonomy updated.'
+			);
+
+			const registered = await requestUtils.rest( {
+				path: '/wp/v2/taxonomies/genre?context=edit',
+				method: 'GET',
+			} );
+			expect( registered.visibility.public ).toBe( false );
+			expect( registered.visibility.show_ui ).toBe( true );
 		} );
 	} );
 } );

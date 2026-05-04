@@ -58,6 +58,10 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: { character: 'R' },
 	},
 	{
+		description: __( 'Rotate 90° counter-clockwise' ),
+		keyCombination: { modifier: 'shift', character: 'R' },
+	},
+	{
 		description: __( 'Flip horizontal' ),
 		keyCombination: { character: 'H' },
 	},
@@ -66,7 +70,7 @@ const SHORTCUTS: ShortcutEntry[] = [
 		keyCombination: { character: 'V' },
 	},
 	{
-		description: __( 'Resize crop (large step)' ),
+		description: __( 'Pan or resize crop (large step)' ),
 		keyCombination: {
 			modifier: 'shift',
 			character: [ '↑', '↓', '←', '→' ],
