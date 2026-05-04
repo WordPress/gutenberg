@@ -196,21 +196,23 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 			}
 		}
 
-		/**
-		 * Filters the script-module dependencies for the
-		 * {{PAGE_SLUG}}-wp-admin page.
-		 *
-		 * Surfaces use this to add their own modules (e.g. widgets) to
-		 * the page's import map. Each entry is an array with `id` and
-		 * `import` keys, matching the shape `wp_register_script_module()`
-		 * expects.
-		 *
-		 * @param array $boot_dependencies List of module dependency entries.
-		 */
-		$boot_dependencies = apply_filters(
-			'{{PAGE_SLUG_UNDERSCORE}}_wp_admin_script_module_dependencies',
-			$boot_dependencies
-		);
+		// Add registered widgets as dynamic dependencies
+		if ( function_exists( '{{PREFIX}}_get_registered_widget_modules' ) ) {
+			foreach ( {{PREFIX}}_get_registered_widget_modules() as $widget ) {
+				if ( ! empty( $widget['has_widget'] ) ) {
+					$boot_dependencies[] = array(
+						'import' => 'dynamic',
+						'id'     => '{{HANDLE_PREFIX}}/widgets/' . $widget['dir_name'] . '/widget',
+					);
+				}
+				if ( ! empty( $widget['has_render'] ) ) {
+					$boot_dependencies[] = array(
+						'import' => 'dynamic',
+						'id'     => '{{HANDLE_PREFIX}}/widgets/' . $widget['dir_name'] . '/render',
+					);
+				}
+			}
+		}
 
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(

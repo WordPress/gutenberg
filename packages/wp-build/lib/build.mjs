@@ -1171,6 +1171,7 @@ async function generatePagesPhp( pageData, replacements ) {
 			'{{PAGE_SLUG}}': page.slug,
 			'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
 			'{{PREFIX}}': prefixUnderscore,
+			'{{HANDLE_PREFIX}}': HANDLE_PREFIX,
 			'{{INIT_MODULES_PHP_ARRAY}}': initModulesPhp,
 			'{{INIT_MODULES_JSON}}': JSON.stringify( page.initModules ),
 		};
