@@ -139,7 +139,9 @@ export default function StateControl( {
 											onChangePseudoState?.(
 												option.value
 											);
-											onClose();
+											if ( ! hasViewportOptions ) {
+												onClose();
+											}
 										} }
 										icon={
 											pseudoStateValue === option.value
