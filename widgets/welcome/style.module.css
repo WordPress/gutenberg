@@ -27,18 +27,6 @@
 	inset-inline-end: 12px;
 }
 
-.header h2 {
-	margin: 0 0 6px;
-}
-
-.header p {
-	margin: 0;
-}
-
-.columns {
-	padding-top: var(--wp-ui-card-padding);
-}
-
 @media (max-width: 782px) {
 	.columns {
 		flex-direction: column;
@@ -81,23 +69,5 @@
 	flex-shrink: 0;
 	width: 40px;
 	height: 40px;
-	border-radius: 4px;
-}
-
-.columnContent h3 {
-	font-size: 13px;
-	font-weight: 600;
-	margin: 0 0 6px;
-	color: var(--wpds-color-fg-content-neutral);
-}
-
-.columnContent p {
-	font-size: 13px;
-	color: var(--wpds-color-fg-content-neutral);
-	margin: 0 0 8px;
-	line-height: 1.5;
-}
-
-.columnContent a {
-	font-size: 13px;
+	border-radius: var(--wpds-border-radius-sm);
 }
