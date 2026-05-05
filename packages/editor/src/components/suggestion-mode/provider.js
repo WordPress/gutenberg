@@ -627,12 +627,12 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
-			// Structural ops (block-remove for now, block-insert-after and
-			// block-move in follow-up PRs) can't ride the
-			// updateBlockAttributes path: their apply mutates the tree
-			// rather than a single block's attributes. Branch out, run the
-			// matching block-editor action, and short-circuit before the
-			// attribute-set rollback machinery below.
+			// Structural ops (block-remove, block-insert-after; block-move
+			// ships in a follow-up) can't ride the updateBlockAttributes
+			// path: their apply mutates the tree rather than a single
+			// block's attributes. Branch out, run the matching block-
+			// editor action, and short-circuit before the attribute-set
+			// rollback machinery below.
 			const structuralOp = findStructuralOp( payload.operations );
 			if ( structuralOp ) {
 				try {
@@ -651,6 +651,25 @@ export function useSuggestionsProvider() {
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
 						removeBlock( targetClientId );
+					} else if ( structuralOp.type === 'block-insert-after' ) {
+						// The block is already in the live tree (the user
+						// inserted it during Suggest mode); apply just
+						// clears the pending-insert marker so the block
+						// loses its dimmed treatment. Any attribute-set
+						// ops in the same payload represent edits the
+						// user made between insertion and auto-save —
+						// the live block already has those values, so the
+						// fall-through attribute-set apply path below
+						// would be a near-no-op. Short-circuit here for
+						// clarity.
+						const clearAttrs = clearSuggestionMarkerAttributes(
+							selectBlockAttributes( targetClientId )
+						);
+						if ( clearAttrs ) {
+							requestInterceptorBypass( targetClientId );
+							updateBlockAttributes( targetClientId, clearAttrs );
+						}
+						clearOverlay( targetClientId );
 					}
 
 					await saveEntityRecord(
@@ -780,19 +799,28 @@ export function useSuggestionsProvider() {
 	 */
 	const rejectSuggestion = useCallback(
 		async ( { commentId, clientId, payload } ) => {
-			// Clear the live block's suggestion marker for structural
-			// rejects. Attribute-set suggestions don't carry a marker, so
-			// nothing to clear.
+			// Reject behavior depends on the structural op type:
+			//   - block-remove: drop the marker (block stays).
+			//   - block-insert-after: dispatch removeBlock to undo the
+			//     suggested insertion. The marker on the live block goes
+			//     away with the block itself.
+			//   - attribute-set (no structural op): no live-block change.
 			const structuralOp = findStructuralOp( payload?.operations );
 			if ( structuralOp && clientId ) {
-				const clearAttrs = clearSuggestionMarkerAttributes(
-					selectBlockAttributes( clientId )
-				);
-				if ( clearAttrs ) {
+				if ( structuralOp.type === 'block-insert-after' ) {
 					requestInterceptorBypass( clientId );
-					updateBlockAttributes( clientId, clearAttrs );
+					clearOverlay( clientId );
+					removeBlock( clientId );
+				} else {
+					const clearAttrs = clearSuggestionMarkerAttributes(
+						selectBlockAttributes( clientId )
+					);
+					if ( clearAttrs ) {
+						requestInterceptorBypass( clientId );
+						updateBlockAttributes( clientId, clearAttrs );
+					}
+					clearOverlay( clientId );
 				}
-				clearOverlay( clientId );
 			}
 
 			try {
@@ -824,6 +852,7 @@ export function useSuggestionsProvider() {
 			createNotice,
 			selectBlockAttributes,
 			updateBlockAttributes,
+			removeBlock,
 			requestInterceptorBypass,
 			clearOverlay,
 		]
