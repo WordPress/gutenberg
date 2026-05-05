@@ -171,13 +171,14 @@ function InserterMenu(
 	const [ isScrolled, setIsScrolled ] = useState( false );
 
 	const handleScroll = useCallback( ( event ) => {
-		const hasScrolled = event.target.scrollTop > 0;
-		setIsScrolled( ( prevIsScrolled ) => {
-			if ( hasScrolled !== prevIsScrolled ) {
-				return hasScrolled;
-			}
-			return prevIsScrolled;
-		} );
+		if (
+			! event.target.classList.contains(
+				'block-editor-tabbed-sidebar__tabpanel'
+			)
+		) {
+			return;
+		}
+		setIsScrolled( event.target.scrollTop > 0 );
 	}, [] );
 
 	const inserterSearch = useMemo( () => {

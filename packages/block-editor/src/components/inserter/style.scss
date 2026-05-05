@@ -125,7 +125,9 @@ $block-inserter-tabs-height: 44px;
 	z-index: 2;
 	background-color: $white;
 	border-bottom: 1px solid transparent;
-	transition: border-bottom-color 0 linear;
+	@media not ( prefers-reduced-motion ) {
+		transition: border-bottom-color 0 linear;
+	}
 	padding-bottom: $grid-unit-20;
 	&.is-scrolled {
 		border-bottom-color: $gray-200;
