@@ -592,6 +592,61 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'adopts a removal that arrives bundled with its marker-clear (reject of pending-insert via sync)', async () => {
+		// Regression: rejecting a pending-insert suggestion on
+		// another client dispatches `removeBlock` (the rejection
+		// undoes the insert). When that arrives here via sync,
+		// batched with the corresponding marker-clear, the
+		// disappearing block carries `metadata.suggestion.type ===
+		// 'pending-insert'` in the previous-tick tree. The
+		// interceptor must adopt that as the reject landing instead
+		// of re-inserting the block and re-tagging it as a fresh
+		// pending-remove — otherwise the rejected paragraph reappears
+		// on the suggester's screen a moment later via the bounced
+		// re-insert.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+
+		// First, this client creates the pending-insert suggestion.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+
+		// Simulate the reject landing: marker-clear + removeBlock
+		// batched into a single store update.
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( inserted.clientId, {
+						metadata: {},
+					} );
+				registry
+					.dispatch( blockEditorStore )
+					.removeBlock( inserted.clientId );
+			} );
+		} );
+		await flushSubscribers();
+
+		// The block must stay removed — the interceptor adopts the
+		// reject landing rather than re-inserting and re-tagging.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
+		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
+	} );
+
 	it( 'records a null anchor when the inserted block lands at index 0 (no previous sibling)', async () => {
 		const { registry, getOverlay } = setup();
 
