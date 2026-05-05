@@ -3,15 +3,18 @@
  */
 import { hasBlockSupport } from '../registration';
 import { getSaveContent } from '../serializer';
-import { parseWithAttributeSchema } from './get-block-attributes';
-import type { BlockAttribute, BlockType } from '../../types';
+import { parseHtml } from './get-block-attributes';
+import type { BlockType } from '../../types';
 
-const CLASS_ATTR_SCHEMA: BlockAttribute = {
-	type: 'string',
-	source: 'attribute',
-	selector: '[data-custom-class-name] > *',
-	attribute: 'class',
-};
+function splitClassName( className: unknown ): string[] {
+	return typeof className === 'string' && className
+		? className.trim().split( /\s+/ )
+		: [];
+}
+
+function getElementClasses( element: Element | null ): string[] {
+	return splitClassName( element?.getAttribute( 'class' ) );
+}
 
 /**
  * Given an HTML string, returns an array of class names assigned to the root
@@ -22,12 +25,8 @@ const CLASS_ATTR_SCHEMA: BlockAttribute = {
  * @return Array of class names assigned to the root element.
  */
 export function getHTMLRootElementClasses( innerHTML: string ): string[] {
-	const parsed = parseWithAttributeSchema(
-		`<div data-custom-class-name>${ innerHTML }</div>`,
-		CLASS_ATTR_SCHEMA
-	) as string | undefined;
-
-	return parsed ? parsed.trim().split( /\s+/ ) : [];
+	const root = ( parseHtml( innerHTML ) as Element )?.firstElementChild;
+	return getElementClasses( root );
 }
 
 /**
@@ -39,13 +38,17 @@ export function getHTMLRootElementClasses( innerHTML: string ): string[] {
  * @param blockAttributes Original block attributes.
  * @param blockType       Block type settings.
  * @param innerHTML       Original block markup.
+ * @param rootElement     Pre-parsed root element of innerHTML, if available.
+ *                        When provided, avoids re-parsing innerHTML to read
+ *                        the actual classes.
  *
  * @return Filtered block attributes.
  */
 export function fixCustomClassname(
 	blockAttributes: Record< string, unknown >,
 	blockType: BlockType,
-	innerHTML: string
+	innerHTML: string,
+	rootElement?: Element | null
 ): Record< string, unknown > {
 	if ( ! hasBlockSupport( blockType, 'customClassName', true ) ) {
 		return blockAttributes;
@@ -59,8 +62,15 @@ export function fixCustomClassname(
 	const { className: omittedClassName, ...attributesSansClassName } =
 		modifiedBlockAttributes;
 	const serialized = getSaveContent( blockType, attributesSansClassName );
+	// `getHTMLRootElementClasses` writes the rendered output into hpq's
+	// shared document body. Callers that pass `rootElement` are insulated by
+	// the deep clone of `parsedBody` in `parseRawBlock`; without that clone,
+	// this parse would mutate the shared body under our feet.
 	const defaultClasses = getHTMLRootElementClasses( serialized );
-	const actualClasses = getHTMLRootElementClasses( innerHTML );
+	const actualClasses =
+		rootElement !== undefined
+			? getElementClasses( rootElement )
+			: getHTMLRootElementClasses( innerHTML );
 
 	const customClasses = actualClasses.filter(
 		( className ) => ! defaultClasses.includes( className )
