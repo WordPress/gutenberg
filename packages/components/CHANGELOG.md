@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `StyleProvider`: Add support for injecting package CSS module styles into target documents ([#77965](https://github.com/WordPress/gutenberg/pull/77965)).
 -   `Button`: Align `link` variant underline (offset and thickness) with `ExternalLink` and `Link` from `@wordpress/ui` ([#77842](https://github.com/WordPress/gutenberg/pull/77842)).
 
 ### Bug Fixes
