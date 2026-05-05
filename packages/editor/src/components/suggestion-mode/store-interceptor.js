@@ -785,11 +785,27 @@ export default function SuggestionStoreInterceptor() {
 					} );
 				}
 
-				// Drop snapshot entries for any remaining (descendant)
-				// removed blocks — they came back as part of their parent's
-				// re-inserted subtree, but we still want a fresh re-seed.
+				// Re-seed the snapshot for every block that came back via
+				// the re-insert (top-level tops AND their descendants). The
+				// live attributes for tops include the pending-remove
+				// marker; `metadata.suggestion`'s membership in
+				// SYSTEM_METADATA_KEYS keeps the marker invisible to the
+				// next diff. Using `snapshot.delete` here would leave the
+				// re-inserted blocks looking new, so the next subscribe
+				// fire — triggered by a sync echo, an unrelated dispatch,
+				// or React batching draining a follow-up tick — would route
+				// them through the new-block branch and overwrite both the
+				// pending-remove marker and the persisted `block-remove`
+				// structural op with the `pending-insert` /
+				// `block-insert-after` pair.
 				for ( const clientId of removedIds ) {
-					snapshot.delete( clientId );
+					const liveAttrs =
+						blockEditor.getBlockAttributes?.( clientId );
+					if ( liveAttrs ) {
+						snapshot.set( clientId, liveAttrs );
+					} else {
+						snapshot.delete( clientId );
+					}
 				}
 			}
 
