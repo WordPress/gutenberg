@@ -75,14 +75,34 @@ $suggestion-color: #007017;
 // move isn't yet committed. A dotted green outline distinguishes it
 // from the dashed pending-insert (the block existed before — only its
 // position is suggested), and reduced opacity de-emphasizes it without
-// hiding. Apply clears the marker; Reject runs moveBlockToPosition to
-// put the block back at its from-parent + from-index.
+// hiding. The "Suggested move" tab pinned to the top corner makes the
+// preview state unambiguous on the reviewer's screen — without it the
+// block looks like a regular drag-and-drop on intents that don't tint
+// the canvas with Suggest-mode chrome. Apply clears the marker; Reject
+// runs moveBlockToPosition to put the block back at its from-parent +
+// from-index.
 .block-editor-block-list__block.is-suggestion-pending-move {
 	position: relative;
 	opacity: 0.7;
 	outline: 2px dotted $suggestion-color;
 	outline-offset: 2px;
 	border-radius: $radius-small;
+
+	&::before {
+		content: "Suggested move";
+		position: absolute;
+		top: -$grid-unit-20;
+		left: -$grid-unit-05;
+		padding: 0 $grid-unit-10;
+		background: $suggestion-color;
+		color: $white;
+		font-size: 11px;
+		font-weight: 500;
+		line-height: $grid-unit-20;
+		border-radius: $radius-small $radius-small 0 0;
+		pointer-events: none;
+		z-index: 1;
+	}
 }
 
 .editor-collab-sidebar-panel__suggestion-summary {
