@@ -73,55 +73,36 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			require_once ABSPATH . 'wp-admin/includes/post.php';
 		}
 
-		$post_lock     = wp_check_post_lock( $post->ID );
-		$is_auto_draft = 'auto-draft' === $post->post_status;
-		$is_draft      = 'draft' === $post->post_status || $is_auto_draft;
-
-		/**
-		 * In the context of real-time collaboration, all peers are effectively
-		 * authors and we don't want to vary behavior based on whether they are the
-		 * original author. Always target an autosave revision.
-		 *
-		 * This avoids the following issue when real-time collaboration is enabled:
-		 *
-		 * - Autosaves from the original author (if they have the post lock) will
-		 *   target the saved post.
-		 *
-		 * - Autosaves from other users are applied to a post revision.
-		 *
-		 * - If any user reloads a post, they load changes from the author's autosave.
-		 *
-		 * - The saved post has now diverged from the persisted CRDT document. The
-		 *   content (and/or title or excerpt) are now "ahead" of the persisted CRDT
-		 *   document.
-		 *
-		 * - When the persisted CRDT document is loaded, a diff is computed against
-		 *   the saved post. This diff is then applied to the in-memory CRDT
-		 *   document, which can lead to duplicate inserts or deletions.
-		 *
-		 * Load the real-time collaboration setting and, when enabled, ensure that an
-		 * an autosave revision is always targeted.
-		 */
+		$post_lock_is_active      = wp_check_post_lock( $post->ID );
+		$is_auto_draft            = 'auto-draft' === $post->post_status;
+		$is_draft                 = 'draft' === $post->post_status || $is_auto_draft;
 		$is_collaboration_enabled = wp_is_collaboration_enabled();
 
+		/*
+		 * When a post is still in draft form, updates from the author can directly update the post
+		 * because it won’t change any rendered pages — it’s just a draft — there’s no need to
+		 * create a new revision. For any other situation a revision preserves potentially important
+		 * versions of the post.
+		 *
+		 * At least, this works for the simple case when collaboration (RTC) isn’t active. Things are
+		 * more complicated in multi-editor environments. Since all peers are sharing a persisted
+		 * editing state (a shared CRDT), it’s important that they all store updates in a revision.
+		 * If one editor updated the post and another editor reloaded, the conflict resolution would
+		 * kick in a duplicate changes already recorded in the shared state.
+		 *
+		 * The one caveat for RTC is that the first peer to store an edit must promote an auto-draft
+		 * into a real draft post. If this doesn’t happen then the peers may continue to make edits
+		 * but the draft will be lost; auto-drafts are not listed in post views.
+		 */
 		if (
 			$is_draft &&
 			(int) $post->post_author === $user_id &&
-			! $post_lock &&
+			! $post_lock_is_active &&
 			( ! $is_collaboration_enabled || $is_auto_draft )
 		) {
-			/*
-			 * Draft posts for the same author: autosaving updates the post and does not create a revision.
-			 * Convert the post object to an array and add slashes, wp_update_post() expects escaped array.
-			 *
-			 * Auto-drafts must still be promoted to drafts when collaboration is
-			 * enabled so that a new post survives URL loss and appears in Drafts.
-			 * Regular draft autosaves remain revisions under collaboration to keep
-			 * the saved post from diverging from the persisted CRDT document.
-			 */
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
 		} else {
-			// Non-draft posts: create or update the post autosave. Pass the meta data.
+			// Non-draft posts: create or update the post autosave. Pass the metadata.
 			$autosave_id = $this->create_post_autosave( (array) $prepared_post, (array) $request->get_param( 'meta' ) );
 		}
 
