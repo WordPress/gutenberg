@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 
@@ -137,28 +138,63 @@ const withSuggestionOverlay = createHigherOrderComponent(
 );
 
 /**
+ * Map a `metadata.suggestion.type` marker to the class that drives the
+ * structural-suggestion visual treatment. Keeps the marker → class lookup
+ * in one place so the rendering layer stays a thin shell over the data
+ * model.
+ *
+ * @param {string|undefined} type Marker type.
+ * @return {string|null} Class name for the marker, or null when the type
+ * is not a recognized structural marker.
+ */
+function structuralMarkerClass( type ) {
+	switch ( type ) {
+		case 'pending-remove':
+			return 'is-suggestion-pending-remove';
+		case 'pending-insert':
+			return 'is-suggestion-pending-insert';
+		case 'pending-move':
+			return 'is-suggestion-pending-move';
+		default:
+			return null;
+	}
+}
+
+/**
  * HOC that tags the rendered block list item with a class whenever it has a
- * pending suggestion overlay. The class is the hook for the "bracket"
- * styling that makes edited blocks discoverable without relying on the
- * block toolbar being visible.
+ * pending suggestion — either an attribute overlay (renders the green
+ * "bracket" treatment) or a structural marker stored in
+ * `metadata.suggestion` (renders strikethrough/dim/move overlays).
  */
 const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
 			const { entries } = useSuggestionOverlay();
-			const isSuggestMode = useSelect(
-				( select ) =>
-					select( EDITOR_STORE_NAME ).getEditorIntent() ===
-					SUGGEST_INTENT,
-				[]
+			const { isSuggestMode, structuralClass } = useSelect(
+				( select ) => {
+					const editor = select( EDITOR_STORE_NAME );
+					const blockEditor = select( blockEditorStore );
+					return {
+						isSuggestMode:
+							editor.getEditorIntent() === SUGGEST_INTENT,
+						structuralClass: structuralMarkerClass(
+							blockEditor?.getBlockAttributes?.( clientId )
+								?.metadata?.suggestion?.type
+						),
+					};
+				},
+				[ clientId ]
 			);
 			const entry = entries[ clientId ];
 			const hasPendingOverlay =
 				!! entry &&
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
 
-			if ( ! isSuggestMode || ! hasPendingOverlay ) {
+			if (
+				! isSuggestMode ||
+				( ! hasPendingOverlay && ! structuralClass )
+			) {
 				return <BlockListBlock { ...props } />;
 			}
 
@@ -167,13 +203,16 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					{ ...props }
 					className={ clsx(
 						props.className,
-						'is-suggestion-pending'
+						hasPendingOverlay && 'is-suggestion-pending',
+						structuralClass
 					) }
 				/>
 			);
 		},
 	'withSuggestionBlockClassName'
 );
+
+export { structuralMarkerClass };
 
 let filterRegistered = false;
 

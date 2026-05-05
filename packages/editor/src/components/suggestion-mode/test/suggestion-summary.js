@@ -199,4 +199,39 @@ describe( 'summarizeOperations', () => {
 		] );
 		expect( lines ).toEqual( [ { label: 'Formatting:', value: 'bold' } ] );
 	} );
+
+	it( 'summarizes a block-remove op as "Remove block: <name>"', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'block-remove',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove block:', value: 'paragraph' },
+		] );
+	} );
+
+	it( 'falls back to "block" when the block name is missing', () => {
+		const lines = summarizeOperations( [
+			{ type: 'block-remove', clientId: 'abc' },
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove block:', value: 'block' },
+		] );
+	} );
+
+	it( 'preserves a non-namespaced block name', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'block-remove',
+				clientId: 'abc',
+				blockName: 'custom-block',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Remove block:', value: 'custom-block' },
+		] );
+	} );
 } );

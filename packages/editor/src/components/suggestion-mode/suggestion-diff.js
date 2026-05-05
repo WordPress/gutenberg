@@ -138,23 +138,12 @@ export default function SuggestionDiff( { operations } ) {
 				{ __( 'Suggested change' ) }
 			</WCText>
 			{ operations.map( ( op, index ) => {
-				const canWordDiff =
-					op.type === 'attribute-set' &&
-					isTextValue( op.before ) &&
-					isTextValue( op.after ) &&
-					( op.before?.length ?? 0 ) <= MAX_DIFF_LENGTH &&
-					( op.after?.length ?? 0 ) <= MAX_DIFF_LENGTH;
-				const key = `${ op.type }:${ op.attribute }:${ index }`;
+				const key = `${ op.type }:${
+					op.attribute ?? op.clientId
+				}:${ index }`;
 				return (
 					<div key={ key }>
-						{ canWordDiff ? (
-							<TextDiff
-								before={ op.before ?? '' }
-								after={ op.after }
-							/>
-						) : (
-							<AttributeDiff operation={ op } />
-						) }
+						<DiffForOperation operation={ op } />
 					</div>
 				);
 			} ) }
@@ -164,6 +153,34 @@ export default function SuggestionDiff( { operations } ) {
 
 function isTextValue( value ) {
 	return value === null || value === undefined || typeof value === 'string';
+}
+
+/**
+ * Pick the diff renderer for an operation. Hoisted out of the parent map
+ * loop so the per-op decision tree is a flat if/else rather than a nested
+ * ternary.
+ *
+ * @param {{ operation: import('./provider').SuggestionOperation }} props
+ */
+function DiffForOperation( { operation } ) {
+	if ( operation.type === 'block-remove' ) {
+		return <BlockRemoveDiff operation={ operation } />;
+	}
+	if (
+		operation.type === 'attribute-set' &&
+		isTextValue( operation.before ) &&
+		isTextValue( operation.after ) &&
+		( operation.before?.length ?? 0 ) <= MAX_DIFF_LENGTH &&
+		( operation.after?.length ?? 0 ) <= MAX_DIFF_LENGTH
+	) {
+		return (
+			<TextDiff
+				before={ operation.before ?? '' }
+				after={ operation.after }
+			/>
+		);
+	}
+	return <AttributeDiff operation={ operation } />;
 }
 
 function TextDiff( { before, after } ) {
@@ -216,3 +233,72 @@ function AttributeDiff( { operation } ) {
 		</WCText>
 	);
 }
+
+/**
+ * Render a `block-remove` op as a strikethrough preview. The op carries a
+ * snapshot of the removed block (`op.block`) so the sidebar can show what
+ * is proposed to disappear without depending on the live tree.
+ *
+ * Falls back to a label-only "Remove block: X" line when the block snapshot
+ * is missing (older payloads, or block-editor reading edge cases).
+ *
+ * @param {{ operation: { blockName?: string, block?: Object } }} props
+ */
+function BlockRemoveDiff( { operation } ) {
+	const blockName = operation.blockName ?? operation.block?.name ?? '';
+	const innerText = collectBlockText( operation.block );
+	return (
+		<WCText
+			size="13px"
+			className="editor-collab-sidebar-panel__suggestion-text-diff"
+		>
+			<del>
+				<VisuallyHidden>{ __( 'Deleted:' ) }</VisuallyHidden>
+				{ innerText
+					? innerText
+					: blockName || __( 'Block proposed for removal.' ) }
+			</del>
+		</WCText>
+	);
+}
+
+/**
+ * Concatenate the text content of a serialized block snapshot for use in
+ * the sidebar diff preview. Walks `attributes.content` (RichText-backed
+ * blocks) plus innerBlocks recursively. Caps the total length at
+ * `MAX_DIFF_LENGTH` so a giant subtree doesn't bloat the sidebar.
+ *
+ * @param {Object|undefined} block Serialized block snapshot.
+ * @return {string} Concatenated text, possibly empty.
+ */
+function collectBlockText( block ) {
+	if ( ! block ) {
+		return '';
+	}
+	const parts = [];
+	const walk = ( node ) => {
+		if ( ! node ) {
+			return;
+		}
+		const text = node.attributes?.content;
+		if ( typeof text === 'string' && text.length > 0 ) {
+			parts.push( text );
+		} else if ( text && typeof text.toString === 'function' ) {
+			// RichTextData wrappers serialize their content via String().
+			const str = String( text );
+			if ( str.length > 0 ) {
+				parts.push( str );
+			}
+		}
+		for ( const child of node.innerBlocks ?? [] ) {
+			walk( child );
+		}
+	};
+	walk( block );
+	const joined = parts.join( ' ' );
+	return joined.length > MAX_DIFF_LENGTH
+		? `${ joined.slice( 0, MAX_DIFF_LENGTH ) }…`
+		: joined;
+}
+
+export { collectBlockText };

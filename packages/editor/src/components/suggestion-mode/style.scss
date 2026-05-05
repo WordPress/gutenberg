@@ -38,6 +38,25 @@ $suggestion-color: #007017;
 	}
 }
 
+// Pending-remove: the block is still real (selection, focus, and toolbar
+// keep working) but the visual treatment communicates "proposed for
+// deletion". A horizontal rule sits above the block; reduced opacity
+// de-emphasizes the content without hiding it. Apply runs the actual
+// removal; Reject clears the marker.
+.block-editor-block-list__block.is-suggestion-pending-remove {
+	position: relative;
+	opacity: 0.5;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		top: 50%;
+		pointer-events: none;
+		border-top: 2px solid var(--wp-block-synced-color, #cc1818);
+	}
+}
+
 .editor-collab-sidebar-panel__suggestion-summary {
 	em {
 		font-style: italic;

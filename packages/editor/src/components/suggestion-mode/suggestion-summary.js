@@ -60,6 +60,26 @@ const FORMAT_ATTRIBUTE_LABELS = {
 };
 
 /**
+ * Convert a block name like `core/paragraph` to a friendlier label used in
+ * structural-suggestion summaries ("Remove block: paragraph"). Strips the
+ * namespace prefix and falls back to the raw name when the block name is
+ * empty or non-namespaced.
+ *
+ * @param {string|undefined} blockName Block name from the suggestion op.
+ * @return {string} Display label.
+ */
+function friendlyBlockName( blockName ) {
+	if ( ! blockName || typeof blockName !== 'string' ) {
+		return __( 'block' );
+	}
+	const slashIdx = blockName.indexOf( '/' );
+	if ( slashIdx === -1 ) {
+		return blockName;
+	}
+	return blockName.slice( slashIdx + 1 ) || blockName;
+}
+
+/**
  * Mapping of inline HTML tags — as emitted by RichText serialization — to
  * human-readable format names. The key is the lower-cased tag name; the
  * value is what appears in a "Formatting:" line. Tags not in this map are
@@ -223,6 +243,13 @@ export function summarizeOperations( operations ) {
 	const formattingLabels = [];
 
 	for ( const op of operations ) {
+		if ( op.type === 'block-remove' ) {
+			lines.push( {
+				label: __( 'Remove block:' ),
+				value: friendlyBlockName( op.blockName ),
+			} );
+			continue;
+		}
 		if ( op.type !== 'attribute-set' ) {
 			attributeLabels.push( op.attribute );
 			continue;
