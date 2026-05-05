@@ -107,6 +107,32 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 			}
 
+			// Append import map and enqueued module script tags to __unstableResolvedAssets.
+			// WP Core's _wp_get_iframed_editor_assets() (called from get_block_editor_settings())
+			// runs enqueue_block_assets which may enqueue view modules, but does not include them
+			// in the returned scripts HTML. We capture them here and inject them into the iframe.
+			$script_modules    = wp_script_modules();
+			$queued_module_ids = $script_modules->get_queue();
+
+			if ( ! empty( $queued_module_ids ) ) {
+				// Build import map for the enqueued modules and their dependencies.
+				ob_start();
+				$script_modules->print_import_map();
+				$import_map_html = ob_get_clean();
+
+				// Build inline <script type="module"> tags to execute each enqueued module.
+				$module_scripts_html = '';
+				foreach ( $queued_module_ids as $module_id ) {
+					$safe_id              = preg_replace( '/[^a-zA-Z0-9-_]/', '-', $module_id );
+					$encoded_id           = wp_json_encode( $module_id );
+					$module_scripts_html .= '<script type="module" id="' . esc_attr( $safe_id ) . '-js-module">import ' . $encoded_id . ';</script>' . "\n";
+				}
+
+				if ( isset( $settings['__unstableResolvedAssets']['scripts'] ) ) {
+					$settings['__unstableResolvedAssets']['scripts'] .= $import_map_html . $module_scripts_html;
+				}
+			}
+
 			return rest_ensure_response( $settings );
 		}
 
@@ -565,11 +591,30 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				}
 			}
 
-			// Collect the list of enqueued (to-be-executed) module IDs.
-			// The import map only maps IDs to URLs; to actually run a module inside
-			// the iframed editor we also need to inject <script type="module"> tags
-			// for every module that was explicitly enqueued.
-			$enqueued_script_modules = $script_modules->get_queue();
+			// The import map maps module IDs to URLs but doesn't execute anything.
+			// We also need the list of enqueued IDs so the JS side can inject
+			// <script type="module"> tags to actually run each module.
+			//
+			// View script modules are intended to run inside the iframe canvas,
+			// not in the parent admin document. Exclude them here so that
+			// loadEditorAssets() doesn't execute them in the wrong context.
+			$view_module_ids = array();
+			foreach ( WP_Block_Type_Registry::get_instance()->get_all_registered() as $block_type ) {
+				if ( ! empty( $block_type->view_script_module_ids ) ) {
+					foreach ( $block_type->view_script_module_ids as $module_id ) {
+						$view_module_ids[] = $module_id;
+					}
+				}
+			}
+			$view_module_ids         = array_flip( array_unique( $view_module_ids ) );
+			$enqueued_script_modules = array_values(
+				array_filter(
+					$script_modules->get_queue(),
+					static function ( $id ) use ( $view_module_ids ) {
+						return ! isset( $view_module_ids[ $id ] );
+					}
+				)
+			);
 
 			return array(
 				'scripts'                 => $scripts_data,

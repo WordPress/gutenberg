@@ -22,9 +22,44 @@ import {
 	getEmbedPreview,
 	canUser,
 	getAutosaves,
+	getEditorSettings,
 	getCurrentUser,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
+
+describe( 'getEditorSettings', () => {
+	let dispatch;
+
+	beforeEach( () => {
+		dispatch = {
+			receiveEditorSettings: jest.fn(),
+		};
+		triggerFetch.mockReset();
+	} );
+
+	it( 'requests editor settings for the current entity', async () => {
+		const settings = {
+			__unstableResolvedAssets: { styles: [], scripts: [] },
+		};
+
+		triggerFetch.mockResolvedValue( settings );
+
+		await getEditorSettings(
+			'edit-site',
+			'page',
+			'123'
+		)( {
+			dispatch,
+		} );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp-block-editor/v1/settings?context=edit-site&postType=page&postId=123',
+		} );
+		expect( dispatch.receiveEditorSettings ).toHaveBeenCalledWith(
+			settings
+		);
+	} );
+} );
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };

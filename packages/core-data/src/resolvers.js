@@ -1300,13 +1300,26 @@ export const getEntitiesConfig =
 
 /**
  * Requests editor settings from the REST API.
+ *
+ * @param {string} [context]  Editor context (e.g. 'edit-site', 'edit-post').
+ * @param {string} [postType] Post type slug.
+ * @param {string} [postId]   Post ID.
  */
 export const getEditorSettings =
-	() =>
+	( context, postType, postId ) =>
 	async ( { dispatch } ) => {
-		const settings = await apiFetch( {
-			path: '/wp-block-editor/v1/settings',
-		} );
+		const query = {};
+		if ( context ) {
+			query.context = context;
+		}
+		if ( postType ) {
+			query.postType = postType;
+		}
+		if ( postId ) {
+			query.postId = postId;
+		}
+		const path = addQueryArgs( '/wp-block-editor/v1/settings', query );
+		const settings = await apiFetch( { path } );
 		dispatch.receiveEditorSettings( settings );
 	};
 
