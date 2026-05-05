@@ -171,7 +171,9 @@ describe( 'Cropper', () => {
 		const handle = await screen.findByRole( 'button', {
 			name: 'Resize top-left corner',
 		} );
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		// The settle transition and viewport pan live on the stage, not the
+		// canvas (which stays fixed so the root background is never exposed).
+		const stage = screen.getByTestId( 'cropper-stage' );
 
 		// Start and end a resize to trigger the settle animation.
 		fireEvent.pointerDown( handle, {
@@ -182,8 +184,8 @@ describe( 'Cropper', () => {
 		} );
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 
-		// The settle transition should now be active.
-		expect( canvas ).toHaveStyle( 'transition: transform 200ms ease-out' );
+		// The settle transition should now be active on the stage.
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
 
 		// Start a new resize before the 200 ms settle timer fires.
 		fireEvent.pointerDown( handle, {
@@ -194,14 +196,14 @@ describe( 'Cropper', () => {
 		} );
 
 		// Settling must be cleared — no transition on the drag.
-		expect( canvas ).not.toHaveStyle(
+		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
-		// Advance past the old settle timer; it was cancelled so the canvas
+		// Advance past the old settle timer; it was cancelled so the stage
 		// should still have no transition.
 		act( () => jest.advanceTimersByTime( 200 ) );
-		expect( canvas ).not.toHaveStyle(
+		expect( stage ).not.toHaveStyle(
 			'transition: transform 200ms ease-out'
 		);
 
@@ -231,7 +233,7 @@ describe( 'Cropper', () => {
 		const eHandle = await screen.findByRole( 'button', {
 			name: 'Resize right edge',
 		} );
-		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
+		const stage = screen.getByTestId( 'cropper-stage' );
 
 		// cropRect starts at {x:0, y:0, width:1, height:1} (right edge = 1.0).
 		// One ArrowRight step (+0.01 normalized) puts the right edge at 1.01.
@@ -239,7 +241,7 @@ describe( 'Cropper', () => {
 		//   rightOverflow = 1.01 * 600 − 600 = 6 → pan.x = −6
 		fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
 
-		expect( canvas ).toHaveStyle( 'transform: translate(-6px, 0px)' );
+		expect( stage ).toHaveStyle( 'transform: translate(-6px, 0px)' );
 
 		jest.useRealTimers();
 	} );

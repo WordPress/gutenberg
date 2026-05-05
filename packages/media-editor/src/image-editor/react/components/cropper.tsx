@@ -310,7 +310,7 @@ function CropperInner(
 			return;
 		}
 		const handleWheel = ( event: WheelEvent ) => {
-			// Block wheel zoom while resizing or settling — the canvas CSS
+			// Block wheel zoom while resizing or settling — the stage CSS
 			// transform changes getBoundingClientRect() during this window,
 			// so focal-point math would resolve against the wrong center.
 			if ( isResizingRef.current || isSettlingRef.current ) {
@@ -448,10 +448,14 @@ function CropperInner(
 		}, 200 );
 	}, [ settleCrop, onGestureEnd, resetViewport ] );
 
-	const imageTransition =
-		settling || isZooming ? 'transform 150ms linear' : undefined;
+	let imageTransition: string | undefined;
+	if ( settling ) {
+		imageTransition = 'transform 200ms ease-out';
+	} else if ( isZooming ) {
+		imageTransition = 'transform 150ms linear';
+	}
 	const settleStencilTransition = settling
-		? 'left 150ms linear, top 150ms linear, width 150ms linear, height 150ms linear'
+		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
 		: undefined;
 
 	// Compute the image's CSS style.
@@ -473,22 +477,22 @@ function CropperInner(
 		};
 	}, [ canvasSize, elementSize, transformString, imageTransition ] );
 
-	// Viewport pan CSS transform for the canvas div. Applied during resize
+	// Viewport pan CSS transform for the stage div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.
 	// Transitions back to zero during the settle animation.
-	// will-change promotes the canvas to its own compositor layer while the
+	// will-change promotes the stage to its own compositor layer while the
 	// transform is active, keeping per-frame pan updates off the main thread.
 	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
 	const willChange = isResizing || settling ? 'transform' : undefined;
-	let canvasStyle: React.CSSProperties | undefined;
+	let stageStyle: React.CSSProperties | undefined;
 	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
-		canvasStyle = {
+		stageStyle = {
 			transform: `translate(${ viewportState.pan.x }px, ${ viewportState.pan.y }px)`,
 			transition: settleTransition,
 			willChange,
 		};
 	} else if ( settling ) {
-		canvasStyle = { transition: settleTransition, willChange };
+		stageStyle = { transition: settleTransition, willChange };
 	}
 
 	// Forward the root element to the consumer's ref.
@@ -533,56 +537,70 @@ function CropperInner(
 					isInteractiveGrid &&
 						'wp-media-editor-image-editor__canvas--grid-interactive',
 					showInteractiveGrid &&
-						'wp-media-editor-image-editor__canvas--show-grid'
+						'wp-media-editor-image-editor__canvas--show-grid',
+					settling && 'wp-media-editor-image-editor__canvas--settling'
 				) }
-				style={ canvasStyle }
 				tabIndex={ 0 }
 				role="group"
 				aria-label={ __( 'Image editor' ) }
 				{ ...handlers }
 			>
-				{ /* The image layer */ }
-				<img
-					className="wp-media-editor-image-editor__image"
-					src={ src }
-					alt=""
-					onLoad={ handleImageLoad }
-					style={ imageStyle }
-					draggable={ false }
-				/>
+				{ /*
+				 * The stage is an inner full-size div that receives the
+				 * viewport pan CSS transform. Keeping the transform here
+				 * (rather than on the canvas) means the canvas always stays
+				 * at its natural position, so the root div's background is
+				 * never exposed when the stage is panned during a resize drag.
+				 */ }
+				<div
+					className="wp-media-editor-image-editor__stage"
+					data-testid="cropper-stage"
+					style={ stageStyle }
+				>
+					{ /* The image layer */ }
+					<img
+						className="wp-media-editor-image-editor__image"
+						src={ src }
+						alt=""
+						onLoad={ handleImageLoad }
+						style={ imageStyle }
+						draggable={ false }
+					/>
 
-				{ /* Dimming overlay outside the crop area */ }
-				{ showDimming && (
-					<DimmingOverlay
+					{ /* Dimming overlay outside the crop area */ }
+					{ showDimming && (
+						<DimmingOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+							transition={ settleStencilTransition }
+						/>
+					) }
+
+					{ /* The stencil (crop area with handles) */ }
+					<StencilComponent
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
 						imageSize={ visualSize }
+						onCropChange={ handleCropChange }
+						onResizeStart={ handleResizeStart }
+						onResizeEnd={ handleResizeEnd }
+						onEscape={ handleEscape }
+						aspectRatio={ aspectRatio }
+						freeformCrop={ freeformCrop }
+						stencilTransition={ settleStencilTransition }
+						cropBounds={ cropBounds }
 					/>
-				) }
 
-				{ /* The stencil (crop area with handles) */ }
-				<StencilComponent
-					cropRect={ state.cropRect }
-					containerSize={ canvasSize }
-					imageSize={ visualSize }
-					onCropChange={ handleCropChange }
-					onResizeStart={ handleResizeStart }
-					onResizeEnd={ handleResizeEnd }
-					onEscape={ handleEscape }
-					aspectRatio={ aspectRatio }
-					freeformCrop={ freeformCrop }
-					stencilTransition={ settleStencilTransition }
-					cropBounds={ cropBounds }
-				/>
-
-				{ /* Rule-of-thirds grid */ }
-				{ ( showGrid === true || isInteractiveGrid ) && (
-					<GridOverlay
-						cropRect={ state.cropRect }
-						containerSize={ canvasSize }
-						imageSize={ visualSize }
-					/>
-				) }
+					{ /* Rule-of-thirds grid */ }
+					{ ( showGrid === true || isInteractiveGrid ) && (
+						<GridOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+						/>
+					) }
+				</div>
 
 				{ /* ARIA live region for screen reader announcements */ }
 				<div
