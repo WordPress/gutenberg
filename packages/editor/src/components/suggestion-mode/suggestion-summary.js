@@ -250,6 +250,13 @@ export function summarizeOperations( operations ) {
 			} );
 			continue;
 		}
+		if ( op.type === 'block-insert-after' ) {
+			lines.push( {
+				label: __( 'Insert block:' ),
+				value: friendlyBlockName( op.blockName ),
+			} );
+			continue;
+		}
 		if ( op.type !== 'attribute-set' ) {
 			attributeLabels.push( op.attribute );
 			continue;

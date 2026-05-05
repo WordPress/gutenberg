@@ -234,4 +234,19 @@ describe( 'summarizeOperations', () => {
 			{ label: 'Remove block:', value: 'custom-block' },
 		] );
 	} );
+
+	it( 'summarizes a block-insert-after op as "Insert block: <name>"', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'block-insert-after',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+				anchorClientId: null,
+				parentClientId: null,
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Insert block:', value: 'paragraph' },
+		] );
+	} );
 } );
