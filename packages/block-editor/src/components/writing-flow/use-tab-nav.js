@@ -46,8 +46,9 @@ export default function useTabNav() {
 		} else if ( hasMultiSelection() ) {
 			containerRef.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
-			if ( getLastFocus()?.current ) {
-				getLastFocus().current.focus();
+			const lastFocus = getLastFocus();
+			if ( lastFocus?.current && lastFocus.current.isConnected ) {
+				lastFocus.current.focus();
 			} else {
 				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
 				containerRef.current

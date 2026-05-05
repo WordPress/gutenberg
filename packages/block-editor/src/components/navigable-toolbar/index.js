@@ -186,7 +186,11 @@ function useToolbarFocus( {
 		if ( focusEditorOnEscape ) {
 			const handleKeyDown = ( event ) => {
 				const lastFocus = getLastFocus();
-				if ( event.keyCode === ESCAPE && lastFocus?.current ) {
+				if (
+					event.keyCode === ESCAPE &&
+					lastFocus?.current &&
+					lastFocus.current.isConnected
+				) {
 					// Focus the last focused element when pressing escape.
 					event.preventDefault();
 					lastFocus.current.focus();
