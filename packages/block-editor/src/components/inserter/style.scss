@@ -242,6 +242,10 @@ $block-inserter-tabs-height: 44px;
 	justify-content: space-between;
 }
 
+.block-editor-inserter__media-tabs-container {
+	padding-top: $grid-unit-20;
+}
+
 .block-editor-inserter__category-tablist {
 	margin-bottom: $grid-unit-10;
 }
