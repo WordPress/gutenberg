@@ -108,13 +108,13 @@ REST/PHP surface lives in `lib/compat/wordpress-6.9/`:
 | `block-comments.php`                              | Registers the `_wp_note_status`, `_wp_suggestion`, and `_wp_suggestion_status` comment meta and adds `editor.notes` post-type support. |
 | `class-gutenberg-rest-comment-controller-6-9.php` | REST controller subclass remapping permissions for `note`-type comments (post editors get `edit_post`-based access; updates are gated by an allowlist of suggestion-lifecycle fields). |
 
-## Suggestion Payload (v1)
+## Suggestion Payload (v2)
 
 Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment:
 
 ```json
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "blockName": "core/paragraph",
   "baseRevision": "2026-04-15T12:34:56",
   "operations": [
@@ -133,9 +133,13 @@ Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment
 | `schemaVersion` | Allows future schema evolution without breaking old payloads. |
 | `blockName` | Safety check — apply is refused if the block type has changed. |
 | `baseRevision` | `post_modified_gmt` at capture time. A mismatch at apply time triggers a staleness warning. |
-| `operations` | Declarative transforms on the block tree. Currently only `attribute-set`; designed to extend to `block-insert-after`, `block-remove` in the future. |
+| `operations` | Declarative transforms on the block tree. v1 emitted `attribute-set` only; v2 reserves the structural variants (`block-insert-after`, `block-remove`, `block-move`) tracked in [#77434](https://github.com/WordPress/gutenberg/issues/77434). |
 
 Operations are **declarative transforms**, not HTML diffs. This makes them compatible with Yjs attribution semantics and resilient to concurrent edits on unrelated attributes.
+
+### v1 → v2 compatibility
+
+The shape of a v1 payload is a strict subset of v2 (only `attribute-set` operations). v1 payloads are migrated forward in `parseSuggestionPayload` by stamping `schemaVersion: 2` — no rewriting needed. The bump matters because a v1 reader that encountered a v2 payload with structural ops would silently drop them at apply time; refusing the payload outright surfaces an explicit "newer editor" notice and offers only Reject.
 
 ### Schema versioning
 
