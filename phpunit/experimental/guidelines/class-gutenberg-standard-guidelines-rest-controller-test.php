@@ -172,6 +172,29 @@ class Gutenberg_Standard_Guidelines_REST_Controller_Test extends WP_UnitTestCase
 	}
 
 	/**
+	 * Authors can pass the post type read capability but must still satisfy
+	 * the per-post check for non-public statuses.
+	 */
+	public function test_get_item_author_cannot_read_other_users_private_guideline() {
+		$create_response = $this->create_artifact_guideline( array( 'status' => 'private' ) );
+		$post_id         = $create_response->get_data()['id'];
+
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $author_id );
+
+		$request  = new WP_REST_Request( 'GET', self::REST_BASE . '/' . $post_id );
+		$response = rest_get_server()->dispatch( $request );
+
+		$status = $response->get_status();
+		$code   = $response->get_data()['code'] ?? null;
+
+		self::delete_user( $author_id );
+
+		$this->assertSame( 403, $status );
+		$this->assertSame( 'rest_forbidden', $code );
+	}
+
+	/**
 	 * Artifact guidelines can be updated through the standard item route.
 	 */
 	public function test_update_artifact_guideline() {
