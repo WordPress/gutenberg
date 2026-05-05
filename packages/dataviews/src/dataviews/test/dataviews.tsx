@@ -560,6 +560,51 @@ describe( 'DataViews component', () => {
 			).toHaveAttribute( 'aria-expanded', 'true' );
 		} );
 
+		it( 'preserves manually collapsed tree rows after data refresh', async () => {
+			const user = userEvent.setup();
+			const view = {
+				...DEFAULT_VIEW,
+				fields: [],
+				titleField: 'title',
+				showLevels: true,
+				layout: {
+					hierarchyStyle: 'tree' as const,
+					expandChildren: true,
+				},
+			};
+			const getItemParentId = ( item: Data ) => item.parent;
+			const { rerender } = render(
+				<DataViewWrapper
+					data={ hierarchicalData }
+					view={ view }
+					getItemParentId={ getItemParentId }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
+			);
+
+			expect(
+				screen.queryByText( 'First child' )
+			).not.toBeInTheDocument();
+
+			rerender(
+				<DataViewWrapper
+					data={ hierarchicalData.map( ( item ) => ( { ...item } ) ) }
+					view={ view }
+					getItemParentId={ getItemParentId }
+				/>
+			);
+
+			expect(
+				screen.queryByText( 'First child' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
 		it( 'expands and collapses tree hierarchy rows', async () => {
 			const user = userEvent.setup();
 			render(

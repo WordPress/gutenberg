@@ -428,6 +428,7 @@ function ViewTable< Item >( {
 			);
 		}
 	);
+	const manuallyCollapsedItemIdsRef = useRef< Set< string > >( new Set() );
 
 	useEffect( () => {
 		if ( ! isTreeHierarchy || ! view.layout?.expandChildren ) {
@@ -441,7 +442,8 @@ function ViewTable< Item >( {
 			for ( const treeRow of treeRows ) {
 				if (
 					treeRow.childCount &&
-					! nextExpandedItemIds.has( treeRow.id )
+					! nextExpandedItemIds.has( treeRow.id ) &&
+					! manuallyCollapsedItemIdsRef.current.has( treeRow.id )
 				) {
 					nextExpandedItemIds.add( treeRow.id );
 					hasChanges = true;
@@ -546,8 +548,12 @@ function ViewTable< Item >( {
 			const nextExpandedItemIds = new Set( previousExpandedItemIds );
 			if ( nextExpandedItemIds.has( itemId ) ) {
 				nextExpandedItemIds.delete( itemId );
+				if ( view.layout?.expandChildren ) {
+					manuallyCollapsedItemIdsRef.current.add( itemId );
+				}
 			} else {
 				nextExpandedItemIds.add( itemId );
+				manuallyCollapsedItemIdsRef.current.delete( itemId );
 			}
 			return nextExpandedItemIds;
 		} );
