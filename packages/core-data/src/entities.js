@@ -127,6 +127,14 @@ export const rootEntitiesConfig = [
 		supportsPagination: false,
 	},
 	{
+		name: 'widgetModule',
+		kind: 'root',
+		baseURL: '/wp/v2/widget-modules',
+		plural: 'widgetModules',
+		label: __( 'Widget modules' ),
+		supportsPagination: false,
+	},
+	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
