@@ -86,25 +86,28 @@ function getMinZoomForCover(
 }
 
 /**
- * Compute the crop handle bounds in normalized visual space by finding the
+ * Compute the crop handle bounds in normalized visual space — the
  * axis-aligned bounding box (AABB) of the actual image footprint at the
- * current pan/zoom/rotation, then intersecting with the container viewport.
+ * current pan/zoom/rotation.
+ *
+ * Returns the full image AABB without intersecting with the container
+ * viewport. The viewport pan mechanism in the Cropper component allows
+ * the canvas to scroll so handles can reach the image edge even when it
+ * lies outside the visible canvas area.
  *
  * Unlike a static centerline-based calculation, this accounts for the
  * current pan position — if the user pans right, the left bound tightens
  * because the image's left edge has moved right.
  *
- * @param state         The current cropper state (crop, zoom, rotation, flip).
- * @param elementSize   The fitted (unrotated) image element dimensions in pixels.
- * @param visualSize    The visual (rotated) image bounding box in pixels.
- * @param containerSize The container dimensions in pixels.
+ * @param state       The current cropper state (crop, zoom, rotation, flip).
+ * @param elementSize The fitted (unrotated) image element dimensions in pixels.
+ * @param visualSize  The visual (rotated) image bounding box in pixels.
  * @return The min/max x and y that a crop rect edge can reach in normalized space.
  */
-export function getCropBounds(
+export function getImageCropBounds(
 	state: CropperState,
 	elementSize: Size,
-	visualSize: Size,
-	containerSize: Size
+	visualSize: Size
 ): { minX: number; minY: number; maxX: number; maxY: number } {
 	if (
 		elementSize.width === 0 ||
@@ -140,13 +143,6 @@ export function getCropBounds(
 		[ -hw, hh ],
 	];
 
-	// Transform corners through CSS matrix → screen offsets from element center.
-	// Screen position = element_center + transformed_offset.
-	// Element center is at (containerW/2, containerH/2) after CSS centering.
-	// But we want normalized coords, so work relative to the visual image origin.
-	const offsetX = ( containerSize.width - visualSize.width ) / 2;
-	const offsetY = ( containerSize.height - visualSize.height ) / 2;
-
 	let imgMinX = Infinity;
 	let imgMaxX = -Infinity;
 	let imgMinY = Infinity;
@@ -167,19 +163,11 @@ export function getCropBounds(
 		imgMaxY = Math.max( imgMaxY, ny );
 	}
 
-	// Container bounds in normalized space.
-	const containerMinX = -offsetX / visualSize.width;
-	const containerMaxX = ( containerSize.width - offsetX ) / visualSize.width;
-	const containerMinY = -offsetY / visualSize.height;
-	const containerMaxY =
-		( containerSize.height - offsetY ) / visualSize.height;
-
-	// Crop bounds = intersection of image AABB and container bounds.
 	return {
-		minX: Math.max( imgMinX, containerMinX ),
-		minY: Math.max( imgMinY, containerMinY ),
-		maxX: Math.min( imgMaxX, containerMaxX ),
-		maxY: Math.min( imgMaxY, containerMaxY ),
+		minX: imgMinX,
+		minY: imgMinY,
+		maxX: imgMaxX,
+		maxY: imgMaxY,
 	};
 }
 

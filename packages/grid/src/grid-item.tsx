@@ -54,6 +54,17 @@ export function GridItem( {
 	// edge — which has shifted whenever the width/height stepped a
 	// column/row. Re-anchor locally by subtracting the tile growth.
 	const initialResizeRectRef = useRef< DOMRect | null >( null );
+	// Document scroll position at the start of a resize. The handle's
+	// `delta` is in document coordinates; `getBoundingClientRect` is
+	// in viewport coordinates. Auto-scroll near the viewport edge
+	// shifts both: the delta inflates by the scroll change, while the
+	// tile's viewport bottom drifts up by the same amount. Without a
+	// scroll reference, the preview overlay would carry that
+	// inflation forward and drift away from the tile's edge.
+	const initialResizeScrollRef = useRef< {
+		x: number;
+		y: number;
+	} | null >( null );
 	// Latest cursor delta from the resize handle. Reading this in a
 	// `useLayoutEffect` lets the overlay re-measure the tile rect
 	// *after* React commits a width step but before paint, so the
@@ -102,22 +113,40 @@ export function GridItem( {
 		const node = itemRef.current;
 		if ( node && ! initialResizeRectRef.current ) {
 			initialResizeRectRef.current = node.getBoundingClientRect();
+			const ownerWindow = node.ownerDocument.defaultView ?? window;
+			initialResizeScrollRef.current = {
+				x: ownerWindow.scrollX,
+				y: ownerWindow.scrollY,
+			};
 		}
 		lastResizeDeltaRef.current = clamped;
 		onResize( item.key, clamped );
 		// Provisional preview against the pre-commit rect; the
 		// `useLayoutEffect` below refines it once React commits the
 		// new tile size so a column step never paints with the
-		// stale offset.
-		if ( node && initialResizeRectRef.current ) {
+		// stale offset. Subtract the scroll change so the overlay
+		// tracks the cursor's viewport-space position rather than
+		// drifting with the document scroll under it.
+		if (
+			node &&
+			initialResizeRectRef.current &&
+			initialResizeScrollRef.current
+		) {
 			const currentRect = node.getBoundingClientRect();
+			const ownerWindow = node.ownerDocument.defaultView ?? window;
+			const scrollDelta = {
+				x: ownerWindow.scrollX - initialResizeScrollRef.current.x,
+				y: ownerWindow.scrollY - initialResizeScrollRef.current.y,
+			};
 			const offsetX =
 				currentRect.right - initialResizeRectRef.current.right;
 			const offsetY =
 				currentRect.bottom - initialResizeRectRef.current.bottom;
 			setPreviewDelta( {
-				width: clamped.width - offsetX,
-				height: clamped.height - ( verticalResizable ? offsetY : 0 ),
+				width: clamped.width - offsetX - scrollDelta.x,
+				height: verticalResizable
+					? clamped.height - offsetY - scrollDelta.y
+					: 0,
 			} );
 		}
 	};
@@ -125,16 +154,24 @@ export function GridItem( {
 	useLayoutEffect( () => {
 		const lastDelta = lastResizeDeltaRef.current;
 		const initialRect = initialResizeRectRef.current;
+		const initialScroll = initialResizeScrollRef.current;
 		const node = itemRef.current;
-		if ( ! lastDelta || ! initialRect || ! node ) {
+		if ( ! lastDelta || ! initialRect || ! initialScroll || ! node ) {
 			return;
 		}
 		const currentRect = node.getBoundingClientRect();
+		const ownerWindow = node.ownerDocument.defaultView ?? window;
+		const scrollDelta = {
+			x: ownerWindow.scrollX - initialScroll.x,
+			y: ownerWindow.scrollY - initialScroll.y,
+		};
 		const offsetX = currentRect.right - initialRect.right;
 		const offsetY = currentRect.bottom - initialRect.bottom;
 		const next = {
-			width: lastDelta.width - offsetX,
-			height: lastDelta.height - ( verticalResizable ? offsetY : 0 ),
+			width: lastDelta.width - offsetX - scrollDelta.x,
+			height: verticalResizable
+				? lastDelta.height - offsetY - scrollDelta.y
+				: 0,
 		};
 		// Use the updater form so the effect doesn't need `previewDelta`
 		// in its deps. Returning `prev` when nothing changed lets React
@@ -149,6 +186,7 @@ export function GridItem( {
 	const handleResizeEnd = () => {
 		setPreviewDelta( null );
 		initialResizeRectRef.current = null;
+		initialResizeScrollRef.current = null;
 		lastResizeDeltaRef.current = null;
 		onResizeEnd();
 	};
