@@ -3,6 +3,15 @@
  */
 import { Marked, type Tokens } from 'marked';
 
+// Skip escaping `"` and `'` so shortcodes like `[gallery ids="123"]` survive
+// for the shortcode converter to match.
+function escapeBodyText( value: string ): string {
+	return value
+		.replace( /&(?!#?\w+;)/g, '&amp;' )
+		.replace( /</g, '&lt;' )
+		.replace( />/g, '&gt;' );
+}
+
 const converter = new Marked( {
 	gfm: true,
 	breaks: true,
@@ -15,13 +24,18 @@ const converter = new Marked( {
 			const cls = language
 				? ` class="${ language } language-${ language }"`
 				: '';
-			const escaped = text
-				.replace( /&(?!#?\w+;)/g, '&amp;' )
-				.replace( /</g, '&lt;' )
-				.replace( />/g, '&gt;' )
-				.replace( /"/g, '&quot;' )
-				.replace( /'/g, '&#39;' );
-			return `<pre><code${ cls }>${ escaped }</code></pre>`;
+			return `<pre><code${ cls }>${ escapeBodyText(
+				text
+			) }</code></pre>`;
+		},
+		text( this: any, token: Tokens.Text | Tokens.Escape ): string {
+			if ( 'tokens' in token && token.tokens ) {
+				return this.parser.parseInline( token.tokens );
+			}
+			if ( 'escaped' in token && token.escaped ) {
+				return token.text;
+			}
+			return escapeBodyText( token.text );
 		},
 	},
 } );

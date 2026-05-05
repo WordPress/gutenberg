@@ -30,13 +30,13 @@ describe( 'markdownConverter', () => {
 
 	it( 'should not convert single-line date string into an ordered list', () => {
 		const input = '18. May 2021';
-		const output = '<p>18. May 2021</p>';
+		const output = '<p>18. May 2021</p>\n';
 		expect( markdownConverter( input ) ).toEqual( output );
 	} );
 
 	it( 'should not convert single-line "1. foo" into an ordered list', () => {
 		const input = '1. foo';
-		const output = '<p>1. foo</p>';
+		const output = '<p>1. foo</p>\n';
 		expect( markdownConverter( input ) ).toEqual( output );
 	} );
 
@@ -50,5 +50,10 @@ describe( 'markdownConverter', () => {
 		expect( markdownConverter( input ) ).toContain( '<ul>' );
 		expect( markdownConverter( input ) ).toContain( '<li>one</li>' );
 		expect( markdownConverter( input ) ).toContain( '<li>two</li>' );
+	} );
+
+	it( 'should preserve quotes in body text for shortcode matching', () => {
+		const input = '[gallery ids="123"]';
+		expect( markdownConverter( input ) ).toContain( '[gallery ids="123"]' );
 	} );
 } );
