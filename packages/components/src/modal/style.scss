@@ -29,9 +29,12 @@
 // The modal window element.
 .components-modal__frame {
 	@include reset;
-	// Use the entire viewport on smaller screens.
-	margin: $grid-unit-50 0 0 0;
+	// On smaller screens, render as a bottom sheet: edge-to-edge, anchored to
+	// the bottom of the viewport, with a height that adapts to the content
+	// (capped so it never covers the full viewport).
+	margin: auto 0 0 0;
 	width: 100%;
+	max-height: calc(100% - #{$grid-unit-50});
 	background: $white;
 	box-shadow: $elevation-large;
 	border-radius: $radius-large $radius-large 0 0;
@@ -60,6 +63,15 @@
 		animation-timing-function: cubic-bezier(1, 0, 0.2, 1);
 	}
 
+	// Full-screen modals still cover the entire viewport on mobile.
+	&.is-full-screen {
+		margin: 0;
+		width: 100%;
+		height: 100%;
+		max-height: none;
+		border-radius: 0;
+	}
+
 	// Show a centered modal on bigger screens.
 	@include break-small() {
 		border-radius: $radius-large;
@@ -71,6 +83,11 @@
 
 		&.is-full-screen {
 			@include break-small() {
+				// Reset the mobile bottom-sheet `is-full-screen` overrides
+				// (margin: 0, border-radius: 0) so the desktop full-screen
+				// modal is centered with rounded corners.
+				margin: auto;
+				border-radius: $radius-large;
 				width: calc(100% - #{ $grid-unit-20 * 2 });
 				height: calc(100% - #{ $grid-unit-20 * 2 });
 				max-height: none;
@@ -119,14 +136,15 @@
 	}
 }
 
+// On mobile, the modal slides up from the bottom of the viewport.
 @keyframes components-modal__appear-animation {
 	from {
 		opacity: 0;
-		transform: scale(0.9);
+		transform: translateY(100%);
 	}
 	to {
 		opacity: 1;
-		transform: scale(1);
+		transform: translateY(0);
 	}
 }
 
@@ -135,11 +153,38 @@
 @keyframes components-modal__disappear-animation {
 	from {
 		opacity: 1;
-		transform: scale(1);
+		transform: translateY(0);
 	}
 	to {
 		opacity: 0;
-		transform: scale(0.9);
+		transform: translateY(100%);
+	}
+}
+
+// On bigger screens, the modal scales in/out instead of sliding. The keyframe
+// names are intentionally reused so the JS animationend listener
+// (use-modal-exit-animation.ts) keeps working unchanged.
+@include break-small() {
+	@keyframes components-modal__appear-animation {
+		from {
+			opacity: 0;
+			transform: scale(0.9);
+		}
+		to {
+			opacity: 1;
+			transform: scale(1);
+		}
+	}
+
+	@keyframes components-modal__disappear-animation {
+		from {
+			opacity: 1;
+			transform: scale(1);
+		}
+		to {
+			opacity: 0;
+			transform: scale(0.9);
+		}
 	}
 }
 
