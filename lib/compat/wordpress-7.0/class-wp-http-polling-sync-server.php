@@ -500,9 +500,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 						return $this->add_update( $room, $client_id, $type, $data );
 					}
 
-					// Reaching this point means there's a newer compaction, so we can
-					// silently ignore this one.
-					return true;
+					/*
+					 * A newer compaction already advanced the cursor, but we
+					 * can not safely drop an update. The incoming bytes still encode
+					 * operations other clients may not have seen, so store them as a
+					 * regular update. Y.applyUpdateV2 merges state-as-update blobs
+					 * idempotently, so overlap with the existing compaction is safe.
+					 */
+					return $this->add_update( $room, $client_id, self::UPDATE_TYPE_UPDATE, $data );
 
 				case self::UPDATE_TYPE_SYNC_STEP1:
 				case self::UPDATE_TYPE_SYNC_STEP2:
