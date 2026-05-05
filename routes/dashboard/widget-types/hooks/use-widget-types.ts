@@ -1,14 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { dispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import type { WidgetName, WidgetType } from '../types';
+
+/**
+ * Registers the `widgetModule` core-data entity at module load.
+ *
+ * Scoped to this experimental feature: the entity lives here instead of
+ * the static `rootEntitiesConfig` array, so WP installs that never load
+ * the dashboard widgets package never see it.
+ */
+dispatch( coreStore ).addEntities( [
+	{
+		name: 'widgetModule',
+		kind: 'root',
+		key: 'name',
+		baseURL: '/wp/v2/widget-modules',
+		plural: 'widgetModules',
+		label: __( 'Widget modules' ),
+		supportsPagination: false,
+	},
+] );
 
 /**
  * Shape returned by the `/wp/v2/widget-modules` REST endpoint. PHP keeps
