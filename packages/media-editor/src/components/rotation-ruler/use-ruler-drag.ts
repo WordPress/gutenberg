@@ -104,6 +104,7 @@ export function useRulerDrag(
 		value: number;
 		startX: number;
 		startValue: number;
+		activeStep: number;
 		dragging: boolean;
 		captureElement: HTMLElement | null;
 		capturePointerId: number;
@@ -112,6 +113,7 @@ export function useRulerDrag(
 		value,
 		startX: 0,
 		startValue: 0,
+		activeStep: step,
 		dragging: false,
 		captureElement: null,
 		capturePointerId: 0,
@@ -161,6 +163,7 @@ export function useRulerDrag(
 			state.capturePointerId = event.pointerId;
 			state.startX = event.clientX;
 			state.startValue = state.value;
+			state.activeStep = event.shiftKey ? step / 2 : step;
 			state.dragging = true;
 			onPointerDownStart?.();
 
@@ -175,24 +178,40 @@ export function useRulerDrag(
 			window.addEventListener( 'pointerup', onWindowUp );
 			window.addEventListener( 'pointercancel', onWindowUp );
 		},
-		[ disabled, onPointerDownStart, endDrag ]
+		[ disabled, onPointerDownStart, endDrag, step ]
 	);
 
 	const onPointerMove = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
-			if ( ! latestRef.current.dragging ) {
+			const state = latestRef.current;
+			if ( ! state.dragging ) {
 				return;
 			}
-			const deltaPx = event.clientX - latestRef.current.startX;
-			const deltaValue = pxToValueDelta( deltaPx, pixelsPerStep, step );
-			const raw = latestRef.current.startValue + deltaValue;
-			const stepped = quantize( raw, step );
+			// Shift toggles fine mode mid-drag. The drag math computes
+			// from `startX` / `startValue`, so naively swapping `step`
+			// would yank the value backward. Rebase to the current
+			// pointer + value so the granularity changes without a
+			// jump.
+			const requestedStep = event.shiftKey ? step / 2 : step;
+			if ( requestedStep !== state.activeStep ) {
+				state.startX = event.clientX;
+				state.startValue = state.value;
+				state.activeStep = requestedStep;
+			}
+			const deltaPx = event.clientX - state.startX;
+			const deltaValue = pxToValueDelta(
+				deltaPx,
+				pixelsPerStep,
+				state.activeStep
+			);
+			const raw = state.startValue + deltaValue;
+			const stepped = quantize( raw, state.activeStep );
 			const next = clampValue( stepped, min, max );
-			if ( next !== latestRef.current.value ) {
+			if ( next !== state.value ) {
 				// Update the ref synchronously so consecutive pointermove
 				// events that fire before React commits still see the
 				// last *emitted* value as `previous` for the next math.
-				latestRef.current.value = next;
+				state.value = next;
 				onChange( next );
 			}
 		},

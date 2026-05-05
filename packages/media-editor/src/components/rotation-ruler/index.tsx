@@ -93,8 +93,9 @@ function formatValue( value: number ): string {
  * @param props.max           Upper bound of the range (default: 45).
  * @param props.step          Value step for drag and keyboard arrows
  *                            (default: 1). Drag values are quantized to
- *                            multiples of `step`. Shift+arrow halves
- *                            the step for keyboard precision.
+ *                            multiples of `step`. Holding Shift during
+ *                            drag or with arrow keys halves the step
+ *                            for precision adjustment.
  * @param props.label         Accessible label for the slider input.
  * @param props.unit          Unit suffix shown in the active label and
  *                            `aria-valuetext` (default: `°`).
@@ -151,9 +152,9 @@ export default function RotationRuler( {
 			return;
 		}
 		const direction = isIncrement ? 1 : -1;
-		// Shift halves the step for a precision keyboard adjustment
-		// (e.g. 0.5° rotation when step is 1°). Drag stays at full
-		// `step` granularity for tactile snapping.
+		// Shift halves the step for precision adjustment
+		// (e.g. 0.5° rotation when step is 1°). Same modifier works
+		// on drag — see `useRulerDrag`.
 		const magnitude = event.shiftKey ? step / 2 : step;
 		const next = clampValue( value + direction * magnitude, min, max );
 		if ( next !== value ) {

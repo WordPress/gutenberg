@@ -32,5 +32,6 @@ clamp/transform values as they wish before passing them in.
 - **→ / ↑** — increment by `step`
 - **Shift + arrow** — half-step (e.g. 0.5° when `step` is 1°), for
   keyboard precision when the integer drag-step is too coarse.
+  **Shift + drag** does the same on the pointer.
 - **Home / End** — min / max
 - **PageUp / PageDown** — ±10% of range (native input behaviour)
