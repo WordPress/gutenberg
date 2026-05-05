@@ -7,15 +7,19 @@
  */
 
 /**
- * Render a variable that we'll use to declare that the editor will need the classic block.
+ * Inject a global JS flag that declares the editor will need the classic block.
  */
 function gutenberg_declare_classic_block_necessary() {
 	if ( ! gutenberg_classic_block_supports_inserter() ) {
 		return;
 	}
-	echo '<script type="text/javascript">window.wp.needsClassicBlock = true;</script>';
+	wp_add_inline_script(
+		'wp-block-library',
+		'window.wp = window.wp || {}; window.wp.needsClassicBlock = true;',
+		'before'
+	);
 }
-add_action( 'admin_print_footer_scripts', 'gutenberg_declare_classic_block_necessary', 20 );
+add_action( 'admin_init', 'gutenberg_declare_classic_block_necessary' );
 
 /**
  * Whether the Classic block should be available in the inserter.
