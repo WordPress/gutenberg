@@ -97,7 +97,10 @@ const isNoneOperatorDefinition = {
 			return ! filterValue.some( ( fv: any ) =>
 				fieldValue.includes( fv )
 			);
-		} else if ( typeof fieldValue === 'string' ) {
+		}
+
+		const fieldValueType = typeof fieldValue;
+		if ( fieldValueType === 'string' || fieldValueType === 'number' ) {
 			return ! filterValue.includes( fieldValue );
 		}
 
@@ -142,7 +145,10 @@ const OPERATORS: {
 				return filterValue.some( ( fv: any ) =>
 					fieldValue.includes( fv )
 				);
-			} else if ( typeof fieldValue === 'string' ) {
+			}
+
+			const fieldValueType = typeof fieldValue;
+			if ( fieldValueType === 'string' || fieldValueType === 'number' ) {
 				return filterValue.includes( fieldValue );
 			}
 
