@@ -56,6 +56,7 @@ import {
 	useImageEditingSession,
 	type ImageEditingSessionImage,
 } from '../image-editing-session';
+import { useImageEditorExtensionPanels } from '../image-editor-extension-registry';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
@@ -240,6 +241,7 @@ function MediaEditorContent( {
 }: MediaEditorProps ) {
 	const imageSession = useImageEditingSession();
 	const setSourceImage = imageSession.setSourceImage;
+	const extensionPanels = useImageEditorExtensionPanels();
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -377,6 +379,22 @@ function MediaEditorContent( {
 		if ( ! isImage ) {
 			return [ detailsTab ];
 		}
+		const extensionTabs = extensionPanels.map( ( panel ) => {
+			const PanelComponent = panel.component;
+			return {
+				id: `extension/${ panel.name }`,
+				title: panel.title,
+				panel: (
+					<Stack
+						className="media-editor__panel"
+						direction="column"
+						gap="lg"
+					>
+						<PanelComponent session={ imageSession } />
+					</Stack>
+				),
+			};
+		} );
 		return [
 			{
 				id: 'crop',
@@ -400,6 +418,7 @@ function MediaEditorContent( {
 					</Stack>
 				),
 			},
+			...extensionTabs,
 			detailsTab,
 		];
 	}, [
@@ -408,6 +427,8 @@ function MediaEditorContent( {
 		freeformCrop,
 		aspectRatioPresets,
 		signalPlacementControlInteraction,
+		extensionPanels,
+		imageSession,
 	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
