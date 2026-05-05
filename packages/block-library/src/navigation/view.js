@@ -202,6 +202,20 @@ const { state, actions } = store(
 				const { type } = getContext();
 				state.menuOpenedBy[ menuOpenedOn ] = true;
 				if ( type === 'overlay' ) {
+					// Compensate for the scrollbar disappearing to prevent text jumping.
+					if (
+						! document.documentElement.classList.contains(
+							'has-modal-open'
+						)
+					) {
+						const scrollbarWidth =
+							window.innerWidth -
+							document.documentElement.clientWidth;
+						if ( scrollbarWidth > 0 ) {
+							document.body.style.paddingRight = `${ scrollbarWidth }px`;
+						}
+					}
+
 					// Add a `has-modal-open` class to the <html> root.
 					document.documentElement.classList.add( 'has-modal-open' );
 				}
@@ -223,6 +237,7 @@ const { state, actions } = store(
 						document.documentElement.classList.remove(
 							'has-modal-open'
 						);
+						document.body.style.paddingRight = '';
 					}
 				}
 			},
