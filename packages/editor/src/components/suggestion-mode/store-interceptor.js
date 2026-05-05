@@ -78,7 +78,7 @@ function readNoteIds( metadata ) {
  * folds changes to these keys into its snapshot before diffing so they are
  * never reverted and never routed into the user-pending overlay.
  */
-const SYSTEM_METADATA_KEYS = new Set( [ 'noteId' ] );
+const SYSTEM_METADATA_KEYS = new Set( [ 'noteId', 'suggestion' ] );
 
 /**
  * Compare two attribute values structurally. Mirrors `isAttributeEqual` in
@@ -337,6 +337,95 @@ function isAcceptedSuggestionChange( coreSelect, currentAttributes, delta ) {
 }
 
 /**
+ * Marker shape stored at `metadata.suggestion` on a block to indicate a
+ * pending structural suggestion. The block stays in the live tree; the
+ * marker drives the visual treatment and tells the auto-save loop to
+ * persist the corresponding structural operation. Cleared on apply or
+ * reject. See `docs/explanations/architecture/suggestions.md` for the
+ * "apply-and-tag" rationale.
+ *
+ * @typedef {Object} SuggestionMarker
+ * @property {'pending-remove'|'pending-insert'|'pending-move'} type        Op type
+ *                                                                          the marker represents.
+ * @property {number}                                           [commentId] Filled in by auto-save once a note comment
+ *                                                                          exists for this marker.
+ */
+
+/**
+ * Walk the live block-editor tree and capture the parent + index of every
+ * block. Used by the removal-detection branch to re-insert a block at its
+ * previous position when the live tree drops it.
+ *
+ * @param {Object} blockEditor Block-editor selectors (`registry.select(
+ *                             'core/block-editor' )`).
+ * @return {{
+ *   blocksByClientId: Map<string, Object>,
+ *   parentByClientId: Map<string, string|null>,
+ *   indexByClientId:  Map<string, number>,
+ * }} Tree snapshot.
+ */
+function captureTreeSnapshot( blockEditor ) {
+	const blocksByClientId = new Map();
+	const parentByClientId = new Map();
+	const indexByClientId = new Map();
+
+	const walk = ( clientIds, parentClientId ) => {
+		for ( let index = 0; index < clientIds.length; index++ ) {
+			const clientId = clientIds[ index ];
+			const block = blockEditor.getBlock?.( clientId );
+			if ( ! block ) {
+				continue;
+			}
+			blocksByClientId.set( clientId, block );
+			parentByClientId.set( clientId, parentClientId );
+			indexByClientId.set( clientId, index );
+			const childIds = blockEditor.getBlockOrder?.( clientId ) ?? [];
+			if ( childIds.length > 0 ) {
+				walk( childIds, clientId );
+			}
+		}
+	};
+	walk( blockEditor.getBlockOrder?.() ?? [], null );
+
+	return { blocksByClientId, parentByClientId, indexByClientId };
+}
+
+/**
+ * Add or replace the `metadata.suggestion` marker on an attributes object,
+ * leaving every other field untouched. Returns a new object — the caller
+ * passes it to `updateBlockAttributes`, which performs its own merge.
+ *
+ * @param {Object}           currentMetadata Current block metadata.
+ * @param {SuggestionMarker} marker          Marker to write.
+ * @return {Object} New metadata with the marker applied.
+ */
+function withSuggestionMarker( currentMetadata, marker ) {
+	return {
+		...( currentMetadata || {} ),
+		suggestion: marker,
+	};
+}
+
+/**
+ * Filter a list of removed clientIds down to the topmost ancestors — the
+ * parents whose subtree contains the rest. Re-inserting a top-level removed
+ * block restores its descendants automatically; re-inserting both a parent
+ * and its child would duplicate the child.
+ *
+ * @param {string[]}                 removedIds       All clientIds missing
+ *                                                    from the live tree.
+ * @param {Map<string, string|null>} parentByClientId Snapshot parents.
+ * @return {string[]} Top-level removed clientIds.
+ */
+function topLevelRemoved( removedIds, parentByClientId ) {
+	const removedSet = new Set( removedIds );
+	return removedIds.filter( ( id ) => {
+		const parent = parentByClientId.get( id );
+		return parent === null || ! removedSet.has( parent );
+	} );
+}
+
+/**
  * Invisible component that catches block-attribute mutations dispatched
  * directly to the block-editor store while the editor is in Suggest intent.
  *
@@ -416,6 +505,13 @@ export default function SuggestionStoreInterceptor() {
 				blockEditor.getBlockAttributes( clientId )
 			);
 		}
+
+		// Tree snapshot from the previous tick. Used by the removal-
+		// detection branch to recover a block's parent + index + content
+		// after the block-editor store has dropped it. Refreshed at the end
+		// of every fire so the next fire can compare against the most
+		// recently-stable state.
+		let tree = captureTreeSnapshot( blockEditor );
 
 		// Set true while we're calling `updateBlockAttributes` to revert a
 		// detected mutation, so the resulting subscribe fire doesn't loop.
@@ -525,14 +621,89 @@ export default function SuggestionStoreInterceptor() {
 				// block; do NOT update it to `current` here.
 			}
 
-			// Drop snapshot entries for blocks that were removed.
-			if ( snapshot.size > liveClientIds.length ) {
-				for ( const clientId of snapshot.keys() ) {
-					if ( ! live.has( clientId ) ) {
-						snapshot.delete( clientId );
-					}
+			// Detect blocks that disappeared from the live tree and route
+			// them through the Suggest-mode "apply-and-tag" flow: re-insert
+			// the subtree from the previous-tick snapshot at its previous
+			// position, then tag the re-inserted block with a
+			// `metadata.suggestion = { type: 'pending-remove' }` marker.
+			// Auto-save reads the marker and persists it as a `block-remove`
+			// operation; Apply later runs the real `removeBlock`, Reject
+			// just clears the marker. See suggestions.md for the rationale.
+			const removedIds = [];
+			for ( const clientId of tree.blocksByClientId.keys() ) {
+				if ( ! live.has( clientId ) ) {
+					removedIds.push( clientId );
 				}
 			}
+
+			if ( removedIds.length > 0 ) {
+				const tops = topLevelRemoved(
+					removedIds,
+					tree.parentByClientId
+				);
+
+				// Phase 1: re-insert each top-level removed subtree at its
+				// previous position. Done synchronously inside `isReverting`
+				// so the resulting subscribe fires don't loop. The inserted
+				// blocks reuse their original clientIds (preserved by
+				// `getBlock`), so the marker write below targets the same
+				// IDs the caller saw.
+				isReverting = true;
+				try {
+					for ( const clientId of tops ) {
+						const block = tree.blocksByClientId.get( clientId );
+						const parent = tree.parentByClientId.get( clientId );
+						const index = tree.indexByClientId.get( clientId );
+						if ( ! block ) {
+							continue;
+						}
+						blockEditorDispatch.insertBlock(
+							block,
+							index,
+							parent ?? undefined,
+							false
+						);
+					}
+				} finally {
+					isReverting = false;
+				}
+
+				// Phase 2: tag each re-inserted block with the pending-
+				// remove marker. `metadata.suggestion` is in
+				// SYSTEM_METADATA_KEYS, so subsequent fires fold the marker
+				// into the snapshot and don't route it to the user overlay.
+				for ( const clientId of tops ) {
+					const currentAttrs =
+						blockEditor.getBlockAttributes?.( clientId );
+					if ( ! currentAttrs ) {
+						continue;
+					}
+					isReverting = true;
+					try {
+						blockEditorDispatch.updateBlockAttributes( clientId, {
+							metadata: withSuggestionMarker(
+								currentAttrs.metadata,
+								{ type: 'pending-remove' }
+							),
+						} );
+					} finally {
+						isReverting = false;
+					}
+				}
+
+				// Drop snapshot entries for any remaining (descendant)
+				// removed blocks — they came back as part of their parent's
+				// re-inserted subtree, but we still want a fresh re-seed.
+				for ( const clientId of removedIds ) {
+					snapshot.delete( clientId );
+				}
+			}
+
+			// Refresh the tree snapshot so the next fire compares against
+			// the new stable state. Done at the end of every fire whether
+			// or not a removal was detected — captures inserts and moves
+			// the live tree settled on during this tick.
+			tree = captureTreeSnapshot( blockEditor );
 		}, BLOCK_EDITOR_STORE_NAME );
 
 		return unsubscribe;
@@ -547,4 +718,7 @@ export {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	captureTreeSnapshot,
+	topLevelRemoved,
+	withSuggestionMarker,
 };

@@ -26,6 +26,8 @@ import SuggestionStoreInterceptor, {
 	adoptSystemMetadata,
 	stripSystemMetadata,
 	isAcceptedSuggestionChange,
+	topLevelRemoved,
+	withSuggestionMarker,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -171,7 +173,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
-	function setup() {
+	function setup( { initialBlocks } = {} ) {
 		const registry = createRegistry();
 		registry.register( noticesStore );
 		// `preferencesStore` is required by `setEditorIntent` on branches
@@ -183,8 +185,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		registry.register( editorStore );
 		registry.dispatch( editorStore ).setEditorIntent( 'suggest' );
 
-		const block = createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
-		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		const block =
+			initialBlocks?.[ 0 ] ??
+			createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
+		const blocks = initialBlocks ?? [ block ];
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 
 		let overlayHandle;
 		function CaptureOverlay() {
@@ -383,6 +388,62 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			getOverlay().entries[ clientId ]?.overlayAttributes?.content
 		).toBe( 'After apply' );
 	} );
+
+	it( 'tags a removed block with metadata.suggestion = pending-remove instead of dropping it', async () => {
+		// In Suggest mode a `removeBlock` dispatch must not actually remove
+		// the block — the apply-and-tag flow re-inserts the subtree at its
+		// previous position and marks it pending-remove. Auto-save reads
+		// the marker and persists it as a `block-remove` operation; Apply
+		// later runs the real removeBlock, Reject just clears the marker.
+		const { registry, clientId, getOverlay } = setup();
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( clientId );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( clientId );
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion ).toEqual( {
+			type: 'pending-remove',
+		} );
+
+		// The marker is system metadata — it must NOT leak into the user
+		// overlay (the overlay represents user-pending edits, not provider-
+		// internal linkage).
+		expect(
+			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
+		).toBeUndefined();
+	} );
+
+	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {
+		// `removeBlock` on a parent removes the whole subtree atomically.
+		// We must re-insert just the parent — its child rides along.
+		// Re-inserting both would duplicate the child.
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' }, [
+			createBlock( TEST_BLOCK_NAME, { content: 'Child' } ),
+		] );
+		const { registry } = setup( { initialBlocks: [ parent ] } );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.removeBlock( parent.clientId );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( parent.clientId );
+		expect( liveBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].innerBlocks[ 0 ].attributes?.content ).toBe(
+			'Child'
+		);
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-remove'
+		);
+	} );
 } );
 
 describe( 'isAcceptedSuggestionChange', () => {
@@ -578,5 +639,73 @@ describe( 'stripSystemMetadata', () => {
 			level: 3,
 			metadata: { name: 'Heading' },
 		} );
+	} );
+} );
+
+describe( 'topLevelRemoved', () => {
+	it( 'returns the input when every removed block has a live parent', () => {
+		const parentByClientId = new Map( [
+			[ 'a', null ],
+			[ 'b', null ],
+		] );
+		expect( topLevelRemoved( [ 'a', 'b' ], parentByClientId ) ).toEqual( [
+			'a',
+			'b',
+		] );
+	} );
+
+	it( 'filters out descendants of other removed blocks', () => {
+		const parentByClientId = new Map( [
+			[ 'parent', null ],
+			[ 'child', 'parent' ],
+			[ 'grandchild', 'child' ],
+		] );
+		expect(
+			topLevelRemoved(
+				[ 'parent', 'child', 'grandchild' ],
+				parentByClientId
+			)
+		).toEqual( [ 'parent' ] );
+	} );
+
+	it( 'keeps siblings whose parent is still live', () => {
+		const parentByClientId = new Map( [
+			[ 'liveParent', null ],
+			[ 'sibling-a', 'liveParent' ],
+			[ 'sibling-b', 'liveParent' ],
+		] );
+		expect(
+			topLevelRemoved( [ 'sibling-a', 'sibling-b' ], parentByClientId )
+		).toEqual( [ 'sibling-a', 'sibling-b' ] );
+	} );
+} );
+
+describe( 'withSuggestionMarker', () => {
+	it( 'attaches the marker to a fresh metadata object', () => {
+		expect(
+			withSuggestionMarker( undefined, { type: 'pending-remove' } )
+		).toEqual( { suggestion: { type: 'pending-remove' } } );
+	} );
+
+	it( 'preserves existing metadata fields when adding the marker', () => {
+		expect(
+			withSuggestionMarker(
+				{ noteId: 7, name: 'Hero' },
+				{ type: 'pending-remove' }
+			)
+		).toEqual( {
+			noteId: 7,
+			name: 'Hero',
+			suggestion: { type: 'pending-remove' },
+		} );
+	} );
+
+	it( 'replaces an existing marker rather than merging', () => {
+		expect(
+			withSuggestionMarker(
+				{ suggestion: { type: 'pending-insert', commentId: 1 } },
+				{ type: 'pending-remove' }
+			).suggestion
+		).toEqual( { type: 'pending-remove' } );
 	} );
 } );
