@@ -99,6 +99,9 @@ export default function StateControl( {
 			<DropdownMenu
 				icon={ chevronDown }
 				label={ triggerLabel }
+				popoverProps={ {
+					placement: 'right-start',
+				} }
 				text={ triggerLabel }
 				toggleProps={ {
 					size: 'compact',
