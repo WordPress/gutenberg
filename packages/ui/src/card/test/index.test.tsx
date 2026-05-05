@@ -49,7 +49,7 @@ describe( 'Card', () => {
 	} );
 
 	describe( 'fullbleed', () => {
-		it( 'renders children inside Content', () => {
+		it( 'renders children', () => {
 			render(
 				<Card.Root>
 					<Card.Content>
@@ -64,23 +64,6 @@ describe( 'Card', () => {
 			);
 
 			expect( screen.getByRole( 'img', { name: 'test' } ) ).toBeVisible();
-		} );
-
-		it( 'renders children inside Header', () => {
-			render(
-				<Card.Root>
-					<Card.Header>
-						<Card.FullBleed>
-							<img
-								src="https://example.com/hero.jpg"
-								alt="hero"
-							/>
-						</Card.FullBleed>
-					</Card.Header>
-				</Card.Root>
-			);
-
-			expect( screen.getByRole( 'img', { name: 'hero' } ) ).toBeVisible();
 		} );
 	} );
 

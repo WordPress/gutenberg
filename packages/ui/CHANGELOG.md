@@ -37,6 +37,7 @@
 -   `Select`: Hide the browser focus ring on highlighted popup items ([#77919](https://github.com/WordPress/gutenberg/pull/77919)).
 -   `Drawer`: Restore the slide-out animation when the popup closes ([#77800](https://github.com/WordPress/gutenberg/pull/77800)).
 -   `Drawer`: Forward the `render` prop on `Drawer.Content` to the scroll container instead of leaking it as a DOM attribute, matching `Dialog.Content` ([#77941](https://github.com/WordPress/gutenberg/pull/77941)).
+-   `Card`: Fix missing gap between `Card.Header` and `Card.Content` when another element (e.g. an image) precedes the header as the first card child ([#77856](https://github.com/WordPress/gutenberg/pull/77856)).
 
 ### New Features
 
@@ -57,6 +58,10 @@
 
 -   `Dialog`: Use `--wpds-motion-*` design tokens for animation duration and easing ([#76097](https://github.com/WordPress/gutenberg/pull/76097)).
 -   Add internal `getWpCompatOverlaySlot()` helper and a co-located unlayered CSS module that lazily provide a body-level `[data-wp-compat-overlay-slot]` container at z-index `1000000003`, gated by `useEnableWpCompatOverlaySlot()` and by auto-detection of `window.wp.components` ([#77851](https://github.com/WordPress/gutenberg/pull/77851)).
+
+### Documentation
+
+-   `Card`: Add Storybook examples showing how to place images directly inside `Card.Root` for hero and cover image layouts, covering four compositions: image with header and content, image with header only, image with content only, and image alone ([#77856](https://github.com/WordPress/gutenberg/pull/77856)).
 
 ## 0.12.0 (2026-04-29)
 

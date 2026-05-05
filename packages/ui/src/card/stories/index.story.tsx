@@ -72,56 +72,6 @@ export const Default: Story = {
 };
 
 /**
- * `Card.FullBleed` as the sole child of `Card.Content` spans edge-to-edge
- * with no padding around it.
- */
-export const FullBleedOnly: Story = {
-	args: {
-		children: (
-			<Card.Content>
-				<Card.FullBleed>
-					<div
-						style={ {
-							height: 180,
-							background:
-								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-						} }
-					/>
-				</Card.FullBleed>
-			</Card.Content>
-		),
-	},
-};
-
-/**
- * When `Card.FullBleed` is the sole child of `Card.Content` and a
- * `Card.Header` sits above it, the image bumps against the card's side and
- * bottom edges while the header retains its normal padding.
- */
-export const FullBleedContentWithHeader: Story = {
-	args: {
-		children: (
-			<>
-				<Card.Header>
-					<Card.Title>Card title</Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
-				</Card.Content>
-			</>
-		),
-	},
-};
-
-/**
  * `Card.FullBleed` breaks out of the card's padding to span
  * edge-to-edge. Useful for images, dividers, or embedded content.
  */
@@ -163,31 +113,27 @@ export const HeaderOnly: Story = {
 };
 
 /**
- * When `Card.FullBleed` is the **first child** of `Card.Header`, it extends
- * flush to the card's top and side edges — ideal for hero images. Content
- * that follows inside the header is padded normally.
+ * An image placed directly inside `Card.Root` (before `Card.Header` and
+ * `Card.Content`) naturally touches all four card edges. The card's
+ * `overflow: clip` and `border-radius` clip it to the rounded corners, and
+ * the header and content below retain their normal padding.
  */
-export const FullBleedInHeader: Story = {
+export const HeroImageWithHeaderAndContent: Story = {
 	args: {
 		children: (
 			<>
+				<div
+					style={ {
+						height: 180,
+						background:
+							'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+					} }
+				/>
 				<Card.Header>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
 					<Card.Title>Hero image card</Card.Title>
 				</Card.Header>
 				<Card.Content>
-					<Text>
-						The image above bleeds to the card&apos;s top and side
-						edges.
-					</Text>
+					<Text>Card body text below the hero image and title.</Text>
 				</Card.Content>
 			</>
 		),
@@ -195,32 +141,64 @@ export const FullBleedInHeader: Story = {
 };
 
 /**
- * When `Card.FullBleed` is the **only child** of `Card.Header`, it fills the
- * header entirely — top and sides flush to the card edges, no extra padding
- * below.
+ * Hero image followed only by a `Card.Header`. No content section below.
  */
-export const FullBleedHeroOnly: Story = {
+export const HeroImageWithHeader: Story = {
 	args: {
 		children: (
 			<>
+				<div
+					style={ {
+						height: 180,
+						background:
+							'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+					} }
+				/>
 				<Card.Header>
-					<Card.FullBleed>
-						<div
-							style={ {
-								height: 180,
-								background:
-									'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-							} }
-						/>
-					</Card.FullBleed>
+					<Card.Title>Hero image card</Card.Title>
 				</Card.Header>
+			</>
+		),
+	},
+};
+
+/**
+ * Hero image followed only by a `Card.Content` body. No header section.
+ */
+export const HeroImageWithContent: Story = {
+	args: {
+		children: (
+			<>
+				<div
+					style={ {
+						height: 180,
+						background:
+							'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+					} }
+				/>
 				<Card.Content>
-					<Text>
-						The image above bleeds to the card&apos;s top and side
-						edges.
-					</Text>
+					<Text>Card body text below the hero image.</Text>
 				</Card.Content>
 			</>
+		),
+	},
+};
+
+/**
+ * A single image filling the entire card — no header or content sections.
+ * The image is placed directly inside `Card.Root` and is clipped to the
+ * card's rounded corners by `overflow: clip`.
+ */
+export const CoverImage: Story = {
+	args: {
+		children: (
+			<div
+				style={ {
+					height: 180,
+					background:
+						'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+				} }
+			/>
 		),
 	},
 };
