@@ -11,11 +11,11 @@
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
 -   `ColorPicker`: Fix issue where clearing the hex input entirely doesn't reset the selected color to black ([#77912](https://github.com/WordPress/gutenberg/pull/77912)).
 -   `ExternalLink`: Fix focus outline rendered in wp-admin ([#77935](https://github.com/WordPress/gutenberg/pull/77935)).
--   `CustomSelectControl`: Portal the dropdown popover into the registered `Popover.Slot` (with a `document.body` fallback) so it can no longer be clipped by ancestor `overflow` containers (e.g. the Style Panel) or covered by sticky elements (e.g. the block toolbar). Pass `inline` to opt back into the previous inline rendering.
+-   `CustomSelectControl`: Portal the dropdown popover into the registered `Popover.Slot` (with a `document.body` fallback) so it can no longer be clipped by ancestor `overflow` containers (e.g. the Style Panel) or covered by sticky elements (e.g. the block toolbar). Pass `inline` to opt back into the previous inline rendering ([#77969](https://github.com/WordPress/gutenberg/pull/77969)).
 
 ### New Features
 
--   `CustomSelectControlV2` (unstable): Add `portal` and `portalElement` props that forward to the underlying Ariakit `SelectPopover`, allowing the dropdown to be rendered in a React portal.
+-   `CustomSelectControlV2` (unstable): Add `portal` and `portalElement` props that forward to the underlying Ariakit `SelectPopover`, allowing the dropdown to be rendered in a React portal ([#77969](https://github.com/WordPress/gutenberg/pull/77969)).
 
 ### Internal
 
