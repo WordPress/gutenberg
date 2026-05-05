@@ -8,7 +8,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
  */
 import MediaEditorCropPanel from '..';
 import type { MediaEditorCropPanelProps } from '..';
-import { CropperProvider } from '../../../image-editor';
+import { CropperProvider, useCropperState } from '../../../image-editor';
+
+function CropperHarness( { children }: { children: React.ReactNode } ) {
+	const cropper = useCropperState();
+	return <CropperProvider value={ cropper }>{ children }</CropperProvider>;
+}
 
 function setupCropPanel(
 	overrides: Partial< MediaEditorCropPanelProps > = {}
@@ -22,9 +27,9 @@ function setupCropPanel(
 	};
 
 	render(
-		<CropperProvider>
+		<CropperHarness>
 			<MediaEditorCropPanel { ...props } />
-		</CropperProvider>
+		</CropperHarness>
 	);
 
 	return props;

@@ -229,11 +229,17 @@ function ImageEditor() {
 When controls and the cropper are in different parts of the tree, use `CropperProvider` to avoid prop-drilling. Any descendant can call `useCropper()` to access the controller:
 
 ```tsx
-import { Cropper, CropperProvider, useCropper } from '../image-editor';
+import {
+  Cropper,
+  CropperProvider,
+  useCropper,
+  useCropperState,
+} from '../image-editor';
 
 function ImageEditor() {
+  const cropper = useCropperState();
   return (
-    <CropperProvider>
+    <CropperProvider value={ cropper }>
       <Toolbar />
       <CropperPanel />
       <Sidebar />

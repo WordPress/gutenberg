@@ -49,10 +49,12 @@ import MediaEditorCropPanel, {
 import MediaForm from '../media-form';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
-import { buildModifiers } from '../media-editor-modal/build-modifiers';
+import {
+	ImageEditingSessionProvider,
+	useImageEditingSession,
+} from '../image-editing-session';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
@@ -235,7 +237,7 @@ function MediaEditorContent( {
 	showCloseButton = false,
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
-	const cropper = useCropper();
+	const imageSession = useImageEditingSession();
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -257,7 +259,7 @@ function MediaEditorContent( {
 		[ id ]
 	);
 
-	const hasChanges = cropper.isDirty || hasEdits;
+	const hasChanges = imageSession.isDirty || hasEdits;
 
 	const registry = useRegistry();
 	const {
@@ -403,13 +405,7 @@ function MediaEditorContent( {
 		try {
 			let saved: Media | null | undefined;
 
-			const modifiers =
-				cropper.isDirty && cropper.state.image
-					? buildModifiers( cropper.state, {
-							width: cropper.state.image.naturalWidth,
-							height: cropper.state.image.naturalHeight,
-					  } )
-					: [];
+			const modifiers = imageSession.buildSaveModifiers();
 
 			if ( modifiers.length > 0 ) {
 				const pendingEdits = registry
@@ -461,7 +457,7 @@ function MediaEditorContent( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					cropper.reset();
+					imageSession.reset();
 				}
 				onSaved?.( {
 					id: next.id,
@@ -512,9 +508,9 @@ function MediaEditorContent( {
 					return;
 				}
 				if ( isRedoShortcut ) {
-					cropper.redo();
+					imageSession.redo();
 				} else {
-					cropper.undo();
+					imageSession.undo();
 				}
 			}
 		}
@@ -657,10 +653,13 @@ function MediaEditorContent( {
 }
 
 export function MediaEditor( props: MediaEditorProps ) {
+	// `ImageEditingSessionProvider` owns the cropper controller lifecycle.
+	// Keying on `id` remounts the session when the edited attachment changes,
+	// discarding previous image edit state.
 	return (
-		<CropperProvider key={ props.id }>
+		<ImageEditingSessionProvider key={ props.id }>
 			<MediaEditorContent { ...props } />
-		</CropperProvider>
+		</ImageEditingSessionProvider>
 	);
 }
 

@@ -67,7 +67,12 @@ Main cropper component. Fills its parent container.
 
 #### `CropperProvider` / `useCropper()`
 
-Context wrapper for deep component trees. Wraps `useCropperState` and provides it to descendants via `useCropper()`.
+Context wrapper for deep component trees. Owns no state itself — pass a controller from `useCropperState()` as `value`, and any descendant can read it via `useCropper()`.
+
+```tsx
+const cropper = useCropperState();
+return <CropperProvider value={ cropper }>{ children }</CropperProvider>;
+```
 
 ### React hooks
 
