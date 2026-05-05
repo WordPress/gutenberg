@@ -83,24 +83,22 @@ function TaxonomyEditStage() {
 	const navigate = useNavigate();
 	const isAddMode = id === NEW_ID;
 	const taxonomyId = parseInt( id, 10 );
-	const initialData = useSelect(
+	const record = useSelect(
 		( select ) => {
-			if ( isAddMode ) {
-				return BLANK_RECORD;
-			}
-			// beforeLoad (route.ts) guarantees the record is in cache.
-			const record = select(
-				coreStore
-			).getEntityRecord< TaxonomyRecord >(
-				'postType',
-				USER_TAXONOMY_POST_TYPE,
-				taxonomyId
-			)!;
-			return toFormData( record );
+			return (
+				! isAddMode &&
+				// beforeLoad (route.ts) guarantees the record is in cache.
+				select( coreStore ).getEntityRecord< TaxonomyRecord >(
+					'postType',
+					USER_TAXONOMY_POST_TYPE,
+					taxonomyId
+				)!
+			);
 		},
 		[ isAddMode, taxonomyId ]
 	);
-
+	const initialData =
+		! isAddMode && record ? toFormData( record ) : BLANK_RECORD;
 	const title = isAddMode ? __( 'Add taxonomy' ) : initialData.title.raw;
 	const commonProps = { initialData, title };
 	const taxonomyPageProps: TaxonomyPageProps = isAddMode

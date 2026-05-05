@@ -83,24 +83,22 @@ function PostTypeEditStage() {
 	const navigate = useNavigate();
 	const isAddMode = id === NEW_ID;
 	const postTypeId = parseInt( id, 10 );
-	const initialData = useSelect(
+	const record = useSelect(
 		( select ) => {
-			if ( isAddMode ) {
-				return BLANK_RECORD;
-			}
-			// beforeLoad (route.ts) guarantees the record is in cache.
-			const record = select(
-				coreStore
-			).getEntityRecord< PostTypeRecord >(
-				'postType',
-				USER_POST_TYPE_POST_TYPE,
-				postTypeId
-			)!;
-			return toFormData( record );
+			return (
+				! isAddMode &&
+				// beforeLoad (route.ts) guarantees the record is in cache.
+				select( coreStore ).getEntityRecord< PostTypeRecord >(
+					'postType',
+					USER_POST_TYPE_POST_TYPE,
+					postTypeId
+				)!
+			);
 		},
 		[ isAddMode, postTypeId ]
 	);
-
+	const initialData =
+		! isAddMode && record ? toFormData( record ) : BLANK_RECORD;
 	const title = isAddMode ? __( 'Add post type' ) : initialData.title.raw;
 	const commonProps = { initialData, title };
 	const postTypePageProps: PostTypePageProps = isAddMode
