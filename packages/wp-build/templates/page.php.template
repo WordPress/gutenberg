@@ -209,6 +209,24 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			}
 		}
 
+		// Add registered widgets as dynamic dependencies
+		if ( function_exists( '{{PREFIX}}_get_registered_widget_modules' ) ) {
+			foreach ( {{PREFIX}}_get_registered_widget_modules() as $widget ) {
+				if ( ! empty( $widget['widget_module'] ) ) {
+					$boot_dependencies[] = array(
+						'import' => 'dynamic',
+						'id'     => $widget['widget_module'],
+					);
+				}
+				if ( ! empty( $widget['render_module'] ) ) {
+					$boot_dependencies[] = array(
+						'import' => 'dynamic',
+						'id'     => $widget['render_module'],
+					);
+				}
+			}
+		}
+
 		// Dummy script module to ensure dependencies are loaded
 		wp_register_script_module(
 			'{{PAGE_SLUG}}',
