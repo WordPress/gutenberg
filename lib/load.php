@@ -122,6 +122,9 @@ require __DIR__ . '/compat/wordpress-7.0/command-palette.php';
 require __DIR__ . '/compat/wordpress-7.0/meta-box-rtc-compat.php';
 require __DIR__ . '/compat/wordpress-7.0/script-modules.php';
 
+// WordPress 7.1 compat.
+require __DIR__ . '/compat/wordpress-7.1/classic-block.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
@@ -137,10 +140,6 @@ if ( class_exists( '\WordPress\AiClient\AiClient' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
-}
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
-	require __DIR__ . '/experimental/disable-tinymce.php';
 }
 
 // Load the BC Layer to avoid fatal errors of extenders using the Fonts API.
