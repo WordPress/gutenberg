@@ -2,8 +2,6 @@
  * WordPress dependencies
  */
 import type { ReactNode } from 'react';
-// Dashboard is still experimental.
-
 import { Link, Stack, Text } from '@wordpress/ui';
 
 /**

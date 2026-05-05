@@ -6,9 +6,8 @@ import { dateI18n } from '@wordpress/date';
 import { __, _x } from '@wordpress/i18n';
 import { globe, postList, wordpress } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-// Dashboard is still experimental.
 /* eslint-disable @wordpress/use-recommended-components */
-import { EmptyState, Icon, Stack } from '@wordpress/ui';
+import { Card, EmptyState, Icon, Link, Stack } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 
 /**
@@ -34,9 +33,7 @@ interface NewsFeed {
 const NEWS_FEEDS = [
 	{
 		key: 'news',
-		/* translators: WordPress.org blog feed label in the Events and News widget. */
 		label: __( 'WordPress Blog' ),
-		/* translators: If a Rosetta site exists (e.g. https://es.wordpress.org/news/), then use that. Otherwise, leave untranslated. */
 		siteUrl: _x(
 			'https://wordpress.org/news/',
 			'Events and News dashboard widget'
@@ -45,9 +42,7 @@ const NEWS_FEEDS = [
 	},
 	{
 		key: 'planet',
-		/* translators: Planet WordPress feed label in the Events and News widget. */
 		label: __( 'Other WordPress News' ),
-		/* translators: If a localized Planet site exists, use that URL. Otherwise, leave untranslated. */
 		siteUrl: _x(
 			'https://planet.wordpress.org/',
 			'Events and News dashboard widget'
@@ -62,7 +57,7 @@ function decodeEntities( html: string ): string {
 	return txt.value;
 }
 
-export default function NewsSection() {
+export default function WordPressNews() {
 	const [ newsFeeds, setNewsFeeds ] = useState< NewsFeed[] >( [] );
 	const [ newsLoading, setNewsLoading ] = useState( true );
 
@@ -136,13 +131,31 @@ export default function NewsSection() {
 	);
 
 	return (
-		<div className={ styles.section }>
-			{ newsLoading && (
-				<Stack justify="center" align="center">
-					<Spinner />
-				</Stack>
-			) }
-			<List items={ combinedItems } empty={ emptyState } />
-		</div>
+		<Card.Content>
+			<div className={ styles.section }>
+				{ newsLoading && (
+					<Stack justify="center" align="center">
+						<Spinner />
+					</Stack>
+				) }
+				<List items={ combinedItems } empty={ emptyState } />
+			</div>
+			<Stack
+				direction="row"
+				align="center"
+				gap="sm"
+				className={ styles.footer }
+			>
+				<Link
+					href={ _x(
+						'https://wordpress.org/news/',
+						'Events and News dashboard widget'
+					) }
+					openInNewTab
+				>
+					{ __( 'News' ) }
+				</Link>
+			</Stack>
+		</Card.Content>
 	);
 }

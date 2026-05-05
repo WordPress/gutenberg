@@ -1,0 +1,50 @@
+.section {
+	padding: 16px 0;
+}
+
+.locationBar {
+	margin-block-end: 12px;
+}
+
+.locationInput {
+	flex: 1;
+	min-inline-size: 120px;
+}
+
+.eventNone {
+	padding-block: 8px;
+	font-size: 12px;
+	color: var(--wpds-color-fg-content-neutral-weak);
+}
+
+.statusText {
+	color: var(--wpds-color-fg-content-neutral-weak);
+	margin: 0;
+}
+
+.footer {
+	padding: 12px 0;
+	margin: 0;
+	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.listItem {
+	inline-size: 100%;
+}
+
+.listItemIcon {
+	inline-size: 28px;
+	block-size: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+	background: var(--wpds-color-bg-track-neutral-weak);
+	color: var(--wpds-color-fg-content-neutral-weak);
+	flex-shrink: 0;
+}
+
+.listItemContent {
+	flex: 1;
+	min-inline-size: 0;
+}

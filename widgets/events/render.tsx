@@ -13,11 +13,11 @@ import { dateI18n, format } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { calendar, mapMarker, wordpress, people } from '@wordpress/icons';
 import { Spinner } from '@wordpress/components';
-// Dashboard is still experimental.
 /* eslint-disable @wordpress/use-recommended-components */
 import {
 	Autocomplete,
 	Button,
+	Card,
 	EmptyState,
 	Icon,
 	IconButton,
@@ -102,14 +102,12 @@ function getFormattedDate(
 	/* translators: Date string for upcoming events. 1: Starting month, 2: Starting day, 3: Ending month, 4: Ending day, 5: Ending year. */
 	const multipleMonthEvent = __( '%1$s %2$d – %3$s %4$d, %5$d' );
 
-	// Detect single-day events.
 	if (
 		! endDate ||
 		format( 'Y-m-d', startDate ) === format( 'Y-m-d', endDate )
 	) {
 		formattedDate = dateI18n( singleDayEvent, startDate, timeZone );
 	} else if ( format( 'Y-m', startDate ) === format( 'Y-m', endDate ) ) {
-		// Multiple-day events.
 		formattedDate = sprintf(
 			multipleDayEvent,
 			dateI18n(
@@ -140,7 +138,6 @@ function getFormattedDate(
 			)
 		);
 	} else {
-		// Multi-day events that cross a month boundary.
 		formattedDate = sprintf(
 			multipleMonthEvent,
 			dateI18n(
@@ -218,7 +215,6 @@ function EventsList( {
 				</EmptyState.Title>
 				<EmptyState.Description>
 					{ createInterpolateElement(
-						/* translators: Anchor tag links to meetup organizer documentation. */
 						__( '<a>Help organize the next one</a>!' ),
 						{
 							a: <Link href={ organizeUrl } />,
@@ -266,7 +262,6 @@ function EventsList( {
 			{ events.length > 0 && events.length <= 2 && (
 				<p className={ styles.eventNone }>
 					{ createInterpolateElement(
-						/* translators: Anchor tag links to meetup organizer documentation. */
 						__(
 							'Want more events? <a>Help organize the next one</a>!'
 						),
@@ -280,7 +275,7 @@ function EventsList( {
 	);
 }
 
-export default function EventsSection() {
+export default function WordPressEvents() {
 	const locationInputId = useId();
 	const userLocale = useSelect(
 		( select ) =>
@@ -370,7 +365,6 @@ export default function EventsSection() {
 				);
 				const data = ( await response.json() ) as Array< {
 					place_id: number;
-					display_name: string;
 					address?: {
 						city?: string;
 						town?: string;
@@ -448,133 +442,157 @@ export default function EventsSection() {
 	}, [ activeLocation, userLocale ] );
 
 	return (
-		<div className={ styles.section }>
-			<div className={ styles.locationBar }>
-				{ locationLabel && ! isEditingLocation ? (
-					<Text variant="body-sm">
-						{ createInterpolateElement(
-							sprintf(
-								/* translators: %s: The name of a city. */
-								__(
-									'Upcoming events near <strong>%s</strong>.'
+		<Card.Content>
+			<div className={ styles.section }>
+				<div className={ styles.locationBar }>
+					{ locationLabel && ! isEditingLocation ? (
+						<Text variant="body-sm">
+							{ createInterpolateElement(
+								sprintf(
+									/* translators: %s: city name */
+									__(
+										'Upcoming events near <strong>%s</strong>.'
+									),
+									locationLabel
 								),
-								locationLabel
-							),
-							{
-								strong: <strong />,
-							}
-						) }{ ' ' }
-						<Link
-							onClick={ () => {
-								setLocationInput( activeLocation );
-								setIsEditingLocation( true );
+								{
+									strong: <strong />,
+								}
+							) }{ ' ' }
+							<Link
+								onClick={ () => {
+									setLocationInput( activeLocation );
+									setIsEditingLocation( true );
+								} }
+							>
+								{ __( 'Change' ) }
+							</Link>
+						</Text>
+					) : (
+						<form
+							onSubmit={ ( e ) => {
+								e.preventDefault();
+								setActiveLocation( locationInput );
+								setIsEditingLocation( false );
 							} }
 						>
-							{ __( 'Change' ) }
-						</Link>
-					</Text>
-				) : (
-					<form
-						onSubmit={ ( e ) => {
-							e.preventDefault();
-							setActiveLocation( locationInput );
-							setIsEditingLocation( false );
-						} }
-					>
-						<Stack direction="row" align="top" wrap="wrap" gap="sm">
-							<Autocomplete.Root
-								items={ locationOptions }
-								value={ locationInput }
-								onValueChange={ setLocationInput }
+							<Stack
+								direction="row"
+								align="top"
+								wrap="wrap"
+								gap="sm"
 							>
-								<Autocomplete.Input
-									id={ locationInputId }
-									className={ styles.locationInput }
-									render={
-										<InputControl
-											label={ __( 'City' ) }
-											hideLabelFromVision
-											size="compact"
-											description={ __(
-												'Select a city to view upcoming events.'
-											) }
-											onValueChange={ () => {} }
-											suffix={
-												<InputLayout.Slot padding="minimal">
-													<Autocomplete.Clear />
-													<IconButton
-														icon={ mapMarker }
-														label={ __(
-															'Use current location'
-														) }
-														onClick={
-															fillCityFromGeolocation
-														}
-														disabled={
-															isLocatingCity
-														}
-														size="small"
-														variant="minimal"
-													/>
-												</InputLayout.Slot>
-											}
-										/>
-									}
-									// translators: Replace with a recognizable city in your locale.
-									placeholder={ __( 'Cincinnati' ) }
-								/>
-								{ locationOptions.length > 0 && (
-									<Autocomplete.Popup>
-										<Autocomplete.List>
-											<Autocomplete.ListBody>
-												<Autocomplete.Collection>
-													{ ( item: {
-														id: string;
-														value: string;
-													} ) => (
-														<Autocomplete.Item
-															key={ item.id }
-															value={ item }
-														>
-															{ item.value }
-														</Autocomplete.Item>
-													) }
-												</Autocomplete.Collection>
-											</Autocomplete.ListBody>
-										</Autocomplete.List>
-									</Autocomplete.Popup>
-								) }
-							</Autocomplete.Root>
-							<Button
-								variant="outline"
-								tone="neutral"
-								size="compact"
-								type="submit"
-							>
-								{ __( 'Select' ) }
-							</Button>
-							{ isEditingLocation && (
-								<Button
-									size="compact"
-									tone="neutral"
-									variant="minimal"
-									onClick={ () =>
-										setIsEditingLocation( false )
-									}
+								<Autocomplete.Root
+									items={ locationOptions }
+									value={ locationInput }
+									onValueChange={ setLocationInput }
 								>
-									{ __( 'Cancel' ) }
+									<Autocomplete.Input
+										id={ locationInputId }
+										className={ styles.locationInput }
+										render={
+											<InputControl
+												label={ __( 'City' ) }
+												hideLabelFromVision
+												size="compact"
+												description={ __(
+													'Select a city to view upcoming events.'
+												) }
+												onValueChange={ () => {} }
+												suffix={
+													<InputLayout.Slot padding="minimal">
+														<Autocomplete.Clear />
+														<IconButton
+															icon={ mapMarker }
+															label={ __(
+																'Use current location'
+															) }
+															onClick={
+																fillCityFromGeolocation
+															}
+															disabled={
+																isLocatingCity
+															}
+															size="small"
+															variant="minimal"
+														/>
+													</InputLayout.Slot>
+												}
+											/>
+										}
+										placeholder={ __( 'Cincinnati' ) }
+									/>
+									{ locationOptions.length > 0 && (
+										<Autocomplete.Popup>
+											<Autocomplete.List>
+												<Autocomplete.ListBody>
+													<Autocomplete.Collection>
+														{ ( item: {
+															id: string;
+															value: string;
+														} ) => (
+															<Autocomplete.Item
+																key={ item.id }
+																value={ item }
+															>
+																{ item.value }
+															</Autocomplete.Item>
+														) }
+													</Autocomplete.Collection>
+												</Autocomplete.ListBody>
+											</Autocomplete.List>
+										</Autocomplete.Popup>
+									) }
+								</Autocomplete.Root>
+								<Button
+									variant="outline"
+									tone="neutral"
+									size="compact"
+									type="submit"
+								>
+									{ __( 'Select' ) }
 								</Button>
-							) }
-						</Stack>
-					</form>
-				) }
+								{ isEditingLocation && (
+									<Button
+										size="compact"
+										tone="neutral"
+										variant="minimal"
+										onClick={ () =>
+											setIsEditingLocation( false )
+										}
+									>
+										{ __( 'Cancel' ) }
+									</Button>
+								) }
+							</Stack>
+						</form>
+					) }
+				</div>
+				<EventsList
+					events={ events }
+					loading={ eventsLoading }
+					error={ eventsError }
+				/>
 			</div>
-
-			<EventsList
-				events={ events }
-				loading={ eventsLoading }
-				error={ eventsError }
-			/>
-		</div>
+			<Stack
+				direction="row"
+				align="center"
+				gap="sm"
+				className={ styles.footer }
+			>
+				<Link
+					href="https://make.wordpress.org/community/meetups-landing-page"
+					openInNewTab
+				>
+					{ __( 'Meetups' ) }
+				</Link>
+				<Link
+					href="https://central.wordcamp.org/schedule/"
+					openInNewTab
+				>
+					{ __( 'WordCamps' ) }
+				</Link>
+			</Stack>
+		</Card.Content>
 	);
 }
