@@ -4,7 +4,7 @@ export interface PostTypeRecord {
 	slug: string;
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
-	content: { raw: string; rendered: string };
+	config: StoredConfig;
 }
 
 export interface StoredLabels {
@@ -66,8 +66,7 @@ export interface StoredConfig {
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
- * the save payload via `serializeForSave`, so fields never have to JSON
- * round-trip `content.raw` on every keystroke.
+ * the save payload via `serializeForSave`.
  */
 export interface PostTypeFormData {
 	id?: number;

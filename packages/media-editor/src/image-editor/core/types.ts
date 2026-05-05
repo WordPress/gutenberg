@@ -143,6 +143,22 @@ export type CropperAction =
 	| { type: 'RESET'; payload?: Partial< CropperState > };
 
 /**
+ * Viewport camera state — display-only, does not affect export or undo.
+ *
+ * Applied as a CSS transform on the inner stage div so the user can scroll
+ * the view independently of the crop. zoom > 1 magnifies; pan shifts in CSS px.
+ */
+export interface ViewportState {
+	zoom: number;
+	pan: { x: number; y: number };
+}
+
+export type ViewportAction =
+	| { type: 'SET_VIEWPORT_ZOOM'; payload: number }
+	| { type: 'SET_VIEWPORT_PAN'; payload: { x: number; y: number } }
+	| { type: 'RESET_VIEWPORT' };
+
+/**
  * The contract for a pluggable stencil component.
  * Stencils render the crop area overlay and handle resize interactions.
  */

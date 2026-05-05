@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/guidelines.php';
 require_once __DIR__ . '/class-gutenberg-guidelines-post-type.php';
+require_once __DIR__ . '/class-gutenberg-guidelines-rest-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-revisions-controller.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
 

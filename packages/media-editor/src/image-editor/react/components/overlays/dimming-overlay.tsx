@@ -13,24 +13,17 @@ interface DimmingOverlayProps {
 	containerSize: Size;
 	/** The rendered image dimensions in pixels within the container. */
 	imageSize: Size;
+	/** CSS transition string, e.g. during settle animation. */
+	transition?: string;
 }
 
-/**
- * Renders a semi-transparent overlay outside the crop rectangle.
- *
- * Uses the box-shadow approach: a div matching the crop rect position
- * with a large box-shadow that dims everything outside it.
- *
- * @param props               Component props.
- * @param props.cropRect      The crop rectangle in normalized coordinates.
- * @param props.containerSize The container element dimensions in pixels.
- * @param props.imageSize     The rendered image dimensions in pixels.
- * @return The dimming overlay element.
- */
+// Renders a semi-transparent overlay outside the crop rectangle using a
+// box-shadow that dims everything outside the crop rect position.
 export function DimmingOverlay( {
 	cropRect,
 	containerSize,
 	imageSize,
+	transition,
 }: DimmingOverlayProps ) {
 	if ( containerSize.width === 0 || containerSize.height === 0 ) {
 		return null;
@@ -43,6 +36,12 @@ export function DimmingOverlay( {
 	const width = cropRect.width * imageSize.width;
 	const height = cropRect.height * imageSize.height;
 
+	// Compose any incoming transition with the stylesheet's box-shadow
+	// transition so the drag-dimming effect isn't overwritten.
+	const composedTransition = transition
+		? `${ transition }, box-shadow 0.15s ease`
+		: undefined;
+
 	return (
 		<div
 			className="wp-media-editor-image-editor__dimming"
@@ -51,6 +50,7 @@ export function DimmingOverlay( {
 				top,
 				width,
 				height,
+				transition: composedTransition,
 			} }
 		/>
 	);
