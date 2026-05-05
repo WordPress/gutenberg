@@ -832,7 +832,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 				'post_name'   => $room_hash . '-2',
 			)
 		);
-		$this->assertIsInt( $suffixed_post_id, 'Should have received an integer post id.'  );
+		$this->assertIsInt( $suffixed_post_id, 'Should have received an integer post id.' );
 		$this->assertGreaterThan( 0, $suffixed_post_id, 'Suffixed meta post should have a valid post id.' );
 		$this->assertSame(
 			$room_hash . '-2',
