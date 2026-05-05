@@ -36,10 +36,22 @@ export function DimmingOverlay( {
 	const width = cropRect.width * imageSize.width;
 	const height = cropRect.height * imageSize.height;
 
+	// Compose any incoming transition with the stylesheet's box-shadow
+	// transition so the drag-dimming effect isn't overwritten.
+	const composedTransition = transition
+		? `${ transition }, box-shadow 0.15s ease`
+		: undefined;
+
 	return (
 		<div
 			className="wp-media-editor-image-editor__dimming"
-			style={ { left, top, width, height, transition } }
+			style={ {
+				left,
+				top,
+				width,
+				height,
+				transition: composedTransition,
+			} }
 		/>
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, useCallback } from '@wordpress/element';
+import { useReducer, useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,5 +41,8 @@ export function useViewportState(): UseViewportStateReturn {
 		dispatch( { type: 'RESET_VIEWPORT' } );
 	}, [] );
 
-	return { viewport, setViewportZoom, setViewportPan, resetViewport };
+	return useMemo(
+		() => ( { viewport, setViewportZoom, setViewportPan, resetViewport } ),
+		[ viewport, setViewportZoom, setViewportPan, resetViewport ]
+	);
 }

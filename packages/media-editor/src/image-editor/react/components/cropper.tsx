@@ -357,7 +357,11 @@ function CropperInner(
 			setCropRect( rect );
 			// During a resize drag, pan the viewport so the handle stays
 			// visible even when the crop extends beyond the canvas edge.
-			if ( isResizingRef.current && visualSize.width > 0 ) {
+			if (
+				isResizingRef.current &&
+				visualSize.width > 0 &&
+				visualSize.height > 0
+			) {
 				const offsetX = ( canvasSize.width - visualSize.width ) / 2;
 				const offsetY = ( canvasSize.height - visualSize.height ) / 2;
 				const rightOverflow = Math.max(

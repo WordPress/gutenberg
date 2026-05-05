@@ -145,8 +145,8 @@ export type CropperAction =
 /**
  * Viewport camera state — display-only, does not affect export or undo.
  *
- * Applied as a CSS transform on the canvas div so the user can scroll the
- * view independently of the crop. zoom > 1 magnifies; pan shifts in CSS px.
+ * Applied as a CSS transform on the inner stage div so the user can scroll
+ * the view independently of the crop. zoom > 1 magnifies; pan shifts in CSS px.
  */
 export interface ViewportState {
 	zoom: number;
