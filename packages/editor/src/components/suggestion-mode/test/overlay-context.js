@@ -215,4 +215,56 @@ describe( 'overlayReducer', () => {
 		expect( afterClear[ 'block-a' ] ).toBeUndefined();
 		expect( afterClear[ 'block-b' ] ).toEqual( state[ 'block-b' ] );
 	} );
+
+	it( 'creates an entry on SET_STRUCTURAL_OP when none existed', () => {
+		const op = {
+			type: 'block-remove',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+		};
+		const next = overlayReducer( INITIAL, {
+			type: 'SET_STRUCTURAL_OP',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+			op,
+		} );
+		expect( next[ CLIENT_ID ] ).toMatchObject( {
+			blockName: 'core/paragraph',
+			structuralOp: op,
+			baselineAttributes: {},
+			overlayAttributes: {},
+			commentId: null,
+			syncedOpsKey: null,
+		} );
+	} );
+
+	it( 'preserves attribute-overlay state when adding a structural op to an existing entry', () => {
+		let state = overlayReducer( INITIAL, {
+			type: 'CAPTURE_BASELINE',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+			attributes: { content: 'baseline' },
+		} );
+		state = overlayReducer( state, {
+			type: 'SET_OVERLAY_ATTRIBUTES',
+			clientId: CLIENT_ID,
+			attributes: { content: 'edited' },
+		} );
+		state = overlayReducer( state, {
+			type: 'SET_STRUCTURAL_OP',
+			clientId: CLIENT_ID,
+			blockName: 'core/paragraph',
+			op: { type: 'block-remove', clientId: CLIENT_ID },
+		} );
+		expect( state[ CLIENT_ID ].baselineAttributes ).toEqual( {
+			content: 'baseline',
+		} );
+		expect( state[ CLIENT_ID ].overlayAttributes ).toEqual( {
+			content: 'edited',
+		} );
+		expect( state[ CLIENT_ID ].structuralOp ).toEqual( {
+			type: 'block-remove',
+			clientId: CLIENT_ID,
+		} );
+	} );
 } );

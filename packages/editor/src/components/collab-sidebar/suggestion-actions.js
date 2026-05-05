@@ -109,7 +109,11 @@ function useSuggestionDecision( thread ) {
 	const onReject = async () => {
 		setBusy( true );
 		try {
-			await rejectSuggestion( { commentId: thread.id } );
+			await rejectSuggestion( {
+				commentId: thread.id,
+				clientId: thread.blockClientId,
+				payload,
+			} );
 		} catch {
 			// Notice surfaced by the provider.
 		} finally {

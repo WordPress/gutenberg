@@ -13,7 +13,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import SuggestionAutoSave from '../auto-save';
+import SuggestionAutoSave, { operationsForEntry } from '../auto-save';
 import {
 	SuggestionOverlayProvider,
 	useSuggestionOverlay,
@@ -440,5 +440,60 @@ describe( 'SuggestionAutoSave', () => {
 		await flushPromises();
 
 		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'operationsForEntry', () => {
+	it( 'derives attribute-set ops from baseline + overlay when no structural op is set', () => {
+		expect(
+			operationsForEntry( {
+				blockName: 'core/paragraph',
+				baselineAttributes: { content: 'a' },
+				overlayAttributes: { content: 'b' },
+			} )
+		).toEqual( [
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'a',
+				after: 'b',
+			},
+		] );
+	} );
+
+	it( 'returns the structural op as a single-element array when present', () => {
+		const op = {
+			type: 'block-remove',
+			clientId: 'x',
+			blockName: 'core/paragraph',
+		};
+		expect(
+			operationsForEntry( {
+				blockName: 'core/paragraph',
+				baselineAttributes: {},
+				overlayAttributes: {},
+				structuralOp: op,
+			} )
+		).toEqual( [ op ] );
+	} );
+
+	it( 'emits structural op first then attribute-set ops when both are present', () => {
+		const op = { type: 'block-remove', clientId: 'x' };
+		expect(
+			operationsForEntry( {
+				blockName: 'core/paragraph',
+				baselineAttributes: { content: 'a' },
+				overlayAttributes: { content: 'b' },
+				structuralOp: op,
+			} )
+		).toEqual( [
+			op,
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: 'a',
+				after: 'b',
+			},
+		] );
 	} );
 } );
