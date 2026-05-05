@@ -389,12 +389,13 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		).toBe( 'After apply' );
 	} );
 
-	it( 'tags a removed block with metadata.suggestion = pending-remove instead of dropping it', async () => {
+	it( 'tags a removed block with metadata.suggestion = pending-remove and writes a block-remove op into the overlay', async () => {
 		// In Suggest mode a `removeBlock` dispatch must not actually remove
 		// the block — the apply-and-tag flow re-inserts the subtree at its
 		// previous position and marks it pending-remove. Auto-save reads
-		// the marker and persists it as a `block-remove` operation; Apply
-		// later runs the real removeBlock, Reject just clears the marker.
+		// the structural op from the overlay and persists it as a comment;
+		// Apply later runs the real removeBlock, Reject just clears the
+		// marker.
 		const { registry, clientId, getOverlay } = setup();
 
 		await act( async () => {
@@ -415,6 +416,15 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect(
 			getOverlay().entries[ clientId ]?.overlayAttributes?.metadata
 		).toBeUndefined();
+
+		// The structural op slot drives auto-save persistence.
+		expect( getOverlay().entries[ clientId ]?.structuralOp ).toMatchObject(
+			{
+				type: 'block-remove',
+				clientId,
+				blockName: TEST_BLOCK_NAME,
+			}
+		);
 	} );
 
 	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {

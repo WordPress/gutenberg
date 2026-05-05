@@ -451,6 +451,7 @@ export default function SuggestionStoreInterceptor() {
 		entries,
 		captureBaseline,
 		setOverlayAttributes,
+		setStructuralOp,
 		consumeInterceptorBypass,
 	} = useSuggestionOverlay();
 	const registry = useRegistry();
@@ -468,12 +469,14 @@ export default function SuggestionStoreInterceptor() {
 	const entriesRef = useRef( entries );
 	const captureBaselineRef = useRef( captureBaseline );
 	const setOverlayAttributesRef = useRef( setOverlayAttributes );
+	const setStructuralOpRef = useRef( setStructuralOp );
 	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
 
 	useEffect( () => {
 		entriesRef.current = entries;
 		captureBaselineRef.current = captureBaseline;
 		setOverlayAttributesRef.current = setOverlayAttributes;
+		setStructuralOpRef.current = setStructuralOp;
 		consumeInterceptorBypassRef.current = consumeInterceptorBypass;
 	} );
 
@@ -669,15 +672,18 @@ export default function SuggestionStoreInterceptor() {
 				}
 
 				// Phase 2: tag each re-inserted block with the pending-
-				// remove marker. `metadata.suggestion` is in
-				// SYSTEM_METADATA_KEYS, so subsequent fires fold the marker
-				// into the snapshot and don't route it to the user overlay.
+				// remove marker AND record the structural operation in the
+				// overlay so auto-save can persist it as a `block-remove`
+				// op. `metadata.suggestion` is in SYSTEM_METADATA_KEYS, so
+				// subsequent fires fold the marker into the snapshot and
+				// don't route it to the user overlay.
 				for ( const clientId of tops ) {
 					const currentAttrs =
 						blockEditor.getBlockAttributes?.( clientId );
 					if ( ! currentAttrs ) {
 						continue;
 					}
+					const block = tree.blocksByClientId.get( clientId );
 					isReverting = true;
 					try {
 						blockEditorDispatch.updateBlockAttributes( clientId, {
@@ -689,6 +695,12 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isReverting = false;
 					}
+					setStructuralOpRef.current?.( clientId, block?.name ?? '', {
+						type: 'block-remove',
+						clientId,
+						blockName: block?.name ?? '',
+						block,
+					} );
 				}
 
 				// Drop snapshot entries for any remaining (descendant)

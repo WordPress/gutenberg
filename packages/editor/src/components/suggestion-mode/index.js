@@ -16,6 +16,8 @@ export {
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
+	findStructuralOp,
+	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
 } from './provider';

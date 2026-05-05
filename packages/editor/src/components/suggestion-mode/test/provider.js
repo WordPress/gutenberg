@@ -8,6 +8,8 @@ import {
 	parseSuggestionPayload,
 	payloadByteLength,
 	PAYLOAD_MAX_BYTES,
+	findStructuralOp,
+	clearSuggestionMarkerAttributes,
 } from '../provider';
 
 describe( 'operationsFromOverlay', () => {
@@ -331,5 +333,61 @@ describe( 'parseSuggestionPayload', () => {
 		expect(
 			parseSuggestionPayload( JSON.stringify( { noOps: true } ) )
 		).toBeNull();
+	} );
+} );
+
+describe( 'findStructuralOp', () => {
+	it( 'returns null for a payload of attribute-set ops only', () => {
+		expect(
+			findStructuralOp( [
+				{ type: 'attribute-set', attribute: 'content', after: 'x' },
+			] )
+		).toBeNull();
+	} );
+
+	it( 'returns the block-remove op when present', () => {
+		const op = {
+			type: 'block-remove',
+			clientId: 'abc',
+			blockName: 'core/paragraph',
+		};
+		expect(
+			findStructuralOp( [
+				{ type: 'attribute-set', attribute: 'x', after: 1 },
+				op,
+			] )
+		).toBe( op );
+	} );
+
+	it( 'recognizes block-insert-after and block-move op types', () => {
+		expect(
+			findStructuralOp( [ { type: 'block-insert-after' } ] )?.type
+		).toBe( 'block-insert-after' );
+		expect( findStructuralOp( [ { type: 'block-move' } ] )?.type ).toBe(
+			'block-move'
+		);
+	} );
+
+	it( 'returns null for non-array input', () => {
+		expect( findStructuralOp( null ) ).toBeNull();
+		expect( findStructuralOp( undefined ) ).toBeNull();
+	} );
+} );
+
+describe( 'clearSuggestionMarkerAttributes', () => {
+	it( 'returns null when there is no marker to clear', () => {
+		expect( clearSuggestionMarkerAttributes( {} ) ).toBeNull();
+		expect(
+			clearSuggestionMarkerAttributes( { metadata: { noteId: 1 } } )
+		).toBeNull();
+	} );
+
+	it( 'strips the suggestion field while preserving other metadata', () => {
+		expect(
+			clearSuggestionMarkerAttributes( {
+				content: 'hi',
+				metadata: { noteId: 7, suggestion: { type: 'pending-remove' } },
+			} )
+		).toEqual( { metadata: { noteId: 7 } } );
 	} );
 } );

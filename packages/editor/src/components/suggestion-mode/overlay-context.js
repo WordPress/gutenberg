@@ -83,6 +83,7 @@ const OverlayContext = createContext( {
 	clearOverlay: () => {},
 	setCommentId: () => {},
 	setSyncedOpsKey: () => {},
+	setStructuralOp: () => {},
 	hasOverlay: () => false,
 	requestInterceptorBypass: () => {},
 	consumeInterceptorBypass: () => false,
@@ -161,6 +162,25 @@ export function overlayReducer( state, action ) {
 				},
 			};
 		}
+		case 'SET_STRUCTURAL_OP': {
+			// Structural ops (block-remove, block-insert-after, block-move)
+			// don't have a baseline-vs-overlay attribute diff; the operation
+			// itself describes the change. Auto-save reads `structuralOp`
+			// straight through. Replaces any existing op for the same block
+			// — only one structural marker can be pending at a time.
+			const existing = state[ action.clientId ];
+			return {
+				...state,
+				[ action.clientId ]: {
+					blockName: action.blockName,
+					baselineAttributes: existing?.baselineAttributes ?? {},
+					overlayAttributes: existing?.overlayAttributes ?? {},
+					commentId: existing?.commentId ?? null,
+					syncedOpsKey: existing?.syncedOpsKey ?? null,
+					structuralOp: action.op,
+				},
+			};
+		}
 		case 'PRUNE_ORPHANS': {
 			// Action carries a serializable array; the reducer materializes a
 			// Set internally for the lookup. Keeps actions Redux-DevTools-
@@ -233,6 +253,17 @@ export function SuggestionOverlayProvider( { children } ) {
 	const setSyncedOpsKey = useCallback(
 		( clientId, syncedOpsKey ) =>
 			dispatch( { type: 'SET_SYNCED_OPS_KEY', clientId, syncedOpsKey } ),
+		[]
+	);
+
+	const setStructuralOp = useCallback(
+		( clientId, blockName, op ) =>
+			dispatch( {
+				type: 'SET_STRUCTURAL_OP',
+				clientId,
+				blockName,
+				op,
+			} ),
 		[]
 	);
 
@@ -315,6 +346,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			clearOverlay,
 			setCommentId,
 			setSyncedOpsKey,
+			setStructuralOp,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,
@@ -326,6 +358,7 @@ export function SuggestionOverlayProvider( { children } ) {
 			clearOverlay,
 			setCommentId,
 			setSyncedOpsKey,
+			setStructuralOp,
 			hasOverlay,
 			requestInterceptorBypass,
 			consumeInterceptorBypass,

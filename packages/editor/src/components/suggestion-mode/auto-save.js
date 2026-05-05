@@ -67,6 +67,35 @@ export function fingerprintOperations( operations ) {
 }
 
 /**
+ * Derive the operation list a given overlay entry should persist.
+ *
+ * Structural entries (block-remove, block-insert-after, block-move) carry
+ * a single pre-built op in `entry.structuralOp`; the interceptor wrote it
+ * after detecting the corresponding tree mutation. Attribute-set entries
+ * derive their ops from the baseline-vs-overlay diff. An entry can have
+ * both — a user can edit attributes on a block that was suggested for
+ * removal — in which case the structural op leads and any attribute ops
+ * follow.
+ *
+ * @param {Object} entry Overlay entry.
+ * @return {Array} Ops describing the entry's pending suggestion.
+ */
+export function operationsForEntry( entry ) {
+	const ops = [];
+	if ( entry.structuralOp ) {
+		ops.push( entry.structuralOp );
+	}
+	const attrOps = operationsFromOverlay(
+		entry.baselineAttributes,
+		entry.overlayAttributes
+	);
+	for ( const op of attrOps ) {
+		ops.push( op );
+	}
+	return ops;
+}
+
+/**
  * Invisible component that auto-commits pending overlay edits to the server
  * as note comments. Replaces the manual "Submit suggestion" button — in
  * Suggest mode each block's pending changes are persisted after a short
@@ -125,10 +154,7 @@ export default function SuggestionAutoSave() {
 			if ( ! entry ) {
 				return;
 			}
-			const operations = operationsFromOverlay(
-				entry.baselineAttributes,
-				entry.overlayAttributes
-			);
+			const operations = operationsForEntry( entry );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === entry.syncedOpsKey ) {
 				return;
@@ -211,10 +237,7 @@ export default function SuggestionAutoSave() {
 		const timers = timersRef.current;
 
 		for ( const [ clientId, entry ] of Object.entries( entries ) ) {
-			const operations = operationsFromOverlay(
-				entry.baselineAttributes,
-				entry.overlayAttributes
-			);
+			const operations = operationsForEntry( entry );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === entry.syncedOpsKey ) {
 				continue;

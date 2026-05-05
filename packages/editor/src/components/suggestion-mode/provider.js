@@ -182,6 +182,57 @@ function isAttributeEqual( a, b ) {
 }
 
 /**
+ * Operation types that mutate the block tree's structure rather than a
+ * single block's attributes. These flow through a different apply/reject
+ * path than `attribute-set`: Apply dispatches the corresponding block-
+ * editor action (`removeBlock`, `insertBlock`, `moveBlockToPosition`),
+ * Reject just clears the `metadata.suggestion` marker.
+ */
+const STRUCTURAL_OP_TYPES = new Set( [
+	'block-remove',
+	'block-insert-after',
+	'block-move',
+] );
+
+/**
+ * Locate the structural operation in a suggestion payload. v2 payloads carry
+ * at most one structural op per suggestion (the auto-save loop persists each
+ * structural mutation as its own note); attribute-set ops can ride along
+ * inside the same payload but the structural op leads.
+ *
+ * @param {SuggestionOperation[]} operations Payload operations.
+ * @return {SuggestionOperation|null} Structural op, or null when none.
+ */
+export function findStructuralOp( operations ) {
+	if ( ! Array.isArray( operations ) ) {
+		return null;
+	}
+	for ( const op of operations ) {
+		if ( op && STRUCTURAL_OP_TYPES.has( op.type ) ) {
+			return op;
+		}
+	}
+	return null;
+}
+
+/**
+ * Build attributes that clear the `metadata.suggestion` marker on a block
+ * while preserving every other metadata field. Used by Apply (after the
+ * mutation lands) and by Reject (to drop the pending state).
+ *
+ * @param {Object} currentAttributes Block's current attributes.
+ * @return {Object} Partial attributes payload safe for `updateBlockAttributes`.
+ */
+export function clearSuggestionMarkerAttributes( currentAttributes ) {
+	const meta = currentAttributes?.metadata;
+	if ( ! meta || meta.suggestion === undefined ) {
+		return null;
+	}
+	const { suggestion: _drop, ...rest } = meta;
+	return { metadata: rest };
+}
+
+/**
  * Apply a suggestion payload's operations to a block's current attributes
  * to produce the new attributes. Pure function — no side effects.
  *
@@ -328,7 +379,8 @@ export function useSuggestionsProvider() {
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes, removeBlock } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
 		getClientIdsWithDescendants: selectClientIdsWithDescendants,
@@ -575,6 +627,58 @@ export function useSuggestionsProvider() {
 				return;
 			}
 
+			// Structural ops (block-remove for now, block-insert-after and
+			// block-move in follow-up PRs) can't ride the
+			// updateBlockAttributes path: their apply mutates the tree
+			// rather than a single block's attributes. Branch out, run the
+			// matching block-editor action, and short-circuit before the
+			// attribute-set rollback machinery below.
+			const structuralOp = findStructuralOp( payload.operations );
+			if ( structuralOp ) {
+				try {
+					if ( structuralOp.type === 'block-remove' ) {
+						// Bypass twice: the marker-clear dispatch lands
+						// first (so the live block ends without the
+						// pending-remove flag should the removeBlock fail),
+						// then the actual removal.
+						const clearAttrs = clearSuggestionMarkerAttributes(
+							selectBlockAttributes( targetClientId )
+						);
+						if ( clearAttrs ) {
+							requestInterceptorBypass( targetClientId );
+							updateBlockAttributes( targetClientId, clearAttrs );
+						}
+						requestInterceptorBypass( targetClientId );
+						clearOverlay( targetClientId );
+						removeBlock( targetClientId );
+					}
+
+					await saveEntityRecord(
+						'root',
+						'comment',
+						{
+							id: commentId,
+							status: 'approved',
+							meta: { _wp_suggestion_status: 'applied' },
+						},
+						{ throwOnError: true }
+					);
+
+					createNotice( 'snackbar', __( 'Suggestion applied.' ), {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+				} catch ( error ) {
+					createNotice(
+						'error',
+						error?.message ||
+							__( 'Failed to save suggestion status.' ),
+						{ type: 'snackbar', isDismissible: true }
+					);
+				}
+				return;
+			}
+
 			const currentAttributes = selectBlockAttributes( targetClientId );
 			const newAttributes = applyOperations(
 				currentAttributes,
@@ -645,6 +749,7 @@ export function useSuggestionsProvider() {
 		[
 			saveEntityRecord,
 			updateBlockAttributes,
+			removeBlock,
 			selectBlockAttributes,
 			selectClientIdsWithDescendants,
 			createNotice,
@@ -657,14 +762,39 @@ export function useSuggestionsProvider() {
 	 * Reject a suggestion by setting the comment's lifecycle status. The
 	 * comment itself stays as a thread (status `approved`) so the
 	 * conversation persists as evidence that the suggestion was reviewed.
+	 * For structural suggestions (e.g. `block-remove`), also clears the
+	 * `metadata.suggestion` marker on the live block so the dimmed/struck
+	 * visual treatment goes away.
 	 *
-	 * @param {Object}        args           Reject arguments.
-	 * @param {number|string} args.commentId Comment id of the rejected
-	 *                                       suggestion.
+	 * @param {Object}            args            Reject arguments.
+	 * @param {number|string}     args.commentId  Comment id of the rejected
+	 *                                            suggestion.
+	 * @param {string}            [args.clientId] Target block clientId, if
+	 *                                            known.
+	 * @param {SuggestionPayload} [args.payload]  Parsed suggestion payload —
+	 *                                            inspected to detect a
+	 *                                            structural op so the marker
+	 *                                            can be cleared on the live
+	 *                                            block.
 	 * @return {Promise<void>}
 	 */
 	const rejectSuggestion = useCallback(
-		async ( { commentId } ) => {
+		async ( { commentId, clientId, payload } ) => {
+			// Clear the live block's suggestion marker for structural
+			// rejects. Attribute-set suggestions don't carry a marker, so
+			// nothing to clear.
+			const structuralOp = findStructuralOp( payload?.operations );
+			if ( structuralOp && clientId ) {
+				const clearAttrs = clearSuggestionMarkerAttributes(
+					selectBlockAttributes( clientId )
+				);
+				if ( clearAttrs ) {
+					requestInterceptorBypass( clientId );
+					updateBlockAttributes( clientId, clearAttrs );
+				}
+				clearOverlay( clientId );
+			}
+
 			try {
 				await saveEntityRecord(
 					'root',
@@ -689,7 +819,14 @@ export function useSuggestionsProvider() {
 				);
 			}
 		},
-		[ saveEntityRecord, createNotice ]
+		[
+			saveEntityRecord,
+			createNotice,
+			selectBlockAttributes,
+			updateBlockAttributes,
+			requestInterceptorBypass,
+			clearOverlay,
+		]
 	);
 
 	return {
