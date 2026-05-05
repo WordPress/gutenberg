@@ -20,11 +20,13 @@ import {
 
 /**
  * @typedef {Object} SuggestionOperation
- * @property {'attribute-set'} type      Operation type. Only `attribute-set`
- *                                       is implemented in Phase 2.
- * @property {string}          attribute The attribute being changed.
- * @property {*}               before    The baseline value.
- * @property {*}               after     The proposed value.
+ * @property {'attribute-set'|'block-insert-after'|'block-remove'|'block-move'} type
+ *                                                                                          Operation type. `attribute-set` ships in Phase 2; the structural
+ *                                                                                          variants ship in Phase 6 (issue #77434).
+ * @property {string}                                                           [attribute] The attribute being changed
+ *                                                                                          (`attribute-set` only).
+ * @property {*}                                                                [before]    The baseline value (`attribute-set`).
+ * @property {*}                                                                [after]     The proposed value (`attribute-set`).
  */
 
 /**
@@ -37,7 +39,20 @@ import {
  * @property {SuggestionOperation[]} operations    Ordered operations.
  */
 
-const SCHEMA_VERSION = 1;
+/**
+ * Suggestion payload schema version. v1 emitted only `attribute-set`
+ * operations; v2 reserves the structural op types (`block-insert-after`,
+ * `block-remove`, `block-move`) tracked in issue #77434.
+ *
+ * Reader rule:
+ *   parsed < SCHEMA_VERSION → migrate forward, then apply.
+ *   parsed === SCHEMA_VERSION → apply as-is.
+ *   parsed > SCHEMA_VERSION → refuse (newer-editor notice; offer Reject only).
+ *
+ * Bumping this constant requires a corresponding migration step in
+ * `parseSuggestionPayload`.
+ */
+const SCHEMA_VERSION = 2;
 
 /**
  * Maximum byte length of a serialized suggestion payload. Mirrors
@@ -216,28 +231,66 @@ export function hasAttributeConflict( currentAttributes, operations ) {
 }
 
 /**
- * Parse a `_wp_suggestion` meta value into a typed payload.
+ * Migrate a payload emitted by an older `SCHEMA_VERSION` up to the current
+ * shape. v1 → v2 is a pure additive change (structural op types reserved but
+ * v1 payloads never used them), so the migration just stamps the version
+ * field forward — no shape rewriting is needed.
+ *
+ * Add a new `case` per future bump; never remove old cases, since the
+ * comment-meta store may contain payloads written by every prior version.
+ *
+ * @param {Object} parsed Parsed JSON payload of a known older version.
+ * @return {Object} Payload upgraded to the current schema.
+ */
+function migrateSuggestionPayload( parsed ) {
+	let next = parsed;
+	if ( next.schemaVersion === 1 ) {
+		next = { ...next, schemaVersion: 2 };
+	}
+	return next;
+}
+
+/**
+ * Parse a `_wp_suggestion` meta value into a typed payload. Refuses payloads
+ * written by a newer editor (`schemaVersion > SCHEMA_VERSION`) so a partial
+ * apply can't drop op types this consumer doesn't understand. Migrates
+ * older payloads forward to the current shape.
  *
  * @param {string|undefined} raw The raw JSON string from comment meta.
- * @return {SuggestionPayload|null} Parsed payload, or null if invalid.
+ * @return {SuggestionPayload|null} Parsed payload, or null when the input is
+ * malformed or the payload was written by a newer editor.
  */
 export function parseSuggestionPayload( raw ) {
 	if ( ! raw ) {
 		return null;
 	}
+	let parsed;
 	try {
-		const parsed = JSON.parse( raw );
-		if (
-			typeof parsed === 'object' &&
-			parsed !== null &&
-			Array.isArray( parsed.operations )
-		) {
-			return parsed;
-		}
-		return null;
+		parsed = JSON.parse( raw );
 	} catch {
 		return null;
 	}
+	if (
+		typeof parsed !== 'object' ||
+		parsed === null ||
+		! Array.isArray( parsed.operations )
+	) {
+		return null;
+	}
+	// Pre-versioned payloads (schemaVersion missing) are treated as v1 — the
+	// only writer that emitted them was the v1 implementation.
+	const version =
+		typeof parsed.schemaVersion === 'number' ? parsed.schemaVersion : 1;
+	if ( version > SCHEMA_VERSION ) {
+		return null;
+	}
+	if ( version < SCHEMA_VERSION ) {
+		return migrateSuggestionPayload( {
+			...parsed,
+			schemaVersion: version,
+		} );
+	}
+	return parsed;
 }
 
 /**

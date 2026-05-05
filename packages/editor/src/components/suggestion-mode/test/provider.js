@@ -249,9 +249,9 @@ describe( 'hasAttributeConflict', () => {
 } );
 
 describe( 'parseSuggestionPayload', () => {
-	it( 'parses a valid JSON payload', () => {
+	it( 'parses a valid current-version JSON payload', () => {
 		const raw = JSON.stringify( {
-			schemaVersion: 1,
+			schemaVersion: 2,
 			blockName: 'core/paragraph',
 			baseRevision: '2026-04-15T00:00:00',
 			operations: [
@@ -265,8 +265,62 @@ describe( 'parseSuggestionPayload', () => {
 		} );
 		const result = parseSuggestionPayload( raw );
 		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
 		expect( result.operations ).toHaveLength( 1 );
 		expect( result.blockName ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'migrates a v1 payload forward to the current version', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 1,
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
+		expect( result.operations ).toHaveLength( 1 );
+	} );
+
+	it( 'treats a missing schemaVersion as v1 and migrates it', () => {
+		const raw = JSON.stringify( {
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'attribute-set',
+					attribute: 'content',
+					before: 'a',
+					after: 'b',
+				},
+			],
+		} );
+		const result = parseSuggestionPayload( raw );
+		expect( result ).not.toBeNull();
+		expect( result.schemaVersion ).toBe( 2 );
+	} );
+
+	it( 'refuses a payload from a newer editor', () => {
+		const raw = JSON.stringify( {
+			schemaVersion: 99,
+			blockName: 'core/paragraph',
+			baseRevision: null,
+			operations: [
+				{
+					type: 'block-rotate',
+					clientId: 'x',
+				},
+			],
+		} );
+		expect( parseSuggestionPayload( raw ) ).toBeNull();
 	} );
 
 	it( 'returns null for missing, empty, or invalid input', () => {
