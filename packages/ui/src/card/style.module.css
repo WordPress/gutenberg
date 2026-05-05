@@ -22,15 +22,10 @@
 	.header,
 	.content {
 		padding: var(--wp-ui-card-padding);
-	}
 
-	/* Remove the bottom padding from a Content section that sits between two
-	 * other card children so adjacent padded sections don't double up. Header
-	 * is intentionally excluded: the `.header + .content` gap rule below
-	 * depends on the header's bottom padding being intact.
-	 */
-	.content:not(:first-child):not(:last-child) {
-		padding-block-end: 0;
+		&:not(:first-child):not(:last-child) {
+			padding-block-end: 0;
+		}
 	}
 
 	/* Custom vertical gap between header and content */
@@ -42,5 +37,34 @@
 	.fullbleed {
 		margin-inline: calc(-1 * var(--wp-ui-card-padding));
 		width: calc(100% + 2 * var(--wp-ui-card-padding));
+	}
+
+	/* When FullBleed is the first child of Header, extend it flush to the
+	 * card's top edge (the card's overflow:clip + border-radius handle
+	 * the rounded corner clipping).
+	 */
+	.header > .fullbleed:first-child {
+		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+	}
+
+	/* Restore the padding gap between the FullBleed and any subsequent
+	 * siblings (e.g. Card.Title) inside the header.
+	 */
+	.header > .fullbleed:first-child:not(:last-child) {
+		margin-block-end: var(--wp-ui-card-padding);
+	}
+
+	/* When FullBleed is the only child of Content and Content is the first
+	 * child of the card, extend FullBleed flush to the card's top edge.
+	 */
+	.content:first-child > .fullbleed:only-child {
+		margin-block-start: calc(-1 * var(--wp-ui-card-padding));
+	}
+
+	/* When FullBleed is the only child of Content and Content is the last
+	 * child of the card, extend FullBleed flush to the card's bottom edge.
+	 */
+	.content:last-child > .fullbleed:only-child {
+		margin-block-end: calc(-1 * var(--wp-ui-card-padding));
 	}
 }
