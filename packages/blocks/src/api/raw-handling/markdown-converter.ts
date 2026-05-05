@@ -48,6 +48,12 @@ function escapeSingleLineOrderedListMarker( text: string ): string {
 	return text.replace( /^(\d+)\.(\s)/, '$1\\.$2' );
 }
 
+const correctors = [
+	escapeSingleLineOrderedListMarker,
+	bulletsToAsterisks,
+	slackMarkdownVariantCorrector,
+];
+
 /**
  * Converts a piece of text into HTML based on any Markdown present.
  * Also decodes any encoded HTML.
@@ -58,8 +64,9 @@ function escapeSingleLineOrderedListMarker( text: string ): string {
  */
 export default function markdownConverter( text: string ): string {
 	return converter.makeHtml(
-		slackMarkdownVariantCorrector(
-			bulletsToAsterisks( escapeSingleLineOrderedListMarker( text ) )
+		correctors.reduce(
+			( current, corrector ) => corrector( current ),
+			text
 		)
 	);
 }
