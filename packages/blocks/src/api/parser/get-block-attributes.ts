@@ -302,7 +302,7 @@ export function getBlockAttributes(
 	blockTypeOrName: string | BlockType,
 	innerHTML: string | Node,
 	attributes: Record< string, unknown > = {},
-	parsedBody?: Node
+	parsedBody?: Node | null
 ): Record< string, unknown > {
 	const doc = parsedBody ?? parseHtml( innerHTML );
 	const blockType = normalizeBlockType( blockTypeOrName );
