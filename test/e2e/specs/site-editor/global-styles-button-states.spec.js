@@ -42,7 +42,7 @@ test.describe( 'Global Styles - Button States', () => {
 
 		const stateDropdown = page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Properties' } );
+			.getByRole( 'button', { name: 'States' } );
 
 		await expect( stateDropdown ).toBeVisible();
 
