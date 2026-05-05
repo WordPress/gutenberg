@@ -129,6 +129,7 @@ export const rootEntitiesConfig = [
 	{
 		name: 'widgetModule',
 		kind: 'root',
+		key: 'name',
 		baseURL: '/wp/v2/widget-modules',
 		plural: 'widgetModules',
 		label: __( 'Widget modules' ),
