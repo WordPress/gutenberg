@@ -14,6 +14,7 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import withSuggestionOverlay, {
 	mergeOverlayAttributes,
+	structuralMarkerClass,
 } from '../with-suggestion-overlay';
 import {
 	SuggestionOverlayProvider,
@@ -271,5 +272,24 @@ describe( 'mergeOverlayAttributes', () => {
 				{ custom: { other: 'new' } }
 			)
 		).toEqual( { custom: { other: 'new' } } );
+	} );
+} );
+
+describe( 'structuralMarkerClass', () => {
+	it( 'maps each known marker type to its class', () => {
+		expect( structuralMarkerClass( 'pending-remove' ) ).toBe(
+			'is-suggestion-pending-remove'
+		);
+		expect( structuralMarkerClass( 'pending-insert' ) ).toBe(
+			'is-suggestion-pending-insert'
+		);
+		expect( structuralMarkerClass( 'pending-move' ) ).toBe(
+			'is-suggestion-pending-move'
+		);
+	} );
+
+	it( 'returns null for unknown or missing types', () => {
+		expect( structuralMarkerClass( undefined ) ).toBeNull();
+		expect( structuralMarkerClass( 'something-else' ) ).toBeNull();
 	} );
 } );
