@@ -681,22 +681,22 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				'title'      => 'block-editor-assets',
 				'type'       => 'object',
 				'properties' => array(
-					'scripts'        => array(
+					'scripts'                 => array(
 						'description' => __( 'Editor scripts data.', 'gutenberg' ),
 						'type'        => 'object',
 						'readonly'    => true,
 					),
-					'styles'         => array(
+					'styles'                  => array(
 						'description' => __( 'Editor styles data.', 'gutenberg' ),
 						'type'        => 'object',
 						'readonly'    => true,
 					),
-					'inline_scripts' => array(
+					'inline_scripts'          => array(
 						'description' => __( 'Inline scripts for editor assets.', 'gutenberg' ),
 						'type'        => 'object',
 						'readonly'    => true,
 					),
-					'inline_styles'  => array(
+					'inline_styles'           => array(
 						'description' => __( 'Inline styles for editor assets.', 'gutenberg' ),
 						'type'        => 'object',
 						'readonly'    => true,
