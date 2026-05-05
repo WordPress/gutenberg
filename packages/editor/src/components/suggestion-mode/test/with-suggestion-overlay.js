@@ -8,6 +8,9 @@ import { render, screen, act, fireEvent } from '@testing-library/react';
  */
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -15,6 +18,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import withSuggestionOverlay, {
 	mergeOverlayAttributes,
 	structuralMarkerClass,
+	withSuggestionBlockClassName,
 } from '../with-suggestion-overlay';
 import {
 	SuggestionOverlayProvider,
@@ -291,5 +295,96 @@ describe( 'structuralMarkerClass', () => {
 	it( 'returns null for unknown or missing types', () => {
 		expect( structuralMarkerClass( undefined ) ).toBeNull();
 		expect( structuralMarkerClass( 'something-else' ) ).toBeNull();
+	} );
+} );
+
+describe( 'withSuggestionBlockClassName', () => {
+	const TEST_BLOCK_NAME = 'core/test-suggestion-classname';
+
+	beforeAll( () => {
+		registerBlockType( TEST_BLOCK_NAME, {
+			apiVersion: 3,
+			title: 'Test Block',
+			category: 'text',
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save() {
+				return null;
+			},
+		} );
+	} );
+
+	function FakeBlockListBlock( { className } ) {
+		return <div data-testid="block-list-block" className={ className } />;
+	}
+
+	const WrappedBlockListBlock =
+		withSuggestionBlockClassName( FakeBlockListBlock );
+
+	function setup( { intent = 'edit', metadata } = {} ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		registry.dispatch( editorStore ).setEditorIntent( intent );
+
+		const block = createBlock( TEST_BLOCK_NAME, {
+			content: 'Hello',
+			...( metadata !== undefined && { metadata } ),
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		const wrapper = ( { children } ) => (
+			<RegistryProvider value={ registry }>
+				<SuggestionOverlayProvider>
+					{ children }
+				</SuggestionOverlayProvider>
+			</RegistryProvider>
+		);
+
+		render( <WrappedBlockListBlock clientId={ block.clientId } />, {
+			wrapper,
+		} );
+		return screen.getByTestId( 'block-list-block' );
+	}
+
+	it( 'applies is-suggestion-pending-remove for an admin (Edit intent) — the marker is the only signal a reviewer has that a structural change is pending', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-remove' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-remove' );
+	} );
+
+	it( 'applies is-suggestion-pending-insert for an admin (Edit intent)', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-insert' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-insert' );
+	} );
+
+	it( 'applies is-suggestion-pending-move for an admin (Edit intent)', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'applies the structural class for the suggester (Suggest intent) too', () => {
+		const node = setup( {
+			intent: 'suggest',
+			metadata: { suggestion: { type: 'pending-move' } },
+		} );
+		expect( node.className ).toContain( 'is-suggestion-pending-move' );
+	} );
+
+	it( 'applies no suggestion class when the block has no marker', () => {
+		const node = setup( { intent: 'edit' } );
+		expect( node.className ).not.toMatch( /is-suggestion-pending/ );
 	} );
 } );
