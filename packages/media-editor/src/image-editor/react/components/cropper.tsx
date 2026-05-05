@@ -28,13 +28,14 @@ import type {
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit } from '../../core/camera';
-import { getCropBounds } from '../../core/containment';
+import { getImageCropBounds } from '../../core/containment';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
 import { RectangleStencil } from './stencils/rectangle-stencil';
 import { DimmingOverlay } from './overlays/dimming-overlay';
 import { GridOverlay } from './overlays/grid-overlay';
+import { ViewportProvider, useViewport } from './viewport-provider';
 import './cropper.scss';
 
 /** Threshold for comparing normalized crop rect values. */
@@ -81,8 +82,10 @@ export interface CropperProps {
 	controller: UseCropperStateReturn;
 	/** Stencil component for the crop area. Defaults to RectangleStencil. */
 	stencil?: React.ComponentType< StencilProps >;
-	/** Show the rule-of-thirds grid overlay. */
-	showGrid?: boolean;
+	/** Show the rule-of-thirds grid overlay, or only during interactions. */
+	showGrid?: boolean | 'interactive';
+	/** Whether external placement activity should keep the grid visible. */
+	isPlacementActive?: boolean;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -128,22 +131,23 @@ export interface CropperProps {
  * The component fills its parent container (100% width and height).
  * Wrap it in a sized container to control its dimensions.
  *
- * @param root0                Component props implementing CropperProps.
- * @param root0.src            Image source URL.
- * @param root0.controller     The full state/setter object from `useCropperState`.
- * @param root0.stencil        Custom stencil component.
- * @param root0.showGrid       Show rule-of-thirds grid overlay.
- * @param root0.showDimming    Show dimming overlay outside crop.
- * @param root0.minZoom        Minimum zoom level.
- * @param root0.maxZoom        Maximum zoom level.
- * @param root0.aspectRatio    Fixed aspect ratio (width/height).
- * @param root0.freeformCrop   Enable resize handles.
- * @param root0.onImageLoaded  Image load callback.
- * @param root0.onStateChange  Every-frame state callback.
- * @param root0.onGestureStart Gesture boundary start.
- * @param root0.onGestureEnd   Gesture boundary end.
- * @param root0.className      Additional CSS class.
- * @param ref                  Forwarded ref for the container div.
+ * @param root0                   Component props implementing CropperProps.
+ * @param root0.src               Image source URL.
+ * @param root0.controller        The full state/setter object from `useCropperState`.
+ * @param root0.stencil           Custom stencil component.
+ * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
+ * @param root0.isPlacementActive Keep grid visible during external placement activity.
+ * @param root0.showDimming       Show dimming overlay outside crop.
+ * @param root0.minZoom           Minimum zoom level.
+ * @param root0.maxZoom           Maximum zoom level.
+ * @param root0.aspectRatio       Fixed aspect ratio (width/height).
+ * @param root0.freeformCrop      Enable resize handles.
+ * @param root0.onImageLoaded     Image load callback.
+ * @param root0.onStateChange     Every-frame state callback.
+ * @param root0.onGestureStart    Gesture boundary start.
+ * @param root0.onGestureEnd      Gesture boundary end.
+ * @param root0.className         Additional CSS class.
+ * @param ref                     Forwarded ref for the container div.
  */
 function CropperInner(
 	{
@@ -151,6 +155,7 @@ function CropperInner(
 		controller,
 		stencil: StencilComponent = RectangleStencil,
 		showGrid = false,
+		isPlacementActive = false,
 		showDimming = true,
 		minZoom,
 		maxZoom,
@@ -165,6 +170,11 @@ function CropperInner(
 	ref: React.ForwardedRef< HTMLDivElement >
 ) {
 	const { state, setImage, setCropRect, settleCrop } = controller;
+	const {
+		viewport: viewportState,
+		setViewportPan,
+		resetViewport,
+	} = useViewport();
 	// Canvas measurement via ResizeObserver. The canvas is the inner
 	// positioning context for image/stencil/handles — inset from the root
 	// by the handle gutter, so crop math operates on the reduced box.
@@ -262,7 +272,7 @@ function CropperInner(
 	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
 
 	// Compute the crop handle bounds from the actual image footprint.
-	// Depends on the full state object because getCropBounds reads
+	// Depends on the full state object because getImageCropBounds reads
 	// crop, zoom, rotation, flip, and image. React Compiler requires
 	// the complete dependency; the computation is lightweight (a few
 	// trig ops + 4 corner transforms).
@@ -270,22 +280,25 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize, canvasSize );
-	}, [ state, elementSize, visualSize, canvasSize ] );
+		return getImageCropBounds( state, elementSize, visualSize );
+	}, [ state, elementSize, visualSize ] );
+	const [ isResizing, setIsResizing ] = useState( false );
+	const isResizingRef = useRef( false );
+	const isSettlingRef = useRef( false );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
-	const { handlers, onWheelNative, isDragging, isZooming } = useInteraction(
-		state,
-		controller,
-		canvasSize,
-		visualSize,
-		{
-			minZoom,
-			maxZoom,
-			onGestureStart,
-			onGestureEnd,
-		}
-	);
+	const {
+		handlers,
+		onWheelNative,
+		isDragging,
+		isZooming,
+		isPlacementActive: isInteractionPlacementActive,
+	} = useInteraction( state, controller, canvasSize, visualSize, {
+		minZoom,
+		maxZoom,
+		onGestureStart,
+		onGestureEnd,
+	} );
 
 	// Register wheel handler natively with { passive: false } so
 	// preventDefault works. React's onWheel registers as passive. Bound
@@ -296,11 +309,21 @@ function CropperInner(
 		if ( ! el ) {
 			return;
 		}
-		el.addEventListener( 'wheel', onWheelNative, {
+		const handleWheel = ( event: WheelEvent ) => {
+			// Block wheel zoom while resizing or settling — the stage CSS
+			// transform changes getBoundingClientRect() during this window,
+			// so focal-point math would resolve against the wrong center.
+			if ( isResizingRef.current || isSettlingRef.current ) {
+				event.preventDefault();
+				return;
+			}
+			onWheelNative( event );
+		};
+		el.addEventListener( 'wheel', handleWheel, {
 			passive: false,
 		} );
 		return () => {
-			el.removeEventListener( 'wheel', onWheelNative );
+			el.removeEventListener( 'wheel', handleWheel );
 		};
 	}, [ onWheelNative ] );
 
@@ -329,14 +352,45 @@ function CropperInner(
 		[ src, setImage, onImageLoaded ]
 	);
 
-	/**
-	 * Handle crop rect changes from the stencil (during drag).
-	 */
 	const handleCropChange = useCallback(
 		( rect: NormalizedRect ) => {
 			setCropRect( rect );
+			// During a resize drag, pan the viewport so the handle stays
+			// visible even when the crop extends beyond the canvas edge.
+			if (
+				isResizingRef.current &&
+				visualSize.width > 0 &&
+				visualSize.height > 0
+			) {
+				const offsetX = ( canvasSize.width - visualSize.width ) / 2;
+				const offsetY = ( canvasSize.height - visualSize.height ) / 2;
+				const rightOverflow = Math.max(
+					0,
+					offsetX +
+						( rect.x + rect.width ) * visualSize.width -
+						canvasSize.width
+				);
+				const leftOverflow = Math.max(
+					0,
+					-( offsetX + rect.x * visualSize.width )
+				);
+				const bottomOverflow = Math.max(
+					0,
+					offsetY +
+						( rect.y + rect.height ) * visualSize.height -
+						canvasSize.height
+				);
+				const topOverflow = Math.max(
+					0,
+					-( offsetY + rect.y * visualSize.height )
+				);
+				setViewportPan( {
+					x: -rightOverflow + leftOverflow,
+					y: -bottomOverflow + topOverflow,
+				} );
+			}
 		},
-		[ setCropRect ]
+		[ setCropRect, setViewportPan, canvasSize, visualSize ]
 	);
 
 	// Settling animation: brief linear transition after resize end.
@@ -351,6 +405,11 @@ function CropperInner(
 		};
 	}, [] );
 
+	const isInteractiveGrid = showGrid === 'interactive';
+	const showInteractiveGrid =
+		isInteractiveGrid &&
+		( isInteractionPlacementActive || isResizing || isPlacementActive );
+
 	/**
 	 * Handle Escape on a resize handle — return focus to the canvas so
 	 * arrow keys pan the image rather than resize.
@@ -359,23 +418,48 @@ function CropperInner(
 		canvasRef.current?.focus( { preventScroll: true } );
 	}, [] );
 
+	const handleResizeStart = useCallback( () => {
+		isResizingRef.current = true;
+		setIsResizing( true );
+		// Clear any in-flight settle so transitions don't apply during the
+		// new drag (rapid successive resizes would otherwise inherit the
+		// previous settle animation).
+		clearTimeout( settleTimerRef.current );
+		isSettlingRef.current = false;
+		setSettling( false );
+		resetViewport();
+		onGestureStart?.();
+	}, [ onGestureStart, resetViewport ] );
+
 	/**
-	 * Handle resize end — settle the crop rect (re-center, fill height).
+	 * Handle resize end — settle the crop rect (re-center, fill height)
+	 * and reset the viewport pan back to neutral.
 	 */
 	const handleResizeEnd = useCallback( () => {
+		isResizingRef.current = false;
+		setIsResizing( false );
+		isSettlingRef.current = true;
 		setSettling( true );
+		// Reset viewport pan first so it transitions back to zero in sync
+		// with the settle animation on the image.
+		resetViewport();
 		settleCrop();
 		onGestureEnd?.();
 		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
+			isSettlingRef.current = false;
 			setSettling( false );
 		}, 200 );
-	}, [ settleCrop, onGestureEnd ] );
+	}, [ settleCrop, onGestureEnd, resetViewport ] );
 
-	const imageTransition =
-		settling || isZooming ? 'transform 150ms linear' : undefined;
+	let imageTransition: string | undefined;
+	if ( settling ) {
+		imageTransition = 'transform 200ms ease-out';
+	} else if ( isZooming ) {
+		imageTransition = 'transform 150ms linear';
+	}
 	const settleStencilTransition = settling
-		? 'left 150ms linear, top 150ms linear, width 150ms linear, height 150ms linear'
+		? 'left 200ms ease-out, top 200ms ease-out, width 200ms ease-out, height 200ms ease-out'
 		: undefined;
 
 	// Compute the image's CSS style.
@@ -396,6 +480,24 @@ function CropperInner(
 			transition: imageTransition,
 		};
 	}, [ canvasSize, elementSize, transformString, imageTransition ] );
+
+	// Viewport pan CSS transform for the stage div. Applied during resize
+	// drags to keep handles visible when the crop extends past the canvas edge.
+	// Transitions back to zero during the settle animation.
+	// will-change promotes the stage to its own compositor layer while the
+	// transform is active, keeping per-frame pan updates off the main thread.
+	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
+	const willChange = isResizing || settling ? 'transform' : undefined;
+	let stageStyle: React.CSSProperties | undefined;
+	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
+		stageStyle = {
+			transform: `translate(${ viewportState.pan.x }px, ${ viewportState.pan.y }px)`,
+			transition: settleTransition,
+			willChange,
+		};
+	} else if ( settling ) {
+		stageStyle = { transition: settleTransition, willChange };
+	}
 
 	// Forward the root element to the consumer's ref.
 	const setContainerRef = useCallback(
@@ -434,54 +536,75 @@ function CropperInner(
 			 */ }
 			<div
 				ref={ canvasRef }
-				className="wp-media-editor-image-editor__canvas"
+				className={ clsx(
+					'wp-media-editor-image-editor__canvas',
+					isInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--grid-interactive',
+					showInteractiveGrid &&
+						'wp-media-editor-image-editor__canvas--show-grid',
+					settling && 'wp-media-editor-image-editor__canvas--settling'
+				) }
 				tabIndex={ 0 }
 				role="group"
 				aria-label={ __( 'Image editor' ) }
 				{ ...handlers }
 			>
-				{ /* The image layer */ }
-				<img
-					className="wp-media-editor-image-editor__image"
-					src={ src }
-					alt=""
-					onLoad={ handleImageLoad }
-					style={ imageStyle }
-					draggable={ false }
-				/>
+				{ /*
+				 * The stage is an inner full-size div that receives the
+				 * viewport pan CSS transform. Keeping the transform here
+				 * (rather than on the canvas) means the canvas always stays
+				 * at its natural position, so the root div's background is
+				 * never exposed when the stage is panned during a resize drag.
+				 */ }
+				<div
+					className="wp-media-editor-image-editor__stage"
+					data-testid="cropper-stage"
+					style={ stageStyle }
+				>
+					{ /* The image layer */ }
+					<img
+						className="wp-media-editor-image-editor__image"
+						src={ src }
+						alt=""
+						onLoad={ handleImageLoad }
+						style={ imageStyle }
+						draggable={ false }
+					/>
 
-				{ /* Dimming overlay outside the crop area */ }
-				{ showDimming && (
-					<DimmingOverlay
+					{ /* Dimming overlay outside the crop area */ }
+					{ showDimming && (
+						<DimmingOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+							transition={ settleStencilTransition }
+						/>
+					) }
+
+					{ /* The stencil (crop area with handles) */ }
+					<StencilComponent
 						cropRect={ state.cropRect }
 						containerSize={ canvasSize }
 						imageSize={ visualSize }
+						onCropChange={ handleCropChange }
+						onResizeStart={ handleResizeStart }
+						onResizeEnd={ handleResizeEnd }
+						onEscape={ handleEscape }
+						aspectRatio={ aspectRatio }
+						freeformCrop={ freeformCrop }
+						stencilTransition={ settleStencilTransition }
+						cropBounds={ cropBounds }
 					/>
-				) }
 
-				{ /* The stencil (crop area with handles) */ }
-				<StencilComponent
-					cropRect={ state.cropRect }
-					containerSize={ canvasSize }
-					imageSize={ visualSize }
-					onCropChange={ handleCropChange }
-					onResizeStart={ onGestureStart }
-					onResizeEnd={ handleResizeEnd }
-					onEscape={ handleEscape }
-					aspectRatio={ aspectRatio }
-					freeformCrop={ freeformCrop }
-					stencilTransition={ settleStencilTransition }
-					cropBounds={ cropBounds }
-				/>
-
-				{ /* Rule-of-thirds grid */ }
-				{ showGrid && (
-					<GridOverlay
-						cropRect={ state.cropRect }
-						containerSize={ canvasSize }
-						imageSize={ visualSize }
-					/>
-				) }
+					{ /* Rule-of-thirds grid */ }
+					{ ( showGrid === true || isInteractiveGrid ) && (
+						<GridOverlay
+							cropRect={ state.cropRect }
+							containerSize={ canvasSize }
+							imageSize={ visualSize }
+						/>
+					) }
+				</div>
 
 				{ /* ARIA live region for screen reader announcements */ }
 				<div
@@ -507,6 +630,14 @@ function CropperInner(
 	);
 }
 
-export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
+const CropperInnerWithRef = forwardRef< HTMLDivElement, CropperProps >(
 	CropperInner
+);
+
+export const Cropper = forwardRef< HTMLDivElement, CropperProps >(
+	( props, ref ) => (
+		<ViewportProvider>
+			<CropperInnerWithRef { ...props } ref={ ref } />
+		</ViewportProvider>
+	)
 );

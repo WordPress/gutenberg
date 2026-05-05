@@ -4,7 +4,8 @@ export interface TaxonomyRecord {
 	slug: string;
 	status: 'publish' | 'draft';
 	title: { raw: string; rendered: string };
-	content: { raw: string; rendered: string };
+	config: StoredConfig;
+	object_type: string[];
 }
 
 export interface StoredLabels {
@@ -29,17 +30,25 @@ export interface StoredLabels {
 
 export interface StoredConfig {
 	labels?: StoredLabels;
-	object_type?: string[];
 	description?: string;
-	public?: boolean;
-	hierarchical?: boolean;
+	public: boolean;
+	hierarchical: boolean;
+	publicly_queryable: boolean;
+	show_ui: boolean;
+	show_in_menu: boolean;
+	show_in_nav_menus: boolean;
+	show_tagcloud: boolean;
+	show_in_quick_edit: boolean;
+	show_admin_column: boolean;
+	show_in_rest: boolean;
 }
 
 /**
  * Normalized in-memory shape used by the Add/Edit forms and the DataViews
  * table. REST rows are converted to this shape via `toFormData`, and back to
- * the save payload via `serializeForSave`, so fields never have to JSON
- * round-trip `content.raw` on every keystroke.
+ * the save payload via `serializeForSave`. `object_type` lives inside
+ * `config` here even though the wire format keeps it at the top level —
+ * keeps the form components free of split state.
  */
 export interface TaxonomyFormData {
 	id?: number;
@@ -53,6 +62,14 @@ export interface TaxonomyFormData {
 		description: string;
 		public: boolean;
 		hierarchical: boolean;
+		publicly_queryable: boolean;
+		show_ui: boolean;
+		show_in_menu: boolean;
+		show_in_nav_menus: boolean;
+		show_tagcloud: boolean;
+		show_in_quick_edit: boolean;
+		show_admin_column: boolean;
+		show_in_rest: boolean;
 	};
 }
 

@@ -4,17 +4,21 @@
 import { Button, RangeControl } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import {
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
 	flipVertical,
+	undo,
+	redo,
 } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useCropper } from '../../image-editor';
+import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
 
 export interface MediaEditorToolbarProps {
@@ -24,6 +28,10 @@ export interface MediaEditorToolbarProps {
 	 * controller.
 	 */
 	onReset?: () => void;
+	/** Signal that a placement-oriented control is being adjusted. */
+	onPlacementControlInteraction?: () => void;
+	/** Whether undo/redo should be unavailable during an active gesture. */
+	isUndoRedoDisabled?: boolean;
 }
 
 /**
@@ -33,16 +41,43 @@ export interface MediaEditorToolbarProps {
  * and freeform toggle live in the Crop sidebar tab instead.
  * @param props
  * @param props.onReset
+ * @param props.onPlacementControlInteraction
+ * @param props.isUndoRedoDisabled
  */
 export default function MediaEditorToolbar( {
 	onReset,
+	onPlacementControlInteraction,
+	isUndoRedoDisabled = false,
 }: MediaEditorToolbarProps ) {
-	const { state, setRotation, setFlip, snapRotate90, reset, isDirty } =
-		useCropper();
+	const {
+		state,
+		setRotation,
+		setFlip,
+		snapRotate90,
+		reset,
+		isDirty,
+		hasUndo,
+		hasRedo,
+		undo: undoCrop,
+		redo: redoCrop,
+	} = useCropper();
+	const rotationGestureHandlers = useCropGestureHandlers();
 
 	const handleReset = () => {
 		reset();
 		onReset?.();
+	};
+	const handleUndo = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
+		undoCrop();
+	};
+	const handleRedo = () => {
+		if ( isUndoRedoDisabled ) {
+			return;
+		}
+		redoCrop();
 	};
 
 	// `setRotation` is an absolute-angle setter. When a single flip is active
@@ -65,6 +100,7 @@ export default function MediaEditorToolbar( {
 			-MAX_ROTATION_OFFSET + EPS,
 			Math.min( MAX_ROTATION_OFFSET - EPS, value )
 		);
+		onPlacementControlInteraction?.();
 		setRotation( baseAngle + clamped * visualDir );
 	};
 
@@ -77,6 +113,30 @@ export default function MediaEditorToolbar( {
 			gap="sm"
 			wrap="wrap"
 		>
+			<Button
+				size="compact"
+				icon={ undo }
+				label={ __( 'Undo' ) }
+				showTooltip
+				shortcut={ displayShortcut.primary( 'z' ) }
+				disabled={ isUndoRedoDisabled || ! hasUndo }
+				accessibleWhenDisabled
+				onClick={ handleUndo }
+			/>
+			<Button
+				size="compact"
+				icon={ redo }
+				label={ __( 'Redo' ) }
+				showTooltip
+				shortcut={
+					isAppleOS()
+						? displayShortcut.primaryShift( 'z' )
+						: displayShortcut.primary( 'y' )
+				}
+				disabled={ isUndoRedoDisabled || ! hasRedo }
+				accessibleWhenDisabled
+				onClick={ handleRedo }
+			/>
 			<Button
 				size="compact"
 				icon={ rotateLeft }
@@ -117,7 +177,11 @@ export default function MediaEditorToolbar( {
 					} )
 				}
 			/>
-			<div className="media-editor-toolbar__rotation-slider">
+			<div
+				role="presentation"
+				className="media-editor-toolbar__rotation-slider"
+				{ ...rotationGestureHandlers }
+			>
 				<RangeControl
 					__next40pxDefaultSize
 					__nextHasNoMarginBottom

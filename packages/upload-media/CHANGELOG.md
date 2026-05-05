@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.30.0 (2026-04-29)
+
 ### Enhancement
 
 - Remove sideload upload serialization: thumbnail uploads now run concurrently, governed by `maxConcurrentUploads` instead of being queued one-at-a-time per attachment ([#75257](https://github.com/WordPress/gutenberg/pull/75257)).

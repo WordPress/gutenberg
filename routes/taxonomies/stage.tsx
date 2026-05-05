@@ -19,6 +19,7 @@ import {
 	activateAction,
 	deactivateAction,
 	deleteTaxonomyAction,
+	duplicateTaxonomyAction,
 	type TaxonomyRecord,
 } from '@wordpress/user-taxonomies';
 
@@ -49,6 +50,7 @@ function TaxonomiesPage() {
 		() => [
 			editAction,
 			quickEditTaxonomyAction,
+			duplicateTaxonomyAction,
 			activateAction,
 			deactivateAction,
 			deleteTaxonomyAction,
@@ -72,6 +74,9 @@ function TaxonomiesPage() {
 		const statusFilter = view.filters?.find(
 			( filter ) => filter.field === 'status'
 		);
+		const objectTypeFilter = view.filters?.find(
+			( filter ) => filter.field === 'object_type'
+		);
 		return {
 			per_page: view.perPage,
 			page: view.page,
@@ -80,6 +85,7 @@ function TaxonomiesPage() {
 			orderby: view.sort?.field,
 			search: view.search,
 			status: statusFilter?.value ?? [ 'publish', 'draft' ],
+			object_type: objectTypeFilter?.value,
 		};
 	}, [ view ] );
 	const { records, isResolving, hasResolved, totalItems, totalPages } =
@@ -125,6 +131,10 @@ function TaxonomiesPage() {
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
 				getItemId={ ( item ) => String( item.id ) }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) =>
+					navigate( { to: `/edit/${ item.id }` } )
+				}
 			/>
 		</Page>
 	);

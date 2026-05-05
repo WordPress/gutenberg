@@ -26,9 +26,10 @@ import {
 	chooseFromMostUsedField,
 	descriptionField,
 	editItemField,
-	generalForm,
+	generalFormFields,
 	hierarchicalField,
-	labelsForm,
+	labelsActionsField,
+	labelsFormFields,
 	menuNameField,
 	newItemNameField,
 	notFoundField,
@@ -37,9 +38,17 @@ import {
 	pluralLabelField,
 	popularItemsField,
 	publicField,
+	publiclyQueryableField,
 	searchItemsField,
 	separateItemsField,
 	serializeForSave,
+	showAdminColumnField,
+	showInMenuField,
+	showInNavMenusField,
+	showInQuickEditField,
+	showInRestField,
+	showTagcloudField,
+	showUiField,
 	singularLabelField,
 	statusField,
 	toFormData,
@@ -47,6 +56,7 @@ import {
 	useObjectTypeField,
 	useSlugField,
 	viewItemField,
+	visibilityFormFields,
 	type TaxonomyFormData,
 	type TaxonomyRecord,
 } from '@wordpress/user-taxonomies';
@@ -73,24 +83,22 @@ function TaxonomyEditStage() {
 	const navigate = useNavigate();
 	const isAddMode = id === NEW_ID;
 	const taxonomyId = parseInt( id, 10 );
-	const initialData = useSelect(
+	const record = useSelect(
 		( select ) => {
-			if ( isAddMode ) {
-				return BLANK_RECORD;
-			}
-			// beforeLoad (route.ts) guarantees the record is in cache.
-			const record = select(
-				coreStore
-			).getEntityRecord< TaxonomyRecord >(
-				'postType',
-				USER_TAXONOMY_POST_TYPE,
-				taxonomyId
-			)!;
-			return toFormData( record );
+			return (
+				! isAddMode &&
+				// beforeLoad (route.ts) guarantees the record is in cache.
+				select( coreStore ).getEntityRecord< TaxonomyRecord >(
+					'postType',
+					USER_TAXONOMY_POST_TYPE,
+					taxonomyId
+				)!
+			);
 		},
 		[ isAddMode, taxonomyId ]
 	);
-
+	const initialData =
+		! isAddMode && record ? toFormData( record ) : BLANK_RECORD;
 	const title = isAddMode ? __( 'Add taxonomy' ) : initialData.title.raw;
 	const commonProps = { initialData, title };
 	const taxonomyPageProps: TaxonomyPageProps = isAddMode
@@ -138,10 +146,20 @@ function TaxonomyPage( {
 			slugField,
 			descriptionField,
 			objectTypeField,
-			publicField,
 			hierarchicalField,
 			statusField,
+			// Visibility
+			publicField,
+			showInRestField,
+			publiclyQueryableField,
+			showUiField,
+			showInMenuField,
+			showInQuickEditField,
+			showAdminColumnField,
+			showInNavMenusField,
+			showTagcloudField,
 			// Labels
+			labelsActionsField,
 			menuNameField,
 			allItemsField,
 			editItemField,
@@ -177,20 +195,30 @@ function TaxonomyPage( {
 						isCollapsible: true,
 						isOpened: true,
 					},
-					children: generalForm.fields,
+					children: generalFormFields,
 				},
 				{
-					id: 'labels',
-					label: __( 'Labels' ),
+					id: 'visibility',
+					label: __( 'Visibility' ),
 					description: __(
-						'Override the text WordPress shows in admin lists, menus, and forms. Leave blank to use defaults derived from the plural and singular names.'
+						'Where this taxonomy appears: REST API, admin UI, and front-end surfaces.'
 					),
 					layout: {
 						type: 'card',
 						isCollapsible: true,
 						isOpened: false,
 					},
-					children: labelsForm.fields,
+					children: visibilityFormFields,
+				},
+				{
+					id: 'labels',
+					label: __( 'Labels' ),
+					layout: {
+						type: 'card',
+						isCollapsible: true,
+						isOpened: false,
+					},
+					children: labelsFormFields,
 				},
 			],
 		} ),
@@ -267,7 +295,7 @@ function TaxonomyPage( {
 					type="submit"
 					form={ formId }
 					isBusy={ isSaving }
-					disabled={ isSaving }
+					disabled={ isSaving || ! isValid }
 					accessibleWhenDisabled
 				>
 					{ isAddMode ? __( 'Create' ) : __( 'Save' ) }

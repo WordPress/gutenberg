@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __experimentalHStack as HStack, Button } from '@wordpress/components';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
 	__experimentalConnectorItem as ConnectorItem,
@@ -154,22 +154,6 @@ function ApiKeyConnector( {
 	const showActionButton = ! showUnavailableBadge;
 
 	const actionButtonRef = useRef< HTMLButtonElement >( null );
-	const pendingFocusRef = useRef( false );
-
-	// Restore focus to the action button after async actions complete.
-	useEffect( () => {
-		if ( pendingFocusRef.current && ! isBusy ) {
-			pendingFocusRef.current = false;
-			actionButtonRef.current?.focus();
-		}
-	}, [ isBusy, isExpanded, isConnected ] );
-
-	const handleActionClick = () => {
-		if ( pluginStatus === 'not-installed' || pluginStatus === 'inactive' ) {
-			pendingFocusRef.current = true;
-		}
-		handleButtonClick();
-	};
 
 	return (
 		<ConnectorItem
@@ -192,9 +176,10 @@ function ApiKeyConnector( {
 									: 'secondary'
 							}
 							size="compact"
-							onClick={ handleActionClick }
+							onClick={ handleButtonClick }
 							disabled={ pluginStatus === 'checking' || isBusy }
 							isBusy={ isBusy }
+							accessibleWhenDisabled
 						>
 							{ getButtonLabel() }
 						</Button>
@@ -218,18 +203,14 @@ function ApiKeyConnector( {
 						isExternallyConfigured
 							? undefined
 							: async () => {
-									pendingFocusRef.current = true;
-									try {
-										await removeApiKey();
-									} catch {
-										pendingFocusRef.current = false;
-									}
+									await removeApiKey();
+									actionButtonRef.current?.focus();
 							  }
 					}
 					onSave={ async ( apiKey: string ) => {
 						await saveApiKey( apiKey );
-						pendingFocusRef.current = true;
 						setIsExpanded( false );
+						actionButtonRef.current?.focus();
 					} }
 				/>
 			) }

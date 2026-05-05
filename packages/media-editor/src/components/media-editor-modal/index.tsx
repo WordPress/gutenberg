@@ -15,13 +15,16 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	createPortal,
+	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { close, drawerRight } from '@wordpress/icons';
+import { close, drawerRight, keyboard } from '@wordpress/icons';
+import { isAppleOS, isKeyboardEvent } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import {
@@ -50,7 +53,9 @@ import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import { buildModifiers } from './build-modifiers';
+import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -70,6 +75,7 @@ const METADATA_EDIT_KEYS = [
 // Scope save-failure snackbars to this modal so they don't leak into the
 // host editor's notices tray (and vice versa).
 const NOTICES_CONTEXT = 'media-editor';
+const PLACEMENT_CONTROL_IDLE_MS = 300;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -156,6 +162,7 @@ function HeaderActions( {
 	onSave,
 }: HeaderActionsProps ) {
 	const saveDisabled = isSaving || ! hasMedia || ! hasChanges;
+	const [ isShortcutsModalOpen, setIsShortcutsModalOpen ] = useState( false );
 	return (
 		<Flex
 			className="media-editor-modal__header-actions"
@@ -163,6 +170,12 @@ function HeaderActions( {
 			expanded={ false }
 			gap={ 2 }
 		>
+			<Button
+				size="compact"
+				icon={ keyboard }
+				label={ __( 'Keyboard shortcuts' ) }
+				onClick={ () => setIsShortcutsModalOpen( true ) }
+			/>
 			<PinnedItems.Slot scope="media-editor" />
 			<Button
 				size="compact"
@@ -191,6 +204,11 @@ function HeaderActions( {
 				disabled={ isSaving }
 				accessibleWhenDisabled
 			/>
+			{ isShortcutsModalOpen && (
+				<MediaEditorKeyboardShortcutsModal
+					onClose={ () => setIsShortcutsModalOpen( false ) }
+				/>
+			) }
 		</Flex>
 	);
 }
@@ -230,15 +248,43 @@ function MediaEditorModalContent( {
 
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
+	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
+		useState( false );
+	const placementControlTimerRef =
+		useRef< ReturnType< typeof setTimeout > >();
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	const signalPlacementControlInteraction = useCallback( () => {
+		setIsPlacementActive( true );
+		clearTimeout( placementControlTimerRef.current );
+		placementControlTimerRef.current = setTimeout( () => {
+			setIsPlacementActive( false );
+		}, PLACEMENT_CONTROL_IDLE_MS );
+	}, [] );
+	const handleCanvasGestureStart = useCallback( () => {
+		setIsCanvasGestureActive( true );
+	}, [] );
+	const handleCanvasGestureEnd = useCallback( () => {
+		setIsCanvasGestureActive( false );
+	}, [] );
+	const isCropInteractionActive = isPlacementActive || isCanvasGestureActive;
+
+	useEffect( () => {
+		return () => {
+			clearTimeout( placementControlTimerRef.current );
+		};
+	}, [] );
 
 	// Reset aspect-ratio / freeform state when the media changes, so the
 	// next image starts from the defaults.
 	useEffect( () => {
 		setAspectRatioValue( '0' );
 		setFreeformCrop( true );
+		setIsPlacementActive( false );
+		setIsCanvasGestureActive( false );
 	}, [ id ] );
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
@@ -292,6 +338,9 @@ function MediaEditorModalContent( {
 							onAspectRatioChange={ setAspectRatioValue }
 							freeformCrop={ freeformCrop }
 							onFreeformChange={ setFreeformCrop }
+							onPlacementControlInteraction={
+								signalPlacementControlInteraction
+							}
 							aspectRatioPresets={ aspectRatioPresets }
 						/>
 					</Stack>
@@ -299,7 +348,13 @@ function MediaEditorModalContent( {
 			},
 			detailsTab,
 		];
-	}, [ isImage, aspectRatioValue, freeformCrop, aspectRatioPresets ] );
+	}, [
+		isImage,
+		aspectRatioValue,
+		freeformCrop,
+		aspectRatioPresets,
+		signalPlacementControlInteraction,
+	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
 		editEntityRecord( 'postType', 'attachment', id, updates );
@@ -433,6 +488,36 @@ function MediaEditorModalContent( {
 			isDismissible={ false }
 			shouldCloseOnClickOutside={ ! hasChanges && ! isSaving }
 			onKeyDown={ ( event ) => {
+				// Undo / Redo — skip when a metadata text field is focused
+				// so the browser's native field undo/redo (Details tab) is
+				// preserved. Inputs inside a crop control wrapper are
+				// intentionally included — the wrapper's data attribute
+				// signals that custom undo/redo should handle them.
+				const isUndoShortcut = isKeyboardEvent.primary( event, 'z' );
+				const isRedoShortcut =
+					isKeyboardEvent.primaryShift( event, 'z' ) ||
+					( ! isAppleOS() && isKeyboardEvent.primary( event, 'y' ) );
+				if ( ( isUndoShortcut || isRedoShortcut ) && isImage ) {
+					const target = event.target as HTMLElement;
+					const isMetadataField =
+						( target.tagName === 'INPUT' ||
+							target.tagName === 'TEXTAREA' ||
+							target.isContentEditable ) &&
+						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
+					if ( ! isMetadataField ) {
+						event.preventDefault();
+						if ( isCropInteractionActive ) {
+							return;
+						}
+						if ( isRedoShortcut ) {
+							cropper.redo();
+						} else {
+							cropper.undo();
+						}
+						return;
+					}
+				}
+
 				if ( event.code !== 'Escape' && event.key !== 'Escape' ) {
 					return;
 				}
@@ -469,7 +554,9 @@ function MediaEditorModalContent( {
 				settings={ { fields } }
 			>
 				{ ! media ? (
-					<Spinner />
+					<div className="media-editor-modal__loading">
+						<Spinner />
+					</div>
 				) : (
 					<>
 						<Tabs>
@@ -477,6 +564,13 @@ function MediaEditorModalContent( {
 						</Tabs>
 						<InterfaceSkeleton
 							className="media-editor-modal__skeleton"
+							labels={ {
+								body: isImage
+									? __( 'Image editor' )
+									: __( 'Media preview' ),
+								sidebar: __( 'Media details' ),
+								footer: __( 'Image editing tools' ),
+							} }
 							content={
 								<div className="media-editor-modal__canvas">
 									{ isImage ? (
@@ -486,6 +580,15 @@ function MediaEditorModalContent( {
 												imageAspectRatio
 											) }
 											freeformCrop={ freeformCrop }
+											isPlacementActive={
+												isPlacementActive
+											}
+											onGestureStart={
+												handleCanvasGestureStart
+											}
+											onGestureEnd={
+												handleCanvasGestureEnd
+											}
 										/>
 									) : (
 										<MediaPreview />
@@ -499,6 +602,12 @@ function MediaEditorModalContent( {
 											setAspectRatioValue( '0' );
 											setFreeformCrop( true );
 										} }
+										onPlacementControlInteraction={
+											signalPlacementControlInteraction
+										}
+										isUndoRedoDisabled={
+											isCropInteractionActive
+										}
 									/>
 								) : undefined
 							}
@@ -581,11 +690,12 @@ export function MediaEditorModal( {
 	// just a `useReducer` with no side effects — so the inner component
 	// can read `isDirty` for images without forking on media type. The
 	// `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Today the modal always
-	// closes between edits so this is belt-and-braces, but it guards
-	// against future flows that swap `id` in the store without closing.
+	// discarding the previous cropper state. Keying on `id` (rather than
+	// `media?.id`) avoids a remount when `media` resolves from `null` to
+	// the loaded record on open — that flip would otherwise re-run the
+	// modal's entry animation and cause a visible flicker.
 	return (
-		<CropperProvider key={ media?.id ?? 'none' }>
+		<CropperProvider key={ id }>
 			<MediaEditorModalContent
 				fields={ fields }
 				id={ id }

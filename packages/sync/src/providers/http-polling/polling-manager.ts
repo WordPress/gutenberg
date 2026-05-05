@@ -880,6 +880,7 @@ function registerRoom( {
 
 			// This is an unrecoverable error. Unregister the room to prevent syncing.
 			unregisterRoom( room );
+			return;
 		}
 
 		// Tag local document changes as 'update' type.

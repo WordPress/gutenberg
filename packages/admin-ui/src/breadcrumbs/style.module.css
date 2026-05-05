@@ -2,8 +2,6 @@
 	list-style: none;
 	padding: 0;
 	margin: 0;
-	/* @TODO: Replace with a `size` token once that category exists in the theme package. */
-	min-height: calc(var(--wpds-dimension-base) * 8);
 }
 
 /*

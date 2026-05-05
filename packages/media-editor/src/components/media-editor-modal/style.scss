@@ -16,6 +16,18 @@
 	display: flex;
 	flex-direction: column;
 
+	// Center the loading spinner in the modal body while media data is
+	// resolving, before the InterfaceSkeleton mounts. The wrapper sits
+	// inside `.components-modal__children-container`, which isn't a flex
+	// container — `height: 100%` (rather than `flex: 1`) makes it fill
+	// the body so the inner flex can center the spinner.
+	.media-editor-modal__loading {
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
 	// InterfaceSkeleton defaults to position: fixed for full-viewport usage.
 	// Reset it so the skeleton flows inside the modal's content area. Stack
 	// children vertically (header/body/footer) since the default row layout
