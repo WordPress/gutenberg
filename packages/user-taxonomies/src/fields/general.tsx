@@ -1,20 +1,30 @@
 /**
  * WordPress dependencies
  */
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { resolveSelect, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import type { Field, Form } from '@wordpress/dataviews';
+import type {
+	DataFormControlProps,
+	Field,
+	FieldValidity,
+	Form,
+} from '@wordpress/dataviews';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Used here because it supports rendering as a `span` via the `render` prop to avoid invalid HTML.
 import { Badge, Notice, Stack } from '@wordpress/ui';
+import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../lock-unlock';
 import { usePublicPostTypes } from '../utils';
 import type { TaxonomyFormData } from '../types';
 import { booleanField } from './utils';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 export const titleField: Field< TaxonomyFormData > = {
 	id: 'title',
@@ -102,6 +112,23 @@ export const statusField: Field< TaxonomyFormData > = {
 	enableSorting: false,
 };
 
+const SLUG_MAX_LENGTH = 32;
+// Slug field has required + pattern + maxLength + a custom (slug-taken) check.
+// Surface them in priority order: structural rules first, async slug-taken last.
+// `required` only overrides the native browser message when our rule supplies
+// one of its own.
+function getSlugCustomValidity( validity?: FieldValidity ) {
+	if ( validity?.required?.message ) {
+		return validity.required;
+	}
+	if ( validity?.pattern ) {
+		return validity.pattern;
+	}
+	if ( validity?.maxLength ) {
+		return validity.maxLength;
+	}
+	return validity?.custom;
+}
 export function useSlugField(
 	originalSlug?: string,
 	currentValue?: string
@@ -138,7 +165,8 @@ export function useSlugField(
 			),
 			isValid: {
 				required: true,
-				pattern: '^[a-z0-9_\\-]{1,32}$',
+				pattern: '^[a-z0-9_\\-]+$',
+				maxLength: SLUG_MAX_LENGTH,
 				custom: async ( value: TaxonomyFormData ) => {
 					const slug = value.slug;
 					if ( originalSlug !== undefined && slug === originalSlug ) {
@@ -163,6 +191,60 @@ export function useSlugField(
 						? __( 'This taxonomy key is already in use.' )
 						: null;
 				},
+			},
+			Edit: function SlugEdit( {
+				data,
+				field,
+				onChange,
+				hideLabelFromVision,
+				markWhenOptional,
+				validity,
+			}: DataFormControlProps< TaxonomyFormData > ) {
+				const { label, description, getValue, setValue, isValid } =
+					field;
+				const value =
+					( getValue( { item: data } ) as string | undefined ) ?? '';
+				const handleChange = ( newValue: string ) =>
+					onChange( setValue( { item: data, value: newValue } ) );
+				const onFocus = () => {
+					if ( data.id !== undefined || data.slug ) {
+						return;
+					}
+					const singular = data.config.labels.singular_name?.trim();
+					if ( ! singular ) {
+						return;
+					}
+					const cleaned = cleanForSlug( singular );
+					// On a fresh record fill the input from the singular label.
+					// Skip auto-fill if cleanForSlug retained non-ASCII to match
+					// the server's sanitize_key charset.
+					if ( /[^a-z0-9_-]/.test( cleaned ) ) {
+						return;
+					}
+					const trimmed = cleaned
+						.slice( 0, SLUG_MAX_LENGTH )
+						// Slicing can introduce a trailing hyphen — strip it.
+						.replace( /-+$/, '' );
+					if ( trimmed ) {
+						handleChange( trimmed );
+					}
+				};
+				return (
+					<ValidatedInputControl
+						__next40pxDefaultSize
+						required={ !! isValid.required }
+						markWhenOptional={ markWhenOptional }
+						customValidity={ getSlugCustomValidity( validity ) }
+						label={ label }
+						value={ value }
+						help={ description }
+						onChange={ handleChange }
+						onFocus={ onFocus }
+						hideLabelFromVision={ hideLabelFromVision }
+						pattern={ isValid.pattern?.constraint }
+						maxLength={ isValid.maxLength?.constraint }
+					/>
+				);
 			},
 			filterBy: false,
 			enableSorting: false,
