@@ -40,27 +40,13 @@ export function clampValue( value: number, min: number, max: number ): number {
 }
 
 /**
- * Snap `next` to 0 only when entering the snap window from outside.
+ * Round `value` to the nearest multiple of `step`.
  *
- * Avoids a "sticky zero" while scrubbing through 0; the user gets a
- * single satisfying snap on entry, then is free to leave.
- *
- * @param next       Computed next value.
- * @param previous   Previous value (last emitted).
- * @param windowSize Half-width of the snap window in value units. 0
- *                   disables snapping.
+ * @param value Value to quantize.
+ * @param step  Step granularity (must be > 0).
  */
-export function applyZeroSnap(
-	next: number,
-	previous: number,
-	windowSize: number
-): number {
-	if ( windowSize <= 0 ) {
-		return next;
-	}
-	const enteringWindow =
-		Math.abs( next ) < windowSize && Math.abs( previous ) >= windowSize;
-	return enteringWindow ? 0 : next;
+export function quantize( value: number, step: number ): number {
+	return Math.round( value / step ) * step;
 }
 
 export interface UseRulerDragOptions {
@@ -70,7 +56,6 @@ export interface UseRulerDragOptions {
 	max: number;
 	step: number;
 	pixelsPerStep: number;
-	snapToZeroWithin: number;
 	disabled: boolean;
 	/** Called once on pointerdown so the caller can focus the input. */
 	onPointerDownStart?: () => void;
@@ -85,12 +70,13 @@ export interface RulerDragHandlers {
 
 /**
  * Drag-the-ruler gesture for a horizontal slider. Translates pointer
- * movement into value changes; the caller renders the visuals and
- * holds the value.
+ * movement into value changes quantized to `step`; the caller renders
+ * the visuals and holds the value.
  *
  * The hook owns no state of its own — every value change is reported
  * through the supplied `onChange`. The "current value" is read from a
- * ref so closure staleness during a drag is impossible.
+ * ref so closure staleness during a drag is impossible. The drag ends
+ * automatically if the pointer leaves the wrapper's bounds.
  *
  * @param options Ruler-drag configuration. See `UseRulerDragOptions`.
  */
@@ -104,7 +90,6 @@ export function useRulerDrag(
 		max,
 		step,
 		pixelsPerStep,
-		snapToZeroWithin,
 		disabled,
 		onPointerDownStart,
 	} = options;
@@ -125,6 +110,19 @@ export function useRulerDrag(
 		latestRef.current.value = value;
 	}, [ value ] );
 
+	const endDrag = useCallback(
+		( event: React.PointerEvent< HTMLElement > ) => {
+			if ( ! latestRef.current.dragging ) {
+				return;
+			}
+			latestRef.current.dragging = false;
+			if ( event.currentTarget.hasPointerCapture( event.pointerId ) ) {
+				event.currentTarget.releasePointerCapture( event.pointerId );
+			}
+		},
+		[]
+	);
+
 	const onPointerDown = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
 			if ( disabled || event.button !== 0 ) {
@@ -144,41 +142,34 @@ export function useRulerDrag(
 			if ( ! latestRef.current.dragging ) {
 				return;
 			}
+			// End the drag if the pointer leaves the wrapper bounds. We
+			// keep `setPointerCapture` so this handler still receives
+			// events outside the element; the bounds check is what
+			// turns "drag everywhere" into "drag inside the ruler".
+			const rect = event.currentTarget.getBoundingClientRect();
+			if (
+				event.clientX < rect.left ||
+				event.clientX > rect.right ||
+				event.clientY < rect.top ||
+				event.clientY > rect.bottom
+			) {
+				endDrag( event );
+				return;
+			}
 			const deltaPx = event.clientX - latestRef.current.startX;
 			const deltaValue = pxToValueDelta( deltaPx, pixelsPerStep, step );
 			const raw = latestRef.current.startValue + deltaValue;
-			const snapped = applyZeroSnap(
-				raw,
-				latestRef.current.value,
-				snapToZeroWithin
-			);
-			const next = clampValue( snapped, min, max );
+			const stepped = quantize( raw, step );
+			const next = clampValue( stepped, min, max );
 			if ( next !== latestRef.current.value ) {
 				// Update the ref synchronously so consecutive pointermove
 				// events that fire before React commits still see the
-				// last *emitted* value as `previous` for the next snap
-				// calculation. Without this, dragging through 0 keeps
-				// re-snapping back to 0 on every event until the commit
-				// catches up — the "sticky zero" the snap is designed
-				// to avoid.
+				// last *emitted* value as `previous` for the next math.
 				latestRef.current.value = next;
 				onChange( next );
 			}
 		},
-		[ onChange, min, max, step, pixelsPerStep, snapToZeroWithin ]
-	);
-
-	const endDrag = useCallback(
-		( event: React.PointerEvent< HTMLElement > ) => {
-			if ( ! latestRef.current.dragging ) {
-				return;
-			}
-			latestRef.current.dragging = false;
-			if ( event.currentTarget.hasPointerCapture( event.pointerId ) ) {
-				event.currentTarget.releasePointerCapture( event.pointerId );
-			}
-		},
-		[]
+		[ onChange, min, max, step, pixelsPerStep, endDrag ]
 	);
 
 	return {

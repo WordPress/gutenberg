@@ -7,7 +7,7 @@ import userEvent from '@testing-library/user-event';
 /**
  * Internal dependencies
  */
-import { pxToValueDelta, clampValue, applyZeroSnap } from '../use-ruler-drag';
+import { pxToValueDelta, clampValue, quantize } from '../use-ruler-drag';
 import RotationRuler from '../index';
 
 describe( 'rotation-ruler math', () => {
@@ -33,23 +33,13 @@ describe( 'rotation-ruler math', () => {
 		} );
 	} );
 
-	describe( 'applyZeroSnap', () => {
-		it( 'snaps to 0 only when entering the window from outside', () => {
-			// previous outside window, next inside window → snap to 0.
-			expect( applyZeroSnap( 0.4, 1.2, 0.75 ) ).toBe( 0 );
-		} );
-
-		it( 'does not snap when previous value was already inside the window', () => {
-			// already at 0; small drag should produce a non-zero value.
-			expect( applyZeroSnap( 0.4, 0, 0.75 ) ).toBe( 0.4 );
-		} );
-
-		it( 'does not snap when next value is outside the window', () => {
-			expect( applyZeroSnap( 1.5, 5, 0.75 ) ).toBe( 1.5 );
-		} );
-
-		it( 'is a no-op when window is 0', () => {
-			expect( applyZeroSnap( 0.1, 5, 0 ) ).toBe( 0.1 );
+	describe( 'quantize', () => {
+		it( 'rounds to the nearest multiple of step', () => {
+			expect( quantize( 0.4, 1 ) ).toBe( 0 );
+			expect( quantize( 0.6, 1 ) ).toBe( 1 );
+			expect( quantize( -0.6, 1 ) ).toBe( -1 );
+			expect( quantize( 12.3, 5 ) ).toBe( 10 );
+			expect( quantize( 12.5, 5 ) ).toBe( 15 );
 		} );
 	} );
 } );
@@ -85,7 +75,7 @@ describe( 'RotationRuler', () => {
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'fires onChange with value + step / 2 on Shift+ArrowRight', async () => {
+	it( 'fires onChange with value + step on Shift+ArrowRight (no half-step)', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 		render(
@@ -97,7 +87,7 @@ describe( 'RotationRuler', () => {
 		);
 		screen.getByRole( 'slider', { name: 'Fine rotation' } ).focus();
 		await user.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
-		expect( onChange ).toHaveBeenCalledWith( 0.5 );
+		expect( onChange ).toHaveBeenCalledWith( 1 );
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 

@@ -22,13 +22,14 @@ export interface RotationRulerProps {
 	label: string;
 	unit?: string;
 	pixelsPerStep?: number;
-	snapToZeroWithin?: number;
 	className?: string;
 	id?: string;
 	disabled?: boolean;
 }
 
-const STRIP_HEIGHT = 18;
+const STRIP_HEIGHT = 32;
+const LABEL_BASELINE_Y = 11;
+const MAJOR_INTERVAL = 15;
 const TICK_HEIGHT_MINOR = 4;
 const TICK_HEIGHT_MID = 8;
 const TICK_HEIGHT_MAJOR = 14;
@@ -85,24 +86,23 @@ function formatValue( value: number ): string {
  * technologies and keyboard input alongside a decorative tick strip
  * that the user can drag with a pointer.
  *
- * @param props                  Component props.
- * @param props.value            Current value.
- * @param props.onChange         Called with the next value on each change.
- * @param props.min              Lower bound of the range (default: -45).
- * @param props.max              Upper bound of the range (default: 45).
- * @param props.step             Value step for keyboard arrows (default: 1).
- * @param props.label            Accessible label for the slider input.
- * @param props.unit             Unit suffix shown in the bubble and
- *                               `aria-valuetext` (default: `°`).
- * @param props.pixelsPerStep    CSS pixels of pointer travel per `step`
- *                               (default: 6).
- * @param props.snapToZeroWithin Half-width of the zero snap window in
- *                               value units. 0 disables snapping
- *                               (default: 0.75).
- * @param props.className        Optional extra class for the wrapper.
- * @param props.id               Optional id for the underlying input;
- *                               auto-generated when omitted.
- * @param props.disabled         When true, ignores all input.
+ * @param props               Component props.
+ * @param props.value         Current value.
+ * @param props.onChange      Called with the next value on each change.
+ * @param props.min           Lower bound of the range (default: -45).
+ * @param props.max           Upper bound of the range (default: 45).
+ * @param props.step          Value step for drag and keyboard arrows
+ *                            (default: 1). Drag values are quantized to
+ *                            multiples of `step`.
+ * @param props.label         Accessible label for the slider input.
+ * @param props.unit          Unit suffix shown in the active label and
+ *                            `aria-valuetext` (default: `°`).
+ * @param props.pixelsPerStep CSS pixels of pointer travel per `step`
+ *                            (default: 6).
+ * @param props.className     Optional extra class for the wrapper.
+ * @param props.id            Optional id for the underlying input;
+ *                            auto-generated when omitted.
+ * @param props.disabled      When true, ignores all input.
  */
 export default function RotationRuler( {
 	value,
@@ -113,7 +113,6 @@ export default function RotationRuler( {
 	label,
 	unit = '°',
 	pixelsPerStep = 6,
-	snapToZeroWithin = 0.75,
 	className,
 	id,
 	disabled = false,
@@ -129,7 +128,6 @@ export default function RotationRuler( {
 		max,
 		step,
 		pixelsPerStep,
-		snapToZeroWithin,
 		disabled,
 		onPointerDownStart: () => inputRef.current?.focus(),
 	} );
@@ -152,8 +150,7 @@ export default function RotationRuler( {
 			return;
 		}
 		const direction = isIncrement ? 1 : -1;
-		const magnitude = event.shiftKey ? step / 2 : step;
-		const next = clampValue( value + direction * magnitude, min, max );
+		const next = clampValue( value + direction * step, min, max );
 		if ( next !== value ) {
 			onChange( next );
 		}
@@ -179,6 +176,15 @@ export default function RotationRuler( {
 		};
 	}, [ value, pxPerUnit ] );
 
+	// Closest major (every 15°) to current value. Its normal label is
+	// suppressed and replaced by the active label, which sits exactly
+	// under the pointer and shows the precise current value when off-
+	// major (e.g. "-7°") or the major itself when on-major (e.g. "0°").
+	const closestMajor = Math.round( value / MAJOR_INTERVAL ) * MAJOR_INTERVAL;
+	const onMajor = Math.abs( value - closestMajor ) < 0.01;
+	const activeText = onMajor ? `${ closestMajor }${ unit }` : display;
+	const majorTicks = ticks.filter( ( tick ) => tick.kind === 'major' );
+
 	const wrapperClassName = [ 'rotation-ruler', className ]
 		.filter( Boolean )
 		.join( ' ' );
@@ -188,6 +194,7 @@ export default function RotationRuler( {
 			className={ wrapperClassName }
 			role="presentation"
 			data-disabled={ disabled || undefined }
+			{ ...dragHandlers }
 		>
 			<input
 				ref={ inputRef }
@@ -208,11 +215,7 @@ export default function RotationRuler( {
 				}
 				onKeyDown={ handleKeyDown }
 			/>
-			<div
-				className="rotation-ruler__strip"
-				aria-hidden="true"
-				{ ...dragHandlers }
-			>
+			<div className="rotation-ruler__strip" aria-hidden="true">
 				<svg
 					className="rotation-ruler__ticks"
 					style={ stripStyle }
@@ -233,12 +236,24 @@ export default function RotationRuler( {
 							className={ `rotation-ruler__tick rotation-ruler__tick--${ tick.kind }` }
 						/>
 					) ) }
+					{ majorTicks.map( ( tick ) => (
+						<text
+							key={ tick.value }
+							x={ tick.value * pxPerUnit }
+							y={ LABEL_BASELINE_Y }
+							textAnchor="middle"
+							className="rotation-ruler__label"
+						>
+							{ tick.value }
+							{ unit }
+						</text>
+					) ) }
 				</svg>
 			</div>
-			<div className="rotation-ruler__pointer" aria-hidden="true" />
-			<div className="rotation-ruler__bubble" aria-hidden="true">
-				{ display }
+			<div className="rotation-ruler__active-label" aria-hidden="true">
+				{ activeText }
 			</div>
+			<div className="rotation-ruler__pointer" aria-hidden="true" />
 		</div>
 	);
 }
