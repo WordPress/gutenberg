@@ -778,14 +778,6 @@
 			"count": 2
 		}
 	},
-	"packages/edit-post/src/components/layout/index.js": {
-		"react-hooks/immutability": {
-			"count": 2
-		},
-		"react-hooks/refs": {
-			"count": 3
-		}
-	},
 	"packages/edit-post/src/components/welcome-guide/default.js": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
