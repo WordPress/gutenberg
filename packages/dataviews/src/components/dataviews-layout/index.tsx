@@ -29,6 +29,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		fields,
 		getItemId,
 		getItemLevel,
+		getItemParentId,
 		hasInitiallyLoaded,
 		isLoading,
 		view,
@@ -78,6 +79,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 				fields={ fields }
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
+				getItemParentId={ getItemParentId }
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }

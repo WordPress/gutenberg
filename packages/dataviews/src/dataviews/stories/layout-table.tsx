@@ -14,6 +14,7 @@ import { actions, data, fields, type SpaceObject } from './fixtures';
 
 type HierarchicalSpaceObject = SpaceObject & {
 	level: number;
+	parent?: number;
 };
 
 const getItemByTitle = ( title: string ) => {
@@ -27,7 +28,7 @@ const getItemByTitle = ( title: string ) => {
 const createHierarchyItem = (
 	title: string,
 	level: number,
-	overrides: Partial< SpaceObject > = {}
+	overrides: Partial< HierarchicalSpaceObject > = {}
 ): HierarchicalSpaceObject => ( {
 	...getItemByTitle( title ),
 	...overrides,
@@ -39,20 +40,33 @@ const hierarchicalData: HierarchicalSpaceObject[] = [
 		satellites: 95,
 		type: 'Planet group',
 	} ),
-	createHierarchyItem( 'Io', 1 ),
+	createHierarchyItem( 'Io', 1, {
+		parent: getItemByTitle( 'Jupiter' ).id,
+	} ),
 	createHierarchyItem( 'Europa', 1, {
 		name: {
 			...getItemByTitle( 'Europa' ).name,
 			title: 'Europa variations',
 		},
+		parent: getItemByTitle( 'Jupiter' ).id,
 	} ),
-	createHierarchyItem( 'Ganymede', 2 ),
-	createHierarchyItem( 'Callisto', 2 ),
+	createHierarchyItem( 'Ganymede', 2, {
+		parent: getItemByTitle( 'Europa' ).id,
+	} ),
+	createHierarchyItem( 'Callisto', 2, {
+		parent: getItemByTitle( 'Europa' ).id,
+	} ),
 	createHierarchyItem( 'Neptune', 0 ),
-	createHierarchyItem( 'Triton', 1 ),
-	createHierarchyItem( 'Nereid', 1 ),
+	createHierarchyItem( 'Triton', 1, {
+		parent: getItemByTitle( 'Neptune' ).id,
+	} ),
+	createHierarchyItem( 'Nereid', 1, {
+		parent: getItemByTitle( 'Neptune' ).id,
+	} ),
 	createHierarchyItem( 'Earth', 0 ),
-	createHierarchyItem( 'Moon', 1 ),
+	createHierarchyItem( 'Moon', 1, {
+		parent: getItemByTitle( 'Earth' ).id,
+	} ),
 ];
 
 export const LayoutTableComponent = ( {
@@ -152,9 +166,9 @@ export const LayoutTableComponent = ( {
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
-				getItemLevel={
+				getItemParentId={
 					hierarchyStyle
-						? ( item ) => ( item as HierarchicalSpaceObject ).level
+						? ( item ) => ( item as HierarchicalSpaceObject ).parent
 						: undefined
 				}
 				paginationInfo={ paginationInfo }

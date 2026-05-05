@@ -480,7 +480,11 @@ export interface ViewBaseProps< Item > {
 	data: Item[];
 	fields: NormalizedField< Item >[];
 	getItemId: ( item: Item ) => string;
+	/**
+	 * @deprecated Use getItemParentId for hierarchy.
+	 */
 	getItemLevel?: ( item: Item ) => number;
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 	isLoading?: boolean;
 	onChangeView: ( view: View ) => void;
 	onChangeSelection: SetSelection;
@@ -506,6 +510,7 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'onClickItem'
 	| 'renderItemLink'
 	| 'getItemLevel'
+	| 'getItemParentId'
 > & {
 	view: View;
 	onChangeView: ( view: View ) => void;

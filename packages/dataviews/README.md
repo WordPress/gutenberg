@@ -117,14 +117,20 @@ Example:
 
 #### `getItemLevel`: `function`
 
-A function that receives an item and returns its hierarchical level. It's optional, but this property must be passed for DataViews to display the hierarchical levels of the data if `view.showLevels` is true.
+Deprecated. Use `getItemParentId` for hierarchy.
+
+A function that receives an item and returns its hierarchical level. This continues to support the legacy text hierarchy display, but is not used for `tree` hierarchy.
+
+#### `getItemParentId`: `function`
+
+A function that receives an item and returns the unique identifier of its parent item. It's optional, but required for `table` layouts to display hierarchical levels when `view.showLevels` is true. Items without a parent, or whose parent is not present in the current data, are displayed as root items.
 
 Example:
 
 ```js
 // Example implementation
 {
-	getItemLevel={ ( item ) => item.level }
+	getItemParentId={ ( item ) => item.parent }
 }
 ```
 
@@ -237,7 +243,7 @@ Properties:
 -   `showTitle`: Whether the title should be shown in the UI. `true` by default.
 -   `showMedia`: Whether the media should be shown in the UI. `true` by default.
 -   `showDescription`: Whether the description should be shown in the UI. `true` by default.
--   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemLevel` DataView prop.
+-   `showLevels`: Whether to display the hierarchical levels for the data. `false` by default. See related `getItemParentId` DataView prop.
 -   `groupBy`:
 
     -   `field`: the field used for grouping the dataset.
@@ -782,6 +788,7 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `renderItemLink`
 -   `onClickItem`
 -   `getItemLevel`
+-   `getItemParentId`
 -   `header`
 
 ## `DataForm`

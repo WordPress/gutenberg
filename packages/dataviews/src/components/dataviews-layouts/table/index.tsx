@@ -46,11 +46,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
-import {
-	getHierarchyRows,
-	getItemHierarchyLevel,
-	getVisibleHierarchyRows,
-} from './hierarchy-utils';
+import { getTreeRows, getVisibleTreeRows } from './tree-rows';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -374,6 +370,7 @@ function ViewTable< Item >( {
 	fields,
 	getItemId,
 	getItemLevel,
+	getItemParentId,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -400,15 +397,21 @@ function ViewTable< Item >( {
 
 	const isTreeHierarchy = !! (
 		view.showLevels &&
-		typeof getItemLevel === 'function' &&
+		typeof getItemParentId === 'function' &&
 		view.layout?.hierarchyStyle === 'tree'
 	);
-	const hierarchyRows = useMemo( () => {
-		if ( ! isTreeHierarchy || ! getItemLevel ) {
+	const isTextHierarchy = !! (
+		view.showLevels &&
+		( typeof getItemParentId === 'function' ||
+			typeof getItemLevel === 'function' ) &&
+		view.layout?.hierarchyStyle !== 'tree'
+	);
+	const treeRows = useMemo( () => {
+		if ( ! ( isTreeHierarchy || isTextHierarchy ) || ! getItemParentId ) {
 			return [];
 		}
-		return getHierarchyRows( data, getItemId, getItemLevel );
-	}, [ data, getItemId, getItemLevel, isTreeHierarchy ] );
+		return getTreeRows( data, getItemId, getItemParentId );
+	}, [ data, getItemId, getItemParentId, isTextHierarchy, isTreeHierarchy ] );
 
 	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
 		() => {
@@ -418,15 +421,36 @@ function ViewTable< Item >( {
 
 			return new Set(
 				view.layout?.expandChildren
-					? hierarchyRows
-							.filter(
-								( hierarchyRow ) => hierarchyRow.childCount
-							)
-							.map( ( hierarchyRow ) => hierarchyRow.id )
+					? treeRows
+							.filter( ( treeRow ) => treeRow.childCount )
+							.map( ( treeRow ) => treeRow.id )
 					: []
 			);
 		}
 	);
+
+	useEffect( () => {
+		if ( ! isTreeHierarchy || ! view.layout?.expandChildren ) {
+			return;
+		}
+
+		setExpandedItemIds( ( previousExpandedItemIds ) => {
+			const nextExpandedItemIds = new Set( previousExpandedItemIds );
+			let hasChanges = false;
+
+			for ( const treeRow of treeRows ) {
+				if (
+					treeRow.childCount &&
+					! nextExpandedItemIds.has( treeRow.id )
+				) {
+					nextExpandedItemIds.add( treeRow.id );
+					hasChanges = true;
+				}
+			}
+
+			return hasChanges ? nextExpandedItemIds : previousExpandedItemIds;
+		} );
+	}, [ treeRows, isTreeHierarchy, view.layout?.expandChildren ] );
 
 	const showHierarchyBadge =
 		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
@@ -528,29 +552,40 @@ function ViewTable< Item >( {
 			return nextExpandedItemIds;
 		} );
 	};
+	const getTextLevel = ( item: Item ) => {
+		if ( getItemParentId ) {
+			return undefined;
+		}
+
+		const level = getItemLevel?.( item );
+		return typeof level === 'number' && Number.isFinite( level )
+			? Math.max( 0, level )
+			: undefined;
+	};
 	const getRowsToRender = ( items: Item[] ): TableRenderRow< Item >[] => {
-		if ( ! isTreeHierarchy || ! getItemLevel ) {
+		if ( ! ( isTreeHierarchy || isTextHierarchy ) || ! getItemParentId ) {
 			return items.map( ( item, index ) => ( {
 				item,
 				id: getItemId( item ) || index.toString(),
-				level:
-					view.showLevels && typeof getItemLevel === 'function'
-						? getItemHierarchyLevel( item, getItemLevel )
-						: undefined,
+				level: isTextHierarchy ? getTextLevel( item ) : undefined,
 			} ) );
 		}
 
-		const rows =
-			items === data
-				? hierarchyRows
-				: getHierarchyRows( items, getItemId, getItemLevel );
+		const rows = getTreeRows( items, getItemId, getItemParentId );
 
-		return getVisibleHierarchyRows( rows, expandedItemIds ).map(
-			( hierarchyRow ) => ( {
-				...hierarchyRow,
+		if ( isTextHierarchy ) {
+			return rows.map( ( treeRow ) => ( {
+				...treeRow,
+				level: treeRow.depth,
+			} ) );
+		}
+
+		return getVisibleTreeRows( rows, expandedItemIds ).map(
+			( treeRow ) => ( {
+				...treeRow,
 				level: undefined,
-				hierarchyLevel: hierarchyRow.level,
-				isExpanded: expandedItemIds.has( hierarchyRow.id ),
+				hierarchyLevel: treeRow.depth,
+				isExpanded: expandedItemIds.has( treeRow.id ),
 			} )
 		);
 	};

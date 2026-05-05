@@ -68,7 +68,11 @@ type DataViewsProps< Item > = {
 	) => ReactElement;
 	isItemClickable?: ( item: Item ) => boolean;
 	header?: ReactNode;
+	/**
+	 * @deprecated Use getItemParentId for hierarchy.
+	 */
 	getItemLevel?: ( item: Item ) => number;
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 	children?: ReactNode;
 	config?: {
 		perPageSizes: number[];
@@ -143,6 +147,7 @@ function DataViews< Item >( {
 	data,
 	getItemId = defaultGetItemId,
 	getItemLevel,
+	getItemParentId,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
@@ -280,6 +285,7 @@ function DataViews< Item >( {
 				setOpenedFilter,
 				getItemId,
 				getItemLevel,
+				getItemParentId,
 				isItemClickable,
 				onClickItem,
 				renderItemLink,

@@ -37,7 +37,11 @@ type DataViewsContextType< Item > = {
 	openedFilter: string | null;
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 	getItemId: ( item: Item ) => string;
+	/**
+	 * @deprecated Use getItemParentId for hierarchy.
+	 */
 	getItemLevel?: ( item: Item ) => number;
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 	onClickItem?: ( item: Item ) => void;
 	renderItemLink?: (
 		props: {
