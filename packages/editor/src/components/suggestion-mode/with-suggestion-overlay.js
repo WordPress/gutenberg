@@ -165,6 +165,13 @@ function structuralMarkerClass( type ) {
  * pending suggestion — either an attribute overlay (renders the green
  * "bracket" treatment) or a structural marker stored in
  * `metadata.suggestion` (renders strikethrough/dim/move overlays).
+ *
+ * The attribute "bracket" is suggest-mode-only — it represents the suggester's
+ * uncommitted edits living in the local overlay, which other intents have no
+ * way to interact with. Structural markers, by contrast, are persisted on the
+ * live block (synced through the same path as block content), so reviewers in
+ * Edit or View intent see and can act on them too — that's the visual cue a
+ * post author needs to spot a pending removal/insertion/move at a glance.
  */
 const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
@@ -190,11 +197,9 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			const hasPendingOverlay =
 				!! entry &&
 				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
+			const showOverlayBracket = isSuggestMode && hasPendingOverlay;
 
-			if (
-				! isSuggestMode ||
-				( ! hasPendingOverlay && ! structuralClass )
-			) {
+			if ( ! showOverlayBracket && ! structuralClass ) {
 				return <BlockListBlock { ...props } />;
 			}
 
@@ -203,7 +208,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					{ ...props }
 					className={ clsx(
 						props.className,
-						hasPendingOverlay && 'is-suggestion-pending',
+						showOverlayBracket && 'is-suggestion-pending',
 						structuralClass
 					) }
 				/>
