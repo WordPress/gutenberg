@@ -6,6 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useMemo,
+	useState,
 } from '@wordpress/element';
 import type { ReactNode } from 'react';
 
@@ -22,17 +23,30 @@ import {
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
 
-interface WorkingImage {
+export interface ImageEditingSessionImage {
 	src: string;
 	width: number;
 	height: number;
 }
 
+function areImagesEqual(
+	a: ImageEditingSessionImage | null,
+	b: ImageEditingSessionImage | null
+): boolean {
+	return (
+		a?.src === b?.src && a?.width === b?.width && a?.height === b?.height
+	);
+}
+
 export interface ImageEditingSession {
-	/** Current source being edited by the image session. */
-	workingImage: WorkingImage | null;
+	/** Original image source loaded into the current session. */
+	sourceImage: ImageEditingSessionImage | null;
+	/** Current image source being edited by the image session. */
+	workingImage: ImageEditingSessionImage | null;
 	/** Low-level cropper controller. */
 	cropper: UseCropperStateReturn;
+	/** Replace the source image and reset dependent image edits. */
+	setSourceImage: ( image: ImageEditingSessionImage | null ) => void;
 	/** Whether the image session has unsaved image edits. */
 	isDirty: boolean;
 	/** Whether the image session has undo history. */
@@ -61,32 +75,47 @@ export function ImageEditingSessionProvider( {
 	children: ReactNode;
 } ) {
 	const cropper = useCropperState();
+	const setCropperImage = cropper.setImage;
+	const [ sourceImage, setSourceImageState ] =
+		useState< ImageEditingSessionImage | null >( null );
 
-	const workingImage = useMemo< WorkingImage | null >( () => {
-		if ( ! cropper.state.image ) {
-			return null;
-		}
-		return {
-			src: cropper.state.image.src,
-			width: cropper.state.image.naturalWidth,
-			height: cropper.state.image.naturalHeight,
-		};
-	}, [ cropper.state.image ] );
+	const setSourceImage = useCallback(
+		( image: ImageEditingSessionImage | null ) => {
+			if ( areImagesEqual( sourceImage, image ) ) {
+				return;
+			}
+			setSourceImageState( image );
+			setCropperImage(
+				image
+					? {
+							src: image.src,
+							naturalWidth: image.width,
+							naturalHeight: image.height,
+					  }
+					: null
+			);
+		},
+		[ setCropperImage, sourceImage ]
+	);
+
+	const workingImage = sourceImage;
 
 	const buildSaveModifiers = useCallback( () => {
-		if ( ! cropper.isDirty || ! cropper.state.image ) {
+		if ( ! cropper.isDirty || ! workingImage ) {
 			return [];
 		}
 		return buildModifiers( cropper.state, {
-			width: cropper.state.image.naturalWidth,
-			height: cropper.state.image.naturalHeight,
+			width: workingImage.width,
+			height: workingImage.height,
 		} );
-	}, [ cropper.isDirty, cropper.state ] );
+	}, [ cropper.isDirty, cropper.state, workingImage ] );
 
 	const session = useMemo< ImageEditingSession >(
 		() => ( {
+			sourceImage,
 			workingImage,
 			cropper,
+			setSourceImage,
 			isDirty: cropper.isDirty,
 			hasUndo: cropper.hasUndo,
 			hasRedo: cropper.hasRedo,
@@ -96,7 +125,13 @@ export function ImageEditingSessionProvider( {
 			commitHistory: cropper.commitHistory,
 			buildSaveModifiers,
 		} ),
-		[ cropper, workingImage, buildSaveModifiers ]
+		[
+			cropper,
+			setSourceImage,
+			sourceImage,
+			workingImage,
+			buildSaveModifiers,
+		]
 	);
 
 	return (

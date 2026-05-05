@@ -13,8 +13,14 @@ import { buildModifiers } from '../../media-editor-modal/build-modifiers';
 
 const TEST_IMAGE = {
 	src: 'test.jpg',
-	naturalWidth: 1000,
-	naturalHeight: 500,
+	width: 1000,
+	height: 500,
+};
+
+const NEXT_IMAGE = {
+	src: 'next.jpg',
+	width: 1200,
+	height: 800,
 };
 
 function SessionWrapper( { children }: { children: ReactNode } ) {
@@ -36,6 +42,7 @@ describe( 'ImageEditingSessionProvider', () => {
 		expect( result.current.isDirty ).toBe( false );
 		expect( result.current.hasUndo ).toBe( false );
 		expect( result.current.hasRedo ).toBe( false );
+		expect( result.current.sourceImage ).toBeNull();
 		expect( result.current.workingImage ).toBeNull();
 	} );
 
@@ -43,13 +50,14 @@ describe( 'ImageEditingSessionProvider', () => {
 		const { result } = setup();
 
 		act( () => {
-			result.current.cropper.setImage( TEST_IMAGE );
+			result.current.setSourceImage( TEST_IMAGE );
 		} );
 
+		expect( result.current.sourceImage ).toEqual( TEST_IMAGE );
 		expect( result.current.workingImage ).toEqual( {
 			src: TEST_IMAGE.src,
-			width: TEST_IMAGE.naturalWidth,
-			height: TEST_IMAGE.naturalHeight,
+			width: TEST_IMAGE.width,
+			height: TEST_IMAGE.height,
 		} );
 		expect( result.current.isDirty ).toBe( false );
 	} );
@@ -64,6 +72,39 @@ describe( 'ImageEditingSessionProvider', () => {
 		);
 
 		expect( result.current.cropper ).toBe( result.current.session.cropper );
+	} );
+
+	it( 'resets cropper edits when the source image changes', () => {
+		const { result } = setup();
+
+		act( () => {
+			result.current.setSourceImage( TEST_IMAGE );
+		} );
+		act( () => {
+			result.current.cropper.setZoom( 3 );
+		} );
+		act( () => {
+			result.current.commitHistory();
+		} );
+
+		expect( result.current.isDirty ).toBe( true );
+		expect( result.current.hasUndo ).toBe( true );
+
+		act( () => {
+			result.current.setSourceImage( NEXT_IMAGE );
+		} );
+
+		expect( result.current.sourceImage ).toEqual( NEXT_IMAGE );
+		expect( result.current.workingImage ).toEqual( NEXT_IMAGE );
+		expect( result.current.cropper.state.image ).toEqual( {
+			src: NEXT_IMAGE.src,
+			naturalWidth: NEXT_IMAGE.width,
+			naturalHeight: NEXT_IMAGE.height,
+		} );
+		expect( result.current.cropper.state.zoom ).toBe( 1 );
+		expect( result.current.isDirty ).toBe( false );
+		expect( result.current.hasUndo ).toBe( false );
+		expect( result.current.hasRedo ).toBe( false );
 	} );
 
 	it( 'marks the image session dirty when cropper state changes', () => {
@@ -127,7 +168,7 @@ describe( 'ImageEditingSessionProvider', () => {
 		const { result } = setup();
 
 		act( () => {
-			result.current.cropper.setImage( TEST_IMAGE );
+			result.current.setSourceImage( TEST_IMAGE );
 		} );
 
 		expect( result.current.buildSaveModifiers() ).toEqual( [] );
@@ -137,7 +178,7 @@ describe( 'ImageEditingSessionProvider', () => {
 		const { result } = setup();
 
 		act( () => {
-			result.current.cropper.setImage( TEST_IMAGE );
+			result.current.setSourceImage( TEST_IMAGE );
 		} );
 		act( () => {
 			result.current.cropper.snapRotate90( 1 );
@@ -145,8 +186,8 @@ describe( 'ImageEditingSessionProvider', () => {
 
 		expect( result.current.buildSaveModifiers() ).toEqual(
 			buildModifiers( result.current.cropper.state, {
-				width: TEST_IMAGE.naturalWidth,
-				height: TEST_IMAGE.naturalHeight,
+				width: TEST_IMAGE.width,
+				height: TEST_IMAGE.height,
 			} )
 		);
 	} );

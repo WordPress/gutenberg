@@ -34,7 +34,7 @@ import { useHistory } from './use-history';
 export interface UseCropperStateReturn {
 	/** The current cropper state (read-only). */
 	state: CropperState;
-	/** Set the loaded image (natural size and src). */
+	/** Set the loaded image and reset image-dependent crop state. */
 	setImage: ( image: CropperState[ 'image' ] ) => void;
 	/**
 	 * Set the image pan offset in normalized coordinates. Use
@@ -128,6 +128,17 @@ function areHistoryStatesEqual( a: CropperState, b: CropperState ): boolean {
 	);
 }
 
+function areImagesEqual(
+	a: CropperState[ 'image' ],
+	b: CropperState[ 'image' ]
+): boolean {
+	return (
+		a?.src === b?.src &&
+		a?.naturalWidth === b?.naturalWidth &&
+		a?.naturalHeight === b?.naturalHeight
+	);
+}
+
 /**
  * Reducer-based state management hook for the image editor.
  *
@@ -175,6 +186,7 @@ export function useCropperState(
 		undo,
 		redo,
 		suppressNextChange,
+		clearHistory,
 	} = useHistory( {
 		state,
 		isEqual: areHistoryStatesEqual,
@@ -184,18 +196,19 @@ export function useCropperState(
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
-			suppressNextChange( { clearPending: true } );
-			dispatch( { type: 'SET_IMAGE', payload: image } );
-			// Refresh the "clean" snapshot to match the post-load state
-			// produced by the reducer. Otherwise containment can nudge
-			// pan/zoom by tiny amounts on load and `isDirty` would
-			// report true from the start.
-			initialRef.current = enforceContainment( {
-				...initialRef.current,
+			if ( areImagesEqual( stateRef.current.image, image ) ) {
+				return;
+			}
+			const nextInitialState = enforceContainment( {
+				...DEFAULT_STATE,
 				image,
 			} );
+			clearHistory( nextInitialState );
+			suppressNextChange( { clearPending: true } );
+			dispatch( { type: 'RESET', payload: { image } } );
+			initialRef.current = nextInitialState;
 		},
-		[ dispatch, suppressNextChange ]
+		[ clearHistory, dispatch, suppressNextChange ]
 	);
 
 	const setPan = useCallback(

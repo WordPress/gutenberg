@@ -29,6 +29,8 @@ export interface UseHistoryReturn< T > {
 	redo: () => void;
 	/** Suppress the next observed state change from creating history. */
 	suppressNextChange: ( options?: { clearPending?: boolean } ) => void;
+	/** Clear undo/redo history and optionally replace the clean baseline. */
+	clearHistory: ( state?: T ) => void;
 }
 
 /**
@@ -128,6 +130,15 @@ export function useHistory< T >( {
 		[]
 	);
 
+	const clearHistory = useCallback( ( nextState?: T ) => {
+		clearTimeout( debounceTimerRef.current );
+		historyRef.current = [];
+		redoStackRef.current = [];
+		lastCommittedStateRef.current = nextState ?? stateRef.current;
+		setHasUndo( false );
+		setHasRedo( false );
+	}, [] );
+
 	const undo = useCallback( () => {
 		commitHistory();
 		const prev = historyRef.current[ historyRef.current.length - 1 ];
@@ -164,5 +175,6 @@ export function useHistory< T >( {
 		undo,
 		redo,
 		suppressNextChange,
+		clearHistory,
 	};
 }

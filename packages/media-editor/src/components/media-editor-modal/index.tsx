@@ -57,6 +57,7 @@ import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcut
 import {
 	ImageEditingSessionProvider,
 	useImageEditingSession,
+	type ImageEditingSessionImage,
 } from '../image-editing-session';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
@@ -236,6 +237,7 @@ function MediaEditorModalContent( {
 	onUpdate,
 }: MediaEditorModalContentProps ) {
 	const imageSession = useImageEditingSession();
+	const setSourceImage = imageSession.setSourceImage;
 	const hasChanges = imageSession.isDirty || hasEdits;
 
 	const registry = useRegistry();
@@ -280,6 +282,36 @@ function MediaEditorModalContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
+
+	const sourceImage = useMemo< ImageEditingSessionImage | null >( () => {
+		if ( ! isImage || ! media?.source_url ) {
+			return null;
+		}
+		const naturalWidth = Number( media.media_details?.width );
+		const naturalHeight = Number( media.media_details?.height );
+		if (
+			Number.isFinite( naturalWidth ) &&
+			Number.isFinite( naturalHeight ) &&
+			naturalWidth > 0 &&
+			naturalHeight > 0
+		) {
+			return {
+				src: media.source_url,
+				width: naturalWidth,
+				height: naturalHeight,
+			};
+		}
+		return null;
+	}, [
+		isImage,
+		media?.source_url,
+		media?.media_details?.width,
+		media?.media_details?.height,
+	] );
+
+	useEffect( () => {
+		setSourceImage( sourceImage );
+	}, [ setSourceImage, sourceImage ] );
 
 	const imageAspectRatio = useMemo( () => {
 		if ( ! isImage ) {
@@ -405,7 +437,7 @@ function MediaEditorModalContent( {
 					path: `/wp/v2/media/${ id }/edit`,
 					method: 'POST',
 					data: {
-						src: media?.source_url,
+						src: imageSession.sourceImage?.src,
 						modifiers,
 						...metadataEdits,
 					},
