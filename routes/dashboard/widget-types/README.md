@@ -13,9 +13,9 @@ consumer that reads from this store and lazy-loads render modules.
 > **Status.** Lives inside the dashboard route while the API stabilizes.
 > Once the contract settles and other surfaces start consuming it, the
 > module will be promoted to a top-level `@wordpress/widget-types`
-> package. The internal layout (`index.ts`, `bootstrap.ts`, `types.ts`,
-> `store/`) is already aligned with that future shape so the move is a
-> rename, not a rewrite.
+> package. The internal layout (`index.ts`, `use-widget-types.ts`,
+> `types.ts`, `store/`) is already aligned with that future shape so the
+> move is a rename, not a rewrite.
 
 ## Widget identity vs page wiring
 
@@ -76,7 +76,7 @@ Build (@wordpress/build)               Data layer
           Browser import map
                    │
                    ▼
-  bootstrapWidgetTypes() on the client
+  getWidgetTypes resolver (auto-fires on first read)
     ├─ reads window.__registeredWidgetTypes
     ├─ import( widget_module ) for each entry
     ├─ merges metadata + renderModule (snake→camel boundary)
@@ -106,10 +106,10 @@ are the only contracts surfaces consume.
 
 ## Why the page module filter?
 
-The short version: `bootstrapWidgetTypes()` does `import( widget_module )`
-at runtime, and for that to resolve, the module must be in the browser's
-import map for the current page load. The filter is how a surface adds
-widget modules to its page's dep tree.
+The short version: the `getWidgetTypes` resolver does
+`import( widget_module )` at runtime, and for that to resolve, the
+module must be in the browser's import map for the current page load.
+The filter is how a surface adds widget modules to its page's dep tree.
 
 The longer story is about why this specific mechanism exists. We
 considered several alternatives:
@@ -146,25 +146,41 @@ Widgets are authored by placing files under `widgets/<name>/`:
 - `render.tsx` — lazy-loaded React component
 
 The build pipeline discovers them, emits the manifest, and the PHP
-loader injects the bootstrap data. The client calls
-`bootstrapWidgetTypes()` once before rendering any surface that uses
-widgets:
-
-```ts
-import { bootstrapWidgetTypes } from './widget-types';
-
-await bootstrapWidgetTypes();
-```
+loader injects the source data. Consumers do not bootstrap anything;
+they just read.
 
 ### Client: querying registered widgets
 
+The recommended path is the `useWidgetTypes()` hook. Reading it the
+first time triggers the resolver, which dynamically imports each
+widget's metadata module and populates the store. Subsequent reads are
+no-ops.
+
+```tsx
+import { useWidgetTypes } from './widget-types';
+
+function MySurface() {
+	const types = useWidgetTypes();
+	// render the list…
+}
+```
+
+For non-React consumers, the underlying selectors are the same
+contract:
+
 ```ts
-import { select } from '@wordpress/data';
+import { select, resolveSelect } from '@wordpress/data';
 import { store } from './widget-types';
 
-const types = select( store ).getWidgetTypes();
-const stats = select( store ).getWidgetType( 'my-plugin/stats' );
+const types = await resolveSelect( store ).getWidgetTypes();
+const stats = await resolveSelect( store ).getWidgetType(
+	'my-plugin/stats'
+);
 ```
+
+Use `resolveSelect` (instead of `select`) when you need the value
+*after* resolution; `select` returns whatever is currently in the
+store, which may be empty before the resolver runs.
 
 ### Server: a surface opts in to widgets
 
@@ -342,9 +358,11 @@ addFilter(
 
 ### Functions
 
-#### `bootstrapWidgetTypes()` — client
+#### `getWidgetTypes()` resolver, client
 
-Reads `window.__registeredWidgetTypes` (injected by PHP, snake_case),
+Auto-fires the first time any consumer reads `getWidgetTypes()` (or
+`getWidgetType( name )`) from a fresh store. Reads
+`window.__registeredWidgetTypes` (injected by PHP, snake_case),
 dynamically imports each widget's metadata module (`widget.ts`), merges
 it with the `renderModule` handle (mapped from `render_module` at this
 boundary), and calls `registerWidgetType()` for each.
@@ -353,13 +371,20 @@ This is the single point where the PHP snake_case shape is mapped to the
 camelCase shape used throughout JS/TS. Downstream code should never see
 `render_module`.
 
-Returns a `Promise<void>` that resolves when all widgets are registered.
+Idempotent by construction: `@wordpress/data` only runs the resolver
+once per unique selector arguments.
 
 **Behavior:**
 - Entries without `widget_module` are skipped
 - Modules that fail to import are silently skipped (no throw)
 - Modules must export a `default` object with widget metadata
 - `renderModule` falls back to empty string if absent
+
+#### `useWidgetTypes()` hook, client
+
+Returns the list of registered widget types. Thin wrapper over
+`useSelect( ( s ) => s( store ).getWidgetTypes() )`, so the resolver
+fires automatically the first time the hook runs.
 
 #### `gutenberg_get_widget_module_dependencies( $widget_names = null )` — PHP
 
@@ -440,7 +465,8 @@ On `init`:
 
 1. Reads `build/widgets/registry.php` (auto-generated manifest)
 2. Injects `window.__registeredWidgetTypes` via `wp_add_inline_script`
-   so `bootstrapWidgetTypes()` knows which metadata modules to import
+   so the `getWidgetTypes` resolver knows which metadata modules to
+   import
 
 It also exposes `gutenberg_get_widget_module_dependencies()` — a helper
 for surfaces to pull dependency entries and append them to their page
@@ -492,6 +518,8 @@ store without having wired modules would help.
 
 ### `window.__registeredWidgetTypes` global
 
-The PHP layer injects bootstrap data via a global, which the client
-reads in `bootstrapWidgetTypes()`. A proper init module generated by
-the build system would be cleaner.
+The PHP layer injects the source list via a global, which the
+`getWidgetTypes` resolver reads. The list is server-owned data and
+should reach the client through the standard data layer (resolver fed
+by REST), not a side channel. Replacing the global is tracked
+separately and does not change the public surface above.
