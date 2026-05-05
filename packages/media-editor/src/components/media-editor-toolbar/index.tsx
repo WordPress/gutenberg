@@ -30,6 +30,10 @@ export interface MediaEditorToolbarProps {
 	onReset?: () => void;
 	/** Signal that a placement-oriented control is being adjusted. */
 	onPlacementControlInteraction?: () => void;
+	/** Whether undo/redo should be unavailable during an active gesture. */
+	isUndoRedoDisabled?: boolean;
+	/** Synchronous guard for undo/redo clicks before disabled state renders. */
+	shouldSuppressUndoRedo?: () => boolean;
 }
 
 /**
@@ -40,10 +44,14 @@ export interface MediaEditorToolbarProps {
  * @param props
  * @param props.onReset
  * @param props.onPlacementControlInteraction
+ * @param props.isUndoRedoDisabled
+ * @param props.shouldSuppressUndoRedo
  */
 export default function MediaEditorToolbar( {
 	onReset,
 	onPlacementControlInteraction,
+	isUndoRedoDisabled = false,
+	shouldSuppressUndoRedo,
 }: MediaEditorToolbarProps ) {
 	const {
 		state,
@@ -62,6 +70,18 @@ export default function MediaEditorToolbar( {
 	const handleReset = () => {
 		reset();
 		onReset?.();
+	};
+	const handleUndo = () => {
+		if ( shouldSuppressUndoRedo?.() ) {
+			return;
+		}
+		undoCrop();
+	};
+	const handleRedo = () => {
+		if ( shouldSuppressUndoRedo?.() ) {
+			return;
+		}
+		redoCrop();
 	};
 
 	// `setRotation` is an absolute-angle setter. When a single flip is active
@@ -103,9 +123,9 @@ export default function MediaEditorToolbar( {
 				label={ __( 'Undo' ) }
 				showTooltip
 				shortcut={ displayShortcut.primary( 'z' ) }
-				disabled={ ! hasUndo }
+				disabled={ isUndoRedoDisabled || ! hasUndo }
 				accessibleWhenDisabled
-				onClick={ undoCrop }
+				onClick={ handleUndo }
 			/>
 			<Button
 				size="compact"
@@ -117,9 +137,9 @@ export default function MediaEditorToolbar( {
 						? displayShortcut.primaryShift( 'z' )
 						: displayShortcut.primary( 'y' )
 				}
-				disabled={ ! hasRedo }
+				disabled={ isUndoRedoDisabled || ! hasRedo }
 				accessibleWhenDisabled
-				onClick={ redoCrop }
+				onClick={ handleRedo }
 			/>
 			<Button
 				size="compact"

@@ -249,6 +249,10 @@ function MediaEditorModalContent( {
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ isDiscardDialogOpen, setIsDiscardDialogOpen ] = useState( false );
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
+	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
+		useState( false );
+	const isPlacementActiveRef = useRef( false );
+	const isCanvasGestureActiveRef = useRef( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -256,12 +260,27 @@ function MediaEditorModalContent( {
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
 
 	const signalPlacementControlInteraction = useCallback( () => {
+		isPlacementActiveRef.current = true;
 		setIsPlacementActive( true );
 		clearTimeout( placementControlTimerRef.current );
 		placementControlTimerRef.current = setTimeout( () => {
+			isPlacementActiveRef.current = false;
 			setIsPlacementActive( false );
 		}, PLACEMENT_CONTROL_IDLE_MS );
 	}, [] );
+	const handleCanvasGestureStart = useCallback( () => {
+		isCanvasGestureActiveRef.current = true;
+		setIsCanvasGestureActive( true );
+	}, [] );
+	const handleCanvasGestureEnd = useCallback( () => {
+		isCanvasGestureActiveRef.current = false;
+		setIsCanvasGestureActive( false );
+	}, [] );
+	const shouldSuppressUndoRedo = useCallback(
+		() => isPlacementActiveRef.current || isCanvasGestureActiveRef.current,
+		[]
+	);
+	const isCropInteractionActive = isPlacementActive || isCanvasGestureActive;
 
 	useEffect( () => {
 		return () => {
@@ -274,6 +293,10 @@ function MediaEditorModalContent( {
 	useEffect( () => {
 		setAspectRatioValue( '0' );
 		setFreeformCrop( true );
+		isPlacementActiveRef.current = false;
+		setIsPlacementActive( false );
+		isCanvasGestureActiveRef.current = false;
+		setIsCanvasGestureActive( false );
 	}, [ id ] );
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
@@ -495,6 +518,9 @@ function MediaEditorModalContent( {
 						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 					if ( ! isMetadataField ) {
 						event.preventDefault();
+						if ( shouldSuppressUndoRedo() ) {
+							return;
+						}
 						if ( isRedoShortcut ) {
 							cropper.redo();
 						} else {
@@ -569,6 +595,12 @@ function MediaEditorModalContent( {
 											isPlacementActive={
 												isPlacementActive
 											}
+											onGestureStart={
+												handleCanvasGestureStart
+											}
+											onGestureEnd={
+												handleCanvasGestureEnd
+											}
 										/>
 									) : (
 										<MediaPreview />
@@ -584,6 +616,12 @@ function MediaEditorModalContent( {
 										} }
 										onPlacementControlInteraction={
 											signalPlacementControlInteraction
+										}
+										isUndoRedoDisabled={
+											isCropInteractionActive
+										}
+										shouldSuppressUndoRedo={
+											shouldSuppressUndoRedo
 										}
 									/>
 								) : undefined
