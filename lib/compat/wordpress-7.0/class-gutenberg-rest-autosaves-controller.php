@@ -79,20 +79,18 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$is_collaboration_enabled = wp_is_collaboration_enabled();
 
 		/*
-		 * When a post is still in draft form, updates from the author can directly update the post
-		 * because it won’t change any rendered pages — it’s just a draft — there’s no need to
-		 * create a new revision. For any other situation a revision preserves potentially important
-		 * versions of the post.
+		 * When a post is still in draft form, updates from the author can directly update the post.
+		 * Other autosaves must be stored as per-user autosave revisions.
 		 *
-		 * At least, this works for the simple case when collaboration (RTC) isn’t active. Things are
-		 * more complicated in multi-editor environments. Since all peers are sharing a persisted
-		 * editing state (a shared CRDT), it’s important that they all store updates in a revision.
-		 * If one editor updated the post and another editor reloaded, the conflict resolution would
-		 * kick in a duplicate changes already recorded in the shared state.
+		 * When RTC is active, however, regular draft autosaves must not update the parent post directly.
+		 * Since all peers are sharing a persisted editing state (a shared CRDT), it’s important that
+		 * they all store updates in a revision. If edits were applied to the post, then upon the next
+		 * editor reload, it would appear as though the post had been updated externally, and those same
+		 * changes would be re-applied to the CRDT, duplicating the edits.
 		 *
 		 * The one caveat for RTC is that the first peer to store an edit must promote an auto-draft
 		 * into a real draft post. If this doesn’t happen then the peers may continue to make edits
-		 * but the draft will be lost; auto-drafts are not listed in post views.
+		 * but the draft will be lost, as auto-drafts are not listed in post views.
 		 */
 		if (
 			$is_draft &&
