@@ -295,6 +295,37 @@ describe( 'hasAttributeConflict', () => {
 			hasAttributeConflict( { content: wrapperOther }, [ CONTENT_OP ] )
 		).toBe( true );
 	} );
+
+	it( 'returns false for a block-insert-after payload even when attribute-set ops appear divergent', () => {
+		// The overlay baseline for an inserted block is `{}` — every
+		// attribute-set op the auto-save loop persists carries
+		// `before: null` regardless of what the user typed. Comparing
+		// that against the live (already-typed-into) block on the
+		// accepting client must not fire the staleness prompt.
+		const operations = [
+			{
+				type: 'block-insert-after',
+				clientId: 'inserted',
+				blockName: 'core/paragraph',
+				anchorClientId: 'anchor',
+				parentClientId: null,
+				block: {
+					name: 'core/paragraph',
+					attributes: { content: 'Hi' },
+					innerBlocks: [],
+				},
+			},
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: null,
+				after: 'Hi',
+			},
+		];
+		expect( hasAttributeConflict( { content: 'Hi' }, operations ) ).toBe(
+			false
+		);
+	} );
 } );
 
 describe( 'parseSuggestionPayload', () => {
