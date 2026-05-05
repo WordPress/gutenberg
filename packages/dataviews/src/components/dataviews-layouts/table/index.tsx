@@ -46,7 +46,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
-import { getTreeRows, getVisibleTreeRows } from './tree-rows';
+import { useTableHierarchy } from './use-table-hierarchy';
 import getDataByGroup from '../utils/get-data-by-group';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -62,15 +62,6 @@ function getEffectiveAlign(
 		return 'end';
 	}
 	return undefined;
-}
-
-interface TableRenderRow< Item > {
-	item: Item;
-	id: string;
-	level?: number;
-	hierarchyLevel?: number;
-	childCount?: number;
-	isExpanded?: boolean;
 }
 
 interface TableColumnFieldProps< Item > {
@@ -394,68 +385,18 @@ function ViewTable< Item >( {
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
 		getBoundingClientRect: () => DOMRect;
 	} | null >( null );
-
-	const isTreeHierarchy = !! (
-		view.showLevels &&
-		typeof getItemParentId === 'function' &&
-		view.layout?.hierarchyStyle === 'tree'
-	);
-	const isTextHierarchy = !! (
-		view.showLevels &&
-		( typeof getItemParentId === 'function' ||
-			typeof getItemLevel === 'function' ) &&
-		view.layout?.hierarchyStyle !== 'tree'
-	);
-	const treeRows = useMemo( () => {
-		if ( ! ( isTreeHierarchy || isTextHierarchy ) || ! getItemParentId ) {
-			return [];
-		}
-		return getTreeRows( data, getItemId, getItemParentId );
-	}, [ data, getItemId, getItemParentId, isTextHierarchy, isTreeHierarchy ] );
-
-	const [ expandedItemIds, setExpandedItemIds ] = useState< Set< string > >(
-		() => {
-			if ( ! isTreeHierarchy ) {
-				return new Set();
-			}
-
-			return new Set(
-				view.layout?.expandChildren
-					? treeRows
-							.filter( ( treeRow ) => treeRow.childCount )
-							.map( ( treeRow ) => treeRow.id )
-					: []
-			);
-		}
-	);
-	const manuallyCollapsedItemIdsRef = useRef< Set< string > >( new Set() );
-
-	useEffect( () => {
-		if ( ! isTreeHierarchy || ! view.layout?.expandChildren ) {
-			return;
-		}
-
-		setExpandedItemIds( ( previousExpandedItemIds ) => {
-			const nextExpandedItemIds = new Set( previousExpandedItemIds );
-			let hasChanges = false;
-
-			for ( const treeRow of treeRows ) {
-				if (
-					treeRow.childCount &&
-					! nextExpandedItemIds.has( treeRow.id ) &&
-					! manuallyCollapsedItemIdsRef.current.has( treeRow.id )
-				) {
-					nextExpandedItemIds.add( treeRow.id );
-					hasChanges = true;
-				}
-			}
-
-			return hasChanges ? nextExpandedItemIds : previousExpandedItemIds;
-		} );
-	}, [ treeRows, isTreeHierarchy, view.layout?.expandChildren ] );
-
-	const showHierarchyBadge =
-		isTreeHierarchy && view.layout?.showHierarchyBadge !== false;
+	const {
+		getRowsToRender,
+		isTreeHierarchy,
+		onToggleExpanded,
+		showHierarchyBadge,
+	} = useTableHierarchy( {
+		data,
+		getItemId,
+		getItemLevel,
+		getItemParentId,
+		view,
+	} );
 
 	useEffect( () => {
 		if ( headerMenuToFocusRef.current ) {
@@ -472,16 +413,6 @@ function ViewTable< Item >( {
 	} );
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
-
-	if ( nextHeaderMenuToFocus ) {
-		// If we need to force focus, we short-circuit rendering here
-		// to prevent any additional work while we handle that.
-		// Clearing out the focus directive is necessary to make sure
-		// future renders don't cause unexpected focus jumps.
-		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
-		setNextHeaderMenuToFocus( undefined );
-		return;
-	}
 
 	const onHide = ( field: NormalizedField< Item > ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
@@ -514,16 +445,45 @@ function ViewTable< Item >( {
 
 	const hasData = !! data?.length;
 
+	const groupField = view.groupBy?.field
+		? fields.find( ( f ) => f.id === view.groupBy?.field )
+		: null;
+	const dataByGroup = useMemo(
+		() => ( groupField ? getDataByGroup( data, groupField ) : null ),
+		[ data, groupField ]
+	);
+	const rowsToRender = useMemo(
+		() => getRowsToRender( data ),
+		[ data, getRowsToRender ]
+	);
+	const groupedRowsToRender = useMemo( () => {
+		if ( ! dataByGroup ) {
+			return null;
+		}
+
+		return Array.from( dataByGroup.entries() ).map(
+			( [ groupName, groupItems ] ) => ( {
+				groupName,
+				rows: getRowsToRender( groupItems ),
+			} )
+		);
+	}, [ dataByGroup, getRowsToRender ] );
+	if ( nextHeaderMenuToFocus ) {
+		// If we need to force focus, we short-circuit rendering here
+		// to prevent any additional work while we handle that.
+		// Clearing out the focus directive is necessary to make sure
+		// future renders don't cause unexpected focus jumps.
+		headerMenuToFocusRef.current = nextHeaderMenuToFocus;
+		setNextHeaderMenuToFocus( undefined );
+		return;
+	}
+
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
 	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
 	const descriptionField = fields.find(
 		( field ) => field.id === view.descriptionField
 	);
 
-	const groupField = view.groupBy?.field
-		? fields.find( ( f ) => f.id === view.groupBy?.field )
-		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
@@ -543,58 +503,6 @@ function ViewTable< Item >( {
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
-	const onToggleExpanded = ( itemId: string ) => {
-		setExpandedItemIds( ( previousExpandedItemIds ) => {
-			const nextExpandedItemIds = new Set( previousExpandedItemIds );
-			if ( nextExpandedItemIds.has( itemId ) ) {
-				nextExpandedItemIds.delete( itemId );
-				if ( view.layout?.expandChildren ) {
-					manuallyCollapsedItemIdsRef.current.add( itemId );
-				}
-			} else {
-				nextExpandedItemIds.add( itemId );
-				manuallyCollapsedItemIdsRef.current.delete( itemId );
-			}
-			return nextExpandedItemIds;
-		} );
-	};
-	const getTextLevel = ( item: Item ) => {
-		if ( getItemParentId ) {
-			return undefined;
-		}
-
-		const level = getItemLevel?.( item );
-		return typeof level === 'number' && Number.isFinite( level )
-			? Math.max( 0, level )
-			: undefined;
-	};
-	const getRowsToRender = ( items: Item[] ): TableRenderRow< Item >[] => {
-		if ( ! ( isTreeHierarchy || isTextHierarchy ) || ! getItemParentId ) {
-			return items.map( ( item, index ) => ( {
-				item,
-				id: getItemId( item ) || index.toString(),
-				level: isTextHierarchy ? getTextLevel( item ) : undefined,
-			} ) );
-		}
-
-		const rows = getTreeRows( items, getItemId, getItemParentId );
-
-		if ( isTextHierarchy ) {
-			return rows.map( ( treeRow ) => ( {
-				...treeRow,
-				level: treeRow.depth,
-			} ) );
-		}
-
-		return getVisibleTreeRows( rows, expandedItemIds ).map(
-			( treeRow ) => ( {
-				...treeRow,
-				level: undefined,
-				hierarchyLevel: treeRow.depth,
-				isExpanded: expandedItemIds.has( treeRow.id ),
-			} )
-		);
-	};
 	if ( ! hasData ) {
 		return (
 			<div
@@ -788,80 +696,66 @@ function ViewTable< Item >( {
 					</tr>
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
-				{ hasData && groupField && dataByGroup ? (
-					Array.from( dataByGroup.entries() ).map(
-						( [ groupName, groupItems ] ) => (
-							<tbody key={ `group-${ groupName }` }>
-								<tr className="dataviews-view-table__group-header-row">
-									<td
-										colSpan={
-											columns.length +
-											( isTreeHierarchy ? 1 : 0 ) +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 ) +
-											( actions?.length ? 1 : 0 )
-										}
-										className="dataviews-view-table__group-header-cell"
-									>
-										{ view.groupBy?.showLabel === false
-											? groupName
-											: sprintf(
-													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-													__( '%1$s: %2$s' ),
-													groupField.label,
-													groupName
-											  ) }
-									</td>
-								</tr>
-								{ getRowsToRender( groupItems ).map(
-									( row ) => (
-										<TableRow
-											key={ row.id }
-											item={ row.item }
-											level={ row.level }
-											hasBulkActions={ hasBulkActions }
-											actions={ actions }
-											fields={ fields }
-											id={ row.id }
-											view={ view }
-											titleField={ titleField }
-											mediaField={ mediaField }
-											descriptionField={
-												descriptionField
-											}
-											selection={ selection }
-											getItemId={ getItemId }
-											onChangeSelection={
-												onChangeSelection
-											}
-											onClickItem={ onClickItem }
-											renderItemLink={ renderItemLink }
-											isItemClickable={ isItemClickable }
-											isActionsColumnSticky={
-												! isHorizontalScrollEnd
-											}
-											isTreeHierarchy={ isTreeHierarchy }
-											hierarchyLevel={
-												row.hierarchyLevel
-											}
-											childCount={ row.childCount }
-											showHierarchyBadge={
-												showHierarchyBadge
-											}
-											isExpanded={ row.isExpanded }
-											onToggleExpanded={
-												onToggleExpanded
-											}
-										/>
-									)
-								) }
-							</tbody>
-						)
-					)
+				{ hasData && groupField && groupedRowsToRender ? (
+					groupedRowsToRender.map( ( { groupName, rows } ) => (
+						<tbody key={ `group-${ groupName }` }>
+							<tr className="dataviews-view-table__group-header-row">
+								<td
+									colSpan={
+										columns.length +
+										( isTreeHierarchy ? 1 : 0 ) +
+										( hasPrimaryColumn ? 1 : 0 ) +
+										( hasBulkActions ? 1 : 0 ) +
+										( actions?.length ? 1 : 0 )
+									}
+									className="dataviews-view-table__group-header-cell"
+								>
+									{ view.groupBy?.showLabel === false
+										? groupName
+										: sprintf(
+												// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+												__( '%1$s: %2$s' ),
+												groupField.label,
+												groupName
+										  ) }
+								</td>
+							</tr>
+							{ rows.map( ( row ) => (
+								<TableRow
+									key={ row.id }
+									item={ row.item }
+									level={ row.level }
+									hasBulkActions={ hasBulkActions }
+									actions={ actions }
+									fields={ fields }
+									id={ row.id }
+									view={ view }
+									titleField={ titleField }
+									mediaField={ mediaField }
+									descriptionField={ descriptionField }
+									selection={ selection }
+									getItemId={ getItemId }
+									onChangeSelection={ onChangeSelection }
+									onClickItem={ onClickItem }
+									renderItemLink={ renderItemLink }
+									isItemClickable={ isItemClickable }
+									isActionsColumnSticky={
+										! isHorizontalScrollEnd
+									}
+									isTreeHierarchy={ isTreeHierarchy }
+									hierarchyLevel={ row.hierarchyLevel }
+									childCount={ row.childCount }
+									showHierarchyBadge={ showHierarchyBadge }
+									isExpanded={ row.isExpanded }
+									onToggleExpanded={ onToggleExpanded }
+								/>
+							) ) }
+						</tbody>
+					) )
 				) : (
 					<tbody>
 						{ hasData &&
-							getRowsToRender( data ).map( ( row, index ) => (
+							rowsToRender.map( ( row, index ) => (
 								<TableRow
 									key={ row.id }
 									item={ row.item }

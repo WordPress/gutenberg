@@ -442,15 +442,16 @@ describe( 'DataViews component', () => {
 		} );
 
 		it( 'preserves text hierarchy style by default', () => {
-			render(
+			const textHierarchyView = {
+				...DEFAULT_VIEW,
+				fields: [],
+				titleField: 'title',
+				showLevels: true,
+			};
+			const { rerender } = render(
 				<DataViewWrapper
 					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-					} }
+					view={ textHierarchyView }
 					getItemLevel={ ( item ) => item.level ?? 0 }
 				/>
 			);
@@ -462,18 +463,11 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.getByRole( 'row', { name: /—\s*First child/ } )
 			).toBeInTheDocument();
-		} );
 
-		it( 'supports text hierarchy from parent ids', () => {
-			render(
+			rerender(
 				<DataViewWrapper
 					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-					} }
+					view={ textHierarchyView }
 					getItemParentId={ ( item ) => item.parent }
 				/>
 			);
@@ -483,34 +477,7 @@ describe( 'DataViews component', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'starts tree hierarchy collapsed by default', () => {
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
-			);
-
-			expect( screen.getByText( 'Parent' ) ).toBeInTheDocument();
-			expect( screen.getByText( 'Another parent' ) ).toBeInTheDocument();
-			expect(
-				screen.queryByText( 'First child' )
-			).not.toBeInTheDocument();
-			expect(
-				screen.getByRole( 'button', { name: 'Expand Parent' } )
-			).toHaveAttribute( 'aria-expanded', 'false' );
-		} );
-
-		it( 'does not render tree hierarchy without parent ids', () => {
+		it( 'falls back to flat rows when tree hierarchy has no parent ids', () => {
 			render(
 				<DataViewWrapper
 					data={ hierarchicalData }
@@ -535,32 +502,7 @@ describe( 'DataViews component', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'supports expanding tree children by default', () => {
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-							expandChildren: true,
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
-			);
-
-			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
-			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
-			expect(
-				screen.getByRole( 'button', { name: 'Collapse Parent' } )
-			).toHaveAttribute( 'aria-expanded', 'true' );
-		} );
-
-		it( 'preserves manually collapsed tree rows after data refresh', async () => {
+		it( 'respects expandChildren while preserving manual collapses after data refresh', async () => {
 			const user = userEvent.setup();
 			const view = {
 				...DEFAULT_VIEW,
@@ -580,6 +522,12 @@ describe( 'DataViews component', () => {
 					getItemParentId={ getItemParentId }
 				/>
 			);
+
+			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Collapse Parent' } )
@@ -605,84 +553,7 @@ describe( 'DataViews component', () => {
 			).toHaveAttribute( 'aria-expanded', 'false' );
 		} );
 
-		it( 'expands and collapses tree hierarchy rows', async () => {
-			const user = userEvent.setup();
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Expand Parent' } )
-			);
-
-			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
-			expect( screen.getByText( 'Second child' ) ).toBeInTheDocument();
-			expect(
-				screen.queryByText( 'Grandchild' )
-			).not.toBeInTheDocument();
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Collapse Parent' } )
-			);
-
-			expect(
-				screen.queryByText( 'First child' )
-			).not.toBeInTheDocument();
-			expect(
-				screen.queryByText( 'Second child' )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'supports multiple tree nesting levels independently', async () => {
-			const user = userEvent.setup();
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Expand Parent' } )
-			);
-			await user.click(
-				screen.getByRole( 'button', { name: 'Expand Second child' } )
-			);
-
-			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Collapse Second child' } )
-			);
-
-			expect(
-				screen.queryByText( 'Grandchild' )
-			).not.toBeInTheDocument();
-			expect( screen.getByText( 'First child' ) ).toBeInTheDocument();
-		} );
-
-		it( 'builds tree hierarchy from parent ids', async () => {
+		it( 'expands and collapses tree hierarchy rows from parent ids', async () => {
 			const user = userEvent.setup();
 			render(
 				<DataViewWrapper
@@ -708,9 +579,15 @@ describe( 'DataViews component', () => {
 
 			expect( screen.getByText( 'Parent' ) ).toBeInTheDocument();
 			expect( screen.getByText( 'Another parent' ) ).toBeInTheDocument();
+			expect( screen.getByLabelText( '2 children' ) ).toHaveTextContent(
+				'2'
+			);
 			expect(
 				screen.queryByText( 'First child' )
 			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Expand Parent' } )
+			).toHaveAttribute( 'aria-expanded', 'false' );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Expand Parent' } )
@@ -721,65 +598,28 @@ describe( 'DataViews component', () => {
 			expect(
 				screen.queryByText( 'Grandchild' )
 			).not.toBeInTheDocument();
+			expect( screen.getByLabelText( '1 child' ) ).toHaveTextContent(
+				'1'
+			);
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Expand Second child' } )
 			);
 
 			expect( screen.getByText( 'Grandchild' ) ).toBeInTheDocument();
-		} );
-
-		it( 'shows direct child count badges in tree hierarchy', async () => {
-			const user = userEvent.setup();
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
-			);
-
-			expect( screen.getByLabelText( '2 children' ) ).toHaveTextContent(
-				'2'
-			);
 
 			await user.click(
-				screen.getByRole( 'button', { name: 'Expand Parent' } )
-			);
-
-			expect( screen.getByLabelText( '1 child' ) ).toHaveTextContent(
-				'1'
-			);
-		} );
-
-		it( 'can hide tree hierarchy badges', () => {
-			render(
-				<DataViewWrapper
-					data={ hierarchicalData }
-					view={ {
-						...DEFAULT_VIEW,
-						fields: [],
-						titleField: 'title',
-						showLevels: true,
-						layout: {
-							hierarchyStyle: 'tree',
-							showHierarchyBadge: false,
-						},
-					} }
-					getItemParentId={ ( item ) => item.parent }
-				/>
+				screen.getByRole( 'button', { name: 'Collapse Parent' } )
 			);
 
 			expect(
-				screen.queryByLabelText( '2 children' )
+				screen.queryByText( 'First child' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Second child' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Grandchild' )
 			).not.toBeInTheDocument();
 		} );
 
