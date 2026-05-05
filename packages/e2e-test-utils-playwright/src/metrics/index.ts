@@ -3,7 +3,7 @@
  */
 import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
-import type { Page, Browser } from '@playwright/test';
+import { test, type Page, type Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
 // @ts-expect-error
@@ -242,8 +242,13 @@ export class Metrics {
 	 * resulting file can be opened in Chrome DevTools (Performance panel →
 	 * "Load profile…") to inspect the flame graph.
 	 *
-	 * @param name Optional file name (without extension) to disambiguate
-	 *             multiple traces from the same test run.
+	 * The default file name is derived from the surrounding Playwright test's
+	 * title path (e.g. `Post-Editor-Performance__Loading__Run-the-test.trace.json`).
+	 * When `stopTracing` is called multiple times within a single test, a
+	 * sequence suffix (`-2`, `-3`, …) is appended.
+	 *
+	 * @param name Optional file name (without extension), overriding the
+	 *             default test-title-derived name.
 	 */
 	async stopTracing( name?: string ) {
 		const traceBuffer = await this.browser.stopTracing();
@@ -254,9 +259,10 @@ export class Metrics {
 		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
 		if ( artifactsPath ) {
 			const tracesDir = join( artifactsPath, 'traces' );
-			const fileName = `${
-				name ?? `trace-${ ++this.#traceCount }`
-			}.trace.json`;
+			const baseName = name ?? defaultTraceName();
+			const sequence = ++this.#traceCount;
+			const suffix = sequence > 1 ? `-${ sequence }` : '';
+			const fileName = `${ baseName }${ suffix }.trace.json`;
 			await mkdir( tracesDir, { recursive: true } );
 			await writeFile( join( tracesDir, fileName ), traceBuffer );
 		}
@@ -414,4 +420,25 @@ export class Metrics {
 
 		return this.webVitals;
 	}
+}
+
+/**
+ * Build a filesystem-safe default trace name from the current Playwright test's
+ * title path. Falls back to "trace" when called outside a test context.
+ */
+function defaultTraceName(): string {
+	let titlePath: string[] = [];
+	try {
+		titlePath = test.info().titlePath;
+	} catch {
+		// `test.info()` throws when called outside a test (e.g. in a hook
+		// without a current test). Fall through to the generic name.
+	}
+
+	const slug = titlePath
+		.join( '__' )
+		.replace( /[^a-zA-Z0-9-_]+/g, '-' )
+		.replace( /^-+|-+$/g, '' );
+
+	return slug || 'trace';
 }
