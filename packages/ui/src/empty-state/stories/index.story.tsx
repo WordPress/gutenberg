@@ -4,6 +4,7 @@ import { Button } from '../../button';
 import * as EmptyState from '../';
 
 const meta: Meta< typeof EmptyState.Root > = {
+	tags: [ 'manifest' ],
 	title: 'Design System/Components/EmptyState',
 	component: EmptyState.Root,
 	subcomponents: {
@@ -15,7 +16,7 @@ const meta: Meta< typeof EmptyState.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'coming-soon',
+			status: 'stable',
 			whereUsed: 'global',
 		},
 	},
