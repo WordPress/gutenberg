@@ -1,7 +1,14 @@
 /**
+ * External dependencies
+ */
+import type { ReactNode } from 'react';
+
+/**
  * WordPress dependencies
  */
-import { forwardRef, useMemo } from '@wordpress/element';
+import { Component, Suspense, forwardRef, useMemo } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -12,16 +19,59 @@ import { WidgetRender } from '../widget-render';
 import styles from './widget.module.css';
 import type { DashboardWidget } from '../../types';
 
+interface ErrorBoundaryProps {
+	children: ReactNode;
+}
+
+interface ErrorBoundaryState {
+	hasError: boolean;
+}
+
+class WidgetErrorBoundary extends Component<
+	ErrorBoundaryProps,
+	ErrorBoundaryState
+> {
+	state: ErrorBoundaryState = { hasError: false };
+
+	static getDerivedStateFromError(): ErrorBoundaryState {
+		return { hasError: true };
+	}
+
+	render() {
+		if ( this.state.hasError ) {
+			return (
+				<Stack
+					direction="column"
+					justify="center"
+					align="center"
+					className={ styles.error }
+					role="alert"
+				>
+					<p>{ __( 'This widget encountered an error.' ) }</p>
+				</Stack>
+			);
+		}
+		return this.props.children;
+	}
+}
+
+function LoadingOverlay() {
+	return (
+		<Stack justify="center" align="center" className={ styles.loading }>
+			<span>{ __( 'Loading…' ) }</span>
+		</Stack>
+	);
+}
+
 export interface WidgetProps {
 	widget: DashboardWidget< unknown >;
 	index: number;
 }
 
 /**
- * Per-instance wrapper. Currently a minimal slot that provides widget
- * identity via context and hosts `WidgetRender`. Chrome (header, remove,
- * badges, error UI, loading overlay) is tracked separately and extends this
- * compound without changing the public signature.
+ * Per-instance wrapper. Owns the chrome around a widget instance: identity
+ * context, edit-mode `inert` attribute, and the error/loading boundaries that
+ * keep neighbours mounted when one widget fails or is still resolving.
  */
 export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 	function Widget( { widget, index }, ref ) {
@@ -48,7 +98,14 @@ export const Widget = forwardRef< HTMLDivElement, WidgetProps >(
 					className={ styles.widget }
 					{ ...( editMode ? { inert: '' } : {} ) }
 				>
-					<WidgetRender widget={ widget } widgetType={ widgetType } />
+					<WidgetErrorBoundary>
+						<Suspense fallback={ <LoadingOverlay /> }>
+							<WidgetRender
+								widget={ widget }
+								widgetType={ widgetType }
+							/>
+						</Suspense>
+					</WidgetErrorBoundary>
 				</div>
 			</WidgetContextProvider>
 		);
