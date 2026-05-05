@@ -9,7 +9,6 @@ import clsx from 'clsx';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -193,16 +192,13 @@ function CustomSelectControl< T extends CustomSelectOption >(
 
 	// Portal into the registered `Popover.Slot` so the dropdown escapes the
 	// ancestor stacking contexts (e.g. the block toolbar) and `overflow`
-	// containers (e.g. the Style Panel) of the trigger. Falls back to the
-	// document `body` when no slot is registered, matching how the rest of
-	// `@wordpress/components` overlays behave. Consumers can opt back into
+	// containers (e.g. the Style Panel) of the trigger. When no slot is
+	// registered, hand `undefined` to Ariakit so it falls back to its
+	// default (a fresh wrapper div appended to the document `body`, which
+	// is properly cleaned up on unmount). Consumers can opt back into
 	// inline rendering via the `inline` prop.
 	const popoverSlot = useSlot( POPOVER_SLOT_NAME );
-	const portalElement = useCallback(
-		( element: HTMLElement ) =>
-			popoverSlot.ref?.current ?? element.ownerDocument.body,
-		[ popoverSlot.ref ]
-	);
+	const portalElement = popoverSlot.ref?.current ?? undefined;
 
 	return (
 		<>
