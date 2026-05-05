@@ -114,19 +114,19 @@ import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
-	type RichTextCursorSelection,
+	type WPBlockSelection,
 	type YBlock,
 	type YBlocks,
 	type YBlockAttributes,
 } from '../crdt-blocks';
 import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
-import { createHtmlStringIndex, createRichTextOffset } from '../crdt-utils';
+import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
 
-function createCursorSelection( offset: number ): RichTextCursorSelection {
+function createCursorSelection( offset: number ): WPBlockSelection {
 	return {
 		attributeKey: 'content',
 		clientId: 'block-1',
-		offset: createRichTextOffset( offset ),
+		offset: asRichTextOffset( offset ),
 	};
 }
 
@@ -2773,7 +2773,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'a😀c', createHtmlStringIndex( 4 ) );
+			mergeRichTextUpdate( yText, 'a😀c', asHtmlStringIndex( 4 ) );
 
 			expect( yText.toString() ).toBe( 'a😀c' );
 		} );
@@ -2782,7 +2782,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'ab' );
 
-			mergeRichTextUpdate( yText, 'a😀b', createHtmlStringIndex( 3 ) );
+			mergeRichTextUpdate( yText, 'a😀b', asHtmlStringIndex( 3 ) );
 
 			expect( yText.toString() ).toBe( 'a😀b' );
 		} );
@@ -2791,7 +2791,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a😀b' );
 
-			mergeRichTextUpdate( yText, 'ab', createHtmlStringIndex( 1 ) );
+			mergeRichTextUpdate( yText, 'ab', asHtmlStringIndex( 1 ) );
 
 			expect( yText.toString() ).toBe( 'ab' );
 		} );
@@ -2803,7 +2803,7 @@ describe( 'crdt-blocks', () => {
 			mergeRichTextUpdate(
 				yText,
 				'Hello 😀 Beautiful World 🎉',
-				createHtmlStringIndex( 19 )
+				asHtmlStringIndex( 19 )
 			);
 
 			expect( yText.toString() ).toBe( 'Hello 😀 Beautiful World 🎉' );
@@ -2814,7 +2814,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'a🏳️‍🌈b' );
 
-			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', createHtmlStringIndex( 7 ) );
+			mergeRichTextUpdate( yText, 'a🏳️‍🌈xb', asHtmlStringIndex( 7 ) );
 
 			expect( yText.toString() ).toBe( 'a🏳️‍🌈xb' );
 		} );
@@ -2824,7 +2824,7 @@ describe( 'crdt-blocks', () => {
 			const yText = doc.getText( 'test' );
 			yText.insert( 0, 'Hi 👋🏽' );
 
-			mergeRichTextUpdate( yText, 'Hi 👋🏽!', createHtmlStringIndex( 6 ) );
+			mergeRichTextUpdate( yText, 'Hi 👋🏽!', asHtmlStringIndex( 6 ) );
 
 			expect( yText.toString() ).toBe( 'Hi 👋🏽!' );
 		} );
@@ -2923,11 +2923,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𠮷b' );
 
-				mergeRichTextUpdate(
-					yText,
-					'a𠮷xb',
-					createHtmlStringIndex( 4 )
-				);
+				mergeRichTextUpdate( yText, 'a𠮷xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𠮷xb' );
 			} );
@@ -2937,11 +2933,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝐀b' );
 
-				mergeRichTextUpdate(
-					yText,
-					'a𝐀xb',
-					createHtmlStringIndex( 4 )
-				);
+				mergeRichTextUpdate( yText, 'a𝐀xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝐀xb' );
 			} );
@@ -2961,11 +2953,7 @@ describe( 'crdt-blocks', () => {
 				const yText = doc.getText( 'test' );
 				yText.insert( 0, 'a𝄞b' );
 
-				mergeRichTextUpdate(
-					yText,
-					'a𝄞xb',
-					createHtmlStringIndex( 4 )
-				);
+				mergeRichTextUpdate( yText, 'a𝄞xb', asHtmlStringIndex( 4 ) );
 
 				expect( yText.toString() ).toBe( 'a𝄞xb' );
 			} );

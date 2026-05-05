@@ -18,7 +18,7 @@ import {
 	type YSelection,
 } from './block-selection-history';
 import {
-	createHtmlStringIndex,
+	asHtmlStringIndex,
 	findBlockByClientIdInDoc,
 	htmlIndexToRichTextOffset,
 } from './crdt-utils';
@@ -79,7 +79,7 @@ function convertYSelectionToBlockSelection(
 				attributeKey,
 				offset: htmlIndexToRichTextOffset(
 					absolutePosition.type.toString(),
-					createHtmlStringIndex( absolutePosition.index )
+					asHtmlStringIndex( absolutePosition.index )
 				),
 			};
 		}

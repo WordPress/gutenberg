@@ -17,7 +17,7 @@ import {
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
 import {
-	createHtmlStringIndex,
+	asHtmlStringIndex,
 	htmlIndexToRichTextOffset,
 } from '../utils/crdt-utils';
 import {
@@ -294,7 +294,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			richTextOffset: htmlIndexToRichTextOffset(
 				absolutePosition.type.toString(),
-				createHtmlStringIndex( absolutePosition.index )
+				asHtmlStringIndex( absolutePosition.index )
 			),
 			localClientId,
 		};

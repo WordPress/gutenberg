@@ -7,8 +7,8 @@ import { describe, expect, it } from '@jest/globals';
  * Internal dependencies
  */
 import {
-	createHtmlStringIndex,
-	createRichTextOffset,
+	asHtmlStringIndex,
+	asRichTextOffset,
 	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
 	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
 } from '../crdt-utils';
@@ -16,14 +16,14 @@ import {
 function htmlIndexToRichTextOffset( html: string, htmlIndex: number ) {
 	return typedHtmlIndexToRichTextOffset(
 		html,
-		createHtmlStringIndex( htmlIndex )
+		asHtmlStringIndex( htmlIndex )
 	);
 }
 
 function richTextOffsetToHtmlIndex( html: string, richTextOffset: number ) {
 	return typedRichTextOffsetToHtmlIndex(
 		html,
-		createRichTextOffset( richTextOffset )
+		asRichTextOffset( richTextOffset )
 	);
 }
 

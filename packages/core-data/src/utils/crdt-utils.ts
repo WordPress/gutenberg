@@ -87,31 +87,41 @@ export function isYMap< T extends YMapRecord >(
 declare const richTextOffsetBrand: unique symbol;
 declare const htmlStringIndexBrand: unique symbol;
 
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asRichTextOffset()
+ */
 export type RichTextOffset = number & {
 	readonly [ richTextOffsetBrand ]: 'RichTextOffset';
 };
 
+/**
+ * Branded type to prevent confusion between HTML string indices and RichText offsets.
+ *
+ * @see asHtmlStringIndex()
+ */
 export type HtmlStringIndex = number & {
 	readonly [ htmlStringIndexBrand ]: 'HtmlStringIndex';
 };
 
 /**
- * Brand a number as a rich-text offset, counting visible text characters.
+ * Brand a number as an offset into a RichText’s text content.
  *
  * @param offset The rich-text offset to brand.
  * @return The branded rich-text offset.
  */
-export function createRichTextOffset( offset: number ): RichTextOffset {
+export function asRichTextOffset( offset: number ): RichTextOffset {
 	return offset as RichTextOffset;
 }
 
 /**
- * Brand a number as an HTML string index, counting tag characters.
+ * Brand a number as a string index into serialized HTML.
  *
  * @param index The HTML string index to brand.
  * @return The branded HTML string index.
  */
-export function createHtmlStringIndex( index: number ): HtmlStringIndex {
+export function asHtmlStringIndex( index: number ): HtmlStringIndex {
 	return index as HtmlStringIndex;
 }
 
@@ -175,12 +185,12 @@ export function htmlIndexToRichTextOffset(
 	htmlIndex: HtmlStringIndex
 ): RichTextOffset {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return createRichTextOffset( htmlIndex );
+		return asRichTextOffset( htmlIndex );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return createRichTextOffset( htmlIndex );
+		return asRichTextOffset( htmlIndex );
 	}
 
 	// Insert marker and let create() do the parsing.
@@ -189,7 +199,7 @@ export function htmlIndexToRichTextOffset(
 	const value = create( { html: withMarker } );
 	const markerPos = value.text.indexOf( marker );
 
-	return createRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
+	return asRichTextOffset( markerPos === -1 ? htmlIndex : markerPos );
 }
 
 /**
@@ -206,12 +216,12 @@ export function richTextOffsetToHtmlIndex(
 	richTextOffset: RichTextOffset
 ): HtmlStringIndex {
 	if ( ! html.includes( '<' ) && ! html.includes( '&' ) ) {
-		return createHtmlStringIndex( richTextOffset );
+		return asHtmlStringIndex( richTextOffset );
 	}
 
 	const marker = pickMarker( html );
 	if ( ! marker ) {
-		return createHtmlStringIndex( richTextOffset );
+		return asHtmlStringIndex( richTextOffset );
 	}
 
 	const value = create( { html } );
@@ -231,7 +241,7 @@ export function richTextOffsetToHtmlIndex(
 
 	const htmlWithMarker = toHTMLString( { value: withMarker } );
 	const markerIndex = htmlWithMarker.indexOf( marker );
-	return createHtmlStringIndex(
+	return asHtmlStringIndex(
 		markerIndex === -1 ? richTextOffset : markerIndex
 	);
 }

@@ -10,7 +10,7 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import {
-	createRichTextOffset,
+	asRichTextOffset,
 	findBlockByClientIdInDoc,
 	richTextOffsetToHtmlIndex,
 } from './crdt-utils';
@@ -169,7 +169,7 @@ function convertWPBlockSelectionToSelection(
 		changedYText,
 		richTextOffsetToHtmlIndex(
 			changedYText.toString(),
-			createRichTextOffset( offset )
+			asRichTextOffset( offset )
 		)
 	);
 
