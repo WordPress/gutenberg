@@ -2,13 +2,6 @@
 	position: relative;
 	overflow: hidden;
 	min-height: 120px;
-
-	/**
-	 * Negative top margin to bump against top border.
-	 * Remove when Card supports this natively:
-	 * https://github.com/WordPress/gutenberg/pull/77856
-	 */
-	margin-top: calc(-1 * var(--wp-ui-card-padding));
 }
 
 .headerImage {
