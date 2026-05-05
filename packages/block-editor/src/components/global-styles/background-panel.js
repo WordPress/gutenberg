@@ -3,6 +3,7 @@
  */
 import {
 	FocalPointPicker,
+	RangeControl,
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -260,6 +261,25 @@ export default function BackgroundImagePanel( {
 		inheritedValue?.background?.backgroundImage?.url;
 	const isUploadedImage = value?.background?.backgroundImage?.id;
 
+	// Gradient opacity — only meaningful when a gradient overlay sits on top of
+	// an uploaded image (the img-element path). Fall back to 100 (fully opaque)
+	// when the attribute is absent so existing blocks are unaffected.
+	const gradientOpacityValue =
+		value?.background?.gradientOpacity ??
+		inheritedValue?.background?.gradientOpacity;
+
+	const updateGradientOpacity = ( next ) =>
+		onChange(
+			setImmutably( value, [ 'background', 'gradientOpacity' ], next )
+		);
+
+	// Show gradient opacity only when both an uploaded image and a gradient are
+	// set — that is the only case where the gradient is rendered as an overlay div.
+	const showGradientOpacity =
+		showBackgroundGradientControl &&
+		hasBackgroundGradientValue( value ) &&
+		!! isUploadedImage;
+
 	let currentSizeToggle =
 		! sizeValue && isUploadedImage
 			? defaultValues?.backgroundSize ?? DEFAULT_BACKGROUND_SIZE
@@ -401,6 +421,37 @@ export default function BackgroundImagePanel( {
 					} }
 					panelId={ panelId }
 				/>
+			) }
+			{ showGradientOpacity && (
+				<ToolsPanelItem
+					className="block-editor-background-panel__item"
+					label={ __( 'Gradient opacity' ) }
+					isShownByDefault
+					hasValue={ () =>
+						value?.background?.gradientOpacity !== undefined
+					}
+					onDeselect={ () =>
+						onChange(
+							setImmutably(
+								value,
+								[ 'background', 'gradientOpacity' ],
+								undefined
+							)
+						)
+					}
+					panelId={ panelId }
+				>
+					<RangeControl
+						label={ __( 'Gradient opacity' ) }
+						value={ gradientOpacityValue ?? 100 }
+						onChange={ updateGradientOpacity }
+						min={ 0 }
+						max={ 100 }
+						step={ 1 }
+						initialPosition={ 100 }
+						__next40pxDefaultSize
+					/>
+				</ToolsPanelItem>
 			) }
 			{ showBackgroundImageControl && hasImage && (
 				<>

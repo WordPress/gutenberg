@@ -156,12 +156,20 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			if ( ! empty( $background_styles['gradient'] ) ) {
 				$gradient_value = $background_styles['gradient'];
 				// Resolve 'var:preset|gradient|slug' → 'var(--wp--preset--gradient--slug)'.
-				$gradient_value        = preg_replace(
+				$gradient_value = preg_replace(
 					'/^var:preset\|gradient\|(.+)$/',
 					'var(--wp--preset--gradient--$1)',
 					$gradient_value
 				);
-				$gradient_overlay_html = '<div aria-hidden="true" class="wp-block__background-gradient" style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:' . esc_attr( $gradient_value ) . ';background-size:cover;pointer-events:none;"></div>';
+
+				$gradient_opacity_raw   = $block_attributes['style']['background']['gradientOpacity'] ?? null;
+				$opacity_css            = '';
+				if ( null !== $gradient_opacity_raw ) {
+					$gradient_opacity = max( 0, min( 100, (int) $gradient_opacity_raw ) );
+					$opacity_css      = 'opacity:' . round( $gradient_opacity / 100, 2 ) . ';';
+				}
+
+				$gradient_overlay_html = '<div aria-hidden="true" class="wp-block__background-gradient" style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:' . esc_attr( $gradient_value ) . ';background-size:cover;' . $opacity_css . 'pointer-events:none;"></div>';
 			}
 
 			// Insert the img (and optional gradient overlay) as the first children of the wrapper element.
