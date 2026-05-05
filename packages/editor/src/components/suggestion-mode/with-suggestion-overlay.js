@@ -217,7 +217,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 	'withSuggestionBlockClassName'
 );
 
-export { structuralMarkerClass };
+export { structuralMarkerClass, withSuggestionBlockClassName };
 
 let filterRegistered = false;
 
