@@ -34,6 +34,7 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
+            id-token: write
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
@@ -91,14 +92,15 @@ jobs:
                   registry-url: 'https://registry.npmjs.org'
                   check-latest: true
 
+            - name: Upgrade npm to support OIDC trusted publishing
+              run: npm install -g npm@latest
+
             - name: Publish development packages to npm ("next" dist-tag)
               if: ${{ github.event.inputs.release_type == 'development' }}
               run: |
                   cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-next --ci --repository-path ../publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish packages based on the latest Gutenberg plugin to npm ("latest" dist-tag)
               if: ${{ github.event.inputs.release_type == 'latest' }}
@@ -106,8 +108,6 @@ jobs:
                   cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-latest --semver minor --ci --repository-path ../publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish packages to npm with bug fixes ("latest" dist-tag)
               if: ${{ github.event.inputs.release_type == 'bugfix' }}
@@ -115,15 +115,12 @@ jobs:
                   cd cli
                   npm ci
                   ./bin/plugin/cli.js npm-bugfix --ci --repository-path ../publish
-              env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
             - name: Publish packages to npm for WP major version ("wp/${{ github.event.inputs.wp_version || 'X.Y' }}" dist-tag)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
               run: |
                   cd publish
                   npm ci
-                  npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes --no-verify-access
+                  npx lerna publish patch --dist-tag "wp-$WP_VERSION" --no-private --yes
               env:
-                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                   WP_VERSION: ${{ github.event.inputs.wp_version }}
