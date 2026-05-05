@@ -17,7 +17,7 @@ import { postFeaturedImage } from '@wordpress/icons';
 
 // Dashboard is still experimental.
 /* eslint-disable @wordpress/use-recommended-components */
-import { Button, Icon, Link, Text, Stack, Tooltip } from '@wordpress/ui';
+import { Button, Card, Icon, Link, Text, Stack, Tooltip } from '@wordpress/ui';
 /* eslint-enable @wordpress/use-recommended-components */
 import type { Post } from '@wordpress/core-data';
 
@@ -206,84 +206,90 @@ export default function QuickDraft() {
 	const hasDrafts = !! drafts && drafts.length > 0;
 
 	return (
-		<Stack direction="column" gap="md" align="left">
-			<SnackbarList
-				notices={ snackbarNotices }
-				onRemove={ ( id ) => removeNotice( id ) }
-			/>
-			<Stack
-				aria-label={ __( 'Quick draft' ) }
-				direction="column"
-				gap="md"
-				render={ <section /> }
-			>
-				<TextControl
-					label={ __( 'Title' ) }
-					value={ title }
-					onChange={ setTitle }
-					autoComplete="off"
+		<Card.Content>
+			<Stack direction="column" gap="md" align="left">
+				<SnackbarList
+					notices={ snackbarNotices }
+					onRemove={ ( id ) => removeNotice( id ) }
 				/>
-				<TextareaControl
-					label={ __( 'Content' ) }
-					value={ content }
-					onChange={ setContent }
-					placeholder={ __( 'What\u2019s on your mind?' ) }
-					rows={ 3 }
-				/>
+				<Stack
+					aria-label={ __( 'Quick draft' ) }
+					direction="column"
+					gap="md"
+					render={ <section /> }
+				>
+					<TextControl
+						label={ __( 'Title' ) }
+						value={ title }
+						onChange={ setTitle }
+						autoComplete="off"
+					/>
+					<TextareaControl
+						label={ __( 'Content' ) }
+						value={ content }
+						onChange={ setContent }
+						placeholder={ __( 'What\u2019s on your mind?' ) }
+						rows={ 3 }
+					/>
 
-				<Stack direction="row" justify="space-between" align="center">
-					<MediaUploadCheck>
-						<MediaUpload
-							onSelect={ ( media ) => {
-								setFeaturedImageId( media.id );
-							} }
-							allowedTypes={ [ 'image' ] }
-							value={ featuredImageId ?? undefined }
-							render={ ( { open } ) => (
-								<Tooltip.Root>
-									<Tooltip.Trigger
-										onClick={ open }
-										aria-label={ __(
-											'Add featured image'
-										) }
-									>
-										<Icon icon={ postFeaturedImage } />
-									</Tooltip.Trigger>
-									<Tooltip.Popup>
-										{ __( 'Add featured image' ) }
-									</Tooltip.Popup>
-								</Tooltip.Root>
-							) }
-						/>
-					</MediaUploadCheck>
-					<Button
-						variant="solid"
-						onClick={ handleSave }
-						loading={ isSaving }
-						disabled={ isSaving || ! title.trim() }
+					<Stack
+						direction="row"
+						justify="space-between"
+						align="center"
 					>
-						{ __( 'Save draft' ) }
-					</Button>
+						<MediaUploadCheck>
+							<MediaUpload
+								onSelect={ ( media ) => {
+									setFeaturedImageId( media.id );
+								} }
+								allowedTypes={ [ 'image' ] }
+								value={ featuredImageId ?? undefined }
+								render={ ( { open } ) => (
+									<Tooltip.Root>
+										<Tooltip.Trigger
+											onClick={ open }
+											aria-label={ __(
+												'Add featured image'
+											) }
+										>
+											<Icon icon={ postFeaturedImage } />
+										</Tooltip.Trigger>
+										<Tooltip.Popup>
+											{ __( 'Add featured image' ) }
+										</Tooltip.Popup>
+									</Tooltip.Root>
+								) }
+							/>
+						</MediaUploadCheck>
+						<Button
+							variant="solid"
+							onClick={ handleSave }
+							loading={ isSaving }
+							disabled={ isSaving || ! title.trim() }
+						>
+							{ __( 'Save draft' ) }
+						</Button>
+					</Stack>
 				</Stack>
-			</Stack>
 
-			{ hasDrafts && (
-				<section aria-label={ __( 'Your Recent Drafts' ) }>
-					<Text variant="heading-md" render={ <h3 /> }>
-						{ __( 'Your recent drafts' ) }
-					</Text>
-					<p>
-						<Link href="edit.php?post_status=draft&post_type=post">
-							{ __( 'View all drafts' ) }
-						</Link>
-					</p>
-					<ul>
-						{ drafts.map( ( post ) => (
-							<DraftItem key={ post.id } post={ post } />
-						) ) }
-					</ul>
-				</section>
-			) }
-		</Stack>
+				{ hasDrafts && (
+					<section aria-label={ __( 'Your Recent Drafts' ) }>
+						<Text variant="heading-md" render={ <h3 /> }>
+							{ __( 'Your recent drafts' ) }
+						</Text>
+						<p>
+							<Link href="edit.php?post_status=draft&post_type=post">
+								{ __( 'View all drafts' ) }
+							</Link>
+						</p>
+						<ul>
+							{ drafts.map( ( post ) => (
+								<DraftItem key={ post.id } post={ post } />
+							) ) }
+						</ul>
+					</section>
+				) }
+			</Stack>
+		</Card.Content>
 	);
 }

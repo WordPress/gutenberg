@@ -11,7 +11,7 @@ import { Icon, comment, postList } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 
 // Dashboard is still experimental.
-// eslint-disable-next-line @wordpress/use-recommended-components
+
 import { Card, EmptyState, Link } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
@@ -254,33 +254,35 @@ export default function Activity() {
 	}
 
 	return (
-		<Card.FullBleed>
-			<DataViews
-				data={ shownData }
-				fields={ FIELDS }
-				view={ view }
-				onChangeView={ setView }
-				paginationInfo={ paginationInfo }
-				getItemId={ ( item ) => item.id }
-				search={ false }
-				isLoading={ false }
-				defaultLayouts={ {
-					activity: {
-						sort: {
-							field: 'datetime',
-							direction: 'desc',
+		<Card.Content>
+			<Card.FullBleed>
+				<DataViews
+					data={ shownData }
+					fields={ FIELDS }
+					view={ view }
+					onChangeView={ setView }
+					paginationInfo={ paginationInfo }
+					getItemId={ ( item ) => item.id }
+					search={ false }
+					isLoading={ false }
+					defaultLayouts={ {
+						activity: {
+							sort: {
+								field: 'datetime',
+								direction: 'desc',
+							},
 						},
-					},
-				} }
-				renderItemLink={ ( { item, children, ...aProps } ) => (
-					<Link href={ item.link } { ...aProps }>
-						{ children }
-					</Link>
-				) }
-				isItemClickable={ ( item ) => !! item.link }
-			>
-				<DataViews.Layout />
-			</DataViews>
-		</Card.FullBleed>
+					} }
+					renderItemLink={ ( { item, children, ...aProps } ) => (
+						<Link href={ item.link } { ...aProps }>
+							{ children }
+						</Link>
+					) }
+					isItemClickable={ ( item ) => !! item.link }
+				>
+					<DataViews.Layout />
+				</DataViews>
+			</Card.FullBleed>
+		</Card.Content>
 	);
 }

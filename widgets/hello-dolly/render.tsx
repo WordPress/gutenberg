@@ -3,7 +3,7 @@
  */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
+import { Card, Stack, Text, VisuallyHidden } from '@wordpress/ui';
 
 // These are the lyrics to Hello Dolly
 const DOLLY_LYRICS = [
@@ -46,23 +46,27 @@ export default function HelloDolly() {
 
 	// Echoes and positions the chosen line of lyrics.
 	return (
-		<Stack align="center" justify="center" style={ { minHeight: 200 } }>
-			<Text
-				variant="body-lg"
-				render={ <p /> }
-				style={ {
-					textAlign: 'center',
-					fontStyle: 'italic',
-					fontFamily: 'Georgia, "Times New Roman", Times, serif',
-				} }
-			>
-				<VisuallyHidden render={ <span /> }>
-					{ __( 'Quote from Hello Dolly song, by Jerry Herman:' ) }{ ' ' }
-				</VisuallyHidden>
-				<span dir="ltr" lang="en">
-					{ quote }
-				</span>
-			</Text>
-		</Stack>
+		<Card.Content>
+			<Stack align="center" justify="center" style={ { minHeight: 200 } }>
+				<Text
+					variant="body-lg"
+					render={ <p /> }
+					style={ {
+						textAlign: 'center',
+						fontStyle: 'italic',
+						fontFamily: 'Georgia, "Times New Roman", Times, serif',
+					} }
+				>
+					<VisuallyHidden render={ <span /> }>
+						{ __(
+							'Quote from Hello Dolly song, by Jerry Herman:'
+						) }{ ' ' }
+					</VisuallyHidden>
+					<span dir="ltr" lang="en">
+						{ quote }
+					</span>
+				</Text>
+			</Stack>
+		</Card.Content>
 	);
 }

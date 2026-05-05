@@ -15,7 +15,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, EmptyState, Link, Stack, Text } from '@wordpress/ui';
+import { Button, Card, EmptyState, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -111,6 +111,7 @@ const EVENT_FIELDS: Field< WPEvent >[] = [
 	{
 		id: 'title',
 		label: __( 'Event' ),
+		header: '',
 		enableHiding: false,
 		enableSorting: false,
 		getValue: ( { item } ) => item.title,
@@ -123,6 +124,7 @@ const EVENT_FIELDS: Field< WPEvent >[] = [
 	{
 		id: 'typeLocation',
 		label: __( 'Location' ),
+		header: '',
 		enableHiding: false,
 		enableSorting: false,
 		getValue: ( { item } ) =>
@@ -136,6 +138,7 @@ const EVENT_FIELDS: Field< WPEvent >[] = [
 	{
 		id: 'dateTime',
 		label: __( 'Date' ),
+		header: '',
 		type: 'datetime',
 		enableHiding: false,
 		enableSorting: false,
@@ -146,6 +149,7 @@ const EVENT_FIELDS: Field< WPEvent >[] = [
 const DEFAULT_EVENTS_VIEW: View = {
 	type: 'table',
 	fields: [ 'title', 'typeLocation', 'dateTime' ],
+	layout: { enableMoving: false },
 };
 
 function EventsList( {
@@ -232,6 +236,7 @@ const NEWS_FIELDS: Field< NewsPost >[] = [
 	{
 		id: 'title',
 		label: __( 'Post' ),
+		header: '',
 		enableHiding: false,
 		enableSorting: false,
 		getValue: ( { item } ) => decodeEntities( item.title.rendered ),
@@ -244,6 +249,7 @@ const NEWS_FIELDS: Field< NewsPost >[] = [
 	{
 		id: 'date',
 		label: __( 'Date' ),
+		header: '',
 		type: 'datetime',
 		enableHiding: false,
 		enableSorting: false,
@@ -254,6 +260,7 @@ const NEWS_FIELDS: Field< NewsPost >[] = [
 const DEFAULT_NEWS_VIEW: View = {
 	type: 'table',
 	fields: [ 'title', 'date' ],
+	layout: { enableMoving: false },
 };
 
 function NewsFeedList( { posts }: { posts: NewsPost[] } ) {
@@ -362,133 +369,136 @@ export default function EventsNews() {
 	}, [] );
 
 	return (
-		<>
-			{ /* Community Events section */ }
-			<div className={ styles.section }>
-				<div className={ styles.locationBar }>
-					{ locationLabel && ! isEditingLocation ? (
-						<Text variant="body-sm">
-							{ sprintf(
-								/* translators: %s: The name of a city. */
-								__( 'Attend an upcoming event near %s.' ),
-								locationLabel
-							) }{ ' ' }
-							<Link
-								onClick={ () => {
-									setLocationInput( activeLocation );
-									setIsEditingLocation( true );
+		<Card.Content>
+			<>
+				{ /* Community Events section */ }
+				<div className={ styles.section }>
+					<div className={ styles.locationBar }>
+						{ locationLabel && ! isEditingLocation ? (
+							<Text variant="body-sm">
+								{ sprintf(
+									/* translators: %s: The name of a city. */
+									__( 'Attend an upcoming event near %s.' ),
+									locationLabel
+								) }{ ' ' }
+								<Link
+									onClick={ () => {
+										setLocationInput( activeLocation );
+										setIsEditingLocation( true );
+									} }
+								>
+									{ __( 'Select location' ) }
+								</Link>
+							</Text>
+						) : (
+							<form
+								onSubmit={ ( e ) => {
+									e.preventDefault();
+									setActiveLocation( locationInput );
+									setIsEditingLocation( false );
 								} }
 							>
-								{ __( 'Select location' ) }
-							</Link>
-						</Text>
-					) : (
-						<form
-							onSubmit={ ( e ) => {
-								e.preventDefault();
-								setActiveLocation( locationInput );
-								setIsEditingLocation( false );
-							} }
-						>
-							<Stack
-								direction="row"
-								align="center"
-								wrap="wrap"
-								gap="sm"
-							>
-								<label htmlFor={ locationInputId }>
-									{ __( 'City:' ) }
-								</label>
-								<input
-									id={ locationInputId }
-									className={ styles.locationInput }
-									type="text"
-									value={ locationInput }
-									onChange={ ( e ) =>
-										setLocationInput( e.target.value )
-									}
-									// translators: Replace with a recognizable city in your locale.
-									placeholder={ __( 'Cincinnati' ) }
-								/>
-								<Button
-									variant="outlined"
-									tone="neutral"
-									size="compact"
-									type="submit"
+								<Stack
+									direction="row"
+									align="center"
+									wrap="wrap"
+									gap="sm"
 								>
-									{ __( 'Submit' ) }
-								</Button>
-								{ isEditingLocation && (
-									<Link
-										onClick={ () =>
-											setIsEditingLocation( false )
+									<label htmlFor={ locationInputId }>
+										{ __( 'City:' ) }
+									</label>
+									<input
+										id={ locationInputId }
+										className={ styles.locationInput }
+										type="text"
+										value={ locationInput }
+										onChange={ ( e ) =>
+											setLocationInput( e.target.value )
 										}
+										// translators: Replace with a recognizable city in your locale.
+										placeholder={ __( 'Cincinnati' ) }
+									/>
+									<Button
+										variant="outline"
+										tone="neutral"
+										size="compact"
+										type="submit"
 									>
-										{ __( 'Cancel' ) }
-									</Link>
-								) }
-							</Stack>
-						</form>
-					) }
+										{ __( 'Submit' ) }
+									</Button>
+									{ isEditingLocation && (
+										<Link
+											onClick={ () =>
+												setIsEditingLocation( false )
+											}
+										>
+											{ __( 'Cancel' ) }
+										</Link>
+									) }
+								</Stack>
+							</form>
+						) }
+					</div>
+
+					<EventsList
+						events={ events }
+						loading={ eventsLoading }
+						error={ eventsError }
+					/>
 				</div>
 
-				<EventsList
-					events={ events }
-					loading={ eventsLoading }
-					error={ eventsError }
-				/>
-			</div>
-
-			{ /* WordPress News section */ }
-			<div className={ styles.section }>
-				{ newsLoading && (
-					<p className={ styles.statusText }>
-						{ __( 'Loading\u2026' ) }
-					</p>
-				) }
-				{ newsFeeds.map( ( feed ) => (
-					<Stack
-						key={ feed.key }
-						gap="xs"
-						className={ styles.newsFeed }
-					>
-						<Text variant="label-sm" render={ <h3 /> }>
-							<Link href={ feed.siteUrl }>{ feed.label }</Link>
-						</Text>
-						<NewsFeedList posts={ feed.posts } />
-					</Stack>
-				) ) }
-			</div>
-
-			{ /* Footer links */ }
-			<Stack
-				direction="row"
-				align="center"
-				gap="sm"
-				className={ styles.footer }
-			>
-				<Link
-					href="https://make.wordpress.org/community/meetups-landing-page"
-					openInNewTab
-				>
-					{ __( 'Meetups' ) }
-				</Link>
-				<Link
-					href="https://central.wordcamp.org/schedule/"
-					openInNewTab
-				>
-					{ __( 'WordCamps' ) }
-				</Link>
-				<Link
-					href={ _x(
-						'https://wordpress.org/news/',
-						'Events and News dashboard widget'
+				{ /* WordPress News section */ }
+				<div className={ styles.section }>
+					{ newsLoading && (
+						<Stack justify="center" align="center">
+							<Spinner />
+						</Stack>
 					) }
-					openInNewTab
+					{ newsFeeds.map( ( feed ) => (
+						<Stack
+							key={ feed.key }
+							gap="xs"
+							className={ styles.newsFeed }
+						>
+							<Text variant="heading-sm" render={ <h3 /> }>
+								<Link href={ feed.siteUrl }>
+									{ feed.label }
+								</Link>
+							</Text>
+							<NewsFeedList posts={ feed.posts } />
+						</Stack>
+					) ) }
+				</div>
+
+				<Stack
+					direction="row"
+					align="center"
+					gap="sm"
+					className={ styles.footer }
 				>
-					{ __( 'News' ) }
-				</Link>
-			</Stack>
-		</>
+					<Link
+						href="https://make.wordpress.org/community/meetups-landing-page"
+						openInNewTab
+					>
+						{ __( 'Meetups' ) }
+					</Link>
+					<Link
+						href="https://central.wordcamp.org/schedule/"
+						openInNewTab
+					>
+						{ __( 'WordCamps' ) }
+					</Link>
+					<Link
+						href={ _x(
+							'https://wordpress.org/news/',
+							'Events and News dashboard widget'
+						) }
+						openInNewTab
+					>
+						{ __( 'News' ) }
+					</Link>
+				</Stack>
+			</>
+		</Card.Content>
 	);
 }

@@ -1,16 +1,19 @@
 /**
  * WordPress dependencies
  */
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { Spinner } from '@wordpress/components';
 
 // Dashboard is still experimental.
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, Card } from '@wordpress/ui';
+import { Button, Stack } from '@wordpress/ui';
 import styles from './style.module.css';
 
 export default function SitePreview() {
+	const [ isIframeLoading, setIsIframeLoading ] = useState( true );
 	const siteUrl = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord< { url: string } >(
@@ -27,6 +30,10 @@ export default function SitePreview() {
 		[]
 	);
 
+	useEffect( () => {
+		setIsIframeLoading( true );
+	}, [ siteUrl ] );
+
 	if ( ! siteUrl ) {
 		return null;
 	}
@@ -35,17 +42,32 @@ export default function SitePreview() {
 	const editUrl = isBlockTheme ? 'site-editor.php' : 'customize.php';
 
 	return (
-		<Card.FullBleed className={ styles.container }>
+		<div className={ styles.container }>
 			<div className={ styles.previewWrap }>
+				{ isIframeLoading && (
+					<Stack
+						align="center"
+						justify="center"
+						style={ { minHeight: 220 } }
+					>
+						<Spinner />
+					</Stack>
+				) }
 				<iframe
 					className={ styles.iframe }
 					loading="lazy"
-					title={ __( 'Site Preview' ) }
+					scrolling="no"
+					title={ __( 'Site preview' ) }
 					src={ src }
+					onLoad={ () => setIsIframeLoading( false ) }
 					// @ts-expect-error — `inert` is not yet in React's HTMLAttributes
 					inert="true"
 				></iframe>
-				<div className={ styles.overlay }>
+				<Stack
+					align="center"
+					justify="center"
+					className={ styles.overlay }
+				>
 					<Button
 						variant="solid"
 						tone="neutral"
@@ -55,8 +77,8 @@ export default function SitePreview() {
 					>
 						{ __( 'Edit site' ) }
 					</Button>
-				</div>
+				</Stack>
 			</div>
-		</Card.FullBleed>
+		</div>
 	);
 }

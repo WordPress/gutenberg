@@ -5,7 +5,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
-import { Link, Stack, Text } from '@wordpress/ui';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -181,7 +181,11 @@ export default function SiteHealth() {
 	}, [] );
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return (
+			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+				<Spinner />
+			</Stack>
+		);
 	}
 
 	if ( ! counts ) {
@@ -195,29 +199,35 @@ export default function SiteHealth() {
 	const tone = toneForPercentage( percentage );
 
 	return (
-		<Stack direction="column" gap="md" align="center">
-			<Stack
-				direction="column"
-				align="center"
-				justify="center"
-				className={ `${ styles.indicator } ${
-					styles[ `is-${ tone }` ]
-				}` }
-			>
-				<CircleProgress percentage={ percentage } tone={ tone } />
+		<Card.Content>
+			<Stack direction="column" gap="md" align="center">
+				<Stack
+					direction="column"
+					align="center"
+					justify="center"
+					className={ `${ styles.indicator } ${
+						styles[ `is-${ tone }` ]
+					}` }
+				>
+					<CircleProgress percentage={ percentage } tone={ tone } />
+				</Stack>
+
+				<Text variant="body-lg">{ statusMessage( counts ) }</Text>
+
+				{ issuesTotal > 0 && (
+					<Link href="site-health.php">
+						{ sprintf(
+							/* translators: %d: Number of issues to address. */
+							_n(
+								'Review %d item',
+								'Review %d items',
+								issuesTotal
+							),
+							issuesTotal
+						) }
+					</Link>
+				) }
 			</Stack>
-
-			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-
-			{ issuesTotal > 0 && (
-				<Link href="site-health.php">
-					{ sprintf(
-						/* translators: %d: Number of issues to address. */
-						_n( 'Review %d item', 'Review %d items', issuesTotal ),
-						issuesTotal
-					) }
-				</Link>
-			) }
-		</Stack>
+		</Card.Content>
 	);
 }

@@ -276,7 +276,7 @@ export default function Welcome() {
 	return (
 		<>
 			<ThemeProvider color={ { bg: '#000000' } }>
-				<Card.FullBleed className={ styles.headerWrap }>
+				<div className={ styles.headerWrap }>
 					<div className={ styles.headerImage } aria-hidden="true">
 						<DashboardBackground />
 					</div>
@@ -303,116 +303,130 @@ export default function Welcome() {
 							</Link>
 						</Text>
 					</div>
-				</Card.FullBleed>
+				</div>
 			</ThemeProvider>
 
-			<Stack
-				className={ styles.columns }
-				direction="row"
-				gap="lg"
-				wrap="wrap"
-			>
-				<Stack gap="sm" className={ styles.column }>
-					<IconBlocks />
-					<div className={ styles.columnContent }>
-						<Text variant="heading-sm" render={ <h3 /> }>
-							{ __(
-								'Author rich content with blocks and patterns'
-							) }
-						</Text>
-						<Text variant="body-md" render={ <p /> }>
-							{ __(
-								'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
-							) }
-						</Text>
-						<Link href="post-new.php?post_type=page">
-							{ __( 'Add a new page' ) }
-						</Link>
-					</div>
-				</Stack>
-
-				<Stack gap="sm" className={ styles.column }>
-					<IconLayout />
-					<div className={ styles.columnContent }>
-						{ isBlockTheme ? (
-							<>
-								<Text variant="heading-sm" render={ <h3 /> }>
-									{ __(
-										'Customize your entire site with block themes'
-									) }
-								</Text>
-								<Text variant="body-md" render={ <p /> }>
-									{ __(
-										'Design everything on your site \u2014 from the header down to the footer, all using blocks and patterns.'
-									) }
-								</Text>
-								<Link href="site-editor.php">
-									{ __( 'Open site editor' ) }
-								</Link>
-							</>
-						) : (
-							<>
-								<Text variant="heading-sm" render={ <h3 /> }>
-									{ __( 'Start Customizing' ) }
-								</Text>
-								<Text variant="body-md" render={ <p /> }>
-									{ __(
-										'Configure your site\u2019s logo, header, menus, and more in the Customizer.'
-									) }
-								</Text>
-								{ canCustomize && (
-									<Link href="customize.php">
-										{ __( 'Open the Customizer' ) }
-									</Link>
+			<Card.Content>
+				<Stack
+					className={ styles.columns }
+					direction="row"
+					gap="lg"
+					wrap="wrap"
+				>
+					<Stack gap="sm" className={ styles.column }>
+						<IconBlocks />
+						<div className={ styles.columnContent }>
+							<Text variant="heading-sm" render={ <h3 /> }>
+								{ __(
+									'Author rich content with blocks and patterns'
 								) }
-							</>
-						) }
-					</div>
-				</Stack>
+							</Text>
+							<Text variant="body-md" render={ <p /> }>
+								{ __(
+									'Block patterns are pre-configured block layouts. Use them to get inspired or create new pages in a flash.'
+								) }
+							</Text>
+							<Link href="post-new.php?post_type=page">
+								{ __( 'Add a new page' ) }
+							</Link>
+						</div>
+					</Stack>
 
-				<Stack gap="sm" className={ styles.column }>
-					<IconStyles />
-					<div className={ styles.columnContent }>
-						{ isBlockTheme ? (
-							<>
-								<Text variant="heading-sm" render={ <h3 /> }>
-									{ __(
-										'Switch up your site\u2019s look & feel with Styles'
+					<Stack gap="sm" className={ styles.column }>
+						<IconLayout />
+						<div className={ styles.columnContent }>
+							{ isBlockTheme ? (
+								<>
+									<Text
+										variant="heading-sm"
+										render={ <h3 /> }
+									>
+										{ __(
+											'Customize your entire site with block themes'
+										) }
+									</Text>
+									<Text variant="body-md" render={ <p /> }>
+										{ __(
+											'Design everything on your site \u2014 from the header down to the footer, all using blocks and patterns.'
+										) }
+									</Text>
+									<Link href="site-editor.php">
+										{ __( 'Open site editor' ) }
+									</Link>
+								</>
+							) : (
+								<>
+									<Text
+										variant="heading-sm"
+										render={ <h3 /> }
+									>
+										{ __( 'Start Customizing' ) }
+									</Text>
+									<Text variant="body-md" render={ <p /> }>
+										{ __(
+											'Configure your site\u2019s logo, header, menus, and more in the Customizer.'
+										) }
+									</Text>
+									{ canCustomize && (
+										<Link href="customize.php">
+											{ __( 'Open the Customizer' ) }
+										</Link>
 									) }
-								</Text>
-								<Text variant="body-md" render={ <p /> }>
-									{ __(
-										'Tweak your site, or give it a whole new look! Get creative \u2014 how about a new color palette or font?'
-									) }
-								</Text>
-								<Link href="site-editor.php?p=%2Fstyles">
-									{ __( 'Edit styles' ) }
-								</Link>
-							</>
-						) : (
-							<>
-								<Text variant="heading-sm" render={ <h3 /> }>
-									{ __(
-										'Discover a new way to build your site.'
-									) }
-								</Text>
-								<Text variant="body-md" render={ <p /> }>
-									{ __(
-										'There is a new kind of WordPress theme, called a block theme, that lets you build the site you\u2019ve always wanted \u2014 with blocks and styles.'
-									) }
-								</Text>
-								<Link
-									href={ __(
-										'https://wordpress.org/documentation/article/block-themes/'
-									) }
-								>
-									{ __( 'Learn about block themes' ) }
-								</Link>
-							</>
-						) }
-					</div>
+								</>
+							) }
+						</div>
+					</Stack>
+
+					<Stack gap="sm" className={ styles.column }>
+						<IconStyles />
+						<div className={ styles.columnContent }>
+							{ isBlockTheme ? (
+								<>
+									<Text
+										variant="heading-sm"
+										render={ <h3 /> }
+									>
+										{ __(
+											'Switch up your site\u2019s look & feel with Styles'
+										) }
+									</Text>
+									<Text variant="body-md" render={ <p /> }>
+										{ __(
+											'Tweak your site, or give it a whole new look! Get creative \u2014 how about a new color palette or font?'
+										) }
+									</Text>
+									<Link href="site-editor.php?p=%2Fstyles">
+										{ __( 'Edit styles' ) }
+									</Link>
+								</>
+							) : (
+								<>
+									<Text
+										variant="heading-sm"
+										render={ <h3 /> }
+									>
+										{ __(
+											'Discover a new way to build your site.'
+										) }
+									</Text>
+									<Text variant="body-md" render={ <p /> }>
+										{ __(
+											'There is a new kind of WordPress theme, called a block theme, that lets you build the site you\u2019ve always wanted \u2014 with blocks and styles.'
+										) }
+									</Text>
+									<Link
+										href={ __(
+											'https://wordpress.org/documentation/article/block-themes/'
+										) }
+									>
+										{ __( 'Learn about block themes' ) }
+									</Link>
+								</>
+							) }
+						</div>
+					</Stack>
 				</Stack>
-			</Stack>
+			</Card.Content>
 		</>
 	);
 }

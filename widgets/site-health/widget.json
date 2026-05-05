@@ -1,6 +1,6 @@
 {
 	"name": "wordpress/site-health",
-	"title": "Site Health Status",
+	"title": "Site health",
 	"description": "Shows an overview of your site health and any issues that need attention.",
 	"category": "site"
 }
