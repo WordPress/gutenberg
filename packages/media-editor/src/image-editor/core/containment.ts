@@ -104,7 +104,7 @@ function getMinZoomForCover(
  * @param visualSize  The visual (rotated) image bounding box in pixels.
  * @return The min/max x and y that a crop rect edge can reach in normalized space.
  */
-export function getCropBounds(
+export function getImageCropBounds(
 	state: CropperState,
 	elementSize: Size,
 	visualSize: Size

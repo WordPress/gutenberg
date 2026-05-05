@@ -9,7 +9,7 @@ import {
 import {
 	restrictPanZoom,
 	restrictCropRect,
-	getCropBounds,
+	getImageCropBounds,
 } from '../containment';
 import { getSourceRegion, getSourceRegionPercent } from '../source-region';
 import { DEFAULT_STATE } from '../constants';
@@ -547,7 +547,7 @@ describe( 'getSourceRegionPercent', () => {
 	} );
 } );
 
-describe( 'getCropBounds', () => {
+describe( 'getImageCropBounds', () => {
 	it( 'returns the image AABB — handles can reach the image edge regardless of container size', () => {
 		// 500×375 (4:3) in a 600×400 container (3:2).
 		// At zoom=1.75 the image overflows the container. Bounds should reflect
@@ -569,7 +569,7 @@ describe( 'getCropBounds', () => {
 			rotation: 0,
 		} );
 
-		const bounds = getCropBounds( state, elementSize, visualSize );
+		const bounds = getImageCropBounds( state, elementSize, visualSize );
 
 		// At zoom=1.75 the image extends well beyond the container on all sides.
 		// Bounds should be the image AABB corners (≈ ±0.375), not the container

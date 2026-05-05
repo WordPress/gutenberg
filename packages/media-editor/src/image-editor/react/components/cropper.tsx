@@ -28,7 +28,7 @@ import type {
 } from '../../core/types';
 import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 import { getImageFit } from '../../core/camera';
-import { getCropBounds } from '../../core/containment';
+import { getImageCropBounds } from '../../core/containment';
 import { useInteraction } from '../hooks/use-interaction';
 import { useTransformStyle } from '../hooks/use-transform-style';
 import { useAriaAnnouncer } from '../hooks/use-aria-announcer';
@@ -272,7 +272,7 @@ function CropperInner(
 	}, [ aspectRatio, freeformCrop, visualSize, setCropRect ] );
 
 	// Compute the crop handle bounds from the actual image footprint.
-	// Depends on the full state object because getCropBounds reads
+	// Depends on the full state object because getImageCropBounds reads
 	// crop, zoom, rotation, flip, and image. React Compiler requires
 	// the complete dependency; the computation is lightweight (a few
 	// trig ops + 4 corner transforms).
@@ -280,7 +280,7 @@ function CropperInner(
 		if ( ! state.image || elementSize.width === 0 ) {
 			return undefined;
 		}
-		return getCropBounds( state, elementSize, visualSize );
+		return getImageCropBounds( state, elementSize, visualSize );
 	}, [ state, elementSize, visualSize ] );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
