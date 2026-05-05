@@ -83,6 +83,8 @@ export interface UseCropperStateReturn {
 	undo: () => void;
 	/** Redo the last undone cropper operation. */
 	redo: () => void;
+	/** Changes when state-replacing actions should cancel active interactions. */
+	interactionCancellationSignal?: number;
 	/**
 	 * Flush the pending history entry immediately, bypassing the debounce
 	 * timer. Useful in two situations:
@@ -173,6 +175,8 @@ export function useCropperState(
 	const redoStackRef = useRef< CropperState[] >( [] );
 	const [ hasUndo, setHasUndo ] = useState( false );
 	const [ hasRedo, setHasRedo ] = useState( false );
+	const [ interactionCancellationSignal, setInteractionCancellationSignal ] =
+		useState( 0 );
 
 	// Debounce-based history: tracks the last committed state and a pending
 	// timer. Any state change resets the timer; when it expires the
@@ -197,6 +201,10 @@ export function useCropperState(
 		redoStackRef.current = [];
 		setHasUndo( true );
 		setHasRedo( false );
+	}, [] );
+
+	const cancelActiveInteractions = useCallback( () => {
+		setInteractionCancellationSignal( ( signal ) => signal + 1 );
 	}, [] );
 
 	// Watch state and debounce history commits. Any dispatch resets the
@@ -259,13 +267,14 @@ export function useCropperState(
 		if ( ! prev ) {
 			return;
 		}
+		cancelActiveInteractions();
 		redoStackRef.current = [ stateRef.current, ...redoStackRef.current ];
 		historyRef.current = historyRef.current.slice( 0, -1 );
 		suppressDebounceRef.current = true;
 		setHasUndo( historyRef.current.length > 0 );
 		setHasRedo( true );
 		dispatch( { type: 'RESET', payload: prev } );
-	}, [ dispatch, commitHistory ] );
+	}, [ dispatch, commitHistory, cancelActiveInteractions ] );
 
 	const redo = useCallback( () => {
 		// Flush any pending gesture before redoing so the in-flight change
@@ -275,16 +284,18 @@ export function useCropperState(
 		if ( ! next ) {
 			return;
 		}
+		cancelActiveInteractions();
 		historyRef.current = [ ...historyRef.current, stateRef.current ];
 		redoStackRef.current = redoStackRef.current.slice( 1 );
 		suppressDebounceRef.current = true;
 		setHasUndo( true );
 		setHasRedo( redoStackRef.current.length > 0 );
 		dispatch( { type: 'RESET', payload: next } );
-	}, [ dispatch, commitHistory ] );
+	}, [ dispatch, commitHistory, cancelActiveInteractions ] );
 
 	const setImage = useCallback(
 		( image: CropperState[ 'image' ] ) => {
+			cancelActiveInteractions();
 			clearTimeout( debounceTimerRef.current );
 			suppressDebounceRef.current = true;
 			dispatch( { type: 'SET_IMAGE', payload: image } );
@@ -297,7 +308,7 @@ export function useCropperState(
 				image,
 			} );
 		},
-		[ dispatch ]
+		[ dispatch, cancelActiveInteractions ]
 	);
 
 	const setPan = useCallback(
@@ -335,10 +346,11 @@ export function useCropperState(
 		( flip: Flip ) => {
 			commitHistory(); // flush any pending continuous gesture first
 			pushToHistory(); // record current state as the undo point
+			cancelActiveInteractions();
 			suppressDebounceRef.current = true;
 			dispatch( { type: 'SET_FLIP', payload: flip } );
 		},
-		[ dispatch, pushToHistory, commitHistory ]
+		[ dispatch, pushToHistory, commitHistory, cancelActiveInteractions ]
 	);
 
 	const toggleFlip = useCallback(
@@ -355,13 +367,14 @@ export function useCropperState(
 		( direction: 1 | -1 ) => {
 			commitHistory();
 			pushToHistory();
+			cancelActiveInteractions();
 			suppressDebounceRef.current = true;
 			dispatch( {
 				type: 'SNAP_ROTATE_90',
 				payload: { direction },
 			} );
 		},
-		[ dispatch, pushToHistory, commitHistory ]
+		[ dispatch, pushToHistory, commitHistory, cancelActiveInteractions ]
 	);
 
 	const setCropRect = useCallback(
@@ -381,10 +394,11 @@ export function useCropperState(
 		( op: TransformOperation ) => {
 			commitHistory();
 			pushToHistory();
+			cancelActiveInteractions();
 			suppressDebounceRef.current = true;
 			dispatch( { type: 'APPLY_OPERATION', payload: op } );
 		},
-		[ dispatch, pushToHistory, commitHistory ]
+		[ dispatch, pushToHistory, commitHistory, cancelActiveInteractions ]
 	);
 
 	const reset = useCallback(
@@ -400,6 +414,7 @@ export function useCropperState(
 			) {
 				pushToHistory();
 			}
+			cancelActiveInteractions();
 			suppressDebounceRef.current = true;
 			dispatch( { type: 'RESET', payload: resetState } );
 			// Mirror the reducer's RESET exactly so isDirty stays in
@@ -409,7 +424,7 @@ export function useCropperState(
 			// would report true after a reset.
 			initialRef.current = nextInitialState;
 		},
-		[ dispatch, pushToHistory, commitHistory ]
+		[ dispatch, pushToHistory, commitHistory, cancelActiveInteractions ]
 	);
 
 	const isDirty = isStateDirty( state, initialRef.current );
@@ -451,6 +466,7 @@ export function useCropperState(
 		hasRedo,
 		undo,
 		redo,
+		interactionCancellationSignal,
 		commitHistory,
 	};
 	return controller;

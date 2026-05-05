@@ -186,6 +186,53 @@ describe( 'useInteraction grid placement signal', () => {
 		expect( result.current.isPlacementActive ).toBe( false );
 	} );
 
+	it( 'cancels wheel placement and ignores wheel momentum when the cancel signal changes', () => {
+		jest.useFakeTimers();
+		const actions = createActions();
+		const { result, rerender } = renderHook(
+			( { cancelSignal }: { cancelSignal: number } ) =>
+				useInteraction(
+					makeState(),
+					actions,
+					CONTAINER_SIZE,
+					IMAGE_SIZE,
+					{ cancelInteractionSignal: cancelSignal }
+				),
+			{ initialProps: { cancelSignal: 0 } }
+		);
+
+		act( () => {
+			result.current.onWheelNative(
+				createWheelEvent( { deltaY: -100, currentTarget: null } )
+			);
+		} );
+
+		expect( result.current.isPlacementActive ).toBe( true );
+		expect( actions.setZoom ).toHaveBeenCalledTimes( 1 );
+
+		rerender( { cancelSignal: 1 } );
+
+		expect( result.current.isPlacementActive ).toBe( false );
+
+		actions.setZoom.mockClear();
+		act( () => {
+			result.current.onWheelNative(
+				createWheelEvent( { deltaY: -100, currentTarget: null } )
+			);
+		} );
+
+		expect( actions.setZoom ).not.toHaveBeenCalled();
+
+		act( () => {
+			jest.advanceTimersByTime( 300 );
+			result.current.onWheelNative(
+				createWheelEvent( { deltaY: -100, currentTarget: null } )
+			);
+		} );
+
+		expect( actions.setZoom ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'sets isPlacementActive during pinch zoom, then clears it on touch end', () => {
 		const doc = createTouchDocument();
 		const target = createTouchTarget( doc );

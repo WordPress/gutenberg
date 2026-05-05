@@ -13,6 +13,8 @@ import { restrictPanZoom } from './containment';
 
 /** Time window for detecting a double-tap gesture (ms). */
 const DOUBLE_TAP_TIME = 300;
+/** Inactivity window after which a wheel stream is considered idle (ms). */
+const WHEEL_IDLE_MS = 300;
 /** Max distance between taps to count as a double-tap (px). */
 const DOUBLE_TAP_DISTANCE = 30;
 /** Duration of the zoom animation state (ms). */
@@ -192,6 +194,12 @@ export class InteractionController {
 	/** Whether a wheel gesture is currently active. */
 	private wheelGestureActive = false;
 
+	/** Timer for clearing suppressed wheel momentum after an interaction cancel. */
+	private wheelSuppressTimer: ReturnType< typeof setTimeout > | undefined;
+
+	/** Whether wheel events should be swallowed until the wheel stream goes idle. */
+	private suppressWheelUntilIdle = false;
+
 	/** Current requestAnimationFrame ID. */
 	private rafId = 0;
 
@@ -264,6 +272,46 @@ export class InteractionController {
 				isDragging: this.isDragging,
 				isZooming: this.isZooming,
 			} );
+		}
+	}
+
+	private scheduleWheelSuppressClear(): void {
+		clearTimeout( this.wheelSuppressTimer );
+		this.wheelSuppressTimer = setTimeout( () => {
+			this.suppressWheelUntilIdle = false;
+		}, WHEEL_IDLE_MS );
+	}
+
+	/**
+	 * Cancel any in-flight interaction without reporting a gesture end.
+	 *
+	 * This is used when external state replacement (undo/redo/reset) wins
+	 * over the current gesture. Reporting `onGestureEnd` here would let the
+	 * just-replaced state create a fresh history entry.
+	 *
+	 * @param options               Cancellation options.
+	 * @param options.suppressWheel Whether to swallow wheel momentum until idle.
+	 */
+	cancelActiveInteraction( options: { suppressWheel?: boolean } = {} ): void {
+		cancelAnimationFrame( this.rafId );
+		this.rafId = 0;
+
+		clearTimeout( this.zoomTimer );
+		clearTimeout( this.wheelGestureTimer );
+
+		this.pointerCleanup?.();
+		this.pointerCleanup = null;
+		this.touchCleanup?.();
+		this.touchCleanup = null;
+		this.drag = null;
+		this.touch = null;
+		this.lastTap = null;
+		this.wheelGestureActive = false;
+		this.setStatus( { isDragging: false, isZooming: false } );
+
+		if ( options.suppressWheel ) {
+			this.suppressWheelUntilIdle = true;
+			this.scheduleWheelSuppressClear();
 		}
 	}
 
@@ -384,6 +432,11 @@ export class InteractionController {
 	handleWheel( e: WheelEvent ): void {
 		e.preventDefault();
 
+		if ( this.suppressWheelUntilIdle ) {
+			this.scheduleWheelSuppressClear();
+			return;
+		}
+
 		if ( this.drag ) {
 			return;
 		}
@@ -398,7 +451,7 @@ export class InteractionController {
 		this.wheelGestureTimer = setTimeout( () => {
 			this.wheelGestureActive = false;
 			this.options.onGestureEnd?.();
-		}, DOUBLE_TAP_TIME );
+		}, WHEEL_IDLE_MS );
 
 		const s = this.options.getState();
 		const delta = -e.deltaY * this.zoomSpeed;
@@ -531,13 +584,17 @@ export class InteractionController {
 			this.options.onGestureStart?.();
 		}
 
+		const removeTouchListeners = () => {
+			doc.removeEventListener( 'touchmove', this.handleTouchMove );
+			doc.removeEventListener( 'touchend', onTouchEnd );
+			doc.removeEventListener( 'touchcancel', onTouchEnd );
+		};
+
 		const onTouchEnd = () => {
 			this.touch = null;
 			this.touchCleanup = null;
 			cancelAnimationFrame( this.rafId );
-			doc.removeEventListener( 'touchmove', this.handleTouchMove );
-			doc.removeEventListener( 'touchend', onTouchEnd );
-			doc.removeEventListener( 'touchcancel', onTouchEnd );
+			removeTouchListeners();
 			this.setStatus( { isDragging: false } );
 			this.options.onGestureEnd?.();
 		};
@@ -551,7 +608,7 @@ export class InteractionController {
 		doc.addEventListener( 'touchend', onTouchEnd );
 		doc.addEventListener( 'touchcancel', onTouchEnd );
 
-		this.touchCleanup = onTouchEnd;
+		this.touchCleanup = removeTouchListeners;
 	}
 
 	// Handle a touchmove event during an active touch gesture. Decides pinch
@@ -934,6 +991,7 @@ export class InteractionController {
 		cancelAnimationFrame( this.rafId );
 		clearTimeout( this.zoomTimer );
 		clearTimeout( this.wheelGestureTimer );
+		clearTimeout( this.wheelSuppressTimer );
 		this.touchCleanup?.();
 		this.touchCleanup = null;
 		this.pointerCleanup?.();
@@ -941,5 +999,9 @@ export class InteractionController {
 		this.drag = null;
 		this.touch = null;
 		this.lastTap = null;
+		this.wheelGestureActive = false;
+		this.suppressWheelUntilIdle = false;
+		this.isDragging = false;
+		this.isZooming = false;
 	}
 }

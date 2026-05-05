@@ -523,6 +523,47 @@ describe( 'InteractionController', () => {
 
 			jest.useRealTimers();
 		} );
+
+		it( 'cancels active wheel zoom and suppresses remaining wheel momentum until idle', () => {
+			jest.useFakeTimers( {
+				doNotFake: [ 'requestAnimationFrame', 'cancelAnimationFrame' ],
+			} );
+			const state = makeState( { zoom: 2 } );
+			const onGestureStart = jest.fn();
+			const onGestureEnd = jest.fn();
+			const { controller } = createController( state, {
+				onGestureStart,
+				onGestureEnd,
+			} );
+
+			controller.handleWheel(
+				createWheelEvent( { deltaY: -50, currentTarget: null } )
+			);
+			expect( onGestureStart ).toHaveBeenCalledTimes( 1 );
+			expect( actionMocks.setZoom ).toHaveBeenCalledTimes( 1 );
+
+			controller.cancelActiveInteraction( { suppressWheel: true } );
+			expect( onGestureEnd ).not.toHaveBeenCalled();
+
+			actionMocks.setZoom.mockClear();
+			const suppressedWheelEvent = createWheelEvent( {
+				deltaY: -50,
+				currentTarget: null,
+			} );
+			controller.handleWheel( suppressedWheelEvent );
+
+			expect( suppressedWheelEvent.preventDefault ).toHaveBeenCalled();
+			expect( actionMocks.setZoom ).not.toHaveBeenCalled();
+
+			jest.advanceTimersByTime( 350 );
+			controller.handleWheel(
+				createWheelEvent( { deltaY: -50, currentTarget: null } )
+			);
+
+			expect( actionMocks.setZoom ).toHaveBeenCalledTimes( 1 );
+
+			jest.useRealTimers();
+		} );
 	} );
 
 	describe( 'keyboard', () => {

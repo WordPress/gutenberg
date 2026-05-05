@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -53,6 +59,8 @@ export interface UseInteractionOptions {
 	onGestureStart?: () => void;
 	/** Fires when a continuous gesture ends (pointer release). */
 	onGestureEnd?: () => void;
+	/** Incremented by callers to cancel active interactions after state replacement. */
+	cancelInteractionSignal?: number;
 }
 
 /** How long keyboard placement stays active after the latest handled key. */
@@ -124,6 +132,10 @@ export function useInteraction(
 	imageSizeRef.current = imageSize;
 	const optionsRef = useRef( options );
 	optionsRef.current = options;
+	const cancelInteractionSignal = options?.cancelInteractionSignal;
+	const previousCancelInteractionSignalRef = useRef(
+		cancelInteractionSignal
+	);
 	const actionsRef = useRef( actions );
 	actionsRef.current = actions;
 
@@ -154,6 +166,25 @@ export function useInteraction(
 			clearTimeout( keyboardInteractionTimerRef.current );
 		};
 	}, [] );
+
+	useLayoutEffect( () => {
+		if (
+			cancelInteractionSignal === undefined ||
+			previousCancelInteractionSignalRef.current ===
+				cancelInteractionSignal
+		) {
+			return;
+		}
+
+		previousCancelInteractionSignalRef.current = cancelInteractionSignal;
+		clearTimeout( keyboardInteractionTimerRef.current );
+		isKeyboardGestureActiveRef.current = false;
+		setIsKeyboardPanning( false );
+		setIsGestureActive( false );
+		controllerRef.current?.cancelActiveInteraction( {
+			suppressWheel: true,
+		} );
+	}, [ cancelInteractionSignal ] );
 
 	// Create / destroy the controller. The controller reads all volatile
 	// values through refs, so it can stay mounted across render updates.

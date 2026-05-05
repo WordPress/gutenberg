@@ -296,6 +296,7 @@ function CropperInner(
 	} = useInteraction( state, controller, canvasSize, visualSize, {
 		minZoom,
 		maxZoom,
+		cancelInteractionSignal: controller.interactionCancellationSignal,
 		onGestureStart,
 		onGestureEnd,
 	} );
