@@ -24,7 +24,6 @@ const meta: Meta< typeof RotationRuler > = {
 		max: 45,
 		step: 1,
 		pixelsPerStep: 6,
-		snapToZeroWithin: 0.75,
 		disabled: false,
 	},
 	argTypes: {
