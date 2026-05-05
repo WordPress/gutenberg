@@ -217,9 +217,9 @@ function EventsList( {
 				</EmptyState.Title>
 				<EmptyState.Description>
 					{ createInterpolateElement(
-						__( '<a>Help organize the next one</a>!' ),
+						__( '<a>Help organize the next one!</a>' ),
 						{
-							a: <Link href={ organizeUrl } />,
+							a: <Link href={ organizeUrl } openInNewTab />,
 						}
 					) }
 				</EmptyState.Description>
@@ -268,10 +268,10 @@ function EventsList( {
 				<Text variant="body-sm" className={ styles.eventNone }>
 					{ createInterpolateElement(
 						__(
-							'Want more events? <a>Help organize the next one</a>!'
+							'Want more events? <a>Help organize the next one!</a>'
 						),
 						{
-							a: <Link href={ organizeUrl } />,
+							a: <Link href={ organizeUrl } openInNewTab />,
 						}
 					) }
 				</Text>
@@ -360,6 +360,7 @@ export default function WordPressEvents() {
 			try {
 				const params = new URLSearchParams( {
 					q: query,
+					featureType: 'city',
 					format: 'jsonv2',
 					addressdetails: '1',
 					limit: '8',
@@ -375,6 +376,7 @@ export default function WordPressEvents() {
 						town?: string;
 						village?: string;
 						municipality?: string;
+						country?: string;
 					};
 				} >;
 
@@ -386,15 +388,23 @@ export default function WordPressEvents() {
 							place.address?.town ??
 							place.address?.village ??
 							place.address?.municipality;
+						const country = place.address?.country;
 
-						if ( ! city || seen.has( city.toLowerCase() ) ) {
+						if ( ! city ) {
 							return null;
 						}
 
-						seen.add( city.toLowerCase() );
+						const label = country
+							? `${ city }, ${ country }`
+							: city;
+						if ( seen.has( label.toLowerCase() ) ) {
+							return null;
+						}
+
+						seen.add( label.toLowerCase() );
 						return {
 							id: String( place.place_id ),
-							value: city,
+							value: label,
 						};
 					} )
 					.filter( Boolean ) as LocationOption[];
@@ -406,7 +416,7 @@ export default function WordPressEvents() {
 				}
 				setLocationOptions( [] );
 			}
-		}, 300 );
+		}, 200 );
 
 		return () => {
 			clearTimeout( timeoutId );
@@ -448,31 +458,8 @@ export default function WordPressEvents() {
 
 	return (
 		<Card.Content>
-			<div className={ styles.locationBar }>
-				{ locationLabel && ! isEditingLocation ? (
-					<Text variant="body-sm">
-						{ createInterpolateElement(
-							sprintf(
-								/* translators: %s: city name */
-								__(
-									'Upcoming events near <strong>%s</strong>.'
-								),
-								locationLabel
-							),
-							{
-								strong: <strong />,
-							}
-						) }{ ' ' }
-						<Link
-							onClick={ () => {
-								setLocationInput( activeLocation );
-								setIsEditingLocation( true );
-							} }
-						>
-							{ __( 'Change' ) }
-						</Link>
-					</Text>
-				) : (
+			{ ! locationLabel || isEditingLocation ? (
+				<div className={ styles.locationPicker }>
 					<form
 						onSubmit={ ( e ) => {
 							e.preventDefault();
@@ -480,13 +467,7 @@ export default function WordPressEvents() {
 							setIsEditingLocation( false );
 						} }
 					>
-						<Stack
-							direction="row"
-							align="top"
-							wrap="wrap"
-							gap="sm"
-							style={ { maxWidth: '330px' } }
-						>
+						<Stack direction="row" align="top" wrap="wrap" gap="sm">
 							<Autocomplete.Root
 								items={ locationOptions }
 								value={ locationInput }
@@ -497,6 +478,7 @@ export default function WordPressEvents() {
 									className={ styles.locationInput }
 									render={
 										<InputControl
+											autoComplete="off"
 											label={ __( 'City' ) }
 											hideLabelFromVision
 											size="compact"
@@ -525,7 +507,7 @@ export default function WordPressEvents() {
 											}
 										/>
 									}
-									placeholder={ __( 'Cincinnati' ) }
+									placeholder={ __( 'City, like Tokyo…' ) }
 								/>
 								{ locationOptions.length > 0 && (
 									<Autocomplete.Popup>
@@ -571,8 +553,8 @@ export default function WordPressEvents() {
 							) }
 						</Stack>
 					</form>
-				) }
-			</div>
+				</div>
+			) : null }
 			<EventsList
 				events={ events }
 				loading={ eventsLoading }
@@ -580,23 +562,56 @@ export default function WordPressEvents() {
 				showEmptyState={ Boolean( activeLocation.trim() ) }
 			/>
 			<Stack
-				direction="row"
 				align="center"
-				gap="sm"
 				className={ styles.footer }
+				direction="row"
+				gap="md"
+				justify="space-between"
+				wrap="wrap"
 			>
-				<Link
-					href="https://make.wordpress.org/community/meetups-landing-page"
-					openInNewTab
+				{ locationLabel && ! isEditingLocation && (
+					<div>
+						{ createInterpolateElement(
+							sprintf(
+								/* translators: %s: city name */
+								__(
+									'Upcoming events near <strong>%s</strong>.'
+								),
+								locationLabel
+							),
+							{
+								strong: <strong />,
+							}
+						) }{ ' ' }
+						<Link
+							onClick={ () => {
+								setLocationInput( activeLocation );
+								setIsEditingLocation( true );
+							} }
+						>
+							{ __( 'Change' ) }
+						</Link>
+					</div>
+				) }
+				<Stack
+					direction="row"
+					align="center"
+					gap="sm"
+					className={ styles.footerLinks }
 				>
-					{ __( 'Meetups' ) }
-				</Link>
-				<Link
-					href="https://central.wordcamp.org/schedule/"
-					openInNewTab
-				>
-					{ __( 'WordCamps' ) }
-				</Link>
+					<Link
+						href="https://make.wordpress.org/community/meetups-landing-page"
+						openInNewTab
+					>
+						{ __( 'Meetups' ) }
+					</Link>
+					<Link
+						href="https://central.wordcamp.org/schedule/"
+						openInNewTab
+					>
+						{ __( 'WordCamps' ) }
+					</Link>
+				</Stack>
 			</Stack>
 		</Card.Content>
 	);

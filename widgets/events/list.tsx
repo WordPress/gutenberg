@@ -29,11 +29,11 @@ export default function List( {
 	}
 
 	return (
-		<Stack gap="sm" direction="column">
+		<Stack gap="md" direction="column">
 			{ items.map( ( item ) => (
 				<Stack
 					key={ item.id }
-					gap="sm"
+					gap="md"
 					direction="row"
 					align="start"
 					className={ styles.listItem }

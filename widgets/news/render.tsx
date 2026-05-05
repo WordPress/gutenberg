@@ -37,7 +37,7 @@ const NEWS_FEEDS = [
 			'https://wordpress.org/news/',
 			'Events and News dashboard widget'
 		),
-		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?per_page=2&_fields=id,title,link,date',
+		apiUrl: 'https://wordpress.org/news/wp-json/wp/v2/posts?per_page=3&_fields=id,title,link,date',
 	},
 	{
 		key: 'planet',
@@ -145,7 +145,7 @@ export default function WordPressNews() {
 					) }
 					openInNewTab
 				>
-					{ __( 'All news' ) }
+					{ __( 'See all' ) }
 				</Link>
 			</Stack>
 		</Card.Content>

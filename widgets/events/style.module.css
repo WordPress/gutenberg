@@ -1,6 +1,7 @@
 
-.locationBar {
+.locationPicker {
 	margin-block-end: 12px;
+	max-width: 400px;
 }
 
 .locationInput {
@@ -19,9 +20,13 @@
 }
 
 .footer {
-	padding: 12px 0;
+	padding: 12px 0 0;
 	margin: 12px 0 0;
 	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+}
+
+.footerLinks {
+	margin-inline-start: auto;
 }
 
 .listItem {
