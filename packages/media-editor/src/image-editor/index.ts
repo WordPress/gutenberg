@@ -33,11 +33,16 @@ export {
 	getSourceRegionPercent,
 	applyOperationToState,
 	stateFromPipeline,
-	exportCroppedImage,
+	exportImageEdit,
+	areImageEditAdjustmentsDefault,
+	getImageEditAdjustmentFilter,
+	DEFAULT_IMAGE_EDIT_ADJUSTMENTS,
 	applyToCanvas,
 } from './core';
 export type {
 	AspectRatioPreset,
+	ExportImageEditOptions,
+	ImageEditAdjustmentValues,
 	SourceRegion,
 	SourceRegionPercent,
 } from './core';

@@ -59,7 +59,11 @@ import {
 	useImageEditingSession,
 	type ImageEditingSessionImage,
 } from '../image-editing-session';
-import { useImageEditorExtensionPanels } from '../image-editor-extension-registry';
+import {
+	registerImageEditorExtensionPanel,
+	useImageEditorExtensionPanels,
+} from '../image-editor-extension-registry';
+import MediaEditorAdjustmentsPanel from '../media-editor-adjustments-panel';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -75,11 +79,14 @@ const METADATA_EDIT_KEYS = [
 	'alt_text',
 	'post',
 ] as const;
+type MetadataEditKey = ( typeof METADATA_EDIT_KEYS )[ number ];
 
 // Scope save-failure snackbars to this modal so they don't leak into the
 // host editor's notices tray (and vice versa).
 const NOTICES_CONTEXT = 'media-editor';
 const PLACEMENT_CONTROL_IDLE_MS = 300;
+const DEFAULT_EXPORT_MIME_TYPE = 'image/png';
+const EXPORT_QUALITY = 0.92;
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -102,6 +109,128 @@ interface ModalTab {
 	id: string;
 	title: string;
 	panel: JSX.Element;
+}
+
+function getTextFieldValue( value: unknown ): string | undefined {
+	if ( typeof value === 'string' ) {
+		return value;
+	}
+	if ( value && typeof value === 'object' ) {
+		const record = value as { raw?: unknown; rendered?: unknown };
+		if ( typeof record.raw === 'string' ) {
+			return record.raw;
+		}
+		if ( typeof record.rendered === 'string' ) {
+			return record.rendered;
+		}
+	}
+	return undefined;
+}
+
+function getReplacementMimeType( media: Media | null ): string {
+	const mimeType = media?.mime_type;
+	if (
+		mimeType === 'image/jpeg' ||
+		mimeType === 'image/png' ||
+		mimeType === 'image/webp'
+	) {
+		return mimeType;
+	}
+	return DEFAULT_EXPORT_MIME_TYPE;
+}
+
+function getReplacementFileExtension( mimeType: string ): string {
+	switch ( mimeType ) {
+		case 'image/jpeg':
+			return 'jpg';
+		case 'image/webp':
+			return 'webp';
+		case 'image/png':
+		default:
+			return 'png';
+	}
+}
+
+function getReplacementFileName( media: Media | null, mimeType: string ) {
+	const title = getTextFieldValue( media?.title );
+	const baseName =
+		typeof media?.slug === 'string' && media.slug
+			? media.slug
+			: title
+					?.trim()
+					.toLowerCase()
+					.replace( /[^a-z0-9]+/g, '-' ) || 'edited-image';
+	return `${
+		baseName.replace( /^-+|-+$/g, '' ) || 'edited-image'
+	}-edited.${ getReplacementFileExtension( mimeType ) }`;
+}
+
+function getMetadataEdits(
+	media: Media | null,
+	pendingEdits: Record< string, unknown > | undefined
+) {
+	const metadataEdits: Partial< Record< MetadataEditKey, string | number > > =
+		{};
+
+	for ( const key of METADATA_EDIT_KEYS ) {
+		const value =
+			pendingEdits && key in pendingEdits
+				? pendingEdits[ key ]
+				: media?.[ key ];
+
+		if ( key === 'post' ) {
+			if ( typeof value === 'number' || typeof value === 'string' ) {
+				metadataEdits[ key ] = value;
+			}
+			continue;
+		}
+
+		const textValue = getTextFieldValue( value );
+		if ( textValue !== undefined ) {
+			metadataEdits[ key ] = textValue;
+		}
+	}
+
+	return metadataEdits;
+}
+
+function appendFormDataValue(
+	formData: FormData,
+	key: string,
+	value: string | number
+) {
+	formData.append( key, String( value ) );
+}
+
+async function uploadReplacementImage( {
+	blob,
+	media,
+	metadataEdits,
+	mimeType,
+}: {
+	blob: Blob;
+	media: Media | null;
+	metadataEdits: Partial< Record< MetadataEditKey, string | number > >;
+	mimeType: string;
+} ) {
+	const data = new FormData();
+	const file = new File(
+		[ blob ],
+		getReplacementFileName( media, mimeType ),
+		{ type: mimeType }
+	);
+	data.append( 'file', file, file.name );
+	for ( const [ key, value ] of Object.entries( metadataEdits ) ) {
+		if ( value !== undefined ) {
+			appendFormDataValue( data, key, value );
+		}
+	}
+
+	return apiFetch( {
+		path: '/wp/v2/media',
+		method: 'POST',
+		body: data,
+	} ) as Promise< Media >;
 }
 
 // Renders the `ComplementaryArea` with a tab list in its header, mirroring
@@ -260,6 +389,15 @@ function MediaEditorModalContent( {
 
 	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
+
+	useEffect( () => {
+		return registerImageEditorExtensionPanel( {
+			name: 'core/adjustments',
+			title: __( 'Adjust' ),
+			order: 10,
+			component: MediaEditorAdjustmentsPanel,
+		} );
+	}, [] );
 
 	const signalPlacementControlInteraction = useCallback( () => {
 		setIsPlacementActive( true );
@@ -431,36 +569,59 @@ function MediaEditorModalContent( {
 		try {
 			let saved: Media | null | undefined;
 
+			const pendingEdits = registry
+				.select( coreStore )
+				.getEntityRecordNonTransientEdits(
+					'postType',
+					'attachment',
+					id
+				) as Record< string, unknown > | undefined;
+			const replacementMetadataEdits = getMetadataEdits(
+				media,
+				pendingEdits
+			);
+			const pendingMetadataEdits = getMetadataEdits( null, pendingEdits );
 			const modifiers = imageSession.buildSaveModifiers();
 
-			if ( modifiers.length > 0 ) {
+			if ( imageSession.hasReplacementImageEdits ) {
+				const mimeType = getReplacementMimeType( media );
+				const blob = await imageSession.exportImageEdit(
+					mimeType,
+					EXPORT_QUALITY
+				);
+				saved = await uploadReplacementImage( {
+					blob,
+					media,
+					metadataEdits: replacementMetadataEdits,
+					mimeType,
+				} );
+
+				if ( saved ) {
+					// Put the newly-created attachment into the core-data
+					// cache so downstream consumers see it without an
+					// extra fetch round-trip.
+					receiveEntityRecords(
+						'postType',
+						'attachment',
+						saved,
+						undefined,
+						true
+					);
+				}
+			} else if ( modifiers.length > 0 ) {
 				// Bundle staged Details-tab edits into the same /edit
 				// request. Transformed saves duplicate the attachment,
 				// and the prior core-data edits were staged against the
 				// old id — if we don't forward them here they'd be
 				// silently lost. Core's `edit_media_item` honors these
 				// keys via `prepare_item_for_database` and `alt_text`.
-				const pendingEdits = registry
-					.select( coreStore )
-					.getEntityRecordNonTransientEdits(
-						'postType',
-						'attachment',
-						id
-					) as Record< string, unknown > | undefined;
-				const metadataEdits: Record< string, unknown > = {};
-				for ( const key of METADATA_EDIT_KEYS ) {
-					if ( pendingEdits && key in pendingEdits ) {
-						metadataEdits[ key ] = pendingEdits[ key ];
-					}
-				}
-
 				saved = ( await apiFetch( {
 					path: `/wp/v2/media/${ id }/edit`,
 					method: 'POST',
 					data: {
 						src: imageSession.sourceImage?.src,
 						modifiers,
-						...metadataEdits,
+						...pendingMetadataEdits,
 					},
 				} ) ) as Media;
 

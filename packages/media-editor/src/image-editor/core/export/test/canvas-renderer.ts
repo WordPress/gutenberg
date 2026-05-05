@@ -9,7 +9,7 @@ import {
 	applyToCanvas,
 	canvasToBlob,
 	canvasToDataURL,
-	exportCroppedImage,
+	exportImageEdit,
 } from '../canvas-renderer';
 
 /**
@@ -29,6 +29,7 @@ function createMockContext() {
 		moveTo: jest.fn(),
 		lineTo: jest.fn(),
 		clip: jest.fn(),
+		filter: 'none',
 	};
 }
 
@@ -199,6 +200,26 @@ describe( 'renderToCanvas', () => {
 		expect( mockCtx.drawImage ).toHaveBeenCalledTimes( 1 );
 	} );
 
+	it( 'should apply adjustment filters before drawing the image', () => {
+		const state = createTestState();
+		const mockImage = {
+			naturalWidth: 800,
+			naturalHeight: 600,
+		} as HTMLImageElement;
+
+		renderToCanvas( mockImage, state, {
+			brightness: 1.2,
+			contrast: 1.3,
+			saturation: 0.8,
+			grayscale: 0.5,
+		} );
+
+		expect( mockCtx.filter ).toBe(
+			'brightness(1.2) contrast(1.3) saturate(0.8) grayscale(0.5)'
+		);
+		expect( mockCtx.drawImage ).toHaveBeenCalledTimes( 1 );
+	} );
+
 	it( 'should apply flip scale factors when flip is enabled', () => {
 		const state = createTestState( {
 			flip: { horizontal: true, vertical: true },
@@ -366,7 +387,7 @@ describe( 'canvasToDataURL', () => {
 	} );
 } );
 
-describe( 'exportCroppedImage', () => {
+describe( 'exportImageEdit', () => {
 	let originalImage: typeof Image;
 
 	beforeEach( () => {
@@ -426,12 +447,12 @@ describe( 'exportCroppedImage', () => {
 
 	it( 'should chain loadImage, renderToCanvas, and canvasToBlob', async () => {
 		const state = createTestState();
-		const result = await exportCroppedImage(
-			'https://example.com/photo.jpg',
+		const result = await exportImageEdit( {
+			src: 'https://example.com/photo.jpg',
 			state,
-			'image/webp',
-			0.9
-		);
+			mimeType: 'image/webp',
+			quality: 0.9,
+		} );
 
 		expect( result ).toBeInstanceOf( Blob );
 	} );
@@ -454,7 +475,10 @@ describe( 'exportCroppedImage', () => {
 
 		const state = createTestState();
 		await expect(
-			exportCroppedImage( 'https://example.com/broken.jpg', state )
+			exportImageEdit( {
+				src: 'https://example.com/broken.jpg',
+				state,
+			} )
 		).rejects.toBeDefined();
 	} );
 
@@ -512,10 +536,10 @@ describe( 'exportCroppedImage', () => {
 
 		const state = createTestState();
 		await expect(
-			exportCroppedImage(
-				'https://cross-origin.example/photo.jpg',
-				state
-			)
+			exportImageEdit( {
+				src: 'https://cross-origin.example/photo.jpg',
+				state,
+			} )
 		).rejects.toMatchObject( { name: 'SecurityError' } );
 
 		jest.restoreAllMocks();

@@ -90,7 +90,7 @@ See [recipes.md](recipes.md) for the full developer guide. Summary:
 |-----------|-----------|
 | Custom crop area UI | `stencil` prop — any component implementing `StencilProps` |
 | AI agent control | `TransformOperation[]` pipeline — JSON-serializable, replayable |
-| Custom export | `exportCroppedImage()` or `applyToCanvas()` for multi-step pipelines |
+| Custom export | `exportImageEdit()` or `applyToCanvas()` for multi-step pipelines |
 | Theming | BEM CSS classes (`.wp-media-editor-image-editor__*`) |
 | State observation | `onStateChange` (every frame), `onGestureStart`/`onGestureEnd` (gesture boundaries) |
 | Undo/redo | Snapshot state at gesture boundaries, `reset()` to restore — see recipes.md |

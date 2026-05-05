@@ -86,6 +86,8 @@ export interface CropperProps {
 	showGrid?: boolean | 'interactive';
 	/** Whether external placement activity should keep the grid visible. */
 	isPlacementActive?: boolean;
+	/** CSS filter applied to the image preview. */
+	filter?: string;
 	/** Show the dimming overlay outside the crop area. */
 	showDimming?: boolean;
 	/** Minimum zoom level. */
@@ -137,6 +139,7 @@ export interface CropperProps {
  * @param root0.stencil           Custom stencil component.
  * @param root0.showGrid          Grid overlay mode: false | true | 'interactive'.
  * @param root0.isPlacementActive Keep grid visible during external placement activity.
+ * @param root0.filter            CSS filter applied to the image preview.
  * @param root0.showDimming       Show dimming overlay outside crop.
  * @param root0.minZoom           Minimum zoom level.
  * @param root0.maxZoom           Maximum zoom level.
@@ -156,6 +159,7 @@ function CropperInner(
 		stencil: StencilComponent = RectangleStencil,
 		showGrid = false,
 		isPlacementActive = false,
+		filter,
 		showDimming = true,
 		minZoom,
 		maxZoom,
@@ -477,9 +481,10 @@ function CropperInner(
 			left: centerX,
 			top: centerY,
 			transform: transformString,
+			filter,
 			transition: imageTransition,
 		};
-	}, [ canvasSize, elementSize, transformString, imageTransition ] );
+	}, [ canvasSize, elementSize, transformString, filter, imageTransition ] );
 
 	// Viewport pan CSS transform for the stage div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.

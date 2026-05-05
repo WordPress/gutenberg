@@ -108,9 +108,9 @@ Same as `getSourceRegion` but returns percentages (0–100): `{ x, y, width, hei
 
 ### Export
 
-#### `exportCroppedImage( src, state, mimeType?, quality? ): Promise<Blob>`
+#### `exportImageEdit( { src, state, adjustments?, mimeType?, quality? } ): Promise<Blob>`
 
-End-to-end: load image, render with transforms, export as Blob. Browser-only (needs `HTMLCanvasElement`).
+End-to-end: load image, render with cropper transforms and optional adjustments, export as Blob. Browser-only (needs `HTMLCanvasElement`).
 
 Rejects on:
 

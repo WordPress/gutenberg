@@ -14,7 +14,7 @@ import type {
 	Flip,
 } from '../../core/types';
 import { DEFAULT_STATE } from '../../core/constants';
-import { exportCroppedImage } from '../../core/export/canvas-renderer';
+import { exportImageEdit } from '../../core/export/canvas-renderer';
 import {
 	cropperReducer,
 	enforceContainment,
@@ -91,7 +91,7 @@ export interface UseCropperStateReturn {
 	commitHistory: () => void;
 	/**
 	 * Export the cropped image as a Blob. Throws on failure — see
-	 * `exportCroppedImage` in core for the error semantics (image
+	 * `exportImageEdit` in core for the error semantics (image
 	 * load errors, CORS taint, missing canvas context). Wrap in
 	 * try/catch if you need to recover.
 	 */
@@ -174,7 +174,13 @@ export function useCropperState(
 
 	const applyHistoryState = useCallback(
 		( nextState: CropperState ) => {
-			dispatch( { type: 'RESET', payload: nextState } );
+			dispatch( {
+				type: 'RESET',
+				payload: {
+					...nextState,
+					image: nextState.image ?? stateRef.current.image,
+				},
+			} );
 		},
 		[ dispatch ]
 	);
@@ -332,12 +338,12 @@ export function useCropperState(
 					new Error( 'No image loaded — call setImage first.' )
 				);
 			}
-			return exportCroppedImage(
-				state.image.src,
+			return exportImageEdit( {
+				src: state.image.src,
 				state,
 				mimeType,
-				quality
-			);
+				quality,
+			} );
 		},
 		[ state ]
 	);

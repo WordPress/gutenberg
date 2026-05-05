@@ -7,6 +7,45 @@ import { createExportCamera, getRotatedBBox } from '../camera';
 /** Default export quality for lossy formats (JPEG, WebP). */
 const DEFAULT_QUALITY = 0.92;
 
+export interface ImageEditAdjustmentValues {
+	brightness: number;
+	contrast: number;
+	saturation: number;
+	grayscale: number;
+}
+
+export interface ExportImageEditOptions {
+	src: string;
+	state: CropperState;
+	adjustments?: ImageEditAdjustmentValues;
+	mimeType?: string;
+	quality?: number;
+}
+
+export const DEFAULT_IMAGE_EDIT_ADJUSTMENTS: ImageEditAdjustmentValues = {
+	brightness: 1,
+	contrast: 1,
+	saturation: 1,
+	grayscale: 0,
+};
+
+export function areImageEditAdjustmentsDefault(
+	adjustments: ImageEditAdjustmentValues = DEFAULT_IMAGE_EDIT_ADJUSTMENTS
+): boolean {
+	return (
+		adjustments.brightness === DEFAULT_IMAGE_EDIT_ADJUSTMENTS.brightness &&
+		adjustments.contrast === DEFAULT_IMAGE_EDIT_ADJUSTMENTS.contrast &&
+		adjustments.saturation === DEFAULT_IMAGE_EDIT_ADJUSTMENTS.saturation &&
+		adjustments.grayscale === DEFAULT_IMAGE_EDIT_ADJUSTMENTS.grayscale
+	);
+}
+
+export function getImageEditAdjustmentFilter(
+	adjustments: ImageEditAdjustmentValues = DEFAULT_IMAGE_EDIT_ADJUSTMENTS
+): string {
+	return `brightness(${ adjustments.brightness }) contrast(${ adjustments.contrast }) saturate(${ adjustments.saturation }) grayscale(${ adjustments.grayscale })`;
+}
+
 /**
  * Load an image from a URL with CORS support.
  *
@@ -29,13 +68,15 @@ export function loadImage( src: string ): Promise< HTMLImageElement > {
  * Uses createExportCamera to compose the full transform matrix, then applies
  * it in a single ctx.setTransform call before drawing the image.
  *
- * @param image - The source image element.
- * @param state - The full cropper state containing crop, rotation, and flip settings.
+ * @param image       - The source image element.
+ * @param state       - The full cropper state containing crop, rotation, and flip settings.
+ * @param adjustments - Image adjustment values to apply while drawing.
  * @return A canvas element containing the transformed and cropped image.
  */
 export function renderToCanvas(
 	image: HTMLImageElement,
-	state: CropperState
+	state: CropperState,
+	adjustments: ImageEditAdjustmentValues = DEFAULT_IMAGE_EDIT_ADJUSTMENTS
 ): HTMLCanvasElement {
 	const { naturalWidth, naturalHeight } = image;
 	const { rotation, cropRect } = state;
@@ -71,6 +112,9 @@ export function renderToCanvas(
 		camera[ 4 ],
 		camera[ 5 ]
 	);
+	if ( ! areImageEditAdjustmentsDefault( adjustments ) ) {
+		ctx.filter = getImageEditAdjustmentFilter( adjustments );
+	}
 	ctx.drawImage( image, 0, 0 );
 	return canvas;
 }
@@ -133,22 +177,25 @@ export function canvasToDataURL(
  *
  * Only works in browser environments (needs DOM / HTMLCanvasElement).
  *
- * @param src      - The image URL to load.
- * @param state    - The cropper state with all transform settings.
- * @param mimeType - The output MIME type. Defaults to 'image/png'.
- * @param quality  - The quality parameter for lossy formats (0-1). Defaults to DEFAULT_QUALITY.
+ * @param options             - Export options.
+ * @param options.src         - The image URL to load.
+ * @param options.state       - The cropper state with all transform settings.
+ * @param options.adjustments - Optional image adjustment values to apply.
+ * @param options.mimeType    - The output MIME type. Defaults to 'image/png'.
+ * @param options.quality     - The quality parameter for lossy formats (0-1). Defaults to DEFAULT_QUALITY.
  * @return A promise that resolves to the exported Blob.
  * @throws If the image fails to load, canvas creation fails, or
  *         the resulting canvas is tainted by CORS restrictions.
  */
-export async function exportCroppedImage(
-	src: string,
-	state: CropperState,
-	mimeType: string = 'image/png',
-	quality: number = DEFAULT_QUALITY
-): Promise< Blob > {
+export async function exportImageEdit( {
+	src,
+	state,
+	adjustments = DEFAULT_IMAGE_EDIT_ADJUSTMENTS,
+	mimeType = 'image/png',
+	quality = DEFAULT_QUALITY,
+}: ExportImageEditOptions ): Promise< Blob > {
 	const image = await loadImage( src );
-	const canvas = renderToCanvas( image, state );
+	const canvas = renderToCanvas( image, state, adjustments );
 	return canvasToBlob( canvas, mimeType, quality );
 }
 
@@ -221,12 +268,12 @@ export function applyToCanvas(
 }
 
 /**
- * Download the cropped image as a file.
+ * Download the edited image as a file.
  *
  * Loads the source image, applies all transforms, and triggers a
- * browser download via exportCroppedImage() + object URL + anchor click.
+ * browser download via exportImageEdit() + object URL + anchor click.
  *
- * Throws on export failure (see `exportCroppedImage`).
+ * Throws on export failure (see `exportImageEdit`).
  *
  * @param src      - The image URL to load.
  * @param state    - The cropper state with all transform settings.
@@ -242,7 +289,7 @@ export async function downloadCroppedImage(
 	mimeType: string = 'image/png',
 	quality: number = DEFAULT_QUALITY
 ): Promise< void > {
-	const blob = await exportCroppedImage( src, state, mimeType, quality );
+	const blob = await exportImageEdit( { src, state, mimeType, quality } );
 	const ext = mimeType.split( '/' )[ 1 ] ?? 'png';
 	const url = URL.createObjectURL( blob );
 	const a = document.createElement( 'a' );

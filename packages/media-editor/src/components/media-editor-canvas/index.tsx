@@ -3,7 +3,11 @@
  */
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { Cropper, useCropper } from '../../image-editor';
+import {
+	Cropper,
+	getImageEditAdjustmentFilter,
+	useCropper,
+} from '../../image-editor';
 import { useImageEditingSession } from '../image-editing-session';
 
 export interface MediaEditorCanvasProps {
@@ -43,6 +47,10 @@ export default function MediaEditorCanvas( {
 		return null;
 	}
 
+	const adjustmentFilter = getImageEditAdjustmentFilter(
+		imageSession.adjustments
+	);
+
 	return (
 		<div className="media-editor-canvas">
 			<Cropper
@@ -52,6 +60,7 @@ export default function MediaEditorCanvas( {
 				freeformCrop={ freeformCrop }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				filter={ adjustmentFilter }
 				onImageLoaded={ ( size ) =>
 					imageSession.setSourceImage( {
 						src: mediaUrl,

@@ -32,4 +32,14 @@ export {
 } from './transforms/pipeline';
 
 // Export / canvas
-export { exportCroppedImage, applyToCanvas } from './export/canvas-renderer';
+export {
+	exportImageEdit,
+	applyToCanvas,
+	areImageEditAdjustmentsDefault,
+	getImageEditAdjustmentFilter,
+	DEFAULT_IMAGE_EDIT_ADJUSTMENTS,
+} from './export/canvas-renderer';
+export type {
+	ExportImageEditOptions,
+	ImageEditAdjustmentValues,
+} from './export/canvas-renderer';

@@ -1000,6 +1000,25 @@ describe( 'useCropperState', () => {
 			expect( result.current.isDirty ).toBe( false );
 		} );
 
+		it( 'does not undo a loaded image back to an image-less history state', () => {
+			const { result } = renderHook( () => useCropperState() );
+			const image = {
+				src: 'test.jpg',
+				naturalWidth: 1000,
+				naturalHeight: 500,
+			};
+
+			act( () => result.current.setZoom( 2 ) );
+			act( () => result.current.commitHistory() );
+			act( () => result.current.reset( { image } ) );
+
+			expect( result.current.state.image ).toEqual( image );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.state.image ).toEqual( image );
+		} );
+
 		// --- undo/redo with a pending gesture ---
 
 		it( 'undo flushes a pending gesture before undoing', () => {

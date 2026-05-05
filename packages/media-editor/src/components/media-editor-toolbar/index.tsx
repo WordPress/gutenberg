@@ -20,6 +20,7 @@ import {
 import { useCropper } from '../../image-editor';
 import { useCropGestureHandlers } from '../../hooks/use-crop-gesture-handlers';
 import { MAX_ROTATION_OFFSET } from '../../image-editor/core/constants';
+import { useImageEditingSession } from '../image-editing-session';
 
 export interface MediaEditorToolbarProps {
 	/**
@@ -45,22 +46,12 @@ export default function MediaEditorToolbar( {
 	onReset,
 	onPlacementControlInteraction,
 }: MediaEditorToolbarProps ) {
-	const {
-		state,
-		setRotation,
-		setFlip,
-		snapRotate90,
-		reset,
-		isDirty,
-		hasUndo,
-		hasRedo,
-		undo: undoCrop,
-		redo: redoCrop,
-	} = useCropper();
+	const imageSession = useImageEditingSession();
+	const { state, setRotation, setFlip, snapRotate90 } = useCropper();
 	const rotationGestureHandlers = useCropGestureHandlers();
 
 	const handleReset = () => {
-		reset();
+		imageSession.reset();
 		onReset?.();
 	};
 
@@ -103,9 +94,9 @@ export default function MediaEditorToolbar( {
 				label={ __( 'Undo' ) }
 				showTooltip
 				shortcut={ displayShortcut.primary( 'z' ) }
-				disabled={ ! hasUndo }
+				disabled={ ! imageSession.hasUndo }
 				accessibleWhenDisabled
-				onClick={ undoCrop }
+				onClick={ imageSession.undo }
 			/>
 			<Button
 				size="compact"
@@ -117,9 +108,9 @@ export default function MediaEditorToolbar( {
 						? displayShortcut.primaryShift( 'z' )
 						: displayShortcut.primary( 'y' )
 				}
-				disabled={ ! hasRedo }
+				disabled={ ! imageSession.hasRedo }
 				accessibleWhenDisabled
-				onClick={ redoCrop }
+				onClick={ imageSession.redo }
 			/>
 			<Button
 				size="compact"
@@ -182,7 +173,7 @@ export default function MediaEditorToolbar( {
 			<Button
 				size="compact"
 				variant="tertiary"
-				disabled={ ! isDirty }
+				disabled={ ! imageSession.isDirty }
 				accessibleWhenDisabled
 				onClick={ handleReset }
 			>

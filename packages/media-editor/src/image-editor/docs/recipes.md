@@ -430,7 +430,7 @@ The pipeline API is designed for AI agents. An agent can:
 1. **Analyze the image** and determine the optimal crop
 2. **Generate a `TransformOperation[]`** with crop, rotation, zoom
 3. **Apply it** via `applyOperation()` or `stateFromPipeline()`
-4. **Export the result** via `exportCroppedImage()`
+4. **Export the result** via `exportImageEdit()`
 
 ```typescript
 // Agent generates instructions:
@@ -454,7 +454,7 @@ The core layer is pure functions — no React or browser required for steps 1-2:
 import {
   stateFromPipeline,
   getSourceRegion,
-  exportCroppedImage,
+  exportImageEdit,
 } from '../image-editor';
 
 // 1. Build state from operations (pure — runs in Node, workers, anywhere)
@@ -473,7 +473,12 @@ const region = getSourceRegion( state, { width: 4000, height: 3000 } );
 // ffmpeg -i input.jpg -vf "crop=3200:2400:400:300,rotate=0.087" output.jpg
 
 // 3. Or export to Blob (needs canvas — browser or node-canvas)
-const blob = await exportCroppedImage( imageUrl, state, 'image/jpeg', 0.9 );
+const blob = await exportImageEdit( {
+  src: imageUrl,
+  state,
+  mimeType: 'image/jpeg',
+  quality: 0.9,
+} );
 ```
 
 Steps 1 and 2 are pure functions with zero DOM dependencies. Step 3 needs `canvas` and `Image` (browser, jsdom, or node-canvas).
