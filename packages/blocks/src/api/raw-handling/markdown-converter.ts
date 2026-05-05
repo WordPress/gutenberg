@@ -1,17 +1,29 @@
 /**
  * External dependencies
  */
-// @ts-ignore
-import showdown from 'showdown';
+import { Marked, type Tokens } from 'marked';
 
-// Reuse the same showdown converter.
-const converter = new showdown.Converter( {
-	noHeaderId: true,
-	tables: true,
-	literalMidWordUnderscores: true,
-	omitExtraWLInCodeBlocks: true,
-	simpleLineBreaks: true,
-	strikethrough: true,
+const converter = new Marked( {
+	gfm: true,
+	breaks: true,
+	renderer: {
+		// Match showdown's `omitExtraWLInCodeBlocks`: marked appends `\n`
+		// before `</code>`, which leaks into the Code block's content as a
+		// trailing blank line.
+		code( { text, lang }: Tokens.Code ): string {
+			const language = ( lang || '' ).match( /\S*/ )?.[ 0 ];
+			const cls = language
+				? ` class="${ language } language-${ language }"`
+				: '';
+			const escaped = text
+				.replace( /&(?!#?\w+;)/g, '&amp;' )
+				.replace( /</g, '&lt;' )
+				.replace( />/g, '&gt;' )
+				.replace( /"/g, '&quot;' )
+				.replace( /'/g, '&#39;' );
+			return `<pre><code${ cls }>${ escaped }</code></pre>`;
+		},
+	},
 } );
 
 /**
@@ -63,10 +75,11 @@ const correctors = [
  * @return HTML.
  */
 export default function markdownConverter( text: string ): string {
-	return converter.makeHtml(
+	return converter.parse(
 		correctors.reduce(
 			( current, corrector ) => corrector( current ),
 			text
-		)
+		),
+		{ async: false }
 	);
 }
