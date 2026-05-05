@@ -2,17 +2,18 @@
  * WordPress dependencies
  */
 import {
-	TextareaControl,
 	Notice,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { lazy, Suspense, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { default as transformStyles } from '../../utils/transform-styles';
+
+const CodeMirrorEditor = lazy( () => import( './codemirror-editor' ) );
 
 /**
  * Validates that a CSS string doesn't contain HTML markup.
@@ -57,9 +58,7 @@ export default function AdvancedPanel( {
 			setCSSError( null );
 		}
 	}
-	function handleOnBlur( event ) {
-		const cssValue = event?.target?.value;
-
+	function handleOnBlur( cssValue ) {
 		if ( ! cssValue || ! validateCSS( cssValue ) ) {
 			return;
 		}
@@ -86,15 +85,17 @@ export default function AdvancedPanel( {
 					{ cssError }
 				</Notice>
 			) }
-			<TextareaControl
-				label={ __( 'Additional CSS' ) }
-				value={ customCSS }
-				onChange={ ( newValue ) => handleOnChange( newValue ) }
-				onBlur={ handleOnBlur }
-				className="block-editor-global-styles-advanced-panel__custom-css-input"
-				spellCheck={ false }
-				help={ help }
-			/>
+			<h1>ok</h1>
+			<Suspense fallback={ null }>
+				<CodeMirrorEditor
+					label={ __( 'Additional CSS' ) }
+					value={ customCSS }
+					onChange={ handleOnChange }
+					onBlur={ handleOnBlur }
+					className="block-editor-global-styles-advanced-panel__custom-css-input"
+					help={ help }
+				/>
+			</Suspense>
 		</VStack>
 	);
 }
