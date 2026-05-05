@@ -24,26 +24,13 @@ async function deleteAllGuidelines( requestUtils ) {
 	}
 }
 
-// Locate an accordion card (Card container) for a given category title. Each
-// card wraps both the trigger button and the collapsible form body, so
-// scoping subsequent queries to this locator isolates one category from the
-// others.
+// Locate the list item wrapping a category's Collapsible Card. Scoping
+// subsequent queries to this locator isolates one category (its trigger,
+// form, and Save button) from the others.
 function getCategoryCard( page, title ) {
-	return page
-		.locator( '.guidelines__accordion' )
-		.filter( {
-			has: page.getByRole( 'button', {
-				name: `Expand ${ title } guidelines`,
-			} ),
-		} )
-		.or(
-			page.locator( '.guidelines__accordion' ).filter( {
-				has: page.getByRole( 'button', {
-					name: `Collapse ${ title } guidelines`,
-				} ),
-			} )
-		)
-		.first();
+	return page.getByRole( 'listitem' ).filter( {
+		has: page.getByRole( 'button', { name: title } ),
+	} );
 }
 
 // Expand a category accordion and fill its textarea, then click Save and
@@ -52,11 +39,9 @@ async function saveCategoryGuidelines( page, title, text ) {
 	const card = getCategoryCard( page, title );
 
 	// Expand the accordion if it isn't already open.
-	const expandButton = card.getByRole( 'button', {
-		name: `Expand ${ title } guidelines`,
-	} );
-	if ( await expandButton.isVisible() ) {
-		await expandButton.click();
+	const trigger = card.getByRole( 'button', { name: title } );
+	if ( ( await trigger.getAttribute( 'aria-expanded' ) ) !== 'true' ) {
+		await trigger.click();
 	}
 
 	// The DataForm renders a textarea whose accessible name is
@@ -100,10 +85,9 @@ test.describe( 'Guidelines', () => {
 	} ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH );
 
-		const settingsMenu = page.locator( '#menu-settings' );
-		const guidelinesLink = settingsMenu.getByRole( 'link', {
-			name: 'Guidelines',
-		} );
+		const guidelinesLink = page
+			.getByRole( 'navigation', { name: 'Main menu' } )
+			.getByRole( 'link', { name: 'Guidelines' } );
 		await expect( guidelinesLink ).toBeVisible();
 		await expect( guidelinesLink ).toHaveAttribute(
 			'href',
@@ -117,7 +101,7 @@ test.describe( 'Guidelines', () => {
 	} ) => {
 		await admin.visitAdminPage( SETTINGS_PAGE_PATH );
 		await page
-			.locator( '#menu-settings' )
+			.getByRole( 'navigation', { name: 'Main menu' } )
 			.getByRole( 'link', { name: 'Guidelines' } )
 			.click();
 
@@ -126,12 +110,8 @@ test.describe( 'Guidelines', () => {
 		await expect(
 			page.getByRole( 'heading', { name: 'Guidelines', level: 1 } )
 		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: 'Expand Copy guidelines' } )
-		).toBeVisible();
-		await expect(
-			page.getByRole( 'button', { name: 'Expand Images guidelines' } )
-		).toBeVisible();
+		await expect( getCategoryCard( page, 'Copy' ) ).toBeVisible();
+		await expect( getCategoryCard( page, 'Images' ) ).toBeVisible();
 	} );
 
 	test( 'persists Copy and Images guidelines entered through the UI across a refresh', async ( {
@@ -145,9 +125,7 @@ test.describe( 'Guidelines', () => {
 
 		// Wait for the initial fetch to resolve — accordions only render
 		// after the loading spinner disappears.
-		await expect(
-			page.getByRole( 'button', { name: 'Expand Copy guidelines' } )
-		).toBeVisible();
+		await expect( getCategoryCard( page, 'Copy' ) ).toBeVisible();
 
 		// Save Copy and Images through the UI, one category at a time.
 		await saveCategoryGuidelines( page, 'Copy', copyText );
@@ -156,9 +134,7 @@ test.describe( 'Guidelines', () => {
 		// Refresh the page — the "verify saved guidelines load correctly"
 		// step from the PR's testing instructions.
 		await page.reload();
-		await expect(
-			page.getByRole( 'button', { name: 'Expand Copy guidelines' } )
-		).toBeVisible();
+		await expect( getCategoryCard( page, 'Copy' ) ).toBeVisible();
 
 		// Re-expand each accordion and confirm the textareas were
 		// rehydrated with the values that were saved. Reading back from
@@ -166,17 +142,13 @@ test.describe( 'Guidelines', () => {
 		// wp_guideline CPT stored the post, the REST controller served
 		// it, the app hydrated its store, and the DataForm populated.
 		const copyCard = getCategoryCard( page, 'Copy' );
-		await copyCard
-			.getByRole( 'button', { name: 'Expand Copy guidelines' } )
-			.click();
+		await copyCard.getByRole( 'button', { name: 'Copy' } ).click();
 		await expect(
 			copyCard.getByRole( 'textbox', { name: 'copy guidelines' } )
 		).toHaveValue( copyText );
 
 		const imagesCard = getCategoryCard( page, 'Images' );
-		await imagesCard
-			.getByRole( 'button', { name: 'Expand Images guidelines' } )
-			.click();
+		await imagesCard.getByRole( 'button', { name: 'Images' } ).click();
 		await expect(
 			imagesCard.getByRole( 'textbox', { name: 'images guidelines' } )
 		).toHaveValue( imagesText );

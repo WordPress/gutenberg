@@ -164,6 +164,15 @@ const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
 };
 
 /**
+ * Responsive breakpoint state keys and their corresponding CSS media queries.
+ * Keep in sync with WP_Theme_JSON_Gutenberg::RESPONSIVE_BREAKPOINTS.
+ */
+const RESPONSIVE_BREAKPOINTS: Record< string, string > = {
+	mobile: '@media (width <= 480px)',
+	tablet: '@media (480px < width <= 782px)',
+};
+
+/**
  * Transform given preset tree into a set of preset class declarations.
  *
  * @param blockSelector Block selector string
@@ -875,9 +884,12 @@ function pickStyleAndPseudoKeys(
 	const allowedPseudoSelectors = blockName
 		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
 		: [];
+
 	const pickedEntries = entries.filter(
 		( [ key ] ) =>
-			STYLE_KEYS.includes( key ) || allowedPseudoSelectors.includes( key )
+			STYLE_KEYS.includes( key ) ||
+			allowedPseudoSelectors.includes( key ) ||
+			RESPONSIVE_BREAKPOINTS[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -968,6 +980,139 @@ function appendPseudoSelectorStyles(
 		) };}`;
 
 		ruleset += pseudoRule;
+	} );
+
+	return ruleset;
+}
+
+/**
+ * Appends CSS rules for responsive breakpoint states to a ruleset string.
+ * Block styles stored under responsive keys (for example, 'mobile' and
+ * 'tablet') are wrapped in corresponding media queries instead of being
+ * appended directly to the selector.
+ *
+ * @param styles                 The styles object potentially containing responsive keys.
+ * @param selector               The base CSS selector for the block.
+ * @param ruleset                The accumulating CSS ruleset string.
+ * @param featureSelectors       Optional feature-level selectors for the block.
+ * @param treeSettings           Global styles settings tree.
+ * @param blockName              Optional block name used to resolve valid pseudo selectors.
+ * @param styleVariationSelector Optional style variation selector.
+ * @param blockRootSelector      Optional block root selector used to detect block-level feature selectors.
+ * @param styleVariationName     Optional variation name used when applying variation class to block-level feature selectors.
+ * @return Updated ruleset string with responsive base, feature-level, and pseudo-state CSS appended.
+ */
+function appendResponsiveStyles(
+	styles: Record< string, any >,
+	selector: string,
+	ruleset: string,
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	treeSettings: Record< string, any > | undefined,
+	blockName?: string,
+	styleVariationSelector?: string,
+	blockRootSelector?: string,
+	styleVariationName?: string
+): string {
+	const responsiveStyles = Object.entries( styles ).filter(
+		( [ key ] ) => RESPONSIVE_BREAKPOINTS[ key ]
+	);
+
+	if ( ! responsiveStyles.length ) {
+		return ruleset;
+	}
+
+	responsiveStyles.forEach( ( [ breakpointKey, breakpointStyle ] ) => {
+		if ( ! breakpointStyle || typeof breakpointStyle !== 'object' ) {
+			return;
+		}
+
+		const mediaQuery = RESPONSIVE_BREAKPOINTS[ breakpointKey ];
+		const remainingBreakpointStyles = JSON.parse(
+			JSON.stringify( breakpointStyle )
+		);
+
+		if ( featureSelectors && typeof featureSelectors !== 'string' ) {
+			let breakpointFeatureDeclarations = getFeatureDeclarations(
+				featureSelectors,
+				remainingBreakpointStyles
+			);
+
+			breakpointFeatureDeclarations = updateParagraphTextIndentSelector(
+				breakpointFeatureDeclarations,
+				treeSettings,
+				blockName
+			);
+
+			breakpointFeatureDeclarations = updateButtonWidthDeclarations(
+				breakpointFeatureDeclarations,
+				treeSettings
+			);
+
+			Object.entries( breakpointFeatureDeclarations ).forEach(
+				( [ baseSelector, declarations ] ) => {
+					if ( ! declarations.length ) {
+						return;
+					}
+					let cssSelector: string;
+					if ( ! styleVariationSelector ) {
+						cssSelector = baseSelector;
+					} else if (
+						blockRootSelector &&
+						styleVariationName &&
+						! baseSelector.includes( blockRootSelector )
+					) {
+						/*
+						 * Feature selector is block-level (e.g. `.wp-block-button` for
+						 * dimensions/width) — apply the variation class directly to it.
+						 */
+						cssSelector = getBlockStyleVariationSelector(
+							styleVariationName,
+							baseSelector
+						);
+					} else {
+						cssSelector = concatFeatureVariationSelectorString(
+							baseSelector,
+							styleVariationSelector
+						);
+					}
+					const rules = declarations.join( ';' );
+					ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ rules };}}`;
+				}
+			);
+		}
+
+		const breakpointDeclarations = getStylesDeclarations(
+			remainingBreakpointStyles
+		);
+
+		if ( breakpointDeclarations.length ) {
+			const cssSelector = styleVariationSelector
+				? concatFeatureVariationSelectorString(
+						selector,
+						styleVariationSelector
+				  )
+				: selector;
+			ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
+				';'
+			) };}}`;
+		}
+
+		const breakpointPseudoRules = appendPseudoSelectorStyles(
+			remainingBreakpointStyles,
+			selector,
+			'',
+			featureSelectors,
+			treeSettings,
+			blockName,
+			styleVariationSelector
+		);
+
+		if ( breakpointPseudoRules ) {
+			ruleset += `${ mediaQuery }{${ breakpointPseudoRules }}`;
+		}
 	} );
 
 	return ruleset;
@@ -1682,6 +1827,18 @@ export const transformToStyles = (
 									styleVariationSelector as string
 								);
 
+								ruleset = appendResponsiveStyles(
+									styleVariations,
+									styleVariationSelector as string,
+									ruleset,
+									featureSelectors,
+									tree.settings,
+									name,
+									styleVariationSelector as string,
+									selector,
+									styleVariationName
+								);
+
 								// Generate layout styles for the variation if it supports layout and has blockGap defined.
 								if (
 									hasLayoutSupport &&
@@ -1704,6 +1861,15 @@ export const transformToStyles = (
 				}
 
 				ruleset = appendPseudoSelectorStyles(
+					styles,
+					selector,
+					ruleset,
+					featureSelectors,
+					tree.settings,
+					name
+				);
+
+				ruleset = appendResponsiveStyles(
 					styles,
 					selector,
 					ruleset,
