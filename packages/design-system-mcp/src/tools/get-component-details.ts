@@ -14,35 +14,59 @@ export function register( server: McpServer ): void {
 		{
 			title: 'Get Component Details',
 			description:
-				'Get detailed documentation for a WordPress Design System component including props, usage examples, and import statements.',
+				'Get detailed documentation for one or more WordPress Design System components including props, usage examples, and import statements. Pass multiple names to fetch several components in a single call instead of making repeated calls.',
 			inputSchema: z.object( {
 				name: z
-					.string()
-					.min( 1 )
-					.describe( 'The component name (e.g. "Button", "Tabs")' ),
+					.union( [
+						z.string().min( 1 ),
+						z.array( z.string().min( 1 ) ).min( 1 ),
+					] )
+					.describe(
+						'A component name, or an array of component names to fetch in a single call (e.g. "Button" or ["Button", "Tabs"]).'
+					),
 			} ),
 			annotations: {
 				readOnlyHint: true,
 			},
 		},
 		async ( { name } ) => {
-			const detail = await getComponentDetail( name );
-			if ( ! detail ) {
+			const names = Array.isArray( name ) ? name : [ name ];
+			const sections: string[] = [];
+			const missing: string[] = [];
+
+			for ( const componentName of names ) {
+				const detail = await getComponentDetail( componentName );
+				if ( detail ) {
+					sections.push( formatComponentDetail( detail ) );
+				} else {
+					missing.push( componentName );
+				}
+			}
+
+			if ( sections.length === 0 ) {
+				const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
 				return {
 					content: [
 						{
 							type: 'text',
-							text: `No component named "${ name }" was found.`,
+							text: `No components were found for: ${ list }.`,
 						},
 					],
 					isError: true,
 				};
 			}
+
+			let text = sections.join( '\n\n---\n\n' );
+			if ( missing.length > 0 ) {
+				const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
+				text += `\n\n---\n\n_No components were found for: ${ list }._`;
+			}
+
 			return {
 				content: [
 					{
 						type: 'text',
-						text: formatComponentDetail( detail ),
+						text,
 					},
 				],
 			};
