@@ -361,6 +361,10 @@ $block-editor-link-control-number-of-actions: 1;
 	padding: $grid-unit-10 $grid-unit-10 0 $grid-unit-10;
 	margin-top: #{$grid-unit-20 * -1};
 
+	&.suggest-advance-options {
+		margin-bottom: $grid-unit-20;
+	}
+
 	.components-button.block-editor-link-control__drawer-toggle {
 		padding-left: 0;
 		gap: 0;

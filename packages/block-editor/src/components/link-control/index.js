@@ -628,8 +628,12 @@ function LinkControl( {
 	// When editing an existing link, also require that the value has changed
 	const isDisabled =
 		currentInputIsEmpty || ! isUrlValid || ( value && ! valueHasChanges );
-	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
-
+	const showSettings =
+		!! settings?.length &&
+		isEditingLink &&
+		( hasLinkValue || isURLLike( currentUrlInputValue ) );
+	const toolsStyle =
+		showSettings && ! hasLinkValue ? { marginBottom: '15px' } : undefined;
 	const previewValue = useMemo( () => {
 		// There is a chance that the value is not yet set from the entity binding, so we use the preserved URL.
 		if (
@@ -752,7 +756,12 @@ function LinkControl( {
 			) }
 
 			{ showSettings && (
-				<div className="block-editor-link-control__tools">
+				<div
+					className={ clsx( {
+						'block-editor-link-control__tools': true,
+						'suggest-advance-options': toolsStyle,
+					} ) }
+				>
 					{ ! currentInputIsEmpty && (
 						<LinkControlSettingsDrawer
 							settingsOpen={ isSettingsOpen }
