@@ -56,10 +56,7 @@
 		},
 		"dimensions": {
 			"minHeight": true,
-			"minWidth": true,
-			"__experimentalDefaultControls": {
-				"minHeight": true
-			}
+			"minWidth": true
 		},
 		"__experimentalBorder": {
 			"color": true,
