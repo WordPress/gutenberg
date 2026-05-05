@@ -13,7 +13,6 @@ import { Card, EmptyState, Icon, Link, Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import styles from './style.module.css';
 import List, { type ListItem } from './list';
 
 interface NewsPost {
@@ -132,28 +131,21 @@ export default function WordPressNews() {
 
 	return (
 		<Card.Content>
-			<div className={ styles.section }>
+			<Stack direction="column" justify="start" gap="md">
 				{ newsLoading && (
 					<Stack justify="center" align="center">
 						<Spinner />
 					</Stack>
 				) }
 				<List items={ combinedItems } empty={ emptyState } />
-			</div>
-			<Stack
-				direction="row"
-				align="center"
-				gap="sm"
-				className={ styles.footer }
-			>
 				<Link
 					href={ _x(
-						'https://wordpress.org/news/',
+						'https://wordpress.org/news/all-posts/',
 						'Events and News dashboard widget'
 					) }
 					openInNewTab
 				>
-					{ __( 'News' ) }
+					{ __( 'All news' ) }
 				</Link>
 			</Stack>
 		</Card.Content>

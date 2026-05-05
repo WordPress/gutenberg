@@ -1,11 +1,6 @@
-.section {
-	padding: 16px 0;
-}
 
 .footer {
-	padding: 12px 0;
-	margin: 0;
-	border-block-start: 1px solid var(--wpds-color-stroke-surface-neutral);
+	padding: 12px 0 0;
 }
 
 .listItem {
@@ -13,8 +8,8 @@
 }
 
 .listItemIcon {
-	inline-size: 28px;
-	block-size: 28px;
+	inline-size: 36px;
+	block-size: 36px;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
