@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import type { Page, Browser } from '@playwright/test';
+import { mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
+import type { Page, Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
 // See https://devblogs.microsoft.com/typescript/announcing-typescript-5-3-beta/
 // @ts-expect-error
@@ -50,6 +51,7 @@ export class Metrics {
 	browser: Browser;
 	page: Page;
 	trace: Trace;
+	#traceCount = 0;
 
 	webVitals: WebVitalsMeasurements = {};
 
@@ -221,12 +223,30 @@ export class Metrics {
 
 	/**
 	 * Stops Chromium tracing and saves the trace.
+	 *
+	 * When the `WP_ARTIFACTS_PATH` environment variable is set, the raw trace
+	 * is also written to `${WP_ARTIFACTS_PATH}/traces/<name>.trace.json`. The
+	 * resulting file can be opened in Chrome DevTools (Performance panel →
+	 * "Load profile…") to inspect the flame graph.
+	 *
+	 * @param name Optional file name (without extension) to disambiguate
+	 *             multiple traces from the same test run.
 	 */
-	async stopTracing() {
+	async stopTracing( name?: string ) {
 		const traceBuffer = await this.browser.stopTracing();
 		const traceJSON = JSON.parse( traceBuffer.toString() );
 
 		this.trace = traceJSON;
+
+		const artifactsPath = process.env.WP_ARTIFACTS_PATH;
+		if ( artifactsPath ) {
+			const tracesDir = join( artifactsPath, 'traces' );
+			const fileName = `${
+				name ?? `trace-${ ++this.#traceCount }`
+			}.trace.json`;
+			await mkdir( tracesDir, { recursive: true } );
+			await writeFile( join( tracesDir, fileName ), traceBuffer );
+		}
 	}
 
 	/**
