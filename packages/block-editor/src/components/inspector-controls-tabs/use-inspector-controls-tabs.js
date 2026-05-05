@@ -41,6 +41,7 @@ export default function useInspectorControlsTabs(
 		color: colorGroup,
 		content: contentGroup,
 		default: defaultGroup,
+		layout: layoutGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
 		position: positionGroup,
@@ -62,6 +63,7 @@ export default function useInspectorControlsTabs(
 	const styleFills = [
 		...( useSlotFills( borderGroup.name ) || [] ),
 		...( useSlotFills( colorGroup.name ) || [] ),
+		...( useSlotFills( layoutGroup.name ) || [] ),
 		...( useSlotFills( dimensionsGroup.name ) || [] ),
 		...( useSlotFills( stylesGroup.name ) || [] ),
 		...( useSlotFills( typographyGroup.name ) || [] ),

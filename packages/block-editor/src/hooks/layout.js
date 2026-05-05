@@ -239,7 +239,7 @@ function LayoutPanelPure( {
 
 	return (
 		<>
-			<InspectorControls>
+			<InspectorControls group="layout">
 				<PanelBody title={ __( 'Layout' ) }>
 					{ showInheritToggle && (
 						<>

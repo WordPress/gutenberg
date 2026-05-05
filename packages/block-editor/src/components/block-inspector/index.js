@@ -60,6 +60,7 @@ function StyleInspectorSlots( {
 				group="typography"
 				label={ __( 'Typography' ) }
 			/>
+			<InspectorControls.Slot group="layout" />
 			<InspectorControls.Slot
 				group="dimensions"
 				label={ __( 'Dimensions' ) }
