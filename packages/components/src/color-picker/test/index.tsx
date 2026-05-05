@@ -129,6 +129,28 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 		} );
+
+		it( 'should reset color to black when the hex input is completely cleared', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#11aabb';
+
+			render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			await user.selectOptions( formatSelector, 'hex' );
+
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+
+			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
+		} );
 	} );
 
 	describe.each( [
