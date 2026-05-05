@@ -220,11 +220,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 			.digest( 'hex' )
 			.slice( 0, 10 );
 
-		let cssModule = `if (typeof document !== 'undefined' && process.env.NODE_ENV !== 'test' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
-	const style = document.createElement("style");
-	style.setAttribute("data-wp-hash", "${ hash }");
-	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
-	document.head.appendChild(style);
+		let cssModule = `import { registerStyle } from '@wordpress/style-runtime';
+if (typeof process === 'undefined' || process.env.NODE_ENV !== 'test') {
+	registerStyle("${ hash }", ${ JSON.stringify( css ) });
 }
 `;
 
