@@ -4,6 +4,7 @@
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { Cropper, useCropper } from '../../image-editor';
+import { useImageEditingSession } from '../image-editing-session';
 
 export interface MediaEditorCanvasProps {
 	/** Fixed aspect ratio (width / height). `undefined` means free. */
@@ -45,6 +46,7 @@ export default function MediaEditorCanvas( {
 }: MediaEditorCanvasProps ) {
 	const { media } = useMediaEditorContext();
 	const controller = useCropper();
+	const imageSession = useImageEditingSession();
 
 	const mediaUrl = media?.source_url;
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type );
@@ -63,6 +65,13 @@ export default function MediaEditorCanvas( {
 				focusOnMount={ focusOnMount }
 				showGrid="interactive"
 				isPlacementActive={ isPlacementActive }
+				onImageLoaded={ ( size ) =>
+					imageSession.setSourceImage( {
+						src: mediaUrl,
+						width: size.width,
+						height: size.height,
+					} )
+				}
 				// Flush on gesture start so any pending sidebar interaction
 				// (e.g. zoom slider debounce) is committed as its own undo
 				// step before the canvas gesture begins.

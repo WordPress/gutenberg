@@ -54,6 +54,7 @@ import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import {
 	ImageEditingSessionProvider,
 	useImageEditingSession,
+	type ImageEditingSessionImage,
 } from '../image-editing-session';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
 
@@ -238,6 +239,7 @@ function MediaEditorContent( {
 	shouldCloseOnEsc = false,
 }: MediaEditorProps ) {
 	const imageSession = useImageEditingSession();
+	const setSourceImage = imageSession.setSourceImage;
 
 	const { media, hasEdits } = useSelect(
 		( select ) => {
@@ -311,6 +313,36 @@ function MediaEditorContent( {
 
 	const mediaType = getMediaTypeFromMimeType( media?.mime_type ).type;
 	const isImage = !! media && mediaType === 'image';
+
+	const sourceImage = useMemo< ImageEditingSessionImage | null >( () => {
+		if ( ! isImage || ! media?.source_url ) {
+			return null;
+		}
+		const naturalWidth = Number( media.media_details?.width );
+		const naturalHeight = Number( media.media_details?.height );
+		if (
+			Number.isFinite( naturalWidth ) &&
+			Number.isFinite( naturalHeight ) &&
+			naturalWidth > 0 &&
+			naturalHeight > 0
+		) {
+			return {
+				src: media.source_url,
+				width: naturalWidth,
+				height: naturalHeight,
+			};
+		}
+		return null;
+	}, [
+		isImage,
+		media?.source_url,
+		media?.media_details?.width,
+		media?.media_details?.height,
+	] );
+
+	useEffect( () => {
+		setSourceImage( sourceImage );
+	}, [ setSourceImage, sourceImage ] );
 
 	const imageAspectRatio = useMemo( () => {
 		if ( ! isImage ) {
@@ -426,7 +458,7 @@ function MediaEditorContent( {
 					path: `/wp/v2/media/${ id }/edit`,
 					method: 'POST',
 					data: {
-						src: media?.source_url,
+						src: imageSession.sourceImage?.src,
 						modifiers,
 						...metadataEdits,
 					},

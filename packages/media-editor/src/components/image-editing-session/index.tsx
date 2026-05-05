@@ -6,6 +6,7 @@ import {
 	useCallback,
 	useContext,
 	useMemo,
+	useState,
 } from '@wordpress/element';
 import type { ReactNode } from 'react';
 
@@ -22,17 +23,30 @@ import {
 	type Modifier,
 } from '../media-editor-modal/build-modifiers';
 
-interface WorkingImage {
+export interface ImageEditingSessionImage {
 	src: string;
 	width: number;
 	height: number;
 }
 
+function areImagesEqual(
+	a: ImageEditingSessionImage | null,
+	b: ImageEditingSessionImage | null
+): boolean {
+	return (
+		a?.src === b?.src && a?.width === b?.width && a?.height === b?.height
+	);
+}
+
 export interface ImageEditingSession {
-	/** Current source being edited by the image session. */
-	workingImage: WorkingImage | null;
+	/** Original image source loaded into the current session. */
+	sourceImage: ImageEditingSessionImage | null;
+	/** Current image source being edited by the image session. */
+	workingImage: ImageEditingSessionImage | null;
 	/** Low-level cropper controller. */
 	cropper: UseCropperStateReturn;
+	/** Replace the source image and reset dependent image edits. */
+	setSourceImage: ( image: ImageEditingSessionImage | null ) => void;
 	/** Whether the image session has unsaved image edits. */
 	isDirty: boolean;
 	/** Whether the image session has undo history. */
@@ -49,6 +63,19 @@ export interface ImageEditingSession {
 	commitHistory: () => void;
 	/** Build the Core REST media edit modifiers for the current image state. */
 	buildSaveModifiers: () => Modifier[];
+	/**
+	 * Render the current working image to a `Blob`.
+	 *
+	 * Defaults to lossless PNG. Pass `type: 'image/jpeg'` (or `'image/webp'`)
+	 * with an optional `quality` (0–1) to produce a compressed encoding —
+	 * useful for AI vision APIs and uploads where bytes matter.
+	 *
+	 * Rejects when no source image has been loaded.
+	 */
+	getWorkingImage: ( options?: {
+		type?: string;
+		quality?: number;
+	} ) => Promise< Blob >;
 }
 
 const ImageEditingSessionContext = createContext<
@@ -61,32 +88,55 @@ export function ImageEditingSessionProvider( {
 	children: ReactNode;
 } ) {
 	const cropper = useCropperState();
+	const setCropperImage = cropper.setImage;
+	const [ sourceImage, setSourceImageState ] =
+		useState< ImageEditingSessionImage | null >( null );
 
-	const workingImage = useMemo< WorkingImage | null >( () => {
-		if ( ! cropper.state.image ) {
-			return null;
-		}
-		return {
-			src: cropper.state.image.src,
-			width: cropper.state.image.naturalWidth,
-			height: cropper.state.image.naturalHeight,
-		};
-	}, [ cropper.state.image ] );
+	const setSourceImage = useCallback(
+		( image: ImageEditingSessionImage | null ) => {
+			if ( areImagesEqual( sourceImage, image ) ) {
+				return;
+			}
+			setSourceImageState( image );
+			setCropperImage(
+				image
+					? {
+							src: image.src,
+							naturalWidth: image.width,
+							naturalHeight: image.height,
+					  }
+					: null
+			);
+		},
+		[ setCropperImage, sourceImage ]
+	);
+
+	const workingImage = sourceImage;
 
 	const buildSaveModifiers = useCallback( () => {
-		if ( ! cropper.isDirty || ! cropper.state.image ) {
+		if ( ! cropper.isDirty || ! workingImage ) {
 			return [];
 		}
 		return buildModifiers( cropper.state, {
-			width: cropper.state.image.naturalWidth,
-			height: cropper.state.image.naturalHeight,
+			width: workingImage.width,
+			height: workingImage.height,
 		} );
-	}, [ cropper.isDirty, cropper.state ] );
+	}, [ cropper.isDirty, cropper.state, workingImage ] );
+
+	const cropperGetCroppedImage = cropper.getCroppedImage;
+	const getWorkingImage = useCallback(
+		( options?: { type?: string; quality?: number } ): Promise< Blob > => {
+			return cropperGetCroppedImage( options?.type, options?.quality );
+		},
+		[ cropperGetCroppedImage ]
+	);
 
 	const session = useMemo< ImageEditingSession >(
 		() => ( {
+			sourceImage,
 			workingImage,
 			cropper,
+			setSourceImage,
 			isDirty: cropper.isDirty,
 			hasUndo: cropper.hasUndo,
 			hasRedo: cropper.hasRedo,
@@ -95,8 +145,16 @@ export function ImageEditingSessionProvider( {
 			reset: () => cropper.reset(),
 			commitHistory: cropper.commitHistory,
 			buildSaveModifiers,
+			getWorkingImage,
 		} ),
-		[ cropper, workingImage, buildSaveModifiers ]
+		[
+			cropper,
+			setSourceImage,
+			sourceImage,
+			workingImage,
+			buildSaveModifiers,
+			getWorkingImage,
+		]
 	);
 
 	return (

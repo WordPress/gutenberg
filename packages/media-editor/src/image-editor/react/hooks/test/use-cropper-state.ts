@@ -1040,6 +1040,40 @@ describe( 'useCropperState', () => {
 			expect( result.current.hasUndo ).toBe( false );
 		} );
 
+		it( 'setImage resets crop edits and clears history for a new image', () => {
+			const { result } = renderHook( () => useCropperState() );
+
+			act( () => {
+				result.current.setImage( {
+					src: 'test.jpg',
+					naturalWidth: 1000,
+					naturalHeight: 500,
+				} );
+			} );
+			act( () => {
+				result.current.setZoom( 3 );
+			} );
+			act( () => {
+				result.current.commitHistory();
+			} );
+
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.hasUndo ).toBe( true );
+
+			act( () => {
+				result.current.setImage( {
+					src: 'next.jpg',
+					naturalWidth: 1200,
+					naturalHeight: 800,
+				} );
+			} );
+
+			expect( result.current.state.zoom ).toBe( 1 );
+			expect( result.current.isDirty ).toBe( false );
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( false );
+		} );
+
 		it( 'reset is undoable and restores a clean current state', () => {
 			const { result } = renderHook( () => useCropperState() );
 			act( () => result.current.setZoom( 3 ) );

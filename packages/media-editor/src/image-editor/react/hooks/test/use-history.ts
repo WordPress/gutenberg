@@ -94,4 +94,19 @@ describe( 'useHistory', () => {
 		expect( result.current.state.value ).toBe( 1 );
 		expect( result.current.hasUndo ).toBe( false );
 	} );
+
+	it( 'clears undo and redo history', () => {
+		const { result } = renderHook( () => useNumberHistory() );
+
+		act( () => result.current.setState( { value: 1 } ) );
+		act( () => result.current.commitHistory() );
+		act( () => result.current.undo() );
+
+		expect( result.current.hasRedo ).toBe( true );
+
+		act( () => result.current.clearHistory() );
+
+		expect( result.current.hasUndo ).toBe( false );
+		expect( result.current.hasRedo ).toBe( false );
+	} );
 } );
