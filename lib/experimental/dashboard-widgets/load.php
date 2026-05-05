@@ -22,6 +22,37 @@ add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_news_widget'
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_news_widget' );
 add_action( 'dashboard_init', 'gutenberg_dashboard_widgets_register_hello_dolly_widget' );
 add_action( 'dashboard-wp-admin_init', 'gutenberg_dashboard_widgets_register_hello_dolly_widget' );
+add_action( 'admin_print_scripts', 'gutenberg_dashboard_widgets_print_config' );
+
+/**
+ * Prints dashboard widget frontend config for dashboard screens.
+ */
+function gutenberg_dashboard_widgets_print_config() {
+	$screen = get_current_screen();
+
+	if ( ! $screen ) {
+		return;
+	}
+
+	$is_dashboard_widgets_screen = in_array(
+		$screen->id,
+		array( 'dashboard', 'toplevel_page_dashboard-wp-admin' ),
+		true
+	);
+
+	if ( ! $is_dashboard_widgets_screen ) {
+		return;
+	}
+
+	$config = array(
+		'wpVersion' => explode( '-', wp_get_wp_version() )[0],
+	);
+	?>
+	<script>
+		window.wpDashboardWidgetsConfig = <?php echo wp_json_encode( $config ); ?>;
+	</script>
+	<?php
+}
 
 /**
  * Wires the `site-health` widget as a dynamic dep of the dashboard module so it
@@ -148,6 +179,7 @@ function gutenberg_dashboard_widgets_register_welcome_widget() {
 
 	if ( function_exists( 'gutenberg_register_dashboard_wp_admin_route' ) ) {
 		gutenberg_register_dashboard_wp_admin_route( '/__widget_welcome', $widget_module );
+
 	}
 }
 

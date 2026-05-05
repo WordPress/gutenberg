@@ -20,6 +20,14 @@ import { Card, IconButton, Link, Stack, Text } from '@wordpress/ui';
 import { unlock } from '../lock-unlock';
 import styles from './style.module.css';
 
+declare global {
+	interface Window {
+		wpDashboardWidgetsConfig?: {
+			wpVersion?: string;
+		};
+	}
+}
+
 const ThemeProvider: typeof ThemeProviderType =
 	unlock( themePrivateApis ).ThemeProvider;
 
@@ -253,7 +261,7 @@ function DashboardBackground() {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Welcome() {
-	const displayVersion = '7.0';
+	const displayVersion = window.wpDashboardWidgetsConfig?.wpVersion ?? '';
 	const currentTheme = useSelect(
 		( select ) => ( select( coreStore ) as any ).getCurrentTheme(),
 		[]
@@ -293,15 +301,19 @@ export default function Welcome() {
 						<Text variant="heading-2xl" render={ <h2 /> }>
 							{ __( 'Welcome to WordPress!' ) }
 						</Text>
-						<Text variant="body-xl" render={ <p /> }>
-							<Link href="about.php">
-								{ sprintf(
-									/* translators: %s: Current WordPress version. */
-									__( 'Learn more about the %s version.' ),
-									displayVersion
-								) }
-							</Link>
-						</Text>
+						{ displayVersion && (
+							<Text variant="body-xl" render={ <p /> }>
+								<Link href="about.php">
+									{ sprintf(
+										/* translators: %s: Current WordPress version. */
+										__(
+											'Learn more about the %s version.'
+										),
+										displayVersion
+									) }
+								</Link>
+							</Text>
+						) }
 					</div>
 				</div>
 			</ThemeProvider>
