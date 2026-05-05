@@ -1,18 +1,12 @@
 /**
  * External dependencies
  */
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	Suspense,
-	lazy,
-	useCallback,
-	useMemo,
-} from '@wordpress/element';
+import { Component, Suspense, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 
@@ -20,22 +14,9 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { getLazyWidgetComponent } from '../../utils/get-lazy-widget-component';
 import styles from './widget-render.module.css';
-import type {
-	DashboardWidget,
-	WidgetModule,
-	WidgetRenderProps,
-	WidgetType,
-} from '../../types';
-
-function isValidWidgetModule( module: unknown ): module is WidgetModule {
-	return (
-		typeof module === 'object' &&
-		module !== null &&
-		'default' in module &&
-		typeof ( module as { default: unknown } ).default === 'function'
-	);
-}
+import type { DashboardWidget, WidgetType } from '../../types';
 
 interface ErrorBoundaryProps {
 	children: ReactNode;
@@ -90,20 +71,9 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 	const { layout, onLayoutChange, resolveWidgetModule } =
 		useDashboardInternalContext();
 
-	const WidgetComponent = useMemo(
-		() =>
-			lazy< ComponentType< WidgetRenderProps< unknown > > >( async () => {
-				const module: unknown = await resolveWidgetModule(
-					widgetType.renderModule
-				);
-				if ( ! isValidWidgetModule( module ) ) {
-					throw new Error(
-						`Invalid widget module: ${ widgetType.renderModule }`
-					);
-				}
-				return module;
-			} ),
-		[ widgetType.renderModule, resolveWidgetModule ]
+	const WidgetComponent = getLazyWidgetComponent(
+		widgetType.renderModule,
+		resolveWidgetModule
 	);
 
 	const setAttributes = useCallback(
@@ -128,6 +98,8 @@ function WidgetRenderImpl( { widget, widgetType }: WidgetRenderInternalProps ) {
 	return (
 		<WidgetErrorBoundary>
 			<Suspense fallback={ <LoadingOverlay /> }>
+				{ /* WidgetComponent is a cached `lazy()` keyed by renderModule, so its identity stays stable across renders. */ }
+				{ /* eslint-disable-next-line react-hooks/static-components */ }
 				<WidgetComponent
 					attributes={ widget.attributes }
 					setAttributes={ setAttributes }
