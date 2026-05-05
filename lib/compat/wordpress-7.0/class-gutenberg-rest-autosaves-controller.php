@@ -92,15 +92,16 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		 * into a real draft post. If this doesn’t happen then the peers may continue to make edits
 		 * but the draft will be lost, as auto-drafts are not listed in post views.
 		 */
-		if (
+		$should_update_parent_draft_post = (
 			$is_draft &&
 			(int) $post->post_author === $user_id &&
 			! $post_lock_is_active &&
 			( ! $is_collaboration_enabled || $is_auto_draft )
-		) {
+		);
+
+		if ( $should_update_parent_draft_post ) {
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
 		} else {
-			// Non-draft posts: create or update the post autosave. Pass the metadata.
 			$autosave_id = $this->create_post_autosave( (array) $prepared_post, (array) $request->get_param( 'meta' ) );
 		}
 
