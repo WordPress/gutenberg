@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- Operators: Fix support `isAny` and `isNone` filter operators for numeric fields
+
 ## 14.2.0 (2026-04-29)
 
 ### Enhancements
