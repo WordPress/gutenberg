@@ -265,6 +265,16 @@ export function hasAttributeConflict( currentAttributes, operations ) {
 	if ( ! Array.isArray( operations ) ) {
 		return false;
 	}
+	// Inserted blocks have no pre-existing attributes — the overlay's
+	// baseline for a `block-insert-after` entry is `{}`, so every
+	// attribute-set op rides on `before: null`. Comparing that against the
+	// live (already-typed-into) block's attributes always reads as
+	// divergence, which falsely fires the staleness prompt on apply. The
+	// attribute-set ops describe the inserted block's content, not an
+	// overwrite of pre-existing data, so there is nothing to conflict with.
+	if ( findStructuralOp( operations )?.type === 'block-insert-after' ) {
+		return false;
+	}
 	for ( const op of operations ) {
 		if ( op.type !== 'attribute-set' ) {
 			continue;
