@@ -89,7 +89,7 @@ module.exports = {
 		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/257#discussion_r234978268
 		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
 		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
-		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation))',
+		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|@react-native|react-clone-referenced-element|@react-navigation|uuid))',
 	],
 	snapshotSerializers: [ '@emotion/jest/serializer' ],
 	snapshotFormat: {

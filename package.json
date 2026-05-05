@@ -109,7 +109,6 @@
 		"style-loader": "3.2.1",
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "6.0.2",
-		"uuid": "11.1.1",
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
