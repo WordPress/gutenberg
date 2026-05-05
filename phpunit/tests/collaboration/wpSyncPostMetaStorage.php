@@ -1007,6 +1007,20 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		$lineages = $this->get_storage_post_lineages( $room );
 		$this->assertCount( 1, $lineages, 'Duplicate storage lineages should be merged.' );
 
+		$copied_meta_id = (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_id FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s AND meta_value = %s ORDER BY meta_id DESC LIMIT 1",
+				$exact_post_id,
+				WP_Sync_Post_Meta_Storage::SYNC_UPDATE_META_KEY,
+				wp_json_encode( $suffixed_update )
+			)
+		);
+		$this->assertGreaterThan(
+			$active_cursor,
+			$copied_meta_id,
+			'Merged duplicate updates must be re-appended with fresh cursors.'
+		);
+
 		$updates_after_merge  = $active_reader->get_updates_after_cursor( $room, $active_cursor );
 		$payloads_after_merge = wp_list_pluck( $updates_after_merge, 'data' );
 

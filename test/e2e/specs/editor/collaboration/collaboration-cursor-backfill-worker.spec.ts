@@ -257,7 +257,7 @@ test.describe( 'Collaboration - cursor backfill race', () => {
 		);
 	} );
 
-	test( 'active session skips a repaired duplicate update behind its cursor', async ( {
+	test( 'active session receives a repaired duplicate update after its cursor', async ( {
 		admin,
 		collaborationUtils,
 		editor,
@@ -285,11 +285,11 @@ test.describe( 'Collaboration - cursor backfill race', () => {
 
 		// The active editor has now observed normal sync updates with cursors
 		// allocated after the reserved gaps. The test-only backfill below then
-		// simulates a historical duplicate lineage whose rows are repaired into
-		// canonical storage below this active cursor. Generating that old
-		// meta_id ordering from browser-only actions is the non-deterministic
-		// production race; the paragraph update itself is captured from a real
-		// editor action and then seeded into the duplicate lineage.
+		// simulates a historical duplicate lineage whose source rows are older
+		// than this active cursor. Generating that old meta_id ordering from
+		// browser-only actions is the non-deterministic production race; the
+		// paragraph update itself is captured from a real editor action and
+		// then seeded into the duplicate lineage.
 		await waitForRoomCursorGreaterThan( page, room, maxGapId );
 
 		let donorContext: BrowserContext | undefined;
@@ -384,9 +384,14 @@ test.describe( 'Collaboration - cursor backfill race', () => {
 
 			await collaborationUtils.waitForSyncCycle( page, 3 );
 
+			await expect
+				.poll( () => getBlockContents( editor ), {
+					timeout: 10000,
+				} )
+				.toContain( BACKFILLED_TEXT );
+
 			const activeContents = await getBlockContents( editor );
 			expect( activeContents ).toContain( TRIGGER_TEXT );
-			expect( activeContents ).not.toContain( BACKFILLED_TEXT );
 
 			freshContext = await admin.browser.newContext( {
 				baseURL: BASE_URL,
