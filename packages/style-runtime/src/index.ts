@@ -7,6 +7,14 @@ type GlobalScopeWithStyleRuntime = typeof globalThis & {
 
 const STYLE_HASH_ATTRIBUTE = 'data-wp-hash';
 
+/**
+ * Returns the shared style runtime registry.
+ *
+ * The registry is stored on `globalThis` so separately bundled copies of this
+ * package can coordinate through the same document and style maps.
+ *
+ * @return The shared runtime registry.
+ */
 function getRuntime() {
 	const globalScope = globalThis as GlobalScopeWithStyleRuntime;
 
@@ -26,6 +34,14 @@ function getRuntime() {
 	return globalScope.__wpStyleRuntime;
 }
 
+/**
+ * Injects a registered style into a document, unless that document already
+ * contains a style tag for the same hash.
+ *
+ * @param targetDocument Document to inject the style into.
+ * @param hash           Stable hash for the transformed CSS.
+ * @param css            CSS text to inject.
+ */
 function injectStyle( targetDocument: Document, hash: string, css: string ) {
 	if (
 		! targetDocument.head ||
@@ -42,6 +58,17 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
 	targetDocument.head.appendChild( style );
 }
 
+/**
+ * Registers a document as a style injection target.
+ *
+ * Existing registered styles are replayed into the document immediately.
+ * Documents are reference-counted so multiple providers can safely register the
+ * same document without one cleanup removing it while another registration is
+ * still active.
+ *
+ * @param targetDocument Document to receive registered styles.
+ * @return Cleanup function that unregisters this document registration.
+ */
 export function registerDocument( targetDocument: Document ) {
 	const runtime = getRuntime();
 
@@ -70,6 +97,15 @@ export function registerDocument( targetDocument: Document ) {
 	};
 }
 
+/**
+ * Registers a style and injects it into all registered documents.
+ *
+ * The hash is used as the deduplication key, so calling this repeatedly with
+ * the same hash will not add duplicate style tags to a document.
+ *
+ * @param hash Stable hash for the transformed CSS.
+ * @param css  CSS text to inject.
+ */
 export function registerStyle( hash: string, css: string ) {
 	const runtime = getRuntime();
 
