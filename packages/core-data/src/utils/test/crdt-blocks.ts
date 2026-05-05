@@ -114,13 +114,13 @@ import {
 	mergeCrdtBlocks,
 	mergeRichTextUpdate,
 	type Block,
-	type WPBlockSelection,
 	type YBlock,
 	type YBlocks,
 	type YBlockAttributes,
 } from '../crdt-blocks';
 import { getCachedRichTextData, createRichTextDataCache } from '../crdt-text';
 import { asHtmlStringIndex, asRichTextOffset } from '../crdt-utils';
+import { type WPBlockSelection } from '../../types';
 
 function createCursorSelection( offset: number ): WPBlockSelection {
 	return {
