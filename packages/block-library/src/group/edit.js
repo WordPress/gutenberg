@@ -90,7 +90,6 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const bgPosition = bgData.backgroundPosition;
 	const bgUrl = bgData.backgroundImage?.url;
 	const bgGradient = bgData.gradient;
-	const bgGradientOpacity = bgData.gradientOpacity;
 
 	// Render the background as <img> in the editor for all cover/contain images without
 	// tiling. This includes background-attachment:fixed: the editor canvas runs inside an
@@ -215,12 +214,12 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				left: '0',
 				right: '0',
 				bottom: '0',
+				zIndex: 1,
+				margin: '0',
+				maxWidth: 'none',
 				backgroundImage: resolvedGradient,
 				backgroundSize: 'cover',
 				pointerEvents: 'none',
-				...( bgGradientOpacity !== undefined
-					? { opacity: bgGradientOpacity / 100 }
-					: {} ),
 			} }
 		/>
 	);

@@ -40,6 +40,12 @@
 	&#{&} {
 		.background-block-support-panel__inner-wrapper {
 			row-gap: 0;
+
+			/* Restore vertical spacing for secondary controls (focal point,
+			   fixed background, size, repeat) that sit outside the bordered group. */
+			> *:not(.block-editor-background-panel__item) {
+				margin-top: $grid-unit-10;
+			}
 		}
 	}
 }
