@@ -15,8 +15,9 @@ const meta: Meta< typeof Field.Root > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'coming-soon',
+			status: 'use-with-caution',
 			whereUsed: 'global',
+			notes: 'Not yet recommended for use in Gutenberg core, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

@@ -20,8 +20,9 @@ const meta: Meta< typeof Icon > = {
 	],
 	parameters: {
 		componentStatus: {
-			status: 'coming-soon',
+			status: 'use-with-caution',
 			whereUsed: 'global',
+			notes: 'Not yet recommended for use in Gutenberg core, pending a general readiness review. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

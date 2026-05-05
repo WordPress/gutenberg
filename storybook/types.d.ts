@@ -7,8 +7,7 @@ declare module 'storybook/internal/types' {
 				| 'stable'
 				| 'use-with-caution'
 				| 'not-recommended'
-				| 'unaudited'
-				| 'coming-soon';
+				| 'unaudited';
 			whereUsed: 'global' | 'editor';
 			notes?: string;
 		};

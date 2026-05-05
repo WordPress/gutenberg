@@ -13,8 +13,9 @@ const meta: Meta< typeof Button > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'coming-soon',
+			status: 'use-with-caution',
 			whereUsed: 'global',
+			notes: 'Not yet recommended for use in Gutenberg core, pending review of style consistency with `@wordpress/components` and text overflow behavior. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };
