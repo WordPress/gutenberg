@@ -28,8 +28,15 @@
  *     keyboard handlers, external integrations) that wouldn't trigger a
  *     `useSelect`-based watcher.
  *
- * New blocks (no snapshot entry) are tracked but not intercepted — inserting
- * a block in Suggest mode is currently a real edit, not a suggestion.
+ * Structural changes (#77434) flow through the same subscribe loop:
+ *   - Removed blocks → re-inserted from the previous-tick snapshot at their
+ *     prior parent + index, then tagged `metadata.suggestion = pending-remove`.
+ *   - New blocks → tagged `metadata.suggestion = pending-insert` (the block
+ *     stays in the tree; the marker drives the dimmed visual treatment).
+ *   - Move detection ships in a follow-up.
+ *
+ * In every case the live block carries the marker and a corresponding
+ * structural op is written to the overlay so auto-save persists it.
  */
 /**
  * WordPress dependencies
@@ -543,9 +550,63 @@ export default function SuggestionStoreInterceptor() {
 				}
 
 				if ( previous === undefined ) {
-					// New block (inserted after Suggest activated). Track it
-					// but don't intercept.
+					// New block (inserted after Suggest mode activated):
+					// route through the apply-and-tag flow. The block stays
+					// in the live tree; auto-save persists a `block-insert-
+					// after` op against the previous-tick tree snapshot.
+					// Apply later just clears the marker (the block is
+					// already there); Reject runs `removeBlock` to undo.
+					//
+					// Skip descendants of another new block — a Group with
+					// nested children fires multiple new-block entries in a
+					// single tick, but only the top-level Group is the
+					// suggested insertion. The previous-tick tree is the
+					// reference because the active `snapshot` map is being
+					// built up in parents-first iteration order, so its
+					// presence wouldn't distinguish "pre-existing" from
+					// "already-processed-new-block" parents.
 					snapshot.set( clientId, current );
+					const parentClientId =
+						blockEditor.getBlockRootClientId?.( clientId ) || null;
+					const parentExisted =
+						parentClientId === null ||
+						tree.blocksByClientId.has( parentClientId );
+					if ( ! parentExisted ) {
+						continue;
+					}
+					const block = blockEditor.getBlock?.( clientId );
+					if ( ! block ) {
+						continue;
+					}
+					const siblingIds =
+						blockEditor.getBlockOrder?.(
+							parentClientId ?? undefined
+						) ?? [];
+					const indexInParent = siblingIds.indexOf( clientId );
+					const anchorClientId =
+						indexInParent > 0
+							? siblingIds[ indexInParent - 1 ]
+							: null;
+
+					isReverting = true;
+					try {
+						blockEditorDispatch.updateBlockAttributes( clientId, {
+							metadata: withSuggestionMarker( current?.metadata, {
+								type: 'pending-insert',
+							} ),
+						} );
+					} finally {
+						isReverting = false;
+					}
+
+					setStructuralOpRef.current?.( clientId, block.name, {
+						type: 'block-insert-after',
+						clientId,
+						blockName: block.name,
+						anchorClientId,
+						parentClientId,
+						block,
+					} );
 					continue;
 				}
 

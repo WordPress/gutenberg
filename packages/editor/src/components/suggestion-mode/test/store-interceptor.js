@@ -505,6 +505,101 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			'pending-remove'
 		);
 	} );
+
+	it( 'tags a newly-inserted block with metadata.suggestion = pending-insert and writes a block-insert-after op', async () => {
+		// Inserting a block in Suggest mode now flows through the apply-
+		// and-tag pipeline: the block stays at its inserted position; the
+		// marker drives the dimmed visual treatment; auto-save persists
+		// the structural op as a `block-insert-after` comment. Apply
+		// later just clears the marker, Reject runs `removeBlock` to
+		// undo.
+		const { registry, clientId, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 2 );
+		const newBlock = liveBlocks[ 1 ];
+		expect( newBlock.clientId ).toBe( inserted.clientId );
+		expect( newBlock.attributes?.metadata?.suggestion ).toEqual( {
+			type: 'pending-insert',
+		} );
+
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			clientId: inserted.clientId,
+			blockName: TEST_BLOCK_NAME,
+			anchorClientId: clientId,
+			parentClientId: null,
+		} );
+	} );
+
+	it( 'records a null anchor when the inserted block lands at index 0 (no previous sibling)', async () => {
+		const { registry, getOverlay } = setup();
+
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'First' } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 0, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks[ 0 ].clientId ).toBe( inserted.clientId );
+		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-insert'
+		);
+		expect(
+			getOverlay().entries[ inserted.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-insert-after',
+			anchorClientId: null,
+			parentClientId: null,
+		} );
+	} );
+
+	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
+		// A Group block with a child paragraph dispatches both as new in
+		// the same tick. The interceptor must tag only the top-level
+		// Group as pending-insert; the child rides along inside the
+		// captured snapshot.
+		const { registry } = setup();
+
+		const child = createBlock( TEST_BLOCK_NAME, { content: 'Child' } );
+		const parent = createBlock( TEST_BLOCK_NAME, { content: 'Parent' }, [
+			child,
+		] );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( parent, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		const insertedRoot = registry
+			.select( blockEditorStore )
+			.getBlock( parent.clientId );
+		expect( insertedRoot?.attributes?.metadata?.suggestion?.type ).toBe(
+			'pending-insert'
+		);
+		const insertedChild = registry
+			.select( blockEditorStore )
+			.getBlock( child.clientId );
+		// Child must NOT be tagged — its parent's marker covers the whole
+		// subtree.
+		expect(
+			insertedChild?.attributes?.metadata?.suggestion
+		).toBeUndefined();
+	} );
 } );
 
 describe( 'isAcceptedSuggestionChange', () => {
