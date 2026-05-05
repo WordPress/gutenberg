@@ -18,6 +18,7 @@ export const LayoutTableComponent = ( {
 	groupBy = false,
 	groupByLabel = true,
 	perPageSizes = [ 10, 25, 50, 100 ],
+	showLevels = false,
 	showMedia = true,
 }: {
 	backgroundColor?: string;
@@ -25,6 +26,7 @@ export const LayoutTableComponent = ( {
 	groupBy?: boolean;
 	groupByLabel?: boolean;
 	perPageSizes?: number[];
+	showLevels?: boolean;
 	showMedia?: boolean;
 } ) => {
 	const [ view, setView ] = useState< View >( {
@@ -38,6 +40,7 @@ export const LayoutTableComponent = ( {
 		titleField: 'title',
 		descriptionField: 'description',
 		mediaField: 'image',
+		showLevels,
 		showMedia,
 	} );
 
@@ -52,10 +55,11 @@ export const LayoutTableComponent = ( {
 							showLabel: groupByLabel,
 					  }
 					: undefined,
+				showLevels,
 				showMedia,
 			};
 		} );
-	}, [ groupBy, groupByLabel, showMedia ] );
+	}, [ groupBy, groupByLabel, showLevels, showMedia ] );
 
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
@@ -69,6 +73,9 @@ export const LayoutTableComponent = ( {
 		>
 			<DataViews
 				getItemId={ ( item ) => item.id.toString() }
+				getItemLevel={ ( item ) =>
+					item.categories.includes( 'Satellite' ) ? 1 : 0
+				}
 				paginationInfo={ paginationInfo }
 				data={ shownData }
 				view={ view }

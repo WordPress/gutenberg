@@ -65,6 +65,7 @@ export const LayoutTable = {
 		groupByLabel: true,
 		hasClickableItems: true,
 		perPageSizes: [ 10, 25, 50, 100 ],
+		showLevels: false,
 		showMedia: true,
 	},
 	argTypes: {
@@ -88,6 +89,10 @@ export const LayoutTable = {
 		perPageSizes: {
 			control: 'object',
 			description: 'Array of available page sizes',
+		},
+		showLevels: {
+			control: 'boolean',
+			description: 'Whether to show hierarchical levels',
 		},
 		showMedia: {
 			control: 'boolean',
