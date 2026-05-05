@@ -9,6 +9,7 @@ import clsx from 'clsx';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +20,8 @@ import * as Styled from '../custom-select-control-v2/styles';
 import type { CustomSelectProps, CustomSelectOption } from './types';
 import { VisuallyHidden } from '../visually-hidden';
 import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
+import { useSlot } from '../slot-fill';
+import { SLOT_NAME as POPOVER_SLOT_NAME } from '../popover';
 
 function useDeprecatedProps< T extends CustomSelectOption >( {
 	__experimentalShowSelectedHint,
@@ -65,6 +68,7 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		value,
 		className: classNameProp,
 		showSelectedHint = false,
+		inline = false,
 		...restProps
 	} = useDeprecatedProps( props );
 
@@ -187,6 +191,19 @@ function CustomSelectControl< T extends CustomSelectOption >(
 		return size;
 	} )();
 
+	// Portal into the registered `Popover.Slot` so the dropdown escapes the
+	// ancestor stacking contexts (e.g. the block toolbar) and `overflow`
+	// containers (e.g. the Style Panel) of the trigger. Falls back to the
+	// document `body` when no slot is registered, matching how the rest of
+	// `@wordpress/components` overlays behave. Consumers can opt back into
+	// inline rendering via the `inline` prop.
+	const popoverSlot = useSlot( POPOVER_SLOT_NAME );
+	const portalElement = useCallback(
+		( element: HTMLElement ) =>
+			popoverSlot.ref?.current ?? element.ownerDocument.body,
+		[ popoverSlot.ref ]
+	);
+
 	return (
 		<>
 			<CustomSelect
@@ -200,6 +217,8 @@ function CustomSelectControl< T extends CustomSelectOption >(
 					classNameProp
 				) }
 				isLegacy
+				portal={ ! inline }
+				portalElement={ inline ? undefined : portalElement }
 				{ ...restProps }
 			>
 				{ children }

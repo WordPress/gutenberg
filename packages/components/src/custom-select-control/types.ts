@@ -127,4 +127,17 @@ export type CustomSelectProps< T extends CustomSelectOption > = {
 	 * @ignore
 	 */
 	__shouldNotWarnDeprecated36pxSize?: boolean;
+	/**
+	 * By default, the dropdown popover is portaled into the registered
+	 * `Popover.Slot` (or, when no slot is registered, into the document
+	 * `body`). Portaling allows the popover to escape ancestor stacking
+	 * contexts and `overflow` containers, which prevents it from being
+	 * clipped or covered by sticky elements like the block toolbar.
+	 *
+	 * Set this to `true` to opt back into the previous inline rendering,
+	 * where the popover is rendered next to the trigger in the DOM tree.
+	 *
+	 * @default false
+	 */
+	inline?: boolean;
 };

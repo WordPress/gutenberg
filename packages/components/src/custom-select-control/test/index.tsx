@@ -694,6 +694,45 @@ describe.each( [
 	} );
 } );
 
+describe( 'Portaling', () => {
+	/* These tests intentionally assert on DOM tree position to verify the
+	 * popover is portaled (or not) relative to the trigger's wrapper. */
+	/* eslint-disable testing-library/no-node-access */
+	it( 'portals the dropdown listbox outside the trigger wrapper by default', async () => {
+		await render( <UncontrolledCustomSelectControl { ...props } /> );
+
+		const trigger = screen.getByRole( 'combobox', { expanded: false } );
+		const triggerWrapper = trigger.closest(
+			'.components-custom-select-control'
+		);
+		expect( triggerWrapper ).not.toBeNull();
+
+		await click( trigger );
+
+		const listbox = screen.getByRole( 'listbox', { name: props.label } );
+		expect( listbox ).toBeVisible();
+		expect( triggerWrapper?.contains( listbox ) ).toBe( false );
+		expect( document.body.contains( listbox ) ).toBe( true );
+	} );
+
+	it( 'renders the dropdown listbox inline when `inline` is enabled', async () => {
+		await render( <UncontrolledCustomSelectControl { ...props } inline /> );
+
+		const trigger = screen.getByRole( 'combobox', { expanded: false } );
+		const triggerWrapper = trigger.closest(
+			'.components-custom-select-control'
+		);
+		expect( triggerWrapper ).not.toBeNull();
+
+		await click( trigger );
+
+		const listbox = screen.getByRole( 'listbox', { name: props.label } );
+		expect( listbox ).toBeVisible();
+		expect( triggerWrapper?.contains( listbox ) ).toBe( true );
+	} );
+	/* eslint-enable testing-library/no-node-access */
+} );
+
 describe( 'Type checking', () => {
 	// eslint-disable-next-line jest/expect-expect
 	it( 'should infer the value type from available `options`, but not the `value` or `onChange` prop', () => {

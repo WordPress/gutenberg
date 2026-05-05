@@ -99,6 +99,8 @@ function CustomSelect(
 		store,
 		className,
 		isLegacy = false,
+		portal,
+		portalElement,
 		...restProps
 	} = props;
 
@@ -113,6 +115,13 @@ function CustomSelect(
 		);
 
 	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
+
+	// The legacy adapter historically disabled flipping to mask a stacking
+	// context glitch with the block toolbar (see #63180/#63357). When the
+	// popover is portaled, that workaround is no longer needed because the
+	// popover escapes ancestor stacking contexts; let Floating UI flip
+	// near viewport edges, which is also the right thing for #76126.
+	const flip = isLegacy && ! portal ? false : undefined;
 
 	return (
 		// Where should `restProps` be forwarded to?
@@ -149,8 +158,9 @@ function CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
-					// Match legacy behavior
-					flip={ ! isLegacy }
+					flip={ flip }
+					portal={ portal }
+					portalElement={ portalElement }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }

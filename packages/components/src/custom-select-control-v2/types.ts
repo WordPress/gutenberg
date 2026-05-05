@@ -77,6 +77,21 @@ export type _CustomSelectProps = CustomSelectButtonProps & {
 	 * Accessible label for the control.
 	 */
 	label: string;
+	/**
+	 * Determines whether the dropdown popover should be rendered as a React
+	 * Portal. When portaled, the popover escapes ancestor stacking contexts
+	 * and `overflow` containers, but consumers lose the ability to target it
+	 * via descendant selectors.
+	 *
+	 * @default false
+	 */
+	portal?: Ariakit.SelectPopoverProps[ 'portal' ];
+	/**
+	 * The DOM element (or a memoized callback returning one) into which the
+	 * popover should be rendered when `portal` is `true`. When omitted, the
+	 * popover is appended to the document `body`.
+	 */
+	portalElement?: Ariakit.SelectPopoverProps[ 'portalElement' ];
 };
 
 export type CustomSelectProps = _CustomSelectProps & CustomSelectSize;
