@@ -2,10 +2,11 @@
 
 Private to `@wordpress/media-editor`. A horizontal ruler-slider for
 fine-grained numeric values (used for fine-tune rotation in the media
-editor toolbar). Drag the ruler to scrub; the current value sits under
-a fixed center pointer with an always-visible bubble. A visually
+editor toolbar). Drag the ruler to scrub; the current value is shown
+in an active label sitting over the centered pointer triangle, with
+labelled major ticks running through the strip behind it. A visually
 hidden `<input type="range">` underneath provides keyboard access and
-accessibility.
+accessibility. Drag values quantize to multiples of `step`.
 
 ## Usage
 
@@ -27,7 +28,7 @@ clamp/transform values as they wish before passing them in.
 
 ## Keyboard
 
-- **← / →** — ±step
-- **Shift + ← / →** — ±step / 2
+- **← / ↓** — decrement by `step`
+- **→ / ↑** — increment by `step`
 - **Home / End** — min / max
 - **PageUp / PageDown** — ±10% of range (native input behaviour)
