@@ -97,13 +97,21 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	// viewport (often rendering it off-screen), so <img> is a better editor preview.
 	// The PHP renderer handles background-attachment:fixed correctly on the frontend via
 	// CSS (see lib/block-supports/background.php $use_img_element logic).
-	// Skip <img> when a gradient is also set — the gradient needs CSS background-image
-	// and both layers must stack via CSS (url(...), gradient(...)) rather than <img>.
+	// When a gradient is also set, it is rendered as a separate overlay <div> (see
+	// bgGradientOverlayElement below) so the image still benefits from srcset.
 	const useImgElement =
 		!! bgImageId &&
 		[ 'cover', 'contain' ].includes( bgSize ) &&
-		( ! bgRepeat || bgRepeat === 'no-repeat' ) &&
-		! bgGradient;
+		( ! bgRepeat || bgRepeat === 'no-repeat' );
+
+	// Resolve 'var:preset|gradient|slug' to a CSS variable the browser can evaluate.
+	// Raw CSS gradient values (e.g. 'linear-gradient(...)') pass through unchanged.
+	const resolvedGradient = bgGradient
+		? bgGradient.replace(
+				/^var:preset\|gradient\|(.+)$/,
+				'var(--wp--preset--gradient--$1)'
+		  )
+		: null;
 
 	// When using <img>, strip background-* CSS from wrapper and add position:relative.
 	const resolvedBlockProps = useImgElement
@@ -192,6 +200,27 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 		/>
 	);
 
+	// Gradient overlay — rendered as a sibling <div> when both image and gradient
+	// are set. The CSS rule `.wp-block-group > .wp-block__background-image ~ *`
+	// gives this element z-index:1 (above the img) while inner content, which comes
+	// later in DOM order, also gets z-index:1 and therefore paints above the gradient.
+	const bgGradientOverlayElement = useImgElement && resolvedGradient && (
+		<div
+			aria-hidden="true"
+			className="wp-block__background-gradient"
+			style={ {
+				position: 'absolute',
+				top: '0',
+				left: '0',
+				right: '0',
+				bottom: '0',
+				backgroundImage: resolvedGradient,
+				backgroundSize: 'cover',
+				pointerEvents: 'none',
+			} }
+		/>
+	);
+
 	return (
 		<>
 			<GroupEditControls
@@ -221,6 +250,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				! showPlaceholder && (
 					<TagName { ...resolvedBlockProps }>
 						{ bgImgElement }
+						{ bgGradientOverlayElement }
 						<div { ...innerBlocksProps } />
 					</TagName>
 				) }

@@ -95,8 +95,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$attachment_id > 0 &&
 		in_array( $background_styles['backgroundSize'], array( 'cover', 'contain' ), true ) &&
 		( empty( $background_styles['backgroundRepeat'] ) || 'no-repeat' === $background_styles['backgroundRepeat'] ) &&
-		empty( $background_styles['backgroundAttachment'] ) &&
-		empty( $background_styles['gradient'] )
+		empty( $background_styles['backgroundAttachment'] )
 	);
 
 	if ( $use_img_element ) {
@@ -146,11 +145,30 @@ function gutenberg_render_background_support( $block_content, $block ) {
 			}
 			$modified_content = $tags->get_updated_html();
 
-			// Insert the img as the first child of the wrapper element.
+			/*
+			 * When a gradient is also set, render it as a sibling overlay div so
+			 * the image can use srcset/lazy-loading while the gradient sits on top.
+			 * The CSS rule `.wp-block-group > .wp-block__background-image ~ *`
+			 * (style.scss) gives subsequent siblings z-index:1, keeping the gradient
+			 * above the image and inner content above the gradient.
+			 */
+			$gradient_overlay_html = '';
+			if ( ! empty( $background_styles['gradient'] ) ) {
+				$gradient_value = $background_styles['gradient'];
+				// Resolve 'var:preset|gradient|slug' → 'var(--wp--preset--gradient--slug)'.
+				$gradient_value        = preg_replace(
+					'/^var:preset\|gradient\|(.+)$/',
+					'var(--wp--preset--gradient--$1)',
+					$gradient_value
+				);
+				$gradient_overlay_html = '<div aria-hidden="true" class="wp-block__background-gradient" style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:' . esc_attr( $gradient_value ) . ';background-size:cover;pointer-events:none;"></div>';
+			}
+
+			// Insert the img (and optional gradient overlay) as the first children of the wrapper element.
 			$open_tag_pattern = sprintf( '/^(\s*<%s\b[^>]*>)/i', preg_quote( $tag_name, '/' ) );
 			if ( 1 === preg_match( $open_tag_pattern, $modified_content, $matches, PREG_OFFSET_CAPTURE ) ) {
 				$insert_at        = $matches[0][1] + strlen( $matches[0][0] );
-				$modified_content = substr( $modified_content, 0, $insert_at ) . $img_html . substr( $modified_content, $insert_at );
+				$modified_content = substr( $modified_content, 0, $insert_at ) . $img_html . $gradient_overlay_html . substr( $modified_content, $insert_at );
 			}
 
 			return $modified_content;

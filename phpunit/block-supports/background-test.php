@@ -391,16 +391,15 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that when both a media-library image and a gradient are set,
-	 * the renderer stays on the CSS path so the gradient is not lost.
-	 * Previously, a real attachment ID would trigger the img path and the
-	 * early return would drop the gradient CSS entirely.
+	 * Tests that when both a media-library image and a gradient are set, the renderer
+	 * injects an <img> for srcset/lazy-loading AND a separate gradient overlay <div>,
+	 * so the gradient does not suppress the image's performance benefits.
 	 *
 	 * @covers ::gutenberg_render_background_support
 	 */
-	public function test_background_gradient_prevents_img_element() {
+	public function test_background_gradient_and_img_element_rendered_separately() {
 		switch_theme( 'block-theme-child-with-fluid-typography' );
-		$this->test_block_name = 'test/background-img-gradient-fallback';
+		$this->test_block_name = 'test/background-img-gradient-overlay';
 
 		$attachment_id = self::factory()->attachment->create_upload_object(
 			DIR_TESTDATA . '/images/canola.jpg',
@@ -444,10 +443,12 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 
 		$actual = gutenberg_render_background_support( '<div>Content</div>', $block );
 
-		$this->assertStringNotContainsString( '<img', $actual, 'Gradient + image should not inject an img element.' );
-		$this->assertStringContainsString( 'background-image:', $actual, 'Output should contain CSS background-image for gradient.' );
-		$this->assertStringContainsString( 'linear-gradient', $actual, 'Output should include gradient CSS value.' );
+		$this->assertStringContainsString( '<img', $actual, 'Output should contain an img element for srcset.' );
+		$this->assertStringNotContainsString( 'background-image:', $actual, 'Wrapper should not have CSS background-image (image handled by <img>).' );
+		$this->assertStringContainsString( 'wp-block__background-gradient', $actual, 'Output should include gradient overlay div.' );
+		$this->assertStringContainsString( 'linear-gradient', $actual, 'Gradient overlay should include gradient CSS value.' );
 		$this->assertStringContainsString( 'has-background', $actual, 'Wrapper should have has-background class.' );
+		$this->assertStringContainsString( 'position:relative', $actual, 'Wrapper should have position:relative style.' );
 
 		wp_delete_attachment( $attachment_id, true );
 	}
