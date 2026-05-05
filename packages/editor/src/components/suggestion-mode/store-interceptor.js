@@ -696,24 +696,31 @@ export default function SuggestionStoreInterceptor() {
 			const removedIds = [];
 			for ( const clientId of tree.blocksByClientId.keys() ) {
 				if ( ! live.has( clientId ) ) {
-					// "Apply landing": when another client accepts a
-					// `pending-remove` suggestion, the resulting
-					// `removeBlock` arrives here through sync —
-					// typically batched with the marker-clearing
-					// `updateBlockAttributes` into a single block-
-					// editor update, which fires this subscriber
-					// once. The previous-tick tree snapshot still
-					// carries the pending marker, so we can recognize
-					// the disappearance as the apply landing rather
-					// than a fresh user delete. Adopt the removal:
-					// drop the snapshot entry and skip the re-insert
-					// + re-tag path. Without this, the apply bounces
-					// back through sync and undoes the removal on the
-					// accepting client a moment after they clicked.
+					// "Apply / reject landing": when another client
+					// accepts a `pending-remove` — or rejects a
+					// `pending-insert`, which also dispatches
+					// `removeBlock` to undo the insert — the
+					// resulting `removeBlock` arrives here through
+					// sync, typically batched with the marker-
+					// clearing `updateBlockAttributes` into a
+					// single block-editor update, which fires
+					// this subscriber once. The previous-tick
+					// tree snapshot still carries the pending
+					// marker, so we can recognize the
+					// disappearance as the suggestion landing
+					// rather than a fresh user delete. Adopt the
+					// removal: drop the snapshot entry and skip
+					// the re-insert + re-tag path. Without this,
+					// the apply / reject bounces back through
+					// sync and undoes the change on the accepting
+					// client a moment after they clicked.
 					const trackedMarker =
 						tree.blocksByClientId.get( clientId )?.attributes
 							?.metadata?.suggestion?.type;
-					if ( trackedMarker === 'pending-remove' ) {
+					if (
+						trackedMarker === 'pending-remove' ||
+						trackedMarker === 'pending-insert'
+					) {
 						snapshot.delete( clientId );
 						continue;
 					}
