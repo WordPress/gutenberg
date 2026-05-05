@@ -12,7 +12,7 @@ import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 
 // Dashboard is still experimental.
 
-import { Card, EmptyState, Link } from '@wordpress/ui';
+import { EmptyState, Link, Stack } from '@wordpress/ui';
 import type { View, Field } from '@wordpress/dataviews';
 import type { Post, Comment } from '@wordpress/core-data';
 
@@ -147,47 +147,68 @@ const DEFAULT_VIEW: View = {
 	},
 };
 
+const FUTURE_POSTS_QUERY = {
+	status: 'future',
+	orderby: 'date',
+	order: 'asc',
+	per_page: 5,
+};
+
+const RECENT_POSTS_QUERY = {
+	status: 'publish',
+	orderby: 'date',
+	order: 'desc',
+	per_page: 5,
+};
+
+const COMMENTS_QUERY = {
+	per_page: 5,
+};
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function Activity() {
 	const [ view, setView ] = useState< View >( DEFAULT_VIEW );
+	const { futurePosts, recentPosts, comments, isResolved } = useSelect(
+		( select ) => {
+			const coreData = select( coreStore );
 
-	const futurePosts = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< Post >( 'postType', 'post', {
-				status: 'future',
-				orderby: 'date',
-				order: 'asc',
-				per_page: 5,
-			} ),
+			return {
+				futurePosts: coreData.getEntityRecords< Post >(
+					'postType',
+					'post',
+					FUTURE_POSTS_QUERY
+				),
+				recentPosts: coreData.getEntityRecords< Post >(
+					'postType',
+					'post',
+					RECENT_POSTS_QUERY
+				),
+				comments: coreData.getEntityRecords< Comment >(
+					'root',
+					'comment',
+					COMMENTS_QUERY
+				),
+				isResolved:
+					coreData.hasFinishedResolution( 'getEntityRecords', [
+						'postType',
+						'post',
+						FUTURE_POSTS_QUERY,
+					] ) &&
+					coreData.hasFinishedResolution( 'getEntityRecords', [
+						'postType',
+						'post',
+						RECENT_POSTS_QUERY,
+					] ) &&
+					coreData.hasFinishedResolution( 'getEntityRecords', [
+						'root',
+						'comment',
+						COMMENTS_QUERY,
+					] ),
+			};
+		},
 		[]
 	);
-
-	const recentPosts = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< Post >( 'postType', 'post', {
-				status: 'publish',
-				orderby: 'date',
-				order: 'desc',
-				per_page: 5,
-			} ),
-		[]
-	);
-
-	const comments = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecords< Comment >(
-				'root',
-				'comment',
-				{ per_page: 5 }
-			),
-		[]
-	);
-
-	const isResolved =
-		futurePosts !== undefined &&
-		recentPosts !== undefined &&
-		comments !== undefined;
 
 	const allEvents = useMemo< ActivityEvent[] >( () => {
 		const events: ActivityEvent[] = [];
@@ -235,54 +256,57 @@ export default function Activity() {
 	);
 
 	if ( ! isResolved ) {
-		return <Spinner />;
+		return (
+			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+				<Spinner />
+			</Stack>
+		);
 	}
 
 	if ( allEvents.length === 0 ) {
 		return (
-			<EmptyState.Root>
-				<EmptyState.Title>
-					{ __( 'No activity yet.' ) }
-				</EmptyState.Title>
-				<EmptyState.Description>
-					{ __(
-						'When you publish posts or receive comments, they will appear here.'
-					) }
-				</EmptyState.Description>
-			</EmptyState.Root>
+			<Stack align="center" justify="center" style={ { minHeight: 220 } }>
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ postList } />
+					<EmptyState.Title>
+						{ __( 'No activity yet.' ) }
+					</EmptyState.Title>
+					<EmptyState.Description>
+						{ __(
+							'When you publish posts or receive comments, they will appear here.'
+						) }
+					</EmptyState.Description>
+				</EmptyState.Root>
+			</Stack>
 		);
 	}
 
 	return (
-		<Card.Content>
-			<Card.FullBleed>
-				<DataViews
-					data={ shownData }
-					fields={ FIELDS }
-					view={ view }
-					onChangeView={ setView }
-					paginationInfo={ paginationInfo }
-					getItemId={ ( item ) => item.id }
-					search={ false }
-					isLoading={ false }
-					defaultLayouts={ {
-						activity: {
-							sort: {
-								field: 'datetime',
-								direction: 'desc',
-							},
-						},
-					} }
-					renderItemLink={ ( { item, children, ...aProps } ) => (
-						<Link href={ item.link } { ...aProps }>
-							{ children }
-						</Link>
-					) }
-					isItemClickable={ ( item ) => !! item.link }
-				>
-					<DataViews.Layout />
-				</DataViews>
-			</Card.FullBleed>
-		</Card.Content>
+		<DataViews
+			data={ shownData }
+			fields={ FIELDS }
+			view={ view }
+			onChangeView={ setView }
+			paginationInfo={ paginationInfo }
+			getItemId={ ( item ) => item.id }
+			search={ false }
+			isLoading={ false }
+			defaultLayouts={ {
+				activity: {
+					sort: {
+						field: 'datetime',
+						direction: 'desc',
+					},
+				},
+			} }
+			renderItemLink={ ( { item, children, ...aProps } ) => (
+				<Link href={ item.link } { ...aProps }>
+					{ children }
+				</Link>
+			) }
+			isItemClickable={ ( item ) => !! item.link }
+		>
+			<DataViews.Layout />
+		</DataViews>
 	);
 }
