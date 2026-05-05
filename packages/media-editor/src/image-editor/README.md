@@ -108,11 +108,11 @@ Same as `getSourceRegion` but returns percentages (0–100): `{ x, y, width, hei
 
 ### Crop geometry
 
-Validity is always relative to an explicit bounds object. `layoutBounds` answers what fits in the current cropper layout without changing zoom or pan; it is separate from absolute source-image bounds or a future auto-zoom resize operation. Consumers can build their own `CropPixelRectBounds` and pass them to the clamp/validation helpers.
+Validity is always relative to an explicit bounds object. `bounds.image` answers what fits within the same image bounds used by manual crop resizing. Future viewport/layout limits can be exposed alongside it as `bounds.viewport` without changing the clamp/validation helpers. Consumers can build their own `CropPixelRectBounds` and pass them to those helpers.
 
 #### `useCropGeometry(): UseCropGeometryReturn`
 
-Returns the current crop pixel rectangle, current-layout bounds, and source region once the cropper has loaded image and layout geometry. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
+Returns the current crop pixel rectangle, bounds grouped by source, and source region once the cropper has loaded image and measured geometry. The hook intentionally exposes facts about the current cropper state, not operation-specific commands.
 
 #### `getCropPixelRect( state, imageSize ): CropPixelRect`
 
@@ -164,7 +164,7 @@ Applies a single operation to an existing state.
 | ----------------------- | --------------------------------------------------------------------------------- |
 | `CropperState`          | `{ image, pan, zoom, rotation, flip, cropRect, basePan, baseZoom, baseRotation }` |
 | `UseCropperStateReturn` | The full shape returned by `useCropperState()`: state + setters                   |
-| `UseCropGeometryReturn` | Current crop geometry hook result: readiness, rect, layout bounds, source region, snapshot |
+| `UseCropGeometryReturn` | Current crop geometry hook result: readiness, rect, bounds, source region, snapshot |
 | `CropperProps`          | Props for the `<Cropper>` component                                               |
 | `StencilProps`          | Contract for pluggable stencil components                                         |
 | `TransformOperation`    | `{ type: 'crop' \| 'rotate' \| 'flip' \| 'zoom', ... }`                           |
@@ -174,11 +174,13 @@ Applies a single operation to an existing state.
 | `Flip`                  | `{ horizontal: boolean, vertical: boolean }`                                      |
 | `SourceRegion`          | `{ x, y, width, height, rotation, flip, zoom }` in source pixels                  |
 | `SourceRegionPercent`   | `{ x, y, width, height }` as percentages (0–100)                                  |
-| `CropGeometrySnapshot`  | `{ rect, layoutBounds, sourceRegion }` for current crop geometry                  |
+| `CropGeometryBounds`    | `{ image, viewport }` bounds grouped by source                                    |
+| `CropGeometrySnapshot`  | `{ rect, bounds, sourceRegion }` for current crop geometry                        |
 | `CropPixelRect`         | `{ left, top, width, height, right, bottom }` in snap-rotation pixels             |
 | `CropPixelRectInput`    | Consumer-proposed `{ left, top, width, height }` before derived edges are added   |
 | `CropPixelRectBounds`   | Generic edge and size limits in snap-rotation pixels                              |
-| `CropPixelLayoutBounds` | Current-layout limits for the current zoom, pan, rotation, and measured canvas    |
+| `CropPixelImageBounds`  | Image limits in snap-rotation pixels, matching manual resize bounds               |
+| `CropPixelViewportBounds` | Optional viewport/layout limits in snap-rotation pixels                        |
 | `CropPixelRectValidationResult` | `{ isValid, rect, violations }` returned by crop pixel validation         |
 | `CropPixelRectViolation` | String reason returned by crop pixel validation, including `precision-clamped`   |
 | `AspectRatioPreset`     | `{ label: string, value: number }`                                                |

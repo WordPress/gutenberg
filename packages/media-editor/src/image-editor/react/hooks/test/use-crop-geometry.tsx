@@ -13,10 +13,10 @@ import { useEffect } from '@wordpress/element';
  */
 import { DEFAULT_STATE } from '../../../core/constants';
 import type { CropperState } from '../../../core/types';
-import type { CropperLayoutGeometry } from '../../../core/crop-geometry';
+import type { MeasuredCropperGeometry } from '../../../core/crop-geometry';
 import {
 	CropperProvider,
-	useSetCropperLayoutGeometry,
+	useSetMeasuredCropperGeometry,
 } from '../../components/cropper-provider';
 import { useCropGeometry } from '../use-crop-geometry';
 
@@ -26,11 +26,11 @@ const IMAGE = {
 	naturalHeight: 500,
 };
 
-const GEOMETRY: CropperLayoutGeometry = {
+const GEOMETRY: MeasuredCropperGeometry = {
 	canvasSize: { width: 1000, height: 500 },
 	elementSize: { width: 1000, height: 500 },
 	visualSize: { width: 1000, height: 500 },
-	cropBounds: { minX: 0, minY: 0, maxX: 1, maxY: 1 },
+	imageBounds: { minX: 0, minY: 0, maxX: 1, maxY: 1 },
 };
 
 const INITIAL_STATE: Partial< CropperState > = {
@@ -41,9 +41,9 @@ const INITIAL_STATE: Partial< CropperState > = {
 function GeometryPublisher( {
 	geometry,
 }: {
-	geometry: CropperLayoutGeometry;
+	geometry: MeasuredCropperGeometry;
 } ) {
-	const setGeometry = useSetCropperLayoutGeometry();
+	const setGeometry = useSetMeasuredCropperGeometry();
 
 	useEffect( () => {
 		setGeometry( geometry );
@@ -60,7 +60,7 @@ function createWrapper( {
 	geometry,
 }: {
 	initialState?: Partial< CropperState >;
-	geometry?: CropperLayoutGeometry;
+	geometry?: MeasuredCropperGeometry;
 } = {} ) {
 	return function Wrapper( { children }: { children: React.ReactNode } ) {
 		return (
@@ -85,7 +85,7 @@ describe( 'useCropGeometry', () => {
 			expect( result.current.isReady ).toBe( false );
 		} );
 		expect( result.current.rect ).toBeNull();
-		expect( result.current.layoutBounds ).toBeNull();
+		expect( result.current.bounds ).toBeNull();
 		expect( result.current.sourceRegion ).toBeNull();
 		expect( result.current.snapshot ).toBeNull();
 	} );
@@ -97,10 +97,10 @@ describe( 'useCropGeometry', () => {
 
 		expect( result.current.isReady ).toBe( false );
 		expect( result.current.rect ).toBeNull();
-		expect( result.current.layoutBounds ).toBeNull();
+		expect( result.current.bounds ).toBeNull();
 	} );
 
-	it( 'returns the current crop pixels, layout bounds, and source region after geometry is published', async () => {
+	it( 'returns the current crop pixels, image bounds, and source region after geometry is published', async () => {
 		const { result } = renderHook( () => useCropGeometry(), {
 			wrapper: createWrapper( { geometry: GEOMETRY } ),
 		} );
@@ -112,8 +112,9 @@ describe( 'useCropGeometry', () => {
 		expect( result.current.rect?.left ).toBeCloseTo( 200 );
 		expect( result.current.rect?.top ).toBeCloseTo( 100 );
 		expect( result.current.rect?.width ).toBeCloseTo( 400 );
-		expect( result.current.layoutBounds?.maxRight ).toBeCloseTo( 1000 );
-		expect( result.current.layoutBounds?.minWidth ).toBeCloseTo( 50 );
+		expect( result.current.bounds?.image.maxRight ).toBeCloseTo( 1000 );
+		expect( result.current.bounds?.image.minWidth ).toBeCloseTo( 50 );
+		expect( result.current.bounds?.viewport ).toBeNull();
 		expect( result.current.sourceRegion?.width ).toBeCloseTo( 400 );
 		expect( result.current.snapshot?.rect.left ).toBeCloseTo( 200 );
 	} );

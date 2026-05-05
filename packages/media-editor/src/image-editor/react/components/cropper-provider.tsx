@@ -16,7 +16,7 @@ import {
 	type UseCropperStateReturn,
 } from '../hooks/use-cropper-state';
 import type { CropperState } from '../../core/types';
-import type { CropperLayoutGeometry } from '../../core/crop-geometry';
+import type { MeasuredCropperGeometry } from '../../core/crop-geometry';
 
 /**
  * The context value type for the CropperProvider.
@@ -26,18 +26,18 @@ type CropperContextValue = UseCropperStateReturn | null;
 
 const CropperContext = createContext< CropperContextValue >( null );
 
-type CropperLayoutGeometryContextValue = {
-	geometry: CropperLayoutGeometry | null;
+type MeasuredCropperGeometryContextValue = {
+	geometry: MeasuredCropperGeometry | null;
 	setGeometry: React.Dispatch<
-		React.SetStateAction< CropperLayoutGeometry | null >
+		React.SetStateAction< MeasuredCropperGeometry | null >
 	>;
 } | null;
 
-const CropperLayoutGeometryContext =
-	createContext< CropperLayoutGeometryContextValue >( null );
+const MeasuredCropperGeometryContext =
+	createContext< MeasuredCropperGeometryContextValue >( null );
 
 const noopSetGeometry: React.Dispatch<
-	React.SetStateAction< CropperLayoutGeometry | null >
+	React.SetStateAction< MeasuredCropperGeometry | null >
 > = () => {};
 
 /**
@@ -66,9 +66,8 @@ export function CropperProvider( {
 	children,
 }: CropperProviderProps ) {
 	const cropperReturn = useCropperState( initialState );
-	const [ geometry, setGeometry ] = useState< CropperLayoutGeometry | null >(
-		null
-	);
+	const [ geometry, setGeometry ] =
+		useState< MeasuredCropperGeometry | null >( null );
 	const geometryContextValue = useMemo(
 		() => ( { geometry, setGeometry } ),
 		[ geometry ]
@@ -76,11 +75,11 @@ export function CropperProvider( {
 
 	return (
 		<CropperContext.Provider value={ cropperReturn }>
-			<CropperLayoutGeometryContext.Provider
+			<MeasuredCropperGeometryContext.Provider
 				value={ geometryContextValue }
 			>
 				{ children }
-			</CropperLayoutGeometryContext.Provider>
+			</MeasuredCropperGeometryContext.Provider>
 		</CropperContext.Provider>
 	);
 }
@@ -104,16 +103,16 @@ export function useCropper(): UseCropperStateReturn {
 }
 
 /**
- * Hook to consume the measured cropper layout geometry.
+ * Hook to consume the measured cropper geometry.
  *
- * @return Measured cropper layout geometry, or null before the Cropper publishes it.
+ * @return Measured cropper geometry, or null before the Cropper publishes it.
  */
-export function useCropperLayoutGeometry(): CropperLayoutGeometry | null {
-	const context = useContext( CropperLayoutGeometryContext );
+export function useMeasuredCropperGeometry(): MeasuredCropperGeometry | null {
+	const context = useContext( MeasuredCropperGeometryContext );
 
 	if ( ! context ) {
 		throw new Error(
-			'useCropperLayoutGeometry must be used within a CropperProvider.'
+			'useMeasuredCropperGeometry must be used within a CropperProvider.'
 		);
 	}
 
@@ -121,18 +120,18 @@ export function useCropperLayoutGeometry(): CropperLayoutGeometry | null {
 }
 
 /**
- * Hook to publish measured cropper layout geometry.
+ * Hook to publish measured cropper geometry.
  *
- * @return Setter for measured cropper layout geometry.
+ * @return Setter for measured cropper geometry.
  */
-export function useSetCropperLayoutGeometry(): React.Dispatch<
-	React.SetStateAction< CropperLayoutGeometry | null >
+export function useSetMeasuredCropperGeometry(): React.Dispatch<
+	React.SetStateAction< MeasuredCropperGeometry | null >
 > {
-	const context = useContext( CropperLayoutGeometryContext );
+	const context = useContext( MeasuredCropperGeometryContext );
 
 	if ( ! context ) {
 		throw new Error(
-			'useSetCropperLayoutGeometry must be used within a CropperProvider.'
+			'useSetMeasuredCropperGeometry must be used within a CropperProvider.'
 		);
 	}
 
@@ -145,10 +144,10 @@ export function useSetCropperLayoutGeometry(): React.Dispatch<
  *
  * @return Geometry setter, or a no-op outside CropperProvider.
  */
-export function useOptionalSetCropperLayoutGeometry(): React.Dispatch<
-	React.SetStateAction< CropperLayoutGeometry | null >
+export function useOptionalSetMeasuredCropperGeometry(): React.Dispatch<
+	React.SetStateAction< MeasuredCropperGeometry | null >
 > {
-	const context = useContext( CropperLayoutGeometryContext );
+	const context = useContext( MeasuredCropperGeometryContext );
 
 	return context?.setGeometry ?? noopSetGeometry;
 }

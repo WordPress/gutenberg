@@ -8,34 +8,38 @@ import { useMemo } from '@wordpress/element';
  */
 import {
 	getCropGeometrySnapshot,
+	type CropGeometryBounds,
 	type CropGeometrySnapshot,
-	type CropPixelLayoutBounds,
+	type CropPixelImageBounds,
 	type CropPixelRect,
 	type CropPixelRectInput,
 	type CropPixelRectBounds,
 	type CropPixelRectValidationResult,
 	type CropPixelRectViolation,
+	type CropPixelViewportBounds,
 } from '../../core/crop-geometry';
 import type { SourceRegion } from '../../core/source-region';
 import {
-	useCropperLayoutGeometry,
+	useMeasuredCropperGeometry,
 	useCropper,
 } from '../components/cropper-provider';
 
 export type {
+	CropGeometryBounds,
 	CropGeometrySnapshot,
-	CropPixelLayoutBounds,
+	CropPixelImageBounds,
 	CropPixelRect,
 	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
+	CropPixelViewportBounds,
 };
 
 export interface UseCropGeometryReturn {
 	isReady: boolean;
 	rect: CropPixelRect | null;
-	layoutBounds: CropPixelLayoutBounds | null;
+	bounds: CropGeometryBounds | null;
 	sourceRegion: SourceRegion | null;
 	snapshot: CropGeometrySnapshot | null;
 }
@@ -45,11 +49,11 @@ export interface UseCropGeometryReturn {
  * workflows. This hook intentionally reports facts about the current cropper
  * state; consumers derive operation-specific field behavior themselves.
  *
- * @return Current crop geometry, current-layout bounds, and source region.
+ * @return Current crop geometry, bounds, and source region.
  */
 export function useCropGeometry(): UseCropGeometryReturn {
 	const cropper = useCropper();
-	const geometry = useCropperLayoutGeometry();
+	const geometry = useMeasuredCropperGeometry();
 	const imageSize = useMemo(
 		() =>
 			cropper.state.image
@@ -75,7 +79,7 @@ export function useCropGeometry(): UseCropGeometryReturn {
 	return {
 		isReady: !! snapshot,
 		rect: snapshot?.rect ?? null,
-		layoutBounds: snapshot?.layoutBounds ?? null,
+		bounds: snapshot?.bounds ?? null,
 		sourceRegion: snapshot?.sourceRegion ?? null,
 		snapshot,
 	};

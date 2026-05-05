@@ -13,13 +13,15 @@ export { Cropper, CropperProvider, useCropper } from './react/components';
 export type {
 	UseCropperStateReturn,
 	UseCropGeometryReturn,
+	CropGeometryBounds,
 	CropGeometrySnapshot,
-	CropPixelLayoutBounds,
+	CropPixelImageBounds,
 	CropPixelRect,
 	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
+	CropPixelViewportBounds,
 } from './react/hooks';
 export type { CropperProps } from './react/components';
 
@@ -42,6 +44,7 @@ export {
 	getSourceRegion,
 	getSourceRegionPercent,
 	clampCropPixelRectToBounds,
+	cropBoundsToPixelRectBounds,
 	cropPixelRectToNormalizedRect,
 	getCropPixelRect,
 	validateCropPixelRectAgainstBounds,
@@ -52,6 +55,7 @@ export {
 } from './core';
 export type {
 	AspectRatioPreset,
+	NormalizedCropBounds,
 	SourceRegion,
 	SourceRegionPercent,
 } from './core';

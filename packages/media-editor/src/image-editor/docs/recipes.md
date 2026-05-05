@@ -310,7 +310,7 @@ const aiRequest = {
 
 Use crop geometry when a consumer needs to read crop values or check them against explicit bounds without duplicating cropper math. It reports facts about the current cropper state; it is not an operation API. Consumers still decide intent, such as whether a width edit is left-anchored, center-anchored, or aspect-ratio locked.
 
-`CropPixelRectInput`, `CropPixelRect`, and `CropPixelLayoutBounds` are in snap-rotation pixels. `layoutBounds` means current-layout bounds for the current zoom, pan, rotation, and measured canvas; it does not mean absolute source-image bounds. If a consumer only needs source-image containment, it can pass its own `CropPixelRectBounds` to the clamp/validation helpers. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
+`CropPixelRectInput`, `CropPixelRect`, `CropPixelImageBounds`, and `CropPixelViewportBounds` are in snap-rotation pixels. `bounds.image` means the same image bounds used by manual crop resizing. A future viewport/layout constraint can be exposed as `bounds.viewport` without changing the validation helpers. `CropPixelRect` includes derived `right` and `bottom` edges; consumer suggestions should use `CropPixelRectInput`.
 
 ```tsx
 import {
@@ -322,16 +322,16 @@ import {
 
 function ApplySuggestedCrop( { suggestion } ) {
   const { state, setCropRect } = useCropper();
-  const { rect, layoutBounds } = useCropGeometry();
+  const { rect, bounds } = useCropGeometry();
 
-  if ( ! state.image || ! rect || ! layoutBounds ) {
+  if ( ! state.image || ! rect || ! bounds ) {
     return null;
   }
 
   const apply = () => {
     const result = validateCropPixelRectAgainstBounds(
       suggestion,
-      layoutBounds
+      bounds.image
     );
     if ( ! result.isValid ) {
       console.warn( 'Adjusted crop suggestion:', result.violations );

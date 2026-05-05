@@ -28,23 +28,28 @@ export type { SourceRegion, SourceRegionPercent } from './source-region';
 // Crop geometry
 export {
 	clampCropPixelRectToBounds,
+	cropBoundsToPixelRectBounds,
 	cropPixelRectToNormalizedRect,
 	getCropGeometrySnapshot,
-	getCropPixelLayoutBounds,
+	getCropPixelImageBounds,
+	getCropPixelViewportBounds,
 	getCropPixelRect,
 	isCropGeometryReady,
 	validateCropPixelRectAgainstBounds,
 } from './crop-geometry';
 export type {
+	CropGeometryBounds,
 	CropGeometrySnapshot,
 	CropGeometryInput,
-	CropPixelLayoutBounds,
+	CropPixelImageBounds,
 	CropPixelRect,
 	CropPixelRectBounds,
 	CropPixelRectInput,
 	CropPixelRectValidationResult,
 	CropPixelRectViolation,
-	CropperLayoutGeometry,
+	CropPixelViewportBounds,
+	MeasuredCropperGeometry,
+	NormalizedCropBounds,
 } from './crop-geometry';
 
 // Pipeline

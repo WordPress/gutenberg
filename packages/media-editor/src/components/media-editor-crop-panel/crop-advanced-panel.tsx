@@ -20,7 +20,7 @@ import {
 	useCropGeometry,
 	useCropper,
 	validateCropPixelRectAgainstBounds,
-	type CropPixelLayoutBounds,
+	type CropPixelRectBounds,
 	type CropPixelRect,
 	type CropPixelRectInput,
 } from '../../image-editor';
@@ -110,7 +110,7 @@ function getInputCommitValue(
 
 function getWidthRange(
 	rect: CropPixelRect,
-	layoutBounds: CropPixelLayoutBounds,
+	imageBounds: CropPixelRectBounds,
 	aspectRatio: number | undefined,
 	freeformCrop: boolean
 ): CropInputRange {
@@ -118,14 +118,14 @@ function getWidthRange(
 		return makeRange( rect.width, rect.width, false );
 	}
 
-	let minWidth = layoutBounds.minWidth;
-	let maxWidth = layoutBounds.maxRight - rect.left;
+	let minWidth = imageBounds.minWidth;
+	let maxWidth = imageBounds.maxRight - rect.left;
 
 	if ( aspectRatio && aspectRatio > 0 ) {
-		minWidth = Math.max( minWidth, layoutBounds.minHeight * aspectRatio );
+		minWidth = Math.max( minWidth, imageBounds.minHeight * aspectRatio );
 		maxWidth = Math.min(
 			maxWidth,
-			( layoutBounds.maxBottom - rect.top ) * aspectRatio
+			( imageBounds.maxBottom - rect.top ) * aspectRatio
 		);
 	}
 
@@ -134,7 +134,7 @@ function getWidthRange(
 
 function getHeightRange(
 	rect: CropPixelRect,
-	layoutBounds: CropPixelLayoutBounds,
+	imageBounds: CropPixelRectBounds,
 	aspectRatio: number | undefined,
 	freeformCrop: boolean
 ): CropInputRange {
@@ -142,14 +142,14 @@ function getHeightRange(
 		return makeRange( rect.height, rect.height, false );
 	}
 
-	let minHeight = layoutBounds.minHeight;
-	let maxHeight = layoutBounds.maxBottom - rect.top;
+	let minHeight = imageBounds.minHeight;
+	let maxHeight = imageBounds.maxBottom - rect.top;
 
 	if ( aspectRatio && aspectRatio > 0 ) {
-		minHeight = Math.max( minHeight, layoutBounds.minWidth / aspectRatio );
+		minHeight = Math.max( minHeight, imageBounds.minWidth / aspectRatio );
 		maxHeight = Math.min(
 			maxHeight,
-			( layoutBounds.maxRight - rect.left ) / aspectRatio
+			( imageBounds.maxRight - rect.left ) / aspectRatio
 		);
 	}
 
@@ -286,13 +286,14 @@ export default function CropAdvancedPanel( {
 	freeformCrop,
 	onPlacementControlInteraction,
 }: CropAdvancedPanelProps ) {
-	const { state, setCropRect } = useCropper();
-	const { isReady, rect, layoutBounds } = useCropGeometry();
+	const { state, setCropRect, settleCrop } = useCropper();
+	const { isReady, rect, bounds } = useCropGeometry();
 
-	if ( ! isReady || ! rect || ! layoutBounds || ! state.image ) {
+	if ( ! isReady || ! rect || ! bounds || ! state.image ) {
 		return null;
 	}
 
+	const imageBounds = bounds.image;
 	const imageSize = {
 		width: state.image.naturalWidth,
 		height: state.image.naturalHeight,
@@ -301,11 +302,12 @@ export default function CropAdvancedPanel( {
 	const commitRect = ( candidate: CropPixelRectInput ) => {
 		const { rect: clampedRect } = validateCropPixelRectAgainstBounds(
 			candidate,
-			layoutBounds
+			imageBounds
 		);
 		setCropRect(
 			cropPixelRectToNormalizedRect( clampedRect, state, imageSize )
 		);
+		settleCrop();
 		onPlacementControlInteraction?.();
 	};
 
@@ -336,22 +338,22 @@ export default function CropAdvancedPanel( {
 		};
 
 	const leftRange = makeRange(
-		layoutBounds.minLeft,
-		layoutBounds.maxRight - rect.width
+		imageBounds.minLeft,
+		imageBounds.maxRight - rect.width
 	);
 	const topRange = makeRange(
-		layoutBounds.minTop,
-		layoutBounds.maxBottom - rect.height
+		imageBounds.minTop,
+		imageBounds.maxBottom - rect.height
 	);
 	const widthRange = getWidthRange(
 		rect,
-		layoutBounds,
+		imageBounds,
 		aspectRatio,
 		freeformCrop
 	);
 	const heightRange = getHeightRange(
 		rect,
-		layoutBounds,
+		imageBounds,
 		aspectRatio,
 		freeformCrop
 	);
