@@ -132,6 +132,53 @@ describe( 'applyOperations', () => {
 		expect( result ).toEqual( attrs );
 		expect( result ).not.toBe( attrs );
 	} );
+
+	it( 'composes with clearSuggestionMarkerAttributes to produce the inserted-block apply payload', () => {
+		// When applying a block-insert-after suggestion the live block on
+		// the accepter's side is in its captured-at-insertion shape — the
+		// suggester's interceptor diverted any subsequent typing into the
+		// overlay rather than committing it. Apply must (1) materialize
+		// those overlay edits as attribute-set ops, AND (2) clear the
+		// pending-insert marker. Combining `applyOperations` with
+		// `clearSuggestionMarkerAttributes` yields the merged payload the
+		// provider hands to `updateBlockAttributes`.
+		const liveAttributes = {
+			content: '',
+			metadata: {
+				noteId: [ 42 ],
+				suggestion: { type: 'pending-insert' },
+			},
+		};
+		const operations = [
+			{
+				type: 'block-insert-after',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+				anchorClientId: null,
+				parentClientId: null,
+				block: { name: 'core/paragraph', attributes: { content: '' } },
+			},
+			{
+				type: 'attribute-set',
+				attribute: 'content',
+				before: '',
+				after: 'Hello world',
+			},
+		];
+
+		const withOpsApplied = applyOperations( liveAttributes, operations );
+		const markerCleared = clearSuggestionMarkerAttributes( withOpsApplied );
+		const finalAttributes = markerCleared
+			? { ...withOpsApplied, ...markerCleared }
+			: withOpsApplied;
+
+		// The typed content is committed to the live block...
+		expect( finalAttributes.content ).toBe( 'Hello world' );
+		// ...and the pending-insert marker is gone, while noteId
+		// (system metadata) is preserved.
+		expect( finalAttributes.metadata ).toEqual( { noteId: [ 42 ] } );
+		expect( finalAttributes.metadata.suggestion ).toBeUndefined();
+	} );
 } );
 
 describe( 'payloadByteLength', () => {

@@ -653,22 +653,37 @@ export function useSuggestionsProvider() {
 						removeBlock( targetClientId );
 					} else if ( structuralOp.type === 'block-insert-after' ) {
 						// The block is already in the live tree (the user
-						// inserted it during Suggest mode); apply just
-						// clears the pending-insert marker so the block
-						// loses its dimmed treatment. Any attribute-set
-						// ops in the same payload represent edits the
-						// user made between insertion and auto-save —
-						// the live block already has those values, so the
-						// fall-through attribute-set apply path below
-						// would be a near-no-op. Short-circuit here for
-						// clarity.
-						const clearAttrs = clearSuggestionMarkerAttributes(
-							selectBlockAttributes( targetClientId )
+						// inserted it during Suggest mode); apply commits
+						// the captured edits onto the live block AND clears
+						// the pending-insert marker so the block loses its
+						// dimmed treatment.
+						//
+						// Attribute-set ops in the same payload represent
+						// edits the user made between insertion and auto-
+						// save. They never reach the live block on the
+						// suggester's side — the interceptor reverts them
+						// into the overlay — so collaborators (and the
+						// suggester after a reload) see the live block in
+						// the captured shape (typically empty content for
+						// a fresh paragraph). Apply must materialize those
+						// edits on the live block, otherwise the inserted
+						// block ends up empty after acceptance.
+						const currentAttributes =
+							selectBlockAttributes( targetClientId );
+						const withOpsApplied = applyOperations(
+							currentAttributes,
+							payload.operations
 						);
-						if ( clearAttrs ) {
-							requestInterceptorBypass( targetClientId );
-							updateBlockAttributes( targetClientId, clearAttrs );
-						}
+						const markerCleared =
+							clearSuggestionMarkerAttributes( withOpsApplied );
+						const finalAttributes = markerCleared
+							? { ...withOpsApplied, ...markerCleared }
+							: withOpsApplied;
+						requestInterceptorBypass( targetClientId );
+						updateBlockAttributes(
+							targetClientId,
+							finalAttributes
+						);
 						clearOverlay( targetClientId );
 					}
 
