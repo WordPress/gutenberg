@@ -1784,26 +1784,11 @@ export const transformToStyles = (
 											string[],
 										] ) => {
 											if ( declarations.length ) {
-												/*
-												 * If the feature selector does not include the block's
-												 * root selector (e.g. core/button dimensions width uses
-												 * `.wp-block-button` while root is
-												 * `.wp-block-button .wp-block-button__link`), apply the
-												 * variation class directly to the feature selector.
-												 */
 												const cssSelector =
-													! selector ||
-													baseSelector.includes(
-														selector
-													)
-														? concatFeatureVariationSelectorString(
-																baseSelector,
-																styleVariationSelector as string
-														  )
-														: getBlockStyleVariationSelector(
-																styleVariationName,
-																baseSelector
-														  );
+													concatFeatureVariationSelectorString(
+														baseSelector,
+														styleVariationSelector as string
+													);
 												const rules =
 													declarations.join( ';' );
 												ruleset += `:root :where(${ cssSelector }){${ rules };}`;

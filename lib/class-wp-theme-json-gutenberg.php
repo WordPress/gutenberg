@@ -3416,24 +3416,15 @@ class WP_Theme_JSON_Gutenberg {
 					$clean_current_selector = preg_replace( '/,\s+/', ',', $current_selector );
 					$shortened_selector     = str_replace( $block_metadata['selector'], '', $clean_current_selector );
 
-					if ( $block_metadata['selector'] && ! str_contains( $clean_current_selector, $block_metadata['selector'] ) ) {
-						/*
-						 * Feature selector is block-level (e.g. `.wp-block-button` for
-						 * dimensions/width) — apply the variation class directly to it.
-						 */
-						$feature_element_selector = str_replace( $shortened_selector, '', $clean_style_variation_selector );
-						$combined_selectors       = str_replace( $feature_element_selector, '', $clean_style_variation_selector );
-					} else {
-						// Prepend the variation selector to the current selector.
-						$split_selectors    = explode( ',', $shortened_selector );
-						$updated_selectors  = array_map(
-							static function ( $split_selector ) use ( $clean_style_variation_selector ) {
-								return $clean_style_variation_selector . $split_selector;
-							},
-							$split_selectors
-						);
-						$combined_selectors = implode( ',', $updated_selectors );
-					}
+					// Prepend the variation selector to the current selector.
+					$split_selectors    = explode( ',', $shortened_selector );
+					$updated_selectors  = array_map(
+						static function ( $split_selector ) use ( $clean_style_variation_selector ) {
+							return $clean_style_variation_selector . $split_selector;
+						},
+						$split_selectors
+					);
+					$combined_selectors = implode( ',', $updated_selectors );
 
 					// Add the new declarations to the overall results under the modified selector.
 					$style_variation_declarations[ $combined_selectors ] = $new_declarations;
