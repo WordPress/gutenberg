@@ -6,11 +6,7 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import {
-	useCropperState,
-	type UseCropperStateReturn,
-} from '../hooks/use-cropper-state';
-import type { CropperState } from '../../core/types';
+import type { UseCropperStateReturn } from '../hooks/use-cropper-state';
 
 /**
  * The context value type for the CropperProvider.
@@ -24,31 +20,27 @@ const CropperContext = createContext< CropperContextValue >( null );
  * Props for the CropperProvider component.
  */
 interface CropperProviderProps {
-	/** Optional partial initial state to merge with defaults. */
-	initialState?: Partial< CropperState >;
+	/** Cropper controller created by the image editing session. */
+	value: UseCropperStateReturn;
 	/** Child components. */
 	children: React.ReactNode;
 }
 
 /**
- * Convenience context provider that wraps useCropperState.
+ * Context provider for an existing cropper controller.
  *
- * Provides the full cropper state and action creators to all
- * descendant components via React context.
+ * The media editor image editing session owns the controller lifecycle; this
+ * provider only makes that controller available to cropper-specific children
+ * through `useCropper()`.
  *
- * @param props              Provider props.
- * @param props.initialState
+ * @param props
+ * @param props.value
  * @param props.children
  * @return The provider element wrapping children.
  */
-export function CropperProvider( {
-	initialState,
-	children,
-}: CropperProviderProps ) {
-	const cropperReturn = useCropperState( initialState );
-
+export function CropperProvider( { value, children }: CropperProviderProps ) {
 	return (
-		<CropperContext.Provider value={ cropperReturn }>
+		<CropperContext.Provider value={ value }>
 			{ children }
 		</CropperContext.Provider>
 	);

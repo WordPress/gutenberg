@@ -51,11 +51,13 @@ import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
 import { unlock } from '../../lock-unlock';
 import { getMediaTypeFromMimeType } from '../../utils';
-import { CropperProvider, useCropper } from '../../image-editor';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
-import { buildModifiers } from './build-modifiers';
 import MediaEditorKeyboardShortcutsModal from '../media-editor-keyboard-shortcuts-modal';
+import {
+	ImageEditingSessionProvider,
+	useImageEditingSession,
+} from '../image-editing-session';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -222,9 +224,9 @@ interface MediaEditorModalContentProps {
 	onUpdate: ( ( updated: MediaEditorModalUpdate ) => void ) | null;
 }
 
-// Inner component rendered inside `CropperProvider` so it can read
-// `isDirty` from the cropper. The outer `MediaEditorModal` keeps the
-// store reads and provider tree above this.
+// Inner component rendered inside `ImageEditingSessionProvider` so it can read
+// image dirty/history state. The outer `MediaEditorModal` keeps the store reads
+// and provider tree above this.
 function MediaEditorModalContent( {
 	fields,
 	id,
@@ -233,8 +235,8 @@ function MediaEditorModalContent( {
 	aspectRatioPresets,
 	onUpdate,
 }: MediaEditorModalContentProps ) {
-	const cropper = useCropper();
-	const hasChanges = cropper.isDirty || hasEdits;
+	const imageSession = useImageEditingSession();
+	const hasChanges = imageSession.isDirty || hasEdits;
 
 	const registry = useRegistry();
 	const {
@@ -376,13 +378,7 @@ function MediaEditorModalContent( {
 		try {
 			let saved: Media | null | undefined;
 
-			const modifiers =
-				cropper.isDirty && cropper.state.image
-					? buildModifiers( cropper.state, {
-							width: cropper.state.image.naturalWidth,
-							height: cropper.state.image.naturalHeight,
-					  } )
-					: [];
+			const modifiers = imageSession.buildSaveModifiers();
 
 			if ( modifiers.length > 0 ) {
 				// Bundle staged Details-tab edits into the same /edit
@@ -496,9 +492,9 @@ function MediaEditorModalContent( {
 					if ( ! isMetadataField ) {
 						event.preventDefault();
 						if ( isRedoShortcut ) {
-							cropper.redo();
+							imageSession.redo();
 						} else {
-							cropper.undo();
+							imageSession.undo();
 						}
 						return;
 					}
@@ -663,16 +659,14 @@ export function MediaEditorModal( {
 		return null;
 	}
 
-	// `CropperProvider` is always mounted while the modal is open — it's
-	// just a `useReducer` with no side effects — so the inner component
-	// can read `isDirty` for images without forking on media type. The
-	// `key` remounts the provider when the edited attachment changes,
-	// discarding the previous cropper state. Keying on `id` (rather than
-	// `media?.id`) avoids a remount when `media` resolves from `null` to
-	// the loaded record on open — that flip would otherwise re-run the
-	// modal's entry animation and cause a visible flicker.
+	// `ImageEditingSessionProvider` is always mounted while the modal is open.
+	// The `key` remounts the session when the edited attachment changes,
+	// discarding previous image edit state. Keying on `id` (rather than
+	// `media?.id`) avoids a remount when `media` resolves from `null` to the
+	// loaded record on open — that flip would otherwise re-run the modal's
+	// entry animation and cause a visible flicker.
 	return (
-		<CropperProvider key={ id }>
+		<ImageEditingSessionProvider key={ id }>
 			<MediaEditorModalContent
 				fields={ fields }
 				id={ id }
@@ -681,7 +675,7 @@ export function MediaEditorModal( {
 				aspectRatioPresets={ aspectRatioPresets }
 				onUpdate={ onUpdate }
 			/>
-		</CropperProvider>
+		</ImageEditingSessionProvider>
 	);
 }
 
