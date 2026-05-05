@@ -6,7 +6,12 @@ import * as Ariakit from '@ariakit/react';
 /**
  * WordPress dependencies
  */
-import { createContext, useCallback, useMemo } from '@wordpress/element';
+import {
+	createContext,
+	useCallback,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
@@ -25,6 +30,10 @@ import type {
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
 import BaseControl from '../base-control';
+
+// Minimum px of space required below the trigger to open downward (no flip).
+// See: https://github.com/WordPress/gutenberg/issues/
+const FLIP_THRESHOLD = 150;
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
@@ -102,6 +111,24 @@ function CustomSelect(
 		...restProps
 	} = props;
 
+	const [ shouldFlip, setShouldFlip ] = useState( false );
+
+	const handleTriggerPointerDown = useCallback( () => {
+		if ( ! isLegacy ) {
+			return;
+		}
+
+		const triggerElement = store.getState().selectElement;
+		if ( ! triggerElement ) {
+			return;
+		}
+
+		const spaceBelow =
+			window.innerHeight - triggerElement.getBoundingClientRect().bottom;
+
+		setShouldFlip( spaceBelow < FLIP_THRESHOLD );
+	}, [ isLegacy, store ] );
+
 	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
 		useCallback(
 			( e ) => {
@@ -142,6 +169,9 @@ function CustomSelect(
 					store={ store }
 					// Match legacy behavior (move selection rather than open the popover)
 					showOnKeyDown={ ! isLegacy }
+					onPointerDown={
+						isLegacy ? handleTriggerPointerDown : undefined
+					}
 				/>
 				<Styled.SelectPopover
 					gutter={ 12 }
@@ -149,8 +179,9 @@ function CustomSelect(
 					sameWidth
 					slide={ false }
 					onKeyDown={ onSelectPopoverKeyDown }
-					// Match legacy behavior
-					flip={ ! isLegacy }
+					// Match legacy behavior (flip when space below trigger is insufficient)
+					flip={ isLegacy ? shouldFlip : true }
+					overflowPadding={ isLegacy && shouldFlip ? 50 : 0 }
 				>
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
