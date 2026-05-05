@@ -391,6 +391,68 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that when both a media-library image and a gradient are set,
+	 * the renderer stays on the CSS path so the gradient is not lost.
+	 * Previously, a real attachment ID would trigger the img path and the
+	 * early return would drop the gradient CSS entirely.
+	 *
+	 * @covers ::gutenberg_render_background_support
+	 */
+	public function test_background_gradient_prevents_img_element() {
+		switch_theme( 'block-theme-child-with-fluid-typography' );
+		$this->test_block_name = 'test/background-img-gradient-fallback';
+
+		$attachment_id = self::factory()->attachment->create_upload_object(
+			DIR_TESTDATA . '/images/canola.jpg',
+			0,
+			array( 'post_mime_type' => 'image/jpeg' )
+		);
+
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 2,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'background' => array(
+						'backgroundImage' => true,
+						'gradient'        => true,
+					),
+				),
+			)
+		);
+
+		$block = array(
+			'blockName' => $this->test_block_name,
+			'attrs'     => array(
+				'style' => array(
+					'background' => array(
+						'backgroundImage' => array(
+							'id'  => $attachment_id,
+							'url' => wp_get_attachment_url( $attachment_id ),
+						),
+						'backgroundSize'  => 'cover',
+						'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_background_support( '<div>Content</div>', $block );
+
+		$this->assertStringNotContainsString( '<img', $actual, 'Gradient + image should not inject an img element.' );
+		$this->assertStringContainsString( 'background-image:', $actual, 'Output should contain CSS background-image for gradient.' );
+		$this->assertStringContainsString( 'linear-gradient', $actual, 'Output should include gradient CSS value.' );
+		$this->assertStringContainsString( 'has-background', $actual, 'Wrapper should have has-background class.' );
+
+		wp_delete_attachment( $attachment_id, true );
+	}
+
+	/**
 	 * Tests that a background image with backgroundRepeat:'no-repeat' still injects
 	 * an img element (no-repeat is compatible with object-fit; only tiled/repeat
 	 * values require CSS background-image).

@@ -89,6 +89,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const bgRepeat = bgData.backgroundRepeat;
 	const bgPosition = bgData.backgroundPosition;
 	const bgUrl = bgData.backgroundImage?.url;
+	const bgGradient = bgData.gradient;
 
 	// Render the background as <img> in the editor for all cover/contain images without
 	// tiling. This includes background-attachment:fixed: the editor canvas runs inside an
@@ -96,10 +97,13 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	// viewport (often rendering it off-screen), so <img> is a better editor preview.
 	// The PHP renderer handles background-attachment:fixed correctly on the frontend via
 	// CSS (see lib/block-supports/background.php $use_img_element logic).
+	// Skip <img> when a gradient is also set — the gradient needs CSS background-image
+	// and both layers must stack via CSS (url(...), gradient(...)) rather than <img>.
 	const useImgElement =
 		!! bgImageId &&
 		[ 'cover', 'contain' ].includes( bgSize ) &&
-		( ! bgRepeat || bgRepeat === 'no-repeat' );
+		( ! bgRepeat || bgRepeat === 'no-repeat' ) &&
+		! bgGradient;
 
 	// When using <img>, strip background-* CSS from wrapper and add position:relative.
 	const resolvedBlockProps = useImgElement

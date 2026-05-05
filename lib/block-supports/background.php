@@ -95,7 +95,8 @@ function gutenberg_render_background_support( $block_content, $block ) {
 		$attachment_id > 0 &&
 		in_array( $background_styles['backgroundSize'], array( 'cover', 'contain' ), true ) &&
 		( empty( $background_styles['backgroundRepeat'] ) || 'no-repeat' === $background_styles['backgroundRepeat'] ) &&
-		empty( $background_styles['backgroundAttachment'] )
+		empty( $background_styles['backgroundAttachment'] ) &&
+		empty( $background_styles['gradient'] )
 	);
 
 	if ( $use_img_element ) {
