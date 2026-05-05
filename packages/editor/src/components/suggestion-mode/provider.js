@@ -389,7 +389,7 @@ export function useSuggestionsProvider() {
 
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createNotice } = useDispatch( noticesStore );
-	const { updateBlockAttributes, removeBlock } =
+	const { updateBlockAttributes, removeBlock, moveBlockToPosition } =
 		useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes: selectBlockAttributes,
@@ -661,23 +661,27 @@ export function useSuggestionsProvider() {
 						requestInterceptorBypass( targetClientId );
 						clearOverlay( targetClientId );
 						removeBlock( targetClientId );
-					} else if ( structuralOp.type === 'block-insert-after' ) {
-						// The block is already in the live tree (the user
-						// inserted it during Suggest mode); apply commits
-						// the captured edits onto the live block AND clears
-						// the pending-insert marker so the block loses its
-						// dimmed treatment.
+					} else if (
+						structuralOp.type === 'block-insert-after' ||
+						structuralOp.type === 'block-move'
+					) {
+						// The block is already at its proposed location
+						// (the user inserted or moved it during Suggest
+						// mode); apply commits the captured edits onto the
+						// live block AND clears the pending marker so the
+						// block loses its dimmed/outlined treatment.
 						//
 						// Attribute-set ops in the same payload represent
-						// edits the user made between insertion and auto-
-						// save. They never reach the live block on the
-						// suggester's side — the interceptor reverts them
-						// into the overlay — so collaborators (and the
-						// suggester after a reload) see the live block in
-						// the captured shape (typically empty content for
-						// a fresh paragraph). Apply must materialize those
-						// edits on the live block, otherwise the inserted
-						// block ends up empty after acceptance.
+						// edits the user made between the structural
+						// change and auto-save. They never reach the live
+						// block on the suggester's side — the interceptor
+						// reverts them into the overlay — so collaborators
+						// (and the suggester after a reload) see the live
+						// block in the captured shape (typically empty
+						// content for a fresh paragraph). Apply must
+						// materialize those edits on the live block,
+						// otherwise the inserted/moved block ends up in
+						// the wrong shape after acceptance.
 						const currentAttributes =
 							selectBlockAttributes( targetClientId );
 						const withOpsApplied = applyOperations(
@@ -829,6 +833,9 @@ export function useSuggestionsProvider() {
 			//   - block-insert-after: dispatch removeBlock to undo the
 			//     suggested insertion. The marker on the live block goes
 			//     away with the block itself.
+			//   - block-move: clear the marker, then dispatch
+			//     moveBlockToPosition to put the block back at its
+			//     pre-move parent + index.
 			//   - attribute-set (no structural op): no live-block change.
 			const structuralOp = findStructuralOp( payload?.operations );
 			if ( structuralOp && clientId ) {
@@ -836,6 +843,24 @@ export function useSuggestionsProvider() {
 					requestInterceptorBypass( clientId );
 					clearOverlay( clientId );
 					removeBlock( clientId );
+				} else if ( structuralOp.type === 'block-move' ) {
+					const clearAttrs = clearSuggestionMarkerAttributes(
+						selectBlockAttributes( clientId )
+					);
+					if ( clearAttrs ) {
+						requestInterceptorBypass( clientId );
+						updateBlockAttributes( clientId, clearAttrs );
+					}
+					requestInterceptorBypass( clientId );
+					clearOverlay( clientId );
+					moveBlockToPosition(
+						clientId,
+						// `moveBlockToPosition` expects '' (not null) for
+						// the root.
+						structuralOp.fromParentClientId ?? '',
+						structuralOp.fromParentClientId ?? '',
+						structuralOp.fromIndex ?? 0
+					);
 				} else {
 					const clearAttrs = clearSuggestionMarkerAttributes(
 						selectBlockAttributes( clientId )
@@ -878,6 +903,7 @@ export function useSuggestionsProvider() {
 			selectBlockAttributes,
 			updateBlockAttributes,
 			removeBlock,
+			moveBlockToPosition,
 			requestInterceptorBypass,
 			clearOverlay,
 		]

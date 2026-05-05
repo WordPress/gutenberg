@@ -33,7 +33,9 @@
  *     prior parent + index, then tagged `metadata.suggestion = pending-remove`.
  *   - New blocks → tagged `metadata.suggestion = pending-insert` (the block
  *     stays in the tree; the marker drives the dimmed visual treatment).
- *   - Move detection ships in a follow-up.
+ *   - Moved blocks → tagged `metadata.suggestion = pending-move` with the
+ *     pre-move parent + anchor; an LCS-based heuristic isolates the moved
+ *     block from siblings whose index just shifted as a side-effect.
  *
  * In every case the live block carries the marker and a corresponding
  * structural op is written to the overlay so auto-save persists it.
@@ -433,6 +435,171 @@ function topLevelRemoved( removedIds, parentByClientId ) {
 }
 
 /**
+ * Length of the longest common subsequence of two arrays of clientIds (the
+ * elements of the result appear in the same relative order in both inputs).
+ * Used by the move-detection heuristic: blocks NOT in the LCS of their
+ * parent's old vs new sibling order are the ones that actually moved;
+ * blocks in the LCS just had their index shift as a side-effect.
+ *
+ * @param {string[]} a First array.
+ * @param {string[]} b Second array.
+ * @return {Set<string>} The LCS as a set for O(1) membership checks.
+ */
+function lcsClientIds( a, b ) {
+	const m = a.length;
+	const n = b.length;
+	if ( m === 0 || n === 0 ) {
+		return new Set();
+	}
+	const dp = Array.from( { length: m + 1 }, () =>
+		new Array( n + 1 ).fill( 0 )
+	);
+	for ( let i = 1; i <= m; i++ ) {
+		for ( let j = 1; j <= n; j++ ) {
+			dp[ i ][ j ] =
+				a[ i - 1 ] === b[ j - 1 ]
+					? dp[ i - 1 ][ j - 1 ] + 1
+					: Math.max( dp[ i - 1 ][ j ], dp[ i ][ j - 1 ] );
+		}
+	}
+	const result = new Set();
+	let i = m;
+	let j = n;
+	while ( i > 0 && j > 0 ) {
+		if ( a[ i - 1 ] === b[ j - 1 ] ) {
+			result.add( a[ i - 1 ] );
+			i--;
+			j--;
+		} else if ( dp[ i - 1 ][ j ] > dp[ i ][ j - 1 ] ) {
+			i--;
+		} else {
+			j--;
+		}
+	}
+	return result;
+}
+
+/**
+ * Detect blocks that moved between two ticks of the live tree. A block has
+ * "moved" when its parent changed (cross-parent move) or, within the same
+ * parent, its position falls outside the LCS of the parent's old vs new
+ * sibling order. The LCS heuristic prevents tagging blocks whose index
+ * just shifted as a side-effect of another block moving past them.
+ *
+ * Blocks that are new (not in the previous-tick tree) or removed (in the
+ * previous-tick tree but not live) are handled by the insertion / removal
+ * branches; this function ignores both.
+ *
+ * @param {string[]} liveClientIds Live tree client ids.
+ * @param {Object}   tree          Previous-tick tree snapshot from
+ *                                 `captureTreeSnapshot`.
+ * @param {Object}   blockEditor   Block-editor selectors.
+ * @return {Array<Object>} One entry per moved block, with from/to anchors.
+ */
+function detectMovedBlocks( liveClientIds, tree, blockEditor ) {
+	const movedRaw = [];
+
+	const candidatesByNewParent = new Map();
+	for ( const clientId of liveClientIds ) {
+		if ( ! tree.parentByClientId.has( clientId ) ) {
+			continue; // new block — handled elsewhere
+		}
+		const oldParent = tree.parentByClientId.get( clientId );
+		const newParent =
+			blockEditor.getBlockRootClientId?.( clientId ) || null;
+		if ( oldParent !== newParent ) {
+			movedRaw.push( { clientId, oldParent, newParent } );
+			continue;
+		}
+		if ( ! candidatesByNewParent.has( newParent ) ) {
+			candidatesByNewParent.set( newParent, [] );
+		}
+		candidatesByNewParent.get( newParent ).push( clientId );
+	}
+
+	for ( const [ parent, candidates ] of candidatesByNewParent ) {
+		const oldSiblings = candidates
+			.slice()
+			.sort(
+				( a, b ) =>
+					( tree.indexByClientId.get( a ) ?? 0 ) -
+					( tree.indexByClientId.get( b ) ?? 0 )
+			);
+		const newSiblingOrder =
+			blockEditor.getBlockOrder?.( parent ?? undefined ) ?? [];
+		const newSiblings = candidates
+			.slice()
+			.sort(
+				( a, b ) =>
+					newSiblingOrder.indexOf( a ) - newSiblingOrder.indexOf( b )
+			);
+		const samePosition =
+			oldSiblings.length === newSiblings.length &&
+			oldSiblings.every( ( id, i ) => id === newSiblings[ i ] );
+		if ( samePosition ) {
+			continue;
+		}
+		const stable = lcsClientIds( oldSiblings, newSiblings );
+		for ( const clientId of newSiblings ) {
+			if ( ! stable.has( clientId ) ) {
+				movedRaw.push( {
+					clientId,
+					oldParent: parent,
+					newParent: parent,
+				} );
+			}
+		}
+	}
+
+	if ( movedRaw.length === 0 ) {
+		return [];
+	}
+
+	// Reconstruct the previous-tick sibling order per parent so we can
+	// compute fromAnchorClientId. Building this lazily keeps the no-move
+	// path zero-cost.
+	const oldOrderByParent = new Map();
+	const oldOrderFor = ( oldParent ) => {
+		if ( oldOrderByParent.has( oldParent ) ) {
+			return oldOrderByParent.get( oldParent );
+		}
+		const ids = [];
+		for ( const [ id, parent ] of tree.parentByClientId ) {
+			if ( parent === oldParent ) {
+				ids.push( id );
+			}
+		}
+		ids.sort(
+			( a, b ) =>
+				( tree.indexByClientId.get( a ) ?? 0 ) -
+				( tree.indexByClientId.get( b ) ?? 0 )
+		);
+		oldOrderByParent.set( oldParent, ids );
+		return ids;
+	};
+
+	return movedRaw.map( ( { clientId, oldParent, newParent } ) => {
+		const oldIndex = tree.indexByClientId.get( clientId ) ?? 0;
+		const oldSiblingOrder = oldOrderFor( oldParent );
+		const fromAnchorClientId =
+			oldIndex > 0 ? oldSiblingOrder[ oldIndex - 1 ] : null;
+		const newSiblingOrder =
+			blockEditor.getBlockOrder?.( newParent ?? undefined ) ?? [];
+		const newIndex = newSiblingOrder.indexOf( clientId );
+		const toAnchorClientId =
+			newIndex > 0 ? newSiblingOrder[ newIndex - 1 ] : null;
+		return {
+			clientId,
+			fromParentClientId: oldParent,
+			fromAnchorClientId,
+			fromIndex: oldIndex,
+			toParentClientId: newParent,
+			toAnchorClientId,
+		};
+	} );
+}
+
+/**
  * Invisible component that catches block-attribute mutations dispatched
  * directly to the block-editor store while the editor is in Suggest intent.
  *
@@ -685,6 +852,49 @@ export default function SuggestionStoreInterceptor() {
 				// block; do NOT update it to `current` here.
 			}
 
+			// Detect blocks that moved (different parent or out-of-place
+			// within the same parent). The block stays at its new
+			// position; tag it with `metadata.suggestion = pending-move`
+			// and capture the from/to anchors for the structural op.
+			// Apply leaves the block where it is; Reject dispatches
+			// `moveBlockToPosition` with the from-position.
+			const moves = detectMovedBlocks( liveClientIds, tree, blockEditor );
+			for ( const move of moves ) {
+				const currentAttrs = blockEditor.getBlockAttributes?.(
+					move.clientId
+				);
+				if ( ! currentAttrs ) {
+					continue;
+				}
+				const block = blockEditor.getBlock?.( move.clientId );
+				if ( ! block ) {
+					continue;
+				}
+				isReverting = true;
+				try {
+					blockEditorDispatch.updateBlockAttributes( move.clientId, {
+						metadata: withSuggestionMarker( currentAttrs.metadata, {
+							type: 'pending-move',
+							fromAnchorClientId: move.fromAnchorClientId,
+							fromParentClientId: move.fromParentClientId,
+							fromIndex: move.fromIndex,
+						} ),
+					} );
+				} finally {
+					isReverting = false;
+				}
+				setStructuralOpRef.current?.( move.clientId, block.name, {
+					type: 'block-move',
+					clientId: move.clientId,
+					blockName: block.name,
+					fromAnchorClientId: move.fromAnchorClientId,
+					fromParentClientId: move.fromParentClientId,
+					fromIndex: move.fromIndex,
+					toAnchorClientId: move.toAnchorClientId,
+					toParentClientId: move.toParentClientId,
+				} );
+			}
+
 			// Detect blocks that disappeared from the live tree and route
 			// them through the Suggest-mode "apply-and-tag" flow: re-insert
 			// the subtree from the previous-tick snapshot at its previous
@@ -838,4 +1048,6 @@ export {
 	captureTreeSnapshot,
 	topLevelRemoved,
 	withSuggestionMarker,
+	lcsClientIds,
+	detectMovedBlocks,
 };

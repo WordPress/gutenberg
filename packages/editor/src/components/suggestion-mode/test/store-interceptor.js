@@ -28,6 +28,7 @@ import SuggestionStoreInterceptor, {
 	isAcceptedSuggestionChange,
 	topLevelRemoved,
 	withSuggestionMarker,
+	lcsClientIds,
 } from '../store-interceptor';
 import {
 	SuggestionOverlayProvider,
@@ -672,6 +673,58 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'tags a moved block with metadata.suggestion = pending-move and writes a block-move op', async () => {
+		// Move a block from index 1 to index 3 in a 4-block tree. The
+		// moved block carries a pending-move marker with from-position
+		// context; the side-effect siblings (whose indices shifted to
+		// fill the gap) are NOT tagged thanks to the LCS heuristic.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const d = createBlock( TEST_BLOCK_NAME, { content: 'D' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c, d ],
+		} );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.moveBlockToPosition( b.clientId, '', '', 3 );
+		} );
+		await flushSubscribers();
+
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks.map( ( bl ) => bl.attributes?.content ) ).toEqual( [
+			'A',
+			'C',
+			'D',
+			'B',
+		] );
+		expect(
+			liveBlocks.find( ( bl ) => bl.clientId === b.clientId )?.attributes
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-move' );
+
+		// Side-effect siblings: NOT tagged.
+		const sideEffectBlocks = liveBlocks.filter(
+			( bl ) => bl.clientId !== b.clientId
+		);
+		for ( const bl of sideEffectBlocks ) {
+			expect( bl.attributes?.metadata?.suggestion ).toBeUndefined();
+		}
+
+		expect(
+			getOverlay().entries[ b.clientId ]?.structuralOp
+		).toMatchObject( {
+			type: 'block-move',
+			clientId: b.clientId,
+			fromAnchorClientId: a.clientId,
+			fromParentClientId: null,
+			toAnchorClientId: d.clientId,
+			toParentClientId: null,
+		} );
+	} );
+
 	it( 'tags only the top-level new block when an inserted subtree contains nested children', async () => {
 		// A Group block with a child paragraph dispatches both as new in
 		// the same tick. The interceptor must tag only the top-level
@@ -968,5 +1021,28 @@ describe( 'withSuggestionMarker', () => {
 				{ type: 'pending-remove' }
 			).suggestion
 		).toEqual( { type: 'pending-remove' } );
+	} );
+} );
+
+describe( 'lcsClientIds', () => {
+	it( 'returns the full sequence when both sides match', () => {
+		const lcs = lcsClientIds( [ 'a', 'b', 'c' ], [ 'a', 'b', 'c' ] );
+		expect( Array.from( lcs ).sort() ).toEqual( [ 'a', 'b', 'c' ] );
+	} );
+
+	it( 'identifies the moved-block as the one absent from the LCS', () => {
+		// [A, B, C, D] → [A, C, D, B]: B is the moved block; A, C, D form
+		// the longest stable subsequence.
+		const lcs = lcsClientIds(
+			[ 'a', 'b', 'c', 'd' ],
+			[ 'a', 'c', 'd', 'b' ]
+		);
+		expect( Array.from( lcs ).sort() ).toEqual( [ 'a', 'c', 'd' ] );
+		expect( lcs.has( 'b' ) ).toBe( false );
+	} );
+
+	it( 'returns an empty set when either side is empty', () => {
+		expect( lcsClientIds( [], [ 'a' ] ).size ).toBe( 0 );
+		expect( lcsClientIds( [ 'a' ], [] ).size ).toBe( 0 );
 	} );
 } );
