@@ -2,6 +2,25 @@
  * WordPress dependencies
  */
 import { removep, autop } from '@wordpress/autop';
+import { getBlockTransforms, rawHandler } from '@wordpress/blocks';
+import { next } from '@wordpress/shortcode';
+
+const getShortcodeFromTransforms = () =>
+	getBlockTransforms( 'from' ).filter(
+		( transform ) =>
+			transform.type === 'shortcode' &&
+			transform.blockName !== 'core/shortcode'
+	);
+
+// Single-shortcode only: keeps the transform menu honest (one block in, one
+// block out) and avoids unmatched shortcodes silently falling back to freeform.
+const isSingleShortcode = ( text, tag ) => {
+	const trimmed = text.trim();
+	const match = next( tag, trimmed );
+	return (
+		!! match && match.index === 0 && match.content.length === trimmed.length
+	);
+};
 
 const transforms = {
 	from: [
@@ -24,6 +43,30 @@ const transforms = {
 				},
 			},
 			priority: 20,
+		},
+	],
+	to: [
+		{
+			type: 'block',
+			get blocks() {
+				return [
+					...new Set(
+						getShortcodeFromTransforms().map(
+							( transform ) => transform.blockName
+						)
+					),
+				];
+			},
+			isMatch: ( { text } ) => {
+				return getShortcodeFromTransforms().some( ( transform ) =>
+					[]
+						.concat( transform.tag )
+						.some( ( tag ) => isSingleShortcode( text, tag ) )
+				);
+			},
+			transform: ( { text } ) => {
+				return rawHandler( { HTML: `<p>${ text.trim() }</p>` } );
+			},
 		},
 	],
 };
