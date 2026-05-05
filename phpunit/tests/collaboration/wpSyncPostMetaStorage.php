@@ -32,13 +32,13 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		parent::set_up();
 		update_option( 'wp_collaboration_enabled', 1 );
 
-		$this->reset_storage_post_id_cache();
+		self::reset_storage_post_id_cache();
 	}
 
 	/**
 	 * Resets the static room-to-storage-post cache.
 	 */
-	private function reset_storage_post_id_cache(): void {
+	private static function reset_storage_post_id_cache(): void {
 		$reflection = new ReflectionProperty( 'WP_Sync_Post_Meta_Storage', 'storage_post_ids' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$reflection->setAccessible( true );
@@ -52,7 +52,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 	 * @param string $room Room identifier.
 	 * @return array<int, object> Matching storage posts.
 	 */
-	private function get_storage_post_lineages( string $room ): array {
+	private static function get_storage_post_lineages( string $room ): array {
 		global $wpdb;
 
 		$room_hash = md5( $room );
@@ -68,16 +68,6 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 				$wpdb->esc_like( $room_hash . '-' ) . '%'
 			)
 		);
-	}
-
-	/**
-	 * Skips tests that need Gutenberg's compatibility implementation.
-	 */
-	private function skip_if_sync_storage_class_is_provided_by_wordpress_core(): void {
-		$reflection = new ReflectionClass( 'WP_Sync_Post_Meta_Storage' );
-		if ( false === strpos( $reflection->getFileName(), '/wp-content/plugins/' ) ) {
-			$this->markTestSkipped( 'The active WP_Sync_Post_Meta_Storage class is provided by WordPress core, not Gutenberg.' );
-		}
 	}
 
 	/**
@@ -751,9 +741,13 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Ensures that when two sessions create a room simultaneously, that they only
+	 * create a single room in storage.
+	 *
+	 * @ticket 65138
+	 */
 	public function test_first_access_race_does_not_split_room_storage() {
-		$this->skip_if_sync_storage_class_is_provided_by_wordpress_core();
-
 		$storage   = new WP_Sync_Post_Meta_Storage();
 		$room      = $this->get_room() . ':first-access-race';
 		$room_hash = md5( $room );
@@ -798,7 +792,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		$this->assertIsInt( $injected_post_id, 'Expected injected storage post to be created.' );
 		$this->assertGreaterThan( 0, $injected_post_id, 'Expected injected storage post to be created.' );
 
-		$lineages = $this->get_storage_post_lineages( $room );
+		$lineages = self::get_storage_post_lineages( $room );
 		$this->assertCount( 1, $lineages, 'First-access race split room storage.' );
 		$this->assertSame(
 			$room_hash,
@@ -806,7 +800,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 			'The surviving storage lineage must use the exact room hash slug.'
 		);
 
-		$this->reset_storage_post_id_cache();
+		self::reset_storage_post_id_cache();
 		$fresh_storage = new WP_Sync_Post_Meta_Storage();
 		$updates       = $fresh_storage->get_updates_after_cursor( $room, 0 );
 
@@ -817,10 +811,14 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Ensures that merging duplicate rooms in storage preserves the
+	 * intended canonical room slug.
+	 *
+	 * @ticket 65138
+	 */
 	public function test_duplicate_storage_merge_preserves_exact_room_slug() {
 		global $wpdb;
-
-		$this->skip_if_sync_storage_class_is_provided_by_wordpress_core();
 
 		$storage   = new WP_Sync_Post_Meta_Storage();
 		$room      = $this->get_room() . ':suffix-id-before-exact';
@@ -834,9 +832,13 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 				'post_name'   => $room_hash . '-2',
 			)
 		);
-		$this->assertIsInt( $suffixed_post_id );
-		$this->assertGreaterThan( 0, $suffixed_post_id );
-		$this->assertSame( $room_hash . '-2', get_post_field( 'post_name', $suffixed_post_id ) );
+		$this->assertIsInt( $suffixed_post_id, 'Should have received an integer post id.'  );
+		$this->assertGreaterThan( 0, $suffixed_post_id, 'Suffixed meta post should have a valid post id.' );
+		$this->assertSame(
+			$room_hash . '-2',
+			get_post_field( 'post_name', $suffixed_post_id ),
+			'Expected suffixed meta post to have suffixed post name.'
+		);
 
 		$suffixed_update = array(
 			'type' => 'update',
@@ -862,17 +864,28 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 				'post_name'   => $room_hash,
 			)
 		);
-		$this->assertIsInt( $exact_post_id );
-		$this->assertGreaterThan( $suffixed_post_id, $exact_post_id );
-		$this->assertSame( $room_hash, get_post_field( 'post_name', $exact_post_id ) );
+		$this->assertIsInt( $exact_post_id, 'Should have received an integer post id.' );
+		$this->assertGreaterThan(
+			$suffixed_post_id,
+			$exact_post_id,
+			'Canonical meta post id should be greater than (newer) than suffixed copy.'
+		);
+		$this->assertSame(
+			$room_hash,
+			get_post_field( 'post_name', $exact_post_id ),
+			'Should have received the expected room hash.'
+		);
 
 		$exact_update = array(
 			'type' => 'update',
 			'data' => base64_encode( 'exact-lineage-update' ),
 		);
-		$this->assertTrue( $storage->add_update( $room, $exact_update ) );
+		$this->assertTrue(
+			$storage->add_update( $room, $exact_update ),
+			'Failed to create the exact room update.'
+		);
 
-		$lineages = $this->get_storage_post_lineages( $room );
+		$lineages = self::get_storage_post_lineages( $room );
 		$this->assertCount( 1, $lineages, 'Duplicate storage lineages should be merged.' );
 		$this->assertSame(
 			$room_hash,
@@ -880,7 +893,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 			'Merging must keep the exact room hash slug even when a suffixed duplicate has the lower post ID.'
 		);
 
-		$this->reset_storage_post_id_cache();
+		self::reset_storage_post_id_cache();
 		$fresh_storage = new WP_Sync_Post_Meta_Storage();
 		$updates       = $fresh_storage->get_updates_after_cursor( $room, 0 );
 		$update_data   = wp_list_pluck( $updates, 'data' );
@@ -890,6 +903,7 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 			$update_data,
 			'Merged storage must preserve updates from the suffixed lineage.'
 		);
+
 		$this->assertContains(
 			$exact_update['data'],
 			$update_data,
