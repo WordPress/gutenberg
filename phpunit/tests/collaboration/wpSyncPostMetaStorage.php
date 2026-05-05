@@ -914,8 +914,6 @@ class Tests_Collaboration_WpSyncPostMetaStorage extends WP_UnitTestCase {
 	public function test_duplicate_storage_merge_backfills_updates_older_than_active_cursor() {
 		global $wpdb;
 
-		$this->skip_if_sync_storage_class_is_provided_by_wordpress_core();
-
 		$room      = $this->get_room() . ':cursor-backfill-race';
 		$room_hash = md5( $room );
 

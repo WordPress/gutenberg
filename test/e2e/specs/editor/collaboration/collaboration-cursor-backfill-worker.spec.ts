@@ -353,7 +353,9 @@ test.describe( 'Collaboration - cursor backfill race', () => {
 			} );
 
 			const splitDiagnosis = await diagnoseStorage( requestUtils, room );
-			expect( splitDiagnosis.lineages.length ).toBeGreaterThan( 1 );
+			expect(
+				diagnosisContainsAllUpdates( splitDiagnosis, seededUpdates )
+			).toBe( true );
 
 			await typeParagraph( editor2, page2, TRIGGER_TEXT );
 
