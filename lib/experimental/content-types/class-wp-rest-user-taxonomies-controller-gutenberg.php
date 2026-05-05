@@ -76,14 +76,22 @@ class WP_REST_User_Taxonomies_Controller_Gutenberg extends WP_REST_Posts_Control
 			'type'                 => 'object',
 			'additionalProperties' => false,
 			'properties'           => array(
-				'public'       => array( 'type' => 'boolean' ),
-				'hierarchical' => array( 'type' => 'boolean' ),
+				'public'             => array( 'type' => 'boolean' ),
+				'hierarchical'       => array( 'type' => 'boolean' ),
 				// Caps payload size; well above any reasonable description.
-				'description'  => array(
+				'description'        => array(
 					'type'      => 'string',
 					'maxLength' => 1000,
 				),
-				'labels'       => array(
+				'publicly_queryable' => array( 'type' => 'boolean' ),
+				'show_ui'            => array( 'type' => 'boolean' ),
+				'show_in_menu'       => array( 'type' => 'boolean' ),
+				'show_in_nav_menus'  => array( 'type' => 'boolean' ),
+				'show_tagcloud'      => array( 'type' => 'boolean' ),
+				'show_in_quick_edit' => array( 'type' => 'boolean' ),
+				'show_admin_column'  => array( 'type' => 'boolean' ),
+				'show_in_rest'       => array( 'type' => 'boolean' ),
+				'labels'             => array(
 					'type'                 => 'object',
 					'additionalProperties' => false,
 					'properties'           => $label_props,

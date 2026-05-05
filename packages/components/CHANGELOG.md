@@ -13,6 +13,7 @@
 ### Internal
 
 -   Update code to comply with `eslint-plugin-react-hooks` v7 ([#69962](https://github.com/WordPress/gutenberg/pull/69962)).
+-   `SlotFill`: Add dependencies to `updateFill` effect ([#77907](https://github.com/WordPress/gutenberg/pull/77907)).
 
 ## 33.0.0 (2026-04-29)
 

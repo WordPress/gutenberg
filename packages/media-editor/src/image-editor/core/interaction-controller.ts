@@ -896,11 +896,11 @@ export class InteractionController {
 			}
 			case 'r':
 			case 'R': {
-				if ( e.metaKey || e.ctrlKey || e.altKey || e.shiftKey ) {
+				if ( e.metaKey || e.ctrlKey || e.altKey ) {
 					break;
 				}
 				e.preventDefault();
-				this.options.actions.snapRotate90( 1 );
+				this.options.actions.snapRotate90( e.shiftKey ? -1 : 1 );
 				break;
 			}
 			case 'h':
