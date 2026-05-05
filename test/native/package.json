@@ -27,6 +27,7 @@
 		"@babel/plugin-transform-react-jsx-source": "^7.27.1",
 		"@babel/plugin-transform-runtime": "^7.25.7",
 		"@emotion/jest": "^11.14.2",
+		"@react-native-clipboard/clipboard": "1.11.2",
 		"@react-native/babel-preset": "0.73.10",
 		"@testing-library/react-native": "^12.0.0",
 		"@wordpress/api-fetch": "file:../../packages/api-fetch",
@@ -49,8 +50,11 @@
 		"react": "18.3.1",
 		"react-native": "0.73.3",
 		"react-native-gesture-handler": "2.14.1",
+		"react-native-modal": "13.0.1",
 		"react-native-reanimated": "3.6.2",
+		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "4.8.2",
+		"react-native-svg": "14.0.0",
 		"reassure": "^0.7.1",
 		"uuid": "11.1.1"
 	},
@@ -61,7 +65,7 @@
 		"test:native": "cross-env NODE_ENV=test jest --config jest.config.js",
 		"test:native:watch": "npm run test:native -- --watch",
 		"test:native:clean": "jest --clearCache --config jest.config.js",
-		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/.bin/jest --runInBand --verbose --config jest.config.js",
+		"test:native:debug": "cross-env NODE_ENV=test node --inspect-brk jest --runInBand --verbose --config jest.config.js",
 		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
 		"test:native:perf:baseline": "cross-env TEST_RUNNER_ARGS='--runInBand --config jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure --baseline",
 		"test:native:update": "npm run test:native -- --updateSnapshot"
