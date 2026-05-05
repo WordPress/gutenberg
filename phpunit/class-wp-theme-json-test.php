@@ -1739,6 +1739,39 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( ':root :where(.wp-block-button:hover){writing-mode: vertical-rl;}', $css );
 	}
 
+	/**
+	 * Tests that responsive block pseudo-selector styles are output even when the
+	 * default pseudo-selector state does not have styles.
+	 */
+	public function test_get_stylesheet_outputs_responsive_block_pseudo_selector_without_default_pseudo_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'mobile' => array(
+								':hover' => array(
+									'typography' => array(
+										'writingMode' => 'vertical-rl',
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertSameCSS(
+			'@media (width <= 480px){:root :where(.wp-block-button:hover){writing-mode: vertical-rl;}}',
+			$css
+		);
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

@@ -884,17 +884,12 @@ function pickStyleAndPseudoKeys(
 	const allowedPseudoSelectors = blockName
 		? VALID_BLOCK_PSEUDO_SELECTORS[ blockName ] ?? []
 		: [];
-	// Responsive breakpoint keys are available for all blocks (blockName contains '/').
-	const includeResponsive = blockName?.includes( '/' ) ?? false;
+
 	const pickedEntries = entries.filter(
 		( [ key ] ) =>
 			STYLE_KEYS.includes( key ) ||
 			allowedPseudoSelectors.includes( key ) ||
-			( includeResponsive &&
-				Object.prototype.hasOwnProperty.call(
-					RESPONSIVE_BREAKPOINTS,
-					key
-				) )
+			RESPONSIVE_BREAKPOINTS[ key ]
 	);
 	// clone the style objects so that `getFeatureDeclarations` can remove consumed keys from it
 	const clonedEntries = pickedEntries.map( ( [ key, style ] ) => [
@@ -1021,8 +1016,8 @@ function appendResponsiveStyles(
 	blockRootSelector?: string,
 	styleVariationName?: string
 ): string {
-	const responsiveStyles = Object.entries( styles ).filter( ( [ key ] ) =>
-		Object.prototype.hasOwnProperty.call( RESPONSIVE_BREAKPOINTS, key )
+	const responsiveStyles = Object.entries( styles ).filter(
+		( [ key ] ) => RESPONSIVE_BREAKPOINTS[ key ]
 	);
 
 	if ( ! responsiveStyles.length ) {
@@ -1093,19 +1088,17 @@ function appendResponsiveStyles(
 			remainingBreakpointStyles
 		);
 
-		if ( ! breakpointDeclarations.length ) {
-			return;
+		if ( breakpointDeclarations.length ) {
+			const cssSelector = styleVariationSelector
+				? concatFeatureVariationSelectorString(
+						selector,
+						styleVariationSelector
+				  )
+				: selector;
+			ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
+				';'
+			) };}}`;
 		}
-
-		const cssSelector = styleVariationSelector
-			? concatFeatureVariationSelectorString(
-					selector,
-					styleVariationSelector
-			  )
-			: selector;
-		ruleset += `${ mediaQuery }{:root :where(${ cssSelector }){${ breakpointDeclarations.join(
-			';'
-		) };}}`;
 
 		const breakpointPseudoRules = appendPseudoSelectorStyles(
 			remainingBreakpointStyles,
