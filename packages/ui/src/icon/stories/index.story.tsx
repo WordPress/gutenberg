@@ -18,6 +18,12 @@ const meta: Meta< typeof Icon > = {
 			);
 		},
 	],
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

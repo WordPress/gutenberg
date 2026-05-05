@@ -9,6 +9,12 @@ const meta: Meta< typeof InputLayout > = {
 	subcomponents: {
 		Slot: InputLayout.Slot,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

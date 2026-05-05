@@ -12,6 +12,12 @@ const meta: Meta< typeof Tooltip.Root > = {
 		Popup: Tooltip.Popup,
 		Portal: Tooltip.Portal,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

@@ -13,6 +13,12 @@ const meta: Meta< typeof Field.Root > = {
 		Description: Field.Description,
 		Details: Field.Details,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

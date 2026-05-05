@@ -2,7 +2,8 @@ export type ComponentStatus =
 	| 'stable'
 	| 'use-with-caution'
 	| 'not-recommended'
-	| 'unaudited';
+	| 'unaudited'
+	| 'coming-soon';
 
 export const statuses: Record<
 	ComponentStatus,
@@ -26,5 +27,9 @@ export const statuses: Record<
 	unaudited: {
 		label: 'Unaudited',
 		icon: '❓',
+	},
+	'coming-soon': {
+		label: 'Coming soon',
+		icon: '🔜',
 	},
 };

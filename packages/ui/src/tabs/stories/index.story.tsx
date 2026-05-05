@@ -12,6 +12,12 @@ const meta: Meta< typeof Tabs.Root > = {
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.Panel': Tabs.Panel,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

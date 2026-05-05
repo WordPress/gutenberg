@@ -20,6 +20,12 @@ const meta: Meta< typeof IconButton > = {
 			control: { type: 'boolean' },
 		},
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

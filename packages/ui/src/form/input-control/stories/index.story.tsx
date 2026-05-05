@@ -23,6 +23,12 @@ const meta: Meta< typeof InputControl > = {
 		value: { control: false },
 		type: { control: 'text' },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

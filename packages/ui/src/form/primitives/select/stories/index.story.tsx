@@ -10,6 +10,12 @@ const meta: Meta< typeof Select.Root > = {
 		Popup: Select.Popup,
 		Item: Select.Item,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

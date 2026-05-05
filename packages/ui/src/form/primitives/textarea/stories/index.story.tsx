@@ -4,6 +4,12 @@ import { Textarea } from '../index';
 const meta: Meta< typeof Textarea > = {
 	title: 'Design System/Components/Form/Primitives/Textarea',
 	component: Textarea,
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

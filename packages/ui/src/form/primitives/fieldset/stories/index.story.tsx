@@ -10,6 +10,12 @@ const meta: Meta< typeof Fieldset.Root > = {
 		Description: Fieldset.Description,
 		Details: Fieldset.Details,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

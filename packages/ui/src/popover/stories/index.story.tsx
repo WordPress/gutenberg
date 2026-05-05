@@ -23,6 +23,12 @@ const meta: Meta< typeof Popover.Root > = {
 	argTypes: {
 		children: { control: false },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

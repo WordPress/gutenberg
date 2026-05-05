@@ -15,6 +15,10 @@ const meta: Meta = {
 	title: 'Design System/Components/Tooltip/Usage Guidelines',
 	parameters: {
 		controls: { disable: true },
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
 	},
 	tags: [ '!dev' ],
 };

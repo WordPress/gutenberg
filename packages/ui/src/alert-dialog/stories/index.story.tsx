@@ -19,6 +19,12 @@ const meta: Meta< typeof AlertDialog.Root > = {
 		onConfirm: { action: fn() },
 		onOpenChange: { action: fn() },
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

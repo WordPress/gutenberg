@@ -13,6 +13,12 @@ const meta: Meta< typeof EmptyState.Root > = {
 		'EmptyState.Description': EmptyState.Description,
 		'EmptyState.Actions': EmptyState.Actions,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

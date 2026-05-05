@@ -12,6 +12,12 @@ const meta: Meta< typeof Notice.Root > = {
 		'Notice.ActionButton': Notice.ActionButton,
 		'Notice.ActionLink': Notice.ActionLink,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

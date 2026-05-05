@@ -24,6 +24,12 @@ const meta: Meta< typeof Autocomplete.Root > = {
 		Empty: Autocomplete.Empty,
 		Clear: Autocomplete.Clear,
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 

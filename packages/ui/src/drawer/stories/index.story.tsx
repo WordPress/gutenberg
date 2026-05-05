@@ -25,6 +25,12 @@ const meta: Meta< typeof Drawer.Root > = {
 			options: [ true, false, 'trap-focus' ],
 		},
 	},
+	parameters: {
+		componentStatus: {
+			status: 'coming-soon',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
