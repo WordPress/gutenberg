@@ -251,8 +251,6 @@ function MediaEditorModalContent( {
 	const [ isPlacementActive, setIsPlacementActive ] = useState( false );
 	const [ isCanvasGestureActive, setIsCanvasGestureActive ] =
 		useState( false );
-	const isPlacementActiveRef = useRef( false );
-	const isCanvasGestureActiveRef = useRef( false );
 	const placementControlTimerRef =
 		useRef< ReturnType< typeof setTimeout > >();
 
@@ -260,26 +258,18 @@ function MediaEditorModalContent( {
 	const [ freeformCrop, setFreeformCrop ] = useState( true );
 
 	const signalPlacementControlInteraction = useCallback( () => {
-		isPlacementActiveRef.current = true;
 		setIsPlacementActive( true );
 		clearTimeout( placementControlTimerRef.current );
 		placementControlTimerRef.current = setTimeout( () => {
-			isPlacementActiveRef.current = false;
 			setIsPlacementActive( false );
 		}, PLACEMENT_CONTROL_IDLE_MS );
 	}, [] );
 	const handleCanvasGestureStart = useCallback( () => {
-		isCanvasGestureActiveRef.current = true;
 		setIsCanvasGestureActive( true );
 	}, [] );
 	const handleCanvasGestureEnd = useCallback( () => {
-		isCanvasGestureActiveRef.current = false;
 		setIsCanvasGestureActive( false );
 	}, [] );
-	const shouldSuppressUndoRedo = useCallback(
-		() => isPlacementActiveRef.current || isCanvasGestureActiveRef.current,
-		[]
-	);
 	const isCropInteractionActive = isPlacementActive || isCanvasGestureActive;
 
 	useEffect( () => {
@@ -293,9 +283,7 @@ function MediaEditorModalContent( {
 	useEffect( () => {
 		setAspectRatioValue( '0' );
 		setFreeformCrop( true );
-		isPlacementActiveRef.current = false;
 		setIsPlacementActive( false );
-		isCanvasGestureActiveRef.current = false;
 		setIsCanvasGestureActive( false );
 	}, [ id ] );
 
@@ -518,7 +506,7 @@ function MediaEditorModalContent( {
 						! target.closest( `[${ CROP_CONTROL_ATTR }]` );
 					if ( ! isMetadataField ) {
 						event.preventDefault();
-						if ( shouldSuppressUndoRedo() ) {
+						if ( isCropInteractionActive ) {
 							return;
 						}
 						if ( isRedoShortcut ) {
@@ -619,9 +607,6 @@ function MediaEditorModalContent( {
 										}
 										isUndoRedoDisabled={
 											isCropInteractionActive
-										}
-										shouldSuppressUndoRedo={
-											shouldSuppressUndoRedo
 										}
 									/>
 								) : undefined

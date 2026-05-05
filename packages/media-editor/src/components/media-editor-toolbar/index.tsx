@@ -32,8 +32,6 @@ export interface MediaEditorToolbarProps {
 	onPlacementControlInteraction?: () => void;
 	/** Whether undo/redo should be unavailable during an active gesture. */
 	isUndoRedoDisabled?: boolean;
-	/** Synchronous guard for undo/redo clicks before disabled state renders. */
-	shouldSuppressUndoRedo?: () => boolean;
 }
 
 /**
@@ -45,13 +43,11 @@ export interface MediaEditorToolbarProps {
  * @param props.onReset
  * @param props.onPlacementControlInteraction
  * @param props.isUndoRedoDisabled
- * @param props.shouldSuppressUndoRedo
  */
 export default function MediaEditorToolbar( {
 	onReset,
 	onPlacementControlInteraction,
 	isUndoRedoDisabled = false,
-	shouldSuppressUndoRedo,
 }: MediaEditorToolbarProps ) {
 	const {
 		state,
@@ -72,13 +68,13 @@ export default function MediaEditorToolbar( {
 		onReset?.();
 	};
 	const handleUndo = () => {
-		if ( shouldSuppressUndoRedo?.() ) {
+		if ( isUndoRedoDisabled ) {
 			return;
 		}
 		undoCrop();
 	};
 	const handleRedo = () => {
-		if ( shouldSuppressUndoRedo?.() ) {
+		if ( isUndoRedoDisabled ) {
 			return;
 		}
 		redoCrop();
