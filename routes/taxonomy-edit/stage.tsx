@@ -297,7 +297,7 @@ function TaxonomyPage( {
 					type="submit"
 					form={ formId }
 					isBusy={ isSaving }
-					disabled={ isSaving }
+					disabled={ isSaving || ! isValid }
 					accessibleWhenDisabled
 				>
 					{ isAddMode ? __( 'Create' ) : __( 'Save' ) }
