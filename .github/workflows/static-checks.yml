@@ -73,6 +73,9 @@ jobs:
             - name: Lint package.json files
               run: npm run lint:pkg-json
 
+            - name: Lint dependency versions across workspaces
+              run: npm run lint:deps
+
             - name: Lint package-lock.json file
               run: npm run lint:lockfile
 
