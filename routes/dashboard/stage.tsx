@@ -2,22 +2,39 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { useWidgetTypes } from './widget-types/hooks/use-widget-types';
+import { WidgetDashboard, type DashboardWidget } from './widget-dashboard';
+import { useWidgetTypes } from './widget-types';
+
+const DEFAULT_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: '1',
+		type: 'wordpress/hello-world',
+		placement: {
+			width: 'full',
+			height: 1,
+		},
+	},
+];
 
 function Dashboard() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( DEFAULT_LAYOUT );
+
 	const widgetTypes = useWidgetTypes();
 
-	// eslint-disable-next-line no-console
-	console.log( 'widgetTypes', widgetTypes ); // ToDo: clean after testing
-
 	return (
-		<Page title={ __( 'Dashboard' ) }>
-			<div className="dashboard-widgets" />
+		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>
+			<WidgetDashboard
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				widgetTypes={ widgetTypes }
+			/>
 		</Page>
 	);
 }
