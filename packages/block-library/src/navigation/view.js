@@ -45,6 +45,9 @@ function getFocusableElements( ref ) {
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
+let previousPaddingRight = '';
+let previousPaddingLeft = '';
+
 const { state, actions } = store(
 	'core/navigation',
 	{
@@ -214,12 +217,15 @@ const { state, actions } = store(
 
 						if ( scrollbarWidth > 0 ) {
 							const isRTL =
-								window.getComputedStyle(
-									document.documentElement
-								).direction === 'rtl';
+								document.documentElement.dir === 'rtl' ||
+								document.body.classList.contains( 'rtl' );
 							if ( isRTL ) {
+								previousPaddingLeft =
+									document.body.style.paddingLeft;
 								document.body.style.paddingLeft = `${ scrollbarWidth }px`;
 							} else {
+								previousPaddingRight =
+									document.body.style.paddingRight;
 								document.body.style.paddingRight = `${ scrollbarWidth }px`;
 							}
 						}
@@ -246,8 +252,8 @@ const { state, actions } = store(
 						document.documentElement.classList.remove(
 							'has-modal-open'
 						);
-						document.body.style.paddingRight = '';
-						document.body.style.paddingLeft = '';
+						document.body.style.paddingRight = previousPaddingRight;
+						document.body.style.paddingLeft = previousPaddingLeft;
 					}
 				}
 			},
