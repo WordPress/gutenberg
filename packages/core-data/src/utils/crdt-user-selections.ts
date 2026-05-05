@@ -13,6 +13,7 @@ import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import {
+	asRichTextOffset,
 	getRootMap,
 	getYTextByAttributeKey,
 	richTextOffsetToHtmlIndex,
@@ -184,7 +185,10 @@ function getCursorPosition(
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
-		richTextOffsetToHtmlIndex( currentYText.toString(), selection.offset )
+		richTextOffsetToHtmlIndex(
+			currentYText.toString(),
+			asRichTextOffset( selection.offset )
+		)
 	);
 
 	return {

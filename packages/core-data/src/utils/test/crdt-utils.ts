@@ -8,10 +8,26 @@ import { Y } from '@wordpress/sync';
  * Internal dependencies
  */
 import {
+	asHtmlStringIndex,
+	asRichTextOffset,
 	getYTextByAttributeKey,
-	htmlIndexToRichTextOffset,
-	richTextOffsetToHtmlIndex,
+	htmlIndexToRichTextOffset as typedHtmlIndexToRichTextOffset,
+	richTextOffsetToHtmlIndex as typedRichTextOffsetToHtmlIndex,
 } from '../crdt-utils';
+
+function htmlIndexToRichTextOffset( html: string, htmlIndex: number ) {
+	return typedHtmlIndexToRichTextOffset(
+		html,
+		asHtmlStringIndex( htmlIndex )
+	);
+}
+
+function richTextOffsetToHtmlIndex( html: string, richTextOffset: number ) {
+	return typedRichTextOffsetToHtmlIndex(
+		html,
+		asRichTextOffset( richTextOffset )
+	);
+}
 
 function createAttachedAttributes(): Y.Map< unknown > {
 	const ydoc = new Y.Doc();
