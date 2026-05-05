@@ -477,6 +477,57 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
+	it( 'adopts a removal that arrives bundled with its marker-clear (apply of pending-remove via sync)', async () => {
+		// Regression: when another client clicks "Apply" on a
+		// pending-remove suggestion, the resulting marker-clear and
+		// removeBlock land here through sync as a single batched
+		// block-editor update. Without the apply-landing check the
+		// removal-detection branch would re-insert the block and tag
+		// it as a fresh pending-remove — which then bounces back
+		// through sync, undoing the apply on the accepting client a
+		// moment after they clicked.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b ],
+		} );
+
+		// First, this client creates the pending-remove suggestion
+		// (just like the suggester would).
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+
+		// Simulate the apply landing: marker-clear + removeBlock
+		// batched into a single store update (matching how YJS
+		// applies multi-op transactions on a peer client).
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( b.clientId, { metadata: {} } );
+				registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+			} );
+		} );
+		await flushSubscribers();
+
+		// The block must stay removed — the interceptor adopts the
+		// apply landing rather than re-inserting and re-tagging.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
+
+		// The orphan overlay entry is cleaned up by the PRUNE_ORPHANS
+		// effect once the block leaves the live tree.
+		expect( getOverlay().entries[ b.clientId ] ).toBeUndefined();
+	} );
+
 	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {
 		// `removeBlock` on a parent removes the whole subtree atomically.
 		// We must re-insert just the parent — its child rides along.
@@ -539,6 +590,61 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			anchorClientId: clientId,
 			parentClientId: null,
 		} );
+	} );
+
+	it( 'adopts a removal that arrives bundled with its marker-clear (reject of pending-insert via sync)', async () => {
+		// Regression: rejecting a pending-insert suggestion on
+		// another client dispatches `removeBlock` (the rejection
+		// undoes the insert). When that arrives here via sync,
+		// batched with the corresponding marker-clear, the
+		// disappearing block carries `metadata.suggestion.type ===
+		// 'pending-insert'` in the previous-tick tree. The
+		// interceptor must adopt that as the reject landing instead
+		// of re-inserting the block and re-tagging it as a fresh
+		// pending-remove — otherwise the rejected paragraph reappears
+		// on the suggester's screen a moment later via the bounced
+		// re-insert.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const inserted = createBlock( TEST_BLOCK_NAME, { content: 'New' } );
+		const { registry, getOverlay } = setup( { initialBlocks: [ a ] } );
+
+		// First, this client creates the pending-insert suggestion.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 1, undefined, false );
+		} );
+		await flushSubscribers();
+
+		expect(
+			registry
+				.select( blockEditorStore )
+				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
+				?.type
+		).toBe( 'pending-insert' );
+
+		// Simulate the reject landing: marker-clear + removeBlock
+		// batched into a single store update.
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( inserted.clientId, {
+						metadata: {},
+					} );
+				registry
+					.dispatch( blockEditorStore )
+					.removeBlock( inserted.clientId );
+			} );
+		} );
+		await flushSubscribers();
+
+		// The block must stay removed — the interceptor adopts the
+		// reject landing rather than re-inserting and re-tagging.
+		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
+		expect( liveBlocks ).toHaveLength( 1 );
+		expect( liveBlocks[ 0 ].clientId ).toBe( a.clientId );
+		expect( getOverlay().entries[ inserted.clientId ] ).toBeUndefined();
 	} );
 
 	it( 'records a null anchor when the inserted block lands at index 0 (no previous sibling)', async () => {
