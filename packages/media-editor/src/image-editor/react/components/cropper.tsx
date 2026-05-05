@@ -284,6 +284,7 @@ function CropperInner(
 	}, [ state, elementSize, visualSize ] );
 	const [ isResizing, setIsResizing ] = useState( false );
 	const isResizingRef = useRef( false );
+	const isSettlingRef = useRef( false );
 
 	// Use the interaction hook for mouse, touch, and keyboard events.
 	const {
@@ -309,7 +310,10 @@ function CropperInner(
 			return;
 		}
 		const handleWheel = ( event: WheelEvent ) => {
-			if ( isResizingRef.current ) {
+			// Block wheel zoom while resizing or settling — the canvas CSS
+			// transform changes getBoundingClientRect() during this window,
+			// so focal-point math would resolve against the wrong center.
+			if ( isResizingRef.current || isSettlingRef.current ) {
 				event.preventDefault();
 				return;
 			}
@@ -413,6 +417,12 @@ function CropperInner(
 	const handleResizeStart = useCallback( () => {
 		isResizingRef.current = true;
 		setIsResizing( true );
+		// Clear any in-flight settle so transitions don't apply during the
+		// new drag (rapid successive resizes would otherwise inherit the
+		// previous settle animation).
+		clearTimeout( settleTimerRef.current );
+		isSettlingRef.current = false;
+		setSettling( false );
 		resetViewport();
 		onGestureStart?.();
 	}, [ onGestureStart, resetViewport ] );
@@ -424,6 +434,7 @@ function CropperInner(
 	const handleResizeEnd = useCallback( () => {
 		isResizingRef.current = false;
 		setIsResizing( false );
+		isSettlingRef.current = true;
 		setSettling( true );
 		// Reset viewport pan first so it transitions back to zero in sync
 		// with the settle animation on the image.
@@ -432,6 +443,7 @@ function CropperInner(
 		onGestureEnd?.();
 		clearTimeout( settleTimerRef.current );
 		settleTimerRef.current = setTimeout( () => {
+			isSettlingRef.current = false;
 			setSettling( false );
 		}, 200 );
 	}, [ settleCrop, onGestureEnd, resetViewport ] );
@@ -464,15 +476,19 @@ function CropperInner(
 	// Viewport pan CSS transform for the canvas div. Applied during resize
 	// drags to keep handles visible when the crop extends past the canvas edge.
 	// Transitions back to zero during the settle animation.
+	// will-change promotes the canvas to its own compositor layer while the
+	// transform is active, keeping per-frame pan updates off the main thread.
 	const settleTransition = settling ? 'transform 200ms ease-out' : undefined;
+	const willChange = isResizing || settling ? 'transform' : undefined;
 	let canvasStyle: React.CSSProperties | undefined;
 	if ( viewportState.pan.x !== 0 || viewportState.pan.y !== 0 ) {
 		canvasStyle = {
 			transform: `translate(${ viewportState.pan.x }px, ${ viewportState.pan.y }px)`,
 			transition: settleTransition,
+			willChange,
 		};
 	} else if ( settling ) {
-		canvasStyle = { transition: settleTransition };
+		canvasStyle = { transition: settleTransition, willChange };
 	}
 
 	// Forward the root element to the consumer's ref.

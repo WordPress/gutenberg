@@ -13,14 +13,21 @@ export function viewportReducer(
 	action: ViewportAction
 ): ViewportState {
 	switch ( action.type ) {
-		case 'SET_VIEWPORT_ZOOM':
-			return {
-				...state,
-				zoom: Math.min( 4, Math.max( 0.1, action.payload ) ),
-			};
-		case 'SET_VIEWPORT_PAN':
-			return { ...state, pan: action.payload };
+		case 'SET_VIEWPORT_ZOOM': {
+			const zoom = Math.min( 4, Math.max( 0.1, action.payload ) );
+			return zoom === state.zoom ? state : { ...state, zoom };
+		}
+		case 'SET_VIEWPORT_PAN': {
+			const { x, y } = action.payload;
+			return x === state.pan.x && y === state.pan.y
+				? state
+				: { ...state, pan: action.payload };
+		}
 		case 'RESET_VIEWPORT':
-			return DEFAULT_VIEWPORT_STATE;
+			return state.zoom === DEFAULT_VIEWPORT_STATE.zoom &&
+				state.pan.x === DEFAULT_VIEWPORT_STATE.pan.x &&
+				state.pan.y === DEFAULT_VIEWPORT_STATE.pan.y
+				? state
+				: DEFAULT_VIEWPORT_STATE;
 	}
 }
