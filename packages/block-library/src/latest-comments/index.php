@@ -50,17 +50,30 @@ function render_block_core_latest_comments( $attributes ) {
 		$display_content = $attributes['displayContent'] ?? 'excerpt';
 	}
 
+	// Build the comment type filter. Regular comments are always included.
+	// Pingbacks and trackbacks are included based on block attributes,
+	// defaulting to true for backward compatibility with existing blocks.
+	$comment_types   = array( 'comment' );
+	$show_pingbacks  = $attributes['showPingbacks'] ?? true;
+	$show_trackbacks = $attributes['showTrackbacks'] ?? true;
+
+	if ( $show_pingbacks ) {
+		$comment_types[] = 'pingback';
+	}
+	if ( $show_trackbacks ) {
+		$comment_types[] = 'trackback';
+	}
+
+	$query_args = array(
+		'number'      => $attributes['commentsToShow'],
+		'status'      => 'approve',
+		'post_status' => 'publish',
+		'type__in'    => $comment_types,
+	);
+
 	$comments = get_comments(
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php */
-		apply_filters(
-			'widget_comments_args',
-			array(
-				'number'      => $attributes['commentsToShow'],
-				'status'      => 'approve',
-				'post_status' => 'publish',
-			),
-			array()
-		)
+		apply_filters( 'widget_comments_args', $query_args, array() )
 	);
 
 	$list_items_markup = '';
