@@ -55,8 +55,7 @@
 		"react-native-safe-area": "^0.5.0",
 		"react-native-safe-area-context": "4.8.2",
 		"react-native-svg": "14.0.0",
-		"reassure": "^0.7.1",
-		"uuid": "11.1.1"
+		"reassure": "^0.7.1"
 	},
 	"publishConfig": {
 		"access": "public"
