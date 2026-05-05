@@ -87,7 +87,7 @@ function gutenberg_render_background_support( $block_content, $block ) {
 	 * 'no-repeat' is treated the same as unset — both are compatible with object-fit.
 	 * Only explicit tiling values (repeat, repeat-x, repeat-y) require CSS background-image.
 	 */
-	$attachment_id = is_array( $background_styles['backgroundImage'] )
+	$attachment_id = isset( $background_styles['backgroundImage'] ) && is_array( $background_styles['backgroundImage'] )
 		? (int) ( $background_styles['backgroundImage']['id'] ?? 0 )
 		: 0;
 

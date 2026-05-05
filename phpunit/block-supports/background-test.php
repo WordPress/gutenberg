@@ -444,11 +444,17 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 		$actual = gutenberg_render_background_support( '<div>Content</div>', $block );
 
 		$this->assertStringContainsString( '<img', $actual, 'Output should contain an img element for srcset.' );
-		$this->assertStringNotContainsString( 'background-image:', $actual, 'Wrapper should not have CSS background-image (image handled by <img>).' );
 		$this->assertStringContainsString( 'wp-block__background-gradient', $actual, 'Output should include gradient overlay div.' );
 		$this->assertStringContainsString( 'linear-gradient', $actual, 'Gradient overlay should include gradient CSS value.' );
 		$this->assertStringContainsString( 'has-background', $actual, 'Wrapper should have has-background class.' );
-		$this->assertStringContainsString( 'position:relative', $actual, 'Wrapper should have position:relative style.' );
+
+		// The wrapper must have position:relative but must NOT have background-image in its
+		// own style attribute — the image is handled by <img> and the gradient by the overlay div.
+		$tags = new WP_HTML_Tag_Processor( $actual );
+		$this->assertTrue( $tags->next_tag(), 'Rendered HTML should have a first tag.' );
+		$wrapper_style = $tags->get_attribute( 'style' ) ?? '';
+		$this->assertStringContainsString( 'position:relative', $wrapper_style, 'Wrapper should have position:relative style.' );
+		$this->assertStringNotContainsString( 'background-image:', $wrapper_style, 'Wrapper should not have CSS background-image (image handled by <img>).' );
 
 		wp_delete_attachment( $attachment_id, true );
 	}
