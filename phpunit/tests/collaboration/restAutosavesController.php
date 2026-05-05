@@ -11,13 +11,16 @@
 class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 
 	protected static int $author_id;
+	protected static int $editor_id;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$author_id = $factory->user->create( array( 'role' => 'author' ) );
+		self::$editor_id = $factory->user->create( array( 'role' => 'editor' ) );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$author_id );
+		self::delete_user( self::$editor_id );
 		delete_option( 'wp_collaboration_enabled' );
 	}
 
@@ -38,6 +41,25 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 				'post_content' => '',
 				'post_status'  => 'auto-draft',
 				'post_title'   => 'Auto Draft',
+				'post_type'    => 'post',
+			)
+		);
+	}
+
+	/**
+	 * Creates a draft post.
+	 *
+	 * @param string $title   Post title.
+	 * @param string $content Post content.
+	 * @return int Post ID.
+	 */
+	private function create_draft( string $title, string $content ): int {
+		return self::factory()->post->create(
+			array(
+				'post_author'  => self::$author_id,
+				'post_content' => $content,
+				'post_status'  => 'draft',
+				'post_title'   => $title,
 				'post_type'    => 'post',
 			)
 		);
@@ -90,5 +112,45 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( 'draft', $post->post_status );
 		$this->assertSame( $title, $post->post_title );
 		$this->assertSame( $content, $post->post_content );
+	}
+
+	public function test_collaborator_auto_draft_autosave_promotes_parent_post_when_collaboration_is_enabled() {
+		update_option( 'wp_collaboration_enabled', 1 );
+
+		$post_id = $this->create_auto_draft();
+		$title   = 'RTC collaborator autosaved title';
+		$content = '<!-- wp:paragraph --><p>RTC collaborator autosaved content</p><!-- /wp:paragraph -->';
+
+		wp_set_current_user( self::$editor_id );
+		$response = $this->dispatch_autosave( $post_id, $title, $content );
+
+		$this->assertSame( 200, $response->get_status() );
+		$post = get_post( $post_id );
+		$this->assertSame( 'draft', $post->post_status );
+		$this->assertSame( $title, $post->post_title );
+		$this->assertSame( $content, $post->post_content );
+	}
+
+	public function test_draft_autosave_creates_revision_when_collaboration_is_enabled() {
+		update_option( 'wp_collaboration_enabled', 1 );
+
+		$original_title   = 'Original RTC draft title';
+		$original_content = '<!-- wp:paragraph --><p>Original RTC draft content</p><!-- /wp:paragraph -->';
+		$post_id          = $this->create_draft( $original_title, $original_content );
+		$title            = 'RTC draft autosaved title';
+		$content          = '<!-- wp:paragraph --><p>RTC draft autosaved content</p><!-- /wp:paragraph -->';
+
+		$response = $this->dispatch_autosave( $post_id, $title, $content );
+
+		$this->assertSame( 200, $response->get_status() );
+		$post = get_post( $post_id );
+		$this->assertSame( 'draft', $post->post_status );
+		$this->assertSame( $original_title, $post->post_title );
+		$this->assertSame( $original_content, $post->post_content );
+
+		$autosave = wp_get_post_autosave( $post_id, self::$author_id );
+		$this->assertInstanceOf( WP_Post::class, $autosave );
+		$this->assertSame( $title, $autosave->post_title );
+		$this->assertSame( $content, $autosave->post_content );
 	}
 }
