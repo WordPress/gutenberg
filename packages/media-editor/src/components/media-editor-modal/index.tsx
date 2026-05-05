@@ -59,6 +59,7 @@ import {
 	useImageEditingSession,
 	type ImageEditingSessionImage,
 } from '../image-editing-session';
+import { useImageEditorExtensionPanels } from '../image-editor-extension-registry';
 
 // Details-tab edits the modal bundles into a transformed `/edit` request.
 // Matches Core's `WP_REST_Attachments_Controller::get_edit_media_item_args`
@@ -238,6 +239,7 @@ function MediaEditorModalContent( {
 }: MediaEditorModalContentProps ) {
 	const imageSession = useImageEditingSession();
 	const setSourceImage = imageSession.setSourceImage;
+	const extensionPanels = useImageEditorExtensionPanels();
 	const hasChanges = imageSession.isDirty || hasEdits;
 
 	const registry = useRegistry();
@@ -346,6 +348,22 @@ function MediaEditorModalContent( {
 		if ( ! isImage ) {
 			return [ detailsTab ];
 		}
+		const extensionTabs = extensionPanels.map( ( panel ) => {
+			const PanelComponent = panel.component;
+			return {
+				id: `extension/${ panel.name }`,
+				title: panel.title,
+				panel: (
+					<Stack
+						className="media-editor-modal__panel"
+						direction="column"
+						gap="lg"
+					>
+						<PanelComponent session={ imageSession } />
+					</Stack>
+				),
+			};
+		} );
 		return [
 			{
 				id: 'crop',
@@ -369,6 +387,7 @@ function MediaEditorModalContent( {
 					</Stack>
 				),
 			},
+			...extensionTabs,
 			detailsTab,
 		];
 	}, [
@@ -377,6 +396,8 @@ function MediaEditorModalContent( {
 		freeformCrop,
 		aspectRatioPresets,
 		signalPlacementControlInteraction,
+		extensionPanels,
+		imageSession,
 	] );
 
 	const handleChange = ( updates: Partial< Media > ) => {
