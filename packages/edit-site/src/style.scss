@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/dataviews/build-style/style.css" as dataviews;
 @use "@wordpress/fields/build-style/style.css" as fields;
@@ -61,6 +62,79 @@ body.js.site-editor-php {
 
 body.js.site-editor-php {
 	background: $gray-900;
+
+	&.is-admin-bar-in-editor-enabled {
+		margin-top: 0;
+		height: 100%;
+
+		#wpadminbar {
+			display: block;
+		}
+
+		.edit-site-sidebar-navigation-screen__title-icon {
+			padding-top: $grid-unit-20;
+		}
+
+		.edit-site-site-hub {
+			display: none;
+		}
+
+		.edit-site-layout__content,
+		.edit-site-layout__sidebar {
+			min-height: 0;
+		}
+
+		.edit-site-sidebar__content {
+			flex-basis: 0;
+			min-height: 0;
+		}
+
+		.edit-site {
+			box-sizing: border-box;
+			padding-top: $admin-bar-height-big;
+			height: 100vh;
+			min-height: 100vh;
+
+			@include break-small {
+				padding-top: 0;
+				top: $admin-bar-height-big;
+				height: calc(100vh - #{$admin-bar-height-big});
+				min-height: calc(100vh - #{$admin-bar-height-big});
+			}
+		}
+
+		.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
+			top: $admin-bar-height-big;
+			height: calc(100vh - #{$admin-bar-height-big});
+		}
+
+		.is-entity-save-view-open .interface-interface-skeleton__actions {
+			&:focus,
+			&:focus-within {
+				top: $admin-bar-height-big;
+			}
+		}
+
+		@include break-medium {
+			.edit-site {
+				top: $admin-bar-height;
+				height: calc(100vh - #{$admin-bar-height});
+				min-height: calc(100vh - #{$admin-bar-height});
+			}
+
+			.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
+				top: $admin-bar-height;
+				height: calc(100vh - #{$admin-bar-height});
+			}
+
+			.is-entity-save-view-open .interface-interface-skeleton__actions {
+				&:focus,
+				&:focus-within {
+					top: $admin-bar-height;
+				}
+			}
+		}
+	}
 }
 
 .edit-site {

@@ -60,6 +60,18 @@
 			display: block;
 		}
 	}
+
+	body.is-admin-bar-in-editor-enabled & {
+		.edit-site-editor__view-mode-toggle-icon {
+			display: none;
+		}
+
+		.edit-site-editor__back-icon {
+			background: transparent;
+			opacity: 1 !important;
+			transform: none !important;
+		}
+	}
 }
 
 .edit-site-editor__back-icon {

@@ -38,6 +38,33 @@
 			display: block;
 		}
 	}
+
+	body.is-admin-bar-in-editor-enabled & {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: $button-size-compact;
+
+		.components-button {
+			height: $button-size-compact;
+			width: $button-size-compact;
+			color: $gray-900;
+		}
+
+		.edit-post-fullscreen-mode-close__view-mode-toggle-icon {
+			display: none;
+		}
+
+		.edit-post-fullscreen-mode-close__back-icon {
+			top: auto;
+			left: auto;
+			width: $button-size-compact;
+			height: $button-size-compact;
+			background: transparent;
+			opacity: 1 !important;
+			transform: none !important;
+		}
+	}
 }
 
 .edit-post-fullscreen-mode-close-site-icon__icon {

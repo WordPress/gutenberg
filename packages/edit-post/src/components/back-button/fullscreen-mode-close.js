@@ -12,9 +12,14 @@ import {
 	Icon,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-import { wordpress, arrowUpLeft } from '@wordpress/icons';
+import {
+	wordpress,
+	arrowUpLeft,
+	chevronLeft,
+	chevronRight,
+} from '@wordpress/icons';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useReducedMotion } from '@wordpress/compose';
@@ -72,6 +77,16 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 
 	if ( ! postType ) {
 		return null;
+	}
+
+	const isAdminBarInEditorEnabled =
+		globalThis.document?.body.classList.contains(
+			'is-admin-bar-in-editor-enabled'
+		);
+
+	let backIcon = arrowUpLeft;
+	if ( isAdminBarInEditorEnabled ) {
+		backIcon = isRTL() ? chevronRight : chevronLeft;
 	}
 
 	// Create SiteIcon equivalent structure exactly like edit-site
@@ -151,7 +166,7 @@ function FullscreenModeClose( { showTooltip, icon, href, initialPost } ) {
 				) }
 				variants={ ! disableMotion && toggleHomeIconVariants }
 			>
-				<Icon icon={ arrowUpLeft } />
+				<Icon icon={ backIcon } />
 			</motion.div>
 		</motion.div>
 	);

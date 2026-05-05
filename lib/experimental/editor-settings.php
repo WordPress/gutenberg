@@ -45,6 +45,28 @@ add_action( 'admin_init', 'gutenberg_enable_experiments' );
 add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
 
 /**
+ * Adds a body class to editor screens when the admin bar experiment is enabled.
+ *
+ * @param string $classes Space-separated list of body classes.
+ * @return string Filtered body classes.
+ */
+function gutenberg_add_admin_bar_in_editor_body_class( $classes ) {
+	$screen = get_current_screen();
+	if ( ! $screen || ! gutenberg_is_experiment_enabled( 'gutenberg-admin-bar-in-editor' ) ) {
+		return $classes;
+	}
+
+	return (
+		( 'post' === $screen->base && $screen->is_block_editor() ) ||
+		'site-editor' === $screen->id
+	)
+		? $classes . ' is-admin-bar-in-editor-enabled'
+		: $classes;
+}
+
+add_filter( 'admin_body_class', 'gutenberg_add_admin_bar_in_editor_body_class' );
+
+/**
  * Sets a global JS variable used to trigger the availability of form & input blocks.
  *
  * @deprecated 19.0.0 Use gutenberg_enable_block_experiments().
