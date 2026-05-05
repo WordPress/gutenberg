@@ -211,8 +211,17 @@ const { state, actions } = store(
 						const scrollbarWidth =
 							window.innerWidth -
 							document.documentElement.clientWidth;
+
 						if ( scrollbarWidth > 0 ) {
-							document.body.style.paddingRight = `${ scrollbarWidth }px`;
+							const isRTL =
+								window.getComputedStyle(
+									document.documentElement
+								).direction === 'rtl';
+							if ( isRTL ) {
+								document.body.style.paddingLeft = `${ scrollbarWidth }px`;
+							} else {
+								document.body.style.paddingRight = `${ scrollbarWidth }px`;
+							}
 						}
 					}
 
@@ -238,6 +247,7 @@ const { state, actions } = store(
 							'has-modal-open'
 						);
 						document.body.style.paddingRight = '';
+						document.body.style.paddingLeft = '';
 					}
 				}
 			},
