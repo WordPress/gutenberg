@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -154,6 +154,96 @@ describe( 'Cropper', () => {
 		const canvas = screen.getByRole( 'group', { name: 'Image editor' } );
 		expect( canvas ).toHaveClass( GRID_INTERACTIVE_CLASS );
 		expect( canvas ).toHaveClass( SHOW_GRID_CLASS );
+	} );
+
+	it( 'clears settling state when a new resize starts before the settle timer fires', async () => {
+		jest.useFakeTimers();
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ createController() }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize top-left corner',
+		} );
+		// The settle transition and viewport pan live on the stage, not the
+		// canvas (which stays fixed so the root background is never exposed).
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		// Start and end a resize to trigger the settle animation.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		// The settle transition should now be active on the stage.
+		expect( stage ).toHaveStyle( 'transition: transform 200ms ease-out' );
+
+		// Start a new resize before the 200 ms settle timer fires.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+
+		// Settling must be cleared — no transition on the drag.
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		// Advance past the old settle timer; it was cancelled so the stage
+		// should still have no transition.
+		act( () => jest.advanceTimersByTime( 200 ) );
+		expect( stage ).not.toHaveStyle(
+			'transition: transform 200ms ease-out'
+		);
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+
+		jest.useRealTimers();
+	} );
+
+	it( 'pans the canvas when a keyboard resize extends the crop past the canvas edge', async () => {
+		jest.useFakeTimers();
+
+		// zoom: 2 so the image bounds extend past [0, 1] in normalized space,
+		// allowing the crop to be resized beyond the canvas edge.
+		const controller = createController();
+		controller.state = { ...controller.state, zoom: 2 };
+
+		render(
+			<Cropper
+				src="test.jpg"
+				controller={ controller }
+				showDimming={ false }
+				freeformCrop
+			/>
+		);
+
+		// East handle (4th button clockwise: nw, n, ne, e).
+		const eHandle = await screen.findByRole( 'button', {
+			name: 'Resize right edge',
+		} );
+		const stage = screen.getByTestId( 'cropper-stage' );
+
+		// cropRect starts at {x:0, y:0, width:1, height:1} (right edge = 1.0).
+		// One ArrowRight step (+0.01 normalized) puts the right edge at 1.01.
+		// With canvasSize=600×400 and visualSize=600×400:
+		//   rightOverflow = 1.01 * 600 − 600 = 6 → pan.x = −6
+		fireEvent.keyDown( eHandle, { key: 'ArrowRight' } );
+
+		expect( stage ).toHaveStyle( 'transform: translate(-6px, 0px)' );
+
+		jest.useRealTimers();
 	} );
 
 	it( 'ignores wheel zoom while a crop resize is active', async () => {
