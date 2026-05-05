@@ -1,7 +1,11 @@
 /**
  * Internal dependencies
  */
-import type { DashboardWidget, WidgetType, GridTilePlacement } from '../types';
+import type {
+	DashboardWidget,
+	WidgetType,
+	GridTilePlacement,
+} from '../../types';
 
 const DEFAULT_PLACEMENT: GridTilePlacement = {
 	width: 1,
