@@ -19,7 +19,7 @@ function gutenberg_declare_classic_block_necessary() {
 		'before'
 	);
 }
-add_action( 'admin_init', 'gutenberg_declare_classic_block_necessary' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_declare_classic_block_necessary' );
 
 /**
  * Whether the Classic block should be available in the inserter.
@@ -27,15 +27,7 @@ add_action( 'admin_init', 'gutenberg_declare_classic_block_necessary' );
  * @return bool True if the Classic block should be in the inserter.
  */
 function gutenberg_classic_block_supports_inserter() {
-	$post = null;
-	if (
-		is_admin() &&
-		! empty( $_GET['post'] ) &&
-		! empty( $_GET['action'] ) &&
-		'edit' === $_GET['action']
-	) {
-		$post = get_post( absint( $_GET['post'] ) );
-	}
+	global $post;
 
 	/**
 	 * Filters whether the Classic block should be available in the inserter.
