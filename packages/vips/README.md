@@ -20,6 +20,8 @@ Resizes an image into multiple sizes in a single pass using copyMemory().
 
 Decodes the source image once, materializes it in WASM memory via copyMemory(), then uses thumbnailImage() for each sub-size. This avoids re-decoding the source for every thumbnail.
 
+Cancellation semantics: atomic. If `cancelOperations()` is invoked mid-batch, this function throws `OperationCancelledError` and discards any thumbnails generated so far. Callers never observe a partially filled result array — either every requested size is returned, or the call rejects with no usable output.
+
 _Parameters_
 
 -   _id_ `ItemId`: Item ID.
@@ -88,6 +90,16 @@ _Returns_
 
 -   `Promise< boolean >`: Whether the image has an alpha channel.
 
+### OperationCancelledError
+
+Thrown when an image operation is cancelled mid-flight.
+
+Lets callers distinguish user-cancellation from genuine processing failures so they can suppress error reporting for cancelled work.
+
+_Type_
+
+-   `OperationCancelledError`
+
 ### resizeImage
 
 Resizes an image using vips.
@@ -127,6 +139,8 @@ _Returns_
 Resizes an image into multiple sizes in a single pass using copyMemory().
 
 Decodes the source image once, materializes it in WASM memory via copyMemory(), then uses thumbnailImage() for each sub-size. This avoids re-decoding the source for every thumbnail.
+
+Cancellation semantics: atomic. If `cancelOperations()` is invoked mid-batch, this function throws `OperationCancelledError` and discards any thumbnails generated so far. Callers never observe a partially filled result array — either every requested size is returned, or the call rejects with no usable output.
 
 _Parameters_
 
@@ -195,6 +209,16 @@ _Parameters_
 _Returns_
 
 -   `Promise< boolean >`: Whether the image has an alpha channel.
+
+### VipsOperationCancelledError
+
+Thrown when an image operation is cancelled mid-flight.
+
+Lets callers distinguish user-cancellation from genuine processing failures so they can suppress error reporting for cancelled work.
+
+_Type_
+
+-   `OperationCancelledError`
 
 ### vipsResizeImage
 

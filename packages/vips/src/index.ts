@@ -89,6 +89,19 @@ export async function cancelOperations( id: ItemId ) {
 }
 
 /**
+ * Thrown when an image operation is cancelled mid-flight.
+ *
+ * Lets callers distinguish user-cancellation from genuine processing
+ * failures so they can suppress error reporting for cancelled work.
+ */
+export class OperationCancelledError extends Error {
+	constructor( message = 'Image processing was cancelled' ) {
+		super( message );
+		this.name = 'OperationCancelledError';
+	}
+}
+
+/**
  * Converts an image to a different format using vips.
  *
  * @param id         Item ID.
@@ -433,13 +446,21 @@ interface BatchResizeResult {
  * copyMemory(), then uses thumbnailImage() for each sub-size. This avoids
  * re-decoding the source for every thumbnail.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param inputType  Input mime type.
- * @param outputType Output mime type for all results.
- * @param resizes    Array of resize configurations.
- * @param smartCrop  Whether to use smart cropping (i.e. saliency-aware).
+ * Cancellation semantics: atomic. If `cancelOperations()` is invoked
+ * mid-batch, this function throws `OperationCancelledError` and discards
+ * any thumbnails generated so far. Callers never observe a partially
+ * filled result array — either every requested size is returned, or the
+ * call rejects with no usable output.
+ *
+ * @param  id         Item ID.
+ * @param  buffer     Original file buffer.
+ * @param  inputType  Input mime type.
+ * @param  outputType Output mime type for all results.
+ * @param  resizes    Array of resize configurations.
+ * @param  smartCrop  Whether to use smart cropping (i.e. saliency-aware).
  * @return Array of processed results, one per resize config.
+ * @throws {OperationCancelledError} When the operation is cancelled
+ *                                   before all sizes are produced.
  */
 export async function batchResizeImage(
 	id: ItemId,
@@ -479,9 +500,10 @@ export async function batchResizeImage(
 		const results: BatchResizeResult[] = [];
 
 		for ( const config of resizes ) {
-			// Check cancellation between thumbnails.
+			// Atomic cancellation: discard partial results so the caller
+			// never has to reconcile a half-finished batch.
 			if ( ! inProgressOperations.has( id ) ) {
-				break;
+				throw new OperationCancelledError();
 			}
 
 			const image = applyResizeAndCrop(
@@ -647,4 +669,5 @@ export {
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	cancelOperations as vipsCancelOperations,
+	OperationCancelledError as VipsOperationCancelledError,
 };
