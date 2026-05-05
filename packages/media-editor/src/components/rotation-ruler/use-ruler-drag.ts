@@ -94,66 +94,93 @@ export function useRulerDrag(
 		onPointerDownStart,
 	} = options;
 
-	// Mutable mirror of the latest committed value. Pointermove handlers
-	// fire far faster than React commits, so we cannot read `value` from
-	// closure. Writes happen in an effect (not at render time) to satisfy
-	// `react-hooks/refs`; the effect flushes after commit, so by the time
-	// any pointer handler runs, the ref reflects the latest committed
-	// `value`.
-	const latestRef = useRef( {
+	// Mutable mirror of the latest committed value plus per-drag state.
+	// Pointermove handlers fire far faster than React commits, so we
+	// cannot read `value` from closure. The `value` write happens in an
+	// effect (not at render time) to satisfy `react-hooks/refs`; the
+	// effect flushes after commit, so by the time any pointer handler
+	// runs, the ref reflects the latest committed `value`.
+	const latestRef = useRef< {
+		value: number;
+		startX: number;
+		startValue: number;
+		dragging: boolean;
+		captureElement: HTMLElement | null;
+		capturePointerId: number;
+		windowPointerUp: ( () => void ) | null;
+	} >( {
 		value,
 		startX: 0,
 		startValue: 0,
 		dragging: false,
+		captureElement: null,
+		capturePointerId: 0,
+		windowPointerUp: null,
 	} );
 	useEffect( () => {
 		latestRef.current.value = value;
 	}, [ value ] );
 
-	const endDrag = useCallback(
-		( event: React.PointerEvent< HTMLElement > ) => {
-			if ( ! latestRef.current.dragging ) {
-				return;
-			}
-			latestRef.current.dragging = false;
-			if ( event.currentTarget.hasPointerCapture( event.pointerId ) ) {
-				event.currentTarget.releasePointerCapture( event.pointerId );
-			}
-		},
-		[]
-	);
+	const endDrag = useCallback( () => {
+		const state = latestRef.current;
+		if ( ! state.dragging ) {
+			return;
+		}
+		state.dragging = false;
+		if (
+			state.captureElement &&
+			state.captureElement.hasPointerCapture( state.capturePointerId )
+		) {
+			state.captureElement.releasePointerCapture(
+				state.capturePointerId
+			);
+		}
+		state.captureElement = null;
+		if ( state.windowPointerUp ) {
+			window.removeEventListener( 'pointerup', state.windowPointerUp );
+			window.removeEventListener(
+				'pointercancel',
+				state.windowPointerUp
+			);
+			state.windowPointerUp = null;
+		}
+	}, [] );
+
+	// Cleanup any in-flight drag on unmount so we never leak window
+	// listeners or stale pointer capture.
+	useEffect( () => endDrag, [ endDrag ] );
 
 	const onPointerDown = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
 			if ( disabled || event.button !== 0 ) {
 				return;
 			}
+			const state = latestRef.current;
 			event.currentTarget.setPointerCapture( event.pointerId );
-			latestRef.current.startX = event.clientX;
-			latestRef.current.startValue = latestRef.current.value;
-			latestRef.current.dragging = true;
+			state.captureElement = event.currentTarget;
+			state.capturePointerId = event.pointerId;
+			state.startX = event.clientX;
+			state.startValue = state.value;
+			state.dragging = true;
 			onPointerDownStart?.();
+
+			// Window-level backstop. With `setPointerCapture`, the
+			// element should always receive `pointerup` even when the
+			// cursor is released outside its bounds — but in practice
+			// some browsers / window-blur sequences drop the event. The
+			// window listener guarantees the drag ends and capture
+			// releases.
+			const onWindowUp = () => endDrag();
+			state.windowPointerUp = onWindowUp;
+			window.addEventListener( 'pointerup', onWindowUp );
+			window.addEventListener( 'pointercancel', onWindowUp );
 		},
-		[ disabled, onPointerDownStart ]
+		[ disabled, onPointerDownStart, endDrag ]
 	);
 
 	const onPointerMove = useCallback(
 		( event: React.PointerEvent< HTMLElement > ) => {
 			if ( ! latestRef.current.dragging ) {
-				return;
-			}
-			// End the drag if the pointer leaves the wrapper bounds. We
-			// keep `setPointerCapture` so this handler still receives
-			// events outside the element; the bounds check is what
-			// turns "drag everywhere" into "drag inside the ruler".
-			const rect = event.currentTarget.getBoundingClientRect();
-			if (
-				event.clientX < rect.left ||
-				event.clientX > rect.right ||
-				event.clientY < rect.top ||
-				event.clientY > rect.bottom
-			) {
-				endDrag( event );
 				return;
 			}
 			const deltaPx = event.clientX - latestRef.current.startX;
@@ -169,7 +196,7 @@ export function useRulerDrag(
 				onChange( next );
 			}
 		},
-		[ onChange, min, max, step, pixelsPerStep, endDrag ]
+		[ onChange, min, max, step, pixelsPerStep ]
 	);
 
 	return {

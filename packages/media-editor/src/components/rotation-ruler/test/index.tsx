@@ -75,7 +75,7 @@ describe( 'RotationRuler', () => {
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'fires onChange with value + step on Shift+ArrowRight (no half-step)', async () => {
+	it( 'fires onChange with value + step / 2 on Shift+ArrowRight', async () => {
 		const user = userEvent.setup();
 		const onChange = jest.fn();
 		render(
@@ -87,7 +87,7 @@ describe( 'RotationRuler', () => {
 		);
 		screen.getByRole( 'slider', { name: 'Fine rotation' } ).focus();
 		await user.keyboard( '{Shift>}{ArrowRight}{/Shift}' );
-		expect( onChange ).toHaveBeenCalledWith( 1 );
+		expect( onChange ).toHaveBeenCalledWith( 0.5 );
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
 	} );
 
