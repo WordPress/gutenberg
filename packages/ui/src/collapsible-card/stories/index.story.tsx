@@ -166,6 +166,33 @@ export const Stacked: Story = {
 };
 
 /**
+ * Wraps the trigger in a heading element to contribute to the document outline.
+ */
+export const WrappedInHeading: Story = {
+	args: {
+		children: (
+			<>
+				<CollapsibleCard.Header
+					render={ ( props ) => (
+						<h2 style={ { margin: 0 } }>
+							<div { ...props } />
+						</h2>
+					) }
+				>
+					<Card.Title>Section title</Card.Title>
+				</CollapsibleCard.Header>
+				<CollapsibleCard.Content>
+					<Text>
+						The trigger is rendered inside an h2 element so it
+						appears in the document outline.
+					</Text>
+				</CollapsibleCard.Content>
+			</>
+		),
+	},
+};
+
+/**
  * A collapsible card with a `HeaderDescription` that provides supplementary
  * information (e.g. status, summary) as an `aria-describedby` relationship.
  */

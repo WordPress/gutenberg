@@ -18,6 +18,19 @@ import type { HeaderProps } from './types';
  * Avoid placing interactive elements (buttons, links, inputs) inside the
  * header, since the entire area is clickable and their events will bubble
  * to trigger the collapse toggle.
+ *
+ * To contribute to the document outline, wrap the trigger in a heading
+ * element via the `render` prop:
+ *
+ * ```jsx
+ * <CollapsibleCard.Header
+ *   render={ ( props ) => (
+ *     <h2><div { ...props } /></h2>
+ *   ) }
+ * >
+ *   <Card.Title>Section title</Card.Title>
+ * </CollapsibleCard.Header>
+ * ```
  */
 export const Header = forwardRef< HTMLDivElement, HeaderProps >(
 	function CollapsibleCardHeader(
