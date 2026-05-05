@@ -68,7 +68,7 @@ export const RESPONSIVE_STATES: StateDefinition[] = [
  */
 export function getValidPseudoStates( name: string ): StateDefinition[] {
 	// Check if it's a block (contains a slash, e.g. 'core/button').
-	if ( name.includes( '/' ) ) {
+	if ( VALID_BLOCK_STATES[ name ] ) {
 		return VALID_BLOCK_STATES[ name ] ?? [];
 	}
 
@@ -81,18 +81,12 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
 }
 
 /**
- * Get the valid viewport states for a given block or element.
+ * Get the valid viewport state definitions.
  *
- * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid viewport state definitions, or empty array if none
+ * @return Array of valid viewport state definitions.
  */
-export function getValidViewportStates( name: string ): StateDefinition[] {
-	// Responsive styles currently apply to blocks only.
-	if ( name.includes( '/' ) ) {
-		return RESPONSIVE_STATES;
-	}
-
-	return [];
+export function getValidViewportStates(): StateDefinition[] {
+	return RESPONSIVE_STATES;
 }
 
 /**

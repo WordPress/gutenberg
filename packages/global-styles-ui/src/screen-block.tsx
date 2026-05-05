@@ -114,10 +114,7 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
-	const validViewportStates = useMemo(
-		() => getValidViewportStates( name ),
-		[ name ]
-	);
+	const validViewportStates = useMemo( () => getValidViewportStates(), [] );
 	const validPseudoStates = useMemo(
 		() => getValidPseudoStates( name ),
 		[ name ]
