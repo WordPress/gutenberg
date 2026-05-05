@@ -428,6 +428,56 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 	} );
 
+	it( 'keeps the pending-remove marker after a follow-up dispatch fires the subscribe loop again', async () => {
+		// Regression: a follow-up store update (a sync echo, an unrelated
+		// dispatch, or React batching draining a second tick) used to find
+		// the re-inserted block missing from the snapshot and route it
+		// through the new-block branch — overwriting the pending-remove
+		// marker with pending-insert and the structural op from
+		// `block-remove` to `block-insert-after`.
+		const a = createBlock( TEST_BLOCK_NAME, { content: 'A' } );
+		const b = createBlock( TEST_BLOCK_NAME, { content: 'B' } );
+		const c = createBlock( TEST_BLOCK_NAME, { content: 'C' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ a, b, c ],
+		} );
+
+		await act( async () => {
+			registry.dispatch( blockEditorStore ).removeBlock( b.clientId );
+		} );
+		await flushSubscribers();
+
+		// Sanity: the first fire tagged the re-inserted block as
+		// pending-remove and recorded the matching structural op.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+			'block-remove'
+		);
+
+		// Trigger a second subscribe fire by dispatching an unrelated
+		// store update. This is the same code path a YJS sync echo or a
+		// follow-up editor action exercises in the wild.
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( a.clientId, { content: 'A!' } );
+		} );
+		await flushSubscribers();
+
+		// The re-inserted block must still carry the pending-remove
+		// marker and its structural op must still describe a removal.
+		expect(
+			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
+				?.metadata?.suggestion?.type
+		).toBe( 'pending-remove' );
+		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
+			'block-remove'
+		);
+	} );
+
 	it( 're-inserts only the top-level removed block when a parent and its child are removed together', async () => {
 		// `removeBlock` on a parent removes the whole subtree atomically.
 		// We must re-insert just the parent — its child rides along.
