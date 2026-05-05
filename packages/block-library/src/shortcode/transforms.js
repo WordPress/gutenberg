@@ -45,30 +45,24 @@ const transforms = {
 			priority: 20,
 		},
 	],
-	to: [
-		{
+	// One `to` transform per registered shortcode-from block. A single transform
+	// with a dynamic `blocks` list won't work: `isMatch` runs once per
+	// transform, so all targets would surface (or none) regardless of which
+	// shortcode tag the block actually contains.
+	get to() {
+		return getShortcodeFromTransforms().map( ( fromTransform ) => ( {
 			type: 'block',
-			get blocks() {
-				return [
-					...new Set(
-						getShortcodeFromTransforms().map(
-							( transform ) => transform.blockName
-						)
-					),
-				];
-			},
+			blocks: [ fromTransform.blockName ],
 			isMatch: ( { text } ) => {
-				return getShortcodeFromTransforms().some( ( transform ) =>
-					[]
-						.concat( transform.tag )
-						.some( ( tag ) => isSingleShortcode( text, tag ) )
-				);
+				return []
+					.concat( fromTransform.tag )
+					.some( ( tag ) => isSingleShortcode( text, tag ) );
 			},
 			transform: ( { text } ) => {
 				return rawHandler( { HTML: `<p>${ text.trim() }</p>` } );
 			},
-		},
-	],
+		} ) );
+	},
 };
 
 export default transforms;
