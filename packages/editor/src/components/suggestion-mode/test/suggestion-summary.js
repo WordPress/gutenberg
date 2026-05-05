@@ -249,4 +249,19 @@ describe( 'summarizeOperations', () => {
 			{ label: 'Insert block:', value: 'paragraph' },
 		] );
 	} );
+
+	it( 'summarizes a block-move op as "Move block: <name>"', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'block-move',
+				clientId: 'abc',
+				blockName: 'core/paragraph',
+				fromAnchorClientId: 'sibling-a',
+				toAnchorClientId: 'sibling-b',
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Move block:', value: 'paragraph' },
+		] );
+	} );
 } );

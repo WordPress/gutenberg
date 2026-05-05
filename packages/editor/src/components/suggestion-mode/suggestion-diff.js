@@ -169,6 +169,9 @@ function DiffForOperation( { operation } ) {
 	if ( operation.type === 'block-insert-after' ) {
 		return <BlockInsertDiff operation={ operation } />;
 	}
+	if ( operation.type === 'block-move' ) {
+		return <BlockMoveDiff operation={ operation } />;
+	}
 	if (
 		operation.type === 'attribute-set' &&
 		isTextValue( operation.before ) &&
@@ -292,6 +295,42 @@ function BlockInsertDiff( { operation } ) {
 				<VisuallyHidden>{ __( 'Inserted:' ) }</VisuallyHidden>
 				{ innerText || fallbackLabel }
 			</ins>
+		</WCText>
+	);
+}
+
+/**
+ * Render a `block-move` op as a from→to descriptor. The op carries
+ * the from + to anchors (clientId of the previous sibling at each
+ * position, or null for "first child"); the diff renders them in a
+ * compact "Moved from … to …" sentence so reviewers can verify the
+ * proposed motion without the canvas open. Block content stays where
+ * it was — just its position is suggested.
+ *
+ * @param {{ operation: {
+ *   blockName?: string,
+ *   fromAnchorClientId?: string|null,
+ *   toAnchorClientId?: string|null,
+ * } }} props
+ */
+function BlockMoveDiff( { operation } ) {
+	const blockName = operation.blockName ?? '';
+	const friendly = blockName || __( 'block' );
+	const fromLabel = operation.fromAnchorClientId
+		? __( 'after a previous block' )
+		: __( 'the start' );
+	const toLabel = operation.toAnchorClientId
+		? __( 'after a different block' )
+		: __( 'the start' );
+	return (
+		<WCText size="13px" variant="muted">
+			{
+				/* translators: %1$s: block name; %2$s: from-position; %3$s: to-position. */
+				__( 'Moved %1$s from %2$s to %3$s.' )
+					.replace( '%1$s', friendly )
+					.replace( '%2$s', fromLabel )
+					.replace( '%3$s', toLabel )
+			}
 		</WCText>
 	);
 }
