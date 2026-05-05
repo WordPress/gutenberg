@@ -166,6 +166,9 @@ function DiffForOperation( { operation } ) {
 	if ( operation.type === 'block-remove' ) {
 		return <BlockRemoveDiff operation={ operation } />;
 	}
+	if ( operation.type === 'block-insert-after' ) {
+		return <BlockInsertDiff operation={ operation } />;
+	}
 	if (
 		operation.type === 'attribute-set' &&
 		isTextValue( operation.before ) &&
@@ -258,6 +261,37 @@ function BlockRemoveDiff( { operation } ) {
 					? innerText
 					: blockName || __( 'Block proposed for removal.' ) }
 			</del>
+		</WCText>
+	);
+}
+
+/**
+ * Render a `block-insert-after` op as an underlined inserted-block preview.
+ * The captured snapshot (`op.block`) carries the proposed block as it was
+ * at insertion time; `collectBlockText` walks its content and innerBlocks
+ * to produce a textual preview.
+ *
+ * Falls back to "Insert block: <name>" when the op carries no usable text
+ * (an inserted block with no content yet, e.g. an empty paragraph).
+ *
+ * @param {{ operation: { blockName?: string, block?: Object } }} props
+ */
+function BlockInsertDiff( { operation } ) {
+	const blockName = operation.blockName ?? operation.block?.name ?? '';
+	const innerText = collectBlockText( operation.block );
+	const fallbackLabel = blockName
+		? // translators: %s: block name (e.g. "core/paragraph").
+		  __( 'New block: %s' ).replace( '%s', blockName )
+		: __( 'New block proposed.' );
+	return (
+		<WCText
+			size="13px"
+			className="editor-collab-sidebar-panel__suggestion-text-diff"
+		>
+			<ins>
+				<VisuallyHidden>{ __( 'Inserted:' ) }</VisuallyHidden>
+				{ innerText || fallbackLabel }
+			</ins>
 		</WCText>
 	);
 }

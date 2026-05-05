@@ -57,6 +57,20 @@ $suggestion-color: #007017;
 	}
 }
 
+// Pending-insert: the block was inserted in Suggest mode but isn't yet
+// "real" — the marker indicates it's proposed but not committed. A
+// dashed green outline distinguishes it from the solid bracket used by
+// pending attribute edits, and reduced opacity de-emphasizes the
+// content without hiding it. Apply clears the marker; Reject runs
+// removeBlock to undo the insert.
+.block-editor-block-list__block.is-suggestion-pending-insert {
+	position: relative;
+	opacity: 0.7;
+	outline: 2px dashed $suggestion-color;
+	outline-offset: 2px;
+	border-radius: $radius-small;
+}
+
 .editor-collab-sidebar-panel__suggestion-summary {
 	em {
 		font-style: italic;
