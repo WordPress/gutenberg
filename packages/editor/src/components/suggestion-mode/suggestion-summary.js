@@ -257,6 +257,13 @@ export function summarizeOperations( operations ) {
 			} );
 			continue;
 		}
+		if ( op.type === 'block-move' ) {
+			lines.push( {
+				label: __( 'Move block:' ),
+				value: friendlyBlockName( op.blockName ),
+			} );
+			continue;
+		}
 		if ( op.type !== 'attribute-set' ) {
 			attributeLabels.push( op.attribute );
 			continue;
