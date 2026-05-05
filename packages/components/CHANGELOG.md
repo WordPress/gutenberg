@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   `TabPanel`: Fix tab indicator animation while switching tabs ([#77812](https://github.com/WordPress/gutenberg/pull/77812)).
+-   `CustomSelectControlV2`: Flip legacy popover upward when space below trigger is insufficient ([#77947](https://github.com/WordPress/gutenberg/pull/77947)).
 
 ### Internal
 
