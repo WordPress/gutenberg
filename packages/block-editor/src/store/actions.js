@@ -1776,9 +1776,9 @@ export const insertBeforeBlock =
 		const rootClientId = select.getBlockRootClientId( clientId );
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock( {}, rootClientId, blockIndex );
@@ -1815,9 +1815,9 @@ export const insertAfterBlock =
 		const rootClientId = select.getBlockRootClientId( clientId );
 
 		const blockIndex = select.getBlockIndex( clientId );
-		const directInsertBlock = rootClientId
-			? select.getDirectInsertBlock( rootClientId )
-			: null;
+		const { defaultBlock: directInsertBlock } = rootClientId
+			? select.getBlockListSettings( rootClientId ) ?? {}
+			: {};
 
 		if ( ! directInsertBlock ) {
 			return dispatch.insertDefaultBlock(
