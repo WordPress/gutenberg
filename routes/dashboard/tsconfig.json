@@ -1,0 +1,11 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"compilerOptions": {
+		"jsx": "react-jsx",
+		"noEmit": true,
+		"resolveJsonModule": true,
+		"noImplicitAny": false
+	},
+	"include": [ "**/*.ts", "**/*.tsx" ],
+	"exclude": [ "**/test/**" ]
+}

@@ -2,10 +2,11 @@
 /**
  * Registers the private CPTs that store user-defined content types:
  *   - wp_user_taxonomy     (user-defined taxonomies)
+ *   - wp_user_post_type    (user-defined post types)
  *
- * Each record holds the registration intent for one taxonomy. On `init`,
- * this file also reads each published record and calls
- * `register_taxonomy()` for it.
+ * Each record holds the registration intent for one taxonomy or post type.
+ * On `init`, the corresponding files read each published record and call
+ * `register_taxonomy()` / `register_post_type()` for it.
  *
  * @package gutenberg
  */
@@ -15,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 require_once __DIR__ . '/class-wp-rest-user-taxonomies-controller-gutenberg.php';
+require_once __DIR__ . '/class-wp-rest-user-post-types-controller-gutenberg.php';
 
 /**
  * Post meta key that stores the post types attached to a user-defined
