@@ -1,5 +1,5 @@
 {
-	"name": "wordpress/site-preview",
+	"name": "core/site-preview",
 	"title": "Site Preview",
 	"description": "Shows a scaled preview of the site homepage.",
 	"category": "site"

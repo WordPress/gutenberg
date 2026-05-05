@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 
 export default {
-	name: 'wordpress/quick-draft',
+	name: 'core/quick-draft',
 	title: __( 'Quick Draft' ),
 };
