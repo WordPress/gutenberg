@@ -116,7 +116,20 @@ export default function MediaEditorToolbar( {
 			gap="sm"
 			wrap="wrap"
 		>
-			<div className="media-editor-toolbar__rotate-cluster">
+			<div
+				role="presentation"
+				className="media-editor-toolbar__rotation-slider"
+				{ ...rotationGestureHandlers }
+			>
+				<RotationRuler
+					label={ __( 'Fine rotation' ) }
+					min={ -MAX_ROTATION_OFFSET }
+					max={ MAX_ROTATION_OFFSET }
+					value={ fineOffset }
+					onChange={ handleRotationSlider }
+				/>
+			</div>
+			<div className="media-editor-toolbar__action-cluster">
 				<Button
 					size="compact"
 					icon={ rotateLeft }
@@ -124,19 +137,6 @@ export default function MediaEditorToolbar( {
 					showTooltip
 					onClick={ () => snapRotate90( -1 ) }
 				/>
-				<div
-					role="presentation"
-					className="media-editor-toolbar__rotation-slider"
-					{ ...rotationGestureHandlers }
-				>
-					<RotationRuler
-						label={ __( 'Fine rotation' ) }
-						min={ -MAX_ROTATION_OFFSET }
-						max={ MAX_ROTATION_OFFSET }
-						value={ fineOffset }
-						onChange={ handleRotationSlider }
-					/>
-				</div>
 				<Button
 					size="compact"
 					icon={ rotateRight }
@@ -144,8 +144,6 @@ export default function MediaEditorToolbar( {
 					showTooltip
 					onClick={ () => snapRotate90( 1 ) }
 				/>
-			</div>
-			<div className="media-editor-toolbar__primary-cluster">
 				<Button
 					size="compact"
 					icon={ flipHorizontal }
