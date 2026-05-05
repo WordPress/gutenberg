@@ -211,12 +211,25 @@ export class Metrics {
 	/**
 	 * Starts Chromium tracing with predefined options for performance testing.
 	 *
+	 * The category set mirrors what Chrome DevTools enables when recording in
+	 * the Performance panel: `devtools.timeline` provides the top-level event
+	 * tree, and the `disabled-by-default-v8.cpu_profiler` + companion
+	 * `devtools.timeline.stack` categories enable the V8 sampler that
+	 * populates JavaScript call stacks. Without the latter, the saved trace
+	 * shows only opaque "Function call" blocks with no JS frames inside.
+	 *
 	 * @param options Options to pass to `browser.startTracing()`.
 	 */
 	async startTracing( options = {} ) {
 		return await this.browser.startTracing( this.page, {
 			screenshots: false,
-			categories: [ 'devtools.timeline' ],
+			categories: [
+				'devtools.timeline',
+				'disabled-by-default-devtools.timeline',
+				'disabled-by-default-devtools.timeline.stack',
+				'disabled-by-default-v8.cpu_profiler',
+				'v8.execute',
+			],
 			...options,
 		} );
 	}
