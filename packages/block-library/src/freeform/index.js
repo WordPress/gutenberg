@@ -26,7 +26,7 @@ export const init = () => {
 	// a classic block.
 	const supports = {
 		...metadata.supports,
-		inserter: !! window?.wp?.needsClassicBlock,
+		inserter: !! window?.__needsClassicBlock,
 	};
 	return initBlock( { name, metadata, settings: { ...settings, supports } } );
 };

@@ -15,7 +15,7 @@ function gutenberg_declare_classic_block_necessary() {
 	}
 	wp_add_inline_script(
 		'wp-block-library',
-		'window.wp = window.wp || {}; window.wp.needsClassicBlock = true;',
+		'window.__needsClassicBlock = true;',
 		'before'
 	);
 }
