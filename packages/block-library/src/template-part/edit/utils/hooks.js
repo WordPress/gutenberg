@@ -86,6 +86,12 @@ export function useAlternativeBlockPatterns( area, clientId ) {
 			const { getBlockRootClientId, getPatternsByBlockTypes } =
 				select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
+			// Use rootClientId to determine which patterns can be used in the current context.
+			// If revisiting the idea of template parts being spotlighted when edited, it may
+			// be worth either passing null or the template part's clientId instead.
+			// See the following PRs for context:
+			// - https://github.com/WordPress/gutenberg/pull/73736
+			// - https://github.com/WordPress/gutenberg/pull/73419
 			return getPatternsByBlockTypes( blockNameWithArea, rootClientId );
 		},
 		[ area, clientId ]

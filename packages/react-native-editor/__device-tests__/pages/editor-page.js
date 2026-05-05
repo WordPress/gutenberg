@@ -31,7 +31,7 @@ class EditorPage {
 	accessibilityIdKey;
 	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
-	verseBlockName = 'Verse';
+	verseBlockName = 'Poetry';
 	orderedListButtonName = 'Ordered';
 
 	constructor( driver ) {
@@ -1125,7 +1125,7 @@ const blockNames = {
 	separator: 'Separator',
 	socialIcons: 'Social Icons',
 	spacer: 'Spacer',
-	verse: 'Verse',
+	verse: 'Poetry',
 	shortcode: 'Shortcode',
 	group: 'Group',
 	buttons: 'Buttons',

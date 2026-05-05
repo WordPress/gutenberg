@@ -60,5 +60,6 @@ function UnforwardedProgressBar(
  * ```
  */
 export const ProgressBar = forwardRef( UnforwardedProgressBar );
+ProgressBar.displayName = 'ProgressBar';
 
 export default ProgressBar;

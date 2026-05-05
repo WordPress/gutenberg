@@ -29,6 +29,7 @@ export default function CodeEdit( {
 				__unstableOnSplitAtDoubleLineEnd={ () =>
 					insertBlocksAfter( createBlock( getDefaultBlockName() ) )
 				}
+				style={ { whiteSpace: 'break-spaces' } }
 			/>
 		</pre>
 	);

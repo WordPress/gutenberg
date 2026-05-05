@@ -1,0 +1,32 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.positioner {
+		z-index: var(--wp-ui-tooltip-z-index, initial);
+	}
+
+	.popup {
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		padding:
+			var(--wpds-dimension-padding-xs)
+			var(--wpds-dimension-padding-sm);
+		border-radius: var(--wpds-border-radius-sm);
+		font-family: var(--wpds-typography-font-family-body);
+		font-size: var(--wpds-typography-font-size-sm);
+		line-height: 1.4; /* TODO: use DS token for line height */
+		color: var(--wpds-color-fg-content-neutral);
+		box-shadow: var(--wpds-elevation-sm);
+
+		/*
+		 * Forced-colors mode strips `box-shadow` and replaces the
+		 * `background-color` with `Canvas`, so the tooltip would merge
+		 * into the page. A 1px `CanvasText` border restores the edge.
+		 * The popup inherits `box-sizing: border-box` from the
+		 * positioner (via the shared `.box-sizing` reset utility), so
+		 * the 1px is absorbed and non-FC layout is unchanged.
+		 */
+		@media (forced-colors: active) {
+			border: 1px solid CanvasText;
+		}
+	}
+}

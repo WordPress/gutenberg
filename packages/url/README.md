@@ -28,8 +28,8 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `[Object]`: Query arguments to apply to URL.
+-   _url_ `string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+-   _args_ `Record< string, unknown >`: Query arguments to apply to URL.
 
 _Returns_
 
@@ -58,7 +58,7 @@ const queryString = buildQueryString( {
 
 _Parameters_
 
--   _data_ `Record<string,*>`: Data to encode.
+-   _data_ `Record< string, unknown >`: Data to encode.
 
 _Returns_
 
@@ -99,7 +99,7 @@ const imageUrl = filterURLForDisplay(
 _Parameters_
 
 -   _url_ `string`: Original URL.
--   _maxLength_ `number|null`: URL length.
+-   _maxLength_ `number | null`: URL length.
 
 _Returns_
 
@@ -122,7 +122,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The authority part of the URL.
+-   `string | void`: The authority part of the URL.
 
 ### getFilename
 
@@ -141,7 +141,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The filename part of the URL.
+-   `string | void`: The filename part of the URL.
 
 ### getFragment
 
@@ -164,7 +164,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The fragment part of the URL.
+-   `string | void`: The fragment part of the URL.
 
 ### getPath
 
@@ -183,7 +183,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The path part of the URL.
+-   `string | void`: The path part of the URL.
 
 ### getPathAndQueryString
 
@@ -225,7 +225,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The protocol part of the URL.
+-   `string | void`: The protocol part of the URL.
 
 ### getQueryArg
 
@@ -244,7 +244,7 @@ _Parameters_
 
 _Returns_
 
--   `QueryArgParsed|void`: Query arg value.
+-   `QueryArgParsed | undefined`: Query arg value.
 
 ### getQueryArgs
 
@@ -283,7 +283,7 @@ _Parameters_
 
 _Returns_
 
--   `string|void`: The query string part of the URL.
+-   `string | void`: The query string part of the URL.
 
 ### hasQueryArg
 
@@ -525,7 +525,7 @@ const newUrl = removeQueryArgs(
 _Parameters_
 
 -   _url_ `string`: URL.
--   _args_ `...string`: Query Args.
+-   _args_ `string[]`: Query Args.
 
 _Returns_
 

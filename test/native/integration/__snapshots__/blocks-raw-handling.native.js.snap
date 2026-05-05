@@ -33,7 +33,7 @@ exports[`Blocks raw handling pasteHandler ms-word 1`] = `"This is a title<br>&nb
 
 exports[`Blocks raw handling pasteHandler ms-word-list 1`] = `"<a>This is a headline?</a><br>This is a text:<br>One<br>Two<br>Three<br><a>Lorem Ipsum.</a><br>&nbsp;"`;
 
-exports[`Blocks raw handling pasteHandler ms-word-online 1`] = `"This is a <em>heading</em>&nbsp;<br>This is a <strong>paragraph </strong>with a <a href="https://w.org/" target="_blank" rel="noreferrer noopener">link</a>.&nbsp;<br>A&nbsp;<br>Bulleted&nbsp;<br>Indented&nbsp;<br>List&nbsp;<br>&nbsp;<br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br><br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br>1&nbsp;<br>2&nbsp;<br>3&nbsp;<br>I&nbsp;<br>II&nbsp;<br>III&nbsp;<br>&nbsp;<br>An image:&nbsp;<br><img src="data:image/jpeg;base64,###">&nbsp;"`;
+exports[`Blocks raw handling pasteHandler ms-word-online 1`] = `"This is a <em>heading</em>&nbsp;<br>This is a <strong>paragraph </strong>with a <a href="https://w.org/" target="_blank" rel="noopener">link</a>.&nbsp;<br>A&nbsp;<br>Bulleted&nbsp;<br>Indented&nbsp;<br>List&nbsp;<br>&nbsp;<br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br><br>One&nbsp;<br>Two&nbsp;<br>Three&nbsp;<br>1&nbsp;<br>2&nbsp;<br>3&nbsp;<br>I&nbsp;<br>II&nbsp;<br>III&nbsp;<br>&nbsp;<br>An image:&nbsp;<br><img src="data:image/jpeg;base64,###">&nbsp;"`;
 
 exports[`Blocks raw handling pasteHandler ms-word-styled 1`] = `"<br><strong>Lorem ipsum dolor sit amet, consectetur adipiscing elit&nbsp;</strong><br><br><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque aliquet hendrerit auctor. Nam lobortis, est vel lacinia tincidunt, purus tellus vehicula ex, nec pharetra justo dui sed lorem. Nam congue laoreet massa, quis varius est tincidunt ut."`;
 
@@ -75,9 +75,9 @@ exports[`Blocks raw handling pasteHandler should strip windows data 1`] = `
 `;
 
 /*
-exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
+exports[`Blocks raw handling pasteHandler slack-paragraphs 1`] = `"test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a><br>a new line<br><br>a new paragraph<br>another new line<br><br>another paragraph"`;
 
-exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noreferrer noopener">link</a>."`;
+exports[`Blocks raw handling pasteHandler slack-quote 1`] = `"Test with&nbsp;<a target="_blank" href="http://w.org/" rel="noopener">link</a>."`;
 
 exports[`Blocks raw handling pasteHandler two-images 1`] = `"<img src="http://localhost/wp-content/uploads/2018/01/Dec-08-2017-15-12-24-17-300x137.gif" alt="" width="300" height="137"> <img src="http://localhost/wp-content/uploads/2018/01/Dec-05-2017-17-52-09-9-300x248.gif" alt="" width="300" height="248">"`;
 

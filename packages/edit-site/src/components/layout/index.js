@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { NavigableRegion } from '@wordpress/admin-ui';
 import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
@@ -20,18 +21,14 @@ import {
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
-	EditorSnackbars,
 	UnsavedChangesWarning,
 	ErrorBoundary,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { privateApis as coreCommandsPrivateApis } from '@wordpress/core-commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { PluginArea } from '@wordpress/plugins';
-import { store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
@@ -48,17 +45,15 @@ import { SidebarContent, SidebarNavigationProvider } from '../sidebar';
 import SaveHub from '../save-hub';
 import SavePanel from '../save-panel';
 
-const { useCommands } = unlock( coreCommandsPrivateApis );
-const { useGlobalStyle } = unlock( blockEditorPrivateApis );
-const { NavigableRegion, GlobalStylesProvider } = unlock( editorPrivateApis );
 const { useLocation } = unlock( routerPrivateApis );
+const { useStyle } = unlock( editorPrivateApis );
 
 const ANIMATION_DURATION = 0.3;
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
-	const { canvas = 'view' } = query;
-	useCommands();
+	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
+	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -80,8 +75,8 @@ function Layout() {
 		};
 	} );
 
-	const [ backgroundColor ] = useGlobalStyle( 'color.background' );
-	const [ gradientValue ] = useGlobalStyle( 'color.gradient' );
+	const backgroundColor = useStyle( 'color.background' );
+	const gradientValue = useStyle( 'color.gradient' );
 	const previousCanvaMode = usePrevious( canvas );
 	useEffect( () => {
 		if ( previousCanvaMode === 'edit' ) {
@@ -93,7 +88,6 @@ function Layout() {
 	return (
 		<>
 			<UnsavedChangesWarning />
-			<CommandMenu />
 			{ canvas === 'view' && <SaveKeyboardShortcut /> }
 			<div
 				{ ...navigateRegionsProps }
@@ -144,7 +138,8 @@ function Layout() {
 										<SidebarNavigationProvider>
 											<SidebarContent
 												shouldAnimate={
-													routeKey !== 'styles'
+													routeKey !== 'styles' &&
+													routeKey !== 'identity'
 												}
 												routeKey={ routeKey }
 											>
@@ -161,7 +156,7 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
-					<EditorSnackbars />
+					<SnackbarNotices className="edit-site-layout__snackbar" />
 
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
@@ -280,11 +275,9 @@ export default function LayoutWithGlobalStylesProvider( props ) {
 
 	return (
 		<SlotFillProvider>
-			<GlobalStylesProvider>
-				{ /** This needs to be within the SlotFillProvider */ }
-				<PluginArea onError={ onPluginAreaError } />
-				<Layout { ...props } />
-			</GlobalStylesProvider>
+			{ /** This needs to be within the SlotFillProvider */ }
+			<PluginArea onError={ onPluginAreaError } />
+			<Layout { ...props } />
 		</SlotFillProvider>
 	);
 }

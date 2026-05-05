@@ -78,12 +78,7 @@ export function UnforwardedInputControl(
 	} );
 
 	return (
-		<BaseControl
-			className={ classes }
-			help={ help }
-			id={ id }
-			__nextHasNoMarginBottom
-		>
+		<BaseControl className={ classes } help={ help } id={ id }>
 			<InputBase
 				__next40pxDefaultSize={ __next40pxDefaultSize }
 				__unstableInputWidth={ __unstableInputWidth }
@@ -143,5 +138,6 @@ export function UnforwardedInputControl(
  * ```
  */
 export const InputControl = forwardRef( UnforwardedInputControl );
+InputControl.displayName = 'InputControl';
 
 export default InputControl;

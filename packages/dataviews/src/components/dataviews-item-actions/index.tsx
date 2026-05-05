@@ -9,13 +9,14 @@ import type { MouseEventHandler } from 'react';
 import {
 	Button,
 	Modal,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -30,6 +31,7 @@ export interface ActionTriggerProps< Item > {
 	onClick: MouseEventHandler;
 	isBusy?: boolean;
 	items: Item[];
+	variant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 export interface ActionModalProps< Item > {
@@ -62,25 +64,27 @@ interface PrimaryActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	registry: ReturnType< typeof useRegistry >;
+	buttonVariant?: 'primary' | 'secondary' | 'tertiary' | 'link';
 }
 
 function ButtonTrigger< Item >( {
 	action,
 	onClick,
 	items,
+	variant,
 }: ActionTriggerProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
 	return (
 		<Button
-			label={ label }
-			icon={ action.icon }
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
-			isDestructive={ action.isDestructive }
 			size="compact"
+			variant={ variant }
 			onClick={ onClick }
-		/>
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -105,9 +109,14 @@ export function ActionModal< Item >( {
 }: ActionModalProps< Item > ) {
 	const label =
 		typeof action.label === 'string' ? action.label : action.label( items );
+
+	const modalHeader =
+		typeof action.modalHeader === 'function'
+			? action.modalHeader( items )
+			: action.modalHeader;
 	return (
 		<Modal
-			title={ action.modalHeader || label }
+			title={ modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
 			focusOnMount={ action.modalFocusOnMount ?? true }
@@ -127,22 +136,42 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
+	const { primaryActions, regularActions } = useMemo( () => {
+		return actions.reduce(
+			( acc, action ) => {
+				( action.isPrimary
+					? acc.primaryActions
+					: acc.regularActions
+				).push( action );
+				return acc;
+			},
+			{
+				primaryActions: [] as Action< Item >[],
+				regularActions: [] as Action< Item >[],
+			}
+		);
+	}, [ actions ] );
+
+	const renderActionGroup = ( actionList: Action< Item >[] ) =>
+		actionList.map( ( action ) => (
+			<MenuItemTrigger
+				key={ action.id }
+				action={ action }
+				onClick={ () => {
+					if ( 'RenderModal' in action ) {
+						setActiveModalAction( action );
+						return;
+					}
+					action.callback( [ item ], { registry } );
+				} }
+				items={ [ item ] }
+			/>
+		) );
+
 	return (
 		<Menu.Group>
-			{ actions.map( ( action ) => (
-				<MenuItemTrigger
-					key={ action.id }
-					action={ action }
-					onClick={ () => {
-						if ( 'RenderModal' in action ) {
-							setActiveModalAction( action );
-							return;
-						}
-						action.callback( [ item ], { registry } );
-					} }
-					items={ [ item ] }
-				/>
-			) ) }
+			{ renderActionGroup( primaryActions ) }
+			{ renderActionGroup( regularActions ) }
 		</Menu.Group>
 	);
 }
@@ -160,13 +189,15 @@ export default function ItemActions< Item >( {
 			( action ) => ! action.isEligible || action.isEligible( item )
 		);
 		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary && !! action.icon
+			( action ) => action.isPrimary
 		);
 		return {
 			primaryActions: _primaryActions,
 			eligibleActions: _eligibleActions,
 		};
 	}, [ actions, item ] );
+
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	if ( isCompact ) {
 		return (
@@ -179,24 +210,13 @@ export default function ItemActions< Item >( {
 		);
 	}
 
-	// If all actions are primary, there is no need to render the dropdown.
-	if ( primaryActions.length === eligibleActions.length ) {
-		return (
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-		);
-	}
-
 	return (
-		<HStack
-			spacing={ 1 }
+		<Stack
+			direction="row"
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
-				flexShrink: '0',
+				flexShrink: 0,
 				width: 'auto',
 			} }
 		>
@@ -205,12 +225,17 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			<CompactItemActions
-				item={ item }
-				actions={ eligibleActions }
-				registry={ registry }
-			/>
-		</HStack>
+			{ ( primaryActions.length < eligibleActions.length ||
+				// Since we hide primary actions on mobile, we need to show the menu
+				// there if there are any actions at all.
+				isMobileViewport ) && (
+				<CompactItemActions
+					item={ item }
+					actions={ eligibleActions }
+					registry={ registry }
+				/>
+			) }
+		</Stack>
 	);
 }
 
@@ -258,12 +283,19 @@ function CompactItemActions< Item >( {
 	);
 }
 
-function PrimaryActions< Item >( {
+export function PrimaryActions< Item >( {
 	item,
 	actions,
 	registry,
+	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	if ( isMobileViewport ) {
+		return null;
+	}
+
 	if ( ! Array.isArray( actions ) || actions.length === 0 ) {
 		return null;
 	}
@@ -281,6 +313,7 @@ function PrimaryActions< Item >( {
 						action.callback( [ item ], { registry } );
 					} }
 					items={ [ item ] }
+					variant={ buttonVariant }
 				/>
 			) ) }
 			{ !! activeModalAction && (

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import type { MotionProps } from 'framer-motion';
+import { cubicBezier, type MotionProps } from 'framer-motion';
 import type { Placement, ReferenceType } from '@floating-ui/react-dom';
 
 /**
  * Internal dependencies
  */
+import { DROPDOWN_MOTION } from '../utils';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
@@ -129,11 +130,21 @@ export const placementToMotionAnimationProps = (
 		style: PLACEMENT_TO_ANIMATION_ORIGIN[ placement ],
 		initial: {
 			opacity: 0,
-			scale: 0,
-			[ translateProp ]: `${ 2 * translateDirection }em`,
+			[ translateProp ]: `${
+				DROPDOWN_MOTION.SLIDE_DISTANCE * translateDirection
+			}px`,
 		},
-		animate: { opacity: 1, scale: 1, [ translateProp ]: 0 },
-		transition: { duration: 0.1, ease: [ 0, 0, 0.2, 1 ] },
+		animate: { opacity: 1, [ translateProp ]: 0 },
+		transition: {
+			opacity: {
+				duration: DROPDOWN_MOTION.FADE_DURATION / 1000,
+				ease: DROPDOWN_MOTION.FADE_EASING.function,
+			},
+			[ translateProp ]: {
+				duration: DROPDOWN_MOTION.SLIDE_DURATION / 1000,
+				ease: cubicBezier( ...DROPDOWN_MOTION.SLIDE_EASING.args ),
+			},
+		},
 	};
 };
 

@@ -3,4 +3,6 @@
  */
 import { View } from 'react-native';
 
-export default ( props ) => <View>{ props.children }</View>;
+export default function ToolbarButtonContainer( props ) {
+	return <View>{ props.children }</View>;
+}

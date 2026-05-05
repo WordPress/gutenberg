@@ -7,34 +7,12 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
-	terms,
 	entities,
 	embedPreviews,
 	userPermissions,
 	autosaves,
 	currentUser,
 } from '../reducer';
-
-describe( 'terms()', () => {
-	it( 'returns an empty object by default', () => {
-		const state = terms( undefined, {} );
-
-		expect( state ).toEqual( {} );
-	} );
-
-	it( 'returns with received terms', () => {
-		const originalState = deepFreeze( {} );
-		const state = terms( originalState, {
-			type: 'RECEIVE_TERMS',
-			taxonomy: 'categories',
-			terms: [ { id: 1 } ],
-		} );
-
-		expect( state ).toEqual( {
-			categories: [ { id: 1 } ],
-		} );
-	} );
-} );
 
 describe( 'entities', () => {
 	// See also unit tests at `queried-data/test/reducer.js`, which are more

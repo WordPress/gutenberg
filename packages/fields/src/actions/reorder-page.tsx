@@ -6,24 +6,38 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
-import { DataForm, isItemValid } from '@wordpress/dataviews';
 import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
+	__experimentalInputControl as InputControl,
 } from '@wordpress/components';
-import type { Action, RenderModalProps } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
  */
 import type { CoreDataError, BasePost } from '../types';
-import { orderField } from '../fields';
 
-const fields = [ orderField ];
-const formOrderAction = {
-	fields: [ 'menu_order' ],
-};
+interface RenderModalProps< Item > {
+	items: Item[];
+	closeModal?: () => void;
+	onActionPerformed?: ( items: Item[] ) => void;
+}
+
+interface Action< Item > {
+	id: string;
+	label: string;
+	isEligible?: ( item: Item ) => boolean;
+	modalFocusOnMount?: string;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
+}
+
+function isItemValid( item: BasePost ): boolean {
+	return (
+		typeof item.menu_order === 'number' &&
+		Number.isInteger( item.menu_order )
+	);
+}
 
 function ReorderModal( {
 	items,
@@ -31,22 +45,23 @@ function ReorderModal( {
 	onActionPerformed,
 }: RenderModalProps< BasePost > ) {
 	const [ item, setItem ] = useState( items[ 0 ] );
-	const orderInput = item.menu_order;
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
+	const isValid = isItemValid( item );
+
 	async function onOrder( event: React.FormEvent ) {
 		event.preventDefault();
 
-		if ( ! isItemValid( item, fields, formOrderAction ) ) {
+		if ( ! isValid ) {
 			return;
 		}
 
 		try {
 			await editEntityRecord( 'postType', item.type, item.id, {
-				menu_order: orderInput,
+				menu_order: item.menu_order,
 			} );
 			closeModal?.();
 			// Persist edited entity.
@@ -68,7 +83,7 @@ function ReorderModal( {
 			} );
 		}
 	}
-	const isSaveDisabled = ! isItemValid( item, fields, formOrderAction );
+
 	return (
 		<form onSubmit={ onOrder }>
 			<VStack spacing="5">
@@ -77,16 +92,23 @@ function ReorderModal( {
 						'Determines the order of pages. Pages with the same order value are sorted alphabetically. Negative order values are supported.'
 					) }
 				</div>
-				<DataForm
-					data={ item }
-					fields={ fields }
-					form={ formOrderAction }
-					onChange={ ( changes ) =>
+				<InputControl
+					__next40pxDefaultSize
+					label={ __( 'Order' ) }
+					type="number"
+					value={
+						typeof item.menu_order === 'number' &&
+						Number.isInteger( item.menu_order )
+							? String( item.menu_order )
+							: ''
+					}
+					onChange={ ( value ) => {
+						const parsed = parseInt( value as string, 10 ); // absorbs '' and undefined
 						setItem( {
 							...item,
-							...changes,
-						} )
-					}
+							menu_order: isNaN( parsed ) ? undefined : parsed,
+						} );
+					} }
 				/>
 				<HStack justify="right">
 					<Button
@@ -103,7 +125,7 @@ function ReorderModal( {
 						variant="primary"
 						type="submit"
 						accessibleWhenDisabled
-						disabled={ isSaveDisabled }
+						disabled={ ! isValid }
 					>
 						{ __( 'Save' ) }
 					</Button>

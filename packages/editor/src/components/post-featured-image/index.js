@@ -305,21 +305,25 @@ function PostFeaturedImage( {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getMedia, getPostType, hasFinishedResolution } =
+	const { getEntityRecord, getPostType, hasFinishedResolution } =
 		select( coreStore );
 	const { getCurrentPostId, getEditedPostAttribute } = select( editorStore );
 	const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 	return {
 		media: featuredImageId
-			? getMedia( featuredImageId, { context: 'view' } )
+			? getEntityRecord( 'postType', 'attachment', featuredImageId, {
+					context: 'view',
+			  } )
 			: null,
 		currentPostId: getCurrentPostId(),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		featuredImageId,
 		isRequestingFeaturedImageMedia:
 			!! featuredImageId &&
-			! hasFinishedResolution( 'getMedia', [
+			! hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'attachment',
 				featuredImageId,
 				{ context: 'view' },
 			] ),

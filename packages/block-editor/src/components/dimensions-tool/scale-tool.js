@@ -76,7 +76,7 @@ const DEFAULT_SCALE_OPTIONS = [
  *
  * @param {ScaleToolProps} props
  *
- * @return {import('react').ReactElement} The scale tool.
+ * @return {React.ReactElement} The scale tool.
  */
 export default function ScaleTool( {
 	panelId,
@@ -105,7 +105,6 @@ export default function ScaleTool( {
 			panelId={ panelId }
 		>
 			<ToggleGroupControl
-				__nextHasNoMarginBottom
 				label={ __( 'Scale' ) }
 				isBlock
 				help={ scaleHelp[ displayValue ] }

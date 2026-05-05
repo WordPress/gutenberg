@@ -111,6 +111,10 @@ export default function useInput() {
 					// Ensure template is not locked.
 					if (
 						canInsertBlockType(
+							getDefaultBlockName(),
+							getBlockRootClientId( clientId )
+						) ||
+						canInsertBlockType(
 							blockName,
 							getBlockRootClientId( clientId )
 						)

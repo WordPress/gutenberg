@@ -14,7 +14,7 @@ type Log = { name: string; args: unknown[] };
 type EventLogger = ( name: string, args: unknown[] ) => void;
 
 const Picker = ( props: React.ComponentProps< typeof _Picker > ) => {
-	return <_Picker { ...props } __nextHasNoMarginBottom />;
+	return <_Picker { ...props } />;
 };
 
 const props: FocalPointPickerProps = {

@@ -178,14 +178,23 @@ export default function BoxInputControl( {
 	const presetIndex = hasPresetValue
 		? getPresetIndexFromValue( mergedValue, presetKey, presets )
 		: undefined;
-	const marks = hasPresets
-		? [ { value: 0, label: '', tooltip: __( 'None' ) } ].concat(
-				presets.map( ( preset, index ) => ( {
+	const marks: Array< {
+		value: number;
+		label: string;
+		tooltip: string;
+	} > = hasPresets
+		? [
+				{
+					value: 0,
+					label: '',
+					tooltip: __( 'None' ),
+				},
+				...presets.map( ( preset, index ) => ( {
 					value: index + 1,
 					label: '',
 					tooltip: preset.name ?? preset.slug,
-				} ) )
-		  )
+				} ) ),
+		  ]
 		: [];
 
 	return (
@@ -214,7 +223,6 @@ export default function BoxInputControl( {
 					</Tooltip>
 
 					<FlexedRangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize={ __next40pxDefaultSize }
 						__shouldNotWarnDeprecated36pxSize
 						aria-controls={ inputId }
@@ -274,7 +282,6 @@ export default function BoxInputControl( {
 					marks={ marks }
 					label={ LABELS[ side ] }
 					hideLabelFromVision
-					__nextHasNoMarginBottom
 				/>
 			) }
 

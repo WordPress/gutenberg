@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;
@@ -78,10 +83,7 @@
 		}
 
 		&:focus::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -308,7 +310,7 @@
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell {
 		line-height: 0;
-		width: $button-size;
+		width: $button-size-small + $grid-unit-05;
 		vertical-align: middle;
 
 		> * {
@@ -322,21 +324,6 @@
 			> * {
 				opacity: 1;
 			}
-		}
-
-		&,
-		.components-button.has-icon {
-			width: $button-size-small;
-			min-width: $button-size-small;
-			padding: 0;
-		}
-	}
-
-	.block-editor-list-view-block__menu-cell {
-		padding-right: $grid-unit-05;
-
-		.components-button.has-icon {
-			height: 24px;
 		}
 	}
 
@@ -430,6 +417,7 @@
 		color: $white;
 	}
 
+	.block-editor-list-view-block-select-button__block-visibility,
 	.block-editor-list-view-block-select-button__lock,
 	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
@@ -481,7 +469,7 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view__expander {
 	height: $icon-size;
 	width: $icon-size;
-	cursor: pointer;
+	cursor: var(--wpds-cursor-control);
 }
 
 .block-editor-list-view-leaf[aria-level] .block-editor-list-view__expander {

@@ -34,7 +34,7 @@ import { getFilename } from '@wordpress/url';
  */
 import { unlock } from '../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 
 const ALLOWED_TYPES = [ 'text/vtt' ];
 
@@ -48,16 +48,24 @@ const KIND_OPTIONS = [
 	{ label: __( 'Metadata' ), value: 'metadata' },
 ];
 
+const DEFAULT_TRACK = {
+	src: '',
+	label: '',
+	srcLang: 'en',
+	kind: DEFAULT_KIND,
+	default: false,
+};
+
 function TrackList( { tracks, onEditPress } ) {
 	const content = tracks.map( ( track, index ) => {
 		return (
 			<HStack
-				key={ track.src }
+				key={ track.id ?? track.src }
 				className="block-library-video-tracks-editor__track-list-track"
 			>
 				<span>{ track.label }</span>
 				<HStack justify="flex-end">
-					{ track.default && <Badge>{ __( 'Default' ) }</Badge> }
+					{ track.default && <WCBadge>{ __( 'Default' ) }</WCBadge> }
 					<Button
 						__next40pxDefaultSize
 						variant="tertiary"
@@ -92,13 +100,12 @@ function SingleTrackEditor( {
 	onRemove,
 	allowSettingDefault,
 } ) {
-	const {
-		src = '',
-		label = '',
-		srcLang = '',
-		kind = DEFAULT_KIND,
-		default: isDefaultTrack = false,
-	} = track;
+	const [ trackState, setTrackState ] = useState( {
+		...DEFAULT_TRACK,
+		...track,
+	} );
+
+	const { src, label, srcLang, kind, default: isDefaultTrack } = trackState;
 	const fileName = src.startsWith( 'blob:' ) ? '' : getFilename( src ) || '';
 	return (
 		<VStack
@@ -114,12 +121,11 @@ function SingleTrackEditor( {
 			<Grid columns={ 2 } gap={ 4 }>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newLabel ) =>
-						onChange( {
-							...track,
+						setTrackState( ( prevTrackState ) => ( {
+							...prevTrackState,
 							label: newLabel,
-						} )
+						} ) )
 					}
 					label={ __( 'Label' ) }
 					value={ label }
@@ -127,12 +133,11 @@ function SingleTrackEditor( {
 				/>
 				<TextControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					onChange={ ( newSrcLang ) =>
-						onChange( {
-							...track,
+						setTrackState( ( prevTrackState ) => ( {
+							...prevTrackState,
 							srcLang: newSrcLang,
-						} )
+						} ) )
 					}
 					label={ __( 'Source language' ) }
 					value={ srcLang }
@@ -142,30 +147,28 @@ function SingleTrackEditor( {
 			<VStack spacing="4">
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }
 					label={ __( 'Kind' ) }
-					onChange={ ( newKind ) => {
-						onChange( {
-							...track,
+					onChange={ ( newKind ) =>
+						setTrackState( ( prevTrackState ) => ( {
+							...prevTrackState,
 							kind: newKind,
-						} );
-					} }
+						} ) )
+					}
 				/>
 				<ToggleControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Set as default track' ) }
 					checked={ isDefaultTrack }
 					disabled={ ! allowSettingDefault }
-					onChange={ ( defaultTrack ) => {
-						onChange( {
-							...track,
+					onChange={ ( defaultTrack ) =>
+						setTrackState( ( prevTrackState ) => ( {
+							...prevTrackState,
 							default: defaultTrack,
-						} );
-					} }
+						} ) )
+					}
 				/>
 				<HStack className="block-library-video-tracks-editor__single-track-editor-buttons-container">
 					<Button
@@ -180,26 +183,7 @@ function SingleTrackEditor( {
 						__next40pxDefaultSize
 						variant="primary"
 						onClick={ () => {
-							const changes = {};
-							let hasChanges = false;
-							if ( label === '' ) {
-								changes.label = __( 'English' );
-								hasChanges = true;
-							}
-							if ( srcLang === '' ) {
-								changes.srcLang = 'en';
-								hasChanges = true;
-							}
-							if ( track.kind === undefined ) {
-								changes.kind = DEFAULT_KIND;
-								hasChanges = true;
-							}
-							if ( hasChanges ) {
-								onChange( {
-									...track,
-									...changes,
-								} );
-							}
+							onChange( trackState );
 							onClose();
 						} }
 					>
@@ -217,6 +201,54 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 	}, [] );
 	const [ trackBeingEdited, setTrackBeingEdited ] = useState( null );
 	const dropdownPopoverRef = useRef();
+
+	const handleTrackSelect = ( selectedTracks = [], appendTracks = false ) => {
+		const existingTracksMap = new Map(
+			tracks.map( ( track ) => [ track.id, track ] )
+		);
+		const tracksToAdd = selectedTracks.map( ( { id, title, url } ) => {
+			// Reuse existing tracks to preserve user-configured metadata.
+			if ( existingTracksMap.has( id ) ) {
+				return existingTracksMap.get( id );
+			}
+
+			return {
+				...DEFAULT_TRACK,
+				id,
+				label: title || '',
+				src: url,
+			};
+		} );
+
+		if ( tracksToAdd.length === 0 ) {
+			return;
+		}
+
+		onChange( [ ...( appendTracks ? tracks : [] ), ...tracksToAdd ] );
+	};
+
+	function uploadFiles( event ) {
+		const files = event.target.files;
+		mediaUpload( {
+			allowedTypes: ALLOWED_TYPES,
+			filesList: files,
+			onFileChange: ( selectedTracks ) => {
+				if ( ! Array.isArray( selectedTracks ) ) {
+					return;
+				}
+
+				// Wait until the track has been uploaded.
+				const uploadedTracks = selectedTracks.filter(
+					( track ) => !! track?.id
+				);
+
+				if ( ! uploadedTracks.length ) {
+					return;
+				}
+				handleTrackSelect( uploadedTracks, true );
+			},
+		} );
+	}
 
 	useEffect( () => {
 		dropdownPopoverRef.current?.focus();
@@ -305,64 +337,30 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 								className="block-library-video-tracks-editor__add-tracks-container"
 								label={ __( 'Add tracks' ) }
 							>
-								<MediaUpload
-									onSelect={ ( { url } ) => {
-										const trackIndex = tracks.length;
-										onChange( [ ...tracks, { src: url } ] );
-										setTrackBeingEdited( trackIndex );
-									} }
-									allowedTypes={ ALLOWED_TYPES }
-									render={ ( { open } ) => (
-										<MenuItem
-											icon={ media }
-											onClick={ open }
-										>
-											{ __( 'Open Media Library' ) }
-										</MenuItem>
-									) }
-								/>
 								<MediaUploadCheck>
+									<MediaUpload
+										onSelect={ handleTrackSelect }
+										allowedTypes={ ALLOWED_TYPES }
+										value={ tracks.map( ( { id } ) => id ) }
+										multiple
+										render={ ( { open } ) => (
+											<MenuItem
+												icon={ media }
+												onClick={ open }
+											>
+												{ __( 'Open Media Library' ) }
+											</MenuItem>
+										) }
+									/>
 									<FormFileUpload
-										onChange={ ( event ) => {
-											const files = event.target.files;
-											const trackIndex = tracks.length;
-											mediaUpload( {
-												allowedTypes: ALLOWED_TYPES,
-												filesList: files,
-												onFileChange: ( [
-													{ url },
-												] ) => {
-													const newTracks = [
-														...tracks,
-													];
-													if (
-														! newTracks[
-															trackIndex
-														]
-													) {
-														newTracks[
-															trackIndex
-														] = {};
-													}
-													newTracks[ trackIndex ] = {
-														...tracks[ trackIndex ],
-														src: url,
-													};
-													onChange( newTracks );
-													setTrackBeingEdited(
-														trackIndex
-													);
-												},
-											} );
-										} }
+										onChange={ uploadFiles }
 										accept=".vtt,text/vtt"
+										multiple
 										render={ ( { openFileDialog } ) => {
 											return (
 												<MenuItem
 													icon={ upload }
-													onClick={ () => {
-														openFileDialog();
-													} }
+													onClick={ openFileDialog }
 												>
 													{ _x( 'Upload', 'verb' ) }
 												</MenuItem>

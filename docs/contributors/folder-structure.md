@@ -9,10 +9,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── CONTRIBUTING.md
     │
     ├── .editorconfig
-    ├── .eslintignore
-    ├── .eslintrc
+    ├── eslint.config.cjs
+    ├── eslint.config.strict.cjs
     ├── .jshintignore
-    ├── .eslintignore
     ├── .prettierrc.js
     ├── .stylelintignore
     ├── .stylelintrc.js
@@ -85,7 +84,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   PHP Source code of the Gutenberg plugin.
     │
     ├── lib/compact/wordpress-x.x
-    │   PHP code that was include in WordPress ont the WordPrexx X.X version.
+    │   PHP code that was include in WordPress ont the WordPress X.X version.
     │   It is kept to ensure plugin compatibility with older WordPress versions.
     │
     ├── packages
@@ -114,7 +113,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── packages/{packageName}/src/**/{ComponentName}/style.scss
     │   Style entry point for a given component.
     │
-    ├── packages/{packageName}/src/**/{ComponentName}/stories/*.js
+    ├── packages/{packageName}/src/**/{ComponentName}/stories/*.jsx
     │   Component Stories to load on the Gutenberg storybook.
     │
     ├── phpunit

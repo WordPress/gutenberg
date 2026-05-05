@@ -4,11 +4,42 @@
 import { getProtocol, isValidProtocol, isValidFragment } from '@wordpress/url';
 
 /**
- * Determines whether a given value could be a URL. Note this does not
- * guarantee the value is a URL only that it looks like it might be one. For
- * example, just because a string has `www.` in it doesn't make it a URL,
- * but it does make it highly likely that it will be so in the context of
- * creating a link it makes sense to treat it like one.
+ * Checks if a value is a hash/anchor link (e.g., #section).
+ *
+ * @param {string} val The value to check.
+ * @return {boolean} True if the value is a valid hash link.
+ */
+export function isHashLink( val ) {
+	return val?.startsWith( '#' ) && isValidFragment( val );
+}
+
+/**
+ * Checks if a value is a relative path (e.g., /page, ./page, ../page).
+ *
+ * @param {string} val The value to check.
+ * @return {boolean} True if the value is a relative path.
+ */
+export function isRelativePath( val ) {
+	return (
+		val?.startsWith( '/' ) ||
+		val?.startsWith( './' ) ||
+		val?.startsWith( '../' )
+	);
+}
+
+/**
+ * Determines whether a given value could be a URL or valid href value (like
+ * relative paths or hash links). Note this does not guarantee the value is a
+ * URL only that it looks like something that should be treated as direct entry
+ * rather than a search term. For example, just because a string has `www.` in
+ * it doesn't make it a URL, but it does make it highly likely that it will be
+ * so in the context of creating a link it makes sense to treat it like one.
+ *
+ * Examples of "URL-like" values:
+ * - URLs with protocols: `https://wordpress.org`, `mailto:test@example.com`
+ * - Domain-like strings: `www.wordpress.org`, `wordpress.org`
+ * - Relative paths: `/handbook`, `./page`, `../parent`
+ * - Hash links: `#section`
  *
  * @param {string} val the candidate for being URL-like (or not).
  *
@@ -28,9 +59,13 @@ export default function isURLLike( val ) {
 
 	const isWWW = val?.startsWith( 'www.' );
 
-	const isInternal = val?.startsWith( '#' ) && isValidFragment( val );
-
-	return protocolIsValid || isWWW || isInternal || mayBeTLD;
+	return (
+		protocolIsValid ||
+		isWWW ||
+		isHashLink( val ) ||
+		mayBeTLD ||
+		isRelativePath( val )
+	);
 }
 
 /**

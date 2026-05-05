@@ -77,13 +77,12 @@ function MenuTitleSearch( {
 	const placeholder = sprintf(
 		/* translators: placeholder for menu search box. %s: menu title */
 		__( 'Search %s' ),
-		title?.toLowerCase()
+		title?.toLowerCase() || ''
 	).trim();
 
 	return (
 		<MenuTitleSearchControlWrapper>
 			<SearchControl
-				__nextHasNoMarginBottom
 				className="components-navigation__menu-search-input"
 				id={ inputId }
 				onChange={ ( value ) => onSearch?.( value ) }

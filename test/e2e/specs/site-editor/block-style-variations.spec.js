@@ -11,6 +11,7 @@ test.use( {
 
 test.describe( 'Block Style Variations', () => {
 	let stylesPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [
 			requestUtils.activateTheme(
@@ -20,17 +21,25 @@ test.describe( 'Block Style Variations', () => {
 		stylesPostId = await requestUtils.getCurrentThemeGlobalStylesPostId();
 	} );
 
-	test.afterAll( async ( { requestUtils } ) => {
-		await Promise.all( [
-			requestUtils.activateTheme( 'twentytwentyone' ),
-			requestUtils.deleteAllPages(),
-		] );
-	} );
-
 	test.beforeEach( async ( { requestUtils, admin } ) => {
 		await Promise.all( [
 			requestUtils.deleteAllPages(),
 			admin.visitSiteEditor(),
+		] );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'post-only' );
+		}, [] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.activateTheme( 'twentytwentyone' ),
+			requestUtils.deleteAllPages(),
 		] );
 	} );
 
@@ -102,6 +111,12 @@ test.describe( 'Block Style Variations', () => {
 	} ) => {
 		await draftNewPage( page );
 		await addPageContent( editor, page );
+		// switch to template mode (access to global styles)
+		await page.evaluate( async () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		}, [] );
 		const firstGroup = editor.canvas
 			.locator( '[data-type="core/group"]' )
 			.first();
