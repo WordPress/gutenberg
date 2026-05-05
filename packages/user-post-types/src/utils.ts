@@ -11,7 +11,6 @@ import { useMemo } from '@wordpress/element';
 import type {
 	PostTypeFormData,
 	PostTypeRecord,
-	StoredConfig,
 	StoredLabels,
 	SupportFeature,
 } from './types';
@@ -33,18 +32,6 @@ export const BLANK_RECORD: PostTypeFormData = {
 		show_in_rest: true,
 	},
 };
-
-export function parseConfig( raw?: string ): StoredConfig {
-	if ( ! raw ) {
-		return {};
-	}
-	try {
-		const parsed = JSON.parse( raw );
-		return typeof parsed === 'object' && parsed !== null ? parsed : {};
-	} catch {
-		return {};
-	}
-}
 
 export const STRING_LABEL_KEYS: ( keyof StoredLabels )[] = [
 	'singular_name',
@@ -88,16 +75,16 @@ export const SUPPORT_FEATURES: SupportFeature[] = [
 ];
 
 export function toFormData( row: PostTypeRecord ): PostTypeFormData {
-	const parsed = parseConfig( row.content.raw );
+	const config = row.config ?? {};
 	const labels: StoredLabels = {};
 	for ( const key of STRING_LABEL_KEYS ) {
-		const value = parsed.labels?.[ key ];
+		const value = config.labels?.[ key ];
 		if ( typeof value === 'string' ) {
 			labels[ key ] = value;
 		}
 	}
-	const supports: SupportFeature[] = Array.isArray( parsed.supports )
-		? parsed.supports.filter( ( s ): s is SupportFeature =>
+	const supports: SupportFeature[] = Array.isArray( config.supports )
+		? config.supports.filter( ( s ): s is SupportFeature =>
 				SUPPORT_FEATURES.includes( s as SupportFeature )
 		  )
 		: [ ...DEFAULT_SUPPORTS ];
@@ -108,20 +95,20 @@ export function toFormData( row: PostTypeRecord ): PostTypeFormData {
 		title: { raw: row.title.raw },
 		config: {
 			labels: { singular_name: '', ...labels },
-			taxonomies: Array.isArray( parsed.taxonomies )
-				? parsed.taxonomies
+			taxonomies: Array.isArray( config.taxonomies )
+				? config.taxonomies
 				: [],
 			supports,
-			description: parsed.description ?? '',
-			public: parsed.public ?? true,
-			hierarchical: parsed.hierarchical ?? false,
-			has_archive: parsed.has_archive ?? false,
-			show_in_rest: parsed.show_in_rest ?? true,
+			description: config.description ?? '',
+			public: config.public ?? true,
+			hierarchical: config.hierarchical ?? false,
+			has_archive: config.has_archive ?? false,
+			show_in_rest: config.show_in_rest ?? true,
 		},
 	};
 }
 
-function serializeConfig( data: PostTypeFormData ): StoredConfig {
+export function serializeForSave( data: PostTypeFormData ) {
 	const { config } = data;
 
 	const labels: StoredLabels = {};
@@ -137,24 +124,20 @@ function serializeConfig( data: PostTypeFormData ): StoredConfig {
 
 	const description = config.description.trim();
 	return {
-		labels,
-		taxonomies: config.taxonomies,
-		supports: config.supports,
-		public: config.public,
-		hierarchical: config.hierarchical,
-		has_archive: config.has_archive,
-		show_in_rest: config.show_in_rest,
-		...( description !== '' ? { description } : {} ),
-	};
-}
-
-export function serializeForSave( data: PostTypeFormData ) {
-	return {
 		...( data.id !== undefined ? { id: data.id } : {} ),
 		slug: data.slug,
 		status: data.status,
 		title: data.title.raw,
-		content: JSON.stringify( serializeConfig( data ) ),
+		config: {
+			labels,
+			taxonomies: config.taxonomies,
+			supports: config.supports,
+			public: config.public,
+			hierarchical: config.hierarchical,
+			has_archive: config.has_archive,
+			show_in_rest: config.show_in_rest,
+			...( description !== '' ? { description } : {} ),
+		},
 	};
 }
 
