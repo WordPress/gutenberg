@@ -200,20 +200,18 @@ export default function SiteHealth() {
 
 	return (
 		<Card.Content>
-			<Stack direction="column" gap="md" align="center">
-				<Stack
-					direction="column"
-					align="center"
-					justify="center"
-					className={ `${ styles.indicator } ${
-						styles[ `is-${ tone }` ]
-					}` }
-				>
-					<CircleProgress percentage={ percentage } tone={ tone } />
-				</Stack>
-
+			<Stack
+				align="center"
+				direction="column"
+				gap="lg"
+				style={ {
+					margin: '0 auto',
+					maxWidth: 320,
+					textAlign: 'center',
+				} }
+			>
+				<CircleProgress percentage={ percentage } tone={ tone } />
 				<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-
 				{ issuesTotal > 0 && (
 					<Link href="site-health.php">
 						{ sprintf(

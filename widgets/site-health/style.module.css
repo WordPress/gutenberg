@@ -1,15 +1,15 @@
 
-.indicator.is-success {
+.circle.is-success {
 	--site-health-stroke: var(--wpds-color-stroke-surface-success);
 	--site-health-fg: var(--wpds-color-fg-content-success);
 }
 
-.indicator.is-warning {
+.circle.is-warning {
 	--site-health-stroke: var(--wpds-color-stroke-surface-warning);
 	--site-health-fg: var(--wpds-color-fg-content-warning);
 }
 
-.indicator.is-error {
+.circle.is-error {
 	--site-health-stroke: var(--wpds-color-stroke-surface-error);
 	--site-health-fg: var(--wpds-color-fg-content-error);
 }
