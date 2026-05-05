@@ -8,21 +8,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	WidgetDashboard,
-	type DashboardWidget,
-	type WidgetType,
-} from './widget-dashboard';
-
-/*
- * Widget types will be provided by `@wordpress/widget-types` once that
- * package is scaffolded. For now the route mounts the engine with an empty
- * registry so the page renders and the surface can be exercised visually.
- */
-const widgetTypes: WidgetType[] = [];
+import { WidgetDashboard, type DashboardWidget } from './widget-dashboard';
+import { useWidgetTypes } from './widget-types';
 
 function Dashboard() {
 	const [ layout, setLayout ] = useState< DashboardWidget[] >( [] );
+	const widgetTypes = useWidgetTypes();
 
 	return (
 		<Page title={ __( 'Dashboard' ) } headingLevel={ 1 }>

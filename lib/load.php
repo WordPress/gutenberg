@@ -24,7 +24,7 @@ if ( file_exists( $build_registration ) ) {
 // The constants.php file returns an array but doesn't define constants to avoid conflicts.
 $constants_file = plugin_dir_path( __DIR__ ) . 'build/constants.php';
 if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
-	$build_constants = require_once $constants_file;
+	$build_constants = require $constants_file;
 	define( 'GUTENBERG_VERSION', $build_constants['version'] );
 }
 
@@ -232,4 +232,5 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-content-types' ) ) {
 // Dashboard Widgets (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';
+	require __DIR__ . '/experimental/dashboard-widgets/widget-types.php';
 }

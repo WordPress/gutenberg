@@ -7,8 +7,9 @@
 		"noEmit": true,
 		"emitDeclarationOnly": false,
 		"composite": false,
-		"types": [ "jest", "style-imports" ]
+		"noImplicitAny": false,
+		"types": [ "style-imports" ]
 	},
 	"include": [ "**/*.ts", "**/*.tsx" ],
-	"exclude": [ "build", "node_modules" ]
+	"exclude": [ "**/test/**", "build", "node_modules" ]
 }
