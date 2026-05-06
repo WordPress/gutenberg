@@ -56,17 +56,6 @@ const textContentSchema = {
 	'#text': {},
 };
 
-// Recursion is needed.
-// Possible: strong > em > strong.
-// Impossible: strong > strong.
-const excludedElements = [ '#text', 'br' ];
-Object.keys( textContentSchema )
-	.filter( ( element ) => ! excludedElements.includes( element ) )
-	.forEach( ( tag ) => {
-		const { [ tag ]: removedTag, ...restSchema } = textContentSchema;
-		textContentSchema[ tag ].children = restSchema;
-	} );
-
 /**
  * Embedded content elements.
  *
@@ -130,18 +119,21 @@ const embeddedContentSchema = {
 	},
 };
 
-/**
- * <a> uses the transparent content model. The spec disallows interactive
- * content descendants, which excludes most embedded elements (e.g. <embed>,
- * <object>, <audio controls>, <video controls>). Of the embedded set, <img>
- * is the common non-interactive case worth allowing here.
- *
- * @see https://html.spec.whatwg.org/multipage/text-level-semantics.html#the-a-element
- */
-textContentSchema.a.children = {
-	.../** @type {ContentSchema} */ ( textContentSchema.a.children ),
-	img: embeddedContentSchema.img,
-};
+const excludedElements = [ '#text', 'br' ];
+
+// Wire up children for each text-level wrapper.
+// - Recursion is needed (e.g. strong > em > strong; not strong > strong).
+// - <img> is allowed too: text-level wrappers accept phrasing content, and
+//   <a>'s transparent model permits non-interactive embedded content.
+Object.keys( textContentSchema )
+	.filter( ( element ) => ! excludedElements.includes( element ) )
+	.forEach( ( tag ) => {
+		const { [ tag ]: removedTag, ...restSchema } = textContentSchema;
+		textContentSchema[ tag ].children = {
+			...restSchema,
+			img: embeddedContentSchema.img,
+		};
+	} );
 
 /**
  * Phrasing content elements.
