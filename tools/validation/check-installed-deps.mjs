@@ -42,8 +42,9 @@ const hidden = JSON.parse( fs.readFileSync( HIDDEN_LOCKFILE, 'utf8' ) );
 const lockPkgs = lock.packages || {};
 const hiddenPkgs = hidden.packages || {};
 
-const mismatches = [];
+const reportedMismatches = [];
 const MAX_REPORTED = 5;
+let totalMismatches = 0;
 
 for ( const [ pkgPath, info ] of Object.entries( lockPkgs ) ) {
 	/*
@@ -57,33 +58,42 @@ for ( const [ pkgPath, info ] of Object.entries( lockPkgs ) ) {
 
 	const installed = hiddenPkgs[ pkgPath ];
 
-	/*
-	 * Optional dependencies legitimately go uninstalled on platforms they
-	 * don't apply to (e.g. macOS-only fsevents on Linux). Only flag a missing
-	 * optional package if the hidden lockfile records it with a different
-	 * integrity — that would indicate a real drift, not a platform skip.
-	 */
+	let mismatch;
 	if ( ! installed ) {
-		if ( ! info.optional ) {
-			mismatches.push( `missing: ${ pkgPath }` );
+		/*
+		 * Optional deps may be skipped by npm on the current platform
+		 * (e.g. macOS-only fsevents on Linux). Don't flag them as missing.
+		 * Real drift on an optional dep would still be caught below as
+		 * an integrity mismatch.
+		 */
+		if ( info.optional ) {
+			continue;
 		}
+		mismatch = `missing: ${ pkgPath }`;
+	} else if ( installed.integrity !== info.integrity ) {
+		mismatch = `integrity mismatch: ${ pkgPath }`;
+	}
+
+	if ( ! mismatch ) {
 		continue;
 	}
 
-	if ( installed.integrity !== info.integrity ) {
-		mismatches.push( `version mismatch: ${ pkgPath }` );
-	}
-
-	if ( mismatches.length >= MAX_REPORTED ) {
-		break;
+	totalMismatches++;
+	if ( reportedMismatches.length < MAX_REPORTED ) {
+		reportedMismatches.push( mismatch );
 	}
 }
 
-if ( mismatches.length > 0 ) {
-	const count = mismatches.length;
+if ( totalMismatches > 0 ) {
+	const detailLines = reportedMismatches.map( ( m ) => `\t${ m }` );
+	if ( totalMismatches > reportedMismatches.length ) {
+		detailLines.push(
+			`\t... and ${ totalMismatches - reportedMismatches.length } more.`
+		);
+	}
 	fail(
-		`Mismatches found: ${ count }`,
-		mismatches.map( ( m ) => `\t${ m }` ).join( os.EOL )
+		`Mismatches found: ${ totalMismatches }`,
+		detailLines.join( os.EOL )
 	);
 }
 
