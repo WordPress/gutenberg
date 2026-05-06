@@ -1092,10 +1092,10 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
  * @param node Style node that may contain configured responsive state styles.
  * @return Responsive style nodes in configured breakpoint order.
  */
-function getBlockResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
-	const { styles, selector, featureSelectors, name } = node;
+function getResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
+	const { styles, selector, featureSelectors, name, elementName } = node;
 
-	if ( ! name ) {
+	if ( ! name && ! elementName ) {
 		return [];
 	}
 
@@ -1116,6 +1116,7 @@ function getBlockResponsiveStyleNodes( node: StylesNode ): StylesNode[] {
 							? featureSelectors
 							: undefined,
 					name,
+					elementName,
 				},
 			];
 		}
@@ -1765,6 +1766,7 @@ function renderStylesNode(
 		styleVariationSelectors,
 		skipSelectorWrapper,
 		name,
+		elementName,
 	} = node;
 	let ruleset = '';
 	const effectiveSelector = selectorSuffix
@@ -1940,7 +1942,7 @@ function renderStylesNode(
 						} );
 					} );
 
-					getBlockResponsiveStyleNodes( {
+					getResponsiveStyleNodes( {
 						styles: styleVariations,
 						selector: styleVariationSelector as string,
 						featureSelectors,
@@ -2008,11 +2010,12 @@ function renderStylesNode(
 			);
 		}
 
-		const blockResponsiveNodes = getBlockResponsiveStyleNodes( {
+		const blockResponsiveNodes = getResponsiveStyleNodes( {
 			styles,
 			selector,
 			featureSelectors,
 			name,
+			elementName,
 		} );
 		if ( blockResponsiveNodes.length ) {
 			blockResponsiveNodes.forEach( ( responsiveNode ) => {

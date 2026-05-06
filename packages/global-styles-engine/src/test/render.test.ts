@@ -896,6 +896,44 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles responsive element styles', () => {
+			const tree = {
+				styles: {
+					elements: {
+						link: {
+							color: {
+								text: 'blue',
+							},
+							mobile: {
+								color: {
+									text: 'red',
+								},
+								':hover': {
+									color: {
+										text: 'orange',
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'a:where(:not(.wp-element-button)){color: blue;}@media (width <= 480px){:root :where(a:where(:not(.wp-element-button))){color: red;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}}'
+			);
+		} );
+
 		it( 'handles responsive style variation styles', () => {
 			const tree = {
 				styles: {
