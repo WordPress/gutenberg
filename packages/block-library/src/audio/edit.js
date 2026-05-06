@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import { isBlobURL } from '@wordpress/blob';
 import {
+	Button,
 	Disabled,
 	SelectControl,
 	Spinner,
@@ -26,9 +27,10 @@ import {
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
-import { audio as icon } from '@wordpress/icons';
+import { Icon, audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
+import { Path, SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -52,8 +54,17 @@ function AudioEdit( {
 } ) {
 	const { id, autoplay, loop, preload, src } = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const [ isRecording, setIsRecording ] = useState( false );
+	const [ isPreparingRecording, setIsPreparingRecording ] = useState( false );
+	const recorderRef = useRef();
+	const streamRef = useRef();
+	const chunksRef = useRef( [] );
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';
+	const isMediaRecorderSupported =
+		typeof window !== 'undefined' &&
+		typeof window.MediaRecorder !== 'undefined' &&
+		!! window.navigator?.mediaDevices?.getUserMedia;
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -89,6 +100,92 @@ function AudioEdit( {
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
+
+	function stopRecorderStream() {
+		streamRef.current?.getTracks()?.forEach( ( track ) => track.stop() );
+		streamRef.current = undefined;
+	}
+
+	function getSupportedMimeType() {
+		const preferredMimeTypes = [
+			'audio/webm;codecs=opus',
+			'audio/ogg;codecs=opus',
+			'audio/webm',
+			'audio/ogg',
+		];
+		return preferredMimeTypes.find( ( type ) =>
+			window.MediaRecorder.isTypeSupported( type )
+		);
+	}
+
+	async function startRecording() {
+		if (
+			! isMediaRecorderSupported ||
+			isPreparingRecording ||
+			isRecording
+		) {
+			return;
+		}
+
+		try {
+			setIsPreparingRecording( true );
+			const stream = await window.navigator.mediaDevices.getUserMedia( {
+				audio: true,
+			} );
+			streamRef.current = stream;
+			chunksRef.current = [];
+			const mimeType = getSupportedMimeType();
+			const recorder = mimeType
+				? new window.MediaRecorder( stream, { mimeType } )
+				: new window.MediaRecorder( stream );
+
+			recorder.ondataavailable = ( event ) => {
+				if ( event.data?.size ) {
+					chunksRef.current.push( event.data );
+				}
+			};
+
+			recorder.onstop = () => {
+				const blob = new window.Blob( chunksRef.current, {
+					type:
+						mimeType ||
+						recorder.mimeType ||
+						'audio/webm;codecs=opus',
+				} );
+				chunksRef.current = [];
+				onSelectAudio( { url: window.URL.createObjectURL( blob ) } );
+				stopRecorderStream();
+				setIsRecording( false );
+				recorderRef.current = undefined;
+			};
+
+			recorder.start();
+			recorderRef.current = recorder;
+			setIsRecording( true );
+		} catch ( error ) {
+			onUploadError(
+				error?.message || __( 'Could not access microphone.' )
+			);
+			stopRecorderStream();
+		} finally {
+			setIsPreparingRecording( false );
+		}
+	}
+
+	function stopRecording() {
+		if ( recorderRef.current?.state === 'recording' ) {
+			recorderRef.current.stop();
+		}
+	}
+
+	useEffect( () => {
+		return () => {
+			if ( recorderRef.current?.state === 'recording' ) {
+				recorderRef.current.stop();
+			}
+			stopRecorderStream();
+		};
+	}, [] );
 
 	function getAutoplayHelp( checked ) {
 		return checked
@@ -135,6 +232,15 @@ function AudioEdit( {
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	const recordingIcon = (
+		<SVG viewBox="0 0 24 24">
+			<Path
+				fill="#d63638"
+				d="M12 4c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8Z"
+			/>
+		</SVG>
+	);
+
 	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
@@ -146,7 +252,32 @@ function AudioEdit( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
 					onError={ onUploadError }
-				/>
+				>
+					{ isMediaRecorderSupported && (
+						<Button
+							__next40pxDefaultSize
+							className="block-editor-media-placeholder__button"
+							variant="secondary"
+							onClick={
+								isRecording ? stopRecording : startRecording
+							}
+							disabled={ isPreparingRecording }
+							accessibleWhenDisabled
+							icon={
+								isRecording ? (
+									<Icon icon={ recordingIcon } />
+								) : null
+							}
+							tooltip={
+								isRecording ? __( 'Preparing to record…' ) : ''
+							}
+						>
+							{ isRecording
+								? __( 'Stop recording' )
+								: _x( 'Record', 'verb' ) }
+						</Button>
+					) }
+				</MediaPlaceholder>
 			</div>
 		);
 	}
