@@ -65,7 +65,7 @@ describe( 'canvasConvertToJpeg', () => {
 			const result = await canvasConvertToJpeg( file );
 
 			expect( result ).toBeInstanceOf( File );
-			expect( result.name ).toBe( 'photo.jpeg' );
+			expect( result.name ).toBe( 'photo.jpg' );
 			expect( result.type ).toBe( 'image/jpeg' );
 			expect( mockBitmap.close ).toHaveBeenCalled();
 			expect( global.createImageBitmap ).toHaveBeenCalledWith( file );
@@ -100,7 +100,7 @@ describe( 'canvasConvertToJpeg', () => {
 			} );
 		} );
 
-		it( 'should strip the extension and use .jpeg', async () => {
+		it( 'should strip the extension and use .jpg', async () => {
 			const jpegBlob = new Blob( [ 'jpeg-data' ], {
 				type: 'image/jpeg',
 			} );
@@ -120,7 +120,7 @@ describe( 'canvasConvertToJpeg', () => {
 				type: 'image/heic',
 			} );
 			const result = await canvasConvertToJpeg( file );
-			expect( result.name ).toBe( 'my-photo.jpeg' );
+			expect( result.name ).toBe( 'my-photo.jpg' );
 		} );
 
 		it( 'should close the bitmap even if canvas context fails', async () => {

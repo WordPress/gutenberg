@@ -38,6 +38,7 @@
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
+		{ "path": "../ui" },
 		{ "path": "../url" },
 		{ "path": "../upload-media" },
 		{ "path": "../views" },

@@ -34,7 +34,7 @@ import { useDefaultTemplateTypes } from '../add-new-template/utils';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import { unlock } from '../../lock-unlock';
 
-const { Badge } = unlock( componentsPrivateApis );
+const { Badge: WCBadge } = unlock( componentsPrivateApis );
 const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 const { useStyle } = unlock( editorPrivateApis );
 
@@ -165,9 +165,9 @@ export const activeField = {
 		const activeIntent = item._isCustom ? 'info' : 'success';
 		const isActive = item._isActive;
 		return (
-			<Badge intent={ isActive ? activeIntent : 'default' }>
+			<WCBadge intent={ isActive ? activeIntent : 'default' }>
 				{ isActive ? activeLabel : _x( 'Inactive', 'template' ) }
-			</Badge>
+			</WCBadge>
 		);
 	},
 };
@@ -183,9 +183,9 @@ export const useThemeField = () => {
 			getValue: ( { item } ) => item.theme,
 			render: function Render( { item } ) {
 				if ( item.theme === activeTheme.stylesheet ) {
-					return <Badge intent="success">{ item.theme }</Badge>;
+					return <WCBadge intent="success">{ item.theme }</WCBadge>;
 				}
-				return <Badge intent="error">{ item.theme }</Badge>;
+				return <WCBadge intent="error">{ item.theme }</WCBadge>;
 			},
 		} ),
 		[ activeTheme ]
