@@ -50,6 +50,8 @@ body.js.block-editor-page {
 }
 
 body.js.block-editor-page.is-fullscreen-mode.is-admin-bar-in-editor-enabled {
+	--wp-admin-bar-in-editor-height: #{$admin-bar-height};
+
 	.editor-header:has(> .editor-header__back-button) {
 		grid-template-columns: $button-size-compact minmax(0, max-content) minmax(min-content, 1fr) $header-height;
 
@@ -74,11 +76,19 @@ body.js.block-editor-page.is-fullscreen-mode.is-admin-bar-in-editor-enabled {
 		.editor-post-publish-panel,
 		.is-entity-save-view-open .interface-interface-skeleton__actions:focus,
 		.is-entity-save-view-open .interface-interface-skeleton__actions:focus-within {
-			top: $admin-bar-height;
+			top: var(--wp-admin-bar-in-editor-height);
 		}
 
 		.block-editor__container {
-			min-height: calc(100vh - #{$admin-bar-height});
+			min-height: calc(100vh - var(--wp-admin-bar-in-editor-height));
+		}
+	}
+
+	&:has(.editor-editor-interface.is-distraction-free) {
+		--wp-admin-bar-in-editor-height: 0;
+
+		#wpadminbar {
+			display: none;
 		}
 	}
 }

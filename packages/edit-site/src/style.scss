@@ -64,6 +64,8 @@ body.js.site-editor-php {
 	background: $gray-900;
 
 	&.is-admin-bar-in-editor-enabled {
+		--wp-admin-bar-in-editor-height: #{$admin-bar-height-big};
+
 		margin-top: 0;
 		height: 100%;
 
@@ -91,47 +93,39 @@ body.js.site-editor-php {
 
 		.edit-site {
 			box-sizing: border-box;
-			padding-top: $admin-bar-height-big;
+			padding-top: var(--wp-admin-bar-in-editor-height);
 			height: 100vh;
 			min-height: 100vh;
 
 			@include break-small {
 				padding-top: 0;
-				top: $admin-bar-height-big;
-				height: calc(100vh - #{$admin-bar-height-big});
-				min-height: calc(100vh - #{$admin-bar-height-big});
+				top: var(--wp-admin-bar-in-editor-height);
+				height: calc(100vh - var(--wp-admin-bar-in-editor-height));
+				min-height: calc(100vh - var(--wp-admin-bar-in-editor-height));
 			}
 		}
 
 		.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
-			top: $admin-bar-height-big;
-			height: calc(100vh - #{$admin-bar-height-big});
+			top: var(--wp-admin-bar-in-editor-height);
+			height: calc(100vh - var(--wp-admin-bar-in-editor-height));
 		}
 
 		.is-entity-save-view-open .interface-interface-skeleton__actions {
 			&:focus,
 			&:focus-within {
-				top: $admin-bar-height-big;
+				top: var(--wp-admin-bar-in-editor-height);
 			}
 		}
 
 		@include break-medium {
-			.edit-site {
-				top: $admin-bar-height;
-				height: calc(100vh - #{$admin-bar-height});
-				min-height: calc(100vh - #{$admin-bar-height});
-			}
+			--wp-admin-bar-in-editor-height: #{$admin-bar-height};
+		}
 
-			.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region {
-				top: $admin-bar-height;
-				height: calc(100vh - #{$admin-bar-height});
-			}
+		&:has(.editor-editor-interface.is-distraction-free) {
+			--wp-admin-bar-in-editor-height: 0;
 
-			.is-entity-save-view-open .interface-interface-skeleton__actions {
-				&:focus,
-				&:focus-within {
-					top: $admin-bar-height;
-				}
+			#wpadminbar {
+				display: none;
 			}
 		}
 	}
