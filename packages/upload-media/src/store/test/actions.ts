@@ -658,11 +658,15 @@ describe( 'actions', () => {
 					parentOnError,
 				} );
 
+				// resizeCropItem and rotateItem already wrap vips
+				// failures in an UploadError that carries the
+				// actionable user-facing message at the source.
 				const vipsError = new ( jest.requireActual(
 					'../../upload-error'
 				).UploadError )( {
 					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'vips: AVIF profile 0 not supported',
+					message:
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.',
 					file: jpegFile,
 				} );
 
@@ -673,7 +677,7 @@ describe( 'actions', () => {
 				expect( mediaDelete ).toHaveBeenCalledWith( 42 );
 				expect( parentOnError ).toHaveBeenCalledWith(
 					expect.objectContaining( {
-						code: 'IMAGE_PROCESSING_ERROR',
+						code: 'IMAGE_TRANSCODING_ERROR',
 						message: expect.stringContaining(
 							'cannot generate responsive image sizes'
 						),

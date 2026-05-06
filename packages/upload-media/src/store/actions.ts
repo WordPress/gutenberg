@@ -246,33 +246,22 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 						} );
 					}
 
-					// Tailor the parent error to the underlying cause.
-					// Vips processing failures get an actionable hint
-					// about converting the source file; everything else
-					// (network/server failures during sideload) surfaces
-					// the original message so the user sees the real cause.
-					const isVipsFailure =
-						error instanceof UploadError &&
-						( error.code === 'IMAGE_TRANSCODING_ERROR' ||
-							error.code === 'IMAGE_ROTATION_ERROR' );
-					const parentMessage = isVipsFailure
-						? __(
-								'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
-						  )
-						: error?.message ||
-						  __( 'The image could not be uploaded.' );
-					const parentCode = isVipsFailure
-						? 'IMAGE_PROCESSING_ERROR'
-						: ( error instanceof UploadError && error.code ) ||
-						  'UPLOAD_ERROR';
-
 					// Cancel the parent too so the block resets rather
-					// than showing a partial upload.
+					// than showing a partial upload. Propagate the
+					// underlying error's code and message — vips
+					// processing failures already carry an actionable
+					// hint at their source; network/server failures
+					// surface their real cause.
 					dispatch.cancelItem(
 						parentId,
 						new UploadError( {
-							code: parentCode,
-							message: parentMessage,
+							code:
+								( error instanceof UploadError &&
+									error.code ) ||
+								'UPLOAD_ERROR',
+							message:
+								error?.message ||
+								__( 'The image could not be uploaded.' ),
 							file: parentItem.file,
 							cause: error instanceof Error ? error : undefined,
 						} )

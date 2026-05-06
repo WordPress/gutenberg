@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
  */
 import { createBlobURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type { createRegistry } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 
 /**
@@ -949,7 +950,9 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_TRANSCODING_ERROR',
-					message: 'File could not be uploaded',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -1011,7 +1014,9 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				id,
 				new UploadError( {
 					code: 'IMAGE_ROTATION_ERROR',
-					message: 'Image could not be rotated',
+					message: __(
+						'The web server cannot generate responsive image sizes for this image. Convert it to JPEG or PNG before uploading.'
+					),
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
