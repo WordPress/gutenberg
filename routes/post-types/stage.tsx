@@ -71,7 +71,9 @@ function PostTypesEmptyState( {
 			{ ! hasSearchOrFilters && (
 				<EmptyState.Actions>
 					<Link
-						href="https://wordpress.org/documentation/article/what-is-post-type/"
+						href={ __(
+							'https://wordpress.org/documentation/article/what-is-post-type/'
+						) }
 						openInNewTab
 					>
 						{ __( 'Learn more about post types' ) }

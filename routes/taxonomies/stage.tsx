@@ -67,7 +67,9 @@ function TaxonomiesEmptyState( {
 			{ ! hasSearchOrFilters && (
 				<EmptyState.Actions>
 					<Link
-						href="https://wordpress.org/documentation/article/taxonomies/"
+						href={ __(
+							'https://wordpress.org/documentation/article/taxonomies/'
+						) }
 						openInNewTab
 					>
 						{ __( 'Learn more about taxonomies' ) }
