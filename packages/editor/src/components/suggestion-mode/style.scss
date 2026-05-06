@@ -60,28 +60,6 @@ $suggestion-color: #007017;
 	}
 }
 
-// Inline diff formats applied to RichText runs while a suggestion is
-// pending. The marked value lives in the suggest-mode overlay and is fed
-// to the block's RichText components, so the marks render in the editor
-// canvas itself — not just the sidebar summary. The persisted post is
-// untouched (the store interceptor reverts the live block while the
-// suggestion is open; Accept strips the formats before the value lands).
-.has-suggestion-deletion {
-	color: var(--wp-block-synced-color, #cc1818);
-	text-decoration: line-through;
-	text-decoration-color: var(--wp-block-synced-color, #cc1818);
-}
-
-.has-suggestion-addition {
-	color: var(--wp-admin-theme-color, $suggestion-color);
-	background: rgba(0, 112, 23, 0.08);
-	text-decoration: underline;
-	text-decoration-color: var(--wp-admin-theme-color, $suggestion-color);
-	box-shadow:
-		-1px 0 0 var(--wp-admin-theme-color, $suggestion-color),
-		1px 0 0 var(--wp-admin-theme-color, $suggestion-color);
-}
-
 // Inline accept/reject buttons live in the note header, right-aligned next
 // to the author info. Force both icons to render at the same box so the
 // checkmark (a thin glyph) visually matches the close glyph next to it,
