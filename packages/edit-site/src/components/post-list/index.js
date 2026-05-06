@@ -333,17 +333,18 @@ export default function PostList( { postType } ) {
 						: false
 				}
 			/>
-			{ quickEdit &&
-				! isLoadingData &&
-				selection.length > 0 &&
-				view.type !== LAYOUT_LIST && (
-					<QuickEditModal
-						postType={ postType }
-						postId={ selection }
-						closeModal={ closeQuickEditModal }
-						quickEditForm={ quickEditForm }
-					/>
-				) }
+			<QuickEditModal
+				open={
+					!! quickEdit &&
+					! isLoadingData &&
+					selection.length > 0 &&
+					view.type !== LAYOUT_LIST
+				}
+				postType={ postType }
+				postId={ selection }
+				closeModal={ closeQuickEditModal }
+				quickEditForm={ quickEditForm }
+			/>
 		</Page>
 	);
 }
