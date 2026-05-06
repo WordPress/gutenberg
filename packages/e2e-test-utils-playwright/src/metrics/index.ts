@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mkdir, writeFile } from 'fs/promises';
+import { access, mkdir, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { test, type Page, type Browser } from '@playwright/test';
 // resolution-mode support in TypeScript 5.3 will resolve this.
@@ -243,9 +243,10 @@ export class Metrics {
 	 * "Load profile…") to inspect the flame graph.
 	 *
 	 * The default file name is derived from the surrounding Playwright test's
-	 * title path (e.g. `Post-Editor-Performance__Loading__Run-the-test.trace.json`).
-	 * When `stopTracing` is called multiple times within a single test, a
-	 * sequence suffix (`-2`, `-3`, …) is appended.
+	 * title path, with any `(N of M)` iteration suffix stripped so that
+	 * repeated runs of the same scenario share a name. Subsequent traces
+	 * with an existing file name are skipped — one trace per scenario is
+	 * enough to investigate a regression. Pass an explicit `name` to override.
 	 *
 	 * @param name Optional file name (without extension), overriding the
 	 *             default test-title-derived name.
@@ -262,9 +263,14 @@ export class Metrics {
 			const baseName = name ?? defaultTraceName();
 			const sequence = ++this.#traceCount;
 			const suffix = sequence > 1 ? `-${ sequence }` : '';
-			const fileName = `${ baseName }${ suffix }.trace.json`;
+			const filePath = join(
+				tracesDir,
+				`${ baseName }${ suffix }.trace.json`
+			);
 			await mkdir( tracesDir, { recursive: true } );
-			await writeFile( join( tracesDir, fileName ), traceBuffer );
+			if ( ! ( await fileExists( filePath ) ) ) {
+				await writeFile( filePath, traceBuffer );
+			}
 		}
 	}
 
@@ -424,7 +430,9 @@ export class Metrics {
 
 /**
  * Build a filesystem-safe default trace name from the current Playwright test's
- * title path. Falls back to "trace" when called outside a test context.
+ * title path. Strips any `(N of M)` iteration suffix so that repeated runs of
+ * the same scenario produce the same name. Falls back to "trace" when called
+ * outside a test context.
  */
 function defaultTraceName(): string {
 	let titlePath: string[] = [];
@@ -436,9 +444,21 @@ function defaultTraceName(): string {
 	}
 
 	const slug = titlePath
+		.map( ( segment ) =>
+			segment.replace( /\s*\(\s*\d+\s*of\s*\d+\s*\)\s*$/i, '' )
+		)
 		.join( '__' )
 		.replace( /[^a-zA-Z0-9-_]+/g, '-' )
 		.replace( /^-+|-+$/g, '' );
 
 	return slug || 'trace';
+}
+
+async function fileExists( filePath: string ): Promise< boolean > {
+	try {
+		await access( filePath );
+		return true;
+	} catch {
+		return false;
+	}
 }

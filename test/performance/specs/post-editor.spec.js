@@ -68,12 +68,18 @@ test.describe( 'Post Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Open the test draft.
 				await admin.editPost( draftId );
 				const canvas = await perfUtils.getCanvas();
 
 				// Wait for the first block.
 				await canvas.locator( '.wp-block' ).first().waitFor();
+
+				// Stop tracing.
+				await metrics.stopTracing();
 
 				// Get the durations.
 				const loadingDurations = await metrics.getLoadingDurations();
