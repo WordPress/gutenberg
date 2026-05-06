@@ -489,7 +489,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		wp_set_current_user( self::$editor_id );
 
 		$rooms = array();
-		for ( $i = 0; $i < WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST + 1; $i++ ) {
+		for ( $i = 0; $i < Gutenberg_WP_HTTP_Polling_Sync_Server::MAX_ROOMS_PER_REQUEST + 1; $i++ ) {
 			$rooms[] = $this->build_room( 'root/site', $i + 1 );
 		}
 
@@ -506,7 +506,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 	public function test_sync_rejects_update_data_exceeding_max_length(): void {
 		wp_set_current_user( self::$editor_id );
 
-		$oversized_data = str_repeat( 'a', WP_HTTP_Polling_Sync_Server::MAX_UPDATE_DATA_SIZE + 1 );
+		$oversized_data = str_repeat( 'a', Gutenberg_WP_HTTP_Polling_Sync_Server::MAX_UPDATE_DATA_SIZE + 1 );
 
 		$request = new WP_REST_Request( 'POST', '/wp-sync/v1/updates' );
 		$request->set_body_params(
@@ -553,7 +553,7 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		);
 
 		// Set an oversized raw body to trigger the route-level validate_callback.
-		$request->set_body( str_repeat( 'x', WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE + 1 ) );
+		$request->set_body( str_repeat( 'x', Gutenberg_WP_HTTP_Polling_Sync_Server::MAX_BODY_SIZE + 1 ) );
 
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_sync_body_too_large', $response, 413 );
