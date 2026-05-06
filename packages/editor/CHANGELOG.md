@@ -12,6 +12,7 @@
 
 -   Migrate the post-actions modal from `@wordpress/components` `Modal` to `@wordpress/ui` `Dialog`, hoisting `Dialog.Root` / `Dialog.Trigger` to each menu item to drop the parent-owned active-action state. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 -   Post-actions modals now respect `action.modalSize` and `action.modalFocusOnMount`, mirroring the `@wordpress/dataviews` implementation. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
+-   Post-actions menu trigger composes `Dialog.Trigger` with the existing menu-item component via render-prop, removing the `setOpen`-on-click duplication. ([#76837](https://github.com/WordPress/gutenberg/pull/76837))
 
 ## 14.45.0 (2026-04-29)
 
