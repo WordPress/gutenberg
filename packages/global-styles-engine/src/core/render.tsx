@@ -1400,6 +1400,7 @@ export const getNodesWithStyles = (
 
 								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
+									name: variationBlockName,
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:

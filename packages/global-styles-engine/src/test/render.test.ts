@@ -665,6 +665,72 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'handles variation inner block states', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							variations: {
+								foo: {
+									blocks: {
+										'core/button': {
+											color: {
+												text: 'red',
+											},
+											':hover': {
+												color: {
+													text: 'blue',
+												},
+											},
+											mobile: {
+												color: {
+													text: 'green',
+												},
+												':hover': {
+													color: {
+														text: 'yellow',
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						foo: '.is-style-foo.wp-block-group',
+					},
+				},
+				'core/button': {
+					selector: '.wp-block-button',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					variationStyles: true,
+				}
+			);
+
+			expect( result ).toEqual(
+				':root :where(.is-style-foo.wp-block-group .wp-block-button){color: red;}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: blue;}@media (width <= 480px){:root :where(.is-style-foo.wp-block-group .wp-block-button){color: green;}:root :where(.is-style-foo.wp-block-group .wp-block-button:hover){color: yellow;}}'
+			);
+		} );
+
 		it( 'should handle block pseudo selectors', () => {
 			const tree = {
 				styles: {
