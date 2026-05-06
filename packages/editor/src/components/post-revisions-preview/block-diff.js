@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { diffArrays } from 'diff/lib/diff/array';
-import { diffWords } from 'diff/lib/diff/word';
+import { diffWordsWithSpace } from 'diff';
 
 /**
  * WordPress dependencies
@@ -27,6 +26,171 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { unlock } from '../../lock-unlock';
 
 const { parseRawBlock } = unlock( blocksPrivateApis );
+
+/**
+ * Compute an LCS-based array diff with the same tie-breaker semantics as
+ * `diff` v4's `diffArrays`. The post-revisions UI relies on a specific LCS
+ * choice when multiple equally-valid matches exist (e.g. preferring the
+ * earlier occurrence in the previous revision over later ones, and
+ * preferring content blocks over freeform/whitespace blocks). `diff` v6
+ * changed the tie-breaker to "deletions before insertions", which produces
+ * a different but equally-valid pairing — visible as confusing inline diffs
+ * in the post-revisions feature. We reproduce v4's selection locally so
+ * block-level matching stays stable across upgrades of the `diff` library.
+ *
+ * Adapted from `diff` v4's `Diff.prototype.diff` in `lib/diff/base.js`,
+ * specialised for arrays with strict-equality comparison.
+ *
+ * @param {Array} oldArr Previous-revision tokens.
+ * @param {Array} newArr Current-revision tokens.
+ * @return {Array<{ count: number, added: boolean, removed: boolean, value: Array }>} Diff parts.
+ */
+function diffArrays( oldArr, newArr ) {
+	const oldLen = oldArr.length;
+	const newLen = newArr.length;
+	const maxEditLen = oldLen + newLen;
+
+	const pushComponent = ( components, added, removed ) => {
+		const last = components[ components.length - 1 ];
+		if ( last && last.added === added && last.removed === removed ) {
+			components[ components.length - 1 ] = {
+				count: last.count + 1,
+				added,
+				removed,
+			};
+		} else {
+			components.push( { count: 1, added, removed } );
+		}
+	};
+
+	const extractCommon = ( basePath, diagonalPath ) => {
+		let np = basePath.newPos;
+		let op = np - diagonalPath;
+		let common = 0;
+		while (
+			np + 1 < newLen &&
+			op + 1 < oldLen &&
+			newArr[ np + 1 ] === oldArr[ op + 1 ]
+		) {
+			np++;
+			op++;
+			common++;
+		}
+		if ( common ) {
+			basePath.components.push( { count: common } );
+		}
+		basePath.newPos = np;
+		return op;
+	};
+
+	const clonePath = ( p ) => ( {
+		newPos: p.newPos,
+		components: p.components.slice(),
+	} );
+
+	const buildValues = ( components ) => {
+		const result = [];
+		let nIdx = 0;
+		let oIdx = 0;
+		for ( let pos = 0; pos < components.length; pos++ ) {
+			const comp = components[ pos ];
+			if ( comp.added ) {
+				result.push( {
+					count: comp.count,
+					added: true,
+					removed: false,
+					value: newArr.slice( nIdx, nIdx + comp.count ),
+				} );
+				nIdx += comp.count;
+			} else if ( comp.removed ) {
+				result.push( {
+					count: comp.count,
+					added: false,
+					removed: true,
+					value: oldArr.slice( oIdx, oIdx + comp.count ),
+				} );
+				oIdx += comp.count;
+				/*
+				 * Match v4's `buildValues` convention of "removes before adds":
+				 * the algorithm naturally emits added/removed in that order,
+				 * but v4 swaps adjacent (added, removed) pairs so the diff
+				 * reads as (removed, added). Without this, the post-revisions
+				 * pairing logic places condensed/added-after-removed blocks
+				 * in the wrong visual order.
+				 */
+				if ( pos > 0 && result[ pos - 1 ].added ) {
+					const tmp = result[ pos - 1 ];
+					result[ pos - 1 ] = result[ pos ];
+					result[ pos ] = tmp;
+				}
+			} else {
+				result.push( {
+					count: comp.count,
+					added: false,
+					removed: false,
+					value: newArr.slice( nIdx, nIdx + comp.count ),
+				} );
+				nIdx += comp.count;
+				oIdx += comp.count;
+			}
+		}
+		return result;
+	};
+
+	const bestPath = [ { newPos: -1, components: [] } ];
+	const seedOldPos = extractCommon( bestPath[ 0 ], 0 );
+
+	if ( bestPath[ 0 ].newPos + 1 >= newLen && seedOldPos + 1 >= oldLen ) {
+		return buildValues( bestPath[ 0 ].components );
+	}
+
+	for ( let editLen = 1; editLen <= maxEditLen; editLen++ ) {
+		for ( let diag = -editLen; diag <= editLen; diag += 2 ) {
+			const addPath = bestPath[ diag - 1 ];
+			const removePath = bestPath[ diag + 1 ];
+			const opPos = ( removePath ? removePath.newPos : 0 ) - diag;
+			if ( addPath ) {
+				bestPath[ diag - 1 ] = undefined;
+			}
+
+			const canAdd = addPath && addPath.newPos + 1 < newLen;
+			const canRemove = removePath && opPos >= 0 && opPos < oldLen;
+
+			if ( ! canAdd && ! canRemove ) {
+				bestPath[ diag ] = undefined;
+				continue;
+			}
+
+			/*
+			 * v4 tie-breaker: pick the path that has progressed further in
+			 * `newPos`. v6+ flipped this to favour `oldPos` ("deletions
+			 * before insertions"), which would change which equally-valid
+			 * LCS is selected for the post-revisions block pairing.
+			 */
+			let basePath;
+			if (
+				! canAdd ||
+				( canRemove && addPath.newPos < removePath.newPos )
+			) {
+				basePath = clonePath( removePath );
+				pushComponent( basePath.components, undefined, true );
+			} else {
+				basePath = addPath;
+				basePath.newPos++;
+				pushComponent( basePath.components, true, undefined );
+			}
+
+			const op = extractCommon( basePath, diag );
+
+			if ( basePath.newPos + 1 >= newLen && op + 1 >= oldLen ) {
+				return buildValues( basePath.components );
+			}
+			bestPath[ diag ] = basePath;
+		}
+	}
+
+	return [];
+}
 
 /**
  * Safely stringifies a value for display and comparison.
@@ -502,8 +666,16 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 	const currentText = currentRichText.toPlainText();
 	const previousText = previousRichText.toPlainText();
 
-	// Diff the plain text (words for cleaner output)
-	const textDiff = diffWords( previousText, currentText );
+	/*
+	 * Diff the plain text (words for cleaner output).
+	 *
+	 * `diffWordsWithSpace` keeps whitespace as its own token, the same
+	 * behaviour `diffWords` had in `diff` v4. v6+ stopped treating
+	 * whitespace as a token, which would otherwise coalesce adjacent word
+	 * changes into one removed/added pair instead of reporting them
+	 * separately — making the inline rich-text diff less precise.
+	 */
+	const textDiff = diffWordsWithSpace( previousText, currentText );
 
 	let result = create( { text: '' } );
 	let currentIdx = 0;
@@ -660,7 +832,10 @@ function applyDiffToBlock( currentBlock, previousBlock, diffStatus ) {
 				previousBlock.attributes[ attrName ]
 			);
 			if ( currStr !== prevStr ) {
-				changedAttributes[ attrName ] = diffWords( prevStr, currStr );
+				changedAttributes[ attrName ] = diffWordsWithSpace(
+					prevStr,
+					currStr
+				);
 			}
 		}
 	}
