@@ -430,20 +430,31 @@ export class Metrics {
 
 /**
  * Build a filesystem-safe default trace name from the current Playwright test's
- * title path. Strips any `(N of M)` iteration suffix so that repeated runs of
- * the same scenario produce the same name. Falls back to "trace" when called
- * outside a test context.
+ * title path. Drops the project- and file-name segments that Playwright
+ * prepends, and strips any `(N of M)` iteration suffix so that repeated runs
+ * of the same scenario produce the same name. Falls back to "trace" when
+ * called outside a test context.
  */
 function defaultTraceName(): string {
-	let titlePath: string[] = [];
-	try {
-		titlePath = test.info().titlePath;
-	} catch {
-		// `test.info()` throws when called outside a test (e.g. in a hook
-		// without a current test). Fall through to the generic name.
+	const info = ( () => {
+		try {
+			return test.info();
+		} catch {
+			// `test.info()` throws when called outside a test.
+			return undefined;
+		}
+	} )();
+
+	if ( ! info ) {
+		return 'trace';
 	}
 
-	const slug = titlePath
+	// `titlePath` is `[projectName, fileName, ...describes, testTitle]`. Keep
+	// only the describe blocks and the test title — the rest is noise once
+	// the artifact directory is already scoped to a single CI run.
+	const segments = info.titlePath.slice( 2 );
+
+	const slug = segments
 		.map( ( segment ) =>
 			segment.replace( /\s*\(\s*\d+\s*of\s*\d+\s*\)\s*$/i, '' )
 		)
